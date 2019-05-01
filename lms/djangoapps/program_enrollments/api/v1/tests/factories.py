@@ -8,7 +8,7 @@ from factory.django import DjangoModelFactory
 from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.program_enrollments import models
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 
 class ProgramEnrollmentFactory(DjangoModelFactory):
@@ -23,14 +23,12 @@ class ProgramEnrollmentFactory(DjangoModelFactory):
     status = 'enrolled'
 
 
-class ProgramCourseEnrollmentFactory(factory.DjangoModelFactory):
-    """
-    Factory for ProgramCourseEnrollment models
-    """
+class ProgramCourseEnrollmentFactory(DjangoModelFactory):
+    """ A factory for the ProgramCourseEnrollment model. """
     class Meta(object):
         model = models.ProgramCourseEnrollment
 
     program_enrollment = factory.SubFactory(ProgramEnrollmentFactory)
     course_enrollment = factory.SubFactory(CourseEnrollmentFactory)
     course_key = CourseKey.from_string("course-v1:edX+DemoX+Demo_Course")
-    status = "active"
+    status = 'active'

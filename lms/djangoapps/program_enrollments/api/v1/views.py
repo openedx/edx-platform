@@ -3,35 +3,37 @@
 ProgramEnrollment Views
 """
 from __future__ import unicode_literals
+
 from functools import wraps
 
 from django.http import Http404
+from edx_rest_framework_extensions import permissions
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.pagination import CursorPagination
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
-from edx_rest_framework_extensions import permissions
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from lms.djangoapps.program_enrollments.api.v1.constants import CourseEnrollmentResponseStatuses, MAX_ENROLLMENT_RECORDS
 from lms.djangoapps.program_enrollments.api.v1.serializers import (
-    ProgramEnrollmentListSerializer,
+    ProgramCourseEnrollmentListSerializer,
     ProgramCourseEnrollmentRequestSerializer,
+    ProgramEnrollmentListSerializer,
 )
-from lms.djangoapps.program_enrollments.models import ProgramEnrollment, ProgramCourseEnrollment
+from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
-from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, PaginatedAPIView
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, PaginatedAPIView, verify_course_exists
+from util.query import use_read_replica_if_available
 
 
 def verify_program_exists(view_func):
     """
     Raises:
-        An API error if the `program_key` kwarg in the wrapped function
+        An API error if the `program_uuid` kwarg in the wrapped function
         does not exist in the catalog programs cache.
     """
     @wraps(view_func)
@@ -39,7 +41,7 @@ def verify_program_exists(view_func):
         """
         Wraps the given view_function.
         """
-        program_uuid = kwargs['program_key']
+        program_uuid = kwargs['program_uuid']
         program = get_programs(uuid=program_uuid)
         if not program:
             raise self.api_error(
@@ -76,7 +78,7 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
     """
     A view for Create/Read/Update methods on Program Enrollment data.
 
-    Path: `/api/program_enrollments/v1/programs/{program_key}/enrollments/`
+    Path: `/api/program_enrollments/v1/programs/{program_uuid}/enrollments/`
     The path can contain an optional `page_size?=N` query parameter.  The default page size is 100.
 
     Returns:
@@ -97,7 +99,7 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
     Example:
     {
         "next": null,
-        "previous": "http://testserver.com/api/program_enrollments/v1/programs/{program_key}/enrollments/?curor=abcd",
+        "previous": "http://testserver.com/api/program_enrollments/v1/programs/{program_uuid}/enrollments/?curor=abcd",
         "results": [
             {
                 "student_key": "user-0", "status": "pending",
@@ -128,8 +130,11 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
     pagination_class = ProgramEnrollmentPagination
 
     @verify_program_exists
-    def get(self, request, program_key=None):
-        enrollments = ProgramEnrollment.objects.filter(program_uuid=program_key)
+    def get(self, request, program_uuid=None):
+        """ Defines the GET list endpoint for ProgramEnrollment objects. """
+        enrollments = use_read_replica_if_available(
+            ProgramEnrollment.objects.filter(program_uuid=program_uuid)
+        )
         paginated_enrollments = self.paginate_queryset(enrollments)
         serializer = ProgramEnrollmentListSerializer(paginated_enrollments, many=True)
         return self.get_paginated_response(serializer.data)
@@ -188,27 +193,79 @@ class ProgramCourseRunSpecificViewMixin(ProgramSpecificViewMixin):
         return CourseKey.from_string(self.kwargs['course_id'])
 
 
-class ProgramCourseEnrollmentsView(ProgramCourseRunSpecificViewMixin, APIView):
+# pylint: disable=line-too-long
+class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpecificViewMixin, PaginatedAPIView):
     """
     A view for enrolling students in a course through a program,
     modifying program course enrollments, and listing program course
-    enrollments
+    enrollments.
 
-    Path: /api/v1/programs/{program_uuid}/courses/{course_id}/enrollments
+    Path: ``/api/program_enrollments/v1/programs/{program_uuid}/courses/{course_id}/enrollments/``
 
-    Accepts: [POST]
+    Accepts: [GET, POST]
+
+    For GET requests, the path can contain an optional `page_size?=N` query parameter.
+    The default page size is 100.
 
     ------------------------------------------------------------------------------------
     POST
     ------------------------------------------------------------------------------------
 
-    Returns:
-     * 200: Returns a map of students and their enrollment status.
-     * 207: Not all students enrolled. Returns resulting enrollment status.
-     * 401: User is not authenticated
-     * 403: User lacks read access organization of specified program.
-     * 404: Program does not exist, or course does not exist in program
-     * 422: Invalid request, unable to enroll students.
+    **Returns**
+
+        * 200: Returns a map of students and their enrollment status.
+        * 207: Not all students enrolled. Returns resulting enrollment status.
+        * 401: User is not authenticated
+        * 403: User lacks read access organization of specified program.
+        * 404: Program does not exist, or course does not exist in program
+        * 422: Invalid request, unable to enroll students.
+
+    ------------------------------------------------------------------------------------
+    GET
+    ------------------------------------------------------------------------------------
+
+    **Returns**
+
+        * 200: OK - Contains a paginated set of program course enrollment data.
+        * 401: The requesting user is not authenticated.
+        * 403: The requesting user lacks access for the given program/course.
+        * 404: The requested program or course does not exist.
+
+    **Response**
+
+        In the case of a 200 response code, the response will include a paginated
+        data set.  The `results` section of the response consists of a list of
+        program course enrollment records, where each record contains the following keys:
+          * student_key: The identifier of the student enrolled in the program and course.
+          * status: The student's course enrollment status.
+          * account_exists: A boolean indicating if the student has created an edx-platform user account.
+          * curriculum_uuid: The curriculum UUID of the enrollment record for the (student, program).
+
+    **Example**
+
+        {
+            "next": null,
+            "previous": "http://testserver.com/api/program_enrollments/v1/programs/{program_uuid}/courses/{course_id}/enrollments/?curor=abcd",
+            "results": [
+                {
+                    "student_key": "user-0", "status": "inactive",
+                    "account_exists": False, "curriculum_uuid": "00000000-1111-2222-3333-444444444444"
+                },
+                {
+                    "student_key": "user-1", "status": "inactive",
+                    "account_exists": False, "curriculum_uuid": "00000001-1111-2222-3333-444444444444"
+                },
+                {
+                    "student_key": "user-2", "status": "active",
+                    "account_exists": True, "curriculum_uuid": "00000002-1111-2222-3333-444444444444"
+                },
+                {
+                    "student_key": "user-3", "status": "active",
+                    "account_exists": True, "curriculum_uuid": "00000003-1111-2222-3333-444444444444"
+                },
+            ],
+        }
+
     """
     authentication_classes = (
         JwtAuthentication,
@@ -217,6 +274,22 @@ class ProgramCourseEnrollmentsView(ProgramCourseRunSpecificViewMixin, APIView):
     )
     permission_classes = (permissions.JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS,)
     pagination_class = ProgramEnrollmentPagination
+
+    @verify_course_exists
+    @verify_program_exists
+    def get(self, request, program_uuid=None, course_id=None):
+        """ Defines the GET list endpoint for ProgramCourseEnrollment objects. """
+        course_key = CourseKey.from_string(course_id)
+        enrollments = use_read_replica_if_available(
+            ProgramCourseEnrollment.objects.filter(
+                program_enrollment__program_uuid=program_uuid, course_key=course_key
+            ).select_related(
+                'program_enrollment'
+            )
+        )
+        paginated_enrollments = self.paginate_queryset(enrollments)
+        serializer = ProgramCourseEnrollmentListSerializer(paginated_enrollments, many=True)
+        return self.get_paginated_response(serializer.data)
 
     def post(self, request, program_uuid=None, course_id=None):
         """

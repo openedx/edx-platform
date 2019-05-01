@@ -20,8 +20,6 @@ from lms.djangoapps.grades.api.v1.utils import (
     USER_MODEL,
     CourseEnrollmentPagination,
     GradeViewMixin,
-    get_course_key,
-    verify_course_exists
 )
 from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
@@ -42,7 +40,13 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.util.forms import to_bool
-from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, PaginatedAPIView, view_auth_classes
+from openedx.core.lib.api.view_utils import (
+    DeveloperErrorViewMixin,
+    PaginatedAPIView,
+    get_course_key,
+    verify_course_exists,
+    view_auth_classes,
+)
 from openedx.core.lib.cache_utils import request_cached
 from student.auth import has_course_author_access
 from student.models import CourseEnrollment
