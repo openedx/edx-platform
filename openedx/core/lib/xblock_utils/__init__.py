@@ -110,7 +110,7 @@ def wrap_xblock(
         )
     ]
 
-    if isinstance(block, (XModule, XModuleDescriptor)):
+    if isinstance(block, (XModule, XModuleDescriptor)) or getattr(block, 'uses_xmodule_styles_setup', False):
         if view in PREVIEW_VIEWS:
             # The block is acting as an XModule
             css_classes.append('xmodule_display')
@@ -122,8 +122,10 @@ def wrap_xblock(
             css_classes.append('is-hidden')
 
         css_classes.append('xmodule_' + markupsafe.escape(class_name))
+
+    if isinstance(block, (XModule, XModuleDescriptor)):
         data['type'] = block.js_module_name
-        shim_xmodule_js(block, frag)
+        shim_xmodule_js(frag, block.js_module_name)
 
     if frag.js_init_fn:
         data['init'] = frag.js_init_fn

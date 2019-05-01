@@ -5,7 +5,7 @@ import logging
 from pkg_resources import resource_string
 from xblock.fields import Scope, String
 
-from xmodule.mako_module import MakoModuleDescriptor
+from xmodule.mako_module import MakoModuleDescriptor, MakoTemplateBlockBase
 
 log = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ class EditingFields(object):
     data = String(scope=Scope.content, default='')
 
 
-class EditingDescriptor(EditingFields, MakoModuleDescriptor):
+class EditingMixin(EditingFields, MakoTemplateBlockBase):
     """
     Module that provides a raw editing view of its data and children.  It does not
     perform any validation on its definition---just passes it along to the browser.
@@ -31,7 +31,7 @@ class EditingDescriptor(EditingFields, MakoModuleDescriptor):
         """
         `data` should not be editable in the Studio settings editor.
         """
-        non_editable_fields = super(EditingDescriptor, self).non_editable_metadata_fields
+        non_editable_fields = super(EditingMixin, self).non_editable_metadata_fields
         non_editable_fields.append(self.fields['data'])
         return non_editable_fields
 
@@ -39,10 +39,14 @@ class EditingDescriptor(EditingFields, MakoModuleDescriptor):
     # here as with our parent class, let's call into it to get the basic fields
     # set and then add our additional fields. Trying to keep it DRY.
     def get_context(self):
-        _context = MakoModuleDescriptor.get_context(self)
+        _context = MakoTemplateBlockBase.get_context(self)
         # Add our specific template information (the raw data body)
         _context.update({'data': self.data})
         return _context
+
+
+class EditingDescriptor(EditingMixin, MakoModuleDescriptor):
+    pass
 
 
 class TabsEditingDescriptor(EditingFields, MakoModuleDescriptor):

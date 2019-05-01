@@ -1983,7 +1983,7 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
             get_mock_request(self.user),
             self.problem.scope_ids.usage_id,
             field_data_cache,
-        )._xmodule
+        )
 
         # Submit the given score/max_score to the problem xmodule
         grade_dict = {'value': value, 'max_value': max_value, 'user_id': self.user.id}

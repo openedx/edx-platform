@@ -1,5 +1,5 @@
 from xmodule import templates
-from xmodule.capa_module import CapaDescriptor
+from xmodule.capa_module import ProblemBlock
 from xmodule.course_module import CourseDescriptor
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore import ModuleStoreEnum
@@ -102,7 +102,7 @@ class TemplateTests(ModuleStoreTestCase):
             test_course.system, test_course.id, 'problem', fields={'data': test_def_content},
             parent_xblock=test_chapter
         )
-        self.assertIsInstance(test_problem, CapaDescriptor)
+        self.assertIsInstance(test_problem, ProblemBlock)
         self.assertEqual(test_problem.data, test_def_content)
         self.assertIn(test_problem, test_chapter.get_children())
         test_problem.display_name = 'test problem'
