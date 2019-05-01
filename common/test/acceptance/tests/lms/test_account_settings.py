@@ -362,26 +362,6 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             reloads_on_save=True,
         )
 
-    def test_education_completed_field(self):
-        """
-        Test behaviour of "Education Completed" field.
-        """
-        self._test_dropdown_field(
-            u'level_of_education',
-            u'Education Completed',
-            u'',
-            [u'Bachelor\'s degree', u''],
-        )
-
-        actual_events = self.wait_for_events(event_filter=self.settings_changed_event_filter, number_of_matches=2)
-        self.assert_events_match(
-            [
-                self.expected_settings_changed_event('level_of_education', None, 'b'),
-                self.expected_settings_changed_event('level_of_education', 'b', None),
-            ],
-            actual_events
-        )
-
     def test_gender_field(self):
         """
         Test behaviour of "Gender" field.
