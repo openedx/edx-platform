@@ -5,6 +5,7 @@ import logging
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
@@ -19,7 +20,10 @@ from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref.api import all_languages, released_languages
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.user_api.accounts.toggles import should_redirect_to_order_history_microfrontend
+from openedx.core.djangoapps.user_api.accounts.toggles import (
+    should_redirect_to_order_history_microfrontend,
+    should_redirect_to_account_microfrontend,
+)
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
@@ -52,6 +56,9 @@ def account_settings(request):
         GET /account/settings
 
     """
+    if should_redirect_to_account_microfrontend():
+        return redirect(settings.ACCOUNT_MICROFRONTEND_URL)
+
     context = account_settings_context(request)
     return render_to_response('student_account/account_settings.html', context)
 

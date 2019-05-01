@@ -3486,14 +3486,9 @@ USERNAME_REPLACEMENT_WORKER = "REPLACE WITH VALID USERNAME"
 # modify lms/envs/private.py to give it a non-null value
 WRITABLE_GRADEBOOK_URL = None
 
-# TODO (DEPR-17)
-# This URL value is needed to redirect the old profile page to a new
-# micro-frontend based implementation. Once the old implementation is
-# completely removed and this redirect is no longer needed, we can remove this.
-PROFILE_MICROFRONTEND_URL = "http://some.profile.spa/u/"
-
-# URL configuration for new microfrontends.
-ORDER_HISTORY_MICROFRONTEND_URL = "http://some.order_history.spa/"
+PROFILE_MICROFRONTEND_URL = "http://profile-mfe/abc/"
+ORDER_HISTORY_MICROFRONTEND_URL = "http://order-history-mfe/"
+ACCOUNT_MICROFRONTEND_URL = "http://account-mfe/"
 
 ############### Settings for django-fernet-fields ##################
 FERNET_KEYS = [
