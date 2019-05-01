@@ -20,7 +20,7 @@ class BookmarksConfig(AppConfig):
         PluginURLs.CONFIG: {
             ProjectType.LMS: {
                 PluginURLs.NAMESPACE: u'',
-                PluginURLs.REGEX: u'api/bookmarks/',
+                PluginURLs.REGEX: u'^api/bookmarks/',
                 PluginURLs.RELATIVE_PATH: u'urls',
             }
         },
