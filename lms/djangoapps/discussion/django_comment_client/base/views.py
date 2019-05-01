@@ -99,7 +99,7 @@ def track_created_event(request, event_name, course, obj, data):
     """
     Send analytics event for a newly created thread, response or comment.
     """
-    data['truncated'] = bool(len(obj.body) > TRACKING_MAX_FORUM_BODY)
+    data['truncated'] = len(obj.body) > TRACKING_MAX_FORUM_BODY
     data['body'] = obj.body[:TRACKING_MAX_FORUM_BODY]
     track_forum_event(request, event_name, course, obj, data)
 

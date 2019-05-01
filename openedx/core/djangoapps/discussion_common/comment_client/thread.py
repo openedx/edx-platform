@@ -1,4 +1,4 @@
-# pylint: disable=missing-docstring,protected-access,unused-argument
+# pylint: disable=missing-docstring,protected-access
 import logging
 
 from eventtracking import tracker
@@ -123,7 +123,7 @@ class Thread(models.Model):
             return u"{prefix}/threads".format(prefix=settings.PREFIX)
 
     @classmethod
-    def url_for_search_threads(cls, params=None):
+    def url_for_search_threads(cls):
         return "{prefix}/search/threads".format(prefix=settings.PREFIX)
 
     @classmethod
@@ -133,7 +133,7 @@ class Thread(models.Model):
         if action in ['get_all', 'post']:
             return cls.url_for_threads(params)
         elif action == 'search':
-            return cls.url_for_search_threads(params)
+            return cls.url_for_search_threads()
         else:
             return super(Thread, cls).url(action, params)
 
