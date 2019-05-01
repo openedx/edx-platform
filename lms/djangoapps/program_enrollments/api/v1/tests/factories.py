@@ -5,7 +5,6 @@ from uuid import uuid4
 
 import factory
 from factory.django import DjangoModelFactory
-from factory.fuzzy import FuzzyText
 from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.program_enrollments import models
@@ -22,6 +21,7 @@ class ProgramEnrollmentFactory(DjangoModelFactory):
     program_uuid = uuid4()
     curriculum_uuid = uuid4()
     status = 'enrolled'
+
 
 class ProgramCourseEnrollmentFactory(factory.DjangoModelFactory):
     """

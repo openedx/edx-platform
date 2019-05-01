@@ -2,10 +2,8 @@
 Unit tests for ProgramEnrollment views.
 """
 from __future__ import unicode_literals
-
-import json
-import mock
 from uuid import uuid4
+import mock
 
 import ddt
 from django.core.cache import cache
@@ -15,11 +13,10 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from six import text_type
 
-from .factories import ProgramEnrollmentFactory, ProgramCourseEnrollmentFactory
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.program_enrollments.api.v1.constants import CourseEnrollmentResponseStatuses as CourseStatuses
 from lms.djangoapps.program_enrollments.models import ProgramEnrollment, ProgramCourseEnrollment
-from student.tests.factories import UserFactory, GroupFactory
+from student.tests.factories import UserFactory
 from openedx.core.djangoapps.catalog.tests.factories import (
     CourseFactory,
     OrganizationFactory as CatalogOrganizationFactory,
@@ -28,6 +25,7 @@ from openedx.core.djangoapps.catalog.tests.factories import (
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL
+from .factories import ProgramEnrollmentFactory, ProgramCourseEnrollmentFactory
 
 
 class ProgramEnrollmentListTest(APITestCase):
@@ -185,6 +183,7 @@ class ProgramEnrollmentListTest(APITestCase):
             assert self.get_url(self.program_uuid) in next_response.data['previous']
             assert '?cursor=' in next_response.data['previous']
 
+
 class ProgramCacheTestCaseMixin(CacheIsolationMixin):
     """
     Mixin for using program cache in tests
@@ -237,20 +236,26 @@ class CourseEnrollmentPostTests(APITestCase, ProgramCacheTestCaseMixin):
             self.course_not_in_program["course_runs"][0]["key"]
         )
         CourseOverviewFactory(id=self.course_not_in_program_key)
-        self.default_url = self.get_url(str(self.program_uuid), str(self.course_key))
+        self.default_url = self.get_url(self.program_uuid, self.course_key)
         self.client.login(username=self.global_staff, password=self.password)
 
-    def learner_enrollment(self, student_key, status="active"):
+    def learner_enrollment(self, student_key, enrollment_status="active"):
         """
         Convenience method to create a learner enrollment record
         """
-        return {"student_key": student_key, "status": status}
+        return {"student_key": student_key, "status": enrollment_status}
 
     def get_url(self, program_uuid, course_id):
         """
         Convenience method to build a path for a program course enrollment request
         """
-        return reverse('programs_api:v1:program_course_enrollments', kwargs={'program_uuid': program_uuid, 'course_id': course_id})
+        return reverse(
+            'programs_api:v1:program_course_enrollments',
+            kwargs={
+                'program_uuid': str(program_uuid),
+                'course_id': str(course_id)
+            }
+        )
 
     def create_program_enrollment(self, external_user_key, user=False):
         """
@@ -373,9 +378,9 @@ class CourseEnrollmentPostTests(APITestCase, ProgramCacheTestCaseMixin):
 
     def test_404_not_found_program(self):
         paths = [
-            self.get_url(str(uuid4()), str(self.course_key)),
-            self.get_url(str(self.program_uuid), str(CourseKey.from_string("course-v1:fake+fake+fake"))),
-            self.get_url(str(self.program_uuid), str(self.course_not_in_program_key)),
+            self.get_url(uuid4(), self.course_key),
+            self.get_url(self.program_uuid, CourseKey.from_string("course-v1:fake+fake+fake")),
+            self.get_url(self.program_uuid, self.course_not_in_program_key),
         ]
         post_data = [self.learner_enrollment("A")]
         for path_404 in paths:

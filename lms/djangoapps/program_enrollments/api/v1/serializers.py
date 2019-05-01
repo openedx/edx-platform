@@ -48,10 +48,15 @@ class InvalidStatusMixin(object):
     """
     def has_invalid_status(self):
         """
-        Returns whether or not this serializer has an invlaid error choice on the "status" field
+        Returns whether or not this serializer has an invalid error choice on the "status" field
         """
-        invalid_status = 'status' in self.errors
-        return invalid_status and self.errors['status'][0].code == 'invalid_choice'
+        try:
+            for status_error in self.errors['status']:
+                if status_error.code == 'invalid_choice':
+                    return True
+        except KeyError:
+            pass
+        return False
 
 
 # pylint: disable=abstract-method

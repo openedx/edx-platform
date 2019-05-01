@@ -5,7 +5,7 @@ ProgramEnrollment Views
 from __future__ import unicode_literals
 from functools import wraps
 
-from django.http import Http404, HttpResponse
+from django.http import Http404
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
@@ -29,6 +29,7 @@ from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiv
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, PaginatedAPIView
 from student.models import CourseEnrollment
 
+
 def verify_program_exists(view_func):
     """
     Raises:
@@ -50,6 +51,7 @@ def verify_program_exists(view_func):
             )
         return view_func(self, request, **kwargs)
     return wrapped_function
+
 
 class ProgramEnrollmentPagination(CursorPagination):
     """
@@ -139,31 +141,22 @@ class ProgramSpecificViewMixin(object):
     """
     A mixin for views that operate on or within a specific program.
     """
-    def __init__(self, *args, **kwargs):
-        super(ProgramSpecificViewMixin, self).__init__(*args, **kwargs)
-        self._program = None
 
     @property
     def program(self):
         """
         The program specified by the `program_uuid` URL parameter.
         """
-        if self._program is None:
-            program = get_programs(uuid=self.kwargs['program_uuid'])
-            if program is None:
-                raise Http404()
-            self._program = program
-        return self._program
+        program = get_programs(uuid=self.kwargs['program_uuid'])
+        if program is None:
+            raise Http404()
+        return program
 
 
 class ProgramCourseRunSpecificViewMixin(ProgramSpecificViewMixin):
     """
     A mixin for views that operate on or within a specific course run in a program
     """
-    def __init__(self, *args, **kwargs):
-        super(ProgramCourseRunSpecificViewMixin, self).__init__(*args, **kwargs)
-        self._course_run = None
-        self._course_key = None
 
     def check_course_existence_and_membership(self):
         """
@@ -172,45 +165,29 @@ class ProgramCourseRunSpecificViewMixin(ProgramSpecificViewMixin):
         - The course run (course_key) does not exist
         - The course run is not part of the program
         """
-        self._parse_run_and_key()
+        self.course_run  # pylint: disable=pointless-statement
 
     @property
     def course_run(self):
         """
         The course run specified by the `course_id` URL parameter.
         """
-        if self._course_run is None:
-            self._parse_run_and_key()
-        return self._course_run
+        try:
+            CourseOverview.get_from_id(self.course_key)
+        except CourseOverview.DoesNotExist:
+            raise Http404()
+        for course in self.program["courses"]:
+            for course_run in course["course_runs"]:
+                if self.course_key == CourseKey.from_string(course_run["key"]):
+                    return course_run
+        raise Http404()
 
     @property
     def course_key(self):
         """
         The course key for the course run specified by the `course_id` URL parameter.
         """
-        if self._course_key is None:
-            self._parse_run_and_key()
-        return self._course_key
-
-    def _parse_run_and_key(self):
-        """
-        Parse the course_run and course_key fields from the course_id url parameter
-
-        Raises Http404 if the program or course_run does not exist or if the course_run
-        is not in the program
-        """
-        try:
-            course_key = CourseKey.from_string(self.kwargs['course_id'])
-            CourseOverview.get_from_id(course_key)
-        except CourseOverview.DoesNotExist:
-            raise Http404()
-        for course in self.program["courses"]:
-            for course_run in course["course_runs"]:
-                if course_key == CourseKey.from_string(course_run["key"]):
-                    self._course_run = course_run
-                    self._course_key = course_key
-                    return
-        raise Http404()
+        return CourseKey.from_string(self.kwargs['course_id'])
 
 
 class ProgramCourseEnrollmentsView(ProgramCourseRunSpecificViewMixin, APIView):
@@ -332,7 +309,7 @@ class ProgramCourseEnrollmentsView(ProgramCourseRunSpecificViewMixin, APIView):
         if program_enrollment.get_program_course_enrollment(self.course_key):
             return CourseEnrollmentResponseStatuses.CONFLICT
 
-        status = enrollment_request['status']
+        enrollment_status = enrollment_request['status']
         course_enrollment = None
         if program_enrollment.user:  # This user has an account, enroll them in the course
             course_enrollment = CourseEnrollment.enroll(
@@ -341,14 +318,13 @@ class ProgramCourseEnrollmentsView(ProgramCourseRunSpecificViewMixin, APIView):
                 mode=CourseMode.MASTERS,
                 check_access=True,
             )
-            if status == CourseEnrollmentResponseStatuses.INACTIVE:
+            if enrollment_status == CourseEnrollmentResponseStatuses.INACTIVE:
                 course_enrollment.deactivate()
 
         ProgramCourseEnrollment.objects.create(
             program_enrollment=program_enrollment,
             course_enrollment=course_enrollment,
             course_key=self.course_key,
-            status=status,
+            status=enrollment_status,
         )
-        return status
-
+        return enrollment_status
