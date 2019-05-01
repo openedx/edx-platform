@@ -1,14 +1,26 @@
-""" Tests for the v1 program enrollment API Views """
+"""
+Unit tests for ProgramEnrollment views.
+"""
+from __future__ import unicode_literals
+
 import json
+import mock
 from uuid import uuid4
 import ddt
-from django.contrib.auth.models import Permission
-from django.core.cache import cache
+
+from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APITestCase
+from six import text_type
+
+from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.program_enrollments.api.v1.constants import CourseEnrollmentResponseStatuses as CourseStatuses
-from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment
-from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory, ProgramCourseEnrollmentFactory
+from lms.djangoapps.program_enrollments.models import ProgramEnrollment, ProgramCourseEnrollment
+from student.tests.factories import UserFactory, GroupFactory
+
+from .factories import ProgramEnrollmentFactory, ProgramCourseEnrollmentFactory
+
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.lib.api.tests.mixins import JwtMixin
 from openedx.core.djangoapps.catalog.tests.factories import (
     CourseFactory,
     OrganizationFactory as CatalogOrganizationFactory,
@@ -17,95 +29,162 @@ from openedx.core.djangoapps.catalog.tests.factories import (
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL
-from rest_framework.test import APITestCase
-from student.tests.factories import UserFactory, GroupFactory
 
 
-class RequestMixin(JwtMixin):
+class ProgramEnrollmentListTest(APITestCase):
     """
-    Mixin with authenticated get/post/put/patch/delete helper functions.
-
-    Expects implementing classes to provide ``self.client`` attribute.
+    Tests for GET calls to the Program Enrollments API.
     """
+    @classmethod
+    def setUpClass(cls):
+        super(ProgramEnrollmentListTest, cls).setUpClass()
+        cls.program_uuid = '00000000-1111-2222-3333-444444444444'
+        cls.curriculum_uuid = 'aaaaaaaa-1111-2222-3333-444444444444'
+        cls.password = 'password'
+        cls.student = UserFactory.create(username='student', password=cls.password)
+        cls.global_staff = GlobalStaffFactory.create(username='global-staff', password=cls.password)
 
-    def get(self, path, user):
-        """
-        Perform a GET on the given path, optionally with a user.
-        """
-        return self._request('get', path, user)
+    @classmethod
+    def tearDownClass(cls):
+        super(ProgramEnrollmentListTest, cls).tearDownClass()
 
-    def post(self, path, data, user):
+    def create_enrollments(self):
         """
-        Perform a POST on the given path, optionally with a user.
+        Helper method for creating program enrollment records.
         """
-        return self._request('post', path, user, data)
-
-    def put(self, path, data, user):
-        """
-        Perform a PUT on the given path, optionally with a user.
-        """
-        return self._request('put', path, user, data)
-
-    def patch(self, path, data, user):
-        """
-        Perform a PATCH on the given path, optionally with a user.
-        """
-        return self._request('patch', path, user, data)
-
-    def delete(self, path, user):
-        """
-        Perform a DELETE on the given, optionally with a user.
-        """
-        return self._request('delete', path, user)
-
-    def _request(self, method, path, user, data=None):
-        """
-        Perform an HTTP request of the given method.
-
-        If user is not None, include a JWT auth header.
-        """
-        kwargs = {'follow': True}
-        if user:
-            kwargs['HTTP_AUTHORIZATION'] = self.generate_jwt_header(user)
-        if data:
-            kwargs['data'] = json.dumps(data)
-            kwargs['content_type'] = 'application/json'
-        return getattr(self.client, method.lower())(path, **kwargs)
-
-
-class MockAPITestMixin(RequestMixin):
-    """ Base mixin for tests for the v1 API. """
-    api_root = '/api/program_enrollments/v1/'
-    path_suffix = None  # Define me in subclasses
-
-    @property
-    def path(self):
-        return self.api_root + self.path_suffix
-
-    def setUp(self):
-        super(MockAPITestMixin, self).setUp()
-        self.user = UserFactory()
-        permission_names = [
-            'add_programenrollment',
-            'change_programenrollment',
-            'delete_programenrollment',
-            'add_programcourseenrollment',
-            'change_programcourseenrollment',
-            'delete_programcourseenrollment',
-        ]
-        self.admin_program_enrollment_group = GroupFactory(
-            name='admin_program_enrollment',
-        )
-        for permission_name in permission_names:
-            self.admin_program_enrollment_group.permissions.add(
-                Permission.objects.get(codename=permission_name)
+        for i in xrange(2):
+            user_key = 'user-{}'.format(i)
+            ProgramEnrollmentFactory.create(
+                program_uuid=self.program_uuid,
+                curriculum_uuid=self.curriculum_uuid,
+                user=None,
+                status='pending',
+                external_user_key=user_key,
             )
-        self.admin_user = UserFactory(groups=[self.admin_program_enrollment_group])
 
-    def test_unauthenticated(self):
-        response = self.get(self.path, None)
-        self.assertEqual(response.status_code, 401)
+        for i in xrange(2, 4):
+            user_key = 'user-{}'.format(i)
+            ProgramEnrollmentFactory.create(
+                program_uuid=self.program_uuid, curriculum_uuid=self.curriculum_uuid, external_user_key=user_key,
+            )
 
+        self.addCleanup(self.destroy_enrollments)
+
+    def destroy_enrollments(self):
+        """
+        Deletes program enrollments associated with this test case's program_uuid.
+        """
+        ProgramEnrollment.objects.filter(program_uuid=self.program_uuid).delete()
+
+    def get_url(self, program_key=None):
+        return reverse('programs_api:v1:program_enrollments', kwargs={'program_key': program_key})
+
+    @mock.patch('lms.djangoapps.program_enrollments.api.v1.views.get_programs', autospec=True, return_value=None)
+    def test_404_if_no_program_with_key(self, mock_get_programs):
+        self.client.login(username=self.global_staff.username, password=self.password)
+        response = self.client.get(self.get_url(self.program_uuid))
+        assert status.HTTP_404_NOT_FOUND == response.status_code
+        mock_get_programs.assert_called_once_with(uuid=self.program_uuid)
+
+    def test_403_if_not_staff(self):
+        self.client.login(username=self.student.username, password=self.password)
+        response = self.client.get(self.get_url(self.program_uuid))
+        assert status.HTTP_403_FORBIDDEN == response.status_code
+
+    def test_401_if_anonymous(self):
+        response = self.client.get(self.get_url(self.program_uuid))
+        assert status.HTTP_401_UNAUTHORIZED == response.status_code
+
+    def test_200_empty_results(self):
+        self.client.login(username=self.global_staff.username, password=self.password)
+
+        with mock.patch('lms.djangoapps.program_enrollments.api.v1.views.get_programs', autospec=True):
+            response = self.client.get(self.get_url(self.program_uuid))
+
+        assert status.HTTP_200_OK == response.status_code
+        expected = {
+            'next': None,
+            'previous': None,
+            'results': [],
+        }
+        assert expected == response.data
+
+    def test_200_many_results(self):
+        self.client.login(username=self.global_staff.username, password=self.password)
+
+        self.create_enrollments()
+        with mock.patch('lms.djangoapps.program_enrollments.api.v1.views.get_programs', autospec=True):
+            response = self.client.get(self.get_url(self.program_uuid))
+
+        assert status.HTTP_200_OK == response.status_code
+        expected = {
+            'next': None,
+            'previous': None,
+            'results': [
+                {
+                    'student_key': 'user-0', 'status': 'pending', 'account_exists': False,
+                    'curriculum_uuid': text_type(self.curriculum_uuid),
+                },
+                {
+                    'student_key': 'user-1', 'status': 'pending', 'account_exists': False,
+                    'curriculum_uuid': text_type(self.curriculum_uuid),
+                },
+                {
+                    'student_key': 'user-2', 'status': 'enrolled', 'account_exists': True,
+                    'curriculum_uuid': text_type(self.curriculum_uuid),
+                },
+                {
+                    'student_key': 'user-3', 'status': 'enrolled', 'account_exists': True,
+                    'curriculum_uuid': text_type(self.curriculum_uuid),
+                },
+            ],
+        }
+        assert expected == response.data
+
+    def test_200_many_pages(self):
+        self.client.login(username=self.global_staff.username, password=self.password)
+
+        self.create_enrollments()
+        with mock.patch('lms.djangoapps.program_enrollments.api.v1.views.get_programs', autospec=True):
+            url = self.get_url(self.program_uuid) + '?page_size=2'
+            response = self.client.get(url)
+
+            assert status.HTTP_200_OK == response.status_code
+            expected_results = [
+                {
+                    'student_key': 'user-0', 'status': 'pending', 'account_exists': False,
+                    'curriculum_uuid': text_type(self.curriculum_uuid),
+                },
+                {
+                    'student_key': 'user-1', 'status': 'pending', 'account_exists': False,
+                    'curriculum_uuid': text_type(self.curriculum_uuid),
+                },
+            ]
+            assert expected_results == response.data['results']
+            # there's going to be a 'cursor' query param, but we have no way of knowing it's value
+            assert response.data['next'] is not None
+            assert self.get_url(self.program_uuid) in response.data['next']
+            assert '?cursor=' in response.data['next']
+            assert response.data['previous'] is None
+
+            next_response = self.client.get(response.data['next'])
+            assert status.HTTP_200_OK == next_response.status_code
+            next_expected_results = [
+                {
+                    'student_key': 'user-2', 'status': 'enrolled', 'account_exists': True,
+                    'curriculum_uuid': text_type(self.curriculum_uuid),
+                },
+                {
+                    'student_key': 'user-3', 'status': 'enrolled', 'account_exists': True,
+                    'curriculum_uuid': text_type(self.curriculum_uuid),
+                },
+            ]
+            assert next_expected_results == next_response.data['results']
+            assert next_response.data['next'] is None
+            # there's going to be a 'cursor' query param, but we have no way of knowing it's value
+            assert next_response.data['previous'] is not None
+            assert self.get_url(self.program_uuid) in next_response.data['previous']
+            assert '?cursor=' in next_response.data['previous']
 
 class ProgramCacheTestCaseMixin(CacheIsolationMixin):
     """
@@ -127,7 +206,7 @@ class ProgramCacheTestCaseMixin(CacheIsolationMixin):
 
 
 @ddt.ddt
-class CourseEnrollmentPostTests(MockAPITestMixin, APITestCase, ProgramCacheTestCaseMixin):
+class CourseEnrollmentPostTests(APITestCase, ProgramCacheTestCaseMixin):
     """ Tests for mock course enrollment """
 
     @classmethod
