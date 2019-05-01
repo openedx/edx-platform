@@ -555,29 +555,6 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
                 'Wrong input for Advanced Settings Fields must not change its value'
             )
 
-    def test_undo_changes(self):
-        """
-        Test that undo changes button in the modal resets all settings changes
-        """
-
-        # Save original values and feed wrong inputs
-        original_values_map = self.get_settings_fields_of_each_type()
-        self.set_wrong_inputs_to_fields()
-
-        # Let modal popup
-        self.advanced_settings.wait_for_modal_load()
-
-        # Click Undo Changes button
-        self.advanced_settings.undo_changes_via_modal()
-
-        # Check that changes are undone
-        for key, val in original_values_map.iteritems():
-            self.assertEquals(
-                self.advanced_settings.get(key),
-                val,
-                'Undoing Should revert back to original value'
-            )
-
     def test_manual_change(self):
         """
         Test that manual changes button in the modal keeps settings unchanged
