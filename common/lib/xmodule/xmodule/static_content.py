@@ -14,22 +14,57 @@ import os
 import sys
 import textwrap
 from collections import defaultdict
+from pkg_resources import resource_string
 
 import django
 import six
 from docopt import docopt
 from path import Path as path
-from xmodule.x_module import XModuleDescriptor
 
-from .capa_module import ProblemBlock
+from xmodule.capa_module import ProblemBlock
+from xmodule.x_module import XModuleDescriptor, HTMLSnippet
 
 LOG = logging.getLogger(__name__)
+
+
+class VideoBlock(HTMLSnippet):
+    """
+    Static assets for VideoBlock.
+    Kept here because importing VideoBlock code requires Django to be setup.
+    """
+
+    preview_view_js = {
+        'js': [
+            resource_string(__name__, 'js/src/video/10_main.js'),
+        ],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js')
+    }
+    preview_view_css = {
+        'scss': [
+            resource_string(__name__, 'css/video/display.scss'),
+            resource_string(__name__, 'css/video/accessible_menu.scss'),
+        ],
+    }
+
+    studio_view_js = {
+        'js': [
+            resource_string(__name__, 'js/src/tabs/tabs-aggregator.js'),
+        ],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+    }
+
+    studio_view_css = {
+        'scss': [
+            resource_string(__name__, 'css/tabs/tabs.scss'),
+        ]
+    }
 
 
 # List of XBlocks which use this static content setup.
 # Should only be used for XModules being converted to XBlocks.
 XBLOCK_CLASSES = [
     ProblemBlock,
+    VideoBlock,
 ]
 
 

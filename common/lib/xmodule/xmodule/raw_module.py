@@ -69,10 +69,9 @@ class RawDescriptor(RawMixin, XmlDescriptor, XMLEditingDescriptor):
     pass
 
 
-class EmptyDataRawDescriptor(XmlDescriptor, XMLEditingDescriptor):
+class EmptyDataRawMixin(object):
     """
-    Version of RawDescriptor for modules which may have no XML data,
-    but use XMLEditingDescriptor for import/export handling.
+    Common code between EmptyDataRawDescriptor and XBlocks converted from XModules.
     """
     resources_dir = None
 
@@ -88,3 +87,11 @@ class EmptyDataRawDescriptor(XmlDescriptor, XMLEditingDescriptor):
         if self.data:
             return etree.fromstring(self.data)
         return etree.Element(self.category)
+
+
+class EmptyDataRawDescriptor(EmptyDataRawMixin, XmlDescriptor, XMLEditingDescriptor):
+    """
+    Version of RawDescriptor for modules which may have no XML data,
+    but use XMLEditingDescriptor for import/export handling.
+    """
+    pass

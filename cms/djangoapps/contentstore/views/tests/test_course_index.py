@@ -718,7 +718,7 @@ class TestCourseReIndex(CourseTestCase):
             course_id=unicode(self.course.id))
         self.assertEqual(response['total'], 1)
 
-    @mock.patch('xmodule.video_module.VideoDescriptor.index_dictionary')
+    @mock.patch('xmodule.video_module.VideoBlock.index_dictionary')
     def test_reindex_video_error_json_responses(self, mock_index_dictionary):
         """
         Test json response with mocked error data for video
@@ -828,7 +828,7 @@ class TestCourseReIndex(CourseTestCase):
             course_id=unicode(self.course.id))
         self.assertEqual(response['total'], 1)
 
-    @mock.patch('xmodule.video_module.VideoDescriptor.index_dictionary')
+    @mock.patch('xmodule.video_module.VideoBlock.index_dictionary')
     def test_indexing_video_error_responses(self, mock_index_dictionary):
         """
         Test do_course_reindex response with mocked error data for video

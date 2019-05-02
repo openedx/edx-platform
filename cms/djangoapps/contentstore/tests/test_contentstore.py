@@ -54,6 +54,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xlint
 from xmodule.seq_module import SequenceDescriptor
+from xmodule.video_module import VideoBlock
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -1815,15 +1816,15 @@ class MetadataSaveTestCase(ContentStoreTestCase):
         <video display_name="Test Video"
                 youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
                 show_captions="false"
-                from="00:00:01"
-                to="00:01:00">
+                from="1.0"
+                to="60.0">
             <source src="http://www.example.com/file.mp4"/>
             <track src="http://www.example.com/track"/>
         </video>
         """
         self.video_descriptor = ItemFactory.create(
             parent_location=course.location, category='video',
-            data={'data': video_sample_xml}
+            **VideoBlock.parse_video_xml(video_sample_xml)
         )
 
     def test_metadata_not_persistence(self):
@@ -1840,7 +1841,6 @@ class MetadataSaveTestCase(ContentStoreTestCase):
             'youtube_id_1_5',
             'start_time',
             'end_time',
-            'source',
             'html5_sources',
             'track'
         }

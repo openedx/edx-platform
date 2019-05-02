@@ -1013,7 +1013,7 @@ class YouTubeQualityTest(VideoBaseTest):
 
 
 @attr('a11y')
-class LMSVideoModuleA11yTest(VideoBaseTest):
+class LMSVideoBlockA11yTest(VideoBaseTest):
     """
     LMS Video Accessibility Test Class
     """
@@ -1030,7 +1030,7 @@ class LMSVideoModuleA11yTest(VideoBaseTest):
             browser = 'firefox'
 
         with patch.dict(os.environ, {'SELENIUM_BROWSER': browser}):
-            super(LMSVideoModuleA11yTest, self).setUp()
+            super(LMSVideoBlockA11yTest, self).setUp()
 
     def test_video_player_a11y(self):
         # load transcripts so we can test skipping to

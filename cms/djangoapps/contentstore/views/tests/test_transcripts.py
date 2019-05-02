@@ -21,6 +21,7 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
+from xmodule.video_module import VideoBlock
 from xmodule.video_module.transcripts_utils import (
     GetTranscriptsFromYouTubeException,
     Transcript,
@@ -94,7 +95,9 @@ class BaseTranscripts(CourseTestCase):
         self.item = modulestore().get_item(self.video_usage_key)
         # hI10vDNYz4M - valid Youtube ID with transcripts.
         # JMD_ifUUfsU, AKqURZnYqpk, DYpADpL7jAY - valid Youtube IDs without transcripts.
-        self.item.data = '<video youtube="0.75:JMD_ifUUfsU,1.0:hI10vDNYz4M,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY" />'
+        self.set_fields_from_xml(
+            self.item, '<video youtube="0.75:JMD_ifUUfsU,1.0:hI10vDNYz4M,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY" />'
+        )
         modulestore().update_item(self.item, self.user.id)
 
         self.item = modulestore().get_item(self.video_usage_key)
@@ -129,7 +132,7 @@ class BaseTranscripts(CourseTestCase):
         response = self.client.ajax_post('/xblock/', data)
         usage_key = self._get_usage_key(response)
         item = modulestore().get_item(usage_key)
-        item.data = '<non_video youtube="0.75:JMD_ifUUfsU,1.0:hI10vDNYz4M" />'
+        self.set_fields_from_xml(self.item, '<non_video youtube="0.75:JMD_ifUUfsU,1.0:hI10vDNYz4M" />')
         modulestore().update_item(item, self.user.id)
 
         return usage_key
@@ -138,6 +141,11 @@ class BaseTranscripts(CourseTestCase):
         response_content = json.loads(response.content)
         self.assertEqual(response.status_code, expected_status_code)
         self.assertEqual(response_content['status'], expected_message)
+
+    def set_fields_from_xml(self, item, xml):
+        fields_data = VideoBlock.parse_video_xml(xml)
+        for key, value in fields_data.items():
+            setattr(item, key, value)
 
 
 @ddt.ddt
@@ -836,7 +844,7 @@ class TestCheckTranscripts(BaseTranscripts):
     """
     def test_success_download_nonyoutube(self):
         subs_id = str(uuid4())
-        self.item.data = textwrap.dedent(u"""
+        self.set_fields_from_xml(self.item, u"""
             <video youtube="" sub="{}">
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
@@ -885,7 +893,7 @@ class TestCheckTranscripts(BaseTranscripts):
         remove_subs_from_store(subs_id, self.item)
 
     def test_check_youtube(self):
-        self.item.data = '<video youtube="1:JMD_ifUUfsU" />'
+        self.set_fields_from_xml(self.item, '<video youtube="1:JMD_ifUUfsU" />')
         modulestore().update_item(self.item, self.user.id)
 
         subs = {
@@ -931,7 +939,7 @@ class TestCheckTranscripts(BaseTranscripts):
         """
         Test that the transcripts are fetched correctly when the the transcript name is set
         """
-        self.item.data = '<video youtube="good_id_2" />'
+        self.set_fields_from_xml(self.item, '<video youtube="good_id_2" />')
         modulestore().update_item(self.item, self.user.id)
 
         subs = {
@@ -1030,13 +1038,13 @@ class TestCheckTranscripts(BaseTranscripts):
         usage_key = self._get_usage_key(resp)
         subs_id = str(uuid4())
         item = modulestore().get_item(usage_key)
-        item.data = textwrap.dedent(u"""
+        self.set_fields_from_xml(self.item, (u"""
             <not_video youtube="" sub="{}">
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
-            </videoalpha>
-        """.format(subs_id))
+            </not_video>
+        """.format(subs_id)))
         modulestore().update_item(item, self.user.id)
 
         subs = {
@@ -1078,13 +1086,13 @@ class TestCheckTranscripts(BaseTranscripts):
         }
 
         # video_transcript_feature.return_value = feature_enabled
-        self.item.data = textwrap.dedent("""
+        self.set_fields_from_xml(self.item, (u"""
             <video youtube="" sub="" edx_video_id="123">
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
             </video>
-        """)
+        """))
         modulestore().update_item(self.item, self.user.id)
 
         # Make request to check transcript view

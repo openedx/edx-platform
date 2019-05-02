@@ -36,9 +36,8 @@ from xblock.fields import ScopeIds
 
 from xmodule.tests import get_test_descriptor_system
 from xmodule.validation import StudioValidationMessage
-from xmodule.video_module import VideoDescriptor, create_youtube_string, EXPORT_IMPORT_STATIC_DIR
+from xmodule.video_module import VideoBlock, create_youtube_string, EXPORT_IMPORT_STATIC_DIR
 from xmodule.video_module.transcripts_utils import download_youtube_subs, save_to_store, save_subs_to_store
-from . import LogicTest
 from .test_import import DummySystem
 
 SRT_FILEDATA = '''
@@ -96,11 +95,13 @@ def instantiate_descriptor(**field_data):
     """
     Instantiate descriptor with most properties.
     """
+    if field_data.get('data', None):
+        field_data = VideoBlock.parse_video_xml(field_data['data'])
     system = get_test_descriptor_system()
     course_key = CourseLocator('org', 'course', 'run')
     usage_key = course_key.make_usage_key('video', 'SampleProblem')
     return system.construct_xblock_from_class(
-        VideoDescriptor,
+        VideoBlock,
         scope_ids=ScopeIds(None, None, usage_key, usage_key),
         field_data=DictFieldData(field_data),
     )
@@ -119,9 +120,8 @@ class _MockValCannotCreateError(Exception):
     pass
 
 
-class VideoModuleTest(LogicTest):
-    """Logic tests for Video Xmodule."""
-    descriptor_class = VideoDescriptor
+class VideoBlockTest(unittest.TestCase):
+    """Logic tests for Video XBlock."""
 
     raw_field_data = {
         'data': '<video />'
@@ -130,7 +130,7 @@ class VideoModuleTest(LogicTest):
     def test_parse_youtube(self):
         """Test parsing old-style Youtube ID strings into a dict."""
         youtube_str = '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg'
-        output = VideoDescriptor._parse_youtube(youtube_str)
+        output = VideoBlock._parse_youtube(youtube_str)
         self.assertEqual(output, {'0.75': 'jNCf2gIqpeE',
                                   '1.00': 'ZwkTiUPN0mg',
                                   '1.25': 'rsq9auxASqI',
@@ -142,7 +142,7 @@ class VideoModuleTest(LogicTest):
         empty string.
         """
         youtube_str = '0.75:jNCf2gIqpeE'
-        output = VideoDescriptor._parse_youtube(youtube_str)
+        output = VideoBlock._parse_youtube(youtube_str)
         self.assertEqual(output, {'0.75': 'jNCf2gIqpeE',
                                   '1.00': '',
                                   '1.25': '',
@@ -152,14 +152,14 @@ class VideoModuleTest(LogicTest):
         """Ensure that ids that are invalid return an empty dict"""
         # invalid id
         youtube_str = 'thisisaninvalidid'
-        output = VideoDescriptor._parse_youtube(youtube_str)
+        output = VideoBlock._parse_youtube(youtube_str)
         self.assertEqual(output, {'0.75': '',
                                   '1.00': '',
                                   '1.25': '',
                                   '1.50': ''})
         # another invalid id
         youtube_str = ',::,:,,'
-        output = VideoDescriptor._parse_youtube(youtube_str)
+        output = VideoBlock._parse_youtube(youtube_str)
         self.assertEqual(output, {'0.75': '',
                                   '1.00': '',
                                   '1.25': '',
@@ -167,7 +167,7 @@ class VideoModuleTest(LogicTest):
 
         # and another one, partially invalid
         youtube_str = '0.75_BAD!!!,1.0:AXdE34_U,1.25:KLHF9K_Y,1.5:VO3SxfeD,'
-        output = VideoDescriptor._parse_youtube(youtube_str)
+        output = VideoBlock._parse_youtube(youtube_str)
         self.assertEqual(output, {'0.75': '',
                                   '1.00': 'AXdE34_U',
                                   '1.25': 'KLHF9K_Y',
@@ -180,8 +180,8 @@ class VideoModuleTest(LogicTest):
         youtube_str = '1.00:p2Q6BrNhdh8'
         youtube_str_hack = '1.0:p2Q6BrNhdh8'
         self.assertEqual(
-            VideoDescriptor._parse_youtube(youtube_str),
-            VideoDescriptor._parse_youtube(youtube_str_hack)
+            VideoBlock._parse_youtube(youtube_str),
+            VideoBlock._parse_youtube(youtube_str_hack)
         )
 
     def test_parse_youtube_empty(self):
@@ -190,7 +190,7 @@ class VideoModuleTest(LogicTest):
         that well.
         """
         self.assertEqual(
-            VideoDescriptor._parse_youtube(''),
+            VideoBlock._parse_youtube(''),
             {'0.75': '',
              '1.00': '',
              '1.25': '',
@@ -198,13 +198,13 @@ class VideoModuleTest(LogicTest):
         )
 
 
-class VideoDescriptorTestBase(unittest.TestCase):
+class VideoBlockTestBase(unittest.TestCase):
     """
-    Base class for tests for VideoDescriptor
+    Base class for tests for VideoBlock
     """
 
     def setUp(self):
-        super(VideoDescriptorTestBase, self).setUp()
+        super(VideoBlockTestBase, self).setUp()
         self.descriptor = instantiate_descriptor()
 
     def assertXmlEqual(self, expected, xml):
@@ -223,7 +223,7 @@ class VideoDescriptorTestBase(unittest.TestCase):
             self.assertXmlEqual(left, right)
 
 
-class TestCreateYoutubeString(VideoDescriptorTestBase):
+class TestCreateYoutubeString(VideoBlockTestBase):
     """
     Checks that create_youtube_string correcty extracts information from Video descriptor.
     """
@@ -250,7 +250,7 @@ class TestCreateYoutubeString(VideoDescriptorTestBase):
         self.assertEqual(create_youtube_string(self.descriptor), expected)
 
 
-class TestCreateYouTubeUrl(VideoDescriptorTestBase):
+class TestCreateYouTubeUrl(VideoBlockTestBase):
     """
     Tests for helper method `create_youtube_url`.
     """
@@ -264,9 +264,9 @@ class TestCreateYouTubeUrl(VideoDescriptorTestBase):
 
 
 @ddt.ddt
-class VideoDescriptorImportTestCase(TestCase):
+class VideoBlockImportTestCase(TestCase):
     """
-    Make sure that VideoDescriptor can import an old XML-based video correctly.
+    Make sure that VideoBlock can import an old XML-based video correctly.
     """
 
     def assert_attributes_equal(self, video, attrs):
@@ -328,7 +328,7 @@ class VideoDescriptorImportTestCase(TestCase):
               <transcript language="de" src="german_translation.srt" />
             </video>
         '''
-        output = VideoDescriptor.from_xml(xml_data, module_system, Mock())
+        output = VideoBlock.from_xml(xml_data, module_system, Mock())
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': 'izygArpw-Qo',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -376,7 +376,7 @@ class VideoDescriptorImportTestCase(TestCase):
         id_generator = Mock()
         id_generator.target_course_id = course_id
 
-        output = VideoDescriptor.from_xml(xml_data, module_system, id_generator)
+        output = VideoBlock.from_xml(xml_data, module_system, id_generator)
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': 'izygArpw-Qo',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -407,7 +407,7 @@ class VideoDescriptorImportTestCase(TestCase):
               <source src="http://www.example.com/source.mp4"/>
             </video>
         '''
-        output = VideoDescriptor.from_xml(xml_data, module_system, Mock())
+        output = VideoBlock.from_xml(xml_data, module_system, Mock())
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': '',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -419,7 +419,7 @@ class VideoDescriptorImportTestCase(TestCase):
             'track': '',
             'handout': None,
             'download_track': False,
-            'download_video': True,
+            'download_video': False,
             'html5_sources': ['http://www.example.com/source.mp4'],
             'data': ''
         })
@@ -438,7 +438,7 @@ class VideoDescriptorImportTestCase(TestCase):
               <track src="http://www.example.com/track"/>
             </video>
         '''
-        output = VideoDescriptor.from_xml(xml_data, module_system, Mock())
+        output = VideoBlock.from_xml(xml_data, module_system, Mock())
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': '',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -449,7 +449,7 @@ class VideoDescriptorImportTestCase(TestCase):
             'end_time': datetime.timedelta(seconds=0.0),
             'track': 'http://www.example.com/track',
             'download_track': True,
-            'download_video': True,
+            'download_video': False,
             'html5_sources': ['http://www.example.com/source.mp4'],
             'data': '',
             'transcripts': {},
@@ -461,7 +461,7 @@ class VideoDescriptorImportTestCase(TestCase):
         """
         module_system = DummySystem(load_error_modules=True)
         xml_data = '<video></video>'
-        output = VideoDescriptor.from_xml(xml_data, module_system, Mock())
+        output = VideoBlock.from_xml(xml_data, module_system, Mock())
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': '',
             'youtube_id_1_0': '3_yD_cEKoCk',
@@ -500,7 +500,7 @@ class VideoDescriptorImportTestCase(TestCase):
                 youtube_id_1_0="&quot;OEoXaMPEzf10&quot;"
                 />
         '''
-        output = VideoDescriptor.from_xml(xml_data, module_system, Mock())
+        output = VideoBlock.from_xml(xml_data, module_system, Mock())
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': 'OEoXaMPEzf65',
             'youtube_id_1_0': 'OEoXaMPEzf10',
@@ -524,7 +524,7 @@ class VideoDescriptorImportTestCase(TestCase):
                    youtube="1.0:&quot;p2Q6BrNhdh8&quot;,1.25:&quot;1EeWXzPdhSA&quot;">
             </video>
         '''
-        output = VideoDescriptor.from_xml(xml_data, module_system, Mock())
+        output = VideoBlock.from_xml(xml_data, module_system, Mock())
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': '',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -543,7 +543,7 @@ class VideoDescriptorImportTestCase(TestCase):
 
     def test_old_video_format(self):
         """
-        Test backwards compatibility with VideoModule's XML format.
+        Test backwards compatibility with VideoBlock's XML format.
         """
         module_system = DummySystem(load_error_modules=True)
         xml_data = """
@@ -557,7 +557,7 @@ class VideoDescriptorImportTestCase(TestCase):
               <track src="http://www.example.com/track"/>
             </video>
         """
-        output = VideoDescriptor.from_xml(xml_data, module_system, Mock())
+        output = VideoBlock.from_xml(xml_data, module_system, Mock())
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': 'izygArpw-Qo',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -574,7 +574,7 @@ class VideoDescriptorImportTestCase(TestCase):
 
     def test_old_video_data(self):
         """
-        Ensure that Video is able to read VideoModule's model data.
+        Ensure that Video is able to read VideoBlock's model data.
         """
         module_system = DummySystem(load_error_modules=True)
         xml_data = """
@@ -587,7 +587,7 @@ class VideoDescriptorImportTestCase(TestCase):
               <track src="http://www.example.com/track"/>
             </video>
         """
-        video = VideoDescriptor.from_xml(xml_data, module_system, Mock())
+        video = VideoBlock.from_xml(xml_data, module_system, Mock())
         self.assert_attributes_equal(video, {
             'youtube_id_0_75': 'izygArpw-Qo',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -604,7 +604,7 @@ class VideoDescriptorImportTestCase(TestCase):
 
     def test_import_with_float_times(self):
         """
-        Ensure that Video is able to read VideoModule's model data.
+        Ensure that Video is able to read VideoBlock's model data.
         """
         module_system = DummySystem(load_error_modules=True)
         xml_data = """
@@ -617,7 +617,7 @@ class VideoDescriptorImportTestCase(TestCase):
               <track src="http://www.example.com/track"/>
             </video>
         """
-        video = VideoDescriptor.from_xml(xml_data, module_system, Mock())
+        video = VideoBlock.from_xml(xml_data, module_system, Mock())
         self.assert_attributes_equal(video, {
             'youtube_id_0_75': 'izygArpw-Qo',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -665,7 +665,7 @@ class VideoDescriptorImportTestCase(TestCase):
         )
         id_generator = Mock()
         id_generator.target_course_id = 'test_course_id'
-        video = VideoDescriptor.from_xml(xml_data, module_system, id_generator)
+        video = VideoBlock.from_xml(xml_data, module_system, id_generator)
 
         self.assert_attributes_equal(video, {'edx_video_id': edx_video_id})
         mock_val_api.import_from_xml.assert_called_once_with(
@@ -690,12 +690,12 @@ class VideoDescriptorImportTestCase(TestCase):
             </video>
         """
         with self.assertRaises(mock_val_api.ValCannotCreateError):
-            VideoDescriptor.from_xml(xml_data, module_system, id_generator=Mock())
+            VideoBlock.from_xml(xml_data, module_system, id_generator=Mock())
 
 
-class VideoExportTestCase(VideoDescriptorTestBase):
+class VideoExportTestCase(VideoBlockTestBase):
     """
-    Make sure that VideoDescriptor can export itself to XML correctly.
+    Make sure that VideoBlock can export itself to XML correctly.
     """
 
     def setUp(self):
@@ -773,7 +773,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
 
         xml = self.descriptor.definition_to_xml(self.file_system)
         parser = etree.XMLParser(remove_blank_text=True)
-        xml_string = '<video url_name="SampleProblem" download_video="false"/>'
+        xml_string = '<video url_name="SampleProblem"/>'
         expected = etree.XML(xml_string, parser=parser)
         self.assertXmlEqual(expected, xml)
 
@@ -813,7 +813,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         """
         xml = self.descriptor.definition_to_xml(self.file_system)
         # Check that download_video field is also set to default (False) in xml for backward compatibility
-        expected = '<video url_name="SampleProblem" download_video="false"/>\n'
+        expected = '<video url_name="SampleProblem"/>\n'
         self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
 
     @patch('xmodule.video_module.video_module.edxval_api', None)
@@ -823,7 +823,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         """
         self.descriptor.transcripts = None
         xml = self.descriptor.definition_to_xml(self.file_system)
-        expected = '<video url_name="SampleProblem" download_video="false"/>\n'
+        expected = '<video url_name="SampleProblem"/>\n'
         self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
 
     @patch('xmodule.video_module.video_module.edxval_api', None)
@@ -850,9 +850,9 @@ class VideoExportTestCase(VideoDescriptorTestBase):
 @patch.object(settings, 'FEATURES', create=True, new={
     'FALLBACK_TO_ENGLISH_TRANSCRIPTS': False,
 })
-class VideoDescriptorStudentViewDataTestCase(unittest.TestCase):
+class VideoBlockStudentViewDataTestCase(unittest.TestCase):
     """
-    Make sure that VideoDescriptor returns the expected student_view_data.
+    Make sure that VideoBlock returns the expected student_view_data.
     """
 
     VIDEO_URL_1 = 'http://www.example.com/source_low.mp4'
@@ -864,41 +864,6 @@ class VideoDescriptorStudentViewDataTestCase(unittest.TestCase):
         (
             {'only_on_web': True},
             {'only_on_web': True},
-        ),
-        # Ensure that the deprecated `source` attribute is included in the `all_sources` list.
-        (
-            {
-                'only_on_web': False,
-                'youtube_id_1_0': None,
-                'source': VIDEO_URL_1,
-            },
-            {
-                'only_on_web': False,
-                'duration': None,
-                'transcripts': {},
-                'encoded_videos': {
-                    'fallback': {'url': VIDEO_URL_1, 'file_size': 0},
-                },
-                'all_sources': [VIDEO_URL_1],
-            },
-        ),
-        # Ensure that `html5_sources` take precendence over deprecated `source` url
-        (
-            {
-                'only_on_web': False,
-                'youtube_id_1_0': None,
-                'source': VIDEO_URL_1,
-                'html5_sources': [VIDEO_URL_2, VIDEO_URL_3],
-            },
-            {
-                'only_on_web': False,
-                'duration': None,
-                'transcripts': {},
-                'encoded_videos': {
-                    'fallback': {'url': VIDEO_URL_2, 'file_size': 0},
-                },
-                'all_sources': [VIDEO_URL_2, VIDEO_URL_3, VIDEO_URL_1],
-            },
         ),
         # Ensure that YouTube URLs are included in `encoded_videos`, but not `all_sources`.
         (
@@ -1002,9 +967,9 @@ class VideoDescriptorStudentViewDataTestCase(unittest.TestCase):
     # The default value in {lms,cms}/envs/common.py and xmodule/tests/test_video.py should be consistent.
     'FALLBACK_TO_ENGLISH_TRANSCRIPTS': True,
 })
-class VideoDescriptorIndexingTestCase(unittest.TestCase):
+class VideoBlockIndexingTestCase(unittest.TestCase):
     """
-    Make sure that VideoDescriptor can format data for indexing as expected.
+    Make sure that VideoBlock can format data for indexing as expected.
     """
 
     def test_video_with_no_subs_index_dictionary(self):

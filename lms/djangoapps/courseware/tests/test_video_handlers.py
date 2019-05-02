@@ -25,6 +25,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+from xmodule.video_module import VideoBlock
 from xmodule.video_module.transcripts_utils import Transcript, edxval_api, subs_filename
 from xmodule.x_module import STUDENT_VIEW
 
@@ -127,7 +128,26 @@ def attach_bumper_transcript(item, filename, lang="en"):
     item.video_bumper["transcripts"][lang] = filename
 
 
-class TestVideo(BaseTestXmodule):
+class BaseTestVideoXBlock(BaseTestXmodule):
+    """Base class for VideoXBlock tests."""
+
+    CATEGORY = 'video'
+
+    def initialize_block(self, data=None, **kwargs):
+        """ Initialize an XBlock to run tests on. """
+        if data:
+            # VideoBlock data field is no longer used but to avoid needing to re-do
+            # a lot of tests code, parse and set the values as fields.
+            fields_data = VideoBlock.parse_video_xml(data)
+            kwargs.update(fields_data)
+        super(BaseTestVideoXBlock, self).initialize_module(**kwargs)
+
+    def setUp(self):
+        super(BaseTestVideoXBlock, self).setUp()
+        self.initialize_block(data=self.DATA, metadata=self.METADATA)
+
+
+class TestVideo(BaseTestVideoXBlock):
     """Integration tests: web client + mongo."""
     CATEGORY = "video"
     DATA = SOURCE_XML
@@ -225,7 +245,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
     def setUp(self):
         super(TestTranscriptAvailableTranslationsDispatch, self).setUp()
         self.item_descriptor.render(STUDENT_VIEW)
-        self.item = self.item_descriptor.xmodule_runtime.xmodule_instance
+        self.item = self.item_descriptor
         self.subs = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}
 
     def test_available_translation_en(self):
@@ -383,7 +403,7 @@ class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):
     def setUp(self):
         super(TestTranscriptAvailableTranslationsBumperDispatch, self).setUp()
         self.item_descriptor.render(STUDENT_VIEW)
-        self.item = self.item_descriptor.xmodule_runtime.xmodule_instance
+        self.item = self.item_descriptor
         self.dispatch = "available_translations/?is_bumper=1"
         self.item.video_bumper = {"transcripts": {"en": ""}}
 
@@ -449,7 +469,7 @@ class TestTranscriptDownloadDispatch(TestVideo):
     def setUp(self):
         super(TestTranscriptDownloadDispatch, self).setUp()
         self.item_descriptor.render(STUDENT_VIEW)
-        self.item = self.item_descriptor.xmodule_runtime.xmodule_instance
+        self.item = self.item_descriptor
 
     def test_download_transcript_not_exist(self):
         request = Request.blank('/download')
@@ -499,7 +519,7 @@ class TestTranscriptDownloadDispatch(TestVideo):
         self.assertEqual(response.headers['Content-Disposition'], 'attachment; filename="en_塞.srt"')
 
     @patch('xmodule.video_module.transcripts_utils.edxval_api.get_video_transcript_data')
-    @patch('xmodule.video_module.VideoModule.get_transcript', Mock(side_effect=NotFoundError))
+    @patch('xmodule.video_module.VideoBlock.get_transcript', Mock(side_effect=NotFoundError))
     def test_download_fallback_transcript(self, mock_get_video_transcript_data):
         """
         Verify val transcript is returned as a fallback if it is not found in the content store.
@@ -560,7 +580,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
     def setUp(self):
         super(TestTranscriptTranslationGetDispatch, self).setUp()
         self.item_descriptor.render(STUDENT_VIEW)
-        self.item = self.item_descriptor.xmodule_runtime.xmodule_instance
+        self.item = self.item_descriptor
         self.item.video_bumper = {"transcripts": {"en": ""}}
 
     @ddt.data(
@@ -747,7 +767,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
                 response.headerlist
             )
 
-    @patch('xmodule.video_module.VideoModule.course_id', return_value='not_a_course_locator')
+    @patch('xmodule.video_module.VideoBlock.course_id', return_value='not_a_course_locator')
     def test_translation_static_non_course(self, __):
         """
         Test that get_static_transcript short-circuits in the case of a non-CourseLocator.
@@ -769,8 +789,8 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
             store.update_item(self.course, self.user.id)
 
     @patch('xmodule.video_module.transcripts_utils.edxval_api.get_video_transcript_data')
-    @patch('xmodule.video_module.VideoModule.translation', Mock(side_effect=NotFoundError))
-    @patch('xmodule.video_module.VideoModule.get_static_transcript', Mock(return_value=Response(status=404)))
+    @patch('xmodule.video_module.VideoBlock.translation', Mock(side_effect=NotFoundError))
+    @patch('xmodule.video_module.VideoBlock.get_static_transcript', Mock(return_value=Response(status=404)))
     def test_translation_fallback_transcript(self, mock_get_video_transcript_data):
         """
         Verify that the val transcript is returned as a fallback,
@@ -801,8 +821,8 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         for attribute, value in six.iteritems(expected_headers):
             self.assertEqual(response.headers[attribute], value)
 
-    @patch('xmodule.video_module.VideoModule.translation', Mock(side_effect=NotFoundError))
-    @patch('xmodule.video_module.VideoModule.get_static_transcript', Mock(return_value=Response(status=404)))
+    @patch('xmodule.video_module.VideoBlock.translation', Mock(side_effect=NotFoundError))
+    @patch('xmodule.video_module.VideoBlock.get_static_transcript', Mock(return_value=Response(status=404)))
     def test_translation_fallback_transcript_feature_disabled(self):
         """
         Verify that val transcript is not returned when its feature is disabled.
@@ -1132,7 +1152,7 @@ class TestGetTranscript(TestVideo):
     def setUp(self):
         super(TestGetTranscript, self).setUp()
         self.item_descriptor.render(STUDENT_VIEW)
-        self.item = self.item_descriptor.xmodule_runtime.xmodule_instance
+        self.item = self.item_descriptor
 
     def test_good_transcript(self):
         """

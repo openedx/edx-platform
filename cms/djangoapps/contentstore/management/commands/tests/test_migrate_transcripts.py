@@ -18,6 +18,7 @@ from openedx.core.djangoapps.video_config.models import (
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.video_module import VideoBlock
 from xmodule.video_module.transcripts_utils import save_to_store
 from edxval import api as api
 from testfixtures import LogCapture
@@ -105,9 +106,9 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
                    youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
                    show_captions="false"
                    download_track="false"
-                   start_time="00:00:01"
+                   start_time="1.0"
                    download_video="false"
-                   end_time="00:01:00">
+                   end_time="60.0">
               <source src="http://www.example.com/source.mp4"/>
               <track src="http://www.example.com/track"/>
               <handout src="http://www.example.com/handout"/>
@@ -122,9 +123,9 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
                    youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
                    show_captions="false"
                    download_track="false"
-                   start_time="00:00:01"
+                   start_time="1.0"
                    download_video="false"
-                   end_time="00:01:00">
+                   end_time="60.0">
               <source src="http://www.example.com/source.mp4"/>
               <track src="http://www.example.com/track"/>
               <handout src="http://www.example.com/handout"/>
@@ -133,11 +134,11 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
         '''
         self.video_descriptor = ItemFactory.create(
             parent_location=self.course.location, category='video',
-            data={'data': video_sample_xml}
+            **VideoBlock.parse_video_xml(video_sample_xml)
         )
         self.video_descriptor_2 = ItemFactory.create(
             parent_location=self.course_2.location, category='video',
-            data={'data': video_sample_xml_2}
+            **VideoBlock.parse_video_xml(video_sample_xml_2)
         )
 
         save_to_store(SRT_FILEDATA, 'subs_grmtran1.srt', 'text/srt', self.video_descriptor.location)

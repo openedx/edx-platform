@@ -76,6 +76,7 @@ from xmodule.modulestore.tests.django_utils import (
 )
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory, check_mongo_calls
 from xmodule.modulestore.tests.test_asides import AsideTestType
+from xmodule.video_module import VideoBlock
 from xmodule.x_module import STUDENT_VIEW, CombinedSystem, XModule, XModuleDescriptor
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
@@ -989,14 +990,12 @@ class TestTOC(ModuleStoreTestCase):
     #     - 1 for the course
     #     - 1 for its children
     #     - 1 for its grandchildren
-    # Split makes 6 queries to load the course to depth 2:
-    #     - load the structure
-    #     - load 5 definitions
-    # Split makes 5 queries to render the toc:
-    #     - it loads the active version at the start of the bulk operation
-    #     - it loads 4 definitions, because it instantiates 4 VideoModules
-    #       each of which access a Scope.content field in __init__
-    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0, 0), (ModuleStoreEnum.Type.split, 6, 0, 5))
+    # Split makes 2 queries to load the course to depth 2:
+    #     - 1 for the structure
+    #     - 1 for 5 definitions
+    # Split makes 1 query to render the toc:
+    #     - 1 for the active version at the start of the bulk operation
+    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0, 0), (ModuleStoreEnum.Type.split, 2, 0, 1))
     @ddt.unpack
     def test_toc_toy_from_chapter(self, default_ms, setup_finds, setup_sends, toc_finds):
         with self.store.default_store(default_ms):
@@ -1031,14 +1030,12 @@ class TestTOC(ModuleStoreTestCase):
     #     - 1 for the course
     #     - 1 for its children
     #     - 1 for its grandchildren
-    # Split makes 6 queries to load the course to depth 2:
-    #     - load the structure
-    #     - load 5 definitions
-    # Split makes 5 queries to render the toc:
-    #     - it loads the active version at the start of the bulk operation
-    #     - it loads 4 definitions, because it instantiates 4 VideoModules
-    #       each of which access a Scope.content field in __init__
-    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0, 0), (ModuleStoreEnum.Type.split, 6, 0, 5))
+    # Split makes 2 queries to load the course to depth 2:
+    #     - 1 for the structure
+    #     - 1 for 5 definitions
+    # Split makes 1 query to render the toc:
+    #     - 1 for the active version at the start of the bulk operation
+    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0, 0), (ModuleStoreEnum.Type.split, 2, 0, 1))
     @ddt.unpack
     def test_toc_toy_from_section(self, default_ms, setup_finds, setup_sends, toc_finds):
         with self.store.default_store(default_ms):
@@ -1937,6 +1934,7 @@ class TestStaffDebugInfo(SharedModuleStoreTestCase):
 PER_COURSE_ANONYMIZED_DESCRIPTORS = (LTIDescriptor, )
 PER_STUDENT_ANONYMIZED_XBLOCKS = [
     ProblemBlock,
+    VideoBlock,
 ]
 
 # The "set" here is to work around the bug that load_classes returns duplicates for multiply-declared classes.

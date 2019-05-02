@@ -18,8 +18,6 @@ XMODULES = [
     "section = xmodule.backcompat_module:SemanticSectionDescriptor",
     "sequential = xmodule.seq_module:SequenceDescriptor",
     "slides = xmodule.backcompat_module:TranslateCustomTagDescriptor",
-    "video = xmodule.video_module:VideoDescriptor",
-    "videoalpha = xmodule.video_module:VideoDescriptor",
     "videodev = xmodule.backcompat_module:TranslateCustomTagDescriptor",
     "videosequence = xmodule.seq_module:SequenceDescriptor",
     "course_info = xmodule.html_module:CourseInfoDescriptor",
@@ -36,6 +34,8 @@ XBLOCKS = [
     "library = xmodule.library_root_xblock:LibraryRoot",
     "problem = xmodule.capa_module:ProblemBlock",
     "vertical = xmodule.vertical_block:VerticalBlock",
+    "video = xmodule.video_module:VideoBlock",
+    "videoalpha = xmodule.video_module:VideoBlock",
     "wrapper = xmodule.wrapper_module:WrapperBlock",
 ]
 XBLOCKS_ASIDES = [

@@ -52,7 +52,7 @@ update_module_store_settings(
 )
 
 # Needed to enable licensing on video modules
-XBLOCK_SETTINGS.update({'VideoDescriptor': {'licensing_enabled': True}})
+XBLOCK_SETTINGS.update({'VideoBlock': {'licensing_enabled': True}})
 
 # Capture the console log via template includes, until webdriver supports log capture again
 CAPTURE_CONSOLE_LOG = True

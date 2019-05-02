@@ -17,7 +17,7 @@ from common.test.acceptance.tests.helpers import YouTubeStubConfig
 CLASS_SELECTORS = {
     'video_container': '.video',
     'video_init': '.is-initialized',
-    'video_xmodule': '.xmodule_VideoModule',
+    'video_xmodule': '.xmodule_VideoBlock',
     'video_spinner': '.video-wrapper .spinner',
     'video_controls': '.video-controls',
     'attach_asset': '.upload-dialog > input[type="file"]',
