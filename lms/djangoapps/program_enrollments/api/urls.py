@@ -1,5 +1,5 @@
 """
-Grades API URLs.
+Program Enrollment API URLs.
 """
 
 from django.conf.urls import include, url
