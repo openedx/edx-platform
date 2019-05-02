@@ -188,7 +188,7 @@ class TransExpression(Expression):
                                               escape_expr.split('|')[1].strip(' ')
         if trans_var_name_used != escape_expr_var_used:
             _add_violations(self.results,
-                            self.ruleset.django_escape_variable_mismatch,
+                            self.ruleset.django_trans_escape_variable_mismatch,
                             self)
             return
 

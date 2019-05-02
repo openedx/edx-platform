@@ -1462,7 +1462,7 @@ class TestDjangoTemplateLinter(TestLinter):
          'rule': None},
 
         {'expression': '{% trans "whatever" as tmsgx %}{{tmsg|force_escape}}',
-         'rule': ruleset.django_escape_variable_mismatch},
+         'rule': ruleset.django_trans_escape_variable_mismatch},
 
         {'expression': '{% trans "whatever" as tmsgx %}{{tmsgx|force_escap}}',
          'rule': ruleset.django_trans_invalid_escape_filter},

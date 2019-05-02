@@ -1495,7 +1495,7 @@ class DjangoTemplateLinter(BaseLinter):
     ruleset = RuleSet(
         django_trans_missing_escape='django-trans-missing-escape',
         django_trans_invalid_escape_filter='django-trans-invalid-escape-filter',
-        django_escape_variable_mismatch='django-escape-variable-mismatch',
+        django_trans_escape_variable_mismatch='django-trans-escape-variable-mismatch',
         django_blocktrans_missing_escape_filter='django-blocktrans-missing-escape-filter',
         django_blocktrans_parse_error='django-blocktrans-parse-error',
         django_blocktrans_escape_filter_parse_error='django-blocktrans-escape-filter-parse-error',
