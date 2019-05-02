@@ -17,7 +17,7 @@ from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from six import text_type
 
 from config_models.models import ConfigurationModel
-from lms.djangoapps import django_comment_client
+from lms.djangoapps.discussion import django_comment_client
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.models.course_details import CourseDetails

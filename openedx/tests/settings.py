@@ -60,12 +60,12 @@ PROCTORING_BACKENDS = {
 FEATURES = {}
 
 INSTALLED_APPS = (
-    'django_comment_common',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
     'djcelery',
+    'openedx.core.djangoapps.discussion_common',
     'openedx.core.djangoapps.video_config',
     'openedx.core.djangoapps.video_pipeline',
     'openedx.core.djangoapps.bookmarks.apps.BookmarksConfig',

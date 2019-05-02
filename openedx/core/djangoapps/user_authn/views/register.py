@@ -15,8 +15,10 @@ from django.db import transaction
 from django.dispatch import Signal
 from django.utils.translation import get_language
 from django.utils.translation import ugettext as _
+
 # Note that this lives in LMS, so this dependency should be refactored.
-from notification_prefs.views import enable_notifications
+# TODO Have the discussions code subscribe to the REGISTER_USER signal instead.
+from lms.djangoapps.discussion.notification_prefs.views import enable_notifications
 from pytz import UTC
 from requests import HTTPError
 from six import text_type

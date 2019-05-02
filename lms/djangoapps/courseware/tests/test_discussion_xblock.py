@@ -213,7 +213,10 @@ class TestTemplates(TestDiscussionXBlock):
         Test for has_permission method.
         """
         permission_canary = object()
-        with mock.patch('django_comment_client.permissions.has_permission', return_value=permission_canary) as has_perm:
+        with mock.patch(
+            'lms.djangoapps.discussion.django_comment_client.permissions.has_permission',
+            return_value=permission_canary,
+        ) as has_perm:
             actual_permission = self.block.has_permission("test_permission")
         self.assertEqual(actual_permission, permission_canary)
         has_perm.assert_called_once_with(self.django_user_canary, 'test_permission', 'test_course')

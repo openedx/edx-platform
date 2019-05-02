@@ -8,9 +8,9 @@ from courseware.courses import get_course_by_id
 from django.db import migrations
 from django.http import Http404
 
-from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, \
+from openedx.core.djangoapps.discussion_common.models import FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, \
     FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_STUDENT
-from django_comment_common.utils import STUDENT_ROLE_PERMISSIONS,  MODERATOR_ROLE_PERMISSIONS, \
+from openedx.core.djangoapps.discussion_common.utils import STUDENT_ROLE_PERMISSIONS,  MODERATOR_ROLE_PERMISSIONS, \
     ADMINISTRATOR_ROLE_PERMISSIONS
 
 log = logging.getLogger("edx.ccx")
@@ -26,8 +26,8 @@ def seed_forum_roles_for_existing_ccx(apps, schema_editor):
 
     """
     CustomCourseForEdX = apps.get_model("ccx", "CustomCourseForEdX")
-    Role = apps.get_model("django_comment_common", "Role")
-    Permission = apps.get_model("django_comment_common", "Permission")
+    Role = apps.get_model("discussion_common", "Role")
+    Permission = apps.get_model("discussion_common", "Permission")
     db_alias = schema_editor.connection.alias
     # This will need to be changed if ccx gets moved out of the default db for some reason.
     if db_alias != 'default':
@@ -76,7 +76,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('ccx', '0003_add_master_course_staff_in_ccx'),
-        ('django_comment_common', '0002_forumsconfig'),
+        ('discussion_common', '0002_forumsconfig'),
     ]
 
     operations = [
