@@ -13,7 +13,6 @@ from rest_framework.pagination import CursorPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from course_modes.models import CourseMode
 from edx_rest_framework_extensions import permissions
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -27,7 +26,6 @@ from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, PaginatedAPIView
-from student.models import CourseEnrollment
 
 
 def verify_program_exists(view_func):
@@ -312,6 +310,6 @@ class ProgramCourseEnrollmentsView(ProgramCourseRunSpecificViewMixin, APIView):
         enrollment_status = ProgramCourseEnrollment.enroll(
             program_enrollment,
             self.course_key,
-            enrollment_status
+            enrollment_request['status']
         )
         return enrollment_status
