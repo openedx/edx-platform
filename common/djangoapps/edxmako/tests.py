@@ -89,6 +89,7 @@ class ShortcutsTests(UrlResetMixin, TestCase):
             link = marketing_link('TOS')
             self.assertEquals(link, expected_link)
 
+
 class AddLookupTests(TestCase):
     """
     Test the `add_lookup` function.
