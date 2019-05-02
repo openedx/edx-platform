@@ -398,6 +398,7 @@ class CourseEnrollmentPostTests(APITestCase, ProgramCacheTestCaseMixin):
         [{'student_key': '000'}],
         ["this isn't even a dict!"],
         [{'student_key': '000', 'status': 'active'}, "bad_data"],
+        "not a list",
     )
     def test_422_unprocessable_entity_bad_data(self, post_data):
         response = self.client.post(self.default_url, post_data, format="json")

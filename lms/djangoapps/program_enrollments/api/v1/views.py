@@ -228,7 +228,7 @@ class ProgramCourseEnrollmentsView(ProgramCourseRunSpecificViewMixin, APIView):
         enrollments = []
 
         if not isinstance(request.data, list):
-            raise ValidationError("invalid enrollment record")
+            return Response('invalid enrollment record', status.HTTP_422_UNPROCESSABLE_ENTITY)
         if len(request.data) > MAX_ENROLLMENT_RECORDS:
             return Response(
                 'enrollment limit 25', status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
@@ -241,7 +241,11 @@ class ProgramCourseEnrollmentsView(ProgramCourseRunSpecificViewMixin, APIView):
                     results[enrollment_request["student_key"]] = error_status
                 else:
                     enrollments.append(enrollment_request)
-        except (KeyError, ValidationError, TypeError):
+        except KeyError: # student_key is not in enrollment_request
+            return Response('invalid enrollment record', status.HTTP_422_UNPROCESSABLE_ENTITY)
+        except TypeError: # enrollment_request isn't a dict
+            return Response('invalid enrollment record', status.HTTP_422_UNPROCESSABLE_ENTITY)
+        except ValidationError: # there was some other error raised by the serializer
             return Response('invalid enrollment record', status.HTTP_422_UNPROCESSABLE_ENTITY)
 
         program_enrollments = self.get_existing_program_enrollments(program_uuid, enrollments)
