@@ -221,12 +221,14 @@ class UserWrapper(PageObject):
     @property
     def name(self):
         """ Get this user's username, as displayed. """
-        return self.q(css=self._bounded_selector('.user-username')).text[0]
+        text = self.q(css=self._bounded_selector('.user-username')).text
+        return text[0] if text else None
 
     @property
     def role_label(self):
         """ Get this user's role, as displayed. """
-        return self.q(css=self._bounded_selector('.flag-role .value')).text[0]
+        text = self.q(css=self._bounded_selector('.flag-role .value')).text
+        return text[0] if text else None
 
     @property
     def is_current_user(self):
@@ -241,7 +243,8 @@ class UserWrapper(PageObject):
     @property
     def promote_button_text(self):
         """ What does the promote user button say? """
-        return self.q(css=self._bounded_selector('.add-admin-role')).text[0]
+        text = self.q(css=self._bounded_selector('.add-admin-role')).text
+        return text[0] if text else None
 
     def click_promote(self):
         """ Click on the button to promote this user to the more powerful role """
@@ -256,7 +259,8 @@ class UserWrapper(PageObject):
     @property
     def demote_button_text(self):
         """ What does the demote user button say? """
-        return self.q(css=self._bounded_selector('.remove-admin-role')).text[0]
+        text = self.q(css=self._bounded_selector('.remove-admin-role')).text
+        return text[0] if text else None
 
     def click_demote(self):
         """ Click on the button to demote this user to the less powerful role """
