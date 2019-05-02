@@ -7,6 +7,7 @@ import re
 import logging
 from decimal import Decimal
 from student.models import CourseEnrollment
+from django_comment_common.models import Role
 from django.utils.timezone import now
 from lms.djangoapps.commerce.utils import EcommerceService
 from course_modes.models import get_cosmetic_verified_display_price, format_course_price
@@ -16,7 +17,6 @@ from xmodule.partitions.partitions_service import get_user_partition_groups, get
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
 from openedx.core.djangoapps.catalog.utils import get_programs
-from openedx.core.djangoapps.discussion_common.models import Role
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 
 
