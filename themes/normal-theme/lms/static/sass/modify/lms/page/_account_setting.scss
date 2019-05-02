@@ -8,37 +8,36 @@
 }
 .wrapper-account-settings .account-settings-container {
     max-width: 1200px;
-    padding: 0;
+    padding: 20px 10px;
     margin: 0 auto;
 }
 .wrapper-account-settings .wrapper-header .header-title{
-    margin-bottom: 20px;
-    padding-top: 20px;
     font-size: 16px;
-    color: #2e313c;
+    color: $title;
+    padding: 0;
+    margin-bottom: 20px;
 }
 .account-settings-sections .account-nav{
     padding: 12px 22px;
     border-bottom: 1px solid  #f5f7fa;
-}
-.account-settings-sections .account-nav .account-nav-link.active{
-    color: #346ca3;
-}
-.account-settings-sections .account-nav .account-nav-link{
-    background: #fff;
-    border: none;
-    font-size: 14px;
-}
-.account-settings-sections .account-nav {
-    .account-nav-link:active,.account-nav-link:hover,.account-nav-link:focus{
+    .account-nav-link{
+      background: #fff;
+      border: none;
+      font-size: 14px;
+      &.active{
+        color: $primary;
+      }
+      &:active, &:hover, &:focus{
         color: $primary;
         background: #fff;
         box-shadow: none;
         border: none;
         outline: none;
+      }
     }
+}
 
-} 
+
 .account-settings-sections{
     box-shadow: 0px 1px 4px 0px $border;
     border-radius: 3px;
@@ -120,14 +119,11 @@
     height: 34px;
 }
 .account-settings-sections .u-field-message-help-password{
-    background-color: #b6dcfe;
-	border-radius: 2px;
-    border: solid 0px #4788c7;
+    background-color: $border;
+	  border-radius: 2px;
+    border: solid 0px $primary;
     font-size: 14px;
-    /* font-weight: normal; */
-    /* font-stretch: normal; */
-    /* letter-spacing: 0.1px; */
-    color: #346ca3;
+    color:$primary;
 }
 .account-settings-sections .u-field-value.field select{
     box-sizing: border-box;
@@ -142,11 +138,11 @@
 
 
 .account-settings-sections .section .account-settings-section-body .u-field .field .u-field-link{
-    background-color: #b6dcfe;
-	border-radius: 2px;
-    border: solid 1px #4788c7;
+    background-color: $border;
+	  border-radius: 2px;
+    border: solid 1px $primary;
     font-size: 14px;
-    color: #346ca3;
+    color: $primary;
     padding: 7.5px 14px;
     font-weight: normal;
 }
@@ -177,39 +173,11 @@
         margin-right: 0;
     }
 }
-@media screen and (max-width:1200px){
-    .wrapper-account-settings .wrapper-header .header-title{
-        padding-left: 22px;
-    }
-}
-@media screen and (max-width:770px){
-    #orders-tab{
-        padding: 10px 15px;
-    }
-    .wrapper-account-settings .wrapper-header .header-title{
-        padding-left: 22px;
-    }
-    .account-settings-sections #accountsTabSections-tabpanel .section .account-settings-section-body .u-field{
-        width: 100%;
-        margin-right: 0;
-    }
-    .account-settings-sections #ordersTabSections-tabpanel .section .account-settings-section-body .u-field-order-link{
-        position: absolute;
-        bottom: 12px;
-        right: 40px;
-    }
-    .account-settings-sections #ordersTabSections-tabpanel .u-field-order{
-        padding-bottom: 50px;
-        flex-wrap: wrap;
-    }
-    .u-field-order-lines{
-        padding-top: 10px;
-    }
-}
+
 
 .account-settings-sections #accountsTabSections-tabpanel .u-field-value.field{
     margin: 0;
-    box-shadow: 0px 1px 4px 0px #b6dcfe;
+    box-shadow: 0px 1px 4px 0px $border;
     background-color: rgba(182, 220, 254, 0.1);
     text-align: center;
     padding: 35px 30px;
@@ -222,7 +190,7 @@
         line-height: 1.5em;
     }
     .u-field-link{
-        color: #346ca3;
+        color: $primary;
         text-align: center;
     }
    
@@ -230,9 +198,9 @@
 .account-settings-sections .section .account-settings-section-body .u-field .social-field-linked{
     .u-field-link{
         &:focus,&:hover,&:active{
-            background-color: #b6dcfe;
+            background-color: $border;
             border-radius: 2px;
-            border: solid 1px #4788c7;
+            border: solid 1px $primary;
         }
     }
 }
@@ -242,13 +210,13 @@
         .u-field-link{
             background-color: #ffffff;
             border-radius: 3px;
-            border: solid 1px #4788c7;
+            border: solid 1px $primary;
         }
     }
 }
 #accountsTabSections-tabpanel .section-header{
     padding-top: 22px;
-    color: #2e313c;
+    color: $title;
 }
 .account-settings-sections #ordersTabSections-tabpanel  span.u-field-order-link{
     z-index: 99;
@@ -263,12 +231,12 @@
 }
 .account-settings-sections #ordersTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-order span{
     padding: 0 20px;
-    color: #2e313c;
+    color: $title;
 }
 
 .account-settings-sections #ordersTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-order .u-field-order-lines span{
     padding: 0 20px;
-    color: #656d78
+    color: $font
 }
 .account-settings-sections #ordersTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-order-lines .u-field-order-number{
     padding: 10px 20px 20px 20px;
@@ -286,13 +254,11 @@
 }
 .account-settings-sections #ordersTabSections-tabpanel .u-field-order{
     position: relative;
-    // padding: 12px 0 0 0;
 }
 .account-settings-sections #ordersTabSections-tabpanel .section{
     padding-bottom: 20px;
 }
 .account-settings-sections .section .account-settings-section-body .u-field .field select ~ .icon-caret-down::after{
-
     content: '';
     display: none;
     height: 20px;
@@ -352,12 +318,12 @@
 }
 .account-settings-sections .section .account-deletion-details .paragon__modal-open .next-steps{
     font-weight: normal;
-    color: #656d78;
+    color: $font;
     font-size: 14px;
 }
 .account-settings-sections .section .account-deletion-details .paragon__modal-open .paragon__modal-title{
     font-size: 16px;
-    color: #2e313c;
+    color: $title;
     font-weight: normal;
 }
 .delete-confirmation-wrapper .paragon__modal-open:focus .paragon__modal-dialog{
@@ -373,7 +339,7 @@
 }
 .paragon__form-group{
     #label-asInput1{
-       color: #2e313c;
+       color: $title;
        font-size: 14px;  
     }
     #asInput1{
@@ -384,9 +350,9 @@
         box-shadow: none;
         &:focus{
             box-shadow: 0px 1px 2px 0px 
-                #b6dcfe;
+                $border;
             border-radius: 2px;
-            border: solid 1px #4788c7;
+            border: solid 1px $primary;
 
         }
     }
@@ -409,7 +375,7 @@
     }
     p{
        font-size: 14px;
-       color: #656d78; 
+       color: $font; 
        padding-top: 20px;
        line-height: 1.5em;
        margin: 0;
@@ -426,6 +392,7 @@
     padding: 38px 0 0 80px;
 }
 
+
 @media screen and (max-width:991px){
     .account-settings-sections #aboutTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-message .u-field-message-notification{
         padding: 38px 0 0 0;
@@ -434,31 +401,65 @@
         display: none;
     }
 }
+@media screen and (max-width:770px){
+  .account-settings-sections #accountsTabSections-tabpanel .section .account-settings-section-body .u-field{
+      width: 100%;
+      margin-right: 0;
+  }
+  .account-settings-sections #ordersTabSections-tabpanel .section .account-settings-section-body .u-field-order-link{
+      position: absolute;
+      bottom: 12px;
+      right: 40px;
+  }
+  .account-settings-sections #ordersTabSections-tabpanel .u-field-order{
+      padding-bottom: 50px;
+      flex-wrap: wrap;
+  }
+  .u-field-order-lines{
+      padding-top: 10px;
+  }
+}
+
 @media screen and (max-width:568px){
     .account-settings-sections #ordersTabSections-tabpanel .u-field-order{
         padding-bottom: 70px;
     }
-    .account-settings-sections #ordersTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-order span.u-field-order-date{
+    .account-settings-sections #aboutTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-message{
+      padding: 10px 0 25px 0;
+    }
+    .account-settings-sections #ordersTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-order{
+      span.u-field-order-date,
+      span.u-field-order-price{
         display: none;
-    }
-    .account-settings-sections #ordersTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-order span.u-field-order-price{
-        display: none;
-    }
-    .account-settings-sections #ordersTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-order .u-field-order-lines{
+      }
+      .u-field-order-lines,
+      .u-field-order-lines span.u-field-order-number,
+      .u-field-order-lines span.u-field-order-date,
+      .u-field-order-lines span.u-field-order-price{
         display: block;
+      }
     }
-    .account-settings-sections #ordersTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-order .u-field-order-lines span.u-field-order-number{
-        display: block;
-    }
-    .account-settings-sections #ordersTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-order .u-field-order-lines span.u-field-order-date{
-        display: block;
-    }
-    .account-settings-sections #ordersTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-order .u-field-order-lines span.u-field-order-price{
-        display: block;
-    }
+
     .account-settings-sections #ordersTabSections-tabpanel .section .account-settings-section-body .u-field-order-link{
         left: 0;
         right: 40px;
         bottom: 20px;
     }
+    .account-settings-sections{
+      .section{
+        margin: 0 10px;
+      }
+      #about-tab{
+        padding-left: 10px;
+      }
+      .account-nav{
+        padding: 5px;
+        .account-nav-link{
+          width: 49%;
+          padding: 15px 10px;
+          box-sizing: border-box;
+          text-align: left;
+        }
+      } 
+    } 
 }

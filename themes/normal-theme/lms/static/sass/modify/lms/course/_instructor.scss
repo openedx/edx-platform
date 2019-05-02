@@ -1,0 +1,43 @@
+.instructor-dashboard-content-2{
+  input[type="button"],
+  .problem-browser .btn,
+  section.idash-section#membership .member-lists-management .auth-list-container .member-list-widget input[type="button"].add,
+  section.idash-section#cohort_management .cohort-management .message .action-create,
+  section.idash-section#discussions_management .form-submit,
+  .btn-blue,
+  .customBrowseBtn .file-browse .browse
+  {
+    @extend %btn-my-primary;
+  }
+  section.idash-section#membership .batch-enrollment textarea{
+    width: 100%;
+  }
+  section.idash-section#data_download .problem-browser input{
+    margin-left: 10px;
+    height: 36px;
+  }
+  .customBrowseBtn .enhanced-input-file{
+    height: 36px;
+    box-sizing: border-box;
+  }
+}
+@media screen and (max-width:767px){
+  .instructor-dashboard-content-2{
+    padding: 15px 10px;
+
+    section.idash-section#student_admin input[type="text"],
+    section.idash-section#certificates .student-username-or-email,
+    section.idash-section#certificates .notes-field{
+      width: 100%;
+    }
+    section.idash-section#data_download .problem-browser input{
+      margin: 10px 0 0;
+    }
+    section.idash-section#membership .batch-enrollment .role select{
+      margin-left: 0;
+    }
+    .upload-csv-button, #add-exception{
+      margin-top: 10px;
+    }
+  }
+}

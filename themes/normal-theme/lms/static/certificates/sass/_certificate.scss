@@ -1,0 +1,377 @@
+$primary: #4788C7;
+$font: #656D78;
+$title: #2E313C;
+$font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,"Helvetica Neue", Helvetica,Tahoma，Arial, "PingFang SC", "Hiragino Sans GB", 
+"Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei",SimHei，sans-serif;
+%btn-my-primary{
+  box-sizing: border-box;
+  display: inline-block;
+  width: auto;
+  padding: 0 20px !important;
+  font-size: 14px;
+  letter-spacing: 0.3px;
+  height: 36px;
+  line-height: 34px !important;
+  border-radius: 3px;
+  font-weight: normal;
+  cursor: pointer;
+  border: none;
+  background: $primary;
+  border: 1px solid $primary;
+  color: #fff;
+  text-shadow: none;
+  box-shadow: none;
+  font-family: $font-family;
+  outline: none;
+
+  &:hover,&:focus, &:active, &:visited, &:hover:not(:disabled), &:active:not(:disabled), &:focus:not(:disabled){
+    background: $primary;
+    background-image: none;
+    text-decoration: none;
+    opacity: 0.95;
+    box-shadow: none;
+    color: #fff;
+    border: 1px solid $primary;
+  }
+}
+.wrap-h5{
+  padding: 0 10px;
+}
+.layout-accomplishment .accomplishment-rendering{
+  background-size: 1170px 100%;
+  position: relative; 
+  height:51.625rem;
+  border:none; 
+}
+.certificate-content-box{  
+  position: absolute;
+  left: 67px;
+  top: 67px;
+  width: 88.55%;
+  height: 83.55%;
+  background: #fff url('../images/grey-logo.png') center 105px no-repeat;
+  background-size: 50%;
+}
+
+.layout-accomplishment .accomplishment-rendering .accomplishment-type{ 
+  position: absolute;
+  left: 70px;
+  top: 68px;
+  width: 100%;
+  height: auto;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: 0;
+}
+.accomplishment-rendering .accomplishment-type-symbol{  
+  width:19.63rem;
+  margin-left: 0;
+}
+p.prove,p.pro-name,p.accomplishment-success{   
+  text-align: left;
+  color: #434a54;
+  margin-bottom: 0;
+}
+p.prove{  
+  font-size: 20px;
+  margin-bottom: 25px;
+}
+p.pro-name{    
+  font-size: 36px;
+  margin-bottom: 22px;
+}
+p.accomplishment-success{ 
+  font-size: 20px;
+  margin-bottom: 40px;
+}
+.span-accomplishment-course-name{   
+    color: #205179;
+    font-size: 34px;
+    width:auto;
+    display: inline-block;
+    text-align: left;
+}
+.span-accomplishment-course-id{ 
+    margin-top: 5px;
+    font-size: 18px;
+    color: #205179;
+}
+.course-name-line{   
+    height: 3px;
+    width: auto;
+    background: #205179;
+}
+.eliteu-support{ 
+    color: #b0b0b0;
+    font-size: 16px;
+    text-align: left;
+    margin-top: 146px;
+    margin-bottom: 40px;
+}
+.accomplishment-box-right{   
+    position: absolute; 
+    right: 70px;
+    top: 68px;
+    height:100%;
+}
+.verified-end-box{   
+    width: 320px;
+    height: 242px;
+
+}
+.verified-end-box img{  
+    display: block;
+    float: right;
+    width: 193px;
+    height: auto;
+}
+.underwrite{ 
+    position: absolute;
+    bottom: 131px;
+    right: 0px;
+
+}
+.underwrite ul{ 
+    list-style: none;
+    margin-left:  0;
+
+}
+.pro-img{   
+    width: 144px;
+    height: 50px;
+    display: inline-block;
+    border-bottom: 2px solid #ededed;
+}
+
+#code{  
+  position: relative; 
+}
+#code .certificates-mes{    
+  position: absolute; 
+  left: 90px;
+}
+#code .certificates-mes p{    
+  text-align: left;
+  font-size: 12px;
+  margin-bottom: 3px;
+}
+#code .certificates-mes p:nth-of-type(3),#code .certificates-mes p:nth-of-type(4){  
+  color:#b0b0b0;
+}
+#container img{
+  width: 100%;
+  max-width: 1170px;
+}
+
+// new style
+.wrapper-header{
+  padding: 13px 0;
+  margin-bottom: 0;
+}
+
+.wrapper-banner-certificates{
+  max-width: 1200px;
+  background-color: #ffffff;
+	box-shadow: 0px 1px 4px 0px 
+		#b6dcfe;
+  border-radius: 3px;
+  padding: 15px 26px;
+  margin: 20px auto;
+  margin-bottom: 0;
+  line-height: 1.5;
+  display: flex;
+  align-items: flex-end;
+  .message-notice-certificates{
+    flex: 1;
+    p{
+      margin: 0;
+    }
+    p:first-child{
+      font-size: 16px;
+      color: $title;
+      line-height: 2;
+    }
+    p:last-child{
+      font-size: 14px;
+      color: $font;
+    }
+  }
+  .op-container-certificates{
+    flex: 0 0 380px;
+    height: 36px;
+    text-align: right;
+    .certificates-btn{
+      @extend %btn-my-primary;
+      bottom: 0;
+    }
+    .print-btn{
+      margin-right: 10px;
+    }
+  }
+}
+.layout-accomplishment .header-app .logo{
+  width: 175px;
+}
+.layout-accomplishment .accomplishment-main{
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #ffffff !important;
+  box-shadow: 0px 1px 4px 0px #b6dcfe;
+  border-radius: 3px;
+  .wrapper-accomplishment-rendering-header{
+    margin-top: 20px;
+    padding: 13px 25px;
+    color: $title;
+    line-height: 1.5;
+    font-size: 18px;
+    border-bottom: solid 1px #e3f2fe;
+  }
+  .wrapper-accomplishment-rendering{
+    padding: 25px;
+    img{
+      width: 100%;
+    }
+  }
+  .wrapper-accomplishment-extend-info{
+    padding-left: 25px;
+    padding-top: 25px;
+    border-top: 1px solid #e6e9ed;
+    padding-bottom: 45px;
+  }
+  .accomplishment-extend-info-title{
+    font-size: 16px;
+    color: $title;
+    margin-bottom: 20px;
+    font-weight: normal;
+  }
+  .accomplishment-extend-info-data{
+    display: flex;
+    flex-wrap: nowrap;
+    h3,p{
+      margin: 0;
+      padding: 0;
+    }
+    .recipient-img{
+      img{
+        width: 60px;
+        border-radius: 50%;
+      }
+    }
+    .recipient-details.first{
+      padding-left: 20px;
+      padding-right: 60px;
+      padding-top: 0;
+    }
+    .recipient-details{
+      // padding-top: 10px;
+      h3{
+        font-size: 14px;
+        color: $title;
+        line-height: 2;
+      }
+      p{
+        color: $font;
+        line-height: 2;
+        font-size: 14px;
+      }
+    }
+  }
+}
+.layout-accomplishment .wrapper-about .about{
+  max-width: 1200px;
+  padding: 30px 24px;
+}
+.layout-accomplishment .wrapper-about .about-item{
+  width: 100%;
+  .about-edx-title,.about-title {
+    color: $title;
+    line-height: 24px;
+    font-size: 16px;
+    margin: 0;
+    font-weight: bold;
+  }
+  .copy-meta{
+    p{
+      font-size: 14px;
+      color: $font;
+    }
+    a{
+      color: $primary;
+    }
+  }
+}
+@media screen and (max-width:768px){
+  
+  .accomplishment-rendering{
+    #container{
+      width: 100%;
+    }
+  }
+  .layout-accomplishment .accomplishment-main .accomplishment-extend-info-data{
+    flex-wrap: wrap;
+  }
+  // .layout-accomplishment .accomplishment-main .accomplishment-extend-info-data .recipient-details.first{
+  //   padding-left: 0;
+  // }
+  .layout-accomplishment .wrapper-about .about-item{
+    margin-bottom: 20px;
+    p{
+      margin: 0;
+    }
+  }
+  .wrapper-banner-certificates .op-container-certificates{
+    float: unset;
+    text-align: center;
+  }
+  .layout-accomplishment .accomplishment-main .wrapper-accomplishment-extend-info{
+    padding-bottom: 25px;
+  }
+  .layout-accomplishment .wrapper-about .about{
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .wrapper-banner-certificates .message-notice-certificates{
+    padding-bottom: 10px;
+    width: 100%;
+  }
+  .op-container-certificates{
+    display: none;
+  }
+  .recipient-details.first{
+    padding-top: 0;
+  }
+  .recipient-details{
+    padding-top: 10px;
+  }
+}
+@media print {
+  .wrapper-accomplishment-rendering{
+    height: 700px;
+    width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    #container img{
+      height: 668px;
+    } 
+  }
+  .layout-accomplishment .accomplishment-main{
+      box-shadow:unset;
+  }
+  .accomplishment-metadata{
+    display: none !important;
+  }
+  .wrapper-banner-certificates{
+    display:none;
+  }
+  .wrapper-accomplishment-rendering-header{
+      display:none;
+  }
+  .wrapper-accomplishment-extend-info{
+    display:none;
+  }
+
+}
+.layout-accomplishment .accomplishment-rendering,.layout-accomplishment.certificate-no-id-professional .accomplishment-rendering,.layout-accomplishment.certificate-professional .accomplishment-rendering,.layout-accomplishment.certificate-honor .accomplishment-rendering,.layout-accomplishment.certificate-audit .accomplishment-rendering {
+  background: #fff url('../images/bg-verified.png') center no-repeat;
+}
+

@@ -140,15 +140,15 @@
           margin-bottom: 0;
         }
       } 
-    }
-
-    
+    }    
   }
-
-  
-  
 }
 
+@media screen and (max-width:1200px){
+  .content-wrapper .discussion-board{
+    margin: 0 10px 40px;
+  }
+}
 @media screen and (max-width:768px){
   .discussion-column{
     margin-left: 0;
@@ -158,7 +158,7 @@
   }
 }
 
-@media screen and (max-width:576px){
+@media screen and (max-width:767px){
   .content-wrapper{
     .discussion-board{
       .page-content .view-discussion-home{
@@ -213,7 +213,7 @@
   }
   .forum-nav-filter-main-control,
   .forum-nav-sort-control{
-    padding: 0 20px;
+    padding: 0 20px 0 15px;
   }
   .forum-nav-thread-list{
     border: none;
@@ -223,7 +223,7 @@
     }
   }
   .forum-nav-thread-wrapper-1{
-    max-width: none;
+    // max-width: none;
   }
   .search-alert-content{
     text-align: center;

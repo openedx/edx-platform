@@ -87,7 +87,7 @@ def get_login_session_form(request):
 
     # Translators: This label appears above a field on the login form
     # meant to hold the user's email address.
-    email_label = pgettext("Register and Login", u"E-mail or mobile phone number")
+    email_label = pgettext("Register and Login", u"Email or Phone Number")
 
     # Translators: This example email address is used as a placeholder in
     # a field on the login form meant to hold the user's email address.

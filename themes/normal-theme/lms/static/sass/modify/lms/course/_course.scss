@@ -5,9 +5,13 @@
   overflow-x:hidden !important;
   width: 96%;
 
+  .navbar-nav{
+    flex-wrap: wrap;
+    padding: 10px 0;
+  }
   .nav-item .nav-link{
-    padding: 20px 15px 20px 10px;
-    border: none;
+    padding: 10px 15px 10px 10px !important;
+    border: none !important;
   }
   .nav-item.active .nav-link{
     border: none;
@@ -16,15 +20,22 @@
     border: none;
   }
 }
+/*
 body.view-in-course .wrapper-course-material{
   overflow: hidden;
   .course-material{
     overflow: hidden;
   }
 }
+*/
 body.view-in-course .wrapper-course-material .course-tabs{
+  display: flex;
+  flex-wrap: wrap;
+  padding: 10px 0 !important;
   .tab a{ 
-    padding: 20px 15px 20px 10px;
+    padding: 10px 15px 10px 10px;
+    border: none;
+    color: $title;
     &:hover, &:focus, &.active{
       border: 0;
       outline: none;

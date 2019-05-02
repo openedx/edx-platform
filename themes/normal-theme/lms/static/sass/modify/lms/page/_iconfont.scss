@@ -165,7 +165,8 @@ $icon-width: 18px;
 .fa-star:before{
   background-position: calcP(10, 7)
 }
-.forum-nav{
+.forum-nav,
+.forum-nav-thread-link{
   .fa-star:before{
     transform: scale(0.8);
     position: relative;
