@@ -123,3 +123,24 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
 
     def __str__(self):
         return '[ProgramCourseEnrollment id={}]'.format(self.id)
+
+    @classmethod
+    def enroll(cls, program_enrollment, course_key, status):
+        course_enrollment = None
+        if program_enrollment.user:
+            course_enrollment = CourseEnrollment.enroll(
+                program_enrollment.user,
+                self.course_key,
+                mode=CourseMode.MASTERS,
+                check_access=True,
+            )
+            if enrollment_status == CourseEnrollmentResponseStatuses.INACTIVE:
+                course_enrollment.deactivate()
+
+        program_course_enrollment = ProgramCourseEnrollment.objects.create(
+            program_enrollment=program_enrollment,
+            course_enrollment=course_enrollment,
+            course_key=self.course_key,
+            status=enrollment_status,
+        )
+        return program_course_enrollment.status

@@ -311,7 +311,7 @@ class CourseEnrollmentPostTests(APITestCase, ProgramCacheTestCaseMixin):
         self.assertEqual(self.course_key, enrollment.course_key)
         course_enrollment = enrollment.course_enrollment
         if has_user:
-            self.assertIsNotNone(bool(course_enrollment))
+            self.assertIsNotNone(course_enrollment)
             self.assertEqual(expected_status == "active", course_enrollment.is_active)
             self.assertEqual(self.course_key, course_enrollment.course_id)
         else:

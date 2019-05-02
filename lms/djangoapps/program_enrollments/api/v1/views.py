@@ -253,7 +253,7 @@ class ProgramCourseEnrollmentsView(ProgramCourseRunSpecificViewMixin, APIView):
                 continue
             results[student_key] = self.enroll_learner_in_course(enrollment, program_enrollments)
 
-        good_count = sum([1 for _, v in results.items() if v not in CourseEnrollmentResponseStatuses.ERROR_STATUSES])
+        good_count = sum(1 for _, v in results.items() if v not in CourseEnrollmentResponseStatuses.ERROR_STATUSES)
         if not good_count:
             return Response(results, status.HTTP_422_UNPROCESSABLE_ENTITY)
         if good_count != len(results):
@@ -284,7 +284,7 @@ class ProgramCourseEnrollmentsView(ProgramCourseRunSpecificViewMixin, APIView):
             - enrollments: A list of enrollment requests
         Returns:
             - Dictionary mapping all student keys in the enrollment requests
-              to that user's existing program enrollment <self.program>
+              to that user's existing program enrollment in <self.program>
         """
         external_user_keys = [e["student_key"] for e in enrollments]
         existing_enrollments = ProgramEnrollment.objects.filter(
@@ -309,22 +309,9 @@ class ProgramCourseEnrollmentsView(ProgramCourseRunSpecificViewMixin, APIView):
         if program_enrollment.get_program_course_enrollment(self.course_key):
             return CourseEnrollmentResponseStatuses.CONFLICT
 
-        enrollment_status = enrollment_request['status']
-        course_enrollment = None
-        if program_enrollment.user:  # This user has an account, enroll them in the course
-            course_enrollment = CourseEnrollment.enroll(
-                program_enrollment.user,
-                self.course_key,
-                mode=CourseMode.MASTERS,
-                check_access=True,
-            )
-            if enrollment_status == CourseEnrollmentResponseStatuses.INACTIVE:
-                course_enrollment.deactivate()
-
-        ProgramCourseEnrollment.objects.create(
-            program_enrollment=program_enrollment,
-            course_enrollment=course_enrollment,
-            course_key=self.course_key,
-            status=enrollment_status,
+        enrollment_status = ProgramCourseEnrollment.enroll(
+            program_enrollment,
+            self.course_key,
+            enrollment_status
         )
         return enrollment_status
