@@ -1055,8 +1055,8 @@ INSTALLED_APPS = [
     # Ability to detect and special-case crawler behavior
     'openedx.core.djangoapps.crawlers',
 
-    # Discussion
-    'openedx.core.djangoapps.discussion_common',
+    # comment common
+    'django_comment_common',
 
     # for course creator table
     'django.contrib.admin',
