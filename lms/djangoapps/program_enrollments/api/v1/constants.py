@@ -18,6 +18,7 @@ class CourseEnrollmentResponseStatuses(object):
     CONFLICT = "conflict"
     ILLEGAL_OPERATION = "illegal-operation"
     NOT_IN_PROGRAM = "not-in-program"
+    NOT_FOUND = "not-found"
     INTERNAL_ERROR = "internal-error"
 
     ERROR_STATUSES = (
@@ -26,5 +27,6 @@ class CourseEnrollmentResponseStatuses(object):
         CONFLICT,
         ILLEGAL_OPERATION,
         NOT_IN_PROGRAM,
+        NOT_FOUND,
         INTERNAL_ERROR,
     )

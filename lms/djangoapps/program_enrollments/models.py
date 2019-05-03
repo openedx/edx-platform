@@ -3,6 +3,7 @@
 Django model specifications for the Program Enrollments API
 """
 from __future__ import unicode_literals
+import logging
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -14,6 +15,8 @@ from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 from simple_history.models import HistoricalRecords
 from student.models import CourseEnrollment as StudentCourseEnrollment
+
+logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
 class ProgramEnrollment(TimeStampedModel):  # pylint: disable=model-missing-unicode
@@ -162,3 +165,34 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
             status=status,
         )
         return program_course_enrollment.status
+
+    def change_status(self, status):
+        """
+        Modify ProgramCourseEnrollment status and course_enrollment status if it exists
+        """
+        if status == self.status:
+            return status
+
+        self.status = status
+        if self.course_enrollment:
+            if status == CourseEnrollmentResponseStatuses.ACTIVE:
+                self.course_enrollment.activate()
+            elif status == CourseEnrollmentResponseStatuses.INACTIVE:
+                self.course_enrollment.deactivate()
+            else:
+                message = ("Changed {enrollment} status to {status}, not changing course_enrollment"
+                           " status because status is not '{active}' or '{inactive}'")
+                logger.warn(message.format(
+                    enrollment=self,
+                    status=status,
+                    active=CourseEnrollmentResponseStatuses.ACTIVE,
+                    inactive=CourseEnrollmentResponseStatuses.INACTIVE
+                ))
+        elif self.program_enrollment.user:
+            logger.warn("User {user} {program_enrollment} {course_key} has no course_enrollment".format(
+                user=self.program_enrollment.user,
+                program_enrollment=self.program_enrollment,
+                course_key=self.course_key,
+            ))
+        self.save()
+        return self.status
