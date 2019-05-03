@@ -31,6 +31,47 @@ class ProgramEnrollmentModelTests(TestCase):
             status='enrolled'
         )
 
+    def test_bulk_read_by_student_key(self):
+        curriculum_a = uuid4()
+        curriculum_b = uuid4()
+        enrollments = []
+        student_data = {}
+
+        for i in xrange(5):
+            # This will give us 4 program enrollments for self.program_uuid
+            # and 1 enrollment for self.other_program_uuid
+            user_curriculum = curriculum_b if i % 2 else curriculum_a
+            user_status = 'pending' if i % 2 else 'enrolled'
+            user_program = self.other_program_uuid if i == 4 else self.program_uuid
+            user_key = 'student-{}'.format(i)
+            enrollments.append(
+                ProgramEnrollment.objects.create(
+                    user=None,
+                    external_user_key=user_key,
+                    program_uuid=user_program,
+                    curriculum_uuid=user_curriculum,
+                    status=user_status,
+                )
+            )
+            student_data[user_key] = {'curriculum_uuid': user_curriculum}
+
+        enrollment_records = ProgramEnrollment.bulk_read_by_student_key(self.program_uuid, student_data)
+
+        expected = {
+            'student-0': {'curriculum_uuid': curriculum_a, 'status': 'enrolled', 'program_uuid': self.program_uuid},
+            'student-1': {'curriculum_uuid': curriculum_b, 'status': 'pending', 'program_uuid': self.program_uuid},
+            'student-2': {'curriculum_uuid': curriculum_a, 'status': 'enrolled', 'program_uuid': self.program_uuid},
+            'student-3': {'curriculum_uuid': curriculum_b, 'status': 'pending', 'program_uuid': self.program_uuid},
+        }
+        assert expected == {
+            enrollment.external_user_key: {
+                'curriculum_uuid': enrollment.curriculum_uuid,
+                'status': enrollment.status,
+                'program_uuid': enrollment.program_uuid,
+            }
+            for enrollment in enrollment_records
+        }
+
     def test_user_retirement(self):
         """
         Test that the external_user_key is uccessfully retired for a user's program enrollments and history.

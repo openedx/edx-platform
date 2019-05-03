@@ -4,6 +4,7 @@ ProgramEnrollment Views
 """
 from __future__ import unicode_literals
 
+from collections import Counter, OrderedDict
 from functools import wraps
 
 from django.http import Http404
@@ -21,8 +22,11 @@ from lms.djangoapps.program_enrollments.api.v1.serializers import (
     ProgramCourseEnrollmentListSerializer,
     ProgramCourseEnrollmentRequestSerializer,
     ProgramEnrollmentListSerializer,
+    ProgramEnrollmentSerializer,
 )
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
+from lms.djangoapps.program_enrollments.utils import get_user_by_program_id
+
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
@@ -120,6 +124,73 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
         ],
     }
 
+    Create
+    ==========
+    Path: `/api/program_enrollments/v1/programs/{program_uuid}/enrollments/`
+    Where the program_uuid will be the uuid for a program.
+
+    Request body:
+        * The request body will be a list of one or more students to enroll with the following schema:
+            {
+                'status': A choice of the following statuses: ['enrolled', 'pending', 'withdrawn', 'suspended'],
+                'external_user_key': string representation of a learner in partner systems,
+                'curriculum_uuid': string representation of a curriculum
+            }
+        Example:
+            [
+                {
+                    "status": "enrolled",
+                    "external_user_key": "123",
+                    "curriculum_uuid": "2d7de549-b09e-4e50-835d-4c5c5080c566"
+                },{
+                    "status": "withdrawn",
+                    "external_user_key": "456",
+                    "curriculum_uuid": "2d7de549-b09e-4e50-835d-4c5c5080c566"
+                },{
+                    "status": "pending",
+                    "external_user_key": "789",
+                    "curriculum_uuid": "2d7de549-b09e-4e50-835d-4c5c5080c566"
+                },{
+                    "status": "suspended",
+                    "external_user_key": "abc",
+                    "curriculum_uuid": "2d7de549-b09e-4e50-835d-4c5c5080c566"
+                },
+            ]
+
+    Returns:
+      * Response Body: {<external_user_key>: <status>} with as many keys as there were in the request body
+        * external_user_key - string representation of a learner in partner systems
+        * status - the learner's registration status
+            * success statuses:
+                * 'enrolled'
+                * 'pending'
+                * 'withdrawn'
+                * 'suspended'
+            * failure statuses:
+                * 'duplicated' - the request body listed the same learner twice
+                * 'conflict' - there is an existing enrollment for that learner, curriculum and program combo
+                * 'invalid-status' - a status other than 'enrolled', 'pending', 'withdrawn', 'suspended' was entered
+      * 201: CREATED - All students were successfully enrolled.
+        * Example json response:
+            {
+                '123': 'enrolled',
+                '456': 'pending',
+                '789': 'withdrawn,
+                'abc': 'suspended'
+            }
+      * 207: MULTI-STATUS - Some students were successfully enrolled while others were not.
+      Details are included in the JSON response data.
+        * Example json response:
+            {
+                '123': 'duplicated',
+                '456': 'conflict',
+                '789': 'invalid-status,
+                'abc': 'suspended'
+            }
+      * 403: FORBIDDEN - The requesting user lacks access to enroll students in the given program.
+      * 404: NOT FOUND - The requested program does not exist.
+      * 413: PAYLOAD TOO LARGE - Over 25 students supplied
+      * 422: Unprocesable Entity - None of the students were successfully listed.
     """
     authentication_classes = (
         JwtAuthentication,
@@ -138,6 +209,89 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
         paginated_enrollments = self.paginate_queryset(enrollments)
         serializer = ProgramEnrollmentListSerializer(paginated_enrollments, many=True)
         return self.get_paginated_response(serializer.data)
+
+    @verify_program_exists
+    def post(self, request, *args, **kwargs):
+        """
+        This is the POST for ProgramEnrollments
+        """
+        if len(request.data) > 25:
+            return Response(
+                status=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                content_type='application/json',
+            )
+
+        program_uuid = kwargs['program_uuid']
+        student_data = OrderedDict((
+            row.get('external_user_key'),
+            {
+                'program_uuid': program_uuid,
+                'curriculum_uuid': row.get('curriculum_uuid'),
+                'status': row.get('status'),
+                'external_user_key': row.get('external_user_key'),
+            })
+            for row in request.data
+        )
+
+        key_counter = Counter([enrollment.get('external_user_key') for enrollment in request.data])
+
+        response_data = {}
+        for student_key, count in key_counter.items():
+            if count > 1:
+                response_data[student_key] = CourseEnrollmentResponseStatuses.DUPLICATED
+                student_data.pop(student_key)
+
+        existing_enrollments = ProgramEnrollment.bulk_read_by_student_key(program_uuid, student_data)
+        for enrollment in existing_enrollments:
+            response_data[enrollment.external_user_key] = CourseEnrollmentResponseStatuses.CONFLICT
+            student_data.pop(enrollment.external_user_key)
+
+        enrollments_to_create = {}
+
+        for student_key, data in student_data.items():
+            curriculum_uuid = data['curriculum_uuid']
+            existing_user = get_user_by_program_id(student_key, program_uuid)
+
+            if existing_user:
+                data['user'] = existing_user.id
+
+            serializer = ProgramEnrollmentSerializer(data=data)
+            if serializer.is_valid():
+                enrollments_to_create[(student_key, curriculum_uuid)] = serializer
+                response_data[student_key] = data.get('status')
+            else:
+                if 'status' in serializer.errors and serializer.errors['status'][0].code == 'invalid_choice':
+                    response_data[student_key] = CourseEnrollmentResponseStatuses.INVALID_STATUS
+                else:
+                    return Response(
+                        'invalid enrollment record',
+                        status.HTTP_422_UNPROCESSABLE_ENTITY
+                    )
+
+        for enrollment_serializer in enrollments_to_create.values():
+            # create the model
+            enrollment_serializer.save()
+            # TODO: make this a bulk save
+
+        if not enrollments_to_create:
+            return Response(
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                data=response_data,
+                content_type='application/json',
+            )
+
+        if len(request.data) != len(enrollments_to_create):
+            return Response(
+                status=status.HTTP_207_MULTI_STATUS,
+                data=response_data,
+                content_type='application/json',
+            )
+
+        return Response(
+            status=status.HTTP_201_CREATED,
+            data=response_data,
+            content_type='application/json',
+        )
 
 
 class ProgramSpecificViewMixin(object):
