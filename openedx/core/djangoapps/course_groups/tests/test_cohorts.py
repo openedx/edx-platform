@@ -77,7 +77,7 @@ class TestCohortSignals(TestCase):
             """
             Confirms the presence of the specifed event for each user in the specified list of cohorts
             """
-            mock_tracker.emit.assert_has_calls([
+            expected_calls = [
                 call(
                     "edx.cohort.user_" + event_name_suffix,
                     {
@@ -87,7 +87,8 @@ class TestCohortSignals(TestCase):
                     }
                 )
                 for user in user_list for cohort in cohort_list
-            ])
+            ]
+            mock_tracker.emit.assert_has_calls(expected_calls, any_order=True)
 
         # Add users to cohort
         cohort_list[0].users.add(*user_list)
