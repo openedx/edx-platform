@@ -15,8 +15,8 @@ from django.http import Http404
 from django.test.client import RequestFactory
 from opaque_keys.edx.locator import CourseLocator
 
-from django_comment_common.models import CourseDiscussionSettings
-from django_comment_common.utils import get_course_discussion_settings
+from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
+from openedx.core.djangoapps.django_comment_common.utils import get_course_discussion_settings
 from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory

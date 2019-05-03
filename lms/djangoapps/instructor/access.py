@@ -11,7 +11,7 @@ TO DO sync instructor and staff flags
 
 import logging
 
-from django_comment_common.models import Role
+from openedx.core.djangoapps.django_comment_common.models import Role
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
 from student.roles import CourseBetaTesterRole, CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
 

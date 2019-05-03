@@ -132,7 +132,7 @@ build
 /src/
 \#*\#
 .env/
-lms/lib/comment_client/python
+openedx/core/djangoapps/django_comment_common/comment_client/python
 autodeploy.properties
 .ws_migrations_complete
 dist

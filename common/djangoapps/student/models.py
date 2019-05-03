@@ -51,9 +51,7 @@ from slumber.exceptions import HttpClientError, HttpServerError
 from user_util import user_util
 
 from edx_django_utils.cache import RequestCache
-import lms.lib.comment_client as cc
 from student.signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED
-from lms.djangoapps.certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
@@ -62,7 +60,9 @@ from courseware.models import (
 )
 from enrollment.api import _default_course_mode
 
+from lms.djangoapps.certificates.models import GeneratedCertificate
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue

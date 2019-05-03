@@ -16,12 +16,8 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.contrib.auth.hashers import make_password
 
-from django_comment_common.models import ForumsConfig
-from notification_prefs import NOTIFICATION_PREF_KEY
-from openedx.core.djangoapps.user_authn.views.register import (
-    REGISTRATION_AFFILIATE_ID, REGISTRATION_UTM_CREATED_AT, REGISTRATION_UTM_PARAMETERS,
-    _skip_activation_email,
-)
+from lms.djangoapps.discussion.notification_prefs import NOTIFICATION_PREF_KEY
+from openedx.core.djangoapps.django_comment_common.models import ForumsConfig
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.user_api.accounts import (
@@ -29,6 +25,10 @@ from openedx.core.djangoapps.user_api.accounts import (
 )
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, waffle
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
+from openedx.core.djangoapps.user_authn.views.register import (
+    REGISTRATION_AFFILIATE_ID, REGISTRATION_UTM_CREATED_AT, REGISTRATION_UTM_PARAMETERS,
+    _skip_activation_email,
+)
 from student.models import UserAttribute
 from student.tests.factories import UserFactory
 from third_party_auth.tests import factories as third_party_auth_factory
@@ -768,8 +768,11 @@ class TestCreateAccountValidation(TestCase):
 
 
 @mock.patch.dict("student.models.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-@mock.patch("lms.lib.comment_client.User.base_url", TEST_CS_URL)
-@mock.patch("lms.lib.comment_client.utils.requests.request", return_value=mock.Mock(status_code=200, text='{}'))
+@mock.patch("openedx.core.djangoapps.django_comment_common.comment_client.User.base_url", TEST_CS_URL)
+@mock.patch(
+    "openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request",
+    return_value=mock.Mock(status_code=200, text='{}')
+)
 class TestCreateCommentsServiceUser(TransactionTestCase):
     """ Tests for creating comments service user. """
 
