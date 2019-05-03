@@ -4,7 +4,6 @@ Common utility functions useful throughout the contentstore
 from __future__ import print_function
 
 import logging
-import time
 from datetime import datetime
 
 from django.conf import settings
@@ -518,18 +517,3 @@ def is_self_paced(course):
     Returns True if course is self-paced, False otherwise.
     """
     return course and course.self_paced
-
-
-def execute_and_log_time(func, *args, **kwargs):
-    """
-    Call func passed in method with logging the time it took to complete.
-    Temporarily added for EDUCATOR-4013, we will remove this once we get the required information.
-    """
-    course_key = args[1]
-    start_time = time.time()
-    output = func(*args, **kwargs)
-    if 'MITx+7.00x' in unicode(course_key):
-        log.info(
-            u'Execution time for [%s] [%s] completed in [%f]',
-            func.__name__, course_key, (time.time() - start_time))
-    return output
