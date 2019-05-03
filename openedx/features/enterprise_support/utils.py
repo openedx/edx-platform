@@ -242,22 +242,13 @@ def update_account_settings_context_for_enterprise(context, enterprise_customer)
 
     """
     enterprise_context = {
-        'enterprise_name': None,
-        'sync_learner_profile_data': False,
+        'enterprise_name': enterprise_customer['name'] if enterprise_customer else None,
+        'sync_learner_profile_data': _get_sync_learner_profile_data(enterprise_customer),
         'edx_support_url': configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK),
         'enterprise_readonly_account_fields': {
             'fields': settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS
         }
     }
-
-    if enterprise_customer:
-        enterprise_context['enterprise_name'] = enterprise_customer['name']
-        identity_provider = third_party_auth.provider.Registry.get(
-            provider_id=enterprise_customer['identity_provider'],
-        )
-        if identity_provider:
-            enterprise_context['sync_learner_profile_data'] = identity_provider.sync_learner_profile_data
-
     context.update(enterprise_context)
 
 
@@ -265,7 +256,27 @@ def get_enterprise_readonly_account_fields(user):
     """
     Returns a set of account fields that are read-only for enterprise users.
     """
-    return set(settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS) if is_enterprise_learner(user) else set()
+    # TODO circular dependency between enterprise_support.api and enterprise_support.utils
+    from openedx.features.enterprise_support.api import get_enterprise_customer_for_learner
+    enterprise_customer = get_enterprise_customer_for_learner(user)
+
+    sync_learner_profile_data = _get_sync_learner_profile_data(enterprise_customer)
+    return set(settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS) if sync_learner_profile_data else set()
+
+
+def _get_sync_learner_profile_data(enterprise_customer):
+    """
+    Returns whether the configuration of the given enterprise customer supports
+    synching learner profile data.
+    """
+    if enterprise_customer:
+        identity_provider = third_party_auth.provider.Registry.get(
+            provider_id=enterprise_customer['identity_provider'],
+        )
+        if identity_provider:
+            return identity_provider.sync_learner_profile_data
+
+    return False
 
 
 def get_enterprise_learner_generic_name(request):
@@ -278,6 +289,7 @@ def get_enterprise_learner_generic_name(request):
     # Prevent a circular import. This function makes sense to be in this module though. And see function description.
     from openedx.features.enterprise_support.api import enterprise_customer_for_request
     enterprise_customer = enterprise_customer_for_request(request)
+
     return (
         enterprise_customer['name'] + 'Learner'
         if enterprise_customer and enterprise_customer['replace_sensitive_sso_username']
