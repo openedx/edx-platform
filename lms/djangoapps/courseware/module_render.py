@@ -653,7 +653,8 @@ def get_module_system_for_user(
             static_asset_path=static_asset_path,
             user_location=user_location,
             request_token=request_token,
-            course=course
+            course=course,
+            will_recheck_access=will_recheck_access,
         )
 
         module.descriptor.bind_for_student(
