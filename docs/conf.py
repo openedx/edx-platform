@@ -27,7 +27,6 @@ sys.path.append(root / "docs")
 sys.path.append(root / "cms/djangoapps")
 sys.path.append(root / "common/djangoapps")
 sys.path.append(root / "common/lib/capa")
-sys.path.append(root / "common/lib/chem")
 sys.path.append(root / "common/lib/safe_lxml")
 sys.path.append(root / "common/lib/symmath")
 sys.path.append(root / "common/lib/xmodule")
@@ -236,7 +235,6 @@ autodoc_mock_imports = [
 modules = {
     'cms': 'cms',
     'common/lib/capa/capa': 'common/lib/capa',
-    'common/lib/chem/chem': 'common/lib/chem',
     'common/lib/safe_lxml/safe_lxml': 'common/lib/safe_lxml',
     'common/lib/symmath/symmath': 'common/lib/symmath',
     'common/lib/xmodule/xmodule': 'common/lib/xmodule',
