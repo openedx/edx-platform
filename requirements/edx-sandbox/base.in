@@ -10,4 +10,5 @@
 -c ../constraints.txt
 
 -r shared.txt                       # Dependencies in common with LMS and Studio
+tornado==5.1.1                      # Required by matplotlib, compatible with python 2.7
 matplotlib==1.3.1                   # 2D plotting library

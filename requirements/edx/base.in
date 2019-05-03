@@ -48,7 +48,7 @@ django-memcached-hashring
 django-method-override==0.1.0
 django-model-utils==3.0.0
 django-mptt>=0.8.6,<0.9
-django-mysql
+django-mysql==2.4.1
 django-oauth-toolkit<1.2            # Provides oAuth2 capabilities for Django. 1.2+ requires Django 2 and Python 3.5
 django-pyfs
 django-ratelimit
