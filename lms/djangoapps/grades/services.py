@@ -162,7 +162,7 @@ class GradesService(object):
         Given a user_id, course_key, and subsection usage_key,
         creates a new ``PersistentSubsectionGrade``.
         """
-        from lms.djangoapps.courseware.courses import get_course
+        from djangoapps.courseware.courses import get_course
         course = get_course(course_key, depth=None)
         subsection = course.get_child(usage_key)
         if not subsection:

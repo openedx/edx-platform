@@ -37,6 +37,7 @@ XBLOCKS = [
     "problem = xmodule.capa_module:ProblemBlock",
     "vertical = xmodule.vertical_block:VerticalBlock",
     "wrapper = xmodule.wrapper_module:WrapperBlock",
+    "sgp = xmodule.sgp_block:StaffGradedBlock",
 ]
 XBLOCKS_ASIDES = [
     'tagging_aside = cms.lib.xblock.tagging:StructuredTagsAside',

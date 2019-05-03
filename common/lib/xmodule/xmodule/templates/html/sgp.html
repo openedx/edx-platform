@@ -1,0 +1,44 @@
+<h4>{{display_name}}</h4>
+<hr>
+{{instructions|safe}}
+
+{% if is_staff %}
+<p class="row">
+    <div class="col">
+    <form action="{{import_url}}" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
+     <p><input id="thefile" type="file" name="csv"></p>
+     <p><button id="import-button" class="submit btn btn-brand">import CSV</button> <h2 id="status" class="text-info" style="display:none"></h2></p>
+     </form>
+     </div>
+    <div class="col">
+        <a href="{{export_url}}" class="btn btn-brand">download CSV</a>
+        
+    </div>
+</p>
+<script type="text/javascript">
+    $('#import-button').click(function(e){
+        e.preventDefault();
+        var formData = new FormData();
+        formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
+        formData.append('csv', $('#thefile')[0].files[0]);
+
+        $.ajax({
+               url : '{{import_url}}',
+               type : 'POST',
+               data : formData,
+               processData: false,  // tell jQuery not to process the data
+               contentType: false,  // tell jQuery not to set contentType
+               success : function(data) {
+                   console.log(data);
+                    $('#status').html(`${data.processed} processed. ${data.errors} errors`).show();
+               }
+        });
+
+    });
+</script>
+{% else %}
+{% if score %}
+<p>Your score: {{score}}</p>
+{% endif %}
+{% endif %}
