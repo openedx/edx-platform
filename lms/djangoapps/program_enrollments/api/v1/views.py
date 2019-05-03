@@ -449,6 +449,28 @@ class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpec
         """
         Enroll a list of students in a course in a program
         """
+        return self.create_or_modify_enrollments(
+            request,
+            program_uuid,
+            self.enroll_learner_in_course
+        )
+
+    # pylint: disable=unused-argument
+    def patch(self, request, program_uuid=None, course_id=None):
+        """
+        Modify the program course enrollments of a list of learners
+        """
+        return self.create_or_modify_enrollments(
+            request,
+            program_uuid,
+            self.modify_learner_enrollment_status
+        )
+
+    def create_or_modify_enrollments(self, request, program_uuid, operation):
+        """
+        Process a list of program course enrollment request objects
+        and create or modify enrollments based on method
+        """
         self.check_course_existence_and_membership()
         results = {}
         seen_student_keys = set()
@@ -480,7 +502,13 @@ class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpec
             student_key = enrollment["student_key"]
             if student_key in results and results[student_key] == CourseEnrollmentResponseStatuses.DUPLICATED:
                 continue
-            results[student_key] = self.enroll_learner_in_course(enrollment, program_enrollments)
+            try:
+                program_enrollment = program_enrollments[student_key]
+            except KeyError:
+                results[student_key] = CourseEnrollmentResponseStatuses.NOT_IN_PROGRAM
+            else:
+                program_course_enrollment = program_enrollment.get_program_course_enrollment(self.course_key)
+                results[student_key] = operation(enrollment, program_enrollment, program_course_enrollment)
 
         good_count = sum(1 for _, v in results.items() if v not in CourseEnrollmentResponseStatuses.ERROR_STATUSES)
         if not good_count:
@@ -523,24 +551,27 @@ class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpec
         existing_enrollments = existing_enrollments.prefetch_related('program_course_enrollments')
         return {enrollment.external_user_key: enrollment for enrollment in existing_enrollments}
 
-    def enroll_learner_in_course(self, enrollment_request, program_enrollments):
+    def enroll_learner_in_course(self, enrollment_request, program_enrollment, program_course_enrollment):
         """
         Attempts to enroll the specified user into the course as a part of the
          given program enrollment with the given status
 
         Returns the actual status
         """
-        student_key = enrollment_request['student_key']
-        try:
-            program_enrollment = program_enrollments[student_key]
-        except KeyError:
-            return CourseEnrollmentResponseStatuses.NOT_IN_PROGRAM
-        if program_enrollment.get_program_course_enrollment(self.course_key):
+        if program_course_enrollment:
             return CourseEnrollmentResponseStatuses.CONFLICT
-
-        enrollment_status = ProgramCourseEnrollment.enroll(
+        return ProgramCourseEnrollment.enroll(
             program_enrollment,
             self.course_key,
             enrollment_request['status']
         )
-        return enrollment_status
+
+    # pylint: disable=unused-argument
+    def modify_learner_enrollment_status(self, enrollment_request, program_enrollment, program_course_enrollment):
+        """
+        Attempts to modify the specified user's enrollment in the given course
+        in the given program
+        """
+        if program_course_enrollment is None:
+            return CourseEnrollmentResponseStatuses.NOT_FOUND
+        return program_course_enrollment.change_status(enrollment_request['status'])
