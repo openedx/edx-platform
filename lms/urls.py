@@ -643,22 +643,6 @@ urlpatterns += [
         r'^u/',
         include('openedx.features.learner_profile.urls'),
     ),
-
-    # Learner analytics dashboard
-    url(
-        r'^courses/{}/learner_analytics/'.format(
-            settings.COURSE_ID_PATTERN,
-        ),
-        include('openedx.features.learner_analytics.urls'),
-    ),
-
-    # Portfolio project experiment
-    url(
-        r'^courses/{}/xfeature/portfolio/'.format(
-            settings.COURSE_ID_PATTERN,
-        ),
-        include('openedx.features.portfolio_project.urls'),
-    ),
 ]
 
 if settings.FEATURES.get('ENABLE_TEAMS'):
