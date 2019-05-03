@@ -246,7 +246,7 @@ after the first failure.
 common/lib tests are tested with the ``test_lib`` task, which also
 accepts the ``--failed`` and ``--exitfirst`` options::
 
-    paver test_lib -l common/lib/calc
+    paver test_lib -l common/lib/xmodule
     paver test_lib -l common/lib/xmodule --failed
 
 For example, this command runs a single python unit test file::

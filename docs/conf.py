@@ -26,7 +26,6 @@ sys.path.insert(0, root)
 sys.path.append(root / "docs")
 sys.path.append(root / "cms/djangoapps")
 sys.path.append(root / "common/djangoapps")
-sys.path.append(root / "common/lib/calc")
 sys.path.append(root / "common/lib/capa")
 sys.path.append(root / "common/lib/chem")
 sys.path.append(root / "common/lib/safe_lxml")
@@ -237,7 +236,6 @@ autodoc_mock_imports = [
 # the generated *.rst files
 modules = {
     'cms': 'cms',
-    'common/lib/calc/calc': 'common/lib/calc',
     'common/lib/capa/capa': 'common/lib/capa',
     'common/lib/chem/chem': 'common/lib/chem',
     'common/lib/safe_lxml/safe_lxml': 'common/lib/safe_lxml',
