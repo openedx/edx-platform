@@ -35,6 +35,7 @@ from .subsection_grade_factory import SubsectionGradeFactory
 from .transformer import GradesTransformer
 from .grade_utils import are_grades_frozen
 
+
 log = getLogger(__name__)
 
 COURSE_GRADE_TIMEOUT_SECONDS = 1200
