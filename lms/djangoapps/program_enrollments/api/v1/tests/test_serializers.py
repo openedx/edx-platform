@@ -7,8 +7,8 @@ from uuid import uuid4
 
 from django.test import TestCase
 
-from lms.djangoapps.program_enrollments.models import ProgramEnrollment
 from lms.djangoapps.program_enrollments.api.v1.serializers import ProgramEnrollmentSerializer
+from lms.djangoapps.program_enrollments.models import ProgramEnrollment
 from student.tests.factories import UserFactory
 
 
@@ -36,5 +36,11 @@ class ProgramEnrollmentSerializerTests(TestCase):
 
         self.assertEqual(
             set(data.keys()),
-            {'user', 'external_user_key', 'program_uuid', 'curriculum_uuid', 'status'}
+            set([
+                'user',
+                'external_user_key',
+                'program_uuid',
+                'curriculum_uuid',
+                'status'
+            ])
         )
