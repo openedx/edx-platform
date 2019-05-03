@@ -47,6 +47,10 @@ USE_BOOTSTRAP_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'use_bootstrap', fl
 SEO_WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='seo')
 COURSE_ENABLE_UNENROLLED_ACCESS_FLAG = CourseWaffleFlag(SEO_WAFFLE_FLAG_NAMESPACE, 'enable_anonymous_courseware_access')
 
+# Flag to control display of first purchase offer banner
+FIRST_PURCHASE_OFFER_BANNER = WaffleFlagNamespace(name='first_purchase_offer_banner')
+FIRST_PURCHASE_OFFER_BANNER_DISPLAY = WaffleFlag(FIRST_PURCHASE_OFFER_BANNER, 'display', flag_undefined_default=False)
+
 
 def course_home_page_title(course):  # pylint: disable=unused-argument
     """

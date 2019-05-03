@@ -31,6 +31,7 @@ from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
+from openedx.features.course_experience.utils import get_first_purchase_offer_banner_fragment
 from student.models import CourseEnrollment
 from util.views import ensure_valid_course_key
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
@@ -139,6 +140,7 @@ class CourseHomeFragmentView(EdxFragmentView):
         outline_fragment = None
         update_message_fragment = None
         course_sock_fragment = None
+        offer_banner_fragment = None
         course_expiration_fragment = None
         has_visited_course = None
         resume_course_url = None
@@ -159,9 +161,14 @@ class CourseHomeFragmentView(EdxFragmentView):
             course_sock_fragment = CourseSockFragmentView().render_to_fragment(request, course=course, **kwargs)
             has_visited_course, resume_course_url = self._get_resume_course_info(request, course_id)
             handouts_html = self._get_course_handouts(request, course)
+            course_overview = CourseOverview.get_from_id(course.id)
+            offer_banner_fragment = get_first_purchase_offer_banner_fragment(
+                request.user,
+                course_overview
+            )
             course_expiration_fragment = generate_course_expired_fragment(
                 request.user,
-                CourseOverview.get_from_id(course.id)
+                course_overview
             )
         elif allow_public_outline or allow_public:
             outline_fragment = CourseOutlineFragmentView().render_to_fragment(
@@ -212,6 +219,7 @@ class CourseHomeFragmentView(EdxFragmentView):
             'outline_fragment': outline_fragment,
             'handouts_html': handouts_html,
             'course_home_message_fragment': course_home_message_fragment,
+            'offer_banner_fragment': offer_banner_fragment,
             'course_expiration_fragment': course_expiration_fragment,
             'has_visited_course': has_visited_course,
             'resume_course_url': resume_course_url,

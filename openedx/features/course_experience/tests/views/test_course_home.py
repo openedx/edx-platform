@@ -21,6 +21,7 @@ from waffle.testutils import override_flag
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.helpers import get_expiration_banner_text
+
 from django_comment_client.tests.factories import RoleFactory
 from django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
@@ -48,6 +49,7 @@ from openedx.features.course_duration_limits.config import EXPERIMENT_DATA_HOLDB
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
+    FIRST_PURCHASE_OFFER_BANNER_DISPLAY,
     SHOW_REVIEWS_TOOL_FLAG,
     SHOW_UPGRADE_MSG_ON_COURSE_HOME,
     UNIFIED_COURSE_TAB_FLAG
@@ -408,6 +410,19 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
             params=expected_params.urlencode()
         )
         self.assertRedirects(response, expected_url)
+
+    @override_waffle_flag(FIRST_PURCHASE_OFFER_BANNER_DISPLAY, active=True)
+    def test_first_purchase_offer_banner(self):
+        """
+        Ensure first purchase offer banner displays correctly
+        """
+        user = self.create_user_for_course(self.course, CourseUserType.ENROLLED)
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
+        url = course_home_url(self.course)
+        response = self.client.get(url)
+        bannerText = u'''<div class="first-purchase-offer-banner"><span class="first-purchase-offer-banner-bold">
+                     15% off your first upgrade.</span> Discount automatically applied.</div>'''
+        self.assertContains(response, bannerText, html=True)
 
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
     def test_course_does_not_expire_for_verified_user(self):
