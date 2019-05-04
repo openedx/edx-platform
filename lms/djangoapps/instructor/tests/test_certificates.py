@@ -4,19 +4,18 @@ import io
 import json
 from datetime import datetime, timedelta
 
+import ddt
 import mock
 import pytz
+from config_models.models import cache
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test.utils import override_settings
 from django.urls import reverse
 
-import ddt
 from capa.xqueue_interface import XQueueInterface
-from config_models.models import cache
 from course_modes.models import CourseMode
-from courseware.tests.factories import GlobalStaffFactory, InstructorFactory, UserFactory
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -30,6 +29,7 @@ from lms.djangoapps.certificates.tests.factories import (
     CertificateWhitelistFactory,
     GeneratedCertificateFactory
 )
+from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, InstructorFactory, UserFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory

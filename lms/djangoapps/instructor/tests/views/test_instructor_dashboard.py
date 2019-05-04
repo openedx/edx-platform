@@ -6,24 +6,24 @@ import datetime
 import ddt
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.urls import reverse
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import patch
+from pyquery import PyQuery as pq
 from pytz import UTC
 from six import text_type
 
 from common.test.utils import XssTestMixin
 from course_modes.models import CourseMode
-from courseware.tabs import get_course_tab_list
-from courseware.tests.factories import StaffFactory, StudentModuleFactory, UserFactory
-from courseware.tests.helpers import LoginEnrollmentTestCase
 from edxmako.shortcuts import render_to_response
-from lms.djangoapps.grades.config.waffle import waffle_flags, WRITABLE_GRADEBOOK
+from lms.djangoapps.courseware.tabs import get_course_tab_list
+from lms.djangoapps.courseware.tests.factories import StaffFactory, StudentModuleFactory, UserFactory
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
 from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from pyquery import PyQuery as pq
 from shoppingcart.models import CourseRegCodeItem, Order, PaidCourseRegistration
 from student.models import CourseEnrollment
 from student.roles import CourseFinanceAdminRole

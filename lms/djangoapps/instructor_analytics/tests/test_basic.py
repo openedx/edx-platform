@@ -6,8 +6,8 @@ import datetime
 import json
 
 import pytz
-from django.urls import reverse
 from django.db.models import Q
+from django.urls import reverse
 from edx_proctoring.api import create_exam
 from edx_proctoring.models import ProctoredExamStudentAttempt
 from mock import MagicMock, Mock, patch
@@ -16,7 +16,6 @@ from six import text_type
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.tests.factories import InstructorFactory
 from instructor_analytics.basic import (
     AVAILABLE_FEATURES,
     PROFILE_FEATURES,
@@ -31,6 +30,7 @@ from instructor_analytics.basic import (
     sale_order_record_features,
     sale_record_features
 )
+from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from shoppingcart.models import (
     Coupon,

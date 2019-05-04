@@ -3,18 +3,17 @@ Discussion API internal interface
 """
 import itertools
 from collections import defaultdict
+from enum import Enum
 from urllib import urlencode
 from urlparse import urlunparse
 
 from django.core.exceptions import ValidationError
-from django.urls import reverse
 from django.http import Http404
-from enum import Enum
+from django.urls import reverse
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
 from rest_framework.exceptions import PermissionDenied
 
-from courseware.courses import get_course_with_access
 from discussion_api.exceptions import CommentNotFoundError, DiscussionDisabledError, ThreadNotFoundError
 from discussion_api.forms import CommentActionsForm, ThreadActionsForm
 from discussion_api.permissions import (
@@ -37,6 +36,7 @@ from django_comment_common.signals import (
     thread_voted
 )
 from django_comment_common.utils import get_course_discussion_settings
+from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion_api.pagination import DiscussionAPIPagination
 from lms.lib.comment_client.comment import Comment

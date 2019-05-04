@@ -4,9 +4,8 @@ import json
 
 import ddt
 import mock
-
-from django.urls import reverse
 from django.test import RequestFactory, TestCase
+from django.urls import reverse
 from edx_django_utils.cache import RequestCache
 from mock import Mock, patch
 from pytz import UTC
@@ -15,23 +14,18 @@ from six import text_type
 import django_comment_client.utils as utils
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.tabs import get_course_tab_list
-from courseware.tests.factories import InstructorFactory
 from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from django_comment_client.tests.factories import RoleFactory
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_client.tests.utils import config_course_discussions, topic_name_to_id
-from django_comment_common.models import (
-    CourseDiscussionSettings,
-    ForumsConfig,
-    assign_role,
-    DiscussionsIdMapping,
-)
+from django_comment_common.models import CourseDiscussionSettings, DiscussionsIdMapping, ForumsConfig, assign_role
 from django_comment_common.utils import (
     get_course_discussion_settings,
     seed_permissions_roles,
     set_course_discussion_settings
 )
+from lms.djangoapps.courseware.tabs import get_course_tab_list
+from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from lms.lib.comment_client.utils import CommentClientMaintenanceError, perform_request
 from openedx.core.djangoapps.course_groups import cohorts

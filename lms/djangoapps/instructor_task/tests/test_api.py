@@ -2,12 +2,13 @@
 Test for LMS instructor background task queue management
 """
 import ddt
+from celery.states import FAILURE
 from mock import MagicMock, Mock, patch
 
 from bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail
-from lms.djangoapps.certificates.models import CertificateGenerationHistory, CertificateStatuses
 from common.test.utils import normalize_repr
-from courseware.tests.factories import UserFactory
+from lms.djangoapps.certificates.models import CertificateGenerationHistory, CertificateStatuses
+from lms.djangoapps.courseware.tests.factories import UserFactory
 from lms.djangoapps.instructor_task.api import (
     SpecificStudentIdMissingError,
     generate_certificates_for_students,
@@ -43,7 +44,6 @@ from lms.djangoapps.instructor_task.tests.test_base import (
     TestReportMixin
 )
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from celery.states import FAILURE
 
 
 class InstructorTaskReportTest(InstructorTaskTestCase):

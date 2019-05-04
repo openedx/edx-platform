@@ -9,25 +9,25 @@ import ddt
 import pytz
 from ccx_keys.locator import CCXLocator
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.urls import reverse
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
 
-import courseware.access as access
-import courseware.access_response as access_response
-from courseware.masquerade import CourseMasquerade
-from courseware.tests.factories import (
+import lms.djangoapps.courseware.access as access
+import lms.djangoapps.courseware.access_response as access_response
+from lms.djangoapps.ccx.models import CustomCourseForEdX
+from lms.djangoapps.courseware.masquerade import CourseMasquerade
+from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
     GlobalStaffFactory,
     InstructorFactory,
     StaffFactory,
     UserFactory
 )
-from courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_group_member
-from lms.djangoapps.ccx.models import CustomCourseForEdX
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_group_member
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig

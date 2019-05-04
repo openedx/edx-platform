@@ -15,14 +15,14 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse
 from django.utils.translation import ugettext as _
-from opaque_keys.edx.keys import UsageKey
 from oauth2_provider.models import Application
+from opaque_keys.edx.keys import UsageKey
 from requests.exceptions import RequestException
 
-from courseware.access import has_access
-from courseware.courses import get_current_child
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from edxnotes.plugins import EdxNotesTab
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_current_child
 from lms.lib.utils import get_parent_unit
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangolib.markup import Text

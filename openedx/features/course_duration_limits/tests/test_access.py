@@ -1,23 +1,24 @@
 """Tests of openedx.features.course_duration_limits.access"""
 
-from datetime import datetime, timedelta
 import itertools
+from datetime import datetime, timedelta
+
+import ddt
+from django.utils import timezone
+from pytz import UTC
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from django.utils import timezone
-from courseware.models import DynamicUpgradeDeadlineConfiguration
+from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.course_duration_limits.access import (
     generate_course_expired_message,
-    get_user_course_expiration_date,
+    get_user_course_expiration_date
 )
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from pytz import UTC
 from student.tests.factories import CourseEnrollmentFactory
 from util.date_utils import strftime_localized
-import ddt
 
 
 @ddt.ddt

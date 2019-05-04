@@ -9,7 +9,7 @@ from factory.django import DjangoModelFactory
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 
-from courseware.models import (
+from lms.djangoapps.courseware.models import (
     StudentModule,
     XModuleStudentInfoField,
     XModuleStudentPrefsField,
@@ -23,9 +23,9 @@ from student.roles import (
     OrgInstructorRole,
     OrgStaffRole
 )
-from student.tests.factories import UserProfileFactory as StudentUserProfileFactory
 # Imported to re-export
 from student.tests.factories import UserFactory  # Imported to re-export
+from student.tests.factories import UserProfileFactory as StudentUserProfileFactory
 
 # TODO fix this (course_id and location are invalid names as constants, and course_id should really be COURSE_KEY)
 # pylint: disable=invalid-name

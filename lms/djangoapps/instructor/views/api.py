@@ -45,9 +45,6 @@ import instructor_analytics.basic
 import instructor_analytics.csvs
 import instructor_analytics.distributions
 from bulk_email.models import BulkEmailFlag, CourseEmail
-from courseware.access import has_access
-from courseware.courses import get_course_by_id, get_course_with_access
-from courseware.models import StudentModule
 from django_comment_client.utils import (
     get_course_discussion_settings,
     get_group_id_for_user,
@@ -69,6 +66,9 @@ from lms.djangoapps.certificates.models import (
     CertificateWhitelist,
     GeneratedCertificate
 )
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_by_id, get_course_with_access
+from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.instructor import enrollment
 from lms.djangoapps.instructor.access import ROLES, allow_access, list_with_level, revoke_access, update_forum_role
 from lms.djangoapps.instructor.enrollment import (

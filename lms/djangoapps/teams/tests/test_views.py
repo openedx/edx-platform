@@ -8,8 +8,8 @@ import ddt
 import pytz
 from dateutil import parser
 from django.conf import settings
-from django.urls import reverse
 from django.db.models.signals import post_save
+from django.urls import reverse
 from django.utils import translation
 from elasticsearch.exceptions import ConnectionError
 from mock import patch
@@ -17,9 +17,9 @@ from rest_framework.test import APIClient, APITestCase
 from search.search_engine_base import SearchEngine
 
 from common.test.utils import skip_signal
-from courseware.tests.factories import StaffFactory
 from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
 from django_comment_common.utils import seed_permissions_roles
+from lms.djangoapps.courseware.tests.factories import StaffFactory
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from util.testing import EventTestMixin

@@ -3,7 +3,7 @@ This module creates a sysadmin dashboard for managing and viewing
 courses.
 """
 from __future__ import absolute_import
-import unicodecsv as csv
+
 import json
 import logging
 import os
@@ -11,6 +11,7 @@ import StringIO
 import subprocess
 
 import mongoengine
+import unicodecsv as csv
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -30,10 +31,10 @@ from six import text_type
 
 import dashboard.git_import as git_import
 import track.views
-from courseware.courses import get_course_by_id
 from dashboard.git_import import GitImportError
 from dashboard.models import CourseImportLog
 from edxmako.shortcuts import render_to_response
+from lms.djangoapps.courseware.courses import get_course_by_id
 from openedx.core.djangolib.markup import HTML
 from student.models import CourseEnrollment, Registration, UserProfile
 from student.roles import CourseInstructorRole, CourseStaffRole

@@ -5,7 +5,7 @@ requiring Superuser access for all other Request types on an API endpoint.
 
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 
-from courseware.access import has_access
+from lms.djangoapps.courseware.access import has_access
 
 
 class IsAdminOrSupportOrAuthenticatedReadOnly(BasePermission):

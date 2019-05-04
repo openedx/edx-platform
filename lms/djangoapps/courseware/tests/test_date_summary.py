@@ -5,16 +5,17 @@ from datetime import datetime, timedelta
 import ddt
 import waffle
 from django.contrib.messages.middleware import MessageMiddleware
-from django.urls import reverse
 from django.test import RequestFactory
+from django.urls import reverse
 from freezegun import freeze_time
 from mock import patch
 from pytz import utc
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.courses import get_course_date_blocks
-from courseware.date_summary import (
+from lms.djangoapps.commerce.models import CommerceConfiguration
+from lms.djangoapps.courseware.courses import get_course_date_blocks
+from lms.djangoapps.courseware.date_summary import (
     CertificateAvailableDate,
     CourseEndDate,
     CourseStartDate,
@@ -22,12 +23,11 @@ from courseware.date_summary import (
     VerificationDeadlineDate,
     VerifiedUpgradeDeadlineDate
 )
-from courseware.models import (
+from lms.djangoapps.courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
     DynamicUpgradeDeadlineConfiguration,
     OrgDynamicUpgradeDeadlineConfiguration
 )
-from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview

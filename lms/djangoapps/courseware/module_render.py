@@ -9,15 +9,15 @@ import textwrap
 from collections import OrderedDict
 from functools import partial
 
-from completion.models import BlockCompletion
 from completion import waffle as completion_waffle
+from completion.models import BlockCompletion
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
+from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.middleware.csrf import CsrfViewMiddleware
 from django.template.context_processors import csrf
 from django.urls import reverse
-from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.utils.text import slugify
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
@@ -26,12 +26,15 @@ from edx_django_utils.monitoring import set_custom_metrics_for_course_key, set_m
 from edx_proctoring.api import get_attempt_status_summary
 from edx_proctoring.services import ProctoringService
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_when.field_data import DateLookupFieldData
+from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from requests.auth import HTTPBasicAuth
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import APIException
 from six import text_type
+from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
@@ -40,53 +43,50 @@ from xblock.runtime import KvsFieldData
 
 import static_replace
 from capa.xqueue_interface import XQueueInterface
-from courseware.access import get_user_role, has_access
-from courseware.access_response import IncorrectPartitionGroupError
-from courseware.entrance_exams import user_can_skip_entrance_exam, user_has_passed_entrance_exam
-from courseware.masquerade import (
+from edxmako.shortcuts import render_to_string
+from lms.djangoapps.courseware.access import get_user_role, has_access
+from lms.djangoapps.courseware.access_response import IncorrectPartitionGroupError
+from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam, user_has_passed_entrance_exam
+from lms.djangoapps.courseware.field_overrides import OverrideFieldData
+from lms.djangoapps.courseware.masquerade import (
     MasqueradingKeyValueStore,
     filter_displayed_blocks,
     is_masquerading_as_specific_student,
     setup_masquerade
 )
-from courseware.model_data import DjangoKeyValueStore, FieldDataCache
-from edxmako.shortcuts import render_to_string
-from eventtracking import tracker
-from lms.djangoapps.courseware.field_overrides import OverrideFieldData
+from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from lms.djangoapps.grades.signals.signals import SCORE_PUBLISHED
+from lms.djangoapps.grades.util_services import GradesUtilService
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
-from lms.djangoapps.grades.util_services import GradesUtilService
 from lms.djangoapps.verify_student.services import XBlockVerificationService
 from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
 from openedx.core.djangoapps.util.user_utils import SystemUser
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.djangolib.markup import HTML
+from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.lib.gating.services import GatingService
 from openedx.core.lib.license import wrap_with_license
 from openedx.core.lib.url_utils import quote_slashes, unquote_slashes
-from openedx.core.lib.xblock_utils import request_token as xblock_request_token
 from openedx.core.lib.xblock_utils import (
     add_staff_markup,
+    get_aside_from_xblock,
+    is_xblock_aside,
     replace_course_urls,
     replace_jump_to_id_urls,
-    replace_static_urls,
-    wrap_xblock,
-    is_xblock_aside,
-    get_aside_from_xblock,
+    replace_static_urls
 )
+from openedx.core.lib.xblock_utils import request_token as xblock_request_token
+from openedx.core.lib.xblock_utils import wrap_xblock
 from openedx.features.course_duration_limits.access import course_expiration_wrapper
 from student.models import anonymous_id_for_user, user_by_anonymous_id
 from student.roles import CourseBetaTesterRole
 from track import contexts
 from util import milestones_helpers
 from util.json_request import JsonResponse
-from web_fragments.fragment import Fragment
-from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
@@ -94,10 +94,8 @@ from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.lti_module import LTIModule
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from xmodule.x_module import XModuleDescriptor
-
-from edx_when.field_data import DateLookupFieldData
-
 
 log = logging.getLogger(__name__)
 

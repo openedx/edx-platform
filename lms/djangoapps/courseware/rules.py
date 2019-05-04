@@ -3,11 +3,11 @@ django-rules for courseware related features
 """
 from __future__ import absolute_import
 
-from course_modes.models import CourseMode
-from opaque_keys.edx.keys import CourseKey
-from student.models import CourseEnrollment
-
 import rules
+from opaque_keys.edx.keys import CourseKey
+
+from course_modes.models import CourseMode
+from student.models import CourseEnrollment
 
 
 @rules.predicate

@@ -18,14 +18,10 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from courseware import courses
 from lms.djangoapps.ccx.models import CcxFieldOverride, CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import override_field_for_ccx
-from lms.djangoapps.ccx.utils import (
-    add_master_course_staff_to_ccx,
-    assign_staff_role_to_ccx,
-    is_email
-)
+from lms.djangoapps.ccx.utils import add_master_course_staff_to_ccx, assign_staff_role_to_ccx, is_email
+from lms.djangoapps.courseware import courses
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api import authentication, permissions

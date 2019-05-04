@@ -16,7 +16,6 @@ from pytz import UTC
 from rest_framework.exceptions import PermissionDenied
 
 from common.test.utils import MockSignalHandlerMixin, disable_signal
-from courseware.tests.factories import BetaTesterFactory, StaffFactory
 from discussion_api import api
 from discussion_api.api import (
     create_comment,
@@ -46,6 +45,7 @@ from django_comment_common.models import (
     FORUM_ROLE_STUDENT,
     Role
 )
+from lms.djangoapps.courseware.tests.factories import BetaTesterFactory, StaffFactory
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.lib.exceptions import CourseNotFoundError, PageNotFoundError

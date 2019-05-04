@@ -8,7 +8,7 @@ import django.test
 from mock import patch
 from six.moves import range
 
-from courseware.tests.test_masquerade import StaffMasqueradeTestCase
+from lms.djangoapps.courseware.tests.test_masquerade import StaffMasqueradeTestCase
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory

@@ -16,17 +16,17 @@ from mock import MagicMock, Mock, patch
 from opaque_keys.edx.locations import i4xEncoder
 
 from course_modes.models import CourseMode
-from courseware.models import StudentModule
-from courseware.tests.factories import StudentModuleFactory
+from lms.djangoapps.courseware.models import StudentModule
+from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.instructor_task.exceptions import UpdateProblemModuleStateError
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.tasks import (
     delete_problem_state,
     export_ora2_data,
     generate_certificates,
+    override_problem_score,
     rescore_problem,
-    reset_problem_attempts,
-    override_problem_score
+    reset_problem_attempts
 )
 from lms.djangoapps.instructor_task.tasks_helper.misc import upload_ora2_data
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory

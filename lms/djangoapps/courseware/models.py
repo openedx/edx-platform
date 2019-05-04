@@ -22,11 +22,10 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
+from opaque_keys.edx.django.models import BlockTypeKeyField, CourseKeyField, UsageKeyField
 from six import text_type
 
 import coursewarehistoryextended
-from opaque_keys.edx.django.models import BlockTypeKeyField, CourseKeyField, UsageKeyField
-
 from openedx.core.djangolib.markup import HTML
 
 log = logging.getLogger("edx.courseware")

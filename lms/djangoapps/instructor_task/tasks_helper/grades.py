@@ -3,27 +3,27 @@ Functionality for generating grade reports.
 """
 import logging
 import re
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict, defaultdict
 from datetime import datetime
 from itertools import chain, izip, izip_longest
 from time import time
 
-from django.contrib.auth import get_user_model
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from lazy import lazy
 from opaque_keys.edx.keys import UsageKey
 from pytz import UTC
 from six import text_type
 
 from course_blocks.api import get_course_blocks
-from courseware.courses import get_course_by_id
-from courseware.user_state_client import DjangoXBlockUserStateClient
 from instructor_analytics.basic import list_problem_responses
 from instructor_analytics.csvs import format_dictlist
 from lms.djangoapps.certificates.models import CertificateWhitelist, GeneratedCertificate, certificate_info_for_user
+from lms.djangoapps.courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.grades.context import grading_context, grading_context_for_course
-from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsectionGrade
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsectionGrade
 from lms.djangoapps.teams.models import CourseTeamMembership
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache

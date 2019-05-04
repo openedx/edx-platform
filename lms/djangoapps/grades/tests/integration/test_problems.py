@@ -4,9 +4,10 @@ import itertools
 import ddt
 import pytz
 from crum import set_current_request
+
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from lms.djangoapps.course_blocks.api import get_course_blocks
+from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from openedx.core.djangolib.testing.utils import get_mock_request
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory

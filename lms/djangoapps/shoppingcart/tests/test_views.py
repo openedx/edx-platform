@@ -15,10 +15,10 @@ from django.contrib.auth.models import Group, User
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core import mail
 from django.core.cache import cache
-from django.urls import reverse
 from django.http import HttpRequest
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.urls import reverse
 from freezegun import freeze_time
 from mock import Mock, patch
 from pytz import UTC
@@ -27,8 +27,8 @@ from six import text_type
 from common.test.utils import XssTestMixin
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.tests.factories import InstructorFactory
 from edxmako.shortcuts import render_to_response
+from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from shoppingcart.admin import SoftDeleteCouponAdmin
 from shoppingcart.models import (
@@ -1466,7 +1466,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
     def test_shopping_cart_navigation_link_in_microsite_not_on_courseware(self):
         """
         Tests shopping cart link is available in navigation header if request is from a microsite but requested
-        page is not from courseware.
+        page is not from lms.djangoapps.courseware.
         """
         CourseEnrollment.enroll(self.user, self.course_key)
         self.add_course_to_user_cart(self.testing_course.id)
@@ -1479,7 +1479,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
     def test_shopping_cart_navigation_link_in_microsite_courseware_page(self):
         """
         Tests shopping cart link is not available in navigation header if request is from a microsite
-        and requested page is from courseware.
+        and requested page is from lms.djangoapps.courseware.
         """
         CourseEnrollment.enroll(self.user, self.course_key)
         self.add_course_to_user_cart(self.testing_course.id)

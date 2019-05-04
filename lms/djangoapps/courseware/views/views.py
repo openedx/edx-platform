@@ -28,19 +28,28 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from django.views.generic import View
 from edx_django_utils.monitoring import set_custom_metrics_for_course_key
+from ipware.ip import get_ip
 from markupsafe import escape
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from pytz import UTC
 from rest_framework import status
 from six import text_type
+from web_fragments.fragment import Fragment
 
 import shoppingcart
 import survey.views
 from course_modes.models import CourseMode, get_course_prices
-from courseware.access import has_access, has_ccx_coach_role
-from courseware.access_utils import check_course_open_for_learner
-from courseware.courses import (
+from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
+from enrollment.api import add_enrollment
+from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
+from lms.djangoapps.certificates import api as certs_api
+from lms.djangoapps.certificates.models import CertificateStatuses
+from lms.djangoapps.commerce.utils import EcommerceService
+from lms.djangoapps.courseware.access import has_access, has_ccx_coach_role
+from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
+from lms.djangoapps.courseware.courses import (
+    allow_public_access,
     can_self_enroll_in_course,
     course_open_for_self_enrollment,
     get_course,
@@ -53,20 +62,12 @@ from courseware.courses import (
     sort_by_announcement,
     sort_by_start_date
 )
-from courseware.masquerade import setup_masquerade
-from courseware.model_data import FieldDataCache
-from courseware.models import BaseStudentModuleHistory, StudentModule
-from courseware.url_helpers import get_redirect_url
-from courseware.user_state_client import DjangoXBlockUserStateClient
-from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
-from enrollment.api import add_enrollment
-from ipware.ip import get_ip
-from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
-from lms.djangoapps.certificates import api as certs_api
-from lms.djangoapps.certificates.models import CertificateStatuses
-from lms.djangoapps.commerce.utils import EcommerceService
-from lms.djangoapps.courseware.courses import allow_public_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
+from lms.djangoapps.courseware.masquerade import setup_masquerade
+from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
+from lms.djangoapps.courseware.url_helpers import get_redirect_url
+from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.instructor.enrollment import uses_shib
@@ -89,9 +90,9 @@ from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from openedx.features.course_experience import (
-    UNIFIED_COURSE_TAB_FLAG,
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
-    course_home_url_name,
+    UNIFIED_COURSE_TAB_FLAG,
+    course_home_url_name
 )
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
@@ -107,7 +108,6 @@ from util.db import outer_atomic
 from util.milestones_helpers import get_prerequisite_courses_display
 from util.views import _record_feedback_in_zendesk, ensure_valid_course_key, ensure_valid_usage_key
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
-from web_fragments.fragment import Fragment
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.tabs import CourseTabList

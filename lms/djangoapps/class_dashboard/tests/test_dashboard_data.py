@@ -4,8 +4,8 @@ Tests for class dashboard (Metrics tab in instructor dashboard)
 
 import json
 
-from django.urls import reverse
 from django.test.client import RequestFactory
+from django.urls import reverse
 from mock import patch
 from six import text_type
 
@@ -23,7 +23,7 @@ from class_dashboard.dashboard_data import (
     get_students_problem_grades
 )
 from class_dashboard.views import has_instructor_access_for_class
-from courseware.tests.factories import StudentModuleFactory
+from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

@@ -10,25 +10,24 @@ from functools import partial
 import ddt
 import pytz
 from bson import ObjectId
-from completion.models import BlockCompletion
 from completion import waffle as completion_waffle
+from completion.models import BlockCompletion
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.http import Http404, HttpResponse
 from django.middleware.csrf import get_token
 from django.test.client import RequestFactory
-from django.urls import reverse
-from django.http import Http404, HttpResponse
 from django.test.utils import override_settings
+from django.urls import reverse
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 from edx_proctoring.api import create_exam, create_exam_attempt, update_attempt_status
 from edx_proctoring.runtime import set_runtime_service
-from edx_proctoring.tests.test_services import MockCreditService, MockGradesService, MockCertificateService
+from edx_proctoring.tests.test_services import MockCertificateService, MockCreditService, MockGradesService
 from freezegun import freeze_time
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import MagicMock, Mock, patch
 from opaque_keys.edx.asides import AsideUsageKeyV2
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from pyquery import PyQuery
 from six import text_type
 from web_fragments.fragment import Fragment
@@ -36,33 +35,35 @@ from xblock.completable import CompletableXBlockMixin
 from xblock.core import XBlock, XBlockAside
 from xblock.field_data import FieldData
 from xblock.fields import ScopeIds
-from xblock.runtime import (
-    DictKeyValueStore,
-    KvsFieldData,
-    Runtime
-)
+from xblock.runtime import DictKeyValueStore, KvsFieldData, Runtime
 from xblock.test.tools import TestRuntime
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from course_modes.models import CourseMode
-from courseware import module_render as render
-from courseware.courses import get_course_info_section, get_course_with_access
-from courseware.access_response import AccessResponse
-from courseware.masquerade import CourseMasquerade
-from courseware.model_data import FieldDataCache
-from courseware.models import StudentModule
-from courseware.module_render import get_module_for_descriptor, hash_resource
-from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory, UserFactory, RequestFactoryNoCsrf
-from courseware.tests.test_submitting_problems import TestSubmittingProblems
-from courseware.tests.tests import LoginEnrollmentTestCase
-from lms.djangoapps.lms_xblock.field_data import LmsFieldData
+from lms.djangoapps.courseware import module_render as render
+from lms.djangoapps.courseware.access_response import AccessResponse
+from lms.djangoapps.courseware.courses import get_course_info_section, get_course_with_access
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
+from lms.djangoapps.courseware.masquerade import CourseMasquerade
+from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.models import StudentModule
+from lms.djangoapps.courseware.module_render import get_module_for_descriptor, hash_resource
+from lms.djangoapps.courseware.tests.factories import (
+    GlobalStaffFactory,
+    RequestFactoryNoCsrf,
+    StudentModuleFactory,
+    UserFactory
+)
+from lms.djangoapps.courseware.tests.test_submitting_problems import TestSubmittingProblems
+from lms.djangoapps.courseware.tests.tests import LoginEnrollmentTestCase
+from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.credit.api import set_credit_requirement_status, set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.url_utils import quote_slashes
-from student.models import anonymous_id_for_user, CourseEnrollment
+from student.models import CourseEnrollment, anonymous_id_for_user
 from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from xblock_django.models import XBlockConfiguration
 from xmodule.capa_module import ProblemBlock

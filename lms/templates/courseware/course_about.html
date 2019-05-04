@@ -1,18 +1,18 @@
 <%page expression_filter="h"/>
 <%namespace name='static' file='../static_content.html'/>
 <%!
-from django.utils.translation import ugettext as _
-from django.utils.translation import pgettext
-from django.urls import reverse
-from courseware.courses import get_course_about_section
 from django.conf import settings
-from six import text_type
+from django.urls import reverse
+from django.utils.translation import pgettext
+from django.utils.translation import ugettext as _
+from six import string_types, text_type
+
 from edxmako.shortcuts import marketing_link
+from lms.djangoapps.courseware.courses import get_course_about_section
 from openedx.core.djangolib.js_utils import js_escaped_string
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.courses import course_image_url
 
-from six import string_types
 %>
 
 <%inherit file="../main.html" />

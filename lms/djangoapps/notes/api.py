@@ -1,17 +1,18 @@
 from __future__ import absolute_import
+
 import collections
 import json
 import logging
 
+import six
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.http import Http404, HttpResponse
 from opaque_keys.edx.keys import CourseKey
 
-from courseware.courses import get_course_with_access
+from lms.djangoapps.courseware.courses import get_course_with_access
 from notes.models import Note
 from notes.utils import notes_enabled_for_course
-import six
 
 log = logging.getLogger(__name__)
 

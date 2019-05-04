@@ -100,7 +100,7 @@ class TestGetScore(TestCase):
 
     def _create_csm_scores(self, csm_value):
         """
-        Creates a stub result from courseware student module for the given values.
+        Creates a stub result from lms.djangoapps.courseware student module for the given values.
         """
         if csm_value.exists:
             stub_csm_record = namedtuple('stub_csm_record', 'correct, total, created')

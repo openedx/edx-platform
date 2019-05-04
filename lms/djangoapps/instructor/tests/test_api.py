@@ -24,6 +24,8 @@ from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
 from django.urls import reverse as django_reverse
 from django.utils.translation import ugettext as _
+from edx_when.api import get_overrides_for_user
+from edx_when.signals import extract_dates
 from mock import Mock, NonCallableMock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
@@ -33,19 +35,19 @@ from six import text_type
 from bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.models import StudentModule
-from courseware.tests.factories import (
+from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
+from django_comment_common.utils import seed_permissions_roles
+from lms.djangoapps.certificates.models import CertificateStatuses
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
+from lms.djangoapps.courseware.models import StudentModule
+from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
     GlobalStaffFactory,
     InstructorFactory,
     StaffFactory,
     UserProfileFactory
 )
-from courseware.tests.helpers import LoginEnrollmentTestCase
-from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
-from django_comment_common.utils import seed_permissions_roles
-from lms.djangoapps.certificates.models import CertificateStatuses
-from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
 from lms.djangoapps.instructor.views.api import (
     _split_input_list,
@@ -62,9 +64,6 @@ from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.lib.xblock_utils import grade_histogram
-from edx_when.api import get_overrides_for_user
-from edx_when.signals import extract_dates
-
 from shoppingcart.models import (
     Coupon,
     CouponRedemption,

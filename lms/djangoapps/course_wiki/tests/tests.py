@@ -6,7 +6,7 @@ from django.urls import reverse
 from mock import patch
 from six import text_type
 
-from courseware.tests.tests import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.tests.tests import LoginEnrollmentTestCase
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

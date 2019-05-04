@@ -4,13 +4,13 @@ This test file will run through some LMS test scenarios regarding access and nav
 import time
 
 from django.conf import settings
-from django.urls import reverse
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import patch
 from six import text_type
 
-from courseware.tests.factories import GlobalStaffFactory
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG
 from student.tests.factories import UserFactory

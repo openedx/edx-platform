@@ -13,21 +13,21 @@ from django.utils.timezone import now
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
 
+from course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
+from lms.djangoapps.courseware.access_response import MilestoneAccessError, StartDateError, VisibilityError
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
-from course_modes.models import CourseMode
-from courseware.access_response import MilestoneAccessError, StartDateError, VisibilityError
 from mobile_api.testutils import (
     MobileAPITestCase,
     MobileAuthTestMixin,
     MobileAuthUserTestMixin,
     MobileCourseAccessTestMixin
 )
-from mobile_api.utils import API_V05, API_V1
-from openedx.core.lib.courses import course_image_url
+from mobile_api.utils import API_V1, API_V05
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
+from openedx.core.lib.courses import course_image_url
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from student.models import CourseEnrollment

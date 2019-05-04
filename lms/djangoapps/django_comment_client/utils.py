@@ -5,27 +5,27 @@ from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.db import connection
 from django.http import HttpResponse
-from pytz import UTC
+from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import i4xEncoder
+from pytz import UTC
 from six import text_type
 
-from courseware import courses
-from courseware.access import has_access
 from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from django_comment_client.permissions import check_permissions_by_view, get_team, has_permission
 from django_comment_client.settings import MAX_COMMENT_DEPTH
 from django_comment_common.models import (
-    FORUM_ROLE_STUDENT,
     FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_STUDENT,
     CourseDiscussionSettings,
     DiscussionsIdMapping,
     Role
 )
 from django_comment_common.utils import get_course_discussion_settings
+from lms.djangoapps.courseware import courses
+from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id, get_cohort_names, is_course_cohorted
 from openedx.core.lib.cache_utils import request_cached
 from student.models import get_user_by_username_or_email

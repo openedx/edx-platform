@@ -4,14 +4,11 @@ from __future__ import unicode_literals
 import logging
 
 from ccx_keys.locator import CCXLocator
-from courseware.courses import get_course_by_id
 from django.db import migrations
 from django.http import Http404
 
-from lms.djangoapps.ccx.utils import (
-    add_master_course_staff_to_ccx,
-    remove_master_course_staff_from_ccx,
-)
+from lms.djangoapps.ccx.utils import add_master_course_staff_to_ccx, remove_master_course_staff_from_ccx
+from lms.djangoapps.courseware.courses import get_course_by_id
 
 log = logging.getLogger("edx.ccx")
 

@@ -10,7 +10,7 @@ from django.dispatch import receiver
 from edx_ace.utils import date
 
 from course_modes.models import CourseMode
-from courseware.models import (
+from lms.djangoapps.courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
     DynamicUpgradeDeadlineConfiguration,
     OrgDynamicUpgradeDeadlineConfiguration

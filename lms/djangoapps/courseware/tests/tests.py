@@ -9,7 +9,7 @@ from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore

@@ -10,15 +10,15 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
-from django.urls import reverse
 from django.db.models import Count, Q
+from django.urls import reverse
 from edx_proctoring.api import get_exam_violation_report
 from opaque_keys.edx.keys import UsageKey
 from six import text_type
 
 import xmodule.graders as xmgraders
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.grades.context import grading_context_for_course
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers

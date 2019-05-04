@@ -25,10 +25,10 @@ from six import iteritems, text_type
 import track.views
 from bulk_email.models import BulkEmailFlag, Optout  # pylint: disable=import-error
 from course_modes.models import CourseMode
-from courseware.access import has_access
 from edxmako.shortcuts import render_to_response, render_to_string
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
+from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.experiments.utils import get_dashboard_course_info, get_experiment_dashboard_metadata_context
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.utils import (

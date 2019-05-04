@@ -4,19 +4,19 @@ Views for the course search page.
 
 from django.contrib.auth.decorators import login_required
 from django.template.context_processors import csrf
-from django.urls import reverse
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
-
-from courseware.courses import get_course_overview_with_access
-from lms.djangoapps.courseware.views.views import CourseTabView
 from opaque_keys.edx.keys import CourseKey
+from web_fragments.fragment import Fragment
+
+from lms.djangoapps.courseware.courses import get_course_overview_with_access
+from lms.djangoapps.courseware.views.views import CourseTabView
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience import default_course_url_name
 from util.views import ensure_valid_course_key
-from web_fragments.fragment import Fragment
 
 
 class CourseSearchView(CourseTabView):

@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import migrations, models
 import django.db.models.deletion
 from django.conf import settings
-import courseware.models
+from django.db import migrations, models
+
+import lms.djangoapps.courseware.models
 
 
 class Migration(migrations.Migration):

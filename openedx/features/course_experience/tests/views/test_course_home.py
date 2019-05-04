@@ -20,7 +20,6 @@ from waffle.testutils import override_flag
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.tests.helpers import get_expiration_banner_text
 from django_comment_client.tests.factories import RoleFactory
 from django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
@@ -40,6 +39,7 @@ from lms.djangoapps.courseware.tests.factories import (
     OrgStaffFactory,
     StaffFactory
 )
+from lms.djangoapps.courseware.tests.helpers import get_expiration_banner_text
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory

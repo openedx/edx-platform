@@ -23,8 +23,6 @@ from boto.ses.exceptions import (
     SESLocalAddressCharacterError,
     SESMaxSendingRateExceededError
 )
-from util.string_utils import _has_non_ascii_characters
-
 from celery import current_task, task
 from celery.exceptions import RetryTaskError
 from celery.states import FAILURE, RETRY, SUCCESS
@@ -39,7 +37,7 @@ from markupsafe import escape
 from six import text_type
 
 from bulk_email.models import CourseEmail, Optout
-from courseware.courses import get_course
+from lms.djangoapps.courseware.courses import get_course
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.subtasks import (
     SubtaskStatus,
@@ -50,6 +48,7 @@ from lms.djangoapps.instructor_task.subtasks import (
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.courses import course_image_url
 from util.date_utils import get_default_time_display
+from util.string_utils import _has_non_ascii_characters
 
 log = logging.getLogger('edx.celery.task')
 

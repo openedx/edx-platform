@@ -22,9 +22,9 @@ from six import text_type
 from waffle.models import Switch
 from waffle.testutils import override_switch
 
-from courseware.tests.factories import StaffFactory
 from gating import api as lms_gating_api
 from lms.djangoapps.course_api.blocks.transformers.milestones import MilestonesAndSpecialExamsTransformer
+from lms.djangoapps.courseware.tests.factories import StaffFactory
 from openedx.core.lib.gating import api as gating_api
 from openedx.features.course_experience.views.course_outline import (
     DEFAULT_COMPLETION_TRACKING_START,

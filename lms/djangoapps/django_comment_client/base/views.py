@@ -9,6 +9,7 @@ import random
 import time
 import urlparse
 
+import eventtracking
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core import exceptions
@@ -22,8 +23,6 @@ from six import text_type
 
 import django_comment_client.settings as cc_settings
 import lms.lib.comment_client as cc
-from courseware.access import has_access
-from courseware.courses import get_course_by_id, get_course_overview_with_access, get_course_with_access
 from django_comment_client.permissions import check_permissions_by_view, get_team, has_permission
 from django_comment_client.utils import (
     JsonError,
@@ -47,12 +46,13 @@ from django_comment_common.signals import (
     thread_created,
     thread_deleted,
     thread_edited,
-    thread_voted,
     thread_followed,
     thread_unfollowed,
+    thread_voted
 )
 from django_comment_common.utils import ThreadContext
-import eventtracking
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_by_id, get_course_overview_with_access, get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from util.file import store_uploaded_file
 

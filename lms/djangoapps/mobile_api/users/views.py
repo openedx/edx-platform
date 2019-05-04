@@ -3,6 +3,7 @@ Views for user API
 """
 
 import json
+
 from django.shortcuts import redirect
 from django.utils import dateparse
 from opaque_keys import InvalidKeyError
@@ -13,12 +14,12 @@ from rest_framework.response import Response
 from xblock.fields import Scope
 from xblock.runtime import KeyValueStore
 
-from courseware.access import is_mobile_available_for_user
-from courseware.courses import get_current_child
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module_for_descriptor
-from courseware.views.index import save_positions_recursively_up
+from lms.djangoapps.courseware.access import is_mobile_available_for_user
 from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
+from lms.djangoapps.courseware.courses import get_current_child
+from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.module_render import get_module_for_descriptor
+from lms.djangoapps.courseware.views.index import save_positions_recursively_up
 from mobile_api.utils import API_V05
 from openedx.features.course_duration_limits.access import check_course_expired
 from student.models import CourseEnrollment, User

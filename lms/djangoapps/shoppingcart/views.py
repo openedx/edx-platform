@@ -8,7 +8,6 @@ from config_models.decorators import require_config
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
-from django.urls import reverse
 from django.db.models import Q
 from django.http import (
     Http404,
@@ -19,6 +18,7 @@ from django.http import (
     HttpResponseRedirect
 )
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods, require_POST
@@ -28,8 +28,8 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 
 from course_modes.models import CourseMode
-from courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_response
+from lms.djangoapps.courseware.courses import get_course_by_id
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from shoppingcart.reports import (

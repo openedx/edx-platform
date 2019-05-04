@@ -6,41 +6,42 @@ import logging
 from collections import defaultdict
 from datetime import datetime
 
-import branding
 import pytz
 from crum import get_current_request
-from openedx.features.course_duration_limits.access import AuditExpiredError
-from courseware.access import has_access
-from courseware.access_response import StartDateError, MilestoneAccessError
-from courseware.date_summary import (
+from django.conf import settings
+from django.db.models import Prefetch
+from django.http import Http404, QueryDict
+from django.urls import reverse
+from fs.errors import ResourceNotFound
+from opaque_keys.edx.keys import UsageKey
+from path import Path as path
+from six import text_type
+
+import branding
+from course_modes.models import CourseMode
+from edxmako.shortcuts import render_to_string
+from enrollment.api import get_course_enrollment_details
+from lms.djangoapps.certificates import api as certs_api
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.access_response import MilestoneAccessError, StartDateError
+from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
+from lms.djangoapps.courseware.date_summary import (
+    CertificateAvailableDate,
     CourseEndDate,
     CourseStartDate,
     TodaysDate,
     VerificationDeadlineDate,
-    VerifiedUpgradeDeadlineDate,
-    CertificateAvailableDate
+    VerifiedUpgradeDeadlineDate
 )
-from courseware.masquerade import check_content_start_date_for_masquerade_user
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module
-from course_modes.models import CourseMode
-from django.conf import settings
-from django.db.models import Prefetch
-from django.urls import reverse
-from django.http import Http404, QueryDict
-from enrollment.api import get_course_enrollment_details
-from edxmako.shortcuts import render_to_string
-from fs.errors import ResourceNotFound
-from lms.djangoapps.certificates import api as certs_api
-from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
-from opaque_keys.edx.keys import UsageKey
+from lms.djangoapps.courseware.masquerade import check_content_start_date_for_masquerade_user
+from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.module_render import get_module
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.view_utils import LazySequence
+from openedx.features.course_duration_limits.access import AuditExpiredError
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
-from path import Path as path
-from six import text_type
 from static_replace import replace_static_urls
 from student.models import CourseEnrollment
 from survey.utils import is_survey_required_and_unanswered

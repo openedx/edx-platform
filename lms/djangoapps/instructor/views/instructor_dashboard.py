@@ -18,6 +18,7 @@ from django.utils.translation import ugettext_noop
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
+from edx_when.api import is_enabled_for_course
 from mock import patch
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -28,12 +29,9 @@ from xblock.fields import ScopeIds
 from bulk_email.models import BulkEmailFlag
 from class_dashboard.dashboard_data import get_array_section_has_problem, get_section_display_name
 from course_modes.models import CourseMode, CourseModesArchive
-from courseware.access import has_access
-from courseware.courses import get_course_by_id, get_studio_url
 from django_comment_client.utils import available_division_schemes, has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, CourseDiscussionSettings
 from edxmako.shortcuts import render_to_response
-from edx_when.api import is_enabled_for_course
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -43,6 +41,8 @@ from lms.djangoapps.certificates.models import (
     CertificateWhitelist,
     GeneratedCertificate
 )
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_by_id, get_studio_url
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
 from openedx.core.djangoapps.course_groups.cohorts import DEFAULT_COHORT_NAME, get_course_cohorts, is_course_cohorted

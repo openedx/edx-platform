@@ -19,22 +19,22 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.core.mail.message import EmailMessage
-from django.urls import reverse
 from django.db import models, transaction
 from django.db.models import Count, F, Q, Sum
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
+from eventtracking import tracker
 from model_utils.managers import InheritanceManager
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
 
 from course_modes.models import CourseMode
-from courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_string
-from eventtracking import tracker
+from lms.djangoapps.courseware.courses import get_course_by_id
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import HTML, Text
 from shoppingcart.pdf import PDFInvoice

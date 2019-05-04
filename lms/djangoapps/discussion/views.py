@@ -10,11 +10,11 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.template.context_processors import csrf
-from django.urls import reverse
 from django.http import Http404, HttpResponseServerError
 from django.shortcuts import render_to_response
+from django.template.context_processors import csrf
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.translation import get_language_bidi
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
@@ -24,11 +24,7 @@ from rest_framework import status
 from web_fragments.fragment import Fragment
 
 import django_comment_client.utils as utils
-from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 import lms.lib.comment_client as cc
-from courseware.access import has_access
-from courseware.courses import get_course_with_access
-from courseware.views.views import CourseTabView
 from django_comment_client.base.views import track_thread_viewed_event
 from django_comment_client.constants import TYPE_ENTRY
 from django_comment_client.permissions import get_team, has_permission
@@ -45,6 +41,10 @@ from django_comment_client.utils import (
 )
 from django_comment_common.models import CourseDiscussionSettings
 from django_comment_common.utils import ThreadContext, get_course_discussion_settings, set_course_discussion_settings
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_with_access
+from lms.djangoapps.courseware.views.views import CourseTabView
+from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from student.models import CourseEnrollment

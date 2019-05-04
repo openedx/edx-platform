@@ -6,7 +6,7 @@ from django.conf import settings
 from django.utils.translation import ugettext_noop
 
 import django_comment_client.utils as utils
-from courseware.tabs import EnrolledTab
+from lms.djangoapps.courseware.tabs import EnrolledTab
 from xmodule.tabs import TabFragmentViewMixin
 
 from .config import USE_BOOTSTRAP_FLAG

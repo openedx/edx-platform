@@ -5,7 +5,7 @@ import json
 
 from eventtracking import tracker
 
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.models import StudentModule
 from openedx.core.djangoapps.content.block_structure.transformer import (
     BlockStructureTransformer,
     FilteringTransformerMixin

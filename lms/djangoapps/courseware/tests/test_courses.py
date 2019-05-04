@@ -2,21 +2,21 @@
 """
 Tests for course access
 """
+import datetime
 import itertools
 
-import datetime
 import ddt
 import mock
 import pytz
+from crum import set_current_request
 from django.conf import settings
-from django.urls import reverse
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
-from crum import set_current_request
 
-from courseware.courses import (
+from lms.djangoapps.courseware.courses import (
     course_open_for_self_enrollment,
     get_cms_block_link,
     get_cms_course_link,
@@ -27,11 +27,11 @@ from courseware.courses import (
     get_course_overview_with_access,
     get_course_with_access,
     get_courses,
-    get_current_child,
+    get_current_child
 )
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module_for_descriptor
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
+from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.module_render import get_module_for_descriptor
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.courses import course_image_url
 from student.tests.factories import UserFactory
@@ -40,8 +40,8 @@ from xmodule.modulestore.django import _get_modulestore_branch_setting, modulest
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from xmodule.modulestore.xml_importer import import_course_from_xml
-from xmodule.tests.xml import factories as xml
 from xmodule.tests.xml import XModuleXmlImportTest
+from xmodule.tests.xml import factories as xml
 
 CMS_BASE_TEST = 'testcms'
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
