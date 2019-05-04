@@ -5,10 +5,10 @@ from contextlib import contextmanager
 from datetime import datetime
 
 import pytz
-from mock import patch, MagicMock
+from mock import MagicMock, patch
 
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module
+from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.module_render import get_module
 from xmodule.graders import ProblemScore
 
 

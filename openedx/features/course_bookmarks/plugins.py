@@ -2,9 +2,10 @@
 Platform plugins to support course bookmarks.
 """
 
-from courseware.access import has_access
 from django.urls import reverse
 from django.utils.translation import ugettext as _
+
+from lms.djangoapps.courseware.access import has_access
 from openedx.features.course_experience.course_tools import CourseTool
 from student.models import CourseEnrollment
 

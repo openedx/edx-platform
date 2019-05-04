@@ -5,17 +5,17 @@ import urllib
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.cache import cache
-from django.urls import reverse
 from django.db import transaction
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils import translation
 from django.utils.translation.trans_real import get_supported_language_variant
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 import branding.api as branding_api
-import courseware.views.views
+import lms.djangoapps.courseware.views.views
 import student.views
 from edxmako.shortcuts import marketing_link, render_to_response
 from openedx.core.djangoapps.lang_pref.api import released_languages
@@ -88,7 +88,7 @@ def courses(request):
 
     #  we do not expect this case to be reached in cases where
     #  marketing is enabled or the courses are not browsable
-    return courseware.views.views.courses(request)
+    return lms.djangoapps.courseware.views.views.courses(request)
 
 
 def _footer_static_url(request, name):

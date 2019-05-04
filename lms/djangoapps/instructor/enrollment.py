@@ -17,11 +17,13 @@ from django.urls import reverse
 from django.utils.translation import override as override_language
 from edx_ace import ace
 from edx_ace.recipient import Recipient
+from eventtracking import tracker
 from six import text_type
+from submissions import api as sub_api  # installed from the edx-submissions repository
+from submissions.models import score_set
 
 from course_modes.models import CourseMode
-from courseware.models import StudentModule
-from eventtracking import tracker
+from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.events import STATE_DELETED_EVENT_TYPE
 from lms.djangoapps.grades.signals.handlers import disconnect_submissions_signal_receiver
@@ -31,22 +33,15 @@ from lms.djangoapps.instructor.message_types import (
     AddBetaTester,
     AllowedEnroll,
     AllowedUnenroll,
-    EnrollEnrolled,
     EnrolledUnenroll,
-    RemoveBetaTester,
+    EnrollEnrolled,
+    RemoveBetaTester
 )
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.models import UserPreference
-from student.models import (
-    CourseEnrollment,
-    CourseEnrollmentAllowed,
-    anonymous_id_for_user,
-    is_email_retired,
-)
 from openedx.core.djangolib.markup import Text
-from submissions import api as sub_api  # installed from the edx-submissions repository
-from submissions.models import score_set
+from student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user, is_email_retired
 from track.event_transaction_utils import (
     create_new_event_transaction_id,
     get_event_transaction_id,

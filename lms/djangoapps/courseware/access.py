@@ -15,32 +15,30 @@ from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from pytz import UTC
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from pytz import UTC
 from six import text_type
 from xblock.core import XBlock
 
-from courseware.access_response import (
+from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
+from lms.djangoapps.ccx.models import CustomCourseForEdX
+from lms.djangoapps.courseware.access_response import (
+    IncorrectPartitionGroupError,
     MilestoneAccessError,
     MobileAvailabilityError,
-    VisibilityError,
+    NoAllowedPartitionGroupsError,
+    VisibilityError
 )
-from courseware.access_utils import (
+from lms.djangoapps.courseware.access_utils import (
     ACCESS_DENIED,
     ACCESS_GRANTED,
     adjust_start_date,
+    check_course_open_for_learner,
     check_start_date,
     debug,
-    in_preview_mode,
-    check_course_open_for_learner,
+    in_preview_mode
 )
-from courseware.access_response import (
-    NoAllowedPartitionGroupsError,
-    IncorrectPartitionGroupError,
-)
-from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
-from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
-from lms.djangoapps.ccx.models import CustomCourseForEdX
+from lms.djangoapps.courseware.masquerade import get_masquerade_role, is_masquerading_as_student
 from mobile_api.models import IgnoreMobileAvailableFlagConfig
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_duration_limits.access import check_course_expired

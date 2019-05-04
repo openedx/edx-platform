@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 
 from common.test.utils import XssTestMixin
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from survey.models import SurveyAnswer, SurveyForm
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

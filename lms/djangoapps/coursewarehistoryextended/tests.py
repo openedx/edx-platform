@@ -12,8 +12,8 @@ from django.conf import settings
 from django.test import TestCase
 from mock import patch
 
-from courseware.models import BaseStudentModuleHistory, StudentModule, StudentModuleHistory
-from courseware.tests.factories import StudentModuleFactory, course_id, location
+from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule, StudentModuleHistory
+from lms.djangoapps.courseware.tests.factories import StudentModuleFactory, course_id, location
 
 
 @skipUnless(settings.FEATURES["ENABLE_CSMH_EXTENDED"], "CSMH Extended needs to be enabled")

@@ -16,8 +16,8 @@ from django.db import models
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
-from courseware.models import BaseStudentModuleHistory, StudentModule
 from coursewarehistoryextended.fields import UnsignedBigIntAutoField
+from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
 
 
 class StudentModuleHistoryExtended(BaseStudentModuleHistory):

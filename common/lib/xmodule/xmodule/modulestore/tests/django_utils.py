@@ -8,13 +8,14 @@ import os
 from contextlib import contextmanager
 from enum import Enum
 
-from lms.djangoapps.courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
-from courseware.tests.factories import StaffFactory
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User
 from django.test import TestCase
 from django.test.utils import override_settings
 from mock import patch
+
+from lms.djangoapps.courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
+from lms.djangoapps.courseware.tests.factories import StaffFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase, FilteredQueryCountMixin
 from openedx.core.lib.tempdir import mkdtemp_clean
 from student.models import CourseEnrollment

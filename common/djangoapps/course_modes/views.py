@@ -26,9 +26,9 @@ from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
 from course_modes.models import CourseMode
-from courseware.access import has_access
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.commerce.utils import EcommerceService
+from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from openedx.core.djangoapps.catalog.utils import get_currency_data
 from openedx.core.djangoapps.embargo import api as embargo_api

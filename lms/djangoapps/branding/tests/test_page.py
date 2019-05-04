@@ -5,17 +5,17 @@ import datetime
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 from pytz import UTC
 
 from branding.views import index
-from courseware.tests.helpers import LoginEnrollmentTestCase
 from edxmako.shortcuts import render_to_response
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from util.milestones_helpers import set_prerequisite_courses
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -189,7 +189,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.factory = RequestFactory()
 
     @patch('student.views.management.render_to_response', RENDER_MOCK)
-    @patch('courseware.views.views.render_to_response', RENDER_MOCK)
+    @patch('lms.djangoapps.courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
     def test_course_discovery_off(self):
         """
@@ -213,7 +213,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertIn('<div class="courses no-course-discovery"', response.content)
 
     @patch('student.views.management.render_to_response', RENDER_MOCK)
-    @patch('courseware.views.views.render_to_response', RENDER_MOCK)
+    @patch('lms.djangoapps.courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': True})
     def test_course_discovery_on(self):
         """
@@ -235,7 +235,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertIn('<div class="courses"', response.content)
 
     @patch('student.views.management.render_to_response', RENDER_MOCK)
-    @patch('courseware.views.views.render_to_response', RENDER_MOCK)
+    @patch('lms.djangoapps.courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
     def test_course_cards_sorted_by_default_sorting(self):
         response = self.client.get('/')
@@ -260,7 +260,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
 
     @patch('student.views.management.render_to_response', RENDER_MOCK)
-    @patch('courseware.views.views.render_to_response', RENDER_MOCK)
+    @patch('lms.djangoapps.courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_SORTING_BY_START_DATE': False})
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
     def test_course_cards_sorted_by_start_date_disabled(self):

@@ -10,9 +10,12 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
 
-from courseware.courses import get_course_with_access
+from lms.djangoapps.courseware.courses import get_course_with_access
 from openedx.core.djangoapps.django_comment_common.models import (
-    Role, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_GROUP_MODERATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_GROUP_MODERATOR,
+    FORUM_ROLE_MODERATOR,
+    Role
 )
 from openedx.core.djangoapps.util.forms import ExtendedNullBooleanField, MultiValueField
 

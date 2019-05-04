@@ -5,33 +5,35 @@ import json
 
 import ddt
 import mock
-
-from django.urls import reverse
 from django.test import RequestFactory, TestCase
+from django.urls import reverse
 from edx_django_utils.cache import RequestCache
 from mock import Mock, patch
 from pytz import UTC
 from six import text_type
 
+import lms.djangoapps.discussion.django_comment_client.utils as utils
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.tabs import get_course_tab_list
-from courseware.tests.factories import InstructorFactory
+from lms.djangoapps.courseware.tabs import get_course_tab_list
+from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from lms.djangoapps.discussion.django_comment_client.tests.unicode import UnicodeTestMixin
 from lms.djangoapps.discussion.django_comment_client.tests.utils import config_course_discussions, topic_name_to_id
-import lms.djangoapps.discussion.django_comment_client.utils as utils
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory, config_course_cohorts
-from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientMaintenanceError, perform_request
+from openedx.core.djangoapps.django_comment_common.comment_client.utils import (
+    CommentClientMaintenanceError,
+    perform_request
+)
 from openedx.core.djangoapps.django_comment_common.models import (
     CourseDiscussionSettings,
-    ForumsConfig,
-    assign_role,
     DiscussionsIdMapping,
+    ForumsConfig,
+    assign_role
 )
 from openedx.core.djangoapps.django_comment_common.utils import (
     get_course_discussion_settings,

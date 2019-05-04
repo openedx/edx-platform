@@ -10,8 +10,8 @@ from django.urls import reverse
 from django.views.decorators.cache import cache_control
 from opaque_keys.edx.keys import CourseKey
 
-from courseware.courses import get_course_with_access
 from edxmako.shortcuts import render_to_response
+from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.instructor.views.api import require_level
 from xmodule.modulestore.django import modulestore

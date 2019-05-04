@@ -7,37 +7,32 @@ from contextlib import contextmanager
 from functools import wraps
 
 from django.urls import reverse
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from six import text_type
-from util.date_utils import to_timestamp
 
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.grades.api.serializers import StudentGradebookEntrySerializer, SubsectionGradeResponseSerializer
-from lms.djangoapps.grades.api.v1.utils import (
-    USER_MODEL,
-    CourseEnrollmentPagination,
-    GradeViewMixin,
-)
+from lms.djangoapps.grades.api.v1.utils import USER_MODEL, CourseEnrollmentPagination, GradeViewMixin
 from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.context import graded_subsections_for_course
 from lms.djangoapps.grades.course_data import CourseData
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.events import SUBSECTION_GRADE_CALCULATED, subsection_grade_calculated
+from lms.djangoapps.grades.grade_utils import are_grades_frozen
 from lms.djangoapps.grades.models import (
     PersistentCourseGrade,
     PersistentSubsectionGrade,
     PersistentSubsectionGradeOverride,
-    PersistentSubsectionGradeOverrideHistory,
+    PersistentSubsectionGradeOverrideHistory
 )
 from lms.djangoapps.grades.subsection_grade import CreateSubsectionGrade
 from lms.djangoapps.grades.tasks import recalculate_subsection_grade_v3
-from lms.djangoapps.grades.grade_utils import are_grades_frozen
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.util.forms import to_bool
 from openedx.core.lib.api.view_utils import (
@@ -45,7 +40,7 @@ from openedx.core.lib.api.view_utils import (
     PaginatedAPIView,
     get_course_key,
     verify_course_exists,
-    view_auth_classes,
+    view_auth_classes
 )
 from openedx.core.lib.cache_utils import request_cached
 from student.auth import has_course_author_access
@@ -57,6 +52,7 @@ from track.event_transaction_utils import (
     get_event_transaction_type,
     set_event_transaction_type
 )
+from util.date_utils import to_timestamp
 from xmodule.modulestore.django import modulestore
 from xmodule.util.misc import get_default_short_labeler
 

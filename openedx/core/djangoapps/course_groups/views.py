@@ -26,8 +26,8 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
-from courseware.courses import get_course, get_course_with_access
 from edxmako.shortcuts import render_to_response
+from lms.djangoapps.courseware.courses import get_course, get_course_with_access
 from openedx.core.djangoapps.course_groups.models import CohortMembership
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin

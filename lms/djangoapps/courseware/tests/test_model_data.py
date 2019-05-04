@@ -11,21 +11,16 @@ from xblock.core import XBlock
 from xblock.exceptions import KeyValueMultiSaveError
 from xblock.fields import BlockScope, Scope, ScopeIds
 
-from courseware.model_data import DjangoKeyValueStore, FieldDataCache, InvalidScopeError
-from courseware.models import (
+from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache, InvalidScopeError
+from lms.djangoapps.courseware.models import (
     StudentModule,
     XModuleStudentInfoField,
     XModuleStudentPrefsField,
     XModuleUserStateSummaryField
 )
-from courseware.tests.factories import StudentModuleFactory as cmfStudentModuleFactory
-from courseware.tests.factories import (
-    StudentInfoFactory,
-    StudentPrefsFactory,
-    UserStateSummaryFactory,
-    course_id,
-    location
-)
+from lms.djangoapps.courseware.tests.factories import StudentInfoFactory
+from lms.djangoapps.courseware.tests.factories import StudentModuleFactory as cmfStudentModuleFactory
+from lms.djangoapps.courseware.tests.factories import StudentPrefsFactory, UserStateSummaryFactory, course_id, location
 from student.tests.factories import UserFactory
 
 

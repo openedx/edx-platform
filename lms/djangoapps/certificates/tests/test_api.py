@@ -1,23 +1,24 @@
 """Tests for the certificates Python API. """
 import uuid
 from contextlib import contextmanager
+from datetime import datetime, timedelta
 from functools import wraps
 
 import ddt
-from datetime import datetime
-from datetime import timedelta
+import pytz
 from config_models.models import cache
 from django.conf import settings
-from django.urls import reverse
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
+from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
-import pytz
 
+from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -28,9 +29,7 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.certificates.queue import XQueueAddToQueueError, XQueueCertInterface
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
-from courseware.tests.factories import GlobalStaffFactory
+from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from microsite_configuration import microsite
 from student.models import CourseEnrollment

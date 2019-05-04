@@ -12,20 +12,20 @@ import jwt
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ImproperlyConfigured
-from django.urls import reverse
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import MagicMock, patch
 from oauth2_provider.models import Application
 
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module_for_descriptor
-from courseware.tabs import get_course_tab_list
 from edxmako.shortcuts import render_to_string
 from edxnotes import helpers
 from edxnotes.decorators import edxnotes
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from edxnotes.plugins import EdxNotesTab
+from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.module_render import get_module_for_descriptor
+from lms.djangoapps.courseware.tabs import get_course_tab_list
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus

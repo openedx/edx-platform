@@ -5,12 +5,11 @@ import json
 
 from django.db.models import Count
 from django.utils.translation import ugettext as _
-
 from opaque_keys.edx.locator import BlockUsageLocator
 from six import text_type
 
-from courseware import models
 from instructor_analytics.csvs import create_csv_response
+from lms.djangoapps.courseware import models
 from util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata

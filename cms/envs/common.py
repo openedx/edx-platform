@@ -1122,7 +1122,7 @@ INSTALLED_APPS = [
     # by installed apps.
     'openedx.core.djangoapps.oauth_dispatch.apps.OAuthDispatchAppConfig',
     'oauth_provider',
-    'courseware',
+    'lms.djangoapps.courseware',
     'survey.apps.SurveyConfig',
     'lms.djangoapps.verify_student.apps.VerifyStudentConfig',
     'completion',

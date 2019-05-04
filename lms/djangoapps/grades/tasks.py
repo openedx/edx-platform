@@ -16,8 +16,8 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import CourseLocator
 from submissions import api as sub_api
 
-from courseware.model_data import get_score
 from lms.djangoapps.course_blocks.api import get_course_blocks
+from lms.djangoapps.courseware.model_data import get_score
 from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment
@@ -29,11 +29,11 @@ from .config.waffle import DISABLE_REGRADE_ON_POLICY_CHANGE, waffle
 from .constants import ScoreDatabaseTableEnum
 from .course_grade_factory import CourseGradeFactory
 from .exceptions import DatabaseNotReadyError
+from .grade_utils import are_grades_frozen
 from .services import GradesService
 from .signals.signals import SUBSECTION_SCORE_CHANGED
 from .subsection_grade_factory import SubsectionGradeFactory
 from .transformer import GradesTransformer
-from .grade_utils import are_grades_frozen
 
 log = getLogger(__name__)
 

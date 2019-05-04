@@ -10,25 +10,24 @@ from functools import partial
 import ddt
 import pytz
 from bson import ObjectId
-from completion.models import BlockCompletion
 from completion import waffle as completion_waffle
+from completion.models import BlockCompletion
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.http import Http404, HttpResponse
 from django.middleware.csrf import get_token
 from django.test.client import RequestFactory
-from django.urls import reverse
-from django.http import Http404, HttpResponse
 from django.test.utils import override_settings
+from django.urls import reverse
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 from edx_proctoring.api import create_exam, create_exam_attempt, update_attempt_status
 from edx_proctoring.runtime import set_runtime_service
-from edx_proctoring.tests.test_services import MockCreditService, MockGradesService, MockCertificateService
+from edx_proctoring.tests.test_services import MockCertificateService, MockCreditService, MockGradesService
 from freezegun import freeze_time
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import MagicMock, Mock, patch
 from opaque_keys.edx.asides import AsideUsageKeyV2
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from pyquery import PyQuery
 from six import text_type
 from web_fragments.fragment import Fragment
@@ -36,33 +35,35 @@ from xblock.completable import CompletableXBlockMixin
 from xblock.core import XBlock, XBlockAside
 from xblock.field_data import FieldData
 from xblock.fields import ScopeIds
-from xblock.runtime import (
-    DictKeyValueStore,
-    KvsFieldData,
-    Runtime
-)
+from xblock.runtime import DictKeyValueStore, KvsFieldData, Runtime
 from xblock.test.tools import TestRuntime
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from course_modes.models import CourseMode
-from courseware import module_render as render
-from courseware.courses import get_course_info_section, get_course_with_access
-from courseware.access_response import AccessResponse
-from courseware.masquerade import CourseMasquerade
-from courseware.model_data import FieldDataCache
-from courseware.models import StudentModule
-from courseware.module_render import get_module_for_descriptor, hash_resource
-from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory, UserFactory, RequestFactoryNoCsrf
-from courseware.tests.test_submitting_problems import TestSubmittingProblems
-from courseware.tests.tests import LoginEnrollmentTestCase
-from lms.djangoapps.lms_xblock.field_data import LmsFieldData
+from lms.djangoapps.courseware import module_render as render
+from lms.djangoapps.courseware.access_response import AccessResponse
+from lms.djangoapps.courseware.courses import get_course_info_section, get_course_with_access
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
+from lms.djangoapps.courseware.masquerade import CourseMasquerade
+from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.models import StudentModule
+from lms.djangoapps.courseware.module_render import get_module_for_descriptor, hash_resource
+from lms.djangoapps.courseware.tests.factories import (
+    GlobalStaffFactory,
+    RequestFactoryNoCsrf,
+    StudentModuleFactory,
+    UserFactory
+)
+from lms.djangoapps.courseware.tests.test_submitting_problems import TestSubmittingProblems
+from lms.djangoapps.courseware.tests.tests import LoginEnrollmentTestCase
+from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.credit.api import set_credit_requirement_status, set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.url_utils import quote_slashes
-from student.models import anonymous_id_for_user, CourseEnrollment
+from student.models import CourseEnrollment, anonymous_id_for_user
 from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from xblock_django.models import XBlockConfiguration
 from xmodule.capa_module import ProblemBlock
@@ -261,7 +262,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         }
 
         # Patch getmodule to return our mock module
-        with patch('courseware.module_render.load_single_xblock', return_value=self.mock_module):
+        with patch('lms.djangoapps.courseware.module_render.load_single_xblock', return_value=self.mock_module):
             # call xqueue_callback with our mocked information
             request = self.request_factory.post(self.callback_url, data)
             render.xqueue_callback(
@@ -283,7 +284,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             'xqueue_body': 'hello world',
         }
 
-        with patch('courseware.module_render.load_single_xblock', return_value=self.mock_module):
+        with patch('lms.djangoapps.courseware.module_render.load_single_xblock', return_value=self.mock_module):
             # Test with missing xqueue data
             with self.assertRaises(Http404):
                 request = self.request_factory.post(self.callback_url, {})
@@ -891,7 +892,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
             request.session = {}
             request.user.real_user = GlobalStaffFactory.create()
             request.user.real_user.masquerade_settings = CourseMasquerade(course.id, user_name="jem")
-            with patch('courseware.module_render.is_masquerading_as_specific_student') as mock_masq:
+            with patch('lms.djangoapps.courseware.module_render.is_masquerading_as_specific_student') as mock_masq:
                 mock_masq.return_value = True
                 response = render.handle_xblock_callback(
                     request,
@@ -1796,7 +1797,7 @@ class DetachedXBlock(XBlock):
 
 
 @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_DEBUG_INFO_TO_STAFF': True, 'DISPLAY_HISTOGRAMS_TO_STAFF': True})
-@patch('courseware.module_render.has_access', Mock(return_value=True, autospec=True))
+@patch('lms.djangoapps.courseware.module_render.has_access', Mock(return_value=True, autospec=True))
 class TestStaffDebugInfo(SharedModuleStoreTestCase):
     """Tests to verify that Staff Debug Info panel and histograms are displayed to staff."""
 
@@ -1960,7 +1961,7 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         super(TestAnonymousStudentId, self).setUp()
         self.user = UserFactory()
 
-    @patch('courseware.module_render.has_access', Mock(return_value=True, autospec=True))
+    @patch('lms.djangoapps.courseware.module_render.has_access', Mock(return_value=True, autospec=True))
     def _get_anonymous_id(self, course_id, xblock_class):
         location = course_id.make_usage_key('dummy_category', 'dummy_name')
         descriptor = Mock(
@@ -2435,7 +2436,7 @@ class TestFilteredChildren(SharedModuleStoreTestCase):
         self.users = {number: UserFactory() for number in USER_NUMBERS}
 
         self._old_has_access = render.has_access
-        patcher = patch('courseware.module_render.has_access', self._has_access)
+        patcher = patch('lms.djangoapps.courseware.module_render.has_access', self._has_access)
         patcher.start()
         self.addCleanup(patcher.stop)
 

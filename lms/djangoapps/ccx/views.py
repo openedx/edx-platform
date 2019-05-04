@@ -14,17 +14,15 @@ from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.db import transaction
 from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from opaque_keys.edx.keys import CourseKey
 
-from courseware.access import has_access
-from courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import (
@@ -43,8 +41,10 @@ from lms.djangoapps.ccx.utils import (
     get_ccx_for_coach,
     get_date,
     get_enrollment_action_and_identifiers,
-    parse_date,
+    parse_date
 )
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.courseware.field_overrides import disable_overrides
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params

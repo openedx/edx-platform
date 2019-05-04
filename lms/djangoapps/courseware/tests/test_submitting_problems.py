@@ -12,12 +12,13 @@ from textwrap import dedent
 import ddt
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.urls import reverse
 from django.utils.timezone import now
 from mock import patch
 from six import text_type
+from submissions import api as submissions_api
 
 from capa.tests.response_xml_factory import (
     CodeResponseXMLFactory,
@@ -26,8 +27,8 @@ from capa.tests.response_xml_factory import (
     SchematicResponseXMLFactory
 )
 from course_modes.models import CourseMode
-from courseware.models import BaseStudentModuleHistory, StudentModule
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tasks import compute_all_grades_for_course
 from openedx.core.djangoapps.credit.api import get_credit_requirement_status, set_credit_requirements
@@ -35,7 +36,6 @@ from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from openedx.core.lib.url_utils import quote_slashes
 from student.models import CourseEnrollment, anonymous_id_for_user
-from submissions import api as submissions_api
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
@@ -788,7 +788,7 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
             self.addCleanup(fileobj.close)
 
         self.problem_setup("the_problem", filenames)
-        with patch('courseware.module_render.XQUEUE_INTERFACE.session') as mock_session:
+        with patch('lms.djangoapps.courseware.module_render.XQUEUE_INTERFACE.session') as mock_session:
             resp = self.submit_question_answer("the_problem", {'2_1': fileobjs})
 
         self.assertEqual(resp.status_code, 200)

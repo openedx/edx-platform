@@ -4,11 +4,11 @@ Certificate end-points used by the student support UI.
 See lms/djangoapps/support for more details.
 
 """
-import bleach
 import logging
 import urllib
 from functools import wraps
 
+import bleach
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError
@@ -19,7 +19,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.certificates import api
 from lms.djangoapps.certificates.models import CertificateInvalidation
-from courseware.access import has_access
+from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.instructor_task.api import generate_certificates_for_students
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment, User

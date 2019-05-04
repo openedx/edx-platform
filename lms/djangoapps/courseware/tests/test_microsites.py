@@ -2,16 +2,17 @@
 Tests related to the Site Configuration feature
 """
 
-from bs4 import BeautifulSoup
 from contextlib import contextmanager
+
+from bs4 import BeautifulSoup
 from django.conf import settings
-from django.urls import reverse
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import patch
 from six import text_type
 
 from course_modes.models import CourseMode
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from xmodule.course_module import CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CATALOG_VISIBILITY_NONE
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

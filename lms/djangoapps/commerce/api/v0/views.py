@@ -3,9 +3,9 @@ import logging
 
 from django.urls import reverse
 from edx_rest_api_client import exceptions
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import HTTP_406_NOT_ACCEPTABLE, HTTP_409_CONFLICT
@@ -13,10 +13,10 @@ from rest_framework.views import APIView
 from six import text_type
 
 from course_modes.models import CourseMode
-from courseware import courses
 from enrollment.api import add_enrollment
 from enrollment.views import EnrollmentCrossDomainSessionAuth
 from entitlements.models import CourseEntitlement
+from lms.djangoapps.courseware import courses
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in

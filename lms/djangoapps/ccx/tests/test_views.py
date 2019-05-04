@@ -9,21 +9,16 @@ import urlparse
 import ddt
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
-from django.urls import resolve, reverse
 from django.test import RequestFactory
 from django.test.utils import override_settings
-from pytz import UTC
+from django.urls import resolve, reverse
 from django.utils.translation import ugettext as _
+from edx_django_utils.cache import RequestCache
 from mock import MagicMock, patch
 from opaque_keys.edx.keys import CourseKey
+from pytz import UTC
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
-from courseware.courses import get_course_by_id
-from courseware.tabs import get_course_tab_list
-from courseware.tests.factories import StudentModuleFactory
-from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.testutils import FieldOverrideTestMixin
-from edx_django_utils.cache import RequestCache
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import get_override_for_ccx, override_field_for_ccx
@@ -31,6 +26,11 @@ from lms.djangoapps.ccx.tests.factories import CcxFactory
 from lms.djangoapps.ccx.tests.utils import CcxTestCase, flatten
 from lms.djangoapps.ccx.utils import ccx_course, is_email
 from lms.djangoapps.ccx.views import get_date
+from lms.djangoapps.courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.tabs import get_course_tab_list
+from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.testutils import FieldOverrideTestMixin
 from lms.djangoapps.discussion.django_comment_client.utils import has_forum_access
 from lms.djangoapps.grades.tasks import compute_all_grades_for_course
 from lms.djangoapps.instructor.access import allow_access, list_with_level
@@ -234,7 +234,7 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
         self.assertEqual(progress_page_due_date, due)
 
     @patch('ccx.views.render_to_response', intercept_renderer)
-    @patch('courseware.views.views.render_to_response', intercept_renderer)
+    @patch('lms.djangoapps.courseware.views.views.render_to_response', intercept_renderer)
     @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
     def test_edit_schedule(self):
         """
@@ -1111,10 +1111,10 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         self.assertEqual(data['HW 03'], '0.25')
         self.assertEqual(data['HW Avg'], '0.5')
 
-    @patch('courseware.views.views.render_to_response', intercept_renderer)
+    @patch('lms.djangoapps.courseware.views.views.render_to_response', intercept_renderer)
     def test_student_progress(self):
         self.course.enable_ccx = True
-        patch_context = patch('courseware.views.views.get_course_with_access')
+        patch_context = patch('lms.djangoapps.courseware.views.views.get_course_with_access')
         get_course = patch_context.start()
         get_course.return_value = self.course
         self.addCleanup(patch_context.stop)

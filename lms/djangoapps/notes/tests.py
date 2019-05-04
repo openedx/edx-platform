@@ -6,14 +6,14 @@ import json
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.urls import reverse
 from django.test import RequestFactory, TestCase
 from django.test.client import Client
+from django.urls import reverse
 from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
 
-from courseware.tabs import CourseTab, get_course_tab_list
+from lms.djangoapps.courseware.tabs import CourseTab, get_course_tab_list
 from notes import api, models, utils
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

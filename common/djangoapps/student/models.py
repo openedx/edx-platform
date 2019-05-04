@@ -11,10 +11,10 @@ file and check it in at the same time as your model changes. To do that,
 3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
 from __future__ import print_function
+
 import hashlib
 import json
 import logging
-import six
 import uuid
 from collections import OrderedDict, defaultdict, namedtuple
 from datetime import datetime, timedelta
@@ -22,6 +22,7 @@ from functools import total_ordering
 from importlib import import_module
 from urllib import urlencode
 
+import six
 from config_models.models import ConfigurationModel
 from django.apps import apps
 from django.conf import settings
@@ -40,6 +41,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from django_countries.fields import CountryField
+from edx_django_utils.cache import RequestCache
 from edx_rest_api_client.exceptions import SlumberBaseException
 from eventtracking import tracker
 from model_utils.models import TimeStampedModel
@@ -50,22 +52,20 @@ from six import text_type
 from slumber.exceptions import HttpClientError, HttpServerError
 from user_util import user_util
 
-from edx_django_utils.cache import RequestCache
-from student.signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED
+import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from course_modes.models import CourseMode, get_cosmetic_verified_display_price
-from courseware.models import (
+from enrollment.api import _default_course_mode
+from lms.djangoapps.certificates.models import GeneratedCertificate
+from lms.djangoapps.courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
     DynamicUpgradeDeadlineConfiguration,
     OrgDynamicUpgradeDeadlineConfiguration
 )
-from enrollment.api import _default_course_mode
-
-from lms.djangoapps.certificates.models import GeneratedCertificate
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
+from student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED, UNENROLL_DONE
 from track import contexts, segment
 from util.milestones_helpers import is_entrance_exams_enabled
 from util.model_utils import emit_field_changed_events, get_changed_fields_dict
@@ -1242,7 +1242,7 @@ class CourseEnrollment(models.Model):
         """
         # Disable the pylint error here, as per ormsbee. This local import was previously
         # in CourseEnrollment.enroll
-        from courseware.access import has_access  # pylint: disable=import-error
+        from lms.djangoapps.courseware.access import has_access  # pylint: disable=import-error
         return not has_access(user, 'enroll', course)
 
     def update_enrollment(self, mode=None, is_active=None, skip_refund=False):

@@ -23,12 +23,12 @@ from provider.oauth2.models import Client, Grant
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from courseware import courses
 from lms.djangoapps.ccx.api.v0 import views
 from lms.djangoapps.ccx.models import CcxFieldOverride, CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import override_field_for_ccx
 from lms.djangoapps.ccx.tests.utils import CcxTestCase
 from lms.djangoapps.ccx.utils import ccx_course as ccx_course_cm
+from lms.djangoapps.courseware import courses
 from lms.djangoapps.instructor.access import allow_access, list_with_level
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
 from student.models import CourseEnrollment
@@ -501,7 +501,7 @@ class CcxListTest(CcxRestApiTest):
         self.mstore.update_item(self.course, self.coach.id)
 
         # case with deprecated  master_course_id
-        with mock.patch('courseware.courses.get_course_by_id', autospec=True) as mocked:
+        with mock.patch('lms.djangoapps.courseware.courses.get_course_by_id', autospec=True) as mocked:
             mocked.return_value.id.deprecated = True
             resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
 
