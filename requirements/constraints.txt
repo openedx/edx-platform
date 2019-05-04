@@ -39,3 +39,7 @@ tornado<6.0
 
 # Sphinx dropped support for Python 2.7 with 2.0.0. and only supports Python 3.5+
 sphinx<2.0.0
+
+# Pin protoring libraries for Ironwood
+edx-proctoring==1.5.7
+edx-proctoring-proctortrack==1.0.1
