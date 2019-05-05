@@ -4,18 +4,18 @@
 {% block title %}{% trans "Signed Out" %} | {{ block.super }}{% endblock %}
 
 {% block body %}
-    <h1>{% trans "You have signed out." %}</h1>
-
-    <p style="text-align: center; margin-bottom: 20px;">
-        {% blocktrans trimmed %}
-          If you are not redirected within 5 seconds, <a href="{{ target }}">click here to go to the home page</a>.
-        {% endblocktrans %}
-    </p>
-
-    <div id="iframeContainer" style="visibility: hidden" data-redirect-url="{{ target }}">
-        {% for uri in logout_uris %}
-            <iframe src="{{ uri }}"></iframe>
-        {% endfor %}
+    <div style="margin: 60px 20px">
+      <h1>{% trans "You have signed out." %}</h1>
+      <p style="text-align: center; margin-bottom: 20px;line-height: 1.5;">
+          {% blocktrans trimmed %}
+            If you are not redirected within 5 seconds, <a href="{{ target }}">click here to go to the home page</a>.
+          {% endblocktrans %}
+      </p>
+      <div id="iframeContainer" style="visibility: hidden" data-redirect-url="{{ target }}">
+          {% for uri in logout_uris %}
+              <iframe src="{{ uri }}"></iframe>
+          {% endfor %}
+      </div>
     </div>
 
     <script type="text/javascript" src="{% static 'js/jquery.allLoaded.js' %}"></script>

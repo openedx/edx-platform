@@ -382,14 +382,15 @@
        font-weight: normal;
     }
 }
-.u-field-message-notification .fa-check{
-    vertical-align: sub;
-}
+.u-field-message-notification .fa-check, 
 .u-field .message-success{
-    vertical-align: sub;
+    vertical-align: middle;
 }
 .account-settings-sections #aboutTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-message .u-field-message-notification{
     padding: 38px 0 0 80px;
+}
+.u-field-message-notification .fa{
+  margin-right: 10px;
 }
 
 
