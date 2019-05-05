@@ -47,14 +47,15 @@
 #
 # Translators:
 # li ying <code@eliteu.cn>, 2019
+# fengri <173770922@qq.com>, 2019
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-04-24 17:02+0800\n"
+"POT-Creation-Date: 2019-05-05 10:30+0800\n"
 "PO-Revision-Date: 2018-12-07 12:23+0000\n"
-"Last-Translator: li ying <code@eliteu.cn>, 2019\n"
+"Last-Translator: fengri <173770922@qq.com>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -10492,7 +10493,7 @@ msgid "Use Current Transcript"
 msgstr "使用当前字幕"
 
 #: membership/static/membership/js/card.js
-msgid "Open membership"
+msgid "Join"
 msgstr "开通"
 
 #: membership/static/membership/js/card.js
@@ -10504,11 +10505,11 @@ msgid "YYYY-MM-DD"
 msgstr "YYYY-MM-DD"
 
 #: membership/static/membership/js/card.js
-msgid "Open date:"
+msgid "Open date: "
 msgstr "开通日期："
 
 #: membership/static/membership/js/card.js
-msgid "Expire:"
+msgid "Expire: "
 msgstr "到期日期："
 
 #: membership/static/membership/js/card.js
@@ -10516,11 +10517,15 @@ msgid "Last open date:"
 msgstr "上次开通日期："
 
 #: membership/static/membership/js/card.js
+msgid "Expire:"
+msgstr "到期日期："
+
+#: membership/static/membership/js/card.js
 msgid "Renew"
 msgstr "续费"
 
 #: membership/static/membership/js/index.js
-msgid "Average per month"
+msgid "/M"
 msgstr "月均"
 
 #: membership/static/membership/js/pay.js
