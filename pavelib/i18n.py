@@ -443,11 +443,9 @@ def change_position(fpath):
 
 @task
 def i18n_third_party():
-    sh("cp ../edx-membership/conf/locale/en/LC_MESSAGES/django.po conf/locale/en/LC_MESSAGES/membership-saved.po")
-    sh("cp ../edx-membership/conf/locale/en/LC_MESSAGES/djangojs.po conf/locale/en/LC_MESSAGES/membershipjs-saved.po")
-    sh("mv conf/locale/en/LC_MESSAGES/membership-saved.po conf/locale/en/LC_MESSAGES/membership.po")
-    sh("mv conf/locale/en/LC_MESSAGES/membershipjs-saved.po conf/locale/en/LC_MESSAGES/membership-js.po")    
-
+    sh("/bin/cp -rf ../edx-membership/conf/locale/en/LC_MESSAGES/django.po conf/locale/en/LC_MESSAGES/membership.po")
+    sh("/bin/cp -rf ../edx-membership/conf/locale/en/LC_MESSAGES/djangojs.po conf/locale/en/LC_MESSAGES/membership-js.po")
+    
 
 @task
 @needs(
