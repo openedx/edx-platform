@@ -1,10 +1,13 @@
 """Ensure videos emit proper events"""
 
+from __future__ import absolute_import
+
 import datetime
 import json
 from unittest import skip
 
 import ddt
+import six
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from common.test.acceptance.pages.lms.video.video import _parse_time_str
@@ -122,7 +125,7 @@ class VideoEventsTest(VideoEventsTestMixin):
             'session'
         )
         for field in dynamic_string_fields:
-            self.assert_field_type(load_video_event, field, basestring)
+            self.assert_field_type(load_video_event, field, six.string_types)
             self.assertIn(field, load_video_event, u'{0} not found in the root of the event'.format(field))
             del load_video_event[field]
 
@@ -135,7 +138,7 @@ class VideoEventsTest(VideoEventsTestMixin):
         course_key = CourseKey.from_string(self.course_id)
         static_fields_pattern = {
             'context': {
-                'course_id': unicode(course_key),
+                'course_id': six.text_type(course_key),
                 'org_id': course_key.org,
                 'path': '/event',
                 'user_id': self.user_info['user_id']
@@ -359,7 +362,7 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
             'session'
         )
         for field in dynamic_string_fields:
-            self.assert_field_type(load_video_event, field, basestring)
+            self.assert_field_type(load_video_event, field, six.string_types)
             self.assertIn(field, load_video_event, u'{0} not found in the root of the event'.format(field))
             del load_video_event[field]
 
@@ -372,7 +375,7 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
         course_key = CourseKey.from_string(self.course_id)
         static_fields_pattern = {
             'context': {
-                'course_id': unicode(course_key),
+                'course_id': six.text_type(course_key),
                 'org_id': course_key.org,
                 'path': '/event',
                 'user_id': self.user_info['user_id']
