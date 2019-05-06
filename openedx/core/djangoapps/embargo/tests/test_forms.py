@@ -3,17 +3,19 @@
 Unit tests for embargo app admin forms.
 """
 
-from django.test import TestCase
+from __future__ import absolute_import
 
-from opaque_keys.edx.locator import CourseLocator
-
+import six
 # Explicitly import the cache from ConfigurationModel so we can reset it after each test
 from config_models.models import cache
-from ..models import IPFilter
-from ..forms import RestrictedCourseForm, IPFilterForm
+from django.test import TestCase
+from opaque_keys.edx.locator import CourseLocator
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+from ..forms import IPFilterForm, RestrictedCourseForm
+from ..models import IPFilter
 
 
 class RestrictedCourseFormTest(ModuleStoreTestCase):
@@ -22,7 +24,7 @@ class RestrictedCourseFormTest(ModuleStoreTestCase):
     def test_save_valid_data(self):
         course = CourseFactory.create()
         data = {
-            'course_key': unicode(course.id),
+            'course_key': six.text_type(course.id),
             'enroll_msg_key': 'default',
             'access_msg_key': 'default'
         }

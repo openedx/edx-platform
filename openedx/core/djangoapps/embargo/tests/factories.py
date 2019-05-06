@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import factory
 from factory.django import DjangoModelFactory
 from xmodule.modulestore.tests.factories import CourseFactory

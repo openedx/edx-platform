@@ -11,6 +11,7 @@ file and check it in at the same time as your model changes. To do that,
 3. Add the migration file created in edx-platform/openedx/core/djangoapps/embargo/migrations/
 """
 
+from __future__ import absolute_import
 import json
 import logging
 
@@ -31,6 +32,7 @@ from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 
 from .exceptions import InvalidAccessPoint
 from .messages import COURSEWARE_MESSAGES, ENROLL_MESSAGES
+import six
 
 log = logging.getLogger(__name__)
 
@@ -122,12 +124,12 @@ class RestrictedCourse(models.Model):
 
     ENROLL_MSG_KEY_CHOICES = tuple([
         (msg_key, msg.description)
-        for msg_key, msg in ENROLL_MESSAGES.iteritems()
+        for msg_key, msg in six.iteritems(ENROLL_MESSAGES)
     ])
 
     COURSEWARE_MSG_KEY_CHOICES = tuple([
         (msg_key, msg.description)
-        for msg_key, msg in COURSEWARE_MESSAGES.iteritems()
+        for msg_key, msg in six.iteritems(COURSEWARE_MESSAGES)
     ])
 
     course_key = CourseKeyField(
@@ -169,7 +171,7 @@ class RestrictedCourse(models.Model):
             Boolean
             True if course is in restricted course list.
         """
-        return unicode(course_id) in cls._get_restricted_courses_from_cache()
+        return six.text_type(course_id) in cls._get_restricted_courses_from_cache()
 
     @classmethod
     def is_disabled_access_check(cls, course_id):
@@ -187,8 +189,8 @@ class RestrictedCourse(models.Model):
         # checking is_restricted_course method also here to make sure course exists in the list otherwise in case of
         # no course found it will throw the key not found error on 'disable_access_check'
         return (
-            cls.is_restricted_course(unicode(course_id))
-            and cls._get_restricted_courses_from_cache().get(unicode(course_id))["disable_access_check"]
+            cls.is_restricted_course(six.text_type(course_id))
+            and cls._get_restricted_courses_from_cache().get(six.text_type(course_id))["disable_access_check"]
         )
 
     @classmethod
@@ -199,7 +201,7 @@ class RestrictedCourse(models.Model):
         restricted_courses = cache.get(cls.COURSE_LIST_CACHE_KEY)
         if restricted_courses is None:
             restricted_courses = {
-                unicode(course.course_key): {
+                six.text_type(course.course_key): {
                     'disable_access_check': course.disable_access_check
                 }
                 for course in RestrictedCourse.objects.all()
@@ -237,7 +239,7 @@ class RestrictedCourse(models.Model):
             'access_msg': self.access_msg_key,
             'country_rules': [
                 {
-                    'country': unicode(rule.country.country),
+                    'country': six.text_type(rule.country.country),
                     'rule_type': rule.rule_type
                 }
                 for rule in country_rules_for_course
@@ -265,7 +267,7 @@ class RestrictedCourse(models.Model):
             return self.access_msg_key
 
     def __unicode__(self):
-        return unicode(self.course_key)
+        return six.text_type(self.course_key)
 
     @classmethod
     def message_url_path(cls, course_key, access_point):
@@ -385,8 +387,8 @@ class Country(models.Model):
 
     def __unicode__(self):
         return u"{name} ({code})".format(
-            name=unicode(self.country.name),
-            code=unicode(self.country)
+            name=six.text_type(self.country.name),
+            code=six.text_type(self.country)
         )
 
     class Meta(object):
@@ -519,13 +521,13 @@ class CountryAccessRule(models.Model):
     def __unicode__(self):
         if self.rule_type == self.WHITELIST_RULE:
             return _(u"Whitelist {country} for {course}").format(
-                course=unicode(self.restricted_course.course_key),
-                country=unicode(self.country),
+                course=six.text_type(self.restricted_course.course_key),
+                country=six.text_type(self.country),
             )
         elif self.rule_type == self.BLACKLIST_RULE:
             return _(u"Blacklist {country} for {course}").format(
-                course=unicode(self.restricted_course.course_key),
-                country=unicode(self.country),
+                course=six.text_type(self.restricted_course.course_key),
+                country=six.text_type(self.country),
             )
 
     @classmethod

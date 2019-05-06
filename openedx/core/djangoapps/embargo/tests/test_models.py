@@ -1,4 +1,5 @@
 """Test of models for embargo app"""
+from __future__ import absolute_import
 import json
 from django.test import TestCase
 from django.db.utils import IntegrityError
@@ -9,6 +10,7 @@ from ..models import (
 )
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+import six
 
 
 class EmbargoModelsTest(CacheIsolationTestCase):
@@ -28,7 +30,7 @@ class EmbargoModelsTest(CacheIsolationTestCase):
         # Now, course should be embargoed
         self.assertTrue(EmbargoedCourse.is_embargoed(course_id))
         self.assertEquals(
-            unicode(cauth),
+            six.text_type(cauth),
             u"Course '{course_id}' is Embargoed".format(course_id=course_id)
         )
 
@@ -38,7 +40,7 @@ class EmbargoModelsTest(CacheIsolationTestCase):
         # Test that course is now unauthorized
         self.assertFalse(EmbargoedCourse.is_embargoed(course_id))
         self.assertEquals(
-            unicode(cauth),
+            six.text_type(cauth),
             u"Course '{course_id}' is Not Embargoed".format(course_id=course_id)
         )
 
@@ -115,8 +117,8 @@ class RestrictedCourseTest(CacheIsolationTestCase):
         course_id = CourseLocator('abc', '123', 'doremi')
         restricted_course = RestrictedCourse.objects.create(course_key=course_id)
         self.assertEquals(
-            unicode(restricted_course),
-            unicode(course_id)
+            six.text_type(restricted_course),
+            six.text_type(course_id)
         )
 
     def test_restricted_course_cache_with_save_delete(self):
@@ -166,7 +168,7 @@ class CountryTest(TestCase):
 
     def test_unicode_values(self):
         country = Country.objects.create(country='NZ')
-        self.assertEquals(unicode(country), "New Zealand (NZ)")
+        self.assertEquals(six.text_type(country), "New Zealand (NZ)")
 
 
 class CountryAccessRuleTest(CacheIsolationTestCase):
@@ -184,7 +186,7 @@ class CountryAccessRuleTest(CacheIsolationTestCase):
         )
 
         self.assertEquals(
-            unicode(access_rule),
+            six.text_type(access_rule),
             u"Whitelist New Zealand (NZ) for {course_key}".format(course_key=course_id)
         )
 
@@ -197,7 +199,7 @@ class CountryAccessRuleTest(CacheIsolationTestCase):
         )
 
         self.assertEquals(
-            unicode(access_rule),
+            six.text_type(access_rule),
             u"Blacklist New Zealand (NZ) for {course_key}".format(course_key=course_id)
         )
 
