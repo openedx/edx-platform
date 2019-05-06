@@ -1,15 +1,15 @@
 """Tests for user API middleware"""
 from __future__ import absolute_import
-from mock import Mock, patch
 
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import RequestFactory
+from mock import Mock, patch
 
-from student.tests.factories import UserFactory, AnonymousUserFactory
+from student.tests.factories import AnonymousUserFactory, UserFactory
 
-from ..tests.factories import UserCourseTagFactory
 from ..middleware import UserTagsEventContextMiddleware
+from ..tests.factories import UserCourseTagFactory
 
 
 class TagsMiddlewareTest(TestCase):

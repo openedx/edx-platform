@@ -2,29 +2,35 @@
 API for managing user preferences.
 """
 from __future__ import absolute_import
+
 import logging
 
+import six
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django_countries import countries
 from django.db import IntegrityError
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
-
-from openedx.core.lib.time_zone_utils import get_display_time_zone
+from django_countries import countries
 from pytz import common_timezones, common_timezones_set, country_timezones
 from six import text_type
 
+from openedx.core.lib.time_zone_utils import get_display_time_zone
 from student.models import User, UserProfile
 from track import segment
+
 from ..errors import (
-    UserAPIInternalError, UserAPIRequestError, UserNotFound, UserNotAuthorized,
-    PreferenceValidationError, PreferenceUpdateError, CountryCodeError
+    CountryCodeError,
+    PreferenceUpdateError,
+    PreferenceValidationError,
+    UserAPIInternalError,
+    UserAPIRequestError,
+    UserNotAuthorized,
+    UserNotFound
 )
 from ..helpers import intercept_errors, serializer_is_dirty
 from ..models import UserOrgTag, UserPreference
 from ..serializers import RawUserPreferenceSerializer
-import six
 
 log = logging.getLogger(__name__)
 

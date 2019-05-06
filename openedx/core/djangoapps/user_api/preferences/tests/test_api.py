@@ -3,40 +3,40 @@
 Unit tests for preference APIs.
 """
 from __future__ import absolute_import
-import datetime
-import ddt
-from mock import patch
-from pytz import common_timezones, utc
 
+import datetime
+
+import ddt
+from dateutil.parser import parse as parse_datetime
 from django.contrib.auth.models import User
 from django.test.utils import override_settings
-from dateutil.parser import parse as parse_datetime
+from mock import patch
+from pytz import common_timezones, utc
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.time_zone_utils import get_display_time_zone
 from student.models import UserProfile
 from student.tests.factories import UserFactory
-
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from ...accounts.api import create_account
 from ...errors import (
-    UserNotFound,
-    UserNotAuthorized,
-    PreferenceValidationError,
-    PreferenceUpdateError,
     CountryCodeError,
+    PreferenceUpdateError,
+    PreferenceValidationError,
+    UserNotAuthorized,
+    UserNotFound
 )
 from ...models import UserOrgTag
 from ...preferences.api import (
+    delete_user_preference,
+    get_country_time_zones,
     get_user_preference,
     get_user_preferences,
     set_user_preference,
-    update_user_preferences,
-    delete_user_preference,
     update_email_opt_in,
-    get_country_time_zones,
+    update_user_preferences
 )
 
 
