@@ -30,8 +30,9 @@ class PythonTestSuite(TestSuite):
             os.environ['DISABLE_MIGRATIONS'] = '1'
 
         if self.disable_courseenrollment_history:
+            print("HELLO MIKE!!!!")
             os.environ['DISABLE_COURSEENROLLMENT_HISTORY'] = '1'
-
+        print(os.envrion['DISABLE_COURSEENROLLMENT_HISTORY'])
         if not (self.fasttest or self.skip_clean):
             test_utils.clean_test_files()
 
