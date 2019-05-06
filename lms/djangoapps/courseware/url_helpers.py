@@ -36,17 +36,28 @@ def get_redirect_url(course_key, usage_key):
     elif section is None:
         redirect_url = reverse('courseware_chapter', args=(unicode(course_key), chapter))
     elif position is None:
-        redirect_url = reverse(
-            'courseware_section',
-            args=(unicode(course_key), chapter, section)
+        # redirect_url = reverse(
+        #     'courseware_section',
+        #     args=(unicode(course_key), chapter, section)
+        # )
+        redirect_url = 'https://learn.edxdev.org/course/{course}/{chapter}/{section}'.format(
+            course=course_key,
+            chapter=chapter,
+            section=section,
         )
     else:
         # Here we use the navigation_index from the position returned from
         # path_to_location - we can only navigate to the topmost vertical at the
         # moment
-        redirect_url = reverse(
-            'courseware_position',
-            args=(unicode(course_key), chapter, section, navigation_index(position))
+        # redirect_url = reverse(
+        #     'courseware_position',
+        #     args=(unicode(course_key), chapter, section, navigation_index(position))
+        # )
+        redirect_url = 'https://learn.edxdev.org/course/{course}/{chapter}/{section}/{position}'.format(
+            course=course_key,
+            chapter=chapter,
+            section=section,
+            position=position,
         )
     redirect_url += "?{}".format(urlencode({'activate_block_id': unicode(final_target_id)}))
     return redirect_url
