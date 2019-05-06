@@ -70,7 +70,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.core import signing
 from django.http import HttpResponse
 from django.utils.crypto import get_random_string
-from six import text_type
+from six import text_type  # pylint: disable=ungrouped-imports
 
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 

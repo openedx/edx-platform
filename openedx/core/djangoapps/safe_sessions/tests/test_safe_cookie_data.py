@@ -12,7 +12,7 @@ import ddt
 import six
 from django.test import TestCase
 from mock import patch
-from six.moves import range
+from six.moves import range  # pylint: disable=ungrouped-imports
 
 from ..middleware import SafeCookieData, SafeCookieError
 from .test_utils import TestSafeSessionsLogMixin
