@@ -3,12 +3,13 @@
 """
 Acceptance tests for CMS Video Module.
 """
+from __future__ import absolute_import
+
 import os
 from unittest import skipIf
 
-from mock import patch
-
 from bok_choy.promise import EmptyPromise
+from mock import patch
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
