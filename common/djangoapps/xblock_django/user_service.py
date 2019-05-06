@@ -62,7 +62,7 @@ class DjangoXBlockUserService(UserService):
         Return iterator of enrollments, as dicts.
         """
         enrollments = CourseEnrollment.objects.filter(
-                    course_id=course_id).select_related('programcourseenrollment')
+            course_id=course_id).select_related('programcourseenrollment')
         for enrollment in enrollments:
             enrd = {
                 'user_id': enrollment.user.id,

@@ -2,10 +2,16 @@
 <hr>
 {{instructions|safe}}
 
-{% if score %}
-<p>Your score: <strong>{{score.score}}/{{score.max_grade}}</strong></p>
+{% if score.score %}
+<h3>Your grade: <strong>{{score.grade_pct}}</strong></h3>
+{% else %}
+{% if grades_available %}
+<p><em>Not yet scored</em></p>
+{% else %}
+<p><em>View in LMS to see score</em></p>
 {% endif %}
-{% if is_staff %}
+{% endif %}
+{% if is_staff and grades_available %}
 <div class="row">
     <div class="col">
         <hr>

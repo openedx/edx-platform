@@ -17,7 +17,7 @@ class GradesUtilService(object):
         "Check if grades are frozen for given course key"
         return are_grades_frozen(self.course_id)
 
-    def get_score(self, user_id, usage_key):
+    def get_score(self, usage_key, user_id):
         """
         Return score for user_id and usage_key.
         """
@@ -31,7 +31,8 @@ class GradesUtilService(object):
             return None
         else:
             return {
-                'score': score.grade,
+                'grade': score.grade,
+                'score': score.grade * (score.max_grade or 1),
                 'max_grade': score.max_grade,
                 'created': score.created,
                 'modified': score.modified
@@ -48,20 +49,22 @@ class GradesUtilService(object):
         if user_ids:
             scores_qset = scores_qset.filter(student_id__in=user_ids)
 
-        return {row.student_id: {'score': row.grade,
+        return {row.student_id: {'grade': row.grade,
+                                 'score': row.grade * (row.max_grade or 1),
                                  'max_grade': row.max_grade,
                                  'created': row.created,
-                                 'modified': row.modified} for row in scores_qset}
+                                 'modified': row.modified,
+                                 'state': row.state} for row in scores_qset}
 
-    def set_score(self, usage_key, student_id, score):
+    def set_score(self, usage_key, student_id, score, max_points, **defaults):
         """
         Set a score.
         """
+        defaults['module_type'] = 'problem'
+        defaults['grade'] = score / max_points
+        defaults['max_grade'] = max_points
         StudentModule.objects.update_or_create(
             student_id=student_id,
             course_id=usage_key.course_key,
             module_state_key=usage_key,
-            defaults={
-                'module_type': 'problem',
-                'grade': score,
-            })
+            defaults=defaults)
