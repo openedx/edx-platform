@@ -1,17 +1,23 @@
 """
 Tests for the Course Outline view and supporting views.
 """
+from __future__ import absolute_import
+
 import datetime
 import json
 import re
 
+import six
 from completion import waffle
 from completion.models import BlockCompletion
 from completion.test_utils import CompletionWaffleTestMixin
 from django.contrib.sites.models import Site
-from django.urls import reverse
 from django.test import override_settings
+from django.urls import reverse
+from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from pyquery import PyQuery as pq
 from six import text_type
 from waffle.models import Switch
 from waffle.testutils import override_switch
@@ -19,13 +25,11 @@ from waffle.testutils import override_switch
 from courseware.tests.factories import StaffFactory
 from gating import api as lms_gating_api
 from lms.djangoapps.course_api.blocks.transformers.milestones import MilestonesAndSpecialExamsTransformer
-from milestones.tests.utils import MilestonesTestCaseMixin
-from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.lib.gating import api as gating_api
 from openedx.features.course_experience.views.course_outline import (
-    CourseOutlineFragmentView, DEFAULT_COMPLETION_TRACKING_START
+    DEFAULT_COMPLETION_TRACKING_START,
+    CourseOutlineFragmentView
 )
-from pyquery import PyQuery as pq
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
@@ -212,7 +216,7 @@ class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, Mileston
             gating_block: (The prerequisite) The block that must be completed to get access to the gated block
         """
 
-        gating_api.add_prerequisite(self.course.id, unicode(gating_block.location))
+        gating_api.add_prerequisite(self.course.id, six.text_type(gating_block.location))
         gating_api.set_required_content(self.course.id, gated_block.location, gating_block.location, 100)
 
     def test_content_locked(self):
@@ -362,7 +366,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         """
         course_key = CourseKey.from_string(str(course.id))
         # Fake a visit to sequence2/vertical2
-        block_key = UsageKey.from_string(unicode(sequential.location))
+        block_key = UsageKey.from_string(six.text_type(sequential.location))
         completion = 1.0
         BlockCompletion.objects.submit_completion(
             user=self.user,
@@ -595,7 +599,7 @@ class TestCourseOutlinePreview(SharedModuleStoreTestCase):
         masquerade_url = reverse(
             'masquerade_update',
             kwargs={
-                'course_key_string': unicode(course.id),
+                'course_key_string': six.text_type(course.id),
             }
         )
         response = self.client.post(

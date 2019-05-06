@@ -14,7 +14,7 @@ import datetime
 from mock import Mock
 
 import xmodule
-from xmodule.capa_module import CapaModule
+from xmodule.capa_module import ProblemBlock
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -96,7 +96,6 @@ class CapaFactoryWithDelay(object):
         if submission_wait_seconds is not None:
             field_data['submission_wait_seconds'] = submission_wait_seconds
 
-        descriptor = Mock(weight="1")
         if attempts is not None:
             # converting to int here because I keep putting "0" and "1" in the tests
             # since everything else is a string.
@@ -104,8 +103,7 @@ class CapaFactoryWithDelay(object):
 
         system = get_test_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
-        module = CapaModule(
-            descriptor,
+        module = ProblemBlock(
             system,
             DictFieldData(field_data),
             ScopeIds(None, None, location, location),

@@ -53,11 +53,10 @@ from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
-from lms.djangoapps.grades.signals.signals import SCORE_PUBLISHED
+from lms.djangoapps.grades.api import signals as grades_signals, GradesUtilService
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
-from lms.djangoapps.grades.util_services import GradesUtilService
 from lms.djangoapps.verify_student.services import XBlockVerificationService
 from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
@@ -95,6 +94,8 @@ from xmodule.lti_module import LTIModule
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import XModuleDescriptor
+
+from edx_when.field_data import DateLookupFieldData
 
 
 log = logging.getLogger(__name__)
@@ -164,7 +165,6 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
 
     field_data_cache must include data from the course module and 2 levels of its descendants
     '''
-
     with modulestore().bulk_operations(course.id):
         course_module = get_module_for_descriptor(
             user, request, course, field_data_cache, course.id, course=course
@@ -290,7 +290,7 @@ def _add_timed_exam_info(user, course, section, section_context):
 def get_module(user, request, usage_key, field_data_cache,
                position=None, log_if_not_found=True, wrap_xmodule_display=True,
                grade_bucket_type=None, depth=0,
-               static_asset_path='', course=None, will_recheck_access=False):
+               static_asset_path='', course=None):
     """
     Get an instance of the xmodule class identified by location,
     setting the state based on an existing StudentModule, or creating one if none
@@ -325,7 +325,7 @@ def get_module(user, request, usage_key, field_data_cache,
                                          wrap_xmodule_display=wrap_xmodule_display,
                                          grade_bucket_type=grade_bucket_type,
                                          static_asset_path=static_asset_path,
-                                         course=course, will_recheck_access=will_recheck_access)
+                                         course=course)
     except ItemNotFoundError:
         if log_if_not_found:
             log.debug("Error in get_module: ItemNotFoundError")
@@ -392,7 +392,7 @@ def get_xqueue_callback_url_prefix(request):
 def get_module_for_descriptor(user, request, descriptor, field_data_cache, course_key,
                               position=None, wrap_xmodule_display=True, grade_bucket_type=None,
                               static_asset_path='', disable_staff_debug_info=False,
-                              course=None, will_recheck_access=False):
+                              course=None):
     """
     Implements get_module, extracting out the request-specific functionality.
 
@@ -424,8 +424,7 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
         user_location=user_location,
         request_token=xblock_request_token(request),
         disable_staff_debug_info=disable_staff_debug_info,
-        course=course,
-        will_recheck_access=will_recheck_access,
+        course=course
     )
 
 
@@ -444,8 +443,7 @@ def get_module_system_for_user(
         static_asset_path='',
         user_location=None,
         disable_staff_debug_info=False,
-        course=None,
-        will_recheck_access=False
+        course=None
 ):
     """
     Helper function that returns a module system and student_data bound to a user and a descriptor.
@@ -516,7 +514,7 @@ def get_module_system_for_user(
             user_location=user_location,
             request_token=request_token,
             course=course,
-            will_recheck_access=will_recheck_access,
+            will_recheck_access=True,
         )
 
     def get_event_handler(event_type):
@@ -573,7 +571,7 @@ def get_module_system_for_user(
         """
         Submit a grade for the block.
         """
-        SCORE_PUBLISHED.send(
+        grades_signals.SCORE_PUBLISHED.send(
             sender=None,
             block=block,
             user=user,
@@ -660,6 +658,7 @@ def get_module_system_for_user(
             inner_system,
             real_user.id,
             [
+                partial(DateLookupFieldData, course_id=course_id, user=user),
                 partial(OverrideFieldData.wrap, real_user, course),
                 partial(LmsFieldData, student_data=inner_student_data),
             ],
@@ -750,12 +749,13 @@ def get_module_system_for_user(
     is_pure_xblock = isinstance(descriptor, XBlock) and not isinstance(descriptor, XModuleDescriptor)
     module_class = getattr(descriptor, 'module_class', None)
     is_lti_module = not is_pure_xblock and issubclass(module_class, LTIModule)
-    if is_pure_xblock or is_lti_module:
+    if (is_pure_xblock and not getattr(descriptor, 'requires_per_student_anonymous_id', False)) or is_lti_module:
         anonymous_student_id = anonymous_id_for_user(user, course_id)
     else:
         anonymous_student_id = anonymous_id_for_user(user, None)
 
-    field_data = LmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
+    field_data = DateLookupFieldData(descriptor._field_data, course_id, user)  # pylint: disable=protected-access
+    field_data = LmsFieldData(field_data, student_data)
 
     user_is_staff = bool(has_access(user, u'staff', descriptor.location, course_id))
 
@@ -872,8 +872,7 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
         user_location=user_location,
         request_token=request_token,
         disable_staff_debug_info=disable_staff_debug_info,
-        course=course,
-        will_recheck_access=will_recheck_access,
+        course=course
     )
 
     descriptor.bind_for_student(
@@ -901,6 +900,7 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
             not access
             and will_recheck_access
             and (access.user_message or access.user_fragment)
+            and isinstance(access, IncorrectPartitionGroupError)
         )
         if access or caller_will_handle_access_error:
             return descriptor
@@ -908,7 +908,7 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
     return descriptor
 
 
-def load_single_xblock(request, user_id, course_id, usage_key_string, course=None, will_recheck_access=False):
+def load_single_xblock(request, user_id, course_id, usage_key_string, course=None):
     """
     Load a single XBlock identified by usage_key_string.
     """
@@ -922,15 +922,7 @@ def load_single_xblock(request, user_id, course_id, usage_key_string, course=Non
         modulestore().get_item(usage_key),
         depth=0,
     )
-    instance = get_module(
-        user,
-        request,
-        usage_key,
-        field_data_cache,
-        grade_bucket_type='xqueue',
-        course=course,
-        will_recheck_access=will_recheck_access
-    )
+    instance = get_module(user, request, usage_key, field_data_cache, grade_bucket_type='xqueue', course=course)
     if instance is None:
         msg = u"No module {0} for user {1}--access denied?".format(usage_key_string, user)
         log.debug(msg)

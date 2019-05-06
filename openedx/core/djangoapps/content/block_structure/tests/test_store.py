@@ -1,6 +1,8 @@
 """
 Tests for block_structure/cache.py
 """
+from __future__ import absolute_import
+
 import ddt
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
@@ -9,7 +11,7 @@ from ..config import STORAGE_BACKING_FOR_CACHE, waffle
 from ..config.models import BlockStructureConfiguration
 from ..exceptions import BlockStructureNotFound
 from ..store import BlockStructureStore
-from .helpers import ChildrenMapTestMixin, UsageKeyFactoryMixin, MockCache, MockTransformer
+from .helpers import ChildrenMapTestMixin, MockCache, MockTransformer, UsageKeyFactoryMixin
 
 
 @ddt.ddt

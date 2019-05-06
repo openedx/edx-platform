@@ -7,9 +7,6 @@ from mock import patch
 
 import ddt
 from django.test.client import RequestFactory
-from django.test.utils import override_settings
-
-import course_blocks.api as course_blocks_api
 
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
 from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE, waffle
@@ -209,7 +206,7 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
             self._get_blocks(
                 course,
                 expected_mongo_queries=0,
-                expected_sql_queries=10 if with_storage_backing else 9,
+                expected_sql_queries=12 if with_storage_backing else 11,
             )
 
     @ddt.data(
@@ -226,57 +223,9 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
             clear_course_from_cache(course.id)
 
             if with_storage_backing:
-                num_sql_queries = 20
+                num_sql_queries = 22
             else:
-                num_sql_queries = 10
-
-            self._get_blocks(
-                course,
-                expected_mongo_queries,
-                expected_sql_queries=num_sql_queries,
-            )
-
-
-@ddt.ddt
-@override_settings(FIELD_OVERRIDE_PROVIDERS=(course_blocks_api.INDIVIDUAL_STUDENT_OVERRIDE_PROVIDER, ))
-class TestQueryCountsWithIndividualOverrideProvider(TestGetBlocksQueryCountsBase):
-    """
-    Tests query counts for the get_blocks function when IndividualStudentOverrideProvider is set.
-    """
-
-    @ddt.data(
-        *product(
-            (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split),
-            (True, False),
-        )
-    )
-    @ddt.unpack
-    def test_query_counts_cached(self, store_type, with_storage_backing):
-        with waffle().override(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
-            course = self._create_course(store_type)
-            self._get_blocks(
-                course,
-                expected_mongo_queries=0,
-                expected_sql_queries=11 if with_storage_backing else 10,
-            )
-
-    @ddt.data(
-        *product(
-            ((ModuleStoreEnum.Type.mongo, 5), (ModuleStoreEnum.Type.split, 3)),
-            (True, False),
-        )
-    )
-    @ddt.unpack
-    def test_query_counts_uncached(self, store_type_tuple, with_storage_backing):
-        store_type, expected_mongo_queries = store_type_tuple
-        with waffle().override(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
-            course = self._create_course(store_type)
-            clear_course_from_cache(course.id)
-
-            if with_storage_backing:
-                num_sql_queries = 21
-            else:
-                num_sql_queries = 11
+                num_sql_queries = 12
 
             self._get_blocks(
                 course,

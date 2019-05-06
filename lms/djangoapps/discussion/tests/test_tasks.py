@@ -9,18 +9,17 @@ import ddt
 from django.contrib.sites.models import Site
 import mock
 
-import lms.lib.comment_client as cc
-
-from django_comment_common.models import ForumsConfig
-from django_comment_common.signals import comment_created
 from edx_ace.recipient import Recipient
 from edx_ace.renderers import EmailRenderer
 from edx_ace.channel import ChannelType, get_channel_for_message
 from edx_ace.utils import date
 from lms.djangoapps.discussion.signals.handlers import ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY
 from lms.djangoapps.discussion.tasks import _should_send_message, _track_notification_sent
-from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+import openedx.core.djangoapps.django_comment_common.comment_client as cc
+from openedx.core.djangoapps.django_comment_common.models import ForumsConfig
+from openedx.core.djangoapps.django_comment_common.signals import comment_created
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.lib.celery.task_utils import emulate_http_request
 from student.tests.factories import CourseEnrollmentFactory, UserFactory

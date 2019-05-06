@@ -68,7 +68,7 @@ from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.courses import allow_public_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.instructor.enrollment import uses_shib
 from lms.djangoapps.instructor.views.api import require_global_staff
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -317,13 +317,7 @@ def course_info(request, course_id):
             course.id, request.user, course, depth=2
         )
         course_module = get_module_for_descriptor(
-            user,
-            request,
-            course,
-            field_data_cache,
-            course.id,
-            course=course,
-            will_recheck_access=True,
+            user, request, course, field_data_cache, course.id, course=course
         )
         chapter_module = get_current_child(course_module)
         if chapter_module is not None:

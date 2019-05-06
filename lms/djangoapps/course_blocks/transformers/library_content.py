@@ -4,8 +4,9 @@ Content Library Transformer.
 import json
 import random
 
-from courseware.models import StudentModule
 from eventtracking import tracker
+
+from courseware.models import StudentModule
 from openedx.core.djangoapps.content.block_structure.transformer import (
     BlockStructureTransformer,
     FilteringTransformerMixin
@@ -100,7 +101,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
                 if any(block_keys[changed] for changed in ('invalid', 'overlimit', 'added')):
                     state_dict['selected'] = list(selected)
                     random.shuffle(state_dict['selected'])
-                    StudentModule.save_state(  # pylint: disable=no-value-for-parameter
+                    StudentModule.save_state(
                         student=usage_info.user,
                         course_id=usage_info.course_key,
                         module_state_key=block_key,

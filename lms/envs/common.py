@@ -1242,7 +1242,7 @@ MIDDLEWARE_CLASSES = [
     'mobile_api.middleware.AppVersionUpgrade',
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
     'microsite_configuration.middleware.MicrositeMiddleware',
-    'django_comment_client.middleware.AjaxExceptionMiddleware',
+    'lms.djangoapps.discussion.django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sites.middleware.CurrentSiteMiddleware',
     'edx_rest_framework_extensions.auth.jwt.middleware.JwtAuthCookieMiddleware',
@@ -1291,7 +1291,7 @@ MIDDLEWARE_CLASSES = [
     # Must be after DarkLangMiddleware.
     'django.middleware.locale.LocaleMiddleware',
 
-    'django_comment_client.utils.ViewNameMiddleware',
+    'lms.djangoapps.discussion.django_comment_client.utils.ViewNameMiddleware',
     'codejail.django_integration.ConfigureCodeJailMiddleware',
 
     # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
@@ -2123,9 +2123,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.util.apps.UtilConfig',
 
     # Discussion forums
-    'django_comment_client',
-    'django_comment_common',
-    'discussion_api',
+    'openedx.core.djangoapps.django_comment_common',
 
     # Notes
     'notes',
@@ -2140,11 +2138,6 @@ INSTALLED_APPS = [
 
     # Shopping cart
     'shoppingcart',
-
-    # Notification preferences setting
-    'notification_prefs',
-
-    'notifier_api',
 
     # Different Course Modes
     'course_modes.apps.CourseModesConfig',
@@ -2282,8 +2275,6 @@ INSTALLED_APPS = [
     'openedx.features.course_search',
     'openedx.features.enterprise_support.apps.EnterpriseSupportConfig',
     'openedx.features.learner_profile',
-    'openedx.features.learner_analytics',
-    'openedx.features.portfolio_project',
     'openedx.features.course_duration_limits',
     'openedx.features.content_type_gating',
 
@@ -3486,14 +3477,9 @@ USERNAME_REPLACEMENT_WORKER = "REPLACE WITH VALID USERNAME"
 # modify lms/envs/private.py to give it a non-null value
 WRITABLE_GRADEBOOK_URL = None
 
-# TODO (DEPR-17)
-# This URL value is needed to redirect the old profile page to a new
-# micro-frontend based implementation. Once the old implementation is
-# completely removed and this redirect is no longer needed, we can remove this.
-PROFILE_MICROFRONTEND_URL = "http://some.profile.spa/u/"
-
-# URL configuration for new microfrontends.
-ORDER_HISTORY_MICROFRONTEND_URL = "http://some.order_history.spa/"
+PROFILE_MICROFRONTEND_URL = "http://profile-mfe/abc/"
+ORDER_HISTORY_MICROFRONTEND_URL = "http://order-history-mfe/"
+ACCOUNT_MICROFRONTEND_URL = "http://account-mfe/"
 
 ############### Settings for django-fernet-fields ##################
 FERNET_KEYS = [

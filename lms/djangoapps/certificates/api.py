@@ -127,6 +127,25 @@ def get_certificate_for_user(username, course_key):
     return format_certificate_for_user(username, cert)
 
 
+def get_recently_modified_certificates(course_keys=None, start_date=None, end_date=None):
+    """
+    Returns a QuerySet of GeneratedCertificate objects filtered by the input
+    parameters and ordered by modified_date.
+    """
+    cert_filter_args = {}
+
+    if course_keys:
+        cert_filter_args['course_id__in'] = course_keys
+
+    if start_date:
+        cert_filter_args['modified_date__gte'] = start_date
+
+    if end_date:
+        cert_filter_args['modified_date__lte'] = end_date
+
+    return GeneratedCertificate.objects.filter(**cert_filter_args).order_by('modified_date')  # pylint: disable=no-member
+
+
 def generate_user_certificates(student, course_key, course=None, insecure=False, generation_mode='batch',
                                forced_grade=None):
     """

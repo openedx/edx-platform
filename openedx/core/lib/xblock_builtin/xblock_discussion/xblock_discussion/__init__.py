@@ -161,7 +161,7 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):
         :rtype: bool
         """
         # normal import causes the xmodule_assets command to fail due to circular import - hence importing locally
-        from django_comment_client.permissions import has_permission
+        from lms.djangoapps.discussion.django_comment_client.permissions import has_permission
 
         return has_permission(self.django_user, permission, self.course_key)
 

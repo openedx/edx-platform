@@ -2,16 +2,22 @@
 View logic for handling course messages.
 """
 
+from __future__ import absolute_import
+
 from datetime import datetime
 
 from babel.dates import format_date, format_timedelta
-from course_modes.models import CourseMode
-from courseware.courses import get_course_date_blocks, get_course_with_access
 from django.contrib import auth
 from django.template.loader import render_to_string
 from django.utils.http import urlquote_plus
 from django.utils.translation import get_language, to_locale
 from django.utils.translation import ugettext as _
+from opaque_keys.edx.keys import CourseKey
+from pytz import UTC
+from web_fragments.fragment import Fragment
+
+from course_modes.models import CourseMode
+from courseware.courses import get_course_date_blocks, get_course_with_access
 from lms.djangoapps.course_goals.api import (
     get_course_goal,
     get_course_goal_options,
@@ -21,13 +27,10 @@ from lms.djangoapps.course_goals.api import (
 )
 from lms.djangoapps.course_goals.models import GOAL_KEY_CHOICES
 from lms.djangoapps.courseware.courses import allow_public_access
-from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import CourseHomeMessages
-from pytz import UTC
 from student.models import CourseEnrollment
-from web_fragments.fragment import Fragment
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 
 

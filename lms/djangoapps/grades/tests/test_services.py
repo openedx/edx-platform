@@ -5,6 +5,7 @@ from datetime import datetime
 import ddt
 import pytz
 from freezegun import freeze_time
+from lms.djangoapps.grades.constants import GradeOverrideFeatureEnum
 from lms.djangoapps.grades.models import (
     PersistentSubsectionGrade,
     PersistentSubsectionGradeOverride,
@@ -145,7 +146,7 @@ class GradesServiceTests(ModuleStoreTestCase):
     def _verify_override_history(self, override_history, history_action):
         self.assertIsNone(override_history.user)
         self.assertIsNotNone(override_history.created)
-        self.assertEqual(override_history.feature, PersistentSubsectionGradeOverrideHistory.PROCTORING)
+        self.assertEqual(override_history.feature, GradeOverrideFeatureEnum.proctoring)
         self.assertEqual(override_history.action, history_action)
 
     @ddt.data(

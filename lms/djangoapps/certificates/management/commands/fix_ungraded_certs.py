@@ -6,8 +6,8 @@ import logging
 from django.core.management.base import BaseCommand
 
 from lms.djangoapps.certificates.models import GeneratedCertificate
-from courseware import courses
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.courseware import courses
+from lms.djangoapps.grades.api import CourseGradeFactory
 
 log = logging.getLogger(__name__)
 

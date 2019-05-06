@@ -22,10 +22,12 @@ from six import text_type
 from course_modes.models import CourseMode
 from courseware.models import StudentModule
 from eventtracking import tracker
-from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
-from lms.djangoapps.grades.events import STATE_DELETED_EVENT_TYPE
-from lms.djangoapps.grades.signals.handlers import disconnect_submissions_signal_receiver
-from lms.djangoapps.grades.signals.signals import PROBLEM_RAW_SCORE_CHANGED
+from lms.djangoapps.grades.api import (
+    constants as grades_constants,
+    events as grades_events,
+    signals as grades_signals,
+    disconnect_submissions_signal_receiver,
+)
 from lms.djangoapps.instructor.message_types import (
     AccountCreationAndEnrollment,
     AddBetaTester,
@@ -298,16 +300,16 @@ def reset_student_attempts(course_id, student, module_state_key, requesting_user
     if delete_module:
         module_to_reset.delete()
         create_new_event_transaction_id()
-        set_event_transaction_type(STATE_DELETED_EVENT_TYPE)
+        set_event_transaction_type(grades_events.STATE_DELETED_EVENT_TYPE)
         tracker.emit(
-            unicode(STATE_DELETED_EVENT_TYPE),
+            unicode(grades_events.STATE_DELETED_EVENT_TYPE),
             {
                 'user_id': unicode(student.id),
                 'course_id': unicode(course_id),
                 'problem_id': unicode(module_state_key),
                 'instructor_id': unicode(requesting_user.id),
                 'event_transaction_id': unicode(get_event_transaction_id()),
-                'event_transaction_type': unicode(STATE_DELETED_EVENT_TYPE),
+                'event_transaction_type': unicode(grades_events.STATE_DELETED_EVENT_TYPE),
             }
         )
         if not submission_cleared:
@@ -351,7 +353,7 @@ def _fire_score_changed_for_block(
     if block and block.has_score:
         max_score = block.max_score()
         if max_score is not None:
-            PROBLEM_RAW_SCORE_CHANGED.send(
+            grades_signals.PROBLEM_RAW_SCORE_CHANGED.send(
                 sender=None,
                 raw_earned=0,
                 raw_possible=max_score,
@@ -362,7 +364,7 @@ def _fire_score_changed_for_block(
                 score_deleted=True,
                 only_if_higher=False,
                 modified=datetime.now().replace(tzinfo=pytz.UTC),
-                score_db_table=ScoreDatabaseTableEnum.courseware_student_module,
+                score_db_table=grades_constants.ScoreDatabaseTableEnum.courseware_student_module,
             )
 
 

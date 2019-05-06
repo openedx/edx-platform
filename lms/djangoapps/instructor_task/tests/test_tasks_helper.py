@@ -499,13 +499,13 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         Temporarily removes the generate_report_data method so we can test
         report generation when it's absent.
         """
-        from xmodule.capa_module import CapaDescriptor
-        generate_report_data = CapaDescriptor.generate_report_data
-        del CapaDescriptor.generate_report_data
+        from xmodule.capa_module import ProblemBlock
+        generate_report_data = ProblemBlock.generate_report_data
+        del ProblemBlock.generate_report_data
         try:
             yield
         finally:
-            CapaDescriptor.generate_report_data = generate_report_data
+            ProblemBlock.generate_report_data = generate_report_data
 
     @patch.dict('django.conf.settings.FEATURES', {'MAX_PROBLEM_RESPONSES_COUNT': 4})
     def test_build_student_data_limit(self):
@@ -553,7 +553,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.assertIn('state', student_data[0])
         mock_list_problem_responses.assert_called_with(self.course.id, ANY, ANY)
 
-    @patch('xmodule.capa_module.CapaDescriptor.generate_report_data', create=True)
+    @patch('xmodule.capa_module.ProblemBlock.generate_report_data', create=True)
     def test_build_student_data_for_block_with_mock_generate_report_data(self, mock_generate_report_data):
         """
         Ensure that building student data for a block that supports the
@@ -617,7 +617,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.assertIn('state', student_data[0])
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.grades.list_problem_responses')
-    @patch('xmodule.capa_module.CapaDescriptor.generate_report_data', create=True)
+    @patch('xmodule.capa_module.ProblemBlock.generate_report_data', create=True)
     def test_build_student_data_for_block_with_generate_report_data_not_implemented(
             self,
             mock_generate_report_data,

@@ -20,6 +20,23 @@
   }
 }
 
+// First purchase offer banner
+.first-purchase-offer-banner {
+  background-color: #DEE3F1;
+  font-size: 16px;
+  border-radius: 7px;
+  padding: 20px;
+  margin: 20px auto;
+
+  .first-purchase-offer-banner-bold {
+      font-weight: bold;
+      color: #23419F;
+      margin-right: 3px;
+      margin-left: 5px;
+  }
+
+}
+
 // Course call to action message
 .course-message {
   display: flex;

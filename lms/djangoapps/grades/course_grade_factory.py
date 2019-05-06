@@ -13,7 +13,9 @@ from openedx.core.djangoapps.signals.signals import (COURSE_GRADE_CHANGED,
 from .config import assume_zero_if_absent, should_persist_grades
 from .course_data import CourseData
 from .course_grade import CourseGrade, ZeroCourseGrade
-from .models import PersistentCourseGrade, prefetch
+from .models import PersistentCourseGrade
+from .models_api import prefetch_grade_overrides_and_visible_blocks
+
 
 log = getLogger(__name__)
 
@@ -170,7 +172,7 @@ class CourseGradeFactory(object):
         """
         should_persist = should_persist_grades(course_data.course_key)
         if should_persist and force_update_subsections:
-            prefetch(user, course_data.course_key)
+            prefetch_grade_overrides_and_visible_blocks(user, course_data.course_key)
 
         course_grade = CourseGrade(
             user,

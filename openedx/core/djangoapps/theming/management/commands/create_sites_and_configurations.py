@@ -2,21 +2,22 @@
 This command will be run by an ansible script.
 """
 
-import os
-import json
-import fnmatch
-import logging
+from __future__ import absolute_import
 
-from provider.oauth2.models import Client
-from provider.constants import CONFIDENTIAL
-from edx_oauth2_provider.models import TrustedClient
+import fnmatch
+import json
+import logging
+import os
+
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
-
+from edx_oauth2_provider.models import TrustedClient
 from lms.djangoapps.commerce.models import CommerceConfiguration
-from openedx.core.djangoapps.theming.models import SiteTheme
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+from openedx.core.djangoapps.theming.models import SiteTheme
+from provider.constants import CONFIDENTIAL
+from provider.oauth2.models import Client
 from student.models import UserProfile
 
 LOG = logging.getLogger(__name__)

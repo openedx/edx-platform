@@ -10,7 +10,7 @@ from courseware.access import has_access
 from courseware.tests.factories import BetaTesterFactory
 from lms.djangoapps.ccx.tests.test_overrides import inject_field_overrides
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData, OverrideModulestoreFieldData
-from lms.djangoapps.django_comment_client.utils import get_accessible_discussion_xblocks
+from lms.djangoapps.discussion.django_comment_client.utils import get_accessible_discussion_xblocks
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 

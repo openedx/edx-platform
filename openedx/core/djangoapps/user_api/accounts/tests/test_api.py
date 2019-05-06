@@ -58,6 +58,7 @@ from openedx.core.djangoapps.user_api.errors import (
     UserNotFound
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerUserFactory
 from student.models import PendingEmailChange
 from student.tests.factories import UserFactory
 from student.tests.tests import UserSettingsEventTestMixin
@@ -69,6 +70,7 @@ def mock_render_to_string(template_name, context):
 
 
 @skip_unless_lms
+@ddt.ddt
 class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, RetirementTestCase):
     """
     These tests specifically cover the parts of the API methods that are not covered by test_views.py.
@@ -143,9 +145,8 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, Retireme
         with self.assertRaises(UserNotAuthorized):
             update_account_settings(self.different_user, {"name": "Pluto"}, username=self.user.username)
 
-    def test_update_user_not_found(self):
-        """Test that UserNotFound is thrown if there is no user with username."""
-        with self.assertRaises(UserNotFound):
+    def test_update_non_existent_user(self):
+        with self.assertRaises(UserNotAuthorized):
             update_account_settings(self.user, {}, username="does_not_exist")
 
         self.user.username = "does_not_exist"
@@ -219,6 +220,31 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, Retireme
         ]
         with self.assertRaises(AccountUpdateError):
             update_account_settings(self.user, {"social_links": social_links})
+
+    def test_update_success_for_enterprise(self):
+        EnterpriseCustomerUserFactory(user_id=self.user.id)
+        level_of_education = "m"
+        successful_update = {
+            "level_of_education": level_of_education,
+        }
+        update_account_settings(self.user, successful_update)
+        account_settings = get_account_settings(self.default_request)[0]
+        self.assertEqual(level_of_education, account_settings["level_of_education"])
+
+    @ddt.data(
+        ("email", "new_email@example.com"),
+        ("name", "New Name"),
+        ("country", "New Country"),
+    )
+    @ddt.unpack
+    def test_update_validation_error_for_enterprise(self, field_name, field_value):
+        EnterpriseCustomerUserFactory(user_id=self.user.id)
+        update_data = {field_name: field_value}
+
+        with self.assertRaises(AccountValidationError) as validation_error:
+            update_account_settings(self.user, update_data)
+        field_errors = validation_error.exception.field_errors
+        self.assertEqual("This field is not editable via this API", field_errors[field_name]["developer_message"])
 
     def test_update_error_validating(self):
         """Test that AccountValidationError is thrown if incorrect values are supplied."""

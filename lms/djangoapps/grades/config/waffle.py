@@ -48,3 +48,10 @@ def waffle_flags():
             flag_undefined_default=True,
         ),
     }
+
+
+def is_writable_gradebook_enabled(course_key):
+    """
+    Returns whether the writable gradebook app is enabled for the given course.
+    """
+    return waffle_flags()[WRITABLE_GRADEBOOK].is_enabled(course_key)

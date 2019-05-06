@@ -11,8 +11,10 @@ import sys
 import traceback
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from pytz import utc
 from django.utils.encoding import smart_text
+from django.utils.functional import cached_property
 from six import text_type
 
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
@@ -20,14 +22,14 @@ from capa.inputtypes import Status
 from capa.responsetypes import StudentInputError, ResponseError, LoncapaProblemError
 from capa.util import convert_files_to_filenames, get_inner_html_from_xpath
 from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString
+
+from openedx.core.djangolib.markup import HTML, Text
+from xblock.fields import String
 from xblock.scorable import ScorableXBlockMixin, Score
-from xmodule.capa_base_constants import RANDOMIZATION, SHOWANSWER
 from xmodule.exceptions import NotFoundError
 from xmodule.graders import ShowCorrectness
 from .fields import Date, Timedelta, ScoreField
 from .progress import Progress
-
-from openedx.core.djangolib.markup import HTML, Text
 
 log = logging.getLogger("edx.courseware")
 
@@ -40,7 +42,36 @@ NUM_RANDOMIZATION_BINS = 20
 # Never produce more than this many different seeds, no matter what.
 MAX_RANDOMIZATION_BINS = 1000
 
-FEATURES = getattr(settings, 'FEATURES', {})
+
+try:
+    FEATURES = getattr(settings, 'FEATURES', {})
+except ImproperlyConfigured:
+    FEATURES = {}
+
+
+class SHOWANSWER(object):
+    """
+    Constants for when to show answer
+    """
+    ALWAYS = "always"
+    ANSWERED = "answered"
+    ATTEMPTED = "attempted"
+    CLOSED = "closed"
+    FINISHED = "finished"
+    CORRECT_OR_PAST_DUE = "correct_or_past_due"
+    PAST_DUE = "past_due"
+    NEVER = "never"
+    AFTER_SOME_NUMBER_OF_ATTEMPTS = "after_attempts"
+
+
+class RANDOMIZATION(object):
+    """
+    Constants for problem randomization
+    """
+    ALWAYS = "always"
+    ONRESET = "onreset"
+    NEVER = "never"
+    PER_STUDENT = "per_student"
 
 
 def randomization_bin(seed, problem_id):
@@ -145,7 +176,9 @@ class CapaFields(object):
     )
     attempts_before_showanswer_button = Integer(
         display_name=_("Show Answer: Number of Attempts"),
-        help=_("Number of times the student must attempt to answer the question before the Show Answer button appears."),
+        help=_(
+            "Number of times the student must attempt to answer the question before the Show Answer button appears."
+        ),
         values={"min": 0},
         default=0,
         scope=Scope.settings,
@@ -234,75 +267,40 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
     """
         Core logic for Capa Problem, which can be used by XModules or XBlocks.
     """
-    def __init__(self, *args, **kwargs):
-        super(CapaMixin, self).__init__(*args, **kwargs)
-
+    @property
+    def close_date(self):
+        """
+        Return the date submissions should be closed from.
+        """
         due_date = self.due
 
         if self.graceperiod is not None and due_date:
-            self.close_date = due_date + self.graceperiod
+            return due_date + self.graceperiod
         else:
-            self.close_date = due_date
+            return due_date
 
+    def get_seed(self):
+        """
+        Generate the seed if not set and return it.
+        """
         if self.seed is None:
             self.choose_new_seed()
+        return self.seed
 
-        # Need the problem location in openendedresponse to send out.  Adding
-        # it to the system here seems like the least clunky way to get it
-        # there.
-        self.runtime.set('location', text_type(self.location))
-
+    @cached_property
+    def lcp(self):
         try:
-            # TODO (vshnayder): move as much as possible of this work and error
-            # checking to descriptor load time
-            self.lcp = self.new_lcp(self.get_state_for_lcp())
-
-            # At this point, we need to persist the randomization seed
-            # so that when the problem is re-loaded (to check/view/save)
-            # it stays the same.
-            # However, we do not want to write to the database
-            # every time the module is loaded.
-            # So we set the seed ONLY when there is not one set already
-            if self.seed is None:
-                self.seed = self.lcp.seed
-
+            lcp = self.new_lcp(self.get_state_for_lcp())
         except Exception as err:  # pylint: disable=broad-except
             msg = u'cannot create LoncapaProblem {loc}: {err}'.format(
                 loc=text_type(self.location), err=err)
-            # TODO (vshnayder): do modules need error handlers too?
-            # We shouldn't be switching on DEBUG.
-            if self.runtime.DEBUG:
-                log.warning(msg)
-                # TODO (vshnayder): This logic should be general, not here--and may
-                # want to preserve the data instead of replacing it.
-                # e.g. in the CMS
-                msg = HTML(u'<p>{msg}</p>').format(msg=msg)
-                msg += HTML(u'<p><pre>{tb}</pre></p>').format(
-                    # just the traceback, no message - it is already present above
-                    tb=u''.join(
-                        ['Traceback (most recent call last):\n'] +
-                        traceback.format_tb(sys.exc_info()[2])
-                    )
-                )
-                # create a dummy problem with error message instead of failing
-                problem_text = (
-                    HTML(u'<problem><text><span class="inline-error">'
-                         u'Problem {url} has an error:</span>{msg}</text></problem>').format(
-                        url=text_type(self.location),
-                        msg=msg,
-                    )
-                )
-                self.lcp = self.new_lcp(self.get_state_for_lcp(), text=problem_text)
-            else:
-                # add extra info and raise
-                raise Exception(msg), None, sys.exc_info()[2]
-
-            self.set_state_from_lcp()
+            raise Exception(msg), None, sys.exc_info()[2]
 
         if self.score is None:
-            self.set_score(self.score_from_lcp())
+            self.set_score(self.score_from_lcp(lcp))
 
         assert self.seed is not None
+        return lcp
 
     def choose_new_seed(self):
         """
@@ -328,7 +326,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             text = self.data
 
         capa_system = LoncapaSystem(
-            ajax_url=self.runtime.ajax_url,
+            ajax_url=self.ajax_url,
             anonymous_student_id=self.runtime.anonymous_student_id,
             cache=self.runtime.cache,
             can_execute_unsafe_code=self.runtime.can_execute_unsafe_code,
@@ -348,7 +346,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             problem_text=text,
             id=self.location.html_id(),
             state=state,
-            seed=self.seed,
+            seed=self.get_seed(),
             capa_system=capa_system,
             capa_module=self,  # njp
         )
@@ -363,7 +361,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             'student_answers': self.student_answers,
             'has_saved_answers': self.has_saved_answers,
             'input_state': self.input_state,
-            'seed': self.seed,
+            'seed': self.get_seed(),
         }
 
     def set_state_from_lcp(self):
@@ -376,7 +374,6 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         self.input_state = lcp_state['input_state']
         self.student_answers = lcp_state['student_answers']
         self.has_saved_answers = lcp_state['has_saved_answers']
-        self.seed = lcp_state['seed']
 
     def set_last_submission_time(self):
         """
@@ -432,7 +429,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         return self.runtime.render_template('problem_ajax.html', {
             'element_id': self.location.html_id(),
             'id': text_type(self.location),
-            'ajax_url': self.runtime.ajax_url,
+            'ajax_url': self.ajax_url,
             'current_score': curr_score,
             'total_possible': total_possible,
             'attempts_used': self.attempts,
@@ -580,7 +577,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             # Next, generate a fresh LoncapaProblem
             self.lcp = self.new_lcp(None)
             self.set_state_from_lcp()
-            self.set_score(self.score_from_lcp())
+            self.set_score(self.score_from_lcp(self.lcp))
             # Prepend a scary warning to the student
             _ = self.runtime.service(self, "i18n").ugettext
             warning_msg = Text(_("Warning: The problem has been reset to its initial state!"))
@@ -748,7 +745,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
         if encapsulate:
             html = HTML(u'<div id="problem_{id}" class="problem" data-url="{ajax_url}">{html}</div>').format(
-                id=self.location.html_id(), ajax_url=self.runtime.ajax_url, html=HTML(html)
+                id=self.location.html_id(), ajax_url=self.ajax_url, html=HTML(html)
             )
 
         # Now do all the substitutions which the LMS module_render normally does, but
@@ -958,7 +955,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         score_msg = data['xqueue_body']
         self.lcp.update_score(score_msg, queuekey)
         self.set_state_from_lcp()
-        self.set_score(self.score_from_lcp())
+        self.set_score(self.score_from_lcp(self.lcp))
         self.publish_grade(grader_response=True)
 
         return dict()  # No AJAX return is needed
@@ -1228,7 +1225,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             self.attempts = self.attempts + 1
             self.lcp.done = True
             self.set_state_from_lcp()
-            self.set_score(self.score_from_lcp())
+            self.set_score(self.score_from_lcp(self.lcp))
             self.set_last_submission_time()
 
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
@@ -1240,7 +1237,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
             # Save the user's state before failing
             self.set_state_from_lcp()
-            self.set_score(self.score_from_lcp())
+            self.set_score(self.score_from_lcp(self.lcp))
 
             # If the user is a staff member, include
             # the full exception, including traceback,
@@ -1263,7 +1260,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         except Exception as err:
             # Save the user's state before failing
             self.set_state_from_lcp()
-            self.set_score(self.score_from_lcp())
+            self.set_score(self.score_from_lcp(self.lcp))
 
             if self.runtime.DEBUG:
                 msg = u"Error checking problem: {}".format(text_type(err))
@@ -1444,7 +1441,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             # later if necessary.
             variant = ''
             if self.rerandomize != RANDOMIZATION.NEVER:
-                variant = self.seed
+                variant = self.get_seed()
 
             is_correct = correct_map.is_correct(input_id)
             if is_correct is None:
@@ -1503,7 +1500,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         self.lcp.has_saved_answers = True
 
         self.set_state_from_lcp()
-        self.set_score(self.score_from_lcp())
+        self.set_score(self.score_from_lcp(self.lcp))
 
         self.track_function_unmask('save_problem_success', event_info)
         msg = _("Your answers have been saved.")
@@ -1562,7 +1559,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
         # Pull in the new problem seed
         self.set_state_from_lcp()
-        self.set_score(self.score_from_lcp())
+        self.set_score(self.score_from_lcp(self.lcp))
 
         # Grade may have changed, so publish new value
         self.publish_grade()
@@ -1687,10 +1684,10 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         new_score = self.lcp.calculate_score()
         return Score(raw_earned=new_score['score'], raw_possible=new_score['total'])
 
-    def score_from_lcp(self):
+    def score_from_lcp(self, lcp):
         """
         Returns the score associated with the correctness map
         currently stored by the LCP.
         """
-        lcp_score = self.lcp.calculate_score()
+        lcp_score = lcp.calculate_score()
         return Score(raw_earned=lcp_score['score'], raw_possible=lcp_score['total'])

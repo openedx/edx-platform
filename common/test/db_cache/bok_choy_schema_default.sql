@@ -366,7 +366,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `auth_permission_content_type_id_codename_01ab375a_uniq` (`content_type_id`,`codename`),
   CONSTRAINT `auth_permission_content_type_id_2f476e4b_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2285 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2294 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2174,7 +2174,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_model_76bd3d3b_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=759 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=762 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2185,7 +2185,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=537 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=543 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2360,6 +2360,59 @@ CREATE TABLE `djcelery_workerstate` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `hostname` (`hostname`),
   KEY `djcelery_workerstate_last_heartbeat_4539b544` (`last_heartbeat`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `edx_when_contentdate`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `edx_when_contentdate` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `course_id` varchar(255) NOT NULL,
+  `location` varchar(255) DEFAULT NULL,
+  `policy_id` int(11) NOT NULL,
+  `active` tinyint(1) NOT NULL,
+  `field` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `edx_when_contentdate_policy_id_location_field_a26790ec_uniq` (`policy_id`,`location`,`field`),
+  KEY `edx_when_contentdate_course_id_e6c39fdc` (`course_id`),
+  KEY `edx_when_contentdate_location_485206ea` (`location`),
+  KEY `edx_when_contentdate_policy_id_af2bcaf4` (`policy_id`),
+  KEY `edx_when_contentdate_active_d091ba6d` (`active`),
+  CONSTRAINT `edx_when_contentdate_policy_id_af2bcaf4_fk_edx_when_` FOREIGN KEY (`policy_id`) REFERENCES `edx_when_datepolicy` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `edx_when_datepolicy`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `edx_when_datepolicy` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `abs_date` datetime(6) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `edx_when_datepolicy_abs_date_1a510cd3` (`abs_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `edx_when_userdate`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `edx_when_userdate` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `abs_date` datetime(6) DEFAULT NULL,
+  `rel_date` int(11) DEFAULT NULL,
+  `reason` longtext NOT NULL,
+  `actor_id` int(11) DEFAULT NULL,
+  `user_id` int(11) NOT NULL,
+  `content_date_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `edx_when_userdate_user_id_46e8cc36_fk_auth_user_id` (`user_id`),
+  KEY `edx_when_userdate_content_date_id_35c5e2e2_fk_edx_when_` (`content_date_id`),
+  KEY `edx_when_userdate_actor_id_cbef1cdc_fk_auth_user_id` (`actor_id`),
+  CONSTRAINT `edx_when_userdate_actor_id_cbef1cdc_fk_auth_user_id` FOREIGN KEY (`actor_id`) REFERENCES `auth_user` (`id`),
+  CONSTRAINT `edx_when_userdate_content_date_id_35c5e2e2_fk_edx_when_` FOREIGN KEY (`content_date_id`) REFERENCES `edx_when_contentdate` (`id`),
+  CONSTRAINT `edx_when_userdate_user_id_46e8cc36_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `edxval_coursevideo`;

@@ -1,12 +1,14 @@
 """
 Configuration models for Video XModule
 """
-from django.db import models
-from django.db.models import BooleanField, TextField, PositiveIntegerField
+from __future__ import absolute_import
+
+import six
 from config_models.models import ConfigurationModel
+from django.db import models
+from django.db.models import BooleanField, PositiveIntegerField, TextField
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
-
 
 URL_REGEX = r'^[a-zA-Z0-9\-_]*$'
 
@@ -71,7 +73,7 @@ class CourseHLSPlaybackEnabledFlag(ConfigurationModel):
             not_en = ""
 
         return u"Course '{course_key}': HLS Playback {not_enabled}Enabled".format(
-            course_key=unicode(self.course_id),
+            course_key=six.text_type(self.course_id),
             not_enabled=not_en
         )
 
@@ -140,7 +142,7 @@ class CourseVideoTranscriptEnabledFlag(ConfigurationModel):
             not_en = ""
 
         return u"Course '{course_key}': Video Transcript {not_enabled}Enabled".format(
-            course_key=unicode(self.course_id),
+            course_key=six.text_type(self.course_id),
             not_enabled=not_en
         )
 

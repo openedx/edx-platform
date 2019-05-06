@@ -220,7 +220,7 @@ class ContentTest(unittest.TestCase):
         Test that only one filename starts with 000.
         """
         output_root = path(u'common/static/xmodule/descriptors/js')
-        file_owners = _write_js(output_root, _list_descriptors())
+        file_owners = _write_js(output_root, _list_descriptors(), 'get_studio_view_js')
         js_file_paths = set(file_path for file_path in sum(file_owners.values(), []) if os.path.basename(file_path).startswith('000-'))
         self.assertEqual(len(js_file_paths), 1)
         self.assertIn("XModule.Descriptor = (function() {", open(js_file_paths.pop()).read())

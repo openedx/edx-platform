@@ -11,13 +11,7 @@ import ddt
 import mock
 
 from course_modes.models import CourseMode
-from django_comment_client.tests.factories import RoleFactory
-from django_comment_common.models import (
-    FORUM_ROLE_ADMINISTRATOR,
-    FORUM_ROLE_MODERATOR,
-    FORUM_ROLE_GROUP_MODERATOR,
-    FORUM_ROLE_COMMUNITY_TA
-)
+from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from experiments.models import ExperimentData
 from lms.djangoapps.courseware.tests.factories import (
     InstructorFactory,
@@ -28,6 +22,12 @@ from lms.djangoapps.courseware.tests.factories import (
     GlobalStaffFactory,
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.django_comment_common.models import (
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_MODERATOR,
+    FORUM_ROLE_GROUP_MODERATOR,
+    FORUM_ROLE_COMMUNITY_TA
+)
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, CONTENT_TYPE_GATE_GROUP_IDS
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date, MIN_DURATION, MAX_DURATION

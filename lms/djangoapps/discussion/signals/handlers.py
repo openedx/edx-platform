@@ -6,8 +6,8 @@ import logging
 from django.conf import settings
 from django.dispatch import receiver
 
-from django_comment_common import signals
 from lms.djangoapps.discussion import tasks
+from openedx.core.djangoapps.django_comment_common import signals
 from opaque_keys.edx.locator import LibraryLocator
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_current_site

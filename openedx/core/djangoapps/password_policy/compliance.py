@@ -1,6 +1,7 @@
 """
 Utilities for enforcing and tracking compliance with password policy rules.
 """
+from __future__ import absolute_import
 from datetime import datetime
 
 import pytz
@@ -142,7 +143,7 @@ def _get_compliance_deadline_for_user(user):
     staff_deadline = staff_deadline if staff_deadline and user.is_staff else None
 
     # Take minimum remaining deadline
-    filtered_deadlines = filter(None, (staff_deadline, privilege_deadline, general_deadline,))
+    filtered_deadlines = [_f for _f in (staff_deadline, privilege_deadline, general_deadline,) if _f]
     return min(filtered_deadlines) if filtered_deadlines else None
 
 

@@ -15,12 +15,13 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from six import text_type
 
-import accounts
-from django_comment_common.models import Role
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx import locator
 from opaque_keys.edx.keys import CourseKey
+
+from openedx.core.djangoapps.django_comment_common.models import Role
+from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
 from openedx.core.djangoapps.user_api.api import (
     RegistrationFormFactory,

@@ -12,14 +12,7 @@ from django.utils import timezone
 from mock import patch
 
 from course_api.blocks.api import get_blocks
-from django_comment_common.models import (
-    FORUM_ROLE_ADMINISTRATOR,
-    FORUM_ROLE_MODERATOR,
-    FORUM_ROLE_GROUP_MODERATOR,
-    FORUM_ROLE_COMMUNITY_TA,
-    Role
-)
-from django_comment_client.tests.factories import RoleFactory
+from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from course_modes.tests.factories import CourseModeFactory
 from experiments.models import ExperimentData, ExperimentKeyValue
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
@@ -32,6 +25,13 @@ from lms.djangoapps.courseware.tests.factories import (
     OrgStaffFactory,
     OrgInstructorFactory,
     GlobalStaffFactory,
+)
+from openedx.core.djangoapps.django_comment_common.models import (
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_MODERATOR,
+    FORUM_ROLE_GROUP_MODERATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+    Role
 )
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from openedx.core.djangoapps.util.testing import TestConditionalContent
@@ -49,14 +49,6 @@ from student.tests.factories import (
     CourseEnrollmentFactory,
     UserFactory,
     TEST_PASSWORD
-)
-from lms.djangoapps.courseware.tests.factories import (
-    InstructorFactory,
-    StaffFactory,
-    BetaTesterFactory,
-    OrgStaffFactory,
-    OrgInstructorFactory,
-    GlobalStaffFactory,
 )
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -87,8 +79,7 @@ def _get_fragment_from_block(block, user_id, course, request_factory, mock_get_c
         user_id=user_id,
         course_id=unicode(course.id),
         usage_key_string=unicode(course.scope_ids.usage_id),
-        course=course,
-        will_recheck_access=True,
+        course=course
     )
     runtime = vertical_xblock.runtime
 

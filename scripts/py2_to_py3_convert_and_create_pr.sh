@@ -8,10 +8,10 @@
 # 2) On the command line, go into your edx-platform repo checkout
 # 3) Make sure you are on the master branchof edx-platform with no changes
 # 4) Run this script from the root of the repo, handing it your username, ticketname, and subdirectory to convert:
-#     ./scripts/py2_to_py3_convert_and_create_pr.sh cpappas INCR-1234 common/lib/calc
+#     ./scripts/py2_to_py3_convert_and_create_pr.sh cpappas INCR-1234 common/lib/xmodule
 
 help_text="\nUsage: ./scripts/py2_to_py3_convert_and_create_pr.sh <username> <ticket-name> <subdirectory>\n";
-help_text+="Example: ./scripts/py2_to_py3_convert_and_create_pr.sh cpappas INCR-1234 common/lib/calc\n\n";
+help_text+="Example: ./scripts/py2_to_py3_convert_and_create_pr.sh cpappas INCR-1234 common/lib/xmodule\n\n";
 
 for i in "$@" ; do
     if [[ $i == "--help" ]] ; then

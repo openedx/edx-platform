@@ -1,24 +1,25 @@
 """
 APIs providing support for enterprise functionality.
 """
+from __future__ import absolute_import
+
 import logging
 from functools import wraps
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.urls import reverse
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
 from edx_django_utils.cache import TieredCache
 from edx_rest_api_client.client import EdxRestApiClient
-from slumber.exceptions import HttpClientError, HttpNotFoundError, HttpServerError
-
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.features.enterprise_support.utils import get_cache_key, get_data_consent_share_cache_key
+from slumber.exceptions import HttpClientError, HttpNotFoundError, HttpServerError
 from third_party_auth.pipeline import get as get_partial_pipeline
 from third_party_auth.provider import Registry
 
@@ -554,7 +555,7 @@ def get_enterprise_learner_data(user):
 
 
 @enterprise_is_enabled(otherwise={})
-def get_enterprise_customer_for_learner(site, user):
+def get_enterprise_customer_for_learner(user):
     """
     Return enterprise customer to whom given learner belongs.
     """

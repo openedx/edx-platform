@@ -7,14 +7,14 @@
 
     % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
       <section class="courses">
-        <ul class="courses-listing journal-list">
+        <ul class="journal-list">
           % for bundle in journal_info.get('journal_bundles'):
           <li class="courses-listing-item">
             <%include file="journals/bundle_card.html" args="bundle=bundle"/>
           </li>
           % endfor
         </ul>
-        <ul class="courses-listing journal-list">
+        <ul class="journal-list">
           %for journal in journal_info.get('journals'):
           <li class="courses-listing-item">
               <%include file="journals/journal_card.html" args="journal=journal" />

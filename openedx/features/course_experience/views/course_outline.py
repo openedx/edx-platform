@@ -1,8 +1,10 @@
 """
 Views to show a course outline.
 """
-import re
+from __future__ import absolute_import
+
 import datetime
+import re
 
 from completion import waffle as completion_waffle
 from django.contrib.auth.models import User
@@ -16,12 +18,11 @@ from web_fragments.fragment import Fragment
 from courseware.courses import get_course_overview_with_access
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from student.models import CourseEnrollment
-
 from util.milestones_helpers import get_course_content_milestones
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 from xmodule.modulestore.django import modulestore
-from ..utils import get_course_outline_block_tree, get_resume_block
 
+from ..utils import get_course_outline_block_tree, get_resume_block
 
 DEFAULT_COMPLETION_TRACKING_START = datetime.datetime(2018, 1, 24, tzinfo=UTC)
 

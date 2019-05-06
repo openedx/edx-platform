@@ -2,11 +2,15 @@
 Courseware page.
 """
 
+from __future__ import absolute_import
+
 import re
 
 from bok_choy.page_object import PageObject, unguarded
 from bok_choy.promise import EmptyPromise
 from selenium.webdriver.common.action_chains import ActionChains
+from six.moves import range
+
 from common.test.acceptance.pages.lms import BASE_URL
 from common.test.acceptance.pages.lms.bookmarks import BookmarksPage
 from common.test.acceptance.pages.lms.completion import CompletionOnViewMixin

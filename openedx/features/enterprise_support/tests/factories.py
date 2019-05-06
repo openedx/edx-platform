@@ -6,14 +6,9 @@ from __future__ import absolute_import, unicode_literals
 from uuid import UUID
 
 import factory
+from enterprise.models import EnterpriseCustomer, EnterpriseCustomerUser
 from faker import Factory as FakerFactory
-
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-
-from enterprise.models import (
-    EnterpriseCustomer,
-    EnterpriseCustomerUser,
-)
 
 FAKER = FakerFactory.create()
 

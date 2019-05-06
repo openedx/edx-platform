@@ -3,6 +3,8 @@
 Teams pages.
 """
 
+from __future__ import absolute_import
+
 from common.test.acceptance.pages.common.paging import PaginatedUIMixin
 from common.test.acceptance.pages.common.utils import click_css, confirm_prompt
 from common.test.acceptance.pages.lms.course_page import CoursePage

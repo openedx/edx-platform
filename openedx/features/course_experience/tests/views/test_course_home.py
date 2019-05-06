@@ -2,26 +2,22 @@
 """
 Tests for the course home page.
 """
+from __future__ import absolute_import
+
 from datetime import datetime, timedelta
 
 import ddt
 import mock
+import six
 from django.conf import settings
-from django.urls import reverse
 from django.http import QueryDict
+from django.urls import reverse
 from django.utils.http import urlquote_plus
 from django.utils.timezone import now
 from pytz import UTC
 from waffle.models import Flag
 from waffle.testutils import override_flag
 
-from django_comment_common.models import (
-    FORUM_ROLE_ADMINISTRATOR,
-    FORUM_ROLE_MODERATOR,
-    FORUM_ROLE_GROUP_MODERATOR,
-    FORUM_ROLE_COMMUNITY_TA
-)
-from django_comment_client.tests.factories import RoleFactory
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.helpers import get_expiration_banner_text
@@ -30,29 +26,37 @@ from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.api import add_course_goal, remove_course_goal
 from lms.djangoapps.courseware.tests.factories import (
-    InstructorFactory,
-    StaffFactory,
     BetaTesterFactory,
-    OrgStaffFactory,
-    OrgInstructorFactory,
     GlobalStaffFactory,
+    InstructorFactory,
+    OrgInstructorFactory,
+    OrgStaffFactory,
+    StaffFactory
 )
+from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
+from openedx.core.djangoapps.django_comment_common.models import (
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_GROUP_MODERATOR,
+    FORUM_ROLE_MODERATOR
+)
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
 from openedx.features.course_duration_limits.config import EXPERIMENT_DATA_HOLDBACK_KEY, EXPERIMENT_ID
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
+    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
+    FIRST_PURCHASE_OFFER_BANNER_DISPLAY,
     SHOW_REVIEWS_TOOL_FLAG,
     SHOW_UPGRADE_MSG_ON_COURSE_HOME,
-    UNIFIED_COURSE_TAB_FLAG,
-    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
+    UNIFIED_COURSE_TAB_FLAG
 )
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from util.date_utils import strftime_localized
-from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC_OUTLINE, COURSE_VISIBILITY_PUBLIC
+from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
@@ -89,7 +93,7 @@ def course_home_url(course):
     Arguments:
         course (CourseDescriptor): The course being tested.
     """
-    return course_home_url_from_string(unicode(course.id))
+    return course_home_url_from_string(six.text_type(course.id))
 
 
 def course_home_url_from_string(course_key_string):
@@ -213,7 +217,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
 
         # Fetch the view and verify the query counts
         # TODO: decrease query count as part of REVO-28
-        with self.assertNumQueries(89, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(91, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
@@ -405,6 +409,19 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
             params=expected_params.urlencode()
         )
         self.assertRedirects(response, expected_url)
+
+    @override_waffle_flag(FIRST_PURCHASE_OFFER_BANNER_DISPLAY, active=True)
+    def test_first_purchase_offer_banner(self):
+        """
+        Ensure first purchase offer banner displays correctly
+        """
+        user = self.create_user_for_course(self.course, CourseUserType.ENROLLED)
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
+        url = course_home_url(self.course)
+        response = self.client.get(url)
+        bannerText = u'''<div class="first-purchase-offer-banner"><span class="first-purchase-offer-banner-bold">
+                     15% off your first upgrade.</span> Discount automatically applied.</div>'''
+        self.assertContains(response, bannerText, html=True)
 
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
     def test_course_does_not_expire_for_verified_user(self):

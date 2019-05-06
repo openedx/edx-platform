@@ -15,7 +15,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.test.client import RequestFactory
 from opaque_keys.edx.locator import CourseLocator
-from openedx.features.learner_profile import REDIRECT_TO_PROFILE_MICROFRONTEND
+from openedx.features.learner_profile.toggles import REDIRECT_TO_PROFILE_MICROFRONTEND
 from openedx.features.learner_profile.views.learner_profile import learner_profile_context
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
@@ -117,25 +117,24 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
             self.assertIn(attribute, response.content)
 
     def test_redirect_view(self):
-        profile_url = "http://profile-spa/abc/"
-        with override_settings(PROFILE_MICROFRONTEND_URL=profile_url):
-            with override_waffle_flag(REDIRECT_TO_PROFILE_MICROFRONTEND, active=True):
-                profile_path = reverse('learner_profile', kwargs={'username': self.USERNAME})
+        with override_waffle_flag(REDIRECT_TO_PROFILE_MICROFRONTEND, active=True):
+            profile_path = reverse('learner_profile', kwargs={'username': self.USERNAME})
 
-                # Test with waffle flag active, site setting disabled
-                response = self.client.get(path=profile_path)
-                for attribute in self.CONTEXT_DATA:
-                    self.assertIn(attribute, response.content)
+            # Test with waffle flag active and site setting disabled, does not redirect
+            response = self.client.get(path=profile_path)
+            for attribute in self.CONTEXT_DATA:
+                self.assertIn(attribute, response.content)
 
-                # Test with waffle flag active, site setting enabled
-                site_domain = 'othersite.example.com'
-                self.set_up_site(site_domain, {
-                    'SITE_NAME': site_domain,
-                    'ENABLE_PROFILE_MICROFRONTEND': True
-                })
-                self.client.login(username=self.USERNAME, password=self.PASSWORD)
-                response = self.client.get(path=profile_path)
-                self.assertRedirects(response, profile_url + self.USERNAME, target_status_code=404)
+            # Test with waffle flag active and site setting enabled, redirects to microfrontend
+            site_domain = 'othersite.example.com'
+            self.set_up_site(site_domain, {
+                'SITE_NAME': site_domain,
+                'ENABLE_PROFILE_MICROFRONTEND': True
+            })
+            self.client.login(username=self.USERNAME, password=self.PASSWORD)
+            response = self.client.get(path=profile_path)
+            profile_url = settings.PROFILE_MICROFRONTEND_URL
+            self.assertRedirects(response, profile_url + self.USERNAME, fetch_redirect_response=False)
 
     def test_records_link(self):
         profile_path = reverse('learner_profile', kwargs={'username': self.USERNAME})

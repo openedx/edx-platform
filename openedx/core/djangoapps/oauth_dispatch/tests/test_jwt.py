@@ -1,15 +1,16 @@
 """ Tests for OAuth Dispatch's jwt module. """
+from __future__ import absolute_import
+
 import itertools
 from datetime import timedelta
-
-from mock import patch
 
 import ddt
 from django.test import TestCase
 from django.utils.timezone import now
+from mock import patch
 
 from openedx.core.djangoapps.oauth_dispatch import jwt as jwt_api
-from openedx.core.djangoapps.oauth_dispatch.adapters import DOTAdapter, DOPAdapter
+from openedx.core.djangoapps.oauth_dispatch.adapters import DOPAdapter, DOTAdapter
 from openedx.core.djangoapps.oauth_dispatch.models import RestrictedApplication
 from openedx.core.djangoapps.oauth_dispatch.tests.mixins import AccessTokenMixin
 from openedx.core.djangoapps.oauth_dispatch.toggles import ENFORCE_JWT_SCOPES

@@ -82,5 +82,5 @@ def answer_problem(course, request, problem, score=1, max_value=1):
         request,
         problem.scope_ids.usage_id,
         field_data_cache,
-    )._xmodule
+    )
     module.system.publish(problem, 'grade', grade_dict)

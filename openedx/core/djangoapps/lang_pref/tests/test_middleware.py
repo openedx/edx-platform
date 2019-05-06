@@ -2,24 +2,28 @@
 Tests for lang_pref middleware.
 """
 
+from __future__ import absolute_import
+
 import itertools
-import mock
 
 import ddt
+import mock
 from django.conf import settings
-from django.urls import reverse
-from django.test.client import RequestFactory
-from django.http import HttpResponse
 from django.contrib.sessions.middleware import SessionMiddleware
+from django.http import HttpResponse
+from django.test.client import RequestFactory
+from django.urls import reverse
 from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.utils.translation.trans_real import parse_accept_lang_header
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-
-from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY, COOKIE_DURATION
+from openedx.core.djangoapps.lang_pref import COOKIE_DURATION, LANGUAGE_KEY
 from openedx.core.djangoapps.lang_pref.middleware import LanguagePreferenceMiddleware
-from openedx.core.djangoapps.user_api.preferences.api import set_user_preference, get_user_preference, delete_user_preference
-from student.tests.factories import UserFactory
-from student.tests.factories import AnonymousUserFactory
+from openedx.core.djangoapps.user_api.preferences.api import (
+    delete_user_preference,
+    get_user_preference,
+    set_user_preference
+)
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from student.tests.factories import AnonymousUserFactory, UserFactory
 
 
 @ddt.ddt

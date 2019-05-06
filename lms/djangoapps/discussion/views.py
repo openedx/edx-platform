@@ -23,16 +23,14 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from web_fragments.fragment import Fragment
 
-import django_comment_client.utils as utils
-from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
-import lms.lib.comment_client as cc
 from courseware.access import has_access
 from courseware.courses import get_course_with_access
 from courseware.views.views import CourseTabView
-from django_comment_client.base.views import track_thread_viewed_event
-from django_comment_client.constants import TYPE_ENTRY
-from django_comment_client.permissions import get_team, has_permission
-from django_comment_client.utils import (
+import lms.djangoapps.discussion.django_comment_client.utils as utils
+from lms.djangoapps.discussion.django_comment_client.base.views import track_thread_viewed_event
+from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY
+from lms.djangoapps.discussion.django_comment_client.permissions import get_team, has_permission
+from lms.djangoapps.discussion.django_comment_client.utils import (
     add_courseware_context,
     available_division_schemes,
     course_discussion_division_enabled,
@@ -43,8 +41,12 @@ from django_comment_client.utils import (
     is_commentable_divided,
     strip_none
 )
-from django_comment_common.models import CourseDiscussionSettings
-from django_comment_common.utils import ThreadContext, get_course_discussion_settings, set_course_discussion_settings
+from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
+import openedx.core.djangoapps.django_comment_common.comment_client as cc
+from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
+from openedx.core.djangoapps.django_comment_common.utils import (
+    ThreadContext, get_course_discussion_settings, set_course_discussion_settings,
+)
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from student.models import CourseEnrollment

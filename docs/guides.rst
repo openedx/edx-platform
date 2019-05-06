@@ -4,9 +4,8 @@ Guides
 .. toctree::
     :maxdepth: 2
 
-    best_practices
-    testing
-    javascript
-    styling
-    bootstrap
-    static_assets
+    testing/testing
+    frontend/javascript
+    frontend/styling
+    frontend/bootstrap
+    frontend/static_assets

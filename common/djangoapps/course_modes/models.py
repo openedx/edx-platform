@@ -1,9 +1,12 @@
 """
 Add and create new modes for running courses on this particular LMS
 """
+from __future__ import absolute_import
+
 from collections import defaultdict, namedtuple
 from datetime import timedelta
 
+import six
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -14,8 +17,8 @@ from django.dispatch import receiver
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from edx_django_utils.cache import RequestCache
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.django.models import CourseKeyField
+from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.cache_utils import request_cached
@@ -59,7 +62,7 @@ class CourseMode(models.Model):
 
     @course_id.setter
     def course_id(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             self._course_id = CourseKey.from_string(value)
         else:
             self._course_id = value
@@ -296,7 +299,7 @@ class CourseMode(models.Model):
                 mode for mode in modes
                 if mode.expiration_datetime is None or mode.expiration_datetime >= now_dt
             ]
-            for course_id, modes in all_modes.iteritems()
+            for course_id, modes in six.iteritems(all_modes)
         }
 
         return (all_modes, unexpired_modes)
@@ -910,4 +913,4 @@ class CourseModeExpirationConfig(ConfigurationModel):
 
     def __unicode__(self):
         """ Returns the unicode date of the verification window. """
-        return unicode(self.verification_window)
+        return six.text_type(self.verification_window)
