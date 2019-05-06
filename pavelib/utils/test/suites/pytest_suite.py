@@ -294,7 +294,7 @@ class LibTestSuite(PytestSuite):
                 xdist_string = u'--tx {}*ssh="ubuntu@{} -o StrictHostKeyChecking=no"' \
                                '//python="source /edx/app/edxapp/edxapp_env; {}; python"' \
                                '//chdir="/edx/app/edxapp/edx-platform"' \
-                               .format(xdist_remote_processes, ip, django_env_var_cmd)
+                               .format(xdist_remote_processes, ip, env_var_cmd)
                 cmd.append(xdist_string)
             for rsync_dir in Env.rsync_dirs():
                 cmd.append(u'--rsyncdir {}'.format(rsync_dir))
