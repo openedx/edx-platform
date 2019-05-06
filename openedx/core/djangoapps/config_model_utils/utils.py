@@ -1,9 +1,8 @@
 """utils for feature-based enrollments"""
+from __future__ import absolute_import
+
 from experiments.models import ExperimentData
-from openedx.features.course_duration_limits.config import (
-    EXPERIMENT_ID,
-    EXPERIMENT_DATA_HOLDBACK_KEY
-)
+from openedx.features.course_duration_limits.config import EXPERIMENT_DATA_HOLDBACK_KEY, EXPERIMENT_ID
 
 
 def is_in_holdback(user):

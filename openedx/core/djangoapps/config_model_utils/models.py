@@ -5,23 +5,23 @@ StackedConfigurationModel: A ConfigurationModel that can be overridden at site, 
 """
 
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 from collections import defaultdict
 from enum import Enum
 
+import crum
+from config_models.models import ConfigurationModel, cache
 from django.conf import settings
-from django.db import models
-from django.db.models import Q, F
 from django.contrib.sites.models import Site
 from django.contrib.sites.requests import RequestSite
 from django.core.exceptions import ValidationError
+from django.db import models
+from django.db.models import F, Q
 from django.utils.translation import ugettext_lazy as _
-import crum
 
-from config_models.models import ConfigurationModel, cache
-from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.lib.cache_utils import request_cached
 
 
