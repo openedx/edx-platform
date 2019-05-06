@@ -4,13 +4,14 @@ Management command for creating a Django OAuth Toolkit Application model.
 Also creates an oauth_dispatch application access if scopes are provided.
 """
 
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import logging
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from oauth2_provider.models import get_application_model
+
 from openedx.core.djangoapps.oauth_dispatch.models import ApplicationAccess
 
 logger = logging.getLogger(__name__)

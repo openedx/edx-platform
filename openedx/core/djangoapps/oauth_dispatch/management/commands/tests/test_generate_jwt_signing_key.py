@@ -2,18 +2,18 @@
 Tests the ``generate_jwt_signing_key`` management command.
 """
 # pylint: disable=missing-docstring
+from __future__ import absolute_import
+
 import sys
 from contextlib import contextmanager
 from StringIO import StringIO
 
 import ddt
-from mock import patch
-
 from django.core.management import call_command
 from django.test import TestCase
+from mock import patch
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-
 
 COMMAND_NAME = 'generate_jwt_signing_key'
 LOGGER = 'openedx.core.djangoapps.oauth_dispatch.management.commands.generate_jwt_signing_key.log.info'
