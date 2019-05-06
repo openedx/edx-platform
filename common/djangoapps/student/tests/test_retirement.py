@@ -1,15 +1,17 @@
 """
 Test user retirement methods
 """
+from __future__ import absolute_import
+
 import json
 
 import ddt
+import pytest
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.test import TestCase
-import pytest
+from django.urls import reverse
 
 from student.models import (
     _get_all_retired_emails_by_email,
@@ -18,11 +20,10 @@ from student.models import (
     get_potentially_retired_user_by_username_and_hash,
     get_retired_email_by_email,
     get_retired_username_by_username,
-    is_username_retired,
-    is_email_retired
+    is_email_retired,
+    is_username_retired
 )
 from student.tests.factories import UserFactory
-
 
 # Tell pytest it's ok to user the Django db
 pytestmark = pytest.mark.django_db

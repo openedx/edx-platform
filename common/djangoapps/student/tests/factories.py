@@ -1,9 +1,12 @@
 """Provides factories for student models."""
 
+from __future__ import absolute_import
+
 from datetime import datetime
 from uuid import uuid4
 
 import factory
+import six
 from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from factory.django import DjangoModelFactory
@@ -102,7 +105,7 @@ class UserFactory(DjangoModelFactory):
         if extracted is None:
             return
 
-        if isinstance(extracted, basestring):
+        if isinstance(extracted, six.string_types):
             extracted = [extracted]
 
         for group_name in extracted:
@@ -140,7 +143,7 @@ class CourseEnrollmentFactory(DjangoModelFactory):
             course_id = kwargs.get('course_id')
             course_overview = None
             if course_id is not None:
-                if isinstance(course_id, basestring):
+                if isinstance(course_id, six.string_types):
                     course_id = CourseKey.from_string(course_id)
                     course_kwargs.setdefault('id', course_id)
 
