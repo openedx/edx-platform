@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import pytest
-from django.core.management import call_command, CommandError
+from django.core.management import CommandError, call_command
 
 
 def test_without_args(capsys):
