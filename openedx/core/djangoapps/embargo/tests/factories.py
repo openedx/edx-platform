@@ -1,5 +1,4 @@
 """Factories for generating fake embargo data."""
-# pylint: disable=missing-docstring
 from __future__ import absolute_import
 import factory
 from factory.django import DjangoModelFactory
