@@ -1,18 +1,17 @@
 # pylint: disable=missing-docstring,maybe-no-member
 
 from __future__ import absolute_import
-import ddt
-from mock import patch, sentinel
 
+import ddt
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from mock import patch, sentinel
 
+from openedx.core.lib.tests.assertions.events import assert_event_matches
 from track import views
 from track.middleware import TrackMiddleware
-from track.tests import EventTrackingTestCase, FROZEN_TIME
-from openedx.core.lib.tests.assertions.events import assert_event_matches
-
+from track.tests import FROZEN_TIME, EventTrackingTestCase
 
 TEST_USERNAME = 'test-username'
 TEST_USER_ID = 1000

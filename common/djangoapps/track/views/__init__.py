@@ -1,25 +1,21 @@
 from __future__ import absolute_import
+
 import datetime
 import json
 
 import pytz
-
+import six
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import redirect
-
 from django.views.decorators.csrf import ensure_csrf_cookie
-
-from edxmako.shortcuts import render_to_response
+from eventtracking import tracker as eventtracker
 from ipware.ip import get_ip
 
-from track import tracker
-from track import contexts
-from track import shim
+from edxmako.shortcuts import render_to_response
+from track import contexts, shim, tracker
 from track.models import TrackingLog
-from eventtracking import tracker as eventtracker
-import six
 
 
 def log_event(event):
