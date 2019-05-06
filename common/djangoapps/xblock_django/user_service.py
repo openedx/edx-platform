@@ -2,11 +2,13 @@
 Support for converting a django user to an XBlock user
 """
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from opaque_keys.edx.keys import CourseKey
 from xblock.reference.user_service import UserService, XBlockUser
 
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
-from student.models import anonymous_id_for_user, get_user_by_username_or_email
+from student.models import anonymous_id_for_user, get_user_by_username_or_email, CourseEnrollment
+
 
 ATTR_KEY_IS_AUTHENTICATED = 'edx-platform.is_authenticated'
 ATTR_KEY_USER_ID = 'edx-platform.user_id'
@@ -54,6 +56,28 @@ class DjangoXBlockUserService(UserService):
 
         course_id = CourseKey.from_string(course_id)
         return anonymous_id_for_user(user=user, course_id=course_id, save=False)
+
+    def get_enrollments(self, course_id, **kwargs):
+        """
+        Return iterator of enrollments, as dicts.
+        """
+        enrollments = CourseEnrollment.objects.filter(
+                    course_id=course_id).select_related('programcourseenrollment')
+        for enrollment in enrollments:
+            enrd = {
+                'user_id': enrollment.user.id,
+                'username': enrollment.user.username,
+                'full_name': enrollment.user.profile.name,
+                'email': enrollment.user.email,
+                'is_active': enrollment.is_active,
+                'track': enrollment.mode,
+            }
+            try:
+                pce = enrollment.programcourseenrollment.program_enrollment
+                enrd['student_uid'] = pce.external_user_key
+            except ObjectDoesNotExist:
+                pass
+            yield enrd
 
     def _convert_django_user_to_xblock_user(self, django_user):
         """

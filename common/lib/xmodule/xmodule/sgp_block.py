@@ -1,36 +1,43 @@
+"""
+XBlock for Staff Graded Problem
+"""
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import csv
+import hashlib
 import io
 import json
 import logging
-from collections import namedtuple
-
-import six
 
 import markdown
-from student.models import CourseEnrollment
+from crum import get_current_request
+from django.middleware.csrf import get_token
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlock
-from xblock.fields import Boolean, Float, Integer, List, Scope, String
+from xblock.fields import Float, Scope, String
 from xblock.runtime import NoSuchServiceError
-from xblock.scorable import ScorableXBlockMixin, Score
 from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
-from xmodule.fields import ScoreField
+
 
 _ = lambda text: text
 
 log = logging.getLogger(__name__)
 
-ScoreRow = namedtuple('ScoreRow', 'user_id username full_name email student_uid enrollment_is_active enrollment_track block_id unit_title date_last_graded who_last_graded last_points new_points')
+
+CSV_FIELDS = '''user_id username full_name email student_uid is_active track
+block_id title date_last_graded who_last_graded last_points new_points'''.split()
 
 
 @XBlock.needs('settings')
 @XBlock.needs('grade_utils')
 @XBlock.needs('i18n')
-class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
+@XBlock.needs('user')
+class StaffGradedBlock(StudioEditableXBlockMixin, XBlock):
+    """
+    Staff Graded Problem block
+    """
     display_name = String(
         display_name=_("Display Name"),
         help=_("The display name for this component."),
@@ -45,7 +52,6 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
         default=_("Your results will be graded offline"),
         runtime_options={'multiline_editor': 'html'},
     )
-    score = ScoreField(help=_("Dictionary with the current student score"), scope=Scope.user_state, enforce_type=False)
     weight = Float(
         display_name="Weight",
         help=_(
@@ -61,88 +67,87 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
     editable_fields = ('display_name', 'instructions', 'weight')
 
     def student_view(self, context):
+
         fragment = Fragment()
         loader = ResourceLoader(__name__)
 
-        try:
-            score = self.runtime.service(self, "grade_utils").get_score(self.runtime.user_id, self.location)
-        except NoSuchServiceError:
-            score = None
+        context['id'] = self.location.block_id
         context['instructions'] = markdown.markdown(self.instructions)
         context['display_name'] = self.display_name
-        context['score'] = score
         context['is_staff'] = self.runtime.user_is_staff
+
         if context['is_staff']:
             context['import_url'] = self.runtime.handler_url(self, "csv_import_handler")
             context['export_url'] = self.runtime.handler_url(self, "csv_export_handler")
-            from django.middleware.csrf import get_token
-            from crum import get_current_request
             context['csrf_token'] = get_token(get_current_request())
-        fragment.add_content(loader.render_django_template('/templates/html/sgp.html', context))
 
+        try:
+            context['score'] = self.runtime.service(self, "grade_utils").get_score(self.runtime.user_id, self.location)
+            context['score']['max_grade'] = self.weight
+        except NoSuchServiceError:
+            pass
+        fragment.add_content(loader.render_django_template('/templates/html/sgp.html', context))
         return fragment
 
     @XBlock.handler
-    def csv_import_handler(self, request, suffix=''):
+    def csv_import_handler(self, request, suffix=''):  # pylint: disable=unused-argument
+        if not self.runtime.user_is_staff:
+            return Response('not allowed', status_code=403)
         grade_utils = self.runtime.service(self, 'grade_utils')
-        log.info(repr(request.POST))
+
         my_location = self.location
         processed = 0
         errors = 0
         data = {}
         try:
-            reader = csv.reader(request.POST['csv'].file)
+            reader = csv.DictReader(request.POST['csv'].file)
         except KeyError:
             errors = 1
             data['message'] = 'missing file'
         else:
+            max_points = self.weight
             for rownum, row in enumerate(reader):
-                try:
-                    srow = ScoreRow(*row)
-                except (ValueError, TypeError):
-                    errors += 1
-                    continue
-                if rownum == 0 and not srow.user_id.isdigit():
-                    log.info(row)
-                    # header row
-                    continue
-                if srow.new_points:
-                    new_points = float(srow.new_points)
-                    grade_utils.set_score(my_location, srow.user_id, new_points)
-                    processed += 1
-                log.info(row)
+                if row['new_points']:
+                    new_points = float(row['new_points'])
+                    if new_points <= max_points:
+                        grade_utils.set_score(my_location, row['user_id'], new_points)
+                        processed += 1
+                    else:
+                        errors += 1
         data['errors'] = errors
         data['processed'] = processed
+        log.info(data)
         return Response(json.dumps(data), content_type='application/json')
 
     @XBlock.handler
-    def csv_export_handler(self, request, suffix=''):
+    def csv_export_handler(self, request, suffix=''):  # pylint: disable=unused-argument
+        if not self.runtime.user_is_staff:
+            return Response('not allowed', status_code=403)
+
         buf = io.BytesIO()
-        writer = csv.writer(buf)
+        writer = csv.DictWriter(buf, CSV_FIELDS)
+        writer.writeheader()
         my_location = str(self.location)
         my_name = self.display_name
         grade_utils = self.runtime.service(self, 'grade_utils')
-        students = {row.student.id: row for row in grade_utils.get_scores(self.location)}
-        writer.writerow(ScoreRow._fields)
+        students = grade_utils.get_scores(self.location)
 
-        for enrollment in CourseEnrollment.objects.filter(course_id=self.location.course_key):
-            score = students.get(enrollment.user.id, None)
+        user_service = self.runtime.service(self, 'user')
+        enrollments = user_service.get_enrollments(self.location.course_key)
+        for enrollment in enrollments:
+            srow = {
+                'block_id': my_location,
+                'title': my_name,
+                'new_points': None
+            }
+            srow.update(enrollment)
+            score = students.get(enrollment['user_id'], None)
 
-            srow = ScoreRow(
-                enrollment.user.id,
-                enrollment.user.username,
-                enrollment.user.profile.name,
-                enrollment.user.email,
-                '',
-                enrollment.is_active,
-                enrollment.mode,
-                my_location,
-                my_name,
-                score.modified if score else None,
-                'who' if score else None,
-                score.score if score else None,
-                None
-            )
+            if score:
+                srow['last_points'] = score['score']
+                srow['date_last_graded'] = score['modified']
+                srow['who_last_graded'] = 'who'  # TODO
+
             writer.writerow(srow)
 
         resp = Response(buf.getvalue())

@@ -2,26 +2,31 @@
 <hr>
 {{instructions|safe}}
 
+{% if score %}
+<p>Your score: <strong>{{score.score}}/{{score.max_grade}}</strong></p>
+{% endif %}
 {% if is_staff %}
-<p class="row">
+<div class="row">
     <div class="col">
-    <form action="{{import_url}}" method="POST" enctype="multipart/form-data">
-        <input type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
-     <p><input id="thefile" type="file" name="csv"></p>
-     <p><button id="import-button" class="submit btn btn-brand">import CSV</button> <h2 id="status" class="text-info" style="display:none"></h2></p>
-     </form>
-     </div>
-    <div class="col">
-        <a href="{{export_url}}" class="btn btn-brand">download CSV</a>
-        
+        <hr>
+        <p>Please upload a CSV with the grades. Thanks. Have a nice day.</p>
+        <form action="{{import_url}}" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
+            <p>
+                <a href="{{export_url}}" class="btn btn-brand">download CSV</a>
+                <input id="{{id}}-file" type="file" name="csv">
+                <a href="#" id="{{id}}-import" class="submit btn btn-brand">import CSV</a>
+                <h2 id="{{id}}-status" class="text-info" style="display:none"></h2>
+            </p>
+        </form>
     </div>
-</p>
+</div>
 <script type="text/javascript">
-    $('#import-button').click(function(e){
+    $('#{{id}}-import').click(function(e){
         e.preventDefault();
         var formData = new FormData();
         formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
-        formData.append('csv', $('#thefile')[0].files[0]);
+        formData.append('csv', $('#{{id}}-file')[0].files[0]);
 
         $.ajax({
                url : '{{import_url}}',
@@ -31,14 +36,11 @@
                contentType: false,  // tell jQuery not to set contentType
                success : function(data) {
                    console.log(data);
-                    $('#status').html(`${data.processed} processed. ${data.errors} errors`).show();
+                    $('#{{id}}-status').html(`${data.processed} processed. ${data.errors} errors`).show();
                }
         });
 
     });
 </script>
 {% else %}
-{% if score %}
-<p>Your score: {{score}}</p>
-{% endif %}
 {% endif %}
