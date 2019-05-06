@@ -5,8 +5,10 @@ runtime environment with the djangoapps in common configured to load
 """
 
 # NOTE: we are importing this method so that any module that imports us has access to get_current_request
-from crum import get_current_request
+from __future__ import absolute_import
+
 import webpack_loader
+from crum import get_current_request
 
 
 def get_current_request_hostname():
