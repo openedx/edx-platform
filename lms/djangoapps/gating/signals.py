@@ -7,11 +7,11 @@ from django.dispatch import receiver
 from completion.models import BlockCompletion
 from gating import api as gating_api
 from gating.tasks import task_evaluate_subsection_completion_milestones
-from lms.djangoapps.grades.signals.signals import SUBSECTION_SCORE_CHANGED
+from lms.djangoapps.grades.api import signals as grades_signals
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_CHANGED
 
 
-@receiver(SUBSECTION_SCORE_CHANGED)
+@receiver(grades_signals.SUBSECTION_SCORE_CHANGED)
 def evaluate_subsection_gated_milestones(**kwargs):
     """
     Receives the SUBSECTION_SCORE_CHANGED signal and triggers the

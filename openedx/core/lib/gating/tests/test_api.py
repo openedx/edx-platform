@@ -10,10 +10,10 @@ from mock import patch, Mock
 from ddt import ddt, data, unpack
 from django.conf import settings
 from lms.djangoapps.gating import api as lms_gating_api
+from lms.djangoapps.grades.constants import GradeOverrideFeatureEnum
 from lms.djangoapps.grades.models import (
     PersistentSubsectionGrade,
     PersistentSubsectionGradeOverride,
-    PersistentSubsectionGradeOverrideHistory,
 )
 from lms.djangoapps.grades.tests.base import GradeTestBase
 from lms.djangoapps.grades.tests.utils import mock_get_score
@@ -392,7 +392,7 @@ class TestGatingGradesIntegration(GradeTestBase):
                 earned_graded_override=0,
                 earned_all_override=0,
                 possible_graded_override=3,
-                feature=PersistentSubsectionGradeOverrideHistory.GRADEBOOK,
+                feature=GradeOverrideFeatureEnum.gradebook,
             )
 
             # it's important that we stay in the mock_get_score() context here,

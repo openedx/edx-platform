@@ -32,7 +32,7 @@ from lms.djangoapps.ccx.tests.utils import CcxTestCase, flatten
 from lms.djangoapps.ccx.utils import ccx_course, is_email
 from lms.djangoapps.ccx.views import get_date
 from lms.djangoapps.discussion.django_comment_client.utils import has_forum_access
-from lms.djangoapps.grades.tasks import compute_all_grades_for_course
+from lms.djangoapps.grades.api import task_compute_all_grades_for_course
 from lms.djangoapps.instructor.access import allow_access, list_with_level
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
@@ -109,7 +109,7 @@ def setup_students_and_grades(context):
                         module_state_key=problem.location
                     )
 
-        compute_all_grades_for_course.apply_async(kwargs={'course_key': unicode(context.course.id)})
+        task_compute_all_grades_for_course.apply_async(kwargs={'course_key': unicode(context.course.id)})
 
 
 def unhide(unit):

@@ -23,7 +23,7 @@ from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from coursewarehistoryextended.fields import UnsignedBigIntAutoField, UnsignedBigIntOneToOneField
-from lms.djangoapps.grades import events
+from lms.djangoapps.grades import events, constants
 from openedx.core.lib.cache_utils import get_cache
 
 
@@ -743,11 +743,9 @@ class PersistentSubsectionGradeOverrideHistory(models.Model):
 
     .. no_pii:
     """
-    PROCTORING = 'PROCTORING'
-    GRADEBOOK = 'GRADEBOOK'
     OVERRIDE_FEATURES = (
-        (PROCTORING, 'proctoring'),
-        (GRADEBOOK, 'gradebook'),
+        (constants.GradeOverrideFeatureEnum.proctoring, 'proctoring'),
+        (constants.GradeOverrideFeatureEnum.gradebook, 'gradebook'),
     )
 
     CREATE_OR_UPDATE = 'CREATEORUPDATE'
@@ -764,7 +762,7 @@ class PersistentSubsectionGradeOverrideHistory(models.Model):
     feature = models.CharField(
         max_length=32,
         choices=OVERRIDE_FEATURES,
-        default=PROCTORING
+        default=constants.GradeOverrideFeatureEnum.proctoring,
     )
     action = models.CharField(
         max_length=32,
@@ -793,8 +791,3 @@ class PersistentSubsectionGradeOverrideHistory(models.Model):
     @classmethod
     def get_override_history(cls, override_id):
         return cls.objects.filter(override_id=override_id)
-
-
-def prefetch(user, course_key):
-    PersistentSubsectionGradeOverride.prefetch(user.id, course_key)
-    VisibleBlocks.bulk_read(user.id, course_key)

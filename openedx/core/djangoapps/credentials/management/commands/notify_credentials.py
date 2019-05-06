@@ -22,8 +22,8 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
-from lms.djangoapps.certificates.models import GeneratedCertificate
-from lms.djangoapps.grades.models import PersistentCourseGrade
+from lms.djangoapps.certificates.api import get_recently_modified_certificates
+from lms.djangoapps.grades.api import get_recently_modified_grades
 from openedx.core.djangoapps.credentials.models import NotifyCredentialsConfig
 from openedx.core.djangoapps.credentials.signals import handle_cert_change, send_grade_if_interesting
 from openedx.core.djangoapps.programs.signals import handle_course_cert_changed
@@ -169,32 +169,18 @@ class Command(BaseCommand):
             options['delay']
         )
 
-        cert_filter_args = {}
-        grade_filter_args = {}
-
         try:
             site_config = SiteConfiguration.objects.get(site__domain=options['site']) if options['site'] else None
         except SiteConfiguration.DoesNotExist:
             log.error(u'No site configuration found for site %s', options['site'])
-        if options['courses']:
-            course_keys = self.get_course_keys(options['courses'])
-            cert_filter_args['course_id__in'] = course_keys
-            grade_filter_args['course_id__in'] = course_keys
 
-        if options['start_date']:
-            cert_filter_args['modified_date__gte'] = options['start_date']
-            grade_filter_args['modified__gte'] = options['start_date']
-
-        if options['end_date']:
-            cert_filter_args['modified_date__lte'] = options['end_date']
-            grade_filter_args['modified__lte'] = options['end_date']
-
-        if not cert_filter_args:
+        course_keys = self.get_course_keys(options['courses'])
+        if not (course_keys or options['start_date'] or options['end_date']):
             raise CommandError('You must specify a filter (e.g. --courses= or --start-date)')
 
         # pylint: disable=no-member
-        certs = GeneratedCertificate.objects.filter(**cert_filter_args).order_by('modified_date')
-        grades = PersistentCourseGrade.objects.filter(**grade_filter_args).order_by('modified')
+        certs = get_recently_modified_certificates(course_keys, options['start_date'], options['end_date'])
+        grades = get_recently_modified_grades(course_keys, options['start_date'], options['end_date'])
 
         if options['dry_run']:
             self.print_dry_run(certs, grades)
@@ -254,7 +240,7 @@ class Command(BaseCommand):
                 verbose=verbose
             )
 
-    def get_course_keys(self, courses):
+    def get_course_keys(self, courses=None):
         """
         Return a list of CourseKeys that we will emit signals to.
 
@@ -265,7 +251,10 @@ class Command(BaseCommand):
         it is a fatal error and will cause us to exit the entire process.
         """
         # Use specific courses if specified, but fall back to all courses.
+        if not courses:
+            courses = []
         course_keys = []
+
         log.info(u"%d courses specified: %s", len(courses), ", ".join(courses))
         for course_id in courses:
             try:

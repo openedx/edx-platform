@@ -21,7 +21,7 @@ class GradesConfig(AppConfig):
             ProjectType.LMS: {
                 PluginURLs.NAMESPACE: u'grades_api',
                 PluginURLs.REGEX: u'^api/grades/',
-                PluginURLs.RELATIVE_PATH: u'api.urls',
+                PluginURLs.RELATIVE_PATH: u'rest_api.urls',
             }
         },
         PluginSettings.CONFIG: {

@@ -19,9 +19,8 @@ from six import text_type
 
 from course_modes.models import CourseMode
 from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory
-from lms.djangoapps.grades.api.v1.tests.mixins import GradeViewTestMixin
-from lms.djangoapps.grades.api.v1.views import CourseEnrollmentPagination
 from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
+from lms.djangoapps.grades.constants import GradeOverrideFeatureEnum
 from lms.djangoapps.grades.course_data import CourseData
 from lms.djangoapps.grades.course_grade import CourseGrade
 from lms.djangoapps.grades.models import (
@@ -31,6 +30,8 @@ from lms.djangoapps.grades.models import (
     PersistentSubsectionGradeOverride,
     PersistentSubsectionGradeOverrideHistory,
 )
+from lms.djangoapps.grades.rest_api.v1.tests.mixins import GradeViewTestMixin
+from lms.djangoapps.grades.rest_api.v1.views import CourseEnrollmentPagination
 from lms.djangoapps.certificates.models import (
     GeneratedCertificate,
     CertificateStatuses,
@@ -221,7 +222,7 @@ class CourseGradingViewTest(SharedModuleStoreTestCase, APITestCase):
         self.assertEqual(expected_data, resp.data)
 
     def test_course_grade_frozen(self):
-        with patch('lms.djangoapps.grades.api.v1.gradebook_views.are_grades_frozen') as mock_frozen_grades:
+        with patch('lms.djangoapps.grades.rest_api.v1.gradebook_views.are_grades_frozen') as mock_frozen_grades:
             mock_frozen_grades.return_value = True
             self.client.login(username=self.staff.username, password=self.password)
             resp = self.client.get(self.get_url(self.course_key))
@@ -907,7 +908,7 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
         """
         Should receive a 403 when grades have been frozen for a course.
         """
-        with patch('lms.djangoapps.grades.api.v1.gradebook_views.are_grades_frozen', return_value=True):
+        with patch('lms.djangoapps.grades.rest_api.v1.gradebook_views.are_grades_frozen', return_value=True):
             with override_waffle_flag(self.waffle_flag, active=True):
                 getattr(self, login_method)()
                 post_data = [
@@ -1171,7 +1172,7 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
             for audit_item in update_records:
                 self.assertEqual(audit_item.user, request_user)
                 self.assertIsNotNone(audit_item.created)
-                self.assertEqual(audit_item.feature, PersistentSubsectionGradeOverrideHistory.GRADEBOOK)
+                self.assertEqual(audit_item.feature, GradeOverrideFeatureEnum.gradebook)
                 self.assertEqual(audit_item.action, PersistentSubsectionGradeOverrideHistory.CREATE_OR_UPDATE)
 
     def test_update_failing_grade(self):
@@ -1348,7 +1349,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
             subsection_grade_model=self.grade,
             earned_all_override=0.0,
             earned_graded_override=0.0,
-            feature=PersistentSubsectionGradeOverrideHistory.GRADEBOOK,
+            feature=GradeOverrideFeatureEnum.gradebook,
         )
 
         resp = self.client.get(
@@ -1419,7 +1420,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
             subsection_grade_model=self.grade,
             earned_all_override=0.0,
             earned_graded_override=0.0,
-            feature=PersistentSubsectionGradeOverrideHistory.GRADEBOOK,
+            feature=GradeOverrideFeatureEnum.gradebook,
         )
 
         resp = self.client.get(

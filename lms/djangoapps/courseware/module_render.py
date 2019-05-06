@@ -53,11 +53,10 @@ from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
-from lms.djangoapps.grades.signals.signals import SCORE_PUBLISHED
+from lms.djangoapps.grades.api import signals as grades_signals, GradesUtilService
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
-from lms.djangoapps.grades.util_services import GradesUtilService
 from lms.djangoapps.verify_student.services import XBlockVerificationService
 from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
@@ -572,7 +571,7 @@ def get_module_system_for_user(
         """
         Submit a grade for the block.
         """
-        SCORE_PUBLISHED.send(
+        grades_signals.SCORE_PUBLISHED.send(
             sender=None,
             block=block,
             user=user,

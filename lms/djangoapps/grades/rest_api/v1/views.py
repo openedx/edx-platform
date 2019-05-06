@@ -10,13 +10,12 @@ from edx_rest_framework_extensions import permissions
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.grades.api.serializers import GradingPolicySerializer
-from lms.djangoapps.grades.api.v1.utils import (
+from lms.djangoapps.grades.rest_api.serializers import GradingPolicySerializer
+from lms.djangoapps.grades.rest_api.v1.utils import (
     CourseEnrollmentPagination,
     GradeViewMixin,
 )
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
-from lms.djangoapps.grades.models import PersistentCourseGrade
+from lms.djangoapps.grades.api import CourseGradeFactory, prefetch_course_grades, clear_prefetched_course_grades
 from opaque_keys import InvalidKeyError
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import PaginatedAPIView, get_course_key, verify_course_exists
@@ -32,11 +31,11 @@ def bulk_course_grade_context(course_key, users):
     within a context, storing in a RequestCache and deleting
     on context exit.
     """
-    PersistentCourseGrade.prefetch(course_key, users)
+    prefetch_course_grades(course_key, users)
     try:
         yield
     finally:
-        PersistentCourseGrade.clear_prefetched_data(course_key)
+        clear_prefetched_course_grades(course_key)
 
 
 class CourseGradesView(GradeViewMixin, PaginatedAPIView):
