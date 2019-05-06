@@ -1,6 +1,8 @@
 """
 Test the cancel_user_retirement_request management command
 """
+from __future__ import absolute_import
+
 import pytest
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.models import User

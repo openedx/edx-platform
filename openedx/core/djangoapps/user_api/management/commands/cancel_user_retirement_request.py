@@ -3,14 +3,14 @@ Use this mgmt command when a user requests retirement mistakenly, then requests
 for the retirement request to be cancelled. The command can't cancel a retirement
 that has already commenced - only pending retirements.
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import logging
 
 from django.core.management.base import BaseCommand, CommandError
+
 from openedx.core.djangoapps.user_api.accounts.utils import generate_password
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
-
 
 LOGGER = logging.getLogger(__name__)
 

@@ -16,14 +16,16 @@ If the user/org combo does not currently exist in the table, a row will be creat
 will be have the 'email-optin' tag set to 'False'.
 """
 
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+
 import csv
 import logging
 import time
 
+from django.core.management.base import BaseCommand, CommandError
 from django.db import connections
 from django.db.utils import DatabaseError
-from django.core.management.base import BaseCommand, CommandError
+from six.moves import range
 
 log = logging.getLogger(__name__)
 

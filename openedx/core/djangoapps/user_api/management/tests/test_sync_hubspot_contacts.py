@@ -1,18 +1,21 @@
 """
 Test the sync_hubspot_contacts management command
 """
+from __future__ import absolute_import
+
 import json
 from datetime import timedelta
-from mock import patch
 
 from django.core.management import call_command
 from django.test import TestCase
 from django.utils import timezone
 from django.utils.six import StringIO
+from mock import patch
+from six.moves import range
 
-from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangoapps.user_api.management.commands.sync_hubspot_contacts import Command as sync_command
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.models import UserAttribute, UserProfile
 from student.tests.factories import UserFactory
 

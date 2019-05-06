@@ -1,12 +1,14 @@
 """
 Test the test_bulk_user_org_email_optout management command
 """
+from __future__ import absolute_import
+
 import os
 import tempfile
 from contextlib import contextmanager
+
 import mock
 import pytest
-
 from django.core.management import call_command
 
 pytestmark = pytest.mark.django_db
