@@ -1,12 +1,15 @@
 """
 Import/Export pages.
 """
+from __future__ import absolute_import
+
 import os
 import re
 import time
 from datetime import datetime
 
 import requests
+import six
 from bok_choy.promise import EmptyPromise
 
 from common.test.acceptance.pages.common.utils import click_css
@@ -216,7 +219,7 @@ class LibraryLoader(object):
         but is used for import/export.
         """
         # pylint: disable=no-member
-        return "/".join([BASE_URL, self.url_path, unicode(self.locator)])
+        return "/".join([BASE_URL, self.url_path, six.text_type(self.locator)])
 
 
 class ExportCoursePage(ExportMixin, TemplateCheckMixin, CoursePage):

@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 from bok_choy.page_object import PageObject
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select

@@ -2,13 +2,20 @@
 The Files and Uploads page for a course in Studio
 """
 
-import os
-import urllib
-from path import Path
+from __future__ import absolute_import
 
+import os
+
+import six
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 from bok_choy.javascript import wait_for_js
 from bok_choy.promise import EmptyPromise
 from opaque_keys.edx.locator import CourseLocator
+from path import Path
+from six.moves import zip
+
 from common.test.acceptance.pages.common.utils import sync_on_notification
 from common.test.acceptance.pages.studio import BASE_URL
 from common.test.acceptance.pages.studio.course_page import CoursePage
@@ -37,7 +44,7 @@ class AssetIndexPageStudioFrontend(CoursePage):
             self.course_info['course_run'],
             deprecated=(default_store == 'draft')
         )
-        url = "/".join([BASE_URL, self.URL_PATH, urllib.quote_plus(unicode(course_key))])
+        url = "/".join([BASE_URL, self.URL_PATH, six.moves.urllib.parse.quote_plus(six.text_type(course_key))])
         return url if url[-1] == '/' else url + '/'
 
     @wait_for_js
@@ -221,7 +228,7 @@ class AssetIndexPageStudioFrontend(CoursePage):
         if name not in names:
             raise LookupError(u'Asset with filename {} not found.'.format(name))
         delete_buttons = self.asset_delete_buttons
-        assets = dict(zip(names, delete_buttons))
+        assets = dict(list(zip(names, delete_buttons)))
         # Now click the link in that row
         assets.get(name).click()
         self.confirm_asset_deletion()
