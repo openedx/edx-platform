@@ -169,7 +169,7 @@ class SystemTestSuite(PytestSuite):
                         self.disable_courseenrollment_history
                     )
                 xdist_string = u'--tx {}*ssh="ubuntu@{} -o StrictHostKeyChecking=no"' \
-                               '//python="source /edx/app/edxapp/edxapp_env; {}; {}; python"' \
+                               '//python="source /edx/app/edxapp/edxapp_env; {}; python"' \
                                '//chdir="/edx/app/edxapp/edx-platform"' \
                                .format(xdist_remote_processes, ip, env_var_cmd, )
                 cmd.append(xdist_string)
