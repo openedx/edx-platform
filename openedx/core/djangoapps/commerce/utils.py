@@ -1,11 +1,12 @@
 """ Commerce API Service. """
+from __future__ import absolute_import
+
 from django.conf import settings
 from edx_rest_api_client.client import EdxRestApiClient
-
 from eventtracking import tracker
+
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-
 
 ECOMMERCE_DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 
