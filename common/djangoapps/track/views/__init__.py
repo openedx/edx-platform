@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import datetime
 import json
 
@@ -18,6 +19,7 @@ from track import contexts
 from track import shim
 from track.models import TrackingLog
 from eventtracking import tracker as eventtracker
+import six
 
 
 def log_event(event):
@@ -82,7 +84,7 @@ def user_track(request):
     data = _get_request_value(request, 'event', {})
     page = _get_request_value(request, 'page')
 
-    if isinstance(data, basestring) and len(data) > 0:
+    if isinstance(data, six.string_types) and len(data) > 0:
         try:
             data = json.loads(data)
             _add_user_id_for_username(data)

@@ -1,5 +1,6 @@
 # pylint: disable=missing-docstring,maybe-no-member
 
+from __future__ import absolute_import
 import ddt
 from mock import patch, sentinel
 

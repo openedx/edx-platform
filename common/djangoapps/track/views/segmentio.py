@@ -1,5 +1,6 @@
 """Handle events that were forwarded from the Segment webhook integration"""
 
+from __future__ import absolute_import
 import json
 import logging
 
