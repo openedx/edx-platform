@@ -9,7 +9,7 @@ ${reasons}
 ${_("Resubmit Verification: {reverify_url}").format(reverify_url=reverify_url)}
 ## ${_("ID Verification FAQ: {faq_url}").format(faq_url=faq_url)}
 
-${_('(If the link is not clickable, try copying and pasting it into the address bar of your web browser, and press "Enter" key to open the page)')}
+${_('(If the link is invalid, try to copy and paste it into the address bar of your web browser, and press "Enter" to open the page.)')}
 
 ${_("Thank you,")}
 ${_("The {platform_name} team").format(platform_name=platform_name)}

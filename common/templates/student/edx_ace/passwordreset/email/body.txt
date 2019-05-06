@@ -1,5 +1,5 @@
 {% load i18n %}{% autoescape off %}
-{% blocktrans %}You're receiving this e-mail because you requested a password reset for your user account at {{ platform_name }}.{% endblocktrans %}
+{% blocktrans %}You're receiving this email because you requested a password reset for your user account at {{ platform_name }}.{% endblocktrans %}
 
 {% if failed %}
 {% blocktrans %}However, there is currently no user account associated with your email address: {{ email_address }}.{% endblocktrans %}
@@ -10,7 +10,7 @@
 
 {{ reset_link }}
 
-{% trans "If you didn't request this change, you can disregard this email - we have not yet reset your password." %}
+{% trans "If you didn't request this change, you can ignore this email - we have not yet reset your password." %}
 
 {% trans "Thanks for using our site!" %}
 {% endif %}
