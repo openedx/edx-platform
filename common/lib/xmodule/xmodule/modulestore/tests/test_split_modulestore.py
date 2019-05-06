@@ -2,44 +2,46 @@
     Test split modulestore w/o using any django stuff.
 """
 from __future__ import absolute_import
-from mock import patch
+
 import datetime
-from importlib import import_module
-from path import Path as path
+import os
 import random
 import re
 import unittest
-import os
+from importlib import import_module
 
 import ddt
+import six
+from ccx_keys.locator import CCXBlockUsageLocator
 from contracts import contract
-from django.core.cache import caches, InvalidCacheBackendError
+from django.core.cache import InvalidCacheBackendError, caches
+from mock import patch
+from opaque_keys.edx.locator import BlockUsageLocator, CourseKey, CourseLocator, LocalId, VersionTree
+from path import Path as path
+from six.moves import range
+from xblock.fields import Reference, ReferenceList, ReferenceValueDict
 
 from openedx.core.lib import tempdir
 from openedx.core.lib.tests import attr
-from xblock.fields import Reference, ReferenceList, ReferenceValueDict
 from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.exceptions import (
-    ItemNotFoundError, VersionConflictError,
-    DuplicateItemError, DuplicateCourseError,
-    InsufficientSpecificationError
-)
-from opaque_keys.edx.locator import CourseKey, CourseLocator, BlockUsageLocator, VersionTree, LocalId
-from ccx_keys.locator import CCXBlockUsageLocator
-from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.x_module import XModuleMixin
 from xmodule.fields import Date, Timedelta
-from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
-from xmodule.modulestore.tests.test_modulestore import check_has_course_method
-from xmodule.modulestore.split_mongo import BlockKey
-from xmodule.modulestore.tests.factories import check_mongo_calls
-from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
-from xmodule.modulestore.tests.utils import mock_tab_from_json
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.edit_info import EditInfoMixin
-import six
-from six.moves import range
-
+from xmodule.modulestore.exceptions import (
+    DuplicateCourseError,
+    DuplicateItemError,
+    InsufficientSpecificationError,
+    ItemNotFoundError,
+    VersionConflictError
+)
+from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore.split_mongo import BlockKey
+from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
+from xmodule.modulestore.tests.factories import check_mongo_calls
+from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
+from xmodule.modulestore.tests.test_modulestore import check_has_course_method
+from xmodule.modulestore.tests.utils import mock_tab_from_json
+from xmodule.x_module import XModuleMixin
 
 BRANCH_NAME_DRAFT = ModuleStoreEnum.BranchName.draft
 BRANCH_NAME_PUBLISHED = ModuleStoreEnum.BranchName.published

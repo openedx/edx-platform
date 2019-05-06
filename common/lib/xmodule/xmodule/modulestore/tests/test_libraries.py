@@ -6,16 +6,16 @@ Higher-level tests are in `cms/djangoapps/contentstore`.
 """
 
 from __future__ import absolute_import
-import ddt
 
+import ddt
+import six
 from bson.objectid import ObjectId
 from opaque_keys.edx.locator import LibraryLocator
+from six.moves import range
 
 from xmodule.modulestore.exceptions import DuplicateCourseError
-from xmodule.modulestore.tests.factories import LibraryFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory, check_mongo_calls
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
-import six
-from six.moves import range
 
 
 @ddt.ddt

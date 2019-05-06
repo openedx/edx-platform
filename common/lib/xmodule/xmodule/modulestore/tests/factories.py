@@ -1,32 +1,31 @@
 """
 Factories for use in tests of XBlocks.
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
-from __future__ import absolute_import
 import datetime
 import functools
-import pymongo.message
-import pytz
 import threading
 import traceback
 from collections import defaultdict
 from contextlib import contextmanager
 from uuid import uuid4
 
-from factory import Factory, Sequence, lazy_attribute_sequence, lazy_attribute
+import pymongo.message
+import pytz
+import six
+from factory import Factory, Sequence, lazy_attribute, lazy_attribute_sequence
 from factory.errors import CyclicDefinitionError
 from mock import patch
-
-from opaque_keys.edx.locator import BlockUsageLocator
 from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locator import BlockUsageLocator
 from xblock.core import XBlock
-from xmodule.modulestore import prefer_xmodules, ModuleStoreEnum
-from xmodule.modulestore.tests.sample_courses import default_block_info_tree, TOY_BLOCK_INFO_TREE
+
+from xmodule.course_module import Textbook
+from xmodule.modulestore import ModuleStoreEnum, prefer_xmodules
+from xmodule.modulestore.tests.sample_courses import TOY_BLOCK_INFO_TREE, default_block_info_tree
 from xmodule.tabs import CourseTab
 from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT
-from xmodule.course_module import Textbook
-import six
 
 
 class Dummy(object):

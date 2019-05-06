@@ -3,26 +3,28 @@ Tests for assetstore using any of the modulestores for metadata. May extend to t
 too.
 """
 from __future__ import absolute_import
-from datetime import datetime, timedelta
-import ddt
-from django.test import TestCase
-import pytz
-import unittest
 
+import unittest
+from datetime import datetime, timedelta
+
+import ddt
+import pytz
+from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
+from six.moves import range, zip
 
 from openedx.core.lib.tests import attr
 from xmodule.assetstore import AssetMetadata
-from xmodule.modulestore import ModuleStoreEnum, SortedAssetList, IncorrectlySortedList
+from xmodule.modulestore import IncorrectlySortedList, ModuleStoreEnum, SortedAssetList
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.utils import (
-    MIXED_MODULESTORE_BOTH_SETUP, MODULESTORE_SETUPS,
-    XmlModulestoreBuilder, MixedModulestoreBuilder
+    MIXED_MODULESTORE_BOTH_SETUP,
+    MODULESTORE_SETUPS,
+    MixedModulestoreBuilder,
+    XmlModulestoreBuilder
 )
-from six.moves import range
-from six.moves import zip
 
 
 class AssetStoreTestData(object):

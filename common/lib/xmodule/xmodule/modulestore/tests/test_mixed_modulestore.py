@@ -2,60 +2,69 @@
 Unit tests for the Mixed Modulestore, with DDT for the various stores (Split, Draft, XML)
 """
 from __future__ import absolute_import
-from collections import namedtuple
-import datetime
-import logging
-import ddt
-import itertools
-import mimetypes
-from uuid import uuid4
-from contextlib import contextmanager
-import pytest
-from mock import patch, Mock, call
 
+import datetime
+import itertools
+import logging
+import mimetypes
+from collections import namedtuple
+from contextlib import contextmanager
+from shutil import rmtree
+from tempfile import mkdtemp
+from uuid import uuid4
+
+import ddt
+import pymongo
+import pytest
+import six
 # Mixed modulestore depends on django, so we'll manually configure some django settings
 # before importing the module
 # TODO remove this import and the configuration -- xmodule should not depend on django!
 from django.conf import settings
-import pymongo
+from mock import Mock, call, patch
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryLocator
 from pytz import UTC
-from shutil import rmtree
-from tempfile import mkdtemp
+from six.moves import range
 from web_fragments.fragment import Fragment
-
-from xmodule.x_module import XModuleMixin
-from xmodule.modulestore.edit_info import EditInfoMixin
-from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore.tests.utils import MongoContentstoreBuilder
-from xmodule.contentstore.content import StaticContent
-from xmodule.modulestore.xml_importer import import_course_from_xml
-from xmodule.modulestore.xml_exporter import export_course_to_xml
-from xmodule.modulestore.tests.test_asides import AsideTestType
 from xblock.core import XBlockAside
-from xblock.fields import Scope, String, ScopeIds
+from xblock.fields import Scope, ScopeIds, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.tools import TestRuntime
-import six
-from six.moves import range
+
+from openedx.core.lib.tests import attr
+from xmodule.contentstore.content import StaticContent
+from xmodule.exceptions import InvalidVersionError
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES, UnsupportedRevisionError
+from xmodule.modulestore.edit_info import EditInfoMixin
+from xmodule.modulestore.exceptions import (
+    DuplicateCourseError,
+    ItemNotFoundError,
+    NoPathToItem,
+    ReferentialIntegrityError
+)
+from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore.mixed import MixedModuleStore
+from xmodule.modulestore.search import navigation_index, path_to_location
+from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
+from xmodule.modulestore.tests.factories import check_exact_number_of_calls, check_mongo_calls, mongo_uses_error_check
+from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
+from xmodule.modulestore.tests.test_asides import AsideTestType
+from xmodule.modulestore.tests.utils import (
+    LocationMixin,
+    MongoContentstoreBuilder,
+    create_modulestore_instance,
+    mock_tab_from_json
+)
+from xmodule.modulestore.xml_exporter import export_course_to_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml
+from xmodule.tests import DATA_DIR, CourseComparisonTest
+from xmodule.x_module import XModuleMixin
 
 if not settings.configured:
     settings.configure()
 
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryLocator
-from openedx.core.lib.tests import attr
-from xmodule.exceptions import InvalidVersionError
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, DIRECT_ONLY_CATEGORIES
-from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError, NoPathToItem
-from xmodule.modulestore.mixed import MixedModuleStore
-from xmodule.modulestore.search import path_to_location, navigation_index
-from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
-from xmodule.modulestore.tests.factories import check_mongo_calls, check_exact_number_of_calls, \
-    mongo_uses_error_check
-from xmodule.modulestore.tests.utils import create_modulestore_instance, LocationMixin, mock_tab_from_json
-from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
-from xmodule.tests import DATA_DIR, CourseComparisonTest
 
 log = logging.getLogger(__name__)
 

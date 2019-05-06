@@ -3,17 +3,18 @@ Tests for bulk operations in Split Modulestore.
 """
 # pylint: disable=protected-access
 from __future__ import absolute_import
+
 import copy
-import ddt
 import unittest
+
+import ddt
 from bson.objectid import ObjectId
 from mock import MagicMock, Mock, call
-from xmodule.modulestore.split_mongo.split import SplitBulkWriteMixin
-from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection
-
 from opaque_keys.edx.locator import CourseLocator
 from six.moves import range
 
+from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection
+from xmodule.modulestore.split_mongo.split import SplitBulkWriteMixin
 
 VERSION_GUID_DICT = {
     'SAMPLE_VERSION_GUID': 'deadbeef1234' * 2,

@@ -2,18 +2,20 @@
 Helper classes and methods for running modulestore tests without Django.
 """
 from __future__ import absolute_import
-from uuid import uuid4
+
 import io
 import os
-
 from contextlib import contextmanager, nested
 from importlib import import_module
-from path import Path as path
 from shutil import rmtree
 from tempfile import mkdtemp
 from unittest import TestCase
+from uuid import uuid4
 
-from xmodule.x_module import XModuleMixin
+import six
+from path import Path as path
+from six.moves import range, zip
+
 from xmodule.contentstore.mongo import MongoContentStore
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
 from xmodule.modulestore.edit_info import EditInfoMixin
@@ -23,13 +25,11 @@ from xmodule.modulestore.mongo.base import ModuleStoreEnum
 from xmodule.modulestore.mongo.draft import DraftModuleStore
 from xmodule.modulestore.split_mongo.split_draft import DraftVersioningModuleStore
 from xmodule.modulestore.tests.factories import ItemFactory
-from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore.xml_importer import LocationMixin
 from xmodule.tests import DATA_DIR
-import six
-from six.moves import range
-from six.moves import zip
+from xmodule.x_module import XModuleMixin
 
 
 def load_function(path):

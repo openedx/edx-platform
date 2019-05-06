@@ -1,20 +1,22 @@
 from __future__ import absolute_import
+
 import datetime
+import os
 import random
 import unittest
-import os
+
 import mock
 import pytest
+import six
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
-from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.x_module import XModuleMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.mongo import DraftMongoModuleStore
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
-from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
 from xmodule.modulestore.tests.utils import MemoryCache
-import six
+from xmodule.x_module import XModuleMixin
 
 
 @pytest.mark.mongo

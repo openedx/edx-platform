@@ -3,18 +3,18 @@ Tests for split_migrator
 
 """
 from __future__ import absolute_import
+
 import random
 import uuid
 
 import mock
+import six
+from six.moves import range, zip
+from xblock.fields import UNIQUE_ID, Reference, ReferenceList, ReferenceValueDict
 
 from openedx.core.lib.tests import attr
-from xblock.fields import Reference, ReferenceList, ReferenceValueDict, UNIQUE_ID
 from xmodule.modulestore.split_migrator import SplitMigrator
 from xmodule.modulestore.tests.test_split_w_old_mongo import SplitWMongoCourseBootstrapper
-import six
-from six.moves import range
-from six.moves import zip
 
 
 @attr('mongo')

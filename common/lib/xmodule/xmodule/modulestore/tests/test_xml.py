@@ -3,22 +3,21 @@ Tests around our XML modulestore, including importing
 well-formed and not-well-formed XML.
 """
 from __future__ import absolute_import
+
 import os.path
-from django.test import TestCase
 from glob import glob
-from mock import patch, Mock
 
-from xmodule.modulestore.xml import XMLModuleStore
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.x_module import XModuleMixin
-
-from xmodule.tests import DATA_DIR
+from django.test import TestCase
+from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
+
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.test_modulestore import check_has_course_method
-from xmodule.modulestore.tests.utils import (
-    add_temp_files_from_dict, remove_temp_files_from_list, TILDA_FILES_DICT
-)
+from xmodule.modulestore.tests.utils import TILDA_FILES_DICT, add_temp_files_from_dict, remove_temp_files_from_list
+from xmodule.modulestore.xml import XMLModuleStore
+from xmodule.tests import DATA_DIR
+from xmodule.x_module import XModuleMixin
 
 
 def glob_tildes_at_end(path):

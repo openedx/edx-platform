@@ -5,6 +5,7 @@ in a variety of environment variables but provides sensible defaults in case tho
 overrides don't exist
 """
 from __future__ import absolute_import
+
 import os
 
 MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
