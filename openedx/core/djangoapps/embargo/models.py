@@ -12,15 +12,17 @@ file and check it in at the same time as your model changes. To do that,
 """
 
 from __future__ import absolute_import
+
+import ipaddress
 import json
 import logging
 
-import ipaddress
+import six
 from config_models.models import ConfigurationModel
 from django.core.cache import cache
-from django.urls import reverse
 from django.db import models
 from django.db.models.signals import post_delete, post_save
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from django_countries import countries
@@ -32,7 +34,6 @@ from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 
 from .exceptions import InvalidAccessPoint
 from .messages import COURSEWARE_MESSAGES, ENROLL_MESSAGES
-import six
 
 log = logging.getLogger(__name__)
 

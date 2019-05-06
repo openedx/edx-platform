@@ -1,16 +1,24 @@
 """Test of models for embargo app"""
 from __future__ import absolute_import
+
 import json
-from django.test import TestCase
+
+import six
 from django.db.utils import IntegrityError
+from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
-from ..models import (
-    EmbargoedCourse, EmbargoedState, IPFilter, RestrictedCourse,
-    Country, CountryAccessRule, CourseAccessRuleHistory
-)
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-import six
+
+from ..models import (
+    Country,
+    CountryAccessRule,
+    CourseAccessRuleHistory,
+    EmbargoedCourse,
+    EmbargoedState,
+    IPFilter,
+    RestrictedCourse
+)
 
 
 class EmbargoModelsTest(CacheIsolationTestCase):
