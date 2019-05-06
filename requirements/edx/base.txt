@@ -206,7 +206,7 @@ pytz==2019.1
 pyuca==1.1
 pyyaml==5.1
 redis==2.10.6
-reportlab==3.5.20
+reportlab==3.5.21
 requests-oauthlib==1.1.0
 requests==2.21.0
 rest-condition==1.0.3
