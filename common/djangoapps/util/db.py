@@ -1,6 +1,8 @@
 """
 Utility functions related to databases.
 """
+from __future__ import absolute_import
+
 import random
 # TransactionManagementError used below actually *does* derive from the standard "Exception" class.
 # pylint: disable=nonstandard-exception

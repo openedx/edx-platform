@@ -1,10 +1,12 @@
 """
 Utilities for django models.
 """
+from __future__ import absolute_import
+
+import six
 from django.conf import settings
 from django.dispatch import Signal
 from django_countries.fields import Country
-
 from eventtracking import tracker
 
 # The setting name used for events when "settings" (account settings, preferences, profile information) change.
@@ -162,7 +164,7 @@ def _get_truncated_setting_value(value, max_length=None):
         truncated_value (object): the possibly truncated version of the value.
         was_truncated (bool): returns true if the serialized value was truncated.
     """
-    if isinstance(value, basestring) and max_length is not None and len(value) > max_length:
+    if isinstance(value, six.string_types) and max_length is not None and len(value) > max_length:
         return value[0:max_length], True
     else:
         return value, False

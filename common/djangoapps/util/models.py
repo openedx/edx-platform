@@ -1,12 +1,14 @@
 """Models for the util app. """
+from __future__ import absolute_import
+
 import cStringIO
 import gzip
 import logging
 
+import six
 from config_models.models import ConfigurationModel
 from django.db import models
 from django.utils.text import compress_string
-
 from opaque_keys.edx.django.models import CreatorMixin
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
@@ -56,7 +58,7 @@ class CompressedTextField(CreatorMixin, models.TextField):
         Compress the text data.
         """
         if value is not None:
-            if isinstance(value, unicode):
+            if isinstance(value, six.text_type):
                 value = value.encode('utf8')
             value = compress_string(value)
             value = value.encode('base64').decode('utf8')
@@ -66,7 +68,7 @@ class CompressedTextField(CreatorMixin, models.TextField):
         """
         Decompresses the value from the database.
         """
-        if isinstance(value, unicode):
+        if isinstance(value, six.text_type):
             value = decompress_string(value)
 
         return value

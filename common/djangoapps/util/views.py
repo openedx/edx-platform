@@ -1,10 +1,13 @@
+from __future__ import absolute_import
+
 import json
 import logging
 import sys
 from functools import wraps
 from smtplib import SMTPException
-import crum
 
+import calc
+import crum
 import zendesk
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -16,8 +19,8 @@ from django.views.decorators.csrf import requires_csrf_token
 from django.views.defaults import server_error
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from six.moves import map
 
-import calc
 import track.views
 from edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -166,7 +169,7 @@ def calculate(request):
     try:
         result = calc.evaluator({}, {}, equation)
     except:
-        event = {'error': map(str, sys.exc_info()),
+        event = {'error': list(map(str, sys.exc_info())),
                  'equation': equation}
         track.views.server_track(request, 'error:calc', event, page='calc')
         return HttpResponse(json.dumps({'result': 'Invalid syntax'}))
