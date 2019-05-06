@@ -55,11 +55,14 @@ SSL-protected channel.  Otherwise, a session hijacker could copy
 the entire cookie and use it to impersonate the victim.
 
 """
+from __future__ import absolute_import
+
 from base64 import b64encode
 from contextlib import contextmanager
 from hashlib import sha256
 from logging import ERROR, getLogger
 
+import six
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY
 from django.contrib.auth.views import redirect_to_login
@@ -182,11 +185,11 @@ class SafeCookieData(object):
             unsigned_data = signing.loads(self.signature, salt=self.key_salt, max_age=settings.SESSION_COOKIE_AGE)
             if unsigned_data == self._compute_digest(user_id):
                 return True
-            log.error(u"SafeCookieData '%r' is not bound to user '%s'.", unicode(self), user_id)
+            log.error(u"SafeCookieData '%r' is not bound to user '%s'.", six.text_type(self), user_id)
         except signing.BadSignature as sig_error:
             log.error(
                 u"SafeCookieData signature error for cookie data {0!r}: {1}".format(  # pylint: disable=logging-format-interpolation
-                    unicode(self),
+                    six.text_type(self),
                     text_type(sig_error),
                 )
             )
@@ -198,7 +201,7 @@ class SafeCookieData(object):
         """
         hash_func = sha256()
         for data_item in [self.version, self.session_id, user_id]:
-            hash_func.update(unicode(data_item))
+            hash_func.update(six.text_type(data_item))
             hash_func.update('|')
         return hash_func.hexdigest()
 
@@ -212,7 +215,7 @@ class SafeCookieData(object):
         # Compare against unicode(None) as well since the 'value'
         # property of a cookie automatically serializes None to a
         # string.
-        if not session_id or session_id == unicode(None):
+        if not session_id or session_id == six.text_type(None):
             # The session ID should always be valid in the cookie.
             raise SafeCookieError(
                 u"SafeCookieData not created due to invalid value for session_id '{}' for user_id '{}'.".format(
@@ -424,7 +427,7 @@ class SafeSessionMiddleware(SessionMiddleware):
         )
 
         # Update the cookie's value with the safe_cookie_data.
-        cookies[settings.SESSION_COOKIE_NAME] = unicode(safe_cookie_data)
+        cookies[settings.SESSION_COOKIE_NAME] = six.text_type(safe_cookie_data)
 
 
 def _mark_cookie_for_deletion(request):
