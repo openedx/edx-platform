@@ -1,9 +1,12 @@
 """
 Acceptance tests for Library Content in LMS
 """
+from __future__ import absolute_import
+
 import textwrap
 
 import ddt
+import six
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.studio.library import StudioLibraryContainerXBlockWrapper, StudioLibraryContentEditor
@@ -62,7 +65,7 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest, TestWithSe
     def populate_course_fixture(self, course_fixture):
         """ Install a course with sections/problems, tabs, updates, and handouts """
         library_content_metadata = {
-            'source_library_id': unicode(self.library_key),
+            'source_library_id': six.text_type(self.library_key),
             'mode': 'random',
             'max_count': 1,
         }
