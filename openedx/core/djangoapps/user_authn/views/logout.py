@@ -1,14 +1,18 @@
 """ Views related to logout. """
-import urllib
-from urlparse import parse_qs, urlsplit, urlunsplit
+from __future__ import absolute_import
 
 import edx_oauth2_provider
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 from django.conf import settings
 from django.contrib.auth import logout
 from django.shortcuts import redirect
 from django.utils.http import urlencode
 from django.views.generic import TemplateView
 from provider.oauth2.models import Client
+from six.moves.urllib.parse import parse_qs, urlsplit, urlunsplit
+
 from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
 
@@ -53,7 +57,7 @@ class LogoutView(TemplateView):
         #  >> /courses/course-v1:ARTS+D1+2018_T/course/
         #  to handle this scenario we need to encode our URL using quote_plus and then unquote it again.
         if target_url:
-            target_url = urllib.unquote(urllib.quote_plus(target_url))
+            target_url = six.moves.urllib.parse.unquote(six.moves.urllib.parse.quote_plus(target_url))
 
         if target_url and is_safe_login_or_logout_redirect(self.request, target_url):
             return target_url

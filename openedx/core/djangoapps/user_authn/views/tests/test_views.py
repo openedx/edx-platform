@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 """ Tests for user authn views. """
 
-from http.cookies import SimpleCookie
+from __future__ import absolute_import
+
 import logging
 import re
+from http.cookies import SimpleCookie
 from unittest import skipUnless
-from urllib import urlencode
 
 import ddt
 import mock
@@ -17,27 +18,29 @@ from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.urls import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory, RefreshTokenFactory
 from oauth2_provider.models import AccessToken as dot_access_token
 from oauth2_provider.models import RefreshToken as dot_refresh_token
 from provider.oauth2.models import AccessToken as dop_access_token
 from provider.oauth2.models import RefreshToken as dop_refresh_token
+from six.moves import range
+from six.moves.urllib.parse import urlencode
 from testfixtures import LogCapture
 from waffle.models import Switch
 
 from course_modes.models import CourseMode
-from openedx.core.djangoapps.user_authn.views.login_form import login_and_registration_form
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
 from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
-from openedx.core.djangoapps.user_api.errors import UserAPIInternalError
 from openedx.core.djangoapps.user_api.accounts.utils import ENABLE_SECONDARY_EMAIL_FEATURE_SWITCH
+from openedx.core.djangoapps.user_api.errors import UserAPIInternalError
+from openedx.core.djangoapps.user_authn.views.login_form import login_and_registration_form
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
@@ -241,7 +244,7 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         self.client.logout()
 
         # Make many consecutive bad requests in an attempt to trigger the rate limiter
-        for __ in xrange(self.INVALID_ATTEMPTS):
+        for __ in range(self.INVALID_ATTEMPTS):
             self._change_password(email=self.NEW_EMAIL)
 
         response = self._change_password(email=self.NEW_EMAIL)

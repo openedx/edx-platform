@@ -2,11 +2,14 @@
 """
 Tests for student activation and login
 """
+from __future__ import absolute_import
+
 import json
 import unicodedata
 import unittest
 
 import ddt
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
@@ -16,6 +19,8 @@ from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, reverse
 from mock import patch
+from six import unichr
+from six.moves import range
 
 from openedx.core.djangoapps.password_policy.compliance import (
     NonCompliantPasswordException,
@@ -271,7 +276,7 @@ class LoginTest(CacheIsolationTestCase):
     def test_login_ratelimited_success(self):
         # Try (and fail) logging in with fewer attempts than the limit of 30
         # and verify that you can still successfully log in afterwards.
-        for i in xrange(20):
+        for i in range(20):
             password = u'test_password{0}'.format(i)
             response, _audit_log = self._login_response('test@edx.org', password)
             self._assert_response(response, success=False)
@@ -282,7 +287,7 @@ class LoginTest(CacheIsolationTestCase):
     def test_login_ratelimited(self):
         # try logging in 30 times, the default limit in the number of failed
         # login attempts in one 5 minute period before the rate gets limited
-        for i in xrange(30):
+        for i in range(30):
             password = u'test_password{0}'.format(i)
             self._login_response('test@edx.org', password)
         # check to see if this response indicates that this was ratelimited
@@ -545,7 +550,7 @@ class LoginTest(CacheIsolationTestCase):
 
         if value is not None:
             msg = (u"'%s' did not contain '%s'" %
-                   (unicode(response_dict['value']), unicode(value)))
+                   (six.text_type(response_dict['value']), six.text_type(value)))
             self.assertIn(value, response_dict['value'], msg)
 
     def _assert_audit_log(self, mock_audit_log, level, log_strings):
