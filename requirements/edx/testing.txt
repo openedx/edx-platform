@@ -86,7 +86,7 @@ django-appconf==1.0.3
 django-babel-underscore==0.5.2
 django-babel==0.6.2
 django-classy-tags==0.8.0
-django-config-models==0.2.2
+django-config-models==1.0.1
 django-cors-headers==2.1.0
 django-countries==4.6.1
 django-crum==0.7.3
@@ -123,22 +123,22 @@ edx-ace==0.1.10
 edx-analytics-data-api-client==0.15.3
 edx-ccx-keys==0.2.1
 edx-celeryutils==0.2.7
-edx-completion==1.0.3
+edx-completion==2.0.0
 edx-django-oauth2-provider==1.3.5
 edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==1.0.3
 edx-drf-extensions==2.2.0
-edx-enterprise==1.4.8
+edx-enterprise==1.4.9
 edx-i18n-tools==0.4.8
 edx-lint==1.1.2
 edx-milestones==0.1.13
 edx-oauth2-provider==1.2.2
 edx-opaque-keys[django]==0.4.4
-edx-organizations==1.0.1
+edx-organizations==2.0.2
 edx-proctoring-proctortrack==1.0.5
-edx-proctoring==1.7.1
-edx-rbac==0.1.11
+edx-proctoring==2.0.0
+edx-rbac==0.2.0
 edx-rest-api-client==1.9.2
 edx-search==1.2.2
 edx-submissions==2.1.1
@@ -170,14 +170,14 @@ glob2==0.6
 gunicorn==19.0
 help-tokens==1.0.3
 html5lib==1.0.1
-httplib2==0.12.1
+httplib2==0.12.3
 httpretty==0.9.6
 hyperlink==19.0.0         # via twisted
 idna==2.8
 incremental==17.5.0       # via twisted
 inflect==2.1.0
 ipaddress==1.0.22
-isort==4.3.17
+isort==4.3.18
 itsdangerous==1.1.0       # via flask
 itypes==1.1.0
 jinja2-pluralize==0.3.0
@@ -221,7 +221,7 @@ path.py==8.2.1
 pathlib2==2.3.3           # via pytest, pytest-django
 pathtools==0.1.2
 paver==1.3.4
-pbr==5.1.3
+pbr==5.2.0
 pdfminer.six==20181108
 piexif==1.0.2
 pillow==6.0.0
@@ -230,7 +230,7 @@ polib==1.1.0
 psutil==1.2.1
 py2neo==3.1.2
 py==1.8.0                 # via pytest, tox
-pyasn1-modules==0.2.4     # via service-identity
+pyasn1-modules==0.2.5     # via service-identity
 pyasn1==0.4.5             # via pyasn1-modules, service-identity
 pycodestyle==2.5.0
 pycontracts==1.7.1
@@ -276,7 +276,7 @@ pyyaml==5.1
 queuelib==1.5.0           # via scrapy
 radon==3.0.1
 redis==2.10.6
-reportlab==3.5.19
+reportlab==3.5.20
 requests-oauthlib==1.1.0
 requests==2.21.0
 rest-condition==1.0.3
@@ -304,7 +304,7 @@ soupsieve==1.9.1
 sqlparse==0.3.0
 stevedore==1.30.1
 sympy==1.4
-testfixtures==6.7.0
+testfixtures==6.8.1
 text-unidecode==1.2       # via faker
 tincan==0.0.5
 toml==0.10.0              # via tox
@@ -319,7 +319,7 @@ uritemplate==3.0.0
 urllib3==1.23
 urlobject==2.4.3          # via pa11ycrawler
 user-util==0.1.5
-virtualenv==16.4.3        # via tox
+virtualenv==16.5.0        # via tox
 voluptuous==0.11.5
 w3lib==1.20.0             # via parsel, scrapy
 watchdog==0.9.0
