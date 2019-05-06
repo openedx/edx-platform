@@ -12,6 +12,7 @@ sessions. Assumes structure:
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
+from collections import OrderedDict
 
 from django.utils.translation import ugettext_lazy
 
@@ -324,6 +325,11 @@ MKTG_URL_LINK_MAP = {
 SUPPORT_SITE_LINK = 'https://support.example.com'
 PASSWORD_RESET_SUPPORT_LINK = 'https://support.example.com/password-reset-help.html'
 ACTIVATION_EMAIL_SUPPORT_LINK = 'https://support.example.com/activation-email-help.html'
+ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = OrderedDict([
+    ("utm_campaign", "edX.org Referral"),
+    ("utm_source", "edX.org"),
+    ("utm_medium", "Footer"),
+])
 
 ############################ STATIC FILES #############################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'

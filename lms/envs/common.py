@@ -3352,6 +3352,8 @@ SYSTEM_TO_FEATURE_ROLE_MAPPING = {
 
 DATA_CONSENT_SHARE_CACHE_TIMEOUT = None  # Never expire
 
+ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
+
 ############## Settings for Course Enrollment Modes ######################
 # The min_price key refers to the minimum price allowed for an instance
 # of a particular type of course enrollment mode. This is not to be confused

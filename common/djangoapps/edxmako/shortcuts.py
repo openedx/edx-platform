@@ -52,6 +52,12 @@ def marketing_link(name):
         # special case for when we only want the root marketing URL
         if name == 'ROOT':
             return marketing_urls.get('ROOT')
+        # special case for new enterprise marketing url with custom tracking query params
+        if name == 'ENTERPRISE':
+            enterprise_url = marketing_urls.get(name)
+            # if url is not relative, then return it without joining to root
+            if not enterprise_url.startswith('/'):
+                return enterprise_url
         # Using urljoin here allows us to enable a marketing site and set
         # a site ROOT, but still specify absolute URLs for other marketing
         # URLs in the MKTG_URLS setting
