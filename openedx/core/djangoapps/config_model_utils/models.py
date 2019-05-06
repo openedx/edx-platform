@@ -17,7 +17,7 @@ from django.contrib.sites.models import Site
 from django.contrib.sites.requests import RequestSite
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import F, Q
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
