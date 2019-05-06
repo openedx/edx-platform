@@ -4,6 +4,7 @@ An API for retrieving user preference information.
 For additional information and historical context, see:
 https://openedx.atlassian.net/wiki/display/TNL/User+API
 """
+from __future__ import absolute_import
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status

@@ -1,6 +1,7 @@
 """ Tests for API endpoints. """
 from __future__ import unicode_literals
 
+from __future__ import absolute_import
 import datetime
 import freezegun
 import json

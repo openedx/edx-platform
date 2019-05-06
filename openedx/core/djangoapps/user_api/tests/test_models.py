@@ -1,6 +1,7 @@
 """
 Test UserPreferenceModel and UserPreference events
 """
+from __future__ import absolute_import
 from django.db import IntegrityError
 from django.test import TestCase
 

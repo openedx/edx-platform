@@ -1,5 +1,6 @@
 """Tests for the user API at the HTTP request level. """
 
+from __future__ import absolute_import
 import datetime
 import json
 from unittest import skipUnless
@@ -50,6 +51,8 @@ from ..accounts.api import get_account_settings
 from ..models import UserOrgTag
 from ..tests.factories import UserPreferenceFactory
 from ..tests.test_constants import SORTED_COUNTRIES
+import six
+from six.moves import range
 
 USER_LIST_URI = "/user_api/v1/users/"
 USER_PREFERENCE_LIST_URI = "/user_api/v1/user_prefs/"
@@ -80,9 +83,9 @@ class UserAPITestCase(ApiTestCase):
 
     def assertUserIsValid(self, user):
         """Assert that the given user result is valid"""
-        self.assertItemsEqual(user.keys(), ["email", "id", "name", "username", "preferences", "url"])
+        self.assertItemsEqual(list(user.keys()), ["email", "id", "name", "username", "preferences", "url"])
         self.assertItemsEqual(
-            user["preferences"].items(),
+            list(user["preferences"].items()),
             [(pref.key, pref.value) for pref in self.prefs if pref.user.id == user["id"]]
         )
         self.assertSelfReferential(user)
@@ -91,7 +94,7 @@ class UserAPITestCase(ApiTestCase):
         """
         Assert that the given preference is acknowledged by the system
         """
-        self.assertItemsEqual(pref.keys(), ["user", "key", "value", "url"])
+        self.assertItemsEqual(list(pref.keys()), ["user", "key", "value", "url"])
         self.assertSelfReferential(pref)
         self.assertUserIsValid(pref["user"])
 
@@ -111,7 +114,7 @@ class EmptyUserTestCase(UserAPITestCase):
 class EmptyRoleTestCase(UserAPITestCase):
     """Test that the endpoint supports empty result sets"""
     course_id = CourseKey.from_string("org/course/run")
-    LIST_URI = ROLE_LIST_URI + "?course_id=" + unicode(course_id)
+    LIST_URI = ROLE_LIST_URI + "?course_id=" + six.text_type(course_id)
 
     def test_get_list_empty(self):
         """Test that the endpoint properly returns empty result sets"""
@@ -147,7 +150,7 @@ class RoleTestCase(UserApiTestCase):
     Test cases covering Role-related views and their behaviors
     """
     course_id = CourseKey.from_string("org/course/run")
-    LIST_URI = ROLE_LIST_URI + "?course_id=" + unicode(course_id)
+    LIST_URI = ROLE_LIST_URI + "?course_id=" + six.text_type(course_id)
 
     def setUp(self):
         super(RoleTestCase, self).setUp()
@@ -1294,7 +1297,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             ] + [
                 {
                     "value": country_code,
-                    "name": unicode(country_name),
+                    "name": six.text_type(country_name),
                     "default": True if country_code == expected_country_code else False
                 }
                 for country_code, country_name in SORTED_COUNTRIES
@@ -1483,8 +1486,8 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 }
             ] + [
                 {
-                    "value": unicode(year),
-                    "name": unicode(year),
+                    "value": six.text_type(year),
+                    "name": six.text_type(year),
                     "default": False
                 }
                 for year in range(this_year, this_year - 120, -1)
@@ -1627,7 +1630,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             ] + [
                 {
                     "value": country_code,
-                    "name": unicode(country_name),
+                    "name": six.text_type(country_name),
                     "default": False
                 }
                 for country_code, country_name in SORTED_COUNTRIES
@@ -2333,7 +2336,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             msg=u"Could not find field {name}".format(name=expected_field["name"])
         )
 
-        for key, value in expected_field.iteritems():
+        for key, value in six.iteritems(expected_field):
             self.assertEqual(
                 actual_field[key], expected_field[key],
                 msg=u"Expected {expected} for {key} but got {actual} instead".format(
@@ -2624,7 +2627,7 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
         """Tests the email opt in preference"""
         # Register, which should trigger an activation email
         response = self.client.post(self.url, {
-            "course_id": unicode(self.course.id),
+            "course_id": six.text_type(self.course.id),
             "email_opt_in": opt
         })
         self.assertHttpOK(response)
@@ -2643,7 +2646,7 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
         """Tests the email opt in preference"""
         params = {}
         if use_course_id:
-            params["course_id"] = unicode(self.course.id)
+            params["course_id"] = six.text_type(self.course.id)
         if use_opt_in:
             params["email_opt_in"] = u"True"
 
@@ -2656,7 +2659,7 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
         self.user.save()
         # Register, which should trigger an activation email
         response = self.client.post(self.url, {
-            "course_id": unicode(self.course.id),
+            "course_id": six.text_type(self.course.id),
             "email_opt_in": u"True"
         })
         self.assertHttpOK(response)
@@ -2672,7 +2675,7 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
         """
         self.client.logout()
         response = self.client.post(self.url, {
-            "course_id": unicode(self.course.id),
+            "course_id": six.text_type(self.course.id),
             "email_opt_in": u"True"
         })
         self.assertEqual(response.status_code, 403)

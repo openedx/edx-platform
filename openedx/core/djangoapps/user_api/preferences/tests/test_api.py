@@ -2,6 +2,7 @@
 """
 Unit tests for preference APIs.
 """
+from __future__ import absolute_import
 import datetime
 import ddt
 from mock import patch
@@ -139,7 +140,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         with self.assertRaises(PreferenceValidationError) as context_manager:
             set_user_preference(self.user, too_long_key, "new_value")
         errors = context_manager.exception.preference_errors
-        self.assertEqual(len(errors.keys()), 1)
+        self.assertEqual(len(list(errors.keys())), 1)
         self.assertEqual(
             errors[too_long_key],
             {
@@ -152,7 +153,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
             with self.assertRaises(PreferenceValidationError) as context_manager:
                 set_user_preference(self.user, self.test_preference_key, empty_value)
             errors = context_manager.exception.preference_errors
-            self.assertEqual(len(errors.keys()), 1)
+            self.assertEqual(len(list(errors.keys())), 1)
             self.assertEqual(
                 errors[self.test_preference_key],
                 {
@@ -241,7 +242,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         with self.assertRaises(PreferenceValidationError) as context_manager:
             update_user_preferences(self.user, {too_long_key: "new_value"})
         errors = context_manager.exception.preference_errors
-        self.assertEqual(len(errors.keys()), 1)
+        self.assertEqual(len(list(errors.keys())), 1)
         self.assertEqual(
             errors[too_long_key],
             {
@@ -254,7 +255,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
             with self.assertRaises(PreferenceValidationError) as context_manager:
                 update_user_preferences(self.user, {self.test_preference_key: empty_value})
             errors = context_manager.exception.preference_errors
-            self.assertEqual(len(errors.keys()), 1)
+            self.assertEqual(len(list(errors.keys())), 1)
             self.assertEqual(
                 errors[self.test_preference_key],
                 {

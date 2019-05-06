@@ -1,6 +1,7 @@
 """
 Test the user api's partition extensions.
 """
+from __future__ import absolute_import
 from collections import defaultdict
 
 import pytest
@@ -11,6 +12,7 @@ from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartiti
 from student.tests.factories import UserFactory
 from xmodule.partitions.partitions import Group, UserPartition
 from xmodule.partitions.tests.test_partitions import PartitionTestCase
+from six.moves import range
 
 
 class MemoryCourseTagAPI(object):
