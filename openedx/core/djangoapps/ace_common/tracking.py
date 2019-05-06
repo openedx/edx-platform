@@ -2,9 +2,9 @@
 from __future__ import absolute_import
 
 import attr
-import six  # pylint: disable=useless-suppression
+import six
 from django.utils.http import urlencode
-from six.moves.urllib.parse import parse_qs  # pylint: disable=import-error
+from six.moves.urllib.parse import parse_qs  # pylint: disable=import-error, ungrouped-imports
 
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings
 
