@@ -2,16 +2,21 @@
 Module for the dual-branch fall-back Draft->Published Versioning ModuleStore
 """
 
-from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore, EXCLUDE_ALL
+from __future__ import absolute_import
+
+from contracts import contract
+from opaque_keys.edx.locator import CourseLocator, LibraryLocator, LibraryUsageLocator
+
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.exceptions import InsufficientSpecificationError, ItemNotFoundError
 from xmodule.modulestore.draft_and_published import (
-    ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES, UnsupportedRevisionError
+    DIRECT_ONLY_CATEGORIES,
+    ModuleStoreDraftAndPublished,
+    UnsupportedRevisionError
 )
-from opaque_keys.edx.locator import CourseLocator, LibraryLocator, LibraryUsageLocator
+from xmodule.modulestore.exceptions import InsufficientSpecificationError, ItemNotFoundError
 from xmodule.modulestore.split_mongo import BlockKey
-from contracts import contract
+from xmodule.modulestore.split_mongo.split import EXCLUDE_ALL, SplitMongoModuleStore
 
 
 class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPublished):

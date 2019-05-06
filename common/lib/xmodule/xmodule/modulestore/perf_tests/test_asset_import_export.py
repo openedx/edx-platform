@@ -1,26 +1,25 @@
 """
 Performance test for asset metadata in the modulestore.
 """
-from path import Path as path
-import unittest
-from tempfile import mkdtemp
-import itertools
-from shutil import rmtree
-from bson.code import Code
+from __future__ import absolute_import
+
 import datetime
+import itertools
+import unittest
+from shutil import rmtree
+from tempfile import mkdtemp
+
 import ddt
 import pytest
+from bson.code import Code
+from path import Path as path
 
 from xmodule.assetstore import AssetMetadata
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.xml_importer import import_course_from_xml
+from xmodule.modulestore.perf_tests.generate_asset_xml import ASSET_XSD_FILE, make_asset_xml, validate_xml
+from xmodule.modulestore.tests.utils import MODULESTORE_SETUPS, SHORT_NAME_MAP, TEST_DATA_DIR
 from xmodule.modulestore.xml_exporter import export_course_to_xml
-from xmodule.modulestore.tests.utils import (
-    MODULESTORE_SETUPS,
-    SHORT_NAME_MAP,
-    TEST_DATA_DIR,
-)
-from xmodule.modulestore.perf_tests.generate_asset_xml import make_asset_xml, validate_xml, ASSET_XSD_FILE
+from xmodule.modulestore.xml_importer import import_course_from_xml
 
 # Number of assets saved in the modulestore per test run.
 ASSET_AMOUNT_PER_TEST = (0, 1, 10, 100, 1000, 10000)
