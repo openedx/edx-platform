@@ -1,6 +1,7 @@
 """
 Tests for Asides
 """
+from __future__ import absolute_import
 from web_fragments.fragment import Fragment
 from xblock.core import XBlockAside
 from xblock.fields import Scope, String

@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import datetime
 import random
 import unittest
@@ -13,6 +14,7 @@ from xmodule.modulestore.mongo import DraftMongoModuleStore
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.modulestore.tests.utils import MemoryCache
+import six
 
 
 @pytest.mark.mongo
@@ -86,7 +88,7 @@ class SplitWMongoCourseBootstrapper(unittest.TestCase):
         )
         if not draft:
             self.draft_mongo.publish(location, self.user_id)
-        if isinstance(data, basestring):
+        if isinstance(data, six.string_types):
             fields = {'data': data}
         else:
             fields = data.copy()

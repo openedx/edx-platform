@@ -3,6 +3,7 @@ Factories for use in tests of XBlocks.
 """
 from __future__ import print_function
 
+from __future__ import absolute_import
 import datetime
 import functools
 import pymongo.message
@@ -25,6 +26,7 @@ from xmodule.modulestore.tests.sample_courses import default_block_info_tree, TO
 from xmodule.tabs import CourseTab
 from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT
 from xmodule.course_module import Textbook
+import six
 
 
 class Dummy(object):
@@ -370,7 +372,7 @@ class ItemFactory(XModuleFactory):
                 template = clz.get_template(template_id)
                 assert template is not None
                 metadata.update(template.get('metadata', {}))
-                if not isinstance(data, basestring):
+                if not isinstance(data, six.string_types):
                     data.update(template.get('data'))
 
             # replace the display name with an optional parameter passed in from the caller
@@ -506,7 +508,7 @@ class StackTraceCounter(object):
         """
         Iterate over all unique captured stacks.
         """
-        return iter(sorted(self._stacks.keys(), key=lambda stack: (self.stack_calls(stack), stack), reverse=True))
+        return iter(sorted(list(self._stacks.keys()), key=lambda stack: (self.stack_calls(stack), stack), reverse=True))
 
     def __getitem__(self, stack):
         """

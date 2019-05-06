@@ -2,6 +2,7 @@
 """
 Modulestore configuration for test cases.
 """
+from __future__ import absolute_import
 import copy
 import functools
 import os
@@ -24,6 +25,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, clear_existing_modulestores, modulestore
 from xmodule.modulestore.tests.factories import XMODULE_FACTORY_LOCK
 from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
+from six.moves import range
 
 
 class CourseUserType(Enum):
@@ -40,7 +42,7 @@ class CourseUserType(Enum):
 
 class StoreConstructors(object):
     """Enumeration of store constructor types."""
-    draft, split = range(2)
+    draft, split = list(range(2))
 
 
 def mixed_store_config(data_dir, mappings, store_order=None):

@@ -1,6 +1,7 @@
 """
 Tests for XML importer.
 """
+from __future__ import absolute_import
 import mock
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.fields import String, Scope, ScopeIds, List

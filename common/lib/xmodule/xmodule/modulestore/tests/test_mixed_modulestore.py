@@ -1,6 +1,7 @@
 """
 Unit tests for the Mixed Modulestore, with DDT for the various stores (Split, Draft, XML)
 """
+from __future__ import absolute_import
 from collections import namedtuple
 import datetime
 import logging
@@ -34,6 +35,8 @@ from xblock.core import XBlockAside
 from xblock.fields import Scope, String, ScopeIds
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.tools import TestRuntime
+import six
+from six.moves import range
 
 if not settings.configured:
     settings.configure()
@@ -109,7 +112,7 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
         AssertEqual replacement for CourseLocator
         """
         if loc1.for_branch(None) != loc2.for_branch(None):
-            self.fail(self._formatMessage(msg, u"{} != {}".format(unicode(loc1), unicode(loc2))))
+            self.fail(self._formatMessage(msg, u"{} != {}".format(six.text_type(loc1), six.text_type(loc2))))
 
     def setUp(self):
         """
@@ -1614,7 +1617,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         # add another parent (unit) "vertical_x1b" for problem "problem_x1a_1"
         mongo_store.collection.update(
             self.vertical_x1b.to_deprecated_son('_id.'),
-            {'$push': {'definition.children': unicode(self.problem_x1a_1)}}
+            {'$push': {'definition.children': six.text_type(self.problem_x1a_1)}}
         )
 
         # convert first parent (unit) "vertical_x1a" of problem "problem_x1a_1" to draft
@@ -1864,11 +1867,11 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         # add orphan vertical and sequential as another parents of problem "problem_x1a_1"
         mongo_store.collection.update(
             orphan_sequential.to_deprecated_son('_id.'),
-            {'$push': {'definition.children': unicode(self.problem_x1a_1)}}
+            {'$push': {'definition.children': six.text_type(self.problem_x1a_1)}}
         )
         mongo_store.collection.update(
             orphan_vertical.to_deprecated_son('_id.'),
-            {'$push': {'definition.children': unicode(self.problem_x1a_1)}}
+            {'$push': {'definition.children': six.text_type(self.problem_x1a_1)}}
         )
         # test that "get_parent_location" method of published branch still returns the correct non-orphan parent for
         # problem "problem_x1a_1" since the two other parents are orphans
@@ -1879,7 +1882,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         # now add valid published vertical as another parent of problem
         mongo_store.collection.update(
             self.sequential_x1.to_deprecated_son('_id.'),
-            {'$push': {'definition.children': unicode(self.problem_x1a_1)}}
+            {'$push': {'definition.children': six.text_type(self.problem_x1a_1)}}
         )
         # now check that "get_parent_location" method of published branch raises "ReferentialIntegrityError" for
         # problem "problem_x1a_1" since it has now 2 valid published parents

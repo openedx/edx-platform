@@ -2,6 +2,7 @@
 Tests around our XML modulestore, including importing
 well-formed and not-well-formed XML.
 """
+from __future__ import absolute_import
 import os.path
 from django.test import TestCase
 from glob import glob
@@ -146,7 +147,7 @@ class TestModuleStoreIgnore(TestXMLModuleStore):
 
     def setUp(self):
         super(TestModuleStoreIgnore, self).setUp()
-        self.addCleanup(remove_temp_files_from_list, TILDA_FILES_DICT.keys(), self.course_dir / "static")
+        self.addCleanup(remove_temp_files_from_list, list(TILDA_FILES_DICT.keys()), self.course_dir / "static")
         add_temp_files_from_dict(TILDA_FILES_DICT, self.course_dir / "static")
 
     @patch("xmodule.modulestore.xml.glob.glob", side_effect=glob_tildes_at_end)

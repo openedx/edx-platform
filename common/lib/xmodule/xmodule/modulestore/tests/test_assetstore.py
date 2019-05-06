@@ -2,6 +2,7 @@
 Tests for assetstore using any of the modulestores for metadata. May extend to testing the storage options
 too.
 """
+from __future__ import absolute_import
 from datetime import datetime, timedelta
 import ddt
 from django.test import TestCase
@@ -20,6 +21,8 @@ from xmodule.modulestore.tests.utils import (
     MIXED_MODULESTORE_BOTH_SETUP, MODULESTORE_SETUPS,
     XmlModulestoreBuilder, MixedModulestoreBuilder
 )
+from six.moves import range
+from six.moves import zip
 
 
 class AssetStoreTestData(object):
@@ -28,7 +31,7 @@ class AssetStoreTestData(object):
     """
     now = datetime.now(pytz.utc)
     user_id = 144
-    user_id_long = long(user_id)
+    user_id_long = int(user_id)
     user_email = "me@example.com"
 
     asset_fields = (
@@ -66,7 +69,7 @@ class TestSortedAssetList(unittest.TestCase):
 
     def setUp(self):
         super(TestSortedAssetList, self).setUp()
-        asset_list = [dict(zip(AssetStoreTestData.asset_fields, asset)) for asset in AssetStoreTestData.all_asset_data]
+        asset_list = [dict(list(zip(AssetStoreTestData.asset_fields, asset))) for asset in AssetStoreTestData.all_asset_data]
         self.sorted_asset_list_by_filename = SortedAssetList(iterable=asset_list)
         self.sorted_asset_list_by_last_edit = SortedAssetList(iterable=asset_list, key=lambda x: x['edited_on'])
         self.course_key = CourseLocator('org', 'course', 'run')
@@ -151,7 +154,7 @@ class TestMongoAssetMetadataStorage(TestCase):
         Setup assets. Save in store if given
         """
         for i, asset in enumerate(AssetStoreTestData.all_asset_data):
-            asset_dict = dict(zip(AssetStoreTestData.asset_fields[1:], asset[1:]))
+            asset_dict = dict(list(zip(AssetStoreTestData.asset_fields[1:], asset[1:])))
             if i in (0, 1) and course1_key:
                 asset_key = course1_key.make_asset_key('asset', asset[0])
                 asset_md = AssetMetadata(asset_key, **asset_dict)
@@ -604,7 +607,7 @@ class TestMongoAssetMetadataStorage(TestCase):
             )
             # First, with paging across all sorts.
             for sort_test in expected_sorts_by_2:
-                for i in xrange(3):
+                for i in range(3):
                     asset_page = store.get_all_asset_metadata(
                         course2.id, 'asset', start=2 * i, maxresults=2, sort=sort_test[0]
                     )

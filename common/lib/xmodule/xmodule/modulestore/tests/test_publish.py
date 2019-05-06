@@ -1,6 +1,7 @@
 """
 Test the publish code (mostly testing that publishing doesn't result in orphans)
 """
+from __future__ import absolute_import
 import ddt
 import itertools
 import os
@@ -23,6 +24,8 @@ from xmodule.modulestore.tests.utils import (
     MongoContentstoreBuilder, MODULESTORE_SETUPS,
     DRAFT_MODULESTORE_SETUP, SPLIT_MODULESTORE_SETUP, MongoModulestoreBuilder,
 )
+import six
+from six.moves import range
 
 
 @attr('mongo')
@@ -208,7 +211,7 @@ class DraftPublishedOpTestCourseSetup(unittest.TestCase):
             Add a level of the binary course structure by creating the items as children of the proper parents.
             """
             parent_id = 'course'
-            for idx in xrange(num_items):
+            for idx in range(num_items):
                 if parent_type != 'course':
                     parent_id = _make_block_id(parent_type, idx / 2)
                 parent_item = getattr(self, parent_id)
@@ -244,13 +247,13 @@ class DraftPublishedOpTestCourseSetup(unittest.TestCase):
 
         # Create a list of all verticals for convenience.
         block_type = 'vertical'
-        for idx in xrange(8):
+        for idx in range(8):
             block_id = _make_block_id(block_type, idx)
             self.all_verticals.append((block_type, block_id))
 
         # Create a list of all html units for convenience.
         block_type = 'html'
-        for idx in xrange(16):
+        for idx in range(16):
             block_id = _make_block_id(block_type, idx)
             self.all_units.append((block_type, block_id))
 
@@ -406,7 +409,7 @@ class OLXFormatChecker(unittest.TestCase):
         parent_key = course_key.make_usage_key(parent_type, parent_id)
 
         self.assertElementAttrsSubset(element, {
-            'parent_url': re.escape(unicode(parent_key)),
+            'parent_url': re.escape(six.text_type(parent_key)),
             'index_in_children_list': re.escape(str(index_in_children_list)),
         })
 
@@ -564,7 +567,7 @@ class DraftPublishedOpBaseTestSetup(OLXFormatChecker, DraftPublishedOpTestCourse
         """
         Make a unique name for the new export dir.
         """
-        return self.EXPORTED_COURSE_AFTER_DIR_NAME.format(unicode(uuid.uuid4())[:8])
+        return self.EXPORTED_COURSE_AFTER_DIR_NAME.format(six.text_type(uuid.uuid4())[:8])
 
     def publish(self, block_list):
         """

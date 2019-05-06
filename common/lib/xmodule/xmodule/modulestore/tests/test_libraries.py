@@ -5,6 +5,7 @@ Basic unit tests related to content libraries.
 Higher-level tests are in `cms/djangoapps/contentstore`.
 """
 
+from __future__ import absolute_import
 import ddt
 
 from bson.objectid import ObjectId
@@ -13,6 +14,8 @@ from opaque_keys.edx.locator import LibraryLocator
 from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.tests.factories import LibraryFactory, ItemFactory, check_mongo_calls
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
+import six
+from six.moves import range
 
 
 @ddt.ddt
@@ -55,8 +58,8 @@ class TestLibraries(MixedSplitTestCase):
         Test __unicode__() and __str__() methods of libraries
         """
         library = LibraryFactory.create(metadata={"display_name": name}, modulestore=self.store)
-        self.assertIn(name, unicode(library))
-        if not isinstance(name, unicode):
+        self.assertIn(name, six.text_type(library))
+        if not isinstance(name, six.text_type):
             self.assertIn(name, str(library))
 
     def test_display_with_default_methods(self):

@@ -2,6 +2,7 @@
 Tests for split_migrator
 
 """
+from __future__ import absolute_import
 import random
 import uuid
 
@@ -11,6 +12,9 @@ from openedx.core.lib.tests import attr
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict, UNIQUE_ID
 from xmodule.modulestore.split_migrator import SplitMigrator
 from xmodule.modulestore.tests.test_split_w_old_mongo import SplitWMongoCourseBootstrapper
+import six
+from six.moves import range
+from six.moves import zip
 
 
 @attr('mongo')
@@ -163,7 +167,7 @@ class TestMigration(SplitWMongoCourseBootstrapper):
         if split_dag_root.category != 'course':
             self.assertEqual(presplit_dag_root.location.block_id, split_dag_root.location.block_id)
         # compare all fields but references
-        for name, field in presplit_dag_root.fields.iteritems():
+        for name, field in six.iteritems(presplit_dag_root.fields):
             # fields generated from UNIQUE_IDs are unique to an XBlock's scope,
             # so if such a field is unset on an XBlock, we don't expect it
             # to persist across courses

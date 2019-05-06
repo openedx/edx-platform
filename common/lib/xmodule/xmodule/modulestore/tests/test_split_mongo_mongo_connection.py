@@ -1,4 +1,5 @@
 """ Test the behavior of split_mongo/MongoConnection """
+from __future__ import absolute_import
 import unittest
 from mock import patch
 from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection

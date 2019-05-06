@@ -4,6 +4,7 @@ Unit tests for the Mongo modulestore
 # pylint: disable=protected-access
 # pylint: disable=no-name-in-module
 # pylint: disable=bad-continuation
+from __future__ import absolute_import
 from django.test import TestCase
 # pylint: enable=E0611
 from path import Path as path
@@ -41,6 +42,7 @@ from xmodule.modulestore.tests.utils import LocationMixin, mock_tab_from_json
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import InheritanceMixin
+import six
 
 
 log = logging.getLogger(__name__)
@@ -526,7 +528,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
             for ref in refele.reference_list:
                 assert isinstance(ref, UsageKey)
             assert len(refele.reference_dict) > 0
-            for ref in refele.reference_dict.itervalues():
+            for ref in six.itervalues(refele.reference_dict):
                 assert isinstance(ref, UsageKey)
 
         def check_mongo_fields():
@@ -535,17 +537,17 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
 
             def check_children(payload):
                 for child in payload['definition']['children']:
-                    assert isinstance(child, basestring)
+                    assert isinstance(child, six.string_types)
 
             refele = get_item(self.refloc)
             check_children(refele)
-            assert isinstance(refele['definition']['data']['reference_link'], basestring)
+            assert isinstance(refele['definition']['data']['reference_link'], six.string_types)
             assert len(refele['definition']['data']['reference_list']) > 0
             for ref in refele['definition']['data']['reference_list']:
-                assert isinstance(ref, basestring)
+                assert isinstance(ref, six.string_types)
             assert len(refele['metadata']['reference_dict']) > 0
-            for ref in refele['metadata']['reference_dict'].itervalues():
-                assert isinstance(ref, basestring)
+            for ref in six.itervalues(refele['metadata']['reference_dict']):
+                assert isinstance(ref, six.string_types)
 
         setup_test()
         check_xblock_fields()
@@ -704,8 +706,8 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
 
         # First child should have been moved to second position, and better child takes the lead
         course = self.draft_store.get_course(course.id)
-        self.assertEqual(unicode(course.children[1]), unicode(first_child.location))
-        self.assertEqual(unicode(course.children[0]), unicode(second_child.location))
+        self.assertEqual(six.text_type(course.children[1]), six.text_type(first_child.location))
+        self.assertEqual(six.text_type(course.children[0]), six.text_type(second_child.location))
 
         # Clean up the data so we don't break other tests which apparently expect a particular state
         self.draft_store.delete_course(course.id, self.dummy_user)

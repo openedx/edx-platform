@@ -3,6 +3,7 @@ Tests to verify correct number of MongoDB calls during course import/export and 
 when using the Split modulestore.
 """
 
+from __future__ import absolute_import
 from tempfile import mkdtemp
 from shutil import rmtree
 from unittest import TestCase, skip
@@ -17,6 +18,7 @@ from xmodule.modulestore.tests.utils import (
     MongoModulestoreBuilder, TEST_DATA_DIR,
     MemoryCache,
 )
+import six
 
 MIXED_OLD_MONGO_MODULESTORE_BUILDER = MixedModulestoreBuilder([('draft', MongoModulestoreBuilder())])
 MIXED_SPLIT_MODULESTORE_BUILDER = MixedModulestoreBuilder([('split', VersioningModulestoreBuilder())])
@@ -107,7 +109,7 @@ class CountMongoCallsCourseTraversal(TestCase):
         if access_all_block_fields:
             # Read the fields on each block in order to ensure each block and its definition is loaded.
             for xblock in all_blocks:
-                for __, field in xblock.fields.iteritems():
+                for __, field in six.iteritems(xblock.fields):
                     if field.is_set_on(xblock):
                         __ = field.read_from(xblock)
 

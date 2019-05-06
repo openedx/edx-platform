@@ -3,11 +3,13 @@ Tests for split's copy_from_template method.
 Currently it is only used for content libraries.
 However for these tests, we make sure it also works when copying from course to course.
 """
+from __future__ import absolute_import
 import ddt
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
+from six.moves import range
 
 
 @ddt.ddt
