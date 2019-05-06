@@ -302,7 +302,10 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         current user.
         """
         for block_type, block_id in self.selected_children():
-            yield self.runtime.get_block(self.location.course_key.make_usage_key(block_type, block_id))
+            child = self.runtime.get_block(self.location.course_key.make_usage_key(block_type, block_id))
+            if child is None:
+                logger.info("Child not found for [%s] [%s]".format(str(block_type), str(block_id)))
+            yield child
 
     def student_view(self, context):
         fragment = Fragment()
