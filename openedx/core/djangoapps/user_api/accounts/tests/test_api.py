@@ -4,6 +4,8 @@ Unit tests for behavior that is specific to the api methods (vs. the view method
 Most of the functionality is covered in test_views.py.
 """
 
+from __future__ import absolute_import
+
 import itertools
 import re
 import unicodedata
@@ -41,11 +43,7 @@ from openedx.core.djangoapps.user_api.accounts.tests.testutils import (
     INVALID_USERNAMES,
     VALID_USERNAMES_UNICODE
 )
-from openedx.core.djangoapps.user_api.config.waffle import (
-    PREVENT_AUTH_USER_WRITES,
-    SYSTEM_MAINTENANCE_MSG,
-    waffle
-)
+from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangoapps.user_api.errors import (
     AccountEmailInvalid,
     AccountPasswordInvalid,

@@ -3,50 +3,51 @@
 """
 Programmatic integration point for User API Accounts sub-application
 """
-import datetime
-from pytz import UTC
+from __future__ import absolute_import
 
-from django.utils.translation import override as override_language, ugettext as _
-from django.db import transaction, IntegrityError
-from django.core.exceptions import ObjectDoesNotExist
+import datetime
+
+import six
 from django.conf import settings
-from django.core.validators import validate_email, ValidationError
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.validators import ValidationError, validate_email
+from django.db import IntegrityError, transaction
 from django.http import HttpResponseForbidden
-from openedx.core.djangoapps.theming.helpers import get_current_request
+from django.utils.translation import override as override_language
+from django.utils.translation import ugettext as _
+from pytz import UTC
 from six import text_type
 
-from student.models import (
-    AccountRecovery,
-    User,
-    UserProfile,
-    Registration,
-    email_exists_or_retired,
-    username_exists_or_retired
-)
-from student import forms as student_forms
-from student import views as student_views
-from util.model_utils import emit_setting_changed_event
-from util.password_policy_validators import validate_password, normalize_password
-
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.user_api import errors, accounts, forms, helpers
-from openedx.core.djangoapps.user_api.config.waffle import (
-    PREVENT_AUTH_USER_WRITES,
-    SYSTEM_MAINTENANCE_MSG,
-    waffle,
-)
+from openedx.core.djangoapps.theming.helpers import get_current_request
+from openedx.core.djangoapps.user_api import accounts, errors, forms, helpers
+from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangoapps.user_api.errors import (
     AccountUpdateError,
     AccountValidationError,
-    PreferenceValidationError,
+    PreferenceValidationError
 )
 from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
 from openedx.core.lib.api.view_utils import add_serializer_errors
 from openedx.features.enterprise_support.utils import get_enterprise_readonly_account_fields
+from student import forms as student_forms
+from student import views as student_views
+from student.models import (
+    AccountRecovery,
+    Registration,
+    User,
+    UserProfile,
+    email_exists_or_retired,
+    username_exists_or_retired
+)
+from util.model_utils import emit_setting_changed_event
+from util.password_policy_validators import normalize_password, validate_password
 
-from .serializers import (
-    AccountLegacyProfileSerializer, AccountUserSerializer,
-    UserReadOnlySerializer, _visible_fields  # pylint: disable=invalid-name
+from .serializers import (  # pylint: disable=invalid-name
+    AccountLegacyProfileSerializer,
+    AccountUserSerializer,
+    UserReadOnlySerializer,
+    _visible_fields
 )
 
 # Public access point for this function.
@@ -679,7 +680,7 @@ def _validate_username(username):
     """
     try:
         _validate_unicode(username)
-        _validate_type(username, basestring, accounts.USERNAME_BAD_TYPE_MSG)
+        _validate_type(username, six.string_types, accounts.USERNAME_BAD_TYPE_MSG)
         _validate_length(
             username,
             accounts.USERNAME_MIN_LENGTH,
@@ -711,7 +712,7 @@ def _validate_email(email):
     """
     try:
         _validate_unicode(email)
-        _validate_type(email, basestring, accounts.EMAIL_BAD_TYPE_MSG)
+        _validate_type(email, six.string_types, accounts.EMAIL_BAD_TYPE_MSG)
         _validate_length(email, accounts.EMAIL_MIN_LENGTH, accounts.EMAIL_MAX_LENGTH, accounts.EMAIL_BAD_LENGTH_MSG)
         validate_email.message = accounts.EMAIL_INVALID_MSG.format(email=email)
         validate_email(email)
@@ -753,7 +754,7 @@ def _validate_password(password, username=None, email=None):
 
     """
     try:
-        _validate_type(password, basestring, accounts.PASSWORD_BAD_TYPE_MSG)
+        _validate_type(password, six.string_types, accounts.PASSWORD_BAD_TYPE_MSG)
         temp_user = User(username=username, email=email) if username else None
         validate_password(password, user=temp_user)
     except errors.AccountDataBadType as invalid_password_err:
@@ -870,9 +871,9 @@ def _validate_unicode(data, err=u"Input not valid unicode"):
 
     """
     try:
-        if not isinstance(data, str) and not isinstance(data, unicode):
+        if not isinstance(data, str) and not isinstance(data, six.text_type):
             raise UnicodeError(err)
         # In some cases we pass the above, but it's still inappropriate utf-8.
-        unicode(data)
+        six.text_type(data)
     except UnicodeError:
         raise UnicodeError(err)

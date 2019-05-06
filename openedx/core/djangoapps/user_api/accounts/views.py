@@ -4,10 +4,12 @@ An API for retrieving user account information.
 For additional information and historical context, see:
 https://openedx.atlassian.net/wiki/display/TNL/User+API
 """
+from __future__ import absolute_import
+
 import datetime
 import logging
-from functools import wraps
 import uuid
+from functools import wraps
 
 import pytz
 from consent.models import DataSharingConsent
@@ -38,34 +40,34 @@ from wiki.models import ArticleRevision
 from wiki.models.pluginbase import RevisionPluginRevision
 
 from entitlements.models import CourseEntitlement
-from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
-from openedx.core.djangoapps.credit.models import CreditRequirementStatus, CreditRequest
 from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCohortAssignments
+from openedx.core.djangoapps.credit.models import CreditRequest, CreditRequirementStatus
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.profile_images.images import remove_profile_images
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
-from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models, retire_dop_oauth2_models
+from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
+from openedx.core.djangolib.oauth2_retirement_utils import retire_dop_oauth2_models, retire_dot_oauth2_models
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
 from student.models import (
     AccountRecovery,
-    CourseEnrollment,
-    ManualEnrollmentAudit,
-    PendingNameChange,
     CourseEnrollmentAllowed,
     LoginFailures,
+    ManualEnrollmentAudit,
     PendingEmailChange,
+    PendingNameChange,
     Registration,
     User,
     UserProfile,
     get_potentially_retired_user_by_username,
     get_retired_email_by_email,
-    get_retired_username_by_username,
-    is_username_retired
+    get_retired_username_by_username
 )
+
 from ..errors import AccountUpdateError, AccountValidationError, UserNotAuthorized, UserNotFound
+from ..message_types import DeletionNotificationMessage
 from ..models import (
     RetirementState,
     RetirementStateError,
@@ -76,12 +78,7 @@ from ..models import (
 from .api import get_account_settings, update_account_settings
 from .permissions import CanDeactivateUser, CanReplaceUsername, CanRetireUser
 from .serializers import UserRetirementPartnerReportSerializer, UserRetirementStatusSerializer
-from .signals import (
-    USER_RETIRE_LMS_CRITICAL,
-    USER_RETIRE_LMS_MISC,
-    USER_RETIRE_MAILINGS,
-)
-from ..message_types import DeletionNotificationMessage
+from .signals import USER_RETIRE_LMS_CRITICAL, USER_RETIRE_LMS_MISC, USER_RETIRE_MAILINGS
 
 log = logging.getLogger(__name__)
 
@@ -681,7 +678,8 @@ class AccountRetirementStatusView(ViewSet):
         except ValueError:
             return Response('Invalid cool_off_days, should be integer.', status=status.HTTP_400_BAD_REQUEST)
         except KeyError as exc:
-            return Response(u'Missing required parameter: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
+            return Response(u'Missing required parameter: {}'.format(text_type(exc)),
+                            status=status.HTTP_400_BAD_REQUEST)
         except RetirementStateError as exc:
             return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
 
@@ -722,7 +720,8 @@ class AccountRetirementStatusView(ViewSet):
         except ValueError as exc:
             return Response(u'Invalid start or end date: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
         except KeyError as exc:
-            return Response(u'Missing required parameter: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
+            return Response(u'Missing required parameter: {}'.format(text_type(exc)),
+                            status=status.HTTP_400_BAD_REQUEST)
         except RetirementState.DoesNotExist:
             return Response('Unknown retirement state.', status=status.HTTP_400_BAD_REQUEST)
         except RetirementStateError as exc:
