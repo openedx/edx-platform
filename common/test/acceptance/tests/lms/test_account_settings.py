@@ -2,6 +2,7 @@
 """
 End-to-end tests for the Account Settings page.
 """
+from __future__ import absolute_import
 from datetime import datetime
 from unittest import skip
 
@@ -12,6 +13,7 @@ from common.test.acceptance.pages.common.auto_auth import AutoAuthPage, FULL_NAM
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.tests.helpers import AcceptanceTest, EventsTestMixin
+import six
 
 
 class AccountSettingsTestMixin(EventsTestMixin, AcceptanceTest):
@@ -468,12 +470,12 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             'price': 'Cost:\n$100.00',
         }
 
-        for field_name, value in expected_order_data_first_row.iteritems():
+        for field_name, value in six.iteritems(expected_order_data_first_row):
             self.assertEqual(
                 self.account_settings_page.get_value_of_order_history_row_item('order-Edx-123', field_name)[0], value
             )
 
-        for field_name, value in expected_order_data_second_row.iteritems():
+        for field_name, value in six.iteritems(expected_order_data_second_row):
             self.assertEqual(
                 self.account_settings_page.get_value_of_order_history_row_item('order-Edx-123', field_name)[1], value
             )

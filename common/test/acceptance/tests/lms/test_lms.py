@@ -2,6 +2,7 @@
 """
 End-to-end tests for the LMS.
 """
+from __future__ import absolute_import
 import json
 
 from datetime import datetime, timedelta
@@ -44,6 +45,7 @@ from common.test.acceptance.tests.helpers import (
     remove_file
 )
 from openedx.core.lib.tests import attr
+from six.moves import range
 
 
 @attr(shard=19)
@@ -972,7 +974,7 @@ class EntranceExamTest(UniqueCourseTest):
         """
         # visit the course outline and make sure there is no "Entrance Exam" section.
         self.course_home_page.visit()
-        self.assertFalse('Entrance Exam' in self.course_home_page.outline.sections.keys())
+        self.assertFalse('Entrance Exam' in list(self.course_home_page.outline.sections.keys()))
 
         # Logout and login as a staff.
         LogoutPage(self.browser).visit()
@@ -989,7 +991,7 @@ class EntranceExamTest(UniqueCourseTest):
 
         # visit the course outline and make sure there is an "Entrance Exam" section.
         self.course_home_page.visit()
-        self.assertTrue('Entrance Exam' in self.course_home_page.outline.sections.keys())
+        self.assertTrue('Entrance Exam' in list(self.course_home_page.outline.sections.keys()))
 
     # TODO: TNL-6546: Remove test
     def test_entrance_exam_section_2(self):

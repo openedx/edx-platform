@@ -3,6 +3,7 @@
 End-to-end tests for the LMS.
 """
 
+from __future__ import absolute_import
 import json
 from datetime import datetime, timedelta
 
@@ -23,6 +24,7 @@ from ...pages.lms.progress import ProgressPage
 from ...pages.lms.track_selection import TrackSelectionPage
 from ...pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from ..helpers import EventsTestMixin, UniqueCourseTest, auto_auth, create_multiple_choice_problem
+from six.moves import range
 
 
 @attr(shard=9)

@@ -3,6 +3,7 @@
 Tests the "preview" selector in the LMS that allows changing between Staff, Learner, and Content Groups.
 """
 
+from __future__ import absolute_import
 from textwrap import dedent
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc

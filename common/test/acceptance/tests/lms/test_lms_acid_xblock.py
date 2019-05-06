@@ -3,6 +3,7 @@
 End-to-end tests for the LMS.
 """
 
+from __future__ import absolute_import
 import pytest
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
