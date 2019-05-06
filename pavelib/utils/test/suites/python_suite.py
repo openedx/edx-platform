@@ -19,7 +19,6 @@ class PythonTestSuite(TestSuite):
         super(PythonTestSuite, self).__init__(*args, **kwargs)
         self.opts = kwargs
         self.disable_migrations = kwargs.get('disable_migrations', True)
-        self.disable_courseenrollment_history = kwargs.get('disable_courseenrollment_history', True)
         self.fasttest = kwargs.get('fasttest', False)
         self.subsuites = kwargs.get('subsuites', self._default_subsuites)
 
@@ -29,10 +28,6 @@ class PythonTestSuite(TestSuite):
         if self.disable_migrations:
             os.environ['DISABLE_MIGRATIONS'] = '1'
 
-        if self.disable_courseenrollment_history:
-            print("HELLO MIKE!!!!")
-            os.environ['DISABLE_COURSEENROLLMENT_HISTORY'] = '1'
-        print(os.environ['DISABLE_COURSEENROLLMENT_HISTORY'])
         if not (self.fasttest or self.skip_clean):
             test_utils.clean_test_files()
 
