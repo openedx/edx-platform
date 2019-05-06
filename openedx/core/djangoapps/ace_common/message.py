@@ -1,6 +1,7 @@
 """
 Base Message types to be used to construct ace messages.
 """
+from __future__ import absolute_import
 from edx_ace.message import MessageType
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 

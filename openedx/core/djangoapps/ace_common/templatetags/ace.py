@@ -1,5 +1,6 @@
 # pylint: disable=missing-docstring
-from urlparse import urlparse
+from __future__ import absolute_import
+from six.moves.urllib.parse import urlparse
 
 from crum import get_current_request
 from django import template

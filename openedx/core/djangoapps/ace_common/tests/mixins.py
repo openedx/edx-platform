@@ -1,5 +1,6 @@
 # pylint: disable=missing-docstring
-from urlparse import parse_qs, urlparse
+from __future__ import absolute_import
+from six.moves.urllib.parse import parse_qs, urlparse
 import uuid
 from django.http import HttpRequest
 from mock import patch
