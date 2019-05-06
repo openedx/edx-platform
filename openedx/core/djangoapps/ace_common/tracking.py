@@ -1,12 +1,12 @@
 # pylint: disable=missing-docstring
 from __future__ import absolute_import
-from six.moves.urllib.parse import parse_qs
 
 import attr
+import six
 from django.utils.http import urlencode
+from six.moves.urllib.parse import parse_qs
 
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings
-import six
 
 DEFAULT_CAMPAIGN_SOURCE = 'ace'
 DEFAULT_CAMPAIGN_MEDIUM = 'email'
