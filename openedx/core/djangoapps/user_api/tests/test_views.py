@@ -2346,7 +2346,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             msg=u"Could not find field {name}".format(name=expected_field["name"])
         )
 
-        for key, value in six.iteritems(expected_field):
+        for key in expected_field:
             self.assertEqual(
                 actual_field[key], expected_field[key],
                 msg=u"Expected {expected} for {key} but got {actual} instead".format(
