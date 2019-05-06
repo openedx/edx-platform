@@ -39,7 +39,7 @@ from django.conf import settings
   % if settings.FEATURES.get('ENABLE_PROFESSORS'):
       <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
         <a class="${'active ' if reverse('professor_index') in request.path else ''}tab-nav-link" href="${reverse('professor_index')}">
-          ${_("Professor")}
+          ${_("Professors")}
         </a>
       </div>
   % endif
