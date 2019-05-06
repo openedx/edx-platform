@@ -13,13 +13,15 @@ from django.contrib.auth.models import User
 from django.forms import ValidationError
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils.timezone import now
 from mock import Mock
 
-from student.admin import COURSE_ENROLLMENT_ADMIN_SWITCH, UserAdmin
-from student.models import LoginFailures
+from student.admin import COURSE_ENROLLMENT_ADMIN_SWITCH, UserAdmin, CourseEnrollmentForm
+from student.models import CourseEnrollment, LoginFailures
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 
 
 class AdminCourseRolesPageTest(SharedModuleStoreTestCase):
@@ -370,3 +372,53 @@ class LoginFailuresAdminTest(TestCase):
         )
         count = LoginFailures.objects.count()
         self.assertEqual(count, start_count - 1)
+
+
+class CourseEnrollmentAdminFormTest(SharedModuleStoreTestCase):
+    """
+    Unit test for CourseEnrollment admin ModelForm.
+    """
+    @classmethod
+    def setUpClass(cls):
+        super(CourseEnrollmentAdminFormTest, cls).setUpClass()
+        cls.course = CourseOverviewFactory(start=now())
+
+    def setUp(self):
+        super(CourseEnrollmentAdminFormTest, self).setUp()
+        self.user = UserFactory.create()
+
+    def test_admin_model_form_create(self):
+        """
+        Test CourseEnrollmentAdminForm creation.
+        """
+        self.assertEqual(CourseEnrollment.objects.count(), 0)
+
+        form = CourseEnrollmentForm({
+            'user': self.user.id,
+            'course': six.text_type(self.course.id),
+            'is_active': True,
+            'mode': 'audit',
+        })
+        self.assertTrue(form.is_valid())
+        enrollment = form.save()
+        self.assertEqual(CourseEnrollment.objects.count(), 1)
+        self.assertEqual(CourseEnrollment.objects.first(), enrollment)
+
+    def test_admin_model_form_update(self):
+        """
+        Test CourseEnrollmentAdminForm update.
+        """
+        enrollment = CourseEnrollment.get_or_create_enrollment(self.user, self.course.id)
+        count = CourseEnrollment.objects.count()
+        form = CourseEnrollmentForm({
+            'user': self.user.id,
+            'course': six.text_type(self.course.id),
+            'is_active': False,
+            'mode': 'audit'},
+            instance=enrollment
+        )
+        self.assertTrue(form.is_valid())
+        course_enrollment = form.save()
+        self.assertEqual(count, CourseEnrollment.objects.count())
+        self.assertFalse(course_enrollment.is_active)
+        self.assertEqual(enrollment.id, course_enrollment.id)
