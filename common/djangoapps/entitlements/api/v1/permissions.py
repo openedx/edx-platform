@@ -3,6 +3,7 @@ This module provides a custom DRF Permission class for supporting SAFE_METHODS t
 requiring Superuser access for all other Request types on an API endpoint.
 """
 
+from __future__ import absolute_import
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 from courseware.access import has_access
