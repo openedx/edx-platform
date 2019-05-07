@@ -702,7 +702,18 @@ EMBARGO_SITE_REDIRECT_URL = None
 
 ############################### PIPELINE #######################################
 
-PIPELINE_ENABLED = True
+PIPELINE = {
+    'PIPELINE_ENABLED': True,
+    # Don't use compression by default
+    'CSS_COMPRESSOR': None,
+    'JS_COMPRESSOR': None,
+    # Don't wrap JavaScript as there is code that depends upon updating the global namespace
+    'DISABLE_WRAPPER': True,
+    # Specify the UglifyJS binary to use
+    'UGLIFYJS_BINARY': 'node_modules/.bin/uglifyjs',
+    'COMPILERS': (),
+    'YUI_BINARY': 'yui-compressor',
+}
 
 STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 
@@ -716,19 +727,9 @@ STATICFILES_FINDERS = [
     'pipeline.finders.PipelineFinder',
 ]
 
-# Don't use compression by default
-PIPELINE_CSS_COMPRESSOR = None
-PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.uglifyjs.UglifyJSCompressor'
-
-# Don't wrap JavaScript as there is code that depends upon updating the global namespace
-PIPELINE_DISABLE_WRAPPER = True
-
-# Specify the UglifyJS binary to use
-PIPELINE_UGLIFYJS_BINARY = 'node_modules/.bin/uglifyjs'
-
 from openedx.core.lib.rooted_paths import rooted_glob
 
-PIPELINE_CSS = {
+PIPELINE['STYLESHEETS'] = {
     'style-vendor': {
         'source_filenames': [
             'css/vendor/normalize.css',
@@ -826,7 +827,7 @@ base_vendor_js = [
 
 # test_order: Determines the position of this chunk of javascript on
 # the jasmine test page
-PIPELINE_JS = {
+PIPELINE['JAVASCRIPT'] = {
     'base_vendor': {
         'source_filenames': base_vendor_js,
         'output_filename': 'js/cms-base-vendor.js',
@@ -841,10 +842,6 @@ PIPELINE_JS = {
         'test_order': 1
     },
 }
-
-PIPELINE_COMPILERS = ()
-PIPELINE_CSS_COMPRESSOR = None
-PIPELINE_JS_COMPRESSOR = None
 
 STATICFILES_IGNORE_PATTERNS = (
     "*.py",
@@ -867,8 +864,6 @@ STATICFILES_IGNORE_PATTERNS = (
     "xmodule_js",
     "common_static",
 )
-
-PIPELINE_YUI_BINARY = 'yui-compressor'
 
 ################################# DJANGO-REQUIRE ###############################
 

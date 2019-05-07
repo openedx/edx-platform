@@ -58,7 +58,9 @@ class PipelineRenderTest(TestCase):
         Verify the behavior of compressed_css, with the pipeline
         both enabled and disabled.
         """
-        with self.settings(PIPELINE_ENABLED=pipeline_enabled):
+        pipeline = settings.PIPELINE.copy()
+        pipeline['PIPELINE_ENABLED'] = pipeline_enabled
+        with self.settings(PIPELINE=pipeline):
             # Verify the default behavior
             css_include = compressed_css('style-main-v1')
             self.assertIn(u'lms-main-v1.css', css_include)
@@ -74,12 +76,15 @@ class PipelineRenderTest(TestCase):
         Verify the behavior of compressed_css, with the pipeline
         both enabled and disabled.
         """
+        pipeline = settings.PIPELINE.copy()
         # Verify that a single JS file is rendered with the pipeline enabled
-        with self.settings(PIPELINE_ENABLED=True):
+        pipeline['PIPELINE_ENABLED'] = True
+        with self.settings(PIPELINE=pipeline):
             js_include = compressed_js('base_application')
             self.assertIn(u'lms-base-application.js', js_include)
 
         # Verify that multiple JS files are rendered with the pipeline disabled
-        with self.settings(PIPELINE_ENABLED=False):
+        pipeline['PIPELINE_ENABLED'] = False
+        with self.settings(PIPELINE=pipeline):
             js_include = compressed_js('base_application')
             self.assertIn(u'/static/js/src/logger.js', js_include)

@@ -105,7 +105,7 @@ def _footer_css_urls(request, package_name):
     # to identify the CSS file name(s) to include in the footer.
     # We then construct an absolute URI so that external sites (such as the marketing site)
     # can locate the assets.
-    package = settings.PIPELINE_CSS.get(package_name, {})
+    package = settings.PIPELINE['STYLESHEETS'].get(package_name, {})
     paths = [package['output_filename']] if not settings.DEBUG else package['source_filenames']
     return [
         _footer_static_url(request, path)

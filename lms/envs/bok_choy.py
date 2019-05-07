@@ -80,7 +80,7 @@ MEDIA_ROOT = TEST_ROOT / "uploads"
 WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = TEST_ROOT / "staticfiles" / "lms" / "webpack-stats.json"
 
 # Don't use compression during tests
-PIPELINE_JS_COMPRESSOR = None
+PIPELINE['JS_COMPRESSOR'] = None
 
 ################################# CELERY ######################################
 

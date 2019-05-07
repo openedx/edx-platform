@@ -1336,7 +1336,15 @@ P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
 
 ############################### PIPELINE #######################################
 
-PIPELINE_ENABLED = True
+PIPELINE = {
+    'PIPELINE_ENABLED': True,
+    'CSS_COMPRESSOR': None,
+    'JS_COMPRESSOR': 'pipeline.compressors.uglifyjs.UglifyJSCompressor',
+    # Don't wrap JavaScript as there is code that depends upon updating the global namespace
+    'DISABLE_WRAPPER': True,
+    # Specify the UglifyJS binary to use
+    'UGLIFYJS_BINARY': 'node_modules/.bin/uglifyjs',
+}
 
 STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 
@@ -1349,15 +1357,6 @@ STATICFILES_FINDERS = [
     'openedx.core.lib.xblock_pipeline.finder.XBlockPipelineFinder',
     'pipeline.finders.PipelineFinder',
 ]
-
-PIPELINE_CSS_COMPRESSOR = None
-PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.uglifyjs.UglifyJSCompressor'
-
-# Don't wrap JavaScript as there is code that depends upon updating the global namespace
-PIPELINE_DISABLE_WRAPPER = True
-
-# Specify the UglifyJS binary to use
-PIPELINE_UGLIFYJS_BINARY = 'node_modules/.bin/uglifyjs'
 
 from openedx.core.lib.rooted_paths import rooted_glob
 
@@ -1504,7 +1503,7 @@ credit_web_view_js = [
     'js/src/logger.js',
 ]
 
-PIPELINE_CSS = {
+PIPELINE['STYLESHEETS'] = {
     'style-vendor': {
         'source_filenames': [
             'css/vendor/font-awesome.css',
@@ -1678,7 +1677,7 @@ lms_application_js = [
     'js/main.js',
 ]
 
-PIPELINE_JS = {
+PIPELINE['JAVASCRIPT'] = {
     'base_application': {
         'source_filenames': base_application_js,
         'output_filename': 'js/lms-base-application.js',
