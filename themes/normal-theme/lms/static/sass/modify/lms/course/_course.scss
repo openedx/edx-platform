@@ -302,6 +302,9 @@ body.view-in-course .wrapper-preview-menu, .wrapper-preview-menu{
     padding: 0;
   }
   .preview-actions .action-preview{
+    select{
+      width: 250px;
+    }
     .action-preview-label{
       color: $primary;
       font-size: 14px;

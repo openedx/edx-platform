@@ -75,7 +75,7 @@
                 persistChanges: true
             };
             if (hmmInEffect) {
-                emailFieldData.helpMessage = gettext('You have joined Harvard Learning Camp. Email Modification is not supported.');
+                emailFieldData.helpMessage = gettext('You have joined Harvard ManageMentor. Email Modification is not supported.');
             }
             if (!allowEmailChange || hmmInEffect || (syncLearnerProfileData && enterpriseReadonlyAccountFields.fields.indexOf('email') !== -1)) {  // eslint-disable-line max-len
                 emailFieldView = {

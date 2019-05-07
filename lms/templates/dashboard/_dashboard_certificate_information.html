@@ -53,7 +53,7 @@ else:
           % else:
             ${_("Grade required to pass this course:")}
           % endif
-          <span class="grade-value">${"{0:.0f}%".format(float(course_overview.lowest_passing_grade)*100)}</span>.
+          <span class="grade-value">${"{0:.0f}%".format(float(course_overview.lowest_passing_grade)*100)}</span>${_(". ")}
         % elif cert_status['status'] == 'restricted' and enrollment.mode == 'verified':
           <p class="message-copy">
             ${Text(_("Your verified {cert_name_long} is being held pending confirmation that the issuance of your {cert_name_short} is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting {email}. If you would like a refund on your {cert_name_long}, please contact our billing address {billing_email}")).format(email=HTML('<a class="contact-link" href="mailto:{email}">{email}</a>.').format(email=settings.CONTACT_EMAIL), billing_email=HTML('<a class="contact-link" href="mailto:{email}">{email}</a>').format(email=settings.PAYMENT_SUPPORT_EMAIL), cert_name_short=cert_name_short, cert_name_long=cert_name_long)}
