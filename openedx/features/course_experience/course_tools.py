@@ -1,6 +1,8 @@
 """
 Support for course tool plugins.
 """
+from __future__ import absolute_import
+
 from openedx.core.lib.plugins import PluginManager
 
 # Stevedore extension point namespace
@@ -70,7 +72,7 @@ class CourseToolsPluginManager(PluginManager):
         """
         Returns the list of available course tools in their canonical order.
         """
-        course_tools = cls.get_available_plugins().values()
+        course_tools = list(cls.get_available_plugins().values())
         course_tools.sort(key=lambda course_tool: course_tool.title())
         return course_tools
 
@@ -80,4 +82,4 @@ class CourseToolsPluginManager(PluginManager):
         Returns the course tools applicable to the current user and course.
         """
         course_tools = CourseToolsPluginManager.get_course_tools()
-        return filter(lambda tool: tool.is_enabled(request, course_key), course_tools)
+        return [tool for tool in course_tools if tool.is_enabled(request, course_key)]

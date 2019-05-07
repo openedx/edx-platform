@@ -3,6 +3,8 @@ Platform plugins to support the course experience.
 
 This includes any locally defined CourseTools.
 """
+from __future__ import absolute_import
+
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 

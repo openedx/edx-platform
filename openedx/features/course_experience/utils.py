@@ -1,16 +1,19 @@
 """
 Common utilities for the course experience, including course outline.
 """
+from __future__ import absolute_import
+
 from completion.models import BlockCompletion
 from django.utils.translation import ugettext as _
+from opaque_keys.edx.keys import CourseKey
+from six.moves import range
+from web_fragments.fragment import Fragment
 
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
-from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.cache_utils import request_cached
 from openedx.features.course_experience import FIRST_PURCHASE_OFFER_BANNER_DISPLAY
-from web_fragments.fragment import Fragment
 from xmodule.modulestore.django import modulestore
 
 

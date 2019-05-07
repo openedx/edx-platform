@@ -1,11 +1,12 @@
 """
 Unified course experience settings and helper methods.
 """
+from __future__ import absolute_import
+
 from django.utils.translation import ugettext as _
 
 from openedx.core.djangoapps.util.user_messages import UserMessageCollection
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace, WaffleFlag
-
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlag, WaffleFlagNamespace
 
 # Namespace for course experience waffle flags.
 WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='course_experience')

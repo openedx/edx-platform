@@ -1,6 +1,8 @@
 """
 Miscellaneous waffle switches that both LMS and Studio need to access
 """
+from __future__ import absolute_import
+
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 
 # Namespace
