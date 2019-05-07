@@ -108,7 +108,7 @@ def get_bumper_sources(video):
     try:
         val_profiles = ["desktop_webm", "desktop_mp4"]
         val_video_urls = edxval_api.get_urls_for_profiles(video.bumper['edx_video_id'], val_profiles)
-        bumper_sources = [_f for _f in [val_video_urls[p] for p in val_profiles] if _f]
+        bumper_sources = [url for url in [val_video_urls[p] for p in val_profiles] if url]
     except edxval_api.ValInternalError:
         # if no bumper sources, nothing will be showed
         log.warning(

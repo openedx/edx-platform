@@ -221,7 +221,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
 
         track_status = (self.download_track and self.track)
         transcript_download_format = self.transcript_download_format if not track_status else None
-        sources = [_f for _f in self.html5_sources if _f]
+        sources = [source for source in self.html5_sources if source]
 
         download_video_link = None
         branding_info = None
