@@ -4,7 +4,8 @@ requiring Superuser access for all other Request types on an API endpoint.
 """
 
 from __future__ import absolute_import
-from rest_framework.permissions import BasePermission, SAFE_METHODS
+
+from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 from courseware.access import has_access
 
