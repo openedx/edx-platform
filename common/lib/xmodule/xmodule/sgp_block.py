@@ -12,6 +12,7 @@ import logging
 import markdown
 from crum import get_current_request
 from django.middleware.csrf import get_token
+from django.utils.translation import ugettext_noop as _
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlock
@@ -22,12 +23,10 @@ from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
 
-_ = lambda text: text
-
 log = logging.getLogger(__name__)
 
 
-CSV_FIELDS = '''user_id username full_name email student_uid is_active track
+CSV_FIELDS = '''user_id username full_name email student_uid enrolled track
 block_id title date_last_graded who_last_graded last_points points'''.split()
 
 
@@ -107,16 +106,23 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
         grade_utils = self.runtime.service(self, 'grade_utils')
 
         try:
-            result = grade_utils.process_score_csv(self.location, request.POST['csv'].file, self.weight, sync=False)
+            thefile = request.POST['csv'].file
+            sync = thefile.size < 300 * 1024
+            log.info('Processing %d byte score file for %s sync=%s', thefile.size, self.location, sync)
+            result = grade_utils.process_score_csv(self.location, thefile, self.weight, sync=sync)
         except KeyError:
             data = {'errors': 1, 'message': 'missing file'}
-        if result.ready():
-            data = result.result
         else:
-            data = {'message': 'waiting'}
-            data = result.wait()
-        if 'graded' in data:
-            data['percentage'] = format(data['graded']/data['processed'], '.1%')
+            if sync:
+                data = result
+            else:
+                if result.ready():
+                    data = result.result
+                else:
+                    data = {'message': 'waiting'}
+                    data = result.wait()
+            if 'graded' in data:
+                data['percentage'] = format(data['graded']/data['processed'], '.1%')
         log.info(data)
         return Response(json.dumps(data), content_type='application/json')
 
@@ -136,22 +142,22 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
         user_service = self.runtime.service(self, 'user')
         enrollments = user_service.get_enrollments(self.location.course_key)
         for enrollment in enrollments:
-            srow = {
+            row = {
                 'block_id': my_location,
                 'title': my_name,
                 'points': None
             }
-            srow.update(enrollment)
+            row.update(enrollment)
             score = students.get(enrollment['user_id'], None)
 
             if score:
-                srow['last_points'] = int(score['grade'] * self.weight)
-                srow['date_last_graded'] = score['modified']
-                state = score['state']
-                if state:
-                    srow['who_last_graded'] = json.loads(state).get('grader', '')
+                row['last_points'] = int(score['grade'] * self.weight)
+                row['date_last_graded'] = score['modified']
+                # state = score['state']
+                # if state:
+                #     row['who_last_graded'] = json.loads(state).get('grader', '')
 
-            writer.writerow(srow)
+            writer.writerow(row)
 
         resp = Response(buf.getvalue())
         resp.content_type = 'text/csv'

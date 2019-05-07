@@ -69,7 +69,7 @@ class DjangoXBlockUserService(UserService):
                 'username': enrollment.user.username,
                 'full_name': enrollment.user.profile.name,
                 'email': enrollment.user.email,
-                'is_active': enrollment.is_active,
+                'enrolled': enrollment.is_active,
                 'track': enrollment.mode,
             }
             try:

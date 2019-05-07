@@ -4,6 +4,7 @@ This module contains utility functions for grading.
 import csv
 from datetime import timedelta
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 from courseware.models import StudentModule
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from .config.waffle import ENFORCE_FREEZE_GRADE_AFTER_COURSE_END, waffle_flags
@@ -84,7 +85,7 @@ def process_score_csv(block_id, thefile, max_points):
     for rownum, row in enumerate(reader):
         if row['block_id'] != block_id_str:
             errors += 1
-            data['message'] = 'bad file format'
+            data['message'] = _('The CSV does not match this problem. Check that you uploaded the right CSV.')
             break
         elif 'points' in row:
             if not row['points']:
@@ -93,17 +94,17 @@ def process_score_csv(block_id, thefile, max_points):
                 new_points = float(row['points'])
             except ValueError:
                 errors += 1
-                data['message'] = 'points must be numbers'
+                data['message'] = _('Points must be numbers only, not letters.')
             else:
                 if new_points <= max_points:
                     set_score(block_id, row['user_id'], new_points, max_points)
                     processed += 1
                 else:
                     errors += 1
-                    data['message'] = 'points must not be greater than %s' % max_points
+                    data['message'] = _('Points must not be greater than {}').format(max_points)
         else:
             errors += 1
-            data['message'] = 'bad file format'
+            data['message'] = _('The CSV must contain a points column.')
     data['errors'] = errors
     data['processed'] = rownum + 1 if rownum else 0
     data['graded'] = processed

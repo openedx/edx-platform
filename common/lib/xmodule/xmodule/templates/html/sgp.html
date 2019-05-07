@@ -13,22 +13,29 @@
     <div class="col">
         <hr>
         <ul>
-            <li>Step 1: Download a grading template<br>
-                <a href="{{export_url}}" class="btn btn-brand">export scores</a>
+            <li><strong>Step 1:</strong> Download a grading template<br>
+                <p><a href="{{export_url}}" class="btn btn-brand">export scores</a></p>
             </li>
-            <li>Step 2: Add grades to the template<br>
-                (insert docs here)
+            <li><strong>Step 2:</strong> Add grades to the template<br>
+                <p>(insert docs here)</p>
             </li>
-            <li>Step 3: Import grading template<br>
-        <form action="{{import_url}}" method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
-            <label class="submit btn btn-brand">
-                <input id="{{id}}-file" type="file" name="csv" style="display:none">
-                Import Scores
-            </label> <span id="{{id}}-filename"></span>
-        </form>
+            <li><strong>Step 3:</strong> Import grading template<br>
+                <p>Learners will immediately see their grades after import completes.</p>
+                <p>Partially complete grades are ok.</p>
+                <form action="{{import_url}}" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
+                    <label class="submit btn btn-brand">
+                        <input id="{{id}}-file" type="file" name="csv" style="display:none" accept=".csv">
+                        Import Scores
+                    </label> <small id="{{id}}-filename"></small>
+                </form>
             </li>
         </ul>
+        <p class="loading-spinner" style="display:none">
+            <i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>
+            <span class="sr">Loading&hellip;</span>
+        </p>
+
         <div class="text-info" id="{{id}}-status" style="display:none">
             <div class="success">
             </div>
@@ -46,6 +53,8 @@
         formData.append('csv', firstFile);
 
         $('#{{id}}-filename').html(firstFile.name);
+        $('#{{id}}-status').hide();
+        $('.loading-spinner').show();
         $.ajax({
                url : '{{import_url}}',
                type : 'POST',
@@ -54,6 +63,7 @@
                contentType: false,  // tell jQuery not to set contentType
                success : function(data) {
                     var message = {% trans "`${data.percentage} of ${data.processed} learner's grades processed.`" %};
+                    $('.loading-spinner').hide();
                     if (data.errors) {
                         var errorMessage = {% trans "`${data.errors} errors. Please try again. `" %};
                         if (data.message != undefined) {
