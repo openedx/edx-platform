@@ -16,8 +16,8 @@ from django.db.utils import IntegrityError
 from django.template import defaultfilters
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
-from six import text_type
-from six.moves.urllib.parse import urlparse, urlunparse
+from six import text_type  # pylint: disable=ungrouped-imports
+from six.moves.urllib.parse import urlparse, urlunparse  # pylint: disable=import-error
 
 from lms.djangoapps.discussion import django_comment_client
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
