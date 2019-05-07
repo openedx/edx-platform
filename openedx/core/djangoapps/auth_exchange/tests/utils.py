@@ -2,6 +2,7 @@
 Test utilities for OAuth access token exchange
 """
 
+from __future__ import absolute_import
 from django.conf import settings
 from social_django.models import UserSocialAuth, Partial
 
