@@ -2,6 +2,8 @@
 Utility functions related to urls.
 """
 
+from __future__ import absolute_import
+
 import sys
 from importlib import import_module
 
