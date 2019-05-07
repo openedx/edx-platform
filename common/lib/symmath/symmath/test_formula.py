@@ -23,7 +23,7 @@ class FormulaTest(unittest.TestCase):
 
     def setUp(self):
         super(FormulaTest, self).setUp()
-        self.formulaInstance = formula.formula('')
+        self.formulaInstance = formula('')
 
     def test_replace_mathvariants(self):
         expr = '''
