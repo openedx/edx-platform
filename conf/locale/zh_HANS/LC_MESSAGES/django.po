@@ -10,8 +10,8 @@
 # Yi Li <y.li@eliteu.cn>, 2018
 # 家璧 刘 <jb.liu@eliteu.com.cn>, 2018
 # 陈滢冲 <yc.chen@eliteu.cn>, 2018
-# li ying <code@eliteu.cn>, 2019
 # fengri <173770922@qq.com>, 2019
+# li ying <code@eliteu.cn>, 2019
 #
 # #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/).
@@ -32,8 +32,8 @@
 # 微 李 <w.li@eliteu.com.cn>, 2018
 # 家璧 刘 <jb.liu@eliteu.com.cn>, 2018
 # 婕 高 <j.gao@eliteu.cn>, 2018
-# li ying <code@eliteu.cn>, 2019
 # fengri <173770922@qq.com>, 2019
+# li ying <code@eliteu.cn>, 2019
 #
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)
@@ -70,8 +70,8 @@
 # Translators:
 # 嘉杰 李 <jj.li@eliteu.com.cn>, 2018
 # 微 李 <w.li@eliteu.com.cn>, 2018
-# li ying <code@eliteu.cn>, 2019
 # fengri <173770922@qq.com>, 2019
+# li ying <code@eliteu.cn>, 2019
 #
 # #-#-#-#-#  eliteu.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/).
@@ -4590,8 +4590,8 @@ msgstr "密码重置"
 #: common/templates/student/edx_ace/passwordreset/email/body.txt
 #, python-format
 msgid ""
-"You're receiving this e-mail because you requested a password reset for your"
-" user account at %(platform_name)s."
+"You're receiving this email because you requested a password reset for your "
+"user account at %(platform_name)s."
 msgstr "您在%(platform_name)s申请了账号密码重置。"
 
 #: common/templates/student/edx_ace/passwordreset/email/body.html
@@ -4610,8 +4610,8 @@ msgstr "如果您没有申请作出更改，请忽略此邮件。"
 #: common/templates/student/edx_ace/passwordreset/email/body.html
 #: common/templates/student/edx_ace/passwordreset/email/body.txt
 msgid ""
-"If you didn't request this change, you can disregard this email - we have "
-"not yet reset your password."
+"If you didn't request this change, you can ignore this email - we have not "
+"yet reset your password."
 msgstr "如果您没有请求该变更，请忽略本邮件——我们尚未重置您的密码。"
 
 #: common/templates/student/edx_ace/passwordreset/email/body.html
@@ -7215,8 +7215,11 @@ msgstr "公司名称"
 msgid "Title"
 msgstr "标题"
 
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's year of birth.
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: lms/templates/register-form.html
+#: openedx/core/djangoapps/user_api/api.py lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Year of Birth"
 msgstr "出生年份"
@@ -8756,7 +8759,6 @@ msgstr ""
 
 #: lms/envs/common.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: membership/templates/membership/index.html
 msgid "Professional"
 msgstr "教授"
 
@@ -9019,7 +9021,7 @@ msgstr "您已从课程%(course_name)s中被移除。"
 #, python-format
 msgid ""
 "You have been unenrolled from the course %(course_name)s by a member of the "
-"course staff. Please disregard the invitation previously sent."
+"course staff. Please ignore the invitation previously sent."
 msgstr "您已被课程工作人员从 %(course_name)s课程移除。请忽略之前向您发出的所有请求。"
 
 #: lms/templates/instructor/edx_ace/allowedunenroll/email/body.txt
@@ -10826,18 +10828,13 @@ msgid ""
 "The name that will identify you in your courses. It cannot be changed later."
 msgstr "您在课程中的姓名，一旦确定便无法更改。"
 
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's highest completed level of education.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Highest level of education completed"
-msgstr "最高受教育程度"
-
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's year of birth.
-#: openedx/core/djangoapps/user_api/api.py lms/templates/signup_modal.html
-msgid "Year of birth"
-msgstr "出生年份"
+#. form used to select the user's highest completed level of education.
+#: openedx/core/djangoapps/user_api/api.py lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Highest Level of Education Completed"
+msgstr "最高教育程度"
 
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the country in which the user lives.
@@ -11329,8 +11326,8 @@ msgstr "广东英荔国际教育科技有限公司  版权所有"
 #: lms/templates/emails/photo_submission_review.txt
 #: lms/templates/emails/reverification_processed.txt
 msgid ""
-"(If the link is not clickable, try copying and pasting it into the address "
-"bar of your web browser, and press \"Enter\" key to open the page)"
+"(If the link is invalid, try to copy and paste it into the address bar of "
+"your web browser, and press \"Enter\" to open the page.)"
 msgstr "（如链接点击无效，请手动复制链接并粘贴到浏览器地址栏中，然后按“回车”打开页面即可）"
 
 #: themes/normal-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
@@ -13245,11 +13242,6 @@ msgstr "例：北京"
 
 #: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
-msgid "Highest Level of Education Completed"
-msgstr "最高教育程度"
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
 msgid "Please share with us your reasons for registering with {platform_name}"
 msgstr "请告诉我们您注册 {platform_name}的原因"
 
@@ -13442,6 +13434,10 @@ msgstr "全名 *"
 #: lms/templates/signup_modal.html
 msgid "Ed. Completed"
 msgstr "已完成"
+
+#: lms/templates/signup_modal.html
+msgid "Year of birth"
+msgstr "出生年份"
 
 #: lms/templates/signup_modal.html
 msgid "Goals in signing up for {platform_name}"
@@ -16559,9 +16555,9 @@ msgstr "哈佛管理导师"
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
-"You're almost there! Use the link to activate your account to access "
-"engaging, high-quality {platform_name} courses. Note that you will not be "
-"able to log back into your account until you have activated it."
+"You're almost there! Use the link to activate your account to access high-"
+"quality {platform_name} courses. Note that you will not be able to log back "
+"into your account until you have activated it."
 msgstr "注册差不多完成啦！点击链接激活您的账号，体验{platform_name}的精品课程。注意，您必须激活账号才可以登录。"
 
 #: lms/templates/emails/activation_email.txt
@@ -17187,7 +17183,7 @@ msgstr "系统管理员"
 
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/header/navbar-not-authenticated.html
-msgid "Professor"
+msgid "Professors"
 msgstr "教授"
 
 #: lms/templates/header/navbar-authenticated.html
@@ -20640,8 +20636,9 @@ msgid ""
 msgstr "2.  不得干扰、损害和侵犯英荔的各种合法权利与利益；"
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
+#: themes/normal-theme/lms/templates/static_templates/honor.html
 msgid ""
-"3.   Shall not interfere with, damage and infringe upon the various legal "
+"3. Shall not interfere with, damage and infringe upon the various legal "
 "rights and interests of other EliteMBA users;"
 msgstr "3. 不得干扰、损害和侵犯其他英荔用户的各种合法权利与利益；"
 
@@ -21715,12 +21712,6 @@ msgid ""
 "6. Ways of use or disclaimer circumstances listed by EliteMBA in terms of "
 "service and this Disclaimer."
 msgstr "6.  英荔在各服务条款及声明中列明的使用方式或免责情形。"
-
-#: themes/normal-theme/lms/templates/static_templates/honor.html
-msgid ""
-"3. Shall not interfere with, damage and infringe upon the various legal "
-"rights and interests of other EliteMBA users;"
-msgstr "3. 不得干扰、损害和侵犯其他英荔用户的各种合法权利与利益；"
 
 #: themes/normal-theme/lms/templates/static_templates/join_us.html
 msgid "Join us"
@@ -26595,6 +26586,11 @@ msgstr "一年"
 #: membership/templates/membership/index.html
 msgid "average per month"
 msgstr "月均"
+
+#: membership/templates/membership/index.html
+msgctxt "Membership"
+msgid "Professional"
+msgstr "教授"
 
 #: membership/templates/membership/index.html
 msgctxt "Membership"

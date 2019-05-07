@@ -4503,8 +4503,8 @@ msgstr ""
 #: common/templates/student/edx_ace/passwordreset/email/body.txt
 #, python-format
 msgid ""
-"You're receiving this e-mail because you requested a password reset for your"
-" user account at %(platform_name)s."
+"You're receiving this email because you requested a password reset for your "
+"user account at %(platform_name)s."
 msgstr ""
 
 #: common/templates/student/edx_ace/passwordreset/email/body.html
@@ -4523,8 +4523,8 @@ msgstr ""
 #: common/templates/student/edx_ace/passwordreset/email/body.html
 #: common/templates/student/edx_ace/passwordreset/email/body.txt
 msgid ""
-"If you didn't request this change, you can disregard this email - we have "
-"not yet reset your password."
+"If you didn't request this change, you can ignore this email - we have not "
+"yet reset your password."
 msgstr ""
 
 #: common/templates/student/edx_ace/passwordreset/email/body.html
@@ -7108,8 +7108,11 @@ msgstr ""
 msgid "Title"
 msgstr ""
 
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's year of birth.
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: lms/templates/register-form.html
+#: openedx/core/djangoapps/user_api/api.py lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Year of Birth"
 msgstr ""
@@ -8575,7 +8578,6 @@ msgstr ""
 
 #: lms/envs/common.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: membership/templates/membership/index.html
 msgid "Professional"
 msgstr ""
 
@@ -8834,7 +8836,7 @@ msgstr ""
 #, python-format
 msgid ""
 "You have been unenrolled from the course %(course_name)s by a member of the "
-"course staff. Please disregard the invitation previously sent."
+"course staff. Please ignore the invitation previously sent."
 msgstr ""
 
 #: lms/templates/instructor/edx_ace/allowedunenroll/email/body.txt
@@ -10610,17 +10612,12 @@ msgid ""
 "The name that will identify you in your courses. It cannot be changed later."
 msgstr ""
 
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's highest completed level of education.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Highest level of education completed"
-msgstr ""
-
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's year of birth.
-#: openedx/core/djangoapps/user_api/api.py lms/templates/signup_modal.html
-msgid "Year of birth"
+#. form used to select the user's highest completed level of education.
+#: openedx/core/djangoapps/user_api/api.py lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Highest Level of Education Completed"
 msgstr ""
 
 #. Translators: This label appears above a dropdown menu on the registration
@@ -11104,8 +11101,8 @@ msgstr ""
 #: lms/templates/emails/photo_submission_review.txt
 #: lms/templates/emails/reverification_processed.txt
 msgid ""
-"(If the link is not clickable, try copying and pasting it into the address "
-"bar of your web browser, and press \"Enter\" key to open the page)"
+"(If the link is invalid, try to copy and paste it into the address bar of "
+"your web browser, and press \"Enter\" to open the page.)"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
@@ -12998,11 +12995,6 @@ msgstr ""
 
 #: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
-msgid "Highest Level of Education Completed"
-msgstr ""
-
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
 msgid "Please share with us your reasons for registering with {platform_name}"
 msgstr ""
 
@@ -13189,6 +13181,10 @@ msgstr ""
 
 #: lms/templates/signup_modal.html
 msgid "Ed. Completed"
+msgstr ""
+
+#: lms/templates/signup_modal.html
+msgid "Year of birth"
 msgstr ""
 
 #: lms/templates/signup_modal.html
@@ -16237,9 +16233,9 @@ msgstr ""
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
-"You're almost there! Use the link to activate your account to access "
-"engaging, high-quality {platform_name} courses. Note that you will not be "
-"able to log back into your account until you have activated it."
+"You're almost there! Use the link to activate your account to access high-"
+"quality {platform_name} courses. Note that you will not be able to log back "
+"into your account until you have activated it."
 msgstr ""
 
 #: lms/templates/emails/activation_email.txt
@@ -16843,7 +16839,7 @@ msgstr ""
 
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/header/navbar-not-authenticated.html
-msgid "Professor"
+msgid "Professors"
 msgstr ""
 
 #: lms/templates/header/navbar-authenticated.html
@@ -20253,8 +20249,9 @@ msgid ""
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
+#: themes/normal-theme/lms/templates/static_templates/honor.html
 msgid ""
-"3.   Shall not interfere with, damage and infringe upon the various legal "
+"3. Shall not interfere with, damage and infringe upon the various legal "
 "rights and interests of other EliteMBA users;"
 msgstr ""
 
@@ -21277,12 +21274,6 @@ msgstr ""
 msgid ""
 "6. Ways of use or disclaimer circumstances listed by EliteMBA in terms of "
 "service and this Disclaimer."
-msgstr ""
-
-#: themes/normal-theme/lms/templates/static_templates/honor.html
-msgid ""
-"3. Shall not interfere with, damage and infringe upon the various legal "
-"rights and interests of other EliteMBA users;"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/join_us.html
@@ -26061,6 +26052,11 @@ msgstr ""
 
 #: membership/templates/membership/index.html
 msgid "average per month"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgctxt "Membership"
+msgid "Professional"
 msgstr ""
 
 #: membership/templates/membership/index.html
