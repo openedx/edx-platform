@@ -99,7 +99,7 @@ class CourseHomeTest(CourseHomeBaseTest):
         }
 
         actual_sections = self.course_home_page.outline.sections
-        for section, subsections in six.iteritems(EXPECTED_SECTIONS):
+        for section, _ in six.iteritems(EXPECTED_SECTIONS):
             self.assertIn(section, actual_sections)
             self.assertEqual(actual_sections[section], EXPECTED_SECTIONS[section])
 
