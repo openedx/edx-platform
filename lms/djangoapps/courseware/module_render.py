@@ -313,6 +313,9 @@ def get_module(user, request, usage_key, field_data_cache,
                                 by get_course_info_section, because info section modules
                                 do not have a course as the parent module, and thus do not
                                 inherit this lms key value.
+      - will_recheck_access   : If True, the caller commits to re-checking access on each child XBlock
+                                before rendering the content in order to display access error messages
+                                to the user.
 
     Returns: xmodule instance, or None if the user does not have access to the
     module.  If there's an error, will try to return an instance of ErrorModule
@@ -445,7 +448,7 @@ def get_module_system_for_user(
         user_location=None,
         disable_staff_debug_info=False,
         course=None,
-        will_recheck_access=False
+        will_recheck_access=False,
 ):
     """
     Helper function that returns a module system and student_data bound to a user and a descriptor.

@@ -383,7 +383,7 @@ class CoursewareIndex(View):
             self.course_key,
             self.position,
             course=self.course,
-            will_recheck_access=True
+            will_recheck_access=True,
         )
 
     def _save_positions(self):
