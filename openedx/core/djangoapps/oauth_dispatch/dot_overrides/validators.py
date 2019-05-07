@@ -1,8 +1,7 @@
 """
 Classes that override default django-oauth-toolkit behavior
 """
-from __future__ import unicode_literals
-
+from __future__ import unicode_literals, absolute_import
 from datetime import datetime, timedelta
 
 from django.contrib.auth import authenticate, get_user_model
