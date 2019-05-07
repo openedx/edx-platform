@@ -1,5 +1,7 @@
 """Defines ``Group`` and ``UserPartition`` models for partitioning"""
 
+from __future__ import absolute_import
+
 from collections import namedtuple
 
 from stevedore.extension import ExtensionManager
