@@ -2,8 +2,6 @@
 Unit tests for the Mongo modulestore
 """
 
-# pylint: disable=no-name-in-module
-# pylint: disable=bad-continuation
 from __future__ import absolute_import
 
 import logging
@@ -15,12 +13,15 @@ from uuid import uuid4
 import pymongo
 import pytest
 import six
+
+# pylint: disable=no-name-in-module
+# pylint: disable=bad-continuation
 # pylint: disable=protected-access
 from django.test import TestCase
+# pylint: enable=E0611
 from mock import patch
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import AssetLocator, BlockUsageLocator, CourseLocator, LibraryLocator
-# pylint: enable=E0611
 from path import Path as path
 from pytz import UTC
 from xblock.core import XBlock

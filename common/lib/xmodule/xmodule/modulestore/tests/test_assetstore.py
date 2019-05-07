@@ -9,6 +9,8 @@ from datetime import datetime, timedelta
 
 import ddt
 import pytz
+import six
+
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
@@ -33,7 +35,11 @@ class AssetStoreTestData(object):
     """
     now = datetime.now(pytz.utc)
     user_id = 144
-    user_id_long = int(user_id)
+    if six.PY2:
+        user_id_long = long(user_id)
+    else:
+        user_id_long = int(user_id)
+
     user_email = "me@example.com"
 
     asset_fields = (
