@@ -974,7 +974,7 @@ class EntranceExamTest(UniqueCourseTest):
         """
         # visit the course outline and make sure there is no "Entrance Exam" section.
         self.course_home_page.visit()
-        self.assertFalse('Entrance Exam' in list(self.course_home_page.outline.sections.keys()))
+        self.assertNotIn('Entrance Exam', list(self.course_home_page.outline.sections.keys()))
 
         # Logout and login as a staff.
         LogoutPage(self.browser).visit()
@@ -991,7 +991,7 @@ class EntranceExamTest(UniqueCourseTest):
 
         # visit the course outline and make sure there is an "Entrance Exam" section.
         self.course_home_page.visit()
-        self.assertTrue('Entrance Exam' in list(self.course_home_page.outline.sections.keys()))
+        self.assertIn('Entrance Exam', list(self.course_home_page.outline.sections.keys()))
 
     # TODO: TNL-6546: Remove test
     def test_entrance_exam_section_2(self):

@@ -4,6 +4,7 @@ End-to-end tests for the LMS that utilize the
 progress page.
 """
 from __future__ import absolute_import
+from six.moves import range
 from contextlib import contextmanager
 
 import ddt
@@ -24,7 +25,6 @@ from ..helpers import (
     create_multiple_choice_xml,
     get_modal_alert
 )
-from six.moves import range
 
 
 class ProgressPageBaseTest(UniqueCourseTest):
