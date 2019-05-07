@@ -1,5 +1,7 @@
 """Tests for the user API at the HTTP request level. """
 
+from __future__ import absolute_import
+
 import datetime
 import json
 from unittest import skipUnless
@@ -7,49 +9,60 @@ from unittest import skipUnless
 import ddt
 import httpretty
 import mock
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
-from django.urls import reverse
 from django.test.client import RequestFactory
 from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
+from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
-from pytz import common_timezones_set, UTC
+from pytz import UTC, common_timezones_set
 from six import text_type
-from social_django.models import UserSocialAuth, Partial
+from six.moves import range
+from social_django.models import Partial, UserSocialAuth
 
 from openedx.core.djangoapps.django_comment_common import models
 from openedx.core.djangoapps.site_configuration.helpers import get_value
-from openedx.core.lib.api.test_utils import ApiTestCase, TEST_API_KEY
-from openedx.core.lib.time_zone_utils import get_display_time_zone
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
+from openedx.core.lib.api.test_utils import TEST_API_KEY, ApiTestCase
+from openedx.core.lib.time_zone_utils import get_display_time_zone
 from student.tests.factories import UserFactory
-from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
+from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
 from third_party_auth.tests.utils import (
-    ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
+    ThirdPartyOAuthTestMixin,
+    ThirdPartyOAuthTestMixinFacebook,
+    ThirdPartyOAuthTestMixinGoogle
 )
 from util.password_policy_validators import (
-    create_validator_config, password_validators_instruction_texts, password_validators_restrictions,
     DEFAULT_MAX_PASSWORD_LENGTH,
+    create_validator_config,
+    password_validators_instruction_texts,
+    password_validators_restrictions
 )
-from .test_helpers import TestCaseForm
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
 from ..accounts import (
-    NAME_MAX_LENGTH, EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH,
-    USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH, USERNAME_BAD_LENGTH_MSG
+    EMAIL_MAX_LENGTH,
+    EMAIL_MIN_LENGTH,
+    NAME_MAX_LENGTH,
+    USERNAME_BAD_LENGTH_MSG,
+    USERNAME_MAX_LENGTH,
+    USERNAME_MIN_LENGTH
 )
+from ..accounts.api import get_account_settings
 from ..accounts.tests.retirement_helpers import (  # pylint: disable=unused-import
     RetirementTestCase,
     fake_requested_retirement,
     setup_retirement_states
 )
-from ..accounts.api import get_account_settings
 from ..models import UserOrgTag
 from ..tests.factories import UserPreferenceFactory
 from ..tests.test_constants import SORTED_COUNTRIES
+from .test_helpers import TestCaseForm
 
 USER_LIST_URI = "/user_api/v1/users/"
 USER_PREFERENCE_LIST_URI = "/user_api/v1/user_prefs/"
@@ -80,9 +93,9 @@ class UserAPITestCase(ApiTestCase):
 
     def assertUserIsValid(self, user):
         """Assert that the given user result is valid"""
-        self.assertItemsEqual(user.keys(), ["email", "id", "name", "username", "preferences", "url"])
+        self.assertItemsEqual(list(user.keys()), ["email", "id", "name", "username", "preferences", "url"])
         self.assertItemsEqual(
-            user["preferences"].items(),
+            list(user["preferences"].items()),
             [(pref.key, pref.value) for pref in self.prefs if pref.user.id == user["id"]]
         )
         self.assertSelfReferential(user)
@@ -91,7 +104,7 @@ class UserAPITestCase(ApiTestCase):
         """
         Assert that the given preference is acknowledged by the system
         """
-        self.assertItemsEqual(pref.keys(), ["user", "key", "value", "url"])
+        self.assertItemsEqual(list(pref.keys()), ["user", "key", "value", "url"])
         self.assertSelfReferential(pref)
         self.assertUserIsValid(pref["user"])
 
@@ -111,7 +124,7 @@ class EmptyUserTestCase(UserAPITestCase):
 class EmptyRoleTestCase(UserAPITestCase):
     """Test that the endpoint supports empty result sets"""
     course_id = CourseKey.from_string("org/course/run")
-    LIST_URI = ROLE_LIST_URI + "?course_id=" + unicode(course_id)
+    LIST_URI = ROLE_LIST_URI + "?course_id=" + six.text_type(course_id)
 
     def test_get_list_empty(self):
         """Test that the endpoint properly returns empty result sets"""
@@ -147,7 +160,7 @@ class RoleTestCase(UserApiTestCase):
     Test cases covering Role-related views and their behaviors
     """
     course_id = CourseKey.from_string("org/course/run")
-    LIST_URI = ROLE_LIST_URI + "?course_id=" + unicode(course_id)
+    LIST_URI = ROLE_LIST_URI + "?course_id=" + six.text_type(course_id)
 
     def setUp(self):
         super(RoleTestCase, self).setUp()
@@ -1294,7 +1307,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             ] + [
                 {
                     "value": country_code,
-                    "name": unicode(country_name),
+                    "name": six.text_type(country_name),
                     "default": True if country_code == expected_country_code else False
                 }
                 for country_code, country_name in SORTED_COUNTRIES
@@ -1483,8 +1496,8 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 }
             ] + [
                 {
-                    "value": unicode(year),
-                    "name": unicode(year),
+                    "value": six.text_type(year),
+                    "name": six.text_type(year),
                     "default": False
                 }
                 for year in range(this_year, this_year - 120, -1)
@@ -1627,7 +1640,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             ] + [
                 {
                     "value": country_code,
-                    "name": unicode(country_name),
+                    "name": six.text_type(country_name),
                     "default": False
                 }
                 for country_code, country_name in SORTED_COUNTRIES
@@ -2333,7 +2346,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             msg=u"Could not find field {name}".format(name=expected_field["name"])
         )
 
-        for key, value in expected_field.iteritems():
+        for key in expected_field:
             self.assertEqual(
                 actual_field[key], expected_field[key],
                 msg=u"Expected {expected} for {key} but got {actual} instead".format(
@@ -2624,7 +2637,7 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
         """Tests the email opt in preference"""
         # Register, which should trigger an activation email
         response = self.client.post(self.url, {
-            "course_id": unicode(self.course.id),
+            "course_id": six.text_type(self.course.id),
             "email_opt_in": opt
         })
         self.assertHttpOK(response)
@@ -2643,7 +2656,7 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
         """Tests the email opt in preference"""
         params = {}
         if use_course_id:
-            params["course_id"] = unicode(self.course.id)
+            params["course_id"] = six.text_type(self.course.id)
         if use_opt_in:
             params["email_opt_in"] = u"True"
 
@@ -2656,7 +2669,7 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
         self.user.save()
         # Register, which should trigger an activation email
         response = self.client.post(self.url, {
-            "course_id": unicode(self.course.id),
+            "course_id": six.text_type(self.course.id),
             "email_opt_in": u"True"
         })
         self.assertHttpOK(response)
@@ -2672,7 +2685,7 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
         """
         self.client.logout()
         response = self.client.post(self.url, {
-            "course_id": unicode(self.course.id),
+            "course_id": six.text_type(self.course.id),
             "email_opt_in": u"True"
         })
         self.assertEqual(response.status_code, 403)

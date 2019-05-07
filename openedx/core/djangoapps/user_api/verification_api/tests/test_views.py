@@ -1,14 +1,14 @@
 """ Tests for API endpoints. """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import datetime
-import freezegun
 import json
 
+import freezegun
 from django.conf import settings
-from django.urls import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.urls import reverse
 
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from student.tests.factories import UserFactory

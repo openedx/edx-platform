@@ -2,40 +2,41 @@
 """
 Unit tests for preference APIs.
 """
-import datetime
-import ddt
-from mock import patch
-from pytz import common_timezones, utc
+from __future__ import absolute_import
 
+import datetime
+
+import ddt
+from dateutil.parser import parse as parse_datetime
 from django.contrib.auth.models import User
 from django.test.utils import override_settings
-from dateutil.parser import parse as parse_datetime
+from mock import patch
+from pytz import common_timezones, utc
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.time_zone_utils import get_display_time_zone
 from student.models import UserProfile
 from student.tests.factories import UserFactory
-
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from ...accounts.api import create_account
 from ...errors import (
-    UserNotFound,
-    UserNotAuthorized,
-    PreferenceValidationError,
-    PreferenceUpdateError,
     CountryCodeError,
+    PreferenceUpdateError,
+    PreferenceValidationError,
+    UserNotAuthorized,
+    UserNotFound
 )
 from ...models import UserOrgTag
 from ...preferences.api import (
+    delete_user_preference,
+    get_country_time_zones,
     get_user_preference,
     get_user_preferences,
     set_user_preference,
-    update_user_preferences,
-    delete_user_preference,
     update_email_opt_in,
-    get_country_time_zones,
+    update_user_preferences
 )
 
 
@@ -139,7 +140,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         with self.assertRaises(PreferenceValidationError) as context_manager:
             set_user_preference(self.user, too_long_key, "new_value")
         errors = context_manager.exception.preference_errors
-        self.assertEqual(len(errors.keys()), 1)
+        self.assertEqual(len(list(errors.keys())), 1)
         self.assertEqual(
             errors[too_long_key],
             {
@@ -152,7 +153,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
             with self.assertRaises(PreferenceValidationError) as context_manager:
                 set_user_preference(self.user, self.test_preference_key, empty_value)
             errors = context_manager.exception.preference_errors
-            self.assertEqual(len(errors.keys()), 1)
+            self.assertEqual(len(list(errors.keys())), 1)
             self.assertEqual(
                 errors[self.test_preference_key],
                 {
@@ -241,7 +242,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         with self.assertRaises(PreferenceValidationError) as context_manager:
             update_user_preferences(self.user, {too_long_key: "new_value"})
         errors = context_manager.exception.preference_errors
-        self.assertEqual(len(errors.keys()), 1)
+        self.assertEqual(len(list(errors.keys())), 1)
         self.assertEqual(
             errors[too_long_key],
             {
@@ -254,7 +255,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
             with self.assertRaises(PreferenceValidationError) as context_manager:
                 update_user_preferences(self.user, {self.test_preference_key: empty_value})
             errors = context_manager.exception.preference_errors
-            self.assertEqual(len(errors.keys()), 1)
+            self.assertEqual(len(list(errors.keys())), 1)
             self.assertEqual(
                 errors[self.test_preference_key],
                 {

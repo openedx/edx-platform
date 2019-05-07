@@ -3,19 +3,23 @@
 Unit tests for preference APIs.
 """
 
-import ddt
-import json
-from mock import patch
+from __future__ import absolute_import
 
-from django.urls import reverse
+import json
+
+import ddt
+import six
 from django.test.testcases import TransactionTestCase
+from django.urls import reverse
+from mock import patch
 from rest_framework.test import APIClient
-from student.tests.factories import UserFactory, TEST_PASSWORD
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+from student.tests.factories import TEST_PASSWORD, UserFactory
+
 from ...accounts.tests.test_views import UserAPITestCase
 from ..api import set_user_preference
-from .test_api import get_expected_validation_developer_message, get_expected_key_error_user_message
+from .test_api import get_expected_key_error_user_message, get_expected_validation_developer_message
 
 TOO_LONG_PREFERENCE_KEY = u"x" * 256
 
@@ -546,7 +550,7 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         self.send_put(self.client, preference_value)
         response = self.send_get(self.client)
-        self.assertEqual(unicode(preference_value), response.data)
+        self.assertEqual(six.text_type(preference_value), response.data)
 
     @ddt.data(
         ("different_client", "different_user"),
