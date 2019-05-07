@@ -1,6 +1,7 @@
 """
 Tests for course_overviews app.
 """
+from __future__ import absolute_import
 from cStringIO import StringIO
 import datetime
 import ddt
@@ -39,6 +40,8 @@ from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 
 from ..models import CourseOverview, CourseOverviewImageSet, CourseOverviewImageConfig
 from .factories import CourseOverviewFactory
+import six
+from six.moves import range
 
 
 @ddt.ddt
@@ -472,7 +475,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         org_courses = []  # list of lists of courses
         for index in range(3):
             org_courses.append([
-                CourseFactory.create(org='test_org_' + unicode(index), emit_signals=True)
+                CourseFactory.create(org='test_org_' + six.text_type(index), emit_signals=True)
                 for __ in range(3)
             ])
 

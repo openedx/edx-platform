@@ -12,6 +12,7 @@ some subset of courses and signal listeners, and then rely on existing listener
 behavior to trigger the necessary data updates.
 """
 from __future__ import print_function
+from __future__ import absolute_import
 import copy
 import logging
 import os
@@ -25,6 +26,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.ccx.tasks import course_published_handler as ccx_receiver_fn
 from xmodule.modulestore.django import modulestore, SignalHandler
+import six
 
 
 log = logging.getLogger('simulate_publish')
@@ -253,7 +255,7 @@ class Command(BaseCommand):
             log.info("No courses specified, reading all courses from modulestore...")
             course_keys = sorted(
                 (course.id for course in modulestore().get_course_summaries()),
-                key=unicode  # Different types of CourseKeys can't be compared without this.
+                key=six.text_type  # Different types of CourseKeys can't be compared without this.
             )
             log.info(u"%d courses read from modulestore.", len(course_keys))
 

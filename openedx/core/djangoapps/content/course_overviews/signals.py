@@ -1,6 +1,7 @@
 """
 Signal handler for invalidating cached course overviews
 """
+from __future__ import absolute_import
 import logging
 
 from django.dispatch import Signal
