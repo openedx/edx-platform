@@ -75,8 +75,8 @@ def course_wiki_redirect(request, course_id, wiki_path=""):  # pylint: disable=u
 
         content = cgi.escape(
             # Translators: this string includes wiki markup.  Leave the ** and the _ alone.
-            _("This is the wiki for **{organization}**'s _{course_name}_.").format(
-                organization=course.display_org_with_default,
+            _("This is the wiki for _{course_name}_.").format(
+                # organization=course.display_org_with_default,
                 course_name=course.display_name_with_default_escaped,
             )
         )

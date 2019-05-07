@@ -76,7 +76,8 @@
   .thread-wrapper{
     padding: 10px 10px 20px;
   }
-  .discussion-submit-post{
+  .discussion-submit-post,
+  .add-response-btn{
     @extend %btn-my-white;
   }
   .post-header{

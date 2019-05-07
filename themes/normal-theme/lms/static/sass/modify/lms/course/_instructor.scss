@@ -5,7 +5,9 @@
   section.idash-section#cohort_management .cohort-management .message .action-create,
   section.idash-section#discussions_management .form-submit,
   .btn-blue,
-  .customBrowseBtn .file-browse .browse
+  .customBrowseBtn .file-browse .browse,
+  section.idash-section#cohort_management .cohort-management-nav .action-create
+
   {
     @extend %btn-my-primary;
   }

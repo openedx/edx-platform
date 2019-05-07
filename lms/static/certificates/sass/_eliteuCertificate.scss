@@ -1,3 +1,42 @@
+$primary: #4788C7;
+$font: #656D78;
+$title: #2E313C;
+$font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,"Helvetica Neue", Helvetica,Tahoma，Arial, "PingFang SC", "Hiragino Sans GB", 
+"Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei",SimHei，sans-serif;
+%btn-my-primary{
+  box-sizing: border-box;
+  display: inline-block;
+  width: auto;
+  padding: 0 20px !important;
+  font-size: 14px;
+  letter-spacing: 0.3px;
+  height: 36px;
+  line-height: 34px !important;
+  border-radius: 3px;
+  font-weight: normal;
+  cursor: pointer;
+  border: none;
+  background: $primary;
+  border: 1px solid $primary;
+  color: #fff;
+  text-shadow: none;
+  box-shadow: none;
+  font-family: $font-family;
+  outline: none;
+
+  &:hover,&:focus, &:active, &:visited, &:hover:not(:disabled), &:active:not(:disabled), &:focus:not(:disabled){
+    background: $primary;
+    background-image: none;
+    text-decoration: none;
+    opacity: 0.95;
+    box-shadow: none;
+    color: #fff;
+    border: 1px solid $primary;
+  }
+}
+.wrap-h5{
+  padding: 0 10px;
+}
 .layout-accomplishment .accomplishment-rendering{
   background-size: 1170px 100%;
   position: relative; 
@@ -51,13 +90,11 @@ p.accomplishment-success{
     width:auto;
     display: inline-block;
     text-align: left;
-    float:left;
 }
 .span-accomplishment-course-id{ 
     margin-top: 5px;
     font-size: 18px;
     color: #205179;
-    float:left;
 }
 .course-name-line{   
     height: 3px;
@@ -141,30 +178,31 @@ p.accomplishment-success{
   padding: 15px 26px;
   margin: 20px auto;
   margin-bottom: 0;
+  line-height: 1.5;
+  display: flex;
+  align-items: flex-end;
   .message-notice-certificates{
-    float: left;
+    flex: 1;
     p{
       margin: 0;
     }
     p:first-child{
       font-size: 16px;
-      color: #2e313c;
+      color: $title;
+      line-height: 2;
     }
     p:last-child{
       font-size: 14px;
-      color: #656d78;
+      color: $font;
     }
   }
   .op-container-certificates{
-    float: right;
+    flex: 0 0 380px;
+    height: 36px;
+    text-align: right;
     .certificates-btn{
-      background-color: #4788c7;
-      border-radius: 2px;
-      color: #fff;
-      font-size: 14px;
-      display: inline-block;
-      padding: 5px 15px;
-      cursor: pointer;
+      @extend %btn-my-primary;
+      bottom: 0;
     }
     .print-btn{
       margin-right: 10px;
@@ -172,7 +210,7 @@ p.accomplishment-success{
   }
 }
 .layout-accomplishment .header-app .logo{
-  width: 117px;
+  width: 175px;
 }
 .layout-accomplishment .accomplishment-main{
   max-width: 1200px;
@@ -183,8 +221,8 @@ p.accomplishment-success{
   .wrapper-accomplishment-rendering-header{
     margin-top: 20px;
     padding: 13px 25px;
-    color: #2e313c;
-    line-height: 1;
+    color: $title;
+    line-height: 1.5;
     font-size: 18px;
     border-bottom: solid 1px #e3f2fe;
   }
@@ -202,7 +240,7 @@ p.accomplishment-success{
   }
   .accomplishment-extend-info-title{
     font-size: 16px;
-    color: #2e313c;
+    color: $title;
     margin-bottom: 20px;
     font-weight: normal;
   }
@@ -228,11 +266,11 @@ p.accomplishment-success{
       // padding-top: 10px;
       h3{
         font-size: 14px;
-        color: #2e313c;
+        color: $title;
         line-height: 2;
       }
       p{
-        color: #656d78;
+        color: $font;
         line-height: 2;
         font-size: 14px;
       }
@@ -246,7 +284,7 @@ p.accomplishment-success{
 .layout-accomplishment .wrapper-about .about-item{
   width: 100%;
   .about-edx-title,.about-title {
-    color: #2e313c;
+    color: $title;
     line-height: 24px;
     font-size: 16px;
     margin: 0;
@@ -255,17 +293,15 @@ p.accomplishment-success{
   .copy-meta{
     p{
       font-size: 14px;
-      color: #656d78;
+      color: $font;
     }
     a{
-      color: #346ca3;
+      color: $primary;
     }
   }
 }
 @media screen and (max-width:768px){
-  .wrap-h5{
-    padding: 0 10px;
-  }
+  
   .accomplishment-rendering{
     #container{
       width: 100%;
@@ -336,6 +372,6 @@ p.accomplishment-success{
 
 }
 .layout-accomplishment .accomplishment-rendering,.layout-accomplishment.certificate-no-id-professional .accomplishment-rendering,.layout-accomplishment.certificate-professional .accomplishment-rendering,.layout-accomplishment.certificate-honor .accomplishment-rendering,.layout-accomplishment.certificate-audit .accomplishment-rendering {
-  background: $white url('../images/bg-verified.png') center no-repeat;
+  background: #fff url('../images/bg-verified.png') center no-repeat;
 }
 
