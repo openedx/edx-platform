@@ -2,6 +2,7 @@
 Test entitlements utilities
 """
 
+from __future__ import absolute_import
 from datetime import timedelta
 from opaque_keys.edx.keys import CourseKey
 
