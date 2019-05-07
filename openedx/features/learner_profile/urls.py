@@ -2,10 +2,11 @@
 Defines URLs for the learner profile.
 """
 
+from __future__ import absolute_import
 from django.conf import settings
 from django.conf.urls import url
 
-from views.learner_achievements import LearnerAchievementsFragmentView
+from .views.learner_achievements import LearnerAchievementsFragmentView
 from openedx.features.learner_profile.views.learner_profile import learner_profile
 
 urlpatterns = [

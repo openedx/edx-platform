@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """ Tests for student profile views. """
 
+from __future__ import absolute_import
 import datetime
 import ddt
 import mock
