@@ -14,13 +14,13 @@ from django.contrib.auth import login as django_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from ratelimitbackend.exceptions import RateLimitException
 
 import third_party_auth
+from third_party_auth import pipeline, provider
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -31,7 +31,6 @@ from openedx.core.djangolib.markup import HTML, Text
 from student.forms import send_password_reset_email_for_user
 from student.models import LoginFailures
 from student.views import send_reactivation_email_for_user
-from third_party_auth import pipeline, provider
 from track import segment
 from util.json_request import JsonResponse
 from util.password_policy_validators import normalize_password
