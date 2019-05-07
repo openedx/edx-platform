@@ -2,19 +2,22 @@
 Tests for course_overviews app.
 """
 from __future__ import absolute_import
-from cStringIO import StringIO
+
 import datetime
-import ddt
 import itertools
 import math
+from cStringIO import StringIO
+
+import ddt
 import mock
 import pytz
-
+import six
 from django.conf import settings
 from django.db.utils import IntegrityError
 from django.test.utils import override_settings
 from django.utils import timezone
 from PIL import Image
+from six.moves import range
 
 from lms.djangoapps.certificates.api import get_active_web_certificate
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
@@ -24,13 +27,13 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.lib.courses import course_image_url
 from static_replace.models import AssetBaseUrlConfig
 from xmodule.assetstore.assetmgr import AssetManager
-from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 from xmodule.course_module import (
-    CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
     CATALOG_VISIBILITY_ABOUT,
-    CATALOG_VISIBILITY_NONE,
+    CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
+    CATALOG_VISIBILITY_NONE
 )
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum
@@ -38,10 +41,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 
-from ..models import CourseOverview, CourseOverviewImageSet, CourseOverviewImageConfig
+from ..models import CourseOverview, CourseOverviewImageConfig, CourseOverviewImageSet
 from .factories import CourseOverviewFactory
-import six
-from six.moves import range
 
 
 @ddt.ddt

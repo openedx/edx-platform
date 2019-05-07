@@ -11,23 +11,22 @@ This management command will emit the SignalHandler.course_published signal for
 some subset of courses and signal listeners, and then rely on existing listener
 behavior to trigger the necessary data updates.
 """
-from __future__ import print_function
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
+
 import copy
 import logging
 import os
+import sys
 import textwrap
 import time
-import sys
 
+import six
 from django.core.management.base import BaseCommand
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.ccx.tasks import course_published_handler as ccx_receiver_fn
-from xmodule.modulestore.django import modulestore, SignalHandler
-import six
-
+from xmodule.modulestore.django import SignalHandler, modulestore
 
 log = logging.getLogger('simulate_publish')
 

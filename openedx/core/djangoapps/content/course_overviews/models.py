@@ -2,32 +2,32 @@
 Declaration of CourseOverview model
 """
 from __future__ import absolute_import
+
 import json
 import logging
-from six.moves.urllib.parse import urlparse, urlunparse
 
+import six
+from ccx_keys.locator import CCXLocator
+from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.db import models, transaction
-from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField, FloatField, IntegerField
+from django.db.models.fields import BooleanField, DateTimeField, DecimalField, FloatField, IntegerField, TextField
 from django.db.utils import IntegrityError
 from django.template import defaultfilters
-
-from ccx_keys.locator import CCXLocator
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from six import text_type
+from six.moves.urllib.parse import urlparse, urlunparse
 
-from config_models.models import ConfigurationModel
 from lms.djangoapps.discussion import django_comment_client
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from static_replace.models import AssetBaseUrlConfig
-from xmodule import course_metadata_utils, block_metadata_utils
-from xmodule.course_module import CourseDescriptor, DEFAULT_START_DATE
+from xmodule import block_metadata_utils, course_metadata_utils
+from xmodule.course_module import DEFAULT_START_DATE, CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
-import six
 
 log = logging.getLogger(__name__)
 

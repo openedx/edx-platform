@@ -2,13 +2,15 @@
 Signal handler for invalidating cached course overviews
 """
 from __future__ import absolute_import
+
 import logging
 
 from django.dispatch import Signal
 from django.dispatch.dispatcher import receiver
 
-from .models import CourseOverview
 from xmodule.modulestore.django import SignalHandler
+
+from .models import CourseOverview
 
 LOG = logging.getLogger(__name__)
 

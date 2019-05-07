@@ -2,17 +2,17 @@
 Tests the simulate_publish management command.
 """
 from __future__ import absolute_import
-from openedx.core.djangoapps.content.course_overviews.management.commands.simulate_publish import (
-    Command, name_from_fn
-)
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-import openedx.core.djangoapps.content.course_overviews.signals
+
+import six
+
 import lms.djangoapps.ccx.tasks
+import openedx.core.djangoapps.content.course_overviews.signals
+from openedx.core.djangoapps.content.course_overviews.management.commands.simulate_publish import Command, name_from_fn
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SwitchedSignal
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-import six
 
 
 class TestSimulatePublish(SharedModuleStoreTestCase):

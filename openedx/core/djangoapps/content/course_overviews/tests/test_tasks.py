@@ -1,12 +1,13 @@
 from __future__ import absolute_import
+
 import mock
+import six
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..tasks import enqueue_async_course_overview_update_tasks
-import six
 
 
 class BatchedAsyncCourseOverviewUpdateTests(ModuleStoreTestCase):

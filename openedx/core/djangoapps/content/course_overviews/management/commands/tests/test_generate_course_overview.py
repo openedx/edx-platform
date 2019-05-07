@@ -2,15 +2,15 @@
 Tests that the generate_course_overview management command actually generates course overviews.
 """
 from __future__ import absolute_import
+
+import six
 from django.core.management.base import CommandError
 from mock import patch
 
 from openedx.core.djangoapps.content.course_overviews.management.commands import generate_course_overview
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-import six
 
 
 class TestGenerateCourseOverview(ModuleStoreTestCase):
