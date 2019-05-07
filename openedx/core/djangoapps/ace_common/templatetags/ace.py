@@ -1,9 +1,10 @@
 # pylint: disable=missing-docstring
-from urlparse import urlparse
+from __future__ import absolute_import
 
 from crum import get_current_request
 from django import template
 from django.utils.safestring import mark_safe
+from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
 from openedx.core.djangoapps.ace_common.tracking import CampaignTrackingInfo, GoogleAnalyticsTrackingPixel
 from openedx.core.djangolib.markup import HTML
