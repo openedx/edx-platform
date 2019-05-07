@@ -1,19 +1,21 @@
 """ Test Student helpers """
 
+from __future__ import absolute_import
+
 import logging
 
 import ddt
 from django.conf import settings
 from django.contrib.sessions.middleware import SessionMiddleware
-from django.urls import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import patch
 from testfixtures import LogCapture
 
-from student.helpers import get_next_url_for_login_page
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
+from student.helpers import get_next_url_for_login_page
 
 LOGGER_NAME = "student.helpers"
 

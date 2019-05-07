@@ -2,13 +2,15 @@
 """
 Test that various events are fired for models in the student app.
 """
+from __future__ import absolute_import
+
 import mock
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from django_countries.fields import Country
 
 from student.models import CourseEnrollmentAllowed
-from student.tests.factories import UserFactory, CourseEnrollmentAllowedFactory
+from student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
 from student.tests.tests import UserSettingsEventTestMixin
 
 

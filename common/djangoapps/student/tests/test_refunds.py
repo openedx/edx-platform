@@ -1,6 +1,8 @@
 """
     Tests for enrollment refund capabilities.
 """
+from __future__ import absolute_import
+
 import logging
 import unittest
 from datetime import datetime, timedelta
@@ -11,16 +13,17 @@ import pytz
 # Explicitly import the cache from ConfigurationModel so we can reset it after each test
 from config_models.models import cache
 from django.conf import settings
-from django.urls import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import patch
+from six.moves import range
 
-from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
-from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 # These imports refer to lms djangoapps.
 # Their testcases are only run under lms.
 from course_modes.tests.factories import CourseModeFactory
+from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.commerce.utils import ECOMMERCE_DATE_FORMAT
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
