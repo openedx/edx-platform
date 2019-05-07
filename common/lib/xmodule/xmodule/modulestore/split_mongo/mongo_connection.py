@@ -31,9 +31,6 @@ try:
 except ImportError:
     DJANGO_AVAILABLE = False
 
-
-
-
 new_contract('BlockData', BlockData)
 log = logging.getLogger(__name__)
 
