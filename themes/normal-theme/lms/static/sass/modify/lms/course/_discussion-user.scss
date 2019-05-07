@@ -104,3 +104,7 @@
     margin: 0 10px 30px;
   }
 }
+
+.forum-new-post-form .post-field .field-label .field-input:not([type="text"]){
+  vertical-align: bottom;
+}
