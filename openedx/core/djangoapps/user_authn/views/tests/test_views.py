@@ -29,7 +29,7 @@ from oauth2_provider.models import RefreshToken as dot_refresh_token
 from provider.oauth2.models import AccessToken as dop_access_token
 from provider.oauth2.models import RefreshToken as dop_refresh_token
 from six.moves import range
-from six.moves.urllib.parse import urlencode
+from six.moves.urllib.parse import urlencode  # pylint: disable=import-error
 from testfixtures import LogCapture
 from waffle.models import Switch
 
