@@ -4,6 +4,7 @@ Unit tests for behavior that is specific to the api methods (vs. the view method
 Most of the functionality is covered in test_views.py.
 """
 
+import itertools
 import re
 import unicodedata
 
@@ -231,20 +232,54 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, Retireme
         account_settings = get_account_settings(self.default_request)[0]
         self.assertEqual(level_of_education, account_settings["level_of_education"])
 
+    @patch('openedx.features.enterprise_support.api.get_enterprise_customer_for_learner')
+    @patch('openedx.features.enterprise_support.utils.third_party_auth.provider.Registry.get')
     @ddt.data(
-        ("email", "new_email@example.com"),
-        ("name", "New Name"),
-        ("country", "New Country"),
+        *itertools.product(
+            # field_name_value values
+            (("email", "new_email@example.com"), ("name", "new name"), ("country", "IN")),
+            # is_enterprise_user
+            (True, False),
+            # is_synch_learner_profile_data
+            (True, False),
+        )
     )
     @ddt.unpack
-    def test_update_validation_error_for_enterprise(self, field_name, field_value):
-        EnterpriseCustomerUserFactory(user_id=self.user.id)
-        update_data = {field_name: field_value}
+    def test_update_validation_error_for_enterprise(
+        self,
+        field_name_value,
+        is_enterprise_user,
+        is_synch_learner_profile_data,
+        mock_auth_provider,
+        mock_customer,
+    ):
+        mock_customer.return_value = {}
+        if is_enterprise_user:
+            mock_customer.return_value.update({
+                'uuid': 'real-ent-uuid',
+                'name': 'Dummy Enterprise',
+                'identity_provider': 'saml-ubc'
+            })
+        mock_auth_provider.return_value.sync_learner_profile_data = is_synch_learner_profile_data
 
-        with self.assertRaises(AccountValidationError) as validation_error:
-            update_account_settings(self.user, update_data)
-        field_errors = validation_error.exception.field_errors
-        self.assertEqual("This field is not editable via this API", field_errors[field_name]["developer_message"])
+        update_data = {field_name_value[0]: field_name_value[1]}
+
+        # prevent actual email change requests
+        with patch('openedx.core.djangoapps.user_api.accounts.api.student_views.do_email_change_request'):
+            # expect field un-editability only when both of the following conditions are met
+            if is_enterprise_user and is_synch_learner_profile_data:
+                with self.assertRaises(AccountValidationError) as validation_error:
+                    update_account_settings(self.user, update_data)
+                    field_errors = validation_error.exception.field_errors
+                    self.assertEqual(
+                        "This field is not editable via this API",
+                        field_errors[field_name_value[0]]["developer_message"],
+                    )
+            else:
+                update_account_settings(self.user, update_data)
+                account_settings = get_account_settings(self.default_request)[0]
+                if field_name_value[0] != "email":
+                    self.assertEqual(field_name_value[1], account_settings[field_name_value[0]])
 
     def test_update_error_validating(self):
         """Test that AccountValidationError is thrown if incorrect values are supplied."""
