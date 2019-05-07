@@ -3,6 +3,8 @@ Store status messages in the database.
 """
 
 from __future__ import absolute_import
+
+import six
 from config_models.admin import ConfigurationModelAdmin
 from config_models.models import ConfigurationModel
 from django.contrib import admin
@@ -11,7 +13,6 @@ from django.db import models
 from opaque_keys.edx.django.models import CourseKeyField
 
 from openedx.core.djangolib.markup import HTML
-import six
 
 
 class GlobalStatusMessage(ConfigurationModel):
