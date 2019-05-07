@@ -1,12 +1,13 @@
 """
 Tests of symbolic math
 """
+from __future__ import absolute_import
 import re
 import unittest
 
 from lxml import etree
 
-import formula
+from . import formula
 
 
 def stripXML(xml):
