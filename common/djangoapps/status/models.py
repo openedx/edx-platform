@@ -2,6 +2,7 @@
 Store status messages in the database.
 """
 
+from __future__ import absolute_import
 from config_models.admin import ConfigurationModelAdmin
 from config_models.models import ConfigurationModel
 from django.contrib import admin
@@ -10,6 +11,7 @@ from django.db import models
 from opaque_keys.edx.django.models import CourseKeyField
 
 from openedx.core.djangolib.markup import HTML
+import six
 
 
 class GlobalStatusMessage(ConfigurationModel):
@@ -31,7 +33,7 @@ class GlobalStatusMessage(ConfigurationModel):
 
     def full_message(self, course_key):
         """ Returns the full status message, including any course-specific status messages. """
-        cache_key = "status_message.{course_id}".format(course_id=unicode(course_key))
+        cache_key = "status_message.{course_id}".format(course_id=six.text_type(course_key))
         if cache.get(cache_key):
             return cache.get(cache_key)
 
@@ -66,7 +68,7 @@ class CourseMessage(models.Model):
     message = models.TextField(blank=True, null=True)
 
     def __unicode__(self):
-        return unicode(self.course_key)
+        return six.text_type(self.course_key)
 
 
 admin.site.register(GlobalStatusMessage, ConfigurationModelAdmin)
