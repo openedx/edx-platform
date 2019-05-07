@@ -6,9 +6,7 @@ from __future__ import absolute_import
 import unittest
 
 import ddt
-import six.moves.urllib.error
-import six.moves.urllib.parse
-import six.moves.urllib.request
+import six.moves.urllib.parse as parse  # pylint: disable=import-error
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -83,7 +81,7 @@ class LogoutTests(TestCase):
         )
         response = self.client.get(url, HTTP_HOST=host)
         expected = {
-            'target': six.moves.urllib.parse.unquote(redirect_url),
+            'target': parse.unquote(redirect_url),
         }
         self.assertDictContainsSubset(expected, response.context_data)
 
