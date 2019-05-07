@@ -1,45 +1,48 @@
 """
 Contains tests to verify correctness of course expiration functionality
 """
+from __future__ import absolute_import
+
 import json
 from datetime import timedelta
 
+import ddt
+import mock
+import six
 from django.conf import settings
 from django.urls import reverse
 from django.utils.timezone import now
-import ddt
-import mock
 
 from course_modes.models import CourseMode
-from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from experiments.models import ExperimentData
 from lms.djangoapps.courseware.tests.factories import (
-    InstructorFactory,
-    StaffFactory,
     BetaTesterFactory,
-    OrgStaffFactory,
-    OrgInstructorFactory,
     GlobalStaffFactory,
+    InstructorFactory,
+    OrgInstructorFactory,
+    OrgStaffFactory,
+    StaffFactory
 )
+from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
-    FORUM_ROLE_MODERATOR,
+    FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_GROUP_MODERATOR,
-    FORUM_ROLE_COMMUNITY_TA
+    FORUM_ROLE_MODERATOR
 )
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, CONTENT_TYPE_GATE_GROUP_IDS
-from openedx.features.course_duration_limits.access import get_user_course_expiration_date, MIN_DURATION, MAX_DURATION
-from openedx.features.course_duration_limits.config import EXPERIMENT_ID, EXPERIMENT_DATA_HOLDBACK_KEY
-from openedx.features.course_experience.tests.views.helpers import add_course_mode
+from openedx.features.course_duration_limits.access import MAX_DURATION, MIN_DURATION, get_user_course_expiration_date
+from openedx.features.course_duration_limits.config import EXPERIMENT_DATA_HOLDBACK_KEY, EXPERIMENT_ID
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from student.models import CourseEnrollment
 from student.roles import CourseInstructorRole
-from student.tests.factories import UserFactory, CourseEnrollmentFactory, TEST_PASSWORD
-from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
+from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 
 
 @ddt.ddt
@@ -210,7 +213,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
 
         self.update_masquerade(**masquerade_config)
 
-        course_home_url = reverse('openedx.course_experience.course_home', args=[unicode(self.course.id)])
+        course_home_url = reverse('openedx.course_experience.course_home', args=[six.text_type(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertItemsEqual(response.redirect_chain, [])
@@ -227,7 +230,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         masquerade_url = reverse(
             'masquerade_update',
             kwargs={
-                'course_key_string': unicode(self.course.id),
+                'course_key_string': six.text_type(self.course.id),
             }
         )
         response = self.client.post(
@@ -275,7 +278,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
 
         self.update_masquerade(username='audit')
 
-        course_home_url = reverse('openedx.course_experience.course_home', args=[unicode(self.course.id)])
+        course_home_url = reverse('openedx.course_experience.course_home', args=[six.text_type(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertItemsEqual(response.redirect_chain, [])
@@ -311,7 +314,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
 
         self.update_masquerade(username='audit')
 
-        course_home_url = reverse('openedx.course_experience.course_home', args=[unicode(self.course.id)])
+        course_home_url = reverse('openedx.course_experience.course_home', args=[six.text_type(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertItemsEqual(response.redirect_chain, [])
@@ -362,7 +365,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
 
         self.update_masquerade(username=expired_staff.username)
 
-        course_home_url = reverse('openedx.course_experience.course_home', args=[unicode(self.course.id)])
+        course_home_url = reverse('openedx.course_experience.course_home', args=[six.text_type(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertItemsEqual(response.redirect_chain, [])
@@ -411,7 +414,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
 
         self.update_masquerade(username=expired_staff.username)
 
-        course_home_url = reverse('openedx.course_experience.course_home', args=[unicode(self.course.id)])
+        course_home_url = reverse('openedx.course_experience.course_home', args=[six.text_type(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertItemsEqual(response.redirect_chain, [])
