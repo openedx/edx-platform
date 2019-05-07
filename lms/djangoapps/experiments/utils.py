@@ -18,6 +18,8 @@ from opaque_keys import InvalidKeyError
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.django_comment_common.models import Role
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
+from openedx.features.course_duration_limits.access import get_user_course_expiration_date
+from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 
 
 logger = logging.getLogger(__name__)
@@ -58,6 +60,23 @@ DASHBOARD_INFO_FLAG = WaffleFlag(experiments_namespace,
                                  u'add_dashboard_info',
                                  flag_undefined_default=True)
 # TODO END: clean up as part of REVEM-199 (End)
+
+# .. toggle_name: experiments.add_audit_deadline
+# .. toggle_type: feature_flag
+# .. toggle_default: True
+# .. toggle_description: Toggle for adding the current course's audit deadline
+# .. toggle_category: experiments
+# .. toggle_use_cases: monitored_rollout
+# .. toggle_creation_date: 2019-5-7
+# .. toggle_expiration_date: None
+# .. toggle_warnings: None
+# .. toggle_tickets: REVEM-329
+# .. toggle_status: supported
+AUDIT_DEADLINE_FLAG = WaffleFlag(
+    waffle_namespace=experiments_namespace,
+    flag_name=u'add_audit_deadline',
+    flag_undefined_default=True
+)
 
 
 def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
@@ -343,6 +362,7 @@ def get_experiment_user_metadata_context(course, user):
         'enrollment_time': enrollment_time,
         'pacing_type': 'self_paced' if course.self_paced else 'instructor_paced',
         'upgrade_deadline': upgrade_date,
+        'audit_access_deadline': get_audit_access_expiration(user, course),
         'course_key': course.id,
         'course_start': course.start,
         'course_end': course.end,
@@ -356,6 +376,18 @@ def get_experiment_user_metadata_context(course, user):
         'program_key_fields': program_key,
         # TODO: clean up as part of REVEM-199 (END)
     }
+
+
+def get_audit_access_expiration(user, course):
+    """
+    Return the expiration date for the user's audit access to this course.
+    """
+    if AUDIT_DEADLINE_FLAG.is_enabled():
+        if not CourseDurationLimitConfig.enabled_for_enrollment(user=user, course_key=course.id):
+            return None
+
+        return get_user_course_expiration_date(user, course)
+    return None
 
 
 def get_base_experiment_metadata_context(course, user, enrollment, user_enrollments, audit_enrollments):
@@ -381,6 +413,7 @@ def get_base_experiment_metadata_context(course, user, enrollment, user_enrollme
         'enrollment_time': enrollment_time,
         'pacing_type': 'self_paced' if course.self_paced else 'instructor_paced',
         'upgrade_deadline': upgrade_date,
+        'audit_access_deadline': get_audit_access_expiration(user, course),
         'course_key': course.id,
         'course_start': course.start,
         'course_end': course.end,
