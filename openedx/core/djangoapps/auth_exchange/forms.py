@@ -2,6 +2,7 @@
 Forms to support third-party to first-party OAuth 2.0 access token exchange
 """
 from __future__ import absolute_import
+
 import provider.constants
 from django.contrib.auth.models import User
 from django.forms import CharField

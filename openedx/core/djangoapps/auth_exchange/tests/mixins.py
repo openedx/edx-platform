@@ -4,7 +4,9 @@ Django-OAuth2-Provider.
 """
 
 from __future__ import absolute_import
+
 from unittest import expectedFailure
+
 from django.test.client import RequestFactory
 
 from openedx.core.djangoapps.oauth_dispatch import adapters
