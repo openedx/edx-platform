@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Tests for tracking middleware."""
+from __future__ import absolute_import
 import ddt
 from django.contrib.auth.models import User
 from django.contrib.sessions.middleware import SessionMiddleware
@@ -10,6 +11,7 @@ from mock import patch, sentinel
 
 from eventtracking import tracker
 from track.middleware import TrackMiddleware
+import six
 
 
 @ddt.ddt
@@ -152,7 +154,7 @@ class TrackMiddlewareTestCase(TestCase):
 
     def assert_dict_subset(self, superset, subset):
         """Assert that the superset dict contains all of the key-value pairs found in the subset dict."""
-        for key, expected_value in subset.iteritems():
+        for key, expected_value in six.iteritems(subset):
             self.assertEquals(superset[key], expected_value)
 
     def test_request_with_user(self):

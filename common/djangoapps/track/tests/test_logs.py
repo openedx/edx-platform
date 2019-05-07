@@ -1,4 +1,5 @@
 """Tests that tracking data are successfully logged"""
+from __future__ import absolute_import
 import unittest
 
 import mock
@@ -8,6 +9,7 @@ from django.test import TestCase
 
 from track.models import TrackingLog
 from track.views import user_track
+from six import unichr
 
 
 @unittest.skip("TODO: these tests were not being run before, and now that they are they're failing")

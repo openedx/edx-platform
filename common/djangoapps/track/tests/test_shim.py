@@ -1,5 +1,6 @@
 """Ensure emitted events contain the fields legacy processors expect to find."""
 
+from __future__ import absolute_import
 from collections import namedtuple
 
 import ddt
