@@ -16,7 +16,7 @@ from django.http import HttpResponseForbidden
 from django.utils.translation import override as override_language
 from django.utils.translation import ugettext as _
 from pytz import UTC
-from six import text_type
+from six import text_type  # pylint: disable=ungrouped-imports
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_current_request
@@ -43,7 +43,7 @@ from student.models import (
 from util.model_utils import emit_setting_changed_event
 from util.password_policy_validators import normalize_password, validate_password
 
-from .serializers import (  # pylint: disable=invalid-name
+from .serializers import (
     AccountLegacyProfileSerializer,
     AccountUserSerializer,
     UserReadOnlySerializer,

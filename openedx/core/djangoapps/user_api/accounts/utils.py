@@ -14,7 +14,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from six import text_type
 from six.moves import range
-from six.moves.urllib.parse import urlparse
+from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings, get_current_site
@@ -38,10 +38,12 @@ def validate_social_link(platform_name, new_social_link):
     # Ensure that the new link is valid.
     if formatted_social_link is None:
         required_url_stub = settings.SOCIAL_PLATFORMS[platform_name]['url_stub']
-        raise ValueError(_(
-            ' Make sure that you are providing a valid username or a URL that contains "' +
-            required_url_stub + '". To remove the link from your edX profile, leave this field blank.'
-        ))
+        translated_error_message1 = _('Make sure that you are providing a valid '
+                                      'username or a URL that contains')
+        translated_error_message2 = _('To remove the link from your edX profile,'
+                                      ' leave this field blank.')
+        raise ValueError(' ' + translated_error_message1 + ' "' + required_url_stub +
+                         '". ' + translated_error_message2)
 
 
 def format_social_link(platform_name, new_social_link):
