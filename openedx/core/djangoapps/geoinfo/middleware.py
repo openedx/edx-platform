@@ -10,12 +10,13 @@ decorator `django.utils.decorators.decorator_from_middleware(middleware_class)`
 
 """
 
+from __future__ import absolute_import
+
 import logging
+import geoip2.database
 
 from django.conf import settings
 from ipware.ip import get_real_ip
-
-import geoip2.database
 
 log = logging.getLogger(__name__)
 
