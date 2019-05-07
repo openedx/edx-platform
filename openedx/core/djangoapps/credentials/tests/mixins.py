@@ -1,5 +1,7 @@
 """Mixins for use during testing."""
 
+from __future__ import absolute_import
+
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 
 
