@@ -26,7 +26,9 @@ Decisions
 
 #. Ideally, tests should use only Python APIs declared in other apps' "api.py" files. However, if an app's API is needed only for testing (and not needed as part of the app's domain API), then test-relevant Python APIs should be defined/exported in an intentional Python module called "api_for_tests.py".
 
-Exmaples
+#. While an app should only talk to another app via it's "api.py", an exception is made for the linking of models in the database. For performance and data integrity reasons, the linking of models via foreign keys is still the preferred route.
+
+Examples
 ~~~~~~~~
 
 As a reference example, see the Python APIs exposed by the grades app in the `grades/api.py module`_.
