@@ -1,11 +1,12 @@
 from __future__ import absolute_import
+
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
+from six.moves import range
 
 import track.tracker as tracker
 from track.backends import BaseBackend
-from six.moves import range
 
 SIMPLE_SETTINGS = {
     'default': {

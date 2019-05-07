@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 """Tests for tracking middleware."""
 from __future__ import absolute_import
+
 import ddt
+import six
 from django.contrib.auth.models import User
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from eventtracking import tracker
 from mock import patch, sentinel
 
-from eventtracking import tracker
 from track.middleware import TrackMiddleware
-import six
 
 
 @ddt.ddt
