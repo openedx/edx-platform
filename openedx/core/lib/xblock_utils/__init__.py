@@ -485,7 +485,7 @@ def xblock_local_resource_url(block, uri):
     as a static asset which will use a CDN in production.
     """
     xblock_class = getattr(block.__class__, 'unmixed_class', block.__class__)
-    if settings.PIPELINE_ENABLED or not settings.REQUIRE_DEBUG:
+    if settings.PIPELINE['PIPELINE_ENABLED'] or not settings.REQUIRE_DEBUG:
         return staticfiles_storage.url('xblock/resources/{package_name}/{path}'.format(
             package_name=xblock_resource_pkg(xblock_class),
             path=uri

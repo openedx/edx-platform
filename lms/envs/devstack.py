@@ -99,7 +99,7 @@ FEATURES['ENABLE_API_DOCS'] = True
 
 ########################### PIPELINE #################################
 
-PIPELINE_ENABLED = False
+PIPELINE['PIPELINE_ENABLED'] = False
 STATICFILES_STORAGE = 'openedx.core.storage.DevelopmentStorage'
 
 # Revert to the default set of finders as we don't want the production pipeline
@@ -110,12 +110,12 @@ STATICFILES_FINDERS = [
 ]
 
 # Disable JavaScript compression in development
-PIPELINE_JS_COMPRESSOR = None
+PIPELINE['JS_COMPRESSOR'] = None
 
 # Whether to run django-require in debug mode.
 REQUIRE_DEBUG = DEBUG
 
-PIPELINE_SASS_ARGUMENTS = '--debug-info'
+PIPELINE['SASS_ARGUMENTS'] = '--debug-info'
 
 # Load development webpack donfiguration
 WEBPACK_CONFIG_PATH = 'webpack.dev.config.js'
