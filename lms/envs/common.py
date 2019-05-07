@@ -574,7 +574,6 @@ def _make_mako_template_dirs(settings):
 CONTEXT_PROCESSORS = [
     'django.template.context_processors.request',
     'django.template.context_processors.static',
-    'django.contrib.messages.context_processors.messages',
     'django.template.context_processors.i18n',
     'django.contrib.auth.context_processors.auth',  # this is required for admin
     'django.template.context_processors.csrf',

@@ -1,39 +1,51 @@
-<h4>{{display_name}}</h4>
-<hr>
-{{instructions|safe}}
+<h3 class="hd hd-3 problem-header">{{display_name}}</h4>
+<div class="problem-progress">
+    {{score_string}}
+</div>
 
-{% if score.score %}
-<h3>Your grade: <strong>{{score.grade_pct}}</strong></h3>
-{% else %}
-{% if grades_available %}
-<p><em>Not yet scored</em></p>
-{% else %}
-<p><em>View in LMS to see score</em></p>
-{% endif %}
-{% endif %}
+<div class="problem">
+{{instructions|safe}}
+</div>
+
 {% if is_staff and grades_available %}
+{% load i18n %}
 <div class="row">
     <div class="col">
         <hr>
-        <p>Please upload a CSV with the grades. Thanks. Have a nice day.</p>
+        <ul>
+            <li>Step 1: Download a grading template<br>
+                <a href="{{export_url}}" class="btn btn-brand">export scores</a>
+            </li>
+            <li>Step 2: Add grades to the template<br>
+                (insert docs here)
+            </li>
+            <li>Step 3: Import grading template<br>
         <form action="{{import_url}}" method="POST" enctype="multipart/form-data">
             <input type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
-            <p>
-                <a href="{{export_url}}" class="btn btn-brand">download CSV</a>
-                <input id="{{id}}-file" type="file" name="csv">
-                <a href="#" id="{{id}}-import" class="submit btn btn-brand">import CSV</a>
-                <h2 id="{{id}}-status" class="text-info" style="display:none"></h2>
-            </p>
+            <label class="submit btn btn-brand">
+                <input id="{{id}}-file" type="file" name="csv" style="display:none">
+                Import Scores
+            </label> <span id="{{id}}-filename"></span>
         </form>
+            </li>
+        </ul>
+        <div class="text-info" id="{{id}}-status" style="display:none">
+            <div class="success">
+            </div>
+            <div class="error">
+            </div>
+        </div>
     </div>
 </div>
 <script type="text/javascript">
-    $('#{{id}}-import').click(function(e){
-        e.preventDefault();
+    $('#{{id}}-file').change(function(e){
+        // e.preventDefault();
+        var firstFile = $('#{{id}}-file')[0].files[0];
         var formData = new FormData();
         formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
-        formData.append('csv', $('#{{id}}-file')[0].files[0]);
+        formData.append('csv', firstFile);
 
+        $('#{{id}}-filename').html(firstFile.name);
         $.ajax({
                url : '{{import_url}}',
                type : 'POST',
@@ -41,8 +53,16 @@
                processData: false,  // tell jQuery not to process the data
                contentType: false,  // tell jQuery not to set contentType
                success : function(data) {
-                   console.log(data);
-                    $('#{{id}}-status').html(`${data.processed} processed. ${data.errors} errors`).show();
+                    var message = {% trans "`${data.percentage} of ${data.processed} learner's grades processed.`" %};
+                    if (data.errors) {
+                        var errorMessage = {% trans "`${data.errors} errors. Please try again. `" %};
+                        if (data.message != undefined) {
+                            errorMessage += data.message;
+                        }
+                        $('#{{id}}-status,.error').html(errorMessage).show();
+                    } else {
+                        $('#{{id}}-status,.success').html(message).show();
+                    }
                }
         });
 

@@ -1,5 +1,5 @@
 """
-XBlock for Staff Graded Problem
+XBlock for Staff Graded Points
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
@@ -28,7 +28,7 @@ log = logging.getLogger(__name__)
 
 
 CSV_FIELDS = '''user_id username full_name email student_uid is_active track
-block_id title date_last_graded who_last_graded last_points new_points'''.split()
+block_id title date_last_graded who_last_graded last_points points'''.split()
 
 
 @XBlock.needs('settings')
@@ -43,7 +43,7 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
         display_name=_("Display Name"),
         help=_("The display name for this component."),
         scope=Scope.settings,
-        default=_("Staff Graded Problem"),
+        default=_("Staff Graded Points"),
     )
     instructions = String(
         display_name=_("Instructions"),
@@ -54,7 +54,7 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
         runtime_options={'multiline_editor': 'html'},
     )
     weight = Float(
-        display_name="Weight",
+        display_name="Problem Weight",
         help=_(
             "Enter the number of points possible for this component.  "
             "The default value is 1.0.  "
@@ -72,6 +72,7 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
             'edx-platform.username')
 
     def student_view(self, context):
+        _ = self.runtime.service(self, "i18n").ugettext
 
         fragment = Fragment()
         loader = ResourceLoader(__name__)
@@ -87,12 +88,15 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
             context['csrf_token'] = get_token(get_current_request())
 
         try:
-            context['score'] = self.runtime.service(self, "grade_utils").get_score(self.location, self.runtime.user_id) or {}
-            if context['score']:
-                context['score']['grade_pct'] = format(context['score']['grade'], '.0%')
+            score = self.runtime.service(self, "grade_utils").get_score(self.location, self.runtime.user_id) or {}
             context['grades_available'] = True
         except NoSuchServiceError:
             context['grades_available'] = False
+        else:
+            if score:
+                context['score_string'] = _('{score} / {total} points').format(score=score['grade'] * self.weight, total=self.weight)
+            else:
+                context['score_string'] = _('{total} points possible').format(total=self.weight)
         fragment.add_content(loader.render_django_template('/templates/html/sgp.html', context))
         return fragment
 
@@ -102,28 +106,17 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
             return Response('not allowed', status_code=403)
         grade_utils = self.runtime.service(self, 'grade_utils')
 
-        my_location = self.location
-        processed = 0
-        errors = 0
-        data = {}
         try:
-            reader = csv.DictReader(request.POST['csv'].file)
+            result = grade_utils.process_score_csv(self.location, request.POST['csv'].file, self.weight, sync=False)
         except KeyError:
-            errors = 1
-            data['message'] = 'missing file'
+            data = {'errors': 1, 'message': 'missing file'}
+        if result.ready():
+            data = result.result
         else:
-            max_points = self.weight
-            state = json.dumps({'grader': self._get_current_username()})
-            for rownum, row in enumerate(reader):
-                if row['new_points']:
-                    new_points = float(row['new_points'])
-                    if new_points <= max_points:
-                        grade_utils.set_score(my_location, row['user_id'], new_points, max_points, state=state)
-                        processed += 1
-                    else:
-                        errors += 1
-        data['errors'] = errors
-        data['processed'] = processed
+            data = {'message': 'waiting'}
+            data = result.wait()
+        if 'graded' in data:
+            data['percentage'] = format(data['graded']/data['processed'], '.1%')
         log.info(data)
         return Response(json.dumps(data), content_type='application/json')
 
@@ -146,7 +139,7 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
             srow = {
                 'block_id': my_location,
                 'title': my_name,
-                'new_points': None
+                'points': None
             }
             srow.update(enrollment)
             score = students.get(enrollment['user_id'], None)

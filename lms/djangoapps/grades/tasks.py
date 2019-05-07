@@ -10,6 +10,7 @@ from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.core.files.storage import default_storage
 from django.db.utils import DatabaseError
 from edx_django_utils.monitoring import set_custom_metric, set_custom_metrics_for_course_key
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -33,7 +34,8 @@ from .services import GradesService
 from .signals.signals import SUBSECTION_SCORE_CHANGED
 from .subsection_grade_factory import SubsectionGradeFactory
 from .transformer import GradesTransformer
-from .grade_utils import are_grades_frozen
+from .grade_utils import are_grades_frozen, set_score, process_score_csv
+
 
 log = getLogger(__name__)
 
@@ -177,6 +179,22 @@ def recalculate_subsection_grade_v3(self, **kwargs):
     for _recalculate_subsection_grade for further description.
     """
     _recalculate_subsection_grade(self, **kwargs)
+
+
+@task(
+    bind=True
+)
+def process_score_csv_async(self, block_id, filename, block_weight, **kwargs):
+    log.info('Processing score import %r %r %r', block_id, filename, block_weight)
+    block_id = UsageKey.from_string(block_id)
+    the_file = default_storage.open(filename, 'r')
+    try:
+        data = process_score_csv(block_id, the_file, block_weight)
+    except Exception as e:
+        log.exception('processing csv %s', filename)
+        data = {'processed': 0, 'errors': 1, 'message': six.text_type(e)}
+    default_storage.delete(filename)
+    return data
 
 
 def _recalculate_subsection_grade(self, **kwargs):
