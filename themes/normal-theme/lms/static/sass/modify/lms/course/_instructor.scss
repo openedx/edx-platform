@@ -11,6 +11,9 @@
   {
     @extend %btn-my-primary;
   }
+  .btn-type-chapter .btn{
+    @extend %btn-my-white;
+  }
   section.idash-section#membership .batch-enrollment textarea{
     width: 100%;
   }
