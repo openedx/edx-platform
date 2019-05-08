@@ -183,6 +183,7 @@ def _attach_profile_claim(payload, user):
         'family_name': user.last_name,
         'given_name': user.first_name,
         'administrator': user.is_staff,
+        'superuser': user.is_superuser,
     })
 
 
