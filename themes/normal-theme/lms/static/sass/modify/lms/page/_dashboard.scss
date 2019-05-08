@@ -319,6 +319,9 @@
 .wrapper-messages-primary .message.message-upsell .action-upgrade .action-upgrade-icon{
   display: none;
 }
+.wrapper-messages-primary .message.message-status .message-copy{
+  line-height: 1.8;
+}
 @media screen and (max-width: 992px){
   .dashboard .main-container{
     padding: 20px 0 0;
@@ -332,7 +335,7 @@
     padding: 10px 20px;
   }
 }
-@media screen and (max-width: 568px){
+@media screen and (max-width: 767px){
   .wrapper-messages-primary .message.message-status .verification-cta .btn{
     display: none;
   }
