@@ -3,8 +3,8 @@ Django module container for classes and operations related to the "Course Module
 """
 import json
 import logging
-from cStringIO import StringIO
 from datetime import datetime, timedelta
+from io import BytesIO
 import dateutil.parser
 
 from django.conf import settings
@@ -1103,7 +1103,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
 
         # bleh, have to parse the XML here to just pull out the url_name attribute
         # I don't think it's stored anywhere in the instance.
-        course_file = StringIO(xml_data.encode('ascii', 'ignore'))
+        course_file = BytesIO(xml_data.encode('ascii', 'ignore'))
         xml_obj = etree.parse(course_file, parser=edx_xml_parser).getroot()
 
         policy_dir = None
