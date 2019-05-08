@@ -1,9 +1,10 @@
 """
 Utility functions for zendesk interaction.
 """
+from __future__ import absolute_import
 import json
 import logging
-from urlparse import urljoin
+from six.moves.urllib.parse import urljoin
 
 from django.conf import settings
 import requests
