@@ -3,6 +3,7 @@ Defines the "ReSTful" API for course modes.
 """
 
 from __future__ import absolute_import
+
 import logging
 
 from django.shortcuts import get_object_or_404
@@ -14,11 +15,10 @@ from rest_framework import status
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
-from openedx.core.lib.api.parsers import MergePatchParser
-
 from course_modes.api.serializers import CourseModeSerializer
 from course_modes.models import CourseMode
+from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.parsers import MergePatchParser
 
 log = logging.getLogger(__name__)
 
