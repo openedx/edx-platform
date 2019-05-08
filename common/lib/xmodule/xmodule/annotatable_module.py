@@ -7,6 +7,7 @@ from lxml import etree
 from pkg_resources import resource_string
 from xblock.fields import Scope, String
 
+from openedx.core.djangolib.markup import HTML, Text
 from xmodule.raw_module import RawDescriptor
 from xmodule.x_module import XModule
 
