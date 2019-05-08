@@ -89,6 +89,7 @@ from lms.djangoapps.verify_student.models import SSOVerification
 from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
+from third_party_auth import ENABLE_OKTA_AUTH_FIX
 from third_party_auth.utils import user_exists
 from track import segment
 from util.json_request import JsonResponse
@@ -454,7 +455,15 @@ def parse_query_params(strategy, response, *args, **kwargs):
     # We simply assume 'login' in that case.
     auth_entry = strategy.request.session.get(AUTH_ENTRY_KEY, AUTH_ENTRY_LOGIN)
     if auth_entry not in _AUTH_ENTRY_CHOICES:
+        if not auth_entry and ENABLE_OKTA_AUTH_FIX.is_enabled():
+            # This change is for get okta working with the pipeline.
+            # In some clients, the pipeline starts in okta, so we don't have
+            # this in the field in the session, because there there is no
+            # session yet. So we return login, but the standard workflow still
+            # works.
+            return {'auth_entry': 'login'}
         raise AuthEntryError(strategy.request.backend, 'auth_entry invalid')
+
     return {'auth_entry': auth_entry}
 
 
