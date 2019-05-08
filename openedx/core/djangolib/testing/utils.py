@@ -8,6 +8,7 @@ Utility classes for testing django applications.
     A TestCase baseclass that has per-test isolated caches.
 """
 
+from __future__ import absolute_import
 import copy
 import re
 from unittest import skipUnless
