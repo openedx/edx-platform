@@ -26334,7 +26334,7 @@ msgid " days"
 msgstr "天"
 
 #: membership/templates/membership/card.html
-msgid "Tuition:"
+msgid "Tuition: "
 msgstr "学费："
 
 #: membership/templates/membership/card.html
@@ -26460,7 +26460,7 @@ msgstr "美国波士顿学院经济学博士"
 #: membership/templates/membership/index.html
 msgid ""
 "*EliteMBA reserves the right of final interpretation for all course updates."
-msgstr "*英荔商学院保留所有课程的更新和最终解释权。"
+msgstr "*英荔商学院保留所有课程更新的最终解释权。"
 
 #: membership/templates/membership/index.html
 msgid "World-Class Faculty"
@@ -26594,7 +26594,7 @@ msgstr "月均"
 #: membership/templates/membership/index.html
 msgctxt "Membership"
 msgid "Professional"
-msgstr "教授"
+msgstr "全栈职场修炼"
 
 #: membership/templates/membership/index.html
 msgctxt "Membership"
@@ -26684,7 +26684,7 @@ msgstr "实付金额："
 
 #: membership/templates/membership/wechat_paying.html
 msgid ""
-"Please complete the payment within 2 hours, otherwise the purchase may fail"
+"Please complete the payment within 2 hours, otherwise the purchase may fail."
 msgstr "请在2小时内完成支付，否则可能导致购买失败"
 
 #: membership/templates/membership/wechat_paying.html
