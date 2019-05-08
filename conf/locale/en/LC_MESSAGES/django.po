@@ -5332,7 +5332,7 @@ msgstr ""
 #. alone.
 #: lms/djangoapps/course_wiki/views.py
 #, python-brace-format
-msgid "This is the wiki for **{organization}**'s _{course_name}_."
+msgid "This is the wiki for _{course_name}_."
 msgstr ""
 
 #: lms/djangoapps/course_wiki/views.py
@@ -15241,7 +15241,6 @@ msgid "YouTube Video"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
-#: lms/templates/professors/detail.html
 #: lms/templates/shoppingcart/billing_details.html
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "View Courses"
@@ -18663,6 +18662,11 @@ msgstr ""
 msgid "Professor details"
 msgstr ""
 
+#: lms/templates/professors/detail.html
+msgctxt "Professor"
+msgid "View Courses"
+msgstr ""
+
 #: lms/templates/professors/index.html
 msgid "Professors List"
 msgstr ""
@@ -19938,7 +19942,7 @@ msgid "Schools & Partners"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "Learn to Change·Change to Improve"
+msgid "Learn to Change · Change to Improve"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
@@ -19964,7 +19968,7 @@ msgid "Partners"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "Cloud classroom of Netease"
+msgid "NetEase Study"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
@@ -19980,15 +19984,15 @@ msgid "to find out more"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "bind your account to your cellphone number"
+msgid "Bind Your Account to Your Mobile Number"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "Please enter the phone number"
+msgid "Mobile number"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "get verification code"
+msgid "Verify"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
@@ -25823,7 +25827,7 @@ msgid "Payment Completed"
 msgstr ""
 
 #: membership/templates/membership/card.html
-msgid "Encounter a problem？"
+msgid "Encounter a problem?"
 msgstr ""
 
 #: membership/templates/membership/card.html
@@ -26146,11 +26150,12 @@ msgid "Amount paid: "
 msgstr ""
 
 #: membership/templates/membership/wechat_paying.html
-msgid "Please complete the  payment within 2 hours, or the purchase may fail"
+msgid ""
+"Please complete the payment within 2 hours, otherwise the purchase may fail"
 msgstr ""
 
 #: membership/templates/membership/wechat_paying.html
-msgid "Scan QR code with WeChat"
+msgid "Please scan Wechat QR code"
 msgstr ""
 
 #: membership/templates/membership/wechat_paying.html

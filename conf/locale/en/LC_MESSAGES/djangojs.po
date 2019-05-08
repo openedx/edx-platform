@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-05-07 10:04+0800\n"
-"PO-Revision-Date: 2019-05-07 02:04:09.438831\n"
+"POT-Creation-Date: 2019-05-08 10:38+0800\n"
+"PO-Revision-Date: 2019-05-08 02:38:05.201977\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -4499,7 +4499,7 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
-"You have joined Harvard Learning Camp. Email Modification is not supported."
+"You have joined Harvard ManageMentor. Email Modification is not supported."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js

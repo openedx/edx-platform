@@ -5431,8 +5431,8 @@ msgstr "维基"
 #. alone.
 #: lms/djangoapps/course_wiki/views.py
 #, python-brace-format
-msgid "This is the wiki for **{organization}**'s _{course_name}_."
-msgstr "这是**{organization}**_{course_name}_的wiki。"
+msgid "This is the wiki for _{course_name}_."
+msgstr "这是 _{course_name}_ 的wiki。"
 
 #: lms/djangoapps/course_wiki/views.py
 msgid "Course page automatically created."
@@ -15552,7 +15552,6 @@ msgid "YouTube Video"
 msgstr "YouTube 视频"
 
 #: lms/templates/courseware/program_marketing.html
-#: lms/templates/professors/detail.html
 #: lms/templates/shoppingcart/billing_details.html
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "View Courses"
@@ -19031,6 +19030,11 @@ msgstr "返回"
 msgid "Professor details"
 msgstr "教授详情"
 
+#: lms/templates/professors/detail.html
+msgctxt "Professor"
+msgid "View Courses"
+msgstr "讲授课程"
+
 #: lms/templates/professors/index.html
 msgid "Professors List"
 msgstr "教授列表"
@@ -20318,7 +20322,7 @@ msgid "Schools & Partners"
 msgstr "学校 & 伙伴"
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "Learn to Change·Change to Improve"
+msgid "Learn to Change · Change to Improve"
 msgstr "学则变 · 变则进"
 
 #: themes/normal-theme/lms/templates/footer.html
@@ -20344,7 +20348,7 @@ msgid "Partners"
 msgstr "合作机构"
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "Cloud classroom of Netease"
+msgid "NetEase Study"
 msgstr "网易云课堂"
 
 #: themes/normal-theme/lms/templates/footer.html
@@ -20360,15 +20364,15 @@ msgid "to find out more"
 msgstr "关注名师开课动态"
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "bind your account to your cellphone number"
+msgid "Bind Your Account to Your Mobile Number"
 msgstr "绑定手机号"
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "Please enter the phone number"
-msgstr "请输入手机号码"
+msgid "Mobile number"
+msgstr "手机号码"
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "get verification code"
+msgid "Verify"
 msgstr "获取验证码"
 
 #: themes/normal-theme/lms/templates/footer.html
@@ -26356,8 +26360,8 @@ msgid "Payment Completed"
 msgstr "支付完成"
 
 #: membership/templates/membership/card.html
-msgid "Encounter a problem？"
-msgstr "遇到问题?"
+msgid "Encounter a problem?"
+msgstr "遇到问题？"
 
 #: membership/templates/membership/card.html
 msgid "Go to payment"
@@ -26679,11 +26683,12 @@ msgid "Amount paid: "
 msgstr "实付金额："
 
 #: membership/templates/membership/wechat_paying.html
-msgid "Please complete the  payment within 2 hours, or the purchase may fail"
+msgid ""
+"Please complete the payment within 2 hours, otherwise the purchase may fail"
 msgstr "请在2小时内完成支付，否则可能导致购买失败"
 
 #: membership/templates/membership/wechat_paying.html
-msgid "Scan QR code with WeChat"
+msgid "Please scan Wechat QR code"
 msgstr "请使用微信扫描二维码"
 
 #: membership/templates/membership/wechat_paying.html

@@ -1,5 +1,6 @@
 <%page expression_filter="h"/>
 <%! from django.utils.translation import ugettext as _ %>
+<%! from django.utils.translation import pgettext%>
 <%inherit file="../main.html" />
 
 <%block name="pagetitle">${_(u"Professor details")}</%block>
@@ -15,7 +16,7 @@
         url: 'api/v1/professors/' + teacher_id + '/',
         success: function(res){
             $('.my-theme-course-about')[0].innerHTML = res.professor_info;
-            $('.about-staff-block').append('<a class="professor-course" href="/courses?search_query=&QUOT;' +  res.name + '&QUOT;">' + '${_("Professor", "View Courses")}' + '</a>');
+            $('.about-staff-block').append('<a class="professor-course" href="/courses?search_query=&QUOT;' +  res.name + '&QUOT;">' + '${pgettext("Professor", "View Courses")}' + '</a>');
         }
     })
 </script>
