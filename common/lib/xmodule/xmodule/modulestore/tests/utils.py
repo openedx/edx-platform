@@ -1,18 +1,21 @@
 """
 Helper classes and methods for running modulestore tests without Django.
 """
-from uuid import uuid4
+from __future__ import absolute_import
+
 import io
 import os
-
 from contextlib import contextmanager, nested
 from importlib import import_module
-from path import Path as path
 from shutil import rmtree
 from tempfile import mkdtemp
 from unittest import TestCase
+from uuid import uuid4
 
-from xmodule.x_module import XModuleMixin
+import six
+from path import Path as path
+from six.moves import range, zip
+
 from xmodule.contentstore.mongo import MongoContentStore
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
 from xmodule.modulestore.edit_info import EditInfoMixin
@@ -22,10 +25,11 @@ from xmodule.modulestore.mongo.base import ModuleStoreEnum
 from xmodule.modulestore.mongo.draft import DraftModuleStore
 from xmodule.modulestore.split_mongo.split_draft import DraftVersioningModuleStore
 from xmodule.modulestore.tests.factories import ItemFactory
-from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore.xml_importer import LocationMixin
 from xmodule.tests import DATA_DIR
+from xmodule.x_module import XModuleMixin
 
 
 def load_function(path):
@@ -82,7 +86,7 @@ def add_temp_files_from_dict(file_dict, dir):
         with io.open("{}/{}".format(dir, file_name), "w") as opened_file:
             content = file_dict[file_name]
             if content:
-                opened_file.write(unicode(content))
+                opened_file.write(six.text_type(content))
 
 
 def remove_temp_files_from_list(file_list, dir):
@@ -413,12 +417,12 @@ class MixedModulestoreBuilder(StoreBuilderBase):
             contentstore: The contentstore that this modulestore should use to store
                 all of its assets.
         """
-        names, generators = zip(*self.store_builders)
+        names, generators = list(zip(*self.store_builders))
 
         with nested(*(gen.build_with_contentstore(contentstore, **kwargs) for gen in generators)) as modulestores:
             # Make the modulestore creation function just return the already-created modulestores
             store_iterator = iter(modulestores)
-            next_modulestore = lambda *args, **kwargs: store_iterator.next()
+            next_modulestore = lambda *args, **kwargs: next(store_iterator)
 
             # Generate a fake list of stores to give the already generated stores appropriate names
             stores = [{'NAME': name, 'ENGINE': 'This space deliberately left blank'} for name in names]
@@ -491,7 +495,7 @@ DIRECT_MS_SETUPS_SHORT = (
 )
 MODULESTORE_SETUPS = DIRECT_MODULESTORE_SETUPS + MIXED_MODULESTORE_SETUPS
 MODULESTORE_SHORTNAMES = DIRECT_MS_SETUPS_SHORT + MIXED_MS_SETUPS_SHORT
-SHORT_NAME_MAP = dict(zip(MODULESTORE_SETUPS, MODULESTORE_SHORTNAMES))
+SHORT_NAME_MAP = dict(list(zip(MODULESTORE_SETUPS, MODULESTORE_SHORTNAMES)))
 
 CONTENTSTORE_SETUPS = (MongoContentstoreBuilder(),)
 
