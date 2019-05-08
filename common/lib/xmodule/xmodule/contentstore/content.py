@@ -3,8 +3,8 @@ from __future__ import absolute_import
 import logging
 import os
 import re
-import StringIO
 import uuid
+from io import BytesIO
 
 import six
 from opaque_keys import InvalidKeyError
@@ -418,10 +418,10 @@ class ContentStore(object):
                 # for svg simply store the provided svg file, since vector graphics should be good enough
                 # for downscaling client-side
                 if tempfile_path is None:
-                    thumbnail_file = StringIO.StringIO(content.data)
+                    thumbnail_file = BytesIO(content.data)
                 else:
                     with open(tempfile_path) as f:
-                        thumbnail_file = StringIO.StringIO(f.read())
+                        thumbnail_file = BytesIO(f.read())
                 thumbnail_content = StaticContent(thumbnail_file_location, thumbnail_name,
                                                   'image/svg+xml', thumbnail_file)
                 self.save(thumbnail_content)
@@ -431,13 +431,13 @@ class ContentStore(object):
                 # the max-height/width to be whatever you pass in as 'size'
                 # @todo: move the thumbnail size to a configuration setting?!?
                 if tempfile_path is None:
-                    source = StringIO.StringIO(content.data)
+                    source = BytesIO(content.data)
                 else:
                     source = tempfile_path
 
                 # We use the context manager here to avoid leaking the inner file descriptor
                 # of the Image object -- this way it gets closed after we're done with using it.
-                thumbnail_file = StringIO.StringIO()
+                thumbnail_file = BytesIO()
                 with Image.open(source) as image:
                     # I've seen some exceptions from the PIL library when trying to save palletted
                     # PNG files to JPEG. Per the google-universe, they suggest converting to RGB first.
