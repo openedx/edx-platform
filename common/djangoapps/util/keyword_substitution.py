@@ -18,6 +18,8 @@ Usage:
         - CMS: Not called
 """
 
+from __future__ import absolute_import
+
 from django.contrib.auth.models import User
 
 from student.models import anonymous_id_for_user

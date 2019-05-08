@@ -36,7 +36,7 @@ import logging
 LOG_OVERRIDES = [
     ('track.contexts', logging.CRITICAL),
     ('track.middleware', logging.CRITICAL),
-    ('django_comment_client.utils', logging.CRITICAL),
+    ('lms.djangoapps.discussion.django_comment_client.utils', logging.CRITICAL),
 ]
 for log_name, log_level in LOG_OVERRIDES:
     logging.getLogger(log_name).setLevel(log_level)
@@ -60,7 +60,7 @@ DJFS = {
 
 INSTALLED_APPS += ['debug_toolbar', 'debug_toolbar_mongo']
 MIDDLEWARE_CLASSES += [
-    'django_comment_client.utils.QueryCountDebugMiddleware',
+    'lms.djangoapps.discussion.django_comment_client.utils.QueryCountDebugMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
@@ -99,7 +99,7 @@ FEATURES['ENABLE_API_DOCS'] = True
 
 ########################### PIPELINE #################################
 
-PIPELINE_ENABLED = False
+PIPELINE['PIPELINE_ENABLED'] = False
 STATICFILES_STORAGE = 'openedx.core.storage.DevelopmentStorage'
 
 # Revert to the default set of finders as we don't want the production pipeline
@@ -110,12 +110,12 @@ STATICFILES_FINDERS = [
 ]
 
 # Disable JavaScript compression in development
-PIPELINE_JS_COMPRESSOR = None
+PIPELINE['JS_COMPRESSOR'] = None
 
 # Whether to run django-require in debug mode.
 REQUIRE_DEBUG = DEBUG
 
-PIPELINE_SASS_ARGUMENTS = '--debug-info'
+PIPELINE['SASS_ARGUMENTS'] = '--debug-info'
 
 # Load development webpack donfiguration
 WEBPACK_CONFIG_PATH = 'webpack.dev.config.js'

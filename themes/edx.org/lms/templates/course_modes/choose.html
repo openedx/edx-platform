@@ -7,8 +7,6 @@ from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.features.learner_analytics import INCLUDE_UPSELL_MODAL
-from openedx.features.portfolio_project import INCLUDE_PORTFOLIO_UPSELL_MODAL
 %>
 
 <%namespace name='static' file='/static_content.html'/>
@@ -86,21 +84,6 @@ from openedx.features.portfolio_project import INCLUDE_PORTFOLIO_UPSELL_MODAL
 
     <div id="currency_data" value="${currency_data}"></div>
     <div class="container">
-       % if INCLUDE_UPSELL_MODAL.is_enabled():
-            ${static.renderReact(
-              component="UpsellExperimentModal",
-              id="upsell-modal",
-              props={},
-            )}
-        % endif
-
-        % if INCLUDE_PORTFOLIO_UPSELL_MODAL.is_enabled():
-            ${static.renderReact(
-                component="PortfolioExperimentUpsellModal",
-                id="portfolio-experiment-upsell-modal",
-                props={}
-            )}
-        % endif
         <section class="wrapper">
             <div class="wrapper-register-choose wrapper-content-main">
                 <article class="register-choose content-main">

@@ -110,7 +110,7 @@ def wrap_xblock(
         )
     ]
 
-    if isinstance(block, (XModule, XModuleDescriptor)):
+    if isinstance(block, (XModule, XModuleDescriptor)) or getattr(block, 'uses_xmodule_styles_setup', False):
         if view in PREVIEW_VIEWS:
             # The block is acting as an XModule
             css_classes.append('xmodule_display')
@@ -122,8 +122,10 @@ def wrap_xblock(
             css_classes.append('is-hidden')
 
         css_classes.append('xmodule_' + markupsafe.escape(class_name))
+
+    if isinstance(block, (XModule, XModuleDescriptor)):
         data['type'] = block.js_module_name
-        shim_xmodule_js(block, frag)
+        shim_xmodule_js(frag, block.js_module_name)
 
     if frag.js_init_fn:
         data['init'] = frag.js_init_fn
@@ -483,7 +485,7 @@ def xblock_local_resource_url(block, uri):
     as a static asset which will use a CDN in production.
     """
     xblock_class = getattr(block.__class__, 'unmixed_class', block.__class__)
-    if settings.PIPELINE_ENABLED or not settings.REQUIRE_DEBUG:
+    if settings.PIPELINE['PIPELINE_ENABLED'] or not settings.REQUIRE_DEBUG:
         return staticfiles_storage.url('xblock/resources/{package_name}/{path}'.format(
             package_name=xblock_resource_pkg(xblock_class),
             path=uri

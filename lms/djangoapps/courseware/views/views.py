@@ -68,7 +68,7 @@ from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.courses import allow_public_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.instructor.enrollment import uses_shib
 from lms.djangoapps.instructor.views.api import require_global_staff
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -535,23 +535,38 @@ class CourseTabView(EdxFragmentView):
         allow_anonymous = allow_public_access(course, [COURSE_VISIBILITY_PUBLIC])
 
         if request.user.is_anonymous and not allow_anonymous:
-            PageLevelMessages.register_warning_message(
-                request,
-                Text(_(u"To see course content, {sign_in_link} or {register_link}.")).format(
-                    sign_in_link=HTML(u'<a href="/login?next={current_url}">{sign_in_label}</a>').format(
-                        sign_in_label=_("sign in"),
-                        current_url=urlquote_plus(request.path),
-                    ),
-                    register_link=HTML(u'<a href="/register?next={current_url}">{register_label}</a>').format(
-                        register_label=_("register"),
-                        current_url=urlquote_plus(request.path),
-                    ),
+            if CourseTabView.course_open_for_learner_enrollment(course):
+                PageLevelMessages.register_warning_message(
+                    request,
+                    Text(_(u"To see course content, {sign_in_link} or {register_link}.")).format(
+                        sign_in_link=HTML(u'<a href="/login?next={current_url}">{sign_in_label}</a>').format(
+                            sign_in_label=_("sign in"),
+                            current_url=urlquote_plus(request.path),
+                        ),
+                        register_link=HTML(u'<a href="/register?next={current_url}">{register_label}</a>').format(
+                            register_label=_("register"),
+                            current_url=urlquote_plus(request.path),
+                        ),
+                    )
                 )
-            )
+            else:
+                PageLevelMessages.register_warning_message(
+                    request,
+                    Text(_(u"{sign_in_link} or {register_link}.")).format(
+                        sign_in_link=HTML(u'<a href="/login?next={current_url}">{sign_in_label}</a>').format(
+                            sign_in_label=_("Sign in"),
+                            current_url=urlquote_plus(request.path),
+                        ),
+                        register_link=HTML(u'<a href="/register?next={current_url}">{register_label}</a>').format(
+                            register_label=_("register"),
+                            current_url=urlquote_plus(request.path),
+                        ),
+                    )
+                )
         else:
             if not CourseEnrollment.is_enrolled(request.user, course.id) and not allow_anonymous:
                 # Only show enroll button if course is open for enrollment.
-                if course_open_for_self_enrollment(course.id) and not course.invitation_only:
+                if CourseTabView.course_open_for_learner_enrollment(course):
                     enroll_message = _(u'You must be enrolled in the course to see course content. \
                             {enroll_link_start}Enroll now{enroll_link_end}.')
                     PageLevelMessages.register_warning_message(
@@ -566,6 +581,12 @@ class CourseTabView(EdxFragmentView):
                         request,
                         Text(_('You must be enrolled in the course to see course content.'))
                     )
+
+    @staticmethod
+    def course_open_for_learner_enrollment(course):
+        return (course_open_for_self_enrollment(course.id)
+                and not course.invitation_only
+                and not CourseMode.is_masters_only(course.id))
 
     @staticmethod
     def handle_exceptions(request, course_key, course, exception):

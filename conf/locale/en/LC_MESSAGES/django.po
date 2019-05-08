@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-04-07 20:37+0000\n"
-"PO-Revision-Date: 2019-04-07 20:37:41.593434\n"
+"POT-Creation-Date: 2019-04-25 12:20+0000\n"
+"PO-Revision-Date: 2019-04-25 12:20:52.332973\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -948,6 +948,12 @@ msgstr ""
 msgid ""
 "Secondary providers are displayed less prominently, in a separate list of "
 "\"Institution\" login providers."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
+"optional. If this provider is an Organization, this attribute can be used "
+"reference users in that Organization"
 msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
@@ -2286,6 +2292,7 @@ msgstr ""
 #: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
+#: lms/templates/widgets/footer-language-selector.html
 #: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
 #: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -2677,13 +2684,13 @@ msgstr ""
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
-"category must be unique. In \"id\" values, the only special characters that "
-"are supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
+"must be unique. In \"id\" values, the only special characters that are "
+"supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -5849,6 +5856,20 @@ msgid "To see course content, {sign_in_link} or {register_link}."
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
+#: openedx/features/course_experience/views/course_home_messages.py
+#, python-brace-format
+msgid "{sign_in_link} or {register_link}."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+#: openedx/features/course_experience/views/course_home_messages.py
+#: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation/navbar-not-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
+msgid "Sign in"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid ""
 "You must be enrolled in the course to see course content."
@@ -8929,12 +8950,15 @@ msgid "Expired ID Verification"
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
 #, python-format
-msgid ""
-"\n"
-"                    Hello %(full_name)s,\n"
-"                    Your %(platform_name)s ID verification has expired.\n"
-"                "
+msgid "Hello %(full_name)s,"
+msgstr ""
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#, python-format
+msgid "Your %(platform_name)s ID verification has expired.\" "
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
@@ -8956,45 +8980,40 @@ msgid "You can also do this from your dashboard."
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
-msgid ""
-"\n"
-"                    Resubmit Verification : %(lms_verification_link)s\n"
-"                    ID verification FAQ : %(help_center_link)s\n"
-"                "
+msgid "Resubmit Verification : %(lms_verification_link)s "
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
-msgid ""
-"\n"
-"                Thank you,\n"
-"                The %(platform_name)s Team\n"
-"                "
+msgid "ID verification FAQ : %(help_center_link)s "
+msgstr ""
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
+#: lms/templates/emails/failed_verification_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+#: lms/templates/emails/passed_verification_email.txt
+#: lms/templates/emails/photo_submission_confirmation.txt
+msgid "Thank you,"
+msgstr ""
+
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
+#, python-format
+msgid "The %(platform_name)s Team "
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
-msgid ""
-"\n"
-"Hello %(full_name)s,\n"
-"Your %(platform_name)s ID verification has expired.\n"
+msgid "Hello %(full_name)s, "
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
-msgid ""
-"\n"
-"Resubmit Verification : %(lms_verification_link)s\n"
-"ID verification FAQ : %(help_center_link)s\n"
-msgstr ""
-
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
-#, python-format
-msgid ""
-"\n"
-"Thank you,\n"
-"The %(platform_name)s Team\n"
+msgid "Your %(platform_name)s ID verification has expired. "
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/subject.txt
@@ -10685,12 +10704,6 @@ msgstr ""
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
 #, python-format
-msgid "Hello %(full_name)s,"
-msgstr ""
-
-#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
-#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
-#, python-format
 msgid ""
 "We received a deletion request for your account on %(platform_name)s. We're "
 "sorry to see you go!"
@@ -10734,23 +10747,12 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
 msgid ""
-"You've successfully logged into your {provider_name} account, but this "
-"account isn't linked with an {platform_name} account yet."
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"Use your {platform_name} username and password to log into {platform_name} "
+"You've successfully signed in to your {provider_name} account, but this "
+"account isn't linked with your {platform_name} account yet. {blank_lines}Use"
+" your {platform_name} username and password to sign in to {platform_name} "
 "below, and then link your {platform_name} account with {provider_name} from "
-"your dashboard."
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"If you don't have an {platform_name} account yet, click "
-"{register_label_strong} at the top of the page."
+"your dashboard. {blank_lines}If you don't have an account on {platform_name}"
+" yet, click {register_label_strong} at the top of the page."
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
@@ -10769,10 +10771,10 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
 msgid ""
-"In order to sign in, you need to activate your account.<br /><br />We just "
-"sent an activation link to <strong>{email}</strong>.  If you do not receive "
-"an email, check your spam folders or <a href=\"{support_url}\">contact "
-"{platform} Support</a>."
+"In order to sign in, you need to activate your account.{blank_lines}We just "
+"sent an activation link to {email_strong}. If you do not receive an email, "
+"check your spam folders or {link_start}contact {platform_name} "
+"Support{link_end}."
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
@@ -11076,21 +11078,20 @@ msgid "{sign_in_link} or {register_link} and then enroll in this course."
 msgstr ""
 
 #: openedx/features/course_experience/views/course_home_messages.py
-#: lms/templates/header/navbar-not-authenticated.html
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
-msgid "Sign in"
+#, python-brace-format
+msgid "Welcome to {course_display_name}"
+msgstr ""
+
+#: openedx/features/course_experience/views/course_home_messages.py
+msgid ""
+"You must be enrolled in the course to see course content. Please contact "
+"your degree administrator or edX Support if you have questions."
 msgstr ""
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
 msgid ""
 "{open_enroll_link}Enroll now{close_enroll_link} to access the full course."
-msgstr ""
-
-#: openedx/features/course_experience/views/course_home_messages.py
-#, python-brace-format
-msgid "Welcome to {course_display_name}"
 msgstr ""
 
 #: openedx/features/course_experience/views/course_home_messages.py
@@ -11146,14 +11147,6 @@ msgstr ""
 #: openedx/features/enterprise_support/utils.py
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Continue"
-msgstr ""
-
-#: openedx/features/learner_profile/views/learner_profile.py
-#, python-brace-format
-msgid ""
-"Welcome to the new learner profile page. Your full profile now displays more"
-" information to other learners. You can instead choose to display a limited "
-"profile. {learn_more_link_start}Learn more{learn_more_link_end}"
 msgstr ""
 
 #: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
@@ -12340,7 +12333,8 @@ msgstr ""
 msgid "Account Status Info"
 msgstr ""
 
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/dashboard.html lms/templates/header/user_dropdown.html
+#: themes/edx.org/lms/templates/dashboard.html
 msgid "Order History"
 msgstr ""
 
@@ -16377,13 +16371,6 @@ msgid "ID Verification FAQ: {faq_url}"
 msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
-#: lms/templates/emails/order_confirmation_email.txt
-#: lms/templates/emails/passed_verification_email.txt
-#: lms/templates/emails/photo_submission_confirmation.txt
-msgid "Thank you,"
-msgstr ""
-
-#: lms/templates/emails/failed_verification_email.txt
 #: lms/templates/emails/passed_verification_email.txt
 #: lms/templates/emails/photo_submission_confirmation.txt
 #: lms/templates/emails/reverification_processed.txt
@@ -19141,6 +19128,14 @@ msgstr ""
 
 #: lms/templates/support/feature_based_enrollments.html
 msgid "Student Support: Feature Based Enrollments"
+msgstr ""
+
+#: lms/templates/support/feature_based_enrollments.html
+msgid "Content Type Gating"
+msgstr ""
+
+#: lms/templates/support/feature_based_enrollments.html
+msgid "Course Duration Limits"
 msgstr ""
 
 #: lms/templates/support/feature_based_enrollments.html

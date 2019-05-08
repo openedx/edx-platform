@@ -760,6 +760,10 @@ class StudioSettingsA11yTest(StudioCourseTest):
         self.settings_page.a11y_audit.config.set_rules({
             "ignore": [
                 'link-href',  # TODO: AC-590
+                'aria-allowed-role',  # TODO: AC-936
+                'landmark-complementary-is-top-level',  # TODO: AC-939
+                'radiogroup',  # TODO:  AC-941
+                'region',  # TODO: AC-932
             ],
         })
 
@@ -819,6 +823,11 @@ class StudioSubsectionSettingsA11yTest(StudioCourseTest):
         self.course_outline.open_subsection_settings_dialog()
         self.course_outline.select_advanced_tab()
 
+        self.course_outline.a11y_audit.config.set_rules({
+            "ignore": [
+                'section',  # TODO: AC-491
+            ],
+        })
         # limit the scope of the audit to the special exams tab on the modal dialog
         self.course_outline.a11y_audit.config.set_scope(
             include=['section.edit-settings-timed-examination']

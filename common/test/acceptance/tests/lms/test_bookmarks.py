@@ -2,6 +2,7 @@
 """
 End-to-end tests for the courseware unit bookmarks.
 """
+from __future__ import absolute_import
 import json
 from unittest import skip
 
@@ -16,6 +17,7 @@ from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from common.test.acceptance.tests.helpers import EventsTestMixin, UniqueCourseTest, is_404_page
+from six.moves import range
 
 
 class BookmarksTestMixin(EventsTestMixin, UniqueCourseTest):
@@ -598,6 +600,10 @@ class BookmarksA11yTests(BookmarksTestMixin):
         self.bookmarks_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'heading-order',  # TODO: AC-933
+                'landmark-no-duplicate-banner',  # TODO: AC-934
+                'landmark-one-main',  # TODO: AC-944
+                'region'  # TODO: AC-932
             ]
         })
         self.setup_test(num_chapters=11)

@@ -15,11 +15,6 @@ from django.utils.translation import ugettext_lazy as _
 from web_fragments.fragment import Fragment
 
 from course_modes.models import CourseMode
-from courseware.masquerade import (
-    is_masquerading_as_specific_student,
-    is_masquerading_as_student,
-    get_course_masquerade,
-)
 from lms.djangoapps.commerce.utils import EcommerceService
 from xmodule.partitions.partitions import UserPartition, UserPartitionError, ENROLLMENT_TRACK_PARTITION_ID
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
@@ -82,8 +77,8 @@ class ContentTypeGatingPartition(UserPartition):
         course_key = self._get_course_key_from_course_block(block)
         modes = CourseMode.modes_for_course_dict(course_key)
         verified_mode = modes.get(CourseMode.VERIFIED)
-        if (verified_mode is None or not self._is_audit_enrollment(user, course_key) or
-                user_group == FULL_ACCESS):
+        if (verified_mode is None or user_group == FULL_ACCESS or
+                user_group in allowed_groups):
             return None
 
         ecommerce_checkout_link = self._get_checkout_link(user, verified_mode.sku)
@@ -99,8 +94,8 @@ class ContentTypeGatingPartition(UserPartition):
         course_key = block_key.course_key
         modes = CourseMode.modes_for_course_dict(course_key)
         verified_mode = modes.get(CourseMode.VERIFIED)
-        if (verified_mode is None or not self._is_audit_enrollment(user, course_key) or
-                user_group == FULL_ACCESS):
+        if (verified_mode is None or user_group == FULL_ACCESS or
+                user_group in allowed_groups):
             return None
 
         request = crum.get_current_request()
@@ -108,45 +103,6 @@ class ContentTypeGatingPartition(UserPartition):
             return _(u"Graded assessments are available to Verified Track learners.")
         else:
             return _(u"Graded assessments are available to Verified Track learners. Upgrade to Unlock.")
-
-    def _is_audit_enrollment(self, user, course_key):
-        """
-        Checks if user is enrolled in `Audit` track of course or any staff member is
-        viewing course as in `Audit` enrollment.
-        """
-        if self._is_masquerading_as_generic_student(user, course_key):
-            return self._is_masquerading_audit_enrollment(user, course_key)
-        return self._has_active_enrollment_in_audit_mode(user, course_key)
-
-    def _is_masquerading_as_generic_student(self, user, course_key):
-        """
-        Checks if user is masquerading as a generic student.
-        """
-        return (
-            is_masquerading_as_student(user, course_key) and
-            not is_masquerading_as_specific_student(user, course_key)
-        )
-
-    def _is_masquerading_audit_enrollment(self, user, course_key):
-        """
-        Checks if user is masquerading as learners in `Audit` enrollment track.
-        """
-        course_masquerade = get_course_masquerade(user, course_key)
-        if course_masquerade.user_partition_id == ENROLLMENT_TRACK_PARTITION_ID:
-            audit_mode_id = settings.COURSE_ENROLLMENT_MODES.get(CourseMode.AUDIT, {}).get('id')
-            return course_masquerade.group_id == audit_mode_id
-        if course_masquerade.user_partition_id == CONTENT_GATING_PARTITION_ID:
-            limited_access_group_id = LIMITED_ACCESS.id
-            return course_masquerade.group_id == limited_access_group_id
-        return False
-
-    def _has_active_enrollment_in_audit_mode(self, user, course_key):
-        """
-        Checks if user has an audit and active enrollment in the given course.
-        """
-        course_enrollment = apps.get_model('student.CourseEnrollment')
-        mode_slug, is_active = course_enrollment.enrollment_mode_for_user(user, course_key)
-        return mode_slug == CourseMode.AUDIT and is_active
 
     def _get_checkout_link(self, user, sku):
         ecomm_service = EcommerceService()
@@ -177,51 +133,10 @@ class ContentTypeGatingPartitionScheme(object):
         """
         Returns the Group for the specified user.
         """
-
-        # For now, treat everyone as a Full-access user, until we have the rest of the
-        # feature gating logic in place.
-
         if not ContentTypeGatingConfig.enabled_for_enrollment(user=user, course_key=course_key,
                                                               user_partition=user_partition):
             return FULL_ACCESS
-
-        # If CONTENT_TYPE_GATING is enabled use the following logic to determine whether a user should have FULL_ACCESS
-        # or LIMITED_ACCESS
-
-        course_mode = apps.get_model('course_modes.CourseMode')
-        modes = course_mode.modes_for_course(course_key, include_expired=True, only_selectable=False)
-        modes_dict = {mode.slug: mode for mode in modes}
-
-        # If there is no verified mode, all users are granted FULL_ACCESS
-        if not course_mode.has_verified_mode(modes_dict):
-            return FULL_ACCESS
-
-        course_enrollment = apps.get_model('student.CourseEnrollment')
-
-        mode_slug, is_active = course_enrollment.enrollment_mode_for_user(user, course_key)
-
-        if mode_slug and is_active:
-            course_mode = course_mode.mode_for_course(
-                course_key,
-                mode_slug,
-                modes=modes,
-            )
-            if course_mode is None:
-                LOG.error(
-                    u"User %s is in an unknown CourseMode '%s'"
-                    u" for course %s. Granting full access to content for this user",
-                    user.username,
-                    mode_slug,
-                    course_key,
-                )
-                return FULL_ACCESS
-
-            if mode_slug == CourseMode.AUDIT:
-                return LIMITED_ACCESS
-            else:
-                return FULL_ACCESS
         else:
-            # Unenrolled users don't get gated content
             return LIMITED_ACCESS
 
     @classmethod

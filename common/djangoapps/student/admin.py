@@ -1,19 +1,23 @@
 """ Django admin pages for student app """
+from __future__ import absolute_import
+
 from functools import wraps
+
 from config_models.admin import ConfigurationModelAdmin
 from django import forms
-from django.db import router, transaction
 from django.contrib import admin
 from django.contrib.admin.sites import NotRegistered
 from django.contrib.admin.utils import unquote
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.contrib.auth.forms import ReadOnlyPasswordHashField, UserChangeForm as BaseUserChangeForm
-from django.db import models
+from django.contrib.auth.forms import ReadOnlyPasswordHashField
+from django.contrib.auth.forms import UserChangeForm as BaseUserChangeForm
+from django.db import models, router, transaction
 from django.http import HttpResponseRedirect
 from django.http.request import QueryDict
-from django.utils.translation import ugettext_lazy as _, ngettext
 from django.urls import reverse
+from django.utils.translation import ngettext
+from django.utils.translation import ugettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
@@ -27,13 +31,13 @@ from student.models import (
     CourseEnrollmentAllowed,
     DashboardConfiguration,
     LinkedInAddToProfileConfiguration,
+    LoginFailures,
     PendingNameChange,
     Registration,
     RegistrationCookieConfiguration,
     UserAttribute,
     UserProfile,
-    UserTestGroup,
-    LoginFailures,
+    UserTestGroup
 )
 from student.roles import REGISTERED_ACCESS_ROLES
 from xmodule.modulestore.django import modulestore

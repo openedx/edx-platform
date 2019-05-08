@@ -6,7 +6,7 @@ from logging import getLogger
 from course_modes.models import CourseMode
 from django.contrib.sites.models import Site
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers

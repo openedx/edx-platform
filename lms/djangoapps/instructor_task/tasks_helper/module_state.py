@@ -13,7 +13,7 @@ from courseware.courses import get_course_by_id, get_problems_in_section
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from courseware.models import StudentModule
 from courseware.module_render import get_module_for_descriptor_internal
-from lms.djangoapps.grades.events import GRADES_OVERRIDE_EVENT_TYPE, GRADES_RESCORE_EVENT_TYPE
+from lms.djangoapps.grades.api import events as grades_events
 from student.models import get_user_by_username_or_email
 from track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
 from track.views import task_track
@@ -162,7 +162,7 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
         # calls that create events.  We retrieve and store the id here because
         # the request cache will be erased during downstream calls.
         create_new_event_transaction_id()
-        set_event_transaction_type(GRADES_RESCORE_EVENT_TYPE)
+        set_event_transaction_type(grades_events.GRADES_RESCORE_EVENT_TYPE)
 
         # specific events from CAPA are not propagated up the stack. Do we want this?
         try:
@@ -246,7 +246,7 @@ def override_score_module_state(xmodule_instance_args, module_descriptor, studen
         # calls that create events.  We retrieve and store the id here because
         # the request cache will be erased during downstream calls.
         create_new_event_transaction_id()
-        set_event_transaction_type(GRADES_OVERRIDE_EVENT_TYPE)
+        set_event_transaction_type(grades_events.GRADES_OVERRIDE_EVENT_TYPE)
 
         problem_weight = instance.weight if instance.weight is not None else 1
         if problem_weight == 0:

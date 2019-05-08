@@ -1,4 +1,6 @@
 """LMS-hosted Programs pages"""
+from __future__ import absolute_import
+
 from uuid import uuid4
 
 from bok_choy.page_object import PageObject

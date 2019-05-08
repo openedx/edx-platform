@@ -2,6 +2,8 @@
 URLs for student app
 """
 
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.conf.urls import url
 from django.contrib.auth.views import password_reset_complete

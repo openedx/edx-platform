@@ -145,7 +145,7 @@ STATICFILES_DIRS += [
 STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineStorage'
 
 # Don't use compression during tests
-PIPELINE_JS_COMPRESSOR = None
+PIPELINE['JS_COMPRESSOR'] = None
 
 update_module_store_settings(
     MODULESTORE,
@@ -357,7 +357,6 @@ BLOCK_STRUCTURES_SETTINGS['PRUNING_ACTIVE'] = True
 
 # These ports are carefully chosen so that if the browser needs to
 # access them, they will be available through the SauceLabs SSH tunnel
-LETTUCE_SERVER_PORT = 8003
 XQUEUE_PORT = 8040
 YOUTUBE_PORT = 8031
 LTI_PORT = 8765
@@ -551,8 +550,6 @@ COMPREHENSIVE_THEME_LOCALE_PATHS = [REPO_ROOT / "themes/conf/locale", ]
 
 LMS_ROOT_URL = "http://localhost:8000"
 
-# TODO (felipemontoya): This key is only needed during lettuce tests.
-# To be removed during https://openedx.atlassian.net/browse/DEPR-19
 FRONTEND_LOGOUT_URL = LMS_ROOT_URL + '/logout'
 
 ECOMMERCE_API_URL = 'https://ecommerce.example.com/api/v2/'

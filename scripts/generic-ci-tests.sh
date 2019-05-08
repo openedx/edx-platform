@@ -20,10 +20,6 @@ set -e
 #       - "commonlib-unit": Run Python unit tests from the common/lib directory
 #       - "commonlib-js-unit": Run the JavaScript tests and the Python unit
 #           tests from the common/lib directory
-#       - "lms-acceptance": Run the acceptance (Selenium/Lettuce) tests for
-#           the LMS
-#       - "cms-acceptance": Run the acceptance (Selenium/Lettuce) tests for
-#           Studio
 #       - "bok-choy": Run acceptance tests that use the bok-choy framework
 #
 #   `SHARD` is a number indicating which subset of the tests to build.
@@ -174,14 +170,6 @@ case "$TEST_SUITE" in
         # neither command fails then the exit command resolves to simply exit
         # which is considered successful.
         exit $EXIT
-        ;;
-
-    "lms-acceptance")
-        $TOX paver test_acceptance -s lms -vvv --with-xunit
-        ;;
-
-    "cms-acceptance")
-        $TOX paver test_acceptance -s cms -vvv --with-xunit
         ;;
 
     "bok-choy")

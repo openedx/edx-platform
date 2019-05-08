@@ -108,8 +108,10 @@ def skip_signal(signal, **kwargs):
     and then reconnecting the signal.
     """
     signal.disconnect(**kwargs)
-    yield
-    signal.connect(**kwargs)
+    try:
+        yield
+    finally:
+        signal.connect(**kwargs)
 
 
 class MockS3Mixin(object):

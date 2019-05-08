@@ -2,6 +2,7 @@
 """
 End-to-end tests for Student's Profile Page.
 """
+from __future__ import absolute_import
 from contextlib import contextmanager
 from datetime import datetime
 from unittest import skip
@@ -11,6 +12,7 @@ from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
 from common.test.acceptance.pages.lms.learner_profile import LearnerProfilePage
 from common.test.acceptance.tests.helpers import AcceptanceTest, EventsTestMixin
+import six
 
 
 class LearnerProfileTestMixin(EventsTestMixin):
@@ -130,7 +132,7 @@ class LearnerProfileTestMixin(EventsTestMixin):
                     'event': {
                         'user_id': int(profile_user_id),
                         'page': 'profile',
-                        'visibility': unicode(visibility)
+                        'visibility': six.text_type(visibility)
                     }
                 }
             ],
@@ -660,6 +662,7 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         profile_page.a11y_audit.check_for_accessibility_errors()
@@ -686,6 +689,7 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         profile_page.a11y_audit.check_for_accessibility_errors()
@@ -701,6 +705,8 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
+                'color-contrast'  # AC-938
             ]
         })
         profile_page.display_accomplishments()

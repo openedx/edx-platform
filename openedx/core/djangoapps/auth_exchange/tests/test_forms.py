@@ -2,21 +2,23 @@
 """
 Tests for OAuth token exchange forms
 """
+from __future__ import absolute_import
+
 import unittest
 
+import httpretty
+import social_django.utils as social_utils
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
 from django.test.client import RequestFactory
-import httpretty
 from provider import scope
 from social_django.models import Partial
-import social_django.utils as social_utils
 
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
 
 from ..forms import AccessTokenExchangeForm
-from .utils import AccessTokenExchangeTestMixin, TPA_FEATURE_ENABLED, TPA_FEATURES_KEY
 from .mixins import DOPAdapterMixin, DOTAdapterMixin
+from .utils import TPA_FEATURE_ENABLED, TPA_FEATURES_KEY, AccessTokenExchangeTestMixin
 
 
 class AccessTokenExchangeFormTest(AccessTokenExchangeTestMixin):

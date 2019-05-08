@@ -2,6 +2,7 @@
 """
 End-to-end tests for the Account Settings page.
 """
+from __future__ import absolute_import
 from datetime import datetime
 from unittest import skip
 
@@ -12,6 +13,7 @@ from common.test.acceptance.pages.common.auto_auth import AutoAuthPage, FULL_NAM
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.tests.helpers import AcceptanceTest, EventsTestMixin
+import six
 
 
 class AccountSettingsTestMixin(EventsTestMixin, AcceptanceTest):
@@ -362,26 +364,6 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             reloads_on_save=True,
         )
 
-    def test_education_completed_field(self):
-        """
-        Test behaviour of "Education Completed" field.
-        """
-        self._test_dropdown_field(
-            u'level_of_education',
-            u'Education Completed',
-            u'',
-            [u'Bachelor\'s degree', u''],
-        )
-
-        actual_events = self.wait_for_events(event_filter=self.settings_changed_event_filter, number_of_matches=2)
-        self.assert_events_match(
-            [
-                self.expected_settings_changed_event('level_of_education', None, 'b'),
-                self.expected_settings_changed_event('level_of_education', 'b', None),
-            ],
-            actual_events
-        )
-
     def test_gender_field(self):
         """
         Test behaviour of "Gender" field.
@@ -488,12 +470,12 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             'price': 'Cost:\n$100.00',
         }
 
-        for field_name, value in expected_order_data_first_row.iteritems():
+        for field_name, value in six.iteritems(expected_order_data_first_row):
             self.assertEqual(
                 self.account_settings_page.get_value_of_order_history_row_item('order-Edx-123', field_name)[0], value
             )
 
-        for field_name, value in expected_order_data_second_row.iteritems():
+        for field_name, value in six.iteritems(expected_order_data_second_row):
             self.assertEqual(
                 self.account_settings_page.get_value_of_order_history_row_item('order-Edx-123', field_name)[1], value
             )
@@ -550,6 +532,7 @@ class AccountSettingsA11yTest(AccountSettingsTestMixin, AcceptanceTest):
         self.account_settings_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
             ]
         })
         self.account_settings_page.a11y_audit.check_for_accessibility_errors()

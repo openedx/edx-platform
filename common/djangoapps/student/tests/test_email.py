@@ -1,39 +1,39 @@
 # coding=utf-8
-import ddt
+from __future__ import absolute_import
+
 import json
 import unittest
 
+import ddt
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
-from django.urls import reverse
 from django.db import transaction
 from django.http import HttpResponse
-from django.test import override_settings, TransactionTestCase
+from django.test import TransactionTestCase, override_settings
 from django.test.client import RequestFactory
+from django.urls import reverse
 from mock import Mock, patch
 from six import text_type
 
-from edxmako.shortcuts import render_to_string, marketing_link
+from edxmako.shortcuts import marketing_link, render_to_string
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, CacheIsolationMixin
-from student.models import (
-    PendingEmailChange,
-    Registration,
-    UserProfile,
-)
+from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase
 from openedx.core.lib.request_utils import safe_get_host
+from student.models import PendingEmailChange, Registration, UserProfile
 from student.tests.factories import PendingEmailChangeFactory, RegistrationFactory, UserFactory
 from student.views import (
     SETTING_CHANGE_INITIATED,
     confirm_email_change,
     do_email_change_request,
+    generate_activation_email_context,
+    send_reactivation_email_for_user,
     validate_new_email
 )
-from student.views import generate_activation_email_context, send_reactivation_email_for_user
 from third_party_auth.views import inactive_user_view
 from util.testing import EventTestMixin
 
@@ -49,7 +49,7 @@ def mock_render_to_string(template_name, context):
     """
     Return a string that encodes template_name and context
     """
-    return str((template_name, sorted(context.iteritems())))
+    return str((template_name, sorted(six.iteritems(context))))
 
 
 def mock_render_to_response(template_name, context):

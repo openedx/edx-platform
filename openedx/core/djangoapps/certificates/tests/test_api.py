@@ -1,6 +1,8 @@
+from __future__ import absolute_import
+
+import itertools
 from contextlib import contextmanager
 from datetime import datetime, timedelta
-import itertools
 
 import ddt
 import pytz

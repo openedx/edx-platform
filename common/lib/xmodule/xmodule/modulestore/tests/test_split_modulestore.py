@@ -1,42 +1,47 @@
 """
     Test split modulestore w/o using any django stuff.
 """
-from mock import patch
+from __future__ import absolute_import
+
 import datetime
-from importlib import import_module
-from path import Path as path
+import os
 import random
 import re
 import unittest
-import os
+from importlib import import_module
 
 import ddt
+import six
+from ccx_keys.locator import CCXBlockUsageLocator
 from contracts import contract
-from django.core.cache import caches, InvalidCacheBackendError
+from django.core.cache import InvalidCacheBackendError, caches
+from mock import patch
+from opaque_keys.edx.locator import BlockUsageLocator, CourseKey, CourseLocator, LocalId, VersionTree
+from path import Path as path
+from six.moves import range
+from xblock.fields import Reference, ReferenceList, ReferenceValueDict
 
 from openedx.core.lib import tempdir
 from openedx.core.lib.tests import attr
-from xblock.fields import Reference, ReferenceList, ReferenceValueDict
 from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.exceptions import (
-    ItemNotFoundError, VersionConflictError,
-    DuplicateItemError, DuplicateCourseError,
-    InsufficientSpecificationError
-)
-from opaque_keys.edx.locator import CourseKey, CourseLocator, BlockUsageLocator, VersionTree, LocalId
-from ccx_keys.locator import CCXBlockUsageLocator
-from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.x_module import XModuleMixin
 from xmodule.fields import Date, Timedelta
-from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
-from xmodule.modulestore.tests.test_modulestore import check_has_course_method
-from xmodule.modulestore.split_mongo import BlockKey
-from xmodule.modulestore.tests.factories import check_mongo_calls
-from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
-from xmodule.modulestore.tests.utils import mock_tab_from_json
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.edit_info import EditInfoMixin
-
+from xmodule.modulestore.exceptions import (
+    DuplicateCourseError,
+    DuplicateItemError,
+    InsufficientSpecificationError,
+    ItemNotFoundError,
+    VersionConflictError
+)
+from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore.split_mongo import BlockKey
+from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
+from xmodule.modulestore.tests.factories import check_mongo_calls
+from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
+from xmodule.modulestore.tests.test_modulestore import check_has_course_method
+from xmodule.modulestore.tests.utils import mock_tab_from_json
+from xmodule.x_module import XModuleMixin
 
 BRANCH_NAME_DRAFT = ModuleStoreEnum.BranchName.draft
 BRANCH_NAME_PUBLISHED = ModuleStoreEnum.BranchName.published
@@ -497,7 +502,7 @@ class SplitModuleTest(unittest.TestCase):
         '''
         Sets up the initial data into the db
         '''
-        for _course_id, course_spec in SplitModuleTest.COURSE_CONTENT.iteritems():
+        for _course_id, course_spec in six.iteritems(SplitModuleTest.COURSE_CONTENT):
             course = split_store.create_course(
                 course_spec['org'],
                 course_spec['course'],
@@ -508,7 +513,7 @@ class SplitModuleTest(unittest.TestCase):
                 root_block_id=course_spec['root_block_id']
             )
             for revision in course_spec.get('revisions', []):
-                for (block_type, block_id), fields in revision.get('update', {}).iteritems():
+                for (block_type, block_id), fields in six.iteritems(revision.get('update', {})):
                     # cheat since course is most frequent
                     if course.location.block_id == block_id:
                         block = course
@@ -516,7 +521,7 @@ class SplitModuleTest(unittest.TestCase):
                         # not easy to figure out the category but get_item won't care
                         block_usage = BlockUsageLocator.make_relative(course.location, block_type, block_id)
                         block = split_store.get_item(block_usage)
-                    for key, value in fields.iteritems():
+                    for key, value in six.iteritems(fields):
                         setattr(block, key, value)
                 # create new blocks into dag: parent must already exist; thus, order is important
                 new_ele_dict = {}
@@ -1755,8 +1760,8 @@ class TestItemCrud(SplitModuleTest):
             # First child should have been moved to second position, and better child takes the lead
             refetch_course = store.get_course(versionless_course_locator)
             children = refetch_course.get_children()
-            self.assertEqual(unicode(children[1].location), unicode(first_child.location))
-            self.assertEqual(unicode(children[0].location), unicode(second_child.location))
+            self.assertEqual(six.text_type(children[1].location), six.text_type(first_child.location))
+            self.assertEqual(six.text_type(children[0].location), six.text_type(second_child.location))
 
             # Clean up the data so we don't break other tests which apparently expect a particular state
             store.delete_course(refetch_course.id, user)

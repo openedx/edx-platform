@@ -527,7 +527,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         is_staff access).
         """
         client = self.login_client(api_client, user)
-        self.send_patch(client, {}, expected_status=403 if user == "staff_user" else 404)
+        self.send_patch(client, {}, expected_status=403)
 
     @ddt.data(
         ("client", "user"),
@@ -536,14 +536,14 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
     @ddt.unpack
     def test_patch_account_unknown_user(self, api_client, user):
         """
-        Test that trying to update a user who does not exist returns a 404.
+        Test that trying to update a user who does not exist returns a 403.
         """
         client = self.login_client(api_client, user)
         response = client.patch(
             reverse("accounts_api", kwargs={'username': "does_not_exist"}),
             data=json.dumps({}), content_type="application/merge-patch+json"
         )
-        self.assertEqual(404, response.status_code)
+        self.assertEqual(403, response.status_code)
 
     @ddt.data(
         ("gender", "f", "not a gender", u'"not a gender" is not a valid choice.'),

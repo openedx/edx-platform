@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=missing-docstring
 """
 Programmatic integration point for User API Accounts sub-application
 """
@@ -41,6 +42,7 @@ from openedx.core.djangoapps.user_api.errors import (
 )
 from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
 from openedx.core.lib.api.view_utils import add_serializer_errors
+from openedx.features.enterprise_support.utils import get_enterprise_readonly_account_fields
 
 from .serializers import (
     AccountLegacyProfileSerializer, AccountUserSerializer,
@@ -134,149 +136,39 @@ def update_account_settings(requesting_user, update, username=None):
         errors.UserAPIInternalError: the operation failed due to an unexpected error.
 
     """
+    # Get user
     if username is None:
         username = requesting_user.username
-
-    existing_user, existing_user_profile = _get_user_and_profile(username)
-    account_recovery = _get_account_recovery(existing_user)
-
     if requesting_user.username != username:
         raise errors.UserNotAuthorized()
+    user, user_profile = _get_user_and_profile(username)
 
-    # If user has requested to change email, we must call the multi-step process to handle this.
-    # It is not handled by the serializer (which considers email to be read-only).
-    changing_email = False
-    if "email" in update:
-        changing_email = True
-        new_email = update["email"]
-        del update["email"]
-
-    # If user has requested to change name, store old name because we must update associated metadata
-    # after the save process is complete.
-    changing_full_name = False
-    old_name = None
-    if "name" in update:
-        changing_full_name = True
-        old_name = existing_user_profile.name
-
-    changing_secondary_email = False
-    if "secondary_email" in update:
-        changing_secondary_email = True
-
-    # Check for fields that are not editable. Marking them read-only causes them to be ignored, but we wish to 400.
-    read_only_fields = set(update.keys()).intersection(
-        AccountUserSerializer.get_read_only_fields() + AccountLegacyProfileSerializer.get_read_only_fields()
-    )
-
-    # Build up all field errors, whether read-only, validation, or email errors.
+    # Validate fields to update
     field_errors = {}
+    _validate_read_only_fields(user, update, field_errors)
 
-    if read_only_fields:
-        for read_only_field in read_only_fields:
-            field_errors[read_only_field] = {
-                "developer_message": u"This field is not editable via this API",
-                "user_message": _(u"The '{field_name}' field cannot be edited.").format(field_name=read_only_field)
-            }
-            del update[read_only_field]
-
-    user_serializer = AccountUserSerializer(existing_user, data=update)
-    legacy_profile_serializer = AccountLegacyProfileSerializer(existing_user_profile, data=update)
-
+    user_serializer = AccountUserSerializer(user, data=update)
+    legacy_profile_serializer = AccountLegacyProfileSerializer(user_profile, data=update)
     for serializer in user_serializer, legacy_profile_serializer:
-        field_errors = add_serializer_errors(serializer, update, field_errors)
+        add_serializer_errors(serializer, update, field_errors)
 
-    # If the user asked to change email, validate it.
-    if changing_email:
-        try:
-            student_views.validate_new_email(existing_user, new_email)
-        except ValueError as err:
-            field_errors["email"] = {
-                "developer_message": u"Error thrown from validate_new_email: '{}'".format(text_type(err)),
-                "user_message": text_type(err)
-            }
+    _validate_email_change(user, update, field_errors)
+    _validate_secondary_email(user, update, field_errors)
+    old_name = _validate_name_change(user_profile, update, field_errors)
+    old_language_proficiencies = _get_old_language_proficiencies_if_updating(user_profile, update)
 
-        # Don't process with sending email to given new email, if it is already associated with
-        # an account. User must see same success message with no error.
-        # This is so that this endpoint cannot be used to determine if an email is valid or not.
-        changing_email = new_email and not email_exists_or_retired(new_email)
-
-    if changing_secondary_email:
-        try:
-            student_views.validate_secondary_email(account_recovery, update["secondary_email"])
-        except ValueError as err:
-            field_errors["secondary_email"] = {
-                "developer_message": u"Error thrown from validate_secondary_email: '{}'".format(text_type(err)),
-                "user_message": text_type(err)
-            }
-        else:
-            account_recovery.update_recovery_email(update["secondary_email"])
-
-    # If the user asked to change full name, validate it
-    if changing_full_name:
-        try:
-            student_forms.validate_name(update['name'])
-        except ValidationError as err:
-            field_errors["name"] = {
-                "developer_message": u"Error thrown from validate_name: '{}'".format(err.message),
-                "user_message": err.message
-            }
-
-    # If we have encountered any validation errors, return them to the user.
     if field_errors:
         raise errors.AccountValidationError(field_errors)
 
+    # Save requested changes
     try:
-        # If everything validated, go ahead and save the serializers.
-
-        # We have not found a way using signals to get the language proficiency changes (grouped by user).
-        # As a workaround, store old and new values here and emit them after save is complete.
-        if "language_proficiencies" in update:
-            old_language_proficiencies = list(existing_user_profile.language_proficiencies.values('code'))
-
         for serializer in user_serializer, legacy_profile_serializer:
             serializer.save()
 
-        # if any exception is raised for user preference (i.e. account_privacy), the entire transaction for user account
-        # patch is rolled back and the data is not saved
-        if 'account_privacy' in update:
-            update_user_preferences(
-                requesting_user, {'account_privacy': update["account_privacy"]}, existing_user
-            )
-
-        if "language_proficiencies" in update:
-            new_language_proficiencies = update["language_proficiencies"]
-            emit_setting_changed_event(
-                user=existing_user,
-                db_table=existing_user_profile.language_proficiencies.model._meta.db_table,
-                setting_name="language_proficiencies",
-                old_value=old_language_proficiencies,
-                new_value=new_language_proficiencies,
-            )
-
-        # If the name was changed, store information about the change operation. This is outside of the
-        # serializer so that we can store who requested the change.
-        if old_name:
-            meta = existing_user_profile.get_meta()
-            if 'old_names' not in meta:
-                meta['old_names'] = []
-            meta['old_names'].append([
-                old_name,
-                u"Name change requested through account API by {0}".format(requesting_user.username),
-                datetime.datetime.now(UTC).isoformat()
-            ])
-            existing_user_profile.set_meta(meta)
-            existing_user_profile.save()
-
-        # updating extended user profile info
-        if 'extended_profile' in update:
-            meta = existing_user_profile.get_meta()
-            new_extended_profile = update['extended_profile']
-            for field in new_extended_profile:
-                field_name = field['field_name']
-                new_value = field['field_value']
-                meta[field_name] = new_value
-            existing_user_profile.set_meta(meta)
-            existing_user_profile.save()
+        _update_preferences_if_needed(update, requesting_user, user)
+        _notify_language_proficiencies_update_if_needed(update, user, user_profile, old_language_proficiencies)
+        _store_old_name_if_needed(old_name, user_profile, requesting_user)
+        _update_extended_profile_if_needed(update, user_profile)
 
     except PreferenceValidationError as err:
         raise AccountValidationError(err.preference_errors)
@@ -287,22 +179,156 @@ def update_account_settings(requesting_user, update, username=None):
             u"Error thrown when saving account updates: '{}'".format(text_type(err))
         )
 
-    # And try to send the email change request if necessary.
-    if changing_email:
-        if not settings.FEATURES['ALLOW_EMAIL_ADDRESS_CHANGE']:
-            raise AccountUpdateError(u"Email address changes have been disabled by the site operators.")
+    _send_email_change_requests_if_needed(update, user)
+
+
+def _validate_read_only_fields(user, data, field_errors):
+    # Check for fields that are not editable. Marking them read-only causes them to be ignored, but we wish to 400.
+    read_only_fields = set(data.keys()).intersection(
+        # Remove email since it is handled separately below when checking for changing_email.
+        (set(AccountUserSerializer.get_read_only_fields()) - set(["email"])) |
+        set(AccountLegacyProfileSerializer.get_read_only_fields() or set()) |
+        get_enterprise_readonly_account_fields(user)
+    )
+
+    for read_only_field in read_only_fields:
+        field_errors[read_only_field] = {
+            "developer_message": u"This field is not editable via this API",
+            "user_message": _(u"The '{field_name}' field cannot be edited.").format(field_name=read_only_field)
+        }
+        del data[read_only_field]
+
+
+def _validate_email_change(user, data, field_errors):
+    # If user has requested to change email, we must call the multi-step process to handle this.
+    # It is not handled by the serializer (which considers email to be read-only).
+    if "email" not in data:
+        return
+
+    if not settings.FEATURES['ALLOW_EMAIL_ADDRESS_CHANGE']:
+        raise AccountUpdateError(u"Email address changes have been disabled by the site operators.")
+
+    new_email = data["email"]
+    try:
+        student_views.validate_new_email(user, new_email)
+    except ValueError as err:
+        field_errors["email"] = {
+            "developer_message": u"Error thrown from validate_new_email: '{}'".format(text_type(err)),
+            "user_message": text_type(err)
+        }
+        return
+
+    # Don't process with sending email to given new email, if it is already associated with
+    # an account. User must see same success message with no error.
+    # This is so that this endpoint cannot be used to determine if an email is valid or not.
+    if email_exists_or_retired(new_email):
+        del data["email"]
+
+
+def _validate_secondary_email(user, data, field_errors):
+    if "secondary_email" not in data:
+        return
+
+    account_recovery = _get_account_recovery(user)
+    try:
+        student_views.validate_secondary_email(account_recovery, data["secondary_email"])
+    except ValueError as err:
+        field_errors["secondary_email"] = {
+            "developer_message": u"Error thrown from validate_secondary_email: '{}'".format(text_type(err)),
+            "user_message": text_type(err)
+        }
+    else:
+        account_recovery.update_recovery_email(data["secondary_email"])
+
+
+def _validate_name_change(user_profile, data, field_errors):
+    # If user has requested to change name, store old name because we must update associated metadata
+    # after the save process is complete.
+    if "name" not in data:
+        return None
+
+    old_name = user_profile.name
+    try:
+        student_forms.validate_name(data['name'])
+    except ValidationError as err:
+        field_errors["name"] = {
+            "developer_message": u"Error thrown from validate_name: '{}'".format(err.message),
+            "user_message": err.message
+        }
+        return None
+
+    return old_name
+
+
+def _get_old_language_proficiencies_if_updating(user_profile, data):
+    if "language_proficiencies" in data:
+        return list(user_profile.language_proficiencies.values('code'))
+
+
+def _update_preferences_if_needed(data, requesting_user, user):
+    if 'account_privacy' in data:
+        update_user_preferences(
+            requesting_user, {'account_privacy': data["account_privacy"]}, user
+        )
+
+
+def _notify_language_proficiencies_update_if_needed(data, user, user_profile, old_language_proficiencies):
+    if "language_proficiencies" in data:
+        new_language_proficiencies = data["language_proficiencies"]
+        emit_setting_changed_event(
+            user=user,
+            db_table=user_profile.language_proficiencies.model._meta.db_table,
+            setting_name="language_proficiencies",
+            old_value=old_language_proficiencies,
+            new_value=new_language_proficiencies,
+        )
+
+
+def _update_extended_profile_if_needed(data, user_profile):
+    if 'extended_profile' in data:
+        meta = user_profile.get_meta()
+        new_extended_profile = data['extended_profile']
+        for field in new_extended_profile:
+            field_name = field['field_name']
+            new_value = field['field_value']
+            meta[field_name] = new_value
+        user_profile.set_meta(meta)
+        user_profile.save()
+
+
+def _store_old_name_if_needed(old_name, user_profile, requesting_user):
+    # If the name was changed, store information about the change operation. This is outside of the
+    # serializer so that we can store who requested the change.
+    if old_name:
+        meta = user_profile.get_meta()
+        if 'old_names' not in meta:
+            meta['old_names'] = []
+        meta['old_names'].append([
+            old_name,
+            u"Name change requested through account API by {0}".format(requesting_user.username),
+            datetime.datetime.now(UTC).isoformat()
+        ])
+        user_profile.set_meta(meta)
+        user_profile.save()
+
+
+def _send_email_change_requests_if_needed(data, user):
+    new_email = data.get("email")
+    if new_email:
         try:
-            student_views.do_email_change_request(existing_user, new_email)
+            student_views.do_email_change_request(user, new_email)
         except ValueError as err:
             raise AccountUpdateError(
                 u"Error thrown from do_email_change_request: '{}'".format(text_type(err)),
                 user_message=text_type(err)
             )
-    if changing_secondary_email:
+
+    new_secondary_email = data.get("secondary_email")
+    if new_secondary_email:
         try:
             student_views.do_email_change_request(
-                user=existing_user,
-                new_email=update["secondary_email"],
+                user=user,
+                new_email=new_secondary_email,
                 secondary_email_change_request=True,
             )
         except ValueError as err:

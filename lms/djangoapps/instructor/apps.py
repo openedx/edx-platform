@@ -19,7 +19,7 @@ class InstructorConfig(AppConfig):
         PluginURLs.CONFIG: {
             ProjectType.LMS: {
                 PluginURLs.NAMESPACE: u'',
-                PluginURLs.REGEX: u'courses/{}/instructor/api/'.format(COURSE_ID_PATTERN),
+                PluginURLs.REGEX: u'^courses/{}/instructor/api/'.format(COURSE_ID_PATTERN),
                 PluginURLs.RELATIVE_PATH: u'views.api_urls',
             }
         },

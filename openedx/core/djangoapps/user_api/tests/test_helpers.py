@@ -1,20 +1,20 @@
 """
 Tests for helper functions.
 """
+from __future__ import absolute_import
+
 import json
 import re
-import mock
+
 import ddt
+import mock
 import pytest
 from django import forms
 from django.http import HttpRequest, HttpResponse
 from django.test import TestCase
 from six import text_type
 
-from ..helpers import (
-    intercept_errors, shim_student_view,
-    FormDescription, InvalidFieldError
-)
+from ..helpers import FormDescription, InvalidFieldError, intercept_errors, shim_student_view
 
 
 class FakeInputException(Exception):

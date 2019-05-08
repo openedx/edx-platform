@@ -1,11 +1,12 @@
 """
 OAuth Dispatch test mixins
 """
-from django.conf import settings
+from __future__ import absolute_import
 
+import jwt
+from django.conf import settings
 from jwkest.jwk import KEYS
 from jwkest.jws import JWS
-import jwt
 from jwt.exceptions import ExpiredSignatureError
 
 from student.models import UserProfile, anonymous_id_for_user

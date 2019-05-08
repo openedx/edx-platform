@@ -2,9 +2,12 @@
 Management command for expiring old entitlements.
 """
 
+from __future__ import absolute_import
+
 import logging
 
 from django.core.management import BaseCommand
+from six.moves import range
 
 from entitlements.models import CourseEntitlement
 from entitlements.tasks import expire_old_entitlements

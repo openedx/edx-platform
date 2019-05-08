@@ -1,6 +1,7 @@
 """
 Test course discovery.
 """
+from __future__ import absolute_import
 import datetime
 import json
 import uuid
@@ -10,6 +11,7 @@ from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.lms.discovery import CourseDiscoveryPage
 from common.test.acceptance.tests.helpers import AcceptanceTest, remove_file
+from six.moves import range
 
 
 class CourseDiscoveryTest(AcceptanceTest):

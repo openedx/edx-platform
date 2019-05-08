@@ -1,14 +1,18 @@
 """ Verification API v1 views. """
+from __future__ import absolute_import
+
 from django.http import Http404
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import RetrieveAPIView
 from rest_framework_oauth.authentication import OAuth2Authentication
 
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSOVerification, ManualVerification
+from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
 from lms.djangoapps.verify_student.utils import most_recent_verification
 from openedx.core.djangoapps.user_api.serializers import (
-    SoftwareSecurePhotoVerificationSerializer, SSOVerificationSerializer, ManualVerificationSerializer,
+    ManualVerificationSerializer,
+    SoftwareSecurePhotoVerificationSerializer,
+    SSOVerificationSerializer
 )
 from openedx.core.lib.api.permissions import IsStaffOrOwner
 

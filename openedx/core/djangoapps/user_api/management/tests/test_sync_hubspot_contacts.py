@@ -37,7 +37,7 @@ class TestHubspotSyncCommand(TestCase):
     @classmethod
     def _create_users(cls, site_conf):
         # Create some test users
-        for i in range(1, 11):
+        for i in range(1, 20):
             profile_meta = {
                 "first_name": "First Name{0}".format(i),
                 "last_name": "Last Name{0}".format(i),
@@ -58,55 +58,42 @@ class TestHubspotSyncCommand(TestCase):
 
     def test_without_any_hubspot_api_key(self):
         """
-        Test no recent contact call is made if hubspot integration is not enabled for any site
+        Test no _sync_site call is made if hubspot integration is not enabled for any site
         """
         orig_values = self.hubspot_site_config.values
         self.hubspot_site_config.values = {}
         self.hubspot_site_config.save()
-        last_synced_contact_email = patch.object(sync_command, '_get_last_synced_contact_email')
-        mock_last_synced_contact_email = last_synced_contact_email.start()
+        sync_site = patch.object(sync_command, '_sync_site')
+        mock_sync_site = sync_site.start()
         call_command('sync_hubspot_contacts')
-        self.assertFalse(mock_last_synced_contact_email.called, "Recent contact API should not be called")
-        last_synced_contact_email.stop()
+        self.assertFalse(mock_sync_site.called, "_sync_site should not be called")
+        sync_site.stop()
         # put values back
         self.hubspot_site_config.values = orig_values
         self.hubspot_site_config.save()
 
-    def test_recent_contact_called(self):
+    def test_with_initial_sync_days(self):
         """
-        Test recent contact API is called
+        Test with providing initial sync days
         """
-        last_synced_contact_email = patch.object(sync_command, '_get_last_synced_contact_email')
-        mock_last_synced_contact_email = last_synced_contact_email.start()
-        mock_last_synced_contact_email.return_value = None
-        call_command('sync_hubspot_contacts')
-        self.assertTrue(mock_last_synced_contact_email.called, "Recent contact API should be called")
-        last_synced_contact_email.stop()
+        sync_with_hubspot = patch.object(sync_command, '_sync_with_hubspot')
+        mock_sync_with_hubspot = sync_with_hubspot.start()
+        out = StringIO()
+        call_command('sync_hubspot_contacts', '--initial-sync-days=7', '--batch-size=2', stdout=out)
+        output = out.getvalue()
+        self.assertIn('Successfully synced users', output)
+        self.assertEqual(mock_sync_with_hubspot.call_count, 4)  # 4 requests of batch (2, 2, 2, 1), total 7 contacts
+        sync_with_hubspot.stop()
 
-    def test_with_no_recent_contact_found(self):
+    def test_command_without_initial_sync_days(self):
         """
-        Test if no recent contact found it should sync all contacts
+        Test sync last day
         """
-        with patch.object(sync_command, '_get_last_synced_contact_email', return_value=None):
-            sync_with_hubspot = patch.object(sync_command, '_sync_with_hubspot')
-            mock_sync_with_hubspot = sync_with_hubspot.start()
-            out = StringIO()
-            call_command('sync_hubspot_contacts', '--initial-sync-days=20', '--batch-size=2', stdout=out)
-            output = out.getvalue()
-            self.assertIn('Successfully synced users', output)
-            self.assertEqual(mock_sync_with_hubspot.call_count, 5)
-            sync_with_hubspot.stop()
-
-    def test_with_recent_contact_found(self):
-        """
-        Test only not synched contacts are synced
-        """
-        with patch.object(sync_command, '_get_last_synced_contact_email', return_value=self.users[3].email):
-            sync_with_hubspot = patch.object(sync_command, '_sync_with_hubspot')
-            mock_sync_with_hubspot = sync_with_hubspot.start()
-            out = StringIO()
-            call_command('sync_hubspot_contacts', '--batch-size=3', stdout=out)
-            output = out.getvalue()
-            self.assertIn('Successfully synced users', output)
-            self.assertEqual(mock_sync_with_hubspot.call_count, 2)
-            sync_with_hubspot.stop()
+        sync_with_hubspot = patch.object(sync_command, '_sync_with_hubspot')
+        mock_sync_with_hubspot = sync_with_hubspot.start()
+        out = StringIO()
+        call_command('sync_hubspot_contacts', '--batch-size=3', stdout=out)
+        output = out.getvalue()
+        self.assertIn('Successfully synced users', output)
+        self.assertEqual(mock_sync_with_hubspot.call_count, 1)
+        sync_with_hubspot.stop()

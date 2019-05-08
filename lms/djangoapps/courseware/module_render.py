@@ -23,6 +23,7 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 from edx_django_utils.cache import RequestCache
 from edx_django_utils.monitoring import set_custom_metrics_for_course_key, set_monitoring_transaction_name
+from edx_proctoring.api import get_attempt_status_summary
 from edx_proctoring.services import ProctoringService
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from opaque_keys import InvalidKeyError
@@ -52,7 +53,7 @@ from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
-from lms.djangoapps.grades.signals.signals import SCORE_PUBLISHED
+from lms.djangoapps.grades.api import signals as grades_signals, GradesUtilService
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
@@ -93,6 +94,8 @@ from xmodule.lti_module import LTIModule
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import XModuleDescriptor
+
+from edx_when.field_data import DateLookupFieldData
 
 
 log = logging.getLogger(__name__)
@@ -162,7 +165,6 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
 
     field_data_cache must include data from the course module and 2 levels of its descendants
     '''
-
     with modulestore().bulk_operations(course.id):
         course_module = get_module_for_descriptor(
             user, request, course, field_data_cache, course.id, course=course
@@ -256,28 +258,12 @@ def _add_timed_exam_info(user, course, section, section_context):
         settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False)
     )
     if section_is_time_limited:
-        # We need to import this here otherwise Lettuce test
-        # harness fails. When running in 'harvest' mode, the
-        # test service appears to get into trouble with
-        # circular references (not sure which as edx_proctoring.api
-        # doesn't import anything from edx-platform). Odd thing
-        # is that running: manage.py lms runserver --settings=acceptance
-        # works just fine, it's really a combination of Lettuce and the
-        # 'harvest' management command
-        #
-        # One idea is that there is some coupling between
-        # lettuce and the 'terrain' Djangoapps projects in /common
-        # This would need more investigation
-        from edx_proctoring.api import get_attempt_status_summary
-
-        #
         # call into edx_proctoring subsystem
         # to get relevant proctoring information regarding this
         # level of the courseware
         #
         # This will return None, if (user, course_id, content_id)
         # is not applicable
-        #
         timed_exam_attempt_context = None
         try:
             timed_exam_attempt_context = get_attempt_status_summary(
@@ -585,7 +571,7 @@ def get_module_system_for_user(
         """
         Submit a grade for the block.
         """
-        SCORE_PUBLISHED.send(
+        grades_signals.SCORE_PUBLISHED.send(
             sender=None,
             block=block,
             user=user,
@@ -672,6 +658,7 @@ def get_module_system_for_user(
             inner_system,
             real_user.id,
             [
+                partial(DateLookupFieldData, course_id=course_id, user=user),
                 partial(OverrideFieldData.wrap, real_user, course),
                 partial(LmsFieldData, student_data=inner_student_data),
             ],
@@ -762,12 +749,13 @@ def get_module_system_for_user(
     is_pure_xblock = isinstance(descriptor, XBlock) and not isinstance(descriptor, XModuleDescriptor)
     module_class = getattr(descriptor, 'module_class', None)
     is_lti_module = not is_pure_xblock and issubclass(module_class, LTIModule)
-    if is_pure_xblock or is_lti_module:
+    if (is_pure_xblock and not getattr(descriptor, 'requires_per_student_anonymous_id', False)) or is_lti_module:
         anonymous_student_id = anonymous_id_for_user(user, course_id)
     else:
         anonymous_student_id = anonymous_id_for_user(user, None)
 
-    field_data = LmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
+    field_data = DateLookupFieldData(descriptor._field_data, course_id, user)  # pylint: disable=protected-access
+    field_data = LmsFieldData(field_data, student_data)
 
     user_is_staff = bool(has_access(user, u'staff', descriptor.location, course_id))
 
@@ -821,6 +809,7 @@ def get_module_system_for_user(
             'credit': CreditService(),
             'bookmarks': BookmarksService(user=user),
             'gating': GatingService(),
+            'grade_utils': GradesUtilService(course_id=course_id),
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access

@@ -1,6 +1,8 @@
 """
 Tests authz.py
 """
+from __future__ import absolute_import
+
 import mock
 from ccx_keys.locator import CCXLocator
 from django.contrib.auth.models import AnonymousUser, User

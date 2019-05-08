@@ -1,6 +1,8 @@
 """
 Miscellaneous utility functions.
 """
+from __future__ import absolute_import
+
 import re
 
 from xmodule.annotator_mixin import html_to_text

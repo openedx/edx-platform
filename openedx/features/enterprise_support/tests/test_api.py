@@ -2,36 +2,38 @@
 Test the enterprise support APIs.
 """
 
+from __future__ import absolute_import
+
+import mock
+
 import ddt
 import httpretty
-import mock
+from consent.models import DataSharingConsent
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.test.utils import override_settings
-
-from consent.models import DataSharingConsent
+from django.urls import reverse
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.features.enterprise_support.api import (
     ConsentApiClient,
     ConsentApiServiceClient,
-    consent_needed_for_course,
-    get_consent_required_courses,
-    data_sharing_consent_required,
     EnterpriseApiClient,
     EnterpriseApiServiceClient,
+    consent_needed_for_course,
+    data_sharing_consent_required,
     enterprise_customer_for_request,
+    enterprise_enabled,
+    get_consent_required_courses,
     get_dashboard_consent_notification,
     get_enterprise_consent_url,
-    insert_enterprise_pipeline_elements,
-    enterprise_enabled,
+    insert_enterprise_pipeline_elements
 )
 from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
 from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerUserFactory
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
-from openedx.features.enterprise_support.utils import get_cache_key, clear_data_consent_share_cache
+from openedx.features.enterprise_support.utils import clear_data_consent_share_cache, get_cache_key
 from student.tests.factories import UserFactory
 
 

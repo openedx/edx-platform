@@ -903,6 +903,109 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
             )
 
+    # pylint: disable=invalid-name
+    def test_get_html_cdn_source_external_video(self):
+        """
+        Test that video from an external source loads successfully.
+
+        For a video from a third part, which has 'external' status
+        in the VAL, the url-rewrite will not happen and URL will
+        remain unchanged in the get_html() method.
+        """
+
+        source_xml = u"""
+                    <video show_captions="true"
+                    display_name="A Name"
+                    sub="a_sub_file.srt.sjson" source="{source}"
+                    download_video="{download_video}"
+                    edx_video_id="{edx_video_id}"
+                    start_time="01:00:03" end_time="01:00:10"
+                    >
+                        {sources}
+                    </video>
+                """
+
+        case_data = {
+            'download_video': 'true',
+            'source': 'example_source.mp4',
+            'sources': """
+                        <source src="http://example.com/example.mp4"/>
+                    """,
+            'result': {
+                'download_video_link': u'example_source.mp4',
+                'sources': [
+                    u'http://example.com/example.mp4',
+                ],
+            },
+        }
+
+        cases = [
+            dict(case_data, edx_video_id="vid-v1:12345"),
+        ]
+
+        initial_context = {
+            'autoadvance_enabled': False,
+            'branding_info': None,
+            'license': None,
+            'bumper_metadata': 'null',
+            'cdn_eval': False,
+            'cdn_exp_group': None,
+            'display_name': u'A Name',
+            'download_video_link': None,
+            'handout': None,
+            'id': None,
+            'metadata': self.default_metadata_dict,
+            'track': None,
+            'transcript_download_format': u'srt',
+            'transcript_download_formats_list': [
+                {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
+                {'display_name': 'Text (.txt) file', 'value': 'txt'}
+            ],
+            'poster': 'null',
+        }
+        initial_context['metadata']['duration'] = None
+
+        for data in cases:
+            DATA = source_xml.format(
+                download_video=data['download_video'],
+                source=data['source'],
+                sources=data['sources'],
+                edx_video_id=data['edx_video_id'],
+            )
+            self.initialize_module(data=DATA)
+
+            # Mocking the edxval API call because if not done,
+            # the method throws exception as no VAL entry is found
+            # for the corresponding edx-video-id
+            with patch('edxval.api.get_video_info') as mock_get_video_info:
+                mock_get_video_info.return_value = {
+                    'url': 'http://example.com/example.mp4',
+                    'edx_video_id': u'vid-v1:12345',
+                    'status': u'external',
+                    'duration': None,
+                    'client_video_id': u'external video',
+                    'encoded_videos': {}
+                }
+                context = self.item_descriptor.render(STUDENT_VIEW).content
+            expected_context = dict(initial_context)
+            expected_context['metadata'].update({
+                'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
+                'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
+                'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
+                'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
+                'sources': data['result'].get('sources', []),
+            })
+            expected_context.update({
+                'id': self.item_descriptor.location.html_id(),
+                'download_video_link': data['result'].get('download_video_link'),
+                'metadata': json.dumps(expected_context['metadata'])
+            })
+
+            self.assertEqual(
+                context,
+                self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
+            )
+
     @ddt.data(
         (True, ['youtube', 'desktop_webm', 'desktop_mp4', 'hls']),
         (False, ['youtube', 'desktop_webm', 'desktop_mp4'])

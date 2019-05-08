@@ -7,7 +7,6 @@ import re
 import logging
 from decimal import Decimal
 from student.models import CourseEnrollment
-from django_comment_common.models import Role
 from django.utils.timezone import now
 from lms.djangoapps.commerce.utils import EcommerceService
 from course_modes.models import get_cosmetic_verified_display_price, format_course_price
@@ -17,7 +16,10 @@ from xmodule.partitions.partitions_service import get_user_partition_groups, get
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
 from openedx.core.djangoapps.catalog.utils import get_programs
+from openedx.core.djangoapps.django_comment_common.models import Role
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
+from openedx.features.course_duration_limits.access import get_user_course_expiration_date
+from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 
 
 logger = logging.getLogger(__name__)
@@ -26,56 +28,55 @@ logger = logging.getLogger(__name__)
 # TODO: clean up as part of REVEM-199 (START)
 experiments_namespace = WaffleFlagNamespace(name=u'experiments')
 
-# .. feature_toggle_name: experiments.add_programs
-# .. feature_toggle_type: flag
-# .. feature_toggle_default: False
-# .. feature_toggle_description: Toggle for adding the current course's program information to user metadata
-# .. feature_toggle_category: experiments
-# .. feature_toggle_use_cases: monitored_rollout
-# .. feature_toggle_creation_date: 2019-2-25
-# .. feature_toggle_expiration_date: None
-# .. feature_toggle_warnings: None
-# .. feature_toggle_tickets: REVEM-63, REVEM-198
-# .. feature_toggle_status: supported
+# .. toggle_name: experiments.add_programs
+# .. toggle_type: feature_flag
+# .. toggle_default: True
+# .. toggle_description: Toggle for adding the current course's program information to user metadata
+# .. toggle_category: experiments
+# .. toggle_use_cases: monitored_rollout
+# .. toggle_creation_date: 2019-2-25
+# .. toggle_expiration_date: None
+# .. toggle_warnings: None
+# .. toggle_tickets: REVEM-63, REVEM-198
+# .. toggle_status: supported
 PROGRAM_INFO_FLAG = WaffleFlag(
     waffle_namespace=experiments_namespace,
     flag_name=u'add_programs',
-    flag_undefined_default=False
+    flag_undefined_default=True
 )
 
-# .. feature_toggle_name: experiments.add_program_price
-# .. feature_toggle_type: flag
-# .. feature_toggle_default: False
-# .. feature_toggle_description: Toggle for adding the current course's program price and sku information to user
-#                                metadata
-# .. feature_toggle_category: experiments
-# .. feature_toggle_use_cases: monitored_rollout
-# .. feature_toggle_creation_date: 2019-3-12
-# .. feature_toggle_expiration_date: None
-# .. feature_toggle_warnings: None
-# .. feature_toggle_tickets: REVEM-118, REVEM-206
-# .. feature_toggle_status: supported
-PROGRAM_PRICE_FLAG = WaffleFlag(
-    waffle_namespace=experiments_namespace,
-    flag_name=u'add_program_price',
-    flag_undefined_default=False
-)
-
-# .. feature_toggle_name: experiments.add_dashboard_info
-# .. feature_toggle_type: flag
-# .. feature_toggle_default: False
-# .. feature_toggle_description: Toggle for adding info about each course to the dashboard metadata
-# .. feature_toggle_category: experiments
-# .. feature_toggle_use_cases: monitored_rollout
-# .. feature_toggle_creation_date: 2019-3-28
-# .. feature_toggle_expiration_date: None
-# .. feature_toggle_warnings: None
-# .. feature_toggle_tickets: REVEM-118
-# .. feature_toggle_status: supported
+# .. toggle_name: experiments.add_dashboard_info
+# .. toggle_type: feature_flag
+# .. toggle_default: True
+# .. toggle_description: Toggle for adding info about each course to the dashboard metadata
+# .. toggle_category: experiments
+# .. toggle_use_cases: monitored_rollout
+# .. toggle_creation_date: 2019-3-28
+# .. toggle_expiration_date: None
+# .. toggle_warnings: None
+# .. toggle_tickets: REVEM-118
+# .. toggle_status: supported
 DASHBOARD_INFO_FLAG = WaffleFlag(experiments_namespace,
                                  u'add_dashboard_info',
-                                 flag_undefined_default=False)
+                                 flag_undefined_default=True)
 # TODO END: clean up as part of REVEM-199 (End)
+
+# .. toggle_name: experiments.add_audit_deadline
+# .. toggle_type: feature_flag
+# .. toggle_default: True
+# .. toggle_description: Toggle for adding the current course's audit deadline
+# .. toggle_category: experiments
+# .. toggle_use_cases: monitored_rollout
+# .. toggle_creation_date: 2019-5-7
+# .. toggle_expiration_date: None
+# .. toggle_warnings: None
+# .. toggle_tickets: REVEM-329
+# .. toggle_status: supported
+AUDIT_DEADLINE_FLAG = WaffleFlag(
+    waffle_namespace=experiments_namespace,
+    flag_name=u'add_audit_deadline',
+    flag_undefined_default=True
+)
 
 
 def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
@@ -300,25 +301,23 @@ def get_experiment_user_metadata_context(course, user):
                 if courses is not None:
                     total_courses = len(courses)
                     complete_enrollment = is_enrolled_in_all_courses(courses, user_enrollments)
-
-                    if PROGRAM_PRICE_FLAG.is_enabled():
-                        status = program.get('status')
-                        is_eligible_for_one_click_purchase = program.get('is_program_eligible_for_one_click_purchase')
-                        # Get the price and purchase URL of the program courses the user has yet to purchase. Say a
-                        # program has 3 courses (A, B and C), and the user previously purchased a certificate for A.
-                        # The user is enrolled in audit mode for B. The "left to purchase price" should be the price of
-                        # B+C.
-                        non_audit_enrollments = [en for en in user_enrollments if en not in
-                                                 audit_enrollments]
-                        courses_left_to_purchase = get_unenrolled_courses(courses, non_audit_enrollments)
-                        if courses_left_to_purchase:
-                            has_courses_left_to_purchase = True
-                            if is_eligible_for_one_click_purchase:
-                                courses_left_to_purchase_price, courses_left_to_purchase_skus = \
-                                    get_program_price_and_skus(courses_left_to_purchase)
-                                if courses_left_to_purchase_skus:
-                                    courses_left_to_purchase_url = EcommerceService().get_checkout_page_url(
-                                        *courses_left_to_purchase_skus, program_uuid=program_uuid)
+                    status = program.get('status')
+                    is_eligible_for_one_click_purchase = program.get('is_program_eligible_for_one_click_purchase')
+                    # Get the price and purchase URL of the program courses the user has yet to purchase. Say a
+                    # program has 3 courses (A, B and C), and the user previously purchased a certificate for A.
+                    # The user is enrolled in audit mode for B. The "left to purchase price" should be the price of
+                    # B+C.
+                    non_audit_enrollments = [en for en in user_enrollments if en not in
+                                             audit_enrollments]
+                    courses_left_to_purchase = get_unenrolled_courses(courses, non_audit_enrollments)
+                    if courses_left_to_purchase:
+                        has_courses_left_to_purchase = True
+                        if is_eligible_for_one_click_purchase:
+                            courses_left_to_purchase_price, courses_left_to_purchase_skus = \
+                                get_program_price_and_skus(courses_left_to_purchase)
+                            if courses_left_to_purchase_skus:
+                                courses_left_to_purchase_url = EcommerceService().get_checkout_page_url(
+                                    *courses_left_to_purchase_skus, program_uuid=program_uuid)
 
                 program_key = {
                     'uuid': program_uuid,
@@ -363,6 +362,7 @@ def get_experiment_user_metadata_context(course, user):
         'enrollment_time': enrollment_time,
         'pacing_type': 'self_paced' if course.self_paced else 'instructor_paced',
         'upgrade_deadline': upgrade_date,
+        'audit_access_deadline': get_audit_access_expiration(user, course),
         'course_key': course.id,
         'course_start': course.start,
         'course_end': course.end,
@@ -376,6 +376,18 @@ def get_experiment_user_metadata_context(course, user):
         'program_key_fields': program_key,
         # TODO: clean up as part of REVEM-199 (END)
     }
+
+
+def get_audit_access_expiration(user, course):
+    """
+    Return the expiration date for the user's audit access to this course.
+    """
+    if AUDIT_DEADLINE_FLAG.is_enabled():
+        if not CourseDurationLimitConfig.enabled_for_enrollment(user=user, course_key=course.id):
+            return None
+
+        return get_user_course_expiration_date(user, course)
+    return None
 
 
 def get_base_experiment_metadata_context(course, user, enrollment, user_enrollments, audit_enrollments):
@@ -401,6 +413,7 @@ def get_base_experiment_metadata_context(course, user, enrollment, user_enrollme
         'enrollment_time': enrollment_time,
         'pacing_type': 'self_paced' if course.self_paced else 'instructor_paced',
         'upgrade_deadline': upgrade_date,
+        'audit_access_deadline': get_audit_access_expiration(user, course),
         'course_key': course.id,
         'course_start': course.start,
         'course_end': course.end,

@@ -360,10 +360,33 @@ class TestReportMixin(object):
                     {key: row.get(key) for key in expected_rows[index].keys()} for index, row in enumerate(csv_rows)
                 ]
 
+            numeric_csv_rows = [self._extract_and_round_numeric_items(row) for row in csv_rows]
+            numeric_expected_rows = [self._extract_and_round_numeric_items(row) for row in expected_rows]
+
             if verify_order:
                 self.assertEqual(csv_rows, expected_rows)
+                self.assertEqual(numeric_csv_rows, numeric_expected_rows)
             else:
                 self.assertItemsEqual(csv_rows, expected_rows)
+                self.assertItemsEqual(numeric_csv_rows, numeric_expected_rows)
+
+    @staticmethod
+    def _extract_and_round_numeric_items(dictionary):
+        """
+        csv data may contain numeric values that are converted to strings, and fractional
+        numbers can be imprecise (e.g. 1 / 6 is sometimes '0.16666666666666666' and other times
+        '0.166666666667').  This function mutates the provided input (sorry) and returns
+        a new dictionary that contains only the numerically-valued items from it, rounded
+        to four decimal places.
+        """
+        extracted = {}
+        for key, value in dictionary.items():
+            try:
+                float(value)
+                extracted[key] = round(float(dictionary.pop(key)), 4)
+            except ValueError:
+                pass
+        return extracted
 
     def get_csv_row_with_headers(self):
         """

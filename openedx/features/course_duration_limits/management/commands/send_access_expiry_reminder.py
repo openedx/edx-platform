@@ -4,8 +4,11 @@
 Send out reminder emails for any students who will lose access to course content in 7 days.
 """
 
+from __future__ import absolute_import
+
 from openedx.core.djangoapps.schedules.management.commands import SendEmailBaseCommand
 from openedx.features.course_duration_limits.tasks import CourseDurationLimitExpiryReminder
+
 from ... import resolvers
 
 

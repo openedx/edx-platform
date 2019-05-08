@@ -4,12 +4,12 @@
 #
 #    make upgrade
 #
-common/lib/calc
+git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4
 common/lib/chem
 common/lib/sandbox-packages
 common/lib/symmath
 asn1crypto==0.24.0
-cffi==1.12.2
+cffi==1.12.3
 cryptography==2.6.1
 enum34==1.1.6
 ipaddress==1.0.22
@@ -17,7 +17,7 @@ lxml==3.8.0
 markupsafe==1.1.1
 matplotlib==1.3.1
 networkx==1.7
-nltk==3.4
+nltk==3.4.1
 nose==1.3.7               # via matplotlib
 numpy==1.6.2
 pycparser==2.19

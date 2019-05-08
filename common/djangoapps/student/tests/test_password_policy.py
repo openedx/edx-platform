@@ -2,13 +2,15 @@
 """
 This test file will verify proper password policy enforcement, which is an option feature
 """
+from __future__ import absolute_import
+
 import json
 
 from django.contrib.auth.models import AnonymousUser
-from django.urls import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import patch
 
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory

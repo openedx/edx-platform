@@ -7,6 +7,7 @@ from lms.djangoapps.course_blocks.transformers.hidden_content import HiddenConte
 from lms.djangoapps.course_blocks.transformers.hide_empty import HideEmptyTransformer
 from lms.djangoapps.course_blocks.transformers.access_denied_filter import AccessDeniedMessageFilterTransformer
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
+from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
 from .serializers import BlockDictSerializer, BlockSerializer
@@ -26,7 +27,7 @@ def get_blocks(
         student_view_data=None,
         return_type='dict',
         block_types_filter=None,
-        hide_access_denials=True,
+        hide_access_denials=False,
 ):
     """
     Return a serialized representation of the course blocks.
@@ -57,6 +58,16 @@ def get_blocks(
             denied access to the user, even if they have access denial messages
             attached.
     """
+
+    course_blocks_namespace = WaffleFlagNamespace(name=u'course_blocks_api')
+    hide_access_denials_flag = WaffleFlag(
+        waffle_namespace=course_blocks_namespace,
+        flag_name=u'hide_access_denials',
+        flag_undefined_default=False
+    )
+    if hide_access_denials_flag.is_enabled():
+        hide_access_denials = True
+
     # create ordered list of transformers, adding BlocksAPITransformer at end.
     transformers = BlockStructureTransformers()
     if requested_fields is None:

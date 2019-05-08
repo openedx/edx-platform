@@ -10,10 +10,10 @@
                 {% trans "Expired ID Verification" %}
             </h1>
             <p style="color: rgba(0,0,0,.75);">
-                {% blocktrans %}
-                    Hello {{full_name}},
-                    Your {{platform_name}} ID verification has expired.
-                {% endblocktrans %}
+                {% blocktrans %}Hello {{full_name}},{% endblocktrans %}
+                <br />
+                {% blocktrans %}Your {{platform_name}} ID verification has expired. {% endblocktrans %}
+                <br />
             </p>
             <p style="color: rgba(0,0,0,.75);">
                 {% trans "You must have a valid ID verification to take proctored exams and qualify for certificates."%}
@@ -21,16 +21,15 @@
                 {% trans "You can also do this from your dashboard." %}
             </p>
             <p style="color: rgba(0,0,0,.75);">
-                {% blocktrans %}
-                    Resubmit Verification : {{lms_verification_link}}
-                    ID verification FAQ : {{help_center_link}}
-                {% endblocktrans %}
+                {% blocktrans %}Resubmit Verification : {{lms_verification_link}} {% endblocktrans %}
+                <br />
+                {% blocktrans %}ID verification FAQ : {{help_center_link}} {% endblocktrans %}
+                <br />
             </p>
             <p>
-                {% blocktrans %}
-                Thank you,
-                The {{ platform_name }} Team
-                {% endblocktrans %}
+                {% trans "Thank you," %}
+                <br />
+                {% blocktrans %}The {{ platform_name }} Team {% endblocktrans %}
             </p>
         </td>
     </tr>

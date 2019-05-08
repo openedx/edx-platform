@@ -15,7 +15,7 @@ from django_countries.fields import CountryField
 from model_utils import FieldTracker
 from opaque_keys.edx.django.models import CourseKeyField
 
-from django_comment_common.signals import (
+from openedx.core.djangoapps.django_comment_common.signals import (
     comment_created,
     comment_deleted,
     comment_edited,
@@ -82,7 +82,7 @@ def comment_endorsed_handler(sender, **kwargs):  # pylint: disable=unused-argume
 
 def handle_activity(user, post, original_author_id=None):
     """
-    Handle user activity from django_comment_client and discussion_api
+    Handle user activity from lms.djangoapps.discussion.django_comment_client and discussion.rest_api
     and update the user's last activity date. Checks if the user who
     performed the action is the original author, and that the
     discussion has the team context.

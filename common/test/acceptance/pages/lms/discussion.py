@@ -1,3 +1,8 @@
+"""
+LMS discussion page
+"""
+from __future__ import absolute_import
+
 from contextlib import contextmanager
 
 from bok_choy.javascript import wait_for_js

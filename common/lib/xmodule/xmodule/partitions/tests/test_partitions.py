@@ -3,20 +3,26 @@ Test the partitions and partitions service
 
 """
 
+from __future__ import absolute_import
+
 from datetime import datetime
+
+import six
 from django.test import TestCase
 from mock import Mock, patch
-
 from opaque_keys.edx.locator import CourseLocator
 from stevedore.extension import Extension, ExtensionManager
-from xmodule.partitions.partitions import (
-    Group, UserPartition, UserPartitionError, NoSuchUserPartitionGroupError,
-    USER_PARTITION_SCHEME_NAMESPACE, ENROLLMENT_TRACK_PARTITION_ID
-)
-from xmodule.partitions.partitions_service import (
-    PartitionService, get_all_partitions_for_course, FEATURES
-)
+
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from xmodule.partitions.partitions import (
+    ENROLLMENT_TRACK_PARTITION_ID,
+    USER_PARTITION_SCHEME_NAMESPACE,
+    Group,
+    NoSuchUserPartitionGroupError,
+    UserPartition,
+    UserPartitionError
+)
+from xmodule.partitions.partitions_service import FEATURES, PartitionService, get_all_partitions_for_course
 
 
 class TestGroup(TestCase):
@@ -574,7 +580,7 @@ class TestGetCourseUserPartitions(PartitionServiceBaseClass):
         self.assertEqual(self.TEST_SCHEME_NAME, all_partitions[0].scheme.name)
         enrollment_track_partition = all_partitions[1]
         self.assertEqual(self.ENROLLMENT_TRACK_SCHEME_NAME, enrollment_track_partition.scheme.name)
-        self.assertEqual(unicode(self.course.id), enrollment_track_partition.parameters['course_id'])
+        self.assertEqual(six.text_type(self.course.id), enrollment_track_partition.parameters['course_id'])
         self.assertEqual(ENROLLMENT_TRACK_PARTITION_ID, enrollment_track_partition.id)
 
     def test_enrollment_track_partition_not_added_if_conflict(self):

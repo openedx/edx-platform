@@ -1,7 +1,10 @@
 """
 Tests for course welcome messages.
 """
+from __future__ import absolute_import
+
 import ddt
+import six
 from django.urls import reverse
 
 from student.models import CourseEnrollment
@@ -23,7 +26,7 @@ def welcome_message_url(course):
     return reverse(
         'openedx.course_experience.welcome_message_fragment_view',
         kwargs={
-            'course_id': unicode(course.id),
+            'course_id': six.text_type(course.id),
         }
     )
 
@@ -35,7 +38,7 @@ def latest_update_url(course):
     return reverse(
         'openedx.course_experience.latest_update_fragment_view',
         kwargs={
-            'course_id': unicode(course.id),
+            'course_id': six.text_type(course.id),
         }
     )
 
@@ -47,7 +50,7 @@ def dismiss_message_url(course):
     return reverse(
         'openedx.course_experience.dismiss_welcome_message',
         kwargs={
-            'course_id': unicode(course.id),
+            'course_id': six.text_type(course.id),
         }
     )
 

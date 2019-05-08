@@ -2,15 +2,17 @@
 Tests for Enterprise middleware.
 """
 
+from __future__ import absolute_import
+
 import mock
 
-from django.urls import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
-
+from django.urls import reverse
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.features.enterprise_support.tests import (
-    FAKE_ENTERPRISE_CUSTOMER, FEATURES_WITH_ENTERPRISE_ENABLED,
+    FAKE_ENTERPRISE_CUSTOMER,
+    FEATURES_WITH_ENTERPRISE_ENABLED,
     factories
 )
 from student.tests.factories import UserFactory

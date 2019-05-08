@@ -1,24 +1,32 @@
 """
 API for managing user preferences.
 """
+from __future__ import absolute_import
+
 import logging
 
+import six
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django_countries import countries
 from django.db import IntegrityError
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
-
-from openedx.core.lib.time_zone_utils import get_display_time_zone
+from django_countries import countries
 from pytz import common_timezones, common_timezones_set, country_timezones
 from six import text_type
 
+from openedx.core.lib.time_zone_utils import get_display_time_zone
 from student.models import User, UserProfile
 from track import segment
+
 from ..errors import (
-    UserAPIInternalError, UserAPIRequestError, UserNotFound, UserNotAuthorized,
-    PreferenceValidationError, PreferenceUpdateError, CountryCodeError
+    CountryCodeError,
+    PreferenceUpdateError,
+    PreferenceValidationError,
+    UserAPIInternalError,
+    UserAPIRequestError,
+    UserNotAuthorized,
+    UserNotFound
 )
 from ..helpers import intercept_errors, serializer_is_dirty
 from ..models import UserOrgTag, UserPreference
@@ -102,7 +110,7 @@ def update_user_preferences(requesting_user, update, user=None):
         PreferenceUpdateError: the operation failed when performing the update.
         UserAPIInternalError: the operation failed due to an unexpected error.
     """
-    if not user or isinstance(user, basestring):
+    if not user or isinstance(user, six.string_types):
         user = _get_authorized_user(requesting_user, user)
     else:
         _check_authorized(requesting_user, user.username)
@@ -113,7 +121,7 @@ def update_user_preferences(requesting_user, update, user=None):
     for preference_key in update.keys():
         preference_value = update[preference_key]
         if preference_value is not None:
-            preference_value = unicode(preference_value)
+            preference_value = six.text_type(preference_value)
             try:
                 serializer = create_user_preference_serializer(user, preference_key, preference_value)
                 validate_user_preference_serializer(serializer, preference_key, preference_value)
@@ -130,7 +138,7 @@ def update_user_preferences(requesting_user, update, user=None):
     for preference_key in update.keys():
         preference_value = update[preference_key]
         if preference_value is not None:
-            preference_value = unicode(preference_value)
+            preference_value = six.text_type(preference_value)
             try:
                 serializer = serializers[preference_key]
 
@@ -169,7 +177,7 @@ def set_user_preference(requesting_user, preference_key, preference_value, usern
     """
     existing_user = _get_authorized_user(requesting_user, username)
     if preference_value is not None:
-        preference_value = unicode(preference_value)
+        preference_value = six.text_type(preference_value)
     serializer = create_user_preference_serializer(existing_user, preference_key, preference_value)
     validate_user_preference_serializer(serializer, preference_key, preference_value)
 
@@ -365,7 +373,7 @@ def validate_user_preference_serializer(serializer, preference_key, preference_v
     Raises:
         PreferenceValidationError: the supplied key and/or value for a user preference are invalid.
     """
-    if preference_value is None or unicode(preference_value).strip() == '':
+    if preference_value is None or six.text_type(preference_value).strip() == '':
         format_string = ugettext_noop(u"Preference '{preference_key}' cannot be set to an empty value.")
         raise PreferenceValidationError({
             preference_key: {

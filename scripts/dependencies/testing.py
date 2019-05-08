@@ -25,8 +25,6 @@ pattern_fragments = [
     r'/testutils\.py',                         # testutils.py
     r'/tests$',                                # tests/__init__.py
     r'conftest\.py',                           # conftest.py
-    r'/envs/acceptance\.py',                   # cms/envs/acceptance.py, lms/envs/acceptance.py
-    r'/envs/acceptance_docker\.py',            # cms/envs/acceptance.py, lms/envs/acceptance.py
     r'/factories\.py',                         # factories.py
     r'^terrain',                               # terrain/*
     r'/setup_models_to_send_test_emails\.py',  # setup_models_to_send_test_emails management command

@@ -4,6 +4,8 @@ that bulk email is always disabled for non-Mongo backed courses, regardless
 of email feature flag, and that the view is conditionally available when
 Course Auth is turned on.
 """
+from __future__ import absolute_import
+
 import unittest
 
 from django.conf import settings

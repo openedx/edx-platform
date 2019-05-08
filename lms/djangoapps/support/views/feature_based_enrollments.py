@@ -28,7 +28,7 @@ class FeatureBasedEnrollmentsSupportView(View):
         if course_key:
             results = self._get_course_duration_info(course_key)
         else:
-            results = []
+            results = {}
 
         return render_to_response('support/feature_based_enrollments.html', {
             'course_key': course_key,
@@ -39,39 +39,31 @@ class FeatureBasedEnrollmentsSupportView(View):
         """
         Fetch course duration information from database
         """
-        results = []
-
         try:
             key = CourseKey.from_string(course_key)
             course = CourseOverview.objects.values('display_name').get(id=key)
             duration_config = CourseDurationLimitConfig.current(course_key=key)
             gating_config = ContentTypeGatingConfig.current(course_key=key)
-            partially_enabled = duration_config.enabled != gating_config.enabled
+            duration_enabled = CourseDurationLimitConfig.enabled_for_course(course_key=key)
+            gating_enabled = ContentTypeGatingConfig.enabled_for_course(course_key=key)
 
-            if partially_enabled:
-                if duration_config.enabled:
-                    enabled = 'Course Duration Limits Only'
-                    enabled_as_of = str(duration_config.enabled_as_of) if duration_config.enabled_as_of else 'N/A'
-                    reason = 'Course duration limits are enabled for this course, but content type gating is disabled.'
-                elif gating_config.enabled:
-                    enabled = 'Content Type Gating Only'
-                    enabled_as_of = str(gating_config.enabled_as_of) if gating_config.enabled_as_of else 'N/A'
-                    reason = 'Content type gating is enabled for this course, but course duration limits are disabled.'
-            else:
-                enabled = duration_config.enabled or False
-                enabled_as_of = str(duration_config.enabled_as_of) if duration_config.enabled_as_of else 'N/A'
-                reason = duration_config.provenances['enabled']
+            gating_dict = {
+                'enabled': gating_enabled,
+                'enabled_as_of': str(gating_config.enabled_as_of) if gating_config.enabled_as_of else 'N/A',
+                'reason': gating_config.provenances['enabled'].value
+            }
+            duration_dict = {
+                'enabled': duration_enabled,
+                'enabled_as_of': str(duration_config.enabled_as_of) if duration_config.enabled_as_of else 'N/A',
+                'reason': duration_config.provenances['enabled'].value
+            }
 
-            data = {
+            return {
                 'course_id': course_key,
                 'course_name': course.get('display_name'),
-                'enabled': enabled,
-                'enabled_as_of': enabled_as_of,
-                'reason': reason,
+                'gating_config': gating_dict,
+                'duration_config': duration_dict,
             }
-            results.append(data)
 
         except (ObjectDoesNotExist, InvalidKeyError):
-            pass
-
-        return results
+            return {}

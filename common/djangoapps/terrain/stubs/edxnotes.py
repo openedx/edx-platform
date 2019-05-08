@@ -2,13 +2,17 @@
 Stub implementation of EdxNotes for acceptance tests
 """
 
+from __future__ import absolute_import
+
 import json
 import re
 from copy import deepcopy
 from datetime import datetime
 from math import ceil
-from urllib import urlencode
 from uuid import uuid4
+
+import six
+from six.moves.urllib.parse import urlencode  # pylint: disable=import-error
 
 from .http import StubHttpRequestHandler, StubHttpService
 
@@ -390,4 +394,4 @@ class StubEdxNotesService(StubHttpService):
         """
         Search the `query(str)` text in the provided `data(list)`.
         """
-        return [note for note in data if unicode(query).strip() in note.get("text", "").split()]
+        return [note for note in data if six.text_type(query).strip() in note.get("text", "").split()]

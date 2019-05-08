@@ -6,24 +6,35 @@ returns the i4x://org/course/cat/name@draft object if that exists,
 and otherwise returns i4x://org/course/cat/name).
 """
 
-import pymongo
+from __future__ import absolute_import
+
 import logging
 
+import pymongo
+import six
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator
 from six import text_type
-from openedx.core.lib.cache_utils import request_cached
 from xblock.core import XBlock
+
+from openedx.core.lib.cache_utils import request_cached
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES, UnsupportedRevisionError
 from xmodule.modulestore.exceptions import (
-    ItemNotFoundError, DuplicateItemError, DuplicateCourseError, InvalidBranchSetting
+    DuplicateCourseError,
+    DuplicateItemError,
+    InvalidBranchSetting,
+    ItemNotFoundError
 )
 from xmodule.modulestore.mongo.base import (
-    MongoModuleStore, MongoRevisionKey, as_draft, as_published, SORT_REVISION_FAVOR_DRAFT
+    SORT_REVISION_FAVOR_DRAFT,
+    MongoModuleStore,
+    MongoRevisionKey,
+    as_draft,
+    as_published
 )
 from xmodule.modulestore.store_utilities import rewrite_nonportable_content_links
-from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, DIRECT_ONLY_CATEGORIES
 
 log = logging.getLogger(__name__)
 
@@ -207,7 +218,7 @@ class DraftModuleStore(MongoModuleStore):
                 )
             else:
                 # update fields on existing course
-                for key, value in fields.iteritems():
+                for key, value in six.iteritems(fields):
                     setattr(new_course, key, value)
                 self.update_item(new_course, user_id)
 
@@ -232,7 +243,7 @@ class DraftModuleStore(MongoModuleStore):
 
             log.info("Cloning module %s to %s....", original_loc, module.location)
 
-            if 'data' in module.fields and module.fields['data'].is_set_on(module) and isinstance(module.data, basestring):
+            if 'data' in module.fields and module.fields['data'].is_set_on(module) and isinstance(module.data, six.string_types):
                 module.data = rewrite_nonportable_content_links(
                     original_loc.course_key, dest_course_id, module.data
                 )
@@ -653,7 +664,7 @@ class DraftModuleStore(MongoModuleStore):
 
     @request_cached(
         # use the XBlock's location value in the cache key
-        arg_map_function=lambda arg: unicode(arg.location if isinstance(arg, XBlock) else arg),
+        arg_map_function=lambda arg: six.text_type(arg.location if isinstance(arg, XBlock) else arg),
         # use this store's request_cache
         request_cache_getter=lambda args, kwargs: args[1],
     )
@@ -847,7 +858,7 @@ class DraftModuleStore(MongoModuleStore):
             try:
                 source_item = self.get_item(item_location)
             except ItemNotFoundError:
-                log.error('Unable to find the item %s', unicode(item_location))
+                log.error('Unable to find the item %s', six.text_type(item_location))
                 return
 
             if source_item.parent and source_item.parent.block_id != original_parent_location.block_id:
@@ -886,7 +897,7 @@ class DraftModuleStore(MongoModuleStore):
                         to_process_dict[draft_as_non_draft_loc] = draft
 
         # convert the dict - which is used for look ups - back into a list
-        queried_children = to_process_dict.values()
+        queried_children = list(to_process_dict.values())
 
         return queried_children
 

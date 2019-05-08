@@ -8,6 +8,8 @@ import pytz
 
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.locator import CourseLocator
+
+from course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.config_model_utils.models import Provenance
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
@@ -24,6 +26,8 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
 
     def setUp(self):
         self.course_overview = CourseOverviewFactory.create()
+        CourseModeFactory.create(course_id=self.course_overview.id, mode_slug='audit')
+        CourseModeFactory.create(course_id=self.course_overview.id, mode_slug='verified')
         self.user = UserFactory.create()
         super(TestContentTypeGatingConfig, self).setUp()
 
@@ -73,9 +77,9 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
             user = self.user
             course_key = self.course_overview.id
 
-        query_count = 6
+        query_count = 7
         if not already_enrolled or not pass_enrollment and already_enrolled:
-            query_count = 7
+            query_count = 8
 
         with self.assertNumQueries(query_count):
             enabled = ContentTypeGatingConfig.enabled_for_enrollment(

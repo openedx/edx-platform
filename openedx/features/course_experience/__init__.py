@@ -1,11 +1,12 @@
 """
 Unified course experience settings and helper methods.
 """
+from __future__ import absolute_import
+
 from django.utils.translation import ugettext as _
 
 from openedx.core.djangoapps.util.user_messages import UserMessageCollection
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace, WaffleFlag
-
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlag, WaffleFlagNamespace
 
 # Namespace for course experience waffle flags.
 WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='course_experience')
@@ -46,6 +47,10 @@ USE_BOOTSTRAP_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'use_bootstrap', fl
 # Waffle flag to enable anonymous access to a course
 SEO_WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='seo')
 COURSE_ENABLE_UNENROLLED_ACCESS_FLAG = CourseWaffleFlag(SEO_WAFFLE_FLAG_NAMESPACE, 'enable_anonymous_courseware_access')
+
+# Flag to control display of first purchase offer banner
+FIRST_PURCHASE_OFFER_BANNER = WaffleFlagNamespace(name='first_purchase_offer_banner')
+FIRST_PURCHASE_OFFER_BANNER_DISPLAY = WaffleFlag(FIRST_PURCHASE_OFFER_BANNER, 'display', flag_undefined_default=False)
 
 
 def course_home_page_title(course):  # pylint: disable=unused-argument

@@ -10,18 +10,18 @@ file and check it in at the same time as your model changes. To do that,
 2. ./manage.py lms schemamigration student --auto description_of_your_change
 3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+
 import hashlib
 import json
 import logging
-import six
 import uuid
 from collections import OrderedDict, defaultdict, namedtuple
 from datetime import datetime, timedelta
 from functools import total_ordering
 from importlib import import_module
-from urllib import urlencode
 
+import six
 from config_models.models import ConfigurationModel
 from django.apps import apps
 from django.conf import settings
@@ -40,6 +40,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from django_countries.fields import CountryField
+from edx_django_utils.cache import RequestCache
 from edx_rest_api_client.exceptions import SlumberBaseException
 from eventtracking import tracker
 from model_utils.models import TimeStampedModel
@@ -47,13 +48,12 @@ from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import text_type
+from six.moves import range
+from six.moves.urllib.parse import urlencode
 from slumber.exceptions import HttpClientError, HttpServerError
 from user_util import user_util
 
-from edx_django_utils.cache import RequestCache
-import lms.lib.comment_client as cc
-from student.signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED
-from lms.djangoapps.certificates.models import GeneratedCertificate
+import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
@@ -61,11 +61,12 @@ from courseware.models import (
     OrgDynamicUpgradeDeadlineConfiguration
 )
 from enrollment.api import _default_course_mode
-
+from lms.djangoapps.certificates.models import GeneratedCertificate
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
+from student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED, UNENROLL_DONE
 from track import contexts, segment
 from util.milestones_helpers import is_entrance_exams_enabled
 from util.model_utils import emit_field_changed_events, get_changed_fields_dict
@@ -447,7 +448,7 @@ class UserProfile(models.Model):
 
     # Optional demographic data we started capturing from Fall 2012
     this_year = datetime.now(UTC).year
-    VALID_YEARS = range(this_year, this_year - 120, -1)
+    VALID_YEARS = list(range(this_year, this_year - 120, -1))
     year_of_birth = models.IntegerField(blank=True, null=True, db_index=True)
     GENDER_CHOICES = (
         ('m', ugettext_noop('Male')),
@@ -938,7 +939,7 @@ class LoginFailures(models.Model):
             date_str = self.lockout_until.isoformat()
 
         return u'LoginFailures({username}, {count}, {date})'.format(
-            username=unicode(self.user.username, 'utf-8'),
+            username=six.text_type(self.user.username, 'utf-8'),
             count=self.failure_count,
             date=date_str
         )
@@ -950,7 +951,7 @@ class LoginFailures(models.Model):
             date_str = self.lockout_until.isoformat()
 
         return u'{username}: {count} - {date}'.format(
-            username=unicode(self.user.username, 'utf-8'),
+            username=six.text_type(self.user.username, 'utf-8'),
             count=self.failure_count,
             date=date_str
         )
@@ -1114,7 +1115,7 @@ class CourseEnrollment(models.Model):
 
     @course_id.setter
     def course_id(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             self._course_id = CourseKey.from_string(value)
         else:
             self._course_id = value

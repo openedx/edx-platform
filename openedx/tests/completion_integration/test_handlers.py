@@ -15,7 +15,7 @@ import six
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 
-from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
+from lms.djangoapps.grades.api import signals as grades_signals
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
@@ -120,7 +120,7 @@ class ScorableCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
 
     def test_signal_calls_handler(self):
         with patch('completion.handlers.scorable_block_completion') as mock_handler:
-            PROBLEM_WEIGHTED_SCORE_CHANGED.send_robust(
+            grades_signals.PROBLEM_WEIGHTED_SCORE_CHANGED.send_robust(
                 sender=self,
                 user_id=self.user.id,
                 course_id=six.text_type(self.course_key),

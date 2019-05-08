@@ -3,11 +3,14 @@
 """
 Acceptance tests for Video.
 """
+from __future__ import absolute_import
+
 import os
 from unittest import skipIf
 
 from ddt import data, ddt, unpack
 from mock import patch
+from six.moves import range
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage

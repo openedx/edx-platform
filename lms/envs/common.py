@@ -35,6 +35,13 @@ import os
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from path import Path as path
 from django.utils.translation import ugettext_lazy as _
+from enterprise.constants import (
+    ENTERPRISE_ADMIN_ROLE,
+    ENTERPRISE_OPERATOR_ROLE,
+    ENTERPRISE_DASHBOARD_ADMIN_ROLE,
+    ENTERPRISE_CATALOG_ADMIN_ROLE,
+    ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE
+)
 
 from openedx.core.constants import COURSE_KEY_REGEX, COURSE_KEY_PATTERN, COURSE_ID_PATTERN
 from openedx.core.djangoapps.theming.helpers_dirs import (
@@ -85,7 +92,19 @@ FEATURES = {
     # in sync with the corresponding ones in cms/envs/common.py
     'ENABLE_DISCUSSION_SERVICE': True,
     'ENABLE_TEXTBOOK': True,
-    'ENABLE_STUDENT_NOTES': True,  # enables the student notes API and UI.
+
+    # .. toggle_name: ENABLE_STUDENT_NOTES
+    # .. toggle_type: feature_flag
+    # .. toggle_default: True
+    # .. toggle_description: Enables the Student Notes API and UI.
+    # .. toggle_category: ????
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2014-11-13
+    # .. toggle_expiration_date: None
+    # .. toggle_warnings: None
+    # .. toggle_tickets: TNL-659
+    # .. toggle_status: supported
+    'ENABLE_STUDENT_NOTES': True,
 
     # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
     # this should remain off in production until digest notifications are online.
@@ -104,6 +123,17 @@ FEATURES = {
 
     'ENABLE_MASQUERADE': True,  # allow course staff to change to student view of courseware
 
+    # .. toggle_name: ENABLE_SYSADMIN_DASHBOARD
+    # .. toggle_type: feature_flag
+    # .. toggle_default: False
+    # .. toggle_description: enables dashboard at /syadmin/ for django staff, for seeing overview of system status, for deleting and loading courses, for seeing log of git imports of courseware.
+    # .. toggle_category: admin
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2013-12-12
+    # .. toggle_expiration_date: None
+    # .. toggle_warnings: some views are not performant when there are more than 100 courses
+    # .. toggle_tickets: None
+    # .. toggle_status: unsupported
     'ENABLE_SYSADMIN_DASHBOARD': False,  # sysadmin dashboard, to see what courses are loaded, to delete & load courses
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
@@ -1212,7 +1242,7 @@ MIDDLEWARE_CLASSES = [
     'mobile_api.middleware.AppVersionUpgrade',
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
     'microsite_configuration.middleware.MicrositeMiddleware',
-    'django_comment_client.middleware.AjaxExceptionMiddleware',
+    'lms.djangoapps.discussion.django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sites.middleware.CurrentSiteMiddleware',
     'edx_rest_framework_extensions.auth.jwt.middleware.JwtAuthCookieMiddleware',
@@ -1261,7 +1291,7 @@ MIDDLEWARE_CLASSES = [
     # Must be after DarkLangMiddleware.
     'django.middleware.locale.LocaleMiddleware',
 
-    'django_comment_client.utils.ViewNameMiddleware',
+    'lms.djangoapps.discussion.django_comment_client.utils.ViewNameMiddleware',
     'codejail.django_integration.ConfigureCodeJailMiddleware',
 
     # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
@@ -1306,7 +1336,15 @@ P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
 
 ############################### PIPELINE #######################################
 
-PIPELINE_ENABLED = True
+PIPELINE = {
+    'PIPELINE_ENABLED': True,
+    'CSS_COMPRESSOR': None,
+    'JS_COMPRESSOR': 'pipeline.compressors.uglifyjs.UglifyJSCompressor',
+    # Don't wrap JavaScript as there is code that depends upon updating the global namespace
+    'DISABLE_WRAPPER': True,
+    # Specify the UglifyJS binary to use
+    'UGLIFYJS_BINARY': 'node_modules/.bin/uglifyjs',
+}
 
 STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 
@@ -1319,15 +1357,6 @@ STATICFILES_FINDERS = [
     'openedx.core.lib.xblock_pipeline.finder.XBlockPipelineFinder',
     'pipeline.finders.PipelineFinder',
 ]
-
-PIPELINE_CSS_COMPRESSOR = None
-PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.uglifyjs.UglifyJSCompressor'
-
-# Don't wrap JavaScript as there is code that depends upon updating the global namespace
-PIPELINE_DISABLE_WRAPPER = True
-
-# Specify the UglifyJS binary to use
-PIPELINE_UGLIFYJS_BINARY = 'node_modules/.bin/uglifyjs'
 
 from openedx.core.lib.rooted_paths import rooted_glob
 
@@ -1474,7 +1503,7 @@ credit_web_view_js = [
     'js/src/logger.js',
 ]
 
-PIPELINE_CSS = {
+PIPELINE['STYLESHEETS'] = {
     'style-vendor': {
         'source_filenames': [
             'css/vendor/font-awesome.css',
@@ -1648,7 +1677,7 @@ lms_application_js = [
     'js/main.js',
 ]
 
-PIPELINE_JS = {
+PIPELINE['JAVASCRIPT'] = {
     'base_application': {
         'source_filenames': base_application_js,
         'output_filename': 'js/lms-base-application.js',
@@ -2093,9 +2122,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.util.apps.UtilConfig',
 
     # Discussion forums
-    'django_comment_client',
-    'django_comment_common',
-    'discussion_api',
+    'openedx.core.djangoapps.django_comment_common',
 
     # Notes
     'notes',
@@ -2110,11 +2137,6 @@ INSTALLED_APPS = [
 
     # Shopping cart
     'shoppingcart',
-
-    # Notification preferences setting
-    'notification_prefs',
-
-    'notifier_api',
 
     # Different Course Modes
     'course_modes.apps.CourseModesConfig',
@@ -2252,8 +2274,6 @@ INSTALLED_APPS = [
     'openedx.features.course_search',
     'openedx.features.enterprise_support.apps.EnterpriseSupportConfig',
     'openedx.features.learner_profile',
-    'openedx.features.learner_analytics',
-    'openedx.features.portfolio_project',
     'openedx.features.course_duration_limits',
     'openedx.features.content_type_gating',
 
@@ -3321,6 +3341,14 @@ ENTERPRISE_READONLY_ACCOUNT_FIELDS = [
 ]
 ENTERPRISE_CUSTOMER_COOKIE_NAME = 'enterprise_customer_uuid'
 BASE_COOKIE_DOMAIN = 'localhost'
+SYSTEM_TO_FEATURE_ROLE_MAPPING = {
+    ENTERPRISE_ADMIN_ROLE: [ENTERPRISE_DASHBOARD_ADMIN_ROLE],
+    ENTERPRISE_OPERATOR_ROLE: [
+        ENTERPRISE_DASHBOARD_ADMIN_ROLE,
+        ENTERPRISE_CATALOG_ADMIN_ROLE,
+        ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE
+    ],
+}
 
 DATA_CONSENT_SHARE_CACHE_TIMEOUT = None  # Never expire
 
@@ -3448,11 +3476,9 @@ USERNAME_REPLACEMENT_WORKER = "REPLACE WITH VALID USERNAME"
 # modify lms/envs/private.py to give it a non-null value
 WRITABLE_GRADEBOOK_URL = None
 
-# TODO (DEPR-17)
-# This URL value is needed to redirect the old profile page to a new
-# micro-frontend based implementation. Once the old implementation is
-# completely removed and this redirect is no longer needed, we can remove this.
-PROFILE_MICROFRONTEND_URL = "http://some.profile.spa/u/"
+PROFILE_MICROFRONTEND_URL = "http://profile-mfe/abc/"
+ORDER_HISTORY_MICROFRONTEND_URL = "http://order-history-mfe/"
+ACCOUNT_MICROFRONTEND_URL = "http://account-mfe/"
 
 ############### Settings for django-fernet-fields ##################
 FERNET_KEYS = [

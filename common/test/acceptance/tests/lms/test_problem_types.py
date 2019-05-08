@@ -1,8 +1,7 @@
 """
 Bok choy acceptance and a11y tests for problem types in the LMS
-
-See also lettuce tests in lms/djangoapps/courseware/features/problems.feature
 """
+from __future__ import absolute_import
 import random
 import textwrap
 from abc import ABCMeta, abstractmethod
@@ -32,6 +31,8 @@ from common.test.acceptance.pages.lms.problem import ProblemPage
 from common.test.acceptance.tests.helpers import EventsTestMixin, select_option_by_text
 from common.test.acceptance.tests.lms.test_lms_problems import ProblemsTest
 from openedx.core.lib.tests import attr
+import six
+from six.moves import range
 
 
 class ProblemTypeTestBaseMeta(ABCMeta):
@@ -64,7 +65,7 @@ class ProblemTypeTestBaseMeta(ABCMeta):
         return obj
 
 
-class ProblemTypeTestBase(ProblemsTest, EventsTestMixin):
+class ProblemTypeTestBase(six.with_metaclass(ProblemTypeTestBaseMeta, ProblemsTest, EventsTestMixin)):
     """
     Base class for testing assesment problem types in bok choy.
 
@@ -80,7 +81,6 @@ class ProblemTypeTestBase(ProblemsTest, EventsTestMixin):
     Additionally, the default values for factory_kwargs and status_indicators
     may need to be overridden for some problem types.
     """
-    __metaclass__ = ProblemTypeTestBaseMeta
 
     problem_name = None
     problem_type = None
@@ -173,7 +173,8 @@ class ProblemTypeA11yTestMixin(object):
 
         # Set the scope to the problem container
         self.problem_page.a11y_audit.config.set_scope(
-            include=['div#seq_content'])
+            include=['div#seq_content']
+        )
 
         # Run the accessibility audit.
         self.problem_page.a11y_audit.check_for_accessibility_errors()
@@ -338,31 +339,6 @@ class ProblemTypeTestMixin(ProblemTypeA11yTestMixin):
         if self.can_update_save_notification:
             self.answer_problem(correctness='incorrect')
             self.assertFalse(self.problem_page.is_save_notification_visible())
-
-    @attr(shard=12)
-    def test_reset_clears_answer_and_focus(self):
-        """
-        Scenario: Reset will clear answers and focus on problem meta
-        If I select an answer
-        and then reset the problem
-        There should be no answer selected
-        And the focus should shift appropriately
-        """
-        self.problem_page.wait_for(
-            lambda: self.problem_page.problem_name == self.problem_name,
-            "Make sure the correct problem is on the page"
-        )
-        self.wait_for_status('unanswered')
-        # Set an answer
-        self.answer_problem(correctness='correct')
-        self.problem_page.click_submit()
-        self.wait_for_status('correct')
-        # clear the answers
-        self.problem_page.click_reset()
-        # Focus should change to meta
-        self.problem_page.wait_for_focus_on_problem_meta()
-        # Answer should be reset
-        self.wait_for_status('unanswered')
 
     @attr(shard=12)
     def test_reset_shows_errors(self):
@@ -618,6 +594,7 @@ class AnnotationProblemTypeBase(ProblemTypeTestBase):
         self.problem_page.a11y_audit.config.set_rules({
             "ignore": [
                 'label',  # TODO: AC-491
+                'label-title-only',  # TODO: AC-493
             ]
         })
 

@@ -2,8 +2,11 @@
 Stub implementation of ecommerce service for acceptance tests
 """
 
+from __future__ import absolute_import
+
 import re
-import urlparse
+
+import six.moves.urllib.parse  # pylint: disable=import-error
 
 from .http import StubHttpRequestHandler, StubHttpService
 
@@ -22,7 +25,7 @@ class StubEcommerceServiceHandler(StubHttpRequestHandler):  # pylint: disable=mi
         """
         Find the correct handler method given the path info from the HTTP request.
         """
-        path = urlparse.urlparse(self.path).path
+        path = six.moves.urllib.parse.urlparse(self.path).path
         for pattern in pattern_handlers:
             match = re.match(pattern, path)
             if match:

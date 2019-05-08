@@ -1,6 +1,9 @@
 """
 Serializers for Bookmarks.
 """
+from __future__ import absolute_import
+
+import six
 from rest_framework import serializers
 
 from openedx.core.lib.api.serializers import CourseKeyField, UsageKeyField
@@ -60,5 +63,5 @@ class BookmarkSerializer(serializers.ModelSerializer):
         """
         path_items = [path_item._asdict() for path_item in bookmark.path]
         for path_item in path_items:
-            path_item['usage_key'] = unicode(path_item['usage_key'])
+            path_item['usage_key'] = six.text_type(path_item['usage_key'])
         return path_items

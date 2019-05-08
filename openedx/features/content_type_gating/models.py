@@ -20,7 +20,7 @@ from lms.djangoapps.courseware.masquerade import (
 )
 from openedx.core.djangoapps.config_model_utils.models import StackedConfigurationModel
 from openedx.core.djangoapps.config_model_utils.utils import is_in_holdback
-from openedx.features.content_type_gating.helpers import FULL_ACCESS, LIMITED_ACCESS
+from openedx.features.content_type_gating.helpers import FULL_ACCESS, LIMITED_ACCESS, correct_modes_for_fbe
 from student.models import CourseEnrollment
 from student.role_helpers import has_staff_roles
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
@@ -137,14 +137,18 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
         if user_variable_represents_correct_user and is_in_holdback(user):
             return False
 
+        if not correct_modes_for_fbe(course_key, enrollment, user):
+            return False
+
         # enrollment might be None if the user isn't enrolled. In that case,
         # return enablement as if the user enrolled today
         # Also, ignore enrollment creation date if the user is masquerading.
         if enrollment is None or course_masquerade:
-            return cls.enabled_for_course(course_key=course_key, target_datetime=timezone.now())
+            target_datetime = timezone.now()
         else:
-            current_config = cls.current(course_key=enrollment.course_id)
-            return current_config.enabled_as_of_datetime(target_datetime=enrollment.created)
+            target_datetime = enrollment.created
+        current_config = cls.current(course_key=course_key)
+        return current_config.enabled_as_of_datetime(target_datetime=target_datetime)
 
     @classmethod
     def enabled_for_course(cls, course_key, target_datetime=None):
@@ -161,6 +165,8 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
             course_key: The CourseKey of the course being queried.
             target_datetime: The datetime to checked enablement as of. Defaults to the current date and time.
         """
+        if not correct_modes_for_fbe(course_key):
+            return False
 
         if target_datetime is None:
             target_datetime = timezone.now()

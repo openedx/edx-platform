@@ -1,6 +1,7 @@
 """
 Test LMS Notes
 """
+from __future__ import absolute_import
 import random
 from datetime import datetime
 from unittest import skip
@@ -14,6 +15,7 @@ from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.edxnotes import EdxNotesPage, EdxNotesPageNoContent, EdxNotesUnitPage
 from common.test.acceptance.tests.helpers import EventsTestMixin, UniqueCourseTest
 from openedx.core.lib.tests import attr
+from six.moves import range
 
 
 class EdxNotesTestMixin(UniqueCourseTest):
@@ -166,12 +168,12 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
 
     def assert_text_in_notes(self, notes):
         actual = [note.text for note in notes]
-        expected = [u"TEST TEXT {}".format(i) for i in xrange(len(notes))]
+        expected = [u"TEST TEXT {}".format(i) for i in range(len(notes))]
         self.assertEqual(expected, actual)
 
     def assert_tags_in_notes(self, notes, expected_tags):
         actual = [note.tags for note in notes]
-        expected = [expected_tags[i] for i in xrange(len(notes))]
+        expected = [expected_tags[i] for i in range(len(notes))]
         self.assertEqual(expected, actual)
 
     def test_can_create_notes(self):

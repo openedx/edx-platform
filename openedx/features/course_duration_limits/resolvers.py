@@ -164,7 +164,7 @@ class ExpiryReminderResolver(BinnedSchedulesBaseResolver):
 
 def _get_verified_upgrade_link(user, schedule):
     enrollment = schedule.enrollment
-    if verified_upgrade_link_is_valid(enrollment):
+    if enrollment.is_active:
         return verified_upgrade_deadline_link(user, enrollment.course)
 
 

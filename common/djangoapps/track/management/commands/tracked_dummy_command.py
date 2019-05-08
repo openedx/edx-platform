@@ -2,9 +2,12 @@
 Command used for testing TrackedCommands
 """
 
+from __future__ import absolute_import
+
 import json
 
 from eventtracking import tracker as eventtracker
+
 from track.management.tracked_command import TrackedCommand
 
 

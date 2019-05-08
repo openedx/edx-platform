@@ -2,12 +2,14 @@
 """
 End-to-end tests for the main LMS Dashboard (aka, Student Dashboard).
 """
+from __future__ import absolute_import
 import datetime
 
 from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.tests.helpers import UniqueCourseTest, generate_course_key
+import six
 
 DEFAULT_SHORT_DATE_FORMAT = u'{dt:%b} {dt.day}, {dt.year}'
 TEST_DATE_FORMAT = u'{dt:%b} {dt.day}, {dt.year} {dt.hour:02}:{dt.minute:02}'
@@ -102,7 +104,7 @@ class BaseLmsDashboardTestMultiple(UniqueCourseTest):
         self.course_keys = {}
         self.course_fixtures = {}
 
-        for key, value in self.courses.iteritems():
+        for key, value in six.iteritems(self.courses):
             course_key = generate_course_key(
                 value['org'],
                 value['number'],
@@ -411,6 +413,10 @@ class LmsDashboardA11yTest(BaseLmsDashboardTestMultiple):
         self.dashboard_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'button-name',  # TODO: AC-935
+                'landmark-no-duplicate-banner',  # TODO: AC-934
+                'landmark-complementary-is-top-level',  # TODO: AC-939
+                'region'  # TODO: AC-932
             ]
         })
         course_listings = self.dashboard_page.get_courses()

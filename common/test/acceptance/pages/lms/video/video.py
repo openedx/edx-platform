@@ -2,6 +2,8 @@
 Video player in the courseware.
 """
 
+from __future__ import absolute_import
+
 import json
 import logging
 import time
@@ -11,6 +13,7 @@ from bok_choy.javascript import js_defined, wait_for_js
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise, Promise
 from selenium.webdriver.common.action_chains import ActionChains
+from six.moves import zip
 
 log = logging.getLogger('VideoPage')
 
@@ -746,7 +749,7 @@ class VideoPage(PageObject):
         language_codes = self.q(css=languages_selector).attrs('data-lang-code')
         language_names = self.q(css=languages_selector).attrs('textContent')
 
-        return dict(zip(language_codes, language_names))
+        return dict(list(zip(language_codes, language_names)))
 
     @property
     def position(self):

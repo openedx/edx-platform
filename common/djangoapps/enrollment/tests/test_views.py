@@ -1064,23 +1064,6 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         self.assertEqual(enrollment.mode, mode)
         self.assertEqual(enrollment.attributes.get(namespace='order', name='order_number').value, order_number)
 
-        # Updating an enrollment should update attributes (for audit mode enrollments also)
-        order_number = 'EDX-3000'
-        enrollment_attributes = [{
-            'namespace': 'order',
-            'name': 'order_number',
-            'value': order_number,
-        }]
-        self.assert_enrollment_status(
-            as_server=True,
-            mode='audit',
-            enrollment_attributes=enrollment_attributes
-        )
-        enrollment.refresh_from_db()
-        self.assertTrue(enrollment.is_active)
-        self.assertEqual(enrollment.mode, mode)
-        self.assertEqual(enrollment.attributes.get(namespace='order', name='order_number').value, order_number)
-
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestCase):

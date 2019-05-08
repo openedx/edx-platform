@@ -2,21 +2,23 @@
 Tests for EmbargoMiddleware with CountryAccessRules
 """
 
-from mock import patch
-import ddt
+from __future__ import absolute_import
 
-from django.urls import reverse
+import ddt
+import six
+from config_models.models import cache as config_cache
 from django.conf import settings
 from django.core.cache import cache as django_cache
+from django.urls import reverse
+from mock import patch
 
-from config_models.models import cache as config_cache
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from util.testing import UrlResetMixin
 from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory
+from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..models import RestrictedCourse, IPFilter
+from ..models import IPFilter, RestrictedCourse
 from ..test_utils import restrict_course
 
 
@@ -44,7 +46,7 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
 
         self.courseware_url = reverse(
             'openedx.course_experience.course_home',
-            kwargs={'course_id': unicode(self.course.id)}
+            kwargs={'course_id': six.text_type(self.course.id)}
         )
         self.non_courseware_url = reverse('dashboard')
 

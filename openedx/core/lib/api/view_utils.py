@@ -3,11 +3,15 @@ Utilities related to API views
 """
 from __future__ import absolute_import
 from collections import Sequence
+from functools import wraps
+
 from django.core.exceptions import NON_FIELD_ERRORS, ObjectDoesNotExist, ValidationError
 from django.http import Http404
 from django.utils.translation import ugettext as _
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.exceptions import APIException
 from rest_framework.generics import GenericAPIView
@@ -15,8 +19,10 @@ from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import clone_request
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from six import text_type, iteritems
 
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.permissions import IsUserInUrl
 
@@ -304,3 +310,74 @@ class LazySequence(Sequence):
                 self.iterable,
                 self.est_len,
             )
+
+
+class PaginatedAPIView(APIView):
+    """
+    An `APIView` class enhanced with the pagination methods of `GenericAPIView`.
+    """
+    # pylint: disable=attribute-defined-outside-init
+    @property
+    def paginator(self):
+        """
+        The paginator instance associated with the view, or `None`.
+        """
+        if not hasattr(self, '_paginator'):
+            if self.pagination_class is None:
+                self._paginator = None
+            else:
+                self._paginator = self.pagination_class()
+        return self._paginator
+
+    def paginate_queryset(self, queryset):
+        """
+        Return a single page of results, or `None` if pagination is disabled.
+        """
+        if self.paginator is None:
+            return None
+        return self.paginator.paginate_queryset(queryset, self.request, view=self)
+
+    def get_paginated_response(self, data):
+        """
+        Return a paginated style `Response` object for the given output data.
+        """
+        assert self.paginator is not None
+        return self.paginator.get_paginated_response(data)
+
+
+def get_course_key(request, course_id=None):
+    if not course_id:
+        return CourseKey.from_string(request.GET.get('course_id'))
+    return CourseKey.from_string(course_id)
+
+
+def verify_course_exists(view_func):
+    """
+    A decorator to wrap a view function that takes `course_key` as a parameter.
+
+    Raises:
+        An API error if the `course_key` is invalid, or if no `CourseOverview` exists for the given key.
+    """
+    @wraps(view_func)
+    def wrapped_function(self, request, **kwargs):
+        """
+        Wraps the given view_function.
+        """
+        try:
+            course_key = get_course_key(request, kwargs.get('course_id'))
+        except InvalidKeyError:
+            raise self.api_error(
+                status_code=status.HTTP_404_NOT_FOUND,
+                developer_message='The provided course key cannot be parsed.',
+                error_code='invalid_course_key'
+            )
+
+        if not CourseOverview.get_from_id_if_exists(course_key):
+            raise self.api_error(
+                status_code=status.HTTP_404_NOT_FOUND,
+                developer_message=u"Requested grade for unknown course {course}".format(course=text_type(course_key)),
+                error_code='course_does_not_exist'
+            )
+
+        return view_func(self, request, **kwargs)
+    return wrapped_function

@@ -8,15 +8,15 @@ import json
 from abc import ABCMeta
 
 import ddt
-import mock
 from ccx_keys.locator import CCXLocator
+from crum import set_current_request
 from django.conf import settings
-from django.utils.translation import override as override_language
 from django.utils.translation import get_language
+from django.utils.translation import override as override_language
 from mock import patch
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
-from crum import set_current_request
+from submissions import api as sub_api
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.models import StudentModule
@@ -38,7 +38,6 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, get_moc
 from student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user
 from student.roles import CourseCcxCoachRole
 from student.tests.factories import AdminFactory, UserFactory
-from submissions import api as sub_api
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -372,7 +371,7 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
         reset_student_attempts(self.course_key, self.user, msk, requesting_user=self.user)
         self.assertEqual(json.loads(module().state)['attempts'], 0)
 
-    @mock.patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send')
+    @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send')
     def test_delete_student_attempts(self, _mock_signal):
         msk = self.course_key.make_usage_key('dummy', 'module')
         original_state = json.dumps({'attempts': 32, 'otherstuff': 'alsorobots'})
@@ -398,9 +397,9 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
 
     # Disable the score change signal to prevent other components from being
     # pulled into tests.
-    @mock.patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send')
-    @mock.patch('lms.djangoapps.grades.signals.handlers.submissions_score_set_handler')
-    @mock.patch('lms.djangoapps.grades.signals.handlers.submissions_score_reset_handler')
+    @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send')
+    @patch('lms.djangoapps.grades.signals.handlers.submissions_score_set_handler')
+    @patch('lms.djangoapps.grades.signals.handlers.submissions_score_reset_handler')
     def test_delete_submission_scores(self, _mock_send_signal, mock_set_receiver, mock_reset_receiver):
         user = UserFactory()
         problem_location = self.course_key.make_usage_key('dummy', 'module')
@@ -746,7 +745,7 @@ class TestGetEmailParams(SharedModuleStoreTestCase):
     def test_marketing_params(self):
         # For a site with a marketing front end, what do we expect to get for the URLs?
         # Also make sure `auto_enroll` is properly passed through.
-        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
             result = get_email_params(self.course, True)
 
         self.assertEqual(result['auto_enroll'], True)

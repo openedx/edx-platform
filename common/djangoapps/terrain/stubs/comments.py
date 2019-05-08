@@ -2,8 +2,11 @@
 Stub implementation of cs_comments_service for acceptance tests
 """
 
+from __future__ import absolute_import
+
 import re
-import urlparse
+
+import six.moves.urllib.parse  # pylint: disable=import-error
 
 from .http import StubHttpRequestHandler, StubHttpService
 
@@ -12,7 +15,7 @@ class StubCommentsServiceHandler(StubHttpRequestHandler):
 
     @property
     def _params(self):
-        return urlparse.parse_qs(urlparse.urlparse(self.path).query)
+        return six.moves.urllib.parse.parse_qs(six.moves.urllib.parse.urlparse(self.path).query)
 
     def do_GET(self):
         pattern_handlers = {
@@ -30,7 +33,7 @@ class StubCommentsServiceHandler(StubHttpRequestHandler):
         self.send_response(404, content="404 Not Found")
 
     def match_pattern(self, pattern_handlers):
-        path = urlparse.urlparse(self.path).path
+        path = six.moves.urllib.parse.urlparse(self.path).path
         for pattern in pattern_handlers:
             match = re.match(pattern, path)
             if match:
@@ -94,7 +97,7 @@ class StubCommentsServiceHandler(StubHttpRequestHandler):
     def do_thread(self, thread_id):
         if thread_id in self.server.config.get('threads', {}):
             thread = self.server.config['threads'][thread_id].copy()
-            params = urlparse.parse_qs(urlparse.urlparse(self.path).query)
+            params = six.moves.urllib.parse.parse_qs(six.moves.urllib.parse.urlparse(self.path).query)
             if "recursive" in params and params["recursive"][0] == "True":
                 thread.setdefault('children', [])
                 resp_total = thread.setdefault('resp_total', len(thread['children']))
@@ -107,7 +110,7 @@ class StubCommentsServiceHandler(StubHttpRequestHandler):
 
     def do_threads(self):
         threads = self.server.config.get('threads', {})
-        threads_data = threads.values()
+        threads_data = list(threads.values())
         self.send_json_response({"collection": threads_data, "page": 1, "num_pages": 1})
 
     def do_search_threads(self):

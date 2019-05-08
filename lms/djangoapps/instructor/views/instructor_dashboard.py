@@ -10,8 +10,8 @@ from urlparse import urljoin
 import pytz
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse
 from django.http import Http404, HttpResponseServerError
+from django.urls import reverse
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
@@ -26,6 +26,13 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from bulk_email.models import BulkEmailFlag
+from class_dashboard.dashboard_data import get_array_section_has_problem, get_section_display_name
+from course_modes.models import CourseMode, CourseModesArchive
+from courseware.access import has_access
+from courseware.courses import get_course_by_id, get_studio_url
+from lms.djangoapps.discussion.django_comment_client.utils import available_division_schemes, has_forum_access
+from edxmako.shortcuts import render_to_response
+from edx_when.api import is_enabled_for_course
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -35,16 +42,10 @@ from lms.djangoapps.certificates.models import (
     CertificateWhitelist,
     GeneratedCertificate
 )
-from class_dashboard.dashboard_data import get_array_section_has_problem, get_section_display_name
-from course_modes.models import CourseMode, CourseModesArchive
-from courseware.access import has_access
-from courseware.courses import get_course_by_id, get_studio_url
-from django_comment_client.utils import available_division_schemes, has_forum_access
-from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, CourseDiscussionSettings
-from edxmako.shortcuts import render_to_response
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
-from lms.djangoapps.grades.config.waffle import waffle_flags, WRITABLE_GRADEBOOK
+from lms.djangoapps.grades.api import is_writable_gradebook_enabled
 from openedx.core.djangoapps.course_groups.cohorts import DEFAULT_COHORT_NAME, get_course_cohorts, is_course_cohorted
+from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, CourseDiscussionSettings
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
 from openedx.core.djangolib.markup import HTML, Text
@@ -52,7 +53,7 @@ from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_utils import wrap_xblock
 from shoppingcart.models import Coupon, CourseRegCodeItem, PaidCourseRegistration
 from student.models import CourseEnrollment
-from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole, CourseStaffRole, CourseInstructorRole
+from student.roles import CourseFinanceAdminRole, CourseInstructorRole, CourseSalesAdminRole, CourseStaffRole
 from util.json_request import JsonResponse
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore.django import modulestore
@@ -159,7 +160,7 @@ def instructor_dashboard_2(request, course_id):
             unicode(course_key), len(paid_modes)
         )
 
-    if settings.FEATURES.get('INDIVIDUAL_DUE_DATES') and access['instructor']:
+    if access['instructor'] and is_enabled_for_course(course_key, request=request):
         sections.insert(3, _section_extensions(course))
 
     # Gate access to course email by feature flag & by course-specific authorization
@@ -593,7 +594,7 @@ def _section_student_admin(course, access):
                                                           kwargs={'course_id': unicode(course_key)}),
         'spoc_gradebook_url': reverse('spoc_gradebook', kwargs={'course_id': unicode(course_key)}),
     }
-    if waffle_flags()[WRITABLE_GRADEBOOK].is_enabled(course_key) and settings.WRITABLE_GRADEBOOK_URL:
+    if is_writable_gradebook_enabled(course_key) and settings.WRITABLE_GRADEBOOK_URL:
         section_data['writable_gradebook_url'] = urljoin(settings.WRITABLE_GRADEBOOK_URL, '/' + text_type(course_key))
     return section_data
 

@@ -2,19 +2,22 @@
 Tests of CourseDurationLimitConfig.
 """
 
-from datetime import timedelta, datetime
+from __future__ import absolute_import
+
 import itertools
+from datetime import datetime, timedelta
 
 import ddt
-from django.utils import timezone
-from mock import Mock
 import pytz
-
+from django.utils import timezone
 from edx_django_utils.cache import RequestCache
+from mock import Mock
 from opaque_keys.edx.locator import CourseLocator
+
+from course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.config_model_utils.models import Provenance
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
@@ -31,6 +34,8 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
 
     def setUp(self):
         self.course_overview = CourseOverviewFactory.create()
+        CourseModeFactory.create(course_id=self.course_overview.id, mode_slug='audit')
+        CourseModeFactory.create(course_id=self.course_overview.id, mode_slug='verified')
         self.user = UserFactory.create()
         super(TestCourseDurationLimitConfig, self).setUp()
 

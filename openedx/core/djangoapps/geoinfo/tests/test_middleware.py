@@ -1,17 +1,17 @@
 """
 Tests for CountryMiddleware.
 """
+from __future__ import absolute_import
+
 import geoip2
 import maxminddb
-
-from mock import patch, MagicMock, PropertyMock
-
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
 from django.test.client import RequestFactory
+from mock import MagicMock, PropertyMock, patch
 
 from openedx.core.djangoapps.geoinfo.middleware import CountryMiddleware
-from student.tests.factories import UserFactory, AnonymousUserFactory
+from student.tests.factories import AnonymousUserFactory, UserFactory
 
 
 class CountryMiddlewareTests(TestCase):

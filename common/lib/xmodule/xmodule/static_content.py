@@ -18,28 +18,37 @@ from docopt import docopt
 from path import Path as path
 
 from xmodule.x_module import XModuleDescriptor
+from capa_module import ProblemBlock
+
 
 LOG = logging.getLogger(__name__)
 
 
+# List of XBlocks which use this static content setup.
+# Should only be used for XModules being converted to XBlocks.
+XBLOCK_CLASSES = [
+    ProblemBlock,
+]
+
+
 def write_module_styles(output_root):
     """Write all registered XModule css, sass, and scss files to output root."""
-    return _write_styles('.xmodule_display', output_root, _list_modules())
+    return _write_styles('.xmodule_display', output_root, _list_modules(), 'get_preview_view_css')
 
 
 def write_module_js(output_root):
     """Write all registered XModule js and coffee files to output root."""
-    return _write_js(output_root, _list_modules())
+    return _write_js(output_root, _list_modules(), 'get_preview_view_js')
 
 
 def write_descriptor_styles(output_root):
     """Write all registered XModuleDescriptor css, sass, and scss files to output root."""
-    return _write_styles('.xmodule_edit', output_root, _list_descriptors())
+    return _write_styles('.xmodule_edit', output_root, _list_descriptors(), 'get_studio_view_css')
 
 
 def write_descriptor_js(output_root):
     """Write all registered XModuleDescriptor js and coffee files to output root."""
-    return _write_js(output_root, _list_descriptors())
+    return _write_js(output_root, _list_descriptors(), 'get_studio_view_js')
 
 
 def _list_descriptors():
@@ -48,16 +57,16 @@ def _list_descriptors():
         desc for desc in [
             desc for (_, desc) in XModuleDescriptor.load_classes()
         ]
-    ]
+    ] + XBLOCK_CLASSES
 
 
 def _list_modules():
     """Return a list of all registered XModule classes."""
     return [
-        desc.module_class
-        for desc
-        in _list_descriptors()
-    ]
+        desc.module_class for desc in [
+            desc for (_, desc) in XModuleDescriptor.load_classes()
+        ]
+    ] + XBLOCK_CLASSES
 
 
 def _ensure_dir(directory):
@@ -71,7 +80,7 @@ def _ensure_dir(directory):
             raise
 
 
-def _write_styles(selector, output_root, classes):
+def _write_styles(selector, output_root, classes, css_attribute):
     """
     Write the css fragments from all XModules in `classes`
     into `output_root` as individual files, hashed by the contents to remove
@@ -81,7 +90,7 @@ def _write_styles(selector, output_root, classes):
 
     css_fragments = defaultdict(set)
     for class_ in classes:
-        class_css = class_.get_css()
+        class_css = getattr(class_, css_attribute)()
         for filetype in ('sass', 'scss', 'css'):
             for idx, fragment in enumerate(class_css.get(filetype, [])):
                 css_fragments[idx, filetype, fragment].add(class_.__name__)
@@ -114,7 +123,7 @@ def _write_styles(selector, output_root, classes):
     _write_files(output_root, contents)
 
 
-def _write_js(output_root, classes):
+def _write_js(output_root, classes, js_attribute):
     """
     Write the javascript fragments from all XModules in `classes`
     into `output_root` as individual files, hashed by the contents to remove
@@ -127,12 +136,12 @@ def _write_js(output_root, classes):
 
     fragment_owners = defaultdict(list)
     for class_ in classes:
-        module_js = class_.get_javascript()
+        module_js = getattr(class_, js_attribute)()
         # It will enforce 000 prefix for xmodule.js.
-        fragment_owners[(0, 'js', module_js.get('xmodule_js'))].append(class_.__name__)
+        fragment_owners[(0, 'js', module_js.get('xmodule_js'))].append(getattr(class_, js_attribute + '_bundle_name')())
         for filetype in ('coffee', 'js'):
             for idx, fragment in enumerate(module_js.get(filetype, [])):
-                fragment_owners[(idx + 1, filetype, fragment)].append(class_.__name__)
+                fragment_owners[(idx + 1, filetype, fragment)].append(getattr(class_, js_attribute + '_bundle_name')())
 
     for (idx, filetype, fragment), owners in sorted(fragment_owners.items()):
         filename = "{idx:0=3d}-{hash}.{type}".format(

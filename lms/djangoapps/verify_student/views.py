@@ -17,6 +17,7 @@ from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.utils.timezone import now
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from django.views.decorators.csrf import csrf_exempt
@@ -27,7 +28,6 @@ from eventtracking import tracker
 from ipware.ip import get_ip
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC
 
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response, render_to_string
@@ -376,7 +376,7 @@ class PayAndVerifyView(View):
                 current_step = display_steps[current_step_idx + 1]['name']
 
         courseware_url = ""
-        if not course.start or course.start < datetime.datetime.today().replace(tzinfo=UTC):
+        if not course.start or course.start < now():
             courseware_url = reverse(
                 'course_root',
                 kwargs={'course_id': unicode(course_key)}
@@ -716,7 +716,7 @@ class PayAndVerifyView(View):
 
         deadline_passed = (
             deadline_datetime is not None and
-            deadline_datetime < datetime.datetime.now(UTC)
+            deadline_datetime < now()
         )
         if deadline_passed:
             context = {

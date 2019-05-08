@@ -49,6 +49,7 @@ django-model-utils==3.0.0
 django-mptt>=0.8.6,<0.9
 django-mysql==2.4.1
 django-oauth-toolkit<1.2            # Provides oAuth2 capabilities for Django. 1.2+ requires Django 2 and Python 3.5
+django-pipeline
 django-pyfs
 django-ratelimit
 django-ratelimit-backend==1.1.1
@@ -78,12 +79,13 @@ edx-enterprise
 edx-milestones
 edx-oauth2-provider
 edx-organizations
-edx-proctoring>=1.6.0
-edx-proctoring-proctortrack
+edx-proctoring>=2.0.1
+edx-proctoring-proctortrack==1.0.5  # Intentionally and permanently pinned to ensure code changes are reviewed
 edx-rest-api-client
 edx-search
 edx-submissions
 edx-user-state-client
+edx-when
 edxval
 enum34==1.1.6                       # Backport of Enum from Python 3.4+
 event-tracking

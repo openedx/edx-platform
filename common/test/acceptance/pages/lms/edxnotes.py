@@ -1,3 +1,8 @@
+"""
+LMS edxnotes page
+"""
+from __future__ import absolute_import
+
 from bok_choy.page_object import PageLoadError, PageObject, unguarded
 from bok_choy.promise import BrokenPromise, EmptyPromise
 from selenium.webdriver.common.action_chains import ActionChains
@@ -296,7 +301,7 @@ class EdxNotesPage(CoursePage, PaginatedUIMixin):
         """
         tabs = self.q(css=".tabs .tab-label")
         if tabs:
-            return map(lambda x: x.replace("Current tab\n", ""), tabs.text)
+            return [x.replace("Current tab\n", "") for x in tabs.text]
         else:
             return None
 
