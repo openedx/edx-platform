@@ -1,6 +1,7 @@
 """
 Bok choy acceptance and a11y tests for problem types in the LMS
 """
+from __future__ import absolute_import
 import random
 import textwrap
 from abc import ABCMeta, abstractmethod
@@ -30,6 +31,8 @@ from common.test.acceptance.pages.lms.problem import ProblemPage
 from common.test.acceptance.tests.helpers import EventsTestMixin, select_option_by_text
 from common.test.acceptance.tests.lms.test_lms_problems import ProblemsTest
 from openedx.core.lib.tests import attr
+import six
+from six.moves import range
 
 
 class ProblemTypeTestBaseMeta(ABCMeta):
@@ -62,7 +65,7 @@ class ProblemTypeTestBaseMeta(ABCMeta):
         return obj
 
 
-class ProblemTypeTestBase(ProblemsTest, EventsTestMixin):
+class ProblemTypeTestBase(six.with_metaclass(ProblemTypeTestBaseMeta, ProblemsTest, EventsTestMixin)):
     """
     Base class for testing assesment problem types in bok choy.
 
@@ -78,7 +81,6 @@ class ProblemTypeTestBase(ProblemsTest, EventsTestMixin):
     Additionally, the default values for factory_kwargs and status_indicators
     may need to be overridden for some problem types.
     """
-    __metaclass__ = ProblemTypeTestBaseMeta
 
     problem_name = None
     problem_type = None

@@ -3,9 +3,10 @@
 End-to-end tests for the LMS.
 """
 
+from __future__ import absolute_import
 import json
 from datetime import datetime, timedelta
-
+from six.moves import range
 import ddt
 
 from openedx.core.lib.tests import attr

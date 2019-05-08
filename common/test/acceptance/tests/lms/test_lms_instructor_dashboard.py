@@ -3,6 +3,7 @@
 End-to-end tests for the LMS Instructor Dashboard.
 """
 
+from __future__ import absolute_import
 import ddt
 from bok_choy.promise import EmptyPromise
 
@@ -31,6 +32,7 @@ from common.test.acceptance.tests.helpers import (
     get_modal_alert
 )
 from openedx.core.lib.tests import attr
+from six.moves import range
 
 
 class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):

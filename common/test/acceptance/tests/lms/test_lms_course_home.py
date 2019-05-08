@@ -3,6 +3,8 @@
 End-to-end tests for the LMS that utilize the course home page and course outline.
 """
 
+from __future__ import absolute_import
+import six
 from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
 from openedx.core.lib.tests import attr
 
@@ -97,7 +99,7 @@ class CourseHomeTest(CourseHomeBaseTest):
         }
 
         actual_sections = self.course_home_page.outline.sections
-        for section, subsections in EXPECTED_SECTIONS.iteritems():
+        for section, _ in six.iteritems(EXPECTED_SECTIONS):
             self.assertIn(section, actual_sections)
             self.assertEqual(actual_sections[section], EXPECTED_SECTIONS[section])
 

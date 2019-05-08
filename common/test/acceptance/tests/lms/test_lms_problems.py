@@ -2,6 +2,7 @@
 """
 Bok choy acceptance tests for problems in the LMS
 """
+from __future__ import absolute_import
 from textwrap import dedent
 import time
 import ddt

@@ -1,6 +1,7 @@
 """
 Acceptance tests for the teams feature.
 """
+from __future__ import absolute_import
 import json
 import random
 import time
@@ -29,6 +30,8 @@ from common.test.acceptance.pages.lms.teams import (
 )
 from common.test.acceptance.tests.helpers import EventsTestMixin, UniqueCourseTest, get_modal_alert
 from openedx.core.lib.tests import attr
+from six.moves import map
+from six.moves import range
 
 TOPICS_PER_PAGE = 12
 
@@ -47,12 +50,12 @@ class TeamsTabBase(EventsTestMixin, ForumsConfigMixin, UniqueCourseTest):
 
     def create_topics(self, num_topics):
         """Create `num_topics` test topics."""
-        return [{u"description": i, u"name": i, u"id": i} for i in map(str, xrange(num_topics))]
+        return [{u"description": i, u"name": i, u"id": i} for i in map(str, range(num_topics))]
 
     def create_teams(self, topic, num_teams, time_between_creation=0):
         """Create `num_teams` teams belonging to `topic`."""
         teams = []
-        for i in xrange(num_teams):
+        for i in range(num_teams):
             team = {
                 'course_id': self.course_id,
                 'topic_id': topic['id'],
@@ -83,7 +86,7 @@ class TeamsTabBase(EventsTestMixin, ForumsConfigMixin, UniqueCourseTest):
         """Create `num_memberships` users and assign them to `team_id`. The
         last user created becomes the current user."""
         memberships = []
-        for __ in xrange(num_memberships):
+        for __ in range(num_memberships):
             user_info = AutoAuthPage(self.browser, course_id=self.course_id).visit().user_info
             memberships.append(user_info)
             self.create_membership(user_info['username'], team_id)
@@ -142,7 +145,7 @@ class TeamsTabBase(EventsTestMixin, ForumsConfigMixin, UniqueCourseTest):
 
         team_card_names = page.team_names
         team_card_descriptions = page.team_descriptions
-        map(assert_team_equal, expected_teams, team_card_names, team_card_descriptions)
+        list(map(assert_team_equal, expected_teams, team_card_names, team_card_descriptions))
 
     def verify_my_team_count(self, expected_number_of_teams):
         """ Verify the number of teams shown on "My Team". """

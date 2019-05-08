@@ -2,6 +2,7 @@
 """
 End-to-end tests for Student's Profile Page.
 """
+from __future__ import absolute_import
 from contextlib import contextmanager
 from datetime import datetime
 from unittest import skip
@@ -11,6 +12,7 @@ from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
 from common.test.acceptance.pages.lms.learner_profile import LearnerProfilePage
 from common.test.acceptance.tests.helpers import AcceptanceTest, EventsTestMixin
+import six
 
 
 class LearnerProfileTestMixin(EventsTestMixin):
@@ -130,7 +132,7 @@ class LearnerProfileTestMixin(EventsTestMixin):
                     'event': {
                         'user_id': int(profile_user_id),
                         'page': 'profile',
-                        'visibility': unicode(visibility)
+                        'visibility': six.text_type(visibility)
                     }
                 }
             ],

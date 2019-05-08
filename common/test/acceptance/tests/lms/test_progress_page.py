@@ -3,6 +3,8 @@
 End-to-end tests for the LMS that utilize the
 progress page.
 """
+from __future__ import absolute_import
+from six.moves import range
 from contextlib import contextmanager
 
 import ddt
