@@ -1,4 +1,10 @@
+body.view-in-course .instructor-dashboard-wrapper-2{
+  border: none;
+  box-shadow: 0px 1px 4px 0px #b6dcfe;
+}
 .instructor-dashboard-content-2{
+  padding: 0;
+  
   input[type="button"],
   .problem-browser .btn,
   section.idash-section#membership .member-lists-management .auth-list-container .member-list-widget input[type="button"].add,
@@ -6,43 +12,131 @@
   section.idash-section#discussions_management .form-submit,
   .btn-blue,
   .customBrowseBtn .file-browse .browse,
-  section.idash-section#cohort_management .cohort-management-nav .action-create
-
-  {
+  section.idash-section#cohort_management .cohort-management-nav .action-create,
+  section.idash-section#cohort_management .cohort-management-settings .form-submit{
     @extend %btn-my-primary;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .btn-type-chapter .btn{
+  .problem-browser .block-type-chapter .btn{
     @extend %btn-my-white;
+    .fa{
+      vertical-align: sub;
+    }
   }
-  section.idash-section#membership .batch-enrollment textarea{
-    width: 100%;
+  
+  .instructor-dashboard-title{
+    font-size: 18px;
+    color: $title;
+    border-bottom: 1px solid #eeeeee;
+    padding: 13px 20px;
+    display: block;
+    font-weight: normal;
   }
+  .instructor-nav,
+  .idash-section.active-section{
+    margin: 20px;
+  }
+
+  // membership
+  section.idash-section#membership{
+    .batch-enrollment textarea,
+    .batch-beta-testers textarea{
+      width: 100%;
+      padding: 10px 15px;
+    }
+    .member-lists-management .auth-list-container .member-list-widget .bottom-bar input{
+      width: 250px;
+    }
+  } 
+
+  // cohorts
+  section.idash-section#cohort_management .cohort-management-supplemental .icon{
+    vertical-align: middle;
+  }
+
+
+  // data_download
   section.idash-section#data_download .problem-browser input{
     margin-left: 10px;
     height: 36px;
+    max-width: 450px;
   }
+  .slick-header-column.ui-state-default{
+    height: auto;
+  }
+  
+  
+
+  // certificates
   .customBrowseBtn .enhanced-input-file{
     height: 36px;
     box-sizing: border-box;
   }
+
+  .customBrowseBtn .file-browse .file_field{
+    padding: 9px 0 0;
+    outline: none;
+  }
 }
 @media screen and (max-width:767px){
   .instructor-dashboard-content-2{
-    padding: 15px 10px;
+    
+    .instructor-nav,
+    .idash-section.active-section{
+      margin: 20px 10px;
+    }
 
     section.idash-section#student_admin input[type="text"],
     section.idash-section#certificates .student-username-or-email,
     section.idash-section#certificates .notes-field{
       width: 100%;
     }
+
+    // data_download
     section.idash-section#data_download .problem-browser input{
       margin: 10px 0 0;
-    }
-    section.idash-section#membership .batch-enrollment .role select{
-      margin-left: 0;
     }
     .upload-csv-button, #add-exception{
       margin-top: 10px;
     }
+
+    // membership
+    section.idash-section#membership{
+      .batch-enrollment .role select{
+        margin-left: 0;
+      }
+      .member-lists-management .auth-list-container .member-list-widget .bottom-bar{
+        height: 110px;
+        input{
+          width: 100%;
+        }
+        .add{
+          margin-top: 10px;
+          width: 100% !important;
+          position: static !important;
+        }
+      }
+    } 
+
+    // cohorts
+    section.idash-section#cohort_management .cohort-management-nav{
+      .cohort-management-nav-form{
+        width: 100%;
+      }
+      .action-create{
+        width: 100%;
+        margin-top: 10px;
+        text-align: center;
+      }
+    }
+
+    // student admin
+    section.idash-section#student_admin .location-example{
+      display: inline-block;
+      white-space: nowrap;
+    }
+    
   }
 }
