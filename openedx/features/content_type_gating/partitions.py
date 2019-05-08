@@ -5,9 +5,12 @@ These are used together to allow course content to be blocked for a subset
 of audit learners.
 """
 
+from __future__ import absolute_import
+
 import logging
 
 import crum
+import six
 from django.apps import apps
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -16,10 +19,10 @@ from web_fragments.fragment import Fragment
 
 from course_modes.models import CourseMode
 from lms.djangoapps.commerce.utils import EcommerceService
-from xmodule.partitions.partitions import UserPartition, UserPartitionError, ENROLLMENT_TRACK_PARTITION_ID
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
-from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, FULL_ACCESS, LIMITED_ACCESS
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, UserPartition, UserPartitionError
 
 LOG = logging.getLogger(__name__)
 
@@ -55,7 +58,7 @@ def create_content_gating_partition(course):
             CONTENT_TYPE_GATING_SCHEME,
             CONTENT_GATING_PARTITION_ID,
             _get_partition_from_id(course.user_partitions, CONTENT_GATING_PARTITION_ID).name,
-            unicode(course.id),
+            six.text_type(course.id),
         )
         return None
 
@@ -63,7 +66,7 @@ def create_content_gating_partition(course):
         id=CONTENT_GATING_PARTITION_ID,
         name=_(u"Feature-based Enrollments"),
         description=_(u"Partition for segmenting users by access to gated content types"),
-        parameters={"course_id": unicode(course.id)}
+        parameters={"course_id": six.text_type(course.id)}
     )
     return partition
 
@@ -157,8 +160,8 @@ class ContentTypeGatingPartitionScheme(object):
         """
         return ContentTypeGatingPartition(
             id,
-            unicode(name),
-            unicode(description),
+            six.text_type(name),
+            six.text_type(description),
             [
                 LIMITED_ACCESS,
                 FULL_ACCESS,
