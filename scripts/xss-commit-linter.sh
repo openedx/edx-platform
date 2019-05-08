@@ -26,7 +26,7 @@ show_help() {
     echo "For more help using the xss linter, including details on how to"
     echo "understand and fix any violations, read the docs here:"
     echo ""
-    echo "  https://edx.readthedocs.org/projects/edx-developer-guide/en/latest/conventions/preventing_xss.html#xss-linter"
+    echo "  https://edx.readthedocs.io/projects/edx-developer-guide/en/latest/preventing_xss/index.html"
 
 }
 
