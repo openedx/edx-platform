@@ -70,14 +70,24 @@ body.view-in-course .instructor-dashboard-wrapper-2{
   
 
   // certificates
-  .customBrowseBtn .enhanced-input-file{
-    height: 36px;
-    box-sizing: border-box;
-  }
-
-  .customBrowseBtn .file-browse .file_field{
-    padding: 9px 0 0;
-    outline: none;
+  .customBrowseBtn{
+    width: 280px;
+    .enhanced-input-file{
+      height: 36px;
+      box-sizing: border-box;
+      width: 200px;
+    }
+    .file-browse .file_field{
+      padding: 9px 0 0;
+      outline: none;
+      width: 200px;
+      left: -95px;
+    }
+    .file-browse .browse{
+      vertical-align: bottom;
+      margin-left: 200px;
+    }
+    
   }
 }
 @media screen and (max-width:767px){
@@ -136,7 +146,14 @@ body.view-in-course .instructor-dashboard-wrapper-2{
     section.idash-section#student_admin .location-example{
       display: inline-block;
       white-space: nowrap;
+      max-width: 100%;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
     
+    // certificates
+    .customBrowseBtn .file-browse .file_field{
+      padding: 5px 0 0;
+    }
   }
 }
