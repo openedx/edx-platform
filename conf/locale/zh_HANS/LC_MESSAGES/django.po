@@ -26685,7 +26685,7 @@ msgstr "实付金额："
 #: membership/templates/membership/wechat_paying.html
 msgid ""
 "Please complete the payment within 2 hours, otherwise the purchase may fail."
-msgstr "请在2小时内完成支付，否则可能导致购买失败"
+msgstr "请在2小时内完成支付，否则可能导致购买失败。"
 
 #: membership/templates/membership/wechat_paying.html
 msgid "Please scan Wechat QR code"
