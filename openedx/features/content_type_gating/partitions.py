@@ -11,8 +11,6 @@ import logging
 
 import crum
 import six
-from django.apps import apps
-from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from web_fragments.fragment import Fragment
@@ -22,7 +20,7 @@ from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, FULL_ACCESS, LIMITED_ACCESS
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, UserPartition, UserPartitionError
+from xmodule.partitions.partitions import UserPartition, UserPartitionError
 
 LOG = logging.getLogger(__name__)
 
