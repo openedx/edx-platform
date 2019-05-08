@@ -3,8 +3,6 @@ XBlock for Staff Graded Points
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import csv
-import hashlib
 import io
 import json
 import logging
@@ -22,12 +20,7 @@ from xblock.scorable import ScorableXBlockMixin, Score
 from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
-
 log = logging.getLogger(__name__)
-
-
-CSV_FIELDS = '''user_id username full_name email student_uid enrolled track
-block_id title date_last_graded who_last_graded last_points points'''.split()
 
 
 @XBlock.needs('settings')
@@ -36,7 +29,7 @@ block_id title date_last_graded who_last_graded last_points points'''.split()
 @XBlock.needs('user')
 class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
     """
-    Staff Graded Problem block
+    Staff Graded Points block
     """
     display_name = String(
         display_name=_("Display Name"),
@@ -106,23 +99,18 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
         grade_utils = self.runtime.service(self, 'grade_utils')
 
         try:
-            thefile = request.POST['csv'].file
-            sync = thefile.size < 300 * 1024
-            log.info('Processing %d byte score file for %s sync=%s', thefile.size, self.location, sync)
-            result = grade_utils.process_score_csv(self.location, thefile, self.weight, sync=sync)
+            score_file = request.POST['csv'].file
+
+            log.info('Processing %d byte score file for %s', score_file.size, self.location)
+            block_id = self.location
+            block_weight = self.weight
+            processor = grade_utils.get_score_processor(block_id=block_id, block_id_str=str(block_id), max_points=block_weight)
+            processor.read_file(score_file, autocommit=False)
+            processor.commit()
+            data = processor.status()
         except KeyError:
-            data = {'errors': 1, 'message': 'missing file'}
-        else:
-            if sync:
-                data = result
-            else:
-                if result.ready():
-                    data = result.result
-                else:
-                    data = {'message': 'waiting'}
-                    data = result.wait()
-            if 'graded' in data:
-                data['percentage'] = format(data['graded']/data['processed'], '.1%')
+            data = {'error_rows': [1], 'error_messages': [_('missing file')]}
+
         log.info(data)
         return Response(json.dumps(data), content_type='application/json')
 
@@ -131,9 +119,6 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
         if not self.runtime.user_is_staff:
             return Response('not allowed', status_code=403)
 
-        buf = io.BytesIO()
-        writer = csv.DictWriter(buf, CSV_FIELDS)
-        writer.writeheader()
         my_location = str(self.location)
         my_name = self.display_name
         grade_utils = self.runtime.service(self, 'grade_utils')
@@ -141,24 +126,26 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
 
         user_service = self.runtime.service(self, 'user')
         enrollments = user_service.get_enrollments(self.location.course_key)
-        for enrollment in enrollments:
-            row = {
-                'block_id': my_location,
-                'title': my_name,
-                'points': None
-            }
-            row.update(enrollment)
-            score = students.get(enrollment['user_id'], None)
+        def row_iterator():
+            for enrollment in enrollments:
+                row = {
+                    'block_id': my_location,
+                    'title': my_name,
+                    'points': None
+                }
+                row.update(enrollment)
+                score = students.get(enrollment['user_id'], None)
 
-            if score:
-                row['last_points'] = int(score['grade'] * self.weight)
-                row['date_last_graded'] = score['modified']
-                # state = score['state']
-                # if state:
-                #     row['who_last_graded'] = json.loads(state).get('grader', '')
+                if score:
+                    row['last_points'] = int(score['grade'] * self.weight)
+                    row['date_last_graded'] = score['modified']
+                    # state = score['state']
+                    # if state:
+                    #     row['who_last_graded'] = json.loads(state).get('grader', '')
+                yield row
 
-            writer.writerow(row)
-
+        buf = io.BytesIO()
+        grade_utils.get_score_processor().write_file(buf, row_iterator())
         resp = Response(buf.getvalue())
         resp.content_type = 'text/csv'
         resp.content_disposition = 'attachment; filename="%s.csv"' % self.location

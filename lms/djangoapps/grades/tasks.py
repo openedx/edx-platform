@@ -34,7 +34,7 @@ from .services import GradesService
 from .signals.signals import SUBSECTION_SCORE_CHANGED
 from .subsection_grade_factory import SubsectionGradeFactory
 from .transformer import GradesTransformer
-from .grade_utils import are_grades_frozen, set_score, process_score_csv
+from .grade_utils import are_grades_frozen, set_score
 
 
 log = getLogger(__name__)

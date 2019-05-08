@@ -36,14 +36,19 @@ class GradesUtilService(object):
         """
         return set_score(usage_key, student_id, score, max_points, **defaults)
 
-    def process_score_csv(self, block_id, score_file, block_weight, sync=True):
+    def get_score_processor(self, **kwargs):
         """
         Process the score CSV upload, synchronously or async.
         """
-        if sync:
-            return grade_utils.process_score_csv(block_id, score_file, block_weight)
+        if kwargs:
+            return grade_utils.ScoreCSVProcessor(**kwargs)
         else:
-            from django.core.files.storage import default_storage
-            filename = 'csv/import/%s' % block_id
-            default_storage.save(filename, score_file)
-            return tasks.process_score_csv_async.delay(six.text_type(block_id), filename, block_weight)
+            return grade_utils.ScoreCSVProcessor
+
+        # if sync:
+        #     return grade_utils.process_score_csv(block_id, score_file, block_weight)
+        # else:
+        #     from django.core.files.storage import default_storage
+        #     filename = 'csv/import/%s' % block_id
+        #     default_storage.save(filename, score_file)
+        #     return tasks.process_score_csv_async.delay(six.text_type(block_id), filename, block_weight)

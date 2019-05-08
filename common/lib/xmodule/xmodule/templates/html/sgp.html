@@ -48,6 +48,9 @@
     $('#{{id}}-file').change(function(e){
         // e.preventDefault();
         var firstFile = $('#{{id}}-file')[0].files[0];
+        if (firstFile == undefined) {
+            return;
+        }
         var formData = new FormData();
         formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
         formData.append('csv', firstFile);
@@ -62,12 +65,15 @@
                processData: false,  // tell jQuery not to process the data
                contentType: false,  // tell jQuery not to set contentType
                success : function(data) {
-                    var message = {% trans "`${data.percentage} of ${data.processed} learner's grades processed.`" %};
+                    var message = {% trans "`${data.percentage} of ${data.total} learner's grades processed.`" %};
                     $('.loading-spinner').hide();
-                    if (data.errors) {
-                        var errorMessage = {% trans "`${data.errors} errors. Please try again. `" %};
-                        if (data.message != undefined) {
-                            errorMessage += data.message;
+                    if (data.error_rows.length || data.error_messages.length) {
+                        var errorMessage = '';
+                        if (data.error_rows.length) {
+                            errorMessage += {% trans "`${data.error_rows.length} errors. Please try again. `" %};
+                        }
+                        if (data.error_messages.length) {
+                            errorMessage += data.error_messages;
                         }
                         $('#{{id}}-status,.error').html(errorMessage).show();
                     } else {

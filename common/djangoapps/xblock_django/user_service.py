@@ -76,7 +76,7 @@ class DjangoXBlockUserService(UserService):
                 pce = enrollment.programcourseenrollment.program_enrollment
                 enrd['student_uid'] = pce.external_user_key
             except ObjectDoesNotExist:
-                pass
+                enrd['student_uid'] = None
             yield enrd
 
     def _convert_django_user_to_xblock_user(self, django_user):

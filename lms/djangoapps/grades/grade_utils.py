@@ -1,13 +1,78 @@
 """
 This module contains utility functions for grading.
 """
-import csv
+from __future__ import absolute_import, unicode_literals
+
+import logging
+
 from datetime import timedelta
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from courseware.models import StudentModule
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from util.csv_processor import CSVProcessor, ChecksumMixin
 from .config.waffle import ENFORCE_FREEZE_GRADE_AFTER_COURSE_END, waffle_flags
+
+log = logging.getLogger(__name__)
+
+
+class ScoreCSVProcessor(ChecksumMixin, CSVProcessor):
+    columns = ['user_id', 'username', 'full_name', 'email', 'student_uid',
+               'enrolled', 'track', 'block_id', 'title', 'date_last_graded',
+               'who_last_graded', 'csum', 'last_points', 'points']
+    required_columns = ['user_id', 'points', 'csum', 'block_id', 'last_points']
+    checksum_columns = ['user_id', 'block_id', 'last_points']
+
+    handle_undo = False
+
+    def __init__(self, **kwargs):
+        super(ScoreCSVProcessor, self).__init__(**kwargs)
+        self.users_seen = set()
+
+    def validate_row(self, row):
+        validated = super(ScoreCSVProcessor, self).validate_row(row)
+        if validated:
+            validated = row['block_id'] == self.block_id_str
+            if validated:
+                points = row['points']
+                if points:
+                    try:
+                        validated = float(row['points']) <= self.max_points
+                        if not validated:
+                            self.add_error(_('Points must be less than {}.').format(self.max_points))
+                    except ValueError:
+                        self.add_error(_('Points must be numbers.'))
+                        validated = False
+                else:
+                    validated = True
+            else:
+                self.add_error(_('The CSV does not match this problem. Check that you uploaded the right CSV.'))
+        return validated
+
+    def preprocess_row(self, row):
+        if row['points']:
+            to_save = {
+                'user_id': row['user_id'],
+                'block_id': self.block_id,
+                'new_points': float(row['points']),
+                'max_points': self.max_points
+            }
+            return to_save
+
+    def process_row(self, row):
+        if row['user_id'] not in self.users_seen:
+            if self.handle_undo:
+                # get the current score, for undo. expensive
+                undo = get_score(row['block_id'], row['user_id'])
+                undo['new_points'] = undo['score']
+                undo['max_points'] = row['max_points']
+            else:
+                undo = None
+            set_score(row['block_id'], row['user_id'], row['new_points'], row['max_points'])
+            self.users_seen.add(row['user_id'])
+            return True, undo
+        else:
+            return False, None
 
 
 def are_grades_frozen(course_key):
@@ -74,38 +139,3 @@ def get_scores(usage_key, user_ids=None):
                              'created': row.created,
                              'modified': row.modified,
                              'state': row.state} for row in scores_qset}
-
-
-def process_score_csv(block_id, thefile, max_points):
-    processed = rownum = 0
-    errors = 0
-    data = {}
-    reader = csv.DictReader(thefile)
-    block_id_str = str(block_id)
-    for rownum, row in enumerate(reader):
-        if row['block_id'] != block_id_str:
-            errors += 1
-            data['message'] = _('The CSV does not match this problem. Check that you uploaded the right CSV.')
-            break
-        elif 'points' in row:
-            if not row['points']:
-                continue
-            try:
-                new_points = float(row['points'])
-            except ValueError:
-                errors += 1
-                data['message'] = _('Points must be numbers only, not letters.')
-            else:
-                if new_points <= max_points:
-                    set_score(block_id, row['user_id'], new_points, max_points)
-                    processed += 1
-                else:
-                    errors += 1
-                    data['message'] = _('Points must not be greater than {}').format(max_points)
-        else:
-            errors += 1
-            data['message'] = _('The CSV must contain a points column.')
-    data['errors'] = errors
-    data['processed'] = rownum + 1 if rownum else 0
-    data['graded'] = processed
-    return data
