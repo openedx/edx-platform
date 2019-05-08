@@ -5,11 +5,14 @@ This is a place to put simple functions that operate on course metadata. It
 allows us to share code between the CourseDescriptor and CourseOverview
 classes, which both need these type of functions.
 """
+from __future__ import absolute_import
+
 from base64 import b32encode
 from datetime import datetime, timedelta
 from math import exp
 
 import dateutil.parser
+import six
 from pytz import utc
 
 DEFAULT_START_DATE = datetime(2030, 1, 1, tzinfo=utc)
@@ -64,7 +67,7 @@ def clean_course_key(course_key, padding_char):
             string. The standard value for this is '='.
     """
     return "course_{}".format(
-        b32encode(unicode(course_key)).replace('=', padding_char)
+        b32encode(six.text_type(course_key)).replace('=', padding_char)
     )
 
 

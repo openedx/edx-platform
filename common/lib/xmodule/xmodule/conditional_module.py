@@ -2,15 +2,17 @@
 some xmodules by conditions.
 """
 
+from __future__ import absolute_import
+
 import json
 import logging
 
+import six
 from lazy import lazy
 from lxml import etree
+from opaque_keys.edx.locator import BlockUsageLocator
 from pkg_resources import resource_string
 from six import text_type
-
-from opaque_keys.edx.locator import BlockUsageLocator
 from web_fragments.fragment import Fragment
 from xblock.fields import ReferenceList, Scope, String
 
@@ -264,7 +266,7 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor, StudioEditabl
         # Convert sources xml_attribute to a ReferenceList field type so Location/Locator
         # substitution can be done.
         if not self.sources_list:
-            if 'sources' in self.xml_attributes and isinstance(self.xml_attributes['sources'], basestring):
+            if 'sources' in self.xml_attributes and isinstance(self.xml_attributes['sources'], six.string_types):
                 self.sources_list = [
                     # TODO: it is not clear why we are replacing the run here (which actually is a no-op
                     # for old-style course locators. However, this is the implementation of
@@ -302,7 +304,7 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor, StudioEditabl
         children = []
         show_tag_list = []
         definition = {}
-        for conditional_attr in ConditionalModule.conditions_map.iterkeys():
+        for conditional_attr in six.iterkeys(ConditionalModule.conditions_map):
             conditional_value = xml_object.get(conditional_attr)
             if conditional_value is not None:
                 definition.update({
@@ -342,7 +344,7 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor, StudioEditabl
 
         # Overwrite the original sources attribute with the value from sources_list, as
         # Locations may have been changed to Locators.
-        stringified_sources_list = map(lambda loc: text_type(loc), self.sources_list)
+        stringified_sources_list = [text_type(loc) for loc in self.sources_list]
         self.xml_attributes['sources'] = ';'.join(stringified_sources_list)
         self.xml_attributes[self.conditional_attr] = self.conditional_value
         self.xml_attributes['message'] = self.conditional_message
