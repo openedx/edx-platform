@@ -353,10 +353,16 @@ def _find_thread(request, course, discussion_id, thread_id):
             response_limit=request.GET.get("resp_limit")
         )
     except cc.utils.CommentClientRequestError:
+        log.info(u"Discussion Error: Thread ID:{thread_id} not found for Discussion: {discussion_id}".format(
+            thread_id=thread_id, discussion_id=discussion_id)
+        )
         return None
     # Verify that the student has access to this thread if belongs to a course discussion module
     thread_context = getattr(thread, "context", "course")
     if thread_context == "course" and not utils.discussion_category_id_access(course, request.user, discussion_id):
+        log.info(u'Discussion Error: Thread Context:{context} for thread: {thread}'.format(
+            context=thread_context, thread=thread.__dict__)
+        )
         return None
 
     # verify that the thread belongs to the requesting student's group
@@ -365,6 +371,9 @@ def _find_thread(request, course, discussion_id, thread_id):
     if is_commentable_divided(course.id, discussion_id, course_discussion_settings) and not is_moderator:
         user_group_id = get_group_id_for_user(request.user, course_discussion_settings)
         if getattr(thread, "group_id", None) is not None and user_group_id != thread.group_id:
+            log.info(u"Discussion Error: user_group:{user_group} is not equal to thread_group:{thread_group}".format(
+                user_group=user_group_id, thread_group=thread.group_id
+            ))
             return None
 
     return thread
