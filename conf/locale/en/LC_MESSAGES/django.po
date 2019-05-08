@@ -25801,7 +25801,7 @@ msgid " days"
 msgstr ""
 
 #: membership/templates/membership/card.html
-msgid "Tuition:"
+msgid "Tuition: "
 msgstr ""
 
 #: membership/templates/membership/card.html
@@ -26151,7 +26151,7 @@ msgstr ""
 
 #: membership/templates/membership/wechat_paying.html
 msgid ""
-"Please complete the payment within 2 hours, otherwise the purchase may fail"
+"Please complete the payment within 2 hours, otherwise the purchase may fail."
 msgstr ""
 
 #: membership/templates/membership/wechat_paying.html
