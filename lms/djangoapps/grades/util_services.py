@@ -1,9 +1,10 @@
 "A light weight interface to grading helper functions"
 
 import six
+
 from courseware.models import StudentModule
 
-from . import grade_utils, tasks
+from . import grade_utils
 
 
 class GradesUtilService(object):
@@ -38,17 +39,6 @@ class GradesUtilService(object):
 
     def get_score_processor(self, **kwargs):
         """
-        Process the score CSV upload, synchronously or async.
+        Return a csv score processor.
         """
-        if kwargs:
-            return grade_utils.ScoreCSVProcessor(**kwargs)
-        else:
-            return grade_utils.ScoreCSVProcessor
-
-        # if sync:
-        #     return grade_utils.process_score_csv(block_id, score_file, block_weight)
-        # else:
-        #     from django.core.files.storage import default_storage
-        #     filename = 'csv/import/%s' % block_id
-        #     default_storage.save(filename, score_file)
-        #     return tasks.process_score_csv_async.delay(six.text_type(block_id), filename, block_weight)
+        return grade_utils.ScoreCSVProcessor(**kwargs)

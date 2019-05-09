@@ -7,10 +7,11 @@ import io
 import json
 import logging
 
-import markdown
 from crum import get_current_request
 from django.middleware.csrf import get_token
 from django.utils.translation import ugettext_noop as _
+
+import markdown
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlock
@@ -31,6 +32,9 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
     """
     Staff Graded Points block
     """
+    # even though there are no assets, this is required to prevent test breakage
+    resources_dir = 'assets/sgp'
+
     display_name = String(
         display_name=_("Display Name"),
         help=_("The display name for this component."),
@@ -40,7 +44,7 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
     instructions = String(
         display_name=_("Instructions"),
         help=_("The instructions to the learner. Markdown format"),
-        scope=Scope.settings,
+        scope=Scope.content,
         multiline_editor=True,
         default=_("Your results will be graded offline"),
         runtime_options={'multiline_editor': 'html'},
@@ -77,6 +81,7 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
         if context['is_staff']:
             context['import_url'] = self.runtime.handler_url(self, "csv_import_handler")
             context['export_url'] = self.runtime.handler_url(self, "csv_export_handler")
+            context['poll_url'] = self.runtime.handler_url(self, "get_results_handler")
             context['csrf_token'] = get_token(get_current_request())
 
         try:
@@ -100,16 +105,15 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
 
         try:
             score_file = request.POST['csv'].file
-
+        except KeyError:
+            data = {'error_rows': [1], 'error_messages': [_('missing file')]}
+        else:
             log.info('Processing %d byte score file for %s', score_file.size, self.location)
             block_id = self.location
             block_weight = self.weight
-            processor = grade_utils.get_score_processor(block_id=block_id, block_id_str=str(block_id), max_points=block_weight)
-            processor.read_file(score_file, autocommit=False)
-            processor.commit()
+            processor = grade_utils.get_score_processor(block_id=str(block_id), max_points=block_weight)
+            processor.process_file(score_file, autocommit=True)
             data = processor.status()
-        except KeyError:
-            data = {'error_rows': [1], 'error_messages': [_('missing file')]}
 
         log.info(data)
         return Response(json.dumps(data), content_type='application/json')
@@ -119,40 +123,39 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
         if not self.runtime.user_is_staff:
             return Response('not allowed', status_code=403)
 
-        my_location = str(self.location)
-        my_name = self.display_name
         grade_utils = self.runtime.service(self, 'grade_utils')
-        students = grade_utils.get_scores(self.location)
-
-        user_service = self.runtime.service(self, 'user')
-        enrollments = user_service.get_enrollments(self.location.course_key)
-        def row_iterator():
-            for enrollment in enrollments:
-                row = {
-                    'block_id': my_location,
-                    'title': my_name,
-                    'points': None,
-                    'last_points': None,
-                    'date_last_graded': None,
-                    'who_last_graded': None,
-                }
-                row.update(enrollment)
-                score = students.get(enrollment['user_id'], None)
-
-                if score:
-                    row['last_points'] = int(score['grade'] * self.weight)
-                    row['date_last_graded'] = score['modified']
-                    # state = score['state']
-                    # if state:
-                    #     row['who_last_graded'] = json.loads(state).get('grader', '')
-                yield row
 
         buf = io.BytesIO()
-        grade_utils.get_score_processor().write_file(buf, row_iterator())
+        grade_utils.get_score_processor(
+                block_id=str(self.location),
+                max_points=self.weight,
+                display_name=self.display_name).write_file(buf)
         resp = Response(buf.getvalue())
         resp.content_type = 'text/csv'
         resp.content_disposition = 'attachment; filename="%s.csv"' % self.location
         return resp
+
+    @XBlock.handler
+    def get_results_handler(self, request, suffix=''):  # pylint: disable=unused-argument
+        """
+        Endpoint to poll for celery results
+        """
+        if not self.runtime.user_is_staff:
+            return Response('not allowed', status_code=403)
+        grade_utils = self.runtime.service(self, 'grade_utils')
+        try:
+            result_id = request.POST['result_id']
+        except KeyError:
+            data = {'message': 'missing'}
+        else:
+            results = grade_utils.get_score_processor().get_deferred_result(result_id)
+            if results.ready():
+                data = results.get()
+                log.info('Got results from celery %r', data)
+            else:
+                data = {'waiting': True, 'result_id': result_id}
+                log.info('Still waiting for %s', result_id)
+        return Response(json.dumps(data), content_type='application/json')
 
     def max_score(self):
         return self.weight

@@ -4,75 +4,137 @@ This module contains utility functions for grading.
 from __future__ import absolute_import, unicode_literals
 
 import logging
-
+import time
 from datetime import timedelta
+
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from opaque_keys.edx.keys import UsageKey
+from six import text_type
+
 from courseware.models import StudentModule
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from util.csv_processor import CSVProcessor, ChecksumMixin
+from student.models import CourseEnrollment
+from util.csv_processor import ChecksumMixin, CSVProcessor, DeferrableMixin
+
 from .config.waffle import ENFORCE_FREEZE_GRADE_AFTER_COURSE_END, waffle_flags
 
 log = logging.getLogger(__name__)
 
 
-class ScoreCSVProcessor(ChecksumMixin, CSVProcessor):
+class ScoreCSVProcessor(ChecksumMixin, DeferrableMixin, CSVProcessor):
     columns = ['user_id', 'username', 'full_name', 'email', 'student_uid',
                'enrolled', 'track', 'block_id', 'title', 'date_last_graded',
                'who_last_graded', 'csum', 'last_points', 'points']
     required_columns = ['user_id', 'points', 'csum', 'block_id', 'last_points']
-    checksum_columns = ['user_id', 'block_id']
+    checksum_columns = ['user_id', 'block_id', 'last_points']
+    # files larger than 100 rows will be processed asynchronously
+    size_to_defer = 100
 
     handle_undo = False
 
     def __init__(self, **kwargs):
+        self.now = time.time()
         super(ScoreCSVProcessor, self).__init__(**kwargs)
-        self.users_seen = set()
+        self.users_seen = {}
+
+    def get_unique_path(self):
+        return 'csv/state/{}/{}'.format(self.block_id, self.now)
 
     def validate_row(self, row):
-        validated = super(ScoreCSVProcessor, self).validate_row(row)
-        if validated:
-            validated = row['block_id'] == self.block_id_str
-            if validated:
+        valid = super(ScoreCSVProcessor, self).validate_row(row)
+        if valid:
+            valid = row['block_id'] == self.block_id
+            if valid:
                 points = row['points']
                 if points:
                     try:
-                        validated = float(row['points']) <= self.max_points
-                        if not validated:
-                            self.add_error(_('Points must be less than {}.').format(self.max_points))
+                        valid = float(row['points']) <= self.max_points
+                        if not valid:
+                            self.add_error(_('Points must not be greater than {}.').format(self.max_points))
                     except ValueError:
                         self.add_error(_('Points must be numbers.'))
-                        validated = False
+                        valid = False
                 else:
-                    validated = True
+                    valid = True
             else:
                 self.add_error(_('The CSV does not match this problem. Check that you uploaded the right CSV.'))
-        return validated
+        return valid
 
     def preprocess_row(self, row):
-        if row['points']:
+        if row['points'] and row['user_id'] not in self.users_seen:
             to_save = {
                 'user_id': row['user_id'],
                 'block_id': self.block_id,
                 'new_points': float(row['points']),
                 'max_points': self.max_points
             }
+            self.users_seen[row['user_id']] = 1
             return to_save
 
     def process_row(self, row):
-        if row['user_id'] not in self.users_seen:
-            if self.handle_undo:
-                # get the current score, for undo. expensive
-                undo = get_score(row['block_id'], row['user_id'])
-                undo['new_points'] = undo['score']
-                undo['max_points'] = row['max_points']
-            else:
-                undo = None
-            set_score(row['block_id'], row['user_id'], row['new_points'], row['max_points'])
-            self.users_seen.add(row['user_id'])
-            return True, undo
+        if self.handle_undo:
+            # get the current score, for undo. expensive
+            undo = get_score(row['block_id'], row['user_id'])
+            undo['new_points'] = undo['score']
+            undo['max_points'] = row['max_points']
         else:
-            return False, None
+            undo = None
+        set_score(row['block_id'], row['user_id'], row['new_points'], row['max_points'])
+        return True, undo
+
+    def write_file(self, buf, rows=None):
+        location = UsageKey.from_string(self.block_id)
+        my_name = self.display_name
+        super(ScoreCSVProcessor, self).write_file(buf, self._get_export_rows(location, my_name))
+
+    def _get_enrollments(self, course_id, **kwargs):
+        """
+        Return iterator of enrollments, as dicts.
+        """
+        enrollments = CourseEnrollment.objects.filter(
+            course_id=course_id).select_related('programcourseenrollment')
+        for enrollment in enrollments:
+            enrd = {
+                'user_id': enrollment.user.id,
+                'username': enrollment.user.username,
+                'full_name': enrollment.user.profile.name,
+                'email': enrollment.user.email,
+                'enrolled': enrollment.is_active,
+                'track': enrollment.mode,
+            }
+            try:
+                pce = enrollment.programcourseenrollment.program_enrollment
+                enrd['student_uid'] = pce.external_user_key
+            except ObjectDoesNotExist:
+                enrd['student_uid'] = None
+            yield enrd
+
+    def _get_export_rows(self, location, my_name):
+        """
+        Return iterator of rows for file export.
+        """
+        students = get_scores(location)
+
+        enrollments = self._get_enrollments(location.course_key)
+        for enrollment in enrollments:
+            row = {
+                'block_id': location,
+                'title': my_name,
+                'points': None,
+                'last_points': None,
+                'date_last_graded': None,
+                'who_last_graded': None,
+            }
+            row.update(enrollment)
+            score = students.get(enrollment['user_id'], None)
+
+            if score:
+                row['last_points'] = int(score['grade'] * self.max_points)
+                row['date_last_graded'] = score['modified']
+                # TODO: figure out who last graded
+            yield row
 
 
 def are_grades_frozen(course_key):
@@ -90,6 +152,8 @@ def set_score(usage_key, student_id, score, max_points, **defaults):
     """
     Set a score.
     """
+    if not isinstance(usage_key, UsageKey):
+        usage_key = UsageKey.from_string(usage_key)
     defaults['module_type'] = 'problem'
     defaults['grade'] = score / max_points
     defaults['max_grade'] = max_points
@@ -104,6 +168,8 @@ def get_score(usage_key, user_id):
     """
     Return score for user_id and usage_key.
     """
+    if not isinstance(usage_key, UsageKey):
+        usage_key = UsageKey.from_string(usage_key)
     try:
         score = StudentModule.objects.get(
             course_id=usage_key.course_key,

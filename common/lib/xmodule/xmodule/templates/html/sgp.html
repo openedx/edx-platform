@@ -45,6 +45,36 @@
     </div>
 </div>
 <script type="text/javascript">
+    function doneLoading(data) {
+        var message = {% trans "`${data.saved} of ${data.total} learner's grades processed.`" %};
+        $('.loading-spinner').hide();
+        if (data.error_rows.length || data.error_messages.length) {
+            var errorMessage = '';
+            if (data.error_rows.length) {
+                errorMessage += {% trans "`${data.error_rows.length} errors. Please try again. `" %};
+            }
+            if (data.error_messages.length) {
+                errorMessage += data.error_messages;
+            }
+            $('#{{id}}-status,.error').html(errorMessage).show();
+        } else {
+            $('#{{id}}-status,.success').html(message).show();
+        }
+    };
+    function pollResults(result_id) {
+        $.ajax({
+            url: '{{poll_url}}',
+            type: 'POST',
+            data: {result_id: result_id},
+            success: function(data) {
+                if (data.waiting) {
+                    setTimeout(function(){pollResults(result_id)}, 1000);
+                } else {
+                    doneLoading(data);
+                }
+            }
+        });
+    };
     $('#{{id}}-file').change(function(e){
         // e.preventDefault();
         var firstFile = $('#{{id}}-file')[0].files[0];
@@ -65,19 +95,11 @@
                processData: false,  // tell jQuery not to process the data
                contentType: false,  // tell jQuery not to set contentType
                success : function(data) {
-                    var message = {% trans "`${data.percentage} of ${data.total} learner's grades processed.`" %};
-                    $('.loading-spinner').hide();
-                    if (data.error_rows.length || data.error_messages.length) {
-                        var errorMessage = '';
-                        if (data.error_rows.length) {
-                            errorMessage += {% trans "`${data.error_rows.length} errors. Please try again. `" %};
-                        }
-                        if (data.error_messages.length) {
-                            errorMessage += data.error_messages;
-                        }
-                        $('#{{id}}-status,.error').html(errorMessage).show();
+                    $('#{{id}}-file').val('');
+                    if (data.waiting) {
+                        setTimeout(function(){pollResults(data.result_id)}, 1000);
                     } else {
-                        $('#{{id}}-status,.success').html(message).show();
+                        doneLoading(data);
                     }
                }
         });
