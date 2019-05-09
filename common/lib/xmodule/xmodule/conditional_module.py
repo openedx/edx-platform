@@ -16,6 +16,7 @@ from six import text_type
 from web_fragments.fragment import Fragment
 from xblock.fields import ReferenceList, Scope, String
 
+from openedx.core.djangolib.markup import HTML, Text
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.studio_editable import StudioEditableDescriptor, StudioEditableModule
