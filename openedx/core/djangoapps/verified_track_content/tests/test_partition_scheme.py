@@ -3,9 +3,10 @@ Tests for verified_track_content/partition_scheme.py.
 """
 from __future__ import absolute_import
 
+from datetime import datetime, timedelta
+
 import pytz
 import six
-from datetime import datetime, timedelta
 
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment

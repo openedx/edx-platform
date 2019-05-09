@@ -8,7 +8,6 @@ from __future__ import absolute_import
 import ddt
 import mock
 import six
-from mock import patch
 
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
@@ -86,7 +85,7 @@ class TestMoveToVerified(SharedModuleStoreTestCase):
         super(TestMoveToVerified, self).setUp()
         self.user = UserFactory()
         # Spy on number of calls to celery task.
-        celery_task_patcher = patch.object(
+        celery_task_patcher = mock.patch.object(
             sync_cohort_with_mode, 'apply_async',
             mock.Mock(wraps=sync_cohort_with_mode.apply_async)
         )
