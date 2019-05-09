@@ -4,14 +4,14 @@
 Tests for js_utils.py
 """
 from __future__ import absolute_import
-import six.moves.html_parser
+import six.moves.html_parser  # pylint: disable=import-error
 import json
 from unittest import TestCase
 
 from mako.template import Template
 
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
-import six
+import six  # pylint: disable=ungrouped-imports
 
 
 class TestJSUtils(TestCase):

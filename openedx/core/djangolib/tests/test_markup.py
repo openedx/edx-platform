@@ -29,7 +29,7 @@ class FormatHtmlTest(unittest.TestCase):
     )
     def test_simple(self, before_after):
         (before, after) = before_after
-        self.assertEqual(six.text_type(Text(_(before))), after)
+        self.assertEqual(six.text_type(Text(_(before))), after)  # pylint: disable=translation-of-non-string
         self.assertEqual(six.text_type(Text(before)), after)
 
     def test_formatting(self):
