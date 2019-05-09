@@ -3,7 +3,7 @@ from __future__ import absolute_import
 
 import contextlib
 import logging
-import six.moves.urllib.parse
+import six.moves.urllib.parse  # pylint: disable=import-error
 
 from django.conf import settings
 
