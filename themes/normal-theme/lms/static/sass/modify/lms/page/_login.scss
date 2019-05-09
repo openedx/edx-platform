@@ -81,6 +81,10 @@
       vertical-align: middle;
       @extend %input-my-checkbox;
     }
+    input.checkbox + label{
+      margin: 0;
+      line-height: 1.5;
+    }
     &.checkbox-remember{
       label{
         display: inline-block;
@@ -308,9 +312,4 @@
       }
     }
   } 
-}
-.login-register .form-field input.checkbox + label{
-  display: inline-block;
-  margin: 0;
-  line-height: 1;
 }
