@@ -1,12 +1,15 @@
 """
 Test scenarios for the crowdsource hinter xblock.
 """
+from __future__ import absolute_import
+
 import json
 import unittest
 
 from django.conf import settings
 from django.urls import reverse
 from six import text_type
+from six.moves import range
 
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
