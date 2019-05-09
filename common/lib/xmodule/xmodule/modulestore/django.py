@@ -6,29 +6,31 @@ Passes settings.MODULESTORE as kwargs to MongoModuleStore
 
 from __future__ import absolute_import
 
-from importlib import import_module
 import gettext
 import logging
-from pkg_resources import resource_filename
 import re
+from importlib import import_module
 
+import six
+from pkg_resources import resource_filename
+
+import django.dispatch
+import django.utils
 from django.conf import settings
+from django.core.cache import InvalidCacheBackendError, caches
+from django.utils.translation import get_language, to_locale
+from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
+from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.draft_and_published import BranchSettingMixin
+from xmodule.modulestore.mixed import MixedModuleStore
+from xmodule.util.xmodule_django import get_current_request_hostname
 
 # This configuration must be executed BEFORE any additional Django imports. Otherwise, the imports may fail due to
 # Django not being configured properly. This mostly applies to tests.
 if not settings.configured:
     settings.configure()
 
-from django.core.cache import caches, InvalidCacheBackendError
-import django.dispatch
-import django.utils
-from django.utils.translation import get_language, to_locale
-from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
 
-from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.draft_and_published import BranchSettingMixin
-from xmodule.modulestore.mixed import MixedModuleStore
-from xmodule.util.xmodule_django import get_current_request_hostname
 
 # We also may not always have the current request user (crum) module available
 try:
@@ -180,7 +182,7 @@ class SignalHandler(object):
     @classmethod
     def all_signals(cls):
         """Return a list with all our signals in it."""
-        return cls._mapping.values()
+        return list(cls._mapping.values())
 
     @classmethod
     def signal_by_name(cls, signal_name):
@@ -250,7 +252,7 @@ def create_modulestore_instance(
 
     FUNCTION_KEYS = ['render_template']
     for key in FUNCTION_KEYS:
-        if key in _options and isinstance(_options[key], basestring):
+        if key in _options and isinstance(_options[key], six.string_types):
             _options[key] = load_function(_options[key])
 
     request_cache = DEFAULT_REQUEST_CACHE
@@ -423,7 +425,7 @@ def _get_modulestore_branch_setting():
 
             # compare hostname against the regex expressions set of mappings which will tell us which branch to use
             if mappings:
-                for key in mappings.iterkeys():
+                for key in six.iterkeys(mappings):
                     if re.match(key, hostname):
                         return mappings[key]
         if branch is None:

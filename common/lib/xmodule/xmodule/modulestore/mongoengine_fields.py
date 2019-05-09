@@ -1,11 +1,16 @@
 """
 Custom field types for mongoengine
 """
-import mongoengine
-from opaque_keys.edx.locations import Location
+from __future__ import absolute_import
+
 from types import NoneType
-from opaque_keys.edx.keys import CourseKey, UsageKey
+
+import six
 from six import text_type
+
+import mongoengine
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.locations import Location
 
 
 class CourseKeyField(mongoengine.StringField):
@@ -33,16 +38,16 @@ class CourseKeyField(mongoengine.StringField):
         """
         # calling super b/c it decodes utf (and doesn't have circularity of from_python)
         course_key = super(CourseKeyField, self).to_python(course_key)
-        assert isinstance(course_key, (NoneType, basestring, CourseKey))
+        assert isinstance(course_key, (NoneType, six.string_types, CourseKey))
         if course_key == '':
             return None
-        if isinstance(course_key, basestring):
+        if isinstance(course_key, six.string_types):
             return CourseKey.from_string(course_key)
         else:
             return course_key
 
     def validate(self, value):
-        assert isinstance(value, (NoneType, basestring, CourseKey))
+        assert isinstance(value, (NoneType, six.string_types, CourseKey))
         if isinstance(value, CourseKey):
             return super(CourseKeyField, self).validate(text_type(value))
         else:
@@ -69,17 +74,17 @@ class UsageKeyField(mongoengine.StringField):
         """
         Deserialize to a UsageKey instance: for now it's a location missing the run
         """
-        assert isinstance(location, (NoneType, basestring, UsageKey))
+        assert isinstance(location, (NoneType, six.string_types, UsageKey))
         if location == '':
             return None
-        if isinstance(location, basestring):
+        if isinstance(location, six.string_types):
             location = super(UsageKeyField, self).to_python(location)
             return Location.from_string(location)
         else:
             return location
 
     def validate(self, value):
-        assert isinstance(value, (NoneType, basestring, UsageKey))
+        assert isinstance(value, (NoneType, six.string_types, UsageKey))
         if isinstance(value, UsageKey):
             return super(UsageKeyField, self).validate(text_type(value))
         else:
