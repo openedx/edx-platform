@@ -3,8 +3,11 @@ Tests for Verified Track Cohorting models
 """
 # pylint: disable=attribute-defined-outside-init
 
+from __future__ import absolute_import
+
 import ddt
 import mock
+import six
 from mock import patch
 
 from django.test import TestCase
@@ -52,7 +55,7 @@ class TestVerifiedTrackCohortedCourse(TestCase):
         # Enable for a course
         config = VerifiedTrackCohortedCourse.objects.create(course_key=course_key, enabled=True)
         config.save()
-        self.assertEqual(unicode(config), u"Course: {}, enabled: True".format(self.SAMPLE_COURSE))
+        self.assertEqual(six.text_type(config), u"Course: {}, enabled: True".format(self.SAMPLE_COURSE))
 
     def test_verified_cohort_name(self):
         cohort_name = 'verified cohort'
