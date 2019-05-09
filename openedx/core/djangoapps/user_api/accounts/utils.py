@@ -35,7 +35,7 @@ def validate_social_link(platform_name, new_social_link):
         required_url_stub = settings.SOCIAL_PLATFORMS[platform_name]['url_stub']
         raise ValueError(_(
             ' Make sure that you are providing a valid username or a URL that contains "' +
-            required_url_stub + '". To remove the link from your edX profile, leave this field blank.'
+            required_url_stub + '". To remove the link from your profile, leave this field blank.'
         ))
 
 
