@@ -1,4 +1,6 @@
 """Implements basics of Capa, including class CapaModule."""
+from __future__ import absolute_import
+
 import copy
 import datetime
 import hashlib
@@ -10,25 +12,25 @@ import struct
 import sys
 import traceback
 
+import six
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from pytz import utc
 from django.utils.encoding import smart_text
 from django.utils.functional import cached_property
+from pytz import utc
 from six import text_type
+from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString
+from xblock.scorable import ScorableXBlockMixin, Score
 
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
 from capa.inputtypes import Status
-from capa.responsetypes import StudentInputError, ResponseError, LoncapaProblemError
+from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
 from capa.util import convert_files_to_filenames, get_inner_html_from_xpath
-from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString
-
 from openedx.core.djangolib.markup import HTML, Text
-from xblock.fields import String
-from xblock.scorable import ScorableXBlockMixin, Score
 from xmodule.exceptions import NotFoundError
 from xmodule.graders import ShowCorrectness
-from .fields import Date, Timedelta, ScoreField
+
+from .fields import Date, ScoreField, Timedelta
 from .progress import Progress
 
 log = logging.getLogger("edx.courseware")
@@ -294,7 +296,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         except Exception as err:  # pylint: disable=broad-except
             msg = u'cannot create LoncapaProblem {loc}: {err}'.format(
                 loc=text_type(self.location), err=err)
-            raise Exception(msg), None, sys.exc_info()[2]
+            six.reraise(Exception(msg), None, sys.exc_info()[2])
 
         if self.score is None:
             self.set_score(self.score_from_lcp(lcp))
@@ -310,7 +312,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             self.seed = 1
         elif self.rerandomize == RANDOMIZATION.PER_STUDENT and hasattr(self.runtime, 'seed'):
             # see comment on randomization_bin
-            self.seed = randomization_bin(self.runtime.seed, unicode(self.location).encode('utf-8'))
+            self.seed = randomization_bin(self.runtime.seed, six.text_type(self.location).encode('utf-8'))
         else:
             self.seed = struct.unpack('i', os.urandom(4))[0]
 
@@ -563,7 +565,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             # Presumably, student submission has corrupted LoncapaProblem HTML.
             #   First, pull down all student answers
             student_answers = self.lcp.student_answers
-            answer_ids = student_answers.keys()
+            answer_ids = list(student_answers.keys())
 
             # Some inputtypes, such as dynamath, have additional "hidden" state that
             #   is not exposed to the student. Keep those hidden
@@ -771,7 +773,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
         if render_notifications:
             progress = self.get_progress()
-            id_list = self.lcp.correct_map.keys()
+            id_list = list(self.lcp.correct_map.keys())
 
             # Show only a generic message if hiding correctness
             if not self.correctness_available():
@@ -1416,14 +1418,14 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         strings ''.
         """
         input_metadata = {}
-        for input_id, internal_answer in answers.iteritems():
+        for input_id, internal_answer in six.iteritems(answers):
             answer_input = self.lcp.inputs.get(input_id)
 
             if answer_input is None:
                 log.warning('Input id %s is not mapped to an input type.', input_id)
 
             answer_response = None
-            for responder in self.lcp.responders.itervalues():
+            for responder in six.itervalues(self.lcp.responders):
                 if input_id in responder.answer_ids:
                     answer_response = responder
 
