@@ -1,12 +1,11 @@
 """
 Tests the ``notify_credentials`` management command.
 """
-from __future__ import absolute_import, unicode_literals
-from __future__ import print_function
+from __future__ import absolute_import, print_function, unicode_literals
 
 from datetime import datetime
-import mock
 
+import mock
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.db import connection, reset_queries
