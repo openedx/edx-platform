@@ -137,7 +137,7 @@ class StaticContentServer(object):
                     # If the header field is syntactically invalid it should be ignored.
                     log.exception(
                         u"%s in Range header: %s for content: %s",
-                        text_type(exception),header_value, six.text_type(loc)
+                        text_type(exception), header_value, six.text_type(loc)
                     )
                 else:
                     if unit != 'bytes':
