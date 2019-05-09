@@ -261,8 +261,8 @@ def add_repo(repo, rdir_in, branch=None):
     # get commit id
     cmd = ['git', 'log', '-1', '--format=format:{ "commit": "%H", "author": "%an %ae", "date": "%ad"}', ]
     try:
-         git_log_json = json.loads(cmd_log(cmd, cwd=rdirp))
-         commit_id = git_log_json['commit']
+        git_log_json = json.loads(cmd_log(cmd, cwd=rdirp))
+        commit_id = git_log_json['commit']
     except subprocess.CalledProcessError as ex:
         log.exception(u'Unable to get git log: %r', ex.output)
         raise GitImportErrorBadRepo()
