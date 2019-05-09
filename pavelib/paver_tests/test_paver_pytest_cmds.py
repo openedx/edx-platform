@@ -55,10 +55,12 @@ class TestPaverPytestCmd(unittest.TestCase):
                     else:
                         django_env_var_cmd = "export DJANGO_SETTINGS_MODULE='openedx.tests.settings'"
 
+                env_var_cmd = "{} DISABLE_COURSEENROLLMENT_HISTORY=1".format(django_env_var_cmd)
+
                 xdist_string = u'--tx {}*ssh="ubuntu@{} -o StrictHostKeyChecking=no"' \
                                '//python="source /edx/app/edxapp/edxapp_env; {}; python"' \
                                '//chdir="/edx/app/edxapp/edx-platform"' \
-                               .format(processes, ip, django_env_var_cmd)
+                               .format(processes, ip, env_var_cmd)
                 expected_statement.append(xdist_string)
             for rsync_dir in Env.rsync_dirs():
                 expected_statement.append(u'--rsyncdir {}'.format(rsync_dir))
