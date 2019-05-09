@@ -9,7 +9,7 @@ import unicodedata
 
 import ddt
 import six
-import six.unichr  # pylint: disable=import-error
+from six import unichr as sixunichr
 from six.moves import range
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -184,7 +184,7 @@ class LoginTest(CacheIsolationTestCase):
         self._assert_not_in_audit_log(mock_audit_log, 'warning', [u'test'])
 
     def test_login_unicode_email(self):
-        unicode_email = u'test@edx.org' + six.unichr(40960)
+        unicode_email = u'test@edx.org' + sixunichr(40960)
         response, mock_audit_log = self._login_response(
             unicode_email,
             'test_password',
@@ -193,7 +193,7 @@ class LoginTest(CacheIsolationTestCase):
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', unicode_email])
 
     def test_login_unicode_password(self):
-        unicode_password = u'test_password' + six.unichr(1972)
+        unicode_password = u'test_password' + sixunichr(1972)
         response, mock_audit_log = self._login_response(
             'test@edx.org',
             unicode_password,
