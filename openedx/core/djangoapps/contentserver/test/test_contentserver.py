@@ -1,11 +1,14 @@
 """
 Tests for StaticContentServer
 """
+from __future__ import absolute_import
+
 import copy
 
 import datetime
 import ddt
 import logging
+import six
 import unittest
 from uuid import uuid4
 
@@ -89,14 +92,14 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
 
         # A locked asset
         cls.locked_asset = cls.course_key.make_asset_key('asset', 'sample_static.html')
-        cls.url_locked = unicode(cls.locked_asset)
+        cls.url_locked = six.text_type(cls.locked_asset)
         cls.url_locked_versioned = get_versioned_asset_url(cls.url_locked)
         cls.url_locked_versioned_old_style = get_old_style_versioned_asset_url(cls.url_locked)
         cls.contentstore.set_attr(cls.locked_asset, 'locked', True)
 
         # An unlocked asset
         cls.unlocked_asset = cls.course_key.make_asset_key('asset', 'another_static.txt')
-        cls.url_unlocked = unicode(cls.unlocked_asset)
+        cls.url_unlocked = six.text_type(cls.unlocked_asset)
         cls.url_unlocked_versioned = get_versioned_asset_url(cls.url_unlocked)
         cls.url_unlocked_versioned_old_style = get_old_style_versioned_asset_url(cls.url_unlocked)
         cls.length_unlocked = cls.contentstore.get_attr(cls.unlocked_asset, 'length')
