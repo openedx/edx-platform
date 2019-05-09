@@ -21,7 +21,7 @@ class ScoreCSVProcessor(ChecksumMixin, CSVProcessor):
                'enrolled', 'track', 'block_id', 'title', 'date_last_graded',
                'who_last_graded', 'csum', 'last_points', 'points']
     required_columns = ['user_id', 'points', 'csum', 'block_id', 'last_points']
-    checksum_columns = ['user_id', 'block_id', 'last_points']
+    checksum_columns = ['user_id', 'block_id']
 
     handle_undo = False
 

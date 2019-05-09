@@ -131,7 +131,10 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
                 row = {
                     'block_id': my_location,
                     'title': my_name,
-                    'points': None
+                    'points': None,
+                    'last_points': None,
+                    'date_last_graded': None,
+                    'who_last_graded': None,
                 }
                 row.update(enrollment)
                 score = students.get(enrollment['user_id'], None)
