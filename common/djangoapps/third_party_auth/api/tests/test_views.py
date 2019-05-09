@@ -1,6 +1,7 @@
 """
 Tests for the Third Party Auth REST API
 """
+from __future__ import absolute_import
 import unittest
 
 import ddt
@@ -20,6 +21,7 @@ from student.tests.factories import UserFactory
 from third_party_auth.api.permissions import ThirdPartyAuthProviderApiPermission
 from third_party_auth.models import ProviderApiPermissions
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
+from six.moves import range
 
 
 VALID_API_KEY = "i am a key"
@@ -201,7 +203,7 @@ class UserViewAPITests(UserViewsMixin, TpaAPITestCase):
         """
         return reverse(
             'third_party_auth_users_api',
-            kwargs={'username': identifier.values()[0]}
+            kwargs={'username': list(identifier.values())[0]}
         )
 
 

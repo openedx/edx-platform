@@ -1,6 +1,7 @@
 """
 Tests for the Third Party Auth permissions
 """
+from __future__ import absolute_import
 import unittest
 import ddt
 from mock import Mock

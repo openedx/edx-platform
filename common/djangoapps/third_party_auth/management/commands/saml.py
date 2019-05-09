@@ -2,6 +2,7 @@
 """
 Management commands for third_party_auth
 """
+from __future__ import absolute_import
 from django.core.management.base import BaseCommand, CommandError
 import logging
 from third_party_auth.tasks import fetch_saml_metadata
