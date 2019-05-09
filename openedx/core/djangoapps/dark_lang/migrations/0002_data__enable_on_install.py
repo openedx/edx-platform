@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 # Converted from the original South migration 0002_enable_on_install.py
 #
-from __future__ import absolute_import
 from django.db import migrations, models
 
 
