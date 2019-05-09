@@ -28,6 +28,9 @@ body.view-in-course .wrapper-course-material{
   }
 }
 */
+.wrapper-course-material .course-material{
+  overflow-x: auto;
+}
 body.view-in-course .wrapper-course-material .course-tabs{
   display: flex;
   flex-wrap: wrap;
