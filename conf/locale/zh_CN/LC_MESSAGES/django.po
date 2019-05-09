@@ -17503,7 +17503,7 @@ msgstr "点击生成一个CSV文件，列出有资格选修此课但还未选修
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Download a CSV of learners who can enroll"
-msgstr "下载一个列出有资格选修的学生名单的CSV文件"
+msgstr "下载有选修资格的学生名单 CSV文件"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
