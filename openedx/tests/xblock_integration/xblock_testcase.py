@@ -34,26 +34,24 @@ Our next steps would be to:
 * Move more blocks out of the platform, and more tests into the
   blocks themselves.
 """
-from __future__ import absolute_import, print_function
+from __future__ import print_function
 
 import collections
+import HTMLParser
 import json
 import sys
 import unittest
 from datetime import datetime, timedelta
 
-import pytz
-import six
-import six.moves.html_parser
-from bs4 import BeautifulSoup
-from six.moves import range
-
-import lms.djangoapps.lms_xblock.runtime
 import mock
+import pytz
+from bs4 import BeautifulSoup
 from django.conf import settings
 from django.urls import reverse
-from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from xblock.plugin import Plugin
+
+import lms.djangoapps.lms_xblock.runtime
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -275,10 +273,10 @@ class XBlockScenarioTestCaseMixin(object):
                     )
                     cls.xblocks[xblock_config['urlname']] = xblock
 
-                scenario_url = six.text_type(reverse(
+                scenario_url = unicode(reverse(
                     'courseware_section',
                     kwargs={
-                        'course_id': six.text_type(cls.course.id),
+                        'course_id': unicode(cls.course.id),
                         'chapter': "ch_" + chapter_config['urlname'],
                         'section': "sec_" + chapter_config['urlname']
                     }
@@ -374,8 +372,8 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
         Get url for the specified xblock handler
         """
         return reverse('xblock_handler', kwargs={
-            'course_id': six.text_type(self.course.id),
-            'usage_id': six.text_type(
+            'course_id': unicode(self.course.id),
+            'usage_id': unicode(
                 self.course.id.make_usage_key('done', xblock_name)
             ),
             'handler': handler,
@@ -415,9 +413,9 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
                 if block["urlname"] == xblock_name:
                     xblock_type = block["blocktype"]
 
-        key = six.text_type(self.course.id.make_usage_key(xblock_type, xblock_name))
+        key = unicode(self.course.id.make_usage_key(xblock_type, xblock_name))
         return reverse('xblock_handler', kwargs={
-            'course_id': six.text_type(self.course.id),
+            'course_id': unicode(self.course.id),
             'usage_id': key,
             'handler': handler,
             'suffix': ''
@@ -451,7 +449,7 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
         usage_id = self.xblocks[urlname].scope_ids.usage_id
         # First, we get out our <div>
         soup_html = BeautifulSoup(content)
-        xblock_html = six.text_type(soup_html.find(id="seq_contents_0"))
+        xblock_html = unicode(soup_html.find(id="seq_contents_0"))
         # Now, we get out the text of the <div>
         try:
             escaped_html = xblock_html.split('<')[1].split('>')[1]
@@ -467,7 +465,7 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
             print("Dice 2", repr(xblock_html.split('<')[1].split('>')[1]), file=sys.stderr)
             raise
         # Finally, we unescape the contents
-        decoded_html = six.moves.html_parser.HTMLParser().unescape(escaped_html).strip()
+        decoded_html = HTMLParser.HTMLParser().unescape(escaped_html).strip()
 
         return decoded_html
 

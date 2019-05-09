@@ -2,23 +2,21 @@
 Test signal handlers for completion.
 """
 
-from __future__ import absolute_import
-
 from datetime import datetime
 
-import six
-from pytz import utc
-
-import ddt
 from completion import handlers
 from completion.models import BlockCompletion
 from completion.test_utils import CompletionSetUpMixin
+import ddt
 from django.test import TestCase
-from lms.djangoapps.grades.api import signals as grades_signals
 from mock import patch
-from openedx.core.djangolib.testing.utils import skip_unless_lms
+from pytz import utc
+import six
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
+
+from lms.djangoapps.grades.api import signals as grades_signals
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
 class CustomScorableBlock(XBlock):
