@@ -19,7 +19,8 @@ body.view-in-course .instructor-dashboard-wrapper-2{
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .problem-browser .block-type-chapter .btn{
+  .problem-browser .block-type-chapter .btn,
+  .problem-browser .block-type-sequential .btn{
     @extend %btn-my-white;
     .fa{
       vertical-align: sub;
@@ -78,10 +79,12 @@ body.view-in-course .instructor-dashboard-wrapper-2{
       width: 200px;
     }
     .file-browse .file_field{
-      padding: 9px 0 0;
       outline: none;
-      width: 200px;
+      width: 370px;
+      height: 36px;
       left: -95px;
+      font-size: 14px;
+      padding: 10px 0 0;
     }
     .file-browse .browse{
       vertical-align: bottom;
