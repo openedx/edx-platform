@@ -1,6 +1,8 @@
 """
 Third_party_auth integration tests using a mock version of the TestShib provider
 """
+from __future__ import absolute_import
+
 import datetime
 import json
 import logging
