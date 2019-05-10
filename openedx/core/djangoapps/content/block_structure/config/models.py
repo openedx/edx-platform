@@ -1,6 +1,8 @@
 """
 Models for configuration of Block Structures.
 """
+from __future__ import absolute_import
+
 from django.db.models import IntegerField
 from config_models.models import ConfigurationModel
 
