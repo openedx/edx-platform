@@ -10,7 +10,6 @@ git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce8
 -e common/lib/chem
 -e git+https://github.com/edx/codejail.git@a320d43ce6b9c93b17636b2491f724d9e433be47#egg=codejail
 git+https://github.com/edx/crowdsourcehinter.git@518605f0a95190949fe77bd39158450639e2e1dc#egg=crowdsourcehinter-xblock==0.1
-git+https://github.com/mitodl/django-cas.git@afac57bc523f145ae826f4ed3d4fa8b2c86c5364#egg=django-cas==2.1.1
 git+https://github.com/edx/django-celery.git@756cb57aad765cb2b0d37372c1855b8f5f37e6b0#egg=django-celery==3.2.1+edx.2
 git+https://github.com/edx/django-oauth-plus.git@01ec2a161dfc3465f9d35b9211ae790177418316#egg=django-oauth-plus==2.2.9.edx-1
 git+https://github.com/edx/django-openid-auth.git@0.15.1#egg=django-openid-auth==0.15.1
