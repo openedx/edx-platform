@@ -6,6 +6,9 @@
 PROGRAM_UUID_PATTERN = r'(?P<program_uuid>[A-Fa-f0-9-]+)'
 MAX_ENROLLMENT_RECORDS = 25
 
+# The name of the key that identifies students for POST/PATCH requests
+REQUEST_STUDENT_KEY = 'student_key'
+
 
 class CourseEnrollmentResponseStatuses(object):
     """
