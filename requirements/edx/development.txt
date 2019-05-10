@@ -92,7 +92,7 @@ django-cors-headers==2.1.0
 django-countries==4.6.1
 django-crum==0.7.3
 django-debug-toolbar==1.8
-django-fernet-fields==0.5
+django-fernet-fields==0.6
 django-filter==1.0.4
 django-ipware==2.1.0
 django-method-override==0.1.0
@@ -132,7 +132,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==1.0.3
 edx-drf-extensions==2.2.1
-edx-enterprise==1.5.0
+edx-enterprise==1.5.1
 edx-i18n-tools==0.4.8
 edx-lint==1.1.2
 edx-milestones==0.1.13
