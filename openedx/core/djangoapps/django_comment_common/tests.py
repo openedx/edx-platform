@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 
 import six
+from contracts import new_contract
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
@@ -17,6 +18,8 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+new_contract('basestring', six.string_types[0])
 
 
 class RoleAssignmentTest(TestCase):
@@ -124,7 +127,7 @@ class CourseDiscussionSettingsTest(ModuleStoreTestCase):
     def test_invalid_data_types(self):
         exception_msg_template = "Incorrect field type for `{}`. Type must be `{}`"
         fields = [
-            {'name': 'division_scheme', 'type': six.string_types},
+            {'name': 'division_scheme', 'type': basestring},
             {'name': 'always_divide_inline_discussions', 'type': bool},
             {'name': 'divided_discussions', 'type': list}
         ]

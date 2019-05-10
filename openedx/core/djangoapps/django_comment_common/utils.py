@@ -6,6 +6,7 @@ Common comment client utility functions.
 from __future__ import absolute_import
 
 import six
+from contracts import new_contract
 
 from openedx.core.djangoapps.course_groups.cohorts import get_legacy_discussion_settings
 from openedx.core.djangoapps.django_comment_common.models import (
@@ -18,6 +19,8 @@ from openedx.core.djangoapps.django_comment_common.models import (
     Role
 )
 from openedx.core.lib.cache_utils import request_cached
+
+new_contract('basestring', six.string_types[0])
 
 
 class ThreadContext(object):
@@ -150,7 +153,7 @@ def set_course_discussion_settings(course_key, **kwargs):
         A CourseDiscussionSettings object.
     """
     fields = {
-        'division_scheme': six.string_types,
+        'division_scheme': basestring,
         'always_divide_inline_discussions': bool,
         'divided_discussions': list,
     }
