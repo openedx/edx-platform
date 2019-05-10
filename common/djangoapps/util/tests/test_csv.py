@@ -26,6 +26,3 @@ class CSVTestCase(TestCase):
 
     def test_rollback(self):
         pass
-
-
-

@@ -7,7 +7,7 @@ import importlib
 import json
 import logging
 
-from celery import task, app
+from celery import task
 from celery.result import AsyncResult
 from django.conf import settings
 from django.core.files.base import ContentFile
@@ -58,10 +58,11 @@ class CSVProcessor(object):
         """
         self.error_messages.setdefault(message, 1)
 
-    def write_file(self, thefile, rows):
+    def write_file(self, thefile, rows=None):
         """
         Write the rows to the file.
         """
+        rows = rows or self.get_rows_to_export()
         writer = csv.DictWriter(thefile, self.columns)
         writer.writeheader()
         for row in rows:
@@ -141,6 +142,12 @@ class CSVProcessor(object):
         Returns the same row or new row, or None.
         """
         return row
+
+    def get_rows_to_export(self):
+        """
+        Subclasses should implement this to return rows to export.
+        """
+        return []
 
     @property
     def can_commit(self):
@@ -237,12 +244,11 @@ class ChecksumMixin(object):
         return self._get_checksum(row) == row[self.checksum_fieldname]
 
 
-
 @task(bind=True)
 def do_deferred_commit(self, state_file):
     log.info('Loading CSV state %s', state_file)
     with default_storage.open(state_file, 'r') as statefile:
-            state = json.loads(statefile.read())
+        state = json.loads(statefile.read())
     module_name, classname = state.pop('__class__')
 
     instance = getattr(importlib.import_module(module_name), classname)(**state)

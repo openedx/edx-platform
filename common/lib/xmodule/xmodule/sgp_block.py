@@ -68,6 +68,9 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
             'edx-platform.username')
 
     def student_view(self, context):
+        """
+        Return student view of xblock.
+        """
         _ = self.runtime.service(self, "i18n").ugettext
 
         fragment = Fragment()
@@ -91,7 +94,8 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
             context['grades_available'] = False
         else:
             if score:
-                context['score_string'] = _('{score} / {total} points').format(score=score['grade'] * self.weight, total=self.weight)
+                grade = score['grade'] * self.weight
+                context['score_string'] = _('{score} / {total} points').format(score=grade, total=self.weight)
             else:
                 context['score_string'] = _('{total} points possible').format(total=self.weight)
         fragment.add_content(loader.render_django_template('/templates/html/sgp.html', context))
@@ -99,6 +103,9 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
 
     @XBlock.handler
     def csv_import_handler(self, request, suffix=''):  # pylint: disable=unused-argument
+        """
+        Endpoint that handles CSV uploads.
+        """
         if not self.runtime.user_is_staff:
             return Response('not allowed', status_code=403)
         grade_utils = self.runtime.service(self, 'grade_utils')
@@ -120,6 +127,9 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
 
     @XBlock.handler
     def csv_export_handler(self, request, suffix=''):  # pylint: disable=unused-argument
+        """
+        Endpoint that handles CSV downloads.
+        """
         if not self.runtime.user_is_staff:
             return Response('not allowed', status_code=403)
 
@@ -127,9 +137,9 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
 
         buf = io.BytesIO()
         grade_utils.get_score_processor(
-                block_id=str(self.location),
-                max_points=self.weight,
-                display_name=self.display_name).write_file(buf)
+            block_id=str(self.location),
+            max_points=self.weight,
+            display_name=self.display_name).write_file(buf)
         resp = Response(buf.getvalue())
         resp.content_type = 'text/csv'
         resp.content_disposition = 'attachment; filename="%s.csv"' % self.location
@@ -138,7 +148,7 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
     @XBlock.handler
     def get_results_handler(self, request, suffix=''):  # pylint: disable=unused-argument
         """
-        Endpoint to poll for celery results
+        Endpoint to poll for celery results.
         """
         if not self.runtime.user_is_staff:
             return Response('not allowed', status_code=403)
@@ -168,7 +178,8 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
         Returns:
             Score(raw_earned=float, raw_possible=float)
         """
-        score = self.runtime.service(self, "grade_utils").get_score(self.runtime.user_id, self.location) or {'grade': 0, 'max_grade': 1}
+        score = self.runtime.service(self, "grade_utils").get_score(self.runtime.user_id, self.location)
+        score = score or {'grade': 0, 'max_grade': 1}
         return Score(raw_earned=score['grade'], raw_possible=score['max_grade'])
 
     def set_score(self, score):

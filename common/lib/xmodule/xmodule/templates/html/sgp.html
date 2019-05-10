@@ -31,52 +31,49 @@
                 </form>
             </li>
         </ul>
-        <p class="loading-spinner" style="display:none">
+        <p id="{{id}}-spinner" class="loading-spinner" style="display:none">
             <i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>
             <span class="sr">Loading&hellip;</span>
         </p>
 
         <div class="text-info" id="{{id}}-status" style="display:none">
-            <div class="success">
-            </div>
-            <div class="error">
-            </div>
+            <div class="message"></div>
         </div>
     </div>
 </div>
 <script type="text/javascript">
-    function doneLoading(data) {
-        var message = {% trans "`${data.saved} of ${data.total} learner's grades processed.`" %};
-        $('.loading-spinner').hide();
+    function doneLoading(blockId, data) {
+        $(`#${blockId}-spinner`).hide();
         if (data.error_rows.length || data.error_messages.length) {
-            var errorMessage = '';
+            var message = '';
             if (data.error_rows.length) {
-                errorMessage += {% trans "`${data.error_rows.length} errors. Please try again. `" %};
+                message += {% trans "`${data.error_rows.length} errors. Please try again. `" %};
             }
             if (data.error_messages.length) {
-                errorMessage += data.error_messages;
+                message += '<br>';
+                message += data.error_messages;
             }
-            $('#{{id}}-status,.error').html(errorMessage).show();
         } else {
-            $('#{{id}}-status,.success').html(message).show();
+            var message = {% trans "`${data.saved} of ${data.total} learner's grades processed.`" %};
         }
+        $(`#${blockId}-status`).show();
+        $(`#${blockId}-status .message`).html(message);
     };
-    function pollResults(result_id) {
+    function pollResults(blockId, result_id) {
         $.ajax({
             url: '{{poll_url}}',
             type: 'POST',
             data: {result_id: result_id},
             success: function(data) {
                 if (data.waiting) {
-                    setTimeout(function(){pollResults(result_id)}, 1000);
+                    setTimeout(function(){pollResults(blockId, result_id)}, 1000);
                 } else {
-                    doneLoading(data);
+                    doneLoading(blockId, data);
                 }
             }
         });
     };
     $('#{{id}}-file').change(function(e){
-        // e.preventDefault();
         var firstFile = $('#{{id}}-file')[0].files[0];
         if (firstFile == undefined) {
             return;
@@ -87,7 +84,7 @@
 
         $('#{{id}}-filename').html(firstFile.name);
         $('#{{id}}-status').hide();
-        $('.loading-spinner').show();
+        $('#{{id}}-spinner').show();
         $.ajax({
                url : '{{import_url}}',
                type : 'POST',
@@ -97,9 +94,9 @@
                success : function(data) {
                     $('#{{id}}-file').val('');
                     if (data.waiting) {
-                        setTimeout(function(){pollResults(data.result_id)}, 1000);
+                        setTimeout(function(){pollResults('{{id}}', data.result_id)}, 1000);
                     } else {
-                        doneLoading(data);
+                        doneLoading('{{id}}', data);
                     }
                }
         });

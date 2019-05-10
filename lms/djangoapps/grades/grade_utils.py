@@ -9,7 +9,7 @@ from datetime import timedelta
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import UsageKey
 from six import text_type
 
@@ -84,11 +84,6 @@ class ScoreCSVProcessor(ChecksumMixin, DeferrableMixin, CSVProcessor):
         set_score(row['block_id'], row['user_id'], row['new_points'], row['max_points'])
         return True, undo
 
-    def write_file(self, buf, rows=None):
-        location = UsageKey.from_string(self.block_id)
-        my_name = self.display_name
-        super(ScoreCSVProcessor, self).write_file(buf, self._get_export_rows(location, my_name))
-
     def _get_enrollments(self, course_id, **kwargs):
         """
         Return iterator of enrollments, as dicts.
@@ -111,10 +106,13 @@ class ScoreCSVProcessor(ChecksumMixin, DeferrableMixin, CSVProcessor):
                 enrd['student_uid'] = None
             yield enrd
 
-    def _get_export_rows(self, location, my_name):
+    def get_rows_to_export(self):
         """
         Return iterator of rows for file export.
         """
+        location = UsageKey.from_string(self.block_id)
+        my_name = self.display_name
+
         students = get_scores(location)
 
         enrollments = self._get_enrollments(location.course_key)
