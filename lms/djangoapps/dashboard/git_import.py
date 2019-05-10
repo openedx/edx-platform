@@ -5,9 +5,9 @@ instance when using a mongo modulestore
 
 from __future__ import absolute_import
 
+import json
 from dateutil import parser
 import logging
-import json
 import os
 import re
 import StringIO
@@ -259,6 +259,7 @@ def add_repo(repo, rdir_in, branch=None):
         switch_branch(branch, rdirp)
 
     # get commit id
+    # pylint: disable=unicode-format-string
     cmd = ['git', 'log', '-1', '--format=format:{ "commit": "%H", "author": "%an %ae", "date": "%ad"}', ]
     try:
         git_log_json = json.loads(cmd_log(cmd, cwd=rdirp))
@@ -364,7 +365,7 @@ def add_repo(repo, rdir_in, branch=None):
         )
         cil.save()
 
-        log.debug('saved CourseImportLog for %s', cil.course_id)
+        log.debug('saved CourseImportLog for %s', cil.course_id)  # pylint: disable=unicode-format-string
         mdb.disconnect()
     else:
         log.error('Unable to save CourseImportLog because of an error in building mongo connection')

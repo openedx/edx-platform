@@ -273,7 +273,7 @@ class Courses(SysadminDashboardView):
                     gdir = path(git_repo_dir) / cdir
                     if not gdir.exists():
                         return info
-
+                # pylint: disable=unicode-format-string
                 cmd = ['git', 'log', '-1',
                        '--format=format:{ "commit": "%H", "author": "%an %ae", "date": "%ad"}', ]
                 try:
@@ -290,7 +290,7 @@ class Courses(SysadminDashboardView):
                     course.commit = output_json['commit']
                     course.date = parser.parse(output_json['date'])
                     course.save()
-                    log.debug('Updated git logs for course %s', course_id)
+                    log.debug('Updated git logs for course %s', course_id)  # pylint: disable=unicode-format-string
                 except OSError as error:
                     log.warning(text_type(u"Error fetching git data: %s - %s"), text_type(cdir), text_type(error))
                 except (ValueError, subprocess.CalledProcessError):
