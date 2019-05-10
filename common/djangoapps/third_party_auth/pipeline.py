@@ -836,8 +836,6 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):
 
         if email_as_username and details.get('email'):
             username = details['email']
-        elif details.get('username'):
-            username = details['username']
         else:
             username = uuid4().hex
 
