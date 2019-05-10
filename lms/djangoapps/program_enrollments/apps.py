@@ -24,3 +24,9 @@ class ProgramEnrollmentsConfig(AppConfig):
             }
         },
     }
+
+    def ready(self):
+        """
+        Connect handlers to signals.
+        """
+        from . import signals  # pylint: disable=unused-variable
