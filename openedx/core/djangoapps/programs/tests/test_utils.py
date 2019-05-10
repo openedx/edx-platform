@@ -10,12 +10,12 @@ import ddt
 import httpretty
 import mock
 import six
+from six.moves import range
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 from pytz import utc
-from six.moves import range
 from testfixtures import LogCapture
 from waffle.testutils import override_switch
 
@@ -506,7 +506,7 @@ class TestProgramProgressMeter(TestCase):
         # One enrollment, one program in progress.
         self._create_enrollments(first_course_run_key)
         meter = ProgramProgressMeter(self.site, self.user)
-        program, program_uuid = data[0], data[0]['uuid']
+        _, program_uuid = data[0], data[0]['uuid']
         self._assert_progress(
             meter,
             ProgressFactory(uuid=program_uuid, in_progress=1, not_started=1, grades={first_course_run_key: 0.0})
@@ -604,7 +604,7 @@ class TestProgramProgressMeter(TestCase):
         self._create_certificates(course_run_key)
         meter = ProgramProgressMeter(self.site, self.user)
 
-        program, program_uuid = data[0], data[0]['uuid']
+        _, program_uuid = data[0], data[0]['uuid']
         self._assert_progress(
             meter,
             ProgressFactory(uuid=program_uuid, completed=1, grades={course_run_key: 0.0})
