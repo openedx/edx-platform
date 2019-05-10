@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 from ipware.ip import get_ip
 
 
