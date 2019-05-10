@@ -1,12 +1,13 @@
 """
 Tests of symbolic math
 """
+from __future__ import absolute_import
 import re
 import unittest
 
 from lxml import etree
 
-import formula
+from . import formula
 
 
 def stripXML(xml):
@@ -22,7 +23,7 @@ class FormulaTest(unittest.TestCase):
 
     def setUp(self):
         super(FormulaTest, self).setUp()
-        self.formulaInstance = formula.formula('')
+        self.formulaInstance = formula('')
 
     def test_replace_mathvariants(self):
         expr = '''

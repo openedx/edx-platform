@@ -1,5 +1,7 @@
 """Descriptors for XBlocks/Xmodules, that provide editing of atrributes"""
 
+from __future__ import absolute_import
+
 import logging
 
 from pkg_resources import resource_string

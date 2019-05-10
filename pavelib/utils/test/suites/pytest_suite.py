@@ -26,6 +26,7 @@ class PytestSuite(TestSuite):
             self.django_toxenv = None
         else:
             self.django_toxenv = 'py27-django{}'.format(django_version.replace('.', ''))
+        self.disable_courseenrollment_history = kwargs.get('disable_courseenrollment_history', '1')
         self.disable_capture = kwargs.get('disable_capture', None)
         self.report_dir = Env.REPORT_DIR / self.root
 
@@ -36,6 +37,10 @@ class PytestSuite(TestSuite):
         if os.environ.get("SHARD", None):
             shard_str = "shard_{}".format(os.environ.get("SHARD"))
             self.report_dir = self.report_dir / shard_str
+
+        if self.disable_courseenrollment_history:
+            os.environ['DISABLE_COURSEENROLLMENT_HISTORY'] = '1'
+
         self.xunit_report = self.report_dir / "nosetests.xml"
 
         self.cov_args = kwargs.get('cov_args', '')
@@ -161,13 +166,14 @@ class SystemTestSuite(PytestSuite):
             else:
                 xdist_remote_processes = self.processes
             for ip in self.xdist_ip_addresses.split(','):
-                # The django settings runtime command does not propagate to xdist remote workers
-                django_env_var_cmd = u'export DJANGO_SETTINGS_MODULE={}' \
-                                     .format('{}.envs.{}'.format(self.root, self.settings))
+                # Propogate necessary env vars to xdist containers
+                env_var_cmd = u'export DJANGO_SETTINGS_MODULE={} DISABLE_COURSEENROLLMENT_HISTORY={}'\
+                    .format('{}.envs.{}'.format(self.root, self.settings),
+                            self.disable_courseenrollment_history)
                 xdist_string = u'--tx {}*ssh="ubuntu@{} -o StrictHostKeyChecking=no"' \
                                '//python="source /edx/app/edxapp/edxapp_env; {}; python"' \
                                '//chdir="/edx/app/edxapp/edx-platform"' \
-                               .format(xdist_remote_processes, ip, django_env_var_cmd)
+                               .format(xdist_remote_processes, ip, env_var_cmd)
                 cmd.append(xdist_string)
             for rsync_dir in Env.rsync_dirs():
                 cmd.append(u'--rsyncdir {}'.format(rsync_dir))
@@ -280,15 +286,19 @@ class LibTestSuite(PytestSuite):
             else:
                 xdist_remote_processes = self.processes
             for ip in self.xdist_ip_addresses.split(','):
-                # The django settings runtime command does not propagate to xdist remote workers
+                # Propogate necessary env vars to xdist containers
                 if 'pavelib/paver_tests' in self.test_id:
                     django_env_var_cmd = "export DJANGO_SETTINGS_MODULE='lms.envs.test'"
                 else:
                     django_env_var_cmd = "export DJANGO_SETTINGS_MODULE='openedx.tests.settings'"
+
+                env_var_cmd = u'{} DISABLE_COURSEENROLLMENT_HISTORY={}' \
+                    .format(django_env_var_cmd, self.disable_courseenrollment_history)
+
                 xdist_string = u'--tx {}*ssh="ubuntu@{} -o StrictHostKeyChecking=no"' \
                                '//python="source /edx/app/edxapp/edxapp_env; {}; python"' \
                                '//chdir="/edx/app/edxapp/edx-platform"' \
-                               .format(xdist_remote_processes, ip, django_env_var_cmd)
+                               .format(xdist_remote_processes, ip, env_var_cmd)
                 cmd.append(xdist_string)
             for rsync_dir in Env.rsync_dirs():
                 cmd.append(u'--rsyncdir {}'.format(rsync_dir))

@@ -1,6 +1,8 @@
 """
 Test Microsite base backends.
 """
+from __future__ import absolute_import
+
 import logging
 
 from django.test import TestCase

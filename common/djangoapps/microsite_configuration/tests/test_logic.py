@@ -2,6 +2,8 @@
 Some additional unit tests for Microsite logic. The LMS covers some of the Microsite testing, this adds
 some additional coverage
 """
+from __future__ import absolute_import
+
 import ddt
 from mock import patch
 

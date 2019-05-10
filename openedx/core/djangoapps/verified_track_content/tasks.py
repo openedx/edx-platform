@@ -1,6 +1,10 @@
 """
 Celery task for Automatic Verifed Track Cohorting MVP feature.
 """
+from __future__ import absolute_import
+
+import six
+
 from celery.task import task
 from celery.utils.log import get_task_logger
 from django.contrib.auth.models import User
@@ -54,6 +58,6 @@ def sync_cohort_with_mode(self, course_id, user_id, verified_cohort_name, defaul
     except Exception as exc:
         LOGGER.warning(
             u"SYNC_COHORT_WITH_MODE_RETRY: Exception encountered for course '%s' and user '%s': %s",
-            course_id, user.id, unicode(exc)
+            course_id, user.id, six.text_type(exc)
         )
         raise self.retry(exc=exc)

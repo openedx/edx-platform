@@ -1,4 +1,5 @@
 """Tests for zendesk_proxy views."""
+from __future__ import absolute_import
 import json
 from copy import deepcopy
 
@@ -9,6 +10,7 @@ from mock import MagicMock, patch
 
 from openedx.core.djangoapps.zendesk_proxy.v1.views import ZendeskProxyThrottle
 from openedx.core.lib.api.test_utils import ApiTestCase
+from six.moves import range
 
 
 @ddt.ddt

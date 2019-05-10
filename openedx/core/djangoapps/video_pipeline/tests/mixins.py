@@ -1,6 +1,7 @@
 """
 Mixins to test video pipeline integration.
 """
+from __future__ import absolute_import
 from provider.constants import CONFIDENTIAL
 from provider.oauth2.models import Client
 

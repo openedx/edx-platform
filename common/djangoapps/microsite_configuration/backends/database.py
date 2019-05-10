@@ -1,6 +1,8 @@
 """
 Microsite backend that reads the configuration from the database
 """
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver

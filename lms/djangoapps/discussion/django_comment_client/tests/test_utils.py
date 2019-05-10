@@ -1680,14 +1680,8 @@ class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
         # Create course, seed permissions roles, and create team
         self.course = CourseFactory.create()
         seed_permissions_roles(self.course.id)
-        verified_coursemode = CourseModeFactory.create(
-            course_id=self.course.id,
-            mode_slug=CourseMode.VERIFIED
-        )
-        audit_coursemode = CourseModeFactory.create(
-            course_id=self.course.id,
-            mode_slug=CourseMode.AUDIT
-        )
+        verified_coursemode = CourseMode.VERIFIED
+        audit_coursemode = CourseMode.AUDIT
 
         # Create four users: group_moderator (who is within the verified enrollment track and in the cohort),
         # verified_user (who is in the verified enrollment track but not the cohort),
@@ -1773,18 +1767,6 @@ class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
         set_discussion_division_settings(self.course.id, enable_cohorts=True,
                                          division_scheme=CourseDiscussionSettings.COHORT)
         content = {'user_id': self.cohorted_user.id, 'type': 'thread', 'username': self.cohorted_user.username}
-        self.assertEqual(utils.get_ability(self.course.id, content, self.group_moderator), {
-            'editable': True,
-            'can_reply': True,
-            'can_delete': True,
-            'can_openclose': True,
-            'can_vote': True,
-            'can_report': True
-        })
-        RequestCache.clear_all_namespaces()
-
-        set_discussion_division_settings(self.course.id, division_scheme=CourseDiscussionSettings.ENROLLMENT_TRACK)
-        content = {'user_id': self.verified_user.id, 'type': 'thread', 'username': self.verified_user.username}
         self.assertEqual(utils.get_ability(self.course.id, content, self.group_moderator), {
             'editable': True,
             'can_reply': True,

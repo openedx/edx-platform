@@ -10,7 +10,6 @@ git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce8
 -e common/lib/chem
 -e git+https://github.com/edx/codejail.git@a320d43ce6b9c93b17636b2491f724d9e433be47#egg=codejail
 git+https://github.com/edx/crowdsourcehinter.git@518605f0a95190949fe77bd39158450639e2e1dc#egg=crowdsourcehinter-xblock==0.1
-git+https://github.com/mitodl/django-cas.git@afac57bc523f145ae826f4ed3d4fa8b2c86c5364#egg=django-cas==2.1.1
 git+https://github.com/edx/django-celery.git@756cb57aad765cb2b0d37372c1855b8f5f37e6b0#egg=django-celery==3.2.1+edx.2
 git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c4aee6e76b9abe61cc808#egg=django-debug-toolbar-mongo==0.1.10
 git+https://github.com/edx/django-oauth-plus.git@01ec2a161dfc3465f9d35b9211ae790177418316#egg=django-oauth-plus==2.2.9.edx-1
@@ -133,7 +132,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==1.0.3
 edx-drf-extensions==2.2.1
-edx-enterprise==1.4.10
+edx-enterprise==1.5.0
 edx-i18n-tools==0.4.8
 edx-lint==1.1.2
 edx-milestones==0.1.13
@@ -156,7 +155,7 @@ enum34==1.1.6
 event-tracking==0.2.8
 execnet==1.6.0
 factory_boy==2.8.1
-faker==1.0.5
+faker==1.0.6
 feedparser==5.1.3
 filelock==3.0.10
 firebase-token-generator==1.3.2
@@ -232,7 +231,7 @@ pbr==5.2.0
 pdfminer.six==20181108
 piexif==1.0.2
 pillow==6.0.0
-pip-tools==3.6.1
+pip-tools==3.7.0
 pluggy==0.11.0
 polib==1.1.0
 psutil==1.2.1
@@ -248,7 +247,7 @@ pycryptodome==3.8.1
 pycryptodomex==3.4.7
 pydispatcher==2.0.5
 pyflakes==2.1.1
-pygments==2.3.1
+pygments==2.4.0
 pygraphviz==1.5
 pyhamcrest==1.9.0
 pyinotify==0.9.6
@@ -271,7 +270,7 @@ pytest-django==3.4.8
 pytest-forked==1.0.2
 pytest-randomly==1.2.3
 pytest-xdist==1.28.0
-pytest==4.4.1
+pytest==4.4.2
 python-dateutil==2.4.0
 python-levenshtein==0.12.0
 python-memcached==1.59
