@@ -1,4 +1,6 @@
 # pylint: disable=missing-docstring
+from __future__ import absolute_import
+
 from django.conf import settings
 
 if hasattr(settings, "COMMENTS_SERVICE_URL"):
