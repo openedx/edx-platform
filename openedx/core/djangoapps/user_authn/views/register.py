@@ -2,6 +2,8 @@
 Registration related views.
 """
 
+from __future__ import absolute_import
+
 import datetime
 import json
 import logging
@@ -9,46 +11,35 @@ import logging
 from django.conf import settings
 from django.contrib.auth import login as django_login
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.core.validators import ValidationError, validate_email
 from django.db import transaction
 from django.dispatch import Signal
+from django.urls import reverse
 from django.utils.translation import get_language
 from django.utils.translation import ugettext as _
-
-# Note that this lives in LMS, so this dependency should be refactored.
-# TODO Have the discussions code subscribe to the REGISTER_USER signal instead.
-from lms.djangoapps.discussion.notification_prefs.views import enable_notifications
 from pytz import UTC
 from requests import HTTPError
 from six import text_type
 from social_core.exceptions import AuthAlreadyAssociated, AuthException
 from social_django import utils as social_utils
 
+import third_party_auth
+# Note that this lives in LMS, so this dependency should be refactored.
+# TODO Have the discussions code subscribe to the REGISTER_USER signal instead.
+from lms.djangoapps.discussion.notification_prefs.views import enable_notifications
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from openedx.core.djangoapps.user_api.accounts.utils import generate_password
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
-
 from student.forms import AccountCreationForm, get_registration_extension_form
-from student.helpers import (
-    authenticate_new_user,
-    create_or_set_user_attribute_created_on_site,
-    do_create_account,
-)
-from student.models import (
-    RegistrationCookieConfiguration,
-    UserAttribute,
-    create_comments_service_user,
-)
+from student.helpers import authenticate_new_user, create_or_set_user_attribute_created_on_site, do_create_account
+from student.models import RegistrationCookieConfiguration, UserAttribute, create_comments_service_user
 from student.views import compose_and_send_activation_email
-from track import segment
-import third_party_auth
 from third_party_auth import pipeline, provider
 from third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
+from track import segment
 from util.db import outer_atomic
-
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -105,7 +96,7 @@ def create_account_with_params(request, params):
     """
     # Copy params so we can modify it; we can't just do dict(params) because if
     # params is request.POST, that results in a dict containing lists of values
-    params = dict(params.items())
+    params = dict(list(params.items()))
 
     # allow to define custom set of required/optional/hidden fields via configuration
     extra_fields = configuration_helpers.get_value(

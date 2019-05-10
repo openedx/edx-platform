@@ -1,4 +1,6 @@
 """ User Authn code for deprecated views. """
+from __future__ import absolute_import
+
 import warnings
 
 from django.conf import settings
@@ -9,20 +11,15 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
-from six import text_type, iteritems
+from six import iteritems, text_type
 
+import third_party_auth
 from edxmako.shortcuts import render_to_response
-
-from openedx.core.djangoapps.user_authn.views.register import create_account_with_params
-from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
-from student.helpers import (
-    auth_pipeline_urls,
-    get_next_url_for_login_page
-)
-from student.helpers import AccountValidationError
-import third_party_auth
+from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
+from openedx.core.djangoapps.user_authn.views.register import create_account_with_params
+from student.helpers import AccountValidationError, auth_pipeline_urls, get_next_url_for_login_page
 from third_party_auth import pipeline, provider
 from util.json_request import JsonResponse
 
