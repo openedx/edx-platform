@@ -1,6 +1,8 @@
 """
 Test Microsite database backends.
 """
+from __future__ import absolute_import
+
 import logging
 from mock import patch
 
@@ -126,7 +128,7 @@ class DatabaseMicrositeBackendTests(DatabaseMicrositeTestCase):
         """
         microsite.set_by_domain(self.microsite.site.domain)
         configs = microsite.get_all_config()
-        self.assertEqual(len(configs.keys()), 1)
+        self.assertEqual(len(list(configs.keys())), 1)
         self.assertEqual(configs[self.microsite.key], self.microsite.values)
 
     def test_set_config_by_domain(self):
