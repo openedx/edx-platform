@@ -2,9 +2,12 @@
 Tasks requiring asynchronous handling for course_duration_limits
 """
 
+from __future__ import absolute_import
+
 import datetime
 import logging
 
+import six
 import waffle
 from celery import task
 from celery_utils.logged_task import LoggedTask
@@ -16,11 +19,9 @@ from edx_ace.message import Message
 from edx_ace.utils.date import deserialize, serialize
 from edx_django_utils.monitoring import set_custom_metric
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.schedules.tasks import (
-    _annonate_send_task_for_monitoring,
-    _track_message_sent
-)
+
 from openedx.core.djangoapps.schedules.resolvers import _get_datetime_beginning_of_day
+from openedx.core.djangoapps.schedules.tasks import _annonate_send_task_for_monitoring, _track_message_sent
 from openedx.core.lib.celery.task_utils import emulate_http_request
 
 from . import message_types, resolvers
@@ -77,7 +78,7 @@ class CourseDurationLimitMessageBaseTask(LoggedTask):
             target_date = current_date + datetime.timedelta(days=day_offset)
             task_args = (
                 site.id,
-                unicode(course_key),
+                six.text_type(course_key),
                 serialize(target_date),
                 day_offset,
                 override_recipient_email,

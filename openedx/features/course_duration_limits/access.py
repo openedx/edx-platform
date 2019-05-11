@@ -3,13 +3,15 @@
 Contains code related to computing content gating course duration limits
 and course access based on these limits.
 """
+from __future__ import absolute_import
+
 from datetime import timedelta
 
+import six
 from django.utils import timezone
-from django.utils.translation import get_language, ugettext as _
-
-from student.models import CourseEnrollment
-from util.date_utils import strftime_localized
+from django.utils.translation import get_language
+from django.utils.translation import ugettext as _
+from web_fragments.fragment import Fragment
 
 from course_modes.models import CourseMode
 from lms.djangoapps.courseware.access_response import AccessError
@@ -20,7 +22,8 @@ from openedx.core.djangoapps.catalog.utils import get_course_run_details
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from web_fragments.fragment import Fragment
+from student.models import CourseEnrollment
+from util.date_utils import strftime_localized
 
 MIN_DURATION = timedelta(weeks=4)
 MAX_DURATION = timedelta(weeks=18)
@@ -34,7 +37,6 @@ class AuditExpiredError(AccessError):
     def __init__(self, user, course, expiration_date):
         error_code = "audit_expired"
         developer_message = u"User {} had access to {} until {}".format(user, course, expiration_date)
-        language = get_language()
         expiration_date = strftime_localized(expiration_date, EXPIRATION_DATE_FORMAT_STR)
         user_message = _(u"Access expired on {expiration_date}").format(expiration_date=expiration_date)
         try:
@@ -229,7 +231,7 @@ def course_expiration_wrapper(user, block, view, frag, context):  # pylint: disa
     # Course content must be escaped to render correctly due to the way the
     # way the XBlock rendering works. Transforming the safe markup to unicode
     # escapes correctly.
-    course_expiration_fragment.content = unicode(course_expiration_fragment.content)
+    course_expiration_fragment.content = six.text_type(course_expiration_fragment.content)
 
     course_expiration_fragment.add_content(frag.content)
     course_expiration_fragment.add_fragment_resources(frag)

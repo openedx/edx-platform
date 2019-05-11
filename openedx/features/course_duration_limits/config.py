@@ -1,14 +1,7 @@
 """
 Content type gating waffle flag
 """
-import random
-
-from django.dispatch import receiver
-from django.db import IntegrityError
-
-from experiments.models import ExperimentData, ExperimentKeyValue
-from student.models import EnrollStatusChange
-from student.signals import ENROLL_STATUS_CHANGE
+from __future__ import absolute_import
 
 
 EXPERIMENT_ID = 11

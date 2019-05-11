@@ -1,6 +1,8 @@
 """
 Message types used for ACE communication by the course_duration_limits app.
 """
+from __future__ import absolute_import
+
 import logging
 
 from openedx.core.djangoapps.ace_common.message import BaseMessageType
