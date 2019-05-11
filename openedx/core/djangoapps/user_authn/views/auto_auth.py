@@ -1,4 +1,6 @@
 """ Views related to auto auth. """
+from __future__ import absolute_import
+
 import datetime
 import uuid
 
@@ -6,22 +8,24 @@ from django.conf import settings
 from django.contrib.auth import login as django_login
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
-from django.urls import NoReverseMatch, reverse
 from django.core.validators import ValidationError
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect
 from django.template.context_processors import csrf
+from django.urls import NoReverseMatch, reverse
 from django.utils.translation import ugettext as _
+from opaque_keys.edx.locator import CourseLocator
 
 from lms.djangoapps.verify_student.models import ManualVerification
-from opaque_keys.edx.locator import CourseLocator
 from openedx.core.djangoapps.django_comment_common.models import assign_role
 from openedx.core.djangoapps.user_api.accounts.utils import generate_password
 from openedx.features.course_experience import course_home_url_name
 from student.forms import AccountCreationForm
 from student.helpers import (
     AccountValidationError,
+    authenticate_new_user,
     create_or_set_user_attribute_created_on_site,
+    do_create_account
 )
 from student.models import (
     CourseAccessRole,
@@ -31,7 +35,6 @@ from student.models import (
     anonymous_id_for_user,
     create_comments_service_user
 )
-from student.helpers import authenticate_new_user, do_create_account
 from util.json_request import JsonResponse
 
 

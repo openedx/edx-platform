@@ -3,8 +3,9 @@ Adapter to isolate django-oauth2-provider dependencies
 """
 
 from __future__ import absolute_import
-from provider.oauth2 import models
+
 from provider import constants, scope
+from provider.oauth2 import models
 
 
 class DOPAdapter(object):

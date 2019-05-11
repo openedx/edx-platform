@@ -1,7 +1,8 @@
 """
 Classes that override default django-oauth-toolkit behavior
 """
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
+
 from oauth2_provider.exceptions import OAuthToolkitError
 from oauth2_provider.http import HttpResponseUriRedirect
 from oauth2_provider.models import get_access_token_model, get_application_model

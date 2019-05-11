@@ -2,8 +2,11 @@
 Specialized models for oauth_dispatch djangoapp
 """
 
+from __future__ import absolute_import
+
 from datetime import datetime
 
+import six
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django_mysql.models import ListCharField
@@ -140,4 +143,4 @@ class ApplicationOrganization(models.Model):
         """
         Serialize for use in JWT filter claim.
         """
-        return unicode(':'.join([self.relation_type, self.organization.short_name]))
+        return six.text_type(':'.join([self.relation_type, self.organization.short_name]))

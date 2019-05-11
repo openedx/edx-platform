@@ -1,5 +1,7 @@
 """ Test Authn related exception. """
 
+from __future__ import absolute_import
+
 from unittest import TestCase
 
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError

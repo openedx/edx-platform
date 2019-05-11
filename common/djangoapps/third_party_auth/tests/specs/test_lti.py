@@ -1,6 +1,8 @@
 """
 Integration tests for third_party_auth LTI auth providers
 """
+from __future__ import absolute_import
+
 import unittest
 from django.conf import settings
 from django.contrib.auth.models import User

@@ -2,11 +2,14 @@
 """
 Tests for student activation and login
 """
+from __future__ import absolute_import
+
 import json
 import unicodedata
-import unittest
 
 import ddt
+import six
+from six.moves import range
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
@@ -74,7 +77,7 @@ class LoginTest(CacheIsolationTestCase):
         self._assert_not_in_audit_log(mock_audit_log, 'info', [u'test@edx.org'])
 
     def test_login_success_unicode_email(self):
-        unicode_email = u'test' + unichr(40960) + u'@edx.org'
+        unicode_email = u'test' + six.unichr(40960) + u'@edx.org'
         self.user.email = unicode_email
         self.user.save()
 
@@ -180,7 +183,7 @@ class LoginTest(CacheIsolationTestCase):
         self._assert_not_in_audit_log(mock_audit_log, 'warning', [u'test'])
 
     def test_login_unicode_email(self):
-        unicode_email = u'test@edx.org' + unichr(40960)
+        unicode_email = u'test@edx.org' + six.unichr(40960)
         response, mock_audit_log = self._login_response(
             unicode_email,
             'test_password',
@@ -189,7 +192,7 @@ class LoginTest(CacheIsolationTestCase):
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', unicode_email])
 
     def test_login_unicode_password(self):
-        unicode_password = u'test_password' + unichr(1972)
+        unicode_password = u'test_password' + six.unichr(1972)
         response, mock_audit_log = self._login_response(
             'test@edx.org',
             unicode_password,
@@ -271,7 +274,7 @@ class LoginTest(CacheIsolationTestCase):
     def test_login_ratelimited_success(self):
         # Try (and fail) logging in with fewer attempts than the limit of 30
         # and verify that you can still successfully log in afterwards.
-        for i in xrange(20):
+        for i in range(20):
             password = u'test_password{0}'.format(i)
             response, _audit_log = self._login_response('test@edx.org', password)
             self._assert_response(response, success=False)
@@ -282,7 +285,7 @@ class LoginTest(CacheIsolationTestCase):
     def test_login_ratelimited(self):
         # try logging in 30 times, the default limit in the number of failed
         # login attempts in one 5 minute period before the rate gets limited
-        for i in xrange(30):
+        for i in range(30):
             password = u'test_password{0}'.format(i)
             self._login_response('test@edx.org', password)
         # check to see if this response indicates that this was ratelimited
@@ -545,7 +548,7 @@ class LoginTest(CacheIsolationTestCase):
 
         if value is not None:
             msg = (u"'%s' did not contain '%s'" %
-                   (unicode(response_dict['value']), unicode(value)))
+                   (six.text_type(response_dict['value']), six.text_type(value)))
             self.assertIn(value, response_dict['value'], msg)
 
     def _assert_audit_log(self, mock_audit_log, level, log_strings):
