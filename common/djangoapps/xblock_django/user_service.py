@@ -1,6 +1,8 @@
 """
 Support for converting a django user to an XBlock user
 """
+from __future__ import absolute_import
+
 from django.contrib.auth.models import User
 from opaque_keys.edx.keys import CourseKey
 from xblock.reference.user_service import UserService, XBlockUser
