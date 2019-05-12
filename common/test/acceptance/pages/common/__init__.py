@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import os
 
 HOSTNAME = os.environ.get('BOK_CHOY_HOSTNAME', 'localhost')
