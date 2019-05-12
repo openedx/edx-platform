@@ -6,9 +6,9 @@ from __future__ import absolute_import
 import itertools
 
 import ddt
-import six
 from django.core.management.base import CommandError
 from mock import patch
+import six
 from six.moves import range
 
 from openedx.core.djangoapps.content.block_structure.tests.helpers import (
