@@ -2,11 +2,15 @@
 Block Structure Transformer Registry implemented using the platform's
 PluginManager.
 """
+from __future__ import absolute_import
+
 from base64 import b64encode
 from hashlib import sha1
 
-from openedx.core.lib.plugins import PluginManager
+import six
+
 from openedx.core.lib.cache_utils import process_cached
+from openedx.core.lib.plugins import PluginManager
 
 
 class TransformerRegistry(PluginManager):
@@ -30,7 +34,7 @@ class TransformerRegistry(PluginManager):
                 registered with the platform's PluginManager.
         """
         if cls.USE_PLUGIN_MANAGER:
-            return set(cls.get_available_plugins().itervalues())
+            return set(six.itervalues(cls.get_available_plugins()))
         else:
             return set()
 
