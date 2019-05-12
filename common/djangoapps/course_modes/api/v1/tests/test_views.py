@@ -3,9 +3,9 @@ Tests for the course modes API.
 """
 from __future__ import absolute_import, unicode_literals
 
-from itertools import product
 import json
 import unittest
+from itertools import product
 
 import ddt
 from django.conf import settings
@@ -20,7 +20,7 @@ from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.oauth_dispatch.toggles import ENFORCE_JWT_SCOPES
-from openedx.core.djangoapps.user_authn.tests.utils import AuthAndScopesTestMixin, AuthType, JWT_AUTH_TYPES
+from openedx.core.djangoapps.user_authn.tests.utils import JWT_AUTH_TYPES, AuthAndScopesTestMixin, AuthType
 from student.tests.factories import UserFactory
 
 

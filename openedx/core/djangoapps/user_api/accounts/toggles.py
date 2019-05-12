@@ -1,9 +1,10 @@
 """
 Toggles for accounts related code.
 """
+from __future__ import absolute_import
+
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.waffle_utils import WaffleFlag
-
 
 # .. toggle_name: REDIRECT_TO_ORDER_HISTORY_MICROFRONTEND
 # .. toggle_type: waffle_flag

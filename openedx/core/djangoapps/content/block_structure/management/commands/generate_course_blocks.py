@@ -7,6 +7,7 @@ import logging
 
 import six
 from django.core.management.base import BaseCommand
+import six
 from six import text_type
 
 import openedx.core.djangoapps.content.block_structure.api as api

@@ -2,11 +2,11 @@
 URL definitions for the course_modes v1 API.
 """
 from __future__ import absolute_import
+
 from django.conf import settings
 from django.conf.urls import url
 
 from course_modes.api.v1 import views
-
 
 app_name = 'v1'
 

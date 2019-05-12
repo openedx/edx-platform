@@ -1,4 +1,6 @@
 """Tests for the CORS CSRF version of Django Rest Framework's SessionAuthentication."""
+from __future__ import absolute_import
+
 from mock import patch
 
 from django.middleware.csrf import get_token

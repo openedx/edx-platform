@@ -1,6 +1,7 @@
 """
 Models for configuring waffle utils.
 """
+from __future__ import absolute_import
 from django.db.models import CharField
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices

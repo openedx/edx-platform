@@ -1,4 +1,6 @@
 """Models for cross-domain configuration. """
+from __future__ import absolute_import
+
 from config_models.models import ConfigurationModel
 from django.db import models
 from django.utils.translation import ugettext_lazy as _

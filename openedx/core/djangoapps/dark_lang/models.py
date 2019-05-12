@@ -1,6 +1,8 @@
 """
 Models for the dark-launching languages
 """
+from __future__ import absolute_import
+
 from config_models.models import ConfigurationModel
 from django.db import models
 

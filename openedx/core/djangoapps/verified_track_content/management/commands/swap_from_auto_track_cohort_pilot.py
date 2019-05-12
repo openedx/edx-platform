@@ -1,6 +1,5 @@
 """Management command to migrate a course's xblock's group_access from Verified Track Cohorts to Enrollment Tracks"""
-
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 from contentstore.course_group_config import GroupConfiguration
 from django.conf import settings

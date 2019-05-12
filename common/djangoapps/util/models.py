@@ -1,9 +1,9 @@
 """Models for the util app. """
 from __future__ import absolute_import
 
-import cStringIO
 import gzip
 import logging
+from io import BytesIO
 
 import six
 from config_models.models import ConfigurationModel
@@ -37,7 +37,7 @@ def decompress_string(value):
 
     try:
         val = value.encode('utf').decode('base64')
-        zbuf = cStringIO.StringIO(val)
+        zbuf = BytesIO(val)
         zfile = gzip.GzipFile(fileobj=zbuf)
         ret = zfile.read()
         zfile.close()

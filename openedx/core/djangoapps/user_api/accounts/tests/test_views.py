@@ -2,20 +2,22 @@
 """
 Test cases to cover Accounts-related behaviors of the User API application
 """
-from copy import deepcopy
+from __future__ import absolute_import
+
 import datetime
 import hashlib
 import json
+from copy import deepcopy
 
 import ddt
+import mock
+import pytz
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
-
-import mock
-import pytz
 from rest_framework.test import APIClient, APITestCase
+from six.moves import range
 
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KEY
@@ -25,8 +27,7 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_un
 from student.models import PendingEmailChange, UserProfile
 from student.tests.factories import TEST_PASSWORD, UserFactory
 
-from .. import ALL_USERS_VISIBILITY, PRIVATE_VISIBILITY, CUSTOM_VISIBILITY
-
+from .. import ALL_USERS_VISIBILITY, CUSTOM_VISIBILITY, PRIVATE_VISIBILITY
 
 TEST_PROFILE_IMAGE_UPLOADED_AT = datetime.datetime(2002, 1, 9, 15, 43, 1, tzinfo=pytz.UTC)
 
@@ -622,7 +623,8 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
                 "This field is not editable via this API", data["field_errors"][field_name]["developer_message"]
             )
             self.assertEqual(
-                u"The '{0}' field cannot be edited.".format(field_name), data["field_errors"][field_name]["user_message"]
+                u"The '{0}' field cannot be edited.".format(field_name),
+                data["field_errors"][field_name]["user_message"]
             )
 
         for field_name in ["username", "date_joined", "is_active", "profile_image", "requires_parental_consent"]:

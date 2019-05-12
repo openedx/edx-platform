@@ -5,7 +5,7 @@ from __future__ import absolute_import
 
 from collections import namedtuple
 from contextlib import closing
-from cStringIO import StringIO
+from io import BytesIO
 
 import piexif
 import six
@@ -177,7 +177,7 @@ def _create_image_file(image, exif):
     Note that the file object returned is a django ContentFile which holds data
     in memory (not on disk).
     """
-    string_io = StringIO()
+    string_io = BytesIO()
 
     # The if/else dance below is required, because PIL raises an exception if
     # you pass None as the value of the exif kwarg.

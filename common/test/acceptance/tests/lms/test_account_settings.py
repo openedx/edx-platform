@@ -364,26 +364,6 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             reloads_on_save=True,
         )
 
-    def test_gender_field(self):
-        """
-        Test behaviour of "Gender" field.
-        """
-        self._test_dropdown_field(
-            u'gender',
-            u'Gender',
-            u'',
-            [u'Female', u''],
-        )
-
-        actual_events = self.wait_for_events(event_filter=self.settings_changed_event_filter, number_of_matches=2)
-        self.assert_events_match(
-            [
-                self.expected_settings_changed_event('gender', None, 'f'),
-                self.expected_settings_changed_event('gender', 'f', None),
-            ],
-            actual_events
-        )
-
     def test_country_field(self):
         """
         Test behaviour of "Country or Region" field.

@@ -1,18 +1,22 @@
 """ Views related to Account Settings. """
 
-from datetime import datetime
+from __future__ import absolute_import
+
 import logging
+from datetime import datetime
+
+import six
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
-from django.utils.translation import ugettext as _
 from django.urls import reverse
+from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
 
+import third_party_auth
 from edxmako.shortcuts import render_to_response
-
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
@@ -21,8 +25,8 @@ from openedx.core.djangoapps.lang_pref.api import all_languages, released_langua
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.accounts.toggles import (
-    should_redirect_to_order_history_microfrontend,
     should_redirect_to_account_microfrontend,
+    should_redirect_to_order_history_microfrontend
 )
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from openedx.core.lib.edx_api_utils import get_edx_api_data
@@ -30,10 +34,8 @@ from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
 from openedx.features.enterprise_support.api import get_enterprise_customer_for_learner
 from openedx.features.enterprise_support.utils import update_account_settings_context_for_enterprise
 from student.models import UserProfile
-import third_party_auth
 from third_party_auth import pipeline
 from util.date_utils import strftime_localized
-
 
 log = logging.getLogger(__name__)
 
@@ -75,7 +77,7 @@ def account_settings_context(request):
     """
     user = request.user
 
-    year_of_birth_options = [(unicode(year), unicode(year)) for year in UserProfile.VALID_YEARS]
+    year_of_birth_options = [(six.text_type(year), six.text_type(year)) for year in UserProfile.VALID_YEARS]
     try:
         user_orders = get_user_orders(user)
     except:  # pylint: disable=bare-except

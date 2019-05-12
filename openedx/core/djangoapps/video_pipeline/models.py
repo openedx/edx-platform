@@ -1,11 +1,13 @@
 """
 Model to hold edx-video-pipeline configurations.
 """
+from __future__ import absolute_import
 from config_models.models import ConfigurationModel
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from opaque_keys.edx.django.models import CourseKeyField
+import six
 
 
 class VideoPipelineIntegration(ConfigurationModel):
@@ -100,6 +102,6 @@ class CourseVideoUploadsEnabledByDefault(ConfigurationModel):
             not_en = ""
 
         return u"Course '{course_key}': Video Uploads {not_enabled}Enabled by default.".format(
-            course_key=unicode(self.course_id),
+            course_key=six.text_type(self.course_id),
             not_enabled=not_en
         )

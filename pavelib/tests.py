@@ -71,6 +71,19 @@ __test__ = False  # do not collect
         help="Create tables by applying migrations."
     ),
     make_option(
+        '--disable_courseenrollment_history',
+        action='store_true',
+        dest='disable_courseenrollment_history',
+        help="Disable history on student.CourseEnrollent. Can also be used by exporting"
+             "DISABLE_COURSEENROLLMENT_HISTORY=1."
+    ),
+    make_option(
+        '--enable_courseenrollment_history',
+        action='store_false',
+        dest='disable_courseenrollment_history',
+        help="Enable django-simple-history on student.CourseEnrollment."
+    ),
+    make_option(
         '--xdist_ip_addresses',
         dest='xdist_ip_addresses',
         help="Comma separated string of ip addresses to shard tests to via xdist."
@@ -229,6 +242,19 @@ def test_lib(options, passthrough_options):
         action='store_true',
         dest='disable_migrations',
         help="Create tables directly from apps' models. Can also be used by exporting DISABLE_MIGRATIONS=1."
+    ),
+    make_option(
+        '--disable_courseenrollment_history',
+        action='store_true',
+        dest='disable_courseenrollment_history',
+        help="Disable history on student.CourseEnrollent. Can also be used by exporting"
+             "DISABLE_COURSEENROLLMENT_HISTORY=1."
+    ),
+    make_option(
+        '--enable_courseenrollment_history',
+        action='store_false',
+        dest='disable_courseenrollment_history',
+        help="Enable django-simple-history on student.CourseEnrollment."
     ),
 ])
 @PassthroughTask

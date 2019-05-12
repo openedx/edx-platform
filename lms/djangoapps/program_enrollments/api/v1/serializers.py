@@ -19,8 +19,15 @@ class ProgramEnrollmentSerializer(serializers.ModelSerializer):
         validators = []
 
     def validate(self, attrs):
-        enrollment = ProgramEnrollment(**attrs)
-        enrollment.full_clean()
+        """ This modifies self.instance in the case of updates """
+        if not self.instance:
+            enrollment = ProgramEnrollment(**attrs)
+            enrollment.full_clean()
+        else:
+            for key, value in attrs.items():
+                setattr(self.instance, key, value)
+            self.instance.full_clean()
+
         return attrs
 
     def create(self, validated_data):

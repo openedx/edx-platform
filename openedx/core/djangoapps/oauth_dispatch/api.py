@@ -1,8 +1,10 @@
 """ OAuth related Python apis. """
-from oauthlib.oauth2.rfc6749.tokens import BearerToken
+from __future__ import absolute_import
+
 from oauth2_provider.models import AccessToken as dot_access_token
 from oauth2_provider.models import RefreshToken as dot_refresh_token
 from oauth2_provider.settings import oauth2_settings as dot_settings
+from oauthlib.oauth2.rfc6749.tokens import BearerToken
 from provider.oauth2.models import AccessToken as dop_access_token
 from provider.oauth2.models import RefreshToken as dop_refresh_token
 
