@@ -1646,8 +1646,8 @@ class ProgramCourseEnrollmentOverviewViewTests(ProgramCacheTestCaseMixin, Shared
 
         course_run_overview = response.data['course_runs'][0]
 
-        self.assertEqual(course_run_overview['start_date'], '2018-12-31T05:00:00Z')
-        self.assertEqual(course_run_overview['end_date'], '2019-01-02T05:00:00Z')
+        self.assertEqual(course_run_overview['start_date'], '2018-12-31T00:00:00Z')
+        self.assertEqual(course_run_overview['end_date'], '2019-01-02T00:00:00Z')
 
         # course run end date may not exist
         self.course_overview.end = None
