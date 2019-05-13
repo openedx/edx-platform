@@ -1,9 +1,4 @@
 "A light weight interface to grading helper functions"
-
-import six
-
-from courseware.models import StudentModule
-
 from . import grade_utils
 
 
@@ -35,7 +30,7 @@ class GradesUtilService(object):
         """
         Set a score.
         """
-        return set_score(usage_key, student_id, score, max_points, **defaults)
+        return grade_utils.set_score(usage_key, student_id, score, max_points, **defaults)
 
     def get_score_processor(self, **kwargs):
         """

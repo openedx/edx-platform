@@ -11,7 +11,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import UsageKey
-from six import text_type
 
 from courseware.models import StudentModule
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -24,6 +23,9 @@ log = logging.getLogger(__name__)
 
 
 class ScoreCSVProcessor(ChecksumMixin, DeferrableMixin, CSVProcessor):
+    """
+    CSV Processor for file format defined for Staff Graded Points
+    """
     columns = ['user_id', 'username', 'full_name', 'email', 'student_uid',
                'enrolled', 'track', 'block_id', 'title', 'date_last_graded',
                'who_last_graded', 'csum', 'last_points', 'points']
@@ -36,6 +38,8 @@ class ScoreCSVProcessor(ChecksumMixin, DeferrableMixin, CSVProcessor):
 
     def __init__(self, **kwargs):
         self.now = time.time()
+        self.max_points = 1
+        self.display_name = ''
         super(ScoreCSVProcessor, self).__init__(**kwargs)
         self.users_seen = {}
 
@@ -84,7 +88,7 @@ class ScoreCSVProcessor(ChecksumMixin, DeferrableMixin, CSVProcessor):
         set_score(row['block_id'], row['user_id'], row['new_points'], row['max_points'])
         return True, undo
 
-    def _get_enrollments(self, course_id, **kwargs):
+    def _get_enrollments(self, course_id, **kwargs):  # pylint: disable=unused-argument
         """
         Return iterator of enrollments, as dicts.
         """
