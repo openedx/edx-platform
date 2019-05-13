@@ -90,7 +90,6 @@ class CertificateStatuses(object):
     auditing = 'auditing'
     audit_passing = 'audit_passing'
     audit_notpassing = 'audit_notpassing'
-    honor_passing = 'honor_passing'
     unverified = 'unverified'
     invalidated = 'invalidated'
     requesting = 'requesting'

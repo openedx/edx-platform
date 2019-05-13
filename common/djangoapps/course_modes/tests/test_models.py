@@ -456,7 +456,7 @@ class CourseModeModelTest(TestCase):
 
     @ddt.data(
         (CourseMode.AUDIT, False),
-        (CourseMode.HONOR, False),
+        (CourseMode.HONOR, True),
         (CourseMode.VERIFIED, True),
         (CourseMode.CREDIT_MODE, True),
         (CourseMode.PROFESSIONAL, True),

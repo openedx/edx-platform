@@ -135,14 +135,6 @@ AUDIT_PASSING_CERT_DATA = CertData(
     cert_web_view_url=None
 )
 
-HONOR_PASSING_CERT_DATA = CertData(
-    CertificateStatuses.honor_passing,
-    _('Your enrollment: Honor track'),
-    _('You are enrolled in the honor track for this course. The honor track does not include a certificate.'),
-    download_url=None,
-    cert_web_view_url=None
-)
-
 GENERATING_CERT_DATA = CertData(
     CertificateStatuses.generating,
     _("We're working on it..."),
@@ -1075,7 +1067,7 @@ def _get_cert_data(student, course, enrollment_mode, course_grade=None):
         returns dict if course certificate is available else None.
     """
     if not CourseMode.is_eligible_for_certificate(enrollment_mode):
-        return AUDIT_PASSING_CERT_DATA if enrollment_mode == CourseMode.AUDIT else HONOR_PASSING_CERT_DATA
+        return AUDIT_PASSING_CERT_DATA
 
     certificates_enabled_for_course = certs_api.cert_generation_enabled(course.id)
     if course_grade is None:
