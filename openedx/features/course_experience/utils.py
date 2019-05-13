@@ -14,6 +14,7 @@ from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
 from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.cache_utils import request_cached
 from openedx.features.course_experience import FIRST_PURCHASE_OFFER_BANNER_DISPLAY
+from openedx.features.discounts.applicability import can_recieve_discount, discount_percentage
 from xmodule.modulestore.django import modulestore
 
 
@@ -192,14 +193,18 @@ def get_resume_block(block):
 
 
 def get_first_purchase_offer_banner_fragment(user, course):
-    if FIRST_PURCHASE_OFFER_BANNER_DISPLAY.is_enabled() and user and course:
+    if (FIRST_PURCHASE_OFFER_BANNER_DISPLAY.is_enabled() and
+            user and
+            course and
+            can_recieve_discount(user=user, course_key_string=unicode(course.id))):
         # Translator: xgettext:no-python-format
-        offer_message = _(u'{banner_open}15% off your first upgrade.{span_close}'
+        offer_message = _(u'{banner_open}{percentage}% off your first upgrade.{span_close}'
                           u' Discount automatically applied.{div_close}')
         return Fragment(HTML(offer_message).format(
             banner_open=HTML(
                 '<div class="first-purchase-offer-banner"><span class="first-purchase-offer-banner-bold">'
             ),
+            percentage=discount_percentage(),
             span_close=HTML('</span>'),
             div_close=HTML('</div>')
         ))
