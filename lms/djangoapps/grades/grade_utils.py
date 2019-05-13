@@ -33,7 +33,7 @@ class ScoreCSVProcessor(ChecksumMixin, DeferrableMixin, CSVProcessor):
     checksum_columns = ['user_id', 'block_id', 'last_points']
     # files larger than 100 rows will be processed asynchronously
     size_to_defer = 100
-
+    max_file_size = 1024 * 1024
     handle_undo = False
 
     def __init__(self, **kwargs):

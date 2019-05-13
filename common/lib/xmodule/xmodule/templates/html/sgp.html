@@ -3,9 +3,9 @@
     {{score_string}}
 </div>
 
-<div class="problem">
+<p class="problem">
 {{instructions|safe}}
-</div>
+</p>
 
 {% if is_staff and grades_available %}
 {% load i18n %}
@@ -13,15 +13,15 @@
     <div class="col">
         <hr>
         <ul>
-            <li><strong>Step 1:</strong> Download a grading CSV<br>
-                <p><a href="{{export_url}}" class="btn btn-brand">export scores</a></p>
+            <li><strong>{% trans "Step 1:" %}</strong> {% trans "Export scores." %}<br>
+                <p>{% trans "Download a grading CSV and use this as a template to assign scores for this problem." %}</p>
+                <p><a href="{{export_url}}" class="btn btn-brand">{% trans "export scores" %}</a></p>
             </li>
-            <li><strong>Step 2:</strong> Add points to the CSV<br>
-                <p>(insert docs here)</p>
+            <li><strong>{% trans "Step 2:" %}</strong> {% trans "(On your own machine) Fill out grades." %}<br>
+                <p>{% trans "Open the CSV in a spreadsheet editor and assign scores to learners via “New Points” field. Leave scores that you don’t want to change blank." %}</p>
             </li>
-            <li><strong>Step 3:</strong> Import grading CSV<br>
-                <p>Learners will immediately see their grades after import completes.</p>
-                <p>Partially complete grades are ok.</p>
+            <li><strong>{% trans "Step 3:" %}</strong> {% trans "Import scores." %}<br>
+                <p>{% trans "Upload the filled out CSV. Learners will immediately see their grades after import completes." %}</p>
                 <form action="{{import_url}}" method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
                     <label class="submit btn btn-brand">
@@ -36,8 +36,10 @@
             <span class="sr">Loading&hellip;</span>
         </p>
 
-        <div class="text-info" id="{{id}}-status" style="display:none">
-            <div class="message"></div>
+        <div class="wrapper-xblock-message text-info" id="{{id}}-status" style="display:none">
+            <div class="xblock-message">
+                <div class="message validation"></div>
+            </div>
         </div>
     </div>
 </div>
@@ -54,7 +56,7 @@
                 message += data.error_messages;
             }
         } else {
-            var message = {% trans "`${data.saved} of ${data.total} learner's grades processed.`" %};
+            var message = {% trans "`Processed ${data.total} row(s). Updated scores for ${data.saved} learner(s).`" %};
         }
         $(`#${blockId}-status`).show();
         $(`#${blockId}-status .message`).html(message);
