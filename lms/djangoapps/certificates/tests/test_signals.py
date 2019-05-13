@@ -257,7 +257,6 @@ class FailingGradeCertsTest(ModuleStoreTestCase):
         CertificateStatuses.auditing,
         CertificateStatuses.audit_passing,
         CertificateStatuses.audit_notpassing,
-        CertificateStatuses.honor_passing,
         CertificateStatuses.unverified,
         CertificateStatuses.invalidated,
         CertificateStatuses.requesting,
