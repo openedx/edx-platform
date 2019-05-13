@@ -114,7 +114,7 @@ class CSVProcessor(object):
         Returns bool.
         """
         if hasattr(thefile, 'size') and self.max_file_size and thefile.size > self.max_file_size:
-            self.add_error(_("The CSV file must be under {} bytes ").format(self.max_file_size))
+            self.add_error(_("The CSV file must be under {} bytes").format(self.max_file_size))
             return False
         elif self.required_columns:
             for field in self.required_columns:
