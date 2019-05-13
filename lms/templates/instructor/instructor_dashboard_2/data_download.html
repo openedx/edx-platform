@@ -106,7 +106,7 @@ from openedx.core.djangolib.markup import HTML, Text
 
     <h3 class="hd hd-3">${_("Reports Available for Download")}</h3>
     <p>
-      ${_("The reports listed below are available for download. A link to every report remains available on this page, identified by the UTC date and time of generation. Reports are not deleted, so you will always be able to access previously generated reports from this page.")}
+      ${_("The reports listed below are available for download, identified by UTC date and time of generation.")}
     </p>
 
   %if settings.FEATURES.get('ENABLE_ASYNC_ANSWER_DISTRIBUTION'):
@@ -117,9 +117,13 @@ from openedx.core.djangolib.markup import HTML, Text
 
     ## Translators: a table of URL links to report files appears after this sentence.
     <p>
-        ${Text(_("{strong_start}Note{strong_end}: To keep student data secure, you cannot save or email these links for direct access. Copies of links expire within 5 minutes.")).format(
+        ${Text(_("{strong_start}Note{strong_end}: {ul_start}{li_start}To keep student data secure, you cannot save or email these links for direct access. Copies of links expire within 5 minutes.{li_end}{li_start}Report files are deleted 90 days after generation. If you will need access to old reports, download and store the files, in accordance with your institution's data security policies.{li_end}{ul_end}")).format(
             strong_start=HTML("<strong>"),
             strong_end=HTML("</strong>"),
+            ul_start=HTML("<ul>"),
+            ul_end=HTML("</ul>"),
+            li_start=HTML("<li>"),
+            li_end=HTML("</li>"),
         )}
     </p><br>
 
