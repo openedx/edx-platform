@@ -182,7 +182,7 @@ imagesize==1.1.0          # via sphinx
 incremental==17.5.0
 inflect==2.1.0
 ipaddress==1.0.22
-isort==4.3.18
+isort==4.3.19
 itsdangerous==1.1.0
 itypes==1.1.0
 jinja2-pluralize==0.3.0
