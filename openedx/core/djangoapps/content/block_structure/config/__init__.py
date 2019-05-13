@@ -9,7 +9,6 @@ from openedx.core.lib.cache_utils import request_cached
 
 from .models import BlockStructureConfiguration
 
-
 # Namespace
 WAFFLE_NAMESPACE = u'block_structure'
 
