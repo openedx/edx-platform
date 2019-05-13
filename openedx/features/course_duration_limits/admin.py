@@ -14,7 +14,8 @@ from .models import CourseDurationLimitConfig
 
 
 class CourseDurationLimitConfigAdmin(StackedConfigModelAdmin):
-    """Admin for course duration limit
+    """
+    Admin for course duration limit
     """
     fieldsets = (
         ('Context', {
