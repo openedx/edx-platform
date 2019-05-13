@@ -4,8 +4,8 @@
 -e git+https://github.com/edx-solutions/xblock-mentoring.git@8837eb5d91fed05ec4758dfd9b9e7adc5c906210#egg=xblock-mentoring
 -e git+https://github.com/edx-solutions/xblock-image-explorer.git@v1.1.4#egg=xblock-image-explorer==1.1.4
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop.git@92ee2055a16899090a073e1df81e35d5293ad767#egg=xblock-drag-and-drop
-# FIXME: temp hash, until a proper solution is findout (ref ticket: https://edx-wiki.atlassian.net/browse/MCKIN-8249)
--e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@28c82e3d63f011029343115cb1b07e27afaeeb3e#egg=xblock-drag-and-drop-v2==2.2.2
+# FIXME: temp hash, until (https://github.com/edx-solutions/xblock-drag-and-drop-v2/pull/207 is merged into `master`)
+-e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@e5e81debd044ba456ca2388535fcad05d968e41b#egg=xblock-drag-and-drop-v2==2.2.3
 # This is required for A2E courses that were created with the temporary (xblock-drag-and-drop-v2-new) DnDv2 branch to continue to work.
 # FIXME: bump version to 2.1.6 when https://github.com/edx-solutions/xblock-drag-and-drop-v2/pull/154 merged and tagged
 -e git+https://github.com/open-craft/xblock-drag-and-drop-v2.git@82c9dc5e16d10793e8b79e60661e1a78893fce25#egg=xblock-drag-and-drop-v2-new
