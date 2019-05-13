@@ -6,7 +6,7 @@ from __future__ import absolute_import
 import json
 import os
 
-from six.moves.urllib.parse import urlencode
+from six.moves import urllib
 from bok_choy.page_object import PageObject, unguarded
 
 # The URL used for user auth in testing
@@ -94,7 +94,7 @@ class AutoAuthPage(PageObject):
         Construct the URL.
         """
         url = AUTH_BASE_URL + "/auto_auth"
-        query_str = urlencode(self._params)
+        query_str = urllib.parse.urlencode(self._params)
 
         if query_str:
             url += "?" + query_str
