@@ -93,7 +93,7 @@ django-cors-headers==2.1.0
 django-countries==4.6.1
 django-crum==0.7.3
 django-debug-toolbar==1.8
-django-fernet-fields==0.5
+django-fernet-fields==0.6
 django-filter==1.0.4
 django-ipware==2.1.0
 django-method-override==0.1.0
@@ -133,7 +133,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==1.0.3
 edx-drf-extensions==2.2.1
-edx-enterprise==1.4.10
+edx-enterprise==1.5.1
 edx-i18n-tools==0.4.8
 edx-lint==1.1.2
 edx-milestones==0.1.13
@@ -147,7 +147,7 @@ edx-rest-api-client==1.9.2
 edx-search==1.2.2
 edx-sphinx-theme==1.4.0
 edx-submissions==2.1.1
-edx-user-state-client==1.0.4
+edx-user-state-client==1.1.0
 edx-when==0.1.4
 edxval==1.1.25
 elasticsearch==1.9.0
@@ -156,7 +156,7 @@ enum34==1.1.6
 event-tracking==0.2.8
 execnet==1.6.0
 factory_boy==2.8.1
-faker==1.0.5
+faker==1.0.6
 feedparser==5.1.3
 filelock==3.0.10
 firebase-token-generator==1.3.2
@@ -183,7 +183,7 @@ imagesize==1.1.0          # via sphinx
 incremental==17.5.0
 inflect==2.1.0
 ipaddress==1.0.22
-isort==4.3.18
+isort==4.3.19
 itsdangerous==1.1.0
 itypes==1.1.0
 jinja2-pluralize==0.3.0
@@ -192,7 +192,8 @@ jmespath==0.9.4
 jsondiff==1.1.1
 jsonfield==2.0.2
 kombu==3.0.37
-lazy-object-proxy==1.4.0
+laboratory==1.0.2
+lazy-object-proxy==1.4.1
 lazy==1.1
 lepl==5.1.3
 libsass==0.10.0
@@ -232,7 +233,7 @@ pbr==5.2.0
 pdfminer.six==20181108
 piexif==1.0.2
 pillow==6.0.0
-pip-tools==3.6.1
+pip-tools==3.7.0
 pluggy==0.11.0
 polib==1.1.0
 psutil==1.2.1
@@ -248,7 +249,7 @@ pycryptodome==3.8.1
 pycryptodomex==3.4.7
 pydispatcher==2.0.5
 pyflakes==2.1.1
-pygments==2.3.1
+pygments==2.4.0
 pygraphviz==1.5
 pyhamcrest==1.9.0
 pyinotify==0.9.6
@@ -271,7 +272,7 @@ pytest-django==3.4.8
 pytest-forked==1.0.2
 pytest-randomly==1.2.3
 pytest-xdist==1.28.0
-pytest==4.4.1
+pytest==4.5.0
 python-dateutil==2.4.0
 python-levenshtein==0.12.0
 python-memcached==1.59
@@ -322,7 +323,7 @@ text-unidecode==1.2
 tincan==0.0.5
 toml==0.10.0
 tox-battery==0.5.1
-tox==3.9.0
+tox==3.10.0
 transifex-client==0.13.6
 twisted==19.2.0
 typing==3.6.6
@@ -337,6 +338,7 @@ voluptuous==0.11.5
 vulture==1.0
 w3lib==1.20.0
 watchdog==0.9.0
+wcwidth==0.1.7
 web-fragments==0.3.0
 webencodings==0.5.1
 webob==1.8.5

@@ -5,6 +5,7 @@ Utilities to facilitate experimentation
 import hashlib
 import re
 import logging
+import laboratory
 from decimal import Decimal
 from student.models import CourseEnrollment
 from django.utils.timezone import now
@@ -282,11 +283,19 @@ def get_dashboard_course_info(user, dashboard_enrollments):
 
 def get_experiment_user_metadata_context(course, user):
     """
+    Temp code to compare results
+    """
+    experiment = laboratory.Experiment(raise_on_mismatch=True)
+    experiment.control(get_deprecated_experiment_user_metadata_context, args=[course, user])
+    experiment.candidate(get_temp_experiment_user_metadata_context, args=[course, user])
+    context = experiment.conduct()
+    return context
+
+
+def get_temp_experiment_user_metadata_context(course, user):
+    """
     Return a context dictionary with the keys used by the user_metadata.html.
     """
-    if DEPRECATED_METADATA.is_enabled():
-        return get_deprecated_experiment_user_metadata_context(course, user)
-
     enrollment = None
     user_enrollments = None
     audit_enrollments = None

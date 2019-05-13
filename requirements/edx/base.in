@@ -99,6 +99,7 @@ help-tokens
 html5lib                            # HTML parser, used for capa problems
 ipaddress                           # Ip network support for Embargo feature
 jsonfield                           # Django model field for validated JSON; used in several apps
+laboratory                          # Temporary--will not be merged
 mailsnake                           # Needed for mailchimp (mailing djangoapp)
 mako==1.0.2                         # Primary template language used for server-side page rendering
 Markdown                            # Convert text markup to HTML; used in capa problems, forums, and course wikis
