@@ -287,19 +287,21 @@ def get_experiment_user_metadata_context(course, user):
     if DEPRECATED_METADATA.is_enabled():
         return get_deprecated_experiment_user_metadata_context(course, user)
 
-    context = {}
-    has_non_audit_enrollments = None
+    enrollment = None
+    user_enrollments = None
+    audit_enrollments = None
+    has_non_audit_enrollments = False
     try:
-        enrollment = CourseEnrollment.objects.select_related(
-            'course'
-        ).get(user_id=user.id, course_id=course.id)
         user_enrollments = CourseEnrollment.objects.select_related('course').filter(user_id=user.id)
         audit_enrollments = user_enrollments.filter(mode='audit')
         has_non_audit_enrollments = (len(audit_enrollments) != len(user_enrollments))
-        context = get_base_experiment_metadata_context(course, user, enrollment, user_enrollments, audit_enrollments)
+        enrollment = CourseEnrollment.objects.select_related(
+            'course'
+        ).get(user_id=user.id, course_id=course.id)
     except CourseEnrollment.DoesNotExist:
         pass  # Not enrolled, use the default None values
 
+    context = get_base_experiment_metadata_context(course, user, enrollment, user_enrollments, audit_enrollments)
     has_staff_access = has_staff_access_to_preview_mode(user, course.id)
     forum_roles = []
     if user.is_authenticated:
@@ -319,6 +321,7 @@ def get_experiment_user_metadata_context(course, user):
     return context
 
 
+# pylint: disable=too-many-statements
 def get_deprecated_experiment_user_metadata_context(course, user):
     """
     Return a context dictionary with the keys used by the user_metadata.html. This is deprecated and will be removed
@@ -443,7 +446,7 @@ def get_base_experiment_metadata_context(course, user, enrollment, user_enrollme
     # TODO: clean up as part of REVEM-199 (START)
     program_key = get_program_context(course, user_enrollments, audit_enrollments)
     # TODO: clean up as part of REVEM-199 (END)
-    if enrollment.is_active:
+    if enrollment and enrollment.is_active:
         enrollment_mode = enrollment.mode
         enrollment_time = enrollment.created
 
