@@ -1,6 +1,7 @@
 """
 Utilities for determining whether or not a survey needs to be completed.
 """
+from __future__ import absolute_import
 from courseware.access import has_access
 from survey.models import SurveyForm, SurveyAnswer
 

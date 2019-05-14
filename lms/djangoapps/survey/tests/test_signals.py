@@ -2,6 +2,7 @@
 Test signal handlers for the survey app
 """
 
+from __future__ import absolute_import
 from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import fake_completed_retirement
 from student.tests.factories import UserFactory
 from survey.models import SurveyAnswer

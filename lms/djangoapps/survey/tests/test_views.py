@@ -2,6 +2,7 @@
 Python tests for the Survey views
 """
 
+from __future__ import absolute_import
 import json
 from collections import OrderedDict
 
@@ -12,6 +13,7 @@ from student.tests.factories import UserFactory
 from survey.models import SurveyAnswer, SurveyForm
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+import six
 
 
 class SurveyViewsTests(ModuleStoreTestCase):
@@ -129,7 +131,7 @@ class SurveyViewsTests(ModuleStoreTestCase):
 
         data['csrfmiddlewaretoken'] = 'foo'
         data['_redirect_url'] = 'bar'
-        data['course_id'] = unicode(self.course.id)
+        data['course_id'] = six.text_type(self.course.id)
 
         resp = self.client.post(
             self.postback_url,
@@ -148,7 +150,7 @@ class SurveyViewsTests(ModuleStoreTestCase):
         )
 
         for answer_obj in answer_objs:
-            self.assertEquals(unicode(answer_obj.course_key), data['course_id'])
+            self.assertEquals(six.text_type(answer_obj.course_key), data['course_id'])
 
     def test_encoding_answers(self):
         """
