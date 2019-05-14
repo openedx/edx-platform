@@ -1,11 +1,12 @@
 """
 Tests for Shopping Cart views
 """
+from __future__ import absolute_import
 import json
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from decimal import Decimal
-from urlparse import urlparse
+from six.moves.urllib.parse import urlparse
 
 import ddt
 import pytz
@@ -53,6 +54,8 @@ from util.date_utils import get_default_time_display
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+import six
+from six.moves import range
 
 
 def mock_render_purchase_form_html(*args, **kwargs):
@@ -936,7 +939,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
                 'quantity': 1,
                 'line_cost': 40,
                 'line_desc': u'{} for course Test Course'.format(self.verified_course_mode.mode_display_name),
-                'course_key': unicode(self.verified_course_key)
+                'course_key': six.text_type(self.verified_course_key)
             })
 
     def test_show_receipt_xss(self):
@@ -997,14 +1000,14 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
             'quantity': 1,
             'line_cost': 40,
             'line_desc': 'Registration for Course: Robot Super Course',
-            'course_key': unicode(self.course_key)
+            'course_key': six.text_type(self.course_key)
         })
         self.assertEqual(items[1], {
             'unit_cost': 40,
             'quantity': 1,
             'line_cost': 40,
             'line_desc': u'{} for course Test Course'.format(self.verified_course_mode.mode_display_name),
-            'course_key': unicode(self.verified_course_key)
+            'course_key': six.text_type(self.verified_course_key)
         })
 
     def test_receipt_json_refunded(self):
@@ -1547,7 +1550,7 @@ class ReceiptRedirectTest(SharedModuleStoreTestCase):
         # page in the verify_student app
         redirect_url = reverse(
             'verify_student_payment_confirmation',
-            kwargs={'course_id': unicode(self.course_key)}
+            kwargs={'course_id': six.text_type(self.course_key)}
         )
         redirect_url += '?payment-order-num={order_num}'.format(
             order_num=self.cart.id
@@ -1760,7 +1763,7 @@ class RegistrationCodeRedemptionCourseEnrollment(SharedModuleStoreTestCase):
         cache.clear()
         url = reverse('register_code_redemption', args=['asdasd'])
         self.login_user()
-        for i in xrange(30):  # pylint: disable=unused-variable
+        for i in range(30):  # pylint: disable=unused-variable
             response = self.client.post(url)
             self.assertEquals(response.status_code, 404)
 
@@ -1784,7 +1787,7 @@ class RegistrationCodeRedemptionCourseEnrollment(SharedModuleStoreTestCase):
         cache.clear()
         url = reverse('register_code_redemption', args=['asdasd'])
         self.login_user()
-        for i in xrange(30):  # pylint: disable=unused-variable
+        for i in range(30):  # pylint: disable=unused-variable
             response = self.client.get(url)
             self.assertEquals(response.status_code, 404)
 
@@ -2033,7 +2036,7 @@ class DonationViewTest(SharedModuleStoreTestCase):
         if course_id is not None:
             self.assertEqual(
                 payment_info["payment_params"]["merchant_defined_data1"],
-                unicode(course_id)
+                six.text_type(course_id)
             )
             self.assertEqual(
                 payment_info["payment_params"]["merchant_defined_data2"],
