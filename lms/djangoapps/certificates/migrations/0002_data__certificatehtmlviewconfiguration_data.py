@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
+from __future__ import absolute_import
 import json
 
 # Converted from the original South migration 0020_certificatehtmlviewconfiguration_data.py

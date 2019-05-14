@@ -4,9 +4,10 @@ Certificate end-points used by the student support UI.
 See lms/djangoapps/support for more details.
 
 """
+from __future__ import absolute_import
 import bleach
 import logging
-import urllib
+import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 from functools import wraps
 
 from django.db import transaction
@@ -25,6 +26,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from student.models import CourseEnrollment, User
 from util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
+import six
 
 log = logging.getLogger(__name__)
 
@@ -81,7 +83,7 @@ def search_certificates(request):
         ]
 
     """
-    user_filter = bleach.clean(urllib.unquote(urllib.quote_plus(request.GET.get("user", ""))))
+    user_filter = bleach.clean(six.moves.urllib.parse.unquote(six.moves.urllib.parse.quote_plus(request.GET.get("user", ""))))
     if not user_filter:
         msg = _("user is not given.")
         return HttpResponseBadRequest(msg)
@@ -93,12 +95,12 @@ def search_certificates(request):
 
     certificates = api.get_certificates_for_user(user.username)
     for cert in certificates:
-        cert["course_key"] = unicode(cert["course_key"])
+        cert["course_key"] = six.text_type(cert["course_key"])
         cert["created"] = cert["created"].isoformat()
         cert["modified"] = cert["modified"].isoformat()
         cert["regenerate"] = not cert['is_pdf_certificate']
 
-    course_id = urllib.quote_plus(request.GET.get("course_id", ""), safe=':/')
+    course_id = six.moves.urllib.parse.quote_plus(request.GET.get("course_id", ""), safe=':/')
     if course_id:
         try:
             course_key = CourseKey.from_string(course_id)

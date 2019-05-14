@@ -2,8 +2,9 @@
 """
 Certificate HTML webview.
 """
+from __future__ import absolute_import
 import logging
-import urllib
+import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 from datetime import datetime
 from uuid import uuid4
 
@@ -48,6 +49,7 @@ from student.models import LinkedInAddToProfileConfiguration
 from util import organizations_helpers as organization_api
 from util.date_utils import strftime_localized
 from util.views import handle_500
+import six
 
 
 log = logging.getLogger(__name__)
@@ -282,7 +284,7 @@ def _update_social_context(request, context, course, user, user_certificate, pla
     if context.get('twitter_share_enabled', False):
         twitter_url = 'https://twitter.com/intent/tweet?text={twitter_share_text}&url={share_url}'.format(
             twitter_share_text=smart_str(context['twitter_share_text']),
-            share_url=urllib.quote_plus(smart_str(share_url))
+            share_url=six.moves.urllib.parse.quote_plus(smart_str(share_url))
         )
     context['twitter_url'] = twitter_url
     context['linked_in_url'] = None
@@ -346,7 +348,7 @@ def _get_user_certificate(request, user, course_key, course, preview_mode=None):
                 modified_date = datetime.now().date()
             user_certificate = GeneratedCertificate(
                 mode=preview_mode,
-                verify_uuid=unicode(uuid4().hex),
+                verify_uuid=six.text_type(uuid4().hex),
                 modified_date=modified_date
             )
     elif certificates_viewable_for_course(course):
@@ -388,7 +390,7 @@ def _track_certificate_events(request, context, course, user, user_certificate):
                     'badge_generator': badge.backend,
                     'issuing_component': badge.badge_class.issuing_component,
                     'user_id': user.id,
-                    'course_id': unicode(course_key),
+                    'course_id': six.text_type(course_key),
                     'enrollment_mode': badge.badge_class.mode,
                     'assertion_id': badge.id,
                     'assertion_image_url': badge.image_url,
@@ -405,7 +407,7 @@ def _track_certificate_events(request, context, course, user, user_certificate):
 
     # track certificate evidence_visited event for analytics when certificate_user and accessing_user are different
     if request.user and request.user.id != user.id:
-        emit_certificate_event('evidence_visited', user, unicode(course.id), course, {
+        emit_certificate_event('evidence_visited', user, six.text_type(course.id), course, {
             'certificate_id': user_certificate.verify_uuid,
             'enrollment_mode': user_certificate.mode,
             'social_network': CertificateSocialNetworks.linkedin
@@ -473,7 +475,7 @@ def render_cert_by_uuid(request, certificate_uuid):
             verify_uuid=certificate_uuid,
             status=CertificateStatuses.downloadable
         )
-        return render_html_view(request, certificate.user.id, unicode(certificate.course_id))
+        return render_html_view(request, certificate.user.id, six.text_type(certificate.course_id))
     except GeneratedCertificate.DoesNotExist:
         raise Http404
 
