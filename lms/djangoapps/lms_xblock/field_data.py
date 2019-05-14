@@ -3,6 +3,7 @@
 """
 
 from __future__ import absolute_import
+
 from xblock.field_data import ReadOnlyFieldData, SplitFieldData
 from xblock.fields import Scope
 

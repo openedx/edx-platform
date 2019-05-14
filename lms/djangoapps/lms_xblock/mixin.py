@@ -4,6 +4,8 @@ Namespace that defines fields common to all blocks used in the LMS
 
 #from django.utils.translation import ugettext_noop as _
 from __future__ import absolute_import
+
+import six
 from lazy import lazy
 from xblock.core import XBlock, XBlockMixin
 from xblock.exceptions import JsonHandlerError
@@ -13,7 +15,6 @@ from xblock.validation import ValidationMessage
 from lms.lib.utils import is_unit
 from xmodule.modulestore.inheritance import UserPartitionList
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
-import six
 
 # Please do not remove, this is a workaround for Django 1.8.
 # more information can be found here: https://openedx.atlassian.net/browse/PLAT-902

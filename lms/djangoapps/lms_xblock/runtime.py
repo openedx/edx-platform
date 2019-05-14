@@ -2,24 +2,25 @@
 Module implementing `xblock.runtime.Runtime` functionality for the LMS
 """
 from __future__ import absolute_import
+
+import six
+import xblock.reference.plugins
 from completion.services import CompletionService
 from django.conf import settings
 from django.urls import reverse
 from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
-import xblock.reference.plugins
 
 from badges.service import BadgingService
 from badges.utils import badges_enabled
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from openedx.core.djangoapps.user_api.course_tag import api as user_course_tag_api
 from openedx.core.lib.url_utils import quote_slashes
-from openedx.core.lib.xblock_utils import xblock_local_resource_url, wrap_xblock_aside
+from openedx.core.lib.xblock_utils import wrap_xblock_aside, xblock_local_resource_url
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore.django import ModuleI18nService, modulestore
 from xmodule.partitions.partitions_service import PartitionService
 from xmodule.services import SettingsService
 from xmodule.x_module import ModuleSystem
-import six
 
 
 def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
