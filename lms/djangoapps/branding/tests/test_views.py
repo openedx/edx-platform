@@ -1,15 +1,18 @@
 # encoding: utf-8
 """Tests of Branding API views. """
 from __future__ import absolute_import
+
 import json
-import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 
 import ddt
 import mock
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.test import TestCase
+from django.urls import reverse
 
 from branding.models import BrandingApiConfig
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig

@@ -2,14 +2,16 @@
 Tests for branding page
 """
 from __future__ import absolute_import
+
 import datetime
 
+import six
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 from pytz import UTC
@@ -21,7 +23,6 @@ from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from util.milestones_helpers import set_prerequisite_courses
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-import six
 
 FEATURES_WITH_STARTDATE = settings.FEATURES.copy()
 FEATURES_WITH_STARTDATE['DISABLE_START_DATES'] = False

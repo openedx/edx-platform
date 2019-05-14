@@ -1,15 +1,18 @@
 """Views for the branding app. """
 from __future__ import absolute_import
-import logging
-import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 
+import logging
+
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.cache import cache
-from django.urls import reverse
 from django.db import transaction
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils import translation
 from django.utils.translation.trans_real import get_supported_language_variant
 from django.views.decorators.cache import cache_control

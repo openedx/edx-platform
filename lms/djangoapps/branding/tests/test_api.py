@@ -1,20 +1,16 @@
 # encoding: utf-8
 """Tests of Branding API """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
-from __future__ import absolute_import
 import mock
 from django.conf import settings
-from django.urls import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.urls import reverse
 
 from branding.api import _footer_business_links, get_footer, get_home_url, get_logo_url
 from edxmako.shortcuts import marketing_link
-
-from openedx.core.djangoapps.site_configuration.tests.test_util import (
-    with_site_configuration,
-)
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 
 test_config_disabled_contact_us = {   # pylint: disable=invalid-name
     "CONTACT_US_ENABLE": False,

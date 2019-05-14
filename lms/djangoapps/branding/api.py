@@ -13,8 +13,10 @@ the marketing site and blog).
 
 """
 from __future__ import absolute_import
+
 import logging
 
+import six
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse
@@ -23,7 +25,6 @@ from django.utils.translation import ugettext as _
 from branding.models import BrandingApiConfig
 from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-import six
 
 try:
     from six.moves.urllib.parse import urlencode

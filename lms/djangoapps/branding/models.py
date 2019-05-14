@@ -6,6 +6,7 @@ Includes:
         use Branding.
 """
 from __future__ import absolute_import
+
 import json
 
 from config_models.models import ConfigurationModel

@@ -8,9 +8,10 @@ such as the site visible courses, university name and logo.
 """
 
 from __future__ import absolute_import
-from django.conf import settings
 
+from django.conf import settings
 from opaque_keys.edx.keys import CourseKey
+
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
