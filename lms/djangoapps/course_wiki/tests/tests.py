@@ -2,6 +2,7 @@
 Tests for course wiki
 """
 
+from __future__ import absolute_import
 from django.urls import reverse
 from mock import patch
 from six import text_type
@@ -10,6 +11,7 @@ from courseware.tests.tests import LoginEnrollmentTestCase
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+import six
 
 
 class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase, ModuleStoreTestCase):
@@ -217,7 +219,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
 
         # However, for private wikis, enrolled users must pass through the consent gate
         # (Unenrolled users are redirected to course/about)
-        course_id = unicode(course.id)
+        course_id = six.text_type(course.id)
         self.login(self.student, self.password)
         self.enroll(course)
 

@@ -2,6 +2,7 @@
 Tests for wiki permissions
 """
 
+from __future__ import absolute_import
 from django.contrib.auth.models import Group
 from wiki.models import URLPath
 
