@@ -2,16 +2,17 @@
 Tests for Pdf file
 """
 from __future__ import absolute_import
+
 import unittest
 from datetime import datetime
 from io import BytesIO
 
 from django.conf import settings
 from django.test.utils import override_settings
+from six.moves import range
 
 from shoppingcart.pdf import PDFInvoice
 from shoppingcart.utils import parse_pages
-from six.moves import range
 
 PDF_RECEIPT_DISCLAIMER_TEXT = "THE SITE AND ANY INFORMATION, CONTENT OR SERVICES MADE AVAILABLE ON OR THROUGH " \
     "THE SITE ARE PROVIDED \"AS IS\" AND \"AS AVAILABLE\" WITHOUT WARRANTY OF ANY KIND (EXPRESS, IMPLIED OR" \

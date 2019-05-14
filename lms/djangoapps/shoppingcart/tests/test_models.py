@@ -2,6 +2,7 @@
 Tests for the Shopping Cart Models
 """
 from __future__ import absolute_import
+
 import copy
 import datetime
 import json
@@ -11,17 +12,19 @@ from decimal import Decimal
 
 import ddt
 import pytz
+import six
 from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core import mail
 from django.core.mail.message import EmailMessage
-from django.urls import reverse
 from django.db import DatabaseError
 from django.test import TestCase
 from django.test.utils import override_settings
-from mock import Mock, MagicMock, patch
+from django.urls import reverse
+from mock import MagicMock, Mock, patch
 from opaque_keys.edx.locator import CourseLocator
+from six.moves import range
 
 from course_modes.models import CourseMode
 from shoppingcart.exceptions import (
@@ -54,8 +57,6 @@ from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-import six
-from six.moves import range
 
 
 @ddt.ddt

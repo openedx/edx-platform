@@ -3,6 +3,7 @@
 Dashboard with Shopping Cart History tests with configuration overrides.
 """
 from __future__ import absolute_import
+
 from django.urls import reverse
 from mock import patch
 

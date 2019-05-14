@@ -2,28 +2,31 @@
 Tests for Shopping Cart views
 """
 from __future__ import absolute_import
+
 import json
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from decimal import Decimal
-from six.moves.urllib.parse import urlparse
 
 import ddt
 import pytz
+import six
 from django.conf import settings
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import Group, User
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core import mail
 from django.core.cache import cache
-from django.urls import reverse
 from django.http import HttpRequest
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.urls import reverse
 from freezegun import freeze_time
 from mock import Mock, patch
 from pytz import UTC
 from six import text_type
+from six.moves import range
+from six.moves.urllib.parse import urlparse
 
 from common.test.utils import XssTestMixin
 from course_modes.models import CourseMode
@@ -54,8 +57,6 @@ from util.date_utils import get_default_time_display
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-import six
-from six.moves import range
 
 
 def mock_render_purchase_form_html(*args, **kwargs):
