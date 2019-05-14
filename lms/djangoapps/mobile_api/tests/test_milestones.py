@@ -1,6 +1,7 @@
 """
 Milestone related tests for the mobile_api
 """
+from __future__ import absolute_import
 from django.conf import settings
 from mock import patch
 from crum import set_current_request
@@ -10,6 +11,7 @@ from courseware.tests.test_entrance_exam import add_entrance_exam_milestone, ans
 from openedx.core.djangolib.testing.utils import get_mock_request
 from util.milestones_helpers import add_prerequisite_course, fulfill_course_milestone
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+import six
 
 
 class MobileAPIMilestonesMixin(object):
@@ -111,7 +113,7 @@ class MobileAPIMilestonesMixin(object):
             add_entrance_exam_milestone(self.course, self.entrance_exam)
 
             self.course.entrance_exam_minimum_score_pct = 0.50
-            self.course.entrance_exam_id = unicode(self.entrance_exam.location)
+            self.course.entrance_exam_id = six.text_type(self.entrance_exam.location)
             self.store.update_item(self.course, self.user.id)
 
     def _add_prerequisite_course(self):
