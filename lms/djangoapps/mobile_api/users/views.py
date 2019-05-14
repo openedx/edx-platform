@@ -2,6 +2,7 @@
 Views for user API
 """
 
+from __future__ import absolute_import
 import json
 from django.shortcuts import redirect
 from django.utils import dateparse
@@ -28,6 +29,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from .. import errors
 from ..decorators import mobile_course_access, mobile_view
 from .serializers import CourseEnrollmentSerializer, CourseEnrollmentSerializerv05, UserSerializer
+import six
 
 
 @mobile_view(is_user=True)
@@ -140,7 +142,7 @@ class UserCourseStatus(views.APIView):
         Returns the course status
         """
         path = self._last_visited_module_path(request, course)
-        path_ids = [unicode(module.location) for module in path]
+        path_ids = [six.text_type(module.location) for module in path]
         return Response({
             "last_visited_module_id": path_ids[0],
             "last_visited_module_path": path_ids,

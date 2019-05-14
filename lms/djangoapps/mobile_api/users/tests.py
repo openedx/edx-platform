@@ -1,6 +1,7 @@
 """
 Tests for users API
 """
+from __future__ import absolute_import
 import datetime
 
 import ddt
@@ -39,6 +40,8 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from .. import errors
 from .serializers import CourseEnrollmentSerializer, CourseEnrollmentSerializerv05
+import six
+from six.moves import range
 
 
 @ddt.ddt
@@ -111,7 +114,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertIn('courses/{}/about'.format(self.course.id), found_course['course_about'])
         self.assertIn('course_info/{}/updates'.format(self.course.id), found_course['course_updates'])
         self.assertIn('course_info/{}/handouts'.format(self.course.id), found_course['course_handouts'])
-        self.assertEqual(found_course['id'], unicode(self.course.id))
+        self.assertEqual(found_course['id'], six.text_type(self.course.id))
         self.assertEqual(courses[0]['mode'], CourseMode.DEFAULT_MODE_SLUG)
         self.assertEqual(courses[0]['course']['subscription_id'], self.course.clean_id(padding_char='_'))
 
@@ -141,7 +144,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         for course_index in range(num_courses):
             self.assertEqual(
                 response.data[course_index]['course']['id'],
-                unicode(courses[num_courses - course_index - 1].id)
+                six.text_type(courses[num_courses - course_index - 1].id)
             )
 
     @ddt.data(API_V05, API_V1)
@@ -155,7 +158,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
 
         course_with_prereq = CourseFactory.create(start=self.LAST_WEEK, mobile_available=True)
         prerequisite_course = CourseFactory.create()
-        set_prerequisite_courses(course_with_prereq.id, [unicode(prerequisite_course.id)])
+        set_prerequisite_courses(course_with_prereq.id, [six.text_type(prerequisite_course.id)])
 
         # Create list of courses with various expected courseware_access responses and corresponding expected codes
         courses = [
@@ -436,11 +439,11 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         response = self.api_response()
         self.assertEqual(
             response.data["last_visited_module_id"],
-            unicode(self.sub_section.location)
+            six.text_type(self.sub_section.location)
         )
         self.assertEqual(
             response.data["last_visited_module_path"],
-            [unicode(module.location) for module in [self.sub_section, self.section, self.course]]
+            [six.text_type(module.location) for module in [self.sub_section, self.section, self.course]]
         )
 
 
@@ -455,10 +458,10 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
 
     def test_success(self):
         self.login_and_enroll()
-        response = self.api_response(data={"last_visited_module_id": unicode(self.other_unit.location)})
+        response = self.api_response(data={"last_visited_module_id": six.text_type(self.other_unit.location)})
         self.assertEqual(
             response.data["last_visited_module_id"],
-            unicode(self.other_sub_section.location)
+            six.text_type(self.other_sub_section.location)
         )
 
     def test_invalid_module(self):
@@ -483,7 +486,7 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         past_date = datetime.datetime.now()
         response = self.api_response(
             data={
-                "last_visited_module_id": unicode(self.other_unit.location),
+                "last_visited_module_id": six.text_type(self.other_unit.location),
                 "modification_date": past_date.isoformat()
             },
             expected_response_code=400
@@ -501,18 +504,18 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         self.login_and_enroll()
 
         # save something so we have an initial date
-        self.api_response(data={"last_visited_module_id": unicode(initial_unit.location)})
+        self.api_response(data={"last_visited_module_id": six.text_type(initial_unit.location)})
 
         # now actually update it
         response = self.api_response(
             data={
-                "last_visited_module_id": unicode(update_unit.location),
+                "last_visited_module_id": six.text_type(update_unit.location),
                 "modification_date": date.isoformat()
             }
         )
         self.assertEqual(
             response.data["last_visited_module_id"],
-            unicode(expected_subsection.location)
+            six.text_type(expected_subsection.location)
         )
 
     def test_old_date(self):
@@ -529,13 +532,13 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         self.login_and_enroll()
         response = self.api_response(
             data={
-                "last_visited_module_id": unicode(self.other_unit.location),
+                "last_visited_module_id": six.text_type(self.other_unit.location),
                 "modification_date": timezone.now().isoformat()
             }
         )
         self.assertEqual(
             response.data["last_visited_module_id"],
-            unicode(self.other_sub_section.location)
+            six.text_type(self.other_sub_section.location)
         )
 
     def test_invalid_date(self):

@@ -2,6 +2,7 @@
 Tests for course_info
 """
 
+from __future__ import absolute_import
 import ddt
 from django.conf import settings
 from milestones.tests.utils import MilestonesTestCaseMixin
@@ -13,6 +14,7 @@ from xmodule.modulestore.xml_importer import import_course_from_xml
 
 from mobile_api.testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
 from mobile_api.utils import API_V05, API_V1
+from six.moves import range
 
 
 @ddt.ddt

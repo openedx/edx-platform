@@ -2,6 +2,7 @@
 Serializer for user API
 """
 
+from __future__ import absolute_import
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
@@ -11,6 +12,7 @@ from openedx.features.course_duration_limits.access import get_user_course_expir
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from student.models import CourseEnrollment, User
 from util.course import get_encoded_course_sharing_utm_params, get_link_for_about_page
+import six
 
 
 class CourseOverviewField(serializers.RelatedField):
@@ -18,7 +20,7 @@ class CourseOverviewField(serializers.RelatedField):
     Custom field to wrap a CourseOverview object. Read-only.
     """
     def to_representation(self, course_overview):
-        course_id = unicode(course_overview.id)
+        course_id = six.text_type(course_overview.id)
         request = self.context.get('request')
         api_version = self.context.get('api_version')
 
