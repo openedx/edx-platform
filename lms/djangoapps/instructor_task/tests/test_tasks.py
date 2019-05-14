@@ -5,6 +5,7 @@ Runs tasks on answers to course problems to validate that code
 paths actually work.
 """
 
+from __future__ import absolute_import
 import json
 from functools import partial
 from uuid import uuid4
@@ -32,6 +33,7 @@ from lms.djangoapps.instructor_task.tasks_helper.misc import upload_ora2_data
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskModuleTestCase
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from six.moves import range
 
 PROBLEM_URL_NAME = "test_urlname"
 
@@ -167,7 +169,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         """Create & enroll students for testing"""
         return [
             self.create_student(username='robot%d' % i, email='robot+test+%d@edx.org' % i, mode=mode)
-            for i in xrange(num_students)
+            for i in range(num_students)
         ]
 
     def _create_students_with_no_state(self, num_students):

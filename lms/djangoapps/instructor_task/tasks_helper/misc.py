@@ -3,6 +3,7 @@ This file contains tasks that are designed to perform background operations on t
 running state of a course.
 
 """
+from __future__ import absolute_import
 import logging
 from collections import OrderedDict
 from datetime import datetime
@@ -24,6 +25,7 @@ from util.file import UniversalNewlineIterator
 
 from .runner import TaskProgress
 from .utils import UPDATE_STATUS_FAILED, UPDATE_STATUS_SUCCEEDED, upload_csv_to_report_store
+import six
 
 # define different loggers for use within tasks and on client side
 TASK_LOG = logging.getLogger('edx.celery.task')
@@ -52,7 +54,7 @@ def upload_course_survey_report(_xmodule_instance_args, _entry_id, course_id, _t
 
     for survey_field_record in survey_answers_for_course:
         user_id = survey_field_record.user.id
-        if user_id not in user_survey_answers.keys():
+        if user_id not in list(user_survey_answers.keys()):
             user_survey_answers[user_id] = {
                 'username': survey_field_record.user.username,
                 'email': survey_field_record.user.email
@@ -228,7 +230,7 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
             else status_dict[column_name]
             for column_name in output_header
         ]
-        for _cohort_name, status_dict in cohorts_status.iteritems()
+        for _cohort_name, status_dict in six.iteritems(cohorts_status)
     ]
     output_rows.insert(0, output_header)
     upload_csv_to_report_store(output_rows, 'cohort_results', course_id, start_date)

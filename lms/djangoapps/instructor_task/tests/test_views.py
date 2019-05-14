@@ -2,6 +2,7 @@
 """
 Test for LMS instructor background task views.
 """
+from __future__ import absolute_import
 import json
 
 from celery.states import FAILURE, PENDING, REVOKED, SUCCESS
@@ -15,6 +16,7 @@ from lms.djangoapps.instructor_task.tests.test_base import (
     InstructorTaskTestCase
 )
 from lms.djangoapps.instructor_task.views import get_task_completion_info, instructor_task_status
+from six.moves import range
 
 
 class InstructorTaskReportTest(InstructorTaskTestCase):

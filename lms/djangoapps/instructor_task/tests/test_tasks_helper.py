@@ -9,10 +9,11 @@ Unit tests for LMS instructor-initiated background tasks helper functions.
 """
 from __future__ import unicode_literals
 
+from __future__ import absolute_import
 import os
 import shutil
 import tempfile
-import urllib
+import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 
@@ -91,6 +92,9 @@ from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartiti
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
 from ..models import ReportStore
 from ..tasks_helper.utils import UPDATE_STATUS_FAILED, UPDATE_STATUS_SUCCEEDED
+import six
+from six.moves import range
+from six.moves import zip
 
 
 class InstructorGradeReportTestCase(TestReportMixin, InstructorTaskCourseTestCase):
@@ -890,14 +894,14 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         result = ProblemGradeReport.generate(None, None, self.course.id, None, 'graded')
         self.assertDictContainsSubset({'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv([
-            dict(zip(
+            dict(list(zip(
                 self.csv_header_row,
-                [unicode(self.student_1.id), self.student_1.email, self.student_1.username, ENROLLED_IN_COURSE, '0.0']
-            )),
-            dict(zip(
+                [six.text_type(self.student_1.id), self.student_1.email, self.student_1.username, ENROLLED_IN_COURSE, '0.0']
+            ))),
+            dict(list(zip(
                 self.csv_header_row,
-                [unicode(self.student_2.id), self.student_2.email, self.student_2.username, ENROLLED_IN_COURSE, '0.0']
-            ))
+                [six.text_type(self.student_2.id), self.student_2.email, self.student_2.username, ENROLLED_IN_COURSE, '0.0']
+            )))
         ])
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
@@ -916,26 +920,26 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         problem_name = u'Homework 1: Subsection - Problem1'
         header_row = self.csv_header_row + [problem_name + ' (Earned)', problem_name + ' (Possible)']
         self.verify_rows_in_csv([
-            dict(zip(
+            dict(list(zip(
                 header_row,
                 [
-                    unicode(self.student_1.id),
+                    six.text_type(self.student_1.id),
                     self.student_1.email,
                     self.student_1.username,
                     ENROLLED_IN_COURSE,
                     '0.01', '1.0', '2.0',
                 ]
-            )),
-            dict(zip(
+            ))),
+            dict(list(zip(
                 header_row,
                 [
-                    unicode(self.student_2.id),
+                    six.text_type(self.student_2.id),
                     self.student_2.email,
                     self.student_2.username,
                     ENROLLED_IN_COURSE,
                     '0.0', u'Not Attempted', '2.0',
                 ]
-            ))
+            )))
         ])
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
@@ -957,7 +961,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.assertTrue(any('grade_report_err' in item[0] for item in report_store.links_for(self.course.id)))
         self.verify_rows_in_csv([
             {
-                u'Student ID': unicode(student.id),
+                u'Student ID': six.text_type(student.id),
                 u'Email': student.email,
                 u'Username': student.username,
                 u'error_msg': error_message if error_message else "Unknown error"
@@ -984,36 +988,36 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         problem_name = u'Homework 1: Subsection - Problem1'
         header_row = self.csv_header_row + [problem_name + ' (Earned)', problem_name + ' (Possible)']
         self.verify_rows_in_csv([
-            dict(zip(
+            dict(list(zip(
                 header_row,
                 [
-                    unicode(self.student_1.id),
+                    six.text_type(self.student_1.id),
                     self.student_1.email,
                     self.student_1.username,
                     ENROLLED_IN_COURSE,
                     '0.01', '1.0', '2.0',
                 ]
-            )),
-            dict(zip(
+            ))),
+            dict(list(zip(
                 header_row,
                 [
-                    unicode(self.student_2.id),
+                    six.text_type(self.student_2.id),
                     self.student_2.email,
                     self.student_2.username,
                     ENROLLED_IN_COURSE,
                     '0.0', u'Not Attempted', '2.0',
                 ]
-            )),
-            dict(zip(
+            ))),
+            dict(list(zip(
                 header_row,
                 [
-                    unicode(inactive_student.id),
+                    six.text_type(inactive_student.id),
                     inactive_student.email,
                     inactive_student.username,
                     NOT_ENROLLED_IN_COURSE,
                     '0.0', u'Not Attempted', '2.0',
                 ]
-            ))
+            )))
         ])
 
 
@@ -1061,26 +1065,26 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
             header_row += [problem + ' (Earned)', problem + ' (Possible)']
 
         self.verify_rows_in_csv([
-            dict(zip(
+            dict(list(zip(
                 header_row,
                 [
-                    unicode(self.student_a.id),
+                    six.text_type(self.student_a.id),
                     self.student_a.email,
                     self.student_a.username,
                     ENROLLED_IN_COURSE,
                     u'1.0', u'2.0', u'2.0', u'Not Available', u'Not Available'
                 ]
-            )),
-            dict(zip(
+            ))),
+            dict(list(zip(
                 header_row,
                 [
-                    unicode(self.student_b.id),
+                    six.text_type(self.student_b.id),
                     self.student_b.email,
                     self.student_b.username,
                     ENROLLED_IN_COURSE,
                     u'0.5', u'Not Available', u'Not Available', u'1.0', u'2.0'
                 ]
-            ))
+            )))
         ])
 
     def test_problem_grade_report_valid_columns_order(self):
@@ -1097,7 +1101,7 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
                     "drop_count": 0,
                     "short_label": u"HW %d" % i,
                     "weight": 1.0
-                } for i in xrange(1, grader_num)]
+                } for i in range(1, grader_num)]
             }
         )
 
@@ -1109,7 +1113,7 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
 
         problem_vertical_list = []
 
-        for i in xrange(1, grader_num):
+        for i in range(1, grader_num):
             chapter_name = u'Chapter %d' % i
             problem_section_name = u'Problem section %d' % i
             problem_section_format = u'Homework %d' % i
@@ -1134,7 +1138,7 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
             problem_vertical_list.append(problem_vertical)
 
         problem_names = []
-        for i in xrange(1, grader_num):
+        for i in range(1, grader_num):
             problem_url = 'test_problem_%d' % i
             self.define_option_problem(problem_url, parent=problem_vertical_list[i - 1])
             title = u'Homework %d 1: Problem section %d - %s' % (i, i, problem_url)
@@ -1182,15 +1186,15 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
             user(object): Django user object
             grade(list): Users' grade list
         """
-        return dict(zip(
+        return dict(list(zip(
             header_row,
             [
-                unicode(user.id),
+                six.text_type(user.id),
                 user.email,
                 user.username,
                 enrollment_status,
             ] + grade
-        ))
+        )))
 
     def test_cohort_content(self):
         self.submit_student_answer(self.alpha_user.username, u'Problem0', ['Option 1', 'Option 1'])
@@ -1671,8 +1675,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', ''])),
+                dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', '']))),
+                dict(list(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', '']))),
             ],
             verify_order=False
         )
@@ -1686,8 +1690,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', ''])),
+                dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', '']))),
+                dict(list(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', '']))),
             ],
             verify_order=False
         )
@@ -1701,8 +1705,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', ''])),
+                dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', '']))),
+                dict(list(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', '']))),
             ],
             verify_order=False
         )
@@ -1722,8 +1726,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', ''])),
+                dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', '']))),
+                dict(list(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', '']))),
             ],
             verify_order=False
         )
@@ -1736,7 +1740,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 1, 'attempted': 1, 'succeeded': 0, 'failed': 1}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '0', 'Invalid', '', ''])),
+                dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '0', 'Invalid', '', '']))),
             ],
             verify_order=False
         )
@@ -1750,8 +1754,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 1, 'failed': 1}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Does Not Exist', 'False', '0', '', '', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', ''])),
+                dict(list(zip(self.csv_header_row, ['Does Not Exist', 'False', '0', '', '', '']))),
+                dict(list(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', '']))),
             ],
             verify_order=False
         )
@@ -1765,7 +1769,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
                                       result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '0', '', '', 'example_email@example.com'])),
+                dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '0', '', '', 'example_email@example.com']))),
             ],
             verify_order=False
         )
@@ -1778,7 +1782,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 1, 'attempted': 1, 'succeeded': 0, 'failed': 1}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '0', '', 'student_1@', ''])),
+                dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '0', '', 'student_1@', '']))),
             ],
             verify_order=False
         )
@@ -1803,7 +1807,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 0, 'failed': 2}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['', 'False', '0', '', '', ''])),
+                dict(list(zip(self.csv_header_row, ['', 'False', '0', '', '', '']))),
             ],
             verify_order=False
         )
@@ -1827,8 +1831,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', ''])),
+                dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', '']))),
+                dict(list(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', '']))),
             ],
             verify_order=False
         )
@@ -1845,8 +1849,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', ''])),
+                dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', '']))),
+                dict(list(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', '']))),
             ],
             verify_order=False
         )
@@ -1865,8 +1869,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', ''])),
+                dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '', '', '']))),
+                dict(list(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '', '', '']))),
             ],
             verify_order=False
         )
@@ -1885,8 +1889,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'skipped': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '0', '', '', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '0', '', '', ''])),
+                dict(list(zip(self.csv_header_row, ['Cohort 1', 'True', '0', '', '', '']))),
+                dict(list(zip(self.csv_header_row, ['Cohort 2', 'True', '0', '', '', '']))),
             ],
             verify_order=False
         )
@@ -1962,7 +1966,7 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
             self.verify_rows_in_csv(
                 [
                     {
-                        u'Student ID': unicode(self.student.id),
+                        u'Student ID': six.text_type(self.student.id),
                         u'Email': self.student.email,
                         u'Username': self.student.username,
                         u'Grade': '0.13',
@@ -2691,7 +2695,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
                 username='student_{}'.format(index),
                 email='student_{}@example.com'.format(index)
             )
-            for index in xrange(number_of_students)
+            for index in range(number_of_students)
         ]
 
 
@@ -2745,7 +2749,7 @@ class TestInstructorOra2Report(SharedModuleStoreTestCase):
                     return_val = upload_ora2_data(None, None, self.course.id, None, 'generated')
 
                     timestamp_str = datetime.now(UTC).strftime('%Y-%m-%d-%H%M')
-                    course_id_string = urllib.quote(text_type(self.course.id).replace('/', '_'))
+                    course_id_string = six.moves.urllib.parse.quote(text_type(self.course.id).replace('/', '_'))
                     filename = u'{}_ORA_data_{}.csv'.format(course_id_string, timestamp_str)
 
                     self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)

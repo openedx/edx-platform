@@ -1,6 +1,7 @@
 """
 Tests for instructor_task/models.py.
 """
+from __future__ import absolute_import
 import copy
 import time
 from cStringIO import StringIO

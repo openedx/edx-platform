@@ -2,6 +2,7 @@
 Base test classes for LMS instructor-initiated background tasks
 
 """
+from __future__ import absolute_import
 import json
 # pylint: disable=attribute-defined-outside-init
 import os
@@ -397,4 +398,4 @@ class TestReportMixin(object):
         report_path = report_store.path_to(self.course.id, report_csv_filename)
         with report_store.storage.open(report_path) as csv_file:
             rows = unicodecsv.reader(csv_file, encoding='utf-8-sig')
-            return rows.next()
+            return next(rows)

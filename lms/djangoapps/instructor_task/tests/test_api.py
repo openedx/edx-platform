@@ -1,6 +1,7 @@
 """
 Test for LMS instructor background task queue management
 """
+from __future__ import absolute_import
 import ddt
 from mock import MagicMock, Mock, patch
 
@@ -44,6 +45,7 @@ from lms.djangoapps.instructor_task.tests.test_base import (
 )
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from celery.states import FAILURE
+from six.moves import range
 
 
 class InstructorTaskReportTest(InstructorTaskTestCase):
