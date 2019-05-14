@@ -59,7 +59,18 @@ def account_settings(request):
 
     """
     if should_redirect_to_account_microfrontend():
-        return redirect(settings.ACCOUNT_MICROFRONTEND_URL)
+        url = settings.ACCOUNT_MICROFRONTEND_URL
+
+        duplicate_provider = pipeline.get_duplicate_provider(messages.get_messages(request))
+        if duplicate_provider:
+            url = '{url}?{params}'.format(
+                url=url,
+                params=six.moves.urllib.parse.urlencode({
+                    'duplicate_provider': duplicate_provider,
+                }),
+            )
+
+        return redirect(url)
 
     context = account_settings_context(request)
     return render_to_response('student_account/account_settings.html', context)
