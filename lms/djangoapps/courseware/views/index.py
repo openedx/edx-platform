@@ -4,8 +4,9 @@ View for Courseware Index
 
 # pylint: disable=attribute-defined-outside-init
 
+from __future__ import absolute_import
 import logging
-import urllib
+import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -62,6 +63,7 @@ from ..masquerade import (
 )
 from ..model_data import FieldDataCache
 from ..module_render import get_module_for_descriptor, toc_for_course
+import six
 
 log = logging.getLogger("edx.courseware.views.index")
 
@@ -190,7 +192,7 @@ class CoursewareIndex(View):
                                                          self.course.start, self.chapter.start, self.section.start)
 
         if not request.user.is_authenticated:
-            qs = urllib.urlencode({
+            qs = six.moves.urllib.parse.urlencode({
                 'course_id': self.course_key,
                 'enrollment_action': 'enroll',
                 'email_opt_in': False,
@@ -231,7 +233,7 @@ class CoursewareIndex(View):
                 reverse(
                     'courseware_section',
                     kwargs={
-                        'course_id': unicode(self.course_key),
+                        'course_id': six.text_type(self.course_key),
                         'chapter': self.chapter.url_name,
                         'section': self.section.url_name,
                     },
@@ -269,7 +271,7 @@ class CoursewareIndex(View):
             log.warning(
                 u'User %s cannot access the course %s because payment has not yet been received',
                 self.real_user,
-                unicode(self.course_key),
+                six.text_type(self.course_key),
             )
             raise CourseAccessRedirect(reverse('dashboard'))
 
@@ -397,7 +399,7 @@ class CoursewareIndex(View):
         Also returns the table of contents for the courseware.
         """
         course_url_name = default_course_url_name(self.course.id)
-        course_url = reverse(course_url_name, kwargs={'course_id': unicode(self.course.id)})
+        course_url = reverse(course_url_name, kwargs={'course_id': six.text_type(self.course.id)})
 
         courseware_context = {
             'csrf': csrf(self.request)['csrf_token'],
@@ -509,7 +511,7 @@ class CoursewareIndex(View):
             return "{url}?child={requested_child}".format(
                 url=reverse(
                     'courseware_section',
-                    args=[unicode(self.course_key), section_info['chapter_url_name'], section_info['url_name']],
+                    args=[six.text_type(self.course_key), section_info['chapter_url_name'], section_info['url_name']],
                 ),
                 requested_child=requested_child,
             )
@@ -520,7 +522,7 @@ class CoursewareIndex(View):
         section_context = {
             'activate_block_id': self.request.GET.get('activate_block_id'),
             'requested_child': self.request.GET.get("child"),
-            'progress_url': reverse('progress', kwargs={'course_id': unicode(self.course_key)}),
+            'progress_url': reverse('progress', kwargs={'course_id': six.text_type(self.course_key)}),
             'user_authenticated': self.request.user.is_authenticated,
             'position': position,
         }
@@ -542,10 +544,10 @@ def render_accordion(request, course, table_of_contents):
     context = dict(
         [
             ('toc', table_of_contents),
-            ('course_id', unicode(course.id)),
+            ('course_id', six.text_type(course.id)),
             ('csrf', csrf(request)['csrf_token']),
             ('due_date_display_format', course.due_date_display_format),
-        ] + TEMPLATE_IMPORTS.items()
+        ] + list(TEMPLATE_IMPORTS.items())
     )
     return render_to_string('courseware/accordion.html', context)
 

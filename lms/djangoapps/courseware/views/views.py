@@ -1,9 +1,10 @@
 """
 Courseware views functions
 """
+from __future__ import absolute_import
 import json
 import logging
-import urllib
+import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 from collections import OrderedDict, namedtuple
 from datetime import datetime
 
@@ -756,7 +757,7 @@ class EnrollStaffView(View):
         Either enrolls the user in course or redirects user to course about page
         depending upon the option (Enroll, Don't Enroll) chosen by the user.
         """
-        _next = urllib.quote_plus(request.GET.get('next', 'info'), safe='/:?=')
+        _next = six.moves.urllib.parse.quote_plus(request.GET.get('next', 'info'), safe='/:?=')
         course_key = CourseKey.from_string(course_id)
         enroll = 'enroll' in request.POST
         if enroll:
@@ -823,7 +824,7 @@ def course_about(request, course_id):
                     shoppingcart.models.CourseRegCodeItem.contained_in_order(cart, course_key)
 
             reg_then_add_to_cart_link = "{reg_url}?course_id={course_id}&enrollment_action=add_to_cart".format(
-                reg_url=reverse('register_user'), course_id=urllib.quote(str(course_id))
+                reg_url=reverse('register_user'), course_id=six.moves.urllib.parse.quote(str(course_id))
             )
 
         # If the ecommerce checkout flow is enabled and the mode of the course is
@@ -1007,7 +1008,7 @@ def _progress(request, course_key, student_id):
     # student instead of request.user in the rest of the function.
 
     course_grade = CourseGradeFactory().read(student, course)
-    courseware_summary = course_grade.chapter_grades.values()
+    courseware_summary = list(course_grade.chapter_grades.values())
 
     studio_url = get_studio_url(course, 'settings/grading')
     # checking certificate generation configuration
