@@ -1,7 +1,8 @@
 """
 Tests for Course Blocks forms
 """
-from urllib import urlencode
+from __future__ import absolute_import
+from six.moves.urllib.parse import urlencode
 
 import ddt
 from django.http import Http404, QueryDict
@@ -15,6 +16,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..forms import BlockListGetForm
+import six
 
 
 @ddt.ddt
@@ -46,7 +48,7 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
         self.form_data = QueryDict(
             urlencode({
                 'username': self.student.username,
-                'usage_key': unicode(usage_key),
+                'usage_key': six.text_type(usage_key),
             }),
             mutable=True,
         )
