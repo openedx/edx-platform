@@ -3,6 +3,7 @@ Generate a report of certificate statuses
 """
 from __future__ import print_function
 
+from __future__ import absolute_import
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Count
