@@ -13,6 +13,9 @@ from edx_ace.recipient import Recipient
 from edx_django_utils.monitoring import function_trace, set_custom_metric
 
 from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
+from lms.djangoapps.notification_prefs.views import UsernameCipher
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
+from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH
 from openedx.core.djangoapps.schedules.content_highlights import get_week_highlights
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleExperience
@@ -89,6 +92,13 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
             with function_trace('enqueue_send_task'):
                 self.async_send_task.apply_async((self.site.id, str(msg)), retry=False)
 
+    @classmethod
+    def bin_num_for_user_id(cls, user_id):
+        """
+        Returns the bin number used for the given (numeric) user ID.
+        """
+        return user_id % cls.num_bins
+
     def get_schedules_with_target_date_by_bin_and_orgs(
         self, order_by='enrollment__user__id'
     ):
@@ -107,7 +117,7 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
             courseenrollment__is_active=True,
             **schedule_day_equals_target_day_filter
         ).annotate(
-            id_mod=F('id') % self.num_bins
+            id_mod=self.bin_num_for_user_id(F('id'))
         ).filter(
             id_mod=self.bin_num
         )
@@ -358,6 +368,14 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
                 )
                 # continue to the next schedule, don't yield an email for this one
             else:
+                unsubscribe_url = None
+                if (COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH.is_enabled() and
+                        'bulk_email_optout' in settings.ACE_ENABLED_POLICIES):
+                    unsubscribe_url = reverse('bulk_email_opt_out', kwargs={
+                        'token': UsernameCipher.encrypt(user.username),
+                        'course_id': str(enrollment.course_id),
+                    })
+
                 template_context.update({
                     'course_name': schedule.enrollment.course.display_name,
                     'course_url': _get_trackable_course_home_url(enrollment.course_id),
@@ -367,6 +385,7 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
 
                     # This is used by the bulk email optout policy
                     'course_ids': [str(enrollment.course_id)],
+                    'unsubscribe_url': unsubscribe_url,
                 })
                 template_context.update(_get_upsell_information_for_schedule(user, schedule))
 
