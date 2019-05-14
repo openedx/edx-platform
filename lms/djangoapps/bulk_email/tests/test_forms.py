@@ -4,6 +4,7 @@ Unit tests for bulk-email-related forms.
 """
 
 from __future__ import absolute_import
+
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
 

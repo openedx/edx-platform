@@ -2,6 +2,7 @@
 Unit tests for student optouts from course email
 """
 from __future__ import absolute_import
+
 import json
 
 from django.core import mail

@@ -6,8 +6,8 @@ Runs tasks on answers to course problems to validate that code
 paths actually work.
 
 """
-from __future__ import print_function
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
+
 import json
 from itertools import chain, cycle, repeat
 from smtplib import SMTPAuthenticationError, SMTPConnectError, SMTPDataError, SMTPServerDisconnected
@@ -30,6 +30,7 @@ from django.conf import settings
 from django.core.management import call_command
 from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
+from six.moves import range
 
 from bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail, Optout
 from bulk_email.tasks import _get_course_email_context
@@ -39,7 +40,6 @@ from lms.djangoapps.instructor_task.tasks import send_bulk_course_email
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskCourseTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from six.moves import range
 
 
 class TestTaskFailure(Exception):

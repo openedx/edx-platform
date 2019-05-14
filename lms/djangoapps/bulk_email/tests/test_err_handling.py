@@ -3,6 +3,7 @@
 Unit tests for handling email sending errors
 """
 from __future__ import absolute_import
+
 import json
 from itertools import cycle
 from smtplib import SMTPConnectError, SMTPDataError, SMTPServerDisconnected
@@ -11,11 +12,12 @@ import ddt
 from celery.states import RETRY, SUCCESS
 from django.conf import settings
 from django.core.management import call_command
-from django.urls import reverse
 from django.db import DatabaseError
+from django.urls import reverse
 from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
+from six.moves import range
 
 from bulk_email.models import SEND_TO_MYSELF, BulkEmailFlag, CourseEmail
 from bulk_email.tasks import perform_delegate_email_batches, send_course_email
@@ -31,7 +33,6 @@ from lms.djangoapps.instructor_task.subtasks import (
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from six.moves import range
 
 
 class EmailTestException(Exception):
