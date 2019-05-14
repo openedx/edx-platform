@@ -1,6 +1,7 @@
 """
 Fragments for rendering programs.
 """
+from __future__ import absolute_import
 import json
 
 from django.http import Http404

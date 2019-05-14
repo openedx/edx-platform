@@ -2,11 +2,13 @@
 Decorators related to edXNotes.
 """
 
+from __future__ import absolute_import
 import json
 
 from django.conf import settings
 
 from edxmako.shortcuts import render_to_string
+import six
 
 
 def edxnotes(cls):
@@ -42,8 +44,8 @@ def edxnotes(cls):
                 ),
                 "params": {
                     # Use camelCase to name keys.
-                    "usageId": unicode(self.scope_ids.usage_id).encode("utf-8"),
-                    "courseId": unicode(self.runtime.course_id).encode("utf-8"),
+                    "usageId": six.text_type(self.scope_ids.usage_id).encode("utf-8"),
+                    "courseId": six.text_type(self.runtime.course_id).encode("utf-8"),
                     "token": get_edxnotes_id_token(user),
                     "tokenUrl": get_token_url(self.runtime.course_id),
                     "endpoint": get_public_endpoint(),

@@ -2,9 +2,10 @@
 """
 Unit tests covering the program listing and detail pages.
 """
+from __future__ import absolute_import
 import json
 import re
-from urlparse import urljoin
+from six.moves.urllib.parse import urljoin
 from uuid import uuid4
 
 import mock
@@ -27,6 +28,7 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
+import six
 
 PROGRAMS_UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 PROGRAMS_MODULE = 'lms.djangoapps.learner_dashboard.programs'
@@ -57,7 +59,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         super(TestProgramListing, cls).setUpClass()
 
         cls.course = ModuleStoreCourseFactory()
-        course_run = CourseRunFactory(key=unicode(cls.course.id))
+        course_run = CourseRunFactory(key=six.text_type(cls.course.id))
         course = CourseFactory(course_runs=[course_run])
 
         cls.first_program = ProgramFactory(courses=[course])
@@ -193,7 +195,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         super(TestProgramDetails, cls).setUpClass()
 
         modulestore_course = ModuleStoreCourseFactory()
-        course_run = CourseRunFactory(key=unicode(modulestore_course.id))
+        course_run = CourseRunFactory(key=six.text_type(modulestore_course.id))
         course = CourseFactory(course_runs=[course_run])
 
         cls.program_data = ProgramFactory(uuid=cls.program_uuid, courses=[course])
