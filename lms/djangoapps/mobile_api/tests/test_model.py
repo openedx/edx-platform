@@ -2,6 +2,7 @@
 Tests for Mobile API Configuration Models
 """
 from __future__ import absolute_import
+
 from datetime import datetime
 
 import ddt

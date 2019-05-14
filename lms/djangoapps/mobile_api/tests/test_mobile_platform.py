@@ -2,6 +2,7 @@
 Tests for Platform against Mobile App Request
 """
 from __future__ import absolute_import
+
 import ddt
 from django.test import TestCase
 
