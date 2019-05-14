@@ -2,20 +2,22 @@
 Tests for the EdxNotes app.
 """
 from __future__ import absolute_import
+
 import json
-import six.moves.urllib.parse
 from contextlib import contextmanager
 from datetime import datetime
 from unittest import skipUnless
 
 import ddt
 import jwt
+import six
+import six.moves.urllib.parse
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ImproperlyConfigured
-from django.urls import reverse
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import MagicMock, patch
 from oauth2_provider.models import Application
 
@@ -36,7 +38,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.tabs import CourseTab
-import six
 
 FEATURES = settings.FEATURES.copy()
 

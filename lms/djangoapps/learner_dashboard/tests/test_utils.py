@@ -3,11 +3,12 @@ Unit test module covering utils module
 """
 
 from __future__ import absolute_import
+
 import ddt
+import six
 from django.test import TestCase
 
 from lms.djangoapps.learner_dashboard import utils
-import six
 
 
 @ddt.ddt

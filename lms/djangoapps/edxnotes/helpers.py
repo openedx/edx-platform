@@ -2,23 +2,25 @@
 Helper methods related to EdxNotes.
 """
 from __future__ import absolute_import
+
 import json
 import logging
-import six.moves.urllib.parse
 from datetime import datetime
 from json import JSONEncoder
-from six.moves.urllib.parse import urlencode
 from uuid import uuid4
 
 import requests
+import six
+import six.moves.urllib.parse
 from dateutil.parser import parse as dateutil_parse
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse
 from django.utils.translation import ugettext as _
-from opaque_keys.edx.keys import UsageKey
 from oauth2_provider.models import Application
+from opaque_keys.edx.keys import UsageKey
 from requests.exceptions import RequestException
+from six.moves.urllib.parse import urlencode
 
 from courseware.access import has_access
 from courseware.courses import get_current_child
@@ -31,7 +33,6 @@ from student.models import anonymous_id_for_user
 from util.date_utils import get_default_time_display
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-import six
 
 log = logging.getLogger(__name__)
 # OAuth2 Client name for edxnotes

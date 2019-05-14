@@ -2,8 +2,9 @@
 The utility methods and functions to help the djangoapp logic
 """
 from __future__ import absolute_import
-from opaque_keys.edx.keys import CourseKey
+
 import six
+from opaque_keys.edx.keys import CourseKey
 
 FAKE_COURSE_KEY = CourseKey.from_string('course-v1:fake+course+run')
 

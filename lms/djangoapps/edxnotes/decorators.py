@@ -3,12 +3,13 @@ Decorators related to edXNotes.
 """
 
 from __future__ import absolute_import
+
 import json
 
+import six
 from django.conf import settings
 
 from edxmako.shortcuts import render_to_string
-import six
 
 
 def edxnotes(cls):

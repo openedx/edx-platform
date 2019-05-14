@@ -3,23 +3,25 @@
 Unit tests covering the program listing and detail pages.
 """
 from __future__ import absolute_import
+
 import json
 import re
-from six.moves.urllib.parse import urljoin
 from uuid import uuid4
 
 import mock
+import six
 from bs4 import BeautifulSoup
 from django.conf import settings
-from django.urls import reverse, reverse_lazy
 from django.test import override_settings
+from django.urls import reverse, reverse_lazy
+from six.moves.urllib.parse import urljoin
 
 from lms.envs.test import CREDENTIALS_PUBLIC_SERVICE_URL
 from openedx.core.djangoapps.catalog.constants import PathwayType
 from openedx.core.djangoapps.catalog.tests.factories import (
-    PathwayFactory,
     CourseFactory,
     CourseRunFactory,
+    PathwayFactory,
     ProgramFactory
 )
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
@@ -28,7 +30,6 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
-import six
 
 PROGRAMS_UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 PROGRAMS_MODULE = 'lms.djangoapps.learner_dashboard.programs'
