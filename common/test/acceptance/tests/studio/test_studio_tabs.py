@@ -127,18 +127,11 @@ class PagesTest(StudioCourseTest):
             'Tabs are not in the default order'
         )
         self.pages_page.drag_and_drop(default_tab=True)
-        built_in_page_titles = self.pages_page.built_in_page_titles
-        self.assertEqual(
-            built_in_page_titles,
-            new_order,
-            'Tabs are not in the new order'
-        )
+        self.pages_page.wait_for(lambda: self.pages_page.built_in_page_titles == new_order,
+                                 'Tabs are in the new order')
         self.pages_page.refresh_and_wait_for_load()
-        self.assertEqual(
-            built_in_page_titles,
-            new_order,
-            'Tabs are not in the new order'
-        )
+        self.pages_page.wait_for(lambda: self.pages_page.built_in_page_titles == new_order,
+                                 'Tabs are in the new order')
 
     def test_users_can_toggle_visibility(self):
         """
