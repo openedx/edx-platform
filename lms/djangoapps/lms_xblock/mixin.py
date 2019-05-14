@@ -3,6 +3,7 @@ Namespace that defines fields common to all blocks used in the LMS
 """
 
 #from django.utils.translation import ugettext_noop as _
+from __future__ import absolute_import
 from lazy import lazy
 from xblock.core import XBlock, XBlockMixin
 from xblock.exceptions import JsonHandlerError
@@ -12,6 +13,7 @@ from xblock.validation import ValidationMessage
 from lms.lib.utils import is_unit
 from xmodule.modulestore.inheritance import UserPartitionList
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
+import six
 
 # Please do not remove, this is a workaround for Django 1.8.
 # more information can be found here: https://openedx.atlassian.net/browse/PLAT-902
@@ -40,7 +42,7 @@ class GroupAccessDict(Dict):
 
     def to_json(self, value):
         if value is not None:
-            return {unicode(k): value[k] for k in value}
+            return {six.text_type(k): value[k] for k in value}
 
 
 @XBlock.needs('partitions')
@@ -182,7 +184,7 @@ class LmsBlockMixin(XBlockMixin):
         parent_group_access = parent.group_access
         component_group_access = self.group_access
 
-        for user_partition_id, parent_group_ids in parent_group_access.iteritems():
+        for user_partition_id, parent_group_ids in six.iteritems(parent_group_access):
             component_group_ids = component_group_access.get(user_partition_id)  # pylint: disable=no-member
             if component_group_ids:
                 return parent_group_ids and not set(component_group_ids).issubset(set(parent_group_ids))
@@ -200,7 +202,7 @@ class LmsBlockMixin(XBlockMixin):
         has_invalid_groups = False
         block_is_unit = is_unit(self)
 
-        for user_partition_id, group_ids in self.group_access.iteritems():  # pylint: disable=no-member
+        for user_partition_id, group_ids in six.iteritems(self.group_access):  # pylint: disable=no-member
             try:
                 user_partition = self._get_user_partition(user_partition_id)
             except NoSuchUserPartitionError:

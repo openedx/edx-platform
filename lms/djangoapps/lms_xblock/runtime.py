@@ -1,6 +1,7 @@
 """
 Module implementing `xblock.runtime.Runtime` functionality for the LMS
 """
+from __future__ import absolute_import
 from completion.services import CompletionService
 from django.conf import settings
 from django.urls import reverse
@@ -18,6 +19,7 @@ from xmodule.modulestore.django import ModuleI18nService, modulestore
 from xmodule.partitions.partitions_service import PartitionService
 from xmodule.services import SettingsService
 from xmodule.x_module import ModuleSystem
+import six
 
 
 def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
@@ -47,8 +49,8 @@ def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
         view_name = 'xblock_handler_noauth'
 
     url = reverse(view_name, kwargs={
-        'course_id': unicode(block.location.course_key),
-        'usage_id': quote_slashes(unicode(block.scope_ids.usage_id).encode('utf-8')),
+        'course_id': six.text_type(block.location.course_key),
+        'usage_id': quote_slashes(six.text_type(block.scope_ids.usage_id).encode('utf-8')),
         'handler': handler_name,
         'suffix': suffix,
     })
@@ -191,8 +193,8 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
 
         runtime_class = 'LmsRuntime'
         extra_data = {
-            'block-id': quote_slashes(unicode(block.scope_ids.usage_id)),
-            'course-id': quote_slashes(unicode(block.course_id)),
+            'block-id': quote_slashes(six.text_type(block.scope_ids.usage_id)),
+            'course-id': quote_slashes(six.text_type(block.course_id)),
             'url-selector': 'asideBaseUrl',
             'runtime-class': runtime_class,
         }
@@ -205,7 +207,7 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
             view,
             frag,
             context,
-            usage_id_serializer=unicode,
+            usage_id_serializer=six.text_type,
             request_token=self.request_token,
             extra_data=extra_data,
         )

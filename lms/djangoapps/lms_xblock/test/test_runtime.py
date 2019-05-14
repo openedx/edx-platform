@@ -2,7 +2,8 @@
 Tests of the LMS XBlock Runtime and associated utilities
 """
 
-from urlparse import urlparse
+from __future__ import absolute_import
+from six.moves.urllib.parse import urlparse
 
 from ddt import data, ddt
 from django.conf import settings
