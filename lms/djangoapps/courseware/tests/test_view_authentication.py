@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import datetime
 
 import pytz
@@ -20,6 +21,7 @@ from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from six.moves import range
 
 
 class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -84,7 +86,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         urls.extend([
             reverse('book', kwargs={'course_id': text_type(course.id),
                                     'book_index': index})
-            for index in xrange(len(course.textbooks))
+            for index in range(len(course.textbooks))
         ])
         for url in urls:
             self.assert_request_status_code(200, url)

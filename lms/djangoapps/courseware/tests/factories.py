@@ -1,5 +1,6 @@
 # Factories are self documenting
 # pylint: disable=missing-docstring
+from __future__ import absolute_import
 import json
 from functools import partial
 

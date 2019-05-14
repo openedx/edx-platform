@@ -3,6 +3,7 @@
 Video xmodule tests in mongo.
 """
 
+from __future__ import absolute_import
 import json
 import shutil
 from collections import OrderedDict
@@ -55,6 +56,7 @@ from xmodule.x_module import STUDENT_VIEW, PUBLIC_VIEW
 from .helpers import BaseTestXmodule
 from .test_video_handlers import TestVideo
 from .test_video_xml import SOURCE_XML
+import six
 
 MODULESTORES = {
     ModuleStoreEnum.Type.mongo: TEST_DATA_MONGO_MODULESTORE,
@@ -1409,7 +1411,7 @@ class TestEditorSavedMethod(BaseTestXmodule):
         Verify editor saved when video id contains spaces/tabs.
         """
         self.MODULESTORE = MODULESTORES[default_store]
-        stripped_video_id = unicode(uuid4())
+        stripped_video_id = six.text_type(uuid4())
         unstripped_video_id = u'{video_id}{tabs}'.format(video_id=stripped_video_id, tabs=u'\t\t\t')
         self.metadata.update({
             'edx_video_id': unstripped_video_id
@@ -1438,7 +1440,7 @@ class TestEditorSavedMethod(BaseTestXmodule):
 
         # Now, modify `edx_video_id` and save should override `youtube_id_1_0`.
         old_metadata = own_metadata(item)
-        item.edx_video_id = unicode(uuid4())
+        item.edx_video_id = six.text_type(uuid4())
         item.editor_saved(self.user, old_metadata, None)
         self.assertEqual(item.youtube_id_1_0, 'test_yt_id')
 
@@ -1491,7 +1493,7 @@ class TestVideoDescriptorStudentViewJson(CacheIsolationTestCase):
             'duration': self.TEST_DURATION,
             'status': 'dummy',
             'encoded_videos': [self.TEST_ENCODED_VIDEO],
-            'courses': [unicode(self.video.location.course_key)] if associate_course_in_val else [],
+            'courses': [six.text_type(self.video.location.course_key)] if associate_course_in_val else [],
         })
         self.val_video = get_video_info(self.TEST_EDX_VIDEO_ID)  # pylint: disable=attribute-defined-outside-init
 
@@ -1635,7 +1637,7 @@ class TestVideoDescriptorStudentViewJson(CacheIsolationTestCase):
         self.video.transcripts = transcripts
         self.video.sub = english_sub
         student_view_response = self.get_result()
-        self.assertItemsEqual(student_view_response['transcripts'].keys(), expected_transcripts)
+        self.assertItemsEqual(list(student_view_response['transcripts'].keys()), expected_transcripts)
 
 
 @ddt.ddt

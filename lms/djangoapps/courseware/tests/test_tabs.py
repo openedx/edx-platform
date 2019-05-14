@@ -1,6 +1,7 @@
 """
 Test cases for tabs.
 """
+from __future__ import absolute_import
 from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
 from django.http import Http404
@@ -41,6 +42,8 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.utils import TEST_DATA_DIR
 from xmodule.modulestore.xml_importer import import_course_from_xml
+import six
+from six.moves import range
 
 
 class TabTestCase(SharedModuleStoreTestCase):
@@ -381,22 +384,22 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
         )
         milestone = {
             'name': 'Test Milestone',
-            'namespace': '{}.entrance_exams'.format(unicode(self.course.id)),
+            'namespace': '{}.entrance_exams'.format(six.text_type(self.course.id)),
             'description': 'Testing Courseware Tabs'
         }
         self.user.is_staff = False
         request = get_mock_request(self.user)
         self.course.entrance_exam_enabled = True
-        self.course.entrance_exam_id = unicode(entrance_exam.location)
+        self.course.entrance_exam_id = six.text_type(entrance_exam.location)
         milestone = add_milestone(milestone)
         add_course_milestone(
-            unicode(self.course.id),
+            six.text_type(self.course.id),
             self.relationship_types['REQUIRES'],
             milestone
         )
         add_course_content_milestone(
-            unicode(self.course.id),
-            unicode(entrance_exam.location),
+            six.text_type(self.course.id),
+            six.text_type(entrance_exam.location),
             self.relationship_types['FULFILLS'],
             milestone
         )
@@ -416,7 +419,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
         self.client.logout()
         self.client.login(username=instructor.username, password='test')
 
-        url = reverse('mark_student_can_skip_entrance_exam', kwargs={'course_id': unicode(self.course.id)})
+        url = reverse('mark_student_can_skip_entrance_exam', kwargs={'course_id': six.text_type(self.course.id)})
         response = self.client.post(url, {
             'unique_student_identifier': student.email,
         })
@@ -816,7 +819,7 @@ class DiscussionLinkTestCase(TabTestCase):
         """Custom reverse function"""
         def reverse_discussion_link(viewname, args):
             """reverse lookup for discussion link"""
-            if viewname == "forum_form_discussion" and args == [unicode(course.id)]:
+            if viewname == "forum_form_discussion" and args == [six.text_type(course.id)]:
                 return "default_discussion_link"
         return reverse_discussion_link
 

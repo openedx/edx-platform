@@ -5,6 +5,7 @@ Output is UTF-8 encoded by default.
 """
 from __future__ import unicode_literals
 
+from __future__ import absolute_import
 from textwrap import dedent
 
 from six import text_type

@@ -2,6 +2,7 @@
 """
 Test for lms courseware app, module render unit
 """
+from __future__ import absolute_import
 import itertools
 import json
 from datetime import datetime
@@ -77,6 +78,8 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory, check_mongo_calls
 from xmodule.modulestore.tests.test_asides import AsideTestType
 from xmodule.x_module import STUDENT_VIEW, CombinedSystem, XModule, XModuleDescriptor
+import six
+from six.moves import range
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -2414,7 +2417,7 @@ class EmptyXModuleDescriptorWithChildren(EmptyXModuleDescriptor):  # pylint: dis
 
 
 BLOCK_TYPES = ['xblock', 'xmodule']
-USER_NUMBERS = range(2)
+USER_NUMBERS = list(range(2))
 
 
 @ddt.ddt
@@ -2510,10 +2513,10 @@ class TestFilteredChildren(SharedModuleStoreTestCase):
                 ItemFactory(category=child_type, parent=self.parent).scope_ids.usage_id
                 for child_type in BLOCK_TYPES
             ]
-            for user in self.users.itervalues()
+            for user in six.itervalues(self.users)
         }
 
-        self.all_children = sum(self.children_for_user.values(), [])
+        self.all_children = sum(list(self.children_for_user.values()), [])
 
         return modulestore().get_item(self.parent.scope_ids.usage_id)
 

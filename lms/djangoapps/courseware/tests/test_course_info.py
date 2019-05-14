@@ -2,6 +2,7 @@
 """
 Test the course_info xblock
 """
+from __future__ import absolute_import
 from datetime import datetime
 import ddt
 import mock
@@ -34,6 +35,7 @@ from xmodule.modulestore.tests.utils import TEST_DATA_DIR
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
 from .helpers import LoginEnrollmentTestCase
+import six
 
 QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
@@ -171,7 +173,7 @@ class CourseInfoLastAccessedTestCase(LoginEnrollmentTestCase, ModuleStoreTestCas
         is no course content.
         """
         SelfPacedConfiguration(enable_course_home_improvements=True).save()
-        url = reverse('info', args=(unicode(self.course.id),))
+        url = reverse('info', args=(six.text_type(self.course.id),))
         response = self.client.get(url)
         content = pq(response.content)
         self.assertEqual(content('.page-header-secondary a').length, 0)
@@ -202,7 +204,7 @@ class CourseInfoLastAccessedTestCase(LoginEnrollmentTestCase, ModuleStoreTestCas
             }
         )
         self.client.get(section_url)
-        info_url = reverse('info', args=(unicode(self.course.id),))
+        info_url = reverse('info', args=(six.text_type(self.course.id),))
 
         # Assuring a non-authenticated user cannot see the resume course button.
         resume_course_url = self.get_resume_course_url(info_url)
@@ -288,7 +290,7 @@ class CourseInfoTitleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         Test the info page on a course with all the multiple display options
         depeding on the current site configuration
         """
-        url = reverse('info', args=(unicode(self.course.id),))
+        url = reverse('info', args=(six.text_type(self.course.id),))
         with with_site_configuration_context(configuration=site_config):
             response = self.client.get(url)
 
@@ -339,7 +341,7 @@ class CourseInfoTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         # create ccx
         ccx = CcxFactory(course_id=self.course.id, coach=self.coach)
-        ccx_locator = CCXLocator.from_course_locator(self.course.id, unicode(ccx.id))
+        ccx_locator = CCXLocator.from_course_locator(self.course.id, six.text_type(ccx.id))
 
         self.setup_user()
         url = reverse('info', args=[ccx_locator])

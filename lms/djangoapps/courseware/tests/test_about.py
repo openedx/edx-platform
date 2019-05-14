@@ -1,6 +1,7 @@
 """
 Test the about xblock
 """
+from __future__ import absolute_import
 import datetime
 import ddt
 import mock
@@ -43,6 +44,7 @@ from xmodule.modulestore.tests.utils import TEST_DATA_DIR
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
 from .helpers import LoginEnrollmentTestCase
+import six
 
 # HTML for registration button
 REG_STR = "<form id=\"class_enroll_form\" method=\"post\" data-remote=\"true\" action=\"/change_enrollment\">"
@@ -226,7 +228,7 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
                       .format(pre_requisite_course_about_url, pre_requisite_courses[0]['display']),
                       resp.content.decode(resp.charset).strip('\n'))
 
-        url = reverse('about_course', args=[unicode(pre_requisite_course.id)])
+        url = reverse('about_course', args=[six.text_type(pre_requisite_course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
 
@@ -681,7 +683,7 @@ class CourseAboutTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
 
         # create ccx
         ccx = CcxFactory(course_id=self.course.id, coach=self.coach)
-        ccx_locator = CCXLocator.from_course_locator(self.course.id, unicode(ccx.id))
+        ccx_locator = CCXLocator.from_course_locator(self.course.id, six.text_type(ccx.id))
 
         self.setup_user()
         url = reverse('openedx.course_experience.course_home', args=[ccx_locator])

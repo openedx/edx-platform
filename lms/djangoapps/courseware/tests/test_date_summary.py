@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Tests for course home page date summary blocks."""
+from __future__ import absolute_import
 from datetime import datetime, timedelta
 
 import ddt

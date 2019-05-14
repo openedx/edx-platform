@@ -1,6 +1,7 @@
 """
 Test for lms courseware app, module data (runtime data storage for XBlocks)
 """
+from __future__ import absolute_import
 import json
 from functools import partial
 

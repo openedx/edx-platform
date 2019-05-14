@@ -2,6 +2,7 @@
 Tests related to the Site Configuration feature
 """
 
+from __future__ import absolute_import
 from bs4 import BeautifulSoup
 from contextlib import contextmanager
 from django.conf import settings
@@ -15,6 +16,7 @@ from courseware.tests.helpers import LoginEnrollmentTestCase
 from xmodule.course_module import CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CATALOG_VISIBILITY_NONE
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from six.moves import range
 
 
 class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):

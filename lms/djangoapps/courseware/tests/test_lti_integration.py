@@ -1,7 +1,8 @@
 """LTI integration tests"""
 
+from __future__ import absolute_import
 import json
-import urllib
+import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 from collections import OrderedDict
 
 import mock
@@ -42,10 +43,10 @@ class TestLTI(BaseTestXmodule):
         context_id = text_type(self.item_descriptor.course_id)
         user_id = text_type(self.item_descriptor.xmodule_runtime.anonymous_student_id)
         hostname = self.item_descriptor.xmodule_runtime.hostname
-        resource_link_id = text_type(urllib.quote('{}-{}'.format(hostname, self.item_descriptor.location.html_id())))
+        resource_link_id = text_type(six.moves.urllib.parse.quote('{}-{}'.format(hostname, self.item_descriptor.location.html_id())))
 
         sourcedId = "{context}:{resource_link}:{user_id}".format(
-            context=urllib.quote(context_id),
+            context=six.moves.urllib.parse.quote(context_id),
             resource_link=resource_link_id,
             user_id=user_id
         )

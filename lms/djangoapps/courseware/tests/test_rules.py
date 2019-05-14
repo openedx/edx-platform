@@ -1,6 +1,7 @@
 """
 Tests for permissions defined in courseware.rules
 """
+from __future__ import absolute_import
 import ddt
 
 from django.test import TestCase
@@ -10,6 +11,7 @@ from course_modes.tests.factories import CourseModeFactory
 from opaque_keys.edx.locator import CourseLocator
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
+import six
 
 
 @ddt.ddt
@@ -46,5 +48,5 @@ class PermissionTests(TestCase):
         """
         if mode is not None:
             CourseEnrollment.enroll(self.user, self.course_id, mode=mode)
-        has_perm = self.user.has_perm('edx_proctoring.can_take_proctored_exam', {'course_id': unicode(self.course_id)})
+        has_perm = self.user.has_perm('edx_proctoring.can_take_proctored_exam', {'course_id': six.text_type(self.course_id)})
         assert has_perm == should_have_perm

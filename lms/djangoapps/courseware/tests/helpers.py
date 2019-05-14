@@ -1,6 +1,7 @@
 """
 Helpers for courseware tests.
 """
+from __future__ import absolute_import
 from datetime import timedelta
 import json
 
@@ -29,6 +30,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.tests import get_test_descriptor_system, get_test_system
+import six
+from six.moves import range
 
 
 class BaseTestXmodule(ModuleStoreTestCase):
@@ -89,7 +92,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
 
         self.item_descriptor.xmodule_runtime = self.new_module_runtime()
 
-        self.item_url = unicode(self.item_descriptor.location)
+        self.item_url = six.text_type(self.item_descriptor.location)
 
     def setup_course(self):
         self.course = CourseFactory.create(data=self.COURSE_DATA)
@@ -135,7 +138,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
         """Return item url with dispatch."""
         return reverse(
             'xblock_handler',
-            args=(unicode(self.course.id), quote_slashes(self.item_url), 'xmodule_handler', dispatch)
+            args=(six.text_type(self.course.id), quote_slashes(self.item_url), 'xmodule_handler', dispatch)
         )
 
 
@@ -339,7 +342,7 @@ def masquerade_as_group_member(user, course, partition_id, group_id):
         user,
         data={"role": "student", "user_partition_id": partition_id, "group_id": group_id}
     )
-    response = handle_ajax(request, unicode(course.id))
+    response = handle_ajax(request, six.text_type(course.id))
     setup_masquerade(request, course.id, True)
     return response.status_code
 

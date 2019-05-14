@@ -3,6 +3,7 @@ This module defines tests for courseware.access that are specific to group
 access control rules.
 """
 
+from __future__ import absolute_import
 import ddt
 from stevedore.extension import Extension, ExtensionManager
 

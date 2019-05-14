@@ -2,6 +2,7 @@
 """
 Unit tests for masquerade.
 """
+from __future__ import absolute_import
 import json
 import pickle
 from datetime import datetime
@@ -30,6 +31,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
+import six
 
 
 class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -89,7 +91,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': unicode(self.course.id),
+                'course_id': six.text_type(self.course.id),
                 'chapter': self.chapter.location.block_id,
                 'section': self.sequential.location.block_id,
             }
@@ -103,7 +105,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse(
             'info',
             kwargs={
-                'course_id': unicode(self.course.id),
+                'course_id': six.text_type(self.course.id),
             }
         )
         return self.client.get(url)
@@ -115,7 +117,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse(
             'progress',
             kwargs={
-                'course_id': unicode(self.course.id),
+                'course_id': six.text_type(self.course.id),
             }
         )
         return self.client.get(url)
@@ -135,8 +137,8 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         problem_url = reverse(
             'xblock_handler',
             kwargs={
-                'course_id': unicode(self.course.id),
-                'usage_id': unicode(self.problem.location),
+                'course_id': six.text_type(self.course.id),
+                'usage_id': six.text_type(self.problem.location),
                 'handler': 'xmodule_handler',
                 'suffix': 'problem_get'
             }
@@ -207,7 +209,7 @@ class StaffMasqueradeTestCase(MasqueradeTestCase):
         masquerade_url = reverse(
             'masquerade_update',
             kwargs={
-                'course_key_string': unicode(self.course.id),
+                'course_key_string': six.text_type(self.course.id),
             }
         )
         response = self.client.post(
