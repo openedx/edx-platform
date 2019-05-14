@@ -5,15 +5,19 @@ View for Courseware Index
 # pylint: disable=attribute-defined-outside-init
 
 from __future__ import absolute_import
-import logging
-import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 
+import logging
+
+import six
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.views import redirect_to_login
-from django.urls import reverse
 from django.http import Http404
 from django.template.context_processors import csrf
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
@@ -25,7 +29,6 @@ from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
 from edxmako.shortcuts import render_to_response, render_to_string
-
 from lms.djangoapps.courseware.courses import allow_public_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
@@ -38,17 +41,19 @@ from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import (
-    COURSE_OUTLINE_PAGE_FLAG, default_course_url_name, COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
+    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
+    COURSE_OUTLINE_PAGE_FLAG,
+    default_course_url_name
 )
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from shoppingcart.models import CourseRegistrationCode
 from student.views import is_course_blocked
 from util.views import ensure_valid_course_key
-from xmodule.modulestore.django import modulestore
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
+from xmodule.modulestore.django import modulestore
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
-from .views import CourseTabView
+
 from ..access import has_access
 from ..courses import check_course_access, get_course_with_access, get_current_child, get_studio_url
 from ..entrance_exams import (
@@ -57,13 +62,10 @@ from ..entrance_exams import (
     user_can_skip_entrance_exam,
     user_has_passed_entrance_exam
 )
-from ..masquerade import (
-    setup_masquerade,
-    check_content_start_date_for_masquerade_user
-)
+from ..masquerade import check_content_start_date_for_masquerade_user, setup_masquerade
 from ..model_data import FieldDataCache
 from ..module_render import get_module_for_descriptor, toc_for_course
-import six
+from .views import CourseTabView
 
 log = logging.getLogger("edx.courseware.views.index")
 
