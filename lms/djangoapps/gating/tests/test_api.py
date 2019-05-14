@@ -2,6 +2,7 @@
 Unit tests for gating.signals module
 """
 from __future__ import absolute_import
+
 from ddt import data, ddt, unpack
 from milestones import api as milestones_api
 from milestones.tests.utils import MilestonesTestCaseMixin

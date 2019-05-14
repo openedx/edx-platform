@@ -2,17 +2,17 @@
 This file contains celery tasks related to course content gating.
 """
 from __future__ import absolute_import
+
 import logging
 
+import six
 from celery import task
 from django.contrib.auth.models import User
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from gating import api as gating_api
 from lms.djangoapps.course_blocks.api import get_course_blocks
-from opaque_keys.edx.keys import CourseKey, UsageKey
 from xmodule.modulestore.django import modulestore
-import six
-
 
 log = logging.getLogger(__name__)
 

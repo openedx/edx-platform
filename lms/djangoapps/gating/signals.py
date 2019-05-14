@@ -2,15 +2,16 @@
 Signal handlers for the gating djangoapp
 """
 from __future__ import absolute_import
+
+import six
+from completion.models import BlockCompletion
 from django.db import models
 from django.dispatch import receiver
 
-from completion.models import BlockCompletion
 from gating import api as gating_api
 from gating.tasks import task_evaluate_subsection_completion_milestones
 from lms.djangoapps.grades.api import signals as grades_signals
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_CHANGED
-import six
 
 
 @receiver(grades_signals.SUBSECTION_SCORE_CHANGED)

@@ -2,9 +2,10 @@
 Integration tests for gated content.
 """
 from __future__ import absolute_import
+
 import ddt
-from crum import set_current_request
 from completion import waffle as completion_waffle
+from crum import set_current_request
 from edx_django_utils.cache import RequestCache
 from milestones import api as milestones_api
 from milestones.tests.utils import MilestonesTestCaseMixin
