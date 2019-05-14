@@ -1,6 +1,7 @@
 """
 Tests for the Badges app models.
 """
+from __future__ import absolute_import
 from path import Path
 from django.core.exceptions import ValidationError
 from django.core.files.images import ImageFile
@@ -22,6 +23,7 @@ from lms.djangoapps.certificates.tests.test_models import TEST_DATA_ROOT
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from six.moves import range
 
 
 def get_image(name):

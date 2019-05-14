@@ -1,6 +1,7 @@
 """
 Factories for Badge tests
 """
+from __future__ import absolute_import
 from random import random
 
 import factory
