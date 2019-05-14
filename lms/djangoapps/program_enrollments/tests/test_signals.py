@@ -3,18 +3,19 @@ Unit tests for completing program course enrollments
 once a social auth entry for the user is created.
 """
 from __future__ import absolute_import
-from django.test import TestCase
+
 import mock
-from opaque_keys.edx.keys import CourseKey
 import pytest
+from django.test import TestCase
+from edx_django_utils.cache import RequestCache
+from opaque_keys.edx.keys import CourseKey
+from organizations.tests.factories import OrganizationFactory
 from social_django.models import UserSocialAuth
 from testfixtures import LogCapture
 
 from course_modes.models import CourseMode
-from edx_django_utils.cache import RequestCache
 from lms.djangoapps.program_enrollments.signals import logger
 from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
-from organizations.tests.factories import OrganizationFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from student.models import CourseEnrollmentException

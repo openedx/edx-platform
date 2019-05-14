@@ -1,24 +1,23 @@
 """
 Unit tests for ProgramEnrollment models.
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
-from __future__ import absolute_import
 from uuid import uuid4
-from testfixtures import LogCapture
 
 import ddt
 from django.test import TestCase
+from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.keys import CourseKey
+from six.moves import range
+from testfixtures import LogCapture
 
 from course_modes.models import CourseMode
-from edx_django_utils.cache import RequestCache
-from lms.djangoapps.program_enrollments.models import ProgramEnrollment, ProgramCourseEnrollment
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 from openedx.core.djangoapps.catalog.tests.factories import generate_course_run_key
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from six.moves import range
+from student.models import CourseEnrollment
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 
 class ProgramEnrollmentModelTests(TestCase):
