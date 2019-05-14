@@ -3,11 +3,13 @@ Tests for Blocks api.py
 """
 
 from __future__ import absolute_import
+
 from itertools import product
-from mock import patch
 
 import ddt
+import six
 from django.test.client import RequestFactory
+from mock import patch
 
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
 from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE, waffle
@@ -17,9 +19,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import SampleCourseFactory, check_mongo_calls
 from xmodule.modulestore.tests.sample_courses import BlockInfo
 
-
 from ..api import get_blocks
-import six
 
 
 class TestGetBlocks(SharedModuleStoreTestCase):

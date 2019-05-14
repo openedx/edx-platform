@@ -2,13 +2,14 @@
 Tests for Blocks Views
 """
 from __future__ import absolute_import
+
 from datetime import datetime
 from string import join
-from six.moves.urllib.parse import urlencode
-from six.moves.urllib.parse import urlunparse
 
+import six
 from django.urls import reverse
 from opaque_keys.edx.locator import CourseLocator
+from six.moves.urllib.parse import urlencode, urlunparse
 
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
@@ -16,7 +17,6 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 from .helpers import deserialize_usage_key
-import six
 
 
 class TestBlocksView(SharedModuleStoreTestCase):

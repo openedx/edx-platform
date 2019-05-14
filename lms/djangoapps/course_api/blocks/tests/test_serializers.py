@@ -2,6 +2,8 @@
 Tests for Course Blocks serializers
 """
 from __future__ import absolute_import
+
+import six
 from mock import MagicMock
 
 from lms.djangoapps.course_blocks.api import get_course_block_access_transformers, get_course_blocks
@@ -15,7 +17,6 @@ from xmodule.modulestore.tests.factories import ToyCourseFactory
 from ..serializers import BlockDictSerializer, BlockSerializer
 from ..transformers.blocks_api import BlocksAPITransformer
 from .helpers import deserialize_usage_key
-import six
 
 
 class TestBlockSerializerBase(SharedModuleStoreTestCase):

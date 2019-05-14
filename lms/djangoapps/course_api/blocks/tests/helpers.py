@@ -3,6 +3,7 @@ Helper functions for unit tests
 """
 
 from __future__ import absolute_import
+
 from opaque_keys.edx.keys import UsageKey
 
 

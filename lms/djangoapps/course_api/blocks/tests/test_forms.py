@@ -2,12 +2,13 @@
 Tests for Course Blocks forms
 """
 from __future__ import absolute_import
-from six.moves.urllib.parse import urlencode
 
 import ddt
+import six
 from django.http import Http404, QueryDict
 from opaque_keys.edx.locator import CourseLocator
 from rest_framework.exceptions import PermissionDenied
+from six.moves.urllib.parse import urlencode
 
 from openedx.core.djangoapps.util.test_forms import FormTestMixin
 from student.models import CourseEnrollment
@@ -16,7 +17,6 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..forms import BlockListGetForm
-import six
 
 
 @ddt.ddt
