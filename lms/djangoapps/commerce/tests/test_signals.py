@@ -4,9 +4,10 @@ Tests for signal handling in commerce djangoapp.
 """
 from __future__ import unicode_literals
 
+from __future__ import absolute_import
 import base64
 import json
-from urlparse import urljoin
+from six.moves.urllib.parse import urljoin
 
 import ddt
 import httpretty

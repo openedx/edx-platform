@@ -5,6 +5,7 @@ We can use this command to enable/disable commerce configuration or disable chec
 
 from __future__ import unicode_literals
 
+from __future__ import absolute_import
 import logging
 
 from django.core.management import BaseCommand

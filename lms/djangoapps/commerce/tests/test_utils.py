@@ -1,6 +1,7 @@
 """Tests of commerce utilities."""
+from __future__ import absolute_import
 import json
-from urllib import urlencode
+from six.moves.urllib.parse import urlencode
 
 import ddt
 import httpretty
