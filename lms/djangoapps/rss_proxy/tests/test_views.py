@@ -2,6 +2,7 @@
 Tests for the rss_proxy views
 """
 from __future__ import print_function
+from __future__ import absolute_import
 from django.urls import reverse
 from django.test import TestCase
 from mock import Mock, patch
