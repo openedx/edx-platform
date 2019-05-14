@@ -5,11 +5,15 @@ See lms/djangoapps/support for more details.
 
 """
 from __future__ import absolute_import
-import bleach
+
 import logging
-import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 from functools import wraps
 
+import bleach
+import six
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError
@@ -18,15 +22,14 @@ from django.views.decorators.http import require_GET, require_POST
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
+from courseware.access import has_access
 from lms.djangoapps.certificates import api
 from lms.djangoapps.certificates.models import CertificateInvalidation
-from courseware.access import has_access
 from lms.djangoapps.instructor_task.api import generate_certificates_for_students
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment, User
 from util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
-import six
 
 log = logging.getLogger(__name__)
 

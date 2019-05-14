@@ -3,24 +3,32 @@
 Certificate HTML webview.
 """
 from __future__ import absolute_import
+
 import logging
-import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 from datetime import datetime
 from uuid import uuid4
 
 import pytz
+import six
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import Http404, HttpResponse
 from django.template import RequestContext
-from django.utils.encoding import smart_str
 from django.utils import translation
+from django.utils.encoding import smart_str
 from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from badges.events.course_complete import get_completion_badge
 from badges.utils import badges_enabled
+from courseware.access import has_access
+from courseware.courses import get_course_by_id
+from edxmako.shortcuts import render_to_response
+from edxmako.template import Template
 from lms.djangoapps.certificates.api import (
     emit_certificate_event,
     get_active_web_certificate,
@@ -36,21 +44,15 @@ from lms.djangoapps.certificates.models import (
     CertificateStatuses,
     GeneratedCertificate
 )
-from courseware.access import has_access
-from courseware.courses import get_course_by_id
-from edxmako.shortcuts import render_to_response
-from edxmako.template import Template
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
+from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course, display_date_for_certificate
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.courses import course_image_url
-from openedx.core.djangoapps.certificates.api import display_date_for_certificate, certificates_viewable_for_course
 from student.models import LinkedInAddToProfileConfiguration
 from util import organizations_helpers as organization_api
 from util.date_utils import strftime_localized
 from util.views import handle_500
-import six
-
 
 log = logging.getLogger(__name__)
 _ = translation.ugettext
