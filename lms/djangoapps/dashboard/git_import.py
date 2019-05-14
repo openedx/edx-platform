@@ -3,6 +3,7 @@ Provides a function for importing a git repository into the lms
 instance when using a mongo modulestore
 """
 
+from __future__ import absolute_import
 import logging
 import os
 import re

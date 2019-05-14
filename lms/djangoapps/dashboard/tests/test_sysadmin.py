@@ -1,6 +1,7 @@
 """
 Provide tests for sysadmin dashboard feature in sysadmin.py
 """
+from __future__ import absolute_import
 import glob
 import os
 import re
@@ -31,6 +32,7 @@ from xmodule.modulestore.tests.django_utils import (
     SharedModuleStoreTestCase
 )
 from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
+from six.moves import range
 
 TEST_MONGODB_LOG = {
     'host': MONGO_HOST,
@@ -303,7 +305,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         mongoengine.connect(TEST_MONGODB_LOG['db'])
 
-        for _ in xrange(15):
+        for _ in range(15):
             CourseImportLog(
                 course_id=CourseLocator.from_string("test/test/test"),
                 location="location",

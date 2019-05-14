@@ -406,7 +406,7 @@ class Courses(SysadminDashboardView):
                         _('Deleted'), text_type(course.location), text_type(course.id), course.display_name)
 
         context = {
-            'datatable': self.make_datatable(courses.values()),
+            'datatable': self.make_datatable(list(courses.values())),
             'msg': self.msg,
             'djangopid': os.getpid(),
             'modeflag': {'courses': 'active-section'},
