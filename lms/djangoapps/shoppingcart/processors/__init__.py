@@ -10,8 +10,8 @@ The specific implementation is determined at runtime using Django settings:
 """
 
 from __future__ import absolute_import
-from django.conf import settings
 
+from django.conf import settings
 
 # Import the processor implementation, using `CC_PROCESSOR_NAME`
 # as the name of the Python module in `shoppingcart.processors`
