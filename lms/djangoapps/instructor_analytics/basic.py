@@ -4,21 +4,23 @@ Student and course analytics.
 Serve miscellaneous course and student data
 """
 from __future__ import absolute_import
+
 import datetime
 import json
 
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
-from django.urls import reverse
 from django.db.models import Count, Q
+from django.urls import reverse
 from edx_proctoring.api import get_exam_violation_report
 from opaque_keys.edx.keys import UsageKey
 from six import text_type
 
-from courseware.models import StudentModule
 import xmodule.graders as xmgraders
+from courseware.models import StudentModule
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.grades.api import context as grades_context
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -32,7 +34,6 @@ from shoppingcart.models import (
     RegistrationCodeRedemption
 )
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
-import six
 
 STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email')
 PROFILE_FEATURES = ('name', 'language', 'location', 'year_of_birth', 'gender',

@@ -3,17 +3,19 @@ Tests for instructor.basic
 """
 
 from __future__ import absolute_import
+
 import datetime
 import json
 
 import pytz
-from django.urls import reverse
 from django.db.models import Q
+from django.urls import reverse
 from edx_proctoring.api import create_exam
 from edx_proctoring.models import ProctoredExamStudentAttempt
 from mock import MagicMock, Mock, patch
 from opaque_keys.edx.locator import UsageKey
 from six import text_type
+from six.moves import range, zip
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -48,8 +50,6 @@ from student.roles import CourseSalesAdminRole
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from six.moves import range
-from six.moves import zip
 
 
 class TestAnalyticsBasic(ModuleStoreTestCase):

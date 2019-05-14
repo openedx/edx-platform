@@ -5,11 +5,12 @@ Format and create csv responses
 """
 
 from __future__ import absolute_import
+
 import csv
 
+import six
 from django.http import HttpResponse
 from six.moves import map
-import six
 
 
 def create_csv_response(filename, header, datarows):

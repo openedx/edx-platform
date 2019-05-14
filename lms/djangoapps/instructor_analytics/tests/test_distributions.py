@@ -1,15 +1,14 @@
 """ Tests for analytics.distributions """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
-from __future__ import absolute_import
 import pytest
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
+from six.moves import range
 
 from instructor_analytics.distributions import AVAILABLE_PROFILE_FEATURES, profile_distribution
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
-from six.moves import range
 
 
 class TestAnalyticsDistributions(TestCase):

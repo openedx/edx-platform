@@ -1,11 +1,12 @@
 """ Tests for analytics.csvs """
 
 from __future__ import absolute_import
+
 import pytest
 from django.test import TestCase
+from six.moves import range
 
 from instructor_analytics.csvs import create_csv_response, format_dictlist, format_instances
-from six.moves import range
 
 
 class TestAnalyticsCSVS(TestCase):
