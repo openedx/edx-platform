@@ -1,9 +1,11 @@
 """ Tests for analytics.csvs """
 
+from __future__ import absolute_import
 import pytest
 from django.test import TestCase
 
 from instructor_analytics.csvs import create_csv_response, format_dictlist, format_instances
+from six.moves import range
 
 
 class TestAnalyticsCSVS(TestCase):
@@ -98,7 +100,7 @@ class TestAnalyticsFormatInstances(TestCase):
 
     def setUp(self):
         super(TestAnalyticsFormatInstances, self).setUp()
-        self.instances = [self.TestDataClass() for _ in xrange(5)]
+        self.instances = [self.TestDataClass() for _ in range(5)]
 
     def test_format_instances_response(self):
         features = ['a_var', 'c_var', 'd_var']
@@ -108,7 +110,7 @@ class TestAnalyticsFormatInstances(TestCase):
             'aval',
             'cval',
             'dval',
-        ] for _ in xrange(len(self.instances))])
+        ] for _ in range(len(self.instances))])
 
     def test_format_instances_response_noinstances(self):
         features = ['a_var']
@@ -119,7 +121,7 @@ class TestAnalyticsFormatInstances(TestCase):
     def test_format_instances_response_nofeatures(self):
         header, datarows = format_instances(self.instances, [])
         self.assertEqual(header, [])
-        self.assertEqual(datarows, [[] for _ in xrange(len(self.instances))])
+        self.assertEqual(datarows, [[] for _ in range(len(self.instances))])
 
     def test_format_instances_response_nonexistantfeature(self):
         with pytest.raises(AttributeError):

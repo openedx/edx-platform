@@ -2,6 +2,7 @@
 Tests for instructor.basic
 """
 
+from __future__ import absolute_import
 import datetime
 import json
 
@@ -47,6 +48,8 @@ from student.roles import CourseSalesAdminRole
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from six.moves import range
+from six.moves import zip
 
 
 class TestAnalyticsBasic(ModuleStoreTestCase):
@@ -55,7 +58,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
     def setUp(self):
         super(TestAnalyticsBasic, self).setUp()
         self.course_key = self.store.make_course_key('robot', 'course', 'id')
-        self.users = tuple(UserFactory() for _ in xrange(30))
+        self.users = tuple(UserFactory() for _ in range(30))
         self.ces = tuple(CourseEnrollment.enroll(user, self.course_key)
                          for user in self.users)
         self.instructor = InstructorFactory(course_key=self.course_key)
@@ -118,7 +121,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         userreports = enrolled_students_features(self.course_key, ['username'])
         self.assertEqual(len(userreports), len(self.users))
         for userreport in userreports:
-            self.assertEqual(userreport.keys(), ['username'])
+            self.assertEqual(list(userreport.keys()), ['username'])
             self.assertIn(userreport['username'], [user.username for user in self.users])
 
     def test_enrolled_students_features_keys(self):
@@ -197,7 +200,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         course = CourseFactory.create(org="test", course="course1", display_name="run1")
         course.cohort_config = {'cohorted': True, 'auto_cohort': True, 'auto_cohort_groups': ['cohort']}
         self.store.update_item(course, self.instructor.id)
-        cohorted_students = [UserFactory.create() for _ in xrange(10)]
+        cohorted_students = [UserFactory.create() for _ in range(10)]
         cohort = CohortFactory.create(name='cohort', course_id=course.id, users=cohorted_students)
         cohorted_usernames = [student.username for student in cohorted_students]
         non_cohorted_student = UserFactory.create()
@@ -233,7 +236,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         self.assertEqual(len(may_enroll), len(self.students_who_may_enroll) - len(self.users))
         email_adresses = [student.email for student in self.students_who_may_enroll]
         for student in may_enroll:
-            self.assertEqual(student.keys(), ['email'])
+            self.assertEqual(list(student.keys()), ['email'])
             self.assertIn(student['email'], email_adresses)
 
     def test_get_student_exam_attempt_features(self):

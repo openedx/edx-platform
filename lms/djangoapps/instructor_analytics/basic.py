@@ -3,6 +3,7 @@ Student and course analytics.
 
 Serve miscellaneous course and student data
 """
+from __future__ import absolute_import
 import datetime
 import json
 
@@ -31,6 +32,7 @@ from shoppingcart.models import (
     RegistrationCodeRedemption
 )
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
+import six
 
 STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email')
 PROFILE_FEATURES = ('name', 'language', 'location', 'year_of_birth', 'gender',
@@ -114,7 +116,7 @@ def sale_order_record_features(course_id, features):
             coupon_codes = [redemption.coupon.code for redemption in coupon_redemption]
             order_item_dict.update({'coupon_code': ", ".join(coupon_codes)})
 
-        sale_order_dict.update(dict(order_item_dict.items()))
+        sale_order_dict.update(dict(list(order_item_dict.items())))
 
         return sale_order_dict
 
@@ -172,7 +174,7 @@ def sale_record_features(course_id, features):
 
         course_reg_dict['course_id'] = text_type(course_id)
         course_reg_dict.update({'codes': ", ".join(codes)})
-        sale_dict.update(dict(course_reg_dict.items()))
+        sale_dict.update(dict(list(course_reg_dict.items())))
 
         return sale_dict
 
@@ -240,7 +242,7 @@ def enrolled_students_features(course_key, features):
             DjangoJSONEncoder().default(attr)
             return attr
         except TypeError:
-            return unicode(attr)
+            return six.text_type(attr)
 
     def extract_student(student, features):
         """ convert student to dictionary """
@@ -528,7 +530,7 @@ def dump_grading_context(course):
     gcontext = grades_context.grading_context_for_course(course)
     msg += "graded sections:\n"
 
-    msg += '%s\n' % gcontext['all_graded_subsections_by_type'].keys()
+    msg += '%s\n' % list(gcontext['all_graded_subsections_by_type'].keys())
     for (gsomething, gsvals) in gcontext['all_graded_subsections_by_type'].items():
         msg += u"--> Section %s:\n" % (gsomething)
         for sec in gsvals:
