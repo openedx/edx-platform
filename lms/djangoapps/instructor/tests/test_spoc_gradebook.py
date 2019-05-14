@@ -3,8 +3,10 @@ Tests of the instructor dashboard spoc gradebook
 """
 
 from __future__ import absolute_import
+
 from django.urls import reverse
 from six import text_type
+from six.moves import range
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.tests.factories import StudentModuleFactory
@@ -12,7 +14,6 @@ from lms.djangoapps.grades.api import task_compute_all_grades_for_course
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from six.moves import range
 
 USER_COUNT = 11
 

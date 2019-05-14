@@ -2,17 +2,21 @@
 Unit tests for instructor_dashboard.py.
 """
 from __future__ import absolute_import
+
 import datetime
 
 import ddt
+import six
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.urls import reverse
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import patch
+from pyquery import PyQuery as pq
 from pytz import UTC
 from six import text_type
+from six.moves import range
 
 from common.test.utils import XssTestMixin
 from course_modes.models import CourseMode
@@ -20,11 +24,10 @@ from courseware.tabs import get_course_tab_list
 from courseware.tests.factories import StaffFactory, StudentModuleFactory, UserFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from edxmako.shortcuts import render_to_response
-from lms.djangoapps.grades.config.waffle import waffle_flags, WRITABLE_GRADEBOOK
+from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
 from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from pyquery import PyQuery as pq
 from shoppingcart.models import CourseRegCodeItem, Order, PaidCourseRegistration
 from student.models import CourseEnrollment
 from student.roles import CourseFinanceAdminRole
@@ -32,8 +35,6 @@ from student.tests.factories import AdminFactory, CourseEnrollmentFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
-import six
-from six.moves import range
 
 
 def intercept_renderer(path, context):

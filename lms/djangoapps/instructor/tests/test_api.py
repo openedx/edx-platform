@@ -2,9 +2,8 @@
 """
 Unit tests for instructor.api methods.
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
-from __future__ import absolute_import
 import datetime
 import functools
 import io
@@ -29,7 +28,8 @@ from mock import Mock, NonCallableMock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
 from pytz import UTC
-from six import text_type
+from six import text_type, unichr
+from six.moves import range, zip
 
 from bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
 from course_modes.models import CourseMode
@@ -43,6 +43,8 @@ from courseware.tests.factories import (
     UserProfileFactory
 )
 from courseware.tests.helpers import LoginEnrollmentTestCase
+from edx_when.api import get_overrides_for_user
+from edx_when.signals import extract_dates
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
@@ -63,9 +65,6 @@ from openedx.core.djangoapps.django_comment_common.utils import seed_permissions
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.lib.xblock_utils import grade_histogram
-from edx_when.api import get_overrides_for_user
-from edx_when.signals import extract_dates
-
 from shoppingcart.models import (
     Coupon,
     CouponRedemption,
@@ -101,9 +100,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedMo
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from .test_tools import msk_from_problem_urlname
-from six import unichr
-from six.moves import range
-from six.moves import zip
 
 DATE_FIELD = Date()
 EXPECTED_CSV_HEADER = (

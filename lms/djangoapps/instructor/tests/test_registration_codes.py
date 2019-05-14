@@ -2,12 +2,15 @@
 Test for the registration code status information.
 """
 from __future__ import absolute_import
+
 import json
 
+import six
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from six import text_type
+from six.moves import range
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -25,8 +28,6 @@ from student.roles import CourseSalesAdminRole
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-import six
-from six.moves import range
 
 
 @override_settings(REGISTRATION_CODE_LENGTH=8)

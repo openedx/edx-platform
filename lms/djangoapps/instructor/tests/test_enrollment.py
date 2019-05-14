@@ -2,13 +2,13 @@
 """
 Unit tests for instructor.enrollment methods.
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
-from __future__ import absolute_import
 import json
 from abc import ABCMeta
 
 import ddt
+import six
 from ccx_keys.locator import CCXLocator
 from crum import set_current_request
 from django.conf import settings
@@ -41,7 +41,6 @@ from student.roles import CourseCcxCoachRole
 from student.tests.factories import AdminFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-import six
 
 
 class TestSettableEnrollmentState(CacheIsolationTestCase):

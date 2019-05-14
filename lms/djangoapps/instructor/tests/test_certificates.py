@@ -1,21 +1,23 @@
 """Tests for the certificates panel of the instructor dash. """
 from __future__ import absolute_import
+
 import contextlib
 import io
 import json
 from datetime import datetime, timedelta
 
+import ddt
 import mock
 import pytz
+import six
+from config_models.models import cache
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test.utils import override_settings
 from django.urls import reverse
 
-import ddt
 from capa.xqueue_interface import XQueueInterface
-from config_models.models import cache
 from course_modes.models import CourseMode
 from courseware.tests.factories import GlobalStaffFactory, InstructorFactory, UserFactory
 from lms.djangoapps.certificates import api as certs_api
@@ -37,7 +39,6 @@ from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVer
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-import six
 
 
 @ddt.ddt

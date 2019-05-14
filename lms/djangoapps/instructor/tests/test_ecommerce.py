@@ -3,9 +3,11 @@ Unit tests for Ecommerce feature flag in new instructor dashboard.
 """
 
 from __future__ import absolute_import
+
 import datetime
 
 import pytz
+import six
 from django.urls import reverse
 from six import text_type
 
@@ -16,7 +18,6 @@ from student.roles import CourseFinanceAdminRole
 from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-import six
 
 
 class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):

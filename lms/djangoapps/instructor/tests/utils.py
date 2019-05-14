@@ -2,14 +2,15 @@
 Utilities for instructor unit tests
 """
 from __future__ import absolute_import
+
 import datetime
 import json
 import random
 
+import six
 from pytz import UTC
 
 from util.date_utils import get_default_time_display
-import six
 
 
 class FakeInfo(object):
