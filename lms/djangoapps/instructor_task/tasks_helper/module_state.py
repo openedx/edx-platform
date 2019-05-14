@@ -2,12 +2,16 @@
 Instructor Tasks related to module state.
 """
 from __future__ import absolute_import
+
 import json
 import logging
 from time import time
 
+import six
 from django.utils.translation import ugettext_noop
 from opaque_keys.edx.keys import UsageKey
+from xblock.runtime import KvsFieldData
+from xblock.scorable import Score
 
 from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
 from courseware.courses import get_course_by_id, get_problems_in_section
@@ -19,14 +23,11 @@ from student.models import get_user_by_username_or_email
 from track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
 from track.views import task_track
 from util.db import outer_atomic
-
-from xblock.runtime import KvsFieldData
-from xblock.scorable import Score
 from xmodule.modulestore.django import modulestore
+
 from ..exceptions import UpdateProblemModuleStateError
 from .runner import TaskProgress
 from .utils import UNKNOWN_TASK_ID, UPDATE_STATUS_FAILED, UPDATE_STATUS_SKIPPED, UPDATE_STATUS_SUCCEEDED
-import six
 
 TASK_LOG = logging.getLogger('edx.celery.task')
 

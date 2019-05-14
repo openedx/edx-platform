@@ -6,17 +6,20 @@ paths actually work.
 
 """
 from __future__ import absolute_import
+
 import json
 import logging
 import textwrap
 from collections import namedtuple
 
 import ddt
+import six
 from celery.states import FAILURE, SUCCESS
 from django.contrib.auth.models import User
 from django.urls import reverse
 from mock import patch
 from six import text_type
+from six.moves import range
 
 from capa.responsetypes import StudentInputError
 from capa.tests.response_xml_factory import CodeResponseXMLFactory, CustomResponseXMLFactory
@@ -40,8 +43,6 @@ from openedx.core.djangoapps.util.testing import TestConditionalContent
 from openedx.core.lib.url_utils import quote_slashes
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import ItemFactory
-import six
-from six.moves import range
 
 log = logging.getLogger(__name__)
 

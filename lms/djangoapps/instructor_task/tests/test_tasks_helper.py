@@ -7,54 +7,36 @@ Unit tests for LMS instructor-initiated background tasks helper functions.
 - Tests all of the existing reports.
 
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
-from __future__ import absolute_import
 import os
 import shutil
 import tempfile
-import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 
 import ddt
+import six
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 import unicodecsv
+from django.conf import settings
+from django.test.utils import override_settings
+from django.urls import reverse
+from edx_django_utils.cache import RequestCache
+from freezegun import freeze_time
+from mock import ANY, MagicMock, Mock, patch
+from pytz import UTC
+from six import text_type
+from six.moves import range, zip
+
+import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import InstructorFactory
-from django.conf import settings
-from django.urls import reverse
-from django.test.utils import override_settings
-from edx_django_utils.cache import RequestCache
-from freezegun import freeze_time
 from instructor_analytics.basic import UNAVAILABLE, list_problem_responses
-from mock import MagicMock, Mock, patch, ANY
-from pytz import UTC
-from shoppingcart.models import (
-    Coupon,
-    CourseRegistrationCode,
-    CourseRegistrationCodeInvoiceItem,
-    Invoice,
-    InvoiceTransaction,
-    Order,
-    PaidCourseRegistration,
-)
-from six import text_type
-from student.models import (
-    ALLOWEDTOENROLL_TO_ENROLLED,
-    CourseEnrollment,
-    CourseEnrollmentAllowed,
-    ManualEnrollmentAudit,
-)
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from survey.models import SurveyAnswer, SurveyForm
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
-from xmodule.partitions.partitions import Group, UserPartition
-
-import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
 from lms.djangoapps.grades.models import PersistentCourseGrade
@@ -64,24 +46,24 @@ from lms.djangoapps.instructor_task.tasks_helper.enrollments import (
     upload_enrollment_report,
     upload_exec_summary_report,
     upload_may_enroll_csv,
-    upload_students_csv,
+    upload_students_csv
 )
 from lms.djangoapps.instructor_task.tasks_helper.grades import (
     ENROLLED_IN_COURSE,
     NOT_ENROLLED_IN_COURSE,
     CourseGradeReport,
     ProblemGradeReport,
-    ProblemResponses,
+    ProblemResponses
 )
 from lms.djangoapps.instructor_task.tasks_helper.misc import (
     cohort_students_and_upload,
     upload_course_survey_report,
-    upload_ora2_data,
+    upload_ora2_data
 )
 from lms.djangoapps.instructor_task.tests.test_base import (
     InstructorTaskCourseTestCase,
     InstructorTaskModuleTestCase,
-    TestReportMixin,
+    TestReportMixin
 )
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
@@ -90,11 +72,25 @@ from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.credit.tests.factories import CreditCourseFactory
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
+from shoppingcart.models import (
+    Coupon,
+    CourseRegistrationCode,
+    CourseRegistrationCodeInvoiceItem,
+    Invoice,
+    InvoiceTransaction,
+    Order,
+    PaidCourseRegistration
+)
+from student.models import ALLOWEDTOENROLL_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAllowed, ManualEnrollmentAudit
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from survey.models import SurveyAnswer, SurveyForm
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.partitions.partitions import Group, UserPartition
+
 from ..models import ReportStore
 from ..tasks_helper.utils import UPDATE_STATUS_FAILED, UPDATE_STATUS_SUCCEEDED
-import six
-from six.moves import range
-from six.moves import zip
 
 
 class InstructorGradeReportTestCase(TestReportMixin, InstructorTaskCourseTestCase):

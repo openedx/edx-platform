@@ -2,6 +2,7 @@
 Instructor tasks related to certificates.
 """
 from __future__ import absolute_import
+
 from time import time
 
 from django.contrib.auth.models import User

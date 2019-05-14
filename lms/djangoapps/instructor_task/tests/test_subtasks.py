@@ -2,15 +2,16 @@
 Unit tests for instructor_task subtasks.
 """
 from __future__ import absolute_import
+
 from uuid import uuid4
 
 from mock import Mock, patch
+from six.moves import range
 
 from lms.djangoapps.instructor_task.subtasks import queue_subtasks_for_query
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskCourseTestCase
 from student.models import CourseEnrollment
-from six.moves import range
 
 
 class TestSubtasks(InstructorTaskCourseTestCase):

@@ -2,19 +2,22 @@
 Functionality for generating grade reports.
 """
 from __future__ import absolute_import
+
 import logging
 import re
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict, defaultdict
 from datetime import datetime
 from itertools import chain
 from time import time
 
-from django.contrib.auth import get_user_model
+import six
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from lazy import lazy
 from opaque_keys.edx.keys import UsageKey
 from pytz import UTC
 from six import text_type
+from six.moves import zip, zip_longest
 
 from course_blocks.api import get_course_blocks
 from courseware.courses import get_course_by_id
@@ -22,11 +25,9 @@ from courseware.user_state_client import DjangoXBlockUserStateClient
 from instructor_analytics.basic import list_problem_responses
 from instructor_analytics.csvs import format_dictlist
 from lms.djangoapps.certificates.models import CertificateWhitelist, GeneratedCertificate, certificate_info_for_user
-from lms.djangoapps.grades.api import (
-    CourseGradeFactory,
-    context as grades_context,
-    prefetch_course_and_subsection_grades,
-)
+from lms.djangoapps.grades.api import CourseGradeFactory
+from lms.djangoapps.grades.api import context as grades_context
+from lms.djangoapps.grades.api import prefetch_course_and_subsection_grades
 from lms.djangoapps.teams.models import CourseTeamMembership
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
@@ -41,9 +42,6 @@ from xmodule.split_test_module import get_split_user_partitions
 
 from .runner import TaskProgress
 from .utils import upload_csv_to_report_store
-import six
-from six.moves import zip
-from six.moves import zip_longest
 
 WAFFLE_NAMESPACE = 'instructor_task'
 WAFFLE_SWITCHES = WaffleSwitchNamespace(name=WAFFLE_NAMESPACE)

@@ -6,6 +6,7 @@ paths actually work.
 """
 
 from __future__ import absolute_import
+
 import json
 from functools import partial
 from uuid import uuid4
@@ -15,6 +16,7 @@ from celery.states import FAILURE, SUCCESS
 from django.utils.translation import ugettext_noop
 from mock import MagicMock, Mock, patch
 from opaque_keys.edx.locations import i4xEncoder
+from six.moves import range
 
 from course_modes.models import CourseMode
 from courseware.models import StudentModule
@@ -25,15 +27,14 @@ from lms.djangoapps.instructor_task.tasks import (
     delete_problem_state,
     export_ora2_data,
     generate_certificates,
+    override_problem_score,
     rescore_problem,
-    reset_problem_attempts,
-    override_problem_score
+    reset_problem_attempts
 )
 from lms.djangoapps.instructor_task.tasks_helper.misc import upload_ora2_data
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskModuleTestCase
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from six.moves import range
 
 PROBLEM_URL_NAME = "test_urlname"
 

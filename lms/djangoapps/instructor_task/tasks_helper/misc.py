@@ -4,11 +4,13 @@ running state of a course.
 
 """
 from __future__ import absolute_import
+
 import logging
 from collections import OrderedDict
 from datetime import datetime
 from time import time
 
+import six
 import unicodecsv
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -25,7 +27,6 @@ from util.file import UniversalNewlineIterator
 
 from .runner import TaskProgress
 from .utils import UPDATE_STATUS_FAILED, UPDATE_STATUS_SUCCEEDED, upload_csv_to_report_store
-import six
 
 # define different loggers for use within tasks and on client side
 TASK_LOG = logging.getLogger('edx.celery.task')
