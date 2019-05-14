@@ -1,8 +1,10 @@
 """ API v1 models. """
 from __future__ import absolute_import
+
 import logging
 from itertools import groupby
 
+import six
 from django.db import transaction
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -10,7 +12,6 @@ from opaque_keys.edx.keys import CourseKey
 from course_modes.models import CourseMode
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-import six
 
 log = logging.getLogger(__name__)
 

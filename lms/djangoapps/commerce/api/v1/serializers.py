@@ -1,8 +1,10 @@
 """ API v1 serializers. """
 from __future__ import absolute_import
+
 from datetime import datetime
 
 import pytz
+import six
 from django.utils.translation import ugettext as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -11,8 +13,7 @@ from rest_framework import serializers
 from course_modes.models import CourseMode
 from xmodule.modulestore.django import modulestore
 
-from .models import Course, UNDEFINED
-import six
+from .models import UNDEFINED, Course
 
 
 class CourseModeSerializer(serializers.ModelSerializer):

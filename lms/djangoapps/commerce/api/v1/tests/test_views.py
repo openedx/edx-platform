@@ -1,16 +1,18 @@
 """ Commerce API v1 view tests. """
 from __future__ import absolute_import
+
 import itertools
 import json
 from datetime import datetime, timedelta
 
 import ddt
 import pytz
+import six
 from django.conf import settings
 from django.contrib.auth.models import Permission
-from django.urls import reverse, reverse_lazy
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.urls import reverse, reverse_lazy
 from rest_framework.utils.encoders import JSONEncoder
 
 from course_modes.models import CourseMode
@@ -21,7 +23,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from ....tests.mocks import mock_order_endpoint
 from ....tests.test_views import UserMixin
-import six
 
 PASSWORD = 'test'
 JSON_CONTENT_TYPE = 'application/json'
