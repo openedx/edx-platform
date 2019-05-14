@@ -1,6 +1,7 @@
 """
 API Serializers
 """
+from __future__ import absolute_import
 from rest_framework import serializers
 from six import text_type
 
