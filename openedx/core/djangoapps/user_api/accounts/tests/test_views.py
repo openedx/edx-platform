@@ -551,7 +551,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         ("level_of_education", "none", u"ȻħȺɍłɇs", u'"ȻħȺɍłɇs" is not a valid choice.'),
         ("country", "GB", "XY", u'"XY" is not a valid choice.'),
         ("year_of_birth", 2009, "not_an_int", u"A valid integer is required."),
-        ("name", "bob", "z" * 256, u"Ensure this value has at most 255 characters (it has 256)."),
+        ("name", "bob", "z" * 256, u"Ensure this field has no more than 255 characters."),
         ("name", u"ȻħȺɍłɇs", "z   ", u"The name field must be at least 2 characters long."),
         ("goals", "Smell the roses"),
         ("mailing_address", "Sesame Street"),
