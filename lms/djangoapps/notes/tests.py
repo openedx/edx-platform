@@ -2,6 +2,7 @@
 Unit tests for the notes app.
 """
 
+from __future__ import absolute_import
 import json
 
 from django.contrib.auth.models import User
@@ -18,6 +19,8 @@ from notes import api, models, utils
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+import six
+from six.moves import range
 
 
 class UtilsTest(ModuleStoreTestCase):
@@ -443,6 +446,6 @@ class NoteTest(TestCase):
     def test_as_dict(self):
         note = models.Note(course_id=self.course_key, user=self.student)
         d = note.as_dict()
-        self.assertNotIsInstance(d, basestring)
+        self.assertNotIsInstance(d, six.string_types)
         self.assertEqual(d['user_id'], self.student.id)
         self.assertNotIn('course_id', d)
