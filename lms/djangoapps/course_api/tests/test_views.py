@@ -1,6 +1,7 @@
 """
 Tests for Course API views.
 """
+from __future__ import absolute_import
 from datetime import datetime
 import ddt
 from hashlib import md5
@@ -24,6 +25,8 @@ from waffle.testutils import override_switch
 
 from ..views import CourseDetailView, CourseListUserThrottle
 from .mixins import TEST_PASSWORD, CourseApiFactoryMixin
+import six
+from six.moves import range
 
 
 class CourseApiTestViewMixin(CourseApiFactoryMixin):
@@ -198,7 +201,7 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
             response = self.verify_response(params=params)
             self.assertEquals(
                 {course['course_id'] for course in response.data['results']},
-                {unicode(course.id) for course in expected_courses},
+                {six.text_type(course.id) for course in expected_courses},
                 u"testing course_api.views.CourseListView with filter_={}".format(filter_),
             )
 
