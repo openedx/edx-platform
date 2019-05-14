@@ -2,12 +2,13 @@
 Unit Tests for Utils Class
 """
 from __future__ import absolute_import
+
 from unittest import TestCase
 
 import ddt
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from lms.djangoapps.utils import _get_key
-from opaque_keys.edx.keys import CourseKey, UsageKey
 
 
 @ddt.ddt
