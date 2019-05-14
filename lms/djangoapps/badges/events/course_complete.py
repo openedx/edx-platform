@@ -2,9 +2,11 @@
 Helper functions for the course complete event that was originally included with the Badging MVP.
 """
 from __future__ import absolute_import
+
 import hashlib
 import logging
 
+import six
 from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
@@ -12,7 +14,6 @@ from django.utils.translation import ugettext_lazy as _
 from badges.models import BadgeAssertion, BadgeClass, CourseCompleteImageConfiguration
 from badges.utils import requires_badges_enabled, site_prefix
 from xmodule.modulestore.django import modulestore
-import six
 
 LOGGER = logging.getLogger(__name__)
 
