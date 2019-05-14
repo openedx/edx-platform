@@ -3,7 +3,10 @@ Views for user API
 """
 
 from __future__ import absolute_import
+
 import json
+
+import six
 from django.shortcuts import redirect
 from django.utils import dateparse
 from opaque_keys import InvalidKeyError
@@ -29,7 +32,6 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from .. import errors
 from ..decorators import mobile_course_access, mobile_view
 from .serializers import CourseEnrollmentSerializer, CourseEnrollmentSerializerv05, UserSerializer
-import six
 
 
 @mobile_view(is_user=True)

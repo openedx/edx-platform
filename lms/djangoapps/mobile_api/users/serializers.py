@@ -3,16 +3,17 @@ Serializer for user API
 """
 
 from __future__ import absolute_import
+
+import six
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
-from lms.djangoapps.certificates.api import certificate_downloadable_status
 from courseware.access import has_access
+from lms.djangoapps.certificates.api import certificate_downloadable_status
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from student.models import CourseEnrollment, User
 from util.course import get_encoded_course_sharing_utm_params, get_link_for_about_page
-import six
 
 
 class CourseOverviewField(serializers.RelatedField):
