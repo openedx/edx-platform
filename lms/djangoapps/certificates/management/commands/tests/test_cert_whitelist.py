@@ -2,8 +2,8 @@
 Extremely basic tests for the cert_whitelist command
 """
 from __future__ import absolute_import
-import pytest
 
+import pytest
 from django.core.management import call_command
 
 

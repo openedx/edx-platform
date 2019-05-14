@@ -2,6 +2,7 @@
 Management command which fixes ungraded certificates for students
 """
 from __future__ import absolute_import
+
 import logging
 
 from django.core.management.base import BaseCommand
