@@ -1,6 +1,7 @@
 """Tests of comprehensive theming."""
 
 from __future__ import absolute_import
+
 from django.conf import settings
 from django.contrib import staticfiles
 from django.test import TestCase

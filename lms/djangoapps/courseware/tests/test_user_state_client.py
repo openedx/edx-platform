@@ -4,6 +4,7 @@ defined in edx_user_state_client.
 """
 
 from __future__ import absolute_import
+
 from collections import defaultdict
 
 from edx_user_state_client.tests import UserStateClientTestBase

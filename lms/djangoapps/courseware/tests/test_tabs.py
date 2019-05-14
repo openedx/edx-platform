@@ -2,13 +2,16 @@
 Test cases for tabs.
 """
 from __future__ import absolute_import
+
+import six
+from crum import set_current_request
 from django.contrib.auth.models import AnonymousUser
-from django.urls import reverse
 from django.http import Http404
+from django.urls import reverse
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import MagicMock, Mock, patch
 from six import text_type
-from crum import set_current_request
+from six.moves import range
 
 from courseware.courses import get_course_by_id
 from courseware.tabs import (
@@ -42,8 +45,6 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.utils import TEST_DATA_DIR
 from xmodule.modulestore.xml_importer import import_course_from_xml
-import six
-from six.moves import range
 
 
 class TabTestCase(SharedModuleStoreTestCase):

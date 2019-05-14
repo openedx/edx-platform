@@ -2,9 +2,11 @@
 Helpers for courseware tests.
 """
 from __future__ import absolute_import
-from datetime import timedelta
-import json
 
+import json
+from datetime import timedelta
+
+import six
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.test import TestCase
@@ -13,6 +15,8 @@ from django.urls import reverse
 from django.utils.timezone import now
 from django.utils.translation import get_language
 from six import text_type
+from six.moves import range
+from xblock.field_data import DictFieldData
 
 from courseware.access import has_access
 from courseware.masquerade import handle_ajax, setup_masquerade
@@ -22,16 +26,13 @@ from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.features.course_duration_limits.access import EXPIRATION_DATE_FORMAT_STR
-from student.models import Registration, CourseEnrollment
+from student.models import CourseEnrollment, Registration
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.date_utils import strftime_localized
-from xblock.field_data import DictFieldData
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.tests import get_test_descriptor_system, get_test_system
-import six
-from six.moves import range
 
 
 class BaseTestXmodule(ModuleStoreTestCase):

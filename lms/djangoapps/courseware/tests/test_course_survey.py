@@ -3,19 +3,20 @@ Python tests for the Survey workflows
 """
 
 from __future__ import absolute_import
+
 from collections import OrderedDict
 from copy import deepcopy
 
+import six
 from django.contrib.auth.models import User
 from django.urls import reverse
+from six.moves import range
 
 from common.test.utils import XssTestMixin
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from survey.models import SurveyAnswer, SurveyForm
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-import six
-from six.moves import range
 
 
 class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTestMixin):

@@ -15,9 +15,9 @@ common/lib/xmodule/xmodule/modulestore/tests/factories.py to create the
 course, section, subsection, unit, etc.
 """
 from __future__ import absolute_import
+
 from xmodule.tests import LogicTest
 from xmodule.video_module import VideoDescriptor
-
 
 SOURCE_XML = """
     <video show_captions="true"

@@ -7,12 +7,15 @@ functionalities.
 """
 
 from __future__ import absolute_import
+
 import json
 import uuid
 
 import ddt
 import mock
+import six
 from django.urls import reverse
+from six.moves import range
 from web_fragments.fragment import Fragment
 from xblock.field_data import DictFieldData
 
@@ -24,8 +27,6 @@ from xblock_discussion import DiscussionXBlock, loader
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory
-import six
-from six.moves import range
 
 
 @ddt.ddt

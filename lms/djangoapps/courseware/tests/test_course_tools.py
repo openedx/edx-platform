@@ -3,12 +3,13 @@ Unit tests for course tools.
 """
 
 from __future__ import absolute_import
-import crum
+
 import datetime
 
-from mock import patch
+import crum
 import pytz
 from django.test import RequestFactory
+from mock import patch
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory

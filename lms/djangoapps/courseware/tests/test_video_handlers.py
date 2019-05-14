@@ -2,6 +2,7 @@
 """Video xmodule tests in mongo."""
 
 from __future__ import absolute_import
+
 import json
 import os
 import tempfile
@@ -10,8 +11,10 @@ from datetime import timedelta
 
 import ddt
 import freezegun
+import six
 from django.core.files.base import ContentFile
 from django.utils.timezone import now
+from edxval import api
 from mock import MagicMock, Mock, patch
 from webob import Request, Response
 
@@ -22,19 +25,11 @@ from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.video_module.transcripts_utils import (
-    Transcript,
-    edxval_api,
-    subs_filename,
-)
+from xmodule.video_module.transcripts_utils import Transcript, edxval_api, subs_filename
 from xmodule.x_module import STUDENT_VIEW
-
-from edxval import api
 
 from .helpers import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
-import six
-
 
 TRANSCRIPT = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}
 BUMPER_TRANSCRIPT = {"start": [1], "end": [10], "text": ["A bumper"]}

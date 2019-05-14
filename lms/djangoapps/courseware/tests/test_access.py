@@ -3,16 +3,18 @@
 Test the access control framework
 """
 from __future__ import absolute_import
+
 import datetime
 import itertools
 
 import ddt
 import pytz
+import six
 from ccx_keys.locator import CCXLocator
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.urls import reverse
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
@@ -55,7 +57,6 @@ from xmodule.modulestore.tests.django_utils import (
 )
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, Group, UserPartition
-import six
 
 QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 

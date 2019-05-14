@@ -2,6 +2,8 @@
 Test for split test XModule
 """
 from __future__ import absolute_import
+
+import six
 from django.urls import reverse
 from mock import MagicMock
 from six import text_type
@@ -13,7 +15,6 @@ from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
-import six
 
 
 class SplitTestBase(SharedModuleStoreTestCase):

@@ -1,10 +1,12 @@
 from __future__ import absolute_import
+
 import datetime
 
 import pytz
 from django.urls import reverse
 from mock import patch
 from six import text_type
+from six.moves import range
 
 from courseware.access import has_access
 from courseware.tests.factories import (
@@ -21,7 +23,6 @@ from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from six.moves import range
 
 
 class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnrollmentTestCase):

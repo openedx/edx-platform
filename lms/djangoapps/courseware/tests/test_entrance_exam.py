@@ -2,9 +2,12 @@
 Tests use cases related to LMS Entrance Exam behavior, such as gated content access (TOC)
 """
 from __future__ import absolute_import
-from django.urls import reverse
-from mock import Mock, patch
+
+import six
 from crum import set_current_request
+from django.urls import reverse
+from milestones.tests.utils import MilestonesTestCaseMixin
+from mock import Mock, patch
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.entrance_exams import (
@@ -15,9 +18,8 @@ from courseware.entrance_exams import (
 )
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module, handle_xblock_callback, toc_for_course
-from courseware.tests.factories import InstructorFactory, StaffFactory, UserFactory, RequestFactoryNoCsrf
+from courseware.tests.factories import InstructorFactory, RequestFactoryNoCsrf, StaffFactory, UserFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from milestones.tests.utils import MilestonesTestCaseMixin
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG, UNIFIED_COURSE_TAB_FLAG
@@ -34,7 +36,6 @@ from util.milestones_helpers import (
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-import six
 
 
 @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True})

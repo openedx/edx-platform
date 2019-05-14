@@ -4,6 +4,7 @@ Video xmodule tests in mongo.
 """
 
 from __future__ import absolute_import
+
 import json
 import shutil
 from collections import OrderedDict
@@ -11,6 +12,7 @@ from tempfile import mkdtemp
 from uuid import uuid4
 
 import ddt
+import six
 from django.conf import settings
 from django.core.files import File
 from django.core.files.base import ContentFile
@@ -33,11 +35,11 @@ from fs.path import combine
 from lxml import etree
 from mock import MagicMock, Mock, patch
 from path import Path as path
-
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
-from openedx.core.djangoapps.video_pipeline.config.waffle import waffle_flags, DEPRECATE_YOUTUBE
 from waffle.testutils import override_flag
+
+from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE, waffle_flags
+from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import ModuleStoreEnum
@@ -47,16 +49,12 @@ from xmodule.tests.test_import import DummySystem
 from xmodule.tests.test_video import VideoDescriptorTestBase, instantiate_descriptor
 from xmodule.video_module import VideoDescriptor, bumper_utils, video_utils
 from xmodule.video_module.transcripts_utils import Transcript, save_to_store, subs_filename
-from xmodule.video_module.video_module import (
-    EXPORT_IMPORT_COURSE_DIR,
-    EXPORT_IMPORT_STATIC_DIR,
-)
-from xmodule.x_module import STUDENT_VIEW, PUBLIC_VIEW
+from xmodule.video_module.video_module import EXPORT_IMPORT_COURSE_DIR, EXPORT_IMPORT_STATIC_DIR
+from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
 from .helpers import BaseTestXmodule
 from .test_video_handlers import TestVideo
 from .test_video_xml import SOURCE_XML
-import six
 
 MODULESTORES = {
     ModuleStoreEnum.Type.mongo: TEST_DATA_MONGO_MODULESTORE,

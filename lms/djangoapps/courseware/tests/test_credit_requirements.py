@@ -3,7 +3,9 @@ Tests for credit requirement display on the progress page.
 """
 
 from __future__ import absolute_import
+
 import ddt
+import six
 from django.conf import settings
 from django.urls import reverse
 from mock import patch
@@ -14,7 +16,6 @@ from openedx.core.djangoapps.credit.models import CreditCourse
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-import six
 
 
 @patch.dict(settings.FEATURES, {"ENABLE_CREDIT_ELIGIBILITY": True})

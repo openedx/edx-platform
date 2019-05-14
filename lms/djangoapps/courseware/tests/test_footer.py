@@ -4,14 +4,15 @@ edx.org uses an edx footer but other instances use an Open edX footer.
 """
 
 from __future__ import absolute_import
+
 import unittest
 
+import six
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
-import six
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

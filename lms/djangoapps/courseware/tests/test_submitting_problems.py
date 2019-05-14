@@ -6,19 +6,22 @@ Integration tests for submitting problem responses and getting grades.
 # pylint: disable=attribute-defined-outside-init
 
 from __future__ import absolute_import
+
 import json
 import os
 from textwrap import dedent
 
 import ddt
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.urls import reverse
 from django.utils.timezone import now
 from mock import patch
 from six import text_type
+from submissions import api as submissions_api
 
 from capa.tests.response_xml_factory import (
     CodeResponseXMLFactory,
@@ -35,11 +38,9 @@ from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from openedx.core.lib.url_utils import quote_slashes
 from student.models import CourseEnrollment, anonymous_id_for_user
-from submissions import api as submissions_api
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
-import six
 
 
 class ProblemSubmissionTestMixin(TestCase):

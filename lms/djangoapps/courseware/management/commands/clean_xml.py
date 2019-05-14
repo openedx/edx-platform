@@ -1,17 +1,16 @@
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
-from __future__ import absolute_import
 import os
 import sys
 import traceback
 
 import lxml.etree
-
 from django.core.management.base import BaseCommand
 from fs.osfs import OSFS
 from path import Path as path
-from xmodule.modulestore.xml import XMLModuleStore
 from six.moves import map
+
+from xmodule.modulestore.xml import XMLModuleStore
 
 
 def traverse_tree(course):

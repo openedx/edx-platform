@@ -1,19 +1,22 @@
 """LTI integration tests"""
 
 from __future__ import absolute_import
+
 import json
-import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 from collections import OrderedDict
 
 import mock
+import oauthlib
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 from django.conf import settings
 from django.urls import reverse
+from six import text_type
 
-import oauthlib
 from courseware.tests.helpers import BaseTestXmodule
 from courseware.views.views import get_course_lti_endpoints
 from openedx.core.lib.url_utils import quote_slashes
-from six import text_type
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.x_module import STUDENT_VIEW

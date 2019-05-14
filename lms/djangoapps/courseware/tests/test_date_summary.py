@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 """Tests for course home page date summary blocks."""
 from __future__ import absolute_import
+
 from datetime import datetime, timedelta
 
 import ddt
 import waffle
 from django.contrib.messages.middleware import MessageMiddleware
-from django.urls import reverse
 from django.test import RequestFactory
+from django.urls import reverse
 from freezegun import freeze_time
 from mock import patch
 from pytz import utc

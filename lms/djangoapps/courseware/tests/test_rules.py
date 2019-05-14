@@ -2,16 +2,15 @@
 Tests for permissions defined in courseware.rules
 """
 from __future__ import absolute_import
-import ddt
 
+import ddt
+import six
 from django.test import TestCase
+from opaque_keys.edx.locator import CourseLocator
 
 from course_modes.tests.factories import CourseModeFactory
-
-from opaque_keys.edx.locator import CourseLocator
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
-import six
 
 
 @ddt.ddt

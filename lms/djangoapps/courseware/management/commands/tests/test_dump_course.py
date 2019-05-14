@@ -5,14 +5,16 @@ Tests for Django management commands
 """
 
 from __future__ import absolute_import
+
 import json
 from StringIO import StringIO
 
-from six import text_type
-
 import factory
+import six
 from django.conf import settings
 from django.core.management import call_command
+from six import text_type
+
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
@@ -22,7 +24,6 @@ from xmodule.modulestore.tests.django_utils import (
 )
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.xml_importer import import_course_from_xml
-import six
 
 DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 XML_COURSE_DIRS = ['simple']

@@ -2,13 +2,15 @@
 This test file will run through some LMS test scenarios regarding access and navigation of the LMS
 """
 from __future__ import absolute_import
+
 import time
 
 from django.conf import settings
-from django.urls import reverse
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import patch
 from six import text_type
+from six.moves import range
 
 from courseware.tests.factories import GlobalStaffFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
@@ -18,7 +20,6 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from six.moves import range
 
 
 class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
