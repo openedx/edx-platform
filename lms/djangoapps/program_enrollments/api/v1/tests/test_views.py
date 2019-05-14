@@ -1,9 +1,8 @@
 """
 Unit tests for ProgramEnrollment views.
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
-from __future__ import absolute_import
 import json
 from uuid import uuid4
 
@@ -16,6 +15,7 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.test import APITestCase
 from six import text_type
+from six.moves import range, zip
 
 from course_modes.models import CourseMode
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
@@ -30,8 +30,6 @@ from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from six.moves import range
-from six.moves import zip
 
 
 class ListViewTestMixin(object):
