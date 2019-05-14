@@ -3,9 +3,11 @@
 Tests for BlockNavigationTransformer.
 """
 from __future__ import absolute_import
+
 from unittest import TestCase
 
 import ddt
+import six
 
 from lms.djangoapps.course_api.blocks.transformers.block_depth import BlockDepthTransformer
 from lms.djangoapps.course_api.blocks.transformers.navigation import BlockNavigationTransformer
@@ -15,7 +17,6 @@ from openedx.core.djangoapps.content.block_structure.tests.helpers import Childr
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import SampleCourseFactory
-import six
 
 
 @ddt.ddt

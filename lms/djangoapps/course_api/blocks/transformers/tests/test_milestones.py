@@ -2,7 +2,9 @@
 Tests for ProctoredExamTransformer.
 """
 from __future__ import absolute_import
+
 import ddt
+import six
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 
@@ -14,7 +16,6 @@ from openedx.core.lib.gating import api as gating_api
 from student.tests.factories import CourseEnrollmentFactory
 
 from ..milestones import MilestonesAndSpecialExamsTransformer
-import six
 
 
 @ddt.ddt

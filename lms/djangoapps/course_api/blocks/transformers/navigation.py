@@ -2,10 +2,12 @@
 TODO
 """
 from __future__ import absolute_import
+
+import six
+
 from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 
 from .block_depth import BlockDepthTransformer
-import six
 
 
 class DescendantList(object):

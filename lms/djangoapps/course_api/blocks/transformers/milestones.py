@@ -3,18 +3,17 @@ Milestones Transformer
 """
 
 from __future__ import absolute_import
+
 import logging
 
+import six
 from django.conf import settings
 from edx_proctoring.api import get_attempt_status_summary
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 
-from openedx.core.djangoapps.content.block_structure.transformer import (
-    BlockStructureTransformer,
-)
+from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 from student.models import EntranceExamConfiguration
 from util import milestones_helpers
-import six
 
 log = logging.getLogger(__name__)
 
