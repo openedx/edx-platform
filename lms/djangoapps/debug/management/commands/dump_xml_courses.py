@@ -7,18 +7,17 @@ each as a separate output file containing the json representation
 of each of its fields (including those fields that are set as default values).
 """
 
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
-from __future__ import absolute_import
 import json
 
+import six
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from path import Path as path
 from six import text_type
 
 from xmodule.modulestore.xml import XMLModuleStore
-import six
 
 
 class Command(BaseCommand):
