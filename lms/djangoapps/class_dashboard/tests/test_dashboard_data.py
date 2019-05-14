@@ -3,12 +3,14 @@ Tests for class dashboard (Metrics tab in instructor dashboard)
 """
 
 from __future__ import absolute_import
+
 import json
 
-from django.urls import reverse
 from django.test.client import RequestFactory
+from django.urls import reverse
 from mock import patch
 from six import text_type
+from six.moves import range
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from class_dashboard.dashboard_data import (
@@ -28,7 +30,6 @@ from courseware.tests.factories import StudentModuleFactory
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from six.moves import range
 
 USER_COUNT = 11
 

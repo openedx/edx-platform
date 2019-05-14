@@ -2,11 +2,11 @@
 Computes the data to display on the Instructor Dashboard
 """
 from __future__ import absolute_import
+
 import json
 
 from django.db.models import Count
 from django.utils.translation import ugettext as _
-
 from opaque_keys.edx.locator import BlockUsageLocator
 from six import text_type
 

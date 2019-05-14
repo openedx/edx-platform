@@ -2,6 +2,7 @@
 Tests for class dashboard (Metrics tab in instructor dashboard)
 """
 from __future__ import absolute_import
+
 import json
 
 from django.test.client import RequestFactory
