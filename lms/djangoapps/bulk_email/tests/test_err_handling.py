@@ -2,6 +2,7 @@
 """
 Unit tests for handling email sending errors
 """
+from __future__ import absolute_import
 import json
 from itertools import cycle
 from smtplib import SMTPConnectError, SMTPDataError, SMTPServerDisconnected
@@ -30,6 +31,7 @@ from lms.djangoapps.instructor_task.subtasks import (
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from six.moves import range
 
 
 class EmailTestException(Exception):
@@ -105,7 +107,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         get_conn.return_value.send_messages.side_effect = cycle([SMTPDataError(554, "Email address is blacklisted"),
                                                                  None, None, None])
         # Don't forget to account for the "myself" instructor user
-        students = [UserFactory() for _ in xrange(settings.BULK_EMAIL_EMAILS_PER_TASK - 1)]
+        students = [UserFactory() for _ in range(settings.BULK_EMAIL_EMAILS_PER_TASK - 1)]
         for student in students:
             CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
 

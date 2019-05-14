@@ -7,6 +7,7 @@ paths actually work.
 
 """
 from __future__ import print_function
+from __future__ import absolute_import
 import json
 from itertools import chain, cycle, repeat
 from smtplib import SMTPAuthenticationError, SMTPConnectError, SMTPDataError, SMTPServerDisconnected
@@ -38,6 +39,7 @@ from lms.djangoapps.instructor_task.tasks import send_bulk_course_email
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskCourseTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from six.moves import range
 
 
 class TestTaskFailure(Exception):
@@ -137,7 +139,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
     def _create_students(self, num_students):
         """Create students for testing"""
-        return [self.create_student('robot%d' % i) for i in xrange(num_students)]
+        return [self.create_student('robot%d' % i) for i in range(num_students)]
 
     def _assert_single_subtask_status(self, entry, succeeded, failed=0, skipped=0, retried_nomax=0, retried_withmax=0):
         """Compare counts with 'subtasks' entry in InstructorTask table."""
@@ -148,7 +150,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         self.assertEquals(subtask_info.get('failed'), 0 if succeeded > 0 else 1)
         # verify individual subtask status:
         subtask_status_info = subtask_info.get('status')
-        task_id_list = subtask_status_info.keys()
+        task_id_list = list(subtask_status_info.keys())
         self.assertEquals(len(task_id_list), 1)
         task_id = task_id_list[0]
         subtask_status = subtask_status_info.get(task_id)
