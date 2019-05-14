@@ -2,10 +2,11 @@
 Tests for the rss_proxy models
 """
 from __future__ import absolute_import
+
+import six
 from django.test import TestCase
 
 from rss_proxy.models import WhitelistedRssUrl
-import six
 
 
 class WhitelistedRssUrlTests(TestCase):
