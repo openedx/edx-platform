@@ -2,6 +2,7 @@
 Unit tests for completing program course enrollments
 once a social auth entry for the user is created.
 """
+from __future__ import absolute_import
 from django.test import TestCase
 import mock
 from opaque_keys.edx.keys import CourseKey

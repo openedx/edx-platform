@@ -3,6 +3,7 @@ Unit tests for the ProgramEnrollment admin classes.
 """
 from __future__ import unicode_literals
 
+from __future__ import absolute_import
 from django.contrib.admin.sites import AdminSite
 from django.test import TestCase
 import mock

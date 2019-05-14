@@ -3,6 +3,7 @@ Unit tests for ProgramEnrollment models.
 """
 from __future__ import unicode_literals
 
+from __future__ import absolute_import
 from uuid import uuid4
 from testfixtures import LogCapture
 
@@ -17,6 +18,7 @@ from student.models import CourseEnrollment
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from openedx.core.djangoapps.catalog.tests.factories import generate_course_run_key
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from six.moves import range
 
 
 class ProgramEnrollmentModelTests(TestCase):
@@ -45,7 +47,7 @@ class ProgramEnrollmentModelTests(TestCase):
         enrollments = []
         student_data = {}
 
-        for i in xrange(5):
+        for i in range(5):
             # This will give us 4 program enrollments for self.program_uuid
             # and 1 enrollment for self.other_program_uuid
             user_curriculum = curriculum_b if i % 2 else curriculum_a
