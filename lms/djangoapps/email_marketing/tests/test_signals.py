@@ -1,5 +1,6 @@
 """Tests of email marketing signal handlers."""
 from __future__ import absolute_import
+
 import datetime
 import logging
 
@@ -27,14 +28,14 @@ from email_marketing.tasks import (
     _create_user_list,
     _get_list_from_email_marketing_provider,
     _get_or_create_user_list,
-    update_user,
-    update_user_email,
     get_email_cookies_via_sailthru,
     update_course_enrollment,
+    update_user,
+    update_user_email
 )
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from student.models import Registration
-from student.tests.factories import UserFactory, UserProfileFactory, CourseEnrollmentFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory, UserProfileFactory
 from util.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
