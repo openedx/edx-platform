@@ -13,13 +13,14 @@ ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 """
 from __future__ import absolute_import
+
+import six
 from django.db import models
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
 from courseware.models import BaseStudentModuleHistory, StudentModule
 from coursewarehistoryextended.fields import UnsignedBigIntAutoField
-import six
 
 
 class StudentModuleHistoryExtended(BaseStudentModuleHistory):
