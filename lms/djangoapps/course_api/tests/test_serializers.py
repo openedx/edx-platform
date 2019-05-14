@@ -2,9 +2,8 @@
 Test data created by CourseSerializer and CourseDetailSerializer
 """
 
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
-from __future__ import absolute_import
 from datetime import datetime
 
 import ddt

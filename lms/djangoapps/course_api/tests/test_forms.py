@@ -3,12 +3,14 @@ Tests for Course API forms.
 """
 
 from __future__ import absolute_import
+
 from itertools import product
-from six.moves.urllib.parse import urlencode
 
 import ddt
+import six
 from django.contrib.auth.models import AnonymousUser
 from django.http import QueryDict
+from six.moves.urllib.parse import urlencode
 
 from openedx.core.djangoapps.util.test_forms import FormTestMixin
 from student.tests.factories import UserFactory
@@ -16,7 +18,6 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..forms import CourseDetailGetForm, CourseListGetForm
-import six
 
 
 class UsernameTestMixin(object):

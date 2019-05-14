@@ -2,6 +2,7 @@
 Test for course API
 """
 from __future__ import absolute_import
+
 from hashlib import md5
 
 from django.contrib.auth.models import AnonymousUser
