@@ -1,6 +1,7 @@
 """
 Unit tests for instructor_dashboard.py.
 """
+from __future__ import absolute_import
 import datetime
 
 import ddt
@@ -31,6 +32,8 @@ from student.tests.factories import AdminFactory, CourseEnrollmentFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+import six
+from six.moves import range
 
 
 def intercept_renderer(path, context):
@@ -127,7 +130,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         url = reverse(
             'instructor_dashboard',
             kwargs={
-                'course_id': unicode(self.course_info.id)
+                'course_id': six.text_type(self.course_info.id)
             }
         )
 
@@ -171,7 +174,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         url = reverse(
             'instructor_dashboard',
             kwargs={
-                'course_id': unicode(self.course_info.id)
+                'course_id': six.text_type(self.course_info.id)
             }
         )
 
@@ -188,7 +191,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         url = reverse(
             'instructor_dashboard',
             kwargs={
-                'course_id': unicode(self.course_info.id)
+                'course_id': six.text_type(self.course_info.id)
             }
         )
 
@@ -449,7 +452,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
     @patch('lms.djangoapps.instructor.views.gradebook_api.render_to_response', intercept_renderer)
     @patch('lms.djangoapps.instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)
     def test_spoc_gradebook_pages(self):
-        for i in xrange(2):
+        for i in range(2):
             username = "user_%d" % i
             student = UserFactory.create(username=username)
             CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
@@ -541,7 +544,7 @@ class TestInstructorDashboardPerformance(ModuleStoreTestCase, LoginEnrollmentTes
         )
 
         students = []
-        for i in xrange(20):
+        for i in range(20):
             username = "user_%d" % i
             student = UserFactory.create(username=username)
             CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
@@ -569,7 +572,7 @@ class TestInstructorDashboardPerformance(ModuleStoreTestCase, LoginEnrollmentTes
             publish_item=True,
             start=datetime.datetime(2015, 4, 1, tzinfo=UTC),
         )
-        for i in xrange(10):
+        for i in range(10):
             problem = ItemFactory.create(
                 category="problem",
                 parent=vertical,

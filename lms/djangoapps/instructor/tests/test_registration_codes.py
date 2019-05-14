@@ -1,6 +1,7 @@
 """
 Test for the registration code status information.
 """
+from __future__ import absolute_import
 import json
 
 from django.test.utils import override_settings
@@ -24,6 +25,8 @@ from student.roles import CourseSalesAdminRole
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+import six
+from six.moves import range
 
 
 @override_settings(REGISTRATION_CODE_LENGTH=8)
@@ -120,7 +123,7 @@ class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
         for i in range(2):
             CourseRegistrationCode.objects.create(
                 code='reg_code{}'.format(i),
-                course_id=unicode(self.course.id),
+                course_id=six.text_type(self.course.id),
                 created_by=self.instructor,
                 invoice=self.sale_invoice,
                 invoice_item=self.invoice_item,

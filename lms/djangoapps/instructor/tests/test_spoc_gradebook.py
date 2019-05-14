@@ -2,6 +2,7 @@
 Tests of the instructor dashboard spoc gradebook
 """
 
+from __future__ import absolute_import
 from django.urls import reverse
 from six import text_type
 
@@ -11,6 +12,7 @@ from lms.djangoapps.grades.api import task_compute_all_grades_for_course
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from six.moves import range
 
 USER_COUNT = 11
 
@@ -51,7 +53,7 @@ class TestGradebook(SharedModuleStoreTestCase):
                     data=StringResponseXMLFactory().build_xml(answer='foo'),
                     metadata={'rerandomize': 'always'}
                 )
-                for __ in xrange(USER_COUNT - 1)
+                for __ in range(USER_COUNT - 1)
             ]
 
     def setUp(self):
@@ -59,7 +61,7 @@ class TestGradebook(SharedModuleStoreTestCase):
 
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password='test')
-        self.users = [UserFactory.create() for _ in xrange(USER_COUNT)]
+        self.users = [UserFactory.create() for _ in range(USER_COUNT)]
 
         for user in self.users:
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)

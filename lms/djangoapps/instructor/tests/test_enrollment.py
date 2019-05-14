@@ -4,6 +4,7 @@ Unit tests for instructor.enrollment methods.
 """
 from __future__ import print_function
 
+from __future__ import absolute_import
 import json
 from abc import ABCMeta
 
@@ -40,6 +41,7 @@ from student.roles import CourseCcxCoachRole
 from student.tests.factories import AdminFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+import six
 
 
 class TestSettableEnrollmentState(CacheIsolationTestCase):
@@ -64,7 +66,7 @@ class TestSettableEnrollmentState(CacheIsolationTestCase):
         self.assertEqual(mes, ees)
 
 
-class TestEnrollmentChangeBase(CacheIsolationTestCase):
+class TestEnrollmentChangeBase(six.with_metaclass(ABCMeta, CacheIsolationTestCase)):
     """
     Test instructor enrollment administration against database effects.
 
@@ -72,8 +74,6 @@ class TestEnrollmentChangeBase(CacheIsolationTestCase):
     `action` is a function which is run
     the test will pass if `action` mutates state from `before_ideal` to `after_ideal`
     """
-
-    __metaclass__ = ABCMeta
 
     def setUp(self):
         super(TestEnrollmentChangeBase, self).setUp()
