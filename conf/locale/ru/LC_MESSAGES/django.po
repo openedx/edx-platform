@@ -22156,6 +22156,14 @@ msgstr ""
 msgid "Find Courses"
 msgstr "Найти курсы"
 
+#: lms/templates/dashboard.html
+#: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Find courses"
+msgstr "Найти курсы"
+
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Schools & Partners"
 msgstr "Учебные заведения и партнёры"
