@@ -2,6 +2,7 @@
 """Tests of Branding API """
 from __future__ import unicode_literals
 
+from __future__ import absolute_import
 import mock
 from django.conf import settings
 from django.urls import reverse

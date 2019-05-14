@@ -1,7 +1,8 @@
 # encoding: utf-8
 """Tests of Branding API views. """
+from __future__ import absolute_import
 import json
-import urllib
+import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 
 import ddt
 import mock
@@ -256,7 +257,7 @@ class TestFooter(CacheIsolationTestCase):
         if params is not None:
             url = u"{url}?{params}".format(
                 url=url,
-                params=urllib.urlencode(params)
+                params=six.moves.urllib.parse.urlencode(params)
             )
 
         return self.client.get(url, HTTP_ACCEPT=accepts)

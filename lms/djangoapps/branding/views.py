@@ -1,6 +1,7 @@
 """Views for the branding app. """
+from __future__ import absolute_import
 import logging
-import urllib
+import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -273,7 +274,7 @@ def footer(request):
         }
         if include_language_selector:
             cache_params['language_selector_options'] = ','.join(sorted([lang.code for lang in released_languages()]))
-        cache_key = u"branding.footer.{params}.html".format(params=urllib.urlencode(cache_params))
+        cache_key = u"branding.footer.{params}.html".format(params=six.moves.urllib.parse.urlencode(cache_params))
 
         content = cache.get(cache_key)
         if content is None:
@@ -286,7 +287,7 @@ def footer(request):
 
     elif 'application/json' in accepts:
         cache_key = u"branding.footer.{params}.json".format(
-            params=urllib.urlencode({
+            params=six.moves.urllib.parse.urlencode({
                 'language': language,
                 'is_secure': request.is_secure(),
             })
