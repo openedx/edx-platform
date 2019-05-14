@@ -93,6 +93,9 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 
 QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
+FEATURES_WITH_DISABLE_HONOR_CERTIFICATE = settings.FEATURES.copy()
+FEATURES_WITH_DISABLE_HONOR_CERTIFICATE['DISABLE_HONOR_CERTIFICATES'] = True
+
 
 class TestJumpTo(ModuleStoreTestCase):
     """
@@ -1694,13 +1697,15 @@ class ProgressPageTests(ProgressPageBaseTests):
 
     @patch('courseware.views.views.is_course_passed', PropertyMock(return_value=True))
     @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
-    def test_message_for_audit_mode(self):
+    @override_settings(FEATURES=FEATURES_WITH_DISABLE_HONOR_CERTIFICATE)
+    @ddt.data(CourseMode.AUDIT, CourseMode.HONOR)
+    def test_message_for_ineligible_mode(self, course_mode):
         """ Verify that message appears on progress page, if learner is enrolled
-         in audit mode.
+         in an ineligible mode.
         """
         user = UserFactory.create()
         self.assertTrue(self.client.login(username=user.username, password='test'))
-        CourseEnrollmentFactory(user=user, course_id=self.course.id, mode=CourseMode.AUDIT)
+        CourseEnrollmentFactory(user=user, course_id=self.course.id, mode=course_mode)
 
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
             course_grade = mock_create.return_value
@@ -1709,10 +1714,9 @@ class ProgressPageTests(ProgressPageBaseTests):
 
             response = self._get_progress_page()
 
-            self.assertContains(
-                response,
-                u'You are enrolled in the audit track for this course. The audit track does not include a certificate.'
-            )
+            expected_message = (u'You are enrolled in the {mode} track for this course. '
+                                u'The {mode} track does not include a certificate.').format(mode=course_mode)
+            self.assertContains(response, expected_message)
 
     def test_invalidated_cert_data(self):
         """
