@@ -2,6 +2,7 @@
 Utilities to facilitate experimentation
 """
 
+from __future__ import absolute_import
 import hashlib
 import re
 import logging
@@ -20,6 +21,7 @@ from openedx.core.djangoapps.django_comment_common.models import Role
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+import six
 
 
 logger = logging.getLogger(__name__)
@@ -170,7 +172,7 @@ def get_program_price_and_skus(courses):
         skus = None
     else:
         program_price = format_course_price(program_price)
-        program_price = unicode(program_price)
+        program_price = six.text_type(program_price)
 
     return program_price, skus
 
@@ -420,7 +422,7 @@ def get_deprecated_experiment_user_metadata_context(course, user):
 
     return {
         'upgrade_link': upgrade_link,
-        'upgrade_price': unicode(get_cosmetic_verified_display_price(course)),
+        'upgrade_price': six.text_type(get_cosmetic_verified_display_price(course)),
         'enrollment_mode': enrollment_mode,
         'enrollment_time': enrollment_time,
         'pacing_type': 'self_paced' if course.self_paced else 'instructor_paced',
@@ -459,7 +461,7 @@ def get_base_experiment_metadata_context(course, user, enrollment, user_enrollme
 
     return {
         'upgrade_link': upgrade_link,
-        'upgrade_price': unicode(get_cosmetic_verified_display_price(course)),
+        'upgrade_price': six.text_type(get_cosmetic_verified_display_price(course)),
         'enrollment_mode': enrollment_mode,
         'enrollment_time': enrollment_time,
         'pacing_type': 'self_paced' if course.self_paced else 'instructor_paced',

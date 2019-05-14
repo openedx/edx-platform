@@ -1,6 +1,7 @@
 """
 Tests of experiment functionality
 """
+from __future__ import absolute_import
 from decimal import Decimal
 from unittest import TestCase
 from lms.djangoapps.experiments.utils import get_course_entitlement_price_and_sku, get_program_price_and_skus, \
