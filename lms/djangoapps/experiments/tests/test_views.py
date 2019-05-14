@@ -1,11 +1,14 @@
 from __future__ import absolute_import
-import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
+
 import unittest
 
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
-from django.urls import reverse
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import patch
 from rest_framework.test import APITestCase
 
@@ -13,7 +16,6 @@ from experiments.factories import ExperimentDataFactory, ExperimentKeyValueFacto
 from experiments.models import ExperimentData, ExperimentKeyValue
 from experiments.serializers import ExperimentDataSerializer
 from student.tests.factories import UserFactory
-
 
 CROSS_DOMAIN_REFERER = 'https://ecommerce.edx.org'
 
