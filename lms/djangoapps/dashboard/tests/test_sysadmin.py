@@ -2,6 +2,7 @@
 Provide tests for sysadmin dashboard feature in sysadmin.py
 """
 from __future__ import absolute_import
+
 import glob
 import os
 import re
@@ -12,13 +13,14 @@ from uuid import uuid4
 
 import mongoengine
 from django.conf import settings
-from django.urls import reverse
-from django.utils.html import escape
 from django.test.client import Client
 from django.test.utils import override_settings
-from pytz import UTC
+from django.urls import reverse
+from django.utils.html import escape
 from opaque_keys.edx.locator import CourseLocator
+from pytz import UTC
 from six import text_type
+from six.moves import range
 
 from dashboard.git_import import GitImportErrorNoDir
 from dashboard.models import CourseImportLog
@@ -27,12 +29,8 @@ from student.roles import CourseStaffRole, GlobalStaff
 from student.tests.factories import UserFactory
 from util.date_utils import DEFAULT_DATE_TIME_FORMAT, get_time_display
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_SPLIT_MODULESTORE,
-    SharedModuleStoreTestCase
-)
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
-from six.moves import range
 
 TEST_MONGODB_LOG = {
     'host': MONGO_HOST,
