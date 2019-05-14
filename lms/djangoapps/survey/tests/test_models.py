@@ -3,9 +3,11 @@ Python tests for the Survey models
 """
 
 from __future__ import absolute_import
+
 from collections import OrderedDict
 
 import ddt
+import six
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.test import TestCase
@@ -13,7 +15,6 @@ from django.test.client import Client
 
 from survey.exceptions import SurveyFormNameAlreadyExists, SurveyFormNotFound
 from survey.models import SurveyAnswer, SurveyForm
-import six
 
 
 @ddt.ddt
