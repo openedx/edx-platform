@@ -2,6 +2,7 @@
 Synchronizes a mailchimp list with the students of a course.
 """
 from __future__ import absolute_import
+
 import itertools
 import logging
 import math
@@ -9,12 +10,13 @@ import random
 from collections import namedtuple
 from itertools import chain
 
+import six
 from django.core.management.base import BaseCommand
 from mailsnake import MailSnake
 from opaque_keys.edx.keys import CourseKey
-from student.models import UserProfile, unique_id_for_user
-import six
 from six.moves import range
+
+from student.models import UserProfile, unique_id_for_user
 
 BATCH_SIZE = 15000
 # If you try to subscribe with too many users at once

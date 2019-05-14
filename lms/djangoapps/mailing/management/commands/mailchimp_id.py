@@ -2,9 +2,8 @@
 mailchimp_id: Returns whether or not a given mailchimp key represents
 a valid list.
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
-from __future__ import absolute_import
 import sys
 
 from django.core.management.base import BaseCommand
