@@ -5,6 +5,7 @@ but these are specific to the new storage model with multiple
 backend tables.
 """
 
+from __future__ import absolute_import
 import json
 from unittest import skipUnless
 
