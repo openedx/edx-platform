@@ -1,7 +1,7 @@
 """Tests of commerce utilities."""
 from __future__ import absolute_import
+
 import json
-from six.moves.urllib.parse import urlencode
 
 import ddt
 import httpretty
@@ -11,9 +11,8 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import patch
 from opaque_keys.edx.locator import CourseLocator
+from six.moves.urllib.parse import urlencode
 from waffle.testutils import override_switch
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -22,7 +21,9 @@ from lms.djangoapps.commerce.utils import EcommerceService, refund_entitlement, 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.lib.log_utils import audit_log
 from student.models import CourseEnrollment
-from student.tests.factories import (TEST_PASSWORD, UserFactory)
+from student.tests.factories import TEST_PASSWORD, UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':

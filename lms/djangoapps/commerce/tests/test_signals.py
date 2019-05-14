@@ -2,12 +2,10 @@
 """
 Tests for signal handling in commerce djangoapp.
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
-from __future__ import absolute_import
 import base64
 import json
-from six.moves.urllib.parse import urljoin
 
 import ddt
 import httpretty
@@ -18,14 +16,16 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from opaque_keys.edx.keys import CourseKey
 from requests import Timeout
+from six.moves.urllib.parse import urljoin
 
 from course_modes.models import CourseMode
 from student.signals import REFUND_ORDER
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
+
+from ..models import CommerceConfiguration
+from ..utils import _generate_refund_notification_body, _send_refund_notification, create_zendesk_ticket
 from . import JSON
 from .mocks import mock_create_refund, mock_process_refund
-from ..models import CommerceConfiguration
-from ..utils import create_zendesk_ticket, _generate_refund_notification_body, _send_refund_notification
 
 ZENDESK_URL = 'http://zendesk.example.com/'
 ZENDESK_USER = 'test@example.com'
