@@ -1,6 +1,7 @@
 """
 Tests for BlockCompletionTransformer.
 """
+from __future__ import absolute_import
 from completion.models import BlockCompletion
 from completion.test_utils import CompletionWaffleTestMixin
 from xblock.core import XBlock

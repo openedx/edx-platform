@@ -2,6 +2,7 @@
 Milestones Transformer
 """
 
+from __future__ import absolute_import
 import logging
 
 from django.conf import settings
@@ -13,6 +14,7 @@ from openedx.core.djangoapps.content.block_structure.transformer import (
 )
 from student.models import EntranceExamConfiguration
 from util import milestones_helpers
+import six
 
 log = logging.getLogger(__name__)
 
@@ -102,8 +104,8 @@ class MilestonesAndSpecialExamsTransformer(BlockStructureTransformer):
         them from accessing this block.
         """
         return bool(milestones_helpers.get_course_content_milestones(
-            unicode(block_key.course_key),
-            unicode(block_key),
+            six.text_type(block_key.course_key),
+            six.text_type(block_key),
             'requires',
             usage_info.user.id
         ))
@@ -120,8 +122,8 @@ class MilestonesAndSpecialExamsTransformer(BlockStructureTransformer):
             # This will return None, if (user, course_id, content_id) is not applicable.
             special_exam_attempt_context = get_attempt_status_summary(
                 usage_info.user.id,
-                unicode(block_key.course_key),
-                unicode(block_key)
+                six.text_type(block_key.course_key),
+                six.text_type(block_key)
             )
         except ProctoredExamNotFoundException as ex:
             log.exception(ex)
@@ -169,7 +171,7 @@ class MilestonesAndSpecialExamsTransformer(BlockStructureTransformer):
         if not required_content:
             return False
 
-        if block_key.block_type == 'chapter' and unicode(block_key) not in required_content:
+        if block_key.block_type == 'chapter' and six.text_type(block_key) not in required_content:
             return True
 
         return False

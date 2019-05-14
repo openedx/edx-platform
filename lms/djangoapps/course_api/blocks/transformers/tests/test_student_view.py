@@ -1,6 +1,7 @@
 """
 Tests for StudentViewTransformer.
 """
+from __future__ import absolute_import
 import ddt
 
 # pylint: disable=protected-access

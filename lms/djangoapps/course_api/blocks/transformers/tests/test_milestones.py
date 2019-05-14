@@ -1,6 +1,7 @@
 """
 Tests for ProctoredExamTransformer.
 """
+from __future__ import absolute_import
 import ddt
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
@@ -13,6 +14,7 @@ from openedx.core.lib.gating import api as gating_api
 from student.tests.factories import CourseEnrollmentFactory
 
 from ..milestones import MilestonesAndSpecialExamsTransformer
+import six
 
 
 @ddt.ddt
@@ -46,7 +48,7 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
             gated_block: The block that should be inaccessible until gating_block is completed
             gating_block: The block that must be completed before access is granted
         """
-        gating_api.add_prerequisite(self.course.id, unicode(gating_block.location))
+        gating_api.add_prerequisite(self.course.id, six.text_type(gating_block.location))
         gating_api.set_required_content(self.course.id, gated_block.location, gating_block.location, 100, 0)
 
     ALL_BLOCKS = (
