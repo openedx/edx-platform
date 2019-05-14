@@ -70,6 +70,7 @@ from lms.djangoapps.instructor_task.models import InstructorTask
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED, COURSE_CERT_CHANGED
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
+from util.date_utils import strftime_localized
 from util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
 
 LOGGER = logging.getLogger(__name__)
@@ -181,8 +182,10 @@ class CertificateWhitelist(models.Model):
                 'user_name': unicode(item.user.username),
                 'user_email': unicode(item.user.email),
                 'course_id': unicode(item.course_id),
-                'created': item.created.strftime("%B %d, %Y"),
-                'certificate_generated': certificate_generated and certificate_generated.strftime("%B %d, %Y"),
+                'created': strftime_localized(item.created, "LONG_DATE"),
+                'certificate_generated': (
+                        certificate_generated and strftime_localized(certificate_generated,  "LONG_DATE")
+                ),
                 'notes': unicode(item.notes or ''),
             })
         return result

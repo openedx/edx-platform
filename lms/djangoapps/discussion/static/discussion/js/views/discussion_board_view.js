@@ -122,7 +122,7 @@
                 if (event.which === Constants.keyCodes.enter || event.type === 'click') {
                     event.preventDefault();
                     this.hideBrowseMenu();
-                    this.breadcrumbs.model.set('contents', ['Search Results']);
+                    this.breadcrumbs.model.set('contents', [gettext('Search Results')]);
                     this.discussionThreadListView.performSearch($('.search-input', this.$el));
                 }
             },

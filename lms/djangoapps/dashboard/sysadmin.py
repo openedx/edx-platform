@@ -201,7 +201,7 @@ class Users(SysadminDashboardView):
         except IntegrityError:
             msg += _('Oops, failed to create user {user}, {error}').format(
                 user=user,
-                error="IntegrityError"
+                error=_("User already exist.")
             )
             return msg
 
@@ -248,7 +248,7 @@ class Users(SysadminDashboardView):
             except User.DoesNotExist as err:
                 msg = _('Cannot find user with username {username} - {error}').format(
                     username=uname,
-                    error=str(err)
+                    error=_("User does not exist.")
                 )
                 return msg
         user.delete()

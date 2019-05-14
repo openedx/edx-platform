@@ -1,6 +1,6 @@
 <h3 class="hd hd-3"><%- gettext("Generate Exception Certificates") %></h3>
 <fieldset class="under-heading">
-    <legend>Certificate exceptions group selection</legend>
+    <legend><%- gettext('Certificate exceptions group selection') %></legend>
     <label>
         <input type='radio' name='generate-exception-certificates-radio' checked="checked" value='new'>
         <%- gettext('All users on the Exception list who do not yet have a certificate') %>

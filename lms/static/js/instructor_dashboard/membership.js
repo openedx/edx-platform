@@ -259,7 +259,7 @@ such that the value can be defined later than this assignment (file load order).
                     if (data.userDoesNotExist) {
                         return statusAjaxError(function() {
                             authlistwidgetmemberaccess.clear_input();
-                            return callback(gettext('User "' + data.unique_student_identifier + '" does not exist'));
+                            return callback(gettext('User does not exist'));
                         })();
                     }
                     return authlistwidgetmemberaccess.member_response(data);

@@ -2953,6 +2953,8 @@ msgstr "Позиция видео"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 #: common/static/bundles/VideoModule.js
+#, python-format
+#, python-brace-format
 msgid "%(value)s hour"
 msgid_plural "%(value)s hours"
 msgstr[0] "%(value)s часа"
@@ -2962,6 +2964,8 @@ msgstr[3] "%(value)s часов"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 #: common/static/bundles/VideoModule.js
+#, python-brace-format
+#, python-format
 msgid "%(value)s minute"
 msgid_plural "%(value)s minutes"
 msgstr[0] "%(value)s минуты"
@@ -2971,6 +2975,8 @@ msgstr[3] "%(value)s минут"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 #: common/static/bundles/VideoModule.js
+#, python-brace-format
+#, python-format
 msgid "%(value)s second"
 msgid_plural "%(value)s seconds"
 msgstr[0] "%(value)s секунды "
@@ -3878,10 +3884,9 @@ msgstr[3] "{numResponses} другие ответы"
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "{numResponses} response"
 msgid_plural "{numResponses} responses"
-msgstr[0] "{numResponses} ответы "
-msgstr[1] "{numResponses} ответы "
-msgstr[2] "{numResponses} ответы "
-msgstr[3] "{numResponses} ответы"
+msgstr[0] "{numResponses} ответ"
+msgstr[1] "{numResponses} ответа"
+msgstr[2] "{numResponses} ответов"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Showing all responses"
@@ -4010,10 +4015,10 @@ msgstr "около минуты"
 #, javascript-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] "%dминута"
-msgstr[1] "%dминута"
-msgstr[2] "%dминута"
-msgstr[3] "%dминут"
+msgstr[0] "%d минута"
+msgstr[1] "%d минута"
+msgstr[2] "%d минута"
+msgstr[3] "%d минут"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about an hour"
@@ -4036,10 +4041,10 @@ msgstr "один день"
 #, javascript-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] "%dдня"
+msgstr[0] "%d дня"
 msgstr[1] "%d дней "
 msgstr[2] "%d дней "
-msgstr[3] "%dдней"
+msgstr[3] "%d дней"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a month"
@@ -5156,6 +5161,7 @@ msgstr ""
 #: lms/static/js/edxnotes/views/tabs/search_results.js
 #: openedx/features/course_search/static/course_search/templates/course_search_results.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
+#: lms/static/discussion/js/views/discussion_board_view.js
 msgid "Search Results"
 msgstr "Результаты поиска"
 
@@ -5482,6 +5488,10 @@ msgstr "Пометить код зачисления как неиспользу
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Username"
 msgstr "Имя пользователя"
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "User does not exist"
+msgstr "Пользователя не существует."
 
 #: lms/static/js/instructor_dashboard/membership.js
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
@@ -6760,10 +6770,10 @@ msgstr "Итоговая оценка"
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
-msgstr[0] "{total_results} результаты "
-msgstr[1] "{total_results} результаты "
-msgstr[2] "{total_results} результаты "
-msgstr[3] "{total_results} результаты "
+msgstr[0] "{total_results} результатов "
+msgstr[1] "{total_results} результата "
+msgstr[2] "{total_results} результатов "
+msgstr[3] "{total_results} результатов "
 
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Profile Visibility:"
@@ -8840,6 +8850,10 @@ msgid "Generate Exception Certificates"
 msgstr "Создать сертификаты для исключительных случаев"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Certificate exceptions group selection"
+msgstr "Выбор группы исключений сертификатов"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "All users on the Exception list who do not yet have a certificate"
 msgstr "Все пользователи из списка исключений, ещё не получившие сертификаты"
 
@@ -8869,7 +8883,7 @@ msgstr "Разделены"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Manage Learners"
-msgstr "Управление слушателфми"
+msgstr "Управление слушателями"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Add learners to this cohort"
@@ -10096,9 +10110,8 @@ msgstr ""
 msgid "Load next {num_items} result"
 msgid_plural "Load next {num_items} results"
 msgstr[0] "Загрузить следующий {num_items} результат"
-msgstr[1] "Загрузить следующий {num_items} результат"
-msgstr[2] "Загрузить следующий {num_items} результат"
-msgstr[3] "Загрузить следующие {num_items} результаты"
+msgstr[1] "Загрузить следующих {num_items} результата"
+msgstr[2] "Загрузить следующих {num_items} результов"
 
 #: openedx/features/course_search/static/course_search/templates/course_search_results.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
@@ -10573,6 +10586,11 @@ msgstr "Пожалуйста, укажите форму обращения к п
 #: cms/templates/js/signatory-details.underscore
 msgid "Organization"
 msgstr "Организация"
+
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/settings.html
+msgid "Course Type"
+msgstr "Тип курса"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Organization Name"

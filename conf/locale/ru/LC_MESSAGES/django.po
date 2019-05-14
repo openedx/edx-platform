@@ -1504,7 +1504,7 @@ msgstr "апреля"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "May"
-msgstr "май"
+msgstr "мая"
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "June 10, 2014". It is used for the %B directive in
@@ -1708,7 +1708,7 @@ msgstr "Неверный пароль."
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
 msgid "Enter a password with at least {requirements}."
-msgstr "Пароль должен содержать не менее {requirements} символов."
+msgstr "Пароль должен содержать не менее {requirements}."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
@@ -3922,6 +3922,10 @@ msgid "HTML for the additional pages"
 msgstr "HTML-код для дополнительных страниц"
 
 #: common/lib/xmodule/xmodule/html_module.py
+msgid "<p>Add the content you want students to see on this page.</p>"
+msgstr "<p>Добавьте контент которые будут видеть вашим студенты.</p>"
+
+#: common/lib/xmodule/xmodule/html_module.py
 msgid "List of course update items"
 msgstr "Список объявлений курса"
 
@@ -5911,10 +5915,10 @@ msgstr "Сертификат {partner_short_name} {course_number} | {platform_na
 #, python-brace-format
 msgid ""
 "successfully completed, received a passing grade, and was awarded this "
-"{platform_name} {certificate_type} Certificate of Completion in "
+"{platform_name} Certificate of Completion in "
 msgstr ""
 "успешно завершил, получил проходной балл, и был удостоен Сертификата  "
-"{certificate_type} об окончании курса на {platform_name}"
+"об окончании курса на {platform_name}"
 
 #. Translators: This text describes the purpose (and therefore, value) of a
 #. course certificate
@@ -6899,6 +6903,10 @@ msgid "Oops, failed to create user {user}, {error}"
 msgstr "Не удалось создать пользователя {user}, {error}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+msgid "User already exist."
+msgstr "Пользователь уже существует."
+
+#: lms/djangoapps/dashboard/sysadmin.py
 #, python-brace-format
 msgid "User {user} created successfully!"
 msgstr "Пользователь {user} успешно создан!"
@@ -6913,6 +6921,10 @@ msgstr "Не удалось найти пользователя с электр�
 msgid "Cannot find user with username {username} - {error}"
 msgstr ""
 "Не удалось найти пользователя с именем пользователя {username} – {error}"
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "Please select a course."
+msgstr "Пожалуйста, выберите курс."
 
 #: lms/djangoapps/dashboard/sysadmin.py
 #, python-brace-format
@@ -7274,6 +7286,7 @@ msgstr ""
 "ниже «Текущие задачи»."
 
 #: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/dashboard/sysadmin.py
 msgid "User does not exist."
 msgstr "Пользователя не существует."
 
@@ -8732,6 +8745,7 @@ msgstr "Сумма"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/shoppingcart/billing_details.html
 #: lms/templates/shoppingcart/receipt.html
+#: common/lib/xmodule/xmodule/graders.py
 msgid "Total"
 msgstr "Итого"
 
@@ -10677,6 +10691,14 @@ msgstr ""
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Search"
 msgstr "Поиск"
+
+#: lms/templates/index.html
+msgid "ACCEL online schools accelerator"
+msgstr "Accel Aкселератор Онлайн-школ"
+
+#: lms/templates/index.html
+msgid "Launch.Accelerate.Scale"
+msgstr "Запускаем. Ускоряем. Масштабируем."
 
 #: lms/templates/wiki/plugins/attachments/index.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
@@ -13423,20 +13445,19 @@ msgstr "Список тем обсуждений"
 #, python-format
 msgid "%s discussion started"
 msgid_plural "%s discussions started"
-msgstr[0] "%sобсуждения начались"
-msgstr[1] "%sобсуждения начались"
-msgstr[2] "%sобсуждения начались"
-msgstr[3] "%s обсуждения начались"
+msgstr[0] "%s обсуждение началось"
+msgstr[1] "%s обсуждения начались"
+msgstr[2] "%s обсуждений началось"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/discussion/_user_profile.html
 #, python-format
 msgid "%s comment"
 msgid_plural "%s comments"
-msgstr[0] "%s комментарии "
-msgstr[1] "%s комментарии "
-msgstr[2] "%s комментарии "
-msgstr[3] "%s комментарии"
+msgstr[0] "%s комментарий"
+msgstr[1] "%s комментария"
+msgstr[2] "%s комментариев"
+msgstr[3] "%s комментариев"
 
 #: lms/djangoapps/discussion/templates/discussion/maintenance_fragment.html
 msgid "Discussion unavailable"
@@ -16341,6 +16362,11 @@ msgid ""
 msgstr ""
 "Советы и подсказки по распечатке сертификата см. в справочной документации "
 "по сертификатам {link_start}Web Certificates help documents{link_end}."
+
+#: lms/templates/certificates/_accomplishment-rendering.html
+msgid "This certificate is proudly presented to"
+msgstr "Этот сертификат успешно предоставлен"
+
 
 #: lms/templates/certificates/invalid.html
 msgid "Cannot Find Certificate"
@@ -22122,7 +22148,11 @@ msgstr ""
 "организация, и поступления от оплаты подтверждённых сертификатов помогают "
 "нам финансировать бесплатное образование для людей по всему миру"
 
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+#: lms/templates/dashboard.html
+#: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: themes/edx.org/lms/templates/dashboard.html
 msgid "Find Courses"
 msgstr "Найти курсы"
 
@@ -22355,6 +22385,7 @@ msgstr ""
 msgid "Files & Uploads"
 msgstr "Файлы и загрузки"
 
+#: openedx/features/learner_profile/templates/learner_profile/learner-achievements-fragment.html
 #: cms/templates/certificates.html
 msgid "Course Certificates"
 msgstr "Сертификаты курса"
@@ -22646,6 +22677,11 @@ msgstr ""
 #: cms/templates/settings.html
 msgid "Organization"
 msgstr "Организация"
+
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/settings.html
+msgid "Course Type"
+msgstr "Тип курса"
 
 #. Translators: This is an example for the name of the organization sponsoring
 #. a course, seen when filling out the form to create a new course. The
@@ -26027,6 +26063,10 @@ msgstr "Права доступа"
 #: wiki/forms.py
 msgid "Owner"
 msgstr "Владелец"
+
+#: wiki/forms.py
+msgid "Group"
+msgstr "Группа"
 
 #: wiki/forms.py
 msgid "Enter the username of the owner."
