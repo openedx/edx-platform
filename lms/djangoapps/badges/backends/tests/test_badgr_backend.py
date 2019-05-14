@@ -1,6 +1,7 @@
 """
 Tests for BadgrBackend
 """
+from __future__ import absolute_import
 from datetime import datetime
 
 import ddt
@@ -17,6 +18,7 @@ from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from track.tests import EventTrackingTestCase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+import six
 
 BADGR_SETTINGS = {
     'BADGR_API_TOKEN': '12345',
@@ -196,7 +198,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
             'name': 'edx.badge.assertion.created',
             'data': {
                 'user_id': self.user.id,
-                'course_id': unicode(self.course.location.course_key),
+                'course_id': six.text_type(self.course.location.course_key),
                 'enrollment_mode': 'honor',
                 'assertion_id': assertion.id,
                 'badge_name': 'Test Badge',
