@@ -2,6 +2,7 @@
 Views for serving static textbooks.
 """
 
+from __future__ import absolute_import
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.http import Http404

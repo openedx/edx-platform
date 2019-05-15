@@ -2,6 +2,7 @@
 Test the lms/staticbook views.
 """
 
+from __future__ import absolute_import
 import textwrap
 
 import mock
