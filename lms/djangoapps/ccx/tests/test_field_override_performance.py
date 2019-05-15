@@ -2,6 +2,7 @@
 """
 Performance tests for field overrides.
 """
+from __future__ import absolute_import
 import itertools
 from datetime import datetime
 
@@ -34,6 +35,8 @@ from xmodule.modulestore.tests.django_utils import (
 )
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls, check_sum_of_calls
 from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin
+import six
+from six.moves import range
 
 QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
@@ -134,7 +137,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
             self.student,
             course_key
         )
-        return CourseKey.from_string(unicode(course_key))
+        return CourseKey.from_string(six.text_type(course_key))
 
     def grade_course(self, course_key):
         """
@@ -142,7 +145,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
         """
         return progress(
             self.request,
-            course_id=unicode(course_key),
+            course_id=six.text_type(course_key),
             student_id=self.student.id
         )
 
@@ -191,7 +194,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
                         with self.assertXBlockInstantiations(1):
                             self.grade_course(course_key)
 
-    @ddt.data(*itertools.product(('no_overrides', 'ccx'), range(1, 4), (True, False), (True, False)))
+    @ddt.data(*itertools.product(('no_overrides', 'ccx'), list(range(1, 4)), (True, False), (True, False)))
     @ddt.unpack
     @override_settings(
         XBLOCK_FIELD_DATA_WRAPPERS=[],

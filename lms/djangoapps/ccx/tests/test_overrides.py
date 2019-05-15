@@ -2,6 +2,7 @@
 """
 tests for overrides
 """
+from __future__ import absolute_import
 import datetime
 
 import mock
@@ -20,6 +21,7 @@ from lms.djangoapps.courseware.tests.test_field_overrides import inject_field_ov
 from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from six.moves import range
 
 
 @override_settings(
@@ -45,15 +47,15 @@ class TestFieldOverrides(FieldOverrideTestMixin, SharedModuleStoreTestCase):
         start = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=pytz.UTC)
         due = datetime.datetime(2010, 7, 7, 0, 0, tzinfo=pytz.UTC)
         chapters = [ItemFactory.create(start=start, parent=cls.course)
-                    for _ in xrange(2)]
+                    for _ in range(2)]
         sequentials = flatten([
-            [ItemFactory.create(parent=chapter) for _ in xrange(2)]
+            [ItemFactory.create(parent=chapter) for _ in range(2)]
             for chapter in chapters])
         verticals = flatten([
-            [ItemFactory.create(due=due, parent=sequential) for _ in xrange(2)]
+            [ItemFactory.create(due=due, parent=sequential) for _ in range(2)]
             for sequential in sequentials])
         blocks = flatten([  # pylint: disable=unused-variable
-            [ItemFactory.create(parent=vertical) for _ in xrange(2)]
+            [ItemFactory.create(parent=vertical) for _ in range(2)]
             for vertical in verticals])
 
     def setUp(self):

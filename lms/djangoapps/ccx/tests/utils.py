@@ -1,6 +1,7 @@
 """
 Test utils for CCX
 """
+from __future__ import absolute_import
 import datetime
 
 import pytz
@@ -14,6 +15,7 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from six.moves import range
 
 
 class CcxTestCase(EmailTemplateTagMixin, SharedModuleStoreTestCase):
@@ -38,18 +40,18 @@ class CcxTestCase(EmailTemplateTagMixin, SharedModuleStoreTestCase):
         )
 
         cls.chapters = [
-            ItemFactory.create(start=start, parent=course) for _ in xrange(2)
+            ItemFactory.create(start=start, parent=course) for _ in range(2)
         ]
         cls.sequentials = flatten([
             [
-                ItemFactory.create(parent=chapter) for _ in xrange(2)
+                ItemFactory.create(parent=chapter) for _ in range(2)
             ] for chapter in cls.chapters
         ])
         cls.verticals = flatten([
             [
                 ItemFactory.create(
                     start=start, due=due, parent=sequential, graded=True, format='Homework', category=u'vertical'
-                ) for _ in xrange(2)
+                ) for _ in range(2)
             ] for sequential in cls.sequentials
         ])
 
@@ -58,7 +60,7 @@ class CcxTestCase(EmailTemplateTagMixin, SharedModuleStoreTestCase):
         with cls.store.bulk_operations(course.id, emit_signals=False):
             blocks = flatten([  # pylint: disable=unused-variable
                 [
-                    ItemFactory.create(parent=vertical) for _ in xrange(2)
+                    ItemFactory.create(parent=vertical) for _ in range(2)
                 ] for vertical in cls.verticals
             ])
 
