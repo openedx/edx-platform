@@ -10,8 +10,8 @@ from datetime import datetime
 
 import ddt
 import six
-from mock import patch
 from six.moves import range
+from mock import patch
 
 from course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort

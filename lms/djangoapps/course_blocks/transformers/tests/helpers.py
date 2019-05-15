@@ -4,8 +4,8 @@ Test helpers for testing course block transformers.
 from __future__ import absolute_import
 
 import six
-from mock import patch
 from six.moves import range
+from mock import patch
 
 from course_modes.models import CourseMode
 from lms.djangoapps.courseware.access import has_access
