@@ -2,20 +2,23 @@
 # -*- coding: utf-8 -*-
 """Tests for django comment client views."""
 from __future__ import absolute_import
+
 import json
 import logging
-import mock
 from contextlib import contextmanager
 
 import ddt
+import mock
+import six
 from django.contrib.auth.models import User
 from django.core.management import call_command
-from django.urls import reverse
 from django.test.client import RequestFactory
+from django.urls import reverse
 from eventtracking.processors.exceptions import EventEmissionExit
 from mock import ANY, Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
+from six.moves import range
 
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from course_modes.models import CourseMode
@@ -28,38 +31,34 @@ from lms.djangoapps.discussion.django_comment_client.tests.group_id import (
 )
 from lms.djangoapps.discussion.django_comment_client.tests.six.text_type import UnicodeTestMixin
 from lms.djangoapps.discussion.django_comment_client.tests.utils import CohortedTestCase, ForumsEnableMixin
-from openedx.core.djangoapps.django_comment_common.comment_client import Thread
-from openedx.core.djangoapps.django_comment_common.models import (
-    assign_role,
-    CourseDiscussionSettings,
-    FORUM_ROLE_STUDENT,
-    Role
-)
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
+from openedx.core.djangoapps.django_comment_common.comment_client import Thread
+from openedx.core.djangoapps.django_comment_common.models import (
+    FORUM_ROLE_STUDENT,
+    CourseDiscussionSettings,
+    Role,
+    assign_role
+)
 from openedx.core.djangoapps.django_comment_common.utils import (
-    ThreadContext, seed_permissions_roles, set_course_discussion_settings
+    ThreadContext,
+    seed_permissions_roles,
+    set_course_discussion_settings
 )
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from student.roles import CourseStaffRole, UserBasedRole
 from student.tests.factories import CourseAccessRoleFactory, CourseEnrollmentFactory, UserFactory
+from track.middleware import TrackMiddleware
+from track.views import segmentio
+from track.views.tests.base import SEGMENTIO_TEST_USER_ID, SegmentIOTrackingTestCaseBase
 from util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
-from track.middleware import TrackMiddleware
-from track.views import segmentio
-from track.views.tests.base import (
-    SegmentIOTrackingTestCaseBase,
-    SEGMENTIO_TEST_USER_ID
-)
 
 from .event_transformers import ForumThreadViewedEventTransformer
-import six
-from six.moves import range
-
 
 log = logging.getLogger(__name__)
 
