@@ -28,7 +28,7 @@ from mock import Mock, NonCallableMock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
 from pytz import UTC
-from six import text_type, unichr
+from six import text_type, unichr  # pylint: disable=redefined-builtin
 from six.moves import range, zip
 
 from bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
