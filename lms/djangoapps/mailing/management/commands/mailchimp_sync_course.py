@@ -11,10 +11,10 @@ from collections import namedtuple
 from itertools import chain
 
 import six
+from six.moves import range
 from django.core.management.base import BaseCommand
 from mailsnake import MailSnake
 from opaque_keys.edx.keys import CourseKey
-from six.moves import range
 
 from student.models import UserProfile, unique_id_for_user
 
