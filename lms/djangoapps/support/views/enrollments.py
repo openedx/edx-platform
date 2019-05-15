@@ -2,11 +2,13 @@
 Support tool for changing course enrollments.
 """
 from __future__ import absolute_import
+
+import six
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponseBadRequest
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 from opaque_keys import InvalidKeyError
@@ -24,7 +26,6 @@ from lms.djangoapps.support.serializers import ManualEnrollmentSerializer
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, ManualEnrollmentAudit
 from util.json_request import JsonResponse
-import six
 
 
 class EnrollmentSupportView(View):

@@ -11,6 +11,7 @@ transition is complete, we can remove this view.
 
 """
 from __future__ import absolute_import
+
 import logging
 
 from django import forms

@@ -2,8 +2,10 @@
 Certificate tool in the student support app.
 """
 from __future__ import absolute_import
-import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 

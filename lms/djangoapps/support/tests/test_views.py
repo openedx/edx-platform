@@ -4,15 +4,17 @@ Tests for support views.
 """
 
 from __future__ import absolute_import
+
 import itertools
 import json
 import re
 from datetime import datetime, timedelta
 
 import ddt
+import six
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.db.models import signals
+from django.urls import reverse
 from pytz import UTC
 
 from common.test.utils import disable_signal
@@ -24,7 +26,6 @@ from student.roles import GlobalStaff, SupportStaffRole
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-import six
 
 
 class SupportViewTestCase(ModuleStoreTestCase):

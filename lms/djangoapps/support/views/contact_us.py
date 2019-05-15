@@ -2,14 +2,15 @@
 Signle support contact view
 """
 from __future__ import absolute_import
+
 from django.conf import settings
 from django.http import Http404
 from django.views.generic import View
-from edxmako.shortcuts import render_to_response
-from student.models import CourseEnrollment
 
+from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.features.enterprise_support import api as enterprise_api
+from student.models import CourseEnrollment
 
 
 class ContactUsView(View):
