@@ -3,6 +3,7 @@
 # List of valid templates is explicitly managed for (short-term)
 # security reasons.
 
+from __future__ import absolute_import
 import mimetypes
 
 from django.conf import settings
