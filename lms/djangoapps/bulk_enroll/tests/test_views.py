@@ -1,6 +1,7 @@
 """
 Tests for the Bulk Enrollment views.
 """
+from __future__ import absolute_import
 import ddt
 import json
 from django.conf import settings
@@ -26,6 +27,7 @@ from student.models import (
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+import six
 
 
 @override_settings(ENABLE_BULK_ENROLLMENT_VIEW=True)
@@ -55,7 +57,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
         )
 
         self.course = CourseFactory.create()
-        self.course_key = unicode(self.course.id)
+        self.course_key = six.text_type(self.course.id)
         self.enrolled_student = UserFactory(username='EnrolledStudent', first_name='Enrolled', last_name='Student')
         CourseEnrollment.enroll(
             self.enrolled_student,

@@ -1,10 +1,12 @@
 """
 Serializers for Bulk Enrollment.
 """
+from __future__ import absolute_import
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.course_groups.cohorts import is_cohort_exists
 from rest_framework import serializers
+from six.moves import zip
 
 
 class StringListField(serializers.ListField):
