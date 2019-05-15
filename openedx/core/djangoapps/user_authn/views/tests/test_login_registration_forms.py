@@ -1,8 +1,13 @@
 """Tests for the login and registration form rendering. """
+from __future__ import absolute_import
+
 import unittest
-import urllib
 
 import ddt
+import six
+import six.moves.urllib.error  # pylint: disable=import-error
+import six.moves.urllib.parse  # pylint: disable=import-error
+import six.moves.urllib.request  # pylint: disable=import-error
 from django.conf import settings
 from django.urls import reverse
 from mock import patch
@@ -26,13 +31,13 @@ def _third_party_login_url(backend_name, auth_entry, redirect_url=None):
 
     return u"{url}?{params}".format(
         url=reverse("social:begin", kwargs={"backend": backend_name}),
-        params=urllib.urlencode(params)
+        params=six.moves.urllib.parse.urlencode(params)
     )
 
 
 def _finish_auth_url(params):
     """ Construct the URL that follows login/registration if we are doing auto-enrollment """
-    return u"{}?{}".format(reverse('finish_auth'), urllib.urlencode(params))
+    return u"{}?{}".format(reverse('finish_auth'), six.moves.urllib.parse.urlencode(params))
 
 
 @ddt.ddt
@@ -55,7 +60,7 @@ class LoginFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStoreTes
         super(LoginFormTest, self).setUp()
 
         self.url = reverse("signin_user")
-        self.course_id = unicode(self.course.id)
+        self.course_id = six.text_type(self.course.id)
         self.courseware_url = reverse("courseware", args=[self.course_id])
         self.configure_google_provider(enabled=True, visible=True)
         self.configure_facebook_provider(enabled=True, visible=True)
@@ -150,7 +155,7 @@ class LoginFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStoreTes
         # Verify that the login link preserves the querystring params
         login_link = u"{url}?{params}".format(
             url=reverse('signin_user'),
-            params=urllib.urlencode([('next', post_login_handler)])
+            params=six.moves.urllib.parse.urlencode([('next', post_login_handler)])
         )
         self.assertContains(response, login_link)
 
@@ -172,7 +177,7 @@ class RegisterFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStore
         super(RegisterFormTest, self).setUp()
 
         self.url = reverse("register_user")
-        self.course_id = unicode(self.course.id)
+        self.course_id = six.text_type(self.course.id)
         self.configure_google_provider(enabled=True, visible=True)
         self.configure_facebook_provider(enabled=True, visible=True)
 
@@ -226,6 +231,6 @@ class RegisterFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStore
         # Verify that the login link preserves the querystring params
         login_link = u"{url}?{params}".format(
             url=reverse('signin_user'),
-            params=urllib.urlencode([('next', post_login_handler)])
+            params=six.moves.urllib.parse.urlencode([('next', post_login_handler)])
         )
         self.assertContains(response, login_link)

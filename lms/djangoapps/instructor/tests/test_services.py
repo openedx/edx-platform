@@ -2,9 +2,12 @@
 Tests for the InstructorService
 """
 
+from __future__ import absolute_import
+
 import json
 
 import mock
+import six
 
 from courseware.models import StudentModule
 from lms.djangoapps.instructor.access import allow_access
@@ -33,8 +36,8 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
             cls.course.id,
             'robot-some-other_problem-urlname'
         )
-        cls.problem_urlname = unicode(cls.problem_location)
-        cls.other_problem_urlname = unicode(cls.other_problem_location)
+        cls.problem_urlname = six.text_type(cls.problem_location)
+        cls.other_problem_urlname = six.text_type(cls.other_problem_location)
 
     def setUp(self):
         super(InstructorServiceTests, self).setUp()
@@ -68,7 +71,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
 
         self.service.delete_student_attempt(
             self.student.username,
-            unicode(self.course.id),
+            six.text_type(self.course.id),
             self.problem_urlname,
             requesting_user=self.student,
         )
@@ -90,7 +93,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
 
         result = self.service.delete_student_attempt(
             self.student.username,
-            unicode(self.course.id),
+            six.text_type(self.course.id),
             'foo/bar/baz',
             requesting_user=self.student,
         )
@@ -103,7 +106,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
 
         result = self.service.delete_student_attempt(
             'bad_student',
-            unicode(self.course.id),
+            six.text_type(self.course.id),
             'foo/bar/baz',
             requesting_user=self.student,
         )
@@ -116,7 +119,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
 
         result = self.service.delete_student_attempt(
             self.student.username,
-            unicode(self.course.id),
+            six.text_type(self.course.id),
             self.other_problem_urlname,
             requesting_user=self.student,
         )
@@ -128,7 +131,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         """
         result = self.service.is_course_staff(
             self.student,
-            unicode(self.course.id)
+            six.text_type(self.course.id)
         )
         self.assertFalse(result)
 
@@ -136,7 +139,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         allow_access(self.course, self.student, 'staff')
         result = self.service.is_course_staff(
             self.student,
-            unicode(self.course.id)
+            six.text_type(self.course.id)
         )
         self.assertTrue(result)
 
@@ -163,7 +166,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
 
         with mock.patch("lms.djangoapps.instructor.services.create_zendesk_ticket") as mock_create_zendesk_ticket:
             self.service.send_support_notification(
-                course_id=unicode(self.course.id),
+                course_id=six.text_type(self.course.id),
                 exam_name=args['exam_name'],
                 student_username=args["student_username"],
                 review_status="Suspicious",
@@ -175,7 +178,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         args['url'] = 'http://review/url'
         with mock.patch("lms.djangoapps.instructor.services.create_zendesk_ticket") as mock_create_zendesk_ticket:
             self.service.send_support_notification(
-                course_id=unicode(self.course.id),
+                course_id=six.text_type(self.course.id),
                 exam_name=args['exam_name'],
                 student_username=args["student_username"],
                 review_status="Suspicious",

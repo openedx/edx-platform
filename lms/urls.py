@@ -139,6 +139,7 @@ urlpatterns = [
 
     url(r'^dashboard/', include('learner_dashboard.urls')),
     url(r'^api/experiments/', include('experiments.urls', namespace='api_experiments')),
+    url(r'^api/discounts/', include('openedx.features.discounts.urls', namespace='api_discounts')),
 ]
 
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):

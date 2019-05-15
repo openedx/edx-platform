@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import logging
 
+import six
 from ccx_keys.locator import CCXLocator
-from courseware.courses import get_course_by_id
 from django.db import migrations
 from django.http import Http404
 
-from lms.djangoapps.ccx.utils import (
-    add_master_course_staff_to_ccx,
-    remove_master_course_staff_from_ccx,
-)
+from courseware.courses import get_course_by_id
+from lms.djangoapps.ccx.utils import add_master_course_staff_to_ccx, remove_master_course_staff_from_ccx
 
 log = logging.getLogger("edx.ccx")
 
@@ -31,7 +29,7 @@ def add_master_course_staff_to_ccx_for_existing_ccx(apps, schema_editor):
         if not ccx.course_id or ccx.course_id.deprecated:
             # prevent migration for deprecated course ids or invalid ids.
             continue
-        ccx_locator = CCXLocator.from_course_locator(ccx.course_id, unicode(ccx.id))
+        ccx_locator = CCXLocator.from_course_locator(ccx.course_id, six.text_type(ccx.id))
         try:
             course = get_course_by_id(ccx.course_id)
             add_master_course_staff_to_ccx(
@@ -63,7 +61,7 @@ def remove_master_course_staff_from_ccx_for_existing_ccx(apps, schema_editor):
         if not ccx.course_id or ccx.course_id.deprecated:
             # prevent migration for deprecated course ids or invalid ids.
             continue
-        ccx_locator = CCXLocator.from_course_locator(ccx.course_id, unicode(ccx.id))
+        ccx_locator = CCXLocator.from_course_locator(ccx.course_id, six.text_type(ccx.id))
         try:
             course = get_course_by_id(ccx.course_id)
             remove_master_course_staff_from_ccx(

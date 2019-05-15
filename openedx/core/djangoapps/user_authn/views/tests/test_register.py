@@ -1,33 +1,39 @@
 # -*- coding: utf-8 -*-
 """Tests for account creation"""
+from __future__ import absolute_import
+
 import json
+import unicodedata
 import unittest
 from datetime import datetime
-import unicodedata
 
 import ddt
 import mock
 import pytz
 from django.conf import settings
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AnonymousUser, User
-from django.urls import reverse
 from django.test import TestCase, TransactionTestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from django.contrib.auth.hashers import make_password
+from django.urls import reverse
 
 from lms.djangoapps.discussion.notification_prefs import NOTIFICATION_PREF_KEY
 from openedx.core.djangoapps.django_comment_common.models import ForumsConfig
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.user_api.accounts import (
-    USERNAME_BAD_LENGTH_MSG, USERNAME_INVALID_CHARS_ASCII, USERNAME_INVALID_CHARS_UNICODE
+    USERNAME_BAD_LENGTH_MSG,
+    USERNAME_INVALID_CHARS_ASCII,
+    USERNAME_INVALID_CHARS_UNICODE
 )
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, waffle
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangoapps.user_authn.views.register import (
-    REGISTRATION_AFFILIATE_ID, REGISTRATION_UTM_CREATED_AT, REGISTRATION_UTM_PARAMETERS,
-    _skip_activation_email,
+    REGISTRATION_AFFILIATE_ID,
+    REGISTRATION_UTM_CREATED_AT,
+    REGISTRATION_UTM_PARAMETERS,
+    _skip_activation_email
 )
 from student.models import UserAttribute
 from student.tests.factories import UserFactory

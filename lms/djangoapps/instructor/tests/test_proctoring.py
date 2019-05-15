@@ -2,15 +2,17 @@
 Unit tests for Edx Proctoring feature flag in new instructor dashboard.
 """
 
+from __future__ import absolute_import
+
+import ddt
 from django.apps import apps
 from django.conf import settings
 from django.urls import reverse
+from edx_proctoring.api import create_exam
+from edx_proctoring.backends.tests.test_backend import TestBackendProvider
 from mock import patch
 from six import text_type
 
-import ddt
-from edx_proctoring.api import create_exam
-from edx_proctoring.backends.tests.test_backend import TestBackendProvider
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase

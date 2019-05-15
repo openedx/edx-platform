@@ -72,6 +72,8 @@ MKTG_URLS = {
     'WHAT_IS_VERIFIED_CERT': '/verified-certificate',
 }
 
+ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
+
 CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
 
 COURSE_CATALOG_API_URL = 'http://edx.devstack.discovery:18381/api/v1/'

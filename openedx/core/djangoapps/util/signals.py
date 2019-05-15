@@ -2,6 +2,8 @@
 Signal handler for exceptions.
 """
 # pylint: disable=unused-argument
+from __future__ import absolute_import
+
 import logging
 
 from celery.signals import task_postrun

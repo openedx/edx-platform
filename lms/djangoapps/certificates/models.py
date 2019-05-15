@@ -226,8 +226,9 @@ class EligibleAvailableCertificateManager(EligibleCertificateManager):
         Return a queryset for `GeneratedCertificate` models, filtering out
         ineligible certificates and any linked to nonexistent courses.
         """
-        return super(EligibleAvailableCertificateManager, self).get_queryset().filter(
-            course_id__in=list(CourseOverview.objects.values_list('id', flat=True))
+        return super(EligibleAvailableCertificateManager, self).get_queryset().extra(
+            tables=['course_overviews_courseoverview'],
+            where=['course_id = course_overviews_courseoverview.id']
         )
 
 

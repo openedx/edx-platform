@@ -2,13 +2,16 @@
 Tests for the LTI user management functionality
 """
 
+from __future__ import absolute_import
+
 import string
 
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 from django.test.client import RequestFactory
-from mock import MagicMock, patch, PropertyMock
+from mock import MagicMock, PropertyMock, patch
+from six.moves import range
 
 import lti_provider.users as users
 from lti_provider.models import LtiConsumer, LtiUser

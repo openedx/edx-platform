@@ -1,20 +1,20 @@
 # pylint: disable=missing-docstring
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
-from mock import MagicMock, patch
 import six
 from django.conf import settings
 from django.http import HttpResponse
-from django.urls import reverse
 from django.test import RequestFactory, TestCase
-
+from django.urls import reverse
 from edx_rest_framework_extensions.auth.jwt.decoder import jwt_decode_handler
 from edx_rest_framework_extensions.auth.jwt.middleware import JwtAuthCookieMiddleware
+from mock import MagicMock, patch
+
+from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from openedx.core.djangoapps.user_authn import cookies as cookies_api
 from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
-from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from student.models import CourseEnrollment
-from student.tests.factories import UserFactory, AnonymousUserFactory
+from student.tests.factories import AnonymousUserFactory, UserFactory
 
 
 class CookieTests(TestCase):
@@ -52,7 +52,7 @@ class CookieTests(TestCase):
     def _copy_cookies_to_request(self, response, request):
         request.COOKIES = {
             key: val.value
-            for key, val in response.cookies.iteritems()
+            for key, val in six.iteritems(response.cookies)
         }
 
     def _set_use_jwt_cookie_header(self, request):

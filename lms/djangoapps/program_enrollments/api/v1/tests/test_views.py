@@ -7,28 +7,28 @@ import json
 from uuid import uuid4
 
 import ddt
+import mock
+from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.urls import reverse
-from django.contrib.auth.models import User
-import mock
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.test import APITestCase
 from six import text_type
 
+from course_modes.models import CourseMode
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
+from lms.djangoapps.program_enrollments.api.v1.constants import MAX_ENROLLMENT_RECORDS, REQUEST_STUDENT_KEY
 from lms.djangoapps.program_enrollments.api.v1.constants import CourseEnrollmentResponseStatuses as CourseStatuses
-from lms.djangoapps.program_enrollments.models import ProgramEnrollment, ProgramCourseEnrollment
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
+from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL
-from openedx.core.djangoapps.catalog.tests.factories import (
-    CourseFactory,
-    OrganizationFactory as CatalogOrganizationFactory,
-    ProgramFactory,
-)
+from openedx.core.djangoapps.catalog.tests.factories import CourseFactory
+from openedx.core.djangoapps.catalog.tests.factories import OrganizationFactory as CatalogOrganizationFactory
+from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin
-from .factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 
 class ListViewTestMixin(object):
@@ -310,6 +310,7 @@ class BaseCourseEnrollmentTestsMixin(ProgramCacheTestCaseMixin):
             course_enrollment = CourseEnrollmentFactory.create(
                 course_id=self.course_key,
                 user=program_enrollment.user,
+                mode=CourseMode.MASTERS
             )
             course_enrollment.is_active = course_status == "active"
             course_enrollment.save()
@@ -324,7 +325,7 @@ class BaseCourseEnrollmentTestsMixin(ProgramCacheTestCaseMixin):
         program_enrollment = self.create_program_enrollment(external_user_key, user)
         return self.create_program_course_enrollment(program_enrollment, course_status=course_status)
 
-    def assert_program_course_enrollment(self, external_user_key, expected_status, has_user):
+    def assert_program_course_enrollment(self, external_user_key, expected_status, has_user, mode=CourseMode.MASTERS):
         """
         Convenience method to assert that a ProgramCourseEnrollment exists,
         and potentially that a CourseEnrollment also exists
@@ -340,6 +341,7 @@ class BaseCourseEnrollmentTestsMixin(ProgramCacheTestCaseMixin):
             self.assertIsNotNone(course_enrollment)
             self.assertEqual(expected_status == "active", course_enrollment.is_active)
             self.assertEqual(self.course_key, course_enrollment.course_id)
+            self.assertEqual(mode, course_enrollment.mode)
         else:
             self.assertIsNone(course_enrollment)
 
@@ -452,12 +454,43 @@ class CourseEnrollmentPostTests(BaseCourseEnrollmentTestsMixin, APITestCase):
         self.assert_program_course_enrollment("learner-3", "active", False)
         self.assert_program_course_enrollment("learner-4", "inactive", False)
 
-    def test_user_already_enrolled_in_course(self):
+    def test_program_course_enrollment_exists(self):
+        """
+        The program enrollments application already has a program_course_enrollment
+        record for this user and course
+        """
         self.create_program_and_course_enrollments('learner-1')
         post_data = [self.learner_enrollment("learner-1")]
         response = self.request(self.default_url, post_data)
         self.assertEqual(422, response.status_code)
         self.assertDictEqual({'learner-1': CourseStatuses.CONFLICT}, response.data)
+
+    def test_user_currently_enrolled_in_course(self):
+        """
+        If a user is already enrolled in a course through a different method
+        that enrollment should be linked but not overwritten as masters.
+        """
+        CourseEnrollmentFactory.create(
+            course_id=self.course_key,
+            user=self.student,
+            mode=CourseMode.VERIFIED
+        )
+
+        self.create_program_enrollment('learner-1', user=self.student)
+
+        post_data = [
+            self.learner_enrollment("learner-1", "active")
+        ]
+        response = self.request(self.default_url, post_data)
+
+        self.assertEqual(200, response.status_code)
+        self.assertDictEqual(
+            {
+                "learner-1": "active"
+            },
+            response.data
+        )
+        self.assert_program_course_enrollment("learner-1", "active", True, mode=CourseMode.VERIFIED)
 
     def test_207_multistatus(self):
         self.create_program_enrollment('learner-1')
@@ -669,10 +702,14 @@ class ProgramEnrollmentViewPostTests(APITestCase):
         global_staff = GlobalStaffFactory.create(username='global-staff', password='password')
         self.client.login(username=global_staff.username, password='password')
 
+    def tearDown(self):
+        super(ProgramEnrollmentViewPostTests, self).tearDown()
+        ProgramEnrollment.objects.all().delete()
+
     def student_enrollment(self, enrollment_status, external_user_key=None):
         return {
+            REQUEST_STUDENT_KEY: external_user_key or str(uuid4().hex[0:10]),
             'status': enrollment_status,
-            'external_user_key': external_user_key or str(uuid4().hex[0:10]),
             'curriculum_uuid': str(uuid4())
         }
 
@@ -685,7 +722,7 @@ class ProgramEnrollmentViewPostTests(APITestCase):
         curriculum_uuids = [curriculum_uuid, curriculum_uuid, uuid4()]
         post_data = [
             {
-                'external_user_key': e,
+                REQUEST_STUDENT_KEY: e,
                 'status': s,
                 'curriculum_uuid': str(c)
             }
@@ -701,10 +738,10 @@ class ProgramEnrollmentViewPostTests(APITestCase):
             ):
                 response = self.client.post(url, json.dumps(post_data), content_type='application/json')
 
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         for i in range(3):
-            enrollment = ProgramEnrollment.objects.filter(external_user_key=external_user_keys[i])[0]
+            enrollment = ProgramEnrollment.objects.get(external_user_key=external_user_keys[i])
 
             self.assertEqual(enrollment.external_user_key, external_user_keys[i])
             self.assertEqual(enrollment.program_uuid, program_key)
@@ -719,7 +756,7 @@ class ProgramEnrollmentViewPostTests(APITestCase):
         post_data = [
             {
                 'status': 'enrolled',
-                'external_user_key': 'abc1',
+                REQUEST_STUDENT_KEY: 'abc1',
                 'curriculum_uuid': str(curriculum_uuid)
             }
         ]
@@ -736,9 +773,9 @@ class ProgramEnrollmentViewPostTests(APITestCase):
             ):
                 response = self.client.post(url, json.dumps(post_data), content_type='application/json')
 
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        enrollment = ProgramEnrollment.objects.first()
+        enrollment = ProgramEnrollment.objects.get(external_user_key='abc1')
 
         self.assertEqual(enrollment.external_user_key, 'abc1')
         self.assertEqual(enrollment.program_uuid, program_key)
@@ -749,7 +786,7 @@ class ProgramEnrollmentViewPostTests(APITestCase):
     def test_enrollment_payload_limit(self):
 
         post_data = []
-        for _ in range(26):
+        for _ in range(MAX_ENROLLMENT_RECORDS + 1):
             post_data += self.student_enrollment('enrolled')
 
         url = reverse('programs_api:v1:program_enrollments', args=[uuid4()])
@@ -760,7 +797,7 @@ class ProgramEnrollmentViewPostTests(APITestCase):
                 return_value=None
             ):
                 response = self.client.post(url, json.dumps(post_data), content_type='application/json')
-        self.assertEqual(response.status_code, 413)
+        self.assertEqual(response.status_code, status.HTTP_413_REQUEST_ENTITY_TOO_LARGE)
 
     def test_duplicate_enrollment(self):
         post_data = [
@@ -778,7 +815,7 @@ class ProgramEnrollmentViewPostTests(APITestCase):
             ):
                 response = self.client.post(url, json.dumps(post_data), content_type='application/json')
 
-        self.assertEqual(response.status_code, 207)
+        self.assertEqual(response.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response.data, {
             '001': 'duplicated',
             '002': 'enrolled',
@@ -799,7 +836,7 @@ class ProgramEnrollmentViewPostTests(APITestCase):
                     content_type='application/json'
                 )
 
-        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
 
     def test_unauthenticated(self):
         self.client.logout()
@@ -813,7 +850,7 @@ class ProgramEnrollmentViewPostTests(APITestCase):
             content_type='application/json'
         )
 
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_program_unauthorized(self):
         student = UserFactory.create(username='student', password='password')
@@ -828,7 +865,7 @@ class ProgramEnrollmentViewPostTests(APITestCase):
             json.dumps(post_data),
             content_type='application/json'
         )
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_program_not_found(self):
         post_data = [
@@ -840,7 +877,7 @@ class ProgramEnrollmentViewPostTests(APITestCase):
             json.dumps(post_data),
             content_type='application/json'
         )
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_partially_valid_enrollment(self):
 
@@ -858,8 +895,224 @@ class ProgramEnrollmentViewPostTests(APITestCase):
             ):
                 response = self.client.post(url, json.dumps(post_data), content_type='application/json')
 
-        self.assertEqual(response.status_code, 207)
+        self.assertEqual(response.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response.data, {
             '001': 'invalid-status',
             '003': 'pending',
+        })
+
+
+class ProgramEnrollmentViewPatchTests(APITestCase):
+    """
+    Tests for the ProgramEnrollment view PATCH method.
+    """
+    def setUp(self):
+        super(ProgramEnrollmentViewPatchTests, self).setUp()
+
+        self.program_uuid = '00000000-1111-2222-3333-444444444444'
+        self.curriculum_uuid = 'aaaaaaaa-1111-2222-3333-444444444444'
+        self.other_curriculum_uuid = 'bbbbbbbb-1111-2222-3333-444444444444'
+
+        self.course_id = CourseKey.from_string('course-v1:edX+ToyX+Toy_Course')
+        _ = CourseOverviewFactory.create(id=self.course_id)
+
+        self.password = 'password'
+        self.student = UserFactory.create(username='student', password=self.password)
+        self.global_staff = GlobalStaffFactory.create(username='global-staff', password=self.password)
+
+        self.client.login(username=self.global_staff.username, password=self.password)
+
+    def student_enrollment(self, enrollment_status, external_user_key=None):
+        return {
+            'status': enrollment_status,
+            REQUEST_STUDENT_KEY: external_user_key or str(uuid4().hex[0:10]),
+        }
+
+    def test_successfully_patched_program_enrollment(self):
+        enrollments = {}
+        for i in xrange(4):
+            user_key = 'user-{}'.format(i)
+            instance = ProgramEnrollment.objects.create(
+                program_uuid=self.program_uuid,
+                curriculum_uuid=self.curriculum_uuid,
+                user=None,
+                status='pending',
+                external_user_key=user_key,
+            )
+            enrollments[user_key] = instance
+
+        post_data = [
+            {REQUEST_STUDENT_KEY: 'user-1', 'status': 'withdrawn'},
+            {REQUEST_STUDENT_KEY: 'user-2', 'status': 'suspended'},
+            {REQUEST_STUDENT_KEY: 'user-3', 'status': 'enrolled'},
+        ]
+
+        url = reverse('programs_api:v1:program_enrollments', args=[self.program_uuid])
+        with mock.patch('lms.djangoapps.program_enrollments.api.v1.views.get_programs', autospec=True):
+            response = self.client.patch(url, json.dumps(post_data), content_type='application/json')
+
+        for enrollment in enrollments.values():
+            enrollment.refresh_from_db()
+
+        expected_statuses = {
+            'user-0': 'pending',
+            'user-1': 'withdrawn',
+            'user-2': 'suspended',
+            'user-3': 'enrolled',
+        }
+        for user_key, enrollment in enrollments.items():
+            assert expected_statuses[user_key] == enrollment.status
+
+        expected_response = {
+            'user-1': 'withdrawn',
+            'user-2': 'suspended',
+            'user-3': 'enrolled',
+        }
+        assert status.HTTP_200_OK == response.status_code
+        assert expected_response == response.data
+
+    def test_enrollment_payload_limit(self):
+        patch_data = []
+        for _ in range(MAX_ENROLLMENT_RECORDS + 1):
+            patch_data += self.student_enrollment('enrolled')
+
+        url = reverse('programs_api:v1:program_enrollments', args=[uuid4()])
+        with mock.patch('lms.djangoapps.program_enrollments.api.v1.views.get_programs', autospec=True):
+            response = self.client.patch(url, json.dumps(patch_data), content_type='application/json')
+
+        self.assertEqual(response.status_code, status.HTTP_413_REQUEST_ENTITY_TOO_LARGE)
+
+    def test_unauthenticated(self):
+        self.client.logout()
+        patch_data = [
+            self.student_enrollment('enrolled')
+        ]
+        url = reverse('programs_api:v1:program_enrollments', args=[uuid4()])
+        response = self.client.patch(
+            url,
+            json.dumps(patch_data),
+            content_type='application/json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_program_unauthorized(self):
+        self.client.login(username=self.student.username, password=self.password)
+
+        patch_data = [
+            self.student_enrollment('enrolled')
+        ]
+        url = reverse('programs_api:v1:program_enrollments', args=[uuid4()])
+        response = self.client.patch(
+            url,
+            json.dumps(patch_data),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_program_not_found(self):
+        patch_data = [
+            self.student_enrollment('enrolled')
+        ]
+        url = reverse('programs_api:v1:program_enrollments', args=[uuid4()])
+        response = self.client.patch(
+            url,
+            json.dumps(patch_data),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_unprocessable_enrollment(self):
+        url = reverse('programs_api:v1:program_enrollments', args=[uuid4()])
+
+        with mock.patch('lms.djangoapps.program_enrollments.api.v1.views.get_programs', autospec=True):
+            response = self.client.patch(
+                url,
+                json.dumps([{'status': 'enrolled'}]),
+                content_type='application/json'
+            )
+
+        self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+    def test_duplicate_enrollment(self):
+        enrollments = {}
+        for i in xrange(4):
+            user_key = 'user-{}'.format(i)
+            instance = ProgramEnrollment.objects.create(
+                program_uuid=self.program_uuid,
+                curriculum_uuid=self.curriculum_uuid,
+                user=None,
+                status='pending',
+                external_user_key=user_key,
+            )
+            enrollments[user_key] = instance
+
+        patch_data = [
+            self.student_enrollment('enrolled', 'user-1'),
+            self.student_enrollment('enrolled', 'user-2'),
+            self.student_enrollment('enrolled', 'user-1'),
+        ]
+
+        url = reverse('programs_api:v1:program_enrollments', args=[self.program_uuid])
+        with mock.patch('lms.djangoapps.program_enrollments.api.v1.views.get_programs', autospec=True):
+            response = self.client.patch(url, json.dumps(patch_data), content_type='application/json')
+
+        for enrollment in enrollments.values():
+            enrollment.refresh_from_db()
+
+        expected_statuses = {
+            'user-0': 'pending',
+            'user-1': 'pending',
+            'user-2': 'enrolled',
+            'user-3': 'pending',
+        }
+        for user_key, enrollment in enrollments.items():
+            assert expected_statuses[user_key] == enrollment.status
+
+        self.assertEqual(response.status_code, status.HTTP_207_MULTI_STATUS)
+        self.assertEqual(response.data, {
+            'user-1': 'duplicated',
+            'user-2': 'enrolled',
+        })
+
+    def test_partially_valid_enrollment(self):
+        enrollments = {}
+        for i in xrange(4):
+            user_key = 'user-{}'.format(i)
+            instance = ProgramEnrollment.objects.create(
+                program_uuid=self.program_uuid,
+                curriculum_uuid=self.curriculum_uuid,
+                user=None,
+                status='pending',
+                external_user_key=user_key,
+            )
+            enrollments[user_key] = instance
+
+        patch_data = [
+            self.student_enrollment('new', 'user-1'),
+            self.student_enrollment('withdrawn', 'user-3'),
+            self.student_enrollment('enrolled', 'user-who-is-not-in-program'),
+        ]
+
+        url = reverse('programs_api:v1:program_enrollments', args=[self.program_uuid])
+        with mock.patch('lms.djangoapps.program_enrollments.api.v1.views.get_programs', autospec=True):
+            response = self.client.patch(url, json.dumps(patch_data), content_type='application/json')
+
+        for enrollment in enrollments.values():
+            enrollment.refresh_from_db()
+
+        expected_statuses = {
+            'user-0': 'pending',
+            'user-1': 'pending',
+            'user-2': 'pending',
+            'user-3': 'withdrawn',
+        }
+        for user_key, enrollment in enrollments.items():
+            assert expected_statuses[user_key] == enrollment.status
+
+        self.assertEqual(response.status_code, status.HTTP_207_MULTI_STATUS)
+        self.assertEqual(response.data, {
+            'user-1': 'invalid-status',
+            'user-3': 'withdrawn',
+            'user-who-is-not-in-program': 'not-in-program',
         })

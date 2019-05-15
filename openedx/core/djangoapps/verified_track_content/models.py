@@ -1,7 +1,10 @@
 """
 Models for verified track selections.
 """
+from __future__ import absolute_import
+
 import logging
+import six
 
 from config_models.models import ConfigurationModel
 from django.db import models
@@ -49,7 +52,7 @@ def move_to_verified_cohort(sender, instance, **kwargs):  # pylint: disable=unus
                 # cohort yet exist.
                 random_cohort = get_random_cohort(course_key)
                 args = {
-                    'course_id': unicode(course_key),
+                    'course_id': six.text_type(course_key),
                     'user_id': instance.user.id,
                     'verified_cohort_name': verified_cohort_name,
                     'default_cohort_name': random_cohort.name
@@ -107,7 +110,7 @@ class VerifiedTrackCohortedCourse(models.Model):
     CACHE_NAMESPACE = u"verified_track_content.VerifiedTrackCohortedCourse.cache."
 
     def __unicode__(self):
-        return u"Course: {}, enabled: {}".format(unicode(self.course_key), self.enabled)
+        return u"Course: {}, enabled: {}".format(six.text_type(self.course_key), self.enabled)
 
     @classmethod
     def verified_cohort_name_for_course(cls, course_key):

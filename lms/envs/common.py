@@ -1324,6 +1324,9 @@ MIDDLEWARE_CLASSES = [
 
     'edx_rest_framework_extensions.auth.jwt.middleware.EnsureJWTAuthSettingsMiddleware',
 
+    # Handles automatically storing user ids in django-simple-history tables when possible.
+    'simple_history.middleware.HistoryRequestMiddleware',
+
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 ]
@@ -2276,6 +2279,7 @@ INSTALLED_APPS = [
     'openedx.features.learner_profile',
     'openedx.features.course_duration_limits',
     'openedx.features.content_type_gating',
+    'openedx.features.discounts',
 
     'experiments',
 
@@ -3351,6 +3355,8 @@ SYSTEM_TO_FEATURE_ROLE_MAPPING = {
 }
 
 DATA_CONSENT_SHARE_CACHE_TIMEOUT = None  # Never expire
+
+ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
 
 ############## Settings for Course Enrollment Modes ######################
 # The min_price key refers to the minimum price allowed for an instance
