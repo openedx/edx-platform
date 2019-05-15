@@ -1,11 +1,12 @@
 """
 Discussion API internal interface
 """
+from __future__ import absolute_import
 import itertools
 from collections import defaultdict
 from enum import Enum
-from urllib import urlencode
-from urlparse import urlunparse
+from six.moves.urllib.parse import urlencode
+from six.moves.urllib.parse import urlunparse
 
 from django.core.exceptions import ValidationError
 from django.urls import reverse
@@ -52,6 +53,7 @@ from openedx.core.djangoapps.django_comment_common.signals import (
 from openedx.core.djangoapps.django_comment_common.utils import get_course_discussion_settings
 from openedx.core.djangoapps.user_api.accounts.views import AccountViewSet
 from openedx.core.lib.exceptions import CourseNotFoundError, DiscussionNotFoundError, PageNotFoundError
+import six
 
 
 class DiscussionTopic(object):
@@ -163,7 +165,7 @@ def get_thread_list_url(request, course_key, topic_id_list=None, following=False
     """
     path = reverse("thread-list")
     query_list = (
-        [("course_id", unicode(course_key))] +
+        [("course_id", six.text_type(course_key))] +
         [("topic_id", topic_id) for topic_id in topic_id_list or []] +
         ([("following", following)] if following else [])
     )
@@ -193,7 +195,7 @@ def get_course(request, course_key):
     """
     course = _get_course(course_key, request.user)
     return {
-        "id": unicode(course_key),
+        "id": six.text_type(course_key),
         "blackouts": [
             {"start": blackout["start"].isoformat(), "end": blackout["end"].isoformat()}
             for blackout in course.get_discussion_blackout_datetimes()
@@ -287,7 +289,7 @@ def get_non_courseware_topics(request, course_key, course, topic_ids):
     """
     non_courseware_topics = []
     existing_topic_ids = set()
-    for name, entry in sorted(course.discussion_topics.items(), key=lambda item: item[1].get("sort_key", item[0])):
+    for name, entry in sorted(list(course.discussion_topics.items()), key=lambda item: item[1].get("sort_key", item[0])):
         if not topic_ids or entry['id'] in topic_ids:
             discussion_topic = DiscussionTopic(
                 entry["id"], name, get_thread_list_url(request, course_key, [entry["id"]])
@@ -547,7 +549,7 @@ def get_thread_list(
     context = get_context(course, request)
 
     query_params = {
-        "user_id": unicode(request.user.id),
+        "user_id": six.text_type(request.user.id),
         "group_id": (
             None if context["is_requester_privileged"] else
             get_group_id_for_user(request.user, get_course_discussion_settings(course.id))
@@ -569,7 +571,7 @@ def get_thread_list(
     if following:
         paginated_results = context["cc_requester"].subscribed_threads(query_params)
     else:
-        query_params["course_id"] = unicode(course.id)
+        query_params["course_id"] = six.text_type(course.id)
         query_params["commentable_ids"] = ",".join(topic_id_list) if topic_id_list else None
         query_params["text"] = text_search
         paginated_results = Thread.search(query_params)
@@ -842,12 +844,12 @@ def create_thread(request, thread_data):
     serializer = ThreadSerializer(data=thread_data, context=context)
     actions_form = ThreadActionsForm(thread_data)
     if not (serializer.is_valid() and actions_form.is_valid()):
-        raise ValidationError(dict(serializer.errors.items() + actions_form.errors.items()))
+        raise ValidationError(dict(list(serializer.errors.items()) + list(actions_form.errors.items())))
     serializer.save()
     cc_thread = serializer.instance
     thread_created.send(sender=None, user=user, post=cc_thread)
     api_thread = serializer.data
-    _do_extra_actions(api_thread, cc_thread, thread_data.keys(), actions_form, context, request)
+    _do_extra_actions(api_thread, cc_thread, list(thread_data.keys()), actions_form, context, request)
 
     track_thread_created_event(request, course, cc_thread, actions_form.cleaned_data["following"])
 
@@ -883,12 +885,12 @@ def create_comment(request, comment_data):
     serializer = CommentSerializer(data=comment_data, context=context)
     actions_form = CommentActionsForm(comment_data)
     if not (serializer.is_valid() and actions_form.is_valid()):
-        raise ValidationError(dict(serializer.errors.items() + actions_form.errors.items()))
+        raise ValidationError(dict(list(serializer.errors.items()) + list(actions_form.errors.items())))
     serializer.save()
     cc_comment = serializer.instance
     comment_created.send(sender=None, user=request.user, post=cc_comment)
     api_comment = serializer.data
-    _do_extra_actions(api_comment, cc_comment, comment_data.keys(), actions_form, context, request)
+    _do_extra_actions(api_comment, cc_comment, list(comment_data.keys()), actions_form, context, request)
 
     track_comment_created_event(request, context["course"], cc_comment, cc_thread["commentable_id"], followed=False)
 
@@ -918,14 +920,14 @@ def update_thread(request, thread_id, update_data):
     serializer = ThreadSerializer(cc_thread, data=update_data, partial=True, context=context)
     actions_form = ThreadActionsForm(update_data)
     if not (serializer.is_valid() and actions_form.is_valid()):
-        raise ValidationError(dict(serializer.errors.items() + actions_form.errors.items()))
+        raise ValidationError(dict(list(serializer.errors.items()) + list(actions_form.errors.items())))
     # Only save thread object if some of the edited fields are in the thread data, not extra actions
     if set(update_data) - set(actions_form.fields):
         serializer.save()
         # signal to update Teams when a user edits a thread
         thread_edited.send(sender=None, user=request.user, post=cc_thread)
     api_thread = serializer.data
-    _do_extra_actions(api_thread, cc_thread, update_data.keys(), actions_form, context, request)
+    _do_extra_actions(api_thread, cc_thread, list(update_data.keys()), actions_form, context, request)
 
     # always return read as True (and therefore unread_comment_count=0) as reasonably
     # accurate shortcut, rather than adding additional processing.
@@ -968,13 +970,13 @@ def update_comment(request, comment_id, update_data):
     serializer = CommentSerializer(cc_comment, data=update_data, partial=True, context=context)
     actions_form = CommentActionsForm(update_data)
     if not (serializer.is_valid() and actions_form.is_valid()):
-        raise ValidationError(dict(serializer.errors.items() + actions_form.errors.items()))
+        raise ValidationError(dict(list(serializer.errors.items()) + list(actions_form.errors.items())))
     # Only save comment object if some of the edited fields are in the comment data, not extra actions
     if set(update_data) - set(actions_form.fields):
         serializer.save()
         comment_edited.send(sender=None, user=request.user, post=cc_comment)
     api_comment = serializer.data
-    _do_extra_actions(api_comment, cc_comment, update_data.keys(), actions_form, context, request)
+    _do_extra_actions(api_comment, cc_comment, list(update_data.keys()), actions_form, context, request)
     return api_comment
 
 
@@ -999,7 +1001,7 @@ def get_thread(request, thread_id, requested_fields=None):
         thread_id,
         retrieve_kwargs={
             "with_responses": True,
-            "user_id": unicode(request.user.id),
+            "user_id": six.text_type(request.user.id),
         }
     )
     return _serialize_discussion_entities(request, context, [cc_thread], requested_fields, DiscussionEntity.thread)[0]

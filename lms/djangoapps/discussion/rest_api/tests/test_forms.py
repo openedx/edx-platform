@@ -1,9 +1,10 @@
 """
 Tests for Discussion API forms
 """
+from __future__ import absolute_import
 import itertools
 from unittest import TestCase
-from urllib import urlencode
+from six.moves.urllib.parse import urlencode
 
 import ddt
 from django.http import QueryDict

@@ -1,8 +1,9 @@
 """
 Discussion API serializers
 """
-from urllib import urlencode
-from urlparse import urlunparse
+from __future__ import absolute_import
+from six.moves.urllib.parse import urlencode
+from six.moves.urllib.parse import urlunparse
 
 from django.contrib.auth.models import User as DjangoUser
 from django.core.exceptions import ValidationError

@@ -3,6 +3,7 @@ Discussion API test utilities
 """
 from __future__ import unicode_literals
 
+from __future__ import absolute_import
 import hashlib
 import json
 import re
@@ -16,6 +17,7 @@ from pytz import UTC
 from openedx.core.djangoapps.profile_images.images import create_profile_images
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
+import six
 
 
 def _get_thread_callback(thread_data):
@@ -391,7 +393,7 @@ class CommentsServiceMockMixin(object):
             "voted": False,
             "vote_count": 0,
             "editable_fields": ["abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"],
-            "course_id": unicode(self.course.id),
+            "course_id": six.text_type(self.course.id),
             "topic_id": "test_topic",
             "group_id": None,
             "group_name": None,

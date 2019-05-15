@@ -3,9 +3,10 @@ Tests for Discussion API views
 """
 from __future__ import unicode_literals
 
+from __future__ import absolute_import
 import json
 from datetime import datetime
-from urlparse import urlparse
+from six.moves.urllib.parse import urlparse
 
 import ddt
 import httpretty
@@ -45,6 +46,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from six.moves import range
 
 
 class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMixin):

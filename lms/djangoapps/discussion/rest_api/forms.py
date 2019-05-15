@@ -1,7 +1,8 @@
 """
 Discussion API forms
 """
-import urllib
+from __future__ import absolute_import
+import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 
 from django.core.exceptions import ValidationError
 from django.forms import BooleanField, CharField, ChoiceField, Form, IntegerField
@@ -167,7 +168,7 @@ class CourseDiscussionRolesForm(CourseDiscussionSettingsForm):
 
     def clean_rolename(self):
         """Validate the 'rolename' value."""
-        rolename = urllib.unquote(self.cleaned_data.get('rolename'))
+        rolename = six.moves.urllib.parse.unquote(self.cleaned_data.get('rolename'))
         course_id = self.cleaned_data.get('course_key')
         if course_id and rolename:
             try:
