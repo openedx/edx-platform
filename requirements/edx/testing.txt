@@ -80,7 +80,7 @@ decorator==4.4.0
 defusedxml==0.6.0
 dicttoxml==1.7.4          # via moto
 diff-cover==0.9.8
-distlib==0.2.8            # via caniusepython3
+distlib==0.2.9.post0      # via caniusepython3
 django-appconf==1.0.3
 django-babel-underscore==0.5.2
 django-babel==0.6.2
@@ -150,7 +150,7 @@ enum34==1.1.6
 event-tracking==0.2.8
 execnet==1.6.0            # via pytest-xdist
 factory_boy==2.8.1
-faker==1.0.6              # via factory-boy
+faker==1.0.7              # via factory-boy
 feedparser==5.1.3
 filelock==3.0.10          # via tox
 firebase-token-generator==1.3.2
@@ -176,7 +176,7 @@ idna==2.8
 incremental==17.5.0       # via twisted
 inflect==2.1.0
 ipaddress==1.0.22
-isort==4.3.19
+isort==4.3.20
 itsdangerous==1.1.0       # via flask
 itypes==1.1.0
 jinja2-pluralize==0.3.0
@@ -318,7 +318,7 @@ uritemplate==3.0.0
 urllib3==1.23
 urlobject==2.4.3          # via pa11ycrawler
 user-util==0.1.5
-virtualenv==16.5.0        # via tox
+virtualenv==16.6.0        # via tox
 voluptuous==0.11.5
 w3lib==1.20.0             # via parsel, scrapy
 watchdog==0.9.0
@@ -326,7 +326,7 @@ wcwidth==0.1.7            # via pytest
 web-fragments==0.3.0
 webencodings==0.5.1
 webob==1.8.5
-werkzeug==0.15.2          # via flask
+werkzeug==0.15.4          # via flask
 wrapt==1.10.5
 xblock-utils==1.2.1
 xblock==1.2.2
