@@ -412,7 +412,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
     @override_waffle_flag(FIRST_PURCHASE_OFFER_BANNER_DISPLAY, active=True)
     @mock.patch('openedx.features.course_experience.utils.discount_percentage')
-    @mock.patch('openedx.features.course_experience.utils.can_recieve_discount')
+    @mock.patch('openedx.features.course_experience.utils.can_receive_discount')
     @ddt.data(
         [True, 15],
         [True, 13],
@@ -422,12 +422,12 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
     def test_first_purchase_offer_banner_display(self,
                                                  applicability,
                                                  percentage,
-                                                 can_recieve_discount_mock,
+                                                 can_receive_discount_mock,
                                                  discount_percentage_mock):
         """
         Ensure first purchase offer banner displays correctly
         """
-        can_recieve_discount_mock.return_value = applicability
+        can_receive_discount_mock.return_value = applicability
         discount_percentage_mock.return_value = percentage
         user = self.create_user_for_course(self.course, CourseUserType.ENROLLED)
         self.client.login(username=user.username, password=self.TEST_PASSWORD)
