@@ -2,6 +2,7 @@
 Tests for the models that control the
 persistent grading feature.
 """
+from __future__ import absolute_import
 import itertools
 
 import ddt

@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from django.conf import settings
 
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag

@@ -2,6 +2,7 @@
 Provides helper functions for tests that want
 to configure flags related to persistent grading.
 """
+from __future__ import absolute_import
 from contextlib import contextmanager
 from edx_django_utils.cache import RequestCache
 
