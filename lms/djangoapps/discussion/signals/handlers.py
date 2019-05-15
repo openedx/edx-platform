@@ -2,19 +2,19 @@
 Signal handlers related to discussions.
 """
 from __future__ import absolute_import
+
 import logging
 
+import six
 from django.conf import settings
 from django.dispatch import receiver
+from opaque_keys.edx.locator import LibraryLocator
 
 from lms.djangoapps.discussion import tasks
 from openedx.core.djangoapps.django_comment_common import signals
-from opaque_keys.edx.locator import LibraryLocator
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_current_site
 from xmodule.modulestore.django import SignalHandler
-import six
-
 
 log = logging.getLogger(__name__)
 
