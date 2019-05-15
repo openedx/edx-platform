@@ -8,10 +8,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import ddt
 import six
+from six.moves import range
 from django.contrib.auth import get_user_model
 from django.core.management import CommandError, call_command
 from mock import ANY, patch
-from six.moves import range
 
 from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from lms.djangoapps.grades.management.commands import compute_grades
