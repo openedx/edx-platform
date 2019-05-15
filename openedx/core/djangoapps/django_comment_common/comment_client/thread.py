@@ -1,11 +1,11 @@
 # pylint: disable=missing-docstring,protected-access
+from __future__ import absolute_import
+
 import logging
 
 from eventtracking import tracker
-from . import models
-from . import settings
-from . import utils
 
+from . import models, settings, utils
 
 log = logging.getLogger(__name__)
 
