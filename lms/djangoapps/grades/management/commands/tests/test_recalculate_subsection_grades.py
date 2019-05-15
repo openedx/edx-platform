@@ -3,9 +3,11 @@ Tests for reset_grades management command.
 """
 
 from __future__ import absolute_import
+
 from datetime import datetime
 
 import ddt
+import six
 from django.conf import settings
 from mock import MagicMock, patch
 from pytz import utc
@@ -16,7 +18,6 @@ from lms.djangoapps.grades.tests.test_tasks import HasCourseWithProblemsMixin
 from track.event_transaction_utils import get_event_transaction_id
 from util.date_utils import to_timestamp
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-import six
 
 DATE_FORMAT = u"%Y-%m-%d %H:%M"
 

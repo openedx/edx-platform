@@ -11,13 +11,13 @@ import six
 from django.contrib.auth import get_user_model
 from django.core.management import CommandError, call_command
 from mock import ANY, patch
+from six.moves import range
 
 from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from lms.djangoapps.grades.management.commands import compute_grades
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from six.moves import range
 
 
 @ddt.ddt

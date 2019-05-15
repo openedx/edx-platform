@@ -8,18 +8,18 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import logging
 from datetime import datetime
 
+import six
 from django.core.management.base import BaseCommand, CommandError
 from pytz import utc
+from submissions.models import Submission
 
 from courseware.models import StudentModule
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.events import PROBLEM_SUBMITTED_EVENT_TYPE
 from lms.djangoapps.grades.tasks import recalculate_subsection_grade_v3
 from student.models import user_by_anonymous_id
-from submissions.models import Submission
 from track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
 from util.date_utils import to_timestamp
-import six
 
 log = logging.getLogger(__name__)
 
