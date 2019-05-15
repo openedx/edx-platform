@@ -2,6 +2,7 @@
 Unit tests for grades models.
 """
 from __future__ import absolute_import
+
 import json
 from base64 import b64encode
 from collections import OrderedDict
@@ -10,6 +11,7 @@ from hashlib import sha1
 
 import ddt
 import pytz
+import six
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.utils.timezone import now
@@ -30,7 +32,6 @@ from lms.djangoapps.grades.models import (
 )
 from student.tests.factories import UserFactory
 from track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
-import six
 
 
 class BlockRecordListTestCase(TestCase):

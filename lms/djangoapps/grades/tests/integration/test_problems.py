@@ -1,10 +1,13 @@
 from __future__ import absolute_import
+
 import datetime
 import itertools
 
 import ddt
 import pytz
 from crum import set_current_request
+from six.moves import range
+
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from lms.djangoapps.course_blocks.api import get_course_blocks
@@ -20,7 +23,6 @@ from xmodule.modulestore.xml_importer import import_course_from_xml
 
 from ...subsection_grade_factory import SubsectionGradeFactory
 from ..utils import answer_problem, mock_get_submissions_score
-from six.moves import range
 
 
 @ddt.ddt

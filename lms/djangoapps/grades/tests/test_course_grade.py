@@ -1,8 +1,10 @@
 from __future__ import absolute_import
+
 import ddt
+import six
+from crum import set_current_request
 from django.conf import settings
 from mock import patch
-from crum import set_current_request
 
 from openedx.core.djangolib.testing.utils import get_mock_request
 from student.models import CourseEnrollment
@@ -16,7 +18,6 @@ from ..course_grade import ZeroCourseGrade
 from ..course_grade_factory import CourseGradeFactory
 from .base import GradeTestBase
 from .utils import answer_problem
-import six
 
 
 @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})

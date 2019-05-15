@@ -2,25 +2,28 @@
 Grades Service Tests
 """
 from __future__ import absolute_import
+
 from datetime import datetime
+
 import ddt
 import pytz
+import six
 from freezegun import freeze_time
+from mock import call, patch
+
 from lms.djangoapps.grades.constants import GradeOverrideFeatureEnum
 from lms.djangoapps.grades.models import (
     PersistentSubsectionGrade,
     PersistentSubsectionGradeOverride,
-    PersistentSubsectionGradeOverrideHistory,
+    PersistentSubsectionGradeOverrideHistory
 )
 from lms.djangoapps.grades.services import GradesService
-from mock import patch, call
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from ..config.waffle import REJECTED_EXAM_OVERRIDES_GRADE
 from ..constants import ScoreDatabaseTableEnum
-import six
 
 
 class MockWaffleFlag(object):

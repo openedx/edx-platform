@@ -3,6 +3,7 @@ Tests for the functionality and infrastructure of grades tasks.
 """
 
 from __future__ import absolute_import
+
 import itertools
 from collections import OrderedDict
 from contextlib import contextmanager
@@ -15,10 +16,11 @@ from django.conf import settings
 from django.db.utils import IntegrityError
 from django.utils import timezone
 from mock import MagicMock, patch
+from six.moves import range
 
 from lms.djangoapps.grades import tasks
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
-from lms.djangoapps.grades.config.waffle import waffle_flags, ENFORCE_FREEZE_GRADE_AFTER_COURSE_END
+from lms.djangoapps.grades.config.waffle import ENFORCE_FREEZE_GRADE_AFTER_COURSE_END, waffle_flags
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsectionGrade
 from lms.djangoapps.grades.services import GradesService
@@ -42,9 +44,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
-
 from .utils import mock_get_score
-from six.moves import range
 
 
 class MockGradesService(GradesService):

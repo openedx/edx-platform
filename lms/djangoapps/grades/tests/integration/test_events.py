@@ -3,8 +3,11 @@ Test grading events across apps.
 """
 
 from __future__ import absolute_import
-from mock import call as mock_call, patch
+
+import six
 from crum import set_current_request
+from mock import call as mock_call
+from mock import patch
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
@@ -18,7 +21,6 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from ... import events
-import six
 
 
 class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTestCase):

@@ -3,12 +3,15 @@ Test the behavior of the GradesTransformer
 """
 
 from __future__ import absolute_import
+
 import datetime
 import random
 from copy import deepcopy
 
 import ddt
 import pytz
+import six
+from six.moves import range
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase
@@ -20,8 +23,6 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls
 
 from ..transformer import GradesTransformer
-import six
-from six.moves import range
 
 
 @ddt.ddt
