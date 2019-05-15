@@ -26,7 +26,7 @@ from mock import Mock, patch
 from pytz import UTC
 from six import text_type
 from six.moves import range
-from six.moves.urllib.parse import urlparse
+from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
 from common.test.utils import XssTestMixin
 from course_modes.models import CourseMode
