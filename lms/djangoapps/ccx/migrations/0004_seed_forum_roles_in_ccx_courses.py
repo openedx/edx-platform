@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from __future__ import absolute_import
 import logging
 
 from ccx_keys.locator import CCXLocator
@@ -12,6 +13,7 @@ from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMI
     FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_STUDENT
 from openedx.core.djangoapps.django_comment_common.utils import STUDENT_ROLE_PERMISSIONS,  MODERATOR_ROLE_PERMISSIONS, \
     ADMINISTRATOR_ROLE_PERMISSIONS
+import six
 
 log = logging.getLogger("edx.ccx")
 
@@ -44,7 +46,7 @@ def seed_forum_roles_for_existing_ccx(apps, schema_editor):
             )
             continue
 
-        ccx_locator = CCXLocator.from_course_locator(ccx.course_id, unicode(ccx.id))
+        ccx_locator = CCXLocator.from_course_locator(ccx.course_id, six.text_type(ccx.id))
 
         # Create forum roles.
         admin_role, _ = Role.objects.get_or_create(name=FORUM_ROLE_ADMINISTRATOR, course_id=ccx_locator)
