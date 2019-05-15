@@ -1,6 +1,8 @@
 # pylint: disable=missing-docstring
 from __future__ import absolute_import
+
 import mock
+import six
 from django.core.cache import cache
 from django.test.utils import override_settings
 # Will also run default tests for IDTokens and UserInfo
@@ -13,7 +15,6 @@ from student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff, Or
 from student.tests.factories import UserFactory, UserProfileFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
-import six
 
 
 class BaseTestMixin(ModuleStoreTestCase):
