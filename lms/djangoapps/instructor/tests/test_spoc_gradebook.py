@@ -2,8 +2,11 @@
 Tests of the instructor dashboard spoc gradebook
 """
 
+from __future__ import absolute_import
+
 from django.urls import reverse
 from six import text_type
+from six.moves import range
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.tests.factories import StudentModuleFactory
@@ -51,7 +54,7 @@ class TestGradebook(SharedModuleStoreTestCase):
                     data=StringResponseXMLFactory().build_xml(answer='foo'),
                     metadata={'rerandomize': 'always'}
                 )
-                for __ in xrange(USER_COUNT - 1)
+                for __ in range(USER_COUNT - 1)
             ]
 
     def setUp(self):
@@ -59,7 +62,7 @@ class TestGradebook(SharedModuleStoreTestCase):
 
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password='test')
-        self.users = [UserFactory.create() for _ in xrange(USER_COUNT)]
+        self.users = [UserFactory.create() for _ in range(USER_COUNT)]
 
         for user in self.users:
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
