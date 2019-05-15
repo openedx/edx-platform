@@ -1,5 +1,6 @@
 # pylint: skip-file
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 import datetime
 import json
 
@@ -19,7 +20,7 @@ from courseware.tabs import get_course_tab_list
 from courseware.tests.factories import InstructorFactory
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
-from lms.djangoapps.discussion.django_comment_client.tests.unicode import UnicodeTestMixin
+from lms.djangoapps.discussion.django_comment_client.tests.six.text_type import UnicodeTestMixin
 from lms.djangoapps.discussion.django_comment_client.tests.utils import config_course_discussions, topic_name_to_id
 import lms.djangoapps.discussion.django_comment_client.utils as utils
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
@@ -45,6 +46,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory
+import six
 
 
 class DictionaryTestCase(TestCase):

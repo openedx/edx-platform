@@ -1,8 +1,9 @@
 # pylint: disable=missing-docstring
+from __future__ import absolute_import
 import json
 import threading
 import unittest
-import urllib2
+import six.moves.urllib.request, six.moves.urllib.error, six.moves.urllib.parse
 
 import pytest
 
@@ -49,10 +50,10 @@ class MockCommentServiceServerTest(unittest.TestCase):
                   'external_id': '4', 'email': u'user100@edx.org'}
         data = json.dumps(values)
         headers = {'Content-Type': 'application/json', 'Content-Length': len(data), 'X-Edx-Api-Key': 'TEST_API_KEY'}
-        req = urllib2.Request(self.server_url + '/api/v1/users/4', data, headers)
+        req = six.moves.urllib.request.Request(self.server_url + '/api/v1/users/4', data, headers)
 
         # Send the request to the mock cs server
-        response = urllib2.urlopen(req)
+        response = six.moves.urllib.request.urlopen(req)
 
         # Receive the reply from the mock cs server
         response_dict = json.loads(response.read())
