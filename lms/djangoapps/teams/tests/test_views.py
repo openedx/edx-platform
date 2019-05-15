@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the teams API at the HTTP request level."""
 from __future__ import absolute_import
+
 import json
 import unittest
 from datetime import datetime
@@ -9,13 +10,14 @@ import ddt
 import pytz
 from dateutil import parser
 from django.conf import settings
-from django.urls import reverse
 from django.db.models.signals import post_save
+from django.urls import reverse
 from django.utils import translation
 from elasticsearch.exceptions import ConnectionError
 from mock import patch
 from rest_framework.test import APIClient, APITestCase
 from search.search_engine_base import SearchEngine
+from six.moves import range
 
 from common.test.utils import skip_signal
 from courseware.tests.factories import StaffFactory
@@ -30,7 +32,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from ..models import CourseTeamMembership
 from ..search_indexes import CourseTeam, CourseTeamIndexer, course_team_post_save_callback
 from .factories import LAST_ACTIVITY_AT, CourseTeamFactory
-from six.moves import range
 
 
 class TestDashboard(SharedModuleStoreTestCase):

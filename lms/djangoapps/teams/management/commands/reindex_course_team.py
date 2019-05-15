@@ -1,16 +1,16 @@
 """
 Management command to update course_teams' search index.
 """
-from __future__ import print_function, unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
 
-from __future__ import absolute_import
 from textwrap import dedent
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management import BaseCommand, CommandError
-from lms.djangoapps.teams.models import CourseTeam
 from six.moves import map
+
+from lms.djangoapps.teams.models import CourseTeam
 
 
 class Command(BaseCommand):

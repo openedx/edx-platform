@@ -3,6 +3,7 @@ Tests for course_team reindex command
 """
 
 from __future__ import absolute_import
+
 import ddt
 from django.core.management import CommandError, call_command
 from mock import patch

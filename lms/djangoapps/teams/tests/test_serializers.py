@@ -3,16 +3,17 @@
 Tests for custom Teams Serializers.
 """
 from __future__ import absolute_import
+
+import six
 from django.core.paginator import Paginator
 from django.test.client import RequestFactory
+from six.moves import range
 
 from lms.djangoapps.teams.serializers import BulkTeamCountTopicSerializer, MembershipSerializer, TopicSerializer
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-import six
-from six.moves import range
 
 
 class SerializerTestCase(SharedModuleStoreTestCase):
