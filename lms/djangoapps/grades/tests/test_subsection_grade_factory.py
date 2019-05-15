@@ -1,6 +1,7 @@
 """
 Tests for the SubsectionGradeFactory class.
 """
+from __future__ import absolute_import
 import ddt
 from mock import patch
 from django.conf import settings

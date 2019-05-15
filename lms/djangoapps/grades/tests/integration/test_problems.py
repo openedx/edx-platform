@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import datetime
 import itertools
 
@@ -19,6 +20,7 @@ from xmodule.modulestore.xml_importer import import_course_from_xml
 
 from ...subsection_grade_factory import SubsectionGradeFactory
 from ..utils import answer_problem, mock_get_submissions_score
+from six.moves import range
 
 
 @ddt.ddt

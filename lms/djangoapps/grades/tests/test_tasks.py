@@ -2,6 +2,7 @@
 Tests for the functionality and infrastructure of grades tasks.
 """
 
+from __future__ import absolute_import
 import itertools
 from collections import OrderedDict
 from contextlib import contextmanager
@@ -43,6 +44,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 
 
 from .utils import mock_get_score
+from six.moves import range
 
 
 class MockGradesService(GradesService):
@@ -90,8 +92,8 @@ class HasCourseWithProblemsMixin(object):
             ('weighted_possible', 2.0),
             ('user_id', self.user.id),
             ('anonymous_user_id', 5),
-            ('course_id', unicode(self.course.id)),
-            ('usage_id', unicode(self.problem.location)),
+            ('course_id', six.text_type(self.course.id)),
+            ('usage_id', six.text_type(self.problem.location)),
             ('only_if_higher', None),
             ('modified', self.frozen_now_datetime),
             ('score_db_table', ScoreDatabaseTableEnum.courseware_student_module),
@@ -101,13 +103,13 @@ class HasCourseWithProblemsMixin(object):
 
         self.recalculate_subsection_grade_kwargs = OrderedDict([
             ('user_id', self.user.id),
-            ('course_id', unicode(self.course.id)),
-            ('usage_id', unicode(self.problem.location)),
+            ('course_id', six.text_type(self.course.id)),
+            ('usage_id', six.text_type(self.problem.location)),
             ('anonymous_user_id', 5),
             ('only_if_higher', None),
             ('expected_modified_time', self.frozen_now_timestamp),
             ('score_deleted', False),
-            ('event_transaction_id', unicode(get_event_transaction_id())),
+            ('event_transaction_id', six.text_type(get_event_transaction_id())),
             ('event_transaction_type', u'edx.grades.problem.submitted'),
             ('score_db_table', ScoreDatabaseTableEnum.courseware_student_module),
         ])
@@ -424,12 +426,12 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
 
     def setUp(self):
         super(ComputeGradesForCourseTest, self).setUp()
-        self.users = [UserFactory.create() for _ in xrange(12)]
+        self.users = [UserFactory.create() for _ in range(12)]
         self.set_up_course()
         for user in self.users:
             CourseEnrollment.enroll(user, self.course.id)
 
-    @ddt.data(*xrange(0, 12, 3))
+    @ddt.data(*range(0, 12, 3))
     def test_behavior(self, batch_size):
         with mock_get_score(1, 2):
             result = compute_grades_for_course_v2.delay(
@@ -447,7 +449,7 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
             min(batch_size, 8)  # No more than 8 due to offset
         )
 
-    @ddt.data(*xrange(1, 12, 3))
+    @ddt.data(*range(1, 12, 3))
     def test_course_task_args(self, test_batch_size):
         offset_expected = 0
         for course_key, offset, batch_size in _course_task_args(
@@ -513,7 +515,7 @@ class FreezeGradingAfterCourseEndTest(HasCourseWithProblemsMixin, ModuleStoreTes
     """
     def setUp(self):
         super(FreezeGradingAfterCourseEndTest, self).setUp()
-        self.users = [UserFactory.create() for _ in xrange(12)]
+        self.users = [UserFactory.create() for _ in range(12)]
         self.user = self.users[0]
         self.freeze_grade_flag = waffle_flags()[ENFORCE_FREEZE_GRADE_AFTER_COURSE_END]
 

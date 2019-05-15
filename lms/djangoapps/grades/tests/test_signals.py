@@ -1,6 +1,7 @@
 """
 Tests for the score change signals defined in the courseware models module.
 """
+from __future__ import absolute_import
 import re
 from datetime import datetime
 

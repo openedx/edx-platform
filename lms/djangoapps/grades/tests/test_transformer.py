@@ -2,6 +2,7 @@
 Test the behavior of the GradesTransformer
 """
 
+from __future__ import absolute_import
 import datetime
 import random
 from copy import deepcopy
@@ -19,6 +20,8 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls
 
 from ..transformer import GradesTransformer
+import six
+from six.moves import range
 
 
 @ddt.ddt
@@ -214,7 +217,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         }
         blocks = self.build_complicated_hypothetical_course()
         block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
-        for block_ref, expected_subsections in expected_subsections.iteritems():
+        for block_ref, expected_subsections in six.iteritems(expected_subsections):
             actual_subsections = block_structure.get_transformer_block_field(
                 blocks[block_ref].location,
                 self.TRANSFORMER_CLASS_TO_TEST,
@@ -427,7 +430,7 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
                 u'#children': [],
             },
         ]
-        for problem_number in xrange(random.randrange(10, 20)):
+        for problem_number in range(random.randrange(10, 20)):
             course[0][u'#children'].append(
                 {
                     u'metadata': {

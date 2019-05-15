@@ -1,6 +1,7 @@
 """
 Utilities for grades related tests
 """
+from __future__ import absolute_import
 from contextlib import contextmanager
 from datetime import datetime
 

@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import ddt
 from django.conf import settings
 from mock import patch
@@ -15,6 +16,7 @@ from ..course_grade import ZeroCourseGrade
 from ..course_grade_factory import CourseGradeFactory
 from .base import GradeTestBase
 from .utils import answer_problem
+import six
 
 
 @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
@@ -35,7 +37,7 @@ class ZeroGradeTest(GradeTestBase):
             chapter_grades = ZeroCourseGrade(self.request.user, course_data).chapter_grades
             for chapter in chapter_grades:
                 for section in chapter_grades[chapter]['sections']:
-                    for score in section.problem_scores.itervalues():
+                    for score in six.itervalues(section.problem_scores):
                         self.assertEqual(score.earned, 0)
                         self.assertEqual(score.first_attempted, None)
                     self.assertEqual(section.all_total.earned, 0)
