@@ -5,11 +5,11 @@ import itertools
 
 import ddt
 import six
+from six.moves import range
 from django.conf import settings
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from opaque_keys.edx.locator import CourseLocator
-from six.moves import range
 
 from lms.djangoapps.discussion.notification_prefs import NOTIFICATION_PREF_KEY
 from lms.djangoapps.discussion.notifier_api.views import NotifierUsersViewSet
