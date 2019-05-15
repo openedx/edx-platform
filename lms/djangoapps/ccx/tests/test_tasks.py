@@ -2,9 +2,11 @@
 Tests for celery tasks defined in tasks module
 """
 from __future__ import absolute_import
+
 import contextlib
 
 import mock
+import six
 from ccx_keys.locator import CCXLocator
 
 from lms.djangoapps.ccx.tasks import send_ccx_course_published
@@ -15,7 +17,6 @@ from student.tests.factories import AdminFactory
 from xmodule.modulestore.django import SignalHandler
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-import six
 
 
 @contextlib.contextmanager

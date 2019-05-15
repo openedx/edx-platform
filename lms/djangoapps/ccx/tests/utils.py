@@ -2,10 +2,12 @@
 Test utils for CCX
 """
 from __future__ import absolute_import
+
 import datetime
 
 import pytz
 from django.conf import settings
+from six.moves import range
 
 from lms.djangoapps.ccx.overrides import override_field_for_ccx
 from lms.djangoapps.ccx.tests.factories import CcxFactory
@@ -15,7 +17,6 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from six.moves import range
 
 
 class CcxTestCase(EmailTemplateTagMixin, SharedModuleStoreTestCase):

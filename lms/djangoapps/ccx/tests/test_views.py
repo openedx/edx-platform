@@ -2,21 +2,25 @@
 test views
 """
 from __future__ import absolute_import
+
 import datetime
 import json
 import re
-import six.moves.urllib.parse
 
 import ddt
+import six
+import six.moves.urllib.parse
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
-from django.urls import resolve, reverse
 from django.test import RequestFactory
 from django.test.utils import override_settings
-from pytz import UTC
+from django.urls import resolve, reverse
 from django.utils.translation import ugettext as _
+from edx_django_utils.cache import RequestCache
 from mock import MagicMock, patch
 from opaque_keys.edx.keys import CourseKey
+from pytz import UTC
+from six.moves import range, zip
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.courses import get_course_by_id
@@ -24,7 +28,6 @@ from courseware.tabs import get_course_tab_list
 from courseware.tests.factories import StudentModuleFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.testutils import FieldOverrideTestMixin
-from edx_django_utils.cache import RequestCache
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import get_override_for_ccx, override_field_for_ccx
@@ -50,9 +53,6 @@ from xmodule.modulestore.tests.django_utils import (
 )
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, SampleCourseFactory
 from xmodule.x_module import XModuleMixin
-import six
-from six.moves import range
-from six.moves import zip
 
 
 def intercept_renderer(path, context):

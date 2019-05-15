@@ -2,19 +2,19 @@
 Test the CCXModulestoreWrapper
 """
 from __future__ import absolute_import
+
 import datetime
 from collections import deque
 from itertools import chain
 
 import pytz
 from ccx_keys.locator import CCXLocator
+from six.moves import range, zip_longest
 
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from student.tests.factories import AdminFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from six.moves import zip_longest
-from six.moves import range
 
 
 class TestCCXModulestoreWrapper(SharedModuleStoreTestCase):
