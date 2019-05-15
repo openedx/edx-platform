@@ -11,7 +11,7 @@ from six import text_type
 from course_modes.models import CourseMode
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
 
-from . import models
+from .models import GOAL_KEY_CHOICES, CourseGoal
 
 
 def add_course_goal(user, course_id, goal_key):
@@ -33,7 +33,7 @@ def add_course_goal(user, course_id, goal_key):
         current_goal.save(update_fields=['goal_key'])
     else:
         # Otherwise, create and save a new course goal.
-        new_goal = models.CourseGoal(user=user, course_key=course_key, goal_key=goal_key)
+        new_goal = CourseGoal(user=user, course_key=course_key, goal_key=goal_key)
         new_goal.save()
 
 
@@ -46,7 +46,7 @@ def get_course_goal(user, course_key):
     if user.is_anonymous:
         return None
 
-    course_goals = models.CourseGoal.objects.filter(user=user, course_key=course_key)
+    course_goals = CourseGoal.objects.filter(user=user, course_key=course_key)
     return course_goals[0] if course_goals else None
 
 
@@ -85,7 +85,7 @@ def get_course_goal_options():
     Returns the valid options for goal keys, mapped to their translated
     strings, as defined by theCourseGoal model.
     """
-    return {goal_key: goal_text for goal_key, goal_text in models.GOAL_KEY_CHOICES}
+    return {goal_key: goal_text for goal_key, goal_text in GOAL_KEY_CHOICES}
 
 
 def valid_course_goals_ordered():
@@ -98,8 +98,8 @@ def valid_course_goals_ordered():
     goal_options = get_course_goal_options()
 
     ordered_goal_options = []
-    ordered_goal_options.append((models.GOAL_KEY_CHOICES.certify, goal_options[models.GOAL_KEY_CHOICES.certify]))
-    ordered_goal_options.append((models.GOAL_KEY_CHOICES.complete, goal_options[models.GOAL_KEY_CHOICES.complete]))
-    ordered_goal_options.append((models.GOAL_KEY_CHOICES.explore, goal_options[models.GOAL_KEY_CHOICES.explore]))
+    ordered_goal_options.append((GOAL_KEY_CHOICES.certify, goal_options[GOAL_KEY_CHOICES.certify]))
+    ordered_goal_options.append((GOAL_KEY_CHOICES.complete, goal_options[GOAL_KEY_CHOICES.complete]))
+    ordered_goal_options.append((GOAL_KEY_CHOICES.explore, goal_options[GOAL_KEY_CHOICES.explore]))
 
     return ordered_goal_options
