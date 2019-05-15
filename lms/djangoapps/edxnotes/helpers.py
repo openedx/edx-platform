@@ -11,7 +11,7 @@ from uuid import uuid4
 
 import requests
 import six
-import six.moves.urllib.parse
+from six.moves.urllib.parse import urlencode, urlparse, parse_qs
 from dateutil.parser import parse as dateutil_parse
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -20,7 +20,6 @@ from django.utils.translation import ugettext as _
 from oauth2_provider.models import Application
 from opaque_keys.edx.keys import UsageKey
 from requests.exceptions import RequestException
-from six.moves.urllib.parse import urlencode
 
 from courseware.access import has_access
 from courseware.courses import get_current_child
@@ -307,8 +306,8 @@ def construct_pagination_urls(request, course_id, api_next_url, api_previous_url
             return None
 
         keys = ('page', 'page_size', 'text')
-        parsed = six.moves.urllib.parse.urlparse(url)
-        query_params = six.moves.urllib.parse.parse_qs(parsed.query)
+        parsed = urlparse(url)
+        query_params = parse_qs(parsed.query)
 
         encoded_query_params = urlencode({key: query_params.get(key)[0] for key in keys if key in query_params})
         return "{}?{}".format(request.build_absolute_uri(base_url), encoded_query_params)

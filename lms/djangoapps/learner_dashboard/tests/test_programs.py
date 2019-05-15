@@ -10,11 +10,11 @@ from uuid import uuid4
 
 import mock
 import six
+from six.moves.urllib.parse import urljoin
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse, reverse_lazy
-from six.moves.urllib.parse import urljoin
 
 from lms.envs.test import CREDENTIALS_PUBLIC_SERVICE_URL
 from openedx.core.djangoapps.catalog.constants import PathwayType
