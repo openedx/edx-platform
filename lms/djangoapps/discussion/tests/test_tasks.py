@@ -1,6 +1,7 @@
 """
 Tests the execution of forum notification tasks.
 """
+from __future__ import absolute_import
 from datetime import datetime, timedelta
 import json
 import math
@@ -24,6 +25,7 @@ from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfi
 from openedx.core.lib.celery.task_utils import emulate_http_request
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+import six
 
 
 NOW = datetime.utcnow()
@@ -107,7 +109,7 @@ class TaskTestCase(ModuleStoreTestCase):
     def create_thread_and_comments(cls):
         cls.thread = {
             'id': cls.discussion_id,
-            'course_id': unicode(cls.course.id),
+            'course_id': six.text_type(cls.course.id),
             'created_at': date.serialize(TWO_HOURS_AGO),
             'title': 'thread-title',
             'user_id': cls.thread_author.id,
@@ -145,7 +147,7 @@ class TaskTestCase(ModuleStoreTestCase):
         cls.comment['child_count'] = 1
         cls.thread2 = {
             'id': cls.discussion_id,
-            'course_id': unicode(cls.course.id),
+            'course_id': six.text_type(cls.course.id),
             'created_at': date.serialize(TWO_HOURS_AGO),
             'title': 'thread-title',
             'user_id': cls.thread_author.id,

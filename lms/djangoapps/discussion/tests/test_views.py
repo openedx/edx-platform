@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import json
 import logging
 from datetime import datetime
@@ -21,7 +22,7 @@ from lms.djangoapps.discussion.django_comment_client.tests.group_id import (
     GroupIdAssertionMixin,
     NonCohortedTopicGroupIdTestMixin
 )
-from lms.djangoapps.discussion.django_comment_client.tests.unicode import UnicodeTestMixin
+from lms.djangoapps.discussion.django_comment_client.tests.six.text_type import UnicodeTestMixin
 from lms.djangoapps.discussion.django_comment_client.tests.utils import (
     CohortedTestCase,
     ForumsEnableMixin,
@@ -59,6 +60,8 @@ from xmodule.modulestore.tests.django_utils import (
     SharedModuleStoreTestCase
 )
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+import six
+from six.moves import range
 
 log = logging.getLogger(__name__)
 
@@ -292,7 +295,7 @@ class PartialDictMatcher(object):
     def __eq__(self, other):
         return all([
             key in other and other[key] == value
-            for key, value in self.expected_values.iteritems()
+            for key, value in six.iteritems(self.expected_values)
         ])
 
 
@@ -545,7 +548,7 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
         self.client.login(username=self.student.username, password='test')
         response = self.client.get(
             reverse('single_thread', kwargs={
-                'course_id': unicode(self.course.id),
+                'course_id': six.text_type(self.course.id),
                 'discussion_id': "cohorted_topic",
                 'thread_id': self.mock_thread_id,
             })
@@ -666,7 +669,7 @@ class SingleThreadGroupIdTestCase(CohortedTestCase, GroupIdAssertionMixin):
         self.client.login(username=user.username, password='test')
 
         return self.client.get(
-            reverse('single_thread', args=[unicode(self.course.id), commentable_id, "dummy_thread_id"]),
+            reverse('single_thread', args=[six.text_type(self.course.id), commentable_id, "dummy_thread_id"]),
             data=request_data,
             **headers
         )
@@ -729,7 +732,7 @@ class ForumFormDiscussionContentGroupTestCase(ForumsEnableMixin, ContentGroupTes
         )
         self.client.login(username=user.username, password='test')
         return self.client.get(
-            reverse("forum_form_discussion", args=[unicode(self.course.id)]),
+            reverse("forum_form_discussion", args=[six.text_type(self.course.id)]),
             HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
 
@@ -794,7 +797,7 @@ class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, Content
         def call_single_thread():
             self.client.login(username=user.username, password='test')
             return self.client.get(
-                reverse('single_thread', args=[unicode(self.course.id), discussion_id, thread_id])
+                reverse('single_thread', args=[six.text_type(self.course.id), discussion_id, thread_id])
             )
 
         if should_have_access:
@@ -917,7 +920,7 @@ class InlineDiscussionContextTestCase(ForumsEnableMixin, ModuleStoreTestCase):
 
         response = views.inline_discussion(
             request,
-            unicode(self.course.id),
+            six.text_type(self.course.id),
             self.discussion_topic_id,
         )
 
@@ -995,7 +998,7 @@ class ForumFormDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdT
 
         self.client.login(username=user.username, password='test')
         return self.client.get(
-            reverse("forum_form_discussion", args=[unicode(self.course.id)]),
+            reverse("forum_form_discussion", args=[six.text_type(self.course.id)]),
             data=request_data,
             **headers
         )
@@ -1047,7 +1050,7 @@ class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupI
 
         self.client.login(username=requesting_user.username, password='test')
         return self.client.get(
-            reverse('user_profile', args=[unicode(self.course.id), profiled_user.id]),
+            reverse('user_profile', args=[six.text_type(self.course.id), profiled_user.id]),
             data=request_data,
             **headers
         )
@@ -1290,7 +1293,7 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
 
         response = self.client.get(
             reverse('user_profile', kwargs={
-                'course_id': unicode(self.course.id),
+                'course_id': six.text_type(self.course.id),
                 'user_id': self.profiled_user.id,
             }),
             data=params,
@@ -1552,7 +1555,7 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         mock_user.return_value.to_dict.return_value = {}
         reverse_url = "%s%s" % (reverse(
             "forum_form_discussion",
-            kwargs={"course_id": unicode(self.course.id)}), '/forum_form_discussion')
+            kwargs={"course_id": six.text_type(self.course.id)}), '/forum_form_discussion')
         # Test that malicious code does not appear in html
         url = "%s?%s=%s" % (reverse_url, 'sort_key', malicious_code)
         resp = self.client.get(url)
@@ -1575,7 +1578,7 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         mock_request.side_effect = make_mock_request_impl(course=self.course, text='dummy')
 
         url = reverse('user_profile',
-                      kwargs={'course_id': unicode(self.course.id), 'user_id': str(self.student.id)})
+                      kwargs={'course_id': six.text_type(self.course.id), 'user_id': str(self.student.id)})
         # Test that malicious code does not appear in html
         url_string = "%s?%s=%s" % (url, 'page', malicious_code)
         resp = self.client.get(url_string)
@@ -1772,7 +1775,7 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ForumsEnableMixin
         mock_enterprise_customer_for_request.return_value = None
 
         thread_id = 'dummy'
-        course_id = unicode(self.course.id)
+        course_id = six.text_type(self.course.id)
         mock_request.side_effect = make_mock_request_impl(course=self.course, text='dummy', thread_id=thread_id)
 
         for url in (
@@ -1830,7 +1833,7 @@ class CourseDiscussionTopicsTestCase(DividedDiscussionsTestCase):
         """
         Verify that we cannot access divide_discussion_topics if we're a non-staff user.
         """
-        self._verify_non_staff_cannot_access(views.discussion_topics, "GET", [unicode(self.course.id)])
+        self._verify_non_staff_cannot_access(views.discussion_topics, "GET", [six.text_type(self.course.id)])
 
     def test_get_discussion_topics(self):
         """
@@ -1899,10 +1902,10 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
         Verify that we cannot access course_discussions_settings_handler if we're a non-staff user.
         """
         self._verify_non_staff_cannot_access(
-            course_discussions_settings_handler, "GET", [unicode(self.course.id)]
+            course_discussions_settings_handler, "GET", [six.text_type(self.course.id)]
         )
         self._verify_non_staff_cannot_access(
-            course_discussions_settings_handler, "PATCH", [unicode(self.course.id)]
+            course_discussions_settings_handler, "PATCH", [six.text_type(self.course.id)]
         )
 
     def test_update_always_divide_inline_discussion_settings(self):
@@ -2120,7 +2123,7 @@ class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin
             commentable_id=self.category.discussion_id,
         )
         url = '/courses/{0}/discussion/forum/{1}/threads/{2}'.format(
-            unicode(self.course.id),
+            six.text_type(self.course.id),
             self.category.discussion_id,
             self.DUMMY_THREAD_ID
         )
@@ -2138,9 +2141,9 @@ class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin
             'team_id': self.team.id,
             'url': self.DUMMY_URL,
         }
-        expected_event_items = expected_event.items()
+        expected_event_items = list(expected_event.items())
 
         self.assert_event_emission_count('edx.forum.thread.viewed', 1)
         _, event = self.get_latest_call_args()
-        event_items = event.items()
+        event_items = list(event.items())
         self.assertTrue(kv_pair in event_items for kv_pair in expected_event_items)
