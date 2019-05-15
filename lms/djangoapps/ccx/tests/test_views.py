@@ -9,7 +9,8 @@ import re
 
 import ddt
 import six
-import six.moves.urllib.parse
+import six.moves.urllib.parse  # pylint: disable=import-error
+from six.moves import range, zip
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.test import RequestFactory
@@ -20,7 +21,6 @@ from edx_django_utils.cache import RequestCache
 from mock import MagicMock, patch
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
-from six.moves import range, zip
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.courses import get_course_by_id

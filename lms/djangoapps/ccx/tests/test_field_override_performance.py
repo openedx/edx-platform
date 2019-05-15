@@ -11,6 +11,7 @@ import ddt
 import mock
 import pytest
 import six
+from six.moves import range
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib.messages.storage.fallback import FallbackStorage
@@ -20,7 +21,6 @@ from django.test.utils import override_settings
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
-from six.moves import range
 from xblock.core import XBlock
 
 from courseware.testutils import FieldOverrideTestMixin
