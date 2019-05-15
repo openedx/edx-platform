@@ -8,9 +8,9 @@ from itertools import product
 
 import ddt
 import six
+from six.moves.urllib.parse import urlencode  # pylint: disable=import-error
 from django.contrib.auth.models import AnonymousUser
 from django.http import QueryDict
-from six.moves.urllib.parse import urlencode
 
 from openedx.core.djangoapps.util.test_forms import FormTestMixin
 from student.tests.factories import UserFactory

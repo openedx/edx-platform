@@ -8,6 +8,7 @@ from hashlib import md5
 
 import ddt
 import six
+from six.moves import range
 from django.core.exceptions import ImproperlyConfigured
 from django.test import RequestFactory
 from django.test.utils import override_settings
@@ -16,7 +17,6 @@ from edx_django_utils.cache import RequestCache
 from search.tests.test_course_discovery import DemoCourse
 from search.tests.tests import TEST_INDEX_NAME
 from search.tests.utils import SearcherMixin
-from six.moves import range
 from waffle.testutils import override_switch
 
 from course_modes.models import CourseMode
