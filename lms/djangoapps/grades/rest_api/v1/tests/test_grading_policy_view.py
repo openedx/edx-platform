@@ -1,9 +1,12 @@
 """
 Tests for the views
 """
+from __future__ import absolute_import
+
 from datetime import datetime
 
 import ddt
+import six
 from django.urls import reverse
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 from pytz import UTC
@@ -36,7 +39,7 @@ class GradingPolicyTestMixin(object):
     def create_course_data(cls):
         cls.invalid_course_id = 'foo/bar/baz'
         cls.course = CourseFactory.create(display_name='An Introduction to API Testing', raw_grader=cls.raw_grader)
-        cls.course_id = unicode(cls.course.id)
+        cls.course_id = six.text_type(cls.course.id)
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):
             cls.sequential = ItemFactory.create(
                 category="sequential",
@@ -150,7 +153,7 @@ class GradingPolicyTestMixin(object):
             org="MTD",
             default_store=modulestore_type,
         )
-        self.assert_get_for_course(course_id=unicode(course.id))
+        self.assert_get_for_course(course_id=six.text_type(course.id))
 
 
 class CourseGradingPolicyTests(GradingPolicyTestMixin, SharedModuleStoreTestCase):

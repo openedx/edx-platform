@@ -1,6 +1,8 @@
 """
 Define some view level utility functions here that multiple view modules will share
 """
+from __future__ import absolute_import
+
 from contextlib import contextmanager
 
 from django.contrib.auth import get_user_model
