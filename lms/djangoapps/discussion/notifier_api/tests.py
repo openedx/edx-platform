@@ -1,12 +1,15 @@
 # pylint: disable=missing-docstring
 from __future__ import absolute_import
+
 import itertools
 
 import ddt
+import six
 from django.conf import settings
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from opaque_keys.edx.locator import CourseLocator
+from six.moves import range
 
 from lms.djangoapps.discussion.notification_prefs import NOTIFICATION_PREF_KEY
 from lms.djangoapps.discussion.notifier_api.views import NotifierUsersViewSet
@@ -20,8 +23,6 @@ from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-import six
-from six.moves import range
 
 
 @ddt.ddt
