@@ -13,9 +13,7 @@ import re
 
 import mock
 import six
-import six.moves.urllib.error
 import six.moves.urllib.parse
-import six.moves.urllib.request
 from oauthlib.oauth1 import Client
 from six import text_type
 from webob import Response

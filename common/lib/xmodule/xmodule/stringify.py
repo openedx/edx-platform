@@ -29,4 +29,4 @@ def stringify_children(node):
         parts.append(etree.tostring(c, with_tail=True, encoding='unicode'))
 
     # filter removes possible Nones in texts and tails
-    return u''.join([_f for _f in parts if _f])
+    return u''.join([part for part in parts if part])
