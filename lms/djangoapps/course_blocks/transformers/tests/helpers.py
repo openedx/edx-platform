@@ -1,6 +1,7 @@
 """
 Test helpers for testing course block transformers.
 """
+from __future__ import absolute_import
 from mock import patch
 
 from course_modes.models import CourseMode
@@ -14,6 +15,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from ...api import get_course_blocks
+import six
+from six.moves import range
 
 
 class TransformerRegistryTestMixin(object):
@@ -73,7 +76,7 @@ class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
         block_type = block_hierarchy['#type']
         block_ref = block_hierarchy['#ref']
         factory = (CourseFactory if block_type == 'course' else ItemFactory)
-        kwargs = {key: value for key, value in block_hierarchy.iteritems() if key[0] != '#'}
+        kwargs = {key: value for key, value in six.iteritems(block_hierarchy) if key[0] != '#'}
 
         if block_type != 'course':
             kwargs['category'] = block_type

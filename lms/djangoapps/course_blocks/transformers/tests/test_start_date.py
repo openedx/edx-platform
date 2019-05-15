@@ -1,6 +1,7 @@
 """
 Tests for StartDateTransformer.
 """
+from __future__ import absolute_import
 from datetime import timedelta
 
 import ddt
@@ -11,6 +12,7 @@ from courseware.tests.factories import BetaTesterFactory
 
 from ..start_date import DEFAULT_START_DATE, StartDateTransformer
 from .helpers import BlockParentsMapTestCase, update_block
+import six
 
 
 @ddt.ddt
@@ -107,7 +109,7 @@ class StartDateTransformerTestCase(BlockParentsMapTestCase):
             expected_student_visible_blocks,
             blocks_with_differing_student_access
     ):
-        for idx, start_date_type in start_date_type_values.iteritems():
+        for idx, start_date_type in six.iteritems(start_date_type_values):
             block = self.get_block(idx)
             block.start = self.StartDateType.start(start_date_type)
             update_block(block)

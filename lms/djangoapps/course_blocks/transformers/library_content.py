@@ -1,6 +1,7 @@
 """
 Content Library Transformer.
 """
+from __future__ import absolute_import
 import json
 
 from eventtracking import tracker
@@ -15,6 +16,7 @@ from xmodule.library_content_module import LibraryContentModule
 from xmodule.modulestore.django import modulestore
 
 from ..utils import get_student_module_as_dict
+import six
 
 
 class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransformer):
@@ -52,9 +54,9 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
             """ Basic information about the given block """
             orig_key, orig_version = store.get_block_original_usage(usage_key)
             return {
-                "usage_key": unicode(usage_key),
-                "original_usage_key": unicode(orig_key) if orig_key else None,
-                "original_usage_version": unicode(orig_version) if orig_version else None,
+                "usage_key": six.text_type(usage_key),
+                "original_usage_key": six.text_type(orig_key) if orig_key else None,
+                "original_usage_version": six.text_type(orig_version) if orig_version else None,
             }
 
         # For each block check if block is library_content.
@@ -158,7 +160,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
             Helper function to publish an event for analytics purposes
             """
             event_data = {
-                "location": unicode(location),
+                "location": six.text_type(location),
                 "previous_count": previous_count,
                 "result": result,
                 "max_count": max_count,
