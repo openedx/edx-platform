@@ -1,3 +1,6 @@
+"""
+Tests the forum notification views.
+"""
 from __future__ import absolute_import
 
 import json
@@ -27,7 +30,7 @@ from lms.djangoapps.discussion.django_comment_client.tests.group_id import (
     GroupIdAssertionMixin,
     NonCohortedTopicGroupIdTestMixin
 )
-from lms.djangoapps.discussion.django_comment_client.tests.six.text_type import UnicodeTestMixin
+from lms.djangoapps.discussion.django_comment_client.tests.unicode import UnicodeTestMixin
 from lms.djangoapps.discussion.django_comment_client.tests.utils import (
     CohortedTestCase,
     ForumsEnableMixin,
