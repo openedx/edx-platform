@@ -87,7 +87,7 @@ class BulkEnrollView(APIView):
                 'action': serializer.data.get('action'),
                 'courses': {}
             }
-            for course_id, cohort_name in itertools.zip_longest(serializer.data.get('courses'),
+            for course_id, cohort_name in itertools.izip_longest(serializer.data.get('courses'),
                                                                  serializer.data.get('cohorts', [])):
                 response = students_update_enrollment(self.request, course_id=course_id)
                 response_content = json.loads(response.content)
