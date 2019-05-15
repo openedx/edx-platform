@@ -1,20 +1,25 @@
 from __future__ import absolute_import
+
 import json
 import logging
 from datetime import datetime
 
 import ddt
-from django.urls import reverse
+import six
 from django.http import Http404
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
 from django.utils import translation
 from edx_django_utils.cache import RequestCache
 from mock import ANY, Mock, call, patch
 from six import text_type
+from six.moves import range
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from lms.djangoapps.discussion import views
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from lms.djangoapps.discussion.django_comment_client.permissions import get_team
 from lms.djangoapps.discussion.django_comment_client.tests.group_id import (
@@ -30,19 +35,16 @@ from lms.djangoapps.discussion.django_comment_client.tests.utils import (
     topic_name_to_id
 )
 from lms.djangoapps.discussion.django_comment_client.utils import strip_none
-from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
-from lms.djangoapps.discussion import views
-from lms.djangoapps.discussion.views import _get_discussion_default_topic_id
-from lms.djangoapps.discussion.views import course_discussions_settings_handler
+from lms.djangoapps.discussion.views import _get_discussion_default_topic_id, course_discussions_settings_handler
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
 from openedx.core.djangoapps.course_groups.tests.test_views import CohortViewsTestCase
 from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientPaginatedResult
 from openedx.core.djangoapps.django_comment_common.models import (
-    CourseDiscussionSettings,
-    ForumsConfig,
     FORUM_ROLE_STUDENT,
+    CourseDiscussionSettings,
+    ForumsConfig
 )
 from openedx.core.djangoapps.django_comment_common.utils import ThreadContext, seed_permissions_roles
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
@@ -60,8 +62,6 @@ from xmodule.modulestore.tests.django_utils import (
     SharedModuleStoreTestCase
 )
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
-import six
-from six.moves import range
 
 log = logging.getLogger(__name__)
 
