@@ -1,6 +1,7 @@
 """
 Tests of the LMS XBlock Mixin
 """
+from __future__ import absolute_import
 import ddt
 
 from lms_xblock.mixin import (
