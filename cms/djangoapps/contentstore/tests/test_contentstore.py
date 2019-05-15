@@ -1118,7 +1118,7 @@ class MiscCourseTests(ContentStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         # check that /static/ has been converted to the full path
         # note, we know the link it should be because that's what in the 'toy' course in the test data
-        asset_key = self.course.id.make_asset_key('asset', 'handouts_sample_handout.txt')
+        asset_key = '/static/handouts/sample_handout.txt'
         self.assertContains(resp, text_type(asset_key))
 
     def test_prefetch_children(self):
