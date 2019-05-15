@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
+
 import logging
 
+import six
+from ccx_keys.locator import CCXLocator
 from django.contrib.auth.models import User
 from django.db import migrations
 from django.http import Http404
 
-from ccx_keys.locator import CCXLocator
 from courseware.courses import get_course_by_id
 from instructor.access import allow_access, revoke_access
-import six
-
 
 log = logging.getLogger("edx.ccx")
 
