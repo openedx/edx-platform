@@ -181,7 +181,7 @@ def xblock_handler(request, usage_key_string):
                     return JsonResponse(ancestor_info)
                 # TODO: pass fields to _get_module_info and only return those
                 with modulestore().bulk_operations(usage_key.course_key):
-                    response = _get_module_info(_get_xblock(usage_key, request.user))
+                    response = _get_module_info(_get_xblock(usage_key, request.user), rewrite_static_links=False)
                 return JsonResponse(response)
             else:
                 return HttpResponse(status=406)
