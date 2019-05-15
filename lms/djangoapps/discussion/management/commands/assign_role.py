@@ -1,9 +1,9 @@
 # pylint: disable=missing-docstring
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
-from __future__ import absolute_import
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
+
 from openedx.core.djangoapps.django_comment_common.models import Role
 
 

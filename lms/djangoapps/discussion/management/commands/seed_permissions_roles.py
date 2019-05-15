@@ -3,8 +3,10 @@
 Management command to seed default permissions and roles.
 """
 from __future__ import absolute_import
+
 from django.core.management.base import BaseCommand
 from opaque_keys.edx.keys import CourseKey
+
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 
 
