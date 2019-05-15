@@ -3,7 +3,7 @@ Certificate tool in the student support app.
 """
 from __future__ import absolute_import
 
-from six.moves.urllib import parse
+from six.moves.urllib.parse import unquote, quote_plus
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 
@@ -32,7 +32,7 @@ class CertificatesSupportView(View):
     def get(self, request):
         """Render the certificates support view. """
         context = {
-            "user_filter": parse.unquote(parse.quote_plus(request.GET.get("user", ""))),
+            "user_filter": unquote(quote_plus(request.GET.get("user", ""))),
             "course_filter": request.GET.get("course_id", "")
         }
         return render_to_response("support/certificates.html", context)
