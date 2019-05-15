@@ -23,10 +23,10 @@ DISCOUNT_APPLICABILITY_FLAG = WaffleFlag(
 )
 
 
-def can_recieve_discount(user, course_key_string):  # pylint: disable=unused-argument
+def can_receive_discount(user, course_key_string):  # pylint: disable=unused-argument
     """
     Check all the business logic about whether this combination of user and course
-    can recieve a discount.
+    can receive a discount.
     """
     # Always disable discounts until we are ready to enable this feature
     if not DISCOUNT_APPLICABILITY_FLAG.is_enabled():
