@@ -1,7 +1,8 @@
 """
 Course Goals Python API
 """
-import models
+from __future__ import absolute_import
+from . import models
 from six import text_type
 
 from opaque_keys.edx.keys import CourseKey
