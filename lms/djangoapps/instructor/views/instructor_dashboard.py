@@ -25,7 +25,7 @@ from six import text_type
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
-from bulk_email.models import BulkEmailFlag
+from bulk_email.api import is_bulk_email_feature_enabled
 from class_dashboard.dashboard_data import get_array_section_has_problem, get_section_display_name
 from course_modes.models import CourseMode, CourseModesArchive
 from courseware.access import has_access
@@ -164,7 +164,7 @@ def instructor_dashboard_2(request, course_id):
         sections.insert(3, _section_extensions(course))
 
     # Gate access to course email by feature flag & by course-specific authorization
-    if BulkEmailFlag.feature_enabled(course_key):
+    if is_bulk_email_feature_enabled(course_key):
         sections.append(_section_send_email(course, access))
 
     # Gate access to Metrics tab by featue flag and staff authorization

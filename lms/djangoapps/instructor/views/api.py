@@ -44,7 +44,8 @@ from submissions import api as sub_api  # installed from the edx-submissions rep
 import instructor_analytics.basic
 import instructor_analytics.csvs
 import instructor_analytics.distributions
-from bulk_email.models import BulkEmailFlag, CourseEmail
+from bulk_email.api import is_bulk_email_feature_enabled
+from bulk_email.models import CourseEmail
 from courseware.access import has_access
 from courseware.courses import get_course_by_id, get_course_with_access
 from courseware.models import StudentModule
@@ -2692,7 +2693,7 @@ def send_email(request, course_id):
     """
     course_id = CourseKey.from_string(course_id)
 
-    if not BulkEmailFlag.feature_enabled(course_id):
+    if not is_bulk_email_feature_enabled(course_id):
         log.warning(u'Email is not enabled for course %s', course_id)
         return HttpResponseForbidden("Email is not enabled for this course.")
 

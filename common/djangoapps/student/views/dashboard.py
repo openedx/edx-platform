@@ -23,7 +23,8 @@ from pytz import UTC
 from six import iteritems, text_type
 
 import track.views
-from bulk_email.models import BulkEmailFlag, Optout  # pylint: disable=import-error
+from bulk_email.api import is_bulk_email_feature_enabled
+from bulk_email.models import Optout  # pylint: disable=import-error
 from course_modes.models import CourseMode
 from courseware.access import has_access
 from edxmako.shortcuts import render_to_response, render_to_string
@@ -755,7 +756,7 @@ def student_dashboard(request):
     # only show email settings for Mongo course and when bulk email is turned on
     show_email_settings_for = frozenset(
         enrollment.course_id for enrollment in course_enrollments if (
-            BulkEmailFlag.feature_enabled(enrollment.course_id)
+            is_bulk_email_feature_enabled(enrollment.course_id)
         )
     )
 
