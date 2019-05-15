@@ -2,16 +2,17 @@
 Mixins classes being used by all test classes within this folder
 """
 from __future__ import absolute_import
+
 from datetime import datetime
 
 from pytz import UTC
+from six.moves import range
 
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
-from six.moves import range
 
 
 class GradeViewTestMixin(SharedModuleStoreTestCase):

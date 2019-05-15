@@ -2,9 +2,11 @@
 Tests for the views
 """
 from __future__ import absolute_import
+
 from datetime import datetime
 
 import ddt
+import six
 from django.urls import reverse
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 from pytz import UTC
@@ -15,7 +17,6 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-import six
 
 
 @ddt.ddt

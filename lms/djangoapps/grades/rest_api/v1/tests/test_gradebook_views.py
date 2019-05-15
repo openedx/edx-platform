@@ -1,9 +1,8 @@
 """
 Tests for the course grading API view
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
-from __future__ import absolute_import
 import json
 from collections import OrderedDict, namedtuple
 from datetime import datetime
@@ -19,6 +18,7 @@ from rest_framework.test import APITestCase
 from six import text_type
 
 from course_modes.models import CourseMode
+from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory
 from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
 from lms.djangoapps.grades.constants import GradeOverrideFeatureEnum
@@ -29,14 +29,10 @@ from lms.djangoapps.grades.models import (
     BlockRecordList,
     PersistentSubsectionGrade,
     PersistentSubsectionGradeOverride,
-    PersistentSubsectionGradeOverrideHistory,
+    PersistentSubsectionGradeOverrideHistory
 )
 from lms.djangoapps.grades.rest_api.v1.tests.mixins import GradeViewTestMixin
 from lms.djangoapps.grades.rest_api.v1.views import CourseEnrollmentPagination
-from lms.djangoapps.certificates.models import (
-    GeneratedCertificate,
-    CertificateStatuses,
-)
 from lms.djangoapps.grades.subsection_grade import ReadSubsectionGrade
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
