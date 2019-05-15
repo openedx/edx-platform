@@ -1,6 +1,7 @@
 """
 Defines an endpoint for gradebook data related to a course.
 """
+from __future__ import absolute_import
 import logging
 from collections import namedtuple
 from contextlib import contextmanager
@@ -67,6 +68,7 @@ from track.event_transaction_utils import (
 )
 from xmodule.modulestore.django import modulestore
 from xmodule.util.misc import get_default_short_labeler
+import six
 
 log = logging.getLogger(__name__)
 
@@ -740,8 +742,8 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
                 only_if_higher=False,
                 expected_modified_time=to_timestamp(override.modified),
                 score_deleted=False,
-                event_transaction_id=unicode(get_event_transaction_id()),
-                event_transaction_type=unicode(get_event_transaction_type()),
+                event_transaction_id=six.text_type(get_event_transaction_id()),
+                event_transaction_type=six.text_type(get_event_transaction_type()),
                 score_db_table=grades_constants.ScoreDatabaseTableEnum.overrides,
                 force_update_subsections=True,
             )

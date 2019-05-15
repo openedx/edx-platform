@@ -1,6 +1,7 @@
 """
 Mixins classes being used by all test classes within this folder
 """
+from __future__ import absolute_import
 from datetime import datetime
 
 from pytz import UTC
@@ -10,6 +11,7 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
+from six.moves import range
 
 
 class GradeViewTestMixin(SharedModuleStoreTestCase):
@@ -98,7 +100,7 @@ class GradeViewTestMixin(SharedModuleStoreTestCase):
         # create a problem for each type and minimum count needed by the grading policy
         # A section is not considered if the student answers less than "min_count" problems
         for grading_type, min_count in (("Homework", 12), ("Lab", 12), ("Midterm Exam", 1), ("Final Exam", 1)):
-            for num in xrange(min_count):
+            for num in range(min_count):
                 section = ItemFactory.create(
                     category='sequential',
                     parent_location=chapter.location,
