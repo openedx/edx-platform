@@ -2,17 +2,18 @@
 Course Goals Models
 """
 from __future__ import absolute_import
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
-from opaque_keys.edx.django.models import CourseKeyField
 from model_utils import Choices
+from opaque_keys.edx.django.models import CourseKeyField
 
-from .api import add_course_goal, remove_course_goal
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment
 
+from .api import add_course_goal, remove_course_goal
 
 # Each goal is represented by a goal key and a string description.
 GOAL_KEY_CHOICES = Choices(
