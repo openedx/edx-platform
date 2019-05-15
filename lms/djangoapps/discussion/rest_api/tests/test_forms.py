@@ -2,13 +2,14 @@
 Tests for Discussion API forms
 """
 from __future__ import absolute_import
+
 import itertools
 from unittest import TestCase
-from six.moves.urllib.parse import urlencode
 
 import ddt
 from django.http import QueryDict
 from opaque_keys.edx.locator import CourseLocator
+from six.moves.urllib.parse import urlencode
 
 from lms.djangoapps.discussion.rest_api.forms import CommentListGetForm, ThreadListGetForm
 from openedx.core.djangoapps.util.test_forms import FormTestMixin

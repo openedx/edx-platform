@@ -2,8 +2,10 @@
 Discussion API forms
 """
 from __future__ import absolute_import
-import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 from django.core.exceptions import ValidationError
 from django.forms import BooleanField, CharField, ChoiceField, Form, IntegerField
 from opaque_keys import InvalidKeyError
@@ -13,7 +15,10 @@ from six import text_type
 
 from courseware.courses import get_course_with_access
 from openedx.core.djangoapps.django_comment_common.models import (
-    Role, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_GROUP_MODERATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_GROUP_MODERATOR,
+    FORUM_ROLE_MODERATOR,
+    Role
 )
 from openedx.core.djangoapps.util.forms import ExtendedNullBooleanField, MultiValueField
 

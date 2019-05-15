@@ -2,22 +2,25 @@
 Tests for Discussion API internal interface
 """
 from __future__ import absolute_import
+
 import itertools
 from datetime import datetime, timedelta
-from six.moves.urllib.parse import urlencode
-from six.moves.urllib.parse import parse_qs, urlparse, urlunparse
 
 import ddt
 import httpretty
 import mock
+import six
 from django.core.exceptions import ValidationError
 from django.test.client import RequestFactory
 from opaque_keys.edx.locator import CourseLocator
 from pytz import UTC
 from rest_framework.exceptions import PermissionDenied
+from six.moves import range
+from six.moves.urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from courseware.tests.factories import BetaTesterFactory, StaffFactory
+from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
 from lms.djangoapps.discussion.rest_api import api
 from lms.djangoapps.discussion.rest_api.api import (
     create_comment,
@@ -33,7 +36,9 @@ from lms.djangoapps.discussion.rest_api.api import (
     update_thread
 )
 from lms.djangoapps.discussion.rest_api.exceptions import (
-    CommentNotFoundError, DiscussionDisabledError, ThreadNotFoundError,
+    CommentNotFoundError,
+    DiscussionDisabledError,
+    ThreadNotFoundError
 )
 from lms.djangoapps.discussion.rest_api.tests.utils import (
     CommentsServiceMockMixin,
@@ -41,7 +46,8 @@ from lms.djangoapps.discussion.rest_api.tests.utils import (
     make_minimal_cs_thread,
     make_paginated_api_response
 )
-from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
+from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
+from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
@@ -49,8 +55,6 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_STUDENT,
     Role
 )
-from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
-from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.lib.exceptions import CourseNotFoundError, PageNotFoundError
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
@@ -59,8 +63,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
-import six
-from six.moves import range
 
 
 def _remove_discussion_tab(course, user_id):

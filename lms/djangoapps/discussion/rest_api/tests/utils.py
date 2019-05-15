@@ -1,9 +1,8 @@
 """
 Discussion API test utilities
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
-from __future__ import absolute_import
 import hashlib
 import json
 import re
@@ -11,13 +10,13 @@ from contextlib import closing
 from datetime import datetime
 
 import httpretty
+import six
 from PIL import Image
 from pytz import UTC
 
 from openedx.core.djangoapps.profile_images.images import create_profile_images
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
-import six
 
 
 def _get_thread_callback(thread_data):
