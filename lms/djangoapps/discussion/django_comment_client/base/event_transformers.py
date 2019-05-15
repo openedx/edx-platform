@@ -2,6 +2,7 @@
 """
 Transformers for Discussion-related events.
 """
+from __future__ import absolute_import
 from django.contrib.auth.models import User
 from django.urls import reverse, NoReverseMatch
 
@@ -17,6 +18,7 @@ from track.views.segmentio import (
     BI_SCREEN_VIEWED_EVENT_NAME,
     FORUM_THREAD_VIEWED_EVENT_LABEL
 )
+import six
 
 
 def _get_string(dictionary, key, del_if_bad=True):
@@ -29,7 +31,7 @@ def _get_string(dictionary, key, del_if_bad=True):
     """
     if key in dictionary:
         value = dictionary[key]
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             return value
         else:
             if del_if_bad:
