@@ -203,7 +203,7 @@ class LmsBlockMixin(XBlockMixin):
         has_invalid_groups = False
         block_is_unit = is_unit(self)
 
-        for user_partition_id, group_ids in six.iteritems(self.group_access):  # pylint: disable=no-member
+        for user_partition_id, group_ids in six.iteritems(self.group_access):
             try:
                 user_partition = self._get_user_partition(user_partition_id)
             except NoSuchUserPartitionError:
