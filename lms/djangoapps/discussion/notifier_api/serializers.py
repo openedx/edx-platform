@@ -1,4 +1,5 @@
 # pylint: disable=missing-docstring
+from __future__ import absolute_import
 from django.contrib.auth.models import User
 from django.http import Http404
 from rest_framework import serializers
@@ -6,6 +7,7 @@ from rest_framework import serializers
 from lms.djangoapps.discussion.notification_prefs import NOTIFICATION_PREF_KEY
 from openedx.core.djangoapps.course_groups.cohorts import is_course_cohorted
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+import six
 
 
 class NotifierUserSerializer(serializers.ModelSerializer):
@@ -53,7 +55,7 @@ class NotifierUserSerializer(serializers.ModelSerializer):
         for enrollment in user.courseenrollment_set.all():
             if enrollment.is_active:
                 try:
-                    ret[unicode(enrollment.course_id)] = {
+                    ret[six.text_type(enrollment.course_id)] = {
                         "cohort_id": cohort_id_map.get(enrollment.course_id),
                         "see_all_cohorts": (
                             enrollment.course_id in see_all_cohorts_set or
