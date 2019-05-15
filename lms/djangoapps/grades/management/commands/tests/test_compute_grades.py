@@ -17,6 +17,7 @@ from lms.djangoapps.grades.management.commands import compute_grades
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from six.moves import range
 
 
 @ddt.ddt
