@@ -2,6 +2,7 @@
 Tests for the LTI outcome service handlers, both in outcomes.py and in tasks.py
 """
 
+from __future__ import absolute_import
 from django.test import TestCase
 from lxml import etree
 from mock import ANY, MagicMock, patch

@@ -2,6 +2,7 @@
 Tests for the LTI user management functionality
 """
 
+from __future__ import absolute_import
 import string
 
 from django.contrib.auth.models import User
@@ -13,6 +14,7 @@ from mock import MagicMock, patch, PropertyMock
 import lti_provider.users as users
 from lti_provider.models import LtiConsumer, LtiUser
 from student.tests.factories import UserFactory
+from six.moves import range
 
 
 class UserManagementHelperTest(TestCase):
