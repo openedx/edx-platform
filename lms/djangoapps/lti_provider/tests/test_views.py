@@ -3,9 +3,11 @@ Tests for the LTI provider views
 """
 
 from __future__ import absolute_import
-from django.urls import reverse
+
+import six
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.urls import reverse
 from mock import MagicMock, patch
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
@@ -13,7 +15,6 @@ from courseware.testutils import RenderXBlockTestMixin
 from lti_provider import models, views
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-import six
 
 LTI_DEFAULT_PARAMS = {
     'roles': u'Instructor,urn:lti:instrole:ims/lis/Administrator',

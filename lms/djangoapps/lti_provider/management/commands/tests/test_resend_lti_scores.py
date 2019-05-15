@@ -4,6 +4,8 @@ Test lti_provider management commands.
 
 
 from __future__ import absolute_import
+
+import six
 from django.test import TestCase
 from mock import patch
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -14,7 +16,6 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.utils import TEST_DATA_DIR
 from xmodule.modulestore.xml_importer import import_course_from_xml
-import six
 
 
 class CommandArgsTestCase(TestCase):
