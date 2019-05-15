@@ -33,3 +33,12 @@ class CourseEnrollmentResponseStatuses(object):
         NOT_FOUND,
         INTERNAL_ERROR,
     )
+
+
+class CourseRunProgressStatuses(object):
+    """
+    Class to group statuses that a course run can be in with respect to user progress.
+    """
+    IN_PROGRESS = 'in_progress'
+    UPCOMING = 'upcoming'
+    COMPLETED = 'completed'
