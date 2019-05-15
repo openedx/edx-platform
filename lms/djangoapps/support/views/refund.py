@@ -10,6 +10,7 @@ with an E-Commerce service that supports automatic refunds.  Once that
 transition is complete, we can remove this view.
 
 """
+from __future__ import absolute_import
 import logging
 
 from django import forms
@@ -81,7 +82,7 @@ class RefundForm(forms.Form):
             # this is a two-step form: first look up the data, then issue the refund.
             # first time through, set the hidden "confirmed" field to true and then redisplay the form
             # second time through, do the unenrollment/refund.
-            data = dict(self.data.items())
+            data = dict(list(self.data.items()))
             self.cleaned_data['confirmed'] = data['confirmed'] = 'true'
             self.data = data
             is_valid = False
