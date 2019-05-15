@@ -25,7 +25,7 @@
                 <form action="{{import_url}}" method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
                     <label class="submit btn btn-brand">
-                        <input id="{{id}}-file" type="file" name="csv" style="display:none" accept=".csv">
+                        <input class="file-input" type="file" name="csv" style="display:none" accept=".csv">
                         Import Scores
                     </label> <small id="{{id}}-filename"></small>
                 </form>
@@ -75,35 +75,6 @@
             }
         });
     };
-    $('#{{id}}-file').change(function(e){
-        var firstFile = $('#{{id}}-file')[0].files[0];
-        if (firstFile == undefined) {
-            return;
-        }
-        var formData = new FormData();
-        formData.append('csrfmiddlewaretoken', '{{csrf_token}}');
-        formData.append('csv', firstFile);
-
-        $('#{{id}}-filename').html(firstFile.name);
-        $('#{{id}}-status').hide();
-        $('#{{id}}-spinner').show();
-        $.ajax({
-               url : '{{import_url}}',
-               type : 'POST',
-               data : formData,
-               processData: false,  // tell jQuery not to process the data
-               contentType: false,  // tell jQuery not to set contentType
-               success : function(data) {
-                    $('#{{id}}-file').val('');
-                    if (data.waiting) {
-                        setTimeout(function(){pollResults('{{id}}', data.result_id)}, 1000);
-                    } else {
-                        doneLoading('{{id}}', data);
-                    }
-               }
-        });
-
-    });
 </script>
 {% else %}
 {% endif %}

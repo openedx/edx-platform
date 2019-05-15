@@ -86,6 +86,11 @@ class StaffGradedBlock(StudioEditableXBlockMixin, ScorableXBlockMixin, XBlock):
             context['export_url'] = self.runtime.handler_url(self, "csv_export_handler")
             context['poll_url'] = self.runtime.handler_url(self, "get_results_handler")
             context['csrf_token'] = get_token(get_current_request())
+            fragment.add_javascript(loader.load_unicode('js/src/staff-graded-problem/index.js'))
+            fragment.initialize_js('StaffGradedProblem',
+                                   json_args={k: context[k]
+                                              for k
+                                              in ('csrf_token', 'import_url', 'export_url', 'poll_url', 'id')})
 
         try:
             score = self.runtime.service(self, "grade_utils").get_score(self.location, self.runtime.user_id) or {}
