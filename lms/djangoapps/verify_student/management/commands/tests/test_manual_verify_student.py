@@ -3,17 +3,19 @@ Tests for django admin commands in the verify_student module
 
 """
 from __future__ import absolute_import
+
 import logging
 import os
 import tempfile
 
-from django.core.management import call_command, CommandError
+import six
+from django.core.management import CommandError, call_command
 from django.test import TestCase
+from testfixtures import LogCapture
+
 from lms.djangoapps.verify_student.models import ManualVerification
 from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
 from student.tests.factories import UserFactory
-from testfixtures import LogCapture
-import six
 
 LOGGER_NAME = 'lms.djangoapps.verify_student.management.commands.manual_verifications'
 
