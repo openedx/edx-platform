@@ -16,7 +16,6 @@ from django.conf import settings
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import reverse
-from django.utils.html import escape
 from opaque_keys.edx.locator import CourseLocator
 from pytz import UTC
 from six import text_type
