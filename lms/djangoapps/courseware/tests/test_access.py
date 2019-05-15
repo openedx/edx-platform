@@ -14,6 +14,7 @@ from ccx_keys.locator import CCXLocator
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.test.utils import override_settings
 from django.urls import reverse
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
@@ -544,6 +545,39 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
             invitation_only=False
         )
         self.assertFalse(access._has_access_course(user, 'enroll', course))
+
+    @override_settings(COURSE_DEFAULT_INVITE_ONLY=False)
+    def test__course_default_invite_only_flag_false(self):
+        """Tests that default value of COURSE_DEFAULT_INVITE_ONLY as False."""
+
+        user = UserFactory.create()
+
+        course = self._mock_course(invitation=True)
+        self.assertFalse(access._has_access_course(user, 'enroll', course))
+
+        course = self._mock_course(invitation=False)
+        self.assertTrue(access._has_access_course(user, 'enroll', course))
+
+    @override_settings(COURSE_DEFAULT_INVITE_ONLY=True)
+    def test__course_default_invite_only_flag_true(self):
+        """Tests that default value of COURSE_DEFAULT_INVITE_ONLY as True."""
+
+        user = UserFactory.create()
+
+        course = self._mock_course(invitation=True)
+        self.assertFalse(access._has_access_course(user, 'enroll', course))
+
+        course = self._mock_course(invitation=False)
+        self.assertFalse(access._has_access_course(user, 'enroll', course))
+
+    def _mock_course(self, invitation):
+        yesterday = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
+        tomorrow = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
+        return Mock(
+            enrollment_start=yesterday, enrollment_end=tomorrow,
+            id=CourseLocator('edX', 'test', '2012_Fall'), enrollment_domain='',
+            invitation_only=invitation
+        )
 
     def test__user_passed_as_none(self):
         """Ensure has_access handles a user being passed as null"""
