@@ -16,10 +16,9 @@ from contextlib import contextmanager
 from datetime import datetime, timedelta
 
 import ddt
-import six
-import six.moves.urllib.error
-import six.moves.urllib.parse
-import six.moves.urllib.request
+from six import text_type
+from six.moves.urllib.parse import quote
+from six.moves import range, zip
 import unicodecsv
 from django.conf import settings
 from django.test.utils import override_settings
@@ -28,8 +27,6 @@ from edx_django_utils.cache import RequestCache
 from freezegun import freeze_time
 from mock import ANY, MagicMock, Mock, patch
 from pytz import UTC
-from six import text_type
-from six.moves import range, zip
 
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
@@ -892,11 +889,11 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.verify_rows_in_csv([
             dict(list(zip(
                 self.csv_header_row,
-                [six.text_type(self.student_1.id), self.student_1.email, self.student_1.username, ENROLLED_IN_COURSE, '0.0']
+                [text_type(self.student_1.id), self.student_1.email, self.student_1.username, ENROLLED_IN_COURSE, '0.0']
             ))),
             dict(list(zip(
                 self.csv_header_row,
-                [six.text_type(self.student_2.id), self.student_2.email, self.student_2.username, ENROLLED_IN_COURSE, '0.0']
+                [text_type(self.student_2.id), self.student_2.email, self.student_2.username, ENROLLED_IN_COURSE, '0.0']
             )))
         ])
 
@@ -919,7 +916,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
             dict(list(zip(
                 header_row,
                 [
-                    six.text_type(self.student_1.id),
+                    text_type(self.student_1.id),
                     self.student_1.email,
                     self.student_1.username,
                     ENROLLED_IN_COURSE,
@@ -929,7 +926,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
             dict(list(zip(
                 header_row,
                 [
-                    six.text_type(self.student_2.id),
+                    text_type(self.student_2.id),
                     self.student_2.email,
                     self.student_2.username,
                     ENROLLED_IN_COURSE,
@@ -957,7 +954,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.assertTrue(any('grade_report_err' in item[0] for item in report_store.links_for(self.course.id)))
         self.verify_rows_in_csv([
             {
-                u'Student ID': six.text_type(student.id),
+                u'Student ID': text_type(student.id),
                 u'Email': student.email,
                 u'Username': student.username,
                 u'error_msg': error_message if error_message else "Unknown error"
@@ -987,7 +984,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
             dict(list(zip(
                 header_row,
                 [
-                    six.text_type(self.student_1.id),
+                    text_type(self.student_1.id),
                     self.student_1.email,
                     self.student_1.username,
                     ENROLLED_IN_COURSE,
@@ -997,7 +994,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
             dict(list(zip(
                 header_row,
                 [
-                    six.text_type(self.student_2.id),
+                    text_type(self.student_2.id),
                     self.student_2.email,
                     self.student_2.username,
                     ENROLLED_IN_COURSE,
@@ -1007,7 +1004,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
             dict(list(zip(
                 header_row,
                 [
-                    six.text_type(inactive_student.id),
+                    text_type(inactive_student.id),
                     inactive_student.email,
                     inactive_student.username,
                     NOT_ENROLLED_IN_COURSE,
@@ -1064,7 +1061,7 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
             dict(list(zip(
                 header_row,
                 [
-                    six.text_type(self.student_a.id),
+                    text_type(self.student_a.id),
                     self.student_a.email,
                     self.student_a.username,
                     ENROLLED_IN_COURSE,
@@ -1074,7 +1071,7 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
             dict(list(zip(
                 header_row,
                 [
-                    six.text_type(self.student_b.id),
+                    text_type(self.student_b.id),
                     self.student_b.email,
                     self.student_b.username,
                     ENROLLED_IN_COURSE,
@@ -1185,7 +1182,7 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
         return dict(list(zip(
             header_row,
             [
-                six.text_type(user.id),
+                text_type(user.id),
                 user.email,
                 user.username,
                 enrollment_status,
@@ -1962,7 +1959,7 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
             self.verify_rows_in_csv(
                 [
                     {
-                        u'Student ID': six.text_type(self.student.id),
+                        u'Student ID': text_type(self.student.id),
                         u'Email': self.student.email,
                         u'Username': self.student.username,
                         u'Grade': '0.13',
@@ -2745,7 +2742,7 @@ class TestInstructorOra2Report(SharedModuleStoreTestCase):
                     return_val = upload_ora2_data(None, None, self.course.id, None, 'generated')
 
                     timestamp_str = datetime.now(UTC).strftime('%Y-%m-%d-%H%M')
-                    course_id_string = six.moves.urllib.parse.quote(text_type(self.course.id).replace('/', '_'))
+                    course_id_string = quote(text_type(self.course.id).replace('/', '_'))
                     filename = u'{}_ORA_data_{}.csv'.format(course_id_string, timestamp_str)
 
                     self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)

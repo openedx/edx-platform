@@ -357,7 +357,7 @@ class CourseGradeReport(object):
         to the headers for this report.
         """
         grade_results = []
-        for assignment_type, assignment_info in six.iteritems(context.graded_assignments):
+        for _, assignment_info in six.iteritems(context.graded_assignments):
 
             subsection_grades, subsection_grades_results = self._user_subsection_grades(
                 course_grade,
@@ -525,7 +525,9 @@ class ProblemGradeReport(object):
         graded_scorable_blocks = cls._graded_scorable_blocks_to_header(course)
 
         # Just generate the static fields for now.
-        rows = [list(header_row.values()) + ['Enrollment Status', 'Grade'] + _flatten(list(graded_scorable_blocks.values()))]
+        rows = [
+            list(header_row.values()) + ['Enrollment Status', 'Grade'] + _flatten(list(graded_scorable_blocks.values()))
+        ]
         error_rows = [list(header_row.values()) + ['error_msg']]
         current_step = {'step': 'Calculating Grades'}
 
