@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Tests for the teams API at the HTTP request level."""
+from __future__ import absolute_import
 import json
 import unittest
 from datetime import datetime
@@ -29,6 +30,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from ..models import CourseTeamMembership
 from ..search_indexes import CourseTeam, CourseTeamIndexer, course_team_post_save_callback
 from .factories import LAST_ACTIVITY_AT, CourseTeamFactory
+from six.moves import range
 
 
 class TestDashboard(SharedModuleStoreTestCase):

@@ -1,5 +1,6 @@
 """Factories for testing the Teams API."""
 
+from __future__ import absolute_import
 from datetime import datetime
 from uuid import uuid4
 

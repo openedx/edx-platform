@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Tests for the teams API at the HTTP request level."""
+from __future__ import absolute_import
 import itertools
 from contextlib import contextmanager
 from datetime import datetime
@@ -179,7 +180,7 @@ class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
 
     @ddt.data(
         *itertools.product(
-            SIGNALS.keys(),
+            list(SIGNALS.keys()),
             (('user', True), ('moderator', False))
         )
     )
@@ -202,7 +203,7 @@ class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
             signal = self.SIGNALS[signal_name]
             signal.send(sender=None, user=self.user, post=self.mock_comment(user=self.moderator))
 
-    @ddt.data(*SIGNALS.keys())
+    @ddt.data(*list(SIGNALS.keys()))
     def test_signals_course_context(self, signal_name):
         """Test that `last_activity_at` is not updated when activity takes
         place in discussions outside of a team.

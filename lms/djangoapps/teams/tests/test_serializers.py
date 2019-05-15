@@ -2,6 +2,7 @@
 """
 Tests for custom Teams Serializers.
 """
+from __future__ import absolute_import
 from django.core.paginator import Paginator
 from django.test.client import RequestFactory
 
@@ -10,6 +11,8 @@ from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMe
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+import six
+from six.moves import range
 
 
 class SerializerTestCase(SharedModuleStoreTestCase):
@@ -139,13 +142,13 @@ class BaseTopicSerializerTestCase(SerializerTestCase):
         """
         self.course.teams_configuration['topics'] = []
         topics = [
-            {u'name': u'Tøpic {}'.format(i), u'description': u'The bést topic! {}'.format(i), u'id': unicode(i)}
-            for i in xrange(num_topics)
+            {u'name': u'Tøpic {}'.format(i), u'description': u'The bést topic! {}'.format(i), u'id': six.text_type(i)}
+            for i in range(num_topics)
         ]
-        for i in xrange(num_topics):
-            topic_id = unicode(i)
+        for i in range(num_topics):
+            topic_id = six.text_type(i)
             self.course.teams_configuration['topics'].append(topics[i])
-            for _ in xrange(teams_per_topic):
+            for _ in range(teams_per_topic):
                 CourseTeamFactory.create(course_id=self.course.id, topic_id=topic_id)
         return topics
 
@@ -234,13 +237,13 @@ class BulkTeamCountTopicSerializerTestCase(BaseTopicSerializerTestCase):
         """
         self.course.teams_configuration['topics'] = []
         topics = [
-            {u'name': u'Tøpic {}'.format(i), u'description': u'The bést topic! {}'.format(i), u'id': unicode(i)}
-            for i in xrange(num_topics)
+            {u'name': u'Tøpic {}'.format(i), u'description': u'The bést topic! {}'.format(i), u'id': six.text_type(i)}
+            for i in range(num_topics)
         ]
-        for i in xrange(num_topics):
-            topic_id = unicode(i)
+        for i in range(num_topics):
+            topic_id = six.text_type(i)
             self.course.teams_configuration['topics'].append(topics[i])
-            for _ in xrange(teams_per_topic):
+            for _ in range(teams_per_topic):
                 CourseTeamFactory.create(course_id=self.course.id, topic_id=topic_id)
         return topics
 
