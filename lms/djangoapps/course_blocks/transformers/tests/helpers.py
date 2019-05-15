@@ -2,7 +2,10 @@
 Test helpers for testing course block transformers.
 """
 from __future__ import absolute_import
+
+import six
 from mock import patch
+from six.moves import range
 
 from course_modes.models import CourseMode
 from lms.djangoapps.courseware.access import has_access
@@ -15,8 +18,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from ...api import get_course_blocks
-import six
-from six.moves import range
 
 
 class TransformerRegistryTestMixin(object):

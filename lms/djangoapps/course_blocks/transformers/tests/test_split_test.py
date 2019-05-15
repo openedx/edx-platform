@@ -2,6 +2,7 @@
 Tests for SplitTestTransformer.
 """
 from __future__ import absolute_import
+
 import ddt
 
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api

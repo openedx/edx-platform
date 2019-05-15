@@ -3,12 +3,15 @@
 Tests for UserPartitionTransformer.
 """
 from __future__ import absolute_import
+
 import string
 from collections import namedtuple
 from datetime import datetime
 
 import ddt
+import six
 from mock import patch
+from six.moves import range
 
 from course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
@@ -24,8 +27,6 @@ from xmodule.partitions.partitions import Group, UserPartition
 from ...api import get_course_blocks
 from ..user_partitions import UserPartitionTransformer, _MergedGroupAccess
 from .helpers import CourseStructureTestCase, update_block
-import six
-from six.moves import range
 
 
 class UserPartitionTestMixin(object):

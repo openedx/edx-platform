@@ -2,8 +2,10 @@
 Content Library Transformer.
 """
 from __future__ import absolute_import
+
 import json
 
+import six
 from eventtracking import tracker
 
 from courseware.models import StudentModule
@@ -16,7 +18,6 @@ from xmodule.library_content_module import LibraryContentModule
 from xmodule.modulestore.django import modulestore
 
 from ..utils import get_student_module_as_dict
-import six
 
 
 class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransformer):

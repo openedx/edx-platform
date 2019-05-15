@@ -2,6 +2,9 @@
 User Partitions Transformer
 """
 from __future__ import absolute_import
+
+import six
+
 from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangoapps.content.block_structure.transformer import (
     BlockStructureTransformer,
@@ -15,7 +18,6 @@ from xmodule.partitions.partitions_service import (
 
 from .split_test import SplitTestTransformer
 from .utils import get_field_on_block
-import six
 
 
 class UserPartitionTransformer(FilteringTransformerMixin, BlockStructureTransformer):

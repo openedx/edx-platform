@@ -2,14 +2,15 @@
 Tests for HiddenContentTransformer.
 """
 from __future__ import absolute_import
+
 from datetime import timedelta
 
 import ddt
+import six
 from django.utils.timezone import now
 
 from ..hidden_content import HiddenContentTransformer
 from .helpers import BlockParentsMapTestCase, update_block
-import six
 
 
 @ddt.ddt
