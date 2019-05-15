@@ -2,6 +2,7 @@
 Command to delete all rows from the verify_student_historicalverificationdeadline table.
 """
 
+from __future__ import absolute_import
 import logging
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from openedx.core.djangoapps.util.row_delete import delete_rows, BaseDeletionCommand

@@ -1,6 +1,7 @@
 """
 Django admin command to send verification expiry email to learners
 """
+from __future__ import absolute_import
 import logging
 import time
 from datetime import timedelta
