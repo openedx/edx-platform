@@ -1,11 +1,14 @@
 # pylint: disable=missing-docstring
 from __future__ import absolute_import
+
 import json
 import threading
 import unittest
-import six.moves.urllib.request, six.moves.urllib.error, six.moves.urllib.parse
 
 import pytest
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 
 from lms.djangoapps.discussion.django_comment_client.tests.mock_cs_server.mock_cs_server import MockCommentServiceServer
 

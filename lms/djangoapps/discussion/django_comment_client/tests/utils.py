@@ -2,13 +2,16 @@
 Utilities for tests within the django_comment_client module.
 """
 from __future__ import absolute_import
+
 from mock import patch
 
+from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.django_comment_common.models import ForumsConfig, Role
 from openedx.core.djangoapps.django_comment_common.utils import (
-    CourseDiscussionSettings, seed_permissions_roles, set_course_discussion_settings,
+    CourseDiscussionSettings,
+    seed_permissions_roles,
+    set_course_discussion_settings
 )
-from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum

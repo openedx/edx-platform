@@ -1,8 +1,10 @@
 # pylint: skip-file
 from __future__ import absolute_import
+
 import json
-from six.moves.BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from logging import getLogger
+
+from six.moves.BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
 logger = getLogger(__name__)
 
