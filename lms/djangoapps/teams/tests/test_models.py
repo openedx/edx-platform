@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the teams API at the HTTP request level."""
+from __future__ import absolute_import
+
 import itertools
 from contextlib import contextmanager
 from datetime import datetime
@@ -9,6 +11,9 @@ import pytz
 from mock import Mock
 from opaque_keys.edx.keys import CourseKey
 
+from lms.djangoapps.teams import TEAM_DISCUSSION_CONTEXT
+from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from openedx.core.djangoapps.django_comment_common.signals import (
     comment_created,
     comment_deleted,
@@ -20,9 +25,6 @@ from openedx.core.djangoapps.django_comment_common.signals import (
     thread_edited,
     thread_voted
 )
-from lms.djangoapps.teams import TEAM_DISCUSSION_CONTEXT
-from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
-from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -179,7 +181,7 @@ class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
 
     @ddt.data(
         *itertools.product(
-            SIGNALS.keys(),
+            list(SIGNALS.keys()),
             (('user', True), ('moderator', False))
         )
     )
@@ -202,7 +204,7 @@ class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
             signal = self.SIGNALS[signal_name]
             signal.send(sender=None, user=self.user, post=self.mock_comment(user=self.moderator))
 
-    @ddt.data(*SIGNALS.keys())
+    @ddt.data(*list(SIGNALS.keys()))
     def test_signals_course_context(self, signal_name):
         """Test that `last_activity_at` is not updated when activity takes
         place in discussions outside of a team.
