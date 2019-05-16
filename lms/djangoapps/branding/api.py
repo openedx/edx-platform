@@ -12,8 +12,11 @@ are consistent across the LMS and other sites (such as
 the marketing site and blog).
 
 """
+from __future__ import absolute_import
+
 import logging
 
+import six
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse
@@ -23,12 +26,6 @@ from branding.models import BrandingApiConfig
 from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
-try:
-    from urllib import urlencode
-    import urlparse
-except ImportError:
-    from urllib.parse import urlencode   # pylint: disable=ungrouped-imports
-    import urllib.parse as urlparse
 
 log = logging.getLogger("edx.footer")
 EMPTY_URL = '#'
@@ -166,10 +163,10 @@ def _footer_social_links():
         links.append(
             {
                 "name": social_name,
-                "title": unicode(display.get("title", "")),
+                "title": six.text_type(display.get("title", "")),
                 "url": settings.SOCIAL_MEDIA_FOOTER_URLS.get(social_name, "#"),
                 "icon-class": display.get("icon", ""),
-                "action": unicode(display.get("action", "")).format(platform_name=platform_name),
+                "action": six.text_type(display.get("action", "")).format(platform_name=platform_name),
             }
         )
     return links
@@ -322,7 +319,7 @@ def _add_enterprise_marketing_footer_query_params(url):
     if params:
         return "{url}/?{params}".format(
             url=url,
-            params=urlencode(params),
+            params=six.moves.urllib.parse.urlencode(params),
         )
     return url
 
@@ -475,7 +472,7 @@ def _absolute_url(is_secure, url_path):
     """
     site_name = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
     parts = ("https" if is_secure else "http", site_name, url_path, '', '', '')
-    return urlparse.urlunparse(parts)
+    return six.moves.urllib.parse.urlunparse(parts)  # pylint: disable=too-many-function-args
 
 
 def _absolute_url_staticfile(is_secure, name):
@@ -494,7 +491,7 @@ def _absolute_url_staticfile(is_secure, name):
     # In production, the static files URL will be an absolute
     # URL pointing to a CDN.  If this happens, we can just
     # return the URL.
-    if urlparse.urlparse(url_path).netloc:
+    if six.moves.urllib.parse.urlparse(url_path).netloc:
         return url_path
 
     # For local development, the returned URL will be relative,

@@ -1,14 +1,17 @@
 """
 Tests for branding page
 """
+from __future__ import absolute_import
+
 import datetime
 
+import six
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 from pytz import UTC
@@ -127,7 +130,7 @@ class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase, Mi
             emit_signals=True,
         )
 
-        pre_requisite_courses = [unicode(pre_requisite_course.id)]
+        pre_requisite_courses = [six.text_type(pre_requisite_course.id)]
 
         # for this failure to occur, the enrollment window needs to be in the past
         course = CourseFactory.create(
