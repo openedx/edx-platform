@@ -10,6 +10,7 @@ from unittest import skipIf
 
 import ddt
 import six
+from six.moves import range
 from django.conf import settings
 from django.core import mail
 from django.core.mail.message import forbid_multi_line_headers
@@ -19,7 +20,6 @@ from django.urls import reverse
 from django.utils.translation import get_language
 from markupsafe import escape
 from mock import Mock, patch
-from six.moves import range
 
 from bulk_email.models import BulkEmailFlag, Optout
 from bulk_email.tasks import _get_course_email_context, _get_source_address
