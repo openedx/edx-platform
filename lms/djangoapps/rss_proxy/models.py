@@ -1,6 +1,9 @@
 """
 Models for the rss_proxy djangoapp.
 """
+from __future__ import absolute_import
+
+import six
 from django.db import models
 from model_utils.models import TimeStampedModel
 
@@ -19,4 +22,4 @@ class WhitelistedRssUrl(TimeStampedModel):
         app_label = "rss_proxy"
 
     def __unicode__(self):
-        return unicode(self.url)
+        return six.text_type(self.url)

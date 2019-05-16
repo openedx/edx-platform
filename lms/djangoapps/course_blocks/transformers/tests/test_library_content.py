@@ -2,6 +2,10 @@
 Tests for ContentLibraryTransformer.
 """
 
+from __future__ import absolute_import
+
+from six.moves import range
+
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from student.tests.factories import CourseEnrollmentFactory

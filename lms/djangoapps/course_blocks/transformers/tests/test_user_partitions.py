@@ -2,11 +2,15 @@
 """
 Tests for UserPartitionTransformer.
 """
+from __future__ import absolute_import
+
 import string
 from collections import namedtuple
 from datetime import datetime
 
 import ddt
+import six
+from six.moves import range
 from mock import patch
 
 from course_modes.tests.factories import CourseModeFactory
@@ -38,15 +42,15 @@ class UserPartitionTestMixin(object):
         # Set up groups
         self.groups = []
         for group_num in range(1, num_groups + 1):
-            self.groups.append(Group(group_num, 'Group ' + unicode(group_num)))
+            self.groups.append(Group(group_num, 'Group ' + six.text_type(group_num)))
 
         # Set up user partitions
         self.user_partitions = []
         for user_partition_num in range(1, num_user_partitions + 1):
             user_partition = UserPartition(
                 id=user_partition_num,
-                name='Partition ' + unicode(user_partition_num),
-                description='This is partition ' + unicode(user_partition_num),
+                name='Partition ' + six.text_type(user_partition_num),
+                description='This is partition ' + six.text_type(user_partition_num),
                 groups=self.groups,
                 scheme=CohortPartitionScheme,
                 active=active,
@@ -468,7 +472,7 @@ class MergedGroupAccessTestData(UserPartitionTestMixin, CourseStructureTestCase)
         merged_group_access = _MergedGroupAccess(self.user_partitions, block, merged_parents_list)
 
         # convert group_id to groups in user_partition_groups parameter
-        for partition_id, group_id in user_partition_groups.iteritems():
+        for partition_id, group_id in six.iteritems(user_partition_groups):
             user_partition_groups[partition_id] = self.groups[group_id - 1]
 
         self.assertEquals(

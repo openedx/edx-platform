@@ -17,7 +17,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.utils.decorators import method_decorator
 
-from .applicability import can_recieve_discount, discount_percentage
+from .applicability import can_receive_discount, discount_percentage
 
 
 class CourseUserDiscount(DeveloperErrorViewMixin, APIView):
@@ -34,7 +34,7 @@ class CourseUserDiscount(DeveloperErrorViewMixin, APIView):
 
         Body consists of the following fields:
             discount_applicable:
-                whether the user can recieve a discount for this course
+                whether the user can receive a discount for this course
             jwt:
                 the jwt with user information and discount information
 
@@ -65,7 +65,7 @@ class CourseUserDiscount(DeveloperErrorViewMixin, APIView):
         """
         Return the discount percent, if the user has appropriate permissions.
         """
-        discount_applicable = can_recieve_discount(user=request.user, course_key_string=course_key_string)
+        discount_applicable = can_receive_discount(user=request.user, course_key_string=course_key_string)
         discount_percent = discount_percentage()
         payload = {'discount_applicable': discount_applicable, 'discount_percent': discount_percent}
         return Response({

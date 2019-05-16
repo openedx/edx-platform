@@ -1,6 +1,8 @@
 """
 Django admin command to send verification expiry email to learners
 """
+from __future__ import absolute_import
+
 import logging
 import time
 from datetime import timedelta
@@ -14,14 +16,14 @@ from django.urls import reverse
 from django.utils.timezone import now
 from edx_ace import ace
 from edx_ace.recipient import Recipient
-from util.query import use_read_replica_if_available
-from verify_student.message_types import VerificationExpiry
 
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.lib.celery.task_utils import emulate_http_request
+from util.query import use_read_replica_if_available
+from verify_student.message_types import VerificationExpiry
 
 logger = logging.getLogger(__name__)
 

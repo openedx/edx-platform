@@ -2,9 +2,12 @@
 Unit tests for Ecommerce feature flag in new instructor dashboard.
 """
 
+from __future__ import absolute_import
+
 import datetime
 
 import pytz
+import six
 from django.urls import reverse
 from six import text_type
 
@@ -343,7 +346,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         original_mode = CourseMode.objects.get(course_id=self.course.id, mode_slug='honor')
         original_mode.delete()
         new_mode = CourseMode(
-            course_id=unicode(self.course.id), mode_slug='verified',
+            course_id=six.text_type(self.course.id), mode_slug='verified',
             mode_display_name='verified', min_price=10, currency='usd'
         )
         new_mode.save()

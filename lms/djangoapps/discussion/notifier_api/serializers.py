@@ -1,4 +1,7 @@
 # pylint: disable=missing-docstring
+from __future__ import absolute_import
+
+import six
 from django.contrib.auth.models import User
 from django.http import Http404
 from rest_framework import serializers
@@ -53,7 +56,7 @@ class NotifierUserSerializer(serializers.ModelSerializer):
         for enrollment in user.courseenrollment_set.all():
             if enrollment.is_active:
                 try:
-                    ret[unicode(enrollment.course_id)] = {
+                    ret[six.text_type(enrollment.course_id)] = {
                         "cohort_id": cohort_id_map.get(enrollment.course_id),
                         "see_all_cohorts": (
                             enrollment.course_id in see_all_cohorts_set or

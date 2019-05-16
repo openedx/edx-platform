@@ -2,12 +2,13 @@
 """
 Unit tests for instructor.enrollment methods.
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import json
 from abc import ABCMeta
 
 import ddt
+import six
 from ccx_keys.locator import CCXLocator
 from crum import set_current_request
 from django.conf import settings
@@ -64,7 +65,7 @@ class TestSettableEnrollmentState(CacheIsolationTestCase):
         self.assertEqual(mes, ees)
 
 
-class TestEnrollmentChangeBase(CacheIsolationTestCase):
+class TestEnrollmentChangeBase(six.with_metaclass(ABCMeta, CacheIsolationTestCase)):
     """
     Test instructor enrollment administration against database effects.
 
@@ -72,8 +73,6 @@ class TestEnrollmentChangeBase(CacheIsolationTestCase):
     `action` is a function which is run
     the test will pass if `action` mutates state from `before_ideal` to `after_ideal`
     """
-
-    __metaclass__ = ABCMeta
 
     def setUp(self):
         super(TestEnrollmentChangeBase, self).setUp()
