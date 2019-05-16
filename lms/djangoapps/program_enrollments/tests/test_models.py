@@ -6,23 +6,13 @@ from __future__ import absolute_import, unicode_literals
 from uuid import uuid4
 
 from django.test import TestCase
-from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.keys import CourseKey
 from six.moves import range
 from testfixtures import LogCapture
 
-<<<<<<< HEAD
-from course_modes.models import CourseMode
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 from openedx.core.djangoapps.catalog.tests.factories import generate_course_run_key
-from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-=======
-from lms.djangoapps.program_enrollments.models import ProgramEnrollment, ProgramCourseEnrollment
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from openedx.core.djangoapps.catalog.tests.factories import generate_course_run_key
->>>>>>> master
 
 
 class ProgramEnrollmentModelTests(TestCase):
@@ -88,7 +78,7 @@ class ProgramEnrollmentModelTests(TestCase):
 
     def test_user_retirement(self):
         """
-        Test that the external_user_key is uccessfully retired for a user's program enrollments and history.
+        Test that the external_user_key is successfully retired for a user's program enrollments and history.
         """
         new_status = 'withdrawn'
 
