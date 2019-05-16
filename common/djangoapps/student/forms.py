@@ -73,7 +73,7 @@ class PasswordResetFormNoActive(PasswordResetForm):
                 'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
                 'reset_link': '{protocol}://{site}{link}'.format(
                     protocol='https' if use_https else 'http',
-                    site=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
+                    site=site.domain,
                     link=reverse('password_reset_confirm', kwargs={
                         'uidb36': int_to_base36(user.id),
                         'token': token_generator.make_token(user),
