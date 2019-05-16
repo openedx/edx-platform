@@ -365,9 +365,10 @@ def _get_user_profile_dict(request, usernames):
 
         A dict with username as key and user profile details as value.
     """
-    request.GET = request.GET.copy()  # Make a mutable copy of the GET parameters.
-    request.GET['username'] = usernames
-    user_profile_details = AccountViewSet.as_view({'get': 'list'})(request).data
+    req = request._request              # pylint: disable=protected-access
+    req.GET = req.GET.copy()  # Make a mutable copy of the GET parameters.
+    req.GET['username'] = usernames
+    user_profile_details = AccountViewSet.as_view({'get': 'list'})(req).data
 
     return {user['username']: user for user in user_profile_details}
 
