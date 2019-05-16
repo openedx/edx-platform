@@ -784,7 +784,7 @@ def upload(request, course_id):  # ajax upload file to a question or answer
         result = _('Good')
         file_url = file_storage.url(new_file_name)
         parsed_url = six.moves.urllib.parse.urlparse(file_url)
-        file_url = six.moves.urllib.parse.urlunparse(
+        file_url = six.moves.urllib.parse.urlunparse(  # pylint: disable=too-many-function-args
             six.moves.urllib.parse.ParseResult(
                 parsed_url.scheme,
                 parsed_url.netloc,
