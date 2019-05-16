@@ -371,13 +371,13 @@ def get_expiration_banner_text(user, course, language='en'):
         data-datetime="{formatted_date}" data-language="{language}">{formatted_date_localized}</span>'
     formatted_expiration_date = date_string.format(
         language=language,
-        formatted_date=expiration_date.strftime(EXPIRATION_DATE_FORMAT_STR),
+        formatted_date=expiration_date.strftime("%Y-%m-%d"),
         formatted_date_localized=strftime_localized(expiration_date, EXPIRATION_DATE_FORMAT_STR)
     )
     if upgrade_deadline:
         formatted_upgrade_deadline = date_string.format(
             language=language,
-            formatted_date=upgrade_deadline.strftime(EXPIRATION_DATE_FORMAT_STR),
+            formatted_date=upgrade_deadline.strftime("%Y-%m-%d"),
             formatted_date_localized=strftime_localized(upgrade_deadline, EXPIRATION_DATE_FORMAT_STR)
         )
 
