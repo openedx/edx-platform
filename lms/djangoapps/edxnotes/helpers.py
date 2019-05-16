@@ -11,7 +11,7 @@ from uuid import uuid4
 
 import requests
 import six
-from six.moves.urllib.parse import urlencode, urlparse, parse_qs
+from six.moves.urllib.parse import urlencode, urlparse, parse_qs  # pylint: disable=import-error
 from dateutil.parser import parse as dateutil_parse
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
