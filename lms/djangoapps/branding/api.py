@@ -26,12 +26,6 @@ from branding.models import BrandingApiConfig
 from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
-try:
-    from six.moves.urllib.parse import urlencode
-    import six.moves.urllib.parse
-except ImportError:
-    from urllib.parse import urlencode   # pylint: disable=ungrouped-imports
-    import urllib.parse as urlparse
 
 log = logging.getLogger("edx.footer")
 EMPTY_URL = '#'
@@ -325,7 +319,7 @@ def _add_enterprise_marketing_footer_query_params(url):
     if params:
         return "{url}/?{params}".format(
             url=url,
-            params=urlencode(params),
+            params=six.moves.urllib.parse.urlencode(params),
         )
     return url
 
@@ -478,7 +472,7 @@ def _absolute_url(is_secure, url_path):
     """
     site_name = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
     parts = ("https" if is_secure else "http", site_name, url_path, '', '', '')
-    return six.moves.urllib.parse.urlunparse(parts)
+    return six.moves.urllib.parse.urlunparse(parts)  # pylint: disable=too-many-function-args
 
 
 def _absolute_url_staticfile(is_secure, name):

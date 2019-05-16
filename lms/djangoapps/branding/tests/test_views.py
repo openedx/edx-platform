@@ -6,9 +6,7 @@ import json
 
 import ddt
 import mock
-import six.moves.urllib.error
-import six.moves.urllib.parse
-import six.moves.urllib.request
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
