@@ -13,6 +13,7 @@ from openedx.features.course_experience import ENABLE_COURSE_GOALS
 
 from . import models
 
+
 def add_course_goal(user, course_id, goal_key):
     """
     Add a new course goal for the provided user and course. If the goal
