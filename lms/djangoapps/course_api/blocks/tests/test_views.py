@@ -7,9 +7,9 @@ from datetime import datetime
 from string import join
 
 import six
+from six.moves.urllib.parse import urlencode, urlunparse  # pylint: disable=import-error
 from django.urls import reverse
 from opaque_keys.edx.locator import CourseLocator
-from six.moves.urllib.parse import urlencode, urlunparse
 
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory

@@ -5,10 +5,10 @@ from __future__ import absolute_import
 
 import ddt
 import six
+from six.moves.urllib.parse import urlencode  # pylint: disable=import-error
 from django.http import Http404, QueryDict
 from opaque_keys.edx.locator import CourseLocator
 from rest_framework.exceptions import PermissionDenied
-from six.moves.urllib.parse import urlencode
 
 from openedx.core.djangoapps.util.test_forms import FormTestMixin
 from student.models import CourseEnrollment
