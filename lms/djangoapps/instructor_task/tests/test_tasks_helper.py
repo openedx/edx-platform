@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 
 import ddt
 from six import text_type
-from six.moves.urllib.parse import quote
+from six.moves.urllib.parse import quote  # pylint: disable=import-error
 from six.moves import range, zip
 import unicodecsv
 from django.conf import settings
