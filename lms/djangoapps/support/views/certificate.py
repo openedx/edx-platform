@@ -3,7 +3,7 @@ Certificate tool in the student support app.
 """
 from __future__ import absolute_import
 
-from six.moves.urllib.parse import unquote, quote_plus
+from six.moves.urllib.parse import unquote, quote_plus  # pylint: disable=import-error
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 
