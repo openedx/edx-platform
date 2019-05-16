@@ -60,8 +60,9 @@ def evidence_url(user_id, course_key):
     Generates a URL to the user's Certificate HTML view, along with a GET variable that will signal the evidence visit
     event.
     """
+    course_id = six.text_type(course_key)
     return site_prefix() + reverse(
-        'certificates:html_view', kwargs={'user_id': user_id, 'course_id': six.text_type(course_key)}) + '?evidence_visit=1'
+        'certificates:html_view', kwargs={'user_id': user_id, 'course_id': course_id}) + '?evidence_visit=1'
 
 
 def criteria(course_key):

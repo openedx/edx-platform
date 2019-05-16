@@ -4,11 +4,11 @@ Tests the course meta badging events
 from __future__ import absolute_import
 
 import six
+from six.moves import range, zip
 from ddt import data, ddt, unpack
 from django.conf import settings
 from django.test.utils import override_settings
 from mock import patch
-from six.moves import range, zip
 
 from badges.tests.factories import CourseEventBadgesConfigurationFactory, RandomBadgeClassFactory
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
