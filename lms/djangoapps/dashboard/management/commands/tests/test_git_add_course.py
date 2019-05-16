@@ -1,6 +1,8 @@
 """
 Provide tests for git_add_course management command.
 """
+from __future__ import absolute_import
+
 import logging
 import os
 import shutil

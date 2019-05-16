@@ -3,7 +3,7 @@ This module creates a sysadmin dashboard for managing and viewing
 courses.
 """
 from __future__ import absolute_import
-import unicodecsv as csv
+
 import json
 import logging
 import os
@@ -11,6 +11,7 @@ import StringIO
 import subprocess
 
 import mongoengine
+import unicodecsv as csv
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -406,7 +407,7 @@ class Courses(SysadminDashboardView):
                         _('Deleted'), text_type(course.location), text_type(course.id), course.display_name)
 
         context = {
-            'datatable': self.make_datatable(courses.values()),
+            'datatable': self.make_datatable(list(courses.values())),
             'msg': self.msg,
             'djangopid': os.getpid(),
             'modeflag': {'courses': 'active-section'},
