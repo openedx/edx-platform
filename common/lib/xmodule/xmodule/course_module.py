@@ -483,7 +483,9 @@ class CourseFields(object):
             "soon as certificates are generated, enter early_no_info."
         ),
         scope=Scope.settings,
-        default="end"
+        # Appsembler: Defaulting to "early_with_info" rather than edX's "end" to match customers needs
+        # More info on: https://trello.com/c/bi7J0a4z
+        default="early_with_info",
     )
     course_image = String(
         display_name=_("Course About Page Image"),
