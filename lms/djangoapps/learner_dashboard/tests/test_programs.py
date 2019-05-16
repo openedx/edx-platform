@@ -2,23 +2,26 @@
 """
 Unit tests covering the program listing and detail pages.
 """
+from __future__ import absolute_import
+
 import json
 import re
-from urlparse import urljoin
 from uuid import uuid4
 
 import mock
+import six
+from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
 from bs4 import BeautifulSoup
 from django.conf import settings
-from django.urls import reverse, reverse_lazy
 from django.test import override_settings
+from django.urls import reverse, reverse_lazy
 
 from lms.envs.test import CREDENTIALS_PUBLIC_SERVICE_URL
 from openedx.core.djangoapps.catalog.constants import PathwayType
 from openedx.core.djangoapps.catalog.tests.factories import (
-    PathwayFactory,
     CourseFactory,
     CourseRunFactory,
+    PathwayFactory,
     ProgramFactory
 )
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
@@ -57,7 +60,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         super(TestProgramListing, cls).setUpClass()
 
         cls.course = ModuleStoreCourseFactory()
-        course_run = CourseRunFactory(key=unicode(cls.course.id))
+        course_run = CourseRunFactory(key=six.text_type(cls.course.id))
         course = CourseFactory(course_runs=[course_run])
 
         cls.first_program = ProgramFactory(courses=[course])
@@ -193,7 +196,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         super(TestProgramDetails, cls).setUpClass()
 
         modulestore_course = ModuleStoreCourseFactory()
-        course_run = CourseRunFactory(key=unicode(modulestore_course.id))
+        course_run = CourseRunFactory(key=six.text_type(modulestore_course.id))
         course = CourseFactory(course_runs=[course_run])
 
         cls.program_data = ProgramFactory(uuid=cls.program_uuid, courses=[course])

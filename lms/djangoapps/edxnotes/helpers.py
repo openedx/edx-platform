@@ -1,22 +1,24 @@
 """
 Helper methods related to EdxNotes.
 """
+from __future__ import absolute_import
+
 import json
 import logging
-import urlparse
 from datetime import datetime
 from json import JSONEncoder
-from urllib import urlencode
 from uuid import uuid4
 
 import requests
+import six
+from six.moves.urllib.parse import urlencode, urlparse, parse_qs  # pylint: disable=import-error
 from dateutil.parser import parse as dateutil_parse
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse
 from django.utils.translation import ugettext as _
-from opaque_keys.edx.keys import UsageKey
 from oauth2_provider.models import Application
+from opaque_keys.edx.keys import UsageKey
 from requests.exceptions import RequestException
 
 from courseware.access import has_access
@@ -69,7 +71,7 @@ def get_token_url(course_id):
     Returns token url for the course.
     """
     return reverse("get_token", kwargs={
-        "course_id": unicode(course_id),
+        "course_id": six.text_type(course_id),
     })
 
 
@@ -91,7 +93,7 @@ def send_request(user, course_id, page, page_size, path="", text=None):
     url = get_internal_endpoint(path)
     params = {
         "user": anonymous_id_for_user(user, None),
-        "course_id": unicode(course_id).encode("utf-8"),
+        "course_id": six.text_type(course_id).encode("utf-8"),
         "page": page,
         "page_size": page_size,
     }
@@ -247,7 +249,7 @@ def get_module_context(course, item):
     Returns dispay_name and url for the parent module.
     """
     item_dict = {
-        'location': unicode(item.location),
+        'location': six.text_type(item.location),
         'display_name': Text(item.display_name_with_default),
     }
     if item.category == 'chapter' and item.get_parent():
@@ -259,15 +261,15 @@ def get_module_context(course, item):
         section = item.get_parent()
         chapter = section.get_parent()
         # Position starts from 1, that's why we add 1.
-        position = get_index(unicode(item.location), section.children) + 1
+        position = get_index(six.text_type(item.location), section.children) + 1
         item_dict['url'] = reverse('courseware_position', kwargs={
-            'course_id': unicode(course.id),
+            'course_id': six.text_type(course.id),
             'chapter': chapter.url_name,
             'section': section.url_name,
             'position': position,
         })
     if item.category in ('chapter', 'sequential'):
-        item_dict['children'] = [unicode(child) for child in item.children]
+        item_dict['children'] = [six.text_type(child) for child in item.children]
 
     return item_dict
 
@@ -276,7 +278,7 @@ def get_index(usage_key, children):
     """
     Returns an index of the child with `usage_key`.
     """
-    children = [unicode(child) for child in children]
+    children = [six.text_type(child) for child in children]
     return children.index(usage_key)
 
 
@@ -304,8 +306,8 @@ def construct_pagination_urls(request, course_id, api_next_url, api_previous_url
             return None
 
         keys = ('page', 'page_size', 'text')
-        parsed = urlparse.urlparse(url)
-        query_params = urlparse.parse_qs(parsed.query)
+        parsed = urlparse(url)
+        query_params = parse_qs(parsed.query)
 
         encoded_query_params = urlencode({key: query_params.get(key)[0] for key in keys if key in query_params})
         return "{}?{}".format(request.build_absolute_uri(base_url), encoded_query_params)
@@ -349,7 +351,7 @@ def get_notes(request, course, page=DEFAULT_PAGE, page_size=DEFAULT_PAGE_SIZE, t
 
     # Verify response dict structure
     expected_keys = ['total', 'rows', 'num_pages', 'start', 'next', 'previous', 'current_page']
-    keys = collection.keys()
+    keys = list(collection.keys())
     if not keys or not all(key in expected_keys for key in keys):
         log.error(u"Incorrect data received from notes api: collection_data=%s", str(collection))
         raise EdxNotesParseError(_("Incorrect data received from notes api."))
@@ -418,7 +420,7 @@ def get_course_position(course_module):
     If there is no current position in the course or chapter, then selects
     the first child.
     """
-    urlargs = {'course_id': unicode(course_module.id)}
+    urlargs = {'course_id': six.text_type(course_module.id)}
     chapter = get_current_child(course_module, min_depth=1)
     if chapter is None:
         log.debug("No chapter found when loading current position in course")
