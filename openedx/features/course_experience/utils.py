@@ -196,7 +196,7 @@ def get_first_purchase_offer_banner_fragment(user, course):
     if (FIRST_PURCHASE_OFFER_BANNER_DISPLAY.is_enabled() and
             user and
             course and
-            can_receive_discount(user=user, course_key_string=unicode(course.id))):
+            can_receive_discount(user=user, course=course)):
         # Translator: xgettext:no-python-format
         offer_message = _(u'{banner_open}{percentage}% off your first upgrade.{span_close}'
                           u' Discount automatically applied.{div_close}')

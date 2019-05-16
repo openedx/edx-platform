@@ -7,6 +7,8 @@ The Discount API Views should return information about discounts that apply to t
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 
+from opaque_keys.edx.keys import CourseKey
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
@@ -65,7 +67,9 @@ class CourseUserDiscount(DeveloperErrorViewMixin, APIView):
         """
         Return the discount percent, if the user has appropriate permissions.
         """
-        discount_applicable = can_receive_discount(user=request.user, course_key_string=course_key_string)
+        course_key = CourseKey.from_string(course_key_string)
+        course = CourseOverview.get_from_id(course_key)
+        discount_applicable = can_receive_discount(user=request.user, course=course)
         discount_percent = discount_percentage()
         payload = {'discount_applicable': discount_applicable, 'discount_percent': discount_percent}
         return Response({
