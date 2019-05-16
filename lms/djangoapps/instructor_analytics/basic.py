@@ -3,21 +3,24 @@ Student and course analytics.
 
 Serve miscellaneous course and student data
 """
+from __future__ import absolute_import
+
 import datetime
 import json
 
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
-from django.urls import reverse
 from django.db.models import Count, Q
+from django.urls import reverse
 from edx_proctoring.api import get_exam_violation_report
 from opaque_keys.edx.keys import UsageKey
 from six import text_type
 
-from courseware.models import StudentModule
 import xmodule.graders as xmgraders
+from courseware.models import StudentModule
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.grades.api import context as grades_context
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -114,7 +117,7 @@ def sale_order_record_features(course_id, features):
             coupon_codes = [redemption.coupon.code for redemption in coupon_redemption]
             order_item_dict.update({'coupon_code': ", ".join(coupon_codes)})
 
-        sale_order_dict.update(dict(order_item_dict.items()))
+        sale_order_dict.update(dict(list(order_item_dict.items())))
 
         return sale_order_dict
 
@@ -172,7 +175,7 @@ def sale_record_features(course_id, features):
 
         course_reg_dict['course_id'] = text_type(course_id)
         course_reg_dict.update({'codes': ", ".join(codes)})
-        sale_dict.update(dict(course_reg_dict.items()))
+        sale_dict.update(dict(list(course_reg_dict.items())))
 
         return sale_dict
 
@@ -240,7 +243,7 @@ def enrolled_students_features(course_key, features):
             DjangoJSONEncoder().default(attr)
             return attr
         except TypeError:
-            return unicode(attr)
+            return six.text_type(attr)
 
     def extract_student(student, features):
         """ convert student to dictionary """
@@ -528,7 +531,7 @@ def dump_grading_context(course):
     gcontext = grades_context.grading_context_for_course(course)
     msg += "graded sections:\n"
 
-    msg += '%s\n' % gcontext['all_graded_subsections_by_type'].keys()
+    msg += '%s\n' % list(gcontext['all_graded_subsections_by_type'].keys())
     for (gsomething, gsvals) in gcontext['all_graded_subsections_by_type'].items():
         msg += u"--> Section %s:\n" % (gsomething)
         for sec in gsvals:
