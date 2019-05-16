@@ -10,9 +10,9 @@ from uuid import uuid4
 
 import pytz
 import six
-import six.moves.urllib.error
-import six.moves.urllib.parse
-import six.moves.urllib.request
+import six.moves.urllib.error  # pylint: disable=import-error
+import six.moves.urllib.parse  # pylint: disable=import-error
+import six.moves.urllib.request  # pylint: disable=import-error
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import Http404, HttpResponse

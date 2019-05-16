@@ -11,9 +11,9 @@ from functools import wraps
 
 import bleach
 import six
-import six.moves.urllib.error
-import six.moves.urllib.parse
-import six.moves.urllib.request
+import six.moves.urllib.error  # pylint: disable=import-error
+import six.moves.urllib.parse  # pylint: disable=import-error
+import six.moves.urllib.request  # pylint: disable=import-error
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError
@@ -86,7 +86,9 @@ def search_certificates(request):
         ]
 
     """
-    user_filter = bleach.clean(six.moves.urllib.parse.unquote(six.moves.urllib.parse.quote_plus(request.GET.get("user", ""))))
+    # pylint: disable=too-many-function-args
+    unbleached_filter = six.moves.urllib.parse.unquote(six.moves.urllib.parse.quote_plus(request.GET.get("user", "")))
+    user_filter = bleach.clean(unbleached_filter)
     if not user_filter:
         msg = _("user is not given.")
         return HttpResponseBadRequest(msg)
@@ -103,6 +105,7 @@ def search_certificates(request):
         cert["modified"] = cert["modified"].isoformat()
         cert["regenerate"] = not cert['is_pdf_certificate']
 
+    # pylint: disable=redundant-keyword-arg
     course_id = six.moves.urllib.parse.quote_plus(request.GET.get("course_id", ""), safe=':/')
     if course_id:
         try:
