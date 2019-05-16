@@ -9,7 +9,7 @@ from freezegun import freeze_time
 from testfixtures import LogCapture
 from lms.djangoapps.program_enrollments.models import ProgramEnrollment, ProgramCourseEnrollment
 from lms.djangoapps.program_enrollments.tasks import expire_waiting_enrollments, log
-from lms.djangoapps.program_enrollments.api.v1.tests.factories import (
+from lms.djangoapps.program_enrollments.tests.factories import (
     ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
 )
 from student.tests.factories import UserFactory
