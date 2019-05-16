@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """ Commerce app tests package. """
 
+from __future__ import absolute_import
+
 import httpretty
 import mock
 from django.conf import settings

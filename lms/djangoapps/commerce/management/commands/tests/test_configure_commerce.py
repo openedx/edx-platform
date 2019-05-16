@@ -1,6 +1,8 @@
 """
 Tests for management command for enabling commerce configuration.
 """
+from __future__ import absolute_import
+
 from django.core.management import call_command
 from django.test import TestCase
 
