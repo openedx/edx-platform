@@ -2269,7 +2269,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.waffle_utils',
 
     # Course Goals
-    'lms.djangoapps.course_goals',
+    'lms.djangoapps.course_goals.apps.CourseGoalsConfig',
 
     # Features
     'openedx.features.course_bookmarks',
