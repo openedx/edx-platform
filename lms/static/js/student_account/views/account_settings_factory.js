@@ -278,9 +278,10 @@
                             model: userAccountModel,
                             title: gettext(platformData.display_name + ' Link'),
                             valueAttribute: 'social_links',
-                            helpMessage: gettext(
-                                'Enter your ' + platformData.display_name + ' username or the URL to your ' +
-                                platformData.display_name + ' page. Delete the URL to remove the link.'
+                            helpMessage: HtmlUtils.interpolateHtml(gettext(
+                                'Enter your {platformDataName} username or the URL to your ' +
+                                '{platformDataName} page. Delete the URL to remove the link.'),
+                                {platformDataName: platformData.display_name}
                             ),
                             platform: socialPlatform,
                             persistChanges: true,

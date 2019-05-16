@@ -4028,9 +4028,9 @@ msgstr "около часа"
 #, javascript-format
 msgid "about %d hour"
 msgid_plural "about %d hours"
-msgstr[0] "Около %d часа"
-msgstr[1] "Около %d часов "
-msgstr[2] "Около %d часов"
+msgstr[0] "около %d часа"
+msgstr[1] "около %d часов "
+msgstr[2] "около %d часов"
 msgstr[3] "около %d часов"
 
 #: common/static/js/src/jquery.timeago.locale.js
@@ -6283,6 +6283,14 @@ msgstr ""
 "Support{link_end}."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"Enter your {platformDataName} username or the URL to your "
+"{platformDataName} page. Delete the URL to remove the link."
+msgstr ""
+"Введите ваш {platformDataName} логин или URL на вашу "
+"страницу в {platformDataName} . Для удаления URL удалите ссылку."
+
+#: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Email Address (Sign In)"
 msgstr "Адрес электронной почты (Вход)"
 
@@ -6789,7 +6797,7 @@ msgstr "Полный профиль"
 
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Joined"
-msgstr "Присоеденился"
+msgstr "Присоединился"
 
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Joined Date"

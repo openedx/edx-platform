@@ -7015,6 +7015,12 @@ msgstr ""
 "Ошибка - не удалось открыть курс с идентификатором {0}<br/><pre>{1}</pre>"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
+msgid "Error - cannot get course with ID {0}."
+msgstr ""
+"Ошибка - не удалось найти курс с идентификатором {0}."
+
+#: lms/djangoapps/dashboard/sysadmin.py
 msgid "Deleted"
 msgstr "Удалено"
 
@@ -13181,7 +13187,7 @@ msgstr "Ход курса:"
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Courses"
-msgstr "курсов"
+msgstr "Мои курсы"
 
 #: cms/templates/login.html themes/red-theme/cms/templates/login.html
 msgid "Sign In to {studio_name}"
@@ -16800,8 +16806,8 @@ msgstr "Содержимое курса ещё не добавлено"
 #: lms/templates/courseware/courseware.html
 #, python-format
 msgid ""
-"To access course materials, you must score {required_score}% or higher on "
-"this                     exam. Your current score is {current_score}%."
+"To access course materials, you must score {required_score}% or higher on this "
+"exam. Your current score is {current_score}%."
 msgstr ""
 "Для доступа к материалам курса вам необходимо получить {required_score}% или"
 " более. Ваша текущая оценка: {current_score}%."
@@ -20957,6 +20963,14 @@ msgstr "Изменить свой пароль на {platform_name}"
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Invalid Password Reset Link"
 msgstr "Неверная ссылка для сброса пароля"
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid "This password reset link is invalid. It may have been used already. "
+"To reset your password, go to the {start_link}sign-in{end_link} page and "
+"select {start_strong}Forgot password{end_strong}."
+msgstr "Эта ссылка для сброса пароля недействительна. Возможно, она уже была использована. "
+"Чтобы сбросить пароль, перейдите на {start_link}страницу входа{end_link} и выберите "
+"{start_strong}Забыли пароль{end_strong}."
 
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"
@@ -26904,7 +26918,7 @@ msgid ""
 "      "
 msgstr ""
 "\n"
-"Там %(articles_plur_verb)s%(cnt)s%(articles_plur)s в этом уровне "
+"На данном уровне %(cnt)s%(articles_plur)s %(articles_plur_verb)s"
 
 #: wiki/templates/wiki/dir.html
 msgid "Last modified"
