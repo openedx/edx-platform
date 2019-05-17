@@ -84,7 +84,7 @@ distlib==0.2.9.post0      # via caniusepython3
 django-appconf==1.0.3
 django-babel-underscore==0.5.2
 django-babel==0.6.2
-django-classy-tags==0.8.0
+django-classy-tags==0.9.0
 django-config-models==1.0.1
 django-cors-headers==2.1.0
 django-countries==4.6.1
@@ -277,7 +277,7 @@ radon==3.0.1
 redis==2.10.6
 reportlab==3.5.21
 requests-oauthlib==1.1.0
-requests==2.21.0
+requests==2.22.0
 rest-condition==1.0.3
 rfc6266-parser==0.0.5.post2
 rules==2.0.1
