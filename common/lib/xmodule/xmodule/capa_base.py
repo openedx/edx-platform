@@ -1026,6 +1026,8 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         for answer_id in answers:
             try:
                 answer_content = self.runtime.replace_urls(answers[answer_id])
+                if self.runtime.replace_course_urls:
+                    answer_content = self.runtime.replace_course_urls(answer_content)
                 if self.runtime.replace_jump_to_id_urls:
                     answer_content = self.runtime.replace_jump_to_id_urls(answer_content)
                 new_answer = {answer_id: answer_content}
