@@ -249,7 +249,7 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
         if course_visibility == COURSE_VISIBILITY_PUBLIC or course_visibility == COURSE_VISIBILITY_PUBLIC_OUTLINE:
             self.assertIn("View Course", resp.content)
         else:
-            self.assertIn("Enroll in", resp.content)
+            self.assertIn("Enroll Now", resp.content)
 
 
 class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
@@ -384,7 +384,7 @@ class AboutWithInvitationOnly(SharedModuleStoreTestCase):
         url = reverse('about_course', args=[text_type(self.course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
-        self.assertIn(u"Enroll in {}".format(self.course.id.course), resp.content.decode('utf-8'))
+        self.assertIn(u"Enroll Now", resp.content.decode('utf-8'))
 
         # Check that registration button is present
         self.assertIn(REG_STR, resp.content)
