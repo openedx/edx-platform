@@ -130,7 +130,7 @@ edx-django-utils==1.0.3
 edx-drf-extensions==2.2.1
 edx-enterprise==1.5.2
 edx-i18n-tools==0.4.8
-edx-lint==1.1.2
+edx-lint==1.2.0
 edx-milestones==0.1.13
 edx-oauth2-provider==1.2.2
 edx-opaque-keys[django]==0.4.4
