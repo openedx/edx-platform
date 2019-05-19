@@ -1,7 +1,8 @@
 """
 Tests for v1 views
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
+
 from collections import OrderedDict
 
 import ddt

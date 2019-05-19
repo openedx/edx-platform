@@ -2,7 +2,7 @@
 """
 Unit tests for instructor.api methods.
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import datetime
 import functools
@@ -28,7 +28,8 @@ from mock import Mock, NonCallableMock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
 from pytz import UTC
-from six import text_type
+from six import text_type, unichr  # pylint: disable=redefined-builtin
+from six.moves import range, zip
 
 from bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
 from course_modes.models import CourseMode
@@ -42,6 +43,8 @@ from courseware.tests.factories import (
     UserProfileFactory
 )
 from courseware.tests.helpers import LoginEnrollmentTestCase
+from edx_when.api import get_overrides_for_user
+from edx_when.signals import extract_dates
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
@@ -62,9 +65,6 @@ from openedx.core.djangoapps.django_comment_common.utils import seed_permissions
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.lib.xblock_utils import grade_histogram
-from edx_when.api import get_overrides_for_user
-from edx_when.signals import extract_dates
-
 from shoppingcart.models import (
     Coupon,
     CouponRedemption,
@@ -2604,7 +2604,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             course_id=self.course.id
         )
 
-        self.students = [UserFactory() for _ in xrange(6)]
+        self.students = [UserFactory() for _ in range(6)]
         for student in self.students:
             CourseEnrollment.enroll(student, self.course.id)
 
@@ -4094,7 +4094,7 @@ class TestInstructorAPITaskLists(SharedModuleStoreTestCase, LoginEnrollmentTestC
             state=json.dumps({'attempts': 10}),
         )
         mock_factory = MockCompletionInfo()
-        self.tasks = [self.FakeTask(mock_factory.mock_get_task_completion_info) for _ in xrange(7)]
+        self.tasks = [self.FakeTask(mock_factory.mock_get_task_completion_info) for _ in range(7)]
         self.tasks[-1].make_invalid_output()
 
     @patch('lms.djangoapps.instructor_task.api.get_running_instructor_tasks')
@@ -4228,7 +4228,7 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
     def get_email_content_response(self, num_emails, task_history_request, with_failures=False):
         """ Calls the list_email_content endpoint and returns the repsonse """
         self.setup_fake_email_info(num_emails, with_failures)
-        task_history_request.return_value = self.tasks.values()
+        task_history_request.return_value = list(self.tasks.values())
         url = reverse('list_email_content', kwargs={'course_id': text_type(self.course.id)})
         with patch('lms.djangoapps.instructor.views.api.CourseEmail.objects.get') as mock_email_info:
             mock_email_info.side_effect = self.get_matching_mock_email
@@ -4679,7 +4679,7 @@ class TestCourseIssuedCertificatesData(SharedModuleStoreTestCase):
         url = reverse('get_issued_certificates', kwargs={'course_id': text_type(self.course.id)})
         # firstly generating downloadable certificates with 'honor' mode
         certificate_count = 3
-        for __ in xrange(certificate_count):
+        for __ in range(certificate_count):
             self.generate_certificate(course_id=self.course.id, mode='honor', status=CertificateStatuses.generating)
 
         response = self.client.post(url)
@@ -4701,7 +4701,7 @@ class TestCourseIssuedCertificatesData(SharedModuleStoreTestCase):
         url = reverse('get_issued_certificates', kwargs={'course_id': text_type(self.course.id)})
         # firstly generating downloadable certificates with 'honor' mode
         certificate_count = 3
-        for __ in xrange(certificate_count):
+        for __ in range(certificate_count):
             self.generate_certificate(course_id=self.course.id, mode='honor', status=CertificateStatuses.downloadable)
 
         response = self.client.post(url)
@@ -4716,7 +4716,7 @@ class TestCourseIssuedCertificatesData(SharedModuleStoreTestCase):
         self.assertEqual(certificate.get('course_id'), str(self.course.id))
 
         # Now generating downloadable certificates with 'verified' mode
-        for __ in xrange(certificate_count):
+        for __ in range(certificate_count):
             self.generate_certificate(
                 course_id=self.course.id,
                 mode='verified',
@@ -4742,7 +4742,7 @@ class TestCourseIssuedCertificatesData(SharedModuleStoreTestCase):
         url = reverse('get_issued_certificates', kwargs={'course_id': text_type(self.course.id)})
         # firstly generating downloadable certificates with 'honor' mode
         certificate_count = 3
-        for __ in xrange(certificate_count):
+        for __ in range(certificate_count):
             self.generate_certificate(course_id=self.course.id, mode='honor', status=CertificateStatuses.downloadable)
 
         current_date = datetime.date.today().strftime(u"%B %d, %Y")

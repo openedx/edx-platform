@@ -2269,7 +2269,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.waffle_utils',
 
     # Course Goals
-    'lms.djangoapps.course_goals',
+    'lms.djangoapps.course_goals.apps.CourseGoalsConfig',
 
     # Features
     'openedx.features.course_bookmarks',
@@ -3354,7 +3354,7 @@ SYSTEM_TO_FEATURE_ROLE_MAPPING = {
     ],
 }
 
-DATA_CONSENT_SHARE_CACHE_TIMEOUT = None  # Never expire
+DATA_CONSENT_SHARE_CACHE_TIMEOUT = 8 * 60 * 60  # 8 hours
 
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
 

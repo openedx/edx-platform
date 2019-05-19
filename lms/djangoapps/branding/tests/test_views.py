@@ -1,14 +1,16 @@
 # encoding: utf-8
 """Tests of Branding API views. """
+from __future__ import absolute_import
+
 import json
-import urllib
 
 import ddt
 import mock
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.test import TestCase
+from django.urls import reverse
 
 from branding.models import BrandingApiConfig
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
@@ -256,7 +258,7 @@ class TestFooter(CacheIsolationTestCase):
         if params is not None:
             url = u"{url}?{params}".format(
                 url=url,
-                params=urllib.urlencode(params)
+                params=six.moves.urllib.parse.urlencode(params)
             )
 
         return self.client.get(url, HTTP_ACCEPT=accepts)

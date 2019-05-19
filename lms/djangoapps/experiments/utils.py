@@ -78,6 +78,23 @@ AUDIT_DEADLINE_FLAG = WaffleFlag(
     flag_undefined_default=True
 )
 
+# .. toggle_name: experiments.deprecated_metadata
+# .. toggle_type: feature_flag
+# .. toggle_default: True
+# .. toggle_description: Toggle for using the deprecated method for calculating user metadata
+# .. toggle_category: experiments
+# .. toggle_use_cases: monitored_rollout
+# .. toggle_creation_date: 2019-5-8
+# .. toggle_expiration_date: None
+# .. toggle_warnings: None
+# .. toggle_tickets: REVEM-350
+# .. toggle_status: supported
+DEPRECATED_METADATA = WaffleFlag(
+    waffle_namespace=experiments_namespace,
+    flag_name=u'deprecated_metadata',
+    flag_undefined_default=False
+)
+
 
 def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
     """
@@ -267,7 +284,53 @@ def get_experiment_user_metadata_context(course, user):
     """
     Return a context dictionary with the keys used by the user_metadata.html.
     """
-    # TODO: call get_base_experiment_metadata_context(), and then add in the bits that are only needed by user_metadata
+    if DEPRECATED_METADATA.is_enabled():
+        return get_deprecated_experiment_user_metadata_context(course, user)
+
+    enrollment = None
+    # TODO: clean up as part of REVO-28 (START)
+    user_enrollments = None
+    audit_enrollments = None
+    has_non_audit_enrollments = False
+    try:
+        user_enrollments = CourseEnrollment.objects.select_related('course').filter(user_id=user.id)
+        audit_enrollments = user_enrollments.filter(mode='audit')
+        has_non_audit_enrollments = (len(audit_enrollments) != len(user_enrollments))
+        # TODO: clean up as part of REVO-28 (END)
+        enrollment = CourseEnrollment.objects.select_related(
+            'course'
+        ).get(user_id=user.id, course_id=course.id)
+    except CourseEnrollment.DoesNotExist:
+        pass  # Not enrolled, use the default values
+
+    context = get_base_experiment_metadata_context(course, user, enrollment, user_enrollments, audit_enrollments)
+    has_staff_access = has_staff_access_to_preview_mode(user, course.id)
+    forum_roles = []
+    if user.is_authenticated:
+        forum_roles = list(Role.objects.filter(users=user, course_id=course.id).values_list('name').distinct())
+
+    # get user partition data
+    if user.is_authenticated():
+        partition_groups = get_all_partitions_for_course(course)
+        user_partitions = get_user_partition_groups(course.id, partition_groups, user, 'name')
+    else:
+        user_partitions = {}
+
+    # TODO: clean up as part of REVO-28 (START)
+    context['has_non_audit_enrollments'] = has_non_audit_enrollments
+    # TODO: clean up as part of REVO-28 (END)
+    context['has_staff_access'] = has_staff_access
+    context['forum_roles'] = forum_roles
+    context['partition_groups'] = user_partitions
+    return context
+
+
+# pylint: disable=too-many-statements
+def get_deprecated_experiment_user_metadata_context(course, user):
+    """
+    Return a context dictionary with the keys used by the user_metadata.html. This is deprecated and will be removed
+    once we have confirmed that its replacement functions as intended.
+    """
     enrollment_mode = None
     enrollment_time = None
     enrollment = None
@@ -378,28 +441,16 @@ def get_experiment_user_metadata_context(course, user):
     }
 
 
-def get_audit_access_expiration(user, course):
-    """
-    Return the expiration date for the user's audit access to this course.
-    """
-    if AUDIT_DEADLINE_FLAG.is_enabled():
-        if not CourseDurationLimitConfig.enabled_for_enrollment(user=user, course_key=course.id):
-            return None
-
-        return get_user_course_expiration_date(user, course)
-    return None
-
-
 def get_base_experiment_metadata_context(course, user, enrollment, user_enrollments, audit_enrollments):
     """
-    Return a context dictionary with the keys used by dashboard_metadata.html.
+    Return a context dictionary with the keys used by dashboard_metadata.html and user_metadata.html
     """
     enrollment_mode = None
     enrollment_time = None
     # TODO: clean up as part of REVEM-199 (START)
     program_key = get_program_context(course, user_enrollments, audit_enrollments)
     # TODO: clean up as part of REVEM-199 (END)
-    if enrollment.is_active:
+    if enrollment and enrollment.is_active:
         enrollment_mode = enrollment.mode
         enrollment_time = enrollment.created
 
@@ -421,6 +472,18 @@ def get_base_experiment_metadata_context(course, user, enrollment, user_enrollme
         'program_key_fields': program_key,
         # TODO: clean up as part of REVEM-199 (END)
     }
+
+
+def get_audit_access_expiration(user, course):
+    """
+    Return the expiration date for the user's audit access to this course.
+    """
+    if AUDIT_DEADLINE_FLAG.is_enabled():
+        if not CourseDurationLimitConfig.enabled_for_enrollment(user=user, course_key=course.id):
+            return None
+
+        return get_user_course_expiration_date(user, course)
+    return None
 
 
 # TODO: clean up as part of REVEM-199 (START)

@@ -5,17 +5,21 @@ Runs tasks on answers to course problems to validate that code
 paths actually work.
 
 """
+from __future__ import absolute_import
+
 import json
 import logging
 import textwrap
 from collections import namedtuple
 
 import ddt
+import six
 from celery.states import FAILURE, SUCCESS
 from django.contrib.auth.models import User
 from django.urls import reverse
 from mock import patch
 from six import text_type
+from six.moves import range
 
 from capa.responsetypes import StudentInputError
 from capa.tests.response_xml_factory import CodeResponseXMLFactory, CustomResponseXMLFactory
@@ -401,7 +405,7 @@ class TestRescoringTask(TestIntegrationTask):
             correct_map = state['correct_map']
             log.info(u"Correct Map: %s", correct_map)
             # only one response, so pull it out:
-            answer = correct_map.values()[0]['msg']
+            answer = list(correct_map.values())[0]['msg']
             self.submit_student_answer(user.username, problem_url_name, [answer, answer])
             # we should now get the problem right, with a second attempt:
             self.check_state(user, descriptor, 1, 1, expected_attempts=2)
@@ -609,7 +613,7 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
                     grades,
                     user_partition_group(student)
                 )
-                for student_grades in students_grades for student, grades in student_grades.iteritems()
+                for student_grades in students_grades for student, grades in six.iteritems(student_grades)
             ],
             ignore_other_columns=ignore_other_columns,
         )

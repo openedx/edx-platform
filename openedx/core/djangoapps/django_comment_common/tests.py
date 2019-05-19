@@ -1,18 +1,25 @@
 # pylint: disable=missing-docstring
+from __future__ import absolute_import
+
+import six
+from contracts import new_contract
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
 
 from openedx.core.djangoapps.course_groups.cohorts import CourseCohortsSettings
-from openedx.core.djangoapps.django_comment_common.models import Role, CourseDiscussionSettings
+from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
 from openedx.core.djangoapps.django_comment_common.utils import (
-    get_course_discussion_settings, set_course_discussion_settings,
+    get_course_discussion_settings,
+    set_course_discussion_settings
 )
 from student.models import CourseEnrollment, User
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+new_contract('basestring', six.string_types[0])
 
 
 class RoleAssignmentTest(TestCase):

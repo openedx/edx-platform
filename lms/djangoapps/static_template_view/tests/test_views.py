@@ -1,9 +1,11 @@
 """
 Tests for static templates
 """
+from __future__ import absolute_import
+
 from django.conf import settings
-from django.urls import reverse
 from django.test import TestCase
+from django.urls import reverse
 
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 

@@ -66,7 +66,7 @@ defusedxml==0.6.0
 django-appconf==1.0.3     # via django-statici18n
 django-babel-underscore==0.5.2
 django-babel==0.6.2       # via django-babel-underscore
-django-classy-tags==0.8.0  # via django-sekizai
+django-classy-tags==0.9.0  # via django-sekizai
 django-config-models==1.0.1
 django-cors-headers==2.1.0
 django-countries==4.6.1
@@ -111,7 +111,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==1.0.3
 edx-drf-extensions==2.2.1
-edx-enterprise==1.5.1
+edx-enterprise==1.5.2
 edx-i18n-tools==0.4.8
 edx-milestones==0.1.13
 edx-oauth2-provider==1.2.2
@@ -119,11 +119,11 @@ edx-opaque-keys[django]==0.4.4
 edx-organizations==2.0.2
 edx-proctoring-proctortrack==1.0.5
 edx-proctoring==2.0.1
-edx-rbac==0.2.0           # via edx-enterprise
+edx-rbac==0.2.1           # via edx-enterprise
 edx-rest-api-client==1.9.2
 edx-search==1.2.2
 edx-submissions==2.1.1
-edx-user-state-client==1.0.4
+edx-user-state-client==1.1.0
 edx-when==0.1.4
 edxval==1.1.25
 elasticsearch==1.9.0      # via edx-search
@@ -207,7 +207,7 @@ pyyaml==5.1
 redis==2.10.6
 reportlab==3.5.21
 requests-oauthlib==1.1.0
-requests==2.21.0
+requests==2.22.0
 rest-condition==1.0.3
 rfc6266-parser==0.0.5.post2
 rules==2.0.1

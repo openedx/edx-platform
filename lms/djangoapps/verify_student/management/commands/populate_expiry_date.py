@@ -1,6 +1,8 @@
 """
 Django admin command to populate expiry_date for approved verifications in SoftwareSecurePhotoVerification
 """
+from __future__ import absolute_import
+
 import logging
 import time
 from datetime import timedelta
@@ -8,9 +10,9 @@ from datetime import timedelta
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db.models import F
-from util.query import use_read_replica_if_available
 
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from util.query import use_read_replica_if_available
 
 logger = logging.getLogger(__name__)
 

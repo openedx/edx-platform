@@ -1,51 +1,45 @@
 """
 Defines an endpoint for gradebook data related to a course.
 """
+from __future__ import absolute_import
+
 import logging
 from collections import namedtuple
 from contextlib import contextmanager
 from functools import wraps
 
+import six
 from django.urls import reverse
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from six import text_type
-from util.date_utils import to_timestamp
 
 from courseware.courses import get_course_by_id
-from lms.djangoapps.grades.api import (
-    CourseGradeFactory,
-    is_writable_gradebook_enabled,
-    prefetch_course_and_subsection_grades,
-    clear_prefetched_course_and_subsection_grades,
-    constants as grades_constants,
-    context as grades_context,
-    events as grades_events,
-)
+from lms.djangoapps.grades.api import CourseGradeFactory, clear_prefetched_course_and_subsection_grades
+from lms.djangoapps.grades.api import constants as grades_constants
+from lms.djangoapps.grades.api import context as grades_context
+from lms.djangoapps.grades.api import events as grades_events
+from lms.djangoapps.grades.api import is_writable_gradebook_enabled, prefetch_course_and_subsection_grades
 from lms.djangoapps.grades.course_data import CourseData
+from lms.djangoapps.grades.grade_utils import are_grades_frozen
 # TODO these imports break abstraction of the core Grades layer. This code needs
 # to be refactored so Gradebook views only access public Grades APIs.
 from lms.djangoapps.grades.models import (
     PersistentSubsectionGrade,
     PersistentSubsectionGradeOverride,
-    PersistentSubsectionGradeOverrideHistory,
+    PersistentSubsectionGradeOverrideHistory
 )
 from lms.djangoapps.grades.rest_api.serializers import (
     StudentGradebookEntrySerializer,
-    SubsectionGradeResponseSerializer,
+    SubsectionGradeResponseSerializer
 )
-from lms.djangoapps.grades.rest_api.v1.utils import (
-    USER_MODEL,
-    CourseEnrollmentPagination,
-    GradeViewMixin,
-)
+from lms.djangoapps.grades.rest_api.v1.utils import USER_MODEL, CourseEnrollmentPagination, GradeViewMixin
 from lms.djangoapps.grades.subsection_grade import CreateSubsectionGrade
 from lms.djangoapps.grades.tasks import recalculate_subsection_grade_v3
-from lms.djangoapps.grades.grade_utils import are_grades_frozen
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.util.forms import to_bool
 from openedx.core.lib.api.view_utils import (
@@ -53,7 +47,7 @@ from openedx.core.lib.api.view_utils import (
     PaginatedAPIView,
     get_course_key,
     verify_course_exists,
-    view_auth_classes,
+    view_auth_classes
 )
 from openedx.core.lib.cache_utils import request_cached
 from student.auth import has_course_author_access
@@ -65,6 +59,7 @@ from track.event_transaction_utils import (
     get_event_transaction_type,
     set_event_transaction_type
 )
+from util.date_utils import to_timestamp
 from xmodule.modulestore.django import modulestore
 from xmodule.util.misc import get_default_short_labeler
 
@@ -740,8 +735,8 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
                 only_if_higher=False,
                 expected_modified_time=to_timestamp(override.modified),
                 score_deleted=False,
-                event_transaction_id=unicode(get_event_transaction_id()),
-                event_transaction_type=unicode(get_event_transaction_type()),
+                event_transaction_id=six.text_type(get_event_transaction_id()),
+                event_transaction_type=six.text_type(get_event_transaction_type()),
                 score_db_table=grades_constants.ScoreDatabaseTableEnum.overrides,
                 force_update_subsections=True,
             )

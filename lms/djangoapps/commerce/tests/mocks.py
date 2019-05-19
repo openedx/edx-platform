@@ -1,4 +1,7 @@
 """ Commerce app tests package. """
+# pylint: disable=invalid-name
+from __future__ import absolute_import
+
 import json
 
 import httpretty
@@ -6,8 +9,6 @@ from django.conf import settings
 
 from . import factories
 
-
-# pylint: disable=invalid-name
 
 class mock_ecommerce_api_endpoint(object):
     """

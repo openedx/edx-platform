@@ -27,7 +27,7 @@ from util.date_utils import strftime_localized
 
 MIN_DURATION = timedelta(weeks=4)
 MAX_DURATION = timedelta(weeks=18)
-EXPIRATION_DATE_FORMAT_STR = u'%b. %-d, %Y'
+EXPIRATION_DATE_FORMAT_STR = u'%b %-d, %Y'
 
 
 class AuditExpiredError(AccessError):
@@ -172,13 +172,13 @@ def generate_course_expired_message(user, course):
         date_string = get_date_string()
         formatted_expiration_date = date_string.format(
             language=language,
-            formatted_date=expiration_date.strftime(EXPIRATION_DATE_FORMAT_STR),
+            formatted_date=expiration_date.strftime("%Y-%m-%d"),
             formatted_date_localized=strftime_localized(expiration_date, EXPIRATION_DATE_FORMAT_STR)
         )
         if using_upgrade_messaging:
             formatted_upgrade_deadline = date_string.format(
                 language=language,
-                formatted_date=upgrade_deadline.strftime(EXPIRATION_DATE_FORMAT_STR),
+                formatted_date=upgrade_deadline.strftime("%Y-%m-%d"),
                 formatted_date_localized=strftime_localized(upgrade_deadline, EXPIRATION_DATE_FORMAT_STR)
             )
 

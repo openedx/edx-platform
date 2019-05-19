@@ -67,6 +67,10 @@ class CourseOutlineFragmentView(EdxFragmentView):
         context['gated_content'] = gated_content
         context['xblock_display_names'] = xblock_display_names
 
+        page_context = kwargs.get('page_context', None)
+        if page_context:
+            context['self_paced'] = page_context.get('pacing_type', 'instructor_paced') == 'self_paced'
+
         html = render_to_string('course_experience/course-outline-fragment.html', context)
         return Fragment(html)
 

@@ -5,6 +5,8 @@ non-Mongo backed courses, regardless of email feature flag, and
 that the view is conditionally available when Course Auth is turned on.
 """
 
+from __future__ import absolute_import
+
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from six import text_type

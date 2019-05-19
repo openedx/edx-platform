@@ -1,9 +1,12 @@
 # pylint: disable=missing-docstring,unused-argument,broad-except
 """" Common utilities for comment client wrapper """
+from __future__ import absolute_import
+
 import logging
 from uuid import uuid4
 
 import requests
+import six
 from django.utils.translation import get_language
 
 from .settings import SERVICE_HOST as COMMENTS_SERVICE
@@ -12,13 +15,13 @@ log = logging.getLogger(__name__)
 
 
 def strip_none(dic):
-    return dict([(k, v) for k, v in dic.iteritems() if v is not None])
+    return dict([(k, v) for k, v in six.iteritems(dic) if v is not None])
 
 
 def strip_blank(dic):
     def _is_blank(v):
         return isinstance(v, str) and len(v.strip()) == 0
-    return dict([(k, v) for k, v in dic.iteritems() if not _is_blank(v)])
+    return dict([(k, v) for k, v in six.iteritems(dic) if not _is_blank(v)])
 
 
 def extract(dic, keys):
@@ -151,4 +154,4 @@ def check_forum_heartbeat():
         else:
             return 'forum', False, res.get('check', 'Forum heartbeat failed')
     except Exception as fail:
-        return 'forum', False, unicode(fail)
+        return 'forum', False, six.text_type(fail)

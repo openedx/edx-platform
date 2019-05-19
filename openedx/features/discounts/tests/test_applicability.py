@@ -5,7 +5,7 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..applicability import can_recieve_discount
+from ..applicability import can_receive_discount
 
 
 class TestApplicability(ModuleStoreTestCase):
@@ -19,7 +19,7 @@ class TestApplicability(ModuleStoreTestCase):
         self.user = UserFactory.create()
         self.course = CourseFactory.create(run='test', display_name='test')
 
-    def test_can_recieve_discount(self):
-        # Right now, no one should be able to recieve the discount
-        applicability = can_recieve_discount(user=self.user, course_key_string=self.course.id)
+    def test_can_receive_discount(self):
+        # Right now, no one should be able to receive the discount
+        applicability = can_receive_discount(user=self.user, course_key_string=self.course.id)
         self.assertEqual(applicability, False)

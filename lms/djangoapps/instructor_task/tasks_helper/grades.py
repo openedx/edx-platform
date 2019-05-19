@@ -1,19 +1,23 @@
 """
 Functionality for generating grade reports.
 """
+from __future__ import absolute_import
+
 import logging
 import re
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict, defaultdict
 from datetime import datetime
-from itertools import chain, izip, izip_longest
+from itertools import chain
 from time import time
 
-from django.contrib.auth import get_user_model
+import six
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from lazy import lazy
 from opaque_keys.edx.keys import UsageKey
 from pytz import UTC
 from six import text_type
+from six.moves import zip, zip_longest
 
 from course_blocks.api import get_course_blocks
 from courseware.courses import get_course_by_id
@@ -21,11 +25,9 @@ from courseware.user_state_client import DjangoXBlockUserStateClient
 from instructor_analytics.basic import list_problem_responses
 from instructor_analytics.csvs import format_dictlist
 from lms.djangoapps.certificates.models import CertificateWhitelist, GeneratedCertificate, certificate_info_for_user
-from lms.djangoapps.grades.api import (
-    CourseGradeFactory,
-    context as grades_context,
-    prefetch_course_and_subsection_grades,
-)
+from lms.djangoapps.grades.api import CourseGradeFactory
+from lms.djangoapps.grades.api import context as grades_context
+from lms.djangoapps.grades.api import prefetch_course_and_subsection_grades
 from lms.djangoapps.teams.models import CourseTeamMembership
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
@@ -118,7 +120,7 @@ class _CourseGradeReportContext(object):
         """
         grading_cxt = grades_context.grading_context(self.course, self.course_structure)
         graded_assignments_map = OrderedDict()
-        for assignment_type_name, subsection_infos in grading_cxt['all_graded_subsections_by_type'].iteritems():
+        for assignment_type_name, subsection_infos in six.iteritems(grading_cxt['all_graded_subsections_by_type']):
             graded_subsections_map = OrderedDict()
             for subsection_index, subsection_info in enumerate(subsection_infos, start=1):
                 subsection = subsection_info['subsection_block']
@@ -254,7 +256,7 @@ class CourseGradeReport(object):
         A generator of batches of (success_rows, error_rows) for this report.
         """
         for users in self._batch_users(context):
-            users = filter(lambda u: u is not None, users)
+            users = [u for u in users if u is not None]
             yield self._rows_for_users(context, users)
 
     def _compile(self, context, batched_rows):
@@ -263,7 +265,7 @@ class CourseGradeReport(object):
         the given batched_rows and context.
         """
         # partition and chain successes and errors
-        success_rows, error_rows = izip(*batched_rows)
+        success_rows, error_rows = zip(*batched_rows)
         success_rows = list(chain(*success_rows))
         error_rows = list(chain(*error_rows))
 
@@ -290,9 +292,9 @@ class CourseGradeReport(object):
         """
         graded_assignments = context.graded_assignments
         grades_header = ["Grade"]
-        for assignment_info in graded_assignments.itervalues():
+        for assignment_info in six.itervalues(graded_assignments):
             if assignment_info['separate_subsection_avg_headers']:
-                grades_header.extend(assignment_info['subsection_headers'].itervalues())
+                grades_header.extend(six.itervalues(assignment_info['subsection_headers']))
             grades_header.append(assignment_info['average_header'])
         return grades_header
 
@@ -302,7 +304,7 @@ class CourseGradeReport(object):
         """
         def grouper(iterable, chunk_size=self.USER_BATCH_SIZE, fillvalue=None):
             args = [iter(iterable)] * chunk_size
-            return izip_longest(*args, fillvalue=fillvalue)
+            return zip_longest(*args, fillvalue=fillvalue)
 
         def users_for_course(course_id):
             """
@@ -355,7 +357,7 @@ class CourseGradeReport(object):
         to the headers for this report.
         """
         grade_results = []
-        for assignment_type, assignment_info in context.graded_assignments.iteritems():
+        for _, assignment_info in six.iteritems(context.graded_assignments):
 
             subsection_grades, subsection_grades_results = self._user_subsection_grades(
                 course_grade,
@@ -523,7 +525,9 @@ class ProblemGradeReport(object):
         graded_scorable_blocks = cls._graded_scorable_blocks_to_header(course)
 
         # Just generate the static fields for now.
-        rows = [list(header_row.values()) + ['Enrollment Status', 'Grade'] + _flatten(graded_scorable_blocks.values())]
+        rows = [
+            list(header_row.values()) + ['Enrollment Status', 'Grade'] + _flatten(list(graded_scorable_blocks.values()))
+        ]
         error_rows = [list(header_row.values()) + ['error_msg']]
         current_step = {'step': 'Calculating Grades'}
 
@@ -581,7 +585,7 @@ class ProblemGradeReport(object):
         """
         scorable_blocks_map = OrderedDict()
         grading_context = grades_context.grading_context_for_course(course)
-        for assignment_type_name, subsection_infos in grading_context['all_graded_subsections_by_type'].iteritems():
+        for assignment_type_name, subsection_infos in six.iteritems(grading_context['all_graded_subsections_by_type']):
             for subsection_index, subsection_info in enumerate(subsection_infos, start=1):
                 for scorable_block in subsection_info['scored_descendants']:
                     header_name = (
@@ -694,7 +698,7 @@ class ProblemResponses(object):
                         for user_state in user_states:
                             user_response = response.copy()
                             user_response.update(user_state)
-                            student_data_keys = student_data_keys.union(user_state.keys())
+                            student_data_keys = student_data_keys.union(list(user_state.keys()))
                             responses.append(user_response)
                     else:
                         responses.append(response)

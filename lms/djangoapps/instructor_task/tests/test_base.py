@@ -2,6 +2,8 @@
 Base test classes for LMS instructor-initiated background tasks
 
 """
+from __future__ import absolute_import
+
 import json
 # pylint: disable=attribute-defined-outside-init
 import os
@@ -14,8 +16,8 @@ from celery.states import FAILURE, SUCCESS
 from django.contrib.auth.models import User
 from django.urls import reverse
 from mock import Mock, patch
-from opaque_keys.edx.locations import Location
 from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import Location
 from six import text_type
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
@@ -397,4 +399,4 @@ class TestReportMixin(object):
         report_path = report_store.path_to(self.course.id, report_csv_filename)
         with report_store.storage.open(report_path) as csv_file:
             rows = unicodecsv.reader(csv_file, encoding='utf-8-sig')
-            return rows.next()
+            return next(rows)

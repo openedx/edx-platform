@@ -21,6 +21,8 @@ The distribution in a course for gender might look like:
 }
 """
 
+from __future__ import absolute_import
+
 from django.db.models import Count
 
 from student.models import CourseEnrollment, UserProfile

@@ -6,13 +6,17 @@ If student does not yet answered - `num_inputs` numbers of text inputs.
 If student have answered - words he entered and cloud.
 """
 
+from __future__ import absolute_import
+
 import json
 import logging
 
 from pkg_resources import resource_string
+
+import six
+from six.moves import map
 from web_fragments.fragment import Fragment
 from xblock.fields import Boolean, Dict, Integer, List, Scope, String
-
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.x_module import XModule
@@ -98,7 +102,7 @@ class WordCloudModule(WordCloudFields, XModule):
     def get_state(self):
         """Return success json answer for client."""
         if self.submitted:
-            total_count = sum(self.all_words.itervalues())
+            total_count = sum(six.itervalues(self.all_words))
             return json.dumps({
                 'status': 'success',
                 'submitted': True,
@@ -144,7 +148,7 @@ class WordCloudModule(WordCloudFields, XModule):
         """
         list_to_return = []
         percents = 0
-        for num, word_tuple in enumerate(top_words.iteritems()):
+        for num, word_tuple in enumerate(six.iteritems(top_words)):
             if num == len(top_words) - 1:
                 percent = 100 - percents
             else:
@@ -171,7 +175,7 @@ class WordCloudModule(WordCloudFields, XModule):
         """
         return dict(
             sorted(
-                dict_obj.items(),
+                list(dict_obj.items()),
                 key=lambda x: x[1],
                 reverse=True
             )[:amount]
@@ -197,7 +201,7 @@ class WordCloudModule(WordCloudFields, XModule):
             # Student words from client.
             # FIXME: we must use raw JSON, not a post data (multipart/form-data)
             raw_student_words = data.getall('student_words[]')
-            student_words = filter(None, map(self.good_word, raw_student_words))
+            student_words = [word for word in map(self.good_word, raw_student_words) if word]
 
             self.student_words = student_words
 

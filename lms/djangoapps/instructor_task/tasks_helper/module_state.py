@@ -1,12 +1,17 @@
 """
 Instructor Tasks related to module state.
 """
+from __future__ import absolute_import
+
 import json
 import logging
 from time import time
 
+import six
 from django.utils.translation import ugettext_noop
 from opaque_keys.edx.keys import UsageKey
+from xblock.runtime import KvsFieldData
+from xblock.scorable import Score
 
 from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
 from courseware.courses import get_course_by_id, get_problems_in_section
@@ -18,10 +23,8 @@ from student.models import get_user_by_username_or_email
 from track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
 from track.views import task_track
 from util.db import outer_atomic
-
-from xblock.runtime import KvsFieldData
-from xblock.scorable import Score
 from xmodule.modulestore.django import modulestore
+
 from ..exceptions import UpdateProblemModuleStateError
 from .runner import TaskProgress
 from .utils import UNKNOWN_TASK_ID, UPDATE_STATUS_FAILED, UPDATE_STATUS_SKIPPED, UPDATE_STATUS_SUCCEEDED
@@ -72,7 +75,7 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
 
         # find the problem descriptor:
         problem_descriptor = modulestore().get_item(usage_key)
-        problems[unicode(usage_key)] = problem_descriptor
+        problems[six.text_type(usage_key)] = problem_descriptor
 
     # if entrance_exam is present grab all problems in it
     if entrance_exam_url:
@@ -88,7 +91,7 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
 
     for module_to_update in modules_to_update:
         task_progress.attempted += 1
-        module_descriptor = problems[unicode(module_to_update.module_state_key)]
+        module_descriptor = problems[six.text_type(module_to_update.module_state_key)]
         # There is no try here:  if there's an error, we let it throw, and the task will
         # be marked as FAILED, with a stack trace.
         update_status = update_fcn(module_descriptor, module_to_update, task_input)
