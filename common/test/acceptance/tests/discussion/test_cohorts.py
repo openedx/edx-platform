@@ -1,6 +1,8 @@
 """
 Tests related to the cohorting feature.
 """
+from __future__ import absolute_import
+
 from uuid import uuid4
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
