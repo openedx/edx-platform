@@ -26,7 +26,7 @@ class ScoreCSVProcessor(ChecksumMixin, DeferrableMixin, CSVProcessor):
     """
     CSV Processor for file format defined for Staff Graded Points
     """
-    columns = ['user_id', 'username', 'full_name', 'email', 'student_uid',
+    columns = ['user_id', 'username', 'full_name', 'student_uid',
                'enrolled', 'track', 'block_id', 'title', 'date_last_graded',
                'who_last_graded', 'csum', 'last_points', 'points']
     required_columns = ['user_id', 'points', 'csum', 'block_id', 'last_points']
@@ -47,24 +47,20 @@ class ScoreCSVProcessor(ChecksumMixin, DeferrableMixin, CSVProcessor):
         return 'csv/state/{}/{}'.format(self.block_id, self.now)
 
     def validate_row(self, row):
-        valid = super(ScoreCSVProcessor, self).validate_row(row)
-        if valid:
-            valid = row['block_id'] == self.block_id
-            if valid:
-                points = row['points']
-                if points:
-                    try:
-                        valid = float(row['points']) <= self.max_points
-                        if not valid:
-                            self.add_error(_('Points must not be greater than {}.').format(self.max_points))
-                    except ValueError:
-                        self.add_error(_('Points must be numbers.'))
-                        valid = False
-                else:
-                    valid = True
-            else:
-                self.add_error(_('The CSV does not match this problem. Check that you uploaded the right CSV.'))
-        return valid
+        if not super(ScoreCSVProcessor, self).validate_row(row):
+            return False
+        if row['block_id'] != self.block_id:
+            self.add_error(_('The CSV does not match this problem. Check that you uploaded the right CSV.'))
+            return False
+        if row['points']:
+            try:
+                if float(row['points']) > self.max_points:
+                    self.add_error(_('Points must not be greater than {}.').format(self.max_points))
+                    return False
+            except ValueError:
+                self.add_error(_('Points must be numbers.'))
+                return False
+        return True
 
     def preprocess_row(self, row):
         if row['points'] and row['user_id'] not in self.users_seen:
@@ -78,6 +74,11 @@ class ScoreCSVProcessor(ChecksumMixin, DeferrableMixin, CSVProcessor):
             return to_save
 
     def process_row(self, row):
+        """
+        Set the score for the given row, returning (status, undo)
+        undo is a dict of an operation which would undo the set_score. In this case,
+        that means we would have to call get_score, which could be expensive to do for the entire file.
+        """
         if self.handle_undo:
             # get the current score, for undo. expensive
             undo = get_score(row['block_id'], row['user_id'])
@@ -95,20 +96,19 @@ class ScoreCSVProcessor(ChecksumMixin, DeferrableMixin, CSVProcessor):
         enrollments = CourseEnrollment.objects.filter(
             course_id=course_id).select_related('programcourseenrollment')
         for enrollment in enrollments:
-            enrd = {
+            enrollment_dict = {
                 'user_id': enrollment.user.id,
                 'username': enrollment.user.username,
                 'full_name': enrollment.user.profile.name,
-                'email': enrollment.user.email,
                 'enrolled': enrollment.is_active,
                 'track': enrollment.mode,
             }
             try:
                 pce = enrollment.programcourseenrollment.program_enrollment
-                enrd['student_uid'] = pce.external_user_key
+                enrollment_dict['student_uid'] = pce.external_user_key
             except ObjectDoesNotExist:
-                enrd['student_uid'] = None
-            yield enrd
+                enrollment_dict['student_uid'] = None
+            yield enrollment_dict
 
     def get_rows_to_export(self):
         """
@@ -157,7 +157,7 @@ def set_score(usage_key, student_id, score, max_points, **defaults):
     if not isinstance(usage_key, UsageKey):
         usage_key = UsageKey.from_string(usage_key)
     defaults['module_type'] = 'problem'
-    defaults['grade'] = score / max_points
+    defaults['grade'] = score / (max_points or 1.0)
     defaults['max_grade'] = max_points
     StudentModule.objects.update_or_create(
         student_id=student_id,
@@ -201,9 +201,14 @@ def get_scores(usage_key, user_ids=None):
     if user_ids:
         scores_qset = scores_qset.filter(student_id__in=user_ids)
 
-    return {row.student_id: {'grade': row.grade,
-                             'score': row.grade * (row.max_grade or 1),
-                             'max_grade': row.max_grade,
-                             'created': row.created,
-                             'modified': row.modified,
-                             'state': row.state} for row in scores_qset}
+    scores = {}
+    for row in scores_qset:
+        scores[row.student_id] = {
+            'grade': row.grade,
+            'score': row.grade * (row.max_grade or 1),
+            'max_grade': row.max_grade,
+            'created': row.created,
+            'modified': row.modified,
+            'state': row.state,
+        }
+    return scores
