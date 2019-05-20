@@ -386,7 +386,7 @@ class DeactivateLogoutView(APIView):
     -  Log the user out
     - Create a row in the retirement table for that user
     """
-    authentication_classes = (SessionAuthentication, JwtAuthentication, )
+    authentication_classes = (JwtAuthentication, SessionAuthentication, )
     permission_classes = (permissions.IsAuthenticated, )
 
     def post(self, request):
