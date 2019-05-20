@@ -362,6 +362,7 @@ class CoursewareIndex(View):
             self.field_data_cache,
             self.course_key,
             course=self.course,
+            will_recheck_access=True,
         )
 
     def _prefetch_and_bind_section(self):
@@ -382,6 +383,7 @@ class CoursewareIndex(View):
             self.course_key,
             self.position,
             course=self.course,
+            will_recheck_access=True,
         )
 
     def _save_positions(self):

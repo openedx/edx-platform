@@ -58,10 +58,13 @@ def adjust_start_date(user, days_early_for_beta, start, course_key):
     return start
 
 
-def check_start_date(user, days_early_for_beta, start, course_key):
+def check_start_date(user, days_early_for_beta, start, course_key, display_error_to_user=True):
     """
     Verifies whether the given user is allowed access given the
     start date and the Beta offset for the given course.
+
+    Arguments:
+        display_error_to_user: If True, display this error to users in the UI.
 
     Returns:
         AccessResponse: Either ACCESS_GRANTED or StartDateError.
@@ -80,7 +83,7 @@ def check_start_date(user, days_early_for_beta, start, course_key):
         if now > effective_start:
             return ACCESS_GRANTED
 
-        return StartDateError(start)
+        return StartDateError(start, display_error_to_user=display_error_to_user)
 
 
 def in_preview_mode():
