@@ -6,13 +6,13 @@ from django.utils.translation import ugettext as _
     <div class="date-summary date-summary-${course_date.css_class}">
         % if course_date.title:
             % if course_date.title == 'current_datetime':
-                <span class="hd hd-6 heading localized-datetime" data-datetime="${course_date.date}" data-string="${_(u'Today is {date}')}" data-timezone="${user_timezone}" data-language="${user_language}"></span>
+                <span class="hd hd-6 heading localized-datetime" data-datetime="${course_date.date}" data-string="${_(u'Today is {date}')}" data-timezone="${user_timezone}" data-language="${user_language or request.LANGUAGE_CODE}"></span>
             % else:
                 <span class="hd hd-6 heading">${course_date.title}</span>
             % endif
         % endif
         % if course_date.date and course_date.title != 'current_datetime':
-            <p class="hd hd-6 date localized-datetime" data-format="shortDate" data-datetime="${course_date.date}" data-timezone="${user_timezone}" data-language="${user_language}" data-string="${_(course_date.relative_datestring)}"></p>
+            <p class="hd hd-6 date localized-datetime" data-format="shortDate" data-datetime="${course_date.date}" data-timezone="${user_timezone}" data-language="${user_language or request.LANGUAGE_CODE}" data-string="${_(course_date.relative_datestring)}"></p>
         % endif
         % if course_date.description:
             <p class="description">${course_date.description}</p>

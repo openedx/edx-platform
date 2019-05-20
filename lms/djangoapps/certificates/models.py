@@ -402,7 +402,7 @@ class CertificateGenerationHistory(TimeStampedModel):
         statuses = task_input_json.get('statuses_to_regenerate', None)
         if statuses:
             readable_statuses = [
-                CertificateStatuses.readable_statuses.get(status) for status in statuses
+                _(CertificateStatuses.readable_statuses.get(status)).encode('utf-8') for status in statuses
                 if CertificateStatuses.readable_statuses.get(status) is not None
             ]
             return ", ".join(readable_statuses)

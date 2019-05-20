@@ -5694,6 +5694,26 @@ msgstr "создано"
 msgid "regenerated"
 msgstr "повторно создано"
 
+#: lms/djangoapps/certificates/models.py
+msgid "already received"
+msgstr "уже получен"
+
+#: lms/djangoapps/certificates/models.py
+msgid "didn't receive"
+msgstr "не получен"
+
+#: lms/djangoapps/certificates/models.py
+msgid "error states"
+msgstr "состояние ошибки"
+
+#: lms/djangoapps/certificates/models.py
+msgid "audit passing states"
+msgstr "аудит проходит состояния"
+
+#: lms/djangoapps/certificates/models.py
+msgid "audit not passing states"
+msgstr "аудит не проходит состояния"
+
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
 #: lms/djangoapps/certificates/models.py

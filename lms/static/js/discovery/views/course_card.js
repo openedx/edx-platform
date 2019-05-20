@@ -37,6 +37,9 @@
                     userLanguage = this.model.userPreferences.userLanguage;
                     userTimezone = this.model.userPreferences.userTimezone;
                 }
+                if (isNaN(this.model.userPreferences)) {
+                    userLanguage = $("html").attr('lang');
+                }
                 if (data.advertised_start !== undefined) {
                     data.start = data.advertised_start;
                 } else {
