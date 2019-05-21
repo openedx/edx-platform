@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
+
+from django.conf import settings
+from django.core.files import File
+from django.db import migrations, models
 
 # Converted from the original South migration 0002_default_rate_limit_config.py
 
-from django.db import migrations, models
-from django.conf import settings
-from django.core.files import File
 
 def forwards(apps, schema_editor):
     """Add default modes"""

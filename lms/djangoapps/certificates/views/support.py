@@ -4,11 +4,16 @@ Certificate end-points used by the student support UI.
 See lms/djangoapps/support for more details.
 
 """
-import bleach
+from __future__ import absolute_import
+
 import logging
-import urllib
 from functools import wraps
 
+import bleach
+import six
+import six.moves.urllib.error  # pylint: disable=import-error
+import six.moves.urllib.parse  # pylint: disable=import-error
+import six.moves.urllib.request  # pylint: disable=import-error
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError
@@ -17,9 +22,9 @@ from django.views.decorators.http import require_GET, require_POST
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
+from courseware.access import has_access
 from lms.djangoapps.certificates import api
 from lms.djangoapps.certificates.models import CertificateInvalidation
-from courseware.access import has_access
 from lms.djangoapps.instructor_task.api import generate_certificates_for_students
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment, User
@@ -81,7 +86,9 @@ def search_certificates(request):
         ]
 
     """
-    user_filter = bleach.clean(urllib.unquote(urllib.quote_plus(request.GET.get("user", ""))))
+    # pylint: disable=too-many-function-args
+    unbleached_filter = six.moves.urllib.parse.unquote(six.moves.urllib.parse.quote_plus(request.GET.get("user", "")))
+    user_filter = bleach.clean(unbleached_filter)
     if not user_filter:
         msg = _("user is not given.")
         return HttpResponseBadRequest(msg)
@@ -93,12 +100,13 @@ def search_certificates(request):
 
     certificates = api.get_certificates_for_user(user.username)
     for cert in certificates:
-        cert["course_key"] = unicode(cert["course_key"])
+        cert["course_key"] = six.text_type(cert["course_key"])
         cert["created"] = cert["created"].isoformat()
         cert["modified"] = cert["modified"].isoformat()
         cert["regenerate"] = not cert['is_pdf_certificate']
 
-    course_id = urllib.quote_plus(request.GET.get("course_id", ""), safe=':/')
+    # pylint: disable=redundant-keyword-arg
+    course_id = six.moves.urllib.parse.quote_plus(request.GET.get("course_id", ""), safe=':/')
     if course_id:
         try:
             course_key = CourseKey.from_string(course_id)
