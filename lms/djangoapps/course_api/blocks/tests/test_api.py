@@ -2,11 +2,14 @@
 Tests for Blocks api.py
 """
 
+from __future__ import absolute_import
+
 from itertools import product
-from mock import patch
 
 import ddt
+import six
 from django.test.client import RequestFactory
+from mock import patch
 
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
 from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE, waffle
@@ -15,7 +18,6 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import SampleCourseFactory, check_mongo_calls
 from xmodule.modulestore.tests.sample_courses import BlockInfo
-
 
 from ..api import get_blocks
 
@@ -44,15 +46,15 @@ class TestGetBlocks(SharedModuleStoreTestCase):
 
     def test_basic(self):
         blocks = get_blocks(self.request, self.course.location, self.user)
-        self.assertEquals(blocks['root'], unicode(self.course.location))
+        self.assertEquals(blocks['root'], six.text_type(self.course.location))
 
         # subtract for (1) the orphaned course About block and (2) the hidden Html block
         self.assertEquals(len(blocks['blocks']), len(self.store.get_items(self.course.id)) - 2)
-        self.assertNotIn(unicode(self.html_block.location), blocks['blocks'])
+        self.assertNotIn(six.text_type(self.html_block.location), blocks['blocks'])
 
     def test_no_user(self):
         blocks = get_blocks(self.request, self.course.location)
-        self.assertIn(unicode(self.html_block.location), blocks['blocks'])
+        self.assertIn(six.text_type(self.html_block.location), blocks['blocks'])
 
     def test_access_before_api_transformer_order(self):
         """
@@ -63,16 +65,16 @@ class TestGetBlocks(SharedModuleStoreTestCase):
         vertical_block = self.store.get_item(self.course.id.make_usage_key('vertical', 'vertical_x1a'))
         problem_block = self.store.get_item(self.course.id.make_usage_key('problem', 'problem_x1a_1'))
 
-        vertical_descendants = blocks['blocks'][unicode(vertical_block.location)]['descendants']
+        vertical_descendants = blocks['blocks'][six.text_type(vertical_block.location)]['descendants']
 
-        self.assertIn(unicode(problem_block.location), vertical_descendants)
-        self.assertNotIn(unicode(self.html_block.location), vertical_descendants)
+        self.assertIn(six.text_type(problem_block.location), vertical_descendants)
+        self.assertNotIn(six.text_type(self.html_block.location), vertical_descendants)
 
     def test_sub_structure(self):
         sequential_block = self.store.get_item(self.course.id.make_usage_key('sequential', 'sequential_y1'))
 
         blocks = get_blocks(self.request, sequential_block.location, self.user)
-        self.assertEquals(blocks['root'], unicode(sequential_block.location))
+        self.assertEquals(blocks['root'], six.text_type(sequential_block.location))
         self.assertEquals(len(blocks['blocks']), 5)
 
         for block_type, block_name, is_inside_of_structure in (
@@ -83,9 +85,9 @@ class TestGetBlocks(SharedModuleStoreTestCase):
         ):
             block = self.store.get_item(self.course.id.make_usage_key(block_type, block_name))
             if is_inside_of_structure:
-                self.assertIn(unicode(block.location), blocks['blocks'])
+                self.assertIn(six.text_type(block.location), blocks['blocks'])
             else:
-                self.assertNotIn(unicode(block.location), blocks['blocks'])
+                self.assertNotIn(six.text_type(block.location), blocks['blocks'])
 
     def test_filtering_by_block_types(self):
         sequential_block = self.store.get_item(self.course.id.make_usage_key('sequential', 'sequential_y1'))
@@ -94,7 +96,7 @@ class TestGetBlocks(SharedModuleStoreTestCase):
         blocks = get_blocks(self.request, sequential_block.location, self.user, requested_fields=['type'])
         self.assertEquals(len(blocks['blocks']), 5)
         found_not_problem = False
-        for block in blocks['blocks'].itervalues():
+        for block in six.itervalues(blocks['blocks']):
             if block['type'] != 'problem':
                 found_not_problem = True
         self.assertTrue(found_not_problem)
@@ -103,7 +105,7 @@ class TestGetBlocks(SharedModuleStoreTestCase):
         blocks = get_blocks(self.request, sequential_block.location, self.user,
                             block_types_filter=['problem'], requested_fields=['type'])
         self.assertEquals(len(blocks['blocks']), 3)
-        for block in blocks['blocks'].itervalues():
+        for block in six.itervalues(blocks['blocks']):
             self.assertEqual(block['type'], 'problem')
 
 
