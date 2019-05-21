@@ -455,17 +455,24 @@ class CourseModeModelTest(TestCase):
         self.assertIsNone(verified_mode.expiration_datetime)
 
     @ddt.data(
-        (CourseMode.AUDIT, False),
-        (CourseMode.HONOR, False),
-        (CourseMode.VERIFIED, True),
-        (CourseMode.CREDIT_MODE, True),
-        (CourseMode.PROFESSIONAL, True),
-        (CourseMode.NO_ID_PROFESSIONAL_MODE, True),
+        (False, CourseMode.AUDIT, False),
+        (False, CourseMode.HONOR, True),
+        (False, CourseMode.VERIFIED, True),
+        (False, CourseMode.CREDIT_MODE, True),
+        (False, CourseMode.PROFESSIONAL, True),
+        (False, CourseMode.NO_ID_PROFESSIONAL_MODE, True),
+        (True, CourseMode.AUDIT, False),
+        (True, CourseMode.HONOR, False),
+        (True, CourseMode.VERIFIED, True),
+        (True, CourseMode.CREDIT_MODE, True),
+        (True, CourseMode.PROFESSIONAL, True),
+        (True, CourseMode.NO_ID_PROFESSIONAL_MODE, True),
     )
     @ddt.unpack
-    def test_eligible_for_cert(self, mode_slug, expected_eligibility):
+    def test_eligible_for_cert(self, disable_honor_cert, mode_slug, expected_eligibility):
         """Verify that non-audit modes are eligible for a cert."""
-        self.assertEqual(CourseMode.is_eligible_for_certificate(mode_slug), expected_eligibility)
+        with override_settings(FEATURES={'DISABLE_HONOR_CERTIFICATES': disable_honor_cert}):
+            self.assertEqual(CourseMode.is_eligible_for_certificate(mode_slug), expected_eligibility)
 
     @ddt.data(
         (CourseMode.AUDIT, False),
