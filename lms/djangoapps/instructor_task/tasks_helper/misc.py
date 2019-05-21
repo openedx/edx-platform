@@ -118,8 +118,11 @@ def upload_proctored_exam_results_report(_xmodule_instance_args, _entry_id, cour
         'Suspicious Count',
         'Suspicious Comments',
         'Rules Violation Count',
-        'Rules Violation Comments'
+        'Rules Violation Comments',
+        'provider',
+        'track'
     ]
+
     student_data = get_proctored_exam_results(course_id, query_features)
     header, rows = format_dictlist(student_data, query_features)
 
