@@ -1,7 +1,7 @@
 """
 Unit tests for ProgramEnrollment views.
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import json
 from uuid import uuid4
@@ -15,6 +15,7 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.test import APITestCase
 from six import text_type
+from six.moves import range, zip
 
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.program_enrollments.api.v1.constants import MAX_ENROLLMENT_RECORDS, REQUEST_STUDENT_KEY
@@ -74,7 +75,7 @@ class ProgramEnrollmentListTest(ListViewTestMixin, APITestCase):
         """
         Helper method for creating program enrollment records.
         """
-        for i in xrange(2):
+        for i in range(2):
             user_key = 'user-{}'.format(i)
             ProgramEnrollmentFactory.create(
                 program_uuid=self.program_uuid,
@@ -84,7 +85,7 @@ class ProgramEnrollmentListTest(ListViewTestMixin, APITestCase):
                 external_user_key=user_key,
             )
 
-        for i in xrange(2, 4):
+        for i in range(2, 4):
             user_key = 'user-{}'.format(i)
             ProgramEnrollmentFactory.create(
                 program_uuid=self.program_uuid, curriculum_uuid=self.curriculum_uuid, external_user_key=user_key,
@@ -896,7 +897,7 @@ class ProgramEnrollmentViewPatchTests(APITestCase):
 
     def test_successfully_patched_program_enrollment(self):
         enrollments = {}
-        for i in xrange(4):
+        for i in range(4):
             user_key = 'user-{}'.format(i)
             instance = ProgramEnrollment.objects.create(
                 program_uuid=self.program_uuid,
@@ -1002,7 +1003,7 @@ class ProgramEnrollmentViewPatchTests(APITestCase):
 
     def test_duplicate_enrollment(self):
         enrollments = {}
-        for i in xrange(4):
+        for i in range(4):
             user_key = 'user-{}'.format(i)
             instance = ProgramEnrollment.objects.create(
                 program_uuid=self.program_uuid,
@@ -1043,7 +1044,7 @@ class ProgramEnrollmentViewPatchTests(APITestCase):
 
     def test_partially_valid_enrollment(self):
         enrollments = {}
-        for i in xrange(4):
+        for i in range(4):
             user_key = 'user-{}'.format(i)
             instance = ProgramEnrollment.objects.create(
                 program_uuid=self.program_uuid,
