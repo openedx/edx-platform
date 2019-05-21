@@ -1,5 +1,7 @@
 """Tests for the retire_order command"""
 
+from __future__ import absolute_import
+
 from tempfile import NamedTemporaryFile
 
 from django.core.management import call_command
