@@ -4,6 +4,7 @@ This module contains celery task functions for handling the management of subtas
 import json
 import logging
 from contextlib import contextmanager
+from datetime import datetime
 from time import time
 from uuid import uuid4
 
@@ -336,6 +337,10 @@ def queue_subtasks_for_query(
         num_subtasks += 1
         subtask_status = SubtaskStatus.create(subtask_id)
         new_subtask = create_subtask_fcn(item_list, subtask_status)
+        TASK_LOG.info(
+            u"Queueing BulkEmail Task: %s Subtask: %s at timestamp: %s",
+            task_id, subtask_id, datetime.now()
+        )
         new_subtask.apply_async()
 
     # Subtasks have been queued so no exceptions should be raised after this point.
