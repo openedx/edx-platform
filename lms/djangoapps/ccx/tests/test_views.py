@@ -1,21 +1,26 @@
 """
 test views
 """
+from __future__ import absolute_import
+
 import datetime
 import json
 import re
-import urlparse
 
 import ddt
+import six
+import six.moves.urllib.parse  # pylint: disable=import-error
+from six.moves import range, zip
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
-from django.urls import resolve, reverse
 from django.test import RequestFactory
 from django.test.utils import override_settings
-from pytz import UTC
+from django.urls import resolve, reverse
 from django.utils.translation import ugettext as _
+from edx_django_utils.cache import RequestCache
 from mock import MagicMock, patch
 from opaque_keys.edx.keys import CourseKey
+from pytz import UTC
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.courses import get_course_by_id
@@ -23,7 +28,6 @@ from courseware.tabs import get_course_tab_list
 from courseware.tests.factories import StudentModuleFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.testutils import FieldOverrideTestMixin
-from edx_django_utils.cache import RequestCache
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import get_override_for_ccx, override_field_for_ccx
@@ -109,7 +113,7 @@ def setup_students_and_grades(context):
                         module_state_key=problem.location
                     )
 
-        task_compute_all_grades_for_course.apply_async(kwargs={'course_key': unicode(context.course.id)})
+        task_compute_all_grades_for_course.apply_async(kwargs={'course_key': six.text_type(context.course.id)})
 
 
 def unhide(unit):
@@ -210,7 +214,7 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
                 category="problem",
                 data=StringResponseXMLFactory().build_xml(answer='foo'),
                 metadata={'rerandomize': 'always'}
-            )] for _ in xrange(2))
+            )] for _ in range(2))
 
     def assert_progress_summary(self, ccx_course_key, due):
         """
@@ -242,7 +246,7 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
         """
         self.make_coach()
         ccx = self.make_ccx()
-        ccx_course_key = CCXLocator.from_course_locator(self.course.id, unicode(ccx.id))
+        ccx_course_key = CCXLocator.from_course_locator(self.course.id, six.text_type(ccx.id))
         self.client.login(username=self.coach.username, password="test")
 
         url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_course_key})
@@ -337,7 +341,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         self.make_coach()
         url = reverse(
             'ccx_coach_dashboard',
-            kwargs={'course_id': unicode(self.course.id)})
+            kwargs={'course_id': six.text_type(self.course.id)})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(re.search(
@@ -353,7 +357,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
 
         url = reverse(
             'create_ccx',
-            kwargs={'course_id': unicode(self.course_with_ccx_connect_set.id)})
+            kwargs={'course_id': six.text_type(self.course_with_ccx_connect_set.id)})
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -372,7 +376,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         self.make_coach()
         url = reverse(
             'create_ccx',
-            kwargs={'course_id': unicode(self.course.id)})
+            kwargs={'course_id': six.text_type(self.course.id)})
 
         response = self.client.post(url, {'name': ccx_name})
         self.assertEqual(response.status_code, 302)
@@ -381,7 +385,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 200)
 
         # Get the ccx_key
-        path = urlparse.urlparse(url).path
+        path = six.moves.urllib.parse.urlparse(url).path
         resolver = resolve(path)
         ccx_key = resolver.kwargs['course_id']
 
@@ -856,18 +860,18 @@ class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleSto
         )
 
         self.chapters = [
-            ItemFactory.create(start=start, parent=course) for _ in xrange(2)
+            ItemFactory.create(start=start, parent=course) for _ in range(2)
         ]
         self.sequentials = flatten([
             [
-                ItemFactory.create(parent=chapter) for _ in xrange(2)
+                ItemFactory.create(parent=chapter) for _ in range(2)
             ] for chapter in self.chapters
         ])
         self.verticals = flatten([
             [
                 ItemFactory.create(
                     start=start, due=due, parent=sequential, graded=True, format='Homework', category=u'vertical'
-                ) for _ in xrange(2)
+                ) for _ in range(2)
             ] for sequential in self.sequentials
         ])
 
@@ -876,7 +880,7 @@ class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleSto
         with self.store.bulk_operations(course.id, emit_signals=False):
             blocks = flatten([  # pylint: disable=unused-variable
                 [
-                    ItemFactory.create(parent=vertical) for _ in xrange(2)
+                    ItemFactory.create(parent=vertical) for _ in range(2)
                 ] for vertical in self.verticals
             ])
 
@@ -950,17 +954,17 @@ class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleSto
         vertical = self.verticals[0]
         self.hide_node(vertical)
         locations = self.assert_elements_in_schedule(url, n_verticals=7)
-        self.assertNotIn(unicode(vertical.location), locations)
+        self.assertNotIn(six.text_type(vertical.location), locations)
         # hide a sequential
         sequential = self.sequentials[0]
         self.hide_node(sequential)
         locations = self.assert_elements_in_schedule(url, n_sequentials=3, n_verticals=6)
-        self.assertNotIn(unicode(sequential.location), locations)
+        self.assertNotIn(six.text_type(sequential.location), locations)
         # hide a chapter
         chapter = self.chapters[0]
         self.hide_node(chapter)
         locations = self.assert_elements_in_schedule(url, n_chapters=1, n_sequentials=2, n_verticals=4)
-        self.assertNotIn(unicode(chapter.location), locations)
+        self.assertNotIn(six.text_type(chapter.location), locations)
 
 
 GET_CHILDREN = XModuleMixin.get_children
@@ -1006,7 +1010,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
                 parent=chapter,
                 category="sequential",
                 metadata={'graded': True, 'format': 'Homework'})
-            for _ in xrange(4)
+            for _ in range(4)
         ]
         # making problems available at class level for possible future use in tests
         cls.problems = [
@@ -1016,7 +1020,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
                     category="problem",
                     data=StringResponseXMLFactory().build_xml(answer='foo'),
                     metadata={'rerandomize': 'always'}
-                ) for _ in xrange(4)
+                ) for _ in range(4)
             ] for section in sections
         ]
 
@@ -1052,7 +1056,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
 
         # create a ccx locator and retrieve the course structure using that key
         # which emulates how a student would get access.
-        self.ccx_key = CCXLocator.from_course_locator(self._course.id, unicode(ccx.id))
+        self.ccx_key = CCXLocator.from_course_locator(self._course.id, six.text_type(ccx.id))
         self.course = get_course_by_id(self.ccx_key, depth=None)
         CourseOverview.load_from_module_store(self.course.id)
         setup_students_and_grades(self)
@@ -1082,7 +1086,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         self.assertEqual(len(response.mako_context['students']), 1)
         student_info = response.mako_context['students'][0]
         self.assertEqual(student_info['grade_summary']['percent'], 0.5)
-        self.assertEqual(student_info['grade_summary']['grade_breakdown'].values()[0]['percent'], 0.5)
+        self.assertEqual(list(student_info['grade_summary']['grade_breakdown'].values())[0]['percent'], 0.5)
         self.assertEqual(len(student_info['grade_summary']['section_breakdown']), 4)
 
     def test_grades_csv(self):
@@ -1104,7 +1108,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         headers = rows[0]
 
         # picking first student records
-        data = dict(zip(headers.strip().split(','), rows[1].strip().split(',')))
+        data = dict(list(zip(headers.strip().split(','), rows[1].strip().split(','))))
         self.assertNotIn('HW 04', data)
         self.assertEqual(data['HW 01'], '0.75')
         self.assertEqual(data['HW 02'], '0.5')
@@ -1128,7 +1132,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         self.assertEqual(response.status_code, 200)
         grades = response.mako_context['grade_summary']
         self.assertEqual(grades['percent'], 0.5)
-        self.assertEqual(grades['grade_breakdown'].values()[0]['percent'], 0.5)
+        self.assertEqual(list(grades['grade_breakdown'].values())[0]['percent'], 0.5)
         self.assertEqual(len(grades['section_breakdown']), 4)
 
 
@@ -1199,7 +1203,7 @@ class CCXCoachTabTestCase(CcxTestCase):
         """
         self.make_coach()
         ccx = self.make_ccx()
-        ccx_key = CCXLocator.from_course_locator(self.course.id, unicode(ccx.id))
+        ccx_key = CCXLocator.from_course_locator(self.course.id, six.text_type(ccx.id))
         staff = self.make_staff()
 
         with ccx_course(ccx_key) as course_ccx:
@@ -1228,7 +1232,7 @@ class CCXCoachTabTestCase(CcxTestCase):
         """
         self.make_coach()
         ccx = self.make_ccx()
-        ccx_key = CCXLocator.from_course_locator(self.course.id, unicode(ccx.id))
+        ccx_key = CCXLocator.from_course_locator(self.course.id, six.text_type(ccx.id))
         instructor = self.make_instructor()
 
         with ccx_course(ccx_key) as course_ccx:
@@ -1276,5 +1280,5 @@ class TestStudentViewsWithCCX(ModuleStoreTestCase):
 
     def test_load_courseware(self):
         self.client.login(username=self.student.username, password=self.student_password)
-        response = self.client.get(reverse('courseware', kwargs={'course_id': unicode(self.ccx_course_key)}))
+        response = self.client.get(reverse('courseware', kwargs={'course_id': six.text_type(self.ccx_course_key)}))
         self.assertEqual(response.status_code, 200)
