@@ -8,6 +8,7 @@ from __future__ import absolute_import
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
 
+from bulk_email.api import is_bulk_email_feature_enabled
 from bulk_email.forms import CourseAuthorizationAdminForm, CourseEmailTemplateForm
 from bulk_email.models import BulkEmailFlag, CourseEmailTemplate
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -29,7 +30,7 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
 
     def test_authorize_mongo_course(self):
         # Initially course shouldn't be authorized
-        self.assertFalse(BulkEmailFlag.feature_enabled(self.course.id))
+        self.assertFalse(is_bulk_email_feature_enabled(self.course.id))
         # Test authorizing the course, which should totally work
         form_data = {'course_id': text_type(self.course.id), 'email_enabled': True}
         form = CourseAuthorizationAdminForm(data=form_data)
@@ -37,11 +38,11 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         self.assertTrue(form.is_valid())
         form.save()
         # Check that this course is authorized
-        self.assertTrue(BulkEmailFlag.feature_enabled(self.course.id))
+        self.assertTrue(is_bulk_email_feature_enabled(self.course.id))
 
     def test_repeat_course(self):
         # Initially course shouldn't be authorized
-        self.assertFalse(BulkEmailFlag.feature_enabled(self.course.id))
+        self.assertFalse(is_bulk_email_feature_enabled(self.course.id))
         # Test authorizing the course, which should totally work
         form_data = {'course_id': text_type(self.course.id), 'email_enabled': True}
         form = CourseAuthorizationAdminForm(data=form_data)
@@ -49,7 +50,7 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         self.assertTrue(form.is_valid())
         form.save()
         # Check that this course is authorized
-        self.assertTrue(BulkEmailFlag.feature_enabled(self.course.id))
+        self.assertTrue(is_bulk_email_feature_enabled(self.course.id))
 
         # Now make a new course authorization with the same course id that tries to turn email off
         form_data = {'course_id': text_type(self.course.id), 'email_enabled': False}
@@ -67,7 +68,7 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
             form.save()
 
         # Course should still be authorized (invalid attempt had no effect)
-        self.assertTrue(BulkEmailFlag.feature_enabled(self.course.id))
+        self.assertTrue(is_bulk_email_feature_enabled(self.course.id))
 
     def test_form_typo(self):
         # Munge course id

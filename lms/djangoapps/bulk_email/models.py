@@ -325,6 +325,13 @@ class Optout(models.Model):
         app_label = "bulk_email"
         unique_together = ('user', 'course_id')
 
+    @classmethod
+    def is_user_opted_out_for_course(cls, user, course_id):
+        return cls.objects.filter(
+            user=user,
+            course_id=course_id,
+        ).exists()
+
 
 # Defines the tag that must appear in a template, to indicate
 # the location where the email message body is to be inserted.
