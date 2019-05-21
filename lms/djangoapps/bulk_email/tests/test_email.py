@@ -2,17 +2,21 @@
 """
 Unit tests for sending course email
 """
+from __future__ import absolute_import
+
 import json
 import os
 from unittest import skipIf
 
 import ddt
+import six
+from six.moves import range
 from django.conf import settings
 from django.core import mail
 from django.core.mail.message import forbid_multi_line_headers
 from django.core.management import call_command
-from django.urls import reverse
 from django.test.utils import override_settings
+from django.urls import reverse
 from django.utils.translation import get_language
 from markupsafe import escape
 from mock import Mock, patch
@@ -67,7 +71,7 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
         self.instructor = InstructorFactory(course_key=self.course.id)
 
         self.staff = [
-            StaffFactory(course_key=self.course.id) for __ in xrange(STAFF_COUNT)
+            StaffFactory(course_key=self.course.id) for __ in range(STAFF_COUNT)
         ]
 
     def create_students(self):
@@ -75,7 +79,7 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
         Creates users and enrolls them in self.course. Assigns these users to
         self.students.
         """
-        self.students = [UserFactory() for _ in xrange(STUDENT_COUNT)]
+        self.students = [UserFactory() for _ in range(STUDENT_COUNT)]
         for student in self.students:
             CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
 
@@ -90,7 +94,7 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
         Goes to the instructor dashboard to verify that the email section is
         there.
         """
-        url = reverse('instructor_dashboard', kwargs={'course_id': unicode(self.course.id)})
+        url = reverse('instructor_dashboard', kwargs={'course_id': six.text_type(self.course.id)})
         # Response loads the whole instructor dashboard, so no need to explicitly
         # navigate to a particular email section
         response = self.client.get(url)
@@ -121,10 +125,10 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
         # Pulling up the instructor dash email view here allows us to test sending emails in tests
         self.goto_instructor_dash_email_view()
         self.send_mail_url = reverse(
-            'send_email', kwargs={'course_id': unicode(self.course.id)}
+            'send_email', kwargs={'course_id': six.text_type(self.course.id)}
         )
         self.success_content = {
-            'course_id': unicode(self.course.id),
+            'course_id': six.text_type(self.course.id),
             'success': True,
         }
 
@@ -338,7 +342,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         """
         CourseMode.objects.create(mode_slug='test', course_id=self.course.id)
         for student in self.students:
-            update_enrollment(student, unicode(self.course.id), 'test')
+            update_enrollment(student, six.text_type(self.course.id), 'test')
         test_email = {
             'action': 'Send email',
             'send_to': '["track:test"]',
@@ -362,7 +366,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         # Create a mode and designate an enrolled user to be placed in that mode
         CourseMode.objects.create(mode_slug='test_mode', course_id=self.course.id)
         test_mode_student = self.students[0]
-        update_enrollment(test_mode_student, unicode(self.course.id), 'test_mode')
+        update_enrollment(test_mode_student, six.text_type(self.course.id), 'test_mode')
 
         # Take another user already enrolled in the course, then enroll them in
         # another course but in that same test mode
@@ -373,7 +377,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             user=test_mode_student_other_course,
             course_id=other_course.id
         )
-        update_enrollment(test_mode_student_other_course, unicode(other_course.id), 'test_mode')
+        update_enrollment(test_mode_student_other_course, six.text_type(other_course.id), 'test_mode')
 
         # Send the emails...
         test_email = {
@@ -537,7 +541,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         self.assertEqual(len(unexpected_from_addr), 137)
 
         self.login_as_user(instructor)
-        send_mail_url = reverse('send_email', kwargs={'course_id': unicode(course.id)})
+        send_mail_url = reverse('send_email', kwargs={'course_id': six.text_type(course.id)})
         response = self.client.post(send_mail_url, test_email)
         self.assertTrue(json.loads(response.content)['success'])
 
@@ -563,7 +567,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         mock_factory = MockCourseEmailResult()
         email_mock.side_effect = mock_factory.get_mock_update_subtask_status()
         added_users = []
-        for _ in xrange(LARGE_NUM_EMAILS):
+        for _ in range(LARGE_NUM_EMAILS):
             user = UserFactory()
             added_users.append(user)
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)

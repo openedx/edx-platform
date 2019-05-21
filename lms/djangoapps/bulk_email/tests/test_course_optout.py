@@ -2,20 +2,22 @@
 """
 Unit tests for student optouts from course email
 """
+from __future__ import absolute_import
+
 import json
 
 from django.core import mail
 from django.core.management import call_command
 from django.urls import reverse
+from edx_ace.channel import ChannelType
+from edx_ace.message import Message
+from edx_ace.policy import PolicyResult
+from edx_ace.recipient import Recipient
 from mock import Mock, patch
 from six import text_type
 
 from bulk_email.models import BulkEmailFlag
 from bulk_email.policies import CourseEmailOptout
-from edx_ace.message import Message
-from edx_ace.recipient import Recipient
-from edx_ace.policy import PolicyResult
-from edx_ace.channel import ChannelType
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
