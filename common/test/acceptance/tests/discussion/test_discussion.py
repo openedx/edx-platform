@@ -1008,7 +1008,9 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
             'Text line 2 \n'
             '$$e[n]=d_2$$'
         )
-        self.assertEqual(self.page.get_new_post_preview_text(), 'Text line 1\nText line 2')
+        self.assertEqual(self.page.get_new_post_preview_text(),
+                         'Text line 1\ne[n]=\nd\n1\nText line 2\ne[n]=\nd\n2'
+                         )
 
     def test_inline_mathjax_rendering_in_order(self):
         """
@@ -1023,7 +1025,9 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
             'Text line 2 \n'
             '$e[n]=d_2$'
         )
-        self.assertEqual(self.page.get_new_post_preview_text('.wmd-preview > p'), 'Text line 1 Text line 2')
+        self.assertEqual(self.page.get_new_post_preview_text('.wmd-preview > p'),
+                         'Text line 1\ne[n]=\nd\n1\nText line 2\ne[n]=\nd\n2'
+                         )
 
     def test_mathjax_not_rendered_after_post_cancel(self):
         """
