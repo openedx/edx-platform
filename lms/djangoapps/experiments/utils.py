@@ -2,25 +2,29 @@
 Utilities to facilitate experimentation
 """
 
+from __future__ import absolute_import
+
 import hashlib
-import re
 import logging
+import re
 from decimal import Decimal
-from student.models import CourseEnrollment
+
+import six
 from django.utils.timezone import now
-from lms.djangoapps.commerce.utils import EcommerceService
-from course_modes.models import get_cosmetic_verified_display_price, format_course_price
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+
+from course_modes.models import format_course_price, get_cosmetic_verified_display_price
 from courseware.access import has_staff_access_to_preview_mode
 from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
-from xmodule.partitions.partitions_service import get_user_partition_groups, get_all_partitions_for_course
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys import InvalidKeyError
+from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.django_comment_common.models import Role
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-
+from student.models import CourseEnrollment
+from xmodule.partitions.partitions_service import get_all_partitions_for_course, get_user_partition_groups
 
 logger = logging.getLogger(__name__)
 
@@ -170,7 +174,7 @@ def get_program_price_and_skus(courses):
         skus = None
     else:
         program_price = format_course_price(program_price)
-        program_price = unicode(program_price)
+        program_price = six.text_type(program_price)
 
     return program_price, skus
 
@@ -420,7 +424,7 @@ def get_deprecated_experiment_user_metadata_context(course, user):
 
     return {
         'upgrade_link': upgrade_link,
-        'upgrade_price': unicode(get_cosmetic_verified_display_price(course)),
+        'upgrade_price': six.text_type(get_cosmetic_verified_display_price(course)),
         'enrollment_mode': enrollment_mode,
         'enrollment_time': enrollment_time,
         'pacing_type': 'self_paced' if course.self_paced else 'instructor_paced',
@@ -459,7 +463,7 @@ def get_base_experiment_metadata_context(course, user, enrollment, user_enrollme
 
     return {
         'upgrade_link': upgrade_link,
-        'upgrade_price': unicode(get_cosmetic_verified_display_price(course)),
+        'upgrade_price': six.text_type(get_cosmetic_verified_display_price(course)),
         'enrollment_mode': enrollment_mode,
         'enrollment_time': enrollment_time,
         'pacing_type': 'self_paced' if course.self_paced else 'instructor_paced',
