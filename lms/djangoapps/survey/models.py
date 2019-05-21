@@ -2,6 +2,8 @@
 Models to support Course Surveys feature
 """
 
+from __future__ import absolute_import
+
 import logging
 from collections import OrderedDict
 
@@ -157,7 +159,7 @@ class SurveyForm(TimeStampedModel):
         )
 
         for input_field in input_fields:
-            if 'name' in input_field.keys() and input_field.attrib['name'] not in names:
+            if 'name' in list(input_field.keys()) and input_field.attrib['name'] not in names:
                 names.append(input_field.attrib['name'])
 
         return names
