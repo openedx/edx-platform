@@ -1,15 +1,18 @@
 """ Commerce API v1 view tests. """
+from __future__ import absolute_import
+
 import itertools
 import json
 from datetime import datetime, timedelta
 
 import ddt
 import pytz
+import six
 from django.conf import settings
 from django.contrib.auth.models import Permission
-from django.urls import reverse, reverse_lazy
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.urls import reverse, reverse_lazy
 from rest_framework.utils.encoders import JSONEncoder
 
 from course_modes.models import CourseMode
@@ -72,8 +75,8 @@ class CourseApiViewTestMixin(object):
         verification_deadline = verification_deadline or VerificationDeadline.deadline_for_course(course.id)
 
         return {
-            u'id': unicode(course.id),
-            u'name': unicode(course.display_name),
+            u'id': six.text_type(course.id),
+            u'name': six.text_type(course.display_name),
             u'verification_deadline': cls._serialize_datetime(verification_deadline),
             u'modes': [cls._serialize_course_mode(mode) for mode in modes]
         }
@@ -112,7 +115,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
 
     def setUp(self):
         super(CourseRetrieveUpdateViewTests, self).setUp()
-        self.path = reverse('commerce_api:v1:courses:retrieve_update', args=[unicode(self.course.id)])
+        self.path = reverse('commerce_api:v1:courses:retrieve_update', args=[six.text_type(self.course.id)])
         self.user = UserFactory.create()
         self.client.login(username=self.user.username, password=PASSWORD)
 
@@ -286,7 +289,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
     def test_update_overwrite(self):
         """ Verify that data submitted via PUT overwrites/deletes modes that are
         not included in the body of the request. """
-        course_id = unicode(self.course.id)
+        course_id = six.text_type(self.course.id)
         expected_course_mode = CourseMode(
             mode_slug=u'credit',
             min_price=500,
@@ -323,7 +326,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
                 expiration_datetime=expiration_datetime
             )
         )
-        course_id = unicode(self.course.id)
+        course_id = six.text_type(self.course.id)
         payload = {u'id': course_id, u'modes': [mode]}
         path = reverse('commerce_api:v1:courses:retrieve_update', args=[course_id])
 
@@ -351,7 +354,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
             )
         ]
         expected = self._serialize_course(course, expected_modes)
-        path = reverse('commerce_api:v1:courses:retrieve_update', args=[unicode(course.id)])
+        path = reverse('commerce_api:v1:courses:retrieve_update', args=[six.text_type(course.id)])
 
         response = self.client.put(path, json.dumps(expected), content_type=JSON_CONTENT_TYPE, **request_kwargs)
         self.assertEqual(response.status_code, 201)
@@ -397,13 +400,13 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         course_key = 'non/existing/key'
 
         course_dict = {
-            u'id': unicode(course_key),
-            u'name': unicode('Non Existing Course'),
+            u'id': six.text_type(course_key),
+            u'name': six.text_type('Non Existing Course'),
             u'verification_deadline': None,
             u'modes': [self._serialize_course_mode(mode) for mode in expected_modes]
         }
 
-        path = reverse('commerce_api:v1:courses:retrieve_update', args=[unicode(course_key)])
+        path = reverse('commerce_api:v1:courses:retrieve_update', args=[six.text_type(course_key)])
 
         response = self.client.put(path, json.dumps(course_dict), content_type=JSON_CONTENT_TYPE)
         self.assertEqual(response.status_code, 400)

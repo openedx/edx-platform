@@ -1,7 +1,10 @@
 """ API v1 models. """
+from __future__ import absolute_import
+
 import logging
 from itertools import groupby
 
+import six
 from django.db import transaction
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -22,7 +25,7 @@ class Course(object):
     _deleted_modes = None
 
     def __init__(self, id, modes, **kwargs):  # pylint: disable=redefined-builtin
-        self.id = CourseKey.from_string(unicode(id))  # pylint: disable=invalid-name
+        self.id = CourseKey.from_string(six.text_type(id))  # pylint: disable=invalid-name
         self.modes = list(modes)
         self.verification_deadline = UNDEFINED
         if 'verification_deadline' in kwargs:
@@ -32,7 +35,7 @@ class Course(object):
     @property
     def name(self):
         """ Return course name. """
-        course_id = CourseKey.from_string(unicode(self.id))
+        course_id = CourseKey.from_string(six.text_type(self.id))
 
         try:
             return CourseOverview.get_from_id(course_id).display_name
@@ -112,7 +115,7 @@ class Course(object):
     def get(cls, course_id):
         """ Retrieve a single course. """
         try:
-            course_id = CourseKey.from_string(unicode(course_id))
+            course_id = CourseKey.from_string(six.text_type(course_id))
         except InvalidKeyError:
             log.debug(u'[%s] is not a valid course key.', course_id)
             raise ValueError

@@ -1,7 +1,10 @@
 """ API v1 serializers. """
+from __future__ import absolute_import
+
 from datetime import datetime
 
 import pytz
+import six
 from django.utils.translation import ugettext as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -10,7 +13,7 @@ from rest_framework import serializers
 from course_modes.models import CourseMode
 from xmodule.modulestore.django import modulestore
 
-from .models import Course, UNDEFINED
+from .models import UNDEFINED, Course
 
 
 class CourseModeSerializer(serializers.ModelSerializer):
@@ -40,7 +43,7 @@ def validate_course_id(course_id):
     Check that course id is valid and exists in modulestore.
     """
     try:
-        course_key = CourseKey.from_string(unicode(course_id))
+        course_key = CourseKey.from_string(six.text_type(course_id))
     except InvalidKeyError:
         raise serializers.ValidationError(
             _(u"{course_id} is not a valid course key.").format(
