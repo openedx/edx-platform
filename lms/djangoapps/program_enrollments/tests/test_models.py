@@ -1,17 +1,18 @@
 """
 Unit tests for ProgramEnrollment models.
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 from uuid import uuid4
-from testfixtures import LogCapture
 
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
+from six.moves import range
+from testfixtures import LogCapture
 
-from lms.djangoapps.program_enrollments.models import ProgramEnrollment, ProgramCourseEnrollment
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 from openedx.core.djangoapps.catalog.tests.factories import generate_course_run_key
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 
 class ProgramEnrollmentModelTests(TestCase):
@@ -40,7 +41,7 @@ class ProgramEnrollmentModelTests(TestCase):
         enrollments = []
         student_data = {}
 
-        for i in xrange(5):
+        for i in range(5):
             # This will give us 4 program enrollments for self.program_uuid
             # and 1 enrollment for self.other_program_uuid
             user_curriculum = curriculum_b if i % 2 else curriculum_a
@@ -77,7 +78,7 @@ class ProgramEnrollmentModelTests(TestCase):
 
     def test_user_retirement(self):
         """
-        Test that the external_user_key is uccessfully retired for a user's program enrollments and history.
+        Test that the external_user_key is successfully retired for a user's program enrollments and history.
         """
         new_status = 'withdrawn'
 
