@@ -29,6 +29,7 @@ git+https://github.com/edx/edx-ora2.git@2.2.3#egg=ora2==2.2.3
 git+https://github.com/edx/RecommenderXBlock.git@1.4.0#egg=recommender-xblock==1.4.0
 -e common/lib/safe_lxml
 -e common/lib/sandbox-packages
+git+https://github.com/davestgermain/super-csv@4963bf5da5489f06369da9cce84c92e3e42fe3d2#egg=super-csv==0.1.0
 -e common/lib/symmath
 -e openedx/core/lib/xblock_builtin/xblock_discussion
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.1#egg=xblock-drag-and-drop-v2==2.2.1

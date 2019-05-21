@@ -1362,7 +1362,7 @@ ADVANCED_PROBLEM_TYPES = [
     {
         'component': 'drag-and-drop-v2',
         'boilerplate_name': None
-    }
+    },
 ]
 
 USERNAME_REPLACEMENT_WORKER = "REPLACE WITH VALID USERNAME"
