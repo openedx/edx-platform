@@ -1,15 +1,17 @@
 # pylint: disable=missing-docstring,unused-argument
 """Views for discussion forums."""
 
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import functools
 import json
 import logging
 import random
 import time
-import urlparse
 
+import eventtracking
+import six
+import six.moves.urllib.parse  # pylint: disable=import-error
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core import exceptions
@@ -21,13 +23,16 @@ from django.views.decorators.http import require_GET, require_POST
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
+import lms.djangoapps.discussion.django_comment_client.settings as cc_settings
+import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from courseware.access import has_access
 from courseware.courses import get_course_by_id, get_course_overview_with_access, get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion.django_comment_client.permissions import (
-    check_permissions_by_view, get_team, has_permission,
+    check_permissions_by_view,
+    get_team,
+    has_permission
 )
-import lms.djangoapps.discussion.django_comment_client.settings as cc_settings
 from lms.djangoapps.discussion.django_comment_client.utils import (
     JsonError,
     JsonResponse,
@@ -41,7 +46,6 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
     is_comment_too_deep,
     prepare_content
 )
-import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from openedx.core.djangoapps.django_comment_common.signals import (
     comment_created,
     comment_deleted,
@@ -51,12 +55,11 @@ from openedx.core.djangoapps.django_comment_common.signals import (
     thread_created,
     thread_deleted,
     thread_edited,
-    thread_voted,
     thread_followed,
     thread_unfollowed,
+    thread_voted
 )
 from openedx.core.djangoapps.django_comment_common.utils import ThreadContext
-import eventtracking
 from util.file import store_uploaded_file
 
 log = logging.getLogger(__name__)
@@ -771,18 +774,18 @@ def upload(request, course_id):  # ajax upload file to a question or answer
         )
 
     except exceptions.PermissionDenied as err:
-        error = unicode(err)
+        error = six.text_type(err)
     except Exception as err:      # pylint: disable=broad-except
         print(err)
-        logging.critical(unicode(err))
+        logging.critical(six.text_type(err))
         error = _('Error uploading file. Please contact the site administrator. Thank you.')
 
     if error == '':
         result = _('Good')
         file_url = file_storage.url(new_file_name)
-        parsed_url = urlparse.urlparse(file_url)
-        file_url = urlparse.urlunparse(
-            urlparse.ParseResult(
+        parsed_url = six.moves.urllib.parse.urlparse(file_url)
+        file_url = six.moves.urllib.parse.urlunparse(  # pylint: disable=too-many-function-args
+            six.moves.urllib.parse.ParseResult(
                 parsed_url.scheme,
                 parsed_url.netloc,
                 parsed_url.path,
