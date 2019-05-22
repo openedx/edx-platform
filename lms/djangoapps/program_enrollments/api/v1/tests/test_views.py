@@ -21,12 +21,14 @@ from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.program_enrollments.api.v1.constants import MAX_ENROLLMENT_RECORDS, REQUEST_STUDENT_KEY
 from lms.djangoapps.program_enrollments.api.v1.constants import CourseEnrollmentResponseStatuses as CourseStatuses
 from lms.djangoapps.program_enrollments.models import ProgramEnrollment, ProgramCourseEnrollment
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from student.tests.factories import UserFactory, CourseEnrollmentFactory, SuperuserFactory
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory
 from openedx.core.djangoapps.catalog.tests.factories import OrganizationFactory as CatalogOrganizationFactory
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
+from openedx.core.djangoapps.user_api.models import UserRetirementStatus, RetirementStateError, RetirementState
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin
 from .factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
 
@@ -1083,3 +1085,76 @@ class ProgramEnrollmentViewPatchTests(APITestCase):
             'user-3': 'withdrawn',
             'user-who-is-not-in-program': 'not-in-program',
         })
+
+
+class RetireUserViewTests(APITestCase):
+    """
+    Tests for retiring a user from program_enrollments
+    """
+
+    def setUp(self):
+        super(RetireUserViewTests, self).setUp()
+        self.user = UserFactory()
+        catalog_org1 = CatalogOrganizationFactory.create(key='org1')
+        self.program = ProgramFactory(authoring_organizations=catalog_org1)
+        self.program_enrollment_1 = ProgramEnrollmentFactory.create(
+            user=self.user, external_user_key='user-0',
+        )
+        self.program_enrollment_1.status = 'pending'
+        self.program_enrollment_1.save()
+        self.program_enrollment_1.status = 'suspended'
+        self.program_enrollment_1.save()
+        self.program_enrollment_1.status = 'active'
+        self.program_enrollment_1.save()
+
+        self.program_enrollment_2 = ProgramEnrollmentFactory.create(
+            user=self.user, external_user_key='user-a',
+        )
+        self.retire_program_enrollments_state = RetirementState.objects.create(
+            state_name='RETIRING_PROGRAM_ENROLLMENTS',
+            state_execution_order=50
+        )
+        self.retirement = UserRetirementStatus.create_retirement(self.user)
+        self.retirement.current_state = self.retire_program_enrollments_state
+        self.retirement.save()
+
+        self.superuser = SuperuserFactory()
+        self.url = reverse('programs_api:v1:retire_user')
+
+    def request(self, user, retired_username):
+        token = create_jwt_for_user(user)
+        headers = {'HTTP_AUTHORIZATION': 'JWT ' + token}
+        data = {'username': retired_username}
+        return self.client.post(self.url, json.dumps(data), content_type='application/json', **headers)
+
+    def test_retirement(self):
+        response = self.request(self.superuser, self.user.username)
+        self.assertEqual(204, response.status_code)
+        for program_enrollment in self.user.programenrollment_set.all():
+            self.assertIsNone(program_enrollment.external_user_key)
+            for historical_record in program_enrollment.historical_records.all():
+                self.assertIsNone(historical_record.external_user_key)
+
+    def test_unauthorized(self):
+        response = self.request(self.user, self.user.username)
+        self.assertEqual(403, response.status_code)
+
+    def test_retirement_not_found(self):
+        response = self.request(self.superuser, 'notexistant-user-1243123412')
+        self.assertEqual(404, response.status_code)
+
+    @mock.patch('openedx.core.djangoapps.user_api.models.UserRetirementStatus.get_retirement_for_retirement_action')
+    def test_retirement_error(self, mocked_get_retirement_status):
+        message = 'Problem with Retirement States!!'
+        mocked_get_retirement_status.side_effect = RetirementStateError(message)
+        response = self.request(self.superuser, self.user.username)
+        self.assertEqual(405, response.status_code)
+        self.assertIn(message, response.data)
+
+    @mock.patch('openedx.core.djangoapps.user_api.models.UserRetirementStatus.get_retirement_for_retirement_action')
+    def test_exception(self, mocked_get_retirement_status):
+        message = 'There was a problem!'
+        mocked_get_retirement_status.side_effect = Exception(message)
+        response = self.request(self.superuser, self.user.username)
+        self.assertEqual(500, response.status_code)
+        self.assertIn(message, response.data)

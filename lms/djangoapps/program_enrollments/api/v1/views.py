@@ -6,6 +6,7 @@ from __future__ import absolute_import, unicode_literals
 
 from collections import Counter, OrderedDict
 from functools import wraps
+import six
 
 from django.http import Http404
 from edx_rest_framework_extensions import permissions
@@ -16,6 +17,7 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.pagination import CursorPagination
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from lms.djangoapps.program_enrollments.api.v1.constants import (
     MAX_ENROLLMENT_RECORDS,
@@ -32,6 +34,8 @@ from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, P
 from lms.djangoapps.program_enrollments.utils import get_user_by_program_id
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.user_api.accounts.permissions import CanRetireUser
+from openedx.core.djangoapps.user_api.models import UserRetirementStatus, RetirementStateError
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, PaginatedAPIView, verify_course_exists
 from util.query import use_read_replica_if_available
@@ -703,3 +707,35 @@ class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpec
         if program_course_enrollment is None:
             return CourseEnrollmentResponseStatuses.NOT_FOUND
         return program_course_enrollment.change_status(enrollment_request['status'])
+
+
+class ProgramEnrollmentRetireUserView(APIView):
+    """
+    View for retiring user PII
+
+    Path: ``/api/retire_user/``
+
+    Accepts: [POST]
+
+    Returns: 207 on success
+
+    This view should only be accessable by the retirement service worker
+    """
+    authentication_classes = (JwtAuthentication,)
+    permission_classes = (permissions.IsAuthenticated, CanRetireUser)
+
+    def post(self, request):
+        """
+        Retire a given user's pii from program enrollments
+        """
+        username = request.data['username']
+        try:
+            retirement_status = UserRetirementStatus.get_retirement_for_retirement_action(username)
+            ProgramEnrollment.retire_user(retirement_status.user.id)
+        except UserRetirementStatus.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except RetirementStateError as exc:
+            return Response(six.text_type(exc), status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        except Exception as exc:  # pylint: disable=broad-except
+            return Response(six.text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(status=status.HTTP_204_NO_CONTENT)
