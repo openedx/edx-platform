@@ -109,30 +109,6 @@ class PagesTest(StudioCourseTest):
             u'Order should be:["Empty", "First] but getting {} from the page'.format(static_tab_titles)
         )
 
-    def test_user_can_reorder_builtin_tabs(self):
-        """
-        Scenario: Users can reorder built-in pages
-            Given I have opened the pages page in a new course
-                Then the built-in pages are in the default order
-            When I drag the first page to the last
-                Then the built-in pages are switched
-            And I reload the page
-                Then the built-in pages are switched
-        """
-        default_order = ['Home', 'Course', 'Discussion', 'Wiki', 'Progress']
-        new_order = ['Home', 'Course', 'Wiki', 'Progress', 'Discussion']
-        self.assertEqual(
-            self.pages_page.built_in_page_titles,
-            default_order,
-            'Tabs are not in the default order'
-        )
-        self.pages_page.drag_and_drop(default_tab=True)
-        self.pages_page.wait_for(lambda: self.pages_page.built_in_page_titles == new_order,
-                                 'Tabs are in the new order')
-        self.pages_page.refresh_and_wait_for_load()
-        self.pages_page.wait_for(lambda: self.pages_page.built_in_page_titles == new_order,
-                                 'Tabs are in the new order')
-
     def test_users_can_toggle_visibility(self):
         """
         Scenario: Users can toggle visibility on hideable pages
