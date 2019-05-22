@@ -308,6 +308,14 @@ class TestPipelineUtilityFunctions(TestCase, test.TestCase):
 class EnsureUserInformationTestCase(testutil.TestCase, test.TestCase):
     """Tests ensuring that we have the necessary user information to proceed with the pipeline."""
 
+    def setUp(self):
+        super(EnsureUserInformationTestCase, self).setUp()
+        self.user = social_models.DjangoStorage.user.create_user(
+            username='username',
+            password='password',
+            email='email@example.com',
+        )
+
     @ddt.data(
         (True, '/register'),
         (False, '/login')
@@ -337,6 +345,44 @@ class EnsureUserInformationTestCase(testutil.TestCase, test.TestCase):
                 )
                 assert response.status_code == 302
                 assert response.url == expected_redirect_url
+
+    @ddt.data(
+        ('non_existing_user_email@example.com', '/register', True),
+        ('email@example.com', '/login', True),
+        (None, '/register', True),
+        ('non_existing_user_email@example.com', '/register', False),
+        ('email@example.com', '/login', False),
+        (None, '/login', False),
+    )
+    @ddt.unpack
+    def test_redirect_for_saml_based_on_email_only(self, email, expected_redirect_url, is_saml):
+        """
+        Test that only email(and not username) is used by saml based auth flows
+        to determine if a user already exists
+        """
+        saml_provider = mock.MagicMock(
+            slug='unique_slug',
+            send_to_registration_first=True,
+            skip_email_verification=False
+        )
+        with mock.patch('third_party_auth.pipeline.provider.Registry.get_from_pipeline') as get_from_pipeline:
+            get_from_pipeline.return_value = saml_provider
+            with mock.patch(
+                'third_party_auth.pipeline.provider.Registry.get_enabled_by_backend_name'
+            ) as enabled_saml_providers:
+                enabled_saml_providers.return_value = [saml_provider, ] if is_saml else []
+                with mock.patch('social_core.pipeline.partial.partial_prepare') as partial_prepare:
+                    partial_prepare.return_value = mock.MagicMock(token='')
+                    strategy = mock.MagicMock()
+                    response = pipeline.ensure_user_information(
+                        strategy=strategy,
+                        backend=None,
+                        auth_entry=pipeline.AUTH_ENTRY_LOGIN,
+                        pipeline_index=0,
+                        details={'username': self.user.username, 'email': email}
+                    )
+                    assert response.status_code == 302
+                    assert response.url == expected_redirect_url
 
 
 @unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
