@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-04-25 12:20+0000\n"
-"PO-Revision-Date: 2019-04-25 12:20:52.332973\n"
+"POT-Creation-Date: 2019-05-16 10:12+0000\n"
+"PO-Revision-Date: 2019-05-16 10:12:24.699998\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -366,28 +366,6 @@ msgstr "هردشمهي شوخعرف سثمثذفثي."
 #: common/djangoapps/course_modes/views.py
 msgid "No selected price or selected price is too low."
 msgstr "رخ سثمثذفثي حقهذث خق سثمثذفثي حقهذث هس فخخ مخص."
-
-#: common/djangoapps/django_comment_common/models.py
-msgid "Administrator"
-msgstr "شيوهرهسفقشفخق"
-
-#: common/djangoapps/django_comment_common/models.py
-msgid "Moderator"
-msgstr "وخيثقشفخق"
-
-#: common/djangoapps/django_comment_common/models.py
-msgid "Group Moderator"
-msgstr "لقخعح وخيثقشفخق"
-
-#: common/djangoapps/django_comment_common/models.py
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Community TA"
-msgstr "ذخووعرهفغ فش"
-
-#: common/djangoapps/django_comment_common/models.py
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Student"
-msgstr "سفعيثرف"
 
 #: common/djangoapps/student/admin.py
 msgid "User profile"
@@ -5361,19 +5339,19 @@ msgstr "حمثشسث ذاثذن فاث سغرفشط خب غخعق ثرفقغ."
 msgid "Take free online courses at edX.org"
 msgstr "فشنث بقثث خرمهرث ذخعقسثس شف ثيط.خقل"
 
-#. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
+#. Translators: 'edX' and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
 #: lms/djangoapps/branding/api.py
 #, python-brace-format
 msgid ""
-"© {org_name}.  All rights reserved except where noted.  EdX, Open edX and "
-"their respective logos are trademarks or registered trademarks of edX Inc."
+"© {org_name}.  All rights reserved except where noted.  edX, Open edX and "
+"their respective logos are registered trademarks of edX Inc."
 msgstr ""
 "© {org_name}.  شمم قهلافس قثسثقدثي ثطذثحف صاثقث رخفثي.  ثيط, خحثر ثيط شري "
-"فاثهق قثسحثذفهدث مخلخس شقث فقشيثوشقنس خق قثلهسفثقثي فقشيثوشقنس خب ثيط هرذ."
+"فاثهق قثسحثذفهدث مخلخس شقث قثلهسفثقثي فقشيثوشقنس خب ثيط هرذ."
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
-#. Translators: 'Open edX' is a brand, please keep this untranslated.
+#. Translators: 'Open edX' is a trademark, please keep this untranslated.
 #. See http://openedx.org for more information.
 #. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
 #. Translators: 'Open edX' is a brand, please keep this untranslated. See
@@ -6838,6 +6816,32 @@ msgstr "قخمث"
 msgid "full_name"
 msgstr "بعمم_رشوث"
 
+#: lms/djangoapps/discussion/django_comment_client/base/views.py
+msgid "Title can't be empty"
+msgstr "فهفمث ذشر'ف زث ثوحفغ"
+
+#: lms/djangoapps/discussion/django_comment_client/base/views.py
+msgid "Body can't be empty"
+msgstr "زخيغ ذشر'ف زث ثوحفغ"
+
+#: lms/djangoapps/discussion/django_comment_client/base/views.py
+msgid "Topic doesn't exist"
+msgstr "فخحهذ يخثسر'ف ثطهسف"
+
+#: lms/djangoapps/discussion/django_comment_client/base/views.py
+msgid "Comment level too deep"
+msgstr "ذخووثرف مثدثم فخخ يثثح"
+
+#: lms/djangoapps/discussion/django_comment_client/base/views.py
+msgid ""
+"Error uploading file. Please contact the site administrator. Thank you."
+msgstr ""
+"ثققخق عحمخشيهرل بهمث. حمثشسث ذخرفشذف فاث سهفث شيوهرهسفقشفخق. فاشرن غخع."
+
+#: lms/djangoapps/discussion/django_comment_client/base/views.py
+msgid "Good"
+msgstr "لخخي"
+
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
 #, python-format
@@ -6853,32 +6857,6 @@ msgstr "دهثص يهسذعسسهخر"
 #, python-format
 msgid "Response to %(thread_title)s"
 msgstr "قثسحخرسث فخ %(thread_title)s"
-
-#: lms/djangoapps/django_comment_client/base/views.py
-msgid "Title can't be empty"
-msgstr "فهفمث ذشر'ف زث ثوحفغ"
-
-#: lms/djangoapps/django_comment_client/base/views.py
-msgid "Body can't be empty"
-msgstr "زخيغ ذشر'ف زث ثوحفغ"
-
-#: lms/djangoapps/django_comment_client/base/views.py
-msgid "Topic doesn't exist"
-msgstr "فخحهذ يخثسر'ف ثطهسف"
-
-#: lms/djangoapps/django_comment_client/base/views.py
-msgid "Comment level too deep"
-msgstr "ذخووثرف مثدثم فخخ يثثح"
-
-#: lms/djangoapps/django_comment_client/base/views.py
-msgid ""
-"Error uploading file. Please contact the site administrator. Thank you."
-msgstr ""
-"ثققخق عحمخشيهرل بهمث. حمثشسث ذخرفشذف فاث سهفث شيوهرهسفقشفخق. فاشرن غخع."
-
-#: lms/djangoapps/django_comment_client/base/views.py
-msgid "Good"
-msgstr "لخخي"
 
 #: lms/djangoapps/edxnotes/helpers.py
 msgid "EdxNotes Service is unavailable. Please try again in a few minutes."
@@ -6999,6 +6977,11 @@ msgstr "{platform_name} سفشبب"
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "Course Staff"
 msgstr "ذخعقسث سفشبب"
+
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+#: openedx/core/djangoapps/django_comment_common/models.py
+msgid "Student"
+msgstr "سفعيثرف"
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 #: lms/templates/preview_menu.html
@@ -7829,10 +7812,6 @@ msgstr "عرهف {0} اشس رخ يعث يشفث فخ ثطفثري."
 msgid "An extended due date must be later than the original due date."
 msgstr "شر ثطفثريثي يعث يشفث وعسف زث مشفثق فاشر فاث خقهلهرشم يعث يشفث."
 
-#: lms/djangoapps/instructor/views/tools.py
-msgid "No due date extension is set for that student and unit."
-msgstr "رخ يعث يشفث ثطفثرسهخر هس سثف بخق فاشف سفعيثرف شري عرهف."
-
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's full name.
@@ -8303,6 +8282,10 @@ msgstr ""
 #: lms/djangoapps/notes/views.py lms/templates/notes.html
 msgid "My Notes"
 msgstr "وغ رخفثس"
+
+#: lms/djangoapps/program_enrollments/models.py
+msgid "One of user or external_user_key must not be null."
+msgstr "خرث خب عسثق خق ثطفثقرشم_عسثق_نثغ وعسف رخف زث رعمم."
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Order Payment Confirmation"
@@ -9925,9 +9908,10 @@ msgid "Hello %(full_name)s,"
 msgstr "اثممخ %(full_name)s,"
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
-msgid "Your %(platform_name)s ID verification has expired.\" "
-msgstr "غخعق %(platform_name)s هي دثقهبهذشفهخر اشس ثطحهقثي.\" "
+msgid "Your %(platform_name)s ID verification has expired. "
+msgstr "غخعق %(platform_name)s هي دثقهبهذشفهخر اشس ثطحهقثي. "
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
@@ -9981,11 +9965,6 @@ msgstr "فاث %(platform_name)s فثشو "
 #, python-format
 msgid "Hello %(full_name)s, "
 msgstr "اثممخ %(full_name)s, "
-
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
-#, python-format
-msgid "Your %(platform_name)s ID verification has expired. "
-msgstr "غخعق %(platform_name)s هي دثقهبهذشفهخر اشس ثطحهقثي. "
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/subject.txt
 #, python-format
@@ -10990,6 +10969,23 @@ msgstr "فاهس هس ش فثسف صشقرهرل"
 msgid "This is a test error"
 msgstr "فاهس هس ش فثسف ثققخق"
 
+#: openedx/core/djangoapps/django_comment_common/models.py
+msgid "Administrator"
+msgstr "شيوهرهسفقشفخق"
+
+#: openedx/core/djangoapps/django_comment_common/models.py
+msgid "Moderator"
+msgstr "وخيثقشفخق"
+
+#: openedx/core/djangoapps/django_comment_common/models.py
+msgid "Group Moderator"
+msgstr "لقخعح وخيثقشفخق"
+
+#: openedx/core/djangoapps/django_comment_common/models.py
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Community TA"
+msgstr "ذخووعرهفغ فش"
+
 #: openedx/core/djangoapps/embargo/forms.py
 #: openedx/core/djangoapps/verified_track_content/forms.py
 msgid "COURSE NOT FOUND.  Please check that the course ID is valid."
@@ -11610,10 +11606,15 @@ msgid "Specialty"
 msgstr "سحثذهشمفغ"
 
 #: openedx/core/djangoapps/user_api/accounts/utils.py
+#, python-brace-format
 msgid ""
-" Make sure that you are providing a valid username or a URL that contains \""
+"Make sure that you are providing a valid username or a URL that contains "
+"\"{url_stub}\". To remove the link from your edX profile, leave this field "
+"blank."
 msgstr ""
-" وشنث سعقث فاشف غخع شقث حقخدهيهرل ش دشمهي عسثقرشوث خق ش عقم فاشف ذخرفشهرس \""
+"وشنث سعقث فاشف غخع شقث حقخدهيهرل ش دشمهي عسثقرشوث خق ش عقم فاشف ذخرفشهرس "
+"\"{url_stub}\". فخ قثوخدث فاث مهرن بقخو غخعق ثيط حقخبهمث, مثشدث فاهس بهثمي "
+"زمشرن."
 
 #: openedx/core/djangoapps/user_api/accounts/views.py
 #: openedx/core/djangoapps/user_authn/views/login.py
@@ -12266,6 +12267,15 @@ msgstr "عحيشفثس"
 #: openedx/features/course_experience/templates/course_experience/course-reviews-fragment.html
 msgid "Reviews"
 msgstr "قثدهثصس"
+
+#: openedx/features/course_experience/utils.py
+#, no-python-format, python-brace-format
+msgid ""
+"{banner_open}15% off your first upgrade.{span_close} Discount automatically "
+"applied.{div_close}"
+msgstr ""
+"{banner_open}15% خبب غخعق بهقسف عحلقشيث.{span_close} يهسذخعرف شعفخوشفهذشممغ "
+"شححمهثي.{div_close}"
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
@@ -13314,6 +13324,17 @@ msgstr "قثسثف"
 #: themes/red-theme/lms/templates/footer.html
 msgid "Legal"
 msgstr "مثلشم"
+
+#. Translators: 'edX' and 'Open edX' are trademarks of 'edX Inc.'. Please do
+#. not translate any of these trademarks and company names.
+#: cms/templates/widgets/footer.html
+#: themes/red-theme/lms/templates/footer.html
+msgid ""
+"edX, Open edX, and the edX and Open edX logos are registered trademarks of "
+"{link_start}edX Inc.{link_end}"
+msgstr ""
+"ثيط, خحثر ثيط, شري فاث ثيط شري خحثر ثيط مخلخس شقث قثلهسفثقثي فقشيثوشقنس خب "
+"{link_start}ثيط هرذ.{link_end}"
 
 #: cms/templates/widgets/header.html lms/templates/header/header.html
 #: lms/templates/navigation/navigation.html
@@ -14808,11 +14829,6 @@ msgstr "ذخعقسث هي خق يهق"
 #: lms/templates/sysadmin_dashboard.html
 msgid "Delete course from site"
 msgstr "يثمثفث ذخعقسث بقخو سهفث"
-
-#. Translators: A version number appears after this string
-#: lms/templates/sysadmin_dashboard.html
-msgid "Platform Version"
-msgstr "حمشفبخقو دثقسهخر"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Page {current_page} of {total_pages}"
@@ -16770,7 +16786,6 @@ msgstr "قثبهرث غخعق سثشقذا"
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
 #: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
-#: openedx/features/learner_analytics/templates/learner_analytics/dashboard.html
 msgid "{course_number} Courseware"
 msgstr "{course_number} ذخعقسثصشقث"
 
@@ -19105,15 +19120,11 @@ msgstr "قثحخقفس شدشهمشزمث بخق يخصرمخشي"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The reports listed below are available for download. A link to every report "
-"remains available on this page, identified by the UTC date and time of "
-"generation. Reports are not deleted, so you will always be able to access "
-"previously generated reports from this page."
+"The reports listed below are available for download, identified by UTC date "
+"and time of generation."
 msgstr ""
-"فاث قثحخقفس مهسفثي زثمخص شقث شدشهمشزمث بخق يخصرمخشي. ش مهرن فخ ثدثقغ قثحخقف "
-"قثوشهرس شدشهمشزمث خر فاهس حشلث, هيثرفهبهثي زغ فاث عفذ يشفث شري فهوث خب "
-"لثرثقشفهخر. قثحخقفس شقث رخف يثمثفثي, سخ غخع صهمم شمصشغس زث شزمث فخ شذذثسس "
-"حقثدهخعسمغ لثرثقشفثي قثحخقفس بقخو فاهس حشلث."
+"فاث قثحخقفس مهسفثي زثمخص شقث شدشهمشزمث بخق يخصرمخشي, هيثرفهبهثي زغ عفذ يشفث "
+"شري فهوث خب لثرثقشفهخر."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -19129,13 +19140,19 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"{strong_start}Note{strong_end}: To keep student data secure, you cannot save"
-" or email these links for direct access. Copies of links expire within 5 "
-"minutes."
+"{strong_start}Note{strong_end}: {ul_start}{li_start}To keep student data "
+"secure, you cannot save or email these links for direct access. Copies of "
+"links expire within 5 minutes.{li_end}{li_start}Report files are deleted 90 "
+"days after generation. If you will need access to old reports, download and "
+"store the files, in accordance with your institution's data security "
+"policies.{li_end}{ul_end}"
 msgstr ""
-"{strong_start}رخفث{strong_end}: فخ نثثح سفعيثرف يشفش سثذعقث, غخع ذشررخف سشدث"
-" خق ثوشهم فاثسث مهرنس بخق يهقثذف شذذثسس. ذخحهثس خب مهرنس ثطحهقث صهفاهر 5 "
-"وهرعفثس."
+"{strong_start}رخفث{strong_end}: {ul_start}{li_start}فخ نثثح سفعيثرف يشفش "
+"سثذعقث, غخع ذشررخف سشدث خق ثوشهم فاثسث مهرنس بخق يهقثذف شذذثسس. ذخحهثس خب "
+"مهرنس ثطحهقث صهفاهر 5 وهرعفثس.{li_end}{li_start}قثحخقف بهمثس شقث يثمثفثي 90 "
+"يشغس شبفثق لثرثقشفهخر. هب غخع صهمم رثثي شذذثسس فخ خمي قثحخقفس, يخصرمخشي شري "
+"سفخقث فاث بهمثس, هر شذذخقيشرذث صهفا غخعق هرسفهفعفهخر'س يشفش سثذعقهفغ "
+"حخمهذهثس.{li_end}{ul_end}"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Enrollment Codes"
@@ -19525,15 +19542,15 @@ msgstr "هريهدهيعشم يعث يشفث ثطفثرسهخرس"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid ""
-"In this section, you have the ability to grant extensions on specific units "
-"to individual students. Please note that the latest date is always taken; "
-"you cannot use this tool to make an assignment due earlier for a particular "
-"student."
+"In this section, you have the ability to grant extensions on specific "
+"subsections to individual students. Please note that the latest date is "
+"always taken; you cannot use this tool to make an assignment due earlier for"
+" a particular student."
 msgstr ""
-"هر فاهس سثذفهخر, غخع اشدث فاث شزهمهفغ فخ لقشرف ثطفثرسهخرس خر سحثذهبهذ عرهفس "
-"فخ هريهدهيعشم سفعيثرفس. حمثشسث رخفث فاشف فاث مشفثسف يشفث هس شمصشغس فشنثر; "
-"غخع ذشررخف عسث فاهس فخخم فخ وشنث شر شسسهلروثرف يعث ثشقمهثق بخق ش حشقفهذعمشق "
-"سفعيثرف."
+"هر فاهس سثذفهخر, غخع اشدث فاث شزهمهفغ فخ لقشرف ثطفثرسهخرس خر سحثذهبهذ "
+"سعزسثذفهخرس فخ هريهدهيعشم سفعيثرفس. حمثشسث رخفث فاشف فاث مشفثسف يشفث هس "
+"شمصشغس فشنثر; غخع ذشررخف عسث فاهس فخخم فخ وشنث شر شسسهلروثرف يعث ثشقمهثق بخق"
+" ش حشقفهذعمشق سفعيثرف."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid ""
@@ -19546,8 +19563,8 @@ msgid "Student Email or Username"
 msgstr "سفعيثرف ثوشهم خق عسثقرشوث"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
-msgid "Choose the graded unit:"
-msgstr "ذاخخسث فاث لقشيثي عرهف:"
+msgid "Choose the graded subsection:"
+msgstr "ذاخخسث فاث لقشيثي سعزسثذفهخر:"
 
 #. Translators: "format_string" is the string MM/DD/YYYY HH:MM, as that is the
 #. format the system requires.
@@ -19560,6 +19577,10 @@ msgstr ""
 "{format_string})."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
+msgid "Reason for extension"
+msgstr "قثشسخر بخق ثطفثرسهخر"
+
+#: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Change due date for student"
 msgstr "ذاشرلث يعث يشفث بخق سفعيثرف"
 
@@ -19569,19 +19590,19 @@ msgstr "دهثصهرل لقشرفثي ثطفثرسهخرس"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid ""
-"Here you can see what extensions have been granted on particular units or "
-"for a particular student."
+"Here you can see what extensions have been granted on particular subsection "
+"or for a particular student."
 msgstr ""
-"اثقث غخع ذشر سثث صاشف ثطفثرسهخرس اشدث زثثر لقشرفثي خر حشقفهذعمشق عرهفس خق "
-"بخق ش حشقفهذعمشق سفعيثرف."
+"اثقث غخع ذشر سثث صاشف ثطفثرسهخرس اشدث زثثر لقشرفثي خر حشقفهذعمشق سعزسثذفهخر "
+"خق بخق ش حشقفهذعمشق سفعيثرف."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid ""
-"Choose a graded unit and click the button to obtain a list of all students "
-"who have extensions for the given unit."
+"Choose a graded subsection and click the button to obtain a list of all "
+"students who have extensions for the given subsection."
 msgstr ""
-"ذاخخسث ش لقشيثي عرهف شري ذمهذن فاث زعففخر فخ خزفشهر ش مهسف خب شمم سفعيثرفس "
-"صاخ اشدث ثطفثرسهخرس بخق فاث لهدثر عرهف."
+"ذاخخسث ش لقشيثي سعزسثذفهخر شري ذمهذن فاث زعففخر فخ خزفشهر ش مهسف خب شمم "
+"سفعيثرفس صاخ اشدث ثطفثرسهخرس بخق فاث لهدثر سعزسثذفهخر."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "List all students with due date extensions"
@@ -19602,12 +19623,16 @@ msgstr "قثسثففهرل ثطفثرسهخرس"
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid ""
 "Resetting a problem's due date rescinds a due date extension for a student "
-"on a particular unit. This will revert the due date for the student back to "
-"the problem's original due date."
+"on a particular subsection. This will revert the due date for the student "
+"back to the problem's original due date."
 msgstr ""
 "قثسثففهرل ش حقخزمثو'س يعث يشفث قثسذهريس ش يعث يشفث ثطفثرسهخر بخق ش سفعيثرف "
-"خر ش حشقفهذعمشق عرهف. فاهس صهمم قثدثقف فاث يعث يشفث بخق فاث سفعيثرف زشذن فخ "
-"فاث حقخزمثو'س خقهلهرشم يعث يشفث."
+"خر ش حشقفهذعمشق سعزسثذفهخر. فاهس صهمم قثدثقف فاث يعث يشفث بخق فاث سفعيثرف "
+"زشذن فخ فاث حقخزمثو'س خقهلهرشم يعث يشفث."
+
+#: lms/templates/instructor/instructor_dashboard_2/extensions.html
+msgid "Reason for reset"
+msgstr "قثشسخر بخق قثسثف"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Reset due date for student"
@@ -21805,10 +21830,6 @@ msgstr "غخع اشدث رخف حعقذاشسثي شذذثسس فخ شرغ تخ�
 msgid "Explore journals and courses"
 msgstr "ثطحمخقث تخعقرشمس شري ذخعقسثس"
 
-#: openedx/features/learner_analytics/templates/learner_analytics/dashboard.html
-msgid "My Stats (Beta)"
-msgstr "وغ سفشفس (زثفش)"
-
 #. Translators: this section lists all the third-party authentication
 #. providers
 #. (for example, Google and LinkedIn) the user can link with or unlink from
@@ -21911,7 +21932,7 @@ msgid "© 2012–{year} edX Inc. "
 msgstr "© 2012–{year} ثيط هرذ. "
 
 #: themes/edx.org/lms/templates/footer.html
-msgid "EdX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
+msgid "edX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
 msgstr ""
 "ثيط, خحثر ثيط, شري وهذقخوشسفثقس شقث قثلهسفثقثي فقشيثوشقنس خب ثيط هرذ. "
 
@@ -21991,10 +22012,10 @@ msgstr "ثيط هرذ."
 #: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
 msgid ""
 "All rights reserved except where noted. edX, Open edX and the edX and Open "
-"edX logos are registered trademarks or trademarks of edX Inc."
+"edX logos are registered trademarks of edX Inc."
 msgstr ""
 "شمم قهلافس قثسثقدثي ثطذثحف صاثقث رخفثي. ثيط, خحثر ثيط شري فاث ثيط شري خحثر "
-"ثيط مخلخس شقث قثلهسفثقثي فقشيثوشقنس خق فقشيثوشقنس خب ثيط هرذ."
+"ثيط مخلخس شقث قثلهسفثقثي فقشيثوشقنس خب ثيط هرذ."
 
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
@@ -22019,16 +22040,6 @@ msgstr "بهري ذخعقسثس"
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Schools & Partners"
 msgstr "سذاخخمس & حشقفرثقس"
-
-#. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
-#. Please do not translate any of these trademarks and company names.
-#: themes/red-theme/lms/templates/footer.html
-msgid ""
-"EdX, Open edX, and the edX and Open edX logos are registered trademarks or "
-"trademarks of {link_start}edX Inc.{link_end}"
-msgstr ""
-"ثيط, خحثر ثيط, شري فاث ثيط شري خحثر ثيط مخلخس شقث قثلهسفثقثي فقشيثوشقنس خق "
-"فقشيثوشقنس خب {link_start}ثيط هرذ.{link_end}"
 
 #: themes/red-theme/lms/templates/footer.html
 msgid ""
@@ -25639,16 +25650,6 @@ msgstr "شذذثسسهزهمهفغ شذذخووخيشفهخر قثضعثسف"
 #: cms/templates/widgets/footer.html
 msgid "LMS"
 msgstr "موس"
-
-#. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX
-#. Inc.'. Please do not translate any of these trademarks and company names.
-#: cms/templates/widgets/footer.html
-msgid ""
-"EdX, Open edX, Studio, and the edX and Open edX logos are registered "
-"trademarks or trademarks of {link_start}edX Inc.{link_end}"
-msgstr ""
-"ثيط, خحثر ثيط, سفعيهخ, شري فاث ثيط شري خحثر ثيط مخلخس شقث قثلهسفثقثي "
-"فقشيثوشقنس خق فقشيثوشقنس خب {link_start}ثيط هرذ.{link_end}"
 
 #: cms/templates/widgets/header.html
 msgid "Current Course:"
