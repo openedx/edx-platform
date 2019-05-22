@@ -34,6 +34,8 @@ from openedx.core.djangoapps.catalog.utils import get_currency_data
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+from openedx.features.course_experience.utils import get_first_purchase_offer_banner_fragment
+from openedx.features.discounts.applicability import discount_percentage
 from student.models import CourseEnrollment
 from util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
@@ -190,10 +192,21 @@ class ChooseModeView(View):
                 for x in verified_mode.suggested_prices.split(",")
                 if x.strip()
             ]
+            price_before_discount = verified_mode.min_price
+
             context["currency"] = verified_mode.currency.upper()
-            context["min_price"] = verified_mode.min_price
+            context["min_price"] = price_before_discount
             context["verified_name"] = verified_mode.name
             context["verified_description"] = verified_mode.description
+
+            offer_banner_fragment = get_first_purchase_offer_banner_fragment(
+                request.user, course
+            )
+            if offer_banner_fragment:
+                context['offer_banner_fragment'] = offer_banner_fragment
+                discounted_price = "{:0.2f}".format(price_before_discount * ((100.0 - discount_percentage()) / 100))
+                context["min_price"] = discounted_price
+                context["price_before_discount"] = price_before_discount
 
             if verified_mode.sku:
                 context["use_ecommerce_payment_flow"] = ecommerce_service.is_enabled(request.user)
