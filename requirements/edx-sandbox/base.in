@@ -15,7 +15,7 @@ numpy==1.6.2                        # Numeric array processing utilities; used b
 pyparsing==2.2.0                    # Python Parsing module
 scipy==0.14.0                       # Math, science, and engineering library
 sympy==0.7.1                        # Symbolic math library
--e git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4
+git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4
 
 # Install these packages from the edx-platform working tree
 # NOTE: if you change code in these packages, you MUST change the version
