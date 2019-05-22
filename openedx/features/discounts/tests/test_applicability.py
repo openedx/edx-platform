@@ -5,7 +5,9 @@ from datetime import timedelta
 from django.utils.timezone import now
 
 from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+from openedx.features.discounts.models import DiscountRestrictionConfig
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -23,6 +25,8 @@ class TestApplicability(ModuleStoreTestCase):
         super(TestApplicability, self).setUp()
         self.user = UserFactory.create()
         self.course = CourseFactory.create(run='test', display_name='test')
+        course_overview = CourseOverview.get_from_id(self.course.id)
+        DiscountRestrictionConfig.objects.create(enabled=True, course=course_overview)
         CourseModeFactory.create(course_id=self.course.id, mode_slug='verified')
 
     def test_can_receive_discount(self):
@@ -39,9 +43,13 @@ class TestApplicability(ModuleStoreTestCase):
         self.assertEqual(applicability, True)
 
         no_verified_mode_course = CourseFactory(end=now() + timedelta(days=30))
+        no_verified_mode_course_overview = CourseOverview.get_from_id(no_verified_mode_course.id)
+        DiscountRestrictionConfig.objects.create(enabled=True, course=no_verified_mode_course_overview)
         applicability = can_receive_discount(user=self.user, course=no_verified_mode_course)
         self.assertEqual(applicability, False)
 
         course_that_has_ended = CourseFactory(end=now() - timedelta(days=30))
+        course_that_has_ended_overview = CourseOverview.get_from_id(course_that_has_ended.id)
+        DiscountRestrictionConfig.objects.create(enabled=True, course=course_that_has_ended_overview)
         applicability = can_receive_discount(user=self.user, course=course_that_has_ended)
         self.assertEqual(applicability, False)
