@@ -21,7 +21,7 @@ from lazy import lazy
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from opaque_keys.edx.keys import CourseKey, UsageKey
-
+from courseware.models import StudentModule
 from coursewarehistoryextended.fields import UnsignedBigIntAutoField, UnsignedBigIntOneToOneField
 from lms.djangoapps.grades import events, constants
 from openedx.core.lib.cache_utils import get_cache
@@ -791,3 +791,18 @@ class PersistentSubsectionGradeOverrideHistory(models.Model):
     @classmethod
     def get_override_history(cls, override_id):
         return cls.objects.filter(override_id=override_id)
+
+
+class ScoreOverrider(models.Model):
+    """
+    Records who overrode a score, for bulk score assignments.
+    """
+    module = models.ForeignKey(StudentModule, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
+    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
+
+    class Meta(object):
+        app_label = "grades"
+
+    def __unicode__(self):
+        return 'ScoreOverrider({}, {})'.format(self.module.module_state_key, self.user)

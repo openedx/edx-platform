@@ -15,8 +15,9 @@ from opaque_keys.edx.keys import UsageKey
 from courseware.models import StudentModule
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment
-from super_csv import ChecksumMixin, CSVProcessor, DeferrableMixin
+from super_csv.csv_processor import ChecksumMixin, CSVProcessor, DeferrableMixin
 
+from .models import ScoreOverrider
 from .config.waffle import ENFORCE_FREEZE_GRADE_AFTER_COURSE_END, waffle_flags
 
 log = logging.getLogger(__name__)
@@ -37,14 +38,14 @@ class ScoreCSVProcessor(ChecksumMixin, DeferrableMixin, CSVProcessor):
     handle_undo = False
 
     def __init__(self, **kwargs):
-        self.now = time.time()
         self.max_points = 1
+        self.user_id = None
         self.display_name = ''
         super(ScoreCSVProcessor, self).__init__(**kwargs)
         self.users_seen = {}
 
     def get_unique_path(self):
-        return 'csv/state/{}/{}'.format(self.block_id, self.now)
+        return 'sgp/{}'.format(self.block_id)
 
     def validate_row(self, row):
         if not super(ScoreCSVProcessor, self).validate_row(row):
@@ -68,7 +69,8 @@ class ScoreCSVProcessor(ChecksumMixin, DeferrableMixin, CSVProcessor):
                 'user_id': row['user_id'],
                 'block_id': self.block_id,
                 'new_points': float(row['points']),
-                'max_points': self.max_points
+                'max_points': self.max_points,
+                'override_user_id': self.user_id,
             }
             self.users_seen[row['user_id']] = 1
             return to_save
@@ -86,7 +88,7 @@ class ScoreCSVProcessor(ChecksumMixin, DeferrableMixin, CSVProcessor):
             undo['max_points'] = row['max_points']
         else:
             undo = None
-        set_score(row['block_id'], row['user_id'], row['new_points'], row['max_points'])
+        set_score(row['block_id'], row['user_id'], row['new_points'], row['max_points'], row['override_user_id'])
         return True, undo
 
     def _get_enrollments(self, course_id, **kwargs):  # pylint: disable=unused-argument
@@ -135,7 +137,7 @@ class ScoreCSVProcessor(ChecksumMixin, DeferrableMixin, CSVProcessor):
             if score:
                 row['last_points'] = int(score['grade'] * self.max_points)
                 row['date_last_graded'] = score['modified']
-                # TODO: figure out who last graded
+                row['who_last_graded'] = score.get('who_last_graded', None)
             yield row
 
 
@@ -150,7 +152,7 @@ def are_grades_frozen(course_key):
     return False
 
 
-def set_score(usage_key, student_id, score, max_points, **defaults):
+def set_score(usage_key, student_id, score, max_points, override_user_id=None, **defaults):
     """
     Set a score.
     """
@@ -159,11 +161,15 @@ def set_score(usage_key, student_id, score, max_points, **defaults):
     defaults['module_type'] = 'problem'
     defaults['grade'] = score / (max_points or 1.0)
     defaults['max_grade'] = max_points
-    StudentModule.objects.update_or_create(
+    module = StudentModule.objects.update_or_create(
         student_id=student_id,
         course_id=usage_key.course_key,
         module_state_key=usage_key,
-        defaults=defaults)
+        defaults=defaults)[0]
+    if override_user_id:
+        ScoreOverrider.objects.create(
+            module=module,
+            user_id=override_user_id)
 
 
 def get_score(usage_key, user_id):
@@ -211,4 +217,7 @@ def get_scores(usage_key, user_ids=None):
             'modified': row.modified,
             'state': row.state,
         }
+        last_override = row.scoreoverrider_set.latest('created')
+        if last_override:
+            scores[row.student_id]['who_last_graded'] = last_override.user_id
     return scores
