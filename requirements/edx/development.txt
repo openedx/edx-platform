@@ -209,7 +209,7 @@ moto==0.3.1
 mpmath==1.1.0
 mysqlclient==1.4.2.post1
 networkx==1.7
-newrelic==4.18.0.118
+newrelic==4.20.0.120
 nltk==3.4.1
 nodeenv==1.1.1
 numpy==1.16.3
