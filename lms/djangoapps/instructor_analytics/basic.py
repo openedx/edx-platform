@@ -334,7 +334,7 @@ def get_proctored_exam_results(course_key, features):
     """
     comment_statuses = ['Rules Violation', 'Suspicious']
 
-    def extract_details(exam_attempt, features, course_enrollment):
+    def extract_details(exam_attempt, features, course_enrollments):
         """
         Build dict containing information about a single student exam_attempt.
         """
@@ -351,13 +351,15 @@ def get_proctored_exam_results(course_key, features):
                 u'{status} Count'.format(status=status): len(comment_list),
                 u'{status} Comments'.format(status=status): '; '.join(comment_list),
             })
-
-        proctored_exam['track'] = course_enrollment[exam_attempt['user_id']]
+        try:
+            proctored_exam['track'] = course_enrollments[exam_attempt['user_id']]
+        except KeyError:
+            proctored_exam['track'] = 'Unknown'
         return proctored_exam
 
     exam_attempts = get_exam_violation_report(course_key)
-    course_enrollment = get_enrollments_for_course(exam_attempts)
-    return [extract_details(exam_attempt, features, course_enrollment) for exam_attempt in exam_attempts]
+    course_enrollments = get_enrollments_for_course(exam_attempts)
+    return [extract_details(exam_attempt, features, course_enrollments) for exam_attempt in exam_attempts]
 
 
 def get_enrollments_for_course(exam_attempts):
