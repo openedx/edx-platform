@@ -208,6 +208,27 @@ class TestGetPrograms(CacheIsolationTestCase):
         self.assertEqual(actual_program, [expected_program])
         self.assertFalse(mock_warning.called)
 
+    def test_get_via_uuids(self, mock_warning, _mock_info):
+        first_program = ProgramFactory()
+        second_program = ProgramFactory()
+
+        cache.set(
+            PROGRAM_CACHE_KEY_TPL.format(uuid=first_program['uuid']),
+            first_program,
+            None
+        )
+        cache.set(
+            PROGRAM_CACHE_KEY_TPL.format(uuid=second_program['uuid']),
+            second_program,
+            None
+        )
+
+        results = get_programs(uuids=[first_program['uuid'], second_program['uuid']])
+
+        assert first_program in results
+        assert second_program in results
+        assert not mock_warning.called
+
 
 @skip_unless_lms
 @mock.patch(UTILS_MODULE + '.logger.info')

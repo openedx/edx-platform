@@ -440,6 +440,58 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
         )
 
 
+class LearnerProgramEnrollmentsView(DeveloperErrorViewMixin, APIView):
+    """
+    A view for checking the currently logged-in learner's program enrollments
+
+    Path: `/api/program_enrollments/v1/programs/enrollments/`
+
+    Returns:
+      * 200: OK - Contains a list of all programs in which the learner is enrolled.
+      * 401: The requesting user is not authenticated.
+
+    The list will be a list of objects with the following keys:
+      * `uuid` - the identifier of the program in which the learner is enrolled.
+      * `slug` - the string from which a link to the corresponding program page can be constructed.
+
+    Example:
+    [
+      {
+        'uuid': '00000000-1111-2222-3333-444444444444',
+        'slug': 'deadbeef'
+      },
+      {
+        'uuid': '00000000-1111-2222-3333-444444444445',
+        'slug': 'undead-cattle'
+      }
+    ]
+    """
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        """
+        How to respond to a GET request to this endpoint
+        """
+        program_enrollments = ProgramEnrollment.objects.filter(
+            user=request.user,
+            status__in=('enrolled', 'pending')
+        )
+
+        uuids = [enrollment.program_uuid for enrollment in program_enrollments]
+
+        catalog_data_of_programs = get_programs(uuids=uuids) or []
+        programs_in_which_learner_is_enrolled = [{'uuid': program['uuid'], 'slug': program['marketing_slug']}
+                                                 for program
+                                                 in catalog_data_of_programs]
+
+        return Response(programs_in_which_learner_is_enrolled, status.HTTP_200_OK)
+
+
 class ProgramSpecificViewMixin(object):
     """
     A mixin for views that operate on or within a specific program.

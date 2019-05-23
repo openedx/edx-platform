@@ -54,6 +54,7 @@ class ListViewTestMixin(object):
     def setUpClass(cls):
         super(ListViewTestMixin, cls).setUpClass()
         cls.program_uuid = '00000000-1111-2222-3333-444444444444'
+        cls.program_uuid_tmpl = '00000000-1111-2222-3333-4444444444{0:02d}'
         cls.curriculum_uuid = 'aaaaaaaa-1111-2222-3333-444444444444'
         cls.other_curriculum_uuid = 'bbbbbbbb-1111-2222-3333-444444444444'
 
@@ -75,6 +76,37 @@ class ListViewTestMixin(object):
             kwargs['course_id'] = course_id or self.course_id
 
         return reverse(self.view_name, kwargs=kwargs)
+
+
+class LearnerProgramEnrollmentTest(ListViewTestMixin, APITestCase):
+    """
+    Tests for the LearnerProgramEnrollment view class
+    """
+    view_name = 'programs_api:v1:learner_program_enrollments'
+
+    def test_401_if_anonymous(self):
+        response = self.client.get(reverse(self.view_name))
+        assert status.HTTP_401_UNAUTHORIZED == response.status_code
+
+    @mock.patch('lms.djangoapps.program_enrollments.api.v1.views.get_programs', autospec=True, return_value=None)
+    def test_200_if_no_programs_enrolled(self, mock_get_programs):
+        self.client.login(username=self.student.username, password=self.password)
+        response = self.client.get(reverse(self.view_name))
+        assert status.HTTP_200_OK == response.status_code
+        assert response.data == []
+        assert mock_get_programs.call_count == 1
+
+    @mock.patch('lms.djangoapps.program_enrollments.api.v1.views.get_programs', autospec=True, return_value=[
+        {'uuid': 'boop', 'marketing_slug': 'garbage-program'},
+        {'uuid': 'boop-boop', 'marketing_slug': 'garbage-study'},
+        {'uuid': 'boop-boop-boop', 'marketing_slug': 'garbage-life'},
+    ])
+    def test_200_many_programs(self, mock_get_programs):
+        self.client.login(username=self.student.username, password=self.password)
+        response = self.client.get(reverse(self.view_name))
+        assert status.HTTP_200_OK == response.status_code
+        assert len(response.data) == 3
+        assert mock_get_programs.call_count == 1
 
 
 class ProgramEnrollmentListTest(ListViewTestMixin, APITestCase):
