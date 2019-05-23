@@ -203,7 +203,7 @@ pipeline {
                 } finally {
                     if (env.ghprbPullId != null) {
                         // For PR jobs, run the edx-platform-test-notifier for PR reporting
-                        build job: 'edx-platform-test-notifier', parameters: [string(name: 'PR_NUMBER', value: "${ghprbPullId}")], wait: false
+                        build job: 'edx-platform-test-notifier', parameters: [string(name: 'REPO', value: "${REPO_NAME}"), string(name: 'PR_NUMBER', value: "${ghprbPullId}")], wait: false
                     } else {
                         // For master jobs run github-build-status and report to slack when necessary
                         if (currentBuild.currentResult == "SUCCESS") {
