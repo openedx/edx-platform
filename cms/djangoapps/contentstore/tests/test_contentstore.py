@@ -1101,9 +1101,9 @@ class MiscCourseTests(ContentStoreTestCase):
         self.assertEqual(len(assets), 0)
         self.assertEqual(count, 0)
 
-    def test_course_handouts_rewrites(self):
+    def test_course_handouts_doesnot_rewrites(self):
         """
-        Test that the xblock_handler rewrites static handout links
+        Test that the xblock_handler does not rewrites static handout links
         """
         handouts = self.store.create_item(
             self.user.id, self.course.id, 'course_info', 'handouts', fields={
@@ -1116,8 +1116,7 @@ class MiscCourseTests(ContentStoreTestCase):
 
         # make sure we got a successful response
         self.assertEqual(resp.status_code, 200)
-        # check that /static/ has been converted to the full path
-        # note, we know the link it should be because that's what in the 'toy' course in the test data
+        # check that /static/ has not been converted to the full path
         asset_key = '/static/handouts/sample_handout.txt'
         self.assertContains(resp, text_type(asset_key))
 
