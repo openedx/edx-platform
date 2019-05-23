@@ -350,6 +350,7 @@ disable =
 	too-many-locals,
 	too-many-public-methods,
 	too-many-return-statements,
+	ungrouped-imports,
 	unichr-builtin,
 	unicode-builtin,
 	unpacking-in-except,
@@ -456,4 +457,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = Exception
 
-# 69925c09262a3e603e0b833ddc773d2d0c267899
+# f53942526b8e9020150e5025e6a8aa60c76971d9
