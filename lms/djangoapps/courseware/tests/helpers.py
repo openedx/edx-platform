@@ -173,6 +173,10 @@ class LoginEnrollmentTestCase(TestCase):
         self.login(self.email, self.password)
 
     def assert_request_status_code(self, status_code, url, method="GET", **kwargs):
+        """
+        Make a request to the specified URL and verify that it returns the
+        expected status code.
+        """
         make_request = getattr(self.client, method.lower())
         response = make_request(url, **kwargs)
         self.assertEqual(
