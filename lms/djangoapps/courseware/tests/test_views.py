@@ -1922,7 +1922,6 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
             depth=2
         )
         self.addCleanup(set_current_request, None)
-        # pylint: disable=protected-access
         module = get_module(
             self.user,
             get_mock_request(self.user),

@@ -174,7 +174,7 @@ class Command(BaseCommand):
             else:
                 log.fatal(
                     u"simulate_publish should be run as a CMS (Studio) " +
-                    u"command, not %s (override with --force-lms).",  # pylint: disable=unicode-format-string
+                    u"command, not %s (override with --force-lms).",
                     os.environ.get('SERVICE_VARIANT')
                 )
                 sys.exit(1)

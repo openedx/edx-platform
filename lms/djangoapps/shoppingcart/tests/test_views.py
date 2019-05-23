@@ -463,7 +463,8 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
 
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
         self.assertEqual(resp.status_code, 404)
-        self.assertIn(u"Code '{0}' is not valid for any course in the shopping cart.".format(self.reg_code), resp.content)
+        self.assertIn(u"Code '{0}' is not valid for any course in the shopping cart.".format(self.reg_code),
+                      resp.content)
 
     def test_cart_item_qty_greater_than_1_against_valid_reg_code(self):
         course_key = text_type(self.course_key)
@@ -727,7 +728,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.assertEqual(resp.status_code, 200)
         self.assertEquals(self.cart.orderitem_set.count(), 1)
         info_log.assert_called_with(
-            'Coupon "%s" redemption entry removed for user "%s" for order item "%s"',  # pylint: disable=unicode-format-string,line-too-long
+            'Coupon "%s" redemption entry removed for user "%s" for order item "%s"',  # pylint: disable=unicode-format-string
             self.coupon_code,
             self.user,
             str(reg_item.id)
@@ -740,7 +741,8 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         cert_item = CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'honor')
         self.assertEquals(self.cart.orderitem_set.count(), 2)
 
-        # Delete the discounted item, corresponding coupon redemption should be removed for that particular discounted item
+        # Delete the discounted item, corresponding coupon redemption
+        # should be removed for that particular discounted item
         resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
                                 {'id': cert_item.id})
 
@@ -1253,7 +1255,8 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.assertIn('FirstNameTesting123', resp.content)
         self.assertIn('80.00', resp.content)
         # check for the enrollment codes content
-        self.assertIn('Please send each professional one of these unique registration codes to enroll into the course.', resp.content)
+        self.assertIn('Please send each professional one of these unique registration codes to enroll into the course.',
+                      resp.content)
 
         # fetch the newly generated registration codes
         course_registration_codes = CourseRegistrationCode.objects.filter(order=self.cart)
@@ -2141,7 +2144,9 @@ class CSVReportViewsTest(SharedModuleStoreTestCase):
     def test_report_csv_bad_date(self):
         self.login_user()
         self.add_to_download_group(self.user)
-        response = self.client.post(reverse('payment_csv_report'), {'start_date': 'BAD', 'end_date': 'BAD', 'requested_report': 'itemized_purchase_report'})
+        response = self.client.post(reverse('payment_csv_report'),
+                                    {'start_date': 'BAD', 'end_date': 'BAD',
+                                     'requested_report': 'itemized_purchase_report'})
 
         ((template, context), unused_kwargs) = render_mock.call_args
         self.assertEqual(template, 'shoppingcart/download_report.html')

@@ -10,7 +10,7 @@ import time
 import traceback
 from datetime import datetime, timedelta
 
-import six.moves.urllib.parse
+import six.moves.urllib.parse  # pylint: disable=import-error
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.html import escapejs
