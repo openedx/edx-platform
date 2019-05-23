@@ -9,7 +9,7 @@ from openedx.core.djangoapps.schedules.utils import PrefixedDebugLoggerMixin
 
 class SendEmailBaseCommand(PrefixedDebugLoggerMixin, BaseCommand):
     async_send_task = None  # define in subclass
-    offsets = ()  # define in subclass
+    offsets = xrange(-7, -77, -7)
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -22,9 +22,17 @@ class SendEmailBaseCommand(PrefixedDebugLoggerMixin, BaseCommand):
             help='Send all emails to this address instead of the actual recipient'
         )
         parser.add_argument('site_domain_name')
+        parser.add_argument(
+            '--duration',
+            type=int,
+            help='The duration for which weekly emails are sent (days).',
+        )
 
     def handle(self, *args, **options):
         self.log_debug('Args = %r', options)
+
+        if 'duration' in options.keys():
+            self.offsets = xrange(-7, -options['duration'], -7)
 
         current_date = datetime.datetime(
             *[int(x) for x in options['date'].split('-')],
