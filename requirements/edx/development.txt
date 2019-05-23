@@ -165,7 +165,7 @@ future==0.17.1
 futures==3.2.0 ; python_version == "2.7"
 geoip2==2.9.0
 glob2==0.6
-gunicorn==19.0
+gunicorn==19.5.0
 help-tokens==1.0.3
 html5lib==1.0.1
 httplib2==0.12.3
@@ -320,7 +320,7 @@ text-unidecode==1.2
 tincan==0.0.5
 toml==0.10.0
 tox-battery==0.5.1
-tox==3.11.1
+tox==3.12.1
 transifex-client==0.13.6
 twisted==19.2.0
 typing==3.6.6

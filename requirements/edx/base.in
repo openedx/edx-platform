@@ -94,7 +94,7 @@ firebase-token-generator==1.3.2
 fs==2.0.18
 fs-s3fs==0.1.8
 glob2                               # Enhanced glob module, used in openedx.core.lib.rooted_paths
-gunicorn==19.0
+gunicorn==19.5.0
 help-tokens
 html5lib                            # HTML parser, used for capa problems
 ipaddress                           # Ip network support for Embargo feature
