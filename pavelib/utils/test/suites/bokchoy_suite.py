@@ -5,11 +5,9 @@ Class used for defining and running Bok Choy acceptance test suite
 from __future__ import print_function
 import os
 from time import sleep
-from textwrap import dedent
 
 from common.test.acceptance.fixtures.course import CourseFixture, FixtureError
 
-from path import Path as path
 from paver.easy import sh, cmdopts, task, needs, might_call, call_task, dry
 from pavelib.utils.test.suites.suite import TestSuite
 from pavelib.utils.envs import Env
@@ -34,9 +32,6 @@ __test__ = False  # do not collect
 
 DEFAULT_NUM_PROCESSES = 1
 DEFAULT_VERBOSITY = 2
-
-DEMO_COURSE_TAR_GZ = "https://github.com/edx/demo-test-course/archive/master.tar.gz"
-DEMO_COURSE_IMPORT_DIR = path('test_root/courses/')
 
 
 @task

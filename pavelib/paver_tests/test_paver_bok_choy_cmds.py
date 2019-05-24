@@ -5,14 +5,8 @@ Run just this test with: paver test_lib -t pavelib/paver_tests/test_paver_bok_ch
 import os
 import unittest
 from test.test_support import EnvironmentVarGuard
-from textwrap import dedent
-
-import ddt
-from mock import Mock, call, patch
-from paver.easy import call_task, environment
 
 from pavelib.utils.test.suites import BokChoyTestSuite
-from pavelib.utils.test.suites.bokchoy_suite import DEMO_COURSE_IMPORT_DIR, DEMO_COURSE_TAR_GZ
 
 REPO_DIR = os.getcwd()
 
