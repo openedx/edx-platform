@@ -10,15 +10,14 @@ import time
 import traceback
 from datetime import datetime, timedelta
 
-import six.moves.urllib.parse
+import six.moves.urllib.parse  # pylint: disable=import-error
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
-from django.utils.html import escapejs
 from edx_rest_api_client.client import EdxRestApiClient
 from slumber.exceptions import HttpClientError, HttpServerError
 
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-from student.models import UserAttribute, UserProfile
+from student.models import UserAttribute
 from util.query import use_read_replica_if_available
 
 HUBSPOT_API_BASE_URL = 'https://api.hubapi.com'

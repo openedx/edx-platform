@@ -76,7 +76,6 @@ def answer_problem(course, request, problem, score=1, max_value=1):
         course,
         depth=2
     )
-    # pylint: disable=protected-access
     module = get_module(
         user,
         request,

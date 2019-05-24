@@ -9,10 +9,10 @@ import io
 import json
 import os
 import re
-import six
 from datetime import datetime
 from xml.sax.saxutils import quoteattr
 
+import six
 from paver.easy import BuildFailure, cmdopts, needs, sh, task
 
 from openedx.core.djangolib.markup import HTML
@@ -789,7 +789,7 @@ def _extract_missing_pii_annotations(filename):
     ("report-dir=", "r", "Directory in which to put PII reports"),
 ])
 @timed
-def run_pii_check(options):  # pylint: disable=unused-argument
+def run_pii_check(options):
     """
     Guarantee that all Django models are PII-annotated.
     """

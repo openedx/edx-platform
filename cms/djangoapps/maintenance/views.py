@@ -199,7 +199,7 @@ class ForcePublishCourseView(MaintenanceBaseView):
             self.context['msg'] = _('Force publishing course is not supported with old mongo courses.')
             log.warning(
                 u'Force publishing course is not supported with old mongo courses. \
-                %s attempted to force publish the course %s.',  # pylint: disable=unicode-format-string
+                %s attempted to force publish the course %s.',
                 request.user,
                 course_id,
                 exc_info=True
