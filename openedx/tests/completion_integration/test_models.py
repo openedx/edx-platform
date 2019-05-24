@@ -4,11 +4,13 @@ Test models, managers, and validators.
 
 from __future__ import absolute_import, division, unicode_literals
 
+import six
 from completion import models, waffle
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from six.moves import range, zip
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -161,7 +163,7 @@ class SubmitBatchCompletionTestCase(CompletionWaffleTestMixin, TestCase):
         self.block_key = UsageKey.from_string('block-v1:edx+test+run+type@video+block@doggos')
         self.course_key_obj = CourseKey.from_string('course-v1:edx+test+run')
         self.user = UserFactory()
-        CourseEnrollmentFactory.create(user=self.user, course_id=unicode(self.course_key_obj))
+        CourseEnrollmentFactory.create(user=self.user, course_id=six.text_type(self.course_key_obj))
 
     def test_submit_batch_completion(self):
         blocks = [(self.block_key, 1.0)]
@@ -204,7 +206,7 @@ class BatchCompletionMethodTests(CompletionWaffleTestMixin, TestCase):
         self.other_user = UserFactory.create()
         self.course_key = CourseKey.from_string("edX/MOOC101/2049_T2")
         self.other_course_key = CourseKey.from_string("course-v1:ReedX+Hum110+1904")
-        self.block_keys = [UsageKey.from_string("i4x://edX/MOOC101/video/{}".format(number)) for number in xrange(5)]
+        self.block_keys = [UsageKey.from_string("i4x://edX/MOOC101/video/{}".format(number)) for number in range(5)]
 
         submit_completions_for_testing(self.user, self.course_key, self.block_keys[:3])
         submit_completions_for_testing(self.other_user, self.course_key, self.block_keys[2:])
@@ -213,7 +215,7 @@ class BatchCompletionMethodTests(CompletionWaffleTestMixin, TestCase):
     def test_get_course_completions_missing_runs(self):
         actual_completions = models.BlockCompletion.get_course_completions(self.user, self.course_key)
         expected_block_keys = [key.replace(course_key=self.course_key) for key in self.block_keys[:3]]
-        expected_completions = dict(zip(expected_block_keys, [1.0, 0.8, 0.6]))
+        expected_completions = dict(list(zip(expected_block_keys, [1.0, 0.8, 0.6])))
         self.assertEqual(expected_completions, actual_completions)
 
     def test_get_course_completions_empty_result_set(self):
