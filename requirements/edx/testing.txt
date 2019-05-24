@@ -307,7 +307,7 @@ text-unidecode==1.2       # via faker
 tincan==0.0.5
 toml==0.10.0              # via tox
 tox-battery==0.5.1
-tox==3.11.1
+tox==3.12.1
 transifex-client==0.13.6
 twisted==19.2.0           # via scrapy
 typing==3.6.6             # via flake8
