@@ -8,6 +8,7 @@ import logging
 from datetime import datetime
 
 import ddt
+import pytest
 import six
 from django.http import Http404
 from django.test.client import Client, RequestFactory
@@ -122,8 +123,8 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
 
         url = reverse('user_profile',
                       kwargs={'course_id': text_type(self.course.id), 'user_id': '12345'})  # There is no user 12345
-        self.response = self.client.get(url)
-        self.assertEqual(self.response.status_code, 404)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
 
     @patch('student.models.cc.User.from_django_user')
     @patch('student.models.cc.User.subscribed_threads')
@@ -139,8 +140,8 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
 
         url = reverse('followed_threads',
                       kwargs={'course_id': text_type(self.course.id), 'user_id': '12345'})  # There is no user 12345
-        self.response = self.client.get(url)
-        self.assertEqual(self.response.status_code, 404)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
 
 
 def make_mock_thread_data(
@@ -390,7 +391,7 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
             timeout=ANY
         )
 
-    def test_post(self, mock_request):
+    def test_post(self, _mock_request):
         request = RequestFactory().post("dummy_url")
         response = views.single_thread(
             request,
@@ -423,9 +424,6 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
     independent of the number of responses retrieved for a given discussion thread.
     """
     MODULESTORE = TEST_DATA_MONGO_MODULESTORE
-
-    def setUp(self):
-        super(SingleThreadQueryCountTestCase, self).setUp()
 
     @ddt.data(
         # Old mongo with cache. There is an additional SQL query for old mongo
@@ -505,17 +503,18 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
 class SingleCohortedThreadTestCase(CohortedTestCase):
 
     def _create_mock_cohorted_thread(self, mock_request):
-        self.mock_text = "dummy content"
-        self.mock_thread_id = "test_thread_id"
+        mock_text = "dummy content"
+        mock_thread_id = "test_thread_id"
         mock_request.side_effect = make_mock_request_impl(
-            course=self.course, text=self.mock_text,
-            thread_id=self.mock_thread_id,
+            course=self.course, text=mock_text,
+            thread_id=mock_thread_id,
             group_id=self.student_cohort.id,
             commentable_id="cohorted_topic",
         )
+        return mock_text, mock_thread_id
 
     def test_ajax(self, mock_request):
-        self._create_mock_cohorted_thread(mock_request)
+        mock_text, mock_thread_id = self._create_mock_cohorted_thread(mock_request)
 
         request = RequestFactory().get(
             "dummy_url",
@@ -526,7 +525,7 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
             request,
             text_type(self.course.id),
             "cohorted_topic",
-            self.mock_thread_id
+            mock_thread_id
         )
 
         self.assertEquals(response.status_code, 200)
@@ -536,8 +535,8 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
             make_mock_thread_data(
                 course=self.course,
                 commentable_id="cohorted_topic",
-                text=self.mock_text,
-                thread_id=self.mock_thread_id,
+                text=mock_text,
+                thread_id=mock_thread_id,
                 num_children=1,
                 group_id=self.student_cohort.id,
                 group_name=self.student_cohort.name,
@@ -546,14 +545,14 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
         )
 
     def test_html(self, mock_request):
-        self._create_mock_cohorted_thread(mock_request)
+        _mock_text, mock_thread_id = self._create_mock_cohorted_thread(mock_request)
 
         self.client.login(username=self.student.username, password='test')
         response = self.client.get(
             reverse('single_thread', kwargs={
                 'course_id': six.text_type(self.course.id),
                 'discussion_id': "cohorted_topic",
-                'thread_id': self.mock_thread_id,
+                'thread_id': mock_thread_id,
             })
         )
 
@@ -986,7 +985,7 @@ class InlineDiscussionGroupIdTestCase(
 class ForumFormDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):
     cs_endpoint = "/threads"
 
-    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True, is_ajax=False):
+    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True, is_ajax=False):  # pylint: disable=arguments-differ
         kwargs = {}
         if group_id:
             kwargs['group_id'] = group_id
@@ -1058,7 +1057,7 @@ class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupI
             **headers
         )
 
-    def call_view(self, mock_request, _commentable_id, user, group_id, pass_group_id=True, is_ajax=False):
+    def call_view(self, mock_request, _commentable_id, user, group_id, pass_group_id=True, is_ajax=False):  # pylint: disable=arguments-differ
         return self.call_view_for_profiled_user(
             mock_request, user, user, group_id, pass_group_id=pass_group_id, is_ajax=is_ajax
         )
@@ -1107,10 +1106,7 @@ class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupI
                     has_course_id = "course_id" in params
                     if (for_specific_course and has_course_id) or (not for_specific_course and not has_course_id):
                         return params
-            self.assertTrue(
-                False,
-                "Did not find appropriate user_profile call for 'for_specific_course'=" + for_specific_course
-            )
+            pytest.fail("Did not find appropriate user_profile call for 'for_specific_course'=" + for_specific_course)
 
         mock_request.reset_mock()
         self.call_view_for_profiled_user(
@@ -1268,7 +1264,7 @@ class InlineDiscussionTestCase(ForumsEnableMixin, ModuleStoreTestCase):
 
         team.add_user(self.student)
 
-        response = self.send_request(mock_request)
+        self.send_request(mock_request)
         self.assertEqual(mock_request.call_args[1]['params']['context'], ThreadContext.STANDALONE)
 
 
@@ -1367,7 +1363,7 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
                 unenrolled_user.id
             )
 
-    def test_404_profiled_user(self, mock_request):
+    def test_404_profiled_user(self, _mock_request):
         request = RequestFactory().get("dummy_url")
         request.user = self.student
         with self.assertRaises(Http404):
@@ -1377,7 +1373,7 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
                 -999
             )
 
-    def test_404_course(self, mock_request):
+    def test_404_course(self, _mock_request):
         request = RequestFactory().get("dummy_url")
         request.user = self.student
         with self.assertRaises(Http404):
@@ -1483,9 +1479,6 @@ class InlineDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCa
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
 
-    def setUp(self):
-        super(InlineDiscussionUnicodeTestCase, self).setUp()
-
     @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
         mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
@@ -1515,9 +1508,6 @@ class ForumFormDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTes
 
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
-
-    def setUp(self):
-        super(ForumFormDiscussionUnicodeTestCase, self).setUp()
 
     @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
@@ -1604,9 +1594,6 @@ class ForumDiscussionSearchUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreT
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
 
-    def setUp(self):
-        super(ForumDiscussionSearchUnicodeTestCase, self).setUp()
-
     @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
         mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
@@ -1640,9 +1627,6 @@ class SingleThreadUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, 
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
 
-    def setUp(self):
-        super(SingleThreadUnicodeTestCase, self).setUp()
-
     @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
         thread_id = "test_thread_id"
@@ -1673,9 +1657,6 @@ class UserProfileUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, U
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
 
-    def setUp(self):
-        super(UserProfileUnicodeTestCase, self).setUp()
-
     @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
         mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
@@ -1704,9 +1685,6 @@ class FollowedThreadsUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCas
 
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
-
-    def setUp(self):
-        super(FollowedThreadsUnicodeTestCase, self).setUp()
 
     @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
@@ -1741,7 +1719,7 @@ class EnrollmentTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         request = RequestFactory().get('dummy_url')
         request.user = self.student
         with self.assertRaises(CourseAccessRedirect):
-            views.forum_form_discussion(request, course_id=text_type(self.course.id))
+            views.forum_form_discussion(request, course_id=text_type(self.course.id))  # pylint: disable=no-value-for-parameter, unexpected-keyword-arg
 
 
 @patch('requests.request', autospec=True)
@@ -1787,7 +1765,7 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ForumsEnableMixin
                 reverse('single_thread',
                         kwargs=dict(course_id=course_id, discussion_id=self.discussion_id, thread_id=thread_id)),
         ):
-            self.verify_consent_required(self.client, url)
+            self.verify_consent_required(self.client, url)  # pylint: disable=no-value-for-parameter
 
 
 class DividedDiscussionsTestCase(CohortViewsTestCase):
@@ -2013,7 +1991,8 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
             handler=views.course_discussions_settings_handler
         )
         self.assertEqual(
-            u"Incorrect field type for `{}`. Type must be `{}`".format('always_divide_inline_discussions', bool.__name__),
+            u"Incorrect field type for `{}`. Type must be `{}`".format('always_divide_inline_discussions',
+                                                                       bool.__name__),
             response.get("error")
         )
 
@@ -2087,7 +2066,7 @@ class ThreadViewedEventTestCase(EventTestMixin, ForumsEnableMixin, UrlResetMixin
     DUMMY_URL = 'https://example.com/dummy/url/'
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-    def setUp(self):
+    def setUp(self):  # pylint: disable=arguments-differ
         super(ThreadViewedEventTestCase, self).setUp('eventtracking.tracker')
 
         self.course = CourseFactory.create()
