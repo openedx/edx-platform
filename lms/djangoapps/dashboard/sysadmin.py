@@ -174,24 +174,30 @@ class Users(SysadminDashboardView):
         user.delete()
         return _(u'Deleted user {username}').format(username=uname)
 
-    def make_common_context(self):
-        """Returns the datatable used for this view"""
-
-        self.datatable = {}
-
-        self.datatable = dict(header=[_('Statistic'), _('Value')],
-                              title=_('Site statistics'))
-        self.datatable['data'] = [[_('Total number of users'),
-                                   User.objects.all().count()]]
+    def make_datatable(self):
+        """
+        Build the datatable for this view
+        """
+        datatable = {
+            'header': [
+                _('Statistic'),
+                _('Value'),
+            ],
+            'title': _('Site statistics'),
+            'data': [
+                [
+                    _('Total number of users'),
+                    User.objects.all().count(),
+                ],
+            ],
+        }
+        return datatable
 
     def get(self, request):
-
         if not request.user.is_staff:
             raise Http404
-        self.make_common_context()
-
         context = {
-            'datatable': self.datatable,
+            'datatable': self.make_datatable(),
             'msg': self.msg,
             'djangopid': os.getpid(),
             'modeflag': {'users': 'active-section'},
@@ -203,9 +209,6 @@ class Users(SysadminDashboardView):
 
         if not request.user.is_staff:
             raise Http404
-
-        self.make_common_context()
-
         action = request.POST.get('action', '')
         track.views.server_track(request, action, {}, page='user_sysdashboard')
 
@@ -226,9 +229,8 @@ class Users(SysadminDashboardView):
             uname = request.POST.get('student_uname', '').strip()
             self.msg = HTML(u'<h4>{0}</h4><p>{1}</p><hr />{2}').format(
                 _('Delete User Results'), self.delete_user(uname), self.msg)
-
         context = {
-            'datatable': self.datatable,
+            'datatable': self.make_datatable(),
             'msg': self.msg,
             'djangopid': os.getpid(),
             'modeflag': {'users': 'active-section'},
