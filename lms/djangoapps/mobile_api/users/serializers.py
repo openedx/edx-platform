@@ -147,3 +147,5 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'username', 'email', 'name', 'course_enrollments')
         lookup_field = 'username'
+        # For disambiguating within the drf-yasg swagger schema
+        ref_name = 'mobile_api-User'

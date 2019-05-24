@@ -34,6 +34,8 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         # This list is the minimal set required by the notification service
         fields = ("id", "url", "email", "name", "username", "preferences")
         read_only_fields = ("id", "email", "username")
+        # For disambiguating within the drf-yasg swagger schema
+        ref_name = 'user_api-User'
 
 
 class UserPreferenceSerializer(serializers.HyperlinkedModelSerializer):

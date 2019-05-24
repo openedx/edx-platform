@@ -36,6 +36,8 @@ class CourseModeSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = CourseMode
         fields = ('name', 'currency', 'price', 'sku', 'bulk_sku', 'expires')
+        # For disambiguating within the drf-yasg swagger schema
+        ref_name = 'commerce-CourseMode'
 
 
 def validate_course_id(course_id):
@@ -76,6 +78,10 @@ class CourseSerializer(serializers.Serializer):
     name = serializers.CharField(read_only=True)
     verification_deadline = PossiblyUndefinedDateTimeField(format=None, allow_null=True, required=False)
     modes = CourseModeSerializer(many=True)
+
+    class Meta(object):
+        # For disambiguating within the drf-yasg swagger schema
+        ref_name = 'commerce-Course'
 
     def validate(self, attrs):
         """ Ensure the verification deadline occurs AFTER the course mode enrollment deadlines. """

@@ -45,6 +45,10 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     invite_only = serializers.BooleanField(source="invitation_only")
     course_modes = serializers.SerializerMethodField()
 
+    class Meta(object):
+        # For disambiguating within the drf-yasg swagger schema
+        ref_name = 'enrollment-Course'
+
     def __init__(self, *args, **kwargs):
         self.include_expired = kwargs.pop("include_expired", False)
         super(CourseSerializer, self).__init__(*args, **kwargs)
