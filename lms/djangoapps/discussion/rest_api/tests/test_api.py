@@ -16,7 +16,7 @@ from opaque_keys.edx.locator import CourseLocator
 from pytz import UTC
 from rest_framework.exceptions import PermissionDenied
 from six.moves import range
-from six.moves.urllib.parse import parse_qs, urlencode, urlparse, urlunparse
+from six.moves.urllib.parse import parse_qs, urlencode, urlparse, urlunparse  # pylint: disable=import-error
 
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from courseware.tests.factories import BetaTesterFactory, StaffFactory
@@ -243,7 +243,8 @@ class GetCourseTopicsTest(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
         Returns the URL for the thread_list_url field, given a list of topic_ids
         """
         path = "http://testserver/api/discussion/v1/threads/"
-        query_list = [("course_id", six.text_type(self.course.id))] + [("topic_id", topic_id) for topic_id in topic_id_list]
+        topic_ids_to_query = [("topic_id", topic_id) for topic_id in topic_id_list]
+        query_list = [("course_id", six.text_type(self.course.id))] + topic_ids_to_query
         return urlunparse(("", "", path, "", urlencode(query_list), ""))
 
     def get_course_topics(self):
