@@ -92,8 +92,6 @@
     "karma-sourcemap-loader": "0.3.7",
     "karma-spec-reporter": "0.0.20",
     "karma-webpack": "2.0.9",
-    "pa11y": "4.0.1",
-    "pa11y-reporter-json-oldnode": "1.0.0",
     "plato": "1.2.2",
     "react-test-renderer": "16.4.0",
     "selenium-webdriver": "3.4.0",
