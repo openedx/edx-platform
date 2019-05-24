@@ -3184,6 +3184,12 @@ JWT_AUTH = {
     'JWT_AUDIENCE': 'change-me',
 }
 
+EDX_DRF_EXTENSIONS = {
+    # Set this value to an empty dict in order to prevent automatically updating
+    # user data from values in (possibly stale) JWTs.
+    'JWT_PAYLOAD_USER_ATTRIBUTE_MAPPING': {},
+}
+
 ################################ Settings for Microsites ################################
 
 ### Select an implementation for the microsite backend
