@@ -9,7 +9,7 @@ from copy import deepcopy
 from itertools import chain
 
 import six
-from six.moves.urllib.parse import urljoin, urlparse, urlunparse
+from six.moves.urllib.parse import urljoin, urlparse, urlunparse  # pylint: disable=E0401 [import-error]
 from dateutil.parser import parse
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -329,14 +329,14 @@ class ProgramProgressMeter(object):
                 if modes_match and certificate_api.is_passing_status(certificate.status):
                     course_overview = CourseOverview.get_from_id(key)
                     available_date = available_date_for_certificate(course_overview, certificate)
-                    earliest_course_run_date = min([_f for _f in [available_date, earliest_course_run_date] if _f])
+                    earliest_course_run_date = min([date for date in [available_date, earliest_course_run_date] if date])
 
             # If we're missing a cert for a course, the program isn't completed and we should just bail now
             if earliest_course_run_date is None:
                 return None
 
             # Keep the catalog course date if it's the latest one
-            program_available_date = max([_f for _f in [earliest_course_run_date, program_available_date] if _f])
+            program_available_date = max([date for date in [earliest_course_run_date, program_available_date] if date])
 
         return program_available_date
 
@@ -808,7 +808,7 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
             self.data['instructor_ordering'] = []
 
         sorted_instructor_names = [
-            ' '.join([_f for _f in (instructor['given_name'], instructor['family_name']) if _f])
+            ' '.join([name for name in (instructor['given_name'], instructor['family_name']) if name])
             for instructor in self.data['instructor_ordering']
         ]
         instructors_to_be_sorted = [
