@@ -11,7 +11,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if not settings.ROOT_URLCONF == 'cms.urls':
-            raise CommandError('this command can only be run with the cms settings')
+            raise CommandError('this command can only be run from within the CMS')
         all_courses = CourseOverview.get_all_courses()
         amc_admin = User.objects.get(username="amc")
 
