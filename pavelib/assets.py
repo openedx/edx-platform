@@ -168,7 +168,6 @@ def get_theme_sass_dirs(system, theme_dir):
     sass_dir = theme_dir / system / "static" / "sass"
     css_dir = theme_dir / system / "static" / "css"
     customer_specific_dir = theme_dir / "customer_specific" / system / "static" / "sass"
-    print('DINAMO: {}'.format(customer_specific_dir))
 
     dependencies = SASS_LOOKUP_DEPENDENCIES.get(system, [])
     if sass_dir.isdir():
