@@ -48,7 +48,7 @@ django-memcached-hashring
 django-method-override==0.1.0
 django-model-utils==3.0.0
 django-mptt>=0.8.6,<0.9
-django-mysql==2.4.1
+django-mysql
 django-oauth-toolkit<1.2            # Provides oAuth2 capabilities for Django. 1.2+ requires Django 2 and Python 3.5
 django-pyfs
 django-ratelimit
@@ -70,7 +70,7 @@ edx-ace==0.1.10
 edx-analytics-data-api-client
 edx-ccx-keys
 edx-celeryutils
-edx-completion
+edx-completion>=1.0.3,<2.0
 edx-django-oauth2-provider
 edx-django-release-util             # Release utils for the edx release pipeline
 edx-django-sites-extensions==2.3.1

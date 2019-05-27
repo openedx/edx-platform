@@ -9,5 +9,5 @@
 
 -c ../constraints.txt
 
-pip-tools==3.2.0        # Contains pip-compile, used to generate pip requirements files
+pip-tools                 # Contains pip-compile, used to generate pip requirements files
 six==1.11.0             # Pinned because pip-tools needs it, but later transifex-client says ==1.11.0

@@ -41,7 +41,7 @@ git+https://github.com/open-craft/xblock-poll@add89e14558c30f3c8dc7431e5cd6536ff
 -e common/lib/xmodule
 amqp==1.4.9
 analytics-python==1.2.9
-aniso8601==6.0.0
+aniso8601==4.1.0
 anyjson==0.3.3
 apipkg==1.5               # via execnet
 appdirs==1.4.3
@@ -49,44 +49,43 @@ argh==0.26.2
 argparse==1.4.0
 asn1crypto==0.24.0
 astroid==1.5.3            # via edx-lint, pylint, pylint-celery
-atomicwrites==1.3.0       # via pytest
+atomicwrites==1.2.1       # via pytest
 attrs==17.4.0
-automat==0.7.0            # via twisted
 babel==1.3
 backports.functools-lru-cache==1.5
 beautifulsoup4==4.7.1
 before-after==1.0.1
 billiard==3.3.0.23
 bleach==2.1.4
-bok-choy==1.0.0
+bok-choy==0.9.0
 boto3==1.4.8
 boto==2.39.0
 botocore==1.8.17
 celery==3.1.25
-certifi==2019.3.9
-cffi==1.12.3
+certifi==2018.11.29
+cffi==1.11.5
 chardet==3.0.4
 click-log==0.1.8          # via edx-lint
 click==7.0
-colorama==0.4.1           # via radon
-configparser==3.7.4       # via entrypoints, flake8, pylint
+colorama==0.3.9           # via radon
+configparser==3.5.0       # via flake8, pylint
 constantly==15.1.0        # via twisted
 coreapi==2.3.3
 coreschema==0.0.4
 coverage==4.4
-cryptography==2.6.1
+cryptography==2.4.2
 cssselect==1.0.3
 cssutils==1.0.2
-ddt==1.2.1
-decorator==4.4.0
+ddt==1.2.0
+decorator==4.3.0
 defusedxml==0.4.1
 dicttoxml==1.7.4          # via moto
 diff-cover==0.9.8
-django-appconf==1.0.3
+django-appconf==1.0.2
 django-babel-underscore==0.5.2
 django-babel==0.6.2
 django-classy-tags==0.8.0
-django-config-models==1.0.1
+django-config-models==0.2.2
 django-cors-headers==2.1.0
 django-countries==4.6.1
 django-crum==0.7.3
@@ -106,7 +105,7 @@ django-ratelimit-backend==1.1.1
 django-ratelimit==2.0.0
 django-require==1.0.11
 django-rest-swagger==2.2.0
-django-sekizai==1.0.0
+django-sekizai==0.10.0
 django-ses==0.8.4
 django-simple-history==2.7.0
 django-splash==0.2.2
@@ -122,50 +121,48 @@ docopt==0.6.2
 docutils==0.14
 dogapi==1.2.1
 edx-ace==0.1.10
-edx-analytics-data-api-client==0.15.3
+edx-analytics-data-api-client==0.15.2
 edx-ccx-keys==0.2.1
 edx-celeryutils==0.2.7
-edx-completion==2.0.0
+edx-completion==1.0.3
 edx-django-oauth2-provider==1.3.5
 edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==1.0.3
-edx-drf-extensions==2.2.0
-edx-enterprise==1.4.9
+edx-drf-extensions==2.0.1
+edx-enterprise==1.2.8
 edx-i18n-tools==0.4.6
 edx-lint==1.0.0
 edx-milestones==0.1.13
 edx-oauth2-provider==1.2.2
 edx-opaque-keys[django]==0.4.4
-edx-organizations==2.0.2
+edx-organizations==1.0.0
 edx-proctoring-proctortrack==1.0.1
 edx-proctoring==1.5.7
-edx-rbac==0.2.0
 edx-rest-api-client==1.9.2
-edx-search==1.2.2
-edx-submissions==2.1.1
+edx-search==1.2.1
+edx-submissions==2.0.12
 edx-user-state-client==1.0.4
 edxval==1.1.25
 elasticsearch==1.9.0
-entrypoints==0.3          # via flake8
 enum34==1.1.6
-event-tracking==0.2.8
-execnet==1.6.0            # via pytest-xdist
+event-tracking==0.2.7
+execnet==1.5.0            # via pytest-xdist
 extras==1.0.0             # via python-subunit, testtools
 factory_boy==2.8.1
-faker==1.0.5              # via factory-boy
+faker==1.0.1              # via factory-boy
 feedparser==5.1.3
 filelock==3.0.10          # via tox
 firebase-token-generator==1.3.2
 fixtures==3.0.0           # via testtools
 flake8-polyfill==1.0.2    # via radon
-flake8==3.7.7             # via flake8-polyfill
+flake8==3.6.0             # via flake8-polyfill
 flask==1.0.2              # via moto
 freezegun==0.3.11
 fs-s3fs==0.1.8
 fs==2.0.18
 funcsigs==1.0.2           # via pytest
-functools32==3.2.3.post2  # via flake8, parsel
+functools32==3.2.3.post2  # via parsel
 future==0.17.1
 futures==3.2.0 ; python_version == "2.7"
 fuzzywuzzy==0.17.0
@@ -174,21 +171,20 @@ gunicorn==19.0
 hash-ring==1.3.1
 help-tokens==1.0.3
 html5lib==1.0.1
-httplib2==0.12.3
+httplib2==0.12.0
 httpretty==0.9.6
-hyperlink==19.0.0         # via twisted
 idna==2.8
 incremental==17.5.0       # via twisted
 inflect==2.1.0
 ipaddr==2.1.11
 ipaddress==1.0.22
 isodate==0.6.0
-isort==4.3.18
+isort==4.3.4
 itsdangerous==1.1.0       # via flask
 itypes==1.1.0
 jinja2-pluralize==0.3.0
-jinja2==2.10.1
-jmespath==0.9.4
+jinja2==2.10
+jmespath==0.9.3
 jsondiff==1.1.1
 jsonfield==2.0.2
 kombu==3.0.37
@@ -204,7 +200,7 @@ mako==1.0.2
 mando==0.6.4              # via radon
 markdown==2.6.11
 markey==0.8
-markupsafe==1.1.1
+markupsafe==1.1.0
 mccabe==0.6.1             # via flake8, pylint
 mock==1.0.1
 mongoengine==0.10.0
@@ -212,40 +208,39 @@ more-itertools==5.0.0     # via pytest
 moto==0.3.1
 mysql-python==1.2.5
 networkx==1.7
-newrelic==4.18.0.118
-nltk==3.4.1
+newrelic==4.10.0.112
+nltk==3.4
 nodeenv==1.1.1
 numpy==1.6.2
 oauth2==1.9.0.post1
 oauthlib==2.1.0
 openapi-codec==1.3.2
-pa11ycrawler==1.7.3
+pa11ycrawler==1.6.2
 parsel==1.5.1             # via scrapy
 path.py==8.2.1
 pathlib2==2.3.3           # via pytest, pytest-django
 pathtools==0.1.2
 paver==1.3.4
-pbr==5.2.0
+pbr==5.1.1
 pdfminer==20140328
 piexif==1.0.2
-pillow==6.0.0
-pluggy==0.9.0             # via pytest, tox
+pillow==5.4.1
+pluggy==0.8.1             # via pytest, tox
 polib==1.1.0
 psutil==1.2.1
 py2neo==3.1.2
-py==1.8.0                 # via pytest, tox
-pyasn1-modules==0.2.5     # via service-identity
+py==1.7.0                 # via pytest, tox
+pyasn1-modules==0.2.3     # via service-identity
 pyasn1==0.4.5             # via pyasn1-modules, service-identity
-pycodestyle==2.5.0
+pycodestyle==2.4.0
 pycontracts==1.7.1
 pycountry==1.20
 pycparser==2.19
 pycryptodomex==3.4.7
 pydispatcher==2.0.5       # via scrapy
-pyflakes==2.1.1           # via flake8
+pyflakes==2.0.0           # via flake8
 pygments==2.3.1
 pygraphviz==1.1
-pyhamcrest==1.9.0         # via twisted
 pyjwkest==1.3.2
 pyjwt==1.5.2
 pylint-celery==0.3        # via edx-lint
@@ -254,18 +249,18 @@ pylint-plugin-utils==0.3  # via pylint-celery, pylint-django
 pylint==1.7.6             # via edx-lint, pylint-celery, pylint-django
 pymongo==2.9.1
 pynliner==0.8.0
-pyopenssl==19.0.0         # via scrapy
+pyopenssl==18.0.0         # via scrapy
 pyparsing==2.2.0
 pyquery==1.4.0
 pysqlite==2.8.3
 pysrt==1.1.1
 pytest-attrib==0.1.3
-pytest-cov==2.7.1
-pytest-django==3.4.8
-pytest-forked==1.0.2      # via pytest-xdist
+pytest-cov==2.6.1
+pytest-django==3.4.5
+pytest-forked==1.0.1      # via pytest-xdist
 pytest-randomly==1.2.3
-pytest-xdist==1.28.0
-pytest==4.4.1
+pytest-xdist==1.26.0
+pytest==4.1.1
 python-dateutil==2.4.0
 python-levenshtein==0.12.0
 python-memcached==1.48
@@ -274,14 +269,14 @@ python-openid==2.2.5
 python-saml==2.4.0
 python-slugify==1.2.6     # via transifex-client
 python-subunit==1.3.0
-python-swiftclient==3.7.0
-pytz==2019.1
+python-swiftclient==3.6.0
+pytz==2018.9
 pyuca==1.1
-pyyaml==5.1
+pyyaml==3.13
 queuelib==1.5.0           # via scrapy
-radon==3.0.1
+radon==2.4.0
 redis==2.10.6
-reportlab==3.5.20
+reportlab==3.5.13
 requests-oauthlib==1.1.0
 requests==2.21.0
 rest-condition==1.0.3
@@ -289,9 +284,9 @@ rfc6266-parser==0.0.5.post2
 rules==2.0.1
 s3transfer==0.1.13
 sailthru-client==2.2.3
-scandir==1.10.0           # via pathlib2
+scandir==1.9.0            # via pathlib2
 scipy==0.14.0
-scrapy==1.6.0             # via pa11ycrawler
+scrapy==1.1.2             # via pa11ycrawler
 selenium==3.141.0
 semantic-version==2.6.0
 service-identity==18.1.0  # via scrapy
@@ -305,23 +300,22 @@ social-auth-app-django==2.1.0
 social-auth-core==1.7.0
 sorl-thumbnail==12.3
 sortedcontainers==0.9.2
-soupsieve==1.9.1
+soupsieve==1.7.1
 splinter==0.9.0
-sqlparse==0.3.0
+sqlparse==0.2.4
 stevedore==1.10.0
 sure==1.4.11
 sympy==0.7.1
-testfixtures==6.8.1
+testfixtures==6.4.3
 testtools==2.3.0          # via fixtures, python-subunit
 text-unidecode==1.2       # via faker
 tincan==0.0.5
 toml==0.10.0              # via tox
 tox-battery==0.5.1
-tox==3.9.0
+tox==3.7.0
 traceback2==1.4.0         # via testtools, unittest2
-transifex-client==0.13.6
-twisted==19.2.0           # via scrapy
-typing==3.6.6             # via flake8
+transifex-client==0.13.5
+twisted==16.6.0           # via pa11ycrawler, scrapy
 unicodecsv==0.14.1
 unidecode==1.0.23         # via python-slugify
 unittest2==1.1.0          # via testtools
@@ -329,18 +323,18 @@ uritemplate==3.0.0
 urllib3==1.23
 urlobject==2.4.3          # via pa11ycrawler
 user-util==0.1.5
-virtualenv==16.5.0        # via tox
+virtualenv==16.2.0        # via tox
 voluptuous==0.11.5
 w3lib==1.20.0             # via parsel, scrapy
 watchdog==0.9.0
-web-fragments==0.3.0
+web-fragments==0.2.2
 webencodings==0.5.1
 webob==1.8.5
-werkzeug==0.15.2          # via flask
+werkzeug==0.14.1          # via flask
 wrapt==1.10.5
 xblock-review==1.1.5
-xblock-utils==1.2.1
+xblock-utils==1.2.0
 xblock==1.2.2
-xmltodict==0.12.0         # via moto
+xmltodict==0.11.0         # via moto
 zendesk==1.1.1
 zope.interface==4.6.0     # via twisted
