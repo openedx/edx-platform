@@ -70,7 +70,7 @@ edx-ace==0.1.10
 edx-analytics-data-api-client
 edx-ccx-keys
 edx-celeryutils
-edx-completion>=1.0.3,<2.0
+edx-completion
 edx-django-oauth2-provider
 edx-django-release-util             # Release utils for the edx release pipeline
 edx-django-sites-extensions==2.3.1
