@@ -9,7 +9,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if not settings.ROOT_URLCONF == 'lms.urls':
-            raise CommandError('This command can only be run with the lms settings')
+            raise CommandError('This command can only be run from within the LMS')
         for sc in SiteConfiguration.objects.all():
             print('On:', sc.site.domain)
             try:
