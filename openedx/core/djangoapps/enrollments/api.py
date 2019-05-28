@@ -13,11 +13,11 @@ from django.core.cache import cache
 from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import CourseMode
-from enrollment import errors
+from openedx.core.djangoapps.enrollments import errors
 
 log = logging.getLogger(__name__)
 
-DEFAULT_DATA_API = 'enrollment.data'
+DEFAULT_DATA_API = 'openedx.core.djangoapps.enrollments.data'
 
 
 def get_enrollments(user_id, include_inactive=False):

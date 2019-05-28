@@ -4,8 +4,8 @@ Management command for enrolling a user into a course via the enrollment api
 from __future__ import absolute_import
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
-from enrollment.data import CourseEnrollmentExistsError
-from enrollment.api import add_enrollment
+from openedx.core.djangoapps.enrollments.data import CourseEnrollmentExistsError
+from openedx.core.djangoapps.enrollments.api import add_enrollment
 
 
 class Command(BaseCommand):

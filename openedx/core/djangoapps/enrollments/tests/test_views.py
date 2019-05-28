@@ -28,13 +28,13 @@ from six.moves import range
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from enrollment import api, data
-from enrollment.errors import CourseEnrollmentError
-from enrollment.views import EnrollmentUserThrottle
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, RestrictedCourse
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
+from openedx.core.djangoapps.enrollments import api, data
+from openedx.core.djangoapps.enrollments.errors import CourseEnrollmentError
+from openedx.core.djangoapps.enrollments.views import EnrollmentUserThrottle
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.user_api.models import RetirementState, UserOrgTag, UserRetirementStatus
 from openedx.core.lib.django_test_client_utils import get_absolute_url
@@ -105,7 +105,7 @@ class EnrollmentTestMixin(object):
 
         # Verify that the modulestore is queried as expected.
         with check_mongo_calls_range(min_finds=min_mongo_calls, max_finds=max_mongo_calls):
-            with patch('enrollment.views.audit_log') as mock_audit_log:
+            with patch('openedx.core.djangoapps.enrollments.views.audit_log') as mock_audit_log:
                 url = reverse('courseenrollments')
                 response = self.client.post(url, json.dumps(data), content_type='application/json', **extra)
                 self.assertEqual(response.status_code, expected_status)
@@ -1494,7 +1494,7 @@ class UserRoleTest(ModuleStoreTestCase):
         self._assert_roles([expected_role2], False, course_id=text_type(self.course2.id))
 
     def test_roles_exception(self):
-        with patch('enrollment.api.get_user_roles') as mock_get_user_roles:
+        with patch('openedx.core.djangoapps.enrollments.api.get_user_roles') as mock_get_user_roles:
             mock_get_user_roles.side_effect = Exception()
             response = self.client.get(reverse('roles'))
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
