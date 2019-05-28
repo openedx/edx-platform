@@ -1,11 +1,13 @@
 """
 Utilities for grades related tests
 """
+from __future__ import absolute_import
+
 from contextlib import contextmanager
 from datetime import datetime
 
 import pytz
-from mock import patch, MagicMock
+from mock import MagicMock, patch
 
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module

@@ -1,18 +1,23 @@
 """
 Grades Service Tests
 """
+from __future__ import absolute_import
+
 from datetime import datetime
+
 import ddt
 import pytz
+import six
 from freezegun import freeze_time
+from mock import call, patch
+
 from lms.djangoapps.grades.constants import GradeOverrideFeatureEnum
 from lms.djangoapps.grades.models import (
     PersistentSubsectionGrade,
     PersistentSubsectionGradeOverride,
-    PersistentSubsectionGradeOverrideHistory,
+    PersistentSubsectionGradeOverrideHistory
 )
 from lms.djangoapps.grades.services import GradesService
-from mock import patch, call
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -107,8 +112,8 @@ class GradesServiceTests(ModuleStoreTestCase):
         # test with id strings as parameters instead
         self.assertDictEqual(self.subsection_grade_to_dict(self.service.get_subsection_grade(
             user_id=self.user.id,
-            course_key_or_id=unicode(self.course.id),
-            usage_key_or_id=unicode(self.subsection.location)
+            course_key_or_id=six.text_type(self.course.id),
+            usage_key_or_id=six.text_type(self.subsection.location)
         )), {
             'earned_all': 6.0,
             'earned_graded': 5.0
@@ -136,7 +141,7 @@ class GradesServiceTests(ModuleStoreTestCase):
         # test with course key parameter as string instead
         self.assertDictEqual(self.subsection_grade_override_to_dict(self.service.get_subsection_grade_override(
             user_id=self.user.id,
-            course_key_or_id=unicode(self.course.id),
+            course_key_or_id=six.text_type(self.course.id),
             usage_key_or_id=self.subsection.location
         )), {
             'earned_all_override': override.earned_all_override,
@@ -190,8 +195,8 @@ class GradesServiceTests(ModuleStoreTestCase):
             call(
                 sender=None,
                 user_id=self.user.id,
-                course_id=unicode(self.course.id),
-                usage_id=unicode(self.subsection.location),
+                course_id=six.text_type(self.course.id),
+                usage_id=six.text_type(self.subsection.location),
                 only_if_higher=False,
                 modified=override_obj.modified,
                 score_deleted=False,
@@ -241,8 +246,8 @@ class GradesServiceTests(ModuleStoreTestCase):
             call(
                 sender=None,
                 user_id=self.user.id,
-                course_id=unicode(self.course.id),
-                usage_id=unicode(self.subsection_without_grade.location),
+                course_id=six.text_type(self.course.id),
+                usage_id=six.text_type(self.subsection_without_grade.location),
                 only_if_higher=False,
                 modified=override_obj.modified,
                 score_deleted=False,
@@ -270,8 +275,8 @@ class GradesServiceTests(ModuleStoreTestCase):
             call(
                 sender=None,
                 user_id=self.user.id,
-                course_id=unicode(self.course.id),
-                usage_id=unicode(self.subsection.location),
+                course_id=six.text_type(self.course.id),
+                usage_id=six.text_type(self.subsection.location),
                 only_if_higher=False,
                 modified=datetime.now().replace(tzinfo=pytz.UTC),
                 score_deleted=True,

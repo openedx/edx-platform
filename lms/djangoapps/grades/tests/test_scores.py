@@ -1,6 +1,8 @@
 """
 Tests for grades.scores module.
 """
+from __future__ import absolute_import
+
 import itertools
 # pylint: disable=protected-access
 from collections import namedtuple
