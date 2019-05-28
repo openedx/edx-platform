@@ -28,7 +28,7 @@ class CourseEnrollmentsApiListForm(Form):
             try:
                 return CourseKey.from_string(course_id)
             except InvalidKeyError:
-                raise ValidationError("'{}' is not a valid course id.".format(course_id))
+                raise ValidationError(u"'{}' is not a valid course id.".format(course_id))
         return course_id
 
     def clean_username(self):
@@ -40,7 +40,7 @@ class CourseEnrollmentsApiListForm(Form):
             usernames = usernames_csv_string.split(',')
             if len(usernames) > self.MAX_USERNAME_COUNT:
                 raise ValidationError(
-                    "Too many usernames in a single request - {}. A maximum of {} is allowed".format(
+                    u"Too many usernames in a single request - {}. A maximum of {} is allowed".format(
                         len(usernames),
                         self.MAX_USERNAME_COUNT,
                     )

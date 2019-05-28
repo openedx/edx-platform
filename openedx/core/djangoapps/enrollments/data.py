@@ -348,6 +348,7 @@ def get_user_roles(user_id):
     :param user_id: The id of the selected user.
     :return: All roles for all courses that this user has.
     """
+    # pylint: disable=protected-access
     user = _get_user(user_id)
     if not hasattr(user, '_roles'):
         user._roles = RoleCache(user)

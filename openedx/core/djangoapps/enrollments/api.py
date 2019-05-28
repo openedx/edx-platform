@@ -324,7 +324,7 @@ def get_course_enrollment_details(course_id, include_expired=False):
     cached_enrollment_data = None
     try:
         cached_enrollment_data = cache.get(cache_key)
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         # The cache backend could raise an exception (for example, memcache keys that contain spaces)
         log.exception(u"Error occurred while retrieving course enrollment details from the cache")
 
