@@ -2,6 +2,7 @@
 Test for contentstore signals receiver
 """
 
+from __future__ import absolute_import
 import mock
 
 from django.test import TestCase
