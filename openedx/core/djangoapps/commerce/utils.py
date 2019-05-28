@@ -45,3 +45,15 @@ def ecommerce_api_client(user, session=None):
         jwt=jwt,
         session=session
     )
+
+
+def logout_api_client(user, url=None, session=None):
+    """ Returns an E-Commerce API client setup with authentication for the specified user. """
+    claims = {'tracking_context': create_tracking_context(user)}
+    jwt = create_jwt_for_user(user, additional_claims=claims)
+
+    return EdxRestApiClient(
+        url=url,
+        jwt=jwt,
+        session=session
+    )

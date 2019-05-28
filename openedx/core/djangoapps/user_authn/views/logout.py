@@ -1,18 +1,25 @@
 """ Views related to logout. """
 from __future__ import absolute_import
 
+import logging
 import edx_oauth2_provider
+
+from requests.exceptions import Timeout, ConnectionError
 import six.moves.urllib.parse as parse  # pylint: disable=import-error
 from django.conf import settings
 from django.contrib.auth import logout
 from django.shortcuts import redirect
 from django.utils.http import urlencode
 from django.views.generic import TemplateView
+from django.template.response import TemplateResponse
 from provider.oauth2.models import Client
 from six.moves.urllib.parse import parse_qs, urlsplit, urlunsplit  # pylint: disable=import-error
 
 from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
+from openedx.core.djangoapps.commerce.utils import logout_api_client
+
+log = logging.getLogger(__name__)
 
 
 class LogoutView(TemplateView):
@@ -28,13 +35,47 @@ class LogoutView(TemplateView):
     # Keep track of the page to which the user should ultimately be redirected.
     default_target = '/'
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         """
-        Proxy to the GET handler.
+        logout user and redirect if a redirect_url is specified
+        """
+        # We do not log here, because we have a handler registered to perform logging on successful logouts.
+        request.is_from_logout = True
 
-        TODO: remove GET as an allowed method, and update all callers to use POST.
-        """
-        return self.get(request, *args, **kwargs)
+        # Get the list of authorized clients before we clear the session.
+        self.oauth_client_ids = request.session.get(edx_oauth2_provider.constants.AUTHORIZED_CLIENTS_SESSION_KEY, [])
+
+        # logout from other IDA's
+        context = self.get_context_data()
+        log.info("Following are the logout URI's {uris}".format(uris=context.get('logout_uris', [])))
+        for uri in context.get('logout_uris', []):
+            log.info("calling the logout for {uri}".format(uri=uri))
+            uri = uri.replace('logout/', '')
+            api_client = logout_api_client(context.get('user', request.user), url=uri)
+
+            try:
+                r = api_client.logout.post()
+                log.info("Response {r} for logout {uri}".format(r=r, uri=uri))
+            except (Timeout, ConnectionError) as e:
+                log.info(e)
+
+        logout(request)
+
+        # If we are using studio logout directly and there is not OIDC logouts we can just redirect the user
+        if settings.FEATURES.get('DISABLE_STUDIO_SSO_OVER_LMS', False) and not self.oauth_client_ids:
+            response = redirect(self.target)
+
+        else:
+            response = TemplateResponse(
+                request=request,
+                template=self.template_name,
+                context=self.get_context_data(),
+            )
+
+        # Clear the cookie used by the edx.org marketing site
+        delete_logged_in_cookies(response)
+
+        return response
 
     @property
     def target(self):
@@ -62,26 +103,6 @@ class LogoutView(TemplateView):
         else:
             return self.default_target
 
-    def dispatch(self, request, *args, **kwargs):
-        # We do not log here, because we have a handler registered to perform logging on successful logouts.
-        request.is_from_logout = True
-
-        # Get the list of authorized clients before we clear the session.
-        self.oauth_client_ids = request.session.get(edx_oauth2_provider.constants.AUTHORIZED_CLIENTS_SESSION_KEY, [])
-
-        logout(request)
-
-        # If we are using studio logout directly and there is not OIDC logouts we can just redirect the user
-        if settings.FEATURES.get('DISABLE_STUDIO_SSO_OVER_LMS', False) and not self.oauth_client_ids:
-            response = redirect(self.target)
-        else:
-            response = super(LogoutView, self).dispatch(request, *args, **kwargs)
-
-        # Clear the cookie used by the edx.org marketing site
-        delete_logged_in_cookies(response)
-
-        return response
-
     def _build_logout_url(self, url):
         """
         Builds a logout URL with the `no_redirect` query string parameter.
@@ -102,29 +123,25 @@ class LogoutView(TemplateView):
         context = super(LogoutView, self).get_context_data(**kwargs)
 
         # Create a list of URIs that must be called to log the user out of all of the IDAs.
-        uris = []
+        logout_uris = []
 
         # Add the logout URIs for IDAs that the user was logged into (according to the session).  This line is specific
         # to DOP.
-        uris += Client.objects.filter(client_id__in=self.oauth_client_ids,
-                                      logout_uri__isnull=False).values_list('logout_uri', flat=True)
+
+        logout_uris += Client.objects.filter(client_id__in=self.oauth_client_ids,
+                                             logout_uri__isnull=False).values_list('logout_uri', flat=True)
 
         # Add the extra logout URIs from settings.  This is added as a stop-gap solution for sessions that were
         # established via DOT.
-        uris += settings.IDA_LOGOUT_URI_LIST
-
-        referrer = self.request.META.get('HTTP_REFERER', '').strip('/')
-        logout_uris = []
-
-        for uri in uris:
-            # Only include the logout URI if the browser didn't come from that IDA's logout endpoint originally,
-            # avoiding a double-logout.
-            if not referrer or (referrer and not uri.startswith(referrer)):
-                logout_uris.append(self._build_logout_url(uri))
+        logout_uris += settings.IDA_LOGOUT_URI_LIST
 
         context.update({
             'target': self.target,
             'logout_uris': logout_uris,
+            'user': self.request.user
         })
-
         return context
+
+
+class ConfirmLogout(TemplateView):
+    template_name = 'confirm_logout.html'

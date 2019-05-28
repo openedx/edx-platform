@@ -15,9 +15,16 @@
     </p>
 
     <div id="iframeContainer" style="visibility: hidden" data-redirect-url="{{ target }}">
-        {% for uri in logout_uris %}
-            <iframe src="{{ uri }}"></iframe>
-        {% endfor %}
+        <!--{% for uri in logout_uris %}-->
+            <!--<script type="text/javascript">-->
+            <!--$.ajax({-->
+            <!--type: 'POST',-->
+            <!--url: '{{uri}}',-->
+            <!--headers: {'X-CSRFToken': '{{ ecom_csrf }}'},-->
+            <!--xhrFields: {withCredentials: true}-->
+            <!--})-->
+            <!--</script>-->
+        <!--{% endfor %}-->
     </div>
 
     <script type="text/javascript" src="{% static 'js/jquery.allLoaded.js' %}"></script>

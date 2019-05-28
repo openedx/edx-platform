@@ -1,0 +1,26 @@
+<style>
+.button {
+    background-color: #0075b4;
+    padding: 5px 20px;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    color: white;
+    font-weight: 400;
+
+}
+
+.button:hover {
+    background-color: white;
+    color: #0075b4;
+    border: 1px solid #0075b4;
+}
+</style>
+    <p style="text-align:center; margin-top: 200px;">
+    To continue logout click on confirm logout
+        <br/>
+        <form method="post" action="logout">
+            {% csrf_token %}
+            <input class="button" type="submit" value="Confirm Logout">
+         </form>
+    </p>

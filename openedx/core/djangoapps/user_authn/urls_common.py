@@ -21,6 +21,7 @@ urlpatterns = [
     url(r'^login_refresh$', login.login_refresh, name="login_refresh"),
 
     url(r'^logout$', logout.LogoutView.as_view(), name='logout'),
+    url(r'^confirm_logout$', logout.ConfirmLogout.as_view(), name='confirm_logout$'),
 ]
 
 
