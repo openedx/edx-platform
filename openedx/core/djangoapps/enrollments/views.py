@@ -746,7 +746,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     enterprise_api_client.post_enterprise_course_enrollment(username, text_type(course_id), None)
                 except EnterpriseApiException as error:
                     log.exception(u"An unexpected error occurred while creating the new EnterpriseCourseEnrollment "
-                                  "for user [%s] in course run [%s]", username, course_id)
+                                  u"for user [%s] in course run [%s]", username, course_id)
                     raise CourseEnrollmentError(text_type(error))
                 kwargs = {
                     'username': username,
