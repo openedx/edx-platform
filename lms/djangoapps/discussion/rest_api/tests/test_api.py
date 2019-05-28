@@ -1,22 +1,26 @@
 """
 Tests for Discussion API internal interface
 """
+from __future__ import absolute_import
+
 import itertools
 from datetime import datetime, timedelta
-from urllib import urlencode
-from urlparse import parse_qs, urlparse, urlunparse
 
 import ddt
 import httpretty
 import mock
+import six
 from django.core.exceptions import ValidationError
 from django.test.client import RequestFactory
 from opaque_keys.edx.locator import CourseLocator
 from pytz import UTC
 from rest_framework.exceptions import PermissionDenied
+from six.moves import range
+from six.moves.urllib.parse import parse_qs, urlencode, urlparse, urlunparse  # pylint: disable=import-error
 
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from courseware.tests.factories import BetaTesterFactory, StaffFactory
+from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
 from lms.djangoapps.discussion.rest_api import api
 from lms.djangoapps.discussion.rest_api.api import (
     create_comment,
@@ -32,7 +36,9 @@ from lms.djangoapps.discussion.rest_api.api import (
     update_thread
 )
 from lms.djangoapps.discussion.rest_api.exceptions import (
-    CommentNotFoundError, DiscussionDisabledError, ThreadNotFoundError,
+    CommentNotFoundError,
+    DiscussionDisabledError,
+    ThreadNotFoundError
 )
 from lms.djangoapps.discussion.rest_api.tests.utils import (
     CommentsServiceMockMixin,
@@ -40,7 +46,8 @@ from lms.djangoapps.discussion.rest_api.tests.utils import (
     make_minimal_cs_thread,
     make_paginated_api_response
 )
-from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
+from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
+from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
@@ -48,8 +55,6 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_STUDENT,
     Role
 )
-from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
-from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.lib.exceptions import CourseNotFoundError, PageNotFoundError
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
@@ -136,7 +141,7 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
         self.assertEqual(
             get_course(self.request, self.course.id),
             {
-                "id": unicode(self.course.id),
+                "id": six.text_type(self.course.id),
                 "blackouts": [],
                 "thread_list_url": "http://testserver/api/discussion/v1/threads/?course_id=x%2Fy%2Fz",
                 "following_thread_list_url": (
@@ -238,7 +243,8 @@ class GetCourseTopicsTest(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
         Returns the URL for the thread_list_url field, given a list of topic_ids
         """
         path = "http://testserver/api/discussion/v1/threads/"
-        query_list = [("course_id", unicode(self.course.id))] + [("topic_id", topic_id) for topic_id in topic_id_list]
+        topic_ids_to_query = [("topic_id", topic_id) for topic_id in topic_id_list]
+        query_list = [("course_id", six.text_type(self.course.id))] + topic_ids_to_query
         return urlunparse(("", "", path, "", urlencode(query_list), ""))
 
     def get_course_topics(self):
@@ -641,8 +647,8 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         self.get_thread_list([], topic_id_list=["topic_x", "topic_meow"])
         self.assertEqual(urlparse(httpretty.last_request().path).path, "/api/v1/threads")
         self.assert_last_query_params({
-            "user_id": [unicode(self.user.id)],
-            "course_id": [unicode(self.course.id)],
+            "user_id": [six.text_type(self.user.id)],
+            "course_id": [six.text_type(self.course.id)],
             "sort_key": ["activity"],
             "page": ["1"],
             "per_page": ["1"],
@@ -652,8 +658,8 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
     def test_basic_query_params(self):
         self.get_thread_list([], page=6, page_size=14)
         self.assert_last_query_params({
-            "user_id": [unicode(self.user.id)],
-            "course_id": [unicode(self.course.id)],
+            "user_id": [six.text_type(self.user.id)],
+            "course_id": [six.text_type(self.course.id)],
             "sort_key": ["activity"],
             "page": ["6"],
             "per_page": ["14"],
@@ -665,7 +671,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         source_threads = [
             make_minimal_cs_thread({
                 "id": "test_thread_id_0",
-                "course_id": unicode(self.course.id),
+                "course_id": six.text_type(self.course.id),
                 "commentable_id": "topic_x",
                 "username": self.author.username,
                 "user_id": str(self.author.id),
@@ -681,7 +687,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
             }),
             make_minimal_cs_thread({
                 "id": "test_thread_id_1",
-                "course_id": unicode(self.course.id),
+                "course_id": six.text_type(self.course.id),
                 "commentable_id": "topic_y",
                 "group_id": self.cohort.id,
                 "username": self.author.username,
@@ -823,8 +829,8 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
             expected_result
         )
         self.assert_last_query_params({
-            "user_id": [unicode(self.user.id)],
-            "course_id": [unicode(self.course.id)],
+            "user_id": [six.text_type(self.user.id)],
+            "course_id": [six.text_type(self.course.id)],
             "sort_key": ["activity"],
             "page": ["1"],
             "per_page": ["10"],
@@ -854,8 +860,8 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
             "/api/v1/users/{}/subscribed_threads".format(self.user.id)
         )
         self.assert_last_query_params({
-            "user_id": [unicode(self.user.id)],
-            "course_id": [unicode(self.course.id)],
+            "user_id": [six.text_type(self.user.id)],
+            "course_id": [six.text_type(self.course.id)],
             "sort_key": ["activity"],
             "page": ["1"],
             "per_page": ["11"],
@@ -885,8 +891,8 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
             "/api/v1/threads"
         )
         self.assert_last_query_params({
-            "user_id": [unicode(self.user.id)],
-            "course_id": [unicode(self.course.id)],
+            "user_id": [six.text_type(self.user.id)],
+            "course_id": [six.text_type(self.course.id)],
             "sort_key": ["activity"],
             "page": ["1"],
             "per_page": ["11"],
@@ -926,8 +932,8 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
             "/api/v1/threads"
         )
         self.assert_last_query_params({
-            "user_id": [unicode(self.user.id)],
-            "course_id": [unicode(self.course.id)],
+            "user_id": [six.text_type(self.user.id)],
+            "course_id": [six.text_type(self.course.id)],
             "sort_key": [cc_query],
             "page": ["1"],
             "per_page": ["11"],
@@ -957,8 +963,8 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
             "/api/v1/threads"
         )
         self.assert_last_query_params({
-            "user_id": [unicode(self.user.id)],
-            "course_id": [unicode(self.course.id)],
+            "user_id": [six.text_type(self.user.id)],
+            "course_id": [six.text_type(self.course.id)],
             "sort_key": ["activity"],
             "page": ["1"],
             "per_page": ["11"],
@@ -1011,7 +1017,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
         already in overrides.
         """
         overrides = overrides.copy() if overrides else {}
-        overrides.setdefault("course_id", unicode(self.course.id))
+        overrides.setdefault("course_id", six.text_type(self.course.id))
         return make_minimal_cs_thread(overrides)
 
     def get_comment_list(self, thread, endorsed=None, page=1, page_size=1):
@@ -1042,7 +1048,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
         with self.assertRaises(DiscussionDisabledError):
             self.get_comment_list(
                 self.make_minimal_cs_thread(
-                    overrides={"course_id": unicode(disabled_course.id)}
+                    overrides={"course_id": six.text_type(disabled_course.id)}
                 )
             )
 
@@ -1079,7 +1085,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
         role = Role.objects.create(name=role_name, course_id=cohort_course.id)
         role.users = [self.user]
         thread = self.make_minimal_cs_thread({
-            "course_id": unicode(cohort_course.id),
+            "course_id": six.text_type(cohort_course.id),
             "commentable_id": "test_topic",
             "group_id": (
                 None if thread_group_state == "no_group" else
@@ -1482,7 +1488,7 @@ class CreateThreadTest(
         self.request.user = self.user
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
         self.minimal_data = {
-            "course_id": unicode(self.course.id),
+            "course_id": six.text_type(self.course.id),
             "topic_id": "test_topic",
             "type": "discussion",
             "title": "Test Title",
@@ -1501,7 +1507,7 @@ class CreateThreadTest(
             actual = create_thread(self.request, self.minimal_data)
         expected = self.expected_thread_data({
             "id": "test_id",
-            "course_id": unicode(self.course.id),
+            "course_id": six.text_type(self.course.id),
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_id",
             "read": True,
         })
@@ -1509,7 +1515,7 @@ class CreateThreadTest(
         self.assertEqual(
             httpretty.last_request().parsed_body,
             {
-                "course_id": [unicode(self.course.id)],
+                "course_id": [six.text_type(self.course.id)],
                 "commentable_id": ["test_topic"],
                 "thread_type": ["discussion"],
                 "title": ["Test Title"],
@@ -1612,7 +1618,7 @@ class CreateThreadTest(
         role.users = [self.user]
         self.register_post_thread_response({"username": self.user.username})
         data = self.minimal_data.copy()
-        data["course_id"] = unicode(cohort_course.id)
+        data["course_id"] = six.text_type(cohort_course.id)
         if data_group_state == "group_is_none":
             data["group_id"] = None
         elif data_group_state == "group_is_set":
@@ -1705,7 +1711,7 @@ class CreateThreadTest(
 
     def test_discussions_disabled(self):
         disabled_course = _discussion_disabled_course_for(self.user)
-        self.minimal_data["course_id"] = unicode(disabled_course.id)
+        self.minimal_data["course_id"] = six.text_type(disabled_course.id)
         with self.assertRaises(DiscussionDisabledError):
             create_thread(self.request, self.minimal_data)
 
@@ -1748,7 +1754,7 @@ class CreateCommentTest(
         self.register_get_thread_response(
             make_minimal_cs_thread({
                 "id": "test_thread",
-                "course_id": unicode(self.course.id),
+                "course_id": six.text_type(self.course.id),
                 "commentable_id": "test_topic",
             })
         )
@@ -1810,7 +1816,7 @@ class CreateCommentTest(
         self.assertEqual(
             httpretty.last_request().parsed_body,
             {
-                "course_id": [unicode(self.course.id)],
+                "course_id": [six.text_type(self.course.id)],
                 "body": ["Test body"],
                 "user_id": [str(self.user.id)]
             }
@@ -1855,7 +1861,7 @@ class CreateCommentTest(
         self.register_get_thread_response(
             make_minimal_cs_thread({
                 "id": "test_thread",
-                "course_id": unicode(self.course.id),
+                "course_id": six.text_type(self.course.id),
                 "thread_type": thread_type,
                 "user_id": str(self.user.id) if is_thread_author else str(self.user.id + 1),
             })
@@ -1929,7 +1935,7 @@ class CreateCommentTest(
         self.register_get_thread_response(
             make_minimal_cs_thread({
                 "id": "test_thread",
-                "course_id": unicode(disabled_course.id),
+                "course_id": six.text_type(disabled_course.id),
                 "commentable_id": "test_topic",
             })
         )
@@ -1953,7 +1959,7 @@ class CreateCommentTest(
         cohort_course, cohort = _create_course_and_cohort_with_user_role(course_is_cohorted, self.user, role_name)
         self.register_get_thread_response(make_minimal_cs_thread({
             "id": "cohort_thread",
-            "course_id": unicode(cohort_course.id),
+            "course_id": six.text_type(cohort_course.id),
             "group_id": (
                 None if thread_group_state == "no_group" else
                 cohort.id if thread_group_state == "match_group" else
@@ -2020,7 +2026,7 @@ class UpdateThreadTest(
         """
         cs_data = make_minimal_cs_thread({
             "id": "test_thread",
-            "course_id": unicode(self.course.id),
+            "course_id": six.text_type(self.course.id),
             "commentable_id": "original_topic",
             "username": self.user.username,
             "user_id": str(self.user.id),
@@ -2056,7 +2062,7 @@ class UpdateThreadTest(
         self.assertEqual(
             httpretty.last_request().parsed_body,
             {
-                "course_id": [unicode(self.course.id)],
+                "course_id": [six.text_type(self.course.id)],
                 "commentable_id": ["original_topic"],
                 "thread_type": ["discussion"],
                 "title": ["Original Title"],
@@ -2088,7 +2094,7 @@ class UpdateThreadTest(
 
     def test_discussions_disabled(self):
         disabled_course = _discussion_disabled_course_for(self.user)
-        self.register_thread(overrides={"course_id": unicode(disabled_course.id)})
+        self.register_thread(overrides={"course_id": six.text_type(disabled_course.id)})
         with self.assertRaises(DiscussionDisabledError):
             update_thread(self.request, "test_thread", {})
 
@@ -2108,7 +2114,7 @@ class UpdateThreadTest(
     def test_group_access(self, role_name, course_is_cohorted, thread_group_state):
         cohort_course, cohort = _create_course_and_cohort_with_user_role(course_is_cohorted, self.user, role_name)
         self.register_thread({
-            "course_id": unicode(cohort_course.id),
+            "course_id": six.text_type(cohort_course.id),
             "group_id": (
                 None if thread_group_state == "no_group" else
                 cohort.id if thread_group_state == "match_group" else
@@ -2405,7 +2411,7 @@ class UpdateCommentTest(
 
         cs_thread_data = make_minimal_cs_thread({
             "id": "test_thread",
-            "course_id": unicode(course.id)
+            "course_id": six.text_type(course.id)
         })
         cs_thread_data.update(thread_overrides or {})
         self.register_get_thread_response(cs_thread_data)
@@ -2461,7 +2467,7 @@ class UpdateCommentTest(
             httpretty.last_request().parsed_body,
             {
                 "body": ["Edited body"],
-                "course_id": [unicode(self.course.id)],
+                "course_id": [six.text_type(self.course.id)],
                 "user_id": [str(self.user.id)],
                 "anonymous": ["False"],
                 "anonymous_to_peers": ["False"],
@@ -2510,7 +2516,7 @@ class UpdateCommentTest(
             {"thread_id": "test_thread"},
             thread_overrides={
                 "id": "test_thread",
-                "course_id": unicode(cohort_course.id),
+                "course_id": six.text_type(cohort_course.id),
                 "group_id": (
                     None if thread_group_state == "no_group" else
                     cohort.id if thread_group_state == "match_group" else
@@ -2801,7 +2807,7 @@ class DeleteThreadTest(
         """
         cs_data = make_minimal_cs_thread({
             "id": self.thread_id,
-            "course_id": unicode(self.course.id),
+            "course_id": six.text_type(self.course.id),
             "user_id": str(self.user.id),
         })
         cs_data.update(overrides or {})
@@ -2836,7 +2842,7 @@ class DeleteThreadTest(
 
     def test_discussions_disabled(self):
         disabled_course = _discussion_disabled_course_for(self.user)
-        self.register_thread(overrides={"course_id": unicode(disabled_course.id)})
+        self.register_thread(overrides={"course_id": six.text_type(disabled_course.id)})
         with self.assertRaises(DiscussionDisabledError):
             delete_thread(self.request, self.thread_id)
 
@@ -2881,7 +2887,7 @@ class DeleteThreadTest(
         """
         cohort_course, cohort = _create_course_and_cohort_with_user_role(course_is_cohorted, self.user, role_name)
         self.register_thread({
-            "course_id": unicode(cohort_course.id),
+            "course_id": six.text_type(cohort_course.id),
             "group_id": (
                 None if thread_group_state == "no_group" else
                 cohort.id if thread_group_state == "match_group" else
@@ -2939,7 +2945,7 @@ class DeleteCommentTest(
         """
         cs_thread_data = make_minimal_cs_thread({
             "id": self.thread_id,
-            "course_id": unicode(self.course.id)
+            "course_id": six.text_type(self.course.id)
         })
         cs_thread_data.update(thread_overrides or {})
         self.register_get_thread_response(cs_thread_data)
@@ -2985,8 +2991,8 @@ class DeleteCommentTest(
     def test_discussions_disabled(self):
         disabled_course = _discussion_disabled_course_for(self.user)
         self.register_comment_and_thread(
-            thread_overrides={"course_id": unicode(disabled_course.id)},
-            overrides={"course_id": unicode(disabled_course.id)}
+            thread_overrides={"course_id": six.text_type(disabled_course.id)},
+            overrides={"course_id": six.text_type(disabled_course.id)}
         )
         with self.assertRaises(DiscussionDisabledError):
             delete_comment(self.request, self.comment_id)
@@ -3036,7 +3042,7 @@ class DeleteCommentTest(
         self.register_comment_and_thread(
             overrides={"thread_id": "test_thread"},
             thread_overrides={
-                "course_id": unicode(cohort_course.id),
+                "course_id": six.text_type(cohort_course.id),
                 "group_id": (
                     None if thread_group_state == "no_group" else
                     cohort.id if thread_group_state == "match_group" else
@@ -3092,7 +3098,7 @@ class RetrieveThreadTest(
         """
         cs_data = make_minimal_cs_thread({
             "id": self.thread_id,
-            "course_id": unicode(self.course.id),
+            "course_id": six.text_type(self.course.id),
             "commentable_id": "test_topic",
             "username": self.user.username,
             "user_id": str(self.user.id),
@@ -3159,7 +3165,7 @@ class RetrieveThreadTest(
         """
         cohort_course, cohort = _create_course_and_cohort_with_user_role(course_is_cohorted, self.user, role_name)
         self.register_thread({
-            "course_id": unicode(cohort_course.id),
+            "course_id": six.text_type(cohort_course.id),
             "group_id": (
                 None if thread_group_state == "no_group" else
                 cohort.id if thread_group_state == "match_group" else

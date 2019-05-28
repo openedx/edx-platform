@@ -4,6 +4,8 @@ Content rendering functionality
 Note that this module is designed to imitate the front end behavior as
 implemented in Markdown.Sanitizer.js.
 """
+from __future__ import absolute_import
+
 import re
 
 import markdown

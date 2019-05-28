@@ -1,9 +1,10 @@
 """
 Discussion API pagination support
 """
-from rest_framework.utils.urls import replace_query_param
+from __future__ import absolute_import
 
 from edx_rest_framework_extensions.paginators import NamespacedPageNumberPagination
+from rest_framework.utils.urls import replace_query_param
 
 
 class _Page(object):
