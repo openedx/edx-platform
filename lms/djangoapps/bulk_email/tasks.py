@@ -209,10 +209,6 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     def _create_send_email_subtask(to_list, initial_subtask_status):
         """Creates a subtask to send email to a given recipient list."""
         subtask_id = initial_subtask_status.task_id
-        log.info(
-            u"BulkEmail Task: %s Subtask: %s starting at %s in Queue: %s",
-            task_id, subtask_id, datetime.now(), routing_key
-        )
         new_subtask = send_course_email.subtask(
             (
                 entry_id,
@@ -283,8 +279,8 @@ def send_course_email(entry_id, email_id, to_list, global_email_context, subtask
     current_task_id = subtask_status.task_id
     num_to_send = len(to_list)
     log.info((u"Preparing to send email %s to %d recipients as subtask %s "
-              u"for instructor task %d: context = %s, status=%s"),
-             email_id, num_to_send, current_task_id, entry_id, global_email_context, subtask_status)
+              u"for instructor task %d: context = %s, status=%s, time=%s"),
+             email_id, num_to_send, current_task_id, entry_id, global_email_context, subtask_status, datetime.now())
 
     # Check that the requested subtask is actually known to the current InstructorTask entry.
     # If this fails, it throws an exception, which should fail this subtask immediately.
