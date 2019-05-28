@@ -37,6 +37,7 @@ from django.db.utils import ProgrammingError
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.functional import cached_property
+from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from django_countries.fields import CountryField
@@ -63,6 +64,7 @@ from courseware.models import (
 )
 from enrollment.api import _default_course_mode
 from lms.djangoapps.certificates.models import GeneratedCertificate
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
@@ -2031,6 +2033,32 @@ def invalidate_enrollment_mode_cache(sender, instance, **kwargs):  # pylint: dis
         text_type(instance.course_id)
     )
     cache.delete(cache_key)
+
+
+@receiver(models.signals.post_save, sender=CourseEnrollment)
+def update_expiry_email_date(sender, instance, **kwargs):  # pylint: disable=unused-argument
+    """
+    If the user has enrolled in verified track of a course and has expired ID
+    verification then send email to get the ID verified.
+    """
+    resend_days = settings.VERIFICATION_EXPIRY_EMAIL['RESEND_DAYS']
+    days = settings.VERIFICATION_EXPIRY_EMAIL['DAYS_RANGE']
+
+    today = now().replace(hour=0, minute=0, second=0, microsecond=0)
+    recently_expired_date = today - timedelta(days=days)
+    expiry_email_date = today - timedelta(days=resend_days)
+
+    if instance.mode == 'verified':
+        try:
+            verification = SoftwareSecurePhotoVerification.objects.filter(
+                status='approved', user_id=instance.user_id).latest('updated_at')
+            # Set the expiry_email_date so that this verification record is
+            # picked the next time send_verification_expiry_email command runs
+            if verification.expiry_date < recently_expired_date and not verification.expiry_email_date:
+                SoftwareSecurePhotoVerification.objects.filter(pk=verification.pk).update(
+                    expiry_email_date=expiry_email_date)
+        except SoftwareSecurePhotoVerification.DoesNotExist:
+            return
 
 
 class ManualEnrollmentAudit(models.Model):
