@@ -599,3 +599,13 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_c
 ########################## Derive Any Derived Settings  #######################
 
 derive_settings(__name__)
+
+S3_USE_SIGV4 = ENV_TOKENS.get('S3_USE_SIGV4', False)
+S3_HOST = ENV_TOKENS.get('S3_HOST')
+
+if S3_USE_SIGV4 and S3_HOST:
+    os.environ['S3_USE_SIGV4'] = 'True'
+
+ORA2_FILEUPLOAD_BACKEND = ENV_TOKENS.get('ORA2_FILEUPLOAD_BACKEND', 'filesystem')
+ORA2_FILEUPLOAD_ROOT = ENV_TOKENS.get('ORA2_FILEUPLOAD_BACKEND',  os.path.join(MEDIA_ROOT, 'submissions_attachments/'))
+ORA2_FILEUPLOAD_CACHE_NAME = ENV_TOKENS.get('ORA2_FILEUPLOAD_CACHE_NAME', 'default')
