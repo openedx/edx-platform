@@ -11,15 +11,15 @@ from django.db import transaction
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
-from enrollment.errors import (
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.enrollments.errors import (
     CourseEnrollmentClosedError,
     CourseEnrollmentExistsError,
     CourseEnrollmentFullError,
     InvalidEnrollmentAttribute,
     UserNotFoundError
 )
-from enrollment.serializers import CourseEnrollmentSerializer, CourseSerializer
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.enrollments.serializers import CourseEnrollmentSerializer, CourseSerializer
 from openedx.core.lib.exceptions import CourseNotFoundError
 from student.models import (
     AlreadyEnrolledError,
@@ -348,6 +348,7 @@ def get_user_roles(user_id):
     :param user_id: The id of the selected user.
     :return: All roles for all courses that this user has.
     """
+    # pylint: disable=protected-access
     user = _get_user(user_id)
     if not hasattr(user, '_roles'):
         user._roles = RoleCache(user)

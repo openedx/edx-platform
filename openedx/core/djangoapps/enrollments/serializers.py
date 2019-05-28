@@ -20,7 +20,7 @@ class StringListField(serializers.CharField):
     [1,2,3]
 
     """
-    def field_to_native(self, obj, field_name):
+    def field_to_native(self, obj, field_name):  # pylint: disable=unused-argument
         """
         Serialize the object's class name.
         """
@@ -99,7 +99,7 @@ class CourseEnrollmentsApiListSerializer(CourseEnrollmentSerializer):
         fields = CourseEnrollmentSerializer.Meta.fields + ('course_id', )
 
 
-class ModeSerializer(serializers.Serializer):
+class ModeSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """Serializes a course's 'Mode' tuples
 
     Returns a serialized representation of the modes available for course enrollment. The course

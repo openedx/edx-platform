@@ -2156,7 +2156,7 @@ INSTALLED_APPS = [
     'course_modes.apps.CourseModesConfig',
 
     # Enrollment API
-    'enrollment',
+    'openedx.core.djangoapps.enrollments',
 
     # Entitlement API
     'entitlements.apps.EntitlementsConfig',

@@ -17,14 +17,14 @@ from six.moves import range
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from enrollment import data
-from enrollment.errors import (
+from openedx.core.djangoapps.enrollments import data
+from openedx.core.djangoapps.enrollments.errors import (
     CourseEnrollmentClosedError,
     CourseEnrollmentExistsError,
     CourseEnrollmentFullError,
     UserNotFoundError
 )
-from enrollment.serializers import CourseEnrollmentSerializer
+from openedx.core.djangoapps.enrollments.serializers import CourseEnrollmentSerializer
 from openedx.core.lib.exceptions import CourseNotFoundError
 from student.models import AlreadyEnrolledError, CourseEnrollment, CourseFullError, EnrollmentClosedError
 from student.tests.factories import CourseAccessRoleFactory, UserFactory
@@ -385,7 +385,9 @@ class EnrollmentDataTest(ModuleStoreTestCase):
 
     def test_get_roles(self):
         """Create a role for a user, then get it"""
-        expected_role = CourseAccessRoleFactory.create(course_id=self.course.id, user=self.user, role="SuperCoolTestRole")
+        expected_role = CourseAccessRoleFactory.create(
+            course_id=self.course.id, user=self.user, role="SuperCoolTestRole",
+        )
         roles = data.get_user_roles(self.user.username)
         self.assertEqual(roles, {expected_role})
 

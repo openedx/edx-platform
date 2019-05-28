@@ -28,7 +28,6 @@ from django.conf import settings
 from django.db.models import Prefetch
 from django.urls import reverse
 from django.http import Http404, QueryDict
-from enrollment.api import get_course_enrollment_details
 from edxmako.shortcuts import render_to_string
 from fs.errors import ResourceNotFound
 from lms.djangoapps.certificates import api as certs_api
@@ -37,6 +36,7 @@ from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.enrollments.api import get_course_enrollment_details
 from openedx.core.lib.api.view_utils import LazySequence
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from path import Path as path
