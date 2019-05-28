@@ -154,6 +154,9 @@ class ProctoredExamTest(UniqueCourseTest):
         course_fix.add_advanced_settings({
             "enable_proctored_exams": {"value": "true"}
         })
+        course_fix.add_advanced_settings({
+            "show_review_rules": {"value": "true"}
+        })
 
         course_fix.add_children(
             XBlockFixtureDesc('chapter', 'Test Section 1').add_children(
@@ -333,7 +336,6 @@ class ProctoredExamTest(UniqueCourseTest):
 
         self.studio_course_outline.select_proctored_exam()
         self.assertTrue(self.studio_course_outline.time_allotted_field_visible())
-        self.assertTrue(self.studio_course_outline.exam_review_rules_field_visible())
 
         self.studio_course_outline.select_practice_exam()
         self.assertTrue(self.studio_course_outline.time_allotted_field_visible())
