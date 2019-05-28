@@ -53,7 +53,8 @@ click-log==0.3.2          # via edx-lint
 click==7.0
 code-annotations==0.3.1
 colorama==0.4.1           # via radon
-configparser==3.7.4       # via entrypoints, flake8, pylint
+configparser==3.7.4       # via entrypoints, flake8, importlib-metadata, pylint
+contextlib2==0.5.5        # via importlib-metadata
 coreapi==2.3.3
 coreschema==0.0.4
 coverage==4.4
@@ -119,7 +120,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==1.0.3
 edx-drf-extensions==2.2.1
-edx-enterprise==1.5.6
+edx-enterprise==1.5.9
 edx-i18n-tools==0.4.8
 edx-lint==1.2.1
 edx-milestones==0.1.13
@@ -164,6 +165,7 @@ html5lib==1.0.1
 httplib2==0.12.3
 httpretty==0.9.6
 idna==2.8
+importlib-metadata==0.15  # via pluggy
 inflect==2.1.0
 ipaddress==1.0.22
 isort==4.3.20
@@ -208,14 +210,14 @@ openapi-codec==1.3.2
 git+https://github.com/edx/edx-ora2.git@2.2.3#egg=ora2==2.2.3
 packaging==19.0           # via caniusepython3
 path.py==8.2.1
-pathlib2==2.3.3           # via pytest, pytest-django
+pathlib2==2.3.3           # via importlib-metadata, pytest, pytest-django
 pathtools==0.1.2
 paver==1.3.4
 pbr==5.2.0
 pdfminer.six==20181108
 piexif==1.0.2
 pillow==6.0.0
-pluggy==0.11.0            # via pytest, tox
+pluggy==0.12.0            # via pytest, tox
 polib==1.1.0
 psutil==1.2.1
 py2neo==3.1.2
@@ -227,7 +229,7 @@ pycparser==2.19
 pycryptodome==3.8.1
 pycryptodomex==3.4.7
 pyflakes==2.1.1           # via flake8
-pygments==2.4.0
+pygments==2.4.2
 pygraphviz==1.5
 pyjwkest==1.3.2
 pyjwt==1.5.2
@@ -316,3 +318,4 @@ xblock-utils==1.2.1
 xblock==1.2.2
 xmltodict==0.12.0         # via moto
 zendesk==1.1.1
+zipp==0.5.1               # via importlib-metadata
