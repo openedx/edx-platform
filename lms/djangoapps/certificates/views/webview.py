@@ -149,8 +149,7 @@ def _update_certificate_context(context, course, user_certificate, platform_name
                                                 u"certificates, which are awarded for course activities "
                                                 u"that {platform_name} students complete.").format(
         platform_name=platform_name,
-        tos_url=context.get('company_tos_url'),
-        verified_cert_url=context.get('company_verified_certificate_url'))
+    )
 
 
 def _update_context_with_basic_info(context, course_id, platform_name, configuration):
@@ -416,26 +415,6 @@ def _track_certificate_events(request, context, course, user, user_certificate):
         })
 
 
-def _update_configuration_context(context, configuration):
-    """
-    Site Configuration will need to be able to override any hard coded
-    content that was put into the context in the
-    _update_certificate_context() call above. For example the
-    'company_about_description' talks about edX, which we most likely
-    do not want to keep in configurations.
-    So we need to re-apply any configuration/content that
-    we are sourcing from the database. This is somewhat duplicative of
-    the code at the beginning of this method, but we
-    need the configuration at the top as some error code paths
-    require that to be set up early on in the pipeline
-    """
-
-    config_key = configuration_helpers.get_value('domain_prefix')
-    config = configuration.get("microsites", {})
-    if config_key and config:
-        context.update(config.get(config_key, {}))
-
-
 def _update_badge_context(context, course, user):
     """
     Updates context with badge info.
@@ -607,9 +586,6 @@ def render_html_view(request, user_id, course_id):
 
         # Append badge info
         _update_badge_context(context, course, user)
-
-        # Append site configuration overrides
-        _update_configuration_context(context, configuration)
 
         # Add certificate header/footer data to current context
         context.update(get_certificate_header_context(is_secure=request.is_secure()))
