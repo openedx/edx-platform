@@ -18,7 +18,6 @@ from course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.config_model_utils.models import Provenance
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from student.tests.factories import CourseEnrollmentFactory, UserFactory

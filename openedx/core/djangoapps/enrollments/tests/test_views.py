@@ -1,3 +1,4 @@
+# pylint: disable=missing-docstring,redefined-outer-name
 """
 Tests for user enrollment.
 """
@@ -28,13 +29,13 @@ from six.moves import range
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from enrollment import api, data
-from enrollment.errors import CourseEnrollmentError
-from enrollment.views import EnrollmentUserThrottle
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, RestrictedCourse
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
+from openedx.core.djangoapps.enrollments import api, data
+from openedx.core.djangoapps.enrollments.errors import CourseEnrollmentError
+from openedx.core.djangoapps.enrollments.views import EnrollmentUserThrottle
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.user_api.models import RetirementState, UserOrgTag, UserRetirementStatus
 from openedx.core.lib.django_test_client_utils import get_absolute_url
@@ -105,7 +106,7 @@ class EnrollmentTestMixin(object):
 
         # Verify that the modulestore is queried as expected.
         with check_mongo_calls_range(min_finds=min_mongo_calls, max_finds=max_mongo_calls):
-            with patch('enrollment.views.audit_log') as mock_audit_log:
+            with patch('openedx.core.djangoapps.enrollments.views.audit_log') as mock_audit_log:
                 url = reverse('courseenrollments')
                 response = self.client.post(url, json.dumps(data), content_type='application/json', **extra)
                 self.assertEqual(response.status_code, expected_status)
@@ -237,7 +238,10 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         # Create an enrollment
         self.assert_enrollment_status()
         resp = self.client.get(
-            reverse('courseenrollment', kwargs={'username': self.user.username, "course_id": six.text_type(self.course.id)})
+            reverse(
+                'courseenrollment',
+                kwargs={'username': self.user.username, "course_id": six.text_type(self.course.id)},
+            )
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = json.loads(resp.content)
@@ -473,7 +477,12 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         (None, None, None, None),
         (datetime.datetime(2015, 1, 2, 3, 4, 5, tzinfo=pytz.UTC), None, "2015-01-02T03:04:05Z", None),
         (None, datetime.datetime(2015, 1, 2, 3, 4, 5, tzinfo=pytz.UTC), None, "2015-01-02T03:04:05Z"),
-        (datetime.datetime(2014, 6, 7, 8, 9, 10, tzinfo=pytz.UTC), datetime.datetime(2015, 1, 2, 3, 4, 5, tzinfo=pytz.UTC), "2014-06-07T08:09:10Z", "2015-01-02T03:04:05Z"),
+        (
+            datetime.datetime(2014, 6, 7, 8, 9, 10, tzinfo=pytz.UTC),
+            datetime.datetime(2015, 1, 2, 3, 4, 5, tzinfo=pytz.UTC),
+            "2014-06-07T08:09:10Z",
+            "2015-01-02T03:04:05Z",
+        ),
     )
     @ddt.unpack
     def test_get_course_details_course_dates(self, start_datetime, end_datetime, expected_start, expected_end):
@@ -528,7 +537,10 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
     def test_get_enrollment_internal_error(self, mock_get_enrollment):
         mock_get_enrollment.side_effect = CourseEnrollmentError("Something bad happened.")
         resp = self.client.get(
-            reverse('courseenrollment', kwargs={'username': self.user.username, "course_id": six.text_type(self.course.id)})
+            reverse(
+                'courseenrollment',
+                kwargs={'username': self.user.username, "course_id": six.text_type(self.course.id)},
+            )
         )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -576,7 +588,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         try:
             throttle.parse_rate(throttle.get_rate())
         except ImproperlyConfigured:
-            self.fail("No throttle rate set for {}".format(user_scope))
+            self.fail(u"No throttle rate set for {}".format(user_scope))
 
     def test_create_enrollment_with_cohort(self):
         """Enroll in the course, and also add to a cohort."""
@@ -588,7 +600,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
 
         self.assert_enrollment_status(cohort=cohort_name)
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
-        course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+        _, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
         self.assertTrue(is_active)
         self.assertEqual(cohorts.get_cohort(self.user, self.course.id, assign=False).name, cohort_name)
 
@@ -636,7 +648,11 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
 
         # Passes the include_expired parameter to the API call
         v_response = self.client.get(
-            reverse('courseenrollmentdetails', kwargs={"course_id": six.text_type(self.course.id)}), {'include_expired': True}
+            reverse(
+                'courseenrollmentdetails',
+                kwargs={"course_id": six.text_type(self.course.id)}
+            ),
+            {'include_expired': True},
         )
         v_data = json.loads(v_response.content)
 
@@ -644,7 +660,9 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         self.assertEqual(len(v_data['course_modes']), 2)
 
         # Omits the include_expired parameter from the API call
-        h_response = self.client.get(reverse('courseenrollmentdetails', kwargs={"course_id": six.text_type(self.course.id)}))
+        h_response = self.client.get(
+            reverse('courseenrollmentdetails', kwargs={"course_id": six.text_type(self.course.id)}),
+        )
         h_data = json.loads(h_response.content)
 
         # Ensure that only one course mode is returned and that it is honor
@@ -1236,8 +1254,8 @@ class EnrollmentCrossDomainTest(ModuleStoreTestCase):
         })
         resp = self.client.get(url, HTTP_REFERER=self.REFERER)
         self.assertEqual(resp.status_code, 200)
-        self.assertIn('prod-edx-csrftoken', resp.cookies)  # pylint: disable=no-member
-        return resp.cookies['prod-edx-csrftoken'].value  # pylint: disable=no-member
+        self.assertIn('prod-edx-csrftoken', resp.cookies)
+        return resp.cookies['prod-edx-csrftoken'].value
 
     def _cross_domain_post(self, csrf_cookie):
         """Perform a cross-domain POST request. """
@@ -1306,7 +1324,7 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
         """
         Helper method to create a RetirementStatus with useful defaults
         """
-        pending_state = RetirementState.objects.create(
+        RetirementState.objects.create(
             state_name='PENDING',
             state_execution_order=1,
             is_dead_end_state=False,
@@ -1494,7 +1512,7 @@ class UserRoleTest(ModuleStoreTestCase):
         self._assert_roles([expected_role2], False, course_id=text_type(self.course2.id))
 
     def test_roles_exception(self):
-        with patch('enrollment.api.get_user_roles') as mock_get_user_roles:
+        with patch('openedx.core.djangoapps.enrollments.api.get_user_roles') as mock_get_user_roles:
             mock_get_user_roles.side_effect = Exception()
             response = self.client.get(reverse('roles'))
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

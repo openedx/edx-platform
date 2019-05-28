@@ -26,17 +26,28 @@
 # 1. Edit the pylintrc file in the edx-lint repo at
 #    https://github.com/edx/edx-lint/blob/master/edx_lint/files/pylintrc
 #
-# 2. Make a new version of edx_lint, which involves the usual steps of
-#    incrementing the version number, submitting and reviewing a pull
-#    request, and updating the edx-lint version reference in this repo.
+# 2. install the updated version of edx-lint (in edx-lint):
 #
-# 3. Install the newer version of edx-lint.
+#       $ pip install .
 #
-# 4. Run:
+# 3. Run (in edx-lint):
 #
+#       # uses pylintrc_tweaks from edx-lint for linting in edx-lint
+#       # NOTE: Use Python 3.x, which no longer includes comments in the output file
 #       $ edx_lint write pylintrc
 #
-# 5. This will modify the local file.  Submit a pull request to get it
+# 4. Make a new version of edx_lint, submit and review a pull request with the
+#    pylintrc update, and after merging, update the edx-lint version by
+#    creating a new tag in the repo (uses pbr).
+#
+# 5. In your local repo, install the newer version of edx-lint.
+#
+# 6. Run:
+#
+#       # uses local pylintrc_tweaks
+#       $ edx_lint write pylintrc
+#
+# 7. This will modify the local file.  Submit a pull request to get it
 #    checked in so that others will benefit.
 #
 #
@@ -252,7 +263,6 @@ enable =
 	too-many-boolean-expressions,
 	# Consistent import order makes finding where code is
 	# imported from easier
-	ungrouped-imports,
 	wrong-import-order,
 	wrong-import-position,
 	wildcard-import,
@@ -340,6 +350,7 @@ disable =
 	too-many-locals,
 	too-many-public-methods,
 	too-many-return-statements,
+	ungrouped-imports,
 	unichr-builtin,
 	unicode-builtin,
 	unpacking-in-except,
@@ -446,4 +457,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = Exception
 
-# e841c53729c149a4170b2a8b8315f7f410287777
+# f53942526b8e9020150e5025e6a8aa60c76971d9

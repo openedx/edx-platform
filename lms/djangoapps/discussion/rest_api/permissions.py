@@ -1,6 +1,8 @@
 """
 Discussion API permission logic
 """
+from __future__ import absolute_import
+
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 

@@ -2,6 +2,8 @@
 Tests for discussion pages
 """
 
+from __future__ import absolute_import
+
 import datetime
 import time
 from unittest import skip
@@ -9,6 +11,7 @@ from uuid import uuid4
 
 import pytest
 from pytz import UTC
+from six.moves import map
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.fixtures.discussion import (
@@ -34,7 +37,6 @@ from common.test.acceptance.pages.lms.tab_nav import TabNavPage
 from common.test.acceptance.tests.discussion.helpers import BaseDiscussionMixin, BaseDiscussionTestCase
 from common.test.acceptance.tests.helpers import UniqueCourseTest, get_modal_alert, skip_if_browser
 from openedx.core.lib.tests import attr
-
 
 THREAD_CONTENT_WITH_LATEX = u"""Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
                                ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
@@ -1008,7 +1010,9 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
             'Text line 2 \n'
             '$$e[n]=d_2$$'
         )
-        self.assertEqual(self.page.get_new_post_preview_text(), 'Text line 1\nText line 2')
+        self.assertEqual(self.page.get_new_post_preview_text(),
+                         'Text line 1\ne[n]=\nd\n1\nText line 2\ne[n]=\nd\n2'
+                         )
 
     def test_inline_mathjax_rendering_in_order(self):
         """
@@ -1023,7 +1027,9 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
             'Text line 2 \n'
             '$e[n]=d_2$'
         )
-        self.assertEqual(self.page.get_new_post_preview_text('.wmd-preview > p'), 'Text line 1 Text line 2')
+        self.assertEqual(self.page.get_new_post_preview_text('.wmd-preview > p'),
+                         'Text line 1\ne[n]=\nd\n1\nText line 2\ne[n]=\nd\n2'
+                         )
 
     def test_mathjax_not_rendered_after_post_cancel(self):
         """

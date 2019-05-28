@@ -6,9 +6,12 @@ from __future__ import absolute_import
 import json
 import logging
 import mimetypes
+from collections import OrderedDict
 from datetime import datetime
 
 import six.moves.urllib.parse
+from completion.exceptions import UnavailableCompletionData
+from completion.utilities import get_key_to_last_completed_course_block
 from django.conf import settings
 from django.contrib.auth import load_backend
 from django.contrib.auth.models import User
@@ -661,3 +664,32 @@ def do_create_account(form, custom_form=None):
         raise
 
     return user, profile, registration
+
+
+def get_resume_urls_for_enrollments(user, enrollments):
+    '''
+    For a given user, return a list of urls to the user's last completed block in
+    a course run for each course run in the user's enrollments.
+
+    Arguments:
+        user: the user object for which we want resume course urls
+        enrollments (list): a list of user enrollments
+
+    Returns:
+        resume_course_urls (OrderedDict): an OrderdDict of urls
+            key: CourseKey
+            value: url to the last completed block
+                if the value is '', then the user has not completed any blocks in the course run
+    '''
+    resume_course_urls = OrderedDict()
+    for enrollment in enrollments:
+        try:
+            block_key = get_key_to_last_completed_course_block(user, enrollment.course_id)
+            url_to_block = reverse(
+                'jump_to',
+                kwargs={'course_id': enrollment.course_id, 'location': block_key}
+            )
+        except UnavailableCompletionData:
+            url_to_block = ''
+        resume_course_urls[enrollment.course_id] = url_to_block
+    return resume_course_urls

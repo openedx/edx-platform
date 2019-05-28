@@ -549,10 +549,16 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
             return staff_access_response
 
         return (
-            _visible_to_nonstaff_users(descriptor) and
+            _visible_to_nonstaff_users(descriptor, display_error_to_user=False) and
             (
                 _has_detached_class_tag(descriptor) or
-                check_start_date(user, descriptor.days_early_for_beta, descriptor.start, course_key)
+                check_start_date(
+                    user,
+                    descriptor.days_early_for_beta,
+                    descriptor.start,
+                    course_key,
+                    display_error_to_user=False
+                )
             )
         )
 
@@ -782,14 +788,19 @@ def _has_staff_access_to_descriptor(user, descriptor, course_key):
     return _has_staff_access_to_location(user, descriptor.location, course_key)
 
 
-def _visible_to_nonstaff_users(descriptor):
+def _visible_to_nonstaff_users(descriptor, display_error_to_user=True):
     """
     Returns if the object is visible to nonstaff users.
 
     Arguments:
         descriptor: object to check
+        display_error_to_user: If True, show an error message to the user say the content was hidden. Otherwise,
+            hide the content silently.
     """
-    return VisibilityError() if descriptor.visible_to_staff_only else ACCESS_GRANTED
+    if descriptor.visible_to_staff_only:
+        return VisibilityError(display_error_to_user=display_error_to_user)
+    else:
+        return ACCESS_GRANTED
 
 
 def _can_access_descriptor_with_milestones(user, descriptor, course_key):

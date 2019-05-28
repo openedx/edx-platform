@@ -197,6 +197,18 @@ FEATURES = {
     # Toggle to enable certificates of courses on dashboard
     'ENABLE_VERIFIED_CERTIFICATES': False,
 
+    # .. toggle_name: DISABLE_HONOR_CERTIFICATES
+    # .. toggle_type: feature_flag
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to disable honor certificates. Typically used when your installation only allows verified certificates, like courses.edx.org.
+    # .. toggle_category: certificates
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2019-05-14
+    # .. toggle_expiration_date: None
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/PROD-269
+    # .. toggle_status: supported
+    'DISABLE_HONOR_CERTIFICATES': False,  # Toggle to disable honor certificates
+
     # for acceptance and load testing
     'AUTOMATIC_AUTH_FOR_TESTING': False,
 
@@ -574,7 +586,6 @@ def _make_mako_template_dirs(settings):
 CONTEXT_PROCESSORS = [
     'django.template.context_processors.request',
     'django.template.context_processors.static',
-    'django.contrib.messages.context_processors.messages',
     'django.template.context_processors.i18n',
     'django.contrib.auth.context_processors.auth',  # this is required for admin
     'django.template.context_processors.csrf',
@@ -2145,7 +2156,7 @@ INSTALLED_APPS = [
     'course_modes.apps.CourseModesConfig',
 
     # Enrollment API
-    'enrollment',
+    'openedx.core.djangoapps.enrollments',
 
     # Entitlement API
     'entitlements.apps.EntitlementsConfig',
@@ -3171,6 +3182,12 @@ JWT_AUTH = {
 
     'JWT_ISSUER': 'change-me',
     'JWT_AUDIENCE': 'change-me',
+}
+
+EDX_DRF_EXTENSIONS = {
+    # Set this value to an empty dict in order to prevent automatically updating
+    # user data from values in (possibly stale) JWTs.
+    'JWT_PAYLOAD_USER_ATTRIBUTE_MAPPING': {},
 }
 
 ################################ Settings for Microsites ################################

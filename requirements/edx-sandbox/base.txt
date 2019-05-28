@@ -4,11 +4,11 @@
 #
 #    make upgrade
 #
-git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4
 common/lib/chem
 common/lib/sandbox-packages
 common/lib/symmath
 asn1crypto==0.24.0
+git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4
 cffi==1.12.3
 cryptography==2.6.1
 enum34==1.1.6

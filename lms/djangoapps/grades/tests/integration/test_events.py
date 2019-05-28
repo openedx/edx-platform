@@ -2,8 +2,12 @@
 Test grading events across apps.
 """
 
-from mock import call as mock_call, patch
+from __future__ import absolute_import
+
+import six
 from crum import set_current_request
+from mock import call as mock_call
+from mock import patch
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
@@ -85,11 +89,11 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
                 mock_call(
                     events.PROBLEM_SUBMITTED_EVENT_TYPE,
                     {
-                        'user_id': unicode(self.student.id),
+                        'user_id': six.text_type(self.student.id),
                         'event_transaction_id': event_transaction_id,
                         'event_transaction_type': events.PROBLEM_SUBMITTED_EVENT_TYPE,
-                        'course_id': unicode(self.course.id),
-                        'problem_id': unicode(self.problem.location),
+                        'course_id': six.text_type(self.course.id),
+                        'problem_id': six.text_type(self.problem.location),
                         'weighted_earned': 2.0,
                         'weighted_possible': 2.0,
                     },
@@ -97,15 +101,15 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
                 mock_call(
                     events.COURSE_GRADE_CALCULATED,
                     {
-                        'course_version': unicode(course.course_version),
+                        'course_version': six.text_type(course.course_version),
                         'percent_grade': 0.02,
                         'grading_policy_hash': u'ChVp0lHGQGCevD0t4njna/C44zQ=',
-                        'user_id': unicode(self.student.id),
+                        'user_id': six.text_type(self.student.id),
                         'letter_grade': u'',
                         'event_transaction_id': event_transaction_id,
                         'event_transaction_type': events.PROBLEM_SUBMITTED_EVENT_TYPE,
-                        'course_id': unicode(self.course.id),
-                        'course_edited_timestamp': unicode(course.subtree_edited_on),
+                        'course_id': six.text_type(self.course.id),
+                        'course_edited_timestamp': six.text_type(course.subtree_edited_on),
                     }
                 ),
             ],
@@ -126,10 +130,10 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
         enrollment_tracker.emit.assert_called_with(
             events.STATE_DELETED_EVENT_TYPE,
             {
-                'user_id': unicode(self.student.id),
-                'course_id': unicode(self.course.id),
-                'problem_id': unicode(self.problem.location),
-                'instructor_id': unicode(self.instructor.id),
+                'user_id': six.text_type(self.student.id),
+                'course_id': six.text_type(self.course.id),
+                'problem_id': six.text_type(self.problem.location),
+                'instructor_id': six.text_type(self.instructor.id),
                 'event_transaction_id': event_transaction_id,
                 'event_transaction_type': events.STATE_DELETED_EVENT_TYPE,
             }
@@ -140,13 +144,13 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
             {
                 'percent_grade': 0.0,
                 'grading_policy_hash': u'ChVp0lHGQGCevD0t4njna/C44zQ=',
-                'user_id': unicode(self.student.id),
+                'user_id': six.text_type(self.student.id),
                 'letter_grade': u'',
                 'event_transaction_id': event_transaction_id,
                 'event_transaction_type': events.STATE_DELETED_EVENT_TYPE,
-                'course_id': unicode(self.course.id),
-                'course_edited_timestamp': unicode(course.subtree_edited_on),
-                'course_version': unicode(course.course_version),
+                'course_id': six.text_type(self.course.id),
+                'course_edited_timestamp': six.text_type(course.subtree_edited_on),
+                'course_version': six.text_type(course.course_version),
             }
         )
 
@@ -175,7 +179,7 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
         for args in events_tracker.get_tracker().context.call_args_list:
             self.assertEqual(
                 args[0][1],
-                {'course_id': unicode(self.course.id), 'org_id': unicode(self.course.org)}
+                {'course_id': six.text_type(self.course.id), 'org_id': six.text_type(self.course.org)}
             )
 
         event_transaction_id = events_tracker.emit.mock_calls[0][1][1]['event_transaction_id']
@@ -184,13 +188,13 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
                 mock_call(
                     events.GRADES_RESCORE_EVENT_TYPE,
                     {
-                        'course_id': unicode(self.course.id),
-                        'user_id': unicode(self.student.id),
-                        'problem_id': unicode(self.problem.location),
+                        'course_id': six.text_type(self.course.id),
+                        'user_id': six.text_type(self.student.id),
+                        'problem_id': six.text_type(self.problem.location),
                         'new_weighted_earned': 2,
                         'new_weighted_possible': 2,
                         'only_if_higher': False,
-                        'instructor_id': unicode(self.instructor.id),
+                        'instructor_id': six.text_type(self.instructor.id),
                         'event_transaction_id': event_transaction_id,
                         'event_transaction_type': events.GRADES_RESCORE_EVENT_TYPE,
                     },
@@ -198,15 +202,15 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
                 mock_call(
                     events.COURSE_GRADE_CALCULATED,
                     {
-                        'course_version': unicode(course.course_version),
+                        'course_version': six.text_type(course.course_version),
                         'percent_grade': 0.02,
                         'grading_policy_hash': u'ChVp0lHGQGCevD0t4njna/C44zQ=',
-                        'user_id': unicode(self.student.id),
+                        'user_id': six.text_type(self.student.id),
                         'letter_grade': u'',
                         'event_transaction_id': event_transaction_id,
                         'event_transaction_type': events.GRADES_RESCORE_EVENT_TYPE,
-                        'course_id': unicode(self.course.id),
-                        'course_edited_timestamp': unicode(course.subtree_edited_on),
+                        'course_id': six.text_type(self.course.id),
+                        'course_edited_timestamp': six.text_type(course.subtree_edited_on),
                     },
                 ),
             ],

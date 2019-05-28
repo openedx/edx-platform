@@ -1,5 +1,7 @@
 """ Custom API permissions. """
 
+from __future__ import absolute_import
+
 from django.contrib.auth.models import User
 from rest_framework.permissions import BasePermission, DjangoModelPermissions
 

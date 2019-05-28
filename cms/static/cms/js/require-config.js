@@ -136,7 +136,7 @@
             'lang_edx': 'js/src/lang_edx',
 
             // externally hosted files
-            mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',  // eslint-disable-line max-len
+            mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML&delayStartupUntil=configured',  // eslint-disable-line max-len
             'youtube': [
                 // youtube URL does not end in '.js'. We add '?noext' to the path so
                 // that require.js adds the '.js' to the query component of the URL,

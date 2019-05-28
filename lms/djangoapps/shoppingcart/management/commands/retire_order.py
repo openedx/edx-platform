@@ -2,7 +2,7 @@
 Script for retiring order that went through cybersource but weren't
 marked as "purchased" in the db
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 from django.core.management.base import BaseCommand
 from six import text_type

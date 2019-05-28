@@ -320,7 +320,7 @@ def migrate_cohort_settings(course):
     return cohort_settings
 
 
-def get_course_cohorts(course, assignment_type=None):
+def get_course_cohorts(course=None, course_id=None, assignment_type=None):
     """
     Get a list of all the cohorts in the given course. This will include auto cohorts,
     regardless of whether or not the auto cohorts include any users.
@@ -333,11 +333,14 @@ def get_course_cohorts(course, assignment_type=None):
         A list of CourseUserGroup objects. Empty if there are no cohorts. Does
         not check whether the course is cohorted.
     """
+    assert bool(course) ^ bool(course_id), "course or course_id required"
     # Migrate cohort settings for this course
-    migrate_cohort_settings(course)
+    if course:
+        migrate_cohort_settings(course)
+        course_id = course.location.course_key
 
     query_set = CourseUserGroup.objects.filter(
-        course_id=course.location.course_key,
+        course_id=course_id,
         group_type=CourseUserGroup.COHORT
     )
     query_set = query_set.filter(cohort__assignment_type=assignment_type) if assignment_type else query_set

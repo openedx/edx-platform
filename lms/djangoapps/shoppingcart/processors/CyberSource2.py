@@ -20,6 +20,8 @@ To enable this implementation, add the following Django settings:
 
 """
 
+from __future__ import absolute_import
+
 import binascii
 import hmac
 import json
@@ -209,7 +211,7 @@ def sign(params):
         dict: The same parameters dict, with a 'signature' key calculated from the other values.
 
     """
-    fields = u",".join(params.keys())
+    fields = u",".join(list(params.keys()))
     params['signed_field_names'] = fields
 
     signed_fields = params.get('signed_field_names', '').split(',')

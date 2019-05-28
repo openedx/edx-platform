@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 """Tests for the email opt-in list management command. """
-import os.path
-import tempfile
-import shutil
+from __future__ import absolute_import
+
 import csv
+import os.path
+import shutil
+import tempfile
 from collections import defaultdict
 
 import ddt
@@ -11,16 +13,16 @@ from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from six import text_type
+from six.moves import range
 
+from openedx.core.djangoapps.user_api.management.commands import email_opt_in_list
+from openedx.core.djangoapps.user_api.models import UserOrgTag
+from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
+from openedx.core.djangolib.testing.utils import skip_unless_lms
+from student.models import CourseEnrollment
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from student.models import CourseEnrollment
-
-from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
-from openedx.core.djangoapps.user_api.models import UserOrgTag
-from openedx.core.djangoapps.user_api.management.commands import email_opt_in_list
-from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
 @ddt.ddt

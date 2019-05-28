@@ -14,17 +14,19 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.utils.decorators import method_decorator
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
-from enrollment import api
-from enrollment.errors import CourseEnrollmentError, CourseEnrollmentExistsError, CourseModeNotFoundError
-from enrollment.forms import CourseEnrollmentsApiListForm
-from enrollment.paginators import CourseEnrollmentsApiListPagination
-from enrollment.serializers import CourseEnrollmentsApiListSerializer
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup, add_user_to_cohort, get_cohort_by_name
 from openedx.core.djangoapps.embargo import api as embargo_api
+from openedx.core.djangoapps.enrollments import api
+from openedx.core.djangoapps.enrollments.errors import (
+    CourseEnrollmentError, CourseEnrollmentExistsError, CourseModeNotFoundError,
+)
+from openedx.core.djangoapps.enrollments.forms import CourseEnrollmentsApiListForm
+from openedx.core.djangoapps.enrollments.paginators import CourseEnrollmentsApiListPagination
+from openedx.core.djangoapps.enrollments.serializers import CourseEnrollmentsApiListSerializer
 from openedx.core.djangoapps.user_api.accounts.permissions import CanRetireUser
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
@@ -164,10 +166,13 @@ class EnrollmentView(APIView, ApiKeyPermissionMixIn):
             * user: The ID of the user.
    """
 
-    authentication_classes = (JwtAuthentication, OAuth2AuthenticationAllowInactiveUser,
-                              SessionAuthenticationAllowInactiveUser,)
-    permission_classes = ApiKeyHeaderPermissionIsAuthenticated,
-    throttle_classes = EnrollmentUserThrottle,
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (ApiKeyHeaderPermissionIsAuthenticated,)
+    throttle_classes = (EnrollmentUserThrottle,)
 
     # Since the course about page on the marketing site uses this API to auto-enroll users,
     # we need to support cross-domain CSRF.
@@ -236,11 +241,13 @@ class EnrollmentUserRolesView(APIView):
         logged-in user, filtered by course_id if given, along with
         whether or not the user is global staff
     """
-    authentication_classes = (JwtAuthentication,
-                              OAuth2AuthenticationAllowInactiveUser,
-                              EnrollmentCrossDomainSessionAuth)
-    permission_classes = ApiKeyHeaderPermissionIsAuthenticated,
-    throttle_classes = EnrollmentUserThrottle,
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        EnrollmentCrossDomainSessionAuth,
+    )
+    permission_classes = (ApiKeyHeaderPermissionIsAuthenticated,)
+    throttle_classes = (EnrollmentUserThrottle,)
 
     @method_decorator(ensure_csrf_cookie_cross_domain)
     def get(self, request):
@@ -252,7 +259,7 @@ class EnrollmentUserRolesView(APIView):
             roles_data = api.get_user_roles(request.user.username)
             if course_id:
                 roles_data = [role for role in roles_data if text_type(role.course_id) == course_id]
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
                 data={
@@ -339,7 +346,7 @@ class EnrollmentCourseDetailView(APIView):
 
     authentication_classes = []
     permission_classes = []
-    throttle_classes = EnrollmentUserThrottle,
+    throttle_classes = (EnrollmentUserThrottle,)
 
     def get(self, request, course_id=None):
         """Read enrollment information for a particular course.
@@ -405,7 +412,7 @@ class UnenrollmentView(APIView):
             returned along with a list of all courses from which the user was unenrolled.
         """
     authentication_classes = (JwtAuthentication,)
-    permission_classes = (permissions.IsAuthenticated, CanRetireUser)
+    permission_classes = (permissions.IsAuthenticated, CanRetireUser,)
 
     def post(self, request):
         """
@@ -603,10 +610,13 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
 
              * user: The username of the user.
     """
-    authentication_classes = (JwtAuthentication, OAuth2AuthenticationAllowInactiveUser,
-                              EnrollmentCrossDomainSessionAuth,)
-    permission_classes = ApiKeyHeaderPermissionIsAuthenticated,
-    throttle_classes = EnrollmentUserThrottle,
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        EnrollmentCrossDomainSessionAuth,
+    )
+    permission_classes = (ApiKeyHeaderPermissionIsAuthenticated,)
+    throttle_classes = (EnrollmentUserThrottle,)
 
     # Since the course about page on the marketing site
     # uses this API to auto-enroll users, we need to support
@@ -652,6 +662,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         return Response(filtered_data)
 
     def post(self, request):
+        # pylint: disable=too-many-statements
         """Enrolls the currently logged-in user in a course.
 
         Server-to-server calls may deactivate or modify the mode of existing enrollments. All other requests
@@ -734,8 +745,8 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 try:
                     enterprise_api_client.post_enterprise_course_enrollment(username, text_type(course_id), None)
                 except EnterpriseApiException as error:
-                    log.exception("An unexpected error occurred while creating the new EnterpriseCourseEnrollment "
-                                  "for user [%s] in course run [%s]", username, course_id)
+                    log.exception(u"An unexpected error occurred while creating the new EnterpriseCourseEnrollment "
+                                  u"for user [%s] in course run [%s]", username, course_id)
                     raise CourseEnrollmentError(text_type(error))
                 kwargs = {
                     'username': username,
@@ -766,7 +777,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     log.warning(msg)
                     return Response(status=status.HTTP_400_BAD_REQUEST, data={"message": msg})
 
-                if len(missing_attrs) > 0:
+                if missing_attrs:
                     msg = u"Missing enrollment attributes: requested mode={} required attributes={}".format(
                         mode, REQUIRED_ATTRIBUTES.get(mode)
                     )
@@ -805,7 +816,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 org = course_id.org
                 update_email_opt_in(request.user, org, email_opt_in)
 
-            log.info('The user [%s] has already been enrolled in course run [%s].', username, course_id)
+            log.info(u'The user [%s] has already been enrolled in course run [%s].', username, course_id)
             return Response(response)
         except CourseModeNotFoundError as error:
             return Response(
@@ -824,11 +835,11 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 }
             )
         except CourseEnrollmentExistsError as error:
-            log.warning('An enrollment already exists for user [%s] in course run [%s].', username, course_id)
+            log.warning(u'An enrollment already exists for user [%s] in course run [%s].', username, course_id)
             return Response(data=error.enrollment)
         except CourseEnrollmentError:
-            log.exception("An error occurred while creating the new course enrollment for user "
-                          "[%s] in course run [%s]", username, course_id)
+            log.exception(u"An error occurred while creating the new course enrollment for user "
+                          u"[%s] in course run [%s]", username, course_id)
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
                 data={
@@ -839,11 +850,11 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 }
             )
         except CourseUserGroup.DoesNotExist:
-            log.exception('Missing cohort [%s] in course run [%s]', cohort_name, course_id)
+            log.exception(u'Missing cohort [%s] in course run [%s]', cohort_name, course_id)
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
                 data={
-                    "message": "An error occured while adding to cohort [%s]" % cohort_name
+                    "message": u"An error occured while adding to cohort [%s]" % cohort_name
                 })
         finally:
             # Assumes that the ecommerce service uses an API key to authenticate.
@@ -930,8 +941,8 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
         OAuth2AuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
-    permission_classes = (permissions.IsAdminUser, )
-    throttle_classes = (EnrollmentUserThrottle, )
+    permission_classes = (permissions.IsAdminUser,)
+    throttle_classes = (EnrollmentUserThrottle,)
     serializer_class = CourseEnrollmentsApiListSerializer
     pagination_class = CourseEnrollmentsApiListPagination
 

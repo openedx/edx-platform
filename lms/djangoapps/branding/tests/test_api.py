@@ -96,8 +96,8 @@ class TestFooter(TestCase):
         business_url = 'https://business.edx.org/?utm_campaign=edX.org+Referral&utm_source=edX.org&utm_medium=Footer'
         expected_footer = {
             'copyright': '\xa9 \xe9dX.  All rights reserved except where noted. '
-                         ' EdX, Open edX and their respective logos are '
-                         'trademarks or registered trademarks of edX Inc.',
+                         ' edX, Open edX and their respective logos are '
+                         'registered trademarks of edX Inc.',
             'navigation_links': [
                 {'url': 'https://edx.org/about-us', 'name': 'about', 'title': 'About'},
                 {'url': 'https://business.edx.org', 'name': 'enterprise', 'title': '\xe9dX for Business'},

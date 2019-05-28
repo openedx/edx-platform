@@ -252,6 +252,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             'Suspicious Comments',
             'Rules Violation Count',
             'Rules Violation Comments',
+            'track'
         ]
 
         proctored_exam_id = create_exam(self.course_key, 'Test Content', 'Test Exam', 1)

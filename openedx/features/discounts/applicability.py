@@ -2,7 +2,13 @@
 """
 Contains code related to computing discount percentage
 and discount applicability.
+
+WARNING:
+Keep in mind that the code in this file only applies to discounts controlled in the lms like the first purchase offer,
+not other discounts like coupons or enterprise/program offers configured in ecommerce.
+
 """
+from course_modes.models import CourseMode
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 
 # .. feature_toggle_name: discounts.enable_discounting
@@ -23,7 +29,7 @@ DISCOUNT_APPLICABILITY_FLAG = WaffleFlag(
 )
 
 
-def can_receive_discount(user, course_key_string):  # pylint: disable=unused-argument
+def can_receive_discount(user, course):  # pylint: disable=unused-argument
     """
     Check all the business logic about whether this combination of user and course
     can receive a discount.
@@ -33,6 +39,16 @@ def can_receive_discount(user, course_key_string):  # pylint: disable=unused-arg
         return False
 
     # TODO: Add additional conditions to return False here
+
+    # Course end date needs to be in the future
+    if course.has_ended():
+        return False
+
+    # Course needs to have a non-expired verified mode
+    modes_dict = CourseMode.modes_for_course_dict(course=course, include_expired=False)
+    verified_mode = modes_dict.get('verified', None)
+    if not verified_mode:
+        return False
 
     return True
 

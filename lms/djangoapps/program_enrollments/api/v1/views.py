@@ -2,27 +2,41 @@
 """
 ProgramEnrollment Views
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
+import logging
 from collections import Counter, OrderedDict
+from datetime import datetime, timedelta
 from functools import wraps
+from pytz import UTC
 
 from django.http import Http404
+from django.core.exceptions import PermissionDenied
+from django.urls import reverse
 from edx_rest_framework_extensions import permissions
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
+from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError
 from rest_framework.pagination import CursorPagination
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from six import iteritems
+
+from bulk_email.api import is_bulk_email_feature_enabled, is_user_opted_out_for_course
+from edx_when.api import get_dates_for_course
+from lms.djangoapps.certificates.api import get_certificate_for_user
 from lms.djangoapps.program_enrollments.api.v1.constants import (
     CourseEnrollmentResponseStatuses,
+    CourseRunProgressStatuses,
     MAX_ENROLLMENT_RECORDS,
     REQUEST_STUDENT_KEY,
 )
 from lms.djangoapps.program_enrollments.api.v1.serializers import (
+    CourseRunOverviewListSerializer,
     ProgramCourseEnrollmentListSerializer,
     ProgramCourseEnrollmentRequestSerializer,
     ProgramEnrollmentListSerializer,
@@ -30,12 +44,15 @@ from lms.djangoapps.program_enrollments.api.v1.serializers import (
 )
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 from lms.djangoapps.program_enrollments.utils import get_user_by_program_id
-
+from student.helpers import get_resume_urls_for_enrollments
+from xmodule.modulestore.django import modulestore
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, PaginatedAPIView, verify_course_exists
 from util.query import use_read_replica_if_available
+
+logger = logging.getLogger(__name__)
 
 
 def verify_program_exists(view_func):
@@ -423,6 +440,58 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
         )
 
 
+class LearnerProgramEnrollmentsView(DeveloperErrorViewMixin, APIView):
+    """
+    A view for checking the currently logged-in learner's program enrollments
+
+    Path: `/api/program_enrollments/v1/programs/enrollments/`
+
+    Returns:
+      * 200: OK - Contains a list of all programs in which the learner is enrolled.
+      * 401: The requesting user is not authenticated.
+
+    The list will be a list of objects with the following keys:
+      * `uuid` - the identifier of the program in which the learner is enrolled.
+      * `slug` - the string from which a link to the corresponding program page can be constructed.
+
+    Example:
+    [
+      {
+        'uuid': '00000000-1111-2222-3333-444444444444',
+        'slug': 'deadbeef'
+      },
+      {
+        'uuid': '00000000-1111-2222-3333-444444444445',
+        'slug': 'undead-cattle'
+      }
+    ]
+    """
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        """
+        How to respond to a GET request to this endpoint
+        """
+        program_enrollments = ProgramEnrollment.objects.filter(
+            user=request.user,
+            status__in=('enrolled', 'pending')
+        )
+
+        uuids = [enrollment.program_uuid for enrollment in program_enrollments]
+
+        catalog_data_of_programs = get_programs(uuids=uuids) or []
+        programs_in_which_learner_is_enrolled = [{'uuid': program['uuid'], 'slug': program['marketing_slug']}
+                                                 for program
+                                                 in catalog_data_of_programs]
+
+        return Response(programs_in_which_learner_is_enrolled, status.HTTP_200_OK)
+
+
 class ProgramSpecificViewMixin(object):
     """
     A mixin for views that operate on or within a specific program.
@@ -704,3 +773,302 @@ class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpec
         if program_course_enrollment is None:
             return CourseEnrollmentResponseStatuses.NOT_FOUND
         return program_course_enrollment.change_status(enrollment_request['status'])
+
+
+class ProgramCourseEnrollmentOverviewView(DeveloperErrorViewMixin, ProgramSpecificViewMixin, APIView):
+    """
+    A view for getting data associated with a user's course enrollments
+    as part of a program enrollment.
+
+    Path: ``/api/program_enrollments/v1/programs/{program_uuid}/overview/``
+
+    Accepts: [GET]
+
+    ------------------------------------------------------------------------------------
+    GET
+    ------------------------------------------------------------------------------------
+
+    **Returns**
+
+        * 200: OK - Contains an object of user program course enrollment data.
+        * 401: Unauthorized - The requesting user is not authenticated.
+        * 403: Forbidden -The requesting user lacks access for the given program.
+        * 404: Not Found - The requested program does not exist.
+
+    **Response**
+
+        In the case of a 200 response code, the response will include a
+        data set.  The `course_runs` section of the response consists of a list of
+        program course enrollment overview, where each overview contains the following keys:
+            * course_run_id: the id for the course run
+            * display_name: display name of the course run
+            * resume_course_run_url: the url that takes the user back to their position in the course run;
+                if absent, user has not made progress in the course
+            * course_run_url: the url for the course run
+            * start_date: the start date for the course run; null if no start date
+            * end_date: the end date for the course run' null if no end date
+            * course_status: the status of the course; one of "in-progress", "upcoming", and "completed"
+            * emails_enabled: boolean representing whether emails are enabled for the course;
+                if absent, the bulk email feature is either not enable at the platform level or is not enabled for the course;
+                if True or False, bulk email feature is enabled, and value represents whether or not user wants to receive emails
+            * due_dates: a list of subsection due dates for the course run:
+                ** name: name of the subsection
+                ** url: deep link to the subsection
+                ** date: due date for the subsection
+            * micromasters_title: title of the MicroMasters program that the course run is a part of;
+                if absent, the course run is not a part of a MicroMasters program
+            * certificate_download_url: url to download a certificate, if available;
+                if absent, certificate is not downloadable
+
+    **Example**
+
+        {
+            "course_runs": [
+                {
+                    "course_run_id": "edX+AnimalsX+Aardvarks",
+                    "display_name": "Astonishing Aardvarks",
+                    "course_run_url": "https://courses.edx.org/courses/course-v1:edX+AnimalsX+Aardvarks/course/",
+                    "start_date": "2017-02-05T05:00:00Z",
+                    "end_date": "2018-02-05T05:00:00Z",
+                    "course_status": "completed"
+                    "emails_enabled": true,
+                    "due_dates": [
+                        {
+                            "name": "Introduction: What even is an aardvark?",
+                            "url": "https://courses.edx.org/courses/course-v1:edX+AnimalsX+Aardvarks/jump_to/block-v1:edX+AnimalsX+Aardvarks+type@chapter+block@1414ffd5143b4b508f739b563ab468b7",
+                            "date": "2017-05-01T05:00:00Z"
+                        },
+                        {
+                            "name": "Quiz: Aardvark or Anteater?",
+                            "url": "https://courses.edx.org/courses/course-v1:edX+AnimalsX+Aardvarks/jump_to/block-v1:edX+AnimalsX+Aardvarks+type@sequential+block@edx_introduction",
+                            "date": "2017-03-05T00:00:00Z"
+                        }
+                    ],
+                    "micromasters_title": "Animals",
+                    "certificate_download_url": "https://courses.edx.org/certificates/123"
+                },
+                {
+                    "course_run_id": "edX+AnimalsX+Baboons",
+                    "display_name": "Breathtaking Baboons",
+                    "course_run_url": "https://courses.edx.org/courses/course-v1:edX+AnimalsX+Baboons/course/",
+                    "start_date": "2018-02-05T05:00:00Z",
+                    "end_date": null,
+                    "course_status": "in-progress"
+                    "emails_enabled": false,
+                    "due_dates": [],
+                    "micromasters_title": "Animals",
+                    "certificate_download_url": "https://courses.edx.org/certificates/123",
+                    "resume_course_run_url": "https://courses.edx.org/courses/course-v1:edX+AnimalsX+Baboons/jump_to/block-v1:edX+AnimalsX+Baboons+type@sequential+block@edx_introduction"
+                }
+            ]
+        }
+    """
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (IsAuthenticated,)
+
+    @verify_program_exists
+    def get(self, request, program_uuid=None):
+        """
+        Defines the GET endpoint for overviews of course enrollments
+        for a user as part of a program.
+        """
+        user = request.user
+
+        user_program_enrollment = ProgramEnrollment.objects.filter(
+            program_uuid=program_uuid,
+            user=user,
+            status='enrolled',
+        ).order_by(
+            '-modified',
+        )
+
+        user_program_enrollment_count = user_program_enrollment.count()
+
+        if user_program_enrollment_count > 1:
+            # in the unusual and unlikely case of a user having two
+            # active program enrollments for the same program,
+            # choose the most recently modified enrollment and log
+            # a warning
+            user_program_enrollment = user_program_enrollment[0]
+            logger.warning(
+                ('User with user_id {} has more than program enrollment'
+                 'with an enrolled status for program uuid {}.').format(
+                    user.id,
+                    program_uuid,
+                )
+            )
+        elif user_program_enrollment_count == 0:
+            # if the user is not enrolled in the program, they are not authorized
+            # to view the information returned by this endpoint
+            raise PermissionDenied
+
+        user_program_course_enrollments = ProgramCourseEnrollment.objects.filter(
+            program_enrollment=user_program_enrollment
+        ).select_related('course_enrollment')
+
+        enrollment_dict = {enrollment.course_key: enrollment.course_enrollment for enrollment in user_program_course_enrollments}
+
+        overviews = CourseOverview.get_from_ids_if_exists(enrollment_dict.keys())
+
+        resume_course_run_urls = get_resume_urls_for_enrollments(user, enrollment_dict.values())
+
+        response = {
+            'course_runs': [],
+        }
+
+        for enrollment in user_program_course_enrollments:
+            overview = overviews[enrollment.course_key]
+
+            certificate_download_url = None
+            is_certificate_passing = None
+            certificate_creation_date = None
+            certificate_info = get_certificate_for_user(user.username, enrollment.course_key)
+
+            if certificate_info:
+                certificate_download_url = certificate_info['download_url']
+                is_certificate_passing = certificate_info['is_passing']
+                certificate_creation_date = certificate_info['created']
+
+            course_run_dict = {
+                'course_run_id': enrollment.course_key,
+                'display_name': overview.display_name_with_default,
+                'course_run_status': self.get_course_run_status(overview, is_certificate_passing, certificate_creation_date),
+                'course_run_url': self.get_course_run_url(request, enrollment.course_key),
+                'start_date': overview.start,
+                'end_date': overview.end,
+                'due_dates': self.get_due_dates(request, enrollment.course_key, user),
+            }
+
+            if certificate_download_url:
+                course_run_dict['certificate_download_url'] = certificate_download_url
+
+            emails_enabled = self.get_emails_enabled(user, enrollment.course_key)
+            if emails_enabled is not None:
+                course_run_dict['emails_enabled'] = emails_enabled
+
+            micromasters_title = self.program['title'] if self.program['type'] == 'MicroMasters' else None
+            if micromasters_title:
+                course_run_dict['micromasters_title'] = micromasters_title
+
+            # if the url is '', then the url is None so we can omit it from the response
+            resume_course_run_url = resume_course_run_urls[enrollment.course_key]
+            if resume_course_run_url:
+                course_run_dict['resume_course_run_url'] = resume_course_run_url
+
+            response['course_runs'].append(course_run_dict)
+
+        serializer = CourseRunOverviewListSerializer(response)
+        return Response(serializer.data)
+
+    @staticmethod
+    def get_due_dates(request, course_key, user):
+        """
+        Get due date information for a user for blocks in a course.
+
+        Arguments:
+            request: the request object
+            course_key (CourseKey): the CourseKey for the course
+            user: the user object for which we want due date information
+
+        Returns:
+            due_dates (list): a list of dictionaries containing due date information
+                keys:
+                    name: the display name of the block
+                    url: the deep link to the block
+                    date: the due date for the block
+        """
+        dates = get_dates_for_course(
+            course_key,
+            user,
+        )
+
+        store = modulestore()
+
+        due_dates = []
+        for (block_key, date_type), date in iteritems(dates):
+            if date_type == 'due':
+                block = store.get_item(block_key)
+
+                # get url to the block in the course
+                block_url = reverse('jump_to', args=[course_key, block_key])
+                block_url = request.build_absolute_uri(block_url)
+
+                due_dates.append({
+                    'name': block.display_name,
+                    'url': block_url,
+                    'date': date,
+                })
+        return due_dates
+
+    @staticmethod
+    def get_course_run_url(request, course_id):
+        """
+        Get the URL to a course run.
+
+        Arguments:
+            request: the request object
+            course_id (string): the course id of the course
+
+        Returns:
+            (string): the URL to the course run associated with course_id
+        """
+        course_run_url = reverse('openedx.course_experience.course_home', args=[course_id])
+        return request.build_absolute_uri(course_run_url)
+
+    @staticmethod
+    def get_emails_enabled(user, course_id):
+        """
+        Get whether or not emails are enabled in the context of a course.
+
+        Arguments:
+            user: the user object for which we want to check whether emails are enabled
+            course_id (string): the course id of the course
+
+        Returns:
+            (bool): True if emails are enabled for the course associated with course_id for the user;
+            False otherwise
+        """
+        if is_bulk_email_feature_enabled(course_id=course_id):
+            return not is_user_opted_out_for_course(user=user, course_id=course_id)
+        else:
+            return None
+
+    @staticmethod
+    def get_course_run_status(course_overview, is_certificate_passing, certificate_creation_date):
+        """
+        Get the progress status of a course run.
+
+        Arguments:
+            course_overview (CourseOverview): the overview for the course run
+            is_certificate_passing (bool): True if the user has a passing certificate in
+                this course run; False otherwise
+            certificate_creation_date: the date the certificate was created
+
+        Returns:
+            status: one of CourseRunProgressStatuses.COMPLETE,
+                CourseRunProgressStatuses.IN_PROGRESS,
+                or CourseRunProgressStatuses.UPCOMING
+        """
+        if course_overview.pacing == 'instructor':
+            if course_overview.has_ended():
+                return CourseRunProgressStatuses.COMPLETED
+            elif course_overview.has_started():
+                return CourseRunProgressStatuses.IN_PROGRESS
+            else:
+                return CourseRunProgressStatuses.UPCOMING
+        elif course_overview.pacing == 'self':
+            has_ended = course_overview.has_ended()
+            thirty_days_ago = datetime.now(UTC) - timedelta(30)
+            # a self paced course run is completed when either the course run has ended
+            # OR the user has earned a certificate 30 days ago or more
+            if has_ended or is_certificate_passing and (certificate_creation_date and certificate_creation_date <= thirty_days_ago):
+                return CourseRunProgressStatuses.COMPLETED
+            elif course_overview.has_started():
+                return CourseRunProgressStatuses.IN_PROGRESS
+            else:
+                return CourseRunProgressStatuses.UPCOMING
+        return None

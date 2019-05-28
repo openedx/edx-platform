@@ -1,6 +1,8 @@
 """
 Discussion API views
 """
+from __future__ import absolute_import
+
 import logging
 
 from django.contrib.auth.models import User
@@ -8,8 +10,7 @@ from django.core.exceptions import ValidationError
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys.edx.keys import CourseKey
-from rest_framework import permissions
-from rest_framework import status
+from rest_framework import permissions, status
 from rest_framework.exceptions import ParseError, UnsupportedMediaType
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
@@ -17,8 +18,8 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 from six import text_type
 
-from instructor.access import update_forum_role
 from discussion.views import get_divided_discussions
+from instructor.access import update_forum_role
 from lms.djangoapps.discussion.django_comment_client.utils import available_division_schemes
 from lms.djangoapps.discussion.rest_api.api import (
     create_comment,
@@ -37,24 +38,26 @@ from lms.djangoapps.discussion.rest_api.api import (
 from lms.djangoapps.discussion.rest_api.forms import (
     CommentGetForm,
     CommentListGetForm,
+    CourseDiscussionRolesForm,
     CourseDiscussionSettingsForm,
-    ThreadListGetForm,
-    CourseDiscussionRolesForm)
-from lms.djangoapps.discussion.rest_api.serializers import (
-    DiscussionRolesSerializer,
-    DiscussionRolesListSerializer,
-    DiscussionSettingsSerializer,
+    ThreadListGetForm
 )
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
-from openedx.core.lib.api.parsers import MergePatchParser
-from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+from lms.djangoapps.discussion.rest_api.serializers import (
+    DiscussionRolesListSerializer,
+    DiscussionRolesSerializer,
+    DiscussionSettingsSerializer
+)
 from openedx.core.djangoapps.django_comment_common import comment_client
 from openedx.core.djangoapps.django_comment_common.models import Role
 from openedx.core.djangoapps.django_comment_common.utils import (
-    get_course_discussion_settings, set_course_discussion_settings,
+    get_course_discussion_settings,
+    set_course_discussion_settings
 )
 from openedx.core.djangoapps.user_api.accounts.permissions import CanReplaceUsername, CanRetireUser
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
+from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.parsers import MergePatchParser
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
 

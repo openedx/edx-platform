@@ -2,23 +2,25 @@
 Resolvers used to find users for course_duration_limit message
 """
 
+from __future__ import absolute_import
+
 import logging
 from datetime import datetime, timedelta
 
-from course_modes.models import CourseMode
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.db.models import Q
 from django.utils.timesince import timeuntil
 from django.utils.translation import ugettext as _
 from eventtracking import tracker
+
+from course_modes.models import CourseMode
+from courseware.date_summary import verified_upgrade_deadline_link
 from lms.djangoapps.experiments.utils import stable_bucketing_hash_group
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
-from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
-
 from openedx.core.djangoapps.schedules.resolvers import (
     BinnedSchedulesBaseResolver,
     InvalidContextError,
-    _get_trackable_course_home_url,
+    _get_trackable_course_home_url
 )
 from track import segment
 

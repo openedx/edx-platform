@@ -8,8 +8,6 @@ import datetime
 import logging
 from collections import defaultdict
 
-from completion.exceptions import UnavailableCompletionData
-from completion.utilities import get_key_to_last_completed_course_block
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -23,7 +21,8 @@ from pytz import UTC
 from six import iteritems, text_type
 
 import track.views
-from bulk_email.models import BulkEmailFlag, Optout  # pylint: disable=import-error
+from bulk_email.api import is_bulk_email_feature_enabled
+from bulk_email.models import Optout  # pylint: disable=import-error
 from course_modes.models import CourseMode
 from courseware.access import has_access
 from edxmako.shortcuts import render_to_response, render_to_string
@@ -49,7 +48,7 @@ from openedx.features.enterprise_support.api import get_dashboard_consent_notifi
 from openedx.features.journals.api import journals_enabled
 from shoppingcart.api import order_history
 from shoppingcart.models import CourseRegistrationCode, DonationConfiguration
-from student.helpers import cert_info, check_verify_status_by_course
+from student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
 from student.models import (
     AccountRecovery,
     CourseEnrollment,
@@ -532,24 +531,6 @@ def _credit_statuses(user, course_enrollments):
     return statuses
 
 
-def _get_urls_for_resume_buttons(user, enrollments):
-    '''
-    Checks whether a user has made progress in any of a list of enrollments.
-    '''
-    resume_button_urls = []
-    for enrollment in enrollments:
-        try:
-            block_key = get_key_to_last_completed_course_block(user, enrollment.course_id)
-            url_to_block = reverse(
-                'jump_to',
-                kwargs={'course_id': enrollment.course_id, 'location': block_key}
-            )
-        except UnavailableCompletionData:
-            url_to_block = ''
-        resume_button_urls.append(url_to_block)
-    return resume_button_urls
-
-
 @login_required
 @ensure_csrf_cookie
 @add_maintenance_banner
@@ -755,7 +736,7 @@ def student_dashboard(request):
     # only show email settings for Mongo course and when bulk email is turned on
     show_email_settings_for = frozenset(
         enrollment.course_id for enrollment in course_enrollments if (
-            BulkEmailFlag.feature_enabled(enrollment.course_id)
+            is_bulk_email_feature_enabled(enrollment.course_id)
         )
     )
 
@@ -835,7 +816,7 @@ def student_dashboard(request):
         'consent_required_courses': consent_required_courses,
         'enterprise_customer_name': enterprise_customer_name,
         'enrollment_message': enrollment_message,
-        'redirect_message': redirect_message,
+        'redirect_message': Text(redirect_message),
         'account_activation_messages': account_activation_messages,
         'activate_account_message': activate_account_message,
         'course_enrollments': course_enrollments,
@@ -895,7 +876,7 @@ def student_dashboard(request):
 
     # Gather urls for course card resume buttons.
     resume_button_urls = ['' for entitlement in course_entitlements]
-    for url in _get_urls_for_resume_buttons(user, course_enrollments):
+    for url in get_resume_urls_for_enrollments(user, course_enrollments).values():
         resume_button_urls.append(url)
     # There must be enough urls for dashboard.html. Template creates course
     # cards for "enrollments + entitlements".

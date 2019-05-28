@@ -227,7 +227,6 @@ autodoc_mock_imports = [
     'MySQLdb',
     'contracts',
     'django_mysql',
-    'lettuce',
     'pymongo',
 ]
 

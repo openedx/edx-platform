@@ -14,11 +14,11 @@ from six import text_type
 
 from course_modes.models import CourseMode
 from courseware import courses
-from enrollment.api import add_enrollment
-from enrollment.views import EnrollmentCrossDomainSessionAuth
 from entitlements.models import CourseEntitlement
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.embargo import api as embargo_api
+from openedx.core.djangoapps.enrollments.api import add_enrollment
+from openedx.core.djangoapps.enrollments.views import EnrollmentCrossDomainSessionAuth
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from student.models import CourseEnrollment

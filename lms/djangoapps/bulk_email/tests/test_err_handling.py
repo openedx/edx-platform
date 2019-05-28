@@ -2,6 +2,8 @@
 """
 Unit tests for handling email sending errors
 """
+from __future__ import absolute_import
+
 import json
 from itertools import cycle
 from smtplib import SMTPConnectError, SMTPDataError, SMTPServerDisconnected
@@ -10,11 +12,12 @@ import ddt
 from celery.states import RETRY, SUCCESS
 from django.conf import settings
 from django.core.management import call_command
-from django.urls import reverse
 from django.db import DatabaseError
+from django.urls import reverse
 from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
+from six.moves import range
 
 from bulk_email.models import SEND_TO_MYSELF, BulkEmailFlag, CourseEmail
 from bulk_email.tasks import perform_delegate_email_batches, send_course_email
@@ -105,7 +108,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         get_conn.return_value.send_messages.side_effect = cycle([SMTPDataError(554, "Email address is blacklisted"),
                                                                  None, None, None])
         # Don't forget to account for the "myself" instructor user
-        students = [UserFactory() for _ in xrange(settings.BULK_EMAIL_EMAILS_PER_TASK - 1)]
+        students = [UserFactory() for _ in range(settings.BULK_EMAIL_EMAILS_PER_TASK - 1)]
         for student in students:
             CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
 

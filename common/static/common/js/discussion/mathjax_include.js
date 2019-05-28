@@ -50,6 +50,6 @@ if (typeof MathJax === 'undefined') {
             explorer: true
         }
     };
-    vendorScript.src = 'https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_SVG';
+    vendorScript.src = 'https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML';
     document.body.appendChild(vendorScript);
 }

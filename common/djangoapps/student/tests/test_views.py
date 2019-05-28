@@ -24,7 +24,6 @@ from opaque_keys.edx.keys import CourseKey
 from pyquery import PyQuery as pq
 from six.moves import range
 
-from bulk_email.models import BulkEmailFlag
 from course_modes.models import CourseMode
 from entitlements.tests.factories import CourseEntitlementFactory
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
@@ -508,7 +507,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         self.assertIn('Related Programs:', response.content)
 
     @patch('openedx.core.djangoapps.catalog.utils.get_course_runs_for_course')
-    @patch.object(BulkEmailFlag, 'feature_enabled')
+    @patch('student.views.dashboard.is_bulk_email_feature_enabled')
     def test_email_settings_fulfilled_entitlement(self, mock_email_feature, mock_get_course_runs):
         """
         Assert that the Email Settings action is shown when the user has a fulfilled entitlement.
@@ -529,7 +528,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         self.assertEqual(pq(response.content)(self.EMAIL_SETTINGS_ELEMENT_ID).length, 1)
 
     @patch.object(CourseOverview, 'get_from_id')
-    @patch.object(BulkEmailFlag, 'feature_enabled')
+    @patch('student.views.dashboard.is_bulk_email_feature_enabled')
     def test_email_settings_unfulfilled_entitlement(self, mock_email_feature, mock_course_overview):
         """
         Assert that the Email Settings action is not shown when the entitlement is not fulfilled.

@@ -105,6 +105,8 @@ def upload_proctored_exam_results_report(_xmodule_instance_args, _entry_id, cour
     # Compute result table and format it
     query_features = [
         'course_id',
+        'provider',
+        'track',
         'exam_name',
         'username',
         'email',
@@ -120,6 +122,7 @@ def upload_proctored_exam_results_report(_xmodule_instance_args, _entry_id, cour
         'Rules Violation Count',
         'Rules Violation Comments'
     ]
+
     student_data = get_proctored_exam_results(course_id, query_features)
     header, rows = format_dictlist(student_data, query_features)
 

@@ -93,6 +93,9 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 
 QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
+FEATURES_WITH_DISABLE_HONOR_CERTIFICATE = settings.FEATURES.copy()
+FEATURES_WITH_DISABLE_HONOR_CERTIFICATE['DISABLE_HONOR_CERTIFICATES'] = True
+
 
 class TestJumpTo(ModuleStoreTestCase):
     """
@@ -1374,7 +1377,7 @@ class ProgressPageTests(ProgressPageBaseTests):
             course_id=self.course.id,
             status=CertificateStatuses.downloadable,
             download_url="http://www.example.com/certificate.pdf",
-            mode='verified'
+            mode='honor'
         )
 
         # Enable the feature, but do not enable it for this course
@@ -1400,34 +1403,29 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.course.cert_html_view_enabled = True
         self.course.save()
         self.store.update_item(self.course, self.user.id)
-        CourseEnrollment.enroll(self.user, self.course.id, mode="verified")
-        with patch(
-                'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
-        ) as user_verify:
-            user_verify.return_value = True
 
-            with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
-                course_grade = mock_create.return_value
-                course_grade.passed = True
-                course_grade.summary = {'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}}
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
+            course_grade = mock_create.return_value
+            course_grade.passed = True
+            course_grade.summary = {'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}}
 
-                resp = self._get_progress_page()
+            resp = self._get_progress_page()
 
-                self.assertContains(resp, u"View Certificate")
+            self.assertContains(resp, u"View Certificate")
 
-                self.assertContains(resp, u"earned a certificate for this course")
-                cert_url = certs_api.get_certificate_url(course_id=self.course.id, uuid=certificate.verify_uuid)
-                self.assertContains(resp, cert_url)
+            self.assertContains(resp, u"earned a certificate for this course")
+            cert_url = certs_api.get_certificate_url(course_id=self.course.id, uuid=certificate.verify_uuid)
+            self.assertContains(resp, cert_url)
 
-                # when course certificate is not active
-                certificates[0]['is_active'] = False
-                self.store.update_item(self.course, self.user.id)
+            # when course certificate is not active
+            certificates[0]['is_active'] = False
+            self.store.update_item(self.course, self.user.id)
 
-                resp = self._get_progress_page()
-                self.assertNotContains(resp, u"View Your Certificate")
-                self.assertNotContains(resp, u"You can now view your certificate")
-                self.assertContains(resp, "Your certificate is available")
-                self.assertContains(resp, "earned a certificate for this course.")
+            resp = self._get_progress_page()
+            self.assertNotContains(resp, u"View Your Certificate")
+            self.assertNotContains(resp, u"You can now view your certificate")
+            self.assertContains(resp, "Your certificate is available")
+            self.assertContains(resp, "earned a certificate for this course.")
 
     @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
@@ -1441,7 +1439,7 @@ class ProgressPageTests(ProgressPageBaseTests):
             course_id=self.course.id,
             status=CertificateStatuses.downloadable,
             download_url="http://www.example.com/certificate.pdf",
-            mode='verified'
+            mode='honor'
         )
 
         # Enable the feature, but do not enable it for this course
@@ -1450,19 +1448,13 @@ class ProgressPageTests(ProgressPageBaseTests):
         # Enable certificate generation for this course
         certs_api.set_cert_generation_enabled(self.course.id, True)
 
-        CourseEnrollment.enroll(self.user, self.course.id, mode="verified")
-        with patch(
-                'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
-        ) as user_verify:
-            user_verify.return_value = True
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
+            course_grade = mock_create.return_value
+            course_grade.passed = True
+            course_grade.summary = {'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}}
 
-            with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
-                course_grade = mock_create.return_value
-                course_grade.passed = True
-                course_grade.summary = {'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}}
-
-                resp = self._get_progress_page()
-                self.assertContains(resp, u"Download Your Certificate")
+            resp = self._get_progress_page()
+            self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
         (True, 55),
@@ -1532,7 +1524,7 @@ class ProgressPageTests(ProgressPageBaseTests):
 
                 resp = self._get_progress_page()
 
-                cert_button_hidden = course_mode in (CourseMode.AUDIT, CourseMode.HONOR) or \
+                cert_button_hidden = course_mode is CourseMode.AUDIT or \
                     course_mode in CourseMode.VERIFIED_MODES and not user_verified
 
                 self.assertEqual(
@@ -1547,7 +1539,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         re-generate button should not appear on progress page.
         """
         generated_certificate = self.generate_certificate(
-            "http://www.example.com/certificate.pdf", "verified"
+            "http://www.example.com/certificate.pdf", "honor"
         )
 
         # Course certificate configurations
@@ -1566,22 +1558,17 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.course.cert_html_view_enabled = True
         self.course.save()
         self.store.update_item(self.course, self.user.id)
-        CourseEnrollment.enroll(self.user, self.course.id, mode="verified")
-        with patch(
-                'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
-        ) as user_verify:
-            user_verify.return_value = True
 
-            with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
-                course_grade = mock_create.return_value
-                course_grade.passed = True
-                course_grade.summary = {
-                    'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}
-                }
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
+            course_grade = mock_create.return_value
+            course_grade.passed = True
+            course_grade.summary = {
+                'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}
+            }
 
-                resp = self._get_progress_page()
-                self.assertContains(resp, u"View Certificate")
-                self.assert_invalidate_certificate(generated_certificate)
+            resp = self._get_progress_page()
+            self.assertContains(resp, u"View Certificate")
+            self.assert_invalidate_certificate(generated_certificate)
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     def test_page_with_whitelisted_certificate_with_html_view(self):
@@ -1590,7 +1577,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         appearing on dashboard
         """
         generated_certificate = self.generate_certificate(
-            "http://www.example.com/certificate.pdf", "verified"
+            "http://www.example.com/certificate.pdf", "honor"
         )
 
         # Course certificate configurations
@@ -1614,22 +1601,17 @@ class ProgressPageTests(ProgressPageBaseTests):
             course_id=self.course.id,
             whitelist=True
         )
-        CourseEnrollment.enroll(self.user, self.course.id, mode="verified")
-        with patch(
-                'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
-        ) as user_verify:
-            user_verify.return_value = True
 
-            with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
-                course_grade = mock_create.return_value
-                course_grade.passed = False
-                course_grade.summary = {
-                    'grade': 'Fail', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}
-                }
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
+            course_grade = mock_create.return_value
+            course_grade.passed = False
+            course_grade.summary = {
+                'grade': 'Fail', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}
+            }
 
-                resp = self._get_progress_page()
-                self.assertContains(resp, u"View Certificate")
-                self.assert_invalidate_certificate(generated_certificate)
+            resp = self._get_progress_page()
+            self.assertContains(resp, u"View Certificate")
+            self.assert_invalidate_certificate(generated_certificate)
 
     @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     def test_page_with_invalidated_certificate_with_pdf(self):
@@ -1638,44 +1620,17 @@ class ProgressPageTests(ProgressPageBaseTests):
         re-generate button should not appear on progress page.
         """
         generated_certificate = self.generate_certificate(
-            "http://www.example.com/certificate.pdf", "verified"
+            "http://www.example.com/certificate.pdf", "honor"
         )
-        CourseEnrollment.enroll(self.user, self.course.id, mode="verified")
-        with patch(
-                'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
-        ) as user_verify:
-            user_verify.return_value = True
-
-            with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
-                course_grade = mock_create.return_value
-                course_grade.passed = True
-                course_grade.summary = {'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}}
-
-                resp = self._get_progress_page()
-                self.assertContains(resp, u'Download Your Certificate')
-                self.assert_invalidate_certificate(generated_certificate)
-
-    @patch('courseware.views.views.is_course_passed', PropertyMock(return_value=True))
-    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
-    def test_message_for_audit_mode(self):
-        """ Verify that message appears on progress page, if learner is enrolled
-         in audit mode.
-        """
-        user = UserFactory.create()
-        self.assertTrue(self.client.login(username=user.username, password='test'))
-        CourseEnrollmentFactory(user=user, course_id=self.course.id, mode=CourseMode.AUDIT)
 
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
             course_grade = mock_create.return_value
             course_grade.passed = True
             course_grade.summary = {'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}}
 
-            response = self._get_progress_page()
-
-            self.assertContains(
-                response,
-                u'You are enrolled in the audit track for this course. The audit track does not include a certificate.'
-            )
+            resp = self._get_progress_page()
+            self.assertContains(resp, u'Download Your Certificate')
+            self.assert_invalidate_certificate(generated_certificate)
 
     @ddt.data(
         *itertools.product(
@@ -1742,13 +1697,15 @@ class ProgressPageTests(ProgressPageBaseTests):
 
     @patch('courseware.views.views.is_course_passed', PropertyMock(return_value=True))
     @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
-    def test_message_for_honor_mode(self):
+    @override_settings(FEATURES=FEATURES_WITH_DISABLE_HONOR_CERTIFICATE)
+    @ddt.data(CourseMode.AUDIT, CourseMode.HONOR)
+    def test_message_for_ineligible_mode(self, course_mode):
         """ Verify that message appears on progress page, if learner is enrolled
-         in honor mode.
+         in an ineligible mode.
         """
         user = UserFactory.create()
         self.assertTrue(self.client.login(username=user.username, password='test'))
-        CourseEnrollmentFactory(user=user, course_id=self.course.id, mode=CourseMode.HONOR)
+        CourseEnrollmentFactory(user=user, course_id=self.course.id, mode=course_mode)
 
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:
             course_grade = mock_create.return_value
@@ -1757,17 +1714,16 @@ class ProgressPageTests(ProgressPageBaseTests):
 
             response = self._get_progress_page()
 
-            self.assertContains(
-                response,
-                u'You are enrolled in the honor track for this course. The honor track does not include a certificate.'
-            )
+            expected_message = (u'You are enrolled in the {mode} track for this course. '
+                                u'The {mode} track does not include a certificate.').format(mode=course_mode)
+            self.assertContains(response, expected_message)
 
     def test_invalidated_cert_data(self):
         """
         Verify that invalidated cert data is returned if cert is invalidated.
         """
         generated_certificate = self.generate_certificate(
-            "http://www.example.com/certificate.pdf", "verified"
+            "http://www.example.com/certificate.pdf", "honor"
         )
 
         CertificateInvalidationFactory.create(
@@ -1776,7 +1732,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         )
         # Invalidate user certificate
         generated_certificate.invalidate()
-        response = views._get_cert_data(self.user, self.course, CourseMode.VERIFIED, MagicMock(passed=True))
+        response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
         self.assertEqual(response.cert_status, 'invalidated')
         self.assertEqual(response.title, 'Your certificate has been invalidated')
 
@@ -1785,17 +1741,11 @@ class ProgressPageTests(ProgressPageBaseTests):
         Verify that downloadable cert data is returned if cert is downloadable.
         """
         self.generate_certificate(
-            "http://www.example.com/certificate.pdf", "verified"
+            "http://www.example.com/certificate.pdf", "honor"
         )
-        CourseEnrollment.enroll(self.user, self.course.id, mode="verified")
-        with patch(
-                'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
-        ) as user_verify:
-            user_verify.return_value = True
-
-            with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
-                       return_value=self.mock_certificate_downloadable_status(is_downloadable=True)):
-                response = views._get_cert_data(self.user, self.course, CourseMode.VERIFIED, MagicMock(passed=True))
+        with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
+                   return_value=self.mock_certificate_downloadable_status(is_downloadable=True)):
+            response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
 
         self.assertEqual(response.cert_status, 'downloadable')
         self.assertEqual(response.title, 'Your certificate is available')
@@ -1805,11 +1755,11 @@ class ProgressPageTests(ProgressPageBaseTests):
         Verify that generating cert data is returned if cert is generating.
         """
         self.generate_certificate(
-            "http://www.example.com/certificate.pdf", "verified"
+            "http://www.example.com/certificate.pdf", "honor"
         )
         with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
                    return_value=self.mock_certificate_downloadable_status(is_generating=True)):
-            response = views._get_cert_data(self.user, self.course, CourseMode.VERIFIED, MagicMock(passed=True))
+            response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
 
         self.assertEqual(response.cert_status, 'generating')
         self.assertEqual(response.title, "We're working on it...")
@@ -1819,11 +1769,11 @@ class ProgressPageTests(ProgressPageBaseTests):
         Verify that unverified cert data is returned if cert is unverified.
         """
         self.generate_certificate(
-            "http://www.example.com/certificate.pdf", "verified"
+            "http://www.example.com/certificate.pdf", "honor"
         )
         with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
                    return_value=self.mock_certificate_downloadable_status(is_unverified=True)):
-            response = views._get_cert_data(self.user, self.course, CourseMode.VERIFIED, MagicMock(passed=True))
+            response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
 
         self.assertEqual(response.cert_status, 'unverified')
         self.assertEqual(response.title, "Certificate unavailable")
@@ -1833,16 +1783,11 @@ class ProgressPageTests(ProgressPageBaseTests):
         Verify that requested cert data is returned if cert is to be requested.
         """
         self.generate_certificate(
-            "http://www.example.com/certificate.pdf", "verified"
+            "http://www.example.com/certificate.pdf", "honor"
         )
-        CourseEnrollment.enroll(self.user, self.course.id, mode="verified")
-        with patch(
-                'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
-        ) as user_verify:
-            user_verify.return_value = True
-            with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
-                       return_value=self.mock_certificate_downloadable_status()):
-                response = views._get_cert_data(self.user, self.course, CourseMode.VERIFIED, MagicMock(passed=True))
+        with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
+                   return_value=self.mock_certificate_downloadable_status()):
+            response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
 
         self.assertEqual(response.cert_status, 'requesting')
         self.assertEqual(response.title, "Congratulations, you qualified for a certificate!")
@@ -1977,7 +1922,6 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
             depth=2
         )
         self.addCleanup(set_current_request, None)
-        # pylint: disable=protected-access
         module = get_module(
             self.user,
             get_mock_request(self.user),

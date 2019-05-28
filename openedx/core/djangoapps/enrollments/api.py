@@ -13,11 +13,11 @@ from django.core.cache import cache
 from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import CourseMode
-from enrollment import errors
+from openedx.core.djangoapps.enrollments import errors
 
 log = logging.getLogger(__name__)
 
-DEFAULT_DATA_API = 'enrollment.data'
+DEFAULT_DATA_API = 'openedx.core.djangoapps.enrollments.data'
 
 
 def get_enrollments(user_id, include_inactive=False):
@@ -324,7 +324,7 @@ def get_course_enrollment_details(course_id, include_expired=False):
     cached_enrollment_data = None
     try:
         cached_enrollment_data = cache.get(cache_key)
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         # The cache backend could raise an exception (for example, memcache keys that contain spaces)
         log.exception(u"Error occurred while retrieving course enrollment details from the cache")
 

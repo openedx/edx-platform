@@ -128,6 +128,9 @@ from lms.envs.common import (
     CONTACT_EMAIL,
 
     DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH,
+
+    GENERATE_PROFILE_SCORES,
+
     # Video Image settings
     VIDEO_IMAGE_SETTINGS,
     VIDEO_TRANSCRIPTS_SETTINGS,
@@ -1362,7 +1365,7 @@ ADVANCED_PROBLEM_TYPES = [
     {
         'component': 'drag-and-drop-v2',
         'boilerplate_name': None
-    }
+    },
 ]
 
 USERNAME_REPLACEMENT_WORKER = "REPLACE WITH VALID USERNAME"

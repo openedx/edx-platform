@@ -1,21 +1,25 @@
 """
 Unit tests for program_enrollments utils.
 """
+from __future__ import absolute_import
+
 from uuid import uuid4
+
 import pytest
 from django.core.cache import cache
+from organizations.tests.factories import OrganizationFactory
+from social_django.models import UserSocialAuth
 
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL
-from openedx.core.djangoapps.catalog.tests.factories import (
-    OrganizationFactory as CatalogOrganizationFactory, ProgramFactory
-)
+from openedx.core.djangoapps.catalog.tests.factories import OrganizationFactory as CatalogOrganizationFactory
+from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from organizations.tests.factories import OrganizationFactory
 from program_enrollments.utils import (
-    get_user_by_program_id, ProgramDoesNotExistException, OrganizationDoesNotExistException,
-    ProviderDoesNotExistException
+    OrganizationDoesNotExistException,
+    ProgramDoesNotExistException,
+    ProviderDoesNotExistException,
+    get_user_by_program_id
 )
-from social_django.models import UserSocialAuth
 from student.tests.factories import UserFactory
 from third_party_auth.tests.factories import SAMLProviderConfigFactory
 

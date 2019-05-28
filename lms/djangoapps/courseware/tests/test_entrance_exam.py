@@ -607,7 +607,6 @@ def answer_entrance_exam_problem(course, request, problem, user=None, value=1, m
         course,
         depth=2
     )
-    # pylint: disable=protected-access
     module = get_module(
         user,
         request,

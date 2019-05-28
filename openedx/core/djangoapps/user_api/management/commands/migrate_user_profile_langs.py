@@ -1,18 +1,17 @@
 """
 Migrates user preferences from one language code to another in batches. Dark lang preferences are not affected.
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import logging
 from time import sleep
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
-from django.db.models import Q, Max
+from django.db.models import Max, Q
 
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.user_api.models import UserPreference
-
 
 DEFAULT_CHUNK_SIZE = 10000
 DEFAULT_SLEEP_TIME_SECS = 10

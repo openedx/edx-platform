@@ -12,14 +12,16 @@ from django.test.utils import override_settings
 from mock import Mock, patch
 
 from course_modes.models import CourseMode
-from enrollment import api
-from enrollment.errors import CourseModeNotFoundError, EnrollmentApiLoadError, EnrollmentNotFoundError
-from enrollment.tests import fake_data_api
+from openedx.core.djangoapps.enrollments import api
+from openedx.core.djangoapps.enrollments.errors import (
+    CourseModeNotFoundError, EnrollmentApiLoadError, EnrollmentNotFoundError,
+)
+from openedx.core.djangoapps.enrollments.tests import fake_data_api
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 
 @ddt.ddt
-@override_settings(ENROLLMENT_DATA_API="enrollment.tests.fake_data_api")
+@override_settings(ENROLLMENT_DATA_API="openedx.core.djangoapps.enrollments.tests.fake_data_api")
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class EnrollmentTest(CacheIsolationTestCase):
     """
@@ -71,7 +73,7 @@ class EnrollmentTest(CacheIsolationTestCase):
     def test_enroll_no_mode_success(self, course_modes, expected_mode):
         # Add a fake course enrollment information to the fake data API
         fake_data_api.add_course(self.COURSE_ID, course_modes=course_modes)
-        with patch('enrollment.api.CourseMode.modes_for_course') as mock_modes_for_course:
+        with patch('openedx.core.djangoapps.enrollments.api.CourseMode.modes_for_course') as mock_modes_for_course:
             mock_course_modes = [Mock(slug=mode) for mode in course_modes]
             mock_modes_for_course.return_value = mock_course_modes
             # Enroll in the course and verify the URL we get sent to

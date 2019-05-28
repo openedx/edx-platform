@@ -1,3 +1,8 @@
+"""
+Experimentation models
+"""
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.db import models
 from model_utils.models import TimeStampedModel

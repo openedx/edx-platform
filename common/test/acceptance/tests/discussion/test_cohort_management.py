@@ -3,6 +3,8 @@
 End-to-end tests related to the cohort management on the LMS Instructor Dashboard
 """
 
+from __future__ import absolute_import
+
 import os
 import uuid
 from datetime import datetime

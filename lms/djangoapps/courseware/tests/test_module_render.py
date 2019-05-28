@@ -28,7 +28,6 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import MagicMock, Mock, patch
 from opaque_keys.edx.asides import AsideUsageKeyV2
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from pyquery import PyQuery
 from six import text_type
 from web_fragments.fragment import Fragment
@@ -59,6 +58,7 @@ from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from openedx.core.djangoapps.credit.api import set_credit_requirement_status, set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.url_utils import quote_slashes
@@ -1072,12 +1072,12 @@ class TestTOC(ModuleStoreTestCase):
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
 class TestProctoringRendering(SharedModuleStoreTestCase):
+    """Check the Table of Contents for a course"""
     @classmethod
     def setUpClass(cls):
         super(TestProctoringRendering, cls).setUpClass()
         cls.course_key = ToyCourseFactory.create().id
 
-    """Check the Table of Contents for a course"""
     def setUp(self):
         """
         Set up the initial mongo datastores
@@ -1408,6 +1408,10 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
 
 
 class TestGatedSubsectionRendering(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
+    """
+    Test the toc for a course is rendered correctly when there is gated content
+    """
+
     @classmethod
     def setUpClass(cls):
         super(TestGatedSubsectionRendering, cls).setUpClass()
@@ -1416,9 +1420,6 @@ class TestGatedSubsectionRendering(SharedModuleStoreTestCase, MilestonesTestCase
         cls.course.save()
         cls.store.update_item(cls.course, 0)
 
-    """
-    Test the toc for a course is rendered correctly when there is gated content
-    """
     def setUp(self):
         """
         Set up the initial test data
@@ -1538,7 +1539,8 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         )
         result_fragment = module.render(STUDENT_VIEW)
 
-        self.assertNotIn('div class="xblock xblock-student_view xmodule_display xmodule_HtmlModule"', result_fragment.content)
+        self.assertNotIn('div class="xblock xblock-student_view xmodule_display xmodule_HtmlModule"',
+                         result_fragment.content)
 
     def test_static_link_rewrite(self):
         module = render.get_module(
@@ -2163,7 +2165,7 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             self.course.id, user, self.course, depth=2)
 
-        return render.get_module(  # pylint: disable=protected-access
+        return render.get_module(
             user,
             mock_request,
             self.problem.location,
@@ -2236,7 +2238,7 @@ class TestRebindModule(TestSubmittingProblems):
         if item is None:
             item = self.lti
 
-        return render.get_module(  # pylint: disable=protected-access
+        return render.get_module(
             user,
             mock_request,
             item.location,

@@ -1,3 +1,5 @@
-# pylint: disable=missing-docstring,relative-import
+# pylint: disable=missing-docstring
 # This import registers the ForumThreadViewedEventTransformer
-import event_transformers
+from __future__ import absolute_import
+
+from . import event_transformers

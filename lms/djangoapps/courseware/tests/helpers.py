@@ -10,7 +10,6 @@ from django.test import TestCase
 from django.test.client import Client, RequestFactory
 from django.urls import reverse
 from django.utils.timezone import now
-from django.utils.translation import get_language
 from six import text_type
 
 from courseware.access import has_access
@@ -173,7 +172,11 @@ class LoginEnrollmentTestCase(TestCase):
         self.user = self.activate_user(self.email)
         self.login(self.email, self.password)
 
-    def assert_request_status_code(self, status_code, url, method="GET", **kwargs):  # pylint: disable=unicode-format-string
+    def assert_request_status_code(self, status_code, url, method="GET", **kwargs):
+        """
+        Make a request to the specified URL and verify that it returns the
+        expected status code.
+        """
         make_request = getattr(self.client, method.lower())
         response = make_request(url, **kwargs)
         self.assertEqual(
@@ -192,7 +195,7 @@ class LoginEnrollmentTestCase(TestCase):
         message_list = list(messages.get_messages(response.wsgi_request))
         self.assertEqual(len(message_list), 1)
         self.assertIn("success", message_list[0].tags)
-        self.assertTrue("You have activated your account." in message_list[0].message)
+        self.assertIn("You have activated your account.", message_list[0].message)
 
     # ============ User creation and login ==============
 
@@ -224,7 +227,7 @@ class LoginEnrollmentTestCase(TestCase):
             'terms_of_service': 'true',
             'honor_code': 'true',
         }
-        resp = self.assert_request_status_code(200, url, method="POST", data=request_data)
+        self.assert_request_status_code(200, url, method="POST", data=request_data)
         # Check both that the user is created, and inactive
         user = User.objects.get(email=email)
         self.assertFalse(user.is_active)

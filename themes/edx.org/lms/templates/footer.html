@@ -8,6 +8,7 @@
   from openedx.core.djangoapps.lang_pref.api import footer_language_selector_is_enabled
 %>
 <% footer = get_footer(is_secure=is_secure, language=language) %>
+<% icp_license_info = getattr(settings, 'ICP_LICENSE_INFO', {})%>
 <%namespace name='static' file='static_content.html'/>
 
 
@@ -135,10 +136,15 @@
                                   <br/>
                                   ${_(
 
-                                  u"EdX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
+                                  u"edX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
 
                                   )}
-                                  ${u" | {icp}".format(icp=getattr(settings,'ICP_LICENSE')) if getattr(settings,'ICP_LICENSE',False) else ""}
+                                 % if icp_license_info.get('icp_license'):
+                                    ${u" | {text}".format(text=icp_license_info.get('text'))}
+                                    <a href="${icp_license_info.get('icp_license_link', '#')}">
+                                        ${u" {icp}".format(icp=icp_license_info.get('icp_license'))}
+                                    </a>
+                                  % endif
                               </p>
                         </div>
                   </div>

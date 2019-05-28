@@ -1,19 +1,18 @@
 """
 Tests for the SubsectionGradeFactory class.
 """
+from __future__ import absolute_import
+
 import ddt
-from mock import patch
 from django.conf import settings
+from mock import patch
 
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
 from student.tests.factories import UserFactory
 
 from ..constants import GradeOverrideFeatureEnum
-from ..models import (
-    PersistentSubsectionGrade,
-    PersistentSubsectionGradeOverride,
-)
+from ..models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
 from ..subsection_grade_factory import ZeroSubsectionGrade
 from .base import GradeTestBase
 from .utils import mock_get_score
