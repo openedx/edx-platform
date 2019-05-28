@@ -87,7 +87,6 @@ git+https://github.com/edx/crowdsourcehinter.git@518605f0a95190949fe77bd39158450
 -e git+https://github.com/edx/DoneXBlock.git@01a14f3bd80ae47dd08cdbbe2f88f3eb88d00fba#egg=done-xblock
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
 git+https://github.com/edx/xblock-lti-consumer.git@v1.1.8#egg=lti_consumer-xblock==1.1.8
-git+https://github.com/davestgermain/super-csv@4963bf5da5489f06369da9cce84c92e3e42fe3d2#egg=super-csv==0.1.0
 
 # Third Party XBlocks
 

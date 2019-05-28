@@ -13,27 +13,3 @@ class GradesUtilService(object):
     def are_grades_frozen(self):
         "Check if grades are frozen for given course key"
         return grade_utils.are_grades_frozen(self.course_id)
-
-    def get_score(self, usage_key, user_id):
-        """
-        Return score for user_id and usage_key.
-        """
-        return grade_utils.get_score(usage_key, user_id)
-
-    def get_scores(self, usage_key, user_ids=None):
-        """
-        Return dictionary of student_id: scores.
-        """
-        return grade_utils.get_scores(usage_key, user_ids)
-
-    def set_score(self, usage_key, student_id, score, max_points, **defaults):
-        """
-        Set a score.
-        """
-        return grade_utils.set_score(usage_key, student_id, score, max_points, **defaults)
-
-    def get_score_processor(self, **kwargs):
-        """
-        Return a csv score processor.
-        """
-        return grade_utils.ScoreCSVProcessor(**kwargs)

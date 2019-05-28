@@ -45,7 +45,7 @@ def move_to_verified_cohort(sender, instance, **kwargs):  # pylint: disable=unus
             log.error(u"Automatic verified cohorting enabled for course '%s', but course is not cohorted.", course_key)
         else:
             course = get_course_by_id(course_key)
-            existing_manual_cohorts = get_course_cohorts(course, CourseCohort.MANUAL)
+            existing_manual_cohorts = get_course_cohorts(course, assignment_type=CourseCohort.MANUAL)
             if any(cohort.name == verified_cohort_name for cohort in existing_manual_cohorts):
                 # Get a random cohort to use as the default cohort (for audit learners).
                 # Note that calling this method will create a "Default Group" random cohort if no random
