@@ -16,14 +16,14 @@ from django.urls import reverse
 from django.utils.timezone import now
 from edx_ace import ace
 from edx_ace.recipient import Recipient
+from util.query import use_read_replica_if_available
 
+from lms.djangoapps.verify_student.message_types import VerificationExpiry
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.lib.celery.task_utils import emulate_http_request
-from util.query import use_read_replica_if_available
-from verify_student.message_types import VerificationExpiry
 
 logger = logging.getLogger(__name__)
 
@@ -34,11 +34,14 @@ class Command(BaseCommand):
 
     The expiry email is sent when the date represented by SoftwareSecurePhotoVerification's field `expiry_date`
     lies within the date range provided by command arguments. If the email is already sent indicated by field
-    `expiry_email_date` then filter if the specified number of days given as command argument `--resend_days` have
-    passed
+    `expiry_email_date` then filter if the specified number of days given in settings as
+    VERIFICATION_EXPIRY_EMAIL['RESEND_DAYS'] have passed since the last email.
 
-    The range to filter expired verification is selected based on --days-range. This represents the number of days
-    before now and gives us start_date of the range
+    Since a user can have multiple verification all the previous verifications have expiry_date and expiry_email_date
+    set to None so that they are not filtered. See lms.djangoapps.verify_student.models.SoftwareSecurePhotoVerification
+
+    The range to filter expired verification is selected based on VERIFICATION_EXPIRY_EMAIL['DAYS_RANGE']. This
+    represents the number of days before now and gives us start_date of the range
          Range:       start_date to today
 
     The task is performed in batches with maximum number of users to send email given in `batch_size` and the
@@ -56,12 +59,6 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '-d', '--resend-days',
-            type=int,
-            default=15,
-            help='Desired days after which the email will be resent to learners with expired verification'
-        )
-        parser.add_argument(
             '--batch-size',
             type=int,
             default=1000,
@@ -71,11 +68,6 @@ class Command(BaseCommand):
             type=int,
             default=10,
             help='Sleep time in seconds between update of batches')
-        parser.add_argument(
-            '--days-range',
-            type=int,
-            default=1,
-            help="The number of days before now to check expired verification")
         parser.add_argument(
             '--dry-run',
             action='store_true',
@@ -88,10 +80,10 @@ class Command(BaseCommand):
         It creates batches of expired Software Secure Photo Verification and sends it to send_verification_expiry_email
         that used edx_ace to send email to these learners
         """
-        resend_days = options['resend_days']
+        resend_days = settings.VERIFICATION_EXPIRY_EMAIL['RESEND_DAYS']
+        days = settings.VERIFICATION_EXPIRY_EMAIL['DAYS_RANGE']
         batch_size = options['batch_size']
         sleep_time = options['sleep_time']
-        days = options['days_range']
         dry_run = options['dry_run']
 
         end_date = now().replace(hour=0, minute=0, second=0, microsecond=0)
@@ -104,7 +96,7 @@ class Command(BaseCommand):
         query = SoftwareSecurePhotoVerification.objects.filter(Q(status='approved') &
                                                                (Q(expiry_date__gte=start_date,
                                                                   expiry_date__lt=end_date) |
-                                                                Q(expiry_email_date__lt=date_resend_days_ago)
+                                                                Q(expiry_email_date__lte=date_resend_days_ago)
                                                                 )).order_by()
 
         sspv = use_read_replica_if_available(query)
@@ -121,7 +113,7 @@ class Command(BaseCommand):
         batch_verifications = []
 
         for verification in sspv:
-            if not verification.expiry_email_date or verification.expiry_email_date < date_resend_days_ago:
+            if not verification.expiry_email_date or verification.expiry_email_date <= date_resend_days_ago:
                 batch_verifications.append(verification)
 
                 if len(batch_verifications) == batch_size:
