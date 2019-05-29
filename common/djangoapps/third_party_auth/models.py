@@ -126,7 +126,7 @@ class ProviderConfig(ConfigurationModel):
             'in a separate list of "Institution" login providers.'
         ),
     )
-    organization = models.OneToOneField(
+    organization = models.ForeignKey(
         Organization,
         blank=True,
         null=True,

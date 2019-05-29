@@ -758,7 +758,8 @@ class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpec
         """
         if program_course_enrollment:
             return CourseEnrollmentResponseStatuses.CONFLICT
-        return ProgramCourseEnrollment.enroll(
+
+        return ProgramCourseEnrollment.create_program_course_enrollment(
             program_enrollment,
             self.course_key,
             enrollment_request['status']
