@@ -1,10 +1,10 @@
 """
 Tests for ContentLibraryTransformer.
 """
-import mock
 
 
 from six.moves import range
+import mock
 
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers

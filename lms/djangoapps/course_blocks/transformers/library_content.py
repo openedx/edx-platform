@@ -4,6 +4,7 @@ Content Library Transformer.
 
 
 import json
+import logging
 import random
 
 import six
@@ -19,6 +20,8 @@ from xmodule.library_content_module import LibraryContentModule
 from xmodule.modulestore.django import modulestore
 
 from ..utils import get_student_module_as_dict
+
+logger = logging.getLogger(__name__)
 
 
 class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransformer):
@@ -41,17 +44,8 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
         return "library_content"
 
     @classmethod
-    def collect(cls, block_structure):
-        """
-        Collects any information that's necessary to execute this
-        transformer's transform method.
-        """
-        block_structure.request_xblock_fields('mode')
-        block_structure.request_xblock_fields('max_count')
-        block_structure.request_xblock_fields('category')
-        store = modulestore()
-
-        # needed for analytics purposes
+    def set_block_analytics_summary(cls, block_structure, store):
+        """Set the block analytics summary information in the children fields."""
         def summarize_block(usage_key):
             """ Basic information about the given block """
             orig_key, orig_version = store.get_block_original_usage(usage_key)
@@ -71,6 +65,20 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
             for child_key in xblock.children:
                 summary = summarize_block(child_key)
                 block_structure.set_transformer_block_field(child_key, cls, 'block_analytics_summary', summary)
+
+    @classmethod
+    def collect(cls, block_structure):
+        """
+        Collects any information that's necessary to execute this
+        transformer's transform method.
+        """
+        block_structure.request_xblock_fields('mode')
+        block_structure.request_xblock_fields('max_count')
+        block_structure.request_xblock_fields('category')
+        store = modulestore()
+
+        # needed for analytics purposes
+        cls.set_block_analytics_summary(block_structure, store)
 
     def transform_block_filters(self, usage_info, block_structure):
         all_library_children = set()
@@ -104,7 +112,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
                 if any(block_keys[changed] for changed in ('invalid', 'overlimit', 'added')):
                     state_dict['selected'] = list(selected)
                     random.shuffle(state_dict['selected'])
-                    StudentModule.save_state(  # pylint: disable=no-value-for-parameter
+                    StudentModule.save_state(
                         student=usage_info.user,
                         course_id=usage_info.course_key,
                         module_state_key=block_key,
@@ -114,7 +122,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
                     )
 
                 # publish events for analytics
-                self._publish_events(
+                self.publish_events(
                     block_structure,
                     block_key,
                     previous_count,
@@ -139,7 +147,8 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
 
         return [block_structure.create_removal_filter(check_child_removal)]
 
-    def _publish_events(self, block_structure, location, previous_count, max_count, block_keys, user_id):
+    @staticmethod
+    def publish_events(block_structure, location, previous_count, max_count, block_keys, user_id):
         """
         Helper method to publish events for analytics purposes
         """
@@ -179,3 +188,82 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
             format_block_keys,
             publish_event,
         )
+
+
+class ContentLibraryOrderTransformer(BlockStructureTransformer):
+    """
+    A transformer that manipulates the block structure by modifying the order of the
+    selected blocks within a library_content module to match the order of the selections
+    made by the ContentLibraryTransformer or the corresponding XBlock. So this transformer
+    requires the selections for the randomized content block to be already
+    made either by the ContentLibraryTransformer or the XBlock.
+
+    Staff users are *not* exempted from library content pathways/
+    """
+    WRITE_VERSION = 1
+    READ_VERSION = 1
+
+    @classmethod
+    def name(cls):
+        """
+        Unique identifier for the transformer's class;
+        same identifier used in setup.py
+        """
+        return "library_content_randomize"
+
+    @classmethod
+    def collect(cls, block_structure):
+        """
+        Collects any information that's necessary to execute this
+        transformer's transform method.
+        """
+        block_structure.request_xblock_fields('mode')
+        block_structure.request_xblock_fields('max_count')
+
+        ContentLibraryTransformer.set_block_analytics_summary(block_structure, modulestore())
+
+    def transform(self, usage_info, block_structure):
+        """
+        Transforms the order of the children of the randomized content block
+        to match the order of the selections made and stored in the XBlock 'selected' field.
+        """
+        for block_key in block_structure:
+            if block_key.block_type != 'library_content':
+                continue
+
+            library_children = block_structure.get_children(block_key)
+
+            if library_children:
+                state_dict = get_student_module_as_dict(usage_info.user, usage_info.course_key, block_key)
+                current_children_blocks = set(block.block_id for block in library_children)
+                current_selected_blocks = set(item[1] for item in state_dict['selected'])
+
+                # Ensure that the current children blocks are the same as the stored selections
+                # before ordering the blocks.
+                if current_children_blocks != current_selected_blocks:
+                    logger.info(
+                        u'Mismatch between the children of %s in the stored state and the actual children',
+                        str(block_key)
+                    )
+                    previous_count = len(current_selected_blocks.intersection(current_children_blocks))
+                    mode = block_structure.get_xblock_field(block_key, 'mode')
+                    max_count = block_structure.get_xblock_field(block_key, 'max_count')
+                    block_keys = LibraryContentModule.make_selection(
+                        state_dict['selected'], library_children, max_count, mode
+                    )
+                    state_dict['selected'] = block_keys['selected']
+                    random.shuffle(state_dict['selected'])
+                    StudentModule.save_state(
+                        student=usage_info.user,
+                        course_id=usage_info.course_key,
+                        module_state_key=block_key,
+                        defaults={
+                            'state': json.dumps(state_dict)
+                        },
+                    )
+                    ContentLibraryTransformer.publish_events(
+                        block_structure, block_key, previous_count, max_count, block_keys, usage_info.user.id
+                    )
+
+                ordering_data = {block[1]: position for position, block in enumerate(state_dict['selected'])}
+                library_children.sort(key=lambda block, data=ordering_data: data[block.block_id])
