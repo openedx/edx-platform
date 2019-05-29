@@ -387,7 +387,8 @@ class ViewsTestCase(ModuleStoreTestCase):
 
         url = reverse(
             'courseware_chapter',
-            kwargs={'course_id': six.text_type(self.course.id), 'chapter': six.text_type(self.chapter.location.block_id)},
+            kwargs={'course_id': six.text_type(self.course.id),
+                    'chapter': six.text_type(self.chapter.location.block_id)},
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
