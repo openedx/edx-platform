@@ -5,19 +5,23 @@ Integration tests for submitting problem responses and getting grades.
 
 # pylint: disable=attribute-defined-outside-init
 
+from __future__ import absolute_import
+
 import json
 import os
 from textwrap import dedent
 
 import ddt
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.urls import reverse
 from django.utils.timezone import now
 from mock import patch
 from six import text_type
+from submissions import api as submissions_api
 
 from capa.tests.response_xml_factory import (
     CodeResponseXMLFactory,
@@ -34,7 +38,6 @@ from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from openedx.core.lib.url_utils import quote_slashes
 from student.models import CourseEnrollment, anonymous_id_for_user
-from submissions import api as submissions_api
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
@@ -275,14 +278,14 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
         Returns list of scores: [<points on hw_1>, <points on hw_2>, ..., <points on hw_n>]
         """
         return [
-            s.graded_total.earned for s in self.get_course_grade().graded_subsections_by_format['Homework'].itervalues()
+            s.graded_total.earned for s in six.itervalues(self.get_course_grade().graded_subsections_by_format['Homework'])
         ]
 
     def hw_grade(self, hw_url_name):
         """
         Returns SubsectionGrade for given url.
         """
-        for chapter in self.get_course_grade().chapter_grades.itervalues():
+        for chapter in six.itervalues(self.get_course_grade().chapter_grades):
             for section in chapter['sections']:
                 if section.url_name == hw_url_name:
                     return section
@@ -319,7 +322,7 @@ class TestCourseGrades(TestSubmittingProblems):
         Verifies the problem score and the homework grade are as expected.
         """
         hw_grade = self.hw_grade('homework')
-        problem_score = hw_grade.problem_scores.values()[0]
+        problem_score = list(hw_grade.problem_scores.values())[0]
         self.assertEquals((problem_score.earned, problem_score.possible), expected_problem_score)
         self.assertEquals((hw_grade.graded_total.earned, hw_grade.graded_total.possible), expected_hw_grade)
 
@@ -405,7 +408,7 @@ class TestCourseGrader(TestSubmittingProblems):
             ]
         }
         self.add_grading_policy(grading_policy)
-        task_compute_all_grades_for_course.apply_async(kwargs={'course_key': unicode(self.course.id)})
+        task_compute_all_grades_for_course.apply_async(kwargs={'course_key': six.text_type(self.course.id)})
 
     def dropping_setup(self):
         """
@@ -581,8 +584,8 @@ class TestCourseGrader(TestSubmittingProblems):
 
         student_item = {
             'student_id': anonymous_id_for_user(self.student_user, self.course.id),
-            'course_id': unicode(self.course.id),
-            'item_id': unicode(self.problem_location('p3')),
+            'course_id': six.text_type(self.course.id),
+            'item_id': six.text_type(self.problem_location('p3')),
             'item_type': 'problem'
         }
         submission = submissions_api.create_submission(student_item, 'any answer')
@@ -799,8 +802,8 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
         self.assertEqual(name, "post")
         self.assertEqual(len(args), 1)
         self.assertTrue(args[0].endswith("/submit/"))
-        self.assertItemsEqual(kwargs.keys(), ["files", "data", "timeout"])
-        self.assertItemsEqual(kwargs['files'].keys(), filenames.split())
+        self.assertItemsEqual(list(kwargs.keys()), ["files", "data", "timeout"])
+        self.assertItemsEqual(list(kwargs['files'].keys()), filenames.split())
 
 
 class TestPythonGradedResponse(TestSubmittingProblems):
