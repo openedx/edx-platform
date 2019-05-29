@@ -22,6 +22,7 @@ from lms.djangoapps.discussion.notification_prefs import NOTIFICATION_PREF_KEY
 from openedx.core.djangoapps.django_comment_common.models import ForumsConfig
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangoapps.user_api.accounts import (
     USERNAME_BAD_LENGTH_MSG,
     USERNAME_INVALID_CHARS_ASCII,
@@ -78,13 +79,10 @@ def get_mock_pipeline_data(username=TEST_USERNAME, email=TEST_EMAIL):
 
 
 @ddt.ddt
+@with_site_configuration(
+    configuration={"extended_profile_fields": ["extra1", "extra2"]}
+)
 @override_settings(
-    MICROSITE_CONFIGURATION={
-        "microsite": {
-            "domain_prefix": "microsite",
-            "extended_profile_fields": ["extra1", "extra2"],
-        }
-    },
     REGISTRATION_EXTRA_FIELDS={
         key: "optional"
         for key in [
@@ -125,7 +123,7 @@ class TestCreateAccount(SiteMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(get_user_preference(user, LANGUAGE_KEY), lang)
 
-    def create_account_and_fetch_profile(self, host='microsite.example.com'):
+    def create_account_and_fetch_profile(self, host='test.localhost'):
         """
         Create an account with self.params, assert that the response indicates
         success, and return the UserProfile object for the newly created user
@@ -157,10 +155,6 @@ class TestCreateAccount(SiteMixin, TestCase):
         self.assertIn(settings.EDXMKTG_LOGGED_IN_COOKIE_NAME, self.client.cookies)
         self.assertIn(settings.EDXMKTG_USER_INFO_COOKIE_NAME, self.client.cookies)
 
-    @unittest.skipUnless(
-        "microsite_configuration.middleware.MicrositeMiddleware" in settings.MIDDLEWARE_CLASSES,
-        "Microsites not implemented in this environment"
-    )
     def test_profile_saved_no_optional_fields(self):
         profile = self.create_account_and_fetch_profile()
         self.assertEqual(profile.name, self.params["name"])
@@ -179,10 +173,6 @@ class TestCreateAccount(SiteMixin, TestCase):
         )
         self.assertIsNone(profile.year_of_birth)
 
-    @unittest.skipUnless(
-        "microsite_configuration.middleware.MicrositeMiddleware" in settings.MIDDLEWARE_CLASSES,
-        "Microsites not implemented in this environment"
-    )
     @override_settings(LMS_SEGMENT_KEY="testkey")
     @mock.patch('openedx.core.djangoapps.user_authn.views.register.segment.track')
     @mock.patch('openedx.core.djangoapps.user_authn.views.register.segment.identify')
@@ -217,10 +207,6 @@ class TestCreateAccount(SiteMixin, TestCase):
 
         mock_segment_identify.assert_called_with(profile.user.id, expected_payload)
 
-    @unittest.skipUnless(
-        "microsite_configuration.middleware.MicrositeMiddleware" in settings.MIDDLEWARE_CLASSES,
-        "Microsites not implemented in this environment"
-    )
     def test_profile_saved_all_optional_fields(self):
         self.params.update({
             "level_of_education": "a",
@@ -249,10 +235,6 @@ class TestCreateAccount(SiteMixin, TestCase):
         )
         self.assertEqual(profile.year_of_birth, 2015)
 
-    @unittest.skipUnless(
-        "microsite_configuration.middleware.MicrositeMiddleware" in settings.MIDDLEWARE_CLASSES,
-        "Microsites not implemented in this environment"
-    )
     def test_profile_saved_empty_optional_fields(self):
         self.params.update({
             "level_of_education": "",
