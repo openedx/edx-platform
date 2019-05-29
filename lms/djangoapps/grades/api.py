@@ -12,7 +12,7 @@ from lms.djangoapps.grades.models_api import *
 from lms.djangoapps.grades.tasks import compute_all_grades_for_course as task_compute_all_grades_for_course
 
 # Public Grades Modules
-from lms.djangoapps.grades import events, constants, context
+from lms.djangoapps.grades import events, constants, context, course_data
 from lms.djangoapps.grades.signals import signals
 from lms.djangoapps.grades.util_services import GradesUtilService
 
