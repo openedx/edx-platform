@@ -1,7 +1,3 @@
-"""
-Test the draft modulestore
-"""
-
 from __future__ import absolute_import
 
 from django.test import TestCase

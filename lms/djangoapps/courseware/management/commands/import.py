@@ -41,7 +41,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         data_dir = options['data_directory']
         source_dirs = options['course_dirs']
-        if source_dirs:
+        if len(source_dirs) == 0:
             source_dirs = None
         do_import_static = not options.get('nostatic', False)
         # If the static content is not skipped, the python lib should be imported regardless
