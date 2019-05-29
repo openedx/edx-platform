@@ -47,7 +47,8 @@ class TestLTI(BaseTestXmodule):
         user_id = text_type(self.item_descriptor.xmodule_runtime.anonymous_student_id)
         hostname = self.item_descriptor.xmodule_runtime.hostname
         resource_link_id = text_type(six.moves.urllib.parse.quote('{}-{}'.format(hostname,
-                                                                    self.item_descriptor.location.html_id())))
+                                                                                 self.item_descriptor.location.html_id()
+                                                                                 )))
 
         sourcedId = "{context}:{resource_link}:{user_id}".format(
             context=six.moves.urllib.parse.quote(context_id),

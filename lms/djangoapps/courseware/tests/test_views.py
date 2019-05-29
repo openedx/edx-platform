@@ -208,8 +208,9 @@ class TestJumpTo(ModuleStoreTestCase):
     def test_jumpto_id_invalid_location(self):
         location = BlockUsageLocator(CourseLocator('edX', 'toy', 'NoSuchPlace', deprecated=True),
                                      None, None, deprecated=True)
-        jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', six.text_type(self.course_key),
-                                                                    six.text_type(location))
+        jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses',
+                                                     six.text_type(self.course_key),
+                                                     six.text_type(location))
         response = self.client.get(jumpto_url)
         self.assertEqual(response.status_code, 404)
 

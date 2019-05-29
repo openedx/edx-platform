@@ -40,7 +40,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         data_dir = options['data_directory']
-        source_dirs = options['course_dirs']
+        source_dirs = options['course_dirs'] or None
         if len(source_dirs) == 0:
             source_dirs = None
         do_import_static = not options.get('nostatic', False)
