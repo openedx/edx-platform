@@ -1,6 +1,7 @@
 """
 Tests for ContentLibraryTransformer.
 """
+
 import mock
 
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
