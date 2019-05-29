@@ -47,5 +47,6 @@ class PermissionTests(TestCase):
         """
         if mode is not None:
             CourseEnrollment.enroll(self.user, self.course_id, mode=mode)
-        has_perm = self.user.has_perm('edx_proctoring.can_take_proctored_exam', {'course_id': six.text_type(self.course_id)})
+        has_perm = self.user.has_perm('edx_proctoring.can_take_proctored_exam',
+                                      {'course_id': six.text_type(self.course_id)})
         assert has_perm == should_have_perm

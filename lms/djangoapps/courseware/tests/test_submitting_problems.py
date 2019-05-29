@@ -278,7 +278,8 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
         Returns list of scores: [<points on hw_1>, <points on hw_2>, ..., <points on hw_n>]
         """
         return [
-            s.graded_total.earned for s in six.itervalues(self.get_course_grade().graded_subsections_by_format['Homework'])
+            s.graded_total.earned for s in six.itervalues(
+                self.get_course_grade().graded_subsections_by_format['Homework'])
         ]
 
     def hw_grade(self, hw_url_name):

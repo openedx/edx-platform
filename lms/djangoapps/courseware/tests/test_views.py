@@ -30,8 +30,8 @@ from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pytz import UTC
 from six import text_type
 from six.moves import range
-from six.moves.html_parser import HTMLParser
-from six.moves.urllib.parse import quote, urlencode
+from six.moves.html_parser import HTMLParser  # pylint: disable=import-error
+from six.moves.urllib.parse import quote, urlencode  # pylint: disable=import-error
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope, String
@@ -208,7 +208,8 @@ class TestJumpTo(ModuleStoreTestCase):
     def test_jumpto_id_invalid_location(self):
         location = BlockUsageLocator(CourseLocator('edX', 'toy', 'NoSuchPlace', deprecated=True),
                                      None, None, deprecated=True)
-        jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', six.text_type(self.course_key), six.text_type(location))
+        jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', six.text_type(self.course_key),
+                                                                    six.text_type(location))
         response = self.client.get(jumpto_url)
         self.assertEqual(response.status_code, 404)
 
@@ -387,7 +388,8 @@ class ViewsTestCase(ModuleStoreTestCase):
 
         url = reverse(
             'courseware_chapter',
-            kwargs={'course_id': six.text_type(self.course.id), 'chapter': six.text_type(self.chapter.location.block_id)},
+            kwargs={'course_id': six.text_type(self.course.id),
+                    'chapter': six.text_type(self.chapter.location.block_id)},
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)

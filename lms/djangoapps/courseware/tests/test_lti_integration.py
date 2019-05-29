@@ -7,9 +7,9 @@ from collections import OrderedDict
 
 import mock
 import oauthlib
-import six.moves.urllib.error
-import six.moves.urllib.parse
-import six.moves.urllib.request
+import six.moves.urllib.error  # pylint: disable=import-error
+import six.moves.urllib.parse  # pylint: disable=import-error
+import six.moves.urllib.request  # pylint: disable=import-error
 from django.conf import settings
 from django.urls import reverse
 from six import text_type
@@ -46,7 +46,8 @@ class TestLTI(BaseTestXmodule):
         context_id = text_type(self.item_descriptor.course_id)
         user_id = text_type(self.item_descriptor.xmodule_runtime.anonymous_student_id)
         hostname = self.item_descriptor.xmodule_runtime.hostname
-        resource_link_id = text_type(six.moves.urllib.parse.quote('{}-{}'.format(hostname, self.item_descriptor.location.html_id())))
+        resource_link_id = text_type(six.moves.urllib.parse.quote('{}-{}'.format(hostname,
+                                                                    self.item_descriptor.location.html_id())))
 
         sourcedId = "{context}:{resource_link}:{user_id}".format(
             context=six.moves.urllib.parse.quote(context_id),
