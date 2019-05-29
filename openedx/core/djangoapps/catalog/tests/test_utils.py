@@ -14,8 +14,8 @@ from django.test.client import RequestFactory
 from django.utils.timezone import now
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.helpers import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.helpers import CourseMode
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from entitlements.tests.factories import CourseEntitlementFactory
 from openedx.core.constants import COURSE_UNPUBLISHED
 from openedx.core.djangoapps.catalog.cache import (

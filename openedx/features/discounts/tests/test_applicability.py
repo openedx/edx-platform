@@ -4,7 +4,7 @@
 from datetime import timedelta
 from django.utils.timezone import now
 
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

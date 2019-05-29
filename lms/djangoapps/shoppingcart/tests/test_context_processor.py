@@ -7,7 +7,7 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from mock import Mock, patch
 
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from shoppingcart.context_processor import user_has_cart_context_processor
 from shoppingcart.models import Order, PaidCourseRegistration
 from student.tests.factories import UserFactory

@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function
 
 from contentstore.course_group_config import GroupConfiguration
 from django.conf import settings
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from django.core.management.base import BaseCommand, CommandError
 
 from openedx.core.djangoapps.course_groups.cohorts import CourseCohort

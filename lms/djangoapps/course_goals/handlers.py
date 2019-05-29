@@ -4,7 +4,7 @@ Signal handlers for course goals.
 from django.db import models
 from django.dispatch import receiver
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from student.models import CourseEnrollment
 
 from .api import add_course_goal, remove_course_goal

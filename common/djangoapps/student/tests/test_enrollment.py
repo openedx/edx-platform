@@ -11,8 +11,8 @@ from django.conf import settings
 from django.urls import reverse
 from mock import patch
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from student.models import (
     SCORE_RECALCULATION_DELAY_ON_ENROLLMENT_UPDATE,

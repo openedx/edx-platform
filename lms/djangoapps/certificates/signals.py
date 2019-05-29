@@ -21,7 +21,7 @@ from openedx.core.djangoapps.content.course_overviews.signals import COURSE_PACI
 from openedx.core.djangoapps.signals.signals import (COURSE_GRADE_NOW_PASSED,
                                                      LEARNER_NOW_VERIFIED,
                                                      COURSE_GRADE_NOW_FAILED)
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from student.models import CourseEnrollment
 
 

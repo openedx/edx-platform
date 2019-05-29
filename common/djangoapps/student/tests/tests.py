@@ -28,8 +28,8 @@ from six.moves.urllib.parse import quote
 
 import shoppingcart  # pylint: disable=import-error
 from bulk_email.models import Optout  # pylint: disable=import-error
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.certificates.models import CertificateStatuses  # pylint: disable=import-error
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification

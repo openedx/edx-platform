@@ -38,7 +38,7 @@ from six import text_type
 from contentstore.utils import get_lms_link_for_certificate_web_view, reverse_course_url
 from contentstore.views.assets import delete_asset
 from contentstore.views.exception import AssetNotFoundException
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
 from eventtracking import tracker
 from student.auth import has_studio_write_access

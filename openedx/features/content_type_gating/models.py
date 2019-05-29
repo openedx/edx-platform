@@ -12,7 +12,7 @@ from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.masquerade import (
     get_course_masquerade,
     get_masquerading_user_group,

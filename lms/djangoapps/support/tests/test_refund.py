@@ -15,7 +15,7 @@ import pytz
 from django.test.client import Client
 from mock import patch
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from shoppingcart.models import CertificateItem, Order
 from student.models import CourseEnrollment
 from student.roles import SupportStaffRole

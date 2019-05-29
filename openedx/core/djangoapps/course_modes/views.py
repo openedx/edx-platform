@@ -7,9 +7,9 @@ import decimal
 import json
 
 import six
-import six.moves.urllib.error
-import six.moves.urllib.parse
-import six.moves.urllib.request
+import six.moves.urllib.error  # pylint: disable=import-error
+import six.moves.urllib.parse  # pylint: disable=import-error
+import six.moves.urllib.request  # pylint: disable=import-error
 import waffle
 from babel.dates import format_datetime
 from django.contrib.auth.decorators import login_required
@@ -25,7 +25,7 @@ from ipware.ip import get_ip
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from courseware.access import has_access
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.commerce.utils import EcommerceService
@@ -51,7 +51,7 @@ class ChooseModeView(View):
     """
 
     @method_decorator(transaction.non_atomic_requests)
-    def dispatch(self, *args, **kwargs):
+    def dispatch(self, *args, **kwargs):  # pylint: disable=arguments-differ
         """Disable atomicity for the view.
 
         Otherwise, we'd be unable to commit to the database until the
@@ -78,6 +78,7 @@ class ChooseModeView(View):
             Response
 
         """
+        # pylint: disable=too-many-statements
         course_key = CourseKey.from_string(course_id)
 
         # Check whether the user has access to this course

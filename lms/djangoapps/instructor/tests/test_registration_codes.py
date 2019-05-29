@@ -12,8 +12,8 @@ from django.utils.translation import ugettext as _
 from six import text_type
 from six.moves import range
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import InstructorFactory
 from shoppingcart.models import (
     CourseRegCodeItem,

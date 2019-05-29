@@ -15,7 +15,7 @@ from pytz import UTC
 from six.moves import range, zip
 
 from common.test.utils import XssTestMixin
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from shoppingcart.models import DonationConfiguration
 from student.models import CourseEnrollment, DashboardConfiguration

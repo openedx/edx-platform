@@ -32,8 +32,8 @@ from six import text_type, unichr  # pylint: disable=redefined-builtin
 from six.moves import range, zip
 
 from bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from courseware.models import StudentModule
 from courseware.tests.factories import (
     BetaTesterFactory,

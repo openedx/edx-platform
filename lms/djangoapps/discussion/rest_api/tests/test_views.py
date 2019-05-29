@@ -20,8 +20,6 @@ from six.moves import range
 from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
 from common.test.utils import disable_signal
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.discussion.django_comment_client.tests.utils import (
     ForumsEnableMixin,
     config_course_discussions,
@@ -36,6 +34,8 @@ from lms.djangoapps.discussion.rest_api.tests.utils import (
     make_paginated_api_response
 )
 from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
+from openedx.core.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user

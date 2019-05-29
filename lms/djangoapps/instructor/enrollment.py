@@ -19,7 +19,7 @@ from edx_ace import ace
 from edx_ace.recipient import Recipient
 from six import text_type
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from courseware.models import StudentModule
 from eventtracking import tracker
 from lms.djangoapps.grades.api import (

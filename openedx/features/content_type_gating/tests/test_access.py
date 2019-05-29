@@ -21,7 +21,7 @@ from pyquery import PyQuery as pq
 from six.moves.html_parser import HTMLParser
 
 from course_api.blocks.api import get_blocks
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from experiments.models import ExperimentData, ExperimentKeyValue
 from lms.djangoapps.courseware.module_render import load_single_xblock
 from lms.djangoapps.courseware.tests.factories import (

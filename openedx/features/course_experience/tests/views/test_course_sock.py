@@ -6,7 +6,7 @@ from __future__ import absolute_import
 
 import ddt
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG

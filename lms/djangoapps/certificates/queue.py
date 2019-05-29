@@ -12,7 +12,7 @@ from lxml.etree import ParserError, XMLSyntaxError
 from requests.auth import HTTPBasicAuth
 
 from capa.xqueue_interface import XQueueInterface, make_hashkey, make_xheader
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import CertificateStatuses as status
 from lms.djangoapps.certificates.models import (
     CertificateWhitelist,

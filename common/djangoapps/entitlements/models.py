@@ -13,7 +13,7 @@ from django.utils.timezone import now
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from entitlements.utils import is_course_run_entitlement_fulfillable
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.commerce.utils import refund_entitlement

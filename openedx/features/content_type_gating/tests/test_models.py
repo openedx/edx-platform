@@ -10,7 +10,7 @@ from edx_django_utils.cache import RequestCache
 from mock import Mock
 from opaque_keys.edx.locator import CourseLocator
 
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.config_model_utils.models import Provenance
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory

@@ -9,7 +9,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from student.models import User
 

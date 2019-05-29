@@ -4,7 +4,7 @@ from __future__ import absolute_import, unicode_literals
 import six
 from django.utils.translation import ugettext_lazy as _
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from student.helpers import VERIFY_STATUS_APPROVED, VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED
 
 DISPLAY_VERIFIED = "verified"

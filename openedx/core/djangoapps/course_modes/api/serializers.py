@@ -5,7 +5,7 @@ from __future__ import absolute_import
 
 from rest_framework import serializers
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 
 
 class CourseModeSerializer(serializers.Serializer):

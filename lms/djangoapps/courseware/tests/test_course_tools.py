@@ -9,8 +9,8 @@ from mock import patch
 import pytz
 from django.test import RequestFactory
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from courseware.course_tools import VerifiedUpgradeTool
 from courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview

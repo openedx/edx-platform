@@ -1063,7 +1063,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
 
     # for managing course modes
-    'course_modes.apps.CourseModesConfig',
+    'openedx.core.djangoapps.course_modes.apps.CourseModesConfig',
 
     # Verified Track Content Cohorting (Beta feature that will hopefully be removed)
     'openedx.core.djangoapps.verified_track_content',

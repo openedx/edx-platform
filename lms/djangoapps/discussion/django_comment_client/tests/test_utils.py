@@ -15,8 +15,8 @@ from pytz import UTC
 from six import text_type
 
 import lms.djangoapps.discussion.django_comment_client.utils as utils
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from courseware.tabs import get_course_tab_list
 from courseware.tests.factories import InstructorFactory
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY

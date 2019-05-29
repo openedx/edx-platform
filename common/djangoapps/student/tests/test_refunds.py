@@ -21,7 +21,7 @@ from six.moves import range
 
 # These imports refer to lms djangoapps.
 # Their testcases are only run under lms.
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.commerce.utils import ECOMMERCE_DATE_FORMAT

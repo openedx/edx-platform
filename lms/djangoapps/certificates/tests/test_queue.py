@@ -22,7 +22,7 @@ from capa.xqueue_interface import XQueueInterface
 from lms.djangoapps.certificates.models import CertificateStatuses, ExampleCertificate, ExampleCertificateSet, GeneratedCertificate
 from lms.djangoapps.certificates.queue import LOGGER, XQueueCertInterface
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory

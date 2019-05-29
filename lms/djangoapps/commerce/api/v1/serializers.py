@@ -10,7 +10,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from xmodule.modulestore.django import modulestore
 
 from .models import UNDEFINED, Course

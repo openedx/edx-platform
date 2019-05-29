@@ -15,8 +15,8 @@ from mock import patch
 from pytz import UTC
 from six.moves import range
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.enrollments import data
 from openedx.core.djangoapps.enrollments.errors import (
     CourseEnrollmentClosedError,

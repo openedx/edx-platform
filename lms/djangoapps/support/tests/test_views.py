@@ -18,8 +18,8 @@ from django.urls import reverse
 from pytz import UTC
 
 from common.test.utils import disable_signal
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, ManualEnrollmentAudit
 from student.roles import GlobalStaff, SupportStaffRole

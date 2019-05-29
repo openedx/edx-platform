@@ -25,7 +25,7 @@ from contentstore.courseware_index import (
 from contentstore.signals.handlers import listen_for_course_publish, listen_for_library_update
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url, reverse_usage_url
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from xmodule.library_tools import normalize_key_for_search
 from xmodule.modulestore import ModuleStoreEnum

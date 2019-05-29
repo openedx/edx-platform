@@ -17,8 +17,8 @@ from opaque_keys.edx.locator import UsageKey
 from six import text_type
 from six.moves import range, zip
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import InstructorFactory
 from instructor_analytics.basic import (
     AVAILABLE_FEATURES,

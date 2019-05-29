@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC, timezone
 
-from course_modes.models import CourseMode, CourseModeExpirationConfig
+from openedx.core.djangoapps.course_modes.models import CourseMode, CourseModeExpirationConfig
 # Technically, we shouldn't be doing this, since verify_student is defined
 # in LMS, and course_modes is defined in common.
 #

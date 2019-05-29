@@ -14,7 +14,7 @@ from rest_framework import permissions, status, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from entitlements.api.v1.filters import CourseEntitlementFilter
 from entitlements.api.v1.permissions import IsAdminOrSupportOrAuthenticatedReadOnly
 from entitlements.api.v1.serializers import CourseEntitlementSerializer

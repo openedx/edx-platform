@@ -44,6 +44,7 @@ class CourseMode(models.Model):
     .. no_pii:
     """
     class Meta(object):
+        unique_together = ('course', 'mode_slug', 'currency')
         app_label = "course_modes"
 
     course = models.ForeignKey(
@@ -62,6 +63,7 @@ class CourseMode(models.Model):
 
     @course_id.setter
     def course_id(self, value):
+        # pylint: disable=attribute-defined-outside-init
         if isinstance(value, six.string_types):
             self._course_id = CourseKey.from_string(value)
         else:
@@ -193,9 +195,6 @@ class CourseMode(models.Model):
 
     CACHE_NAMESPACE = u"course_modes.CourseMode.cache."
 
-    class Meta(object):
-        unique_together = ('course', 'mode_slug', 'currency')
-
     def clean(self):
         """
         Object-level validation - implemented in this method so DRF serializers
@@ -211,14 +210,11 @@ class CourseMode(models.Model):
         if self.min_price < min_price_for_mode:
             mode_display_name = mode_config.get('display_name', self.mode_slug)
             raise ValidationError(
-                _(
-                    u"The {course_mode} course mode has a minimum price of {min_price}. You must set a price greater than or equal to {min_price}.".format(
-                        course_mode=mode_display_name, min_price=min_price_for_mode
-                    )
-                )
+                _(u"The {course_mode} course mode has a minimum price of {min_price}. You must set a price greater than"
+                    u" or equal to {min_price}.".format(course_mode=mode_display_name, min_price=min_price_for_mode))
             )
 
-    def save(self, force_insert=False, force_update=False, using=None):
+    def save(self, force_insert=False, force_update=False, using=None):  # pylint: disable=arguments-differ
         # Ensure currency is always lowercase.
         self.clean()  # ensure object-level validation is performed before we save.
         self.currency = self.currency.lower()
@@ -849,6 +845,7 @@ def format_course_price(price):
     currency_symbol = settings.PAID_COURSE_REGISTRATION_CURRENCY[1]
 
     if price:
+        # pylint: disable=no-member
         # Translators: This will look like '$50', where {currency_symbol} is a symbol such as '$' and {price} is a
         # numerical amount in that currency. Adjust this display as needed for your language.
         cosmetic_display_price = _("{currency_symbol}{price}").format(currency_symbol=currency_symbol, price=price)
@@ -868,6 +865,7 @@ class CourseModesArchive(models.Model):
 
     .. no_pii:
     """
+    # pylint: disable=model-missing-unicode
     class Meta(object):
         app_label = "course_modes"
 

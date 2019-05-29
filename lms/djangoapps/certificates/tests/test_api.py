@@ -18,8 +18,6 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 import pytz
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
@@ -32,6 +30,8 @@ from lms.djangoapps.certificates.models import (
 from lms.djangoapps.certificates.queue import XQueueAddToQueueError, XQueueCertInterface
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
+from openedx.core.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory

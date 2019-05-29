@@ -6,7 +6,7 @@ from __future__ import absolute_import
 import logging
 import six
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from courseware.masquerade import (
     get_course_masquerade,
     get_masquerading_user_group,

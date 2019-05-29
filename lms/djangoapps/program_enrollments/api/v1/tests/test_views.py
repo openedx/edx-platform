@@ -20,7 +20,6 @@ from six import text_type
 from six.moves import range, zip
 
 from bulk_email.models import BulkEmailFlag, Optout
-from course_modes.models import CourseMode
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
@@ -38,6 +37,7 @@ from openedx.core.djangoapps.catalog.tests.factories import OrganizationFactory 
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory as ModulestoreCourseFactory, ItemFactory

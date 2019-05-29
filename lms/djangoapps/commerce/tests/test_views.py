@@ -8,7 +8,7 @@ import ddt
 import mock
 from django.urls import reverse
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory

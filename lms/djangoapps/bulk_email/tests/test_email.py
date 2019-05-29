@@ -23,7 +23,7 @@ from mock import Mock, patch
 
 from bulk_email.models import BulkEmailFlag, Optout
 from bulk_email.tasks import _get_course_email_context, _get_source_address
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from courseware.tests.factories import InstructorFactory, StaffFactory
 from lms.djangoapps.instructor_task.subtasks import update_subtask_status
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort

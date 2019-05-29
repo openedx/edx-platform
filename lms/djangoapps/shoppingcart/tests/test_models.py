@@ -26,7 +26,7 @@ from django.urls import reverse
 from mock import MagicMock, Mock, patch
 from opaque_keys.edx.locator import CourseLocator
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from shoppingcart.exceptions import (
     AlreadyEnrolledInCourseException,
     CourseDoesNotExistException,

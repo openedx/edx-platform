@@ -24,7 +24,7 @@ from pytz import UTC
 from six import iteritems, text_type
 
 import third_party_auth
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import get_certificate_url, has_html_certificates_enabled
 from lms.djangoapps.certificates.models import CertificateStatuses, certificate_status_for_student
 from lms.djangoapps.grades.api import CourseGradeFactory

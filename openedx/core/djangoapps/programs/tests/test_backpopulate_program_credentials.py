@@ -8,7 +8,7 @@ from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 from six.moves import range
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory

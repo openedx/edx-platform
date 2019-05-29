@@ -17,8 +17,8 @@ from django.conf import settings
 from django.urls import reverse
 from mock import patch
 
-from course_modes.models import CourseMode, Mode
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.models import CourseMode, Mode
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.commerce.tests import test_utils as ecomm_test_utils
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
@@ -38,7 +38,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
     """
     Course Mode View tests
     """
-    URLCONF_MODULES = ['course_modes.urls']
+    URLCONF_MODULES = ['openedx.core.djangoapps.course_modes.urls']
 
     @patch.dict(settings.FEATURES, {'MODE_CREATION_FOR_TESTING': True})
     def setUp(self):

@@ -17,7 +17,7 @@ from django.utils.translation import ugettext as _
 from lazy import lazy
 from pytz import utc
 
-from course_modes.models import CourseMode, get_cosmetic_verified_display_price
+from openedx.core.djangoapps.course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService

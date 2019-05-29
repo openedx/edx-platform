@@ -29,7 +29,7 @@ from lms.djangoapps.certificates.tests.factories import (
     GeneratedCertificateFactory,
     LinkedInAddToProfileConfigurationFactory
 )
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.badges.events.course_complete import get_completion_badge
 from lms.djangoapps.badges.tests.factories import (
     BadgeAssertionFactory,

@@ -12,7 +12,7 @@ from mock import call, patch
 from opaque_keys.edx import locator
 from six import text_type
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from shoppingcart.models import CertificateItem, Order  # pylint: disable=import-error
 from student.models import (
     EVENT_NAME_ENROLLMENT_ACTIVATED,

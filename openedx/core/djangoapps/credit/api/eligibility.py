@@ -10,7 +10,7 @@ import logging
 import six
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.credit.email_utils import send_credit_notifications
 from openedx.core.djangoapps.credit.exceptions import InvalidCreditCourse, InvalidCreditRequirements
 from openedx.core.djangoapps.credit.models import (

@@ -9,10 +9,10 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from course_modes.models import CourseMode
 from lms.djangoapps.program_enrollments.api.v1.constants import (
     CourseEnrollmentResponseStatuses as ProgramCourseEnrollmentResponseStatuses
 )
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 from simple_history.models import HistoricalRecords

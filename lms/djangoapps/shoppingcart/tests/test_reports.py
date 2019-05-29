@@ -13,7 +13,7 @@ from django.conf import settings
 from mock import patch
 from six import text_type
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from shoppingcart.models import (
     CertificateItem,
     CourseRegCodeItemAnnotation,

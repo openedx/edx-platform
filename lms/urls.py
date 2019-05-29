@@ -124,8 +124,8 @@ urlpatterns = [
     url(r'^lang_pref/session_language', lang_pref_views.update_session_language, name='session_language'),
 
     # Multiple course modes and identity verification
-    url(r'^course_modes/', include('course_modes.urls')),
-    url(r'^api/course_modes/', include('course_modes.api.urls', namespace='course_modes_api')),
+    url(r'^course_modes/', include('openedx.core.djangoapps.course_modes.urls')),
+    url(r'^api/course_modes/', include('openedx.core.djangoapps.course_modes.api.urls', namespace='course_modes_api')),
     url(r'^verify_student/', include('verify_student.urls')),
 
     # URLs for managing dark launches of languages

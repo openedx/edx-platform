@@ -17,7 +17,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from six import text_type
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory
 from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags

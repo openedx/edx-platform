@@ -23,7 +23,7 @@ from courseware.date_summary import (
 from courseware.masquerade import check_content_start_date_for_masquerade_user
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from django.conf import settings
 from django.db.models import Prefetch
 from django.urls import reverse

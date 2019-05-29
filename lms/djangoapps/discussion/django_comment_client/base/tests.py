@@ -21,8 +21,8 @@ from six import text_type
 from six.moves import range
 
 from common.test.utils import MockSignalHandlerMixin, disable_signal
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.discussion.django_comment_client.base import views
 from lms.djangoapps.discussion.django_comment_client.tests.group_id import (
     CohortedTopicGroupIdTestMixin,

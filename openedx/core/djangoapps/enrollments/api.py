@@ -12,7 +12,7 @@ from django.conf import settings
 from django.core.cache import cache
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.enrollments import errors
 
 log = logging.getLogger(__name__)

@@ -17,7 +17,7 @@ from django.db import connection
 from django.test.utils import override_settings
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.commerce.tests import TEST_API_URL
 from openedx.core.djangoapps.credit import api
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_attribute_values, make_providers_strings

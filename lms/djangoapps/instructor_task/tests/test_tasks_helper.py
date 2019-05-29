@@ -30,8 +30,8 @@ from pytz import UTC
 
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import InstructorFactory
 from instructor_analytics.basic import UNAVAILABLE, list_problem_responses
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate

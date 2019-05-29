@@ -8,7 +8,7 @@ from datetime import timedelta
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.timezone import now
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 
 TEST_COURSE_PRICE = 50
 

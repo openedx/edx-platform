@@ -12,8 +12,8 @@ from django.urls import reverse, reverse_lazy
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.enrollments.api import get_enrollment
 from openedx.core.lib.django_test_client_utils import get_absolute_url

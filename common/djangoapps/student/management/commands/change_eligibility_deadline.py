@@ -3,7 +3,7 @@
 import logging
 from datetime import datetime, timedelta
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from django.core.management.base import BaseCommand
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey

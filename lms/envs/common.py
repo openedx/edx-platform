@@ -2153,7 +2153,7 @@ INSTALLED_APPS = [
     'shoppingcart',
 
     # Different Course Modes
-    'course_modes.apps.CourseModesConfig',
+    'openedx.core.djangoapps.course_modes.apps.CourseModesConfig',
 
     # Enrollment API
     'openedx.core.djangoapps.enrollments',

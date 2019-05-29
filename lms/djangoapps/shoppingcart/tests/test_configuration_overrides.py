@@ -7,7 +7,7 @@ from __future__ import absolute_import
 from django.urls import reverse
 from mock import patch
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from shoppingcart.models import CertificateItem, Donation, Order, PaidCourseRegistration
 from student.tests.factories import UserFactory

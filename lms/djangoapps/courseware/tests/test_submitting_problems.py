@@ -25,7 +25,7 @@ from capa.tests.response_xml_factory import (
     OptionResponseXMLFactory,
     SchematicResponseXMLFactory
 )
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from courseware.models import BaseStudentModuleHistory, StudentModule
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.grades.api import CourseGradeFactory, task_compute_all_grades_for_course

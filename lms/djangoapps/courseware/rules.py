@@ -3,7 +3,7 @@ django-rules for courseware related features
 """
 from __future__ import absolute_import
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from opaque_keys.edx.keys import CourseKey
 from student.models import CourseEnrollment
 

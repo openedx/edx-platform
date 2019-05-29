@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from six import text_type
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from student.models import CourseEnrollment, UserProfile
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

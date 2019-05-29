@@ -33,7 +33,7 @@ from six.moves.urllib.parse import urlencode  # pylint: disable=import-error
 from testfixtures import LogCapture
 from waffle.models import Switch
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context

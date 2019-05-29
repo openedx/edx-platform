@@ -16,7 +16,7 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework.generics import GenericAPIView
 from six import text_type
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.support.decorators import require_support_permission
 from lms.djangoapps.support.serializers import ManualEnrollmentSerializer

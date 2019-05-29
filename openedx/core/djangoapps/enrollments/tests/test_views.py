@@ -27,10 +27,10 @@ from rest_framework.test import APITestCase
 from six import text_type
 from six.moves import range
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups import cohorts
+from openedx.core.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, RestrictedCourse
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.enrollments import api, data

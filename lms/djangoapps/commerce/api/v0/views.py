@@ -12,7 +12,7 @@ from rest_framework.status import HTTP_406_NOT_ACCEPTABLE, HTTP_409_CONFLICT
 from rest_framework.views import APIView
 from six import text_type
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from courseware import courses
 from entitlements.models import CourseEntitlement
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client

@@ -13,7 +13,7 @@ from django.utils.translation import get_language
 from django.utils.translation import ugettext as _
 from web_fragments.fragment import Fragment
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.access_response import AccessError
 from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
 from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link

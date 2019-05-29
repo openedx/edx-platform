@@ -20,8 +20,8 @@ from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from six.moves import range
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from courseware.models import DynamicUpgradeDeadlineConfiguration
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from openedx.core.djangoapps.schedules import resolvers, tasks

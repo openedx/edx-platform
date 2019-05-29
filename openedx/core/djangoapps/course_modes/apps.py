@@ -5,8 +5,8 @@ from django.apps import AppConfig
 
 
 class CourseModesConfig(AppConfig):
-    name = 'course_modes'
+    name = 'openedx.core.djangoapps.course_modes'
     verbose_name = "Course Modes"
 
     def ready(self):
-        import course_modes.signals  # pylint: disable=unused-variable
+        import openedx.core.djangoapps.course_modes.signals  # pylint: disable=unused-variable

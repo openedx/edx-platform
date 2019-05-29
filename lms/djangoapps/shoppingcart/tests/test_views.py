@@ -29,8 +29,8 @@ from six.moves import range
 from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
 from common.test.utils import XssTestMixin
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import InstructorFactory
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.embargo.test_utils import restrict_course

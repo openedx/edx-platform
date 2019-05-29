@@ -11,7 +11,7 @@ import six
 from django.urls import reverse
 from six import text_type
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from shoppingcart.models import Coupon, CourseRegistrationCode
 from student.roles import CourseFinanceAdminRole

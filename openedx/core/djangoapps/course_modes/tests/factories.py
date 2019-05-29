@@ -9,7 +9,7 @@ from factory import lazy_attribute
 from factory.django import DjangoModelFactory
 from opaque_keys.edx.locator import CourseLocator
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 
 
 # Factories are self documenting

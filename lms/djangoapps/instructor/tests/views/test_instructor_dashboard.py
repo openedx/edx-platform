@@ -19,7 +19,7 @@ from six import text_type
 from six.moves import range
 
 from common.test.utils import XssTestMixin
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from courseware.tabs import get_course_tab_list
 from courseware.tests.factories import StaffFactory, StudentModuleFactory, UserFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase

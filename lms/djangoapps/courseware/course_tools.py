@@ -7,7 +7,7 @@ import pytz
 from crum import get_current_request
 from django.utils.translation import ugettext as _
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from openedx.features.course_experience.course_tools import CourseTool
 from student.models import CourseEnrollment
 from courseware.date_summary import verified_upgrade_deadline_link

@@ -11,7 +11,7 @@ import pytz
 from django.test.client import RequestFactory
 from mock import MagicMock
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.credit.api import get_credit_requirement_status, set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.credit.signals import listen_for_grade_calculation

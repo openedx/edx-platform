@@ -18,8 +18,8 @@ from pytz import UTC
 from waffle.models import Flag
 from waffle.testutils import override_flag
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from courseware.tests.helpers import get_expiration_banner_text
 from experiments.models import ExperimentData
 from lms.djangoapps.commerce.models import CommerceConfiguration

@@ -5,7 +5,7 @@ import ddt
 
 from django.test import TestCase
 
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 
 from opaque_keys.edx.locator import CourseLocator
 from student.models import CourseEnrollment

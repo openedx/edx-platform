@@ -17,7 +17,7 @@ from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from courseware.access_response import MilestoneAccessError, StartDateError, VisibilityError
 from mobile_api.testutils import (
     MobileAPITestCase,

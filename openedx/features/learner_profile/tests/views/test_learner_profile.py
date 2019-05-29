@@ -11,7 +11,7 @@ from django.test import override_settings
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.certificates.api import is_passing_status
 from lms.envs.test import CREDENTIALS_PUBLIC_SERVICE_URL
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from django.conf import settings
 from django.urls import reverse
 from django.test.client import RequestFactory

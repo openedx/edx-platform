@@ -18,7 +18,7 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import utc
 from requests.exceptions import ConnectionError, Timeout
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.certificates.models import GeneratedCertificate

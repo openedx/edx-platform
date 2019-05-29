@@ -27,7 +27,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.embargo import api as embargo_api

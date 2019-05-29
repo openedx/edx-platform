@@ -7,7 +7,7 @@ import six
 from six.moves import range
 from mock import patch
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangoapps.content.block_structure.tests.helpers import clear_registered_transformers_cache
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers

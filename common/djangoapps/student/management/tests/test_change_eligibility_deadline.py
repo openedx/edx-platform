@@ -9,7 +9,7 @@ from opaque_keys import InvalidKeyError
 from six import text_type
 from testfixtures import LogCapture
 
-from course_modes.tests.factories import CourseMode
+from openedx.core.djangoapps.course_modes.tests.factories import CourseMode
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditEligibility
 from student.models import CourseEnrollment, User
 from student.tests.factories import UserFactory

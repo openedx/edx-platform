@@ -11,7 +11,7 @@ from django.conf import settings
 from django.test.utils import override_settings
 from mock import Mock, patch
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.enrollments import api
 from openedx.core.djangoapps.enrollments.errors import (
     CourseModeNotFoundError, EnrollmentApiLoadError, EnrollmentNotFoundError,

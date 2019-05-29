@@ -10,8 +10,8 @@ from django.conf import settings
 from mock import patch
 from pytz import UTC
 
-from course_modes.models import CourseMode
-from course_modes.signals import _listen_for_course_publish
+from openedx.core.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.signals import _listen_for_course_publish
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -67,7 +67,7 @@ class CourseModeSignalTest(ModuleStoreTestCase):
         course_mode, __ = self.create_mode('verified', 'verified', 10)
         self.assertIsNone(course_mode.expiration_datetime)
 
-        with patch('course_modes.models.CourseModeExpirationConfig.current') as config:
+        with patch('openedx.core.djangoapps.course_modes.models.CourseModeExpirationConfig.current') as config:
             instance = config.return_value
             instance.verification_window = timedelta(days=verification_window)
 
@@ -83,7 +83,7 @@ class CourseModeSignalTest(ModuleStoreTestCase):
         course_mode.expiration_datetime_is_explicit = True
         self.assertIsNone(course_mode.expiration_datetime)
 
-        with patch('course_modes.models.CourseModeExpirationConfig.current') as config:
+        with patch('openedx.core.djangoapps.course_modes.models.CourseModeExpirationConfig.current') as config:
             instance = config.return_value
             instance.verification_window = timedelta(days=verification_window)
 

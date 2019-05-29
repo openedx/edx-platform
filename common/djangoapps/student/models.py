@@ -54,7 +54,8 @@ from six.moves.urllib.parse import urlencode
 from slumber.exceptions import HttpClientError, HttpServerError
 from user_util import user_util
 
-from course_modes.models import CourseMode, get_cosmetic_verified_display_price
+from openedx.core.djangoapps.course_modes.models import CourseMode, get_cosmetic_verified_display_price
+import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
     DynamicUpgradeDeadlineConfiguration,

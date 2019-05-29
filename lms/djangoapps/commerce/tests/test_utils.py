@@ -14,8 +14,8 @@ from opaque_keys.edx.locator import CourseLocator
 from six.moves.urllib.parse import urlencode  # pylint: disable=import-error
 from waffle.testutils import override_switch
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService, refund_entitlement, refund_seat
 from openedx.core.djangolib.testing.utils import skip_unless_lms

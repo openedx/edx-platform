@@ -11,7 +11,7 @@ from mock import patch
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.apis.v0.views import CertificatesDetailView, CertificatesListView
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory

@@ -31,7 +31,7 @@ from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker

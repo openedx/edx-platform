@@ -6,7 +6,7 @@ import unicodecsv
 from django.utils.translation import ugettext as _
 from six import text_type
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from courseware.courses import get_course_by_id
 from shoppingcart.models import CertificateItem, OrderItem
 from student.models import CourseEnrollment
@@ -159,6 +159,7 @@ class CertificateStatusReport(Report):
             cur_course = get_course_by_id(course_id)
             university = cur_course.org
             # TODO add term (i.e. Fall 2013) to course?
+            # xss-lint: disable=python-deprecated-display-name
             course = cur_course.number + " " + cur_course.display_name_with_default_escaped
             counts = CourseEnrollment.objects.enrollment_counts(course_id)
             total_enrolled = counts['total']
@@ -239,6 +240,7 @@ class UniversityRevenueShareReport(Report):
         for course_id in course_ids_between(self.start_word, self.end_word):
             cur_course = get_course_by_id(course_id)
             university = cur_course.org
+            # xss-lint: disable=python-deprecated-display-name
             course = cur_course.number + " " + cur_course.display_name_with_default_escaped
             total_payments_collected = CertificateItem.verified_certificates_monetary_field_sum(course_id, 'purchased', 'unit_cost')
             service_fees = CertificateItem.verified_certificates_monetary_field_sum(course_id, 'purchased', 'service_fee')

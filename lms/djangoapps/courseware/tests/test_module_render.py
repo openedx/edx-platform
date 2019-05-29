@@ -43,7 +43,7 @@ from xblock.runtime import (
 from xblock.test.tools import TestRuntime
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from courseware import module_render as render
 from courseware.courses import get_course_info_section, get_course_with_access
 from courseware.access_response import AccessResponse

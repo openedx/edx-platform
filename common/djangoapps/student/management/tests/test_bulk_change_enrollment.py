@@ -7,7 +7,7 @@ from django.core.management.base import CommandError
 from mock import call, patch
 from six import text_type
 
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import EVENT_NAME_ENROLLMENT_MODE_CHANGED, CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory

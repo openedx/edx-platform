@@ -14,7 +14,7 @@ from mock import patch
 from opaque_keys.edx.locator import CourseLocator
 from six.moves import range
 
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.management.commands import send_upgrade_reminder as reminder
 from openedx.core.djangoapps.schedules.management.commands.tests.send_email_base import (

@@ -14,7 +14,7 @@ from search.search_engine_base import SearchEngine
 from six import add_metaclass
 
 from contentstore.course_group_config import GroupConfiguration
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from eventtracking import tracker
 from openedx.core.lib.courses import course_image_url
 from xmodule.annotator_mixin import html_to_text

@@ -4,7 +4,7 @@ Tests for the Studio authoring XBlock mixin.
 from django.conf import settings
 from django.test.utils import override_settings
 
-from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.course_modes.tests.factories import CourseModeFactory
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

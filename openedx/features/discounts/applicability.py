@@ -8,7 +8,7 @@ Keep in mind that the code in this file only applies to discounts controlled in 
 not other discounts like coupons or enterprise/program offers configured in ecommerce.
 
 """
-from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 
 # .. feature_toggle_name: discounts.enable_discounting
