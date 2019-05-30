@@ -59,7 +59,7 @@ class GitImportErrorUrlBad(GitImportError):
     """
     MESSAGE = _(
         'Non usable git url provided. Expecting something like:'
-        ' git@github.com:mitocw/edx4edx_lite.git'
+        ' git@github.com:edx/edx4edx_lite.git'
     )
 
 
