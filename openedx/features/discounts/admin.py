@@ -21,7 +21,7 @@ class DiscountRestrictionConfigAdmin(StackedConfigModelAdmin):
         ('Context', {
             'fields': DiscountRestrictionConfig.KEY_FIELDS,
             'description': _(
-                'These define the context to enable lms-controlled discounts on. '
+                'These define the context to disable lms-controlled discounts on. '
                 'If no values are set, then the configuration applies globally. '
                 'If a single value is set, then the configuration applies to all courses '
                 'within that context. At most one value can be set at a time.<br>'
@@ -31,12 +31,12 @@ class DiscountRestrictionConfigAdmin(StackedConfigModelAdmin):
             ),
         }),
         ('Configuration', {
-            'fields': ('enabled',),
+            'fields': ('disabled',),
             'description': _(
                 'If any of these values is left empty or "Unknown", then their value '
                 'at runtime will be retrieved from the next most specific context that applies. '
-                'For example, if "Enabled" is left as "Unknown" in the course context, then that '
-                'course will be Enabled only if the org that it is in is Enabled.'
+                'For example, if "Disabled" is left as "Unknown" in the course context, then that '
+                'course will be Disabled only if the org that it is in is Disabled.'
             ),
         })
     )

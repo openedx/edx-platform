@@ -52,7 +52,7 @@ def can_receive_discount(user, course):  # pylint: disable=unused-argument
         return False
 
     # Site, Partner, Course or Course Run not excluded from lms-controlled discounts
-    if not DiscountRestrictionConfig.enabled_for_course(course):
+    if DiscountRestrictionConfig.disabled_for_course_stacked_config(course):
         return False
 
     return True
