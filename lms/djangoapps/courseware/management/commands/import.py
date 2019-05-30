@@ -1,5 +1,5 @@
 """
-Script for importing courseware from XML format.
+ Script for importing courseware from XML format.
 """
 from __future__ import absolute_import
 
