@@ -160,7 +160,7 @@ def instructor_dashboard_2(request, course_id):
             unicode(course_key), len(paid_modes)
         )
 
-    if access['instructor'] and is_enabled_for_course(course_key, request=request):
+    if access['instructor'] and is_enabled_for_course(course_key):
         sections.insert(3, _section_extensions(course))
 
     # Gate access to course email by feature flag & by course-specific authorization
