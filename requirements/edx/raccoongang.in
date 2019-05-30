@@ -52,6 +52,3 @@ parsel==1.2.0
 # Info pages requirements
 django-tinymce==2.8.0
 django-hvad==1.8.0
-
-# Accel customization
--e git+ssh://git@gitlab.raccoongang.com/rg-developers/rg-odoo-edx-api.git@added_sso#egg=rg-odoo-api==0.0.1

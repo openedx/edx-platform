@@ -149,3 +149,6 @@ web-fragments                       # Provides the ability to render fragments o
 XBlock                              # Courseware component architecture
 xblock-review                       # XBlock which displays problems from earlier in the course for ungraded retries
 zendesk                             # Python API for the Zendesk customer support system
+
+ # Accel customization
+-e git+ssh://git@gitlab.raccoongang.com/rg-developers/rg-odoo-edx-api.git@added_sso#egg=rg-odoo-api==0.0.1
