@@ -45,7 +45,7 @@ class SysadminBaseTestCase(SharedModuleStoreTestCase):
     Base class with common methods used in XML and Mongo tests
     """
 
-    TEST_REPO = 'https://github.com/mitocw/edx4edx_lite.git'
+    TEST_REPO = 'https://github.com/edx/edx4edx_lite.git'
     TEST_BRANCH = 'testing_do_not_delete'
     TEST_BRANCH_COURSE = CourseLocator.from_string('course-v1:MITx+edx4edx_branch+edx4edx')
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
