@@ -366,7 +366,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `auth_permission_content_type_id_codename_01ab375a_uniq` (`content_type_id`,`codename`),
   CONSTRAINT `auth_permission_content_type_id_2f476e4b_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2297 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2309 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -1254,6 +1254,84 @@ CREATE TABLE `contentstore_videouploadconfig` (
   PRIMARY KEY (`id`),
   KEY `contentstore_videoup_changed_by_id_e7352cb2_fk_auth_user` (`changed_by_id`),
   CONSTRAINT `contentstore_videoup_changed_by_id_e7352cb2_fk_auth_user` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `cornerstone_cornerstoneenterprisecustomerconfiguration`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `cornerstone_cornerstoneenterprisecustomerconfiguration` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `active` tinyint(1) NOT NULL,
+  `transmission_chunk_size` int(11) NOT NULL,
+  `cornerstone_base_url` varchar(255) NOT NULL,
+  `enterprise_customer_id` char(32) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `enterprise_customer_id` (`enterprise_customer_id`),
+  CONSTRAINT `cornerstone_cornerst_enterprise_customer__5b56887b_fk_enterpris` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `cornerstone_cornerstoneglobalconfiguration`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `cornerstone_cornerstoneglobalconfiguration` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `change_date` datetime(6) NOT NULL,
+  `enabled` tinyint(1) NOT NULL,
+  `completion_status_api_path` varchar(255) NOT NULL,
+  `oauth_api_path` varchar(255) NOT NULL,
+  `changed_by_id` int(11) DEFAULT NULL,
+  `subject_mapping` longtext NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `cornerstone_cornerst_changed_by_id_117db502_fk_auth_user` (`changed_by_id`),
+  CONSTRAINT `cornerstone_cornerst_changed_by_id_117db502_fk_auth_user` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `cornerstone_cornerstonelearnerdatatransmissionaudit`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `cornerstone_cornerstonelearnerdatatransmissionaudit` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `user_guid` varchar(255) NOT NULL,
+  `enterprise_course_enrollment_id` int(10) unsigned DEFAULT NULL,
+  `course_id` varchar(255) NOT NULL,
+  `session_token` varchar(255) NOT NULL,
+  `callback_url` varchar(255) NOT NULL,
+  `subdomain` varchar(255) NOT NULL,
+  `course_completed` tinyint(1) NOT NULL,
+  `completed_timestamp` datetime(6) DEFAULT NULL,
+  `status` varchar(100) DEFAULT NULL,
+  `error_message` longtext,
+  `user_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `cornerstone_cornerstonel_user_id_course_id_c975cc5f_uniq` (`user_id`,`course_id`),
+  CONSTRAINT `cornerstone_cornerst_user_id_43bd15bf_fk_auth_user` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `cornerstone_historicalcornerstoneenterprisecustomerconfiguration`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `cornerstone_historicalcornerstoneenterprisecustomerconfiguration` (
+  `id` int(11) NOT NULL,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `active` tinyint(1) NOT NULL,
+  `transmission_chunk_size` int(11) NOT NULL,
+  `cornerstone_base_url` varchar(255) NOT NULL,
+  `history_id` int(11) NOT NULL AUTO_INCREMENT,
+  `history_date` datetime(6) NOT NULL,
+  `history_change_reason` varchar(100) DEFAULT NULL,
+  `history_type` varchar(1) NOT NULL,
+  `enterprise_customer_id` char(32) DEFAULT NULL,
+  `history_user_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`history_id`),
+  KEY `cornerstone_historic_history_user_id_1ded83c5_fk_auth_user` (`history_user_id`),
+  KEY `cornerstone_historicalcorne_id_513efd93` (`id`),
+  KEY `cornerstone_historicalcorne_enterprise_customer_id_7f1c53b1` (`enterprise_customer_id`),
+  CONSTRAINT `cornerstone_historic_history_user_id_1ded83c5_fk_auth_user` FOREIGN KEY (`history_user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `cors_csrf_xdomainproxyconfiguration`;
@@ -2174,7 +2252,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_model_76bd3d3b_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=763 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=767 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2185,7 +2263,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=544 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=547 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5684,11 +5762,11 @@ CREATE TABLE `third_party_auth_ltiproviderconfig` (
   `enable_sso_id_verification` tinyint(1) NOT NULL,
   `organization_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `organization_id` (`organization_id`),
   KEY `third_party_auth_lti_changed_by_id_7b39c829_fk_auth_user` (`changed_by_id`),
   KEY `third_party_auth_ltiproviderconfig_lti_hostname_540ce676` (`lti_hostname`),
   KEY `third_party_auth_lti_site_id_c8442a80_fk_django_si` (`site_id`),
   KEY `third_party_auth_ltiproviderconfig_slug_9cd23a79` (`slug`),
+  KEY `third_party_auth_ltiproviderconfig_organization_id_7494c417` (`organization_id`),
   CONSTRAINT `third_party_auth_lti_changed_by_id_7b39c829_fk_auth_user` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`),
   CONSTRAINT `third_party_auth_lti_organization_id_7494c417_fk_organizat` FOREIGN KEY (`organization_id`) REFERENCES `organizations_organization` (`id`),
   CONSTRAINT `third_party_auth_lti_site_id_c8442a80_fk_django_si` FOREIGN KEY (`site_id`) REFERENCES `django_site` (`id`)
@@ -5723,11 +5801,11 @@ CREATE TABLE `third_party_auth_oauth2providerconfig` (
   `enable_sso_id_verification` tinyint(1) NOT NULL,
   `organization_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `organization_id` (`organization_id`),
   KEY `third_party_auth_oau_changed_by_id_55219296_fk_auth_user` (`changed_by_id`),
   KEY `third_party_auth_oauth2providerconfig_backend_name_0c14d294` (`backend_name`),
   KEY `third_party_auth_oau_site_id_a4ae3e66_fk_django_si` (`site_id`),
   KEY `third_party_auth_oauth2providerconfig_slug_226038d8` (`slug`),
+  KEY `third_party_auth_oauth2providerconfig_organization_id_cc8874ba` (`organization_id`),
   CONSTRAINT `third_party_auth_oau_changed_by_id_55219296_fk_auth_user` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`),
   CONSTRAINT `third_party_auth_oau_organization_id_cc8874ba_fk_organizat` FOREIGN KEY (`organization_id`) REFERENCES `organizations_organization` (`id`),
   CONSTRAINT `third_party_auth_oau_site_id_a4ae3e66_fk_django_si` FOREIGN KEY (`site_id`) REFERENCES `django_site` (`id`)
@@ -5813,11 +5891,11 @@ CREATE TABLE `third_party_auth_samlproviderconfig` (
   `default_username` varchar(255) NOT NULL,
   `organization_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `organization_id` (`organization_id`),
   KEY `third_party_auth_sam_changed_by_id_4c8fa8c0_fk_auth_user` (`changed_by_id`),
   KEY `third_party_auth_sam_site_id_b7e2af73_fk_django_si` (`site_id`),
   KEY `third_party_auth_sam_saml_configuration_i_eeb9fe72_fk_third_par` (`saml_configuration_id`),
   KEY `third_party_auth_samlproviderconfig_slug_95883dea` (`slug`),
+  KEY `third_party_auth_samlproviderconfig_organization_id_8a7f5596` (`organization_id`),
   CONSTRAINT `third_party_auth_sam_changed_by_id_4c8fa8c0_fk_auth_user` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`),
   CONSTRAINT `third_party_auth_sam_organization_id_8a7f5596_fk_organizat` FOREIGN KEY (`organization_id`) REFERENCES `organizations_organization` (`id`),
   CONSTRAINT `third_party_auth_sam_saml_configuration_i_eeb9fe72_fk_third_par` FOREIGN KEY (`saml_configuration_id`) REFERENCES `third_party_auth_samlconfiguration` (`id`),

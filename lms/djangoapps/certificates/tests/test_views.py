@@ -19,6 +19,7 @@ from lms.djangoapps.certificates.models import (
     ExampleCertificateSet,
     GeneratedCertificate
 )
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -179,13 +180,30 @@ class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
         self.assertEqual(content['return_code'], 0)
 
 
-class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
+class CertificatesViewsSiteTests(ModuleStoreTestCase):
     """
-    Tests for the microsite certificates web/html views
+    Tests for the certificates web/html views
     """
+    test_configuration_string = """{
+        "default": {
+            "accomplishment_class_append": "accomplishment-certificate",
+            "platform_name": "edX",
+            "company_about_url": "http://www.edx.org/about-us",
+            "company_privacy_url": "http://www.edx.org/edx-privacy-policy",
+            "company_tos_url": "http://www.edx.org/edx-terms-service",
+            "company_verified_certificate_url": "http://www.edx.org/verified-certificate",
+            "document_stylesheet_url_application": "/static/certificates/sass/main-ltr.css",
+            "logo_src": "/static/certificates/images/logo-edx.svg",
+            "logo_url": "http://www.edx.org",
+            "company_about_description": "This should not survive being overwritten by static content"
+        },
+        "honor": {
+            "certificate_type": "Honor Code"
+        }
+    }"""
 
     def setUp(self):
-        super(MicrositeCertificatesViewsTests, self).setUp()
+        super(CertificatesViewsSiteTests, self).setUp()
         self.client = Client()
         self.course = CourseFactory.create(
             org='testorg',
@@ -216,12 +234,13 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
             mode='honor',
             name=self.user.profile.name,
         )
+        self._setup_configuration()
 
-    def _certificate_html_view_configuration(self, configuration_string, enabled=True):
+    def _setup_configuration(self, enabled=True):
         """
         This will create a certificate html configuration
         """
-        config = CertificateHtmlViewConfiguration(enabled=enabled, configuration=configuration_string)
+        config = CertificateHtmlViewConfiguration(enabled=enabled, configuration=self.test_configuration_string)
         config.save()
         return config
 
@@ -258,82 +277,26 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
         self.store.update_item(self.course, self.user.id)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    def test_html_view_for_microsite(self):
-        test_configuration_string = """{
-            "default": {
-                "accomplishment_class_append": "accomplishment-certificate",
-                "platform_name": "edX",
-                "company_about_url": "http://www.edx.org/about-us",
-                "company_privacy_url": "http://www.edx.org/edx-privacy-policy",
-                "company_tos_url": "http://www.edx.org/edx-terms-service",
-                "company_verified_certificate_url": "http://www.edx.org/verified-certificate",
-                "document_stylesheet_url_application": "/static/certificates/sass/main-ltr.css",
-                "logo_src": "/static/certificates/images/logo-edx.svg",
-                "logo_url": "http://www.edx.org"
-            },
-            "microsites": {
-                "test-site": {
-                    "accomplishment_class_append": "accomplishment-certificate",
-                    "platform_name": "platform_microsite",
-                    "company_about_url": "http://www.microsite.org/about-us",
-                    "company_privacy_url": "http://www.microsite.org/edx-privacy-policy",
-                    "company_tos_url": "http://www.microsite.org/microsite-terms-service",
-                    "company_verified_certificate_url": "http://www.microsite.org/verified-certificate",
-                    "document_stylesheet_url_application": "/static/certificates/sass/main-ltr.css",
-                    "logo_src": "/static/certificates/images/logo-microsite.svg",
-                    "logo_url": "http://www.microsite.org",
-                    "company_about_description": "This is special microsite aware company_about_description content",
-                    "company_about_title": "Microsite title"
-                }
-            },
-            "honor": {
-                "certificate_type": "Honor Code"
-            }
-        }"""
-
-        config = self._certificate_html_view_configuration(configuration_string=test_configuration_string)
-        self.assertEquals(config.configuration, test_configuration_string)
+    @with_site_configuration(configuration={'platform_name': 'My Platform Site'})
+    def test_html_view_for_site(self):
         test_url = get_certificate_url(
             user_id=self.user.id,
             course_id=unicode(self.course.id)
         )
         self._add_course_certificates(count=1, signatory_count=2)
-        response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
-        self.assertIn('platform_microsite', response.content)
-
-        # logo url is taken from microsite configuration setting
-        self.assertIn('http://test_site.localhost', response.content)
-        self.assertIn('This is special microsite aware company_about_description content', response.content)
-        self.assertIn('Microsite title', response.content)
+        response = self.client.get(test_url)
+        self.assertIn('awarded this My Platform Site Honor Code Certificate of Completion', response.content)
+        self.assertIn('My Platform Site offers interactive online classes and MOOCs.', response.content)
+        self.assertIn('About My Platform Site', response.content)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    def test_html_view_microsite_configuration_missing(self):
-        test_configuration_string = """{
-            "default": {
-                "accomplishment_class_append": "accomplishment-certificate",
-                "platform_name": "edX",
-                "company_about_url": "http://www.edx.org/about-us",
-                "company_privacy_url": "http://www.edx.org/edx-privacy-policy",
-                "company_tos_url": "http://www.edx.org/edx-terms-service",
-                "company_verified_certificate_url": "http://www.edx.org/verified-certificate",
-                "document_stylesheet_url_application": "/static/certificates/sass/main-ltr.css",
-                "logo_src": "/static/certificates/images/logo-edx.svg",
-                "logo_url": "http://www.edx.org",
-                "company_about_description": "This should not survive being overwritten by static content"
-            },
-            "honor": {
-                "certificate_type": "Honor Code"
-            }
-        }"""
-        config = self._certificate_html_view_configuration(configuration_string=test_configuration_string)
-        self.assertEquals(config.configuration, test_configuration_string)
+    def test_html_view_site_configuration_missing(self):
         test_url = get_certificate_url(
             user_id=self.user.id,
             course_id=unicode(self.course.id)
         )
         self._add_course_certificates(count=1, signatory_count=2)
-        response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        response = self.client.get(test_url)
         self.assertIn('edX', response.content)
-        self.assertNotIn('platform_microsite', response.content)
-        self.assertNotIn('http://www.microsite.org', response.content)
+        self.assertNotIn('My Platform Site', response.content)
         self.assertNotIn('This should not survive being overwritten by static content', response.content)

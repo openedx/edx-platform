@@ -123,7 +123,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==1.0.3
 edx-drf-extensions==2.2.1
-edx-enterprise==1.5.9
+edx-enterprise==1.6.0
 edx-i18n-tools==0.4.8
 edx-lint==1.2.1
 edx-milestones==0.1.13
@@ -139,7 +139,7 @@ git+https://github.com/mitodl/edx-sga.git@3828ba9e413080a81b907a3381e5ffa05e063f
 edx-sphinx-theme==1.4.0
 edx-submissions==2.1.1
 edx-user-state-client==1.1.0
-edx-when==0.1.5
+edx-when==0.1.6
 edxval==1.1.25
 elasticsearch==1.9.0
 entrypoints==0.3

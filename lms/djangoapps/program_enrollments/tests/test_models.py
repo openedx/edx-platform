@@ -5,14 +5,19 @@ from __future__ import absolute_import, unicode_literals
 
 from uuid import uuid4
 
+import ddt
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 from six.moves import range
 from testfixtures import LogCapture
 
-from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
-from openedx.core.djangoapps.catalog.tests.factories import generate_course_run_key
+from course_modes.models import CourseMode
+from edx_django_utils.cache import RequestCache
+from lms.djangoapps.program_enrollments.models import ProgramEnrollment, ProgramCourseEnrollment
+from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from openedx.core.djangoapps.catalog.tests.factories import generate_course_run_key
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 
 
 class ProgramEnrollmentModelTests(TestCase):
@@ -103,6 +108,7 @@ class ProgramEnrollmentModelTests(TestCase):
             self.assertEquals(record.external_user_key, None)
 
 
+@ddt.ddt
 class ProgramCourseEnrollmentModelTests(TestCase):
     """
     Tests for the ProgramCourseEnrollment model.
@@ -112,6 +118,7 @@ class ProgramCourseEnrollmentModelTests(TestCase):
         Set up test data
         """
         super(ProgramCourseEnrollmentModelTests, self).setUp()
+        RequestCache.clear_all_namespaces()
         self.user = UserFactory.create()
         self.program_uuid = uuid4()
         self.program_enrollment = ProgramEnrollment.objects.create(
@@ -122,21 +129,37 @@ class ProgramCourseEnrollmentModelTests(TestCase):
             status='enrolled'
         )
         self.course_key = CourseKey.from_string(generate_course_run_key())
-        self.course_enrollment = CourseEnrollmentFactory.create(
+        CourseOverviewFactory(id=self.course_key)
+
+    def _create_completed_program_course_enrollment(self):
+        """ helper function create program course enrollment """
+        course_enrollment = CourseEnrollmentFactory.create(
             course_id=self.course_key,
             user=self.user,
+            mode=CourseMode.MASTERS
         )
-        self.program_course_enrollment = ProgramCourseEnrollment.objects.create(
+        program_course_enrollment = ProgramCourseEnrollment.objects.create(
             program_enrollment=self.program_enrollment,
             course_key=self.course_key,
-            course_enrollment=self.course_enrollment,
+            course_enrollment=course_enrollment,
+            status="active"
+        )
+        return program_course_enrollment
+
+    def _create_waiting_program_course_enrollment(self):
+        """ helper function create program course enrollment with no lms user """
+        return ProgramCourseEnrollment.objects.create(
+            program_enrollment=self.program_enrollment,
+            course_key=self.course_key,
+            course_enrollment=None,
             status="active"
         )
 
     def test_change_status_no_enrollment(self):
+        program_course_enrollment = self._create_completed_program_course_enrollment()
         with LogCapture() as capture:
-            self.program_course_enrollment.course_enrollment = None
-            self.program_course_enrollment.change_status("inactive")
+            program_course_enrollment.course_enrollment = None
+            program_course_enrollment.change_status("inactive")
             expected_message = "User {} {} {} has no course_enrollment".format(
                 self.user,
                 self.program_enrollment,
@@ -147,12 +170,43 @@ class ProgramCourseEnrollmentModelTests(TestCase):
             )
 
     def test_change_status_not_active_or_inactive(self):
+        program_course_enrollment = self._create_completed_program_course_enrollment()
         with LogCapture() as capture:
             status = "potential-future-status-0123"
-            self.program_course_enrollment.change_status(status)
+            program_course_enrollment.change_status(status)
             message = ("Changed {} status to {}, not changing course_enrollment"
                        " status because status is not 'active' or 'inactive'")
-            expected_message = message.format(self.program_course_enrollment, status)
+            expected_message = message.format(program_course_enrollment, status)
             capture.check(
                 ('lms.djangoapps.program_enrollments.models', 'WARNING', expected_message)
             )
+
+    def test_enroll_new_course_enrollment(self):
+        program_course_enrollment = self._create_waiting_program_course_enrollment()
+        program_course_enrollment.enroll(self.user)
+
+        course_enrollment = CourseEnrollment.objects.get(user=self.user, course_id=self.course_key)
+        self.assertEqual(course_enrollment.user, self.user)
+        self.assertEqual(course_enrollment.course.id, self.course_key)
+        self.assertEqual(course_enrollment.mode, CourseMode.MASTERS)
+
+    @ddt.data(
+        (CourseMode.VERIFIED, CourseMode.VERIFIED),
+        (CourseMode.AUDIT, CourseMode.MASTERS),
+        (CourseMode.HONOR, CourseMode.MASTERS)
+    )
+    @ddt.unpack
+    def test_enroll_existing_course_enrollment(self, original_mode, result_mode):
+        course_enrollment = CourseEnrollmentFactory.create(
+            course_id=self.course_key,
+            user=self.user,
+            mode=original_mode
+        )
+        program_course_enrollment = self._create_waiting_program_course_enrollment()
+
+        program_course_enrollment.enroll(self.user)
+
+        course_enrollment = CourseEnrollment.objects.get(user=self.user, course_id=self.course_key)
+        self.assertEqual(course_enrollment.user, self.user)
+        self.assertEqual(course_enrollment.course.id, self.course_key)
+        self.assertEqual(course_enrollment.mode, result_mode)

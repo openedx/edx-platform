@@ -20,6 +20,7 @@ from six import text_type
 from six.moves import range, zip
 
 from bulk_email.models import BulkEmailFlag, Optout
+from course_modes.models import CourseMode
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
@@ -29,6 +30,7 @@ from lms.djangoapps.program_enrollments.api.v1.constants import (
     MAX_ENROLLMENT_RECORDS,
     REQUEST_STUDENT_KEY,
 )
+from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
 from lms.djangoapps.program_enrollments.models import ProgramEnrollment, ProgramCourseEnrollment
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory
@@ -40,7 +42,6 @@ from openedx.core.djangolib.testing.utils import CacheIsolationMixin
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory as ModulestoreCourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from .factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
 
 
 class ListViewTestMixin(object):
@@ -357,6 +358,7 @@ class BaseCourseEnrollmentTestsMixin(ProgramCacheTestCaseMixin):
             course_enrollment = CourseEnrollmentFactory.create(
                 course_id=self.course_key,
                 user=program_enrollment.user,
+                mode=CourseMode.MASTERS
             )
             course_enrollment.is_active = course_status == "active"
             course_enrollment.save()
@@ -371,7 +373,7 @@ class BaseCourseEnrollmentTestsMixin(ProgramCacheTestCaseMixin):
         program_enrollment = self.create_program_enrollment(external_user_key, user)
         return self.create_program_course_enrollment(program_enrollment, course_status=course_status)
 
-    def assert_program_course_enrollment(self, external_user_key, expected_status, has_user):
+    def assert_program_course_enrollment(self, external_user_key, expected_status, has_user, mode=CourseMode.MASTERS):
         """
         Convenience method to assert that a ProgramCourseEnrollment exists,
         and potentially that a CourseEnrollment also exists
@@ -387,6 +389,7 @@ class BaseCourseEnrollmentTestsMixin(ProgramCacheTestCaseMixin):
             self.assertIsNotNone(course_enrollment)
             self.assertEqual(expected_status == "active", course_enrollment.is_active)
             self.assertEqual(self.course_key, course_enrollment.course_id)
+            self.assertEqual(mode, course_enrollment.mode)
         else:
             self.assertIsNone(course_enrollment)
 
@@ -499,12 +502,43 @@ class CourseEnrollmentPostTests(BaseCourseEnrollmentTestsMixin, APITestCase):
         self.assert_program_course_enrollment("learner-3", "active", False)
         self.assert_program_course_enrollment("learner-4", "inactive", False)
 
-    def test_user_already_enrolled_in_course(self):
+    def test_program_course_enrollment_exists(self):
+        """
+        The program enrollments application already has a program_course_enrollment
+        record for this user and course
+        """
         self.create_program_and_course_enrollments('learner-1')
         post_data = [self.learner_enrollment("learner-1")]
         response = self.request(self.default_url, post_data)
         self.assertEqual(422, response.status_code)
         self.assertDictEqual({'learner-1': CourseStatuses.CONFLICT}, response.data)
+
+    def test_user_currently_enrolled_in_course(self):
+        """
+        If a user is already enrolled in a course through a different method
+        that enrollment should be linked but not overwritten as masters.
+        """
+        CourseEnrollmentFactory.create(
+            course_id=self.course_key,
+            user=self.student,
+            mode=CourseMode.VERIFIED
+        )
+
+        self.create_program_enrollment('learner-1', user=self.student)
+
+        post_data = [
+            self.learner_enrollment("learner-1", "active")
+        ]
+        response = self.request(self.default_url, post_data)
+
+        self.assertEqual(200, response.status_code)
+        self.assertDictEqual(
+            {
+                "learner-1": "active"
+            },
+            response.data
+        )
+        self.assert_program_course_enrollment("learner-1", "active", True, mode=CourseMode.VERIFIED)
 
     def test_207_multistatus(self):
         self.create_program_enrollment('learner-1')
