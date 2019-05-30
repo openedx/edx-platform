@@ -310,7 +310,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             )
         else:
             with patch(
-                'lms.djangoapps.grades.tasks.GradesService',
+                'lms.djangoapps.grades.api',
                 return_value=MockGradesService(mocked_return_value=MagicMock(modified=modified_datetime))
             ):
                 recalculate_subsection_grade_v3.apply(kwargs=self.recalculate_subsection_grade_kwargs)
@@ -343,7 +343,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
                     mock_score=MagicMock(module_type='any_block_type')
                 )
         elif score_db_table == ScoreDatabaseTableEnum.overrides:
-            with patch('lms.djangoapps.grades.tasks.GradesService',
+            with patch('lms.djangoapps.grades.api',
                        return_value=MockGradesService(mocked_return_value=None)) as mock_service:
                 mock_service.get_subsection_grade_override.return_value = None
                 recalculate_subsection_grade_v3.apply(kwargs=self.recalculate_subsection_grade_kwargs)
@@ -653,7 +653,7 @@ class FreezeGradingAfterCourseEndTest(HasCourseWithProblemsMixin, ModuleStoreTes
         with override_waffle_flag(self.freeze_grade_flag, active=freeze_flag_value):
             modified_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=1)
             with patch(
-                'lms.djangoapps.grades.tasks.GradesService',
+                'lms.djangoapps.grades.api',
                 return_value=MockGradesService(mocked_return_value=MagicMock(modified=modified_datetime))
             ) as mock_grade_service:
                 result = recalculate_subsection_grade_v3.apply_async(kwargs=self.recalculate_subsection_grade_kwargs)
