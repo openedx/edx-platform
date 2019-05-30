@@ -1,5 +1,5 @@
 """
-Docstring for clean_xml.py
+Contains functions that handle XML course data
 """
 
 from __future__ import absolute_import, print_function
