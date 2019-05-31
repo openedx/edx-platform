@@ -3,6 +3,8 @@
 Video xmodule tests in mongo.
 """
 
+from __future__ import absolute_import
+
 import json
 import shutil
 from collections import OrderedDict
@@ -10,6 +12,7 @@ from tempfile import mkdtemp
 from uuid import uuid4
 
 import ddt
+import six
 from django.conf import settings
 from django.core.files import File
 from django.core.files.base import ContentFile
@@ -32,11 +35,11 @@ from fs.path import combine
 from lxml import etree
 from mock import MagicMock, Mock, patch
 from path import Path as path
-
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
-from openedx.core.djangoapps.video_pipeline.config.waffle import waffle_flags, DEPRECATE_YOUTUBE
 from waffle.testutils import override_flag
+
+from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE, waffle_flags
+from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import ModuleStoreEnum
@@ -46,11 +49,8 @@ from xmodule.tests.test_import import DummySystem
 from xmodule.tests.test_video import VideoDescriptorTestBase, instantiate_descriptor
 from xmodule.video_module import VideoDescriptor, bumper_utils, video_utils
 from xmodule.video_module.transcripts_utils import Transcript, save_to_store, subs_filename
-from xmodule.video_module.video_module import (
-    EXPORT_IMPORT_COURSE_DIR,
-    EXPORT_IMPORT_STATIC_DIR,
-)
-from xmodule.x_module import STUDENT_VIEW, PUBLIC_VIEW
+from xmodule.video_module.video_module import EXPORT_IMPORT_COURSE_DIR, EXPORT_IMPORT_STATIC_DIR
+from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
 from .helpers import BaseTestXmodule
 from .test_video_handlers import TestVideo
@@ -1409,7 +1409,7 @@ class TestEditorSavedMethod(BaseTestXmodule):
         Verify editor saved when video id contains spaces/tabs.
         """
         self.MODULESTORE = MODULESTORES[default_store]
-        stripped_video_id = unicode(uuid4())
+        stripped_video_id = six.text_type(uuid4())
         unstripped_video_id = u'{video_id}{tabs}'.format(video_id=stripped_video_id, tabs=u'\t\t\t')
         self.metadata.update({
             'edx_video_id': unstripped_video_id
@@ -1438,7 +1438,7 @@ class TestEditorSavedMethod(BaseTestXmodule):
 
         # Now, modify `edx_video_id` and save should override `youtube_id_1_0`.
         old_metadata = own_metadata(item)
-        item.edx_video_id = unicode(uuid4())
+        item.edx_video_id = six.text_type(uuid4())
         item.editor_saved(self.user, old_metadata, None)
         self.assertEqual(item.youtube_id_1_0, 'test_yt_id')
 
@@ -1491,7 +1491,7 @@ class TestVideoDescriptorStudentViewJson(CacheIsolationTestCase):
             'duration': self.TEST_DURATION,
             'status': 'dummy',
             'encoded_videos': [self.TEST_ENCODED_VIDEO],
-            'courses': [unicode(self.video.location.course_key)] if associate_course_in_val else [],
+            'courses': [six.text_type(self.video.location.course_key)] if associate_course_in_val else [],
         })
         self.val_video = get_video_info(self.TEST_EDX_VIDEO_ID)  # pylint: disable=attribute-defined-outside-init
 
@@ -1635,7 +1635,7 @@ class TestVideoDescriptorStudentViewJson(CacheIsolationTestCase):
         self.video.transcripts = transcripts
         self.video.sub = english_sub
         student_view_response = self.get_result()
-        self.assertItemsEqual(student_view_response['transcripts'].keys(), expected_transcripts)
+        self.assertItemsEqual(list(student_view_response['transcripts'].keys()), expected_transcripts)
 
 
 @ddt.ddt

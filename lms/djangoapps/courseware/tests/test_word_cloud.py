@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Word cloud integration tests using mongo modulestore."""
 
+from __future__ import absolute_import
+
 import json
 from operator import itemgetter
 
@@ -224,7 +226,7 @@ class TestWordCloud(BaseTestXmodule):
 
         for user in self.users:
             self.assertListEqual(
-                users_state[user.username]['student_words'].keys(),
+                list(users_state[user.username]['student_words'].keys()),
                 correct_words)
 
     def test_handle_ajax_incorrect_dispatch(self):

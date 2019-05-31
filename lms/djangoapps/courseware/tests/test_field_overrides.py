@@ -2,6 +2,8 @@
 Tests for `field_overrides` module.
 """
 # pylint: disable=missing-docstring
+from __future__ import absolute_import
+
 import unittest
 
 from django.test.utils import override_settings
