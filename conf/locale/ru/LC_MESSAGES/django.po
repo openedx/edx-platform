@@ -207,6 +207,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/shoppingcart/billing_details.html
 #: lms/templates/shoppingcart/receipt.html
+#: lms/djangoapps/branding/forms.py
 msgid "Name"
 msgstr "Имя"
 
@@ -5577,6 +5578,12 @@ msgstr "Новости"
 msgid "Contact"
 msgstr "Контакты"
 
+#: lms/templates/static_templates/contact.html
+#: themes/red-theme/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/footer.html
+msgid "Contact page"
+msgstr "Служба поддержки"
+
 #: lms/djangoapps/branding/api.py
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
@@ -8742,6 +8749,10 @@ msgstr "{id_label} № {item_id}"
 #, python-brace-format
 msgid "Date: {date}"
 msgstr "Дата: {date}"
+
+#: lms/djangoapps/branding/views.py
+msgid "New appeal through the contact form"
+msgstr "Новое обращение через контактную форму"
 
 #: lms/djangoapps/shoppingcart/pdf.py lms/djangoapps/shoppingcart/reports.py
 msgid "Quantity"
@@ -13228,6 +13239,7 @@ msgstr "Информация, необходимая для входа в {studi
 #: themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
+#: lms/djangoapps/static_template_view/forms.py
 msgid "E-mail"
 msgstr "Адрес электронной почты"
 
@@ -20389,6 +20401,7 @@ msgid "(Maximum 128 characters)"
 msgstr "(Не более 128 символов)"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
+#: lms/djangoapps/branding/forms.py
 msgid "Message:"
 msgstr "Текст сообщения:"
 
@@ -20710,6 +20723,7 @@ msgid "We'll send you a one time SMS with a link to download the app."
 msgstr "Мы отправим Вам одноразовое SMS со ссылкой для скачивания приложения."
 
 #: lms/templates/learner_dashboard/text-me-fragment.html
+#: lms/djangoapps/static_template_view/forms.py
 msgid "Mobile phone number"
 msgstr "Номер мобильного телефона "
 
@@ -21465,6 +21479,14 @@ msgid "This page left intentionally blank. Feel free to add your own content."
 msgstr ""
 "Эта страница преднамеренно оставлена пустой. Вы можете заполнить её своими "
 "материалами."
+
+#: lms/templates/static_templates/contact.html
+msgid "Your message was successfully sent."
+msgstr "Ваше сообщение успешно отправленно."
+
+#: lms/templates/static_templates/contact.html
+msgid "Welcome to the ACCEL platform, if you have any questions, wishes or problems, we will be happy to help."
+msgstr "Приветствуем Вас на платформе ACCEL, если у Вас есть вопросы, пожелания или проблемы - будем рады помочь."
 
 #: lms/templates/static_templates/embargo.html
 msgid ""
@@ -22262,6 +22284,10 @@ msgstr ""
 #: themes/stanford-style/lms/templates/emails/activation_email.txt
 msgid "Thank you for signing up for {platform_name}."
 msgstr "Спасибо за регистрацию на {platform_name}."
+
+#: themes/stanford-style/lms/templates/emails/contact_form_email_message.txt
+msgid "This email was automatically sent"
+msgstr "Это письмо было отправлено автоматически"
 
 #: themes/stanford-style/lms/templates/emails/activation_email.txt
 msgid ""

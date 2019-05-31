@@ -1,0 +1,12 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+${_("Full Name: {realname})").format(realname=name)}
+${_("Email: {email}").format(email=email)}
+${_("Phone: {phone}").format(phone=phone)}
+${_("Message:")}
+
+${_("{message}").format(message=message)}
+
+
+----
+${_("This email was automatically sent")}

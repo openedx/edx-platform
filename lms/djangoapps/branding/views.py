@@ -1,10 +1,13 @@
 """Views for the branding app. """
 import logging
 import urllib
+from smtplib import SMTPException
 
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.cache import cache
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.db import transaction
 from django.http import Http404, HttpResponse
@@ -13,13 +16,16 @@ from django.utils import translation
 from django.utils.translation.trans_real import get_supported_language_variant
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.translation import ugettext as _
 
 import branding.api as branding_api
 import courseware.views.views
 import student.views
+from django.views.decorators.http import require_http_methods
 from edxmako.shortcuts import marketing_link, render_to_response
 from openedx.core.djangoapps.lang_pref.api import released_languages
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from .forms import ContactForm
 from util.cache import cache_if_anonymous
 from util.json_request import JsonResponse
 
@@ -309,3 +315,35 @@ def footer(request):
 
     else:
         return HttpResponse(status=406)
+
+
+@require_http_methods(['GET', 'POST'])
+def contact_form(request):
+    """
+    Render 'contact' page.
+    """
+    sent_mail = False
+    form = ContactForm()
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            form_params = form.get_data
+            from_email = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+
+            try:
+                send_mail(
+                    subject=_("New appeal through the contact form"),
+                    message=render_to_string("emails/contact_form_email_message.txt", form_params),
+                    from_email=from_email,
+                    recipient_list=[settings.API_ACCESS_MANAGER_EMAIL],
+                    fail_silently=False
+                )
+            except SMTPException:
+                log.warning("Failure sending contact form e-mail")
+
+            sent_mail = True
+            if sent_mail:
+                form = ContactForm()
+
+    data = {'sent_mail': sent_mail, 'form': form}
+    return render_to_response('static_templates/contact.html', data)

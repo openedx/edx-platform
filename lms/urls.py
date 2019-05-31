@@ -20,6 +20,7 @@ from courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseT
 from debug import views as debug_views
 from django_comment_common.models import ForumsConfig
 from django_openid_auth import views as django_openid_auth_views
+from lms.djangoapps.branding.views import contact_form
 from lms.djangoapps.certificates import views as certificates_views
 from lms.djangoapps.discussion import views as discussion_views
 from lms.djangoapps.instructor.views import coupons as instructor_coupons_views
@@ -74,6 +75,8 @@ urlpatterns = [
 
     # Event tracking endpoints
     url(r'', include('track.urls')),
+
+    url(r'^contact$', contact_form, name='contact_form'),
 
     # Static template view endpoints like blog, faq, etc.
     url(r'', include('static_template_view.urls')),
