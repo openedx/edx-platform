@@ -324,18 +324,6 @@ def contact_form(request):
     """
     sent_mail = False
     form = ContactForm()
-    message = (
-"""
-
-Full Name: {name}
-Email: {email}
-Phone: {phone}
-Message:
-
-{message}
-
-"""
-    )
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
@@ -345,7 +333,7 @@ Message:
             try:
                 send_mail(
                     subject=_("New appeal through the contact form"),
-                    message=message.format(**form_params),
+                    message=render_to_string("emails/contact_form_email_message.txt", form_params),
                     from_email=from_email,
                     recipient_list=[settings.API_ACCESS_MANAGER_EMAIL],
                     fail_silently=False

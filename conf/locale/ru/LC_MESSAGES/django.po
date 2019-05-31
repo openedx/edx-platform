@@ -20402,8 +20402,17 @@ msgstr "(Не более 128 символов)"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 #: lms/djangoapps/branding/forms.py
+#: lms/templates/emails/contact_form_email_message.txt
 msgid "Message:"
 msgstr "Текст сообщения:"
+
+#: lms/templates/emails/contact_form_email_message.txt
+msgid "Full Name:"
+msgstr "Имя:"
+
+#: lms/templates/emails/contact_form_email_message.txt
+msgid "Phone:"
+msgstr "Телефон:"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid ""
