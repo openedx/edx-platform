@@ -78,8 +78,6 @@ log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 SessionStore = import_module(settings.SESSION_ENGINE).SessionStore  # pylint: disable=invalid-name
 
-resend_days = settings.VERIFICATION_EXPIRY_EMAIL['RESEND_DAYS']
-delta_days = settings.VERIFICATION_EXPIRY_EMAIL['DAYS_RANGE']
 # enroll status changed events - signaled to email_marketing.  See email_marketing.tasks for more info
 
 
@@ -2043,6 +2041,9 @@ def update_expiry_email_date(sender, instance, **kwargs):  # pylint: disable=unu
     verification then send email to get the ID verified by setting the
     expiry_email_date field.
     """
+    resend_days = settings.VERIFICATION_EXPIRY_EMAIL['RESEND_DAYS']
+    delta_days = settings.VERIFICATION_EXPIRY_EMAIL['DAYS_RANGE']
+
     if instance.mode == 'verified':
         today = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
         recently_expired_date = today - timedelta(days=delta_days)

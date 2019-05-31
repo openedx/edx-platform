@@ -193,7 +193,7 @@ class TestSendVerificationExpiryEmail(MockS3Mixin, ModuleStoreTestCase):
         today = now().replace(hour=0, minute=0, second=0, microsecond=0)
         verification = self.create_and_submit(user)
         verification.status = 'approved'
-        verification.expiry_date = now() - timedelta(days=self.resend_days*self.default_no_of_emails)
+        verification.expiry_date = now() - timedelta(days=self.resend_days * self.default_no_of_emails)
         verification.expiry_email_date = today - timedelta(days=self.resend_days)
         verification.save()
 
@@ -217,7 +217,7 @@ class TestSendVerificationExpiryEmail(MockS3Mixin, ModuleStoreTestCase):
         today = now().replace(hour=0, minute=0, second=0, microsecond=0)
         verification = self.create_and_submit(user)
         verification.status = 'approved'
-        verification.expiry_date = now() - timedelta(days=self.resend_days*self.default_no_of_emails)
+        verification.expiry_date = now() - timedelta(days=self.resend_days * self.default_no_of_emails)
         verification.expiry_email_date = today - timedelta(days=self.resend_days)
         verification.save()
 
