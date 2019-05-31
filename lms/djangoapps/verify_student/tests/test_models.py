@@ -368,6 +368,57 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
         # No user
         self.assertFalse(attempt.retire_user(user_id=47))
 
+    def test_get_recent_verification(self):
+        """Test that method 'get_recent_verification' of model
+        'SoftwareSecurePhotoVerification' always returns the most
+        recent 'approved' verification based on updated_at set
+        against a user.
+        """
+        user = UserFactory.create()
+        attempt = None
+
+        for _ in range(2):
+            # Make an approved verification
+            attempt = SoftwareSecurePhotoVerification(user=user)
+            attempt.status = 'approved'
+            attempt.save()
+
+        # Test method 'get_recent_verification' returns the most recent
+        # verification attempt based on updated_at
+        recent_verification = SoftwareSecurePhotoVerification.get_recent_verification(user=user)
+        self.assertIsNotNone(recent_verification)
+        self.assertEqual(recent_verification.id, attempt.id)
+
+    def test_no_approved_verification(self):
+        """Test that method 'get_recent_verification' of model
+        'SoftwareSecurePhotoVerification' returns None if no
+        'approved' verification are found
+        """
+        user = UserFactory.create()
+        SoftwareSecurePhotoVerification(user=user)
+
+        result = SoftwareSecurePhotoVerification.get_recent_verification(user=user)
+        self.assertIs(result, None)
+
+    def test_update_expiry_email_date_for_user(self):
+        """Test that method update_expiry_email_date_for_user of
+        model 'SoftwareSecurePhotoVerification' set expiry_email_date
+        if the most recent approved verification is expired.
+        """
+        email_config = getattr(settings, 'VERIFICATION_EXPIRY_EMAIL', {'DAYS_RANGE': 1, 'RESEND_DAYS': 15})
+        user = UserFactory.create()
+        verification = SoftwareSecurePhotoVerification(user=user)
+        verification.expiry_date = now() - timedelta(days=FAKE_SETTINGS['DAYS_GOOD_FOR'])
+        verification.status = 'approved'
+        verification.save()
+
+        self.assertIsNone(verification.expiry_email_date)
+
+        SoftwareSecurePhotoVerification.update_expiry_email_date_for_user(user, email_config)
+        result = SoftwareSecurePhotoVerification.get_recent_verification(user=user)
+
+        self.assertIsNotNone(result.expiry_email_date)
+
 
 class SSOVerificationTest(TestVerification):
     """
