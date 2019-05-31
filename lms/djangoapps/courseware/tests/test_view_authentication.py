@@ -1,9 +1,16 @@
+"""
+Check that view authentication works properly.
+"""
+
+from __future__ import absolute_import
+
 import datetime
 
 import pytz
 from django.urls import reverse
 from mock import patch
 from six import text_type
+from six.moves import range
 
 from courseware.access import has_access
 from courseware.tests.factories import (
@@ -84,7 +91,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         urls.extend([
             reverse('book', kwargs={'course_id': text_type(course.id),
                                     'book_index': index})
-            for index in xrange(len(course.textbooks))
+            for index in range(len(course.textbooks))
         ])
         for url in urls:
             self.assert_request_status_code(200, url)

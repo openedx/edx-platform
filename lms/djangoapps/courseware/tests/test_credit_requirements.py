@@ -2,7 +2,10 @@
 Tests for credit requirement display on the progress page.
 """
 
+from __future__ import absolute_import
+
 import ddt
+import six
 from django.conf import settings
 from django.urls import reverse
 from mock import patch
@@ -168,5 +171,5 @@ class ProgressPageCreditRequirementsTest(SharedModuleStoreTestCase):
 
     def _get_progress_page(self):
         """Load the progress page for the course the user is enrolled in. """
-        url = reverse("progress", kwargs={"course_id": unicode(self.course.id)})
+        url = reverse("progress", kwargs={"course_id": six.text_type(self.course.id)})
         return self.client.get(url)

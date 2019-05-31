@@ -1,14 +1,18 @@
 """
 Test the about xblock
 """
+from __future__ import absolute_import
+
 import datetime
+
 import ddt
 import mock
 import pytz
+import six
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
-from django.urls import reverse
 from django.test.utils import override_settings
+from django.urls import reverse
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
 from six import text_type
@@ -17,9 +21,9 @@ from waffle.testutils import override_switch
 from course_modes.models import CourseMode
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from openedx.features.course_experience.waffle import WAFFLE_NAMESPACE as COURSE_EXPERIENCE_WAFFLE_NAMESPACE
-from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
+from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
+from openedx.features.course_experience.waffle import WAFFLE_NAMESPACE as COURSE_EXPERIENCE_WAFFLE_NAMESPACE
 from shoppingcart.models import Order, PaidCourseRegistration
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, CourseEnrollmentAllowedFactory, UserFactory
@@ -29,8 +33,8 @@ from xmodule.course_module import (
     CATALOG_VISIBILITY_ABOUT,
     CATALOG_VISIBILITY_NONE,
     COURSE_VISIBILITY_PRIVATE,
-    COURSE_VISIBILITY_PUBLIC_OUTLINE,
-    COURSE_VISIBILITY_PUBLIC
+    COURSE_VISIBILITY_PUBLIC,
+    COURSE_VISIBILITY_PUBLIC_OUTLINE
 )
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MIXED_MODULESTORE,
@@ -226,7 +230,7 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
                       .format(pre_requisite_course_about_url, pre_requisite_courses[0]['display']),
                       resp.content.decode(resp.charset).strip('\n'))
 
-        url = reverse('about_course', args=[unicode(pre_requisite_course.id)])
+        url = reverse('about_course', args=[six.text_type(pre_requisite_course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
 
@@ -681,7 +685,7 @@ class CourseAboutTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
 
         # create ccx
         ccx = CcxFactory(course_id=self.course.id, coach=self.coach)
-        ccx_locator = CCXLocator.from_course_locator(self.course.id, unicode(ccx.id))
+        ccx_locator = CCXLocator.from_course_locator(self.course.id, six.text_type(ccx.id))
 
         self.setup_user()
         url = reverse('openedx.course_experience.course_home', args=[ccx_locator])

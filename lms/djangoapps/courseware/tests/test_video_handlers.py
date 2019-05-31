@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Video xmodule tests in mongo."""
 
+from __future__ import absolute_import
+
 import json
 import os
 import tempfile
@@ -9,8 +11,10 @@ from datetime import timedelta
 
 import ddt
 import freezegun
+import six
 from django.core.files.base import ContentFile
 from django.utils.timezone import now
+from edxval import api
 from mock import MagicMock, Mock, patch
 from webob import Request, Response
 
@@ -21,18 +25,11 @@ from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.video_module.transcripts_utils import (
-    Transcript,
-    edxval_api,
-    subs_filename,
-)
+from xmodule.video_module.transcripts_utils import Transcript, edxval_api, subs_filename
 from xmodule.x_module import STUDENT_VIEW
-
-from edxval import api
 
 from .helpers import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
-
 
 TRANSCRIPT = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}
 BUMPER_TRANSCRIPT = {"start": [1], "end": [10], "text": ["A bumper"]}
@@ -321,7 +318,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
         Tests available translations with video component's and val's transcript languages
         while the feature is enabled.
         """
-        for lang_code, in_content_store in dict(transcripts).iteritems():
+        for lang_code, in_content_store in six.iteritems(dict(transcripts)):
             if in_content_store:
                 file_name, __ = os.path.split(self.srt_file.name)
                 _upload_file(self.srt_file, self.item_descriptor.location, file_name)
@@ -531,7 +528,7 @@ class TestTranscriptDownloadDispatch(TestVideo):
         # Assert the actual response
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.text, expected_content)
-        for attribute, value in expected_headers.iteritems():
+        for attribute, value in six.iteritems(expected_headers):
             self.assertEqual(response.headers[attribute], value)
 
 
@@ -801,7 +798,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         # Assert the actual response
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.text, transcript['content'])
-        for attribute, value in expected_headers.iteritems():
+        for attribute, value in six.iteritems(expected_headers):
             self.assertEqual(response.headers[attribute], value)
 
     @patch('xmodule.video_module.VideoModule.translation', Mock(side_effect=NotFoundError))
@@ -1022,7 +1019,7 @@ class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):
             'client_video_id': 'awesome.mp4',
             'duration': 0,
             'encoded_videos': [],
-            'courses': [unicode(self.course.id)]
+            'courses': [six.text_type(self.course.id)]
         })
         api.create_video_transcript(
             video_id=self.EDX_VIDEO_ID,

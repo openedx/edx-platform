@@ -69,6 +69,7 @@ from xmodule.services import ConfigurationService, SettingsService
 from xmodule.tabs import CourseTabList
 from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW
 from edx_proctoring.api import get_exam_configuration_dashboard_url, does_backend_support_onboarding
+from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
 
 __all__ = [
     'orphan_handler', 'xblock_handler', 'xblock_view_handler', 'xblock_outline_handler', 'xblock_container_handler'
@@ -1218,7 +1219,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                 xblock_info.update({
                     'enable_proctored_exams': xblock.enable_proctored_exams,
                     'create_zendesk_tickets': xblock.create_zendesk_tickets,
-                    'enable_timed_exams': xblock.enable_timed_exams
+                    'enable_timed_exams': xblock.enable_timed_exams,
                 })
             elif xblock.category == 'sequential':
                 rules_url = settings.PROCTORING_SETTINGS.get('LINK_URLS', {}).get('online_proctoring_rules', "")
@@ -1239,6 +1240,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                     'default_time_limit_minutes': xblock.default_time_limit_minutes,
                     'proctoring_exam_configuration_link': proctoring_exam_configuration_link,
                     'supports_onboarding': supports_onboarding,
+                    'show_review_rules': SHOW_REVIEW_RULES_FLAG.is_enabled(xblock.location.course_key),
                 })
 
         # Update with gating info

@@ -2,13 +2,17 @@
 Tests related to the Site Configuration feature
 """
 
-from bs4 import BeautifulSoup
+from __future__ import absolute_import
+
 from contextlib import contextmanager
+
+from bs4 import BeautifulSoup
 from django.conf import settings
-from django.urls import reverse
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import patch
 from six import text_type
+from six.moves import range
 
 from course_modes.models import CourseMode
 from courseware.tests.helpers import LoginEnrollmentTestCase
