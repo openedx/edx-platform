@@ -78,6 +78,51 @@ def verify_program_exists(view_func):
     return wrapped_function
 
 
+def verify_course_exists_and_in_program(view_func):
+    """
+    Raises:
+        An api error if the course run specified by the `course_key` kwarg
+        in the wrapped function is not part of the curriculum of the program
+        specified by the `program_uuid` kwarg
+
+    Assumes that the program exists and that a program has exactly one active curriculum
+    """
+    @wraps(view_func)
+    @verify_course_exists
+    def wrapped_function(self, request, **kwargs):
+        """
+        Wraps view function
+        """
+        course_key = CourseKey.from_string(kwargs['course_id'])
+        program_uuid = kwargs['program_uuid']
+        program = get_programs(uuid=program_uuid)
+        active_curricula = [c for c in program['curricula'] if c['is_active']]
+        if not active_curricula:
+            raise self.api_error(
+                status_code=status.HTTP_404_NOT_FOUND,
+                developer_message="the program does not have an active curriculum",
+                error_code='no_active_curriculum'
+            )
+
+        curriculum = active_curricula[0]
+
+        if not is_course_in_curriculum(curriculum, course_key):
+            raise self.api_error(
+                status_code=status.HTTP_404_NOT_FOUND,
+                developer_message="the program's curriculum does not contain the given course",
+                error_code='course_not_in_program'
+            )
+        return view_func(self, request, **kwargs)
+
+    def is_course_in_curriculum(curriculum, course_key):
+        for course in curriculum['courses']:
+            for course_run in course['course_runs']:
+                if CourseKey.from_string(course_run["key"]) == course_key:
+                    return True
+
+    return wrapped_function
+
+
 class ProgramEnrollmentPagination(CursorPagination):
     """
     Pagination class for Program Enrollments.
@@ -513,30 +558,6 @@ class ProgramCourseRunSpecificViewMixin(ProgramSpecificViewMixin):
     A mixin for views that operate on or within a specific course run in a program
     """
 
-    def check_course_existence_and_membership(self):
-        """
-        Attempting to look up the course and program will trigger 404 responses if:
-        - The program does not exist
-        - The course run (course_key) does not exist
-        - The course run is not part of the program
-        """
-        self.course_run  # pylint: disable=pointless-statement
-
-    @property
-    def course_run(self):
-        """
-        The course run specified by the `course_id` URL parameter.
-        """
-        try:
-            CourseOverview.get_from_id(self.course_key)
-        except CourseOverview.DoesNotExist:
-            raise Http404()
-        for course in self.program["courses"]:
-            for course_run in course["course_runs"]:
-                if self.course_key == CourseKey.from_string(course_run["key"]):
-                    return course_run
-        raise Http404()
-
     @property
     def course_key(self):
         """
@@ -643,6 +664,8 @@ class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpec
         serializer = ProgramCourseEnrollmentListSerializer(paginated_enrollments, many=True)
         return self.get_paginated_response(serializer.data)
 
+    @verify_program_exists
+    @verify_course_exists_and_in_program
     def post(self, request, program_uuid=None, course_id=None):
         """
         Enroll a list of students in a course in a program
@@ -653,6 +676,8 @@ class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpec
             self.enroll_learner_in_course
         )
 
+    @verify_program_exists
+    @verify_course_exists_and_in_program
     # pylint: disable=unused-argument
     def patch(self, request, program_uuid=None, course_id=None):
         """
@@ -669,7 +694,6 @@ class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpec
         Process a list of program course enrollment request objects
         and create or modify enrollments based on method
         """
-        self.check_course_existence_and_membership()
         results = {}
         seen_student_keys = set()
         enrollments = []
