@@ -62,7 +62,7 @@ username = get_enterprise_learner_generic_name(request) or student.username
                 </div>
                 % endif
                 <h2 class="hd hd-2 progress-certificates-title">
-                    ${_("Course Progress for Student '{username}' ({email})").format(username=username, email=student.email)}
+                    ${_("Course Progress for '{username}' ({email})").format(username=username, email=student.email)}
                 </h2>
                 % if course_expiration_fragment:
                     ${HTML(course_expiration_fragment.content)}
