@@ -12,7 +12,8 @@ from django.urls import reverse
 from django.db import models
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _u
+from django.utils.translation import ugettext_lazy as _
 
 from edxmako.shortcuts import render_to_string
 from model_utils.models import TimeStampedModel
@@ -161,7 +162,7 @@ def _send_new_pending_email(instance):
     message = render_to_string('api_admin/api_access_request_email_new_request.txt', context)
     try:
         send_mail(
-            _('API access request from {company}').format(company=instance.company_name),
+            _u(u'API access request from {company}').format(company=instance.company_name),
             message,
             settings.API_ACCESS_FROM_EMAIL,
             [settings.API_ACCESS_MANAGER_EMAIL],
@@ -196,7 +197,7 @@ def _send_decision_email(instance):
     )
     try:
         send_mail(
-            _('API access request'),
+            _u('API access request'),
             message,
             settings.API_ACCESS_FROM_EMAIL,
             [instance.user.email],
