@@ -153,7 +153,7 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
     Request body:
         * The request body will be a list of one or more students to enroll with the following schema:
             {
-                'status': A choice of the following statuses: ['enrolled', 'pending', 'withdrawn', 'suspended'],
+                'status': A choice of the following statuses: ['enrolled', 'pending', 'canceled', 'suspended'],
                 student_key: string representation of a learner in partner systems,
                 'curriculum_uuid': string representation of a curriculum
             }
@@ -164,7 +164,7 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
                     "external_user_key": "123",
                     "curriculum_uuid": "2d7de549-b09e-4e50-835d-4c5c5080c566"
                 },{
-                    "status": "withdrawn",
+                    "status": "canceled",
                     "external_user_key": "456",
                     "curriculum_uuid": "2d7de549-b09e-4e50-835d-4c5c5080c566"
                 },{
@@ -185,18 +185,18 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
             * success statuses:
                 * 'enrolled'
                 * 'pending'
-                * 'withdrawn'
+                * 'canceled'
                 * 'suspended'
             * failure statuses:
                 * 'duplicated' - the request body listed the same learner twice
                 * 'conflict' - there is an existing enrollment for that learner, curriculum and program combo
-                * 'invalid-status' - a status other than 'enrolled', 'pending', 'withdrawn', 'suspended' was entered
+                * 'invalid-status' - a status other than 'enrolled', 'pending', 'canceled', 'suspended' was entered
       * 201: CREATED - All students were successfully enrolled.
         * Example json response:
             {
                 '123': 'enrolled',
                 '456': 'pending',
-                '789': 'withdrawn,
+                '789': 'canceled,
                 'abc': 'suspended'
             }
       * 207: MULTI-STATUS - Some students were successfully enrolled while others were not.
@@ -221,7 +221,7 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
     Request body:
         * The request body will be a list of one or more students with their updated enrollment status:
             {
-                'status': A choice of the following statuses: ['enrolled', 'pending', 'withdrawn', 'suspended'],
+                'status': A choice of the following statuses: ['enrolled', 'pending', 'canceled', 'suspended'],
                 student_key: string representation of a learner in partner systems
             }
         Example:
@@ -230,7 +230,7 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
                     "status": "enrolled",
                     "external_user_key": "123",
                 },{
-                    "status": "withdrawn",
+                    "status": "canceled",
                     "external_user_key": "456",
                 },{
                     "status": "pending",
@@ -248,19 +248,19 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
             * success statuses:
                 * 'enrolled'
                 * 'pending'
-                * 'withdrawn'
+                * 'canceled'
                 * 'suspended'
             * failure statuses:
                 * 'duplicated' - the request body listed the same learner twice
                 * 'conflict' - there is an existing enrollment for that learner, curriculum and program combo
-                * 'invalid-status' - a status other than 'enrolled', 'pending', 'withdrawn', 'suspended' was entered
+                * 'invalid-status' - a status other than 'enrolled', 'pending', 'canceled', 'suspended' was entered
                 * 'not-in-program' - the user is not in the program and cannot be updated
       * 201: CREATED - All students were successfully enrolled.
         * Example json response:
             {
                 '123': 'enrolled',
                 '456': 'pending',
-                '789': 'withdrawn,
+                '789': 'canceled,
                 'abc': 'suspended'
             }
       * 207: MULTI-STATUS - Some students were successfully enrolled while others were not.

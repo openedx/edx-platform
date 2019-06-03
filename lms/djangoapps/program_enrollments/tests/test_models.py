@@ -85,7 +85,7 @@ class ProgramEnrollmentModelTests(TestCase):
         """
         Test that the external_user_key is successfully retired for a user's program enrollments and history.
         """
-        new_status = 'withdrawn'
+        new_status = 'canceled'
 
         self.enrollment.status = new_status
         self.enrollment.save()
