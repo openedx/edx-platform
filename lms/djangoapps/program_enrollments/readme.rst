@@ -13,10 +13,10 @@ Considerations:
             - `enrolled`
             - `pending`
             - `suspended`
-            - `withdrawn`
+            - `canceled`
     - ProgramCourseEnrollments
         -  Valid values for the `status` field:
             - `enrolled`
             - `pending`
             - `suspended`
-            - `withdrawn`
+            - `canceled`
