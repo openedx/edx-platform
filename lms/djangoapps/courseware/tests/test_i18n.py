@@ -2,13 +2,15 @@
 Tests i18n in courseware
 """
 
+from __future__ import absolute_import
+
 import json
 import re
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.urls import reverse, reverse_lazy
 from django.test.client import Client
+from django.urls import reverse, reverse_lazy
 from django.utils import translation
 
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig

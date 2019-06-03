@@ -990,7 +990,7 @@ class ProgramEnrollmentViewPatchTests(APITestCase):
             enrollments[user_key] = instance
 
         post_data = [
-            {REQUEST_STUDENT_KEY: 'user-1', 'status': 'withdrawn'},
+            {REQUEST_STUDENT_KEY: 'user-1', 'status': 'canceled'},
             {REQUEST_STUDENT_KEY: 'user-2', 'status': 'suspended'},
             {REQUEST_STUDENT_KEY: 'user-3', 'status': 'enrolled'},
         ]
@@ -1004,7 +1004,7 @@ class ProgramEnrollmentViewPatchTests(APITestCase):
 
         expected_statuses = {
             'user-0': 'pending',
-            'user-1': 'withdrawn',
+            'user-1': 'canceled',
             'user-2': 'suspended',
             'user-3': 'enrolled',
         }
@@ -1012,7 +1012,7 @@ class ProgramEnrollmentViewPatchTests(APITestCase):
             assert expected_statuses[user_key] == enrollment.status
 
         expected_response = {
-            'user-1': 'withdrawn',
+            'user-1': 'canceled',
             'user-2': 'suspended',
             'user-3': 'enrolled',
         }
@@ -1138,7 +1138,7 @@ class ProgramEnrollmentViewPatchTests(APITestCase):
 
         patch_data = [
             self.student_enrollment('new', 'user-1'),
-            self.student_enrollment('withdrawn', 'user-3'),
+            self.student_enrollment('canceled', 'user-3'),
             self.student_enrollment('enrolled', 'user-who-is-not-in-program'),
         ]
 
@@ -1153,7 +1153,7 @@ class ProgramEnrollmentViewPatchTests(APITestCase):
             'user-0': 'pending',
             'user-1': 'pending',
             'user-2': 'pending',
-            'user-3': 'withdrawn',
+            'user-3': 'canceled',
         }
         for user_key, enrollment in enrollments.items():
             assert expected_statuses[user_key] == enrollment.status
@@ -1161,7 +1161,7 @@ class ProgramEnrollmentViewPatchTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_207_MULTI_STATUS)
         self.assertEqual(response.data, {
             'user-1': 'invalid-status',
-            'user-3': 'withdrawn',
+            'user-3': 'canceled',
             'user-who-is-not-in-program': 'not-in-program',
         })
 
@@ -1264,7 +1264,7 @@ class ProgramCourseEnrollmentOverviewViewTests(ProgramCacheTestCaseMixin, Shared
     @ddt.data(
         'pending',
         'suspended',
-        'withdrawn',
+        'canceled',
     )
     def test_multiple_enrollments_with_not_enrolled(self, program_enrollment_status):
         # add a second program enrollment

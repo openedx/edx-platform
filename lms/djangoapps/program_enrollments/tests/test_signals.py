@@ -44,7 +44,7 @@ class ProgramEnrollmentRetireSignalTests(ModuleStoreTestCase):
             enrollment = ProgramEnrollmentFactory(user=user)
         else:
             enrollment = ProgramEnrollmentFactory()
-        for status in ['pending', 'suspended', 'withdrawn', 'enrolled']:
+        for status in ['pending', 'suspended', 'canceled', 'enrolled']:
             enrollment.status = status
             enrollment.save()
         return enrollment

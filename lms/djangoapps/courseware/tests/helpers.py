@@ -1,9 +1,12 @@
 """
 Helpers for courseware tests.
 """
-from datetime import timedelta
-import json
+from __future__ import absolute_import
 
+import json
+from datetime import timedelta
+
+import six
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.test import TestCase
@@ -11,6 +14,8 @@ from django.test.client import Client, RequestFactory
 from django.urls import reverse
 from django.utils.timezone import now
 from six import text_type
+from six.moves import range
+from xblock.field_data import DictFieldData
 
 from courseware.access import has_access
 from courseware.masquerade import handle_ajax, setup_masquerade
@@ -20,10 +25,9 @@ from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.features.course_duration_limits.access import EXPIRATION_DATE_FORMAT_STR
-from student.models import Registration, CourseEnrollment
+from student.models import CourseEnrollment, Registration
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.date_utils import strftime_localized
-from xblock.field_data import DictFieldData
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -88,7 +92,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
 
         self.item_descriptor.xmodule_runtime = self.new_module_runtime()
 
-        self.item_url = unicode(self.item_descriptor.location)
+        self.item_url = six.text_type(self.item_descriptor.location)
 
     def setup_course(self):
         self.course = CourseFactory.create(data=self.COURSE_DATA)
@@ -134,7 +138,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
         """Return item url with dispatch."""
         return reverse(
             'xblock_handler',
-            args=(unicode(self.course.id), quote_slashes(self.item_url), 'xmodule_handler', dispatch)
+            args=(six.text_type(self.course.id), quote_slashes(self.item_url), 'xmodule_handler', dispatch)
         )
 
 
@@ -342,7 +346,7 @@ def masquerade_as_group_member(user, course, partition_id, group_id):
         user,
         data={"role": "student", "user_partition_id": partition_id, "group_id": group_id}
     )
-    response = handle_ajax(request, unicode(course.id))
+    response = handle_ajax(request, six.text_type(course.id))
     setup_masquerade(request, course.id, True)
     return response.status_code
 

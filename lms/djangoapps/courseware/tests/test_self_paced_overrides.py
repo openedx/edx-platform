@@ -1,5 +1,7 @@
 """Tests for self-paced course due date overrides."""
 # pylint: disable=missing-docstring
+from __future__ import absolute_import
+
 import datetime
 
 import pytz

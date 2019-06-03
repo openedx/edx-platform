@@ -2,19 +2,23 @@
 """
 Tests for course access
 """
-import itertools
+from __future__ import absolute_import
 
 import datetime
+import itertools
+
 import ddt
 import mock
 import pytz
+import six
+from crum import set_current_request
 from django.conf import settings
-from django.urls import reverse
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
-from crum import set_current_request
+from six.moves import range
 
 from courseware.courses import (
     course_open_for_self_enrollment,
@@ -27,7 +31,7 @@ from courseware.courses import (
     get_course_overview_with_access,
     get_course_with_access,
     get_courses,
-    get_current_child,
+    get_current_child
 )
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
@@ -40,8 +44,8 @@ from xmodule.modulestore.django import _get_modulestore_branch_setting, modulest
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from xmodule.modulestore.xml_importer import import_course_from_xml
-from xmodule.tests.xml import factories as xml
 from xmodule.tests.xml import XModuleXmlImportTest
+from xmodule.tests.xml import factories as xml
 
 CMS_BASE_TEST = 'testcms'
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
@@ -67,9 +71,9 @@ class CoursesTest(ModuleStoreTestCase):
             org='org', number='num', display_name='name'
         )
 
-        cms_url = u"//{}/course/{}".format(CMS_BASE_TEST, unicode(self.course.id))
+        cms_url = u"//{}/course/{}".format(CMS_BASE_TEST, six.text_type(self.course.id))
         self.assertEqual(cms_url, get_cms_course_link(self.course))
-        cms_url = u"//{}/course/{}".format(CMS_BASE_TEST, unicode(self.course.location))
+        cms_url = u"//{}/course/{}".format(CMS_BASE_TEST, six.text_type(self.course.location))
         self.assertEqual(cms_url, get_cms_block_link(self.course, 'course'))
 
     @ddt.data(GET_COURSE_WITH_ACCESS, GET_COURSE_OVERVIEW_WITH_ACCESS)
@@ -389,7 +393,7 @@ class CourseInstantiationTests(ModuleStoreTestCase):
 
         self.factory = RequestFactory()
 
-    @ddt.data(*itertools.product(xrange(5), [ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split], [None, 0, 5]))
+    @ddt.data(*itertools.product(range(5), [ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split], [None, 0, 5]))
     @ddt.unpack
     def test_repeated_course_module_instantiation(self, loops, default_store, course_depth):
 
@@ -400,12 +404,12 @@ class CourseInstantiationTests(ModuleStoreTestCase):
             __ = ItemFactory(parent=section, category='problem')
 
         fake_request = self.factory.get(
-            reverse('progress', kwargs={'course_id': unicode(course.id)})
+            reverse('progress', kwargs={'course_id': six.text_type(course.id)})
         )
 
         course = modulestore().get_course(course.id, depth=course_depth)
 
-        for _ in xrange(loops):
+        for _ in range(loops):
             field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
                 course.id, self.user, course, depth=course_depth
             )
@@ -448,5 +452,5 @@ class TestGetCourseChapters(ModuleStoreTestCase):
         self.assertEqual(len(course_chapter_ids), 2)
         self.assertEqual(
             course_chapter_ids,
-            [unicode(child) for child in course.children]
+            [six.text_type(child) for child in course.children]
         )

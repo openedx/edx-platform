@@ -1,6 +1,8 @@
 """
 Test for lms courseware app, module data (runtime data storage for XBlocks)
 """
+from __future__ import absolute_import
+
 import json
 from functools import partial
 
@@ -18,14 +20,9 @@ from courseware.models import (
     XModuleStudentPrefsField,
     XModuleUserStateSummaryField
 )
+from courseware.tests.factories import StudentInfoFactory
 from courseware.tests.factories import StudentModuleFactory as cmfStudentModuleFactory
-from courseware.tests.factories import (
-    StudentInfoFactory,
-    StudentPrefsFactory,
-    UserStateSummaryFactory,
-    course_id,
-    location
-)
+from courseware.tests.factories import StudentPrefsFactory, UserStateSummaryFactory, course_id, location
 from student.tests.factories import UserFactory
 
 

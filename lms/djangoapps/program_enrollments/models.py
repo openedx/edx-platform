@@ -33,7 +33,7 @@ class ProgramEnrollment(TimeStampedModel):  # pylint: disable=model-missing-unic
         ('enrolled', 'enrolled'),
         ('pending', 'pending'),
         ('suspended', 'suspended'),
-        ('withdrawn', 'withdrawn'),
+        ('canceled', 'canceled'),
     )
 
     class Meta(object):

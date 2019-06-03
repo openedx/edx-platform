@@ -19,7 +19,7 @@ class TestExpireWaitingEnrollments(TestCase):
         cls.command = expire_waiting_enrollments.Command()
 
     @ddt.data(90, None)
-    @patch('lms.djangoapps.program_enrollments.tasks.expire_waiting_enrollments')
+    @patch('lms.djangoapps.program_enrollments.tasks.expire_waiting_enrollments', autospec=True)
     def test_task_fired_with_args(self, expire_days_argument, mock_task):
         mock_task.return_value = {}
         expected_expiration = 60
@@ -30,10 +30,10 @@ class TestExpireWaitingEnrollments(TestCase):
         else:
             call_command(command)
 
-        mock_task.apply_async.assert_called_with(args=[expected_expiration])
+        mock_task.assert_called_with(expected_expiration)
 
-    @patch('lms.djangoapps.program_enrollments.tasks.expire_waiting_enrollments')
+    @patch('lms.djangoapps.program_enrollments.tasks.expire_waiting_enrollments', autospec=True)
     def test_task_failure_fails_command(self, mock_task):
-        mock_task.apply_async.side_effect = Exception('BOOM!')
+        mock_task.side_effect = Exception('BOOM!')
         with self.assertRaises(Exception):
             call_command('expire_waiting_enrollments')
