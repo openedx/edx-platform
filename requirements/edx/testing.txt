@@ -121,7 +121,7 @@ edx-django-utils==1.0.3
 edx-drf-extensions==2.2.1
 edx-enterprise==1.6.0
 edx-i18n-tools==0.4.8
-edx-lint==1.2.1
+git+https://github.com/edx/edx-lint.git@314c377710932e44a3d47011e96afbb6628027ec#egg=edx-lint==1.2.1
 edx-milestones==0.1.13
 edx-oauth2-provider==1.2.2
 edx-opaque-keys[django]==0.4.4
