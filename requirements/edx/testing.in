@@ -48,4 +48,4 @@ tox                       # virtualenv management for tests
 tox-battery               # Makes tox aware of requirements file changes
 transifex-client          # Command-line interface for the Transifex localization service
 
-git+https://github.com/edx/edx-lint.git@314c377710932e44a3d47011e96afbb6628027ec#egg=edx-lint==1.2.1
+git+https://github.com/edx/edx-lint.git@697c2c3cf90e4dc4d6ade3de7ff49e7a4340d1ab#egg=edx-lint==1.2.1
