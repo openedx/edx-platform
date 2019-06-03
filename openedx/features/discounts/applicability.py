@@ -10,6 +10,7 @@ not other discounts like coupons or enterprise/program offers configured in ecom
 """
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
+from openedx.features.discounts.models import DiscountRestrictionConfig
 
 # .. feature_toggle_name: discounts.enable_discounting
 # .. feature_toggle_type: flag
@@ -48,6 +49,10 @@ def can_receive_discount(user, course):  # pylint: disable=unused-argument
     modes_dict = CourseMode.modes_for_course_dict(course=course, include_expired=False)
     verified_mode = modes_dict.get('verified', None)
     if not verified_mode:
+        return False
+
+    # Site, Partner, Course or Course Run not excluded from lms-controlled discounts
+    if DiscountRestrictionConfig.disabled_for_course_stacked_config(course):
         return False
 
     return True
