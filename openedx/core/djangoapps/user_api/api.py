@@ -120,14 +120,6 @@ def get_login_session_form(request):
         restrictions={'max_length': DEFAULT_MAX_PASSWORD_LENGTH}
     )
 
-    form_desc.add_field(
-        "remember",
-        field_type="checkbox",
-        label=_("Remember me"),
-        default=False,
-        required=False,
-    )
-
     return form_desc
 
 
