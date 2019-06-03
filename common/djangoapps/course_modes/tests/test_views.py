@@ -422,9 +422,10 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         bannerText = u'''<div class="first-purchase-offer-banner"><span class="first-purchase-offer-banner-bold">
                      15% off your first upgrade.</span> Discount automatically applied.</div>'''
         button = u'''<button type="submit" name="verified_mode">
-                         Pursue a Verified Certificate ($8.50 USD
-                             <del>$10 USD</del>)
-                     </button>'''
+                    <span>Pursue a Verified Certificate</span>
+                    (<span class="upgrade-price-string">$8.50 USD</span>
+                    <del> <span class="upgrade-price-string">$10 USD</span></del>)
+                    </button>'''
         self.assertContains(response, bannerText, html=True)
         self.assertContains(response, button, html=True)
 
