@@ -5924,6 +5924,10 @@ msgstr "Este enlace se abrirá en una nueva ventana o pestaña del navegador"
 msgid "This link will open in a modal window"
 msgstr "Este enlace se abrirá en una ventana modal"
 
+#: cms/static/js/certificates/collections/certificates.js
+msgid "Could not parse certificate JSON. %(message)s"
+msgstr "No fue posible leer el archivo JSON del certificado. %(message)s"
+
 #: cms/static/js/certificates/models/certificate.js
 msgid "Certificate name is required."
 msgstr "Se requiere un nombre para el certificado."

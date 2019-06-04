@@ -272,7 +272,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-30 20:42+0000\n"
+"POT-Creation-Date: 2018-12-16 20:42+0000\n"
 "PO-Revision-Date: 2018-08-18 07:26+0000\n"
 "Last-Translator: John Burke <johnb@matinee.co.uk>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
@@ -1035,13 +1035,6 @@ msgid ""
 "Check your {email_start}{email}{email_end} inbox for an account activation "
 "link from {platform_name}. If you need help, contact "
 "{link_start}{platform_name} Support{link_end}."
-msgstr ""
-
-#: common/djangoapps/student/views/dashboard.py
-#, python-brace-format
-msgid ""
-"Add a recovery email to retain access when single-sign on is not available. "
-"Go to {link_start}your Account Settings{link_end}."
 msgstr ""
 
 #: common/djangoapps/student/views/dashboard.py
@@ -3040,13 +3033,13 @@ msgstr "Mise en correspondance des sujets de discussions"
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
-"category must be unique. In \"id\" values, the only special characters that "
-"are supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
+"must be unique. In \"id\" values, the only special characters that are "
+"supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3657,8 +3650,8 @@ msgstr ""
 "Si le partage du tableau de bord sur les réseaux sociaux et les URLs de "
 "cours personnalisés sont activés, vous pouvez fournir un URL (comme le URL "
 "d'une page d'information de cours) que les médias sociaux peuvent partager. "
-"Les URLs doivent être complets. Par exemple: "
-"http://www.edx.org/course/Introduction-to-MOOCs-ITM001"
+"Les URLs doivent être complets. Par exemple: http://www.edx.org/course"
+"/Introduction-to-MOOCs-ITM001"
 
 #: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
 msgid "Course Language"
@@ -4154,8 +4147,8 @@ msgid ""
 "on this setting."
 msgstr ""
 "Ajouter la paire clé/valeur pour n'importe quel paramètre personnalisé, tel "
-"que la page à laquelle un livre électronique devrait ouvrir ou la couleur "
-"d'arrière-plan de ce composant.<br />Voir {docs_anchor_open}the edX LTI "
+"que la page à laquelle un livre électronique devrait ouvrir ou la couleur d"
+"'arrière-plan de ce composant.<br />Voir {docs_anchor_open}the edX LTI "
 "documentation{anchor_close} pour plus de détails sur ce paramètre."
 
 #: common/lib/xmodule/xmodule/lti_module.py
@@ -11589,19 +11582,6 @@ msgid "The email address you used to register with {platform_name}"
 msgstr ""
 "L'adresse email utilisée lors de votre inscription sur {platform_name}"
 
-#. Translators: This label appears above a field on the password reset
-#. form meant to hold the user's email address.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Secondary email"
-msgstr ""
-
-#: openedx/core/djangoapps/user_api/api.py
-#, python-brace-format
-msgid ""
-"Secondary email address you registered with {platform_name} using account "
-"settings page"
-msgstr ""
-
 #: openedx/core/djangoapps/user_api/api.py lms/templates/login.html
 msgid "Remember me"
 msgstr "Se souvenir de moi"
@@ -11858,6 +11838,18 @@ msgid "There was an error receiving your login information. Please email us."
 msgstr ""
 "Il y a une erreur avec vos informations de connexion. Merci de nous envoyer "
 "un mail."
+
+#: openedx/core/djangoapps/user_authn/views/login.py
+msgid ""
+"Your password has expired due to password policy on this account. You must "
+"reset your password before you can log in again. Please click the \"Forgot "
+"Password\" link on this page to reset your password before logging in again."
+msgstr ""
+"Votre mot de passe a expiré en raison de la politique de mot de passe sur ce"
+" compte. Vous devez réinitialiser votre mot de passe avant de pouvoir vous "
+"connecter à nouveau. Veuillez cliquer sur le lien \"Mot de passe oublié\" "
+"sur cette page pour réinitialiser votre mot de passe avant de vous connecter"
+" à nouveau."
 
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format

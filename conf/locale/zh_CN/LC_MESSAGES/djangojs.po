@@ -5486,6 +5486,10 @@ msgstr "该链接将在新浏览器窗口/标签页中打开"
 msgid "This link will open in a modal window"
 msgstr "该链接将在模式窗口中打开"
 
+#: cms/static/js/certificates/collections/certificates.js
+msgid "Could not parse certificate JSON. %(message)s"
+msgstr "无法解析证书JSON. %(message)s"
+
 #: cms/static/js/certificates/models/certificate.js
 msgid "Certificate name is required."
 msgstr "证书名称必填。"

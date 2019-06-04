@@ -199,7 +199,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-30 20:42+0000\n"
+"POT-Creation-Date: 2018-12-16 20:42+0000\n"
 "PO-Revision-Date: 2018-07-23 07:15+0000\n"
 "Last-Translator: Muhammad Ayub khan <ayubkhan@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -955,13 +955,6 @@ msgid ""
 "Check your {email_start}{email}{email_end} inbox for an account activation "
 "link from {platform_name}. If you need help, contact "
 "{link_start}{platform_name} Support{link_end}."
-msgstr ""
-
-#: common/djangoapps/student/views/dashboard.py
-#, python-brace-format
-msgid ""
-"Add a recovery email to retain access when single-sign on is not available. "
-"Go to {link_start}your Account Settings{link_end}."
 msgstr ""
 
 #: common/djangoapps/student/views/dashboard.py
@@ -3033,13 +3026,13 @@ msgstr "تعيين موضوع المناقشة"
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
-"category must be unique. In \"id\" values, the only special characters that "
-"are supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
+"must be unique. In \"id\" values, the only special characters that are "
+"supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -11366,19 +11359,6 @@ msgstr "username@domain.com"
 msgid "The email address you used to register with {platform_name}"
 msgstr "عنوان البريد الإلكتروني الذي استخدمته للتسجيل في {platform_name}"
 
-#. Translators: This label appears above a field on the password reset
-#. form meant to hold the user's email address.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Secondary email"
-msgstr ""
-
-#: openedx/core/djangoapps/user_api/api.py
-#, python-brace-format
-msgid ""
-"Secondary email address you registered with {platform_name} using account "
-"settings page"
-msgstr ""
-
 #: openedx/core/djangoapps/user_api/api.py lms/templates/login.html
 msgid "Remember me"
 msgstr "تذكُّر بياناتي"
@@ -11625,6 +11605,17 @@ msgid "There was an error receiving your login information. Please email us."
 msgstr ""
 "نعتذر لحدوث خطأ أثناء تلقّي بيانات تسجيل دخولك. يُرجى مراسلتنا على عنوان "
 "بريدنا الإلكتروني."
+
+#: openedx/core/djangoapps/user_authn/views/login.py
+msgid ""
+"Your password has expired due to password policy on this account. You must "
+"reset your password before you can log in again. Please click the \"Forgot "
+"Password\" link on this page to reset your password before logging in again."
+msgstr ""
+"انتهت صلاحية كلمة المرور الخاصة بك حسب سياسة كلمة المرور المعتمدة لهذا "
+"الحساب. لذا يُرجى منك إعادة ضبط كلمة المرور لتتمكّن من تسجيل دخولك مرّة "
+"أخرى. يُرجى الضغط على رابط \"نسيت كلمة المرور\" الموجود على هذه الصفحة لتعيد"
+" ضبط كلمة المرور قبل إعادة محاولة تسجيل الدخول."
 
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
