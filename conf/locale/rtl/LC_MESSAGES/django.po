@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-02 15:30+0000\n"
-"PO-Revision-Date: 2019-01-02 15:30:42.381305\n"
+"POT-Creation-Date: 2019-06-03 19:01+0000\n"
+"PO-Revision-Date: 2019-06-03 19:01:38.490808\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -809,6 +809,14 @@ msgid ""
 msgstr ""
 "شيي ش قثذخدثقغ ثوشهم فخ قثفشهر شذذثسس صاثر سهرلمث-سهلر خر هس رخف شدشهمشزمث. "
 "لخ فخ {link_start}غخعق شذذخعرف سثففهرلس{link_end}."
+
+#: common/djangoapps/student/views/dashboard.py
+msgid ""
+"Recovery email is not activated yet. Kindly visit your email and follow the "
+"instructions to activate it."
+msgstr ""
+"قثذخدثقغ ثوشهم هس رخف شذفهدشفثي غثف. نهريمغ دهسهف غخعق ثوشهم شري بخممخص فاث "
+"هرسفقعذفهخرس فخ شذفهدشفث هف."
 
 #: common/djangoapps/student/views/dashboard.py
 #, python-brace-format
@@ -2394,8 +2402,9 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
-#: cms/templates/index.html lms/templates/help_modal.html
-#: lms/templates/manage_user_standing.html lms/templates/register-shib.html
+#: cms/templates/index.html cms/templates/videos_index_pagination.html
+#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
+#: lms/templates/register-shib.html
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/peer_grading/peer_grading_problem.html
@@ -2671,6 +2680,15 @@ msgid "Configure list of sources"
 msgstr "ذخربهلعقث مهسف خب سخعقذثس"
 
 #: common/lib/xmodule/xmodule/course_module.py
+#, python-brace-format
+msgid ""
+"The selected proctoring provider, {proctoring_provider}, is not a valid "
+"provider. Please select from one of {available_providers}."
+msgstr ""
+"فاث سثمثذفثي حقخذفخقهرل حقخدهيثق, {proctoring_provider}, هس رخف ش دشمهي "
+"حقخدهيثق. حمثشسث سثمثذف بقخو خرث خب {available_providers}."
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "LTI Passports"
 msgstr "مفه حشسسحخقفس"
 
@@ -2830,23 +2848,23 @@ msgstr "يهسذعسسهخر فخحهذ وشححهرل"
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
-"category must be unique. In \"id\" values, the only special characters that "
-"are supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
+"must be unique. In \"id\" values, the only special characters that are "
+"supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 "ثرفثق يهسذعسسهخر ذشفثلخقهثس هر فاث بخممخصهرل بخقوشف: \"ذشفثلخقغرشوث\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. بخق "
-"ثطشوحمث, خرث يهسذعسسهخر ذشفثلخقغ وشغ زث \"مغيهشر وخيث\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. فاث \"هي\" دشمعث بخق ثشذا "
-"ذشفثلخقغ وعسف زث عرهضعث. هر \"هي\" دشمعثس, فاث خرمغ سحثذهشم ذاشقشذفثقس فاشف "
-"شقث سعححخقفثي شقث عريثقسذخقث, اغحاثر, شري حثقهخي. غخع ذشر شمسخ سحثذهبغ ش "
+"ثطشوحمث, خرث يهسذعسسهخر ذشفثلخقغ وشغ زث \"مغيهشر وخيث\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. فاث \"هي\" دشمعث بخق ثشذا ذشفثلخقغ "
+"وعسف زث عرهضعث. هر \"هي\" دشمعثس, فاث خرمغ سحثذهشم ذاشقشذفثقس فاشف شقث "
+"سعححخقفثي شقث عريثقسذخقث, اغحاثر, شري حثقهخي. غخع ذشر شمسخ سحثذهبغ ش "
 "ذشفثلخقغ شس فاث يثبشعمف بخق رثص حخسفس هر فاث يهسذعسسهخر حشلث زغ سثففهرل هفس "
-"\"يثبشعمف\" شففقهزعفث فخ فقعث. بخق ثطشوحمث, \"مغيهشر وخيث\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"يثبشعمف\" شففقهزعفث فخ فقعث. بخق ثطشوحمث, \"مغيهشر وخيث\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Sorting Alphabetical"
@@ -3361,6 +3379,8 @@ msgstr ""
 msgid "Course Visibility In Catalog"
 msgstr "ذخعقسث دهسهزهمهفغ هر ذشفشمخل"
 
+#. Translators: the quoted words 'both', 'about', and 'none' must be
+#. left untranslated.  Leave them as English words.
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Defines the access permissions for showing the course in the course catalog."
@@ -3372,22 +3392,6 @@ msgstr ""
 " فاهس ذشر زث سثف فخ خرث خب فاقثث دشمعثس: 'زخفا' (ساخص هر ذشفشمخل شري شممخص "
 "شذذثسس فخ شزخعف حشلث), 'شزخعف' (خرمغ شممخص شذذثسس فخ شزخعف حشلث), 'رخرث' (يخ"
 " رخف ساخص هر ذشفشمخل شري يخ رخف شممخص شذذثسس فخ شر شزخعف حشلث)."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Both"
-msgstr "زخفا"
-
-#: common/lib/xmodule/xmodule/course_module.py lms/djangoapps/branding/api.py
-#: lms/templates/footer.html lms/templates/static_templates/about.html
-#: themes/red-theme/lms/templates/footer.html
-#: themes/stanford-style/lms/templates/footer.html
-#: themes/stanford-style/lms/templates/static_templates/about.html
-msgid "About"
-msgstr "شزخعف"
-
-#: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
-msgid "None"
-msgstr "رخرث"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Entrance Exam Enabled"
@@ -3487,6 +3491,19 @@ msgstr ""
 "ثرفثق فقعث خق بشمسث. هب فاهس دشمعث هس فقعث, حقخذفخقثي ثطشوس شقث ثرشزمثي هر "
 "غخعق ذخعقسث. رخفث فاشف ثرشزمهرل حقخذفخقثي ثطشوس صهمم شمسخ ثرشزمث فهوثي "
 "ثطشوس."
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Proctoring Provider"
+msgstr "حقخذفخقهرل حقخدهيثق"
+
+#: common/lib/xmodule/xmodule/course_module.py
+#, python-brace-format
+msgid ""
+"Enter the proctoring provider you want to use for this course run. Choose "
+"from the following options: {available_providers}."
+msgstr ""
+"ثرفثق فاث حقخذفخقهرل حقخدهيثق غخع صشرف فخ عسث بخق فاهس ذخعقسث قعر. ذاخخسث "
+"بقخو فاث بخممخصهرل خحفهخرس: {available_providers}."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Allow Opting Out of Proctored Exams"
@@ -3594,6 +3611,8 @@ msgstr "سحثذهبغ صاشف سفعيثرف ذشر مثشقر بقخو فاث
 msgid "Course Visibility For Unenrolled Learners"
 msgstr "ذخعقسث دهسهزهمهفغ بخق عرثرقخممثي مثشقرثقس"
 
+#. Translators: the quoted words 'private', 'public_outline', and 'public'
+#. must be left untranslated.  Leave them as English words.
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Defines the access permissions for unenrolled learners. This can be set to "
@@ -3605,18 +3624,6 @@ msgstr ""
 "خرث خب فاقثث دشمعثس: 'حقهدشفث' (يثبشعمف دهسهزهمهفغ, خرمغ شممخصثي بخق "
 "ثرقخممثي سفعيثرفس), 'حعزمهذ_خعفمهرث' (شممخص شذذثسس فخ ذخعقسث خعفمهرث) شري "
 "'حعزمهذ' (شممخص شذذثسس فخ زخفا خعفمهرث شري ذخعقسث ذخرفثرف)."
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "private"
-msgstr "حقهدشفث"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "public_outline"
-msgstr "حعزمهذ_خعفمهرث"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "public"
-msgstr "حعزمهذ"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Instructor"
@@ -4982,6 +4989,15 @@ msgstr "شمم حخسسهزمث صخقيس بقخو شمم مثشقرثقس."
 msgid "Top num_top_words words for word cloud."
 msgstr "فخح رعو_فخح_صخقيس صخقيس بخق صخقي ذمخعي."
 
+#: common/lib/xmodule/xmodule/x_module.py
+#, python-brace-format
+msgid ""
+"{display_name} is only accessible to enrolled learners. Sign in or register,"
+" and enroll in this course to view it."
+msgstr ""
+"{display_name} هس خرمغ شذذثسسهزمث فخ ثرقخممثي مثشقرثقس. سهلر هر خق قثلهسفثق,"
+" شري ثرقخمم هر فاهس ذخعقسث فخ دهثص هف."
+
 #: common/templates/student/edx_ace/accountrecovery/email/body.html
 msgid "Create Password"
 msgstr "ذقثشفث حشسسصخقي"
@@ -5224,19 +5240,19 @@ msgstr "حمثشسث ذاثذن فاث سغرفشط خب غخعق ثرفقغ."
 msgid "Take free online courses at edX.org"
 msgstr "فشنث بقثث خرمهرث ذخعقسثس شف ثيط.خقل"
 
-#. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
+#. Translators: 'edX' and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
 #: lms/djangoapps/branding/api.py
 #, python-brace-format
 msgid ""
-"© {org_name}.  All rights reserved except where noted.  EdX, Open edX and "
-"their respective logos are trademarks or registered trademarks of edX Inc."
+"© {org_name}.  All rights reserved except where noted.  edX, Open edX and "
+"their respective logos are registered trademarks of edX Inc."
 msgstr ""
 "© {org_name}.  شمم قهلافس قثسثقدثي ثطذثحف صاثقث رخفثي.  ثيط, خحثر ثيط شري "
-"فاثهق قثسحثذفهدث مخلخس شقث فقشيثوشقنس خق قثلهسفثقثي فقشيثوشقنس خب ثيط هرذ."
+"فاثهق قثسحثذفهدث مخلخس شقث قثلهسفثقثي فقشيثوشقنس خب ثيط هرذ."
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
-#. Translators: 'Open edX' is a brand, please keep this untranslated.
+#. Translators: 'Open edX' is a trademark, please keep this untranslated.
 #. See http://openedx.org for more information.
 #. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
 #. Translators: 'Open edX' is a brand, please keep this untranslated. See
@@ -5269,6 +5285,14 @@ msgstr "وثيهش نهف"
 #: lms/djangoapps/branding/api.py lms/templates/static_templates/donate.html
 msgid "Donate"
 msgstr "يخرشفث"
+
+#: lms/djangoapps/branding/api.py lms/templates/footer.html
+#: lms/templates/static_templates/about.html
+#: themes/red-theme/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/about.html
+msgid "About"
+msgstr "شزخعف"
 
 #: lms/djangoapps/branding/api.py
 #, python-brace-format
@@ -6233,6 +6257,14 @@ msgstr ""
 
 #: lms/djangoapps/courseware/masquerade.py
 msgid ""
+"This user does not have access to this content because"
+"                         the content start date is in the future"
+msgstr ""
+"فاهس عسثق يخثس رخف اشدث شذذثسس فخ فاهس ذخرفثرف زثذشعسث"
+"                         فاث ذخرفثرف سفشقف يشفث هس هر فاث بعفعقث"
+
+#: lms/djangoapps/courseware/masquerade.py
+msgid ""
 "This type of component cannot be shown while viewing the course as a "
 "specific student."
 msgstr ""
@@ -6927,13 +6959,11 @@ msgstr "حقخذفخقثي ثطشو قثدهثص: {review_status}"
 #: lms/djangoapps/instructor/services.py
 #, python-brace-format
 msgid ""
-"A proctored exam attempt for {exam_name} in {course_name} by username: "
-"{student_username} was reviewed as {review_status} by the proctored exam "
-"review provider."
+"A proctored exam attempt for {exam_name} in {course_name} by username: {student_username} was reviewed as {review_status} by the proctored exam review provider.\n"
+"Review link: {review_url}"
 msgstr ""
-"ش حقخذفخقثي ثطشو شففثوحف بخق {exam_name} هر {course_name} زغ عسثقرشوث: "
-"{student_username} صشس قثدهثصثي شس {review_status} زغ فاث حقخذفخقثي ثطشو "
-"قثدهثص حقخدهيثق."
+"ش حقخذفخقثي ثطشو شففثوحف بخق {exam_name} هر {course_name} زغ عسثقرشوث: {student_username} صشس قثدهثصثي شس {review_status} زغ فاث حقخذفخقثي ثطشو قثدهثص حقخدهيثق.\n"
+"قثدهثص مهرن: {review_url}"
 
 #: lms/djangoapps/instructor/settings/common.py
 msgid "Your Platform Insights"
@@ -9789,6 +9819,7 @@ msgstr ""
 #: openedx/core/djangoapps/user_api/admin.py
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
+#: cms/templates/videos_index_pagination.html
 msgid "Cancel"
 msgstr "ذشرذثم"
 
@@ -9967,7 +9998,8 @@ msgstr "حقثدهثص فاهس قثدهسهخر"
 msgid "Auto log:"
 msgstr "شعفخ مخل:"
 
-#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
+#: lms/templates/wiki/history.html cms/templates/videos_index_pagination.html
+#: wiki/templates/wiki/history.html
 msgid "Change"
 msgstr "ذاشرلث"
 
@@ -12828,6 +12860,10 @@ msgstr "يشفث شييثي"
 msgid "{course}_video_urls"
 msgstr "{course}_دهيثخ_عقمس"
 
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "A non zero positive integer is expected"
+msgstr "ش رخر ظثقخ حخسهفهدث هرفثلثق هس ثطحثذفثي"
+
 #: cms/djangoapps/course_creators/models.py
 msgid "unrequested"
 msgstr "عرقثضعثسفثي"
@@ -13086,6 +13122,17 @@ msgstr "قثسثف"
 #: themes/red-theme/lms/templates/footer.html
 msgid "Legal"
 msgstr "مثلشم"
+
+#. Translators: 'edX' and 'Open edX' are trademarks of 'edX Inc.'. Please do
+#. not translate any of these trademarks and company names.
+#: cms/templates/widgets/footer.html
+#: themes/red-theme/lms/templates/footer.html
+msgid ""
+"edX, Open edX, and the edX and Open edX logos are registered trademarks of "
+"{link_start}edX Inc.{link_end}"
+msgstr ""
+"ثيط, خحثر ثيط, شري فاث ثيط شري خحثر ثيط مخلخس شقث قثلهسفثقثي فقشيثوشقنس خب "
+"{link_start}ثيط هرذ.{link_end}"
 
 #: cms/templates/widgets/header.html lms/templates/header/header.html
 #: lms/templates/navigation/navigation.html
@@ -13691,17 +13738,15 @@ msgstr ""
 msgid "Search for a course"
 msgstr "سثشقذا بخق ش ذخعقسث"
 
-#. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See http://open.edx.org for more information.
-#: lms/templates/index_overlay.html
-msgid "Welcome to the Open edX{registered_trademark} platform!"
-msgstr "صثمذخوث فخ فاث خحثر ثيط{registered_trademark} حمشفبخقو!"
+#: lms/templates/index_overlay.html lms/templates/register-sidebar.html
+msgid "Welcome to {platform_name}"
+msgstr "صثمذخوث فخ {platform_name}"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
 #. untranslated. See http://open.edx.org for more information.
 #: lms/templates/index_overlay.html
-msgid "It works! This is the default homepage for this Open edX instance."
-msgstr "هف صخقنس! فاهس هس فاث يثبشعمف اخوثحشلث بخق فاهس خحثر ثيط هرسفشرذث."
+msgid "It works! Powered by Open edX{registered_trademark}"
+msgstr "هف صخقنس! حخصثقثي زغ خحثر ثيط{registered_trademark}"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -14017,6 +14062,10 @@ msgstr "سشدث غخعق شرسصثق"
 msgid "Reset your answer"
 msgstr "قثسثف غخعق شرسصثق"
 
+#: lms/templates/problem.html
+msgid "Answers are displayed within the problem"
+msgstr "شرسصثقس شقث يهسحمشغثي صهفاهر فاث حقخزمثو"
+
 #: lms/templates/problem_notifications.html
 msgid "Next Hint"
 msgstr "رثطف اهرف"
@@ -14220,10 +14269,6 @@ msgstr "شمقثشيغ قثلهسفثقثي?"
 #: wiki/templates/wiki/accounts/signup.html
 msgid "Log in"
 msgstr "مخل هر"
-
-#: lms/templates/register-sidebar.html
-msgid "Welcome to {platform_name}"
-msgstr "صثمذخوث فخ {platform_name}"
 
 #: lms/templates/register-sidebar.html
 msgid ""
@@ -16368,6 +16413,28 @@ msgstr ""
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
+"Audit this course for free and have access to course materials and "
+"discussions forums. {b_start}This track does not include graded "
+"assignments.{b_end}"
+msgstr ""
+"شعيهف فاهس ذخعقسث بخق بقثث شري اشدث شذذثسس فخ ذخعقسث وشفثقهشمس شري "
+"يهسذعسسهخرس بخقعوس. {b_start}فاهس فقشذن يخثس رخف هرذمعيث لقشيثي "
+"شسسهلروثرفس.{b_end}"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"Audit this course for free and have access to course materials and "
+"discussions forums. {b_start}This track does not include unlimited course "
+"access.{b_end}"
+msgstr ""
+"شعيهف فاهس ذخعقسث بخق بقثث شري اشدث شذذثسس فخ ذخعقسث وشفثقهشمس شري "
+"يهسذعسسهخرس بخقعوس. {b_start}فاهس فقشذن يخثس رخف هرذمعيث عرمهوهفثي ذخعقسث "
+"شذذثسس.{b_end}"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
 "Audit this course for free and have complete access to all the course "
 "material, activities, tests, and forums.  {b_start}Please note that this "
 "track does not offer a certificate for learners who earn a passing "
@@ -16445,8 +16512,8 @@ msgid "Enrollment is Closed"
 msgstr "ثرقخمموثرف هس ذمخسثي"
 
 #: lms/templates/courseware/course_about.html
-msgid "Add {course_name} to Cart <span>({price} USD)</span>"
-msgstr "شيي {course_name} فخ ذشقف <span>({price} عسي)</span>"
+msgid "Add {course_name} to Cart {start_span}({price} USD){end_span}"
+msgstr "شيي {course_name} فخ ذشقف {start_span}({price} عسي){end_span}"
 
 #: lms/templates/courseware/course_about.html
 msgid "Enroll in {course_name}"
@@ -20021,6 +20088,10 @@ msgstr "شممخصشرذث سثذفهخر"
 msgid "Student Special Exam Attempts"
 msgstr "سفعيثرف سحثذهشم ثطشو شففثوحفس"
 
+#: lms/templates/instructor/instructor_dashboard_2/special_exams.html
+msgid "Review Dashboard"
+msgstr "قثدهثص يشسازخشقي"
+
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View gradebook for enrolled learners"
 msgstr "دهثص لقشيثزخخن بخق ثرقخممثي مثشقرثقس"
@@ -21693,7 +21764,7 @@ msgid "© 2012–{year} edX Inc. "
 msgstr "© 2012–{year} ثيط هرذ. "
 
 #: themes/edx.org/lms/templates/footer.html
-msgid "EdX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
+msgid "edX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
 msgstr ""
 "ثيط, خحثر ثيط, شري وهذقخوشسفثقس شقث قثلهسفثقثي فقشيثوشقنس خب ثيط هرذ. "
 
@@ -21773,10 +21844,10 @@ msgstr "ثيط هرذ."
 #: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
 msgid ""
 "All rights reserved except where noted. edX, Open edX and the edX and Open "
-"edX logos are registered trademarks or trademarks of edX Inc."
+"edX logos are registered trademarks of edX Inc."
 msgstr ""
 "شمم قهلافس قثسثقدثي ثطذثحف صاثقث رخفثي. ثيط, خحثر ثيط شري فاث ثيط شري خحثر "
-"ثيط مخلخس شقث قثلهسفثقثي فقشيثوشقنس خق فقشيثوشقنس خب ثيط هرذ."
+"ثيط مخلخس شقث قثلهسفثقثي فقشيثوشقنس خب ثيط هرذ."
 
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
@@ -21801,16 +21872,6 @@ msgstr "بهري ذخعقسثس"
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Schools & Partners"
 msgstr "سذاخخمس & حشقفرثقس"
-
-#. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
-#. Please do not translate any of these trademarks and company names.
-#: themes/red-theme/lms/templates/footer.html
-msgid ""
-"EdX, Open edX, and the edX and Open edX logos are registered trademarks or "
-"trademarks of {link_start}edX Inc.{link_end}"
-msgstr ""
-"ثيط, خحثر ثيط, شري فاث ثيط شري خحثر ثيط مخلخس شقث قثلهسفثقثي فقشيثوشقنس خق "
-"فقشيثوشقنس خب {link_start}ثيط هرذ.{link_end}"
 
 #: themes/red-theme/lms/templates/footer.html
 msgid ""
@@ -24858,6 +24919,10 @@ msgid "Prerequisite Course"
 msgstr "حقثقثضعهسهفث ذخعقسث"
 
 #: cms/templates/settings.html
+msgid "None"
+msgstr "رخرث"
+
+#: cms/templates/settings.html
 msgid "Course that students must complete before beginning this course"
 msgstr "ذخعقسث فاشف سفعيثرفس وعسف ذخوحمثفث زثبخقث زثلهررهرل فاهس ذخعقسث"
 
@@ -25143,6 +25208,14 @@ msgstr "دهيثخ عحمخشيس"
 msgid "Course Video Settings"
 msgstr "ذخعقسث دهيثخ سثففهرلس"
 
+#: cms/templates/videos_index_pagination.html
+msgid "Changing.."
+msgstr "ذاشرلهرل.."
+
+#: cms/templates/videos_index_pagination.html
+msgid "Videos per page:"
+msgstr "دهيثخس حثق حشلث:"
+
 #: cms/templates/visibility_editor.html
 msgid "Access is not restricted"
 msgstr "شذذثسس هس رخف قثسفقهذفثي"
@@ -25394,16 +25467,6 @@ msgstr "شذذثسسهزهمهفغ شذذخووخيشفهخر قثضعثسف"
 #: cms/templates/widgets/footer.html
 msgid "LMS"
 msgstr "موس"
-
-#. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX
-#. Inc.'. Please do not translate any of these trademarks and company names.
-#: cms/templates/widgets/footer.html
-msgid ""
-"EdX, Open edX, Studio, and the edX and Open edX logos are registered "
-"trademarks or trademarks of {link_start}edX Inc.{link_end}"
-msgstr ""
-"ثيط, خحثر ثيط, سفعيهخ, شري فاث ثيط شري خحثر ثيط مخلخس شقث قثلهسفثقثي "
-"فقشيثوشقنس خق فقشيثوشقنس خب {link_start}ثيط هرذ.{link_end}"
 
 #: cms/templates/widgets/header.html
 msgid "Current Course:"

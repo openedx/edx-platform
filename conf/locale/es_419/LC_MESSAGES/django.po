@@ -120,7 +120,7 @@
 # Developer EdX <mperez_ges@galileo.edu>, 2016
 # Diego Rojas <diego.rojas@edunext.co>, 2017
 # David Salazar <imdjsg@gmail.com>, 2014
-# Eduardo Zambrano <ezambrano@edx.org>, 2017-2019
+# Eduardo Zambrano <ezambrano@edx.org>, 2017-2018
 # Elias Estay <eestay@u.uchile.cl>, 2015
 # Fabio Avellaneda <fabio_avellaneda@javeriana.edu.co>, 2015
 # Félix Antonio Valdez Noverola <felix@itesm.mx>, 2015
@@ -229,7 +229,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-30 20:42+0000\n"
+"POT-Creation-Date: 2018-12-16 20:42+0000\n"
 "PO-Revision-Date: 2018-12-03 12:00+0000\n"
 "Last-Translator: Marina Pastor <mpastor@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -1000,13 +1000,6 @@ msgstr ""
 "Busque un enlace de activación de cuenta de {platform_name} en su bandeja de"
 " {email_start}{email}{email_end}. Si necesite asistencia, contáctese con "
 "{link_start}Soporte de {platform_name}{link_end}."
-
-#: common/djangoapps/student/views/dashboard.py
-#, python-brace-format
-msgid ""
-"Add a recovery email to retain access when single-sign on is not available. "
-"Go to {link_start}your Account Settings{link_end}."
-msgstr ""
 
 #: common/djangoapps/student/views/dashboard.py
 #, python-brace-format
@@ -3067,13 +3060,13 @@ msgstr "Trama para los temas de discusión"
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
-"category must be unique. In \"id\" values, the only special characters that "
-"are supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
+"must be unique. In \"id\" values, the only special characters that are "
+"supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 "Ingrese las categorías de discusión en el siguiente formato: "
 "\"CategoryName\": {\"id\": \"i4x-InstitutionName-CourseNumber-course-"
@@ -9457,9 +9450,10 @@ msgstr "Derechos"
 msgid "View, create, and reissue learner entitlements"
 msgstr "Ver, crear y reexpedir derechos de los estudiantes."
 
+#: lms/djangoapps/support/views/index.py
 #: lms/templates/support/feature_based_enrollments.html
 msgid "Feature Based Enrollments"
-msgstr "Inscripciones basadas en características"
+msgstr ""
 
 #: lms/djangoapps/support/views/index.py
 msgid "View feature based enrollment settings"
@@ -11859,19 +11853,6 @@ msgstr ""
 "La dirección de correo electrónico que utilizó para registrarse con "
 "{platform_name}"
 
-#. Translators: This label appears above a field on the password reset
-#. form meant to hold the user's email address.
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Secondary email"
-msgstr ""
-
-#: openedx/core/djangoapps/user_api/api.py
-#, python-brace-format
-msgid ""
-"Secondary email address you registered with {platform_name} using account "
-"settings page"
-msgstr ""
-
 #: openedx/core/djangoapps/user_api/api.py lms/templates/login.html
 msgid "Remember me"
 msgstr "Recordarme"
@@ -12153,6 +12134,16 @@ msgstr ""
 "escríbanos al correo electrónico."
 
 #: openedx/core/djangoapps/user_authn/views/login.py
+msgid ""
+"Your password has expired due to password policy on this account. You must "
+"reset your password before you can log in again. Please click the \"Forgot "
+"Password\" link on this page to reset your password before logging in again."
+msgstr ""
+"Su contraseña ha expirado de acuerdo con las políticas establecidas al "
+"respecto. Para poder reingresar, elija una nueva contraseña presionando el "
+"vínculo \"Olvidé mi contraseña\" en esta misma página."
+
+#: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
 msgid ""
 "In order to sign in, you need to activate your account.<br /><br />We just "
@@ -12324,9 +12315,11 @@ msgid ""
 "then that course will be Enabled only if the org that it is in is Enabled."
 msgstr ""
 
+#: openedx/features/content_type_gating/models.py
+#: openedx/features/course_duration_limits/models.py
 #: lms/templates/support/feature_based_enrollments.html
 msgid "Enabled As Of"
-msgstr "Habilitado a partir de"
+msgstr ""
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
@@ -16649,7 +16642,7 @@ msgstr "Lo sentimos, hubo un error al intentar inscribirte"
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Pursue Academic Credit with the Verified Track"
-msgstr "Obtén crédito académico con con la opción con certificado "
+msgstr ""
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -16672,7 +16665,7 @@ msgstr ""
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Benefits of the Verified Track"
-msgstr "Beneficios de un Certificado Verificado"
+msgstr ""
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -16698,8 +16691,6 @@ msgid ""
 "{b_start}Graded Assignments: {b_end}Build your skills through graded "
 "assignments and projects."
 msgstr ""
-"{b_start}Asignaciones calificadas: {b_end}Desarrolla tus habilidades a "
-"través de tareas y proyectos calificados."
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -16707,8 +16698,6 @@ msgid ""
 "{b_start}Easily Sharable: {b_end}Add the certificate to your CV or resume, "
 "or post it directly on LinkedIn."
 msgstr ""
-"{b_start}Fácil de compartir: {b_end}Agrega el certificado a tu CV o "
-"publícalo directamente en LinkedIn."
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -16741,7 +16730,7 @@ msgstr "Tomar el curso con Certificado Verificado"
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Pursue the Verified Track"
-msgstr "Tomar el curso con Certificado Verificado "
+msgstr ""
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -17619,7 +17608,7 @@ msgstr "Inicia - {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "for {course_display_name}"
-msgstr "Para {course_display_name}"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You must select a session by {expiration_date} to access the course."
@@ -18459,32 +18448,30 @@ msgid ""
 "Sorry! The photos you submitted for ID verification were not accepted, for "
 "the following reason(s):"
 msgstr ""
-"¡Lo siento! Las fotos que envió para la verificación de ID no fueron "
-"aceptadas por la siguiente razón(es):"
 
 #: lms/templates/emails/failed_verification_email.txt
 msgid "The photo(s) of you:"
-msgstr "Foto(s) de ti:"
+msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
 msgid "The photo of you:"
-msgstr "La foto de ti:"
+msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
 msgid "The photo of your ID:"
-msgstr "La foto de tu ID:"
+msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
 msgid "Other Reasons:"
-msgstr "Otras Razones:"
+msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
 msgid "Resubmit Verification: {reverify_url}"
-msgstr "Volver a enviar la verificación: {reverify_url}"
+msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
 msgid "ID Verification FAQ: {faq_url}"
-msgstr "Preguntas frecuentes sobre la verificación de ID: {faq_url}"
+msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
@@ -18514,16 +18501,16 @@ msgstr "Su número de orden es: {order_number}"
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid "Hi {full_name}"
-msgstr "Hola {full_name} "
+msgstr ""
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid "Congratulations! Your ID verification process was successful."
-msgstr "¡Felicidades! Su proceso de verificación de ID fue exitoso."
+msgstr ""
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid ""
 "Your verification is effective for one year. It will expire on {expiry_date}"
-msgstr "Tu verificación es efectiva por un año. Expirará el {expiry_date}"
+msgstr ""
 
 #: lms/templates/emails/photo_submission_confirmation.txt
 msgid "Hi {full_name},"
@@ -20589,12 +20576,11 @@ msgstr "Ver libro de calificaciones"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View a specific learner's enrollment status"
-msgstr "Ver el estado de inscripción de un estudiante específico"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Learner's {platform_name} email address or username *"
 msgstr ""
-"Dirección de email {platform_name} o nombre de usuario del estudiante *"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Learner email address or username"
@@ -20602,7 +20588,7 @@ msgstr "Dirección de correo electrónico o nombre de usuario del estudiante"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View Enrollment Status"
-msgstr "Ver estado de inscripción"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View a specific learner's grades and progress"
@@ -21658,15 +21644,15 @@ msgstr "Soporte a estudiantes: Inscripciones"
 
 #: lms/templates/support/feature_based_enrollments.html
 msgid "Student Support: Feature Based Enrollments"
-msgstr "Soporte al estudiante: inscripciones basadas en características"
+msgstr ""
 
 #: lms/templates/support/feature_based_enrollments.html
 msgid "Is Enabled"
-msgstr "Está habilitado"
+msgstr ""
 
 #: lms/templates/support/feature_based_enrollments.html
 msgid "No results found"
-msgstr "No se han encontrado resultados"
+msgstr ""
 
 #: lms/templates/support/manage_user.html
 msgid "Student Support: Manage User"
@@ -22362,9 +22348,6 @@ msgid ""
 "{b_start}Support our Mission: {b_end}EdX, a non-profit, relies on verified "
 "certificates to help fund affordable education to everyone globally."
 msgstr ""
-"{b_start}Apoya nuestra misión: {b_end}EdX, una organización sin fines de "
-"lucro, se basa en certificados verificados para ayudar a financiar una "
-"educación asequible para todos en todo el mundo."
 
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
