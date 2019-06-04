@@ -102,3 +102,34 @@ class TestCreateJWTs(AccessTokenMixin, TestCase):
         self.assertDictContainsSubset(additional_claims, token_payload)
         self.assertEqual(user_email_verified, token_payload['email_verified'])
         self.assertEqual(token_payload['roles'], mock_create_roles.return_value)
+
+    def test_default_scopes(self):
+        """
+        Ensure the default scopes are used.
+        """
+        jwt = jwt_api.create_jwt_for_user(self.user)
+        jwt_scopes = jwt_api.create_jwt_for_user(self.user, scopes=self.default_scopes)
+        self.assertEqual(jwt, jwt_scopes)
+
+    def test_scopes(self):
+        """
+        Ensure the requested scopes are used.
+        """
+        scopes = [
+            'user_id',
+        ]
+        aud = 'test_aud'
+        secret = 'test_secret'
+
+        jwt = jwt_api.create_jwt_for_user(self.user, secret=secret, aud=aud)
+        jwt_scopes = jwt_api.create_jwt_for_user(self.user, scopes=scopes, secret=secret, aud=aud)
+
+        jwt_payload = self.assert_valid_jwt_access_token(
+            jwt, self.user, self.default_scopes, aud=aud, secret=secret,
+        )
+        jwt_scopes_payload = self.assert_valid_jwt_access_token(
+            jwt_scopes, self.user, scopes, aud=aud, secret=secret,
+        )
+        self.assertEqual(jwt_payload['scopes'], self.default_scopes)
+        self.assertEqual(jwt_scopes_payload['scopes'], scopes)
+        self.assertEqual(jwt_scopes_payload['user_id'], self.user.id)
