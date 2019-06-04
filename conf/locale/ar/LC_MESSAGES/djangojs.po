@@ -5492,6 +5492,10 @@ msgstr ""
 msgid "This link will open in a modal window"
 msgstr ""
 
+#: cms/static/js/certificates/collections/certificates.js
+msgid "Could not parse certificate JSON. %(message)s"
+msgstr "تعذّر تفسير JSON الشهادة. %(message)s"
+
 #: cms/static/js/certificates/models/certificate.js
 msgid "Certificate name is required."
 msgstr "اسم الشهادة مطلوب."
