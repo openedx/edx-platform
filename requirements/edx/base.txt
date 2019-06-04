@@ -58,6 +58,7 @@ parsel==1.2.0
 -e git+https://github.com/edx-solutions/xblock-image-explorer.git#egg=xblock-image-explorer
 -e git+https://github.com/raccoongang/xblock-in-video-quiz.git@invquiz-rg#egg=xblock-in-video-quiz
 -e git+https://github.com/raccoongang/xblock-free-text-response.git@v0.2.1#egg=xblock-free-text-response==0.2.1
+-e git+https://github.com/raccoongang/django-oauth2-provider@1.2.5-multiple-redirect_uris#egg=edx-django-oauth2-provider==1.2.5
 -e common/lib/xmodule
 amqp==1.4.9               # via kombu
 analytics-python==1.1.0
@@ -131,7 +132,6 @@ edx-analytics-data-api-client==0.14.4
 edx-ccx-keys==0.2.1
 edx-celeryutils==0.2.7
 edx-completion==0.1.7
-edx-django-oauth2-provider==1.2.5
 edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-drf-extensions==1.5.2

@@ -5,6 +5,9 @@ from django.contrib import admin
 from django.contrib.admin.sites import NotRegistered
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.forms import ReadOnlyPasswordHashField, UserChangeForm as BaseUserChangeForm
+from django.db import models
+from django.http.request import QueryDict
 from django.utils.translation import ugettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -147,13 +150,26 @@ class LinkedInAddToProfileConfigurationAdmin(admin.ModelAdmin):
 class CourseEnrollmentForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
+        # If args is a QueryDict, then the ModelForm addition request came in as a POST with a course ID string.
+        # Change the course ID string to a CourseLocator object by copying the QueryDict to make it mutable.
+        if args and 'course' in args[0] and isinstance(args[0], QueryDict):
+            args_copy = args[0].copy()
+            try:
+                args_copy['course'] = CourseKey.from_string(args_copy['course'])
+            except InvalidKeyError:
+                raise forms.ValidationError("Cannot make a valid CourseKey from id {}!".format(args_copy['course']))
+            args = [args_copy]
+
         super(CourseEnrollmentForm, self).__init__(*args, **kwargs)
 
         if self.data.get('course'):
             try:
                 self.data['course'] = CourseKey.from_string(self.data['course'])
-            except InvalidKeyError:
-                raise forms.ValidationError("Cannot make a valid CourseKey from id {}!".format(self.data['course']))
+            except AttributeError:
+                # Change the course ID string to a CourseLocator.
+                # On a POST request, self.data is a QueryDict and is immutable - so this code will fail.
+                # However, the args copy above before the super() call handles this case.
+                pass
 
     def clean_course_id(self):
         course_id = self.cleaned_data['course']

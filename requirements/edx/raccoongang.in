@@ -52,3 +52,6 @@ parsel==1.2.0
 # Info pages requirements
 django-tinymce==2.8.0
 django-hvad==1.8.0
+
+# Oauth2 provider with multiple Redirect URIs support
+-e git+https://github.com/raccoongang/django-oauth2-provider@1.2.5-multiple-redirect_uris#egg=edx-django-oauth2-provider==1.2.5

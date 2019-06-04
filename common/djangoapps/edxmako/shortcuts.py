@@ -48,6 +48,8 @@ def marketing_link(name):
         settings.MKTG_URLS
     )
 
+    external_mktg_urls = getattr(settings, 'EXTERNAL_MKTG_URLS', {})
+
     if enable_mktg_site and name in marketing_urls:
         # special case for when we only want the root marketing URL
         if name == 'ROOT':
@@ -58,6 +60,9 @@ def marketing_link(name):
         # e.g. urljoin('http://marketing.com', 'http://open-edx.org/about') >>> 'http://open-edx.org/about'
         return urljoin(marketing_urls.get('ROOT'), marketing_urls.get(name))
     # only link to the old pages when the marketing site isn't on
+    elif not enable_mktg_site and name in external_mktg_urls:
+        # Special case for overriding standard MKTG_URLS
+        return external_mktg_urls[name] or '#'
     elif not enable_mktg_site and name in link_map:
         # don't try to reverse disabled marketing links
         if link_map[name] is not None:

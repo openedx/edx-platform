@@ -42,6 +42,7 @@ git+https://github.com/edx/xblock-utils.git@v1.1.1#egg=xblock-utils==1.1.1
 -e git+https://github.com/raccoongang/edx-ora2@rg-v.2.1.17-accel#egg=rg_ora2==rg-v.2.1.17-accel
 -e git+https://github.com/raccoongang/rg_instructor_analytics@release-0.3.0#egg=rg_instructor_analytics
 -e git+https://github.com/raccoongang/rg_instructor_analytics_log_collector@release-0.1.0#egg=rg_instructor_analytics_log_collector
+-e git+https://github.com/raccoongang/django-oauth2-provider@1.2.5-multiple-redirect_uris#egg=edx-django-oauth2-provider==1.2.5
 -e common/lib/xmodule
 amqp==1.4.9
 analytics-python==1.1.0
@@ -129,7 +130,6 @@ edx-analytics-data-api-client==0.14.4
 edx-ccx-keys==0.2.1
 edx-celeryutils==0.2.7
 edx-completion==0.1.7
-edx-django-oauth2-provider==1.2.5
 edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-drf-extensions==1.5.2
@@ -332,3 +332,5 @@ xblock==1.2.1
 xmltodict==0.11.0         # via moto
 zendesk==1.1.1
 zope.interface==4.5.0     # via twisted
+django-tinymce==2.8.0
+django-hvad==1.8.0

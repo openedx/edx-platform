@@ -4,6 +4,7 @@ Tests student admin.py
 import ddt
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
+from django.forms import ValidationError
 from django.urls import reverse
 from django.test import TestCase
 from mock import Mock
@@ -209,7 +210,8 @@ class CourseEnrollmentAdminTest(SharedModuleStoreTestCase):
         super(CourseEnrollmentAdminTest, self).setUp()
         self.user = UserFactory.create(is_staff=True, is_superuser=True)
         self.client.login(username=self.user.username, password='test')
-        CourseEnrollmentFactory(
+        self.course = CourseFactory()
+        self.course_enrollment = CourseEnrollmentFactory(
             user=self.user,
             course_id=CourseFactory().id,  # pylint: disable=no-member
         )
@@ -232,3 +234,67 @@ class CourseEnrollmentAdminTest(SharedModuleStoreTestCase):
         with COURSE_ENROLLMENT_ADMIN_SWITCH.override(active=True):
             response = getattr(self.client, method)(url)
         self.assertEqual(response.status_code, 200)
+
+    def test_username_exact_match(self):
+        """
+        Ensure that course enrollment searches return exact matches on username first.
+        """
+        user2 = UserFactory.create(username='aaa_{}'.format(self.user.username))
+        CourseEnrollmentFactory(
+            user=user2,
+            course_id=self.course.id,  # pylint: disable=no-member
+        )
+        search_url = '{}?q={}'.format(reverse('admin:student_courseenrollment_changelist'), self.user.username)
+        with COURSE_ENROLLMENT_ADMIN_SWITCH.override(active=True):
+            response = self.client.get(search_url)
+        self.assertEqual(response.status_code, 200)
+
+        # context['results'] is an array of arrays of HTML <td> elements to be rendered
+        self.assertEqual(len(response.context['results']), 2)
+        for idx, username in enumerate([self.user.username, user2.username]):
+            # Locate the <td> column containing the username
+            user_field = next(col for col in response.context['results'][idx] if "field-user" in col)
+            self.assertIn(username, user_field)
+
+    def test_save_toggle_active(self):
+        """
+        Edit a CourseEnrollment to toggle its is_active checkbox, save it and verify that it was toggled.
+        When the form is saved, Django uses a QueryDict object which is immutable and needs special treatment.
+        This test implicitly verifies that the POST parameters are handled correctly.
+        """
+        # is_active will change from True to False
+        self.assertTrue(self.course_enrollment.is_active)
+        data = {
+            'user': unicode(self.course_enrollment.user.id),
+            'course': unicode(self.course_enrollment.course.id),
+            'is_active': 'false',
+            'mode': self.course_enrollment.mode,
+        }
+
+        with COURSE_ENROLLMENT_ADMIN_SWITCH.override(active=True):
+            response = self.client.post(
+                reverse('admin:student_courseenrollment_change', args=(self.course_enrollment.id, )),
+                data=data,
+            )
+        self.assertEqual(response.status_code, 302)
+
+        self.course_enrollment.refresh_from_db()
+        self.assertFalse(self.course_enrollment.is_active)
+
+    def test_save_invalid_course_id(self):
+        """
+        Send an invalid course ID instead of "org.0/course_0/Run_0" when saving, and verify that it fails.
+        """
+        data = {
+            'user': unicode(self.course_enrollment.user.id),
+            'course': 'invalid-course-id',
+            'is_active': 'true',
+            'mode': self.course_enrollment.mode,
+        }
+
+        with COURSE_ENROLLMENT_ADMIN_SWITCH.override(active=True):
+            with self.assertRaises(ValidationError):
+                self.client.post(
+                    reverse('admin:student_courseenrollment_change', args=(self.course_enrollment.id, )),
+                    data=data,
+                )

@@ -55,7 +55,7 @@ class CourseModeForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         # If args is a QueryDict, then the ModelForm addition request came in as a POST with a course ID string.
         # Change the course ID string to a CourseLocator object by copying the QueryDict to make it mutable.
-        if len(args) > 0 and 'course' in args[0] and isinstance(args[0], QueryDict):
+        if args and 'course' in args[0] and isinstance(args[0], QueryDict):
             args_copy = args[0].copy()
             args_copy['course'] = CourseKey.from_string(args_copy['course'])
             args = [args_copy]
