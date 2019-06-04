@@ -159,7 +159,6 @@ class LinkedInAddToProfileConfigurationAdmin(admin.ModelAdmin):
 
 
 class CourseEnrollmentForm(forms.ModelForm):
-
     def __init__(self, *args, **kwargs):
         # If args is a QueryDict, then the ModelForm addition request came in as a POST with a course ID string.
         # Change the course ID string to a CourseLocator object by copying the QueryDict to make it mutable.
@@ -194,6 +193,15 @@ class CourseEnrollmentForm(forms.ModelForm):
 
         return course_key
 
+    def save(self, *args, **kwargs):
+        course_enrollment = super(CourseEnrollmentForm, self).save(commit=False)
+        user = self.cleaned_data['user']
+        course_overview = self.cleaned_data['course']
+        enrollment = CourseEnrollment.get_or_create_enrollment(user, course_overview.id)
+        course_enrollment.id = enrollment.id
+        course_enrollment.created = enrollment.created
+        return course_enrollment
+
     class Meta:
         model = CourseEnrollment
         fields = '__all__'
@@ -204,7 +212,7 @@ class CourseEnrollmentAdmin(admin.ModelAdmin):
     """ Admin interface for the CourseEnrollment model. """
     list_display = ('id', 'course_id', 'mode', 'user', 'is_active',)
     list_filter = ('mode', 'is_active',)
-    raw_id_fields = ('user',)
+    raw_id_fields = ('user', 'course')
     search_fields = ('course__id', 'mode', 'user__username',)
     form = CourseEnrollmentForm
 
