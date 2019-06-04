@@ -8,10 +8,12 @@ common/lib/chem
 common/lib/sandbox-packages
 common/lib/symmath
 asn1crypto==0.24.0
+backports-abc==0.5        # via tornado
 git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4
 cffi==1.12.3
-cryptography==2.6.1
+cryptography==2.7
 enum34==1.1.6
+futures==3.2.0 ; python_version == "2.7"  # via tornado
 ipaddress==1.0.22
 lxml==3.8.0
 markupsafe==1.1.1

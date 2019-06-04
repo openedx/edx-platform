@@ -6,7 +6,7 @@
 #
 asn1crypto==0.24.0        # via cryptography
 cffi==1.12.3              # via cryptography
-cryptography==2.6.1
+cryptography==2.7
 enum34==1.1.6             # via cryptography
 ipaddress==1.0.22         # via cryptography
 lxml==3.8.0

@@ -12,6 +12,7 @@ from django.db import IntegrityError, models, transaction
 from django.utils.timezone import now
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
+from simple_history.models import HistoricalRecords
 
 from course_modes.models import CourseMode
 from entitlements.utils import is_course_run_entitlement_fulfillable
@@ -172,6 +173,8 @@ class CourseEntitlement(TimeStampedModel):
     order_number = models.CharField(max_length=128, null=True)
     refund_locked = models.BooleanField(default=False)
     _policy = models.ForeignKey(CourseEntitlementPolicy, null=True, blank=True, on_delete=models.CASCADE)
+
+    history = HistoricalRecords()
 
     @property
     def expired_at_datetime(self):
