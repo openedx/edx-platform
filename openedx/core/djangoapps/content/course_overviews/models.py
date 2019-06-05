@@ -16,6 +16,7 @@ from django.db.utils import IntegrityError
 from django.template import defaultfilters
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
+from simple_history.models import HistoricalRecords
 from six import text_type  # pylint: disable=ungrouped-imports
 from six.moves.urllib.parse import urlparse, urlunparse  # pylint: disable=import-error
 
@@ -109,6 +110,8 @@ class CourseOverview(TimeStampedModel):
     eligible_for_financial_aid = BooleanField(default=True)
 
     language = TextField(null=True)
+
+    history = HistoricalRecords()
 
     @classmethod
     def _create_or_update(cls, course):
