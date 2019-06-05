@@ -122,7 +122,7 @@ class TestCreateJWTs(AccessTokenMixin, TestCase):
         secret = 'test_secret'
 
         jwt = jwt_api.create_jwt_for_user(self.user, secret=secret, aud=aud)
-        jwt_scopes = jwt_api.create_jwt_for_user(self.user, scopes=scopes, secret=secret, aud=aud)
+        jwt_scopes = jwt_api.create_jwt_for_user(self.user, secret=secret, aud=aud, scopes=scopes)
 
         jwt_payload = self.assert_valid_jwt_access_token(
             jwt, self.user, self.default_scopes, aud=aud, secret=secret,
