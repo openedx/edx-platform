@@ -31,6 +31,7 @@ argh==0.26.2
 argparse==1.4.0           # via caniusepython3
 asn1crypto==0.24.0
 astroid==1.5.3            # via pylint, pylint-celery
+atomicwrites==1.3.0       # via pytest
 attrs==17.4.0
 babel==1.3
 backports.functools-lru-cache==1.5
@@ -119,7 +120,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==1.0.3
 edx-drf-extensions==2.3.0
-edx-enterprise==1.6.2
+edx-enterprise==1.6.3
 edx-i18n-tools==0.4.8
 edx-lint==1.2.1
 edx-milestones==0.1.13
@@ -152,6 +153,7 @@ flask==1.0.3              # via moto
 freezegun==0.3.12
 fs-s3fs==0.1.8
 fs==2.0.18
+funcsigs==1.0.2           # via pytest
 functools32==3.2.3.post2 ; python_version == "2.7"  # via flake8
 future==0.17.1
 futures==3.2.0 ; python_version == "2.7"
@@ -194,6 +196,7 @@ mccabe==0.6.1             # via flake8, pylint
 mock==1.0.1
 git+https://github.com/edx/MongoDBProxy.git@25b99097615bda06bd7cdfe5669ed80dc2a7fed0#egg=MongoDBProxy==0.1.0
 mongoengine==0.10.0
+more-itertools==5.0.0     # via pytest
 moto==0.3.1
 mpmath==1.1.0
 mysqlclient==1.4.2.post1
@@ -208,7 +211,7 @@ openapi-codec==1.3.2
 git+https://github.com/edx/edx-ora2.git@2.2.3#egg=ora2==2.2.3
 packaging==19.0           # via caniusepython3
 path.py==8.2.1
-pathlib2==2.3.3           # via importlib-metadata, pytest-django
+pathlib2==2.3.3           # via importlib-metadata, pytest, pytest-django
 pathtools==0.1.2
 paver==1.3.4
 pbr==5.2.1
@@ -216,11 +219,11 @@ pdfminer.six==20181108
 piexif==1.0.2
 pillow==6.0.0
 pkgconfig==1.5.1
-pluggy==0.12.0            # via tox
+pluggy==0.12.0            # via pytest, tox
 polib==1.1.0
 psutil==1.2.1
 py2neo==3.1.2
-py==1.8.0                 # via tox
+py==1.8.0                 # via pytest, tox
 pycodestyle==2.5.0
 pycontracts==1.7.1
 pycountry==18.12.8
@@ -304,6 +307,7 @@ user-util==0.1.5
 virtualenv==16.6.0        # via tox
 voluptuous==0.11.5
 watchdog==0.9.0
+wcwidth==0.1.7            # via pytest
 web-fragments==0.3.0
 webencodings==0.5.1
 webob==1.8.5

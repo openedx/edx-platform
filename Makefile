@@ -71,7 +71,7 @@ upgrade: ## update the pip requirements files to use the latest releases satisfy
 	@for f in $(REQ_FILES); do \
 		echo ; \
 		echo "== $$f ===============================" ; \
-		pip-compile -v --no-emit-trusted-host --no-index --upgrade -o $$f.txt $$f.in || exit 1; \
+		pip-compile -v --no-emit-trusted-host --no-index --rebuild --upgrade -o $$f.txt $$f.in || exit 1; \
 	done
 	# Post process all of the files generated above to work around open pip-tools issues
 	scripts/post-pip-compile.sh $(REQ_FILES:=.txt)
