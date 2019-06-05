@@ -63,7 +63,7 @@ cssselect==1.0.3
 cssutils==1.0.2
 ddt==1.2.1
 decorator==4.4.0
-defusedxml==0.5.0
+defusedxml==0.6.0
 dicttoxml==1.7.4          # via moto
 diff-cover==0.9.8
 distlib==0.2.9.post0      # via caniusepython3
@@ -119,7 +119,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==1.0.3
 edx-drf-extensions==2.3.0
-edx-enterprise==1.6.2
+edx-enterprise==1.6.3
 edx-i18n-tools==0.4.8
 edx-lint==1.2.1
 edx-milestones==0.1.13
@@ -166,7 +166,6 @@ idna==2.8
 importlib-metadata==0.17  # via pluggy
 inflect==2.1.0
 ipaddress==1.0.22
-isodate==0.6.0
 isort==4.3.20
 itsdangerous==1.1.0       # via flask
 itypes==1.1.0
@@ -215,7 +214,6 @@ pbr==5.2.1
 pdfminer.six==20181108
 piexif==1.0.2
 pillow==6.0.0
-pkgconfig==1.5.1
 pluggy==0.12.0            # via tox
 polib==1.1.0
 psutil==1.2.1
@@ -313,7 +311,6 @@ git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.1#egg=xblock-d
 git+https://github.com/open-craft/xblock-poll@add89e14558c30f3c8dc7431e5cd6536fff6d941#egg=xblock-poll==1.5.1
 xblock-utils==1.2.1
 xblock==1.2.2
-xmlsec==1.3.3
 xmltodict==0.12.0         # via moto
 zendesk==1.1.1
 zipp==0.5.1               # via importlib-metadata
