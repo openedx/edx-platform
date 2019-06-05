@@ -57,7 +57,7 @@ from six import text_type
         %for student in students:
         <tr>
           <td>
-            <a href="${reverse('student_progress', kwargs=dict(course_id=text_type(course_id), student_id=student['id']))}">${student['username']}</a>
+            <a href="${reverse('student_progress', kwargs=dict(course_id=text_type(course_id), student_id=student['id']))}">${student['email']}</a>
           </td>
         </tr>
         %endfor
