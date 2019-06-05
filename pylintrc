@@ -304,11 +304,13 @@ disable =
 	dict-view-method,
 	duplicate-code,
 	execfile-builtin,
+	feature-toggle-needs-doc,
 	file-builtin,
 	filter-builtin-not-iterating,
 	fixme,
 	getslice-method,
 	hex-method,
+	illegal-waffle-usage,
 	import-star-module-level,
 	indexing-exception,
 	input-builtin,
@@ -457,4 +459,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = Exception
 
-# f53942526b8e9020150e5025e6a8aa60c76971d9
+# c9c6a6da98d5eb4ede060038e6b0f1892f32f83b
