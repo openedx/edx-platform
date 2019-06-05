@@ -353,6 +353,11 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
 
         program_uuid = kwargs['program_uuid']
         student_data = self._request_data_by_student_key(request, program_uuid)
+        if None in student_data:
+            return Response(
+                'invalid enrollment record',
+                status.HTTP_422_UNPROCESSABLE_ENTITY
+            )
 
         response_data = {}
         response_data.update(self._remove_duplicate_entries(request, student_data))
@@ -399,6 +404,11 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
 
         program_uuid = kwargs['program_uuid']
         student_data = self._request_data_by_student_key(request, program_uuid)
+        if None in student_data:
+            return Response(
+                'invalid enrollment record',
+                status.HTTP_422_UNPROCESSABLE_ENTITY
+            )
 
         response_data = {}
         response_data.update(self._remove_duplicate_entries(request, student_data))
