@@ -14,7 +14,7 @@ from openedx.core.djangoapps.oauth_dispatch.toggles import ENFORCE_JWT_SCOPES
 from student.models import UserProfile, anonymous_id_for_user
 
 
-def create_jwt_for_user(user, secret=None, aud=None, additional_claims=None):
+def create_jwt_for_user(user, secret=None, aud=None, additional_claims=None, scopes=None):
     """
     Returns a JWT to identify the given user.
 
@@ -25,6 +25,8 @@ def create_jwt_for_user(user, secret=None, aud=None, additional_claims=None):
 
     Arguments:
         user (User): User for which to generate the JWT.
+        scopes (list): Optional. Scopes that limit access to the token bearer and
+            controls which optional claims are included in the token.
 
     Deprecated Arguments (to be removed):
         secret (string): Overrides configured JWT secret (signing) key.
@@ -34,6 +36,7 @@ def create_jwt_for_user(user, secret=None, aud=None, additional_claims=None):
     expires_in = settings.OAUTH_ID_TOKEN_EXPIRATION
     return _create_jwt(
         user,
+        scopes=scopes,
         expires_in=expires_in,
         aud=aud,
         additional_claims=additional_claims,
