@@ -1,6 +1,9 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 <div class="wrap-instructor-info studio-view">
-  <a class="instructor-info-action" href="${edit_link}">${_("View Unit in Studio")}</a>
+
+  %if not is_local_staff:
+    <a class="instructor-info-action" href="${edit_link}">${_("View Unit in Studio")}</a>
+  %endif
 </div>
 ${frag_content}

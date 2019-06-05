@@ -34,6 +34,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from pytz import UTC
 from rest_framework import status
 from six import text_type
+from student.models import CourseAccessRole
 from web_fragments.fragment import Fragment
 
 import shoppingcart
@@ -980,6 +981,17 @@ def _progress(request, course_key, student_id):
     # checking certificate generation configuration
     enrollment_mode, _ = CourseEnrollment.enrollment_mode_for_user(student, course_key)
 
+    user_role = CourseAccessRole.objects.filter(
+        user=request.user,
+        course_id=course_key
+    ).values_list('role', flat=True)
+
+    # is_local_staff == True means that User doesn't have is_staff permissions, but has staff role
+    # and can't see 'View Grading in studio' button
+    is_local_staff = False
+    if 'staff' in user_role and not request.user.is_staff:
+        is_local_staff = True
+
     context = {
         'course': course,
         'courseware_summary': courseware_summary,
@@ -991,6 +1003,7 @@ def _progress(request, course_key, student_id):
         'student': student,
         'credit_course_requirements': _credit_course_requirements(course_key, student),
         'certificate_data': _get_cert_data(student, course, enrollment_mode, course_grade),
+        'is_local_staff': is_local_staff,
     }
     context.update(
         get_experiment_user_metadata_context(

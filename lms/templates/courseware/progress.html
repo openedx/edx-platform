@@ -55,7 +55,7 @@ username = get_enterprise_learner_generic_name(request) or student.username
                 lang="${course.language}"
               % endif
               >
-                % if staff_access and studio_url is not None:
+                % if not is_local_staff and studio_url is not None and staff_access:
                 <div class="wrap-instructor-info">
                     <a class="instructor-info-action studio-view" href="${studio_url}">${_("View Grading in studio")}</a>
                 </div>

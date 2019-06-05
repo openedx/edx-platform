@@ -20,6 +20,7 @@ from django.utils.html import escape
 from django.contrib.auth.models import User
 from edxmako.shortcuts import render_to_string
 from six import text_type
+from student.models import CourseAccessRole
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
@@ -318,12 +319,23 @@ def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context)
             # build edit link to unit in CMS. Can't use reverse here as lms doesn't load cms's urls.py
             edit_link = "//" + settings.CMS_BASE + '/container/' + text_type(block.location)
 
+            user_role = CourseAccessRole.objects.filter(
+                user=user,
+                course_id=block.course_id
+            ).values_list('role', flat=True)
+
+            # is_local_staff == True means that User doesn't have is_staff permissions, but has staff role
+            # and can't see 'View Grading in studio' button
+            is_local_staff = False
+            if 'staff' in user_role and not user.is_staff:
+                is_local_staff = True
+
             # return edit link in rendered HTML for display
             return wrap_fragment(
                 frag,
                 render_to_string(
                     "edit_unit_link.html",
-                    {'frag_content': frag.content, 'edit_link': edit_link}
+                    {'frag_content': frag.content, 'edit_link': edit_link, 'is_local_staff': is_local_staff}
                 )
             )
         else:
