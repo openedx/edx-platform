@@ -43,7 +43,7 @@ from lms.djangoapps.program_enrollments.api.v1.serializers import (
     ProgramEnrollmentSerializer,
 )
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
-from lms.djangoapps.program_enrollments.utils import get_user_by_program_id
+from lms.djangoapps.program_enrollments.utils import get_user_by_program_id, ProviderDoesNotExistException
 from student.helpers import get_resume_urls_for_enrollments
 from xmodule.modulestore.django import modulestore
 from openedx.core.djangoapps.catalog.utils import get_programs
@@ -362,10 +362,13 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
 
         for student_key, data in student_data.items():
             curriculum_uuid = data['curriculum_uuid']
-            existing_user = get_user_by_program_id(student_key, program_uuid)
 
-            if existing_user:
-                data['user'] = existing_user.id
+            try:
+                existing_user = get_user_by_program_id(student_key, program_uuid)
+                if existing_user:
+                    data['user'] = existing_user.id
+            except ProviderDoesNotExistException:
+                pass  # IDP has not yet been set up, just create waiting enrollments
 
             serializer = ProgramEnrollmentSerializer(data=data)
             if serializer.is_valid():

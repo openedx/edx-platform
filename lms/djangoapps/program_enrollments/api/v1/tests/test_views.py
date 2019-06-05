@@ -32,6 +32,7 @@ from lms.djangoapps.program_enrollments.api.v1.constants import (
 )
 from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
 from lms.djangoapps.program_enrollments.models import ProgramEnrollment, ProgramCourseEnrollment
+from lms.djangoapps.program_enrollments.utils import ProviderDoesNotExistException
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory
 from openedx.core.djangoapps.catalog.tests.factories import OrganizationFactory as CatalogOrganizationFactory
@@ -838,6 +839,38 @@ class ProgramEnrollmentViewPostTests(APITestCase):
         self.assertEqual(enrollment.status, 'enrolled')
         self.assertEqual(enrollment.curriculum_uuid, curriculum_uuid)
         self.assertEqual(enrollment.user, user)
+
+    def test_program_enrollments_no_idp(self):
+        program_key = uuid4()
+        curriculum_uuid = uuid4()
+
+        post_data = [
+            {
+                'status': 'enrolled',
+                REQUEST_STUDENT_KEY: 'abc{}'.format(i),
+                'curriculum_uuid': str(curriculum_uuid)
+            } for i in range(3)
+        ]
+
+        url = reverse('programs_api:v1:program_enrollments', args=[program_key])
+
+        with mock.patch('lms.djangoapps.program_enrollments.api.v1.views.get_programs', autospec=True):
+            with mock.patch(
+                'lms.djangoapps.program_enrollments.api.v1.views.get_user_by_program_id',
+                autospec=True,
+                side_effect=ProviderDoesNotExistException()
+            ):
+                response = self.client.post(url, json.dumps(post_data), content_type='application/json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        for i in range(3):
+            enrollment = ProgramEnrollment.objects.get(external_user_key='abc{}'.format(i))
+
+            self.assertEqual(enrollment.program_uuid, program_key)
+            self.assertEqual(enrollment.status, 'enrolled')
+            self.assertEqual(enrollment.curriculum_uuid, curriculum_uuid)
+            self.assertIsNone(enrollment.user)
 
     def test_enrollment_payload_limit(self):
 
