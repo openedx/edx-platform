@@ -68,12 +68,12 @@ class GradesServiceTests(ModuleStoreTestCase):
         )
         self.signal_patcher = patch('lms.djangoapps.grades.signals.signals.SUBSECTION_OVERRIDE_CHANGED.send')
         self.mock_signal = self.signal_patcher.start()
-        self.id_patcher = patch('lms.djangoapps.grades.services.create_new_event_transaction_id')
+        self.id_patcher = patch('lms.djangoapps.grades.api.create_new_event_transaction_id')
         self.mock_create_id = self.id_patcher.start()
         self.mock_create_id.return_value = 1
-        self.type_patcher = patch('lms.djangoapps.grades.services.set_event_transaction_type')
+        self.type_patcher = patch('lms.djangoapps.grades.api.set_event_transaction_type')
         self.mock_set_type = self.type_patcher.start()
-        self.flag_patcher = patch('lms.djangoapps.grades.services.waffle_flags')
+        self.flag_patcher = patch('lms.djangoapps.grades.config.waffle.waffle_flags')
         self.mock_waffle_flags = self.flag_patcher.start()
         self.mock_waffle_flags.return_value = {
             REJECTED_EXAM_OVERRIDES_GRADE: MockWaffleFlag(True)

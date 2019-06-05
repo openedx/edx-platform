@@ -736,6 +736,15 @@ class PersistentSubsectionGradeOverride(models.Model):
             )
         return cleaned_data
 
+    def delete(self, **kwargs):  # pylint: disable=arguments-differ
+        # TODO: a proper history table
+        PersistentSubsectionGradeOverrideHistory.objects.create(
+            override_id=self.id,
+            feature=kwargs.pop('feature', ''),
+            action=PersistentSubsectionGradeOverrideHistory.DELETE
+        )
+        super(PersistentSubsectionGradeOverride, self).delete(**kwargs)
+
 
 class PersistentSubsectionGradeOverrideHistory(models.Model):
     """
