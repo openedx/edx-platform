@@ -103,14 +103,6 @@ class TestCreateJWTs(AccessTokenMixin, TestCase):
         self.assertEqual(user_email_verified, token_payload['email_verified'])
         self.assertEqual(token_payload['roles'], mock_create_roles.return_value)
 
-    def test_default_scopes(self):
-        """
-        Ensure the default scopes are used.
-        """
-        jwt = jwt_api.create_jwt_for_user(self.user)
-        jwt_scopes = jwt_api.create_jwt_for_user(self.user, scopes=self.default_scopes)
-        self.assertEqual(jwt, jwt_scopes)
-
     def test_scopes(self):
         """
         Ensure the requested scopes are used.
