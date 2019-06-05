@@ -4,7 +4,7 @@ Module containing API functions for the CCXCon
 
 from __future__ import absolute_import
 import logging
-import six.moves.urllib.parse
+import six.moves.urllib.parse  # pylint: disable=import-error
 
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
@@ -18,8 +18,8 @@ from openedx.core.djangoapps.models.course_details import CourseDetails
 from student.models import anonymous_id_for_user
 from student.roles import CourseInstructorRole
 
-from .models import CCXCon
 import six
+from .models import CCXCon
 
 log = logging.getLogger(__name__)
 

@@ -6,7 +6,7 @@ from __future__ import absolute_import
 import datetime
 import mock
 import pytz
-import six.moves.urllib.parse
+import six.moves.urllib.parse  # pylint: disable=import-error
 
 from opaque_keys.edx.keys import CourseKey
 from student.tests.factories import AdminFactory
@@ -21,8 +21,8 @@ from xmodule.modulestore.tests.factories import (
 )
 
 from openedx.core.djangoapps.ccxcon import api as ccxconapi
-from .factories import CcxConFactory
 from six.moves import range
+from .factories import CcxConFactory
 
 
 def flatten(seq):
