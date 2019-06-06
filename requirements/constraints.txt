@@ -53,3 +53,9 @@ edx-opaque-keys==0.4.4
 # Unless we constrain pytest to <4.6.0, it may break all tests inside of
 # xmodule.tests.test_resource_templates.ResourceTemplatesTests See TE-2391 for details.
 pytest<4.6.0
+
+# Pinning to older versions of edx-enterprise, edx-rbac, and edx-drf-extensions until
+# a bug is fixed in the edx-drf-extensions package.
+edx-drf-extensions==2.2.1
+edx-enterprise==1.6.0
+edx-rbac==0.2.1
