@@ -37,7 +37,7 @@
     "jquery-migrate": "1.4.1",
     "jquery.scrollto": "2.1.2",
     "js-cookie": "2.2.0",
-    "moment": "2.18.1",
+    "moment": "2.19.3",
     "moment-timezone": "0.5.14",
     "node-sass": "4.7.2",
     "picturefill": "3.0.2",
