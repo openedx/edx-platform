@@ -25,7 +25,8 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from coursewarehistoryextended.fields import UnsignedBigIntAutoField, UnsignedBigIntOneToOneField
 from lms.djangoapps.grades import events, constants
 from openedx.core.lib.cache_utils import get_cache
-
+from simple_history.models import HistoricalRecords
+from simple_history.utils import update_change_reason
 
 log = logging.getLogger(__name__)
 
@@ -652,6 +653,7 @@ class PersistentSubsectionGradeOverride(models.Model):
     possible_graded_override = models.FloatField(null=True, blank=True)
 
     _CACHE_NAMESPACE = u"grades.models.PersistentSubsectionGradeOverride"
+    history = HistoricalRecords()
 
     def __unicode__(self):
         return u', '.join([
@@ -703,6 +705,7 @@ class PersistentSubsectionGradeOverride(models.Model):
             grade=subsection_grade_model,
             defaults=cls._prepare_override_params(subsection_grade_model, override_data),
         )
+        update_change_reason(override, feature)
 
         action = action or PersistentSubsectionGradeOverrideHistory.CREATE_OR_UPDATE
 
