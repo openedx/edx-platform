@@ -4,7 +4,7 @@
   "dependencies": {
     "@edx/cookie-policy-banner": "1.1.10",
     "@edx/edx-bootstrap": "1.0.3",
-    "@edx/edx-proctoring": "^1.5.0",
+    "@edx/edx-proctoring": "1.5.0",
     "@edx/paragon": "2.6.4",
     "@edx/studio-frontend": "1.16.14",
     "babel-core": "6.26.0",
@@ -67,7 +67,7 @@
     "which-country": "1.0.0"
   },
   "devDependencies": {
-    "@edx/mockprock": "^1.0.1",
+    "@edx/mockprock": "1.0.2",
     "@edx/stylelint-config-edx": "1.1.0",
     "babel-jest": "23.0.1",
     "edx-custom-a11y-rules": "1.0.6",
