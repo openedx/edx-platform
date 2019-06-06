@@ -5,6 +5,7 @@ This module contains signals related to enterprise.
 from __future__ import absolute_import
 
 import logging
+import six
 
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save, pre_save
@@ -56,7 +57,7 @@ def update_dsc_cache_on_enterprise_customer_update(sender, instance, **kwargs):
         new_value = instance.enable_data_sharing_consent
         old_value = old_instance.enable_data_sharing_consent
         if new_value != old_value:
-            kwargs = {'enterprise_customer_uuid': instance.uuid}
+            kwargs = {'enterprise_customer_uuid': six.text_type(instance.uuid)}
             result = clear_enterprise_customer_data_consent_share_cache.apply_async(kwargs=kwargs)
             log.info(u"DSC: Created {task_name}[{task_id}] with arguments {kwargs}".format(
                 task_name=clear_enterprise_customer_data_consent_share_cache.name,
