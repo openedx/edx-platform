@@ -43,7 +43,7 @@
     <header class="post-header">
         <% if (!readOnly) { %>
             <div class="post-header-actions">
-                <%=
+                <%= /* xss-lint: disable=underscore-not-escaped */
                 _.template(
                     $('#forum-actions').html())(
                     {
@@ -76,7 +76,8 @@
                 postedTimeAgoMessage = gettext('question posted %(time_ago)s by %(author)s');
             }
             %>
-            <%= interpolate(_.escape(postedTimeAgoMessage), {time_ago: timeAgoHtml, author: author_display}, true) %>
+            <%= /* xss-lint: disable=underscore-not-escaped */
+            interpolate(_.escape(postedTimeAgoMessage), {time_ago: timeAgoHtml, author: author_display}, true) %>
             </p>
             <div class="post-labels">
                 <span class="post-label post-label-pinned">
@@ -102,7 +103,7 @@
                 true
             );
             %>
-            <%=
+            <%= /* xss-lint: disable=underscore-not-escaped */
             interpolate(
                 _.escape(gettext('Related to: %(courseware_title_linked)s')),
                 {courseware_title_linked: courseware_title_linked},
@@ -174,9 +175,9 @@
 <script aria-hidden="true" type="text/template" id="thread-response-show-template">
 <header class="response-header">
   <div class="response-header-content">
-    <%= author_display %>
+    <%- author_display %>
     <p class="posted-details">
-        <span class="timeago" title="<%= created_at %>"><%= created_at %></span>
+        <span class="timeago" title="<%= HtmlUtils.HTML(created_at) %>"><%= HtmlUtils.HTML(created_at) %></span>
         <% if (obj.endorsement && obj.endorsed) { %>
             -
             <%
@@ -208,7 +209,8 @@
               true
             );
             %>
-            <%= interpolate(fmt, {time_ago: time_ago, user: endorser_display}, true) %>
+            <%= /* xss-lint: disable=underscore-not-escaped */
+                interpolate(fmt, {time_ago: time_ago, user: endorser_display}, true) %>
         <% } %>
       </p>
       <div class="post-labels">
@@ -218,7 +220,7 @@
       </div>
       </div>
       <div class="response-header-actions">
-        <%=
+        <%= /* xss-lint: disable=underscore-not-escaped */
             _.template(
                 $('#forum-actions').html())(
                 {
@@ -249,7 +251,7 @@
 <script aria-hidden="true" type="text/template" id="response-comment-show-template">
 <div class="discussion-comment" id="comment_<%- id %>">
   <div class="response-body"><%- body %></div>
-  <%=
+  <%= /* xss-lint: disable=underscore-not-escaped */
       _.template(
           $('#forum-actions').html())(
           {
@@ -269,7 +271,8 @@
       true
     );
     %>
-    <%= interpolate(
+    <%= /* xss-lint: disable=underscore-not-escaped */
+    interpolate(
       // Translators: 'timeago' is a placeholder for a fuzzy, relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
       gettext("posted %(time_ago)s by %(author)s"),
       {time_ago: time_ago, author: author_display},
@@ -314,8 +317,8 @@
           sr_text = gettext("unanswered question");
       }
       %>
-      <span class="sr"><%= sr_text %></span>
-      <span class="icon fa <%= icon_class %>" aria-hidden="true"></span>
+      <span class="sr"><%= HtmlUtils.HTML(sr_text) %></span>
+      <span class="icon fa <%- icon_class %>" aria-hidden="true"></span>
     </div><div class="forum-nav-thread-wrapper-1">
       <span class="forum-nav-thread-title"><%- title %></span>
       <% if (showThreadPreview){ %>
@@ -364,7 +367,8 @@
       );
       %>
       <span class="forum-nav-thread-votes-count">
-      +<%= interpolate(fmt, {
+      +<%= /* xss-lint: disable=underscore-not-escaped */
+           interpolate(fmt, {
                votes_count: votes['up_count'],
                span_start: '<span class="sr">',
                span_end: '</span>'
@@ -589,31 +593,31 @@
 <nav class="discussion-paginator">
     <ol>
         <% if (previous) { %>
-            <li class="previous-page"><a class="discussion-pagination" href="<%= previous.url %>" data-page-number="<%= previous.number %>">&lt; <%- gettext("Previous") %></a></li>
+            <li class="previous-page"><a class="discussion-pagination" href="<%- previous.url() %>" data-page-number="<%- previous.number %>">&lt; <%- gettext("Previous") %></a></li>
         <% } %>
         <% if (first) { %>
-            <li class="first-page"><a class="discussion-pagination" href="<%= first.url %>" data-page-number="1">1</a></li>
+            <li class="first-page"><a class="discussion-pagination" href="<%- first.url() %>" data-page-number="1">1</a></li>
         <% } %>
         <% if (leftdots) { %>
             <li class="previous-ellipses"><%- gettext("…") %></li>
         <% } %>
 
         <% _.each(lowPages, function(page) { %>
-            <li class="lower-page"><a class="discussion-pagination" href="<%= page.url %>" data-page-number="<%= page.number %>"><%= page.number %></a></li>
+            <li class="lower-page"><a class="discussion-pagination" href="<%- page.url() %>" data-page-number="<%- page.number %>"><%- page.number %></a></li>
         <% }); %>
-        <li class="current-page"><span><%= page %></span></li>
+        <li class="current-page"><span><%- page %></span></li>
         <% _.each(highPages, function(page) { %>
-            <li class="higher-page"><a class="discussion-pagination" href="<%= page.url %>" data-page-number="<%= page.number %>"><%= page.number %></a></li>
+            <li class="higher-page"><a class="discussion-pagination" href="<%- page.url() %>" data-page-number="<%- page.number %>"><%- page.number %></a></li>
         <% }); %>
 
         <% if (rightdots) { %>
             <li class="next-ellipses"><%- gettext("…") %></li>
         <% } %>
         <% if (last) { %>
-            <li class="last-page"><a class="discussion-pagination" href="<%= last.url %>" data-page-number="<%= last.number %>"><%= last.number %></a></li>
+            <li class="last-page"><a class="discussion-pagination" href="<%- last.url() %>" data-page-number="<%- last.number %>"><%- last.number %></a></li>
         <% } %>
         <% if (next) { %>
-            <li class="next-page"><a class="discussion-pagination" href="<%= next.url %>" data-page-number="<%= next.number %>"><%- gettext("Next") %> &gt;</a></li>
+            <li class="next-page"><a class="discussion-pagination" href="<%- next.url() %>" data-page-number="<%- next.number %>"><%- gettext("Next") %> &gt;</a></li>
         <% } %>
     </ol>
 </nav>
@@ -636,7 +640,7 @@
                 </span>
             </p>
         </header>
-        <div class="post-body"><%= abbreviatedBody %></div>
+        <div class="post-body"><%= HtmlUtils.HTML(abbreviatedBody) %></div>
     </div>
     <div class="post-tools">
         <a href="<%- permalink %>"><%- gettext("View discussion") %></a>
@@ -717,16 +721,16 @@
         <%- gettext("Questions raise issues that need answers. Discussions share ideas and start conversations. (Required)") %>
     </div>
     <div class="field-label">
-        <label for="<%= form_id %>-post-type-question" class="post-type-label">
-            <input aria-describedby="field_help_post_type" type="radio" name="<%= form_id %>-post-type" class="field-input input-radio" id="<%= form_id %>-post-type-question" value="question">
+        <label for="<%- edx.StringUtils.interpolate(form_id) %>-post-type-question" class="post-type-label">
+            <input aria-describedby="field_help_post_type" type="radio" name="<%- edx.StringUtils.interpolate(form_id) %>-post-type" class="field-input input-radio" id="<%- edx.StringUtils.interpolate(form_id) %>-post-type-question" value="question">
             <span class="field-input-label">
                 <span class="icon fa fa-question" aria-hidden="true"></span>
                 <% // Translators: This is a forum post type %>
                 <%- gettext("Question") %>
             </span>
         </label>
-        <label for="<%= form_id %>-post-type-discussion" class="post-type-label">
-            <input aria-describedby="field_help_post_type" type="radio" name="<%= form_id %>-post-type" class="field-input input-radio" id="<%= form_id %>-post-type-discussion" value="discussion" checked>
+        <label for="<%- edx.StringUtils.interpolate(form_id) %>-post-type-discussion" class="post-type-label">
+            <input aria-describedby="field_help_post_type" type="radio" name="<%- edx.StringUtils.interpolate(form_id) %>-post-type" class="field-input input-radio" id="<%- edx.StringUtils.interpolate(form_id) %>-post-type-discussion" value="discussion" checked>
             <span class="field-input-label">
                 <span class="icon fa fa-comments" aria-hidden="true"></span>
                 <% // Translators: This is a forum post type %>
