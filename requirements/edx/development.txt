@@ -209,7 +209,7 @@ mpmath==1.1.0
 mysqlclient==1.4.2.post1
 networkx==1.7
 newrelic==4.20.0.120
-nltk==3.4.1
+nltk==3.4.2
 nodeenv==1.1.1
 numpy==1.16.4
 oauth2==1.9.0.post1
