@@ -8,7 +8,6 @@ import os
 from datetime import datetime, timedelta
 
 import ddt
-import pysnooper
 import six
 from django.conf import settings
 from django.test.client import RequestFactory, Client
@@ -491,6 +490,24 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
             request_factory=self.factory,
         )
 
+    def test_dump_memory_and_fail(self):
+        import os
+        import psutil
+
+        PROCESS = psutil.Process(os.getpid())
+        MEGA = 10 ** 6
+        MEGA_STR = ' ' * MEGA
+
+        try:
+            tot, avail, percent, used, free, active, inactive, buffers = psutil.virtual_memory()
+        except ValueError:
+            tot, avail, percent, used, free, active, inactive, buffers, cached, shared = psutil.virtual_memory()
+        tot, avail, used, free = tot / MEGA, avail / MEGA, used / MEGA, free / MEGA
+        proc = PROCESS.memory_info()[1] / MEGA
+        print('process = %s total = %s avail = %s used = %s free = %s percent = %s'
+              % (proc, tot, avail, used, free, percent))
+        assert False
+
     @ddt.data(
         ('audit', 'problem', 'default', True),
         ('verified', 'problem', 'default', False),
@@ -540,33 +557,33 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
             has_upgrade_link=False
         )
 
-    # @ddt.data(
-    #     ('problem', 'graded_problem', 'audit', 404),
-    #     ('problem', 'graded_problem', 'verified', 200),
-    #     ('problem', 'ungraded_problem', 'audit', 200),
-    #     ('problem', 'ungraded_problem', 'verified', 200),
-    # )
-    # @ddt.unpack
-    # def test_xblock_handlers(self, xblock_type, xblock_name, user, status_code):
-    #     """
-    #     Test the ajax calls to the problem xblock to ensure the LMS is sending back
-    #     the expected response codes on requests when content is gated for audit users
-    #     (404) and when it is available to audit users (200). Content is always available
-    #     to verified users.
-    #     """
-    #     problem_location = self.blocks_dict[xblock_name].scope_ids.usage_id
-    #     url = reverse(
-    #         'xblock_handler',
-    #         kwargs={
-    #             'course_id': six.text_type(self.course.id),
-    #             'usage_id': quote_slashes(six.text_type(problem_location)),
-    #             'handler': 'xmodule_handler',
-    #             'suffix': 'problem_show',
-    #         }
-    #     )
-    #     self.client.login(username=self.users[user].username, password=TEST_PASSWORD)
-    #     response = self.client.post(url)
-    #     self.assertEqual(response.status_code, status_code)
+    @ddt.data(
+        ('problem', 'graded_problem', 'audit', 404),
+        ('problem', 'graded_problem', 'verified', 200),
+        ('problem', 'ungraded_problem', 'audit', 200),
+        ('problem', 'ungraded_problem', 'verified', 200),
+    )
+    @ddt.unpack
+    def test_xblock_handlers(self, xblock_type, xblock_name, user, status_code):
+        """
+        Test the ajax calls to the problem xblock to ensure the LMS is sending back
+        the expected response codes on requests when content is gated for audit users
+        (404) and when it is available to audit users (200). Content is always available
+        to verified users.
+        """
+        problem_location = self.blocks_dict[xblock_name].scope_ids.usage_id
+        url = reverse(
+            'xblock_handler',
+            kwargs={
+                'course_id': six.text_type(self.course.id),
+                'usage_id': quote_slashes(six.text_type(problem_location)),
+                'handler': 'xmodule_handler',
+                'suffix': 'problem_show',
+            }
+        )
+        self.client.login(username=self.users[user].username, password=TEST_PASSWORD)
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status_code)
 
     @ddt.data(
         InstructorFactory,
@@ -660,7 +677,6 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
             request_factory=self.factory,
         )
 
-    @pysnooper.snoop()
     @ddt.data(
         ({'user_partition_id': CONTENT_GATING_PARTITION_ID,
           'group_id': CONTENT_TYPE_GATE_GROUP_IDS['limited_access']}, True),
