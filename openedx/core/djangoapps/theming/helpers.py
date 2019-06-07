@@ -45,10 +45,7 @@ def get_template(uri):
     This is a proxy function to hide microsite_configuration behind comprehensive theming.
     :param uri: uri of the template
     """
-    # We need to give priority to theming over microsites
-    # So, we apply microsite template override only when there is no associated theme,
-    if not current_request_has_associated_site_theme():
-        return microsite.get_template(uri)
+    return None
 
 
 def get_template_path_with_theme(relative_path):
@@ -324,14 +321,8 @@ def is_comprehensive_theming_enabled():
     Returns:
          (bool): True if comprehensive theming is enabled else False
     """
-    # We need to give priority to theming over microsites
     if settings.ENABLE_COMPREHENSIVE_THEMING and current_request_has_associated_site_theme():
         return True
-
-    # Disable theming for microsites
-    # Microsite configurations take priority over the default site theme.
-    if microsite.is_request_in_microsite():
-        return False
 
     return settings.ENABLE_COMPREHENSIVE_THEMING
 
