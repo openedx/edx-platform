@@ -50,7 +50,7 @@ from six import string_types
         $.ajax({
           url: "${reverse('add_course_to_cart', args=[text_type(course.id)]) | n, js_escaped_string}",
           type: "POST",
-          /* Rant: HAD TO USE COMPLETE B/C PROMISE.DONE FOR SOME REASON DOES NOT WORK ON THIS PAGE. */
+          /* Using `complete` as promise.done did not work on this page */
           complete: add_course_complete_handler
         })
         event.preventDefault();
@@ -58,13 +58,17 @@ from six import string_types
     % endif
 
     $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
-      if(xhr.status == 200) {
+      if (xhr.status == 200) {
         if (xhr.responseText == "") {
           location.href = "${reverse('dashboard') | n, js_escaped_string}";
         }
         else {
           location.href = xhr.responseText;
         }
+      } else if (xhr.status == 403) {
+        $('#register_error').text(
+            (xhr.responseText ? xhr.responseText : "${_("An error has occurred. Please ensure that you are logged in to enroll.") | n, js_escaped_string}")
+        ).css("display", "block");
       } else {
         $('#register_error').text(
             (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.") | n, js_escaped_string}")
