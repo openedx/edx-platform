@@ -125,7 +125,7 @@ class CourseRunImageSerializer(serializers.Serializer):
 class CourseRunSerializerCommonFieldsMixin(serializers.Serializer):
     schedule = CourseRunScheduleSerializer(source='*', required=False)
     pacing_type = CourseRunPacingTypeField(source='self_paced', required=False,
-                                           choices=(('instructor_paced', False), ('self_paced', True),))
+                                           choices=((False, 'instructor_paced'), (True, 'self_paced'),))
 
 
 class CourseRunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTeamSerializerMixin, serializers.Serializer):
