@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "dependencies": {
     "@edx/cookie-policy-banner": "1.1.10",
-    "@edx/edx-bootstrap": "1.0.3",
+    "@edx/edx-bootstrap": "1.0.4",
     "@edx/edx-proctoring": "^1.5.0",
     "@edx/paragon": "2.6.4",
     "@edx/studio-frontend": "1.16.14",
