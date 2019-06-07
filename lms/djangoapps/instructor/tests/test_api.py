@@ -34,15 +34,15 @@ from six.moves import range, zip
 from bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.models import StudentModule
-from courseware.tests.factories import (
+from lms.djangoapps.courseware.models import StudentModule
+from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
     GlobalStaffFactory,
     InstructorFactory,
     StaffFactory,
     UserProfileFactory
 )
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from edx_when.api import get_overrides_for_user
 from edx_when.signals import extract_dates
 from lms.djangoapps.certificates.models import CertificateStatuses

@@ -12,7 +12,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from pytz import UTC
 
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_string
 from instructor_analytics.basic import enrolled_students_features, list_may_enroll
 from instructor_analytics.csvs import format_dictlist

@@ -19,7 +19,7 @@ from django.urls import reverse
 
 from capa.xqueue_interface import XQueueInterface
 from course_modes.models import CourseMode
-from courseware.tests.factories import GlobalStaffFactory, InstructorFactory, UserFactory
+from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, InstructorFactory, UserFactory
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,

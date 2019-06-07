@@ -10,7 +10,7 @@ from django.utils.translation import ugettext as _
 from opaque_keys.edx.locator import BlockUsageLocator
 from six import text_type
 
-from courseware import models
+from lms.djangoapps.courseware import models
 from instructor_analytics.csvs import create_csv_response
 from util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore

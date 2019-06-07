@@ -24,7 +24,7 @@ from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
 from six import text_type
 
-import coursewarehistoryextended
+import lms.djangoapps.coursewarehistoryextended
 from opaque_keys.edx.django.models import BlockTypeKeyField, CourseKeyField, UsageKeyField
 
 from openedx.core.djangolib.markup import HTML

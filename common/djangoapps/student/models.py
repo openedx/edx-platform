@@ -55,7 +55,7 @@ from slumber.exceptions import HttpClientError, HttpServerError
 from user_util import user_util
 
 from course_modes.models import CourseMode, get_cosmetic_verified_display_price
-from courseware.models import (
+from lms.djangoapps.courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
     DynamicUpgradeDeadlineConfiguration,
     OrgDynamicUpgradeDeadlineConfiguration
@@ -1252,7 +1252,7 @@ class CourseEnrollment(models.Model):
         """
         # Disable the pylint error here, as per ormsbee. This local import was previously
         # in CourseEnrollment.enroll
-        from courseware.access import has_access  # pylint: disable=import-error
+        from lms.djangoapps.courseware.access import has_access  # pylint: disable=import-error
         return not has_access(user, 'enroll', course)
 
     def update_enrollment(self, mode=None, is_active=None, skip_refund=False):

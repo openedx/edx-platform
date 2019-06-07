@@ -14,7 +14,7 @@ from django.utils.translation import ugettext as _
 from eventtracking import tracker
 
 from course_modes.models import CourseMode
-from courseware.date_summary import verified_upgrade_deadline_link
+from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
 from lms.djangoapps.experiments.utils import stable_bucketing_hash_group
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
 from openedx.core.djangoapps.schedules.resolvers import (

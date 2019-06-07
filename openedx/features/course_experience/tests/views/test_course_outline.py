@@ -22,7 +22,7 @@ from six import text_type
 from waffle.models import Switch
 from waffle.testutils import override_switch
 
-from courseware.tests.factories import StaffFactory
+from lms.djangoapps.courseware.tests.factories import StaffFactory
 from gating import api as lms_gating_api
 from lms.djangoapps.course_api.blocks.transformers.milestones import MilestonesAndSpecialExamsTransformer
 from openedx.core.lib.gating import api as gating_api

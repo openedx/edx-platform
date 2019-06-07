@@ -24,7 +24,7 @@ import track.views
 from bulk_email.api import is_bulk_email_feature_enabled
 from bulk_email.models import Optout  # pylint: disable=import-error
 from course_modes.models import CourseMode
-from courseware.access import has_access
+from lms.djangoapps.courseware.access import has_access
 from edxmako.shortcuts import render_to_response, render_to_string
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error

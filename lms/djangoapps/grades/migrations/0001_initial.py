@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-import coursewarehistoryextended.fields
+import lms.djangoapps.coursewarehistoryextended.fields
 import django.utils.timezone
 import model_utils.fields
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField

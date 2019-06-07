@@ -14,8 +14,8 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import i4xEncoder
 from six import text_type
 
-from courseware import courses
-from courseware.access import has_access
+from lms.djangoapps.courseware import courses
+from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from lms.djangoapps.discussion.django_comment_client.permissions import (
     check_permissions_by_view, get_team, has_permission,

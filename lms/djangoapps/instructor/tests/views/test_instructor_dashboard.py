@@ -20,9 +20,9 @@ from six.moves import range
 
 from common.test.utils import XssTestMixin
 from course_modes.models import CourseMode
-from courseware.tabs import get_course_tab_list
-from courseware.tests.factories import StaffFactory, StudentModuleFactory, UserFactory
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.tabs import get_course_tab_list
+from lms.djangoapps.courseware.tests.factories import StaffFactory, StudentModuleFactory, UserFactory
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
 from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info

@@ -13,8 +13,8 @@ from django.test.utils import override_settings
 from edx_django_utils.cache import RequestCache
 from six.moves import range
 
-from courseware.courses import get_course_by_id
-from courseware.testutils import FieldOverrideTestMixin
+from lms.djangoapps.courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.testutils import FieldOverrideTestMixin
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import override_field_for_ccx
 from lms.djangoapps.ccx.tests.utils import flatten, iter_blocks

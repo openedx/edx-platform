@@ -20,8 +20,8 @@ from six import text_type
 from six.moves import zip, zip_longest
 
 from course_blocks.api import get_course_blocks
-from courseware.courses import get_course_by_id
-from courseware.user_state_client import DjangoXBlockUserStateClient
+from lms.djangoapps.courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from instructor_analytics.basic import list_problem_responses
 from instructor_analytics.csvs import format_dictlist
 from lms.djangoapps.certificates.models import CertificateWhitelist, GeneratedCertificate, certificate_info_for_user

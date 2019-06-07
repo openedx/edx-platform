@@ -23,8 +23,8 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from xblock.core import XBlock
 
-from courseware.testutils import FieldOverrideTestMixin
-from courseware.views.views import progress
+from lms.djangoapps.courseware.testutils import FieldOverrideTestMixin
+from lms.djangoapps.courseware.views.views import progress
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache

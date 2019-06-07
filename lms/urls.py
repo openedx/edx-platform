@@ -12,11 +12,11 @@ from rest_framework_swagger.views import get_swagger_view
 
 from branding import views as branding_views
 from config_models.views import ConfigurationModelCurrentAPIView
-from courseware.masquerade import handle_ajax as courseware_masquerade_handle_ajax
-from courseware.module_render import handle_xblock_callback, handle_xblock_callback_noauth, xblock_view, xqueue_callback
-from courseware.views import views as courseware_views
-from courseware.views.index import CoursewareIndex
-from courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
+from lms.djangoapps.courseware.masquerade import handle_ajax as courseware_masquerade_handle_ajax
+from lms.djangoapps.courseware.module_render import handle_xblock_callback, handle_xblock_callback_noauth, xblock_view, xqueue_callback
+from lms.djangoapps.courseware.views import views as courseware_views
+from lms.djangoapps.courseware.views.index import CoursewareIndex
+from lms.djangoapps.courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
 from debug import views as debug_views
 from lms.djangoapps.certificates import views as certificates_views
 from lms.djangoapps.discussion import views as discussion_views

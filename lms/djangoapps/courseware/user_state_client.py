@@ -17,7 +17,7 @@ from edx_django_utils import monitoring as monitoring_utils
 from edx_user_state_client.interface import XBlockUserState, XBlockUserStateClient
 from xblock.fields import Scope
 
-from courseware.models import BaseStudentModuleHistory, StudentModule
+from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
 
 try:
     import simplejson as json

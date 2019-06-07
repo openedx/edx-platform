@@ -40,16 +40,16 @@ from xblock.runtime import KvsFieldData
 
 import static_replace
 from capa.xqueue_interface import XQueueInterface
-from courseware.access import get_user_role, has_access
-from courseware.access_response import IncorrectPartitionGroupError
-from courseware.entrance_exams import user_can_skip_entrance_exam, user_has_passed_entrance_exam
-from courseware.masquerade import (
+from lms.djangoapps.courseware.access import get_user_role, has_access
+from lms.djangoapps.courseware.access_response import IncorrectPartitionGroupError
+from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam, user_has_passed_entrance_exam
+from lms.djangoapps.courseware.masquerade import (
     MasqueradingKeyValueStore,
     filter_displayed_blocks,
     is_masquerading_as_specific_student,
     setup_masquerade
 )
-from courseware.model_data import DjangoKeyValueStore, FieldDataCache
+from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData

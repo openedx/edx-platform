@@ -10,8 +10,8 @@ from django.http import Http404
 from django.utils.translation import ugettext_noop
 from opaque_keys.edx.keys import CourseKey
 
-from courseware.courses import get_course_with_access
-from courseware.tabs import EnrolledTab
+from lms.djangoapps.courseware.courses import get_course_with_access
+from lms.djangoapps.courseware.tabs import EnrolledTab
 from edxmako.shortcuts import render_to_response
 from notes.models import Note
 from notes.utils import notes_enabled_for_course

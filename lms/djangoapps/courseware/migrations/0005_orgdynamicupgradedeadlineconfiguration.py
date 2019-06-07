@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 import django.db.models.deletion
 from django.conf import settings
-import courseware.models
+import lms.djangoapps.courseware.models
 
 
 class Migration(migrations.Migration):

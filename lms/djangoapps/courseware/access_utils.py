@@ -10,8 +10,8 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from pytz import UTC
 
-from courseware.access_response import AccessResponse, StartDateError
-from courseware.masquerade import (
+from lms.djangoapps.courseware.access_response import AccessResponse, StartDateError
+from lms.djangoapps.courseware.masquerade import (
     get_course_masquerade,
     is_masquerading_as_student
 )

@@ -36,7 +36,7 @@ from xblock.exceptions import InvalidScopeError, KeyValueMultiSaveError
 from xblock.fields import Scope, UserScope
 from xblock.runtime import KeyValueStore
 
-from courseware.user_state_client import DjangoXBlockUserStateClient
+from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from xmodule.modulestore.django import modulestore
 
 from .models import StudentModule, XModuleStudentInfoField, XModuleStudentPrefsField, XModuleUserStateSummaryField

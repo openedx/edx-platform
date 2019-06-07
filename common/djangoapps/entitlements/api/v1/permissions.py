@@ -7,7 +7,7 @@ from __future__ import absolute_import
 
 from rest_framework.permissions import SAFE_METHODS, BasePermission
 
-from courseware.access import has_access
+from lms.djangoapps.courseware.access import has_access
 
 
 class IsAdminOrSupportOrAuthenticatedReadOnly(BasePermission):

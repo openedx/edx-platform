@@ -17,7 +17,7 @@ from opaque_keys.edx.locator import CourseLocator
 from six import text_type
 from six.moves import range
 
-from courseware.tabs import CourseTab, get_course_tab_list
+from lms.djangoapps.courseware.tabs import CourseTab, get_course_tab_list
 from notes import api, models, utils
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

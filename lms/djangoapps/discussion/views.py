@@ -23,9 +23,9 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from web_fragments.fragment import Fragment
 
-from courseware.access import has_access
-from courseware.courses import get_course_with_access
-from courseware.views.views import CourseTabView
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_with_access
+from lms.djangoapps.courseware.views.views import CourseTabView
 import lms.djangoapps.discussion.django_comment_client.utils as utils
 from lms.djangoapps.discussion.django_comment_client.base.views import track_thread_viewed_event
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY

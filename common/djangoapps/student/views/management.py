@@ -46,7 +46,7 @@ from six import text_type
 import track.views
 from bulk_email.models import Optout
 from course_modes.models import CourseMode
-from courseware.courses import get_courses, sort_by_announcement, sort_by_start_date
+from lms.djangoapps.courseware.courses import get_courses, sort_by_announcement, sort_by_start_date
 from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
 from entitlements.models import CourseEntitlement
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context

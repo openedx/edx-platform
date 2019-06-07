@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
 
-from courseware import models
+from lms.djangoapps.courseware import models
 
 admin.site.register(models.DynamicUpgradeDeadlineConfiguration, ConfigurationModelAdmin)
 admin.site.register(models.OfflineComputedGrade)

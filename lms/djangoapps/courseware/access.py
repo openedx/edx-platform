@@ -20,12 +20,12 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from six import text_type
 from xblock.core import XBlock
 
-from courseware.access_response import (
+from lms.djangoapps.courseware.access_response import (
     MilestoneAccessError,
     MobileAvailabilityError,
     VisibilityError,
 )
-from courseware.access_utils import (
+from lms.djangoapps.courseware.access_utils import (
     ACCESS_DENIED,
     ACCESS_GRANTED,
     adjust_start_date,
@@ -34,11 +34,11 @@ from courseware.access_utils import (
     in_preview_mode,
     check_course_open_for_learner,
 )
-from courseware.access_response import (
+from lms.djangoapps.courseware.access_response import (
     NoAllowedPartitionGroupsError,
     IncorrectPartitionGroupError,
 )
-from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
+from lms.djangoapps.courseware.masquerade import get_masquerade_role, is_masquerading_as_student
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from mobile_api.models import IgnoreMobileAvailableFlagConfig

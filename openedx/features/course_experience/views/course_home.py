@@ -15,8 +15,8 @@ from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
 from course_modes.models import get_cosmetic_verified_display_price
-from courseware.access import has_access
-from courseware.courses import can_self_enroll_in_course, get_course_info_section, get_course_with_access
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import can_self_enroll_in_course, get_course_info_section, get_course_with_access
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.api import (
     get_course_goal,
