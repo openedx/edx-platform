@@ -32,3 +32,7 @@ class BookmarksConfig(AppConfig):
     def ready(self):
         # Register the signals handled by bookmarks.
         from . import signals
+        # Register the tasks handled by signals
+        from . import tasks
+        from cms import CELERY_APP
+        CELERY_APP.tasks.register(task=tasks.update_xblocks_cache)
