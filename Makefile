@@ -63,7 +63,8 @@ REQ_FILES = \
 	requirements/edx-sandbox/base \
 	requirements/edx/base \
 	requirements/edx/testing \
-	requirements/edx/development
+	requirements/edx/development \
+	scripts/xblock/requirements
 
 upgrade: export CUSTOM_COMPILE_COMMAND=make upgrade
 upgrade: ## update the pip requirements files to use the latest releases satisfying our constraints
