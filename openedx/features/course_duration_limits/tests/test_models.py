@@ -236,21 +236,21 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
             all_configs[CourseLocator('7-True', 'test_course', 'run-None')],
             {
                 'enabled': (True, Provenance.org),
-                'enabled_as_of': (datetime(2018, 1, 1, 5, tzinfo=pytz.UTC), Provenance.run),
+                'enabled_as_of': (datetime(2018, 1, 1, 0, tzinfo=pytz.UTC), Provenance.run),
             }
         )
         self.assertEqual(
             all_configs[CourseLocator('7-True', 'test_course', 'run-False')],
             {
                 'enabled': (False, Provenance.run),
-                'enabled_as_of': (datetime(2018, 1, 1, 5, tzinfo=pytz.UTC), Provenance.run),
+                'enabled_as_of': (datetime(2018, 1, 1, 0, tzinfo=pytz.UTC), Provenance.run),
             }
         )
         self.assertEqual(
             all_configs[CourseLocator('7-None', 'test_course', 'run-None')],
             {
                 'enabled': (True, Provenance.site),
-                'enabled_as_of': (datetime(2018, 1, 1, 5, tzinfo=pytz.UTC), Provenance.run),
+                'enabled_as_of': (datetime(2018, 1, 1, 0, tzinfo=pytz.UTC), Provenance.run),
             }
         )
 
