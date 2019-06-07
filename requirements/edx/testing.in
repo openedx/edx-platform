@@ -41,6 +41,7 @@ pytest-cov                # pytest plugin for measuring code coverage.
 pytest-django             # Django support for pytest
 pytest-randomly           # pytest plugin to randomly order tests
 pytest-xdist              # Parallel execution of tests on multiple CPU cores or hosts
+pysnooper                 # temp for debugging tests
 radon                     # Calculates cyclomatic complexity of Python code (code quality utility)
 selenium                  # Browser automation library, used for acceptance tests
 singledispatch            # Backport of functools.singledispatch from Python 3.4+, used in tests of XBlock rendering

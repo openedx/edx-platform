@@ -6,9 +6,12 @@ from __future__ import absolute_import
 
 import mock
 
+import pysnooper
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
+
+
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.features.enterprise_support.tests import (
     FAKE_ENTERPRISE_CUSTOMER,
@@ -55,6 +58,7 @@ class EnterpriseMiddlewareTest(TestCase):
         self.client.get(self.dashboard)
         assert self.client.session.get('enterprise_customer') == self.enterprise_customer
 
+    @pysnooper.snoop()
     def test_enterprise_customer_cached(self):
         """The middleware doesn't attempt to refill `enterprise_customer` if it already exists in the session."""
         assert not self.mock_enterprise_customer_from_api.called

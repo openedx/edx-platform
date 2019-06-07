@@ -8,6 +8,7 @@ import os
 from datetime import datetime, timedelta
 
 import ddt
+import pysnooper
 import six
 from django.conf import settings
 from django.test.client import RequestFactory, Client
@@ -659,6 +660,7 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
             request_factory=self.factory,
         )
 
+    @pysnooper.snoop()
     @ddt.data(
         ({'user_partition_id': CONTENT_GATING_PARTITION_ID,
           'group_id': CONTENT_TYPE_GATE_GROUP_IDS['limited_access']}, True),
