@@ -1173,7 +1173,7 @@ INSTALLED_APPS = [
     'pipeline_mako',
 
     # API Documentation
-    'rest_framework_swagger',
+    'drf_yasg',
 
     'openedx.features.course_duration_limits',
     'openedx.features.content_type_gating',
