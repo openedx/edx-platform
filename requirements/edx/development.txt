@@ -335,3 +335,6 @@ xmlsec==1.3.3
 xmltodict==0.12.0
 zendesk==1.1.1
 zipp==0.5.1
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools==41.0.1        # via caniusepython3, fs, lazy, pytest, python-levenshtein, sphinx, tox
