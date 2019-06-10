@@ -9,7 +9,7 @@ from copy import deepcopy
 from itertools import chain
 
 import six
-from six.moves.urllib.parse import urljoin, urlparse, urlunparse  # pylint: disable=E0401 [import-error]
+from six.moves.urllib.parse import urljoin, urlparse, urlunparse  # pylint: disable=import-error
 from dateutil.parser import parse
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -329,7 +329,9 @@ class ProgramProgressMeter(object):
                 if modes_match and certificate_api.is_passing_status(certificate.status):
                     course_overview = CourseOverview.get_from_id(key)
                     available_date = available_date_for_certificate(course_overview, certificate)
-                    earliest_course_run_date = min([date for date in [available_date, earliest_course_run_date] if date])
+                    earliest_course_run_date = min(
+                        [date for date in [available_date, earliest_course_run_date] if date]
+                    )
 
             # If we're missing a cert for a course, the program isn't completed and we should just bail now
             if earliest_course_run_date is None:
