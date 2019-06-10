@@ -2,17 +2,19 @@
 Factories for generating edXML for testing XModule import
 """
 
+from __future__ import absolute_import
+
 import inspect
-
 from tempfile import mkdtemp
-from fs.osfs import OSFS
-from factory import Factory, lazy_attribute, post_generation, Sequence
-from lxml import etree
 
+from factory import Factory, Sequence, lazy_attribute, post_generation
+from fs.osfs import OSFS
+from lxml import etree
 from xblock.mixins import HierarchyMixin
+
+from xmodule.modulestore import only_xmodules
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
-from xmodule.modulestore import only_xmodules
 
 
 class XmlImportData(object):
