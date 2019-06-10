@@ -1245,7 +1245,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                     'default_time_limit_minutes': xblock.default_time_limit_minutes,
                     'proctoring_exam_configuration_link': proctoring_exam_configuration_link,
                     'supports_onboarding': supports_onboarding,
-                    'show_review_rules': show_review_rules # SHOW_REVIEW_RULES_FLAG.is_enabled(xblock.location.course_key),
+                    'show_review_rules': show_review_rules
                 })
 
 
