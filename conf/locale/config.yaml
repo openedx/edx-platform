@@ -2,8 +2,7 @@
 
 # This will copy each source language to a new directory at the end of the i18n generate step
 # which allows us to migrate to a new locale code without re-creating the Transifex project.
-edx_lang_map:
-    zh_CN: zh_HANS
+edx_lang_map: {}
 
 locales:
     - en  # English - Source Language
@@ -42,8 +41,8 @@ locales:
     - fr_CA # French (Canada)
     # - gl  # Galician
     # - gu  # Gujarati
-    - he  # Hebrew
-    - hi  # Hindi
+    # - he  # Hebrew
+    # - hi  # Hindi
     # - hr  # Croatian
     # - hu  # Hungarian
     # - hy_AM  # Armenian (Armenia)
@@ -53,7 +52,7 @@ locales:
     # - kk_KZ  # Kazakh (Kazakhstan)
     # - km_KH  # Khmer (Cambodia)
     # - kn  # Kannada
-    - ko_KR  # Korean (Korea)
+    # - ko_KR  # Korean (Korea)
     # - lt_LT  # Lithuanian (Lithuania)
     # - ml  # Malayalam
     # - mn  # Mongolian
@@ -67,7 +66,7 @@ locales:
     - pt_BR  # Portuguese (Brazil)
     # - pt_PT  # Portuguese (Portugal)
     # - ro  # Romanian
-    - ru  # Russian
+    # - ru  # Russian
     # - si  # Sinhala
     # - sk  # Slovak
     # - sl  # Slovenian
@@ -83,7 +82,7 @@ locales:
     # - ur  # Urdu
     # - uz  # Uzbek
     # - vi  # Vietnamese
-    - zh_CN  # Chinese (China)
+    # - zh_CN  # Chinese (China)
     # - zh_HK  # Chinese (Hong Kong)
     # - zh_TW  # Chinese (Taiwan)
 
