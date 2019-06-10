@@ -491,21 +491,11 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         )
 
     def test_dump_memory_and_fail(self):
-        import os
         import psutil
 
-        PROCESS = psutil.Process(os.getpid())
-        MEGA = 10 ** 6
-        MEGA_STR = ' ' * MEGA
+        print(psutil.virtual_memory())
+        print(psutil.swap_memory())
 
-        try:
-            tot, avail, percent, used, free, active, inactive, buffers = psutil.virtual_memory()
-        except ValueError:
-            tot, avail, percent, used, free, active, inactive, buffers, cached, shared = psutil.virtual_memory()
-        tot, avail, used, free = tot / MEGA, avail / MEGA, used / MEGA, free / MEGA
-        proc = PROCESS.memory_info()[1] / MEGA
-        print('process = %s total = %s avail = %s used = %s free = %s percent = %s'
-              % (proc, tot, avail, used, free, percent))
         assert False
 
     @ddt.data(
