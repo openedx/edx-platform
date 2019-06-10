@@ -1248,7 +1248,6 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                     'show_review_rules': show_review_rules
                 })
 
-
         # Update with gating info
         xblock_info.update(_get_gating_info(course, xblock))
 
