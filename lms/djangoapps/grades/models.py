@@ -14,6 +14,7 @@ from base64 import b64encode
 from collections import defaultdict, namedtuple
 from hashlib import sha1
 
+from django.apps import apps
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.timezone import now
@@ -25,7 +26,8 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from coursewarehistoryextended.fields import UnsignedBigIntAutoField, UnsignedBigIntOneToOneField
 from lms.djangoapps.grades import events, constants
 from openedx.core.lib.cache_utils import get_cache
-
+from simple_history.models import HistoricalRecords
+from simple_history.utils import update_change_reason
 
 log = logging.getLogger(__name__)
 
@@ -653,6 +655,12 @@ class PersistentSubsectionGradeOverride(models.Model):
 
     _CACHE_NAMESPACE = u"grades.models.PersistentSubsectionGradeOverride"
 
+    # This is necessary because CMS does not install the grades app, but it
+    # imports this models code. Simple History will attempt to connect to the installed
+    # model in the grades app, which will fail.
+    if 'grades' in apps.app_configs:
+        history = HistoricalRecords()
+
     def __unicode__(self):
         return u', '.join([
             u"{}".format(type(self).__name__),
@@ -703,6 +711,7 @@ class PersistentSubsectionGradeOverride(models.Model):
             grade=subsection_grade_model,
             defaults=cls._prepare_override_params(subsection_grade_model, override_data),
         )
+        update_change_reason(override, feature)
 
         action = action or PersistentSubsectionGradeOverrideHistory.CREATE_OR_UPDATE
 
