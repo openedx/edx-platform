@@ -145,7 +145,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-30 20:42+0000\n"
+"POT-Creation-Date: 2018-12-16 20:42+0000\n"
 "PO-Revision-Date: 2018-12-19 13:28+0000\n"
 "Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -5692,6 +5692,10 @@ msgstr "Este enlace se abrirá en una nueva ventana o pestaña del navegador"
 msgid "This link will open in a modal window"
 msgstr "Este enlace se abrirá en una ventana modal"
 
+#: cms/static/js/certificates/collections/certificates.js
+msgid "Could not parse certificate JSON. %(message)s"
+msgstr "No fue posible leer el archivo JSON del certificado. %(message)s"
+
 #: cms/static/js/certificates/models/certificate.js
 msgid "Certificate name is required."
 msgstr "Se requiere un nombre para el certificado."
@@ -8735,20 +8739,6 @@ msgstr "Cambiar mi dirección de correo electrónico"
 #: lms/templates/student_account/account.underscore
 msgid "Reset Password"
 msgstr "Restablecer Contraseña"
-
-#: lms/templates/student_account/account_recovery.underscore
-msgid "Account Recovery"
-msgstr ""
-
-#: lms/templates/student_account/account_recovery.underscore
-msgid ""
-"Please enter your secondary email address below and we will send you "
-"instructions for recovering your account and setting a new password."
-msgstr ""
-
-#: lms/templates/student_account/account_recovery.underscore
-msgid "Recover my account"
-msgstr ""
 
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"

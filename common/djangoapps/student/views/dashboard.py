@@ -818,7 +818,7 @@ def student_dashboard(request):
         'consent_required_courses': consent_required_courses,
         'enterprise_customer_name': enterprise_customer_name,
         'enrollment_message': enrollment_message,
-        'redirect_message': redirect_message,
+        'redirect_message': Text(redirect_message),
         'account_activation_messages': account_activation_messages,
         'activate_account_message': activate_account_message,
         'course_enrollments': course_enrollments,

@@ -206,7 +206,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-30 20:42+0000\n"
+"POT-Creation-Date: 2018-12-16 20:42+0000\n"
 "PO-Revision-Date: 2018-12-12 14:22+0000\n"
 "Last-Translator: 微 李 <w.li@eliteu.com.cn>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -5319,6 +5319,10 @@ msgstr "该链接将在新浏览器窗口/标签页中打开"
 msgid "This link will open in a modal window"
 msgstr "该链接将在模式窗口中打开"
 
+#: cms/static/js/certificates/collections/certificates.js
+msgid "Could not parse certificate JSON. %(message)s"
+msgstr "无法解析证书JSON. %(message)s"
+
 #: cms/static/js/certificates/models/certificate.js
 msgid "Certificate name is required."
 msgstr "证书名称必填。"
@@ -8180,20 +8184,6 @@ msgstr "更改我的电子邮件"
 #: lms/templates/student_account/account.underscore
 msgid "Reset Password"
 msgstr "重设密码"
-
-#: lms/templates/student_account/account_recovery.underscore
-msgid "Account Recovery"
-msgstr ""
-
-#: lms/templates/student_account/account_recovery.underscore
-msgid ""
-"Please enter your secondary email address below and we will send you "
-"instructions for recovering your account and setting a new password."
-msgstr ""
-
-#: lms/templates/student_account/account_recovery.underscore
-msgid "Recover my account"
-msgstr ""
 
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
