@@ -493,10 +493,10 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
     def test_dump_memory_and_fail(self):
         import psutil
 
-        print(psutil.virtual_memory())
-        print(psutil.swap_memory())
-
-        assert False
+        out = str(psutil.virtual_memory())
+        out += " \n"
+        out += str(psutil.swap_memory())
+        raise Exception(out)
 
     @ddt.data(
         ('audit', 'problem', 'default', True),
