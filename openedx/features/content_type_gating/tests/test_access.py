@@ -20,6 +20,7 @@ from pyquery import PyQuery as pq
 
 from six.moves.html_parser import HTMLParser
 
+from course_modes.models import CourseMode
 from course_api.blocks.api import get_blocks
 from course_modes.tests.factories import CourseModeFactory
 from experiments.models import ExperimentData, ExperimentKeyValue
@@ -43,6 +44,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from openedx.core.djangoapps.util.testing import TestConditionalContent
 from openedx.core.lib.url_utils import quote_slashes
+from openedx.features.discounts.applicability import DISCOUNT_APPLICABILITY_FLAG
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, CONTENT_TYPE_GATE_GROUP_IDS
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import ContentTypeGatingPartition
@@ -779,6 +781,33 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
             is_gated=False,
             request_factory=self.factory,
         )
+
+    @ddt.data(True, False)
+    def test_discount_display(self, has_discount):
+        verified_mode = CourseMode.objects.get(course_id=self.course.id, mode_slug=CourseMode.VERIFIED)
+        verified_mode.min_price = 100
+        verified_mode.save()
+
+        with DISCOUNT_APPLICABILITY_FLAG.override(has_discount):
+            with patch.object(ContentTypeGatingPartition, '_get_checkout_link', return_value='#'):
+                block_content = _get_content_from_lms_index(
+                    block=self.blocks_dict['problem'],
+                    user_id=self.audit_user.id,
+                    course=self.course,
+                    request_factory=self.factory,
+                )
+
+        assert 'content-paywall' in block_content
+        assert 'certA_1' in block_content
+
+        if has_discount:
+            assert '<del>$100</del>' in block_content
+            assert '$85' in block_content
+        else:
+            assert '<del>' not in block_content
+            assert '$85' not in block_content
+            assert '$100' in block_content
+
 
 
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(
