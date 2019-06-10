@@ -1230,6 +1230,11 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                     proctoring_exam_configuration_link = get_exam_configuration_dashboard_url(
                         course.id, xblock_info['id'])
 
+                if course.proctoring_provider == 'proctortrack':
+                    show_review_rules = SHOW_REVIEW_RULES_FLAG.is_enabled(xblock.location.course_key)
+                else:
+                    show_review_rules = True
+
                 xblock_info.update({
                     'is_proctored_exam': xblock.is_proctored_exam,
                     'online_proctoring_rules': rules_url,
@@ -1240,7 +1245,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                     'default_time_limit_minutes': xblock.default_time_limit_minutes,
                     'proctoring_exam_configuration_link': proctoring_exam_configuration_link,
                     'supports_onboarding': supports_onboarding,
-                    'show_review_rules': SHOW_REVIEW_RULES_FLAG.is_enabled(xblock.location.course_key),
+                    'show_review_rules': show_review_rules
                 })
 
         # Update with gating info
