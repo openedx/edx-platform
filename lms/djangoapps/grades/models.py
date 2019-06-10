@@ -14,6 +14,7 @@ from base64 import b64encode
 from collections import defaultdict, namedtuple
 from hashlib import sha1
 
+from django.apps import apps
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.timezone import now
@@ -653,7 +654,12 @@ class PersistentSubsectionGradeOverride(models.Model):
     possible_graded_override = models.FloatField(null=True, blank=True)
 
     _CACHE_NAMESPACE = u"grades.models.PersistentSubsectionGradeOverride"
-    history = HistoricalRecords()
+
+    # This is necessary because CMS does not install the grades app, but it
+    # imports this models code. Simple History will attempt to connect to the installed
+    # model in the grades app, which will fail.
+    if 'grades' in apps.app_configs:
+        history = HistoricalRecords()
 
     def __unicode__(self):
         return u', '.join([

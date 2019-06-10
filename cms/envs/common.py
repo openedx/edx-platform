@@ -1127,8 +1127,6 @@ INSTALLED_APPS = [
     'survey.apps.SurveyConfig',
     'lms.djangoapps.verify_student.apps.VerifyStudentConfig',
     'completion',
-    # Reference we couldn't get simple_history dependencies working in any other way. Leaving it
-    'lms.djangoapps.grades.apps.GradesConfig',
 
     # Microsite configuration application
     'microsite_configuration',
