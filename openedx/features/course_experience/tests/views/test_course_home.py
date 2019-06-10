@@ -53,6 +53,7 @@ from openedx.features.course_experience import (
     SHOW_UPGRADE_MSG_ON_COURSE_HOME,
     UNIFIED_COURSE_TAB_FLAG
 )
+from openedx.features.discounts.applicability import DISCOUNT_APPLICABILITY_FLAG
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from util.date_utils import strftime_localized
@@ -927,6 +928,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         self.assertNotContains(response, TEST_COURSE_GOAL_UPDATE_FIELD_HIDDEN)
 
 
+@ddt.ddt
 class CourseHomeFragmentViewTests(ModuleStoreTestCase):
     """
     Test Messages Displayed on the Course Home
@@ -1001,3 +1003,28 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
     def test_display_upgrade_message_if_audit_and_deadline_not_passed(self):
         CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
         self.assert_upgrade_message_displayed()
+
+    @ddt.data(True, False)
+    def test_upgrade_message_discount(self, has_discount):
+        CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
+
+        self.verified_mode.min_price = 100
+        self.verified_mode.save()
+
+        with FIRST_PURCHASE_OFFER_BANNER_DISPLAY.override(has_discount):
+            with DISCOUNT_APPLICABILITY_FLAG.override(has_discount):
+                response = self.client.get(self.url)
+
+        self.assertIn('section-upgrade', response.content)
+        url = EcommerceService().get_checkout_page_url(self.verified_mode.sku)
+        self.assertIn('<a class="btn-brand btn-upgrade"', response.content)
+        self.assertIn(url, response.content)
+        content = response.content.decode(response.charset)
+        print(content)
+        if has_discount:
+            assert '$85' in content
+            assert '<del>$100</del>' in content
+        else:
+            assert u'$85' not in content
+            assert u'<del>' not in content
+            assert u'Upgrade ($100)' in content

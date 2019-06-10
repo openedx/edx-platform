@@ -124,7 +124,7 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REV
                 </div>
             % endif
             % if upgrade_url and upgrade_price:
-                <div class="section section-upgrade course-home-sidebar-upgrade">
+                <div class="section section-upgrade course-home-sidebar-upgrade ${'discount' if upgrade_price_before_discount else 'no-discount'}">
                     <h3 class="hd hd-6">${_("Pursue a verified certificate")}</h3>
                         <img src="https://courses.edx.org/static/images/edx-verified-mini-cert.png" alt="">
                         <div class="upgrade-container">
@@ -132,11 +132,16 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REV
                                 <a class="btn-brand btn-upgrade"
                                    href="${upgrade_url}"
                                    data-creative="sidebarupsell"
-                                   data-position="sidebar-message">
-                                   ${_("Upgrade ({price})").format(price=upgrade_price)}
+                                   data-position="sidebar-message"
+                                >
+                                    % if upgrade_price_before_discount:
+                                        ${_("Upgrade")} (${upgrade_price} <del>${upgrade_price_before_discount}</del>)
+                                    % else:
+                                        ${_("Upgrade ({price})").format(price=upgrade_price)}
+                                    % endif
                                 </a>
                             </p>
-                    <p><button class="btn-link btn-small promo-learn-more">${_('Learn More')}</button></p>
+                            <p><button class="btn-link btn-small promo-learn-more">${_('Learn More')}</button></p>
                         </div>
                 </div>
             % endif
