@@ -6,9 +6,10 @@ from __future__ import absolute_import
 from django.template.loader import render_to_string
 from web_fragments.fragment import Fragment
 
-from course_modes.models import get_cosmetic_verified_display_price
+from course_modes.models import get_cosmetic_verified_display_price, get_course_prices, format_course_price
 from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
+from openedx.features.discounts.applicability import discount_percentage, can_receive_discount
 from student.models import CourseEnrollment
 
 
@@ -30,7 +31,14 @@ class CourseSockFragmentView(EdxFragmentView):
         show_course_sock = verified_upgrade_link_is_valid(enrollment)
         if show_course_sock:
             upgrade_url = verified_upgrade_deadline_link(request.user, course=course)
-            course_price = get_cosmetic_verified_display_price(course)
+
+            if can_receive_discount(request.user, course):
+                course_price_before_discount_num = get_course_prices(course, verified_only=True)[0]
+                course_price_before_discount = format_course_price(course_price_before_discount_num)
+                course_price = format_course_price("{:0.2f}".format(course_price_before_discount_num * ((100.0 - discount_percentage()) / 100)))
+            else:
+                course_price_before_discount = None
+                course_price = get_cosmetic_verified_display_price(course)
         else:
             upgrade_url = ''
             course_price = ''
@@ -38,6 +46,7 @@ class CourseSockFragmentView(EdxFragmentView):
         context = {
             'show_course_sock': show_course_sock,
             'course_price': course_price,
+            'course_price_before_discount': course_price_before_discount,
             'course_id': course.id,
             'upgrade_url': upgrade_url,
         }
