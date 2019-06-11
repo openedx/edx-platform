@@ -300,7 +300,7 @@ def i18n_robot_pull(options):
 
     sh('git clean -fdX conf/locale/rtl')
     sh('git clean -fdX conf/locale/eo')
-    print "\n\nValidating translations with `i18n_tool validate`..."
+    print("\n\nValidating translations with `i18n_tool validate`...")
 
     sh("pip install edx-i18n-tools==0.4.6")  # Hack: Fix an issue with the i18n tools
 
