@@ -2,6 +2,7 @@ define(['codemirror', 'js/utils/handle_iframe_binding', 'utility'],
     function(CodeMirror, IframeBinding) {
         var editWithCodeMirror = function(model, contentName, baseAssetUrl, textArea) {
             var content = rewriteStaticLinks(model.get(contentName), baseAssetUrl, '/static/');
+            content = rewriteCdnLinksToStatic(content); // eslint-disable-line no-undef
             model.set(contentName, content);
             var $codeMirror = CodeMirror.fromTextArea(textArea, {
                 mode: 'text/html',
