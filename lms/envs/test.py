@@ -12,22 +12,31 @@ sessions. Assumes structure:
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
-from collections import OrderedDict
+from __future__ import absolute_import
 
-from django.utils.translation import ugettext_lazy
-
-from .common import *
+import logging
 import os
-from path import Path as path
+from collections import OrderedDict
+from random import choice
+from string import digits, letters, punctuation
 from uuid import uuid4
 
-from util.db import NoOpMigrationModules
+import openid.oidutil
+from django.utils.translation import ugettext_lazy
+from path import Path as path
+from six.moves import range
+
+from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
 from openedx.core.lib.derived import derive_settings
 from openedx.core.lib.tempdir import mkdtemp_clean
 
+from .common import *
+
+from util.db import NoOpMigrationModules  # pylint: disable=wrong-import-order
+from util.testing import patch_sessions, patch_testcase  # pylint: disable=wrong-import-order
+
 # This patch disables the commit_on_success decorator during tests
 # in TestCase subclasses.
-from util.testing import patch_testcase, patch_sessions
 patch_testcase()
 patch_sessions()
 
@@ -37,7 +46,6 @@ ALLOWED_HOSTS = [
 ]
 
 # Silence noisy logs to make troubleshooting easier when tests fail.
-import logging
 LOG_OVERRIDES = [
     ('factory.generate', logging.ERROR),
     ('factory.containers', logging.ERROR),
@@ -283,8 +291,6 @@ FEATURES['ENABLE_PAYMENT_FAKE'] = True
 # Since both the fake payment page and the shoppingcart app are using
 # the same settings, we can generate this randomly and guarantee
 # that they are using the same secret.
-from random import choice
-from string import letters, digits, punctuation
 RANDOM_SHARED_SECRET = ''.join(
     choice(letters + digits + punctuation)
     for x in range(250)
@@ -398,9 +404,9 @@ FEATURES['CLASS_DASHBOARD'] = True
 ################### Make tests quieter
 
 # OpenID spews messages like this to stderr, we don't need to see them:
-#   Generated checkid_setup request to http://testserver/openid/provider/login/ with assocication {HMAC-SHA1}{51d49995}{s/kRmA==}
+# Generated checkid_setup request to http://testserver/openid/provider/login/
+# With assocication {HMAC-SHA1}{51d49995}{s/kRmA==}
 
-import openid.oidutil
 openid.oidutil.log = lambda message, level=0: None
 
 
@@ -618,7 +624,6 @@ JWT_AUTH.update({
 # pylint: enable=unicode-format-string
 ####################### Plugin Settings ##########################
 
-from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_constants.SettingsType.TEST)
 
 ########################## Derive Any Derived Settings  #######################

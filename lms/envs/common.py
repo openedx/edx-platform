@@ -28,6 +28,8 @@ Longer TODO:
 # and throws spurious errors. Therefore, we disable invalid-name checking.
 # pylint: disable=invalid-name, wrong-import-position
 
+from __future__ import absolute_import
+
 import imp
 import sys
 import os
@@ -37,10 +39,10 @@ from path import Path as path
 from django.utils.translation import ugettext_lazy as _
 from enterprise.constants import (
     ENTERPRISE_ADMIN_ROLE,
-    ENTERPRISE_OPERATOR_ROLE,
-    ENTERPRISE_DASHBOARD_ADMIN_ROLE,
     ENTERPRISE_CATALOG_ADMIN_ROLE,
-    ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE
+    ENTERPRISE_DASHBOARD_ADMIN_ROLE,
+    ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE,
+    ENTERPRISE_OPERATOR_ROLE
 )
 
 from openedx.core.constants import COURSE_KEY_REGEX, COURSE_KEY_PATTERN, COURSE_ID_PATTERN
