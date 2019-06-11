@@ -1,3 +1,5 @@
+"""HTTP endpoints for the Course Run API."""
+
 from __future__ import absolute_import
 
 from django.conf import settings
