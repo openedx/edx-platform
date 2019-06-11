@@ -997,7 +997,7 @@ MEDIA_URL = '/media/'
 
 # Locale/Internationalization
 CELERY_TIMEZONE = 'UTC'
-TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+TIME_ZONE = 'UTC'
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 # these languages display right to left
 LANGUAGES_BIDI = ("he", "ar", "fa", "ur", "fa-ir", "rtl")
@@ -2150,6 +2150,8 @@ INSTALLED_APPS = [
 
     # User API
     'rest_framework',
+    'drf_yasg',
+
     'openedx.core.djangoapps.user_api',
 
     # Shopping cart
