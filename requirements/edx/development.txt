@@ -163,7 +163,7 @@ functools32==3.2.3.post2 ; python_version == "2.7"
 future==0.17.1
 futures==3.2.0 ; python_version == "2.7"
 geoip2==2.9.0
-glob2==0.6
+glob2==0.7
 gunicorn==19.5.0
 help-tokens==1.0.3
 html5lib==1.0.1
@@ -304,7 +304,7 @@ sphinxcontrib-websupport==1.1.2  # via sphinx
 sqlparse==0.3.0
 stevedore==1.30.1
 sympy==1.4
-testfixtures==6.8.2
+testfixtures==6.9.0
 text-unidecode==1.2
 tincan==0.0.5
 toml==0.10.0
