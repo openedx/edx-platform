@@ -865,3 +865,79 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
         course_overview = CourseOverview.get_from_id(course.id)
         with self.assertNumQueries(num_queries, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             bool(access.has_access(user, action, course_overview, course_key=course.id))
+
+
+@ddt.ddt
+class CCXTestCase(SharedModuleStoreTestCase):
+    """
+    Tests for ccx course visibility
+    """
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
+    def setUp(self):
+        """
+        Set up tests
+        """
+        super(CCXTestCase, self).setUp()
+
+        course = CourseFactory.create(enable_ccx=True)
+        CourseOverview.load_from_module_store(course.id)
+        self.course = course
+
+        student = UserFactory.create()
+        staff = AdminFactory.create()
+        coach = UserFactory.create()
+
+        ccx = CustomCourseForEdX(
+            course_id=course.id,
+            coach=coach,
+            display_name="Test CCX"
+        )
+        ccx.save()
+        self.ccx_overview = CourseOverview.get_from_id(ccx.locator)
+
+        self.users = {
+            'coach': coach,
+            'student': student,
+            'staff': staff,
+        }
+
+    @ddt.data(
+        ('student', 'see_in_catalog', True),
+        ('student', 'see_exists', True),
+    )
+    @ddt.unpack
+    def test_base_course_visibility(self, username, permission, has_permission):
+        """
+        Test base course visibility is as expected
+        """
+        user = self.users[username]
+        self.assertEqual(bool(access.has_access(user, permission, self.course)), has_permission)
+
+    @ddt.data(
+        ('student', 'see_in_catalog', False),
+        ('student', 'see_exists', False),
+        ('student', 'enroll', False),
+        # load permission is required because other areas in the code need it.
+        ('student', 'load', True),
+        ('student', 'see_about_page', True),
+
+        ('coach', 'see_in_catalog', False),
+        ('coach', 'see_exists', False),
+        ('coach', 'enroll', False),
+        ('coach', 'load', True),
+        ('coach', 'see_about_page', True),
+
+        ('staff', 'see_in_catalog', False),
+        ('staff', 'see_exists', False),
+        ('staff', 'enroll', True),
+        ('staff', 'load', True),
+        ('staff', 'see_about_page', True),
+    )
+    @ddt.unpack
+    def test_ccx_visibility(self, username, permission, has_permission):
+        """
+        Test ccx course visibility is as expected
+        """
+        user = self.users[username]
+        self.assertEqual(bool(access.has_access(user, permission, self.ccx_overview)), has_permission)
