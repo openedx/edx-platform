@@ -191,7 +191,7 @@ def _authenticate_first_party(request, unauthenticated_user):
         raise AuthFailedError(_('Too many failed login attempts. Try again later.'))
 
 
-def _handle_failed_authentication(user):
+def _handle_failed_authentication(user, has_authentication):
     """
     Handles updating the failed login count, inactive user notifications, and logging failed authentications.
     """
@@ -199,7 +199,7 @@ def _handle_failed_authentication(user):
         if LoginFailures.is_feature_enabled():
             LoginFailures.increment_lockout_counter(user)
 
-        if not user.is_active:
+        if has_authentication and not user.is_active:
             _log_and_raise_inactive_user_auth_error(user)
 
         # if we didn't find this username earlier, the account for this email
@@ -335,7 +335,7 @@ def login_user(request):
                 _enforce_password_policy_compliance(request, possibly_authenticated_user)
 
         if possibly_authenticated_user is None or not possibly_authenticated_user.is_active:
-            _handle_failed_authentication(email_user)
+            _handle_failed_authentication(email_user, possibly_authenticated_user)
 
         _handle_successful_authentication_and_login(possibly_authenticated_user, request)
 
