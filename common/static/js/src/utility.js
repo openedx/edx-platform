@@ -35,5 +35,12 @@ window.rewriteStaticLinks = function(content, from, to) {
     // escape all regex interpretable chars
     fromRe = from.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
     var regex = new RegExp('(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9@:%_\+.~#?&//=]*))?' + fromRe, 'g');
+
     return content.replace(regex, replacer);
+};
+
+window.rewriteCdnLinksToStatic = function(content) {
+    'use strict';
+    var regex = new RegExp('((https?:)|[/][/](www.)?[-a-zA-Z0-9@:%._+~#=]{2,256}[a-z]{2,6}([-a-zA-Z0-9@:%_+~#?&//=]*)|[a-z-]{14})[/]', 'g');// eslint-disable-line max-len
+    return content.replace(regex, '/static/');
 };
