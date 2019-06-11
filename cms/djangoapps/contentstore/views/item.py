@@ -69,7 +69,11 @@ from xmodule.services import ConfigurationService, SettingsService
 from xmodule.tabs import CourseTabList
 from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW
 from edx_proctoring.api import get_exam_configuration_dashboard_url, does_backend_support_onboarding
-from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
+from cms.djangoapps.contentstore.config.waffle import (
+    SHOW_REVIEW_RULES_FLAG,
+    REVIEW_RULES_PER_PROCTORING_PROVIDER,
+    create_review_rules_for_provider_waffle_flag
+)
 
 __all__ = [
     'orphan_handler', 'xblock_handler', 'xblock_view_handler', 'xblock_outline_handler', 'xblock_container_handler'
@@ -1230,10 +1234,16 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                     proctoring_exam_configuration_link = get_exam_configuration_dashboard_url(
                         course.id, xblock_info['id'])
 
-                if course.proctoring_provider == 'proctortrack':
-                    show_review_rules = SHOW_REVIEW_RULES_FLAG.is_enabled(xblock.location.course_key)
-                else:
+
+                if course.proctoring_provider == 'software_secure':
                     show_review_rules = True
+                else:
+                    if course.proctoring_provider in REVIEW_RULES_PER_PROCTORING_PROVIDER:
+                        show_review_rules =  REVIEW_RULES_PER_PROCTORING_PROVIDER[course.proctoring_provider].is_enabled(xblock.location.course_key)
+                    else:
+                        new_flag = create_review_rules_for_provider_waffle_flag(course.proctoring_provider)
+                        REVIEW_RULES_PER_PROCTORING_PROVIDER[course.proctoring_provider] = new_flag
+                        show_review_rules = new_flag.is_enabled(xblock.location.course_key)
 
                 xblock_info.update({
                     'is_proctored_exam': xblock.is_proctored_exam,

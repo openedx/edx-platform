@@ -14,10 +14,14 @@ ENABLE_ACCESSIBILITY_POLICY_PAGE = u'enable_policy_page'
 REVIEW_RULES_PER_PROCTORING_PROVIDER = {}
 
 def create_review_rules_for_provider_waffle_flag(provider_name):
-    name_format = u'show_review_rules_for'
+    """
+    Creates a waffle flag with the following name format: studio.show_review_rules_for_<provider_name>
+    and returns it to the user
+    """
+    flag_name = u'show_review_rules_for_{}'.format(provider_name)
     new_flag = CourseWaffleFlag(
         waffle_namespace=waffle_flags(),
-        flag_name=u'show_review_rules',
+        flag_name=flag_name,
         flag_undefined_default=False
     )
     return new_flag
