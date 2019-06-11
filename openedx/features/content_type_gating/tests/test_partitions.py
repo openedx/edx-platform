@@ -117,7 +117,7 @@ class TestContentTypeGatingPartition(CacheIsolationTestCase):
             message = partition.access_denied_message(mock_block.scope_ids.usage_id, global_staff, FULL_ACCESS, 'test_allowed_group')
             self.assertIsNone(message)
 
-    def test_acess_denied_fragment_for_null_request(self):
+    def test_access_denied_fragment_for_null_request(self):
         """
         Verifies the access denied fragment is visible when HTTP request is not available.
 
