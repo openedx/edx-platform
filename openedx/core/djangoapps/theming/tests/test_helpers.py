@@ -86,33 +86,14 @@ class TestHelpers(TestCase):
             "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
             Mock(return_value=True),
         ):
-            with patch(
-                "openedx.core.djangoapps.theming.helpers.microsite.is_request_in_microsite",
-                Mock(return_value=True),
-            ):
-                self.assertTrue(theming_helpers.is_comprehensive_theming_enabled())
-
-        # Theming is enabled, there is no SiteTheme record but there is microsite configuration for the current site.
-        with patch(
-            "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
-            Mock(return_value=False),
-        ):
-            with patch(
-                "openedx.core.djangoapps.theming.helpers.microsite.is_request_in_microsite",
-                Mock(return_value=True),
-            ):
-                self.assertFalse(theming_helpers.is_comprehensive_theming_enabled())
+            self.assertTrue(theming_helpers.is_comprehensive_theming_enabled())
 
         # Theming is enabled, there is neither a SiteTheme record nor microsite configuration for the current site.
         with patch(
             "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
             Mock(return_value=False),
         ):
-            with patch(
-                "openedx.core.djangoapps.theming.helpers.microsite.is_request_in_microsite",
-                Mock(return_value=False),
-            ):
-                self.assertTrue(theming_helpers.is_comprehensive_theming_enabled())
+            self.assertTrue(theming_helpers.is_comprehensive_theming_enabled())
 
         with override_settings(ENABLE_COMPREHENSIVE_THEMING=False):
             # Theming is disabled, there is a SiteTheme record and microsite configuration for the current site.
@@ -120,11 +101,7 @@ class TestHelpers(TestCase):
                 "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
                 Mock(return_value=True),
             ):
-                with patch(
-                    "openedx.core.djangoapps.theming.helpers.microsite.is_request_in_microsite",
-                    Mock(return_value=True),
-                ):
-                    self.assertFalse(theming_helpers.is_comprehensive_theming_enabled())
+                self.assertFalse(theming_helpers.is_comprehensive_theming_enabled())
 
             # Theming is disabled, there is no SiteTheme record but
             # there is microsite configuration for the current site.
@@ -132,84 +109,14 @@ class TestHelpers(TestCase):
                 "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
                 Mock(return_value=False),
             ):
-                with patch(
-                    "openedx.core.djangoapps.theming.helpers.microsite.is_request_in_microsite",
-                    Mock(return_value=True),
-                ):
-                    self.assertFalse(theming_helpers.is_comprehensive_theming_enabled())
+                self.assertFalse(theming_helpers.is_comprehensive_theming_enabled())
 
             # Theming is disabled, there is neither a SiteTheme record nor microsite configuration for the current site.
             with patch(
                 "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
                 Mock(return_value=False),
             ):
-                with patch(
-                    "openedx.core.djangoapps.theming.helpers.microsite.is_request_in_microsite",
-                    Mock(return_value=False),
-                ):
-                    self.assertFalse(theming_helpers.is_comprehensive_theming_enabled())
-
-    def test_get_template(self):
-        """
-        Tests to make sure the get_template function works as expected.
-        """
-        # if the current site has associated SiteTheme then get_template should return None
-        with patch(
-            "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
-            Mock(return_value=True),
-        ):
-            with patch(
-                "openedx.core.djangoapps.theming.helpers.microsite.is_request_in_microsite",
-                Mock(return_value=True),
-            ):
-                with patch("microsite_configuration.microsite.TEMPLATES_BACKEND") as mock_microsite_backend:
-                    mock_microsite_backend.get_template = Mock(return_value="/microsite/about.html")
-                    self.assertIsNone(theming_helpers.get_template("about.html"))
-
-        # if the current site does not have associated SiteTheme then get_template should return microsite override
-        with patch(
-            "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
-            Mock(return_value=False),
-        ):
-            with patch(
-                "openedx.core.djangoapps.theming.helpers.microsite.is_request_in_microsite",
-                Mock(return_value=True),
-            ):
-                with patch("microsite_configuration.microsite.TEMPLATES_BACKEND") as mock_microsite_backend:
-                    mock_microsite_backend.get_template = Mock(return_value="/microsite/about.html")
-                    self.assertEqual(theming_helpers.get_template("about.html"), "/microsite/about.html")
-
-    def test_get_template_path(self):
-        """
-        Tests to make sure the get_template_path function works as expected.
-        """
-        # if the current site has associated SiteTheme then get_template_path should return the argument as is.
-        with patch(
-            "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
-            Mock(return_value=True),
-        ):
-            with patch(
-                "openedx.core.djangoapps.theming.helpers.microsite.is_request_in_microsite",
-                Mock(return_value=True),
-            ):
-                with patch("microsite_configuration.microsite.TEMPLATES_BACKEND") as mock_microsite_backend:
-                    mock_microsite_backend.get_template = Mock(return_value="/microsite/about.html")
-                    self.assertEqual(theming_helpers.get_template_path("about.html"), "about.html")
-
-        RequestCache.clear_all_namespaces()
-
-        # if the current site does not have associated SiteTheme then get_template_path should return microsite override
-        with patch(
-            "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
-            Mock(return_value=False),
-        ):
-            with patch(
-                "openedx.core.djangoapps.theming.helpers.microsite.is_request_in_microsite",
-                Mock(return_value=True),
-            ):
-                with patch("microsite_configuration.microsite.TEMPLATES_BACKEND") as mock_microsite_backend:
-                    mock_microsite_backend.get_template_path = Mock(return_value="/microsite/about.html")
-                    self.assertEqual(theming_helpers.get_template_path("about.html"), "/microsite/about.html")
+                self.assertFalse(theming_helpers.is_comprehensive_theming_enabled())
 
 
 @skip_unless_lms
