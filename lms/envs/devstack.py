@@ -1,9 +1,18 @@
 """
 Specific overrides to the base prod settings to make development easier.
 """
+from __future__ import absolute_import
+
+# Silence noisy logs
+import logging
 from os.path import abspath, dirname, join
 
 from corsheaders.defaults import default_headers as corsheaders_default_headers
+
+# pylint: enable=unicode-format-string
+#####################################################################
+from openedx.core.djangoapps.plugins import constants as plugin_constants
+from openedx.core.djangoapps.plugins import plugin_settings
 
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
@@ -31,8 +40,6 @@ IDA_LOGOUT_URI_LIST = [
 
 ################################ LOGGERS ######################################
 
-# Silence noisy logs
-import logging
 LOG_OVERRIDES = [
     ('track.contexts', logging.CRITICAL),
     ('track.middleware', logging.CRITICAL),
@@ -260,9 +267,6 @@ JWT_AUTH.update({
         'y5ZLcTUomo4rZLjghVpq6KZxfS6I1Vz79ZsMVUWEdXOYePCKKsrQG20ogQEkmTf9FT_SouC6jPcHLXw"}]}'
     ),
 })
-# pylint: enable=unicode-format-string
-#####################################################################
-from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_constants.SettingsType.DEVSTACK)
 
 
