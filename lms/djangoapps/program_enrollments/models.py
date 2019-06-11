@@ -67,16 +67,15 @@ class ProgramEnrollment(TimeStampedModel):  # pylint: disable=model-missing-unic
             raise ValidationError(_('One of user or external_user_key must not be null.'))
 
     @classmethod
-    def bulk_read_by_student_key(cls, program_uuid, student_data):
+    def bulk_read_by_student_key(cls, program_uuid, student_keys):
         """
         args:
             program_uuid - The UUID of the program to read enrollment data of.
-            student_data - A dictionary keyed by external_user_key and
-            valued by a dict containing the curriculum_uuid for the user in the given program.
+            student_keys - list of student keys
         """
         return cls.objects.filter(
             program_uuid=program_uuid,
-            external_user_key__in=list(student_data.keys()),
+            external_user_key__in=student_keys,
         )
 
     @classmethod

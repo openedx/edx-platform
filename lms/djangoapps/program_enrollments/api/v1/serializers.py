@@ -7,11 +7,31 @@ from rest_framework import serializers
 from six import text_type
 
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
-from lms.djangoapps.program_enrollments.api.v1.constants import CourseRunProgressStatuses
+from lms.djangoapps.program_enrollments.api.v1.constants import (
+    CourseRunProgressStatuses,
+    ProgramEnrollmentResponseStatuses
+)
+
+
+class InvalidStatusMixin(object):
+    """
+    Mixin to provide has_invalid_status method
+    """
+    def has_invalid_status(self):
+        """
+        Returns whether or not this serializer has an invalid error choice on the "status" field
+        """
+        try:
+            for status_error in self.errors['status']:
+                if status_error.code == 'invalid_choice':
+                    return True
+        except KeyError:
+            pass
+        return False
 
 
 # pylint: disable=abstract-method
-class ProgramEnrollmentSerializer(serializers.ModelSerializer):
+class ProgramEnrollmentSerializer(serializers.ModelSerializer, InvalidStatusMixin):
     """
     Serializer for Program Enrollments
     """
@@ -37,6 +57,31 @@ class ProgramEnrollmentSerializer(serializers.ModelSerializer):
         return ProgramEnrollment.objects.create(**validated_data)
 
 
+class BaseProgramEnrollmentRequestMixin(serializers.Serializer, InvalidStatusMixin):
+    """
+    Base fields for all program enrollment related serializers
+    """
+    student_key = serializers.CharField()
+    status = serializers.ChoiceField(
+        allow_blank=False,
+        choices=ProgramEnrollmentResponseStatuses.VALID_STATUSES
+    )
+
+
+class ProgramEnrollmentCreateRequestSerializer(BaseProgramEnrollmentRequestMixin):
+    """
+    Serializer for program enrollment creation requests
+    """
+    curriculum_uuid = serializers.UUIDField()
+
+
+class ProgramEnrollmentModifyRequestSerializer(BaseProgramEnrollmentRequestMixin):
+    """
+    Serializer for program enrollment modification requests
+    """
+    pass
+
+
 class ProgramEnrollmentListSerializer(serializers.Serializer):
     """
     Serializer for listing enrollments in a program.
@@ -51,23 +96,6 @@ class ProgramEnrollmentListSerializer(serializers.Serializer):
 
     def get_account_exists(self, obj):
         return bool(obj.user)
-
-
-class InvalidStatusMixin(object):
-    """
-    Mixin to provide has_invalid_status method
-    """
-    def has_invalid_status(self):
-        """
-        Returns whether or not this serializer has an invalid error choice on the "status" field
-        """
-        try:
-            for status_error in self.errors['status']:
-                if status_error.code == 'invalid_choice':
-                    return True
-        except KeyError:
-            pass
-        return False
 
 
 # pylint: disable=abstract-method
