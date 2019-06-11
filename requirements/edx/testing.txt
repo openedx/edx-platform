@@ -94,6 +94,7 @@ django-pyfs==2.0
 django-ratelimit-backend==1.1.1
 django-ratelimit==2.0.0
 django-require==1.0.11
+django-rest-swagger==2.2.0
 django-sekizai==1.0.0
 django-ses==0.8.4
 django-simple-history==2.7.0
@@ -106,10 +107,9 @@ django-webpack-loader==0.6.0
 djangorestframework-jwt==1.11.0
 git+https://github.com/edx/django-rest-framework-oauth.git@0a43e8525f1e3048efe4bc70c03de308a277197c#egg=djangorestframework-oauth==1.1.1
 djangorestframework-xml==1.3.0
-djangorestframework==3.7.7
+git+https://github.com/edx/django-rest-framework.git@1ceda7c086fddffd1c440cc86856441bbf0bd9cb#egg=djangorestframework==3.6.3
 docopt==0.6.2
 docutils==0.14
-drf-yasg==1.15.0
 edx-ace==0.1.10
 edx-analytics-data-api-client==0.15.3
 edx-ccx-keys==0.2.1
@@ -167,7 +167,6 @@ httpretty==0.9.6
 idna==2.8
 importlib-metadata==0.17  # via pluggy
 inflect==2.1.0
-inflection==0.3.1
 ipaddress==1.0.22
 isodate==0.6.0
 isort==4.3.20
@@ -208,6 +207,7 @@ nodeenv==1.1.1
 numpy==1.16.4
 oauth2==1.9.0.post1
 oauthlib==2.1.0
+openapi-codec==1.3.2
 git+https://github.com/edx/edx-ora2.git@2.2.3#egg=ora2==2.2.3
 packaging==19.0           # via caniusepython3
 path.py==8.2.1
@@ -270,8 +270,6 @@ requests-oauthlib==1.1.0
 requests==2.22.0
 rest-condition==1.0.3
 rfc6266-parser==0.0.5.post2
-ruamel.ordereddict==0.4.13
-ruamel.yaml==0.15.96
 rules==2.0.1
 s3transfer==0.1.13
 sailthru-client==2.2.3
