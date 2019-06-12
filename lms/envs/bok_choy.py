@@ -23,8 +23,6 @@ from path import Path as path
 
 from openedx.core.release import RELEASE_LINE
 
-from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-position
-
 CONFIG_ROOT = path(__file__).abspath().dirname()
 TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
 
@@ -38,6 +36,9 @@ os.environ['SERVICE_VARIANT'] = 'bok_choy_docker' if 'BOK_CHOY_HOSTNAME' in os.e
 os.environ['CONFIG_ROOT'] = CONFIG_ROOT
 os.environ['LMS_CFG'] = str.format("{config_root}/{service_variant}.yml",
                                    config_root=os.environ['CONFIG_ROOT'], service_variant=os.environ['SERVICE_VARIANT'])
+
+from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-position
+
 
 ######################### Testing overrides ####################################
 
