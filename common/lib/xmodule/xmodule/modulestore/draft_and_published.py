@@ -171,8 +171,8 @@ class ModuleStoreDraftAndPublished(six.with_metaclass(ABCMeta, BranchSettingMixi
             self.update_item(old_parent_item, user_id)  # pylint: disable=no-member
             log.info(
                 '%s removed from %s children',
-                six.text_type(source_item.location),
-                six.text_type(old_parent_item.location)
+                text_type(source_item.location),
+                text_type(old_parent_item.location)
             )
 
         # Add item to new parent at particular location.
@@ -184,8 +184,8 @@ class ModuleStoreDraftAndPublished(six.with_metaclass(ABCMeta, BranchSettingMixi
             self.update_item(new_parent_item, user_id)  # pylint: disable=no-member
             log.info(
                 '%s added to %s children',
-                six.text_type(source_item.location),
-                six.text_type(new_parent_item.location)
+                text_type(source_item.location),
+                text_type(new_parent_item.location)
             )
 
         # Update parent attribute of the item block
@@ -193,8 +193,8 @@ class ModuleStoreDraftAndPublished(six.with_metaclass(ABCMeta, BranchSettingMixi
         self.update_item(source_item, user_id)  # pylint: disable=no-member
         log.info(
             '%s parent updated to %s',
-            six.text_type(source_item.location),
-            six.text_type(new_parent_item.location)
+            text_type(source_item.location),
+            text_type(new_parent_item.location)
         )
         return source_item.location
 
