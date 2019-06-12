@@ -7,11 +7,12 @@ define(['js/views/baseview', 'underscore', 'jquery', 'js/views/edit_chapter', 'c
                     var chapters = this.model.get('chapters');
                     this.listenTo(chapters, 'add', this.addOne);
                     this.listenTo(chapters, 'reset', this.addAll);
+                    this.listenTo(chapters, 'all', this.render);
                 },
                 tagName: 'section',
                 className: 'textbook',
                 render: function() {
-                    this.$el.html(this.template({ // xss-lint: disable=javascript-jquery-html
+                    this.$el.html(this.template({
                         name: this.model.get('name'),
                         error: this.model.validationError
                     }));
