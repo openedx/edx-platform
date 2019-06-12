@@ -1237,7 +1237,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                     show_review_rules = True
                 else:
                     if course.proctoring_provider in REVIEW_RULES_PER_PROCTORING_PROVIDER:
-                        show_review_rules = REVIEW_RULES_PER_PROCTORING_PROVIDER[course.proctoring_provider].is_enabled(xblock.location.course_key)
+                        show_review_rules = REVIEW_RULES_PER_PROCTORING_PROVIDER[course.proctoring_provider] \
+                        .is_enabled(xblock.location.course_key)
                     else:
                         new_flag = create_review_rules_for_provider_waffle_flag(course.proctoring_provider)
                         REVIEW_RULES_PER_PROCTORING_PROVIDER[course.proctoring_provider] = new_flag
