@@ -39,9 +39,6 @@ os.environ['CONFIG_ROOT'] = CONFIG_ROOT
 os.environ['LMS_CFG'] = str.format("{config_root}/{service_variant}.yml",
                                    config_root=os.environ['CONFIG_ROOT'], service_variant=os.environ['SERVICE_VARIANT'])
 
-
-
-
 ######################### Testing overrides ####################################
 
 # Redirect to the test_root folder within the repo
@@ -122,10 +119,8 @@ XQUEUE_INTERFACE['url'] = 'http://localhost:8040'
 EDXNOTES_PUBLIC_API = 'http://localhost:8042/api/v1'
 EDXNOTES_INTERNAL_API = 'http://localhost:8042/api/v1'
 
-
 EDXNOTES_CONNECT_TIMEOUT = 10  # time in seconds
 EDXNOTES_READ_TIMEOUT = 10  # time in seconds
-
 
 NOTES_DISABLED_TABS = []
 
