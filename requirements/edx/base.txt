@@ -96,6 +96,7 @@ docopt==0.6.2
 docutils==0.14            # via botocore
 edx-ace==0.1.10
 edx-analytics-data-api-client==0.15.3
+git+https://github.com/edx/edx-bulk-grades@f58f9fa01d95c01211fc94ebb92f0fb1a04bf32b#egg=edx-bulk-grades==0.1.1
 edx-ccx-keys==0.2.1
 edx-celeryutils==0.2.7
 edx-completion==2.0.0
@@ -104,7 +105,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==1.0.3
 edx-drf-extensions==2.3.1
-edx-enterprise==1.6.5
+edx-enterprise==1.6.7
 edx-i18n-tools==0.4.8
 edx-milestones==0.2.2
 edx-oauth2-provider==1.2.2
@@ -130,7 +131,7 @@ fs==2.0.18
 future==0.17.1            # via pyjwkest
 futures==3.2.0 ; python_version == "2.7"  # via django-pipeline, python-swiftclient, s3transfer, xblock-utils
 geoip2==2.9.0
-glob2==0.6
+glob2==0.7
 gunicorn==19.5.0
 help-tokens==1.0.3
 html5lib==1.0.1
@@ -227,7 +228,9 @@ sorl-thumbnail==12.3
 sortedcontainers==2.1.0
 soupsieve==1.9.1          # via beautifulsoup4
 sqlparse==0.3.0
+git+https://github.com/edx/staff_graded-xblock.git@a1ebad3e379555617bcbd3ceaee65294e2c93c4c#egg=staff_graded-xblock==0.1
 stevedore==1.30.1
+git+https://github.com/edx/super-csv@1a9dcc89eb65c3ed434b509b84062f8fcabd901b#egg=super-csv==0.2
 sympy==1.4
 tincan==0.0.5             # via edx-enterprise
 unicodecsv==0.14.1
