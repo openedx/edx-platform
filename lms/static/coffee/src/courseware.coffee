@@ -9,8 +9,6 @@ class @Courseware
     new Courseware
 
   render: ->
-    XBlock.initializeBlocks($('.course-content'))
-    
     courseContentElement = $('.course-content')[0]
     blocks = XBlock.initializeBlocks(courseContentElement)
 
