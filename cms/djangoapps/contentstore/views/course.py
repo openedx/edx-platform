@@ -284,9 +284,11 @@ def course_rerun_handler(request, course_key_string):
         html: return html page with form to rerun a course for the given course id
     """
     # Only global staff (PMs) are able to rerun courses during the soft launch
-    if not GlobalStaff().has_user(request.user):
-        raise PermissionDenied()
+    # Appsembler: Also course staff can do reruns
     course_key = CourseKey.from_string(course_key_string)
+    if not CourseStaffRole(course_key).has_user(request.user):
+        if not GlobalStaff().has_user(request.user):
+            raise PermissionDenied()
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user, depth=3)
         if request.method == 'GET':
@@ -554,7 +556,9 @@ def course_listing(request):
         u'user': user,
         u'request_course_creator_url': reverse('request_course_creator'),
         u'course_creator_status': _get_course_creator_status(user),
-        u'rerun_creator_status': GlobalStaff().has_user(user),
+        # Appsembler: Using the course creator status instead of `GlobalStaff().has_user(user)`
+        #             to match the Tahoe multi-tenant requirements.
+        u'rerun_creator_status': _get_course_creator_status(user) == 'granted',
         u'allow_unicode_course_id': settings.FEATURES.get(u'ALLOW_UNICODE_COURSE_ID', False),
         u'allow_course_reruns': settings.FEATURES.get(u'ALLOW_COURSE_RERUNS', True),
         u'optimization_enabled': optimization_enabled
