@@ -13,6 +13,7 @@ ENABLE_ACCESSIBILITY_POLICY_PAGE = u'enable_policy_page'
 # Global dictionary to store proctoring provider specific waffle flags
 REVIEW_RULES_PER_PROCTORING_PROVIDER = {}
 
+
 def create_review_rules_for_provider_waffle_flag(provider_name):
     """
     Creates a waffle flag with the following name format: studio.show_review_rules_for_<provider_name>
@@ -25,6 +26,7 @@ def create_review_rules_for_provider_waffle_flag(provider_name):
         flag_undefined_default=False
     )
     return new_flag
+
 
 def waffle():
     """
