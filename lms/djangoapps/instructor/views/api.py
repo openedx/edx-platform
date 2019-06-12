@@ -601,6 +601,7 @@ def create_and_enroll_user(email, username, name, country, password, course_id, 
                 'message_type': 'account_creation_and_enrollment',
                 'email_address': email,
                 'password': password,
+                'username': username,
                 'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
             })
             send_mail_to_student(email, email_params)
