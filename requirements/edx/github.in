@@ -80,7 +80,7 @@ git+https://github.com/edx/django-celery.git@756cb57aad765cb2b0d37372c1855b8f5f3
 # Our libraries:
 -e git+https://github.com/edx/codejail.git@a320d43ce6b9c93b17636b2491f724d9e433be47#egg=codejail
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
--e git+https://github.com/edx/edx-django-utils.git@dsheraz/prod-343#egg=edx-django-utils
+-e git+https://github.com/edx/help-tokens.git@dsheraz/prod-343#egg=help-tokens
 git+https://github.com/edx/edx-ora2.git@2.2.3#egg=ora2==2.2.3
 git+https://github.com/edx/RecommenderXBlock.git@1.4.0#egg=recommender-xblock==1.4.0
 git+https://github.com/edx/crowdsourcehinter.git@518605f0a95190949fe77bd39158450639e2e1dc#egg=crowdsourcehinter-xblock==0.1

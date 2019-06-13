@@ -73,6 +73,7 @@ edx-completion
 edx-django-oauth2-provider
 edx-django-release-util             # Release utils for the edx release pipeline
 edx-django-sites-extensions==2.3.1
+edx-django-utils
 edx-drf-extensions
 edx-enterprise
 edx-milestones
@@ -94,7 +95,6 @@ fs==2.0.18
 fs-s3fs==0.1.8
 glob2                               # Enhanced glob module, used in openedx.core.lib.rooted_paths
 gunicorn==19.5.0
-help-tokens
 html5lib                            # HTML parser, used for capa problems
 ipaddress                           # Ip network support for Embargo feature
 jsonfield                           # Django model field for validated JSON; used in several apps
