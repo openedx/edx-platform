@@ -4,10 +4,12 @@ Discussion Application Configuration
 Signal handlers are connected here.
 """
 
+from __future__ import absolute_import
+
 from django.apps import AppConfig
 
 from openedx.core.constants import COURSE_ID_PATTERN
-from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType, PluginURLs, PluginSettings
+from openedx.core.djangoapps.plugins.constants import PluginSettings, PluginURLs, ProjectType, SettingsType
 
 
 class DiscussionConfig(AppConfig):
