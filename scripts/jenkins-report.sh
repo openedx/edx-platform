@@ -11,6 +11,9 @@ set -e
 
 source scripts/jenkins-common.sh
 
+echo "Installing paver requirements..."
+pip install -qr requirements/edx/paver.txt
+
 # Get the diff coverage and html reports for unit tests
 paver coverage -b $TARGET_BRANCH
 

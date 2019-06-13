@@ -10,8 +10,10 @@ from __future__ import absolute_import, unicode_literals
 
 import importlib
 import os
+
 import contracts
 import pytest
+from setproctitle import getproctitle, setproctitle
 
 
 # Patch the xml libs before anything else.
@@ -25,6 +27,13 @@ def pytest_configure(config):
     """
     if config.getoption('help'):
         return
+    if hasattr(config, 'workerinput'):
+        # Set the process name for pytest-xdist workers to something
+        # recognizable, like "py_xdist_gw0", for the benefit of tools like
+        # New Relic Infrastructure and top
+        old_name = getproctitle()
+        new_name = 'py_xdist_{}'.format(config.workerinput['workerid'])
+        setproctitle(old_name.replace('python', new_name, 1))
     enable_contracts = os.environ.get('ENABLE_CONTRACTS', False)
     if not enable_contracts:
         contracts.disable_all()

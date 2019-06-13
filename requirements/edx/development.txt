@@ -289,6 +289,7 @@ scandir==1.10.0
 scipy==1.2.1
 selenium==3.141.0
 semantic-version==2.6.0
+setproctitle==1.1.10
 shapely==1.6.4.post2
 shortuuid==0.5.0
 simplejson==3.16.0

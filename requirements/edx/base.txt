@@ -218,6 +218,7 @@ s3transfer==0.1.13        # via boto3
 sailthru-client==2.2.3
 scipy==1.2.1
 semantic-version==2.6.0   # via edx-drf-extensions
+setproctitle==1.1.10
 shapely==1.6.4.post2
 shortuuid==0.5.0          # via edx-django-oauth2-provider
 simplejson==3.16.0        # via mailsnake, sailthru-client, zendesk

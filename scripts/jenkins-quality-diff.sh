@@ -5,6 +5,9 @@ set -e
 source scripts/jenkins-common.sh
 source scripts/thresholds.sh
 
+echo "Installing paver requirements..."
+pip install -qr requirements/edx/paver.txt
+
 # Run quality task. Pass in the 'fail-under' percentage to diff-quality
 echo "Running diff quality."
 mkdir -p test_root/log/

@@ -21,11 +21,13 @@ from safe_lxml import defuse_xml_libs
 defuse_xml_libs()
 
 import importlib
+import io
 import os
 import sys
 from argparse import ArgumentParser
 
 import contracts
+from setproctitle import getproctitle, setproctitle
 
 
 def parse_args():
@@ -98,6 +100,13 @@ if __name__ == "__main__":
     edx_args, django_args = parse_args()
 
     edx_args_base = edx_args.settings_base.replace('/', '.') + '.'
+    if django_args:
+        # Replace "python" in the process name with "py_<service>_<command>"
+        # to make it clear in tools like New Relic Infrastructure and top
+        # what this particular python process is doing.
+        old_name = getproctitle()
+        new_name = 'py_{}_{}'.format(edx_args.service_variant, django_args[0])
+        setproctitle(old_name.replace('python', new_name, 1))
     if edx_args.settings:
         os.environ["DJANGO_SETTINGS_MODULE"] = edx_args_base + edx_args.settings
     elif os.environ.get("EDX_PLATFORM_SETTINGS") and not os.environ.get("DJANGO_SETTINGS_MODULE"):
