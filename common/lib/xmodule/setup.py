@@ -44,7 +44,7 @@ XBLOCKS_ASIDES = [
 
 setup(
     name="XModule",
-    version="0.1.1",
+    version="0.1.2",
     packages=find_packages(exclude=["tests"]),
     install_requires=[
         'setuptools',
@@ -52,7 +52,7 @@ setup(
         'capa',
         'path.py',
         'webob',
-        'edx-opaque-keys>=0.4.0,<1.0.0',
+        'edx-opaque-keys>=0.4.0',
     ],
     package_data={
         'xmodule': ['js/module/*'],
