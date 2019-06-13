@@ -15,7 +15,7 @@ from . import lazymod
 # Capa assumes float-friendly division always.
 # The name "random" is a properly-seeded stand-in for the random module.
 CODE_PROLOG = """\
-from __future__ import division
+from __future__ import absolute_import, division
 
 import os
 os.environ["OPENBLAS_NUM_THREADS"] = "1"    # See TNL-6456
