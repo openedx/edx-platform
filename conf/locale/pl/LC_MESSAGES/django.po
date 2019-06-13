@@ -1,0 +1,658 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"#-#-#-#-#  edx-platform-pl.po (PACKAGE VERSION)  #-#-#-#-#\n"
+"#-#-#-#-#  api-integration django-en-pl-R-C.po (PACKAGE VERSION)  #-#-#-#-#\n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-05-31 10:17+0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"#-#-#-#-#  edx-notifications django-en-pl-R-C.po (PACKAGE VERSION)  #-#-#-#-"
+"#\n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-05-30 15:15+0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"#-#-#-#-#  xblock-discussion django-en-pl-R-C.po (PACKAGE VERSION)  #-#-#-#-"
+"#\n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-05-31 10:17+0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: edx_solutions_api_integration/courses/views.py:858
+#: edx_solutions_api_integration/groups/views.py:378
+#: edx_solutions_api_integration/users/views.py:920
+msgid "group_id is missing"
+msgstr "Brak group_id"
+
+#: edx_solutions_api_integration/courses/views.py:1962
+msgid "Both start_date and end_date parameters are required"
+msgstr "Zarówno parametr start_date jak i end_date są wymagane"
+
+#: edx_solutions_api_integration/courses/views.py:1965
+msgid ""
+"Interval parameter is not valid. It should be one of these 'days', 'weeks', "
+"'months'"
+msgstr ""
+"Parametr przedziału czasowego jest niepoprawny. Musi on zostać wyrażony jako "
+"jeden z tych ‚dni’, ‚tygodni’, ‚miesięcy’"
+
+#: edx_solutions_api_integration/courses/views.py:1971
+msgid "date format is invalid"
+msgstr "niepoprawny format danych"
+
+#: edx_solutions_api_integration/courses/views.py:2204
+msgid "content_id is missing"
+msgstr "Brak content_id"
+
+#: edx_solutions_api_integration/courses/views.py:2206
+#: edx_solutions_api_integration/groups/views.py:255
+msgid "user_id is missing"
+msgstr "Brak user_id"
+
+#: edx_solutions_api_integration/courses/views.py:2212
+msgid "content_id is invalid"
+msgstr "Niepoprawny content_id"
+
+#: edx_solutions_api_integration/courses/views.py:2217
+msgid "user_id is invalid"
+msgstr "Niepoprawny userd_id"
+
+#: edx_solutions_api_integration/groups/views.py:382
+msgid "relationship_type is missing"
+msgstr "Brak relationship_type"
+
+#: edx_solutions_api_integration/groups/views.py:548
+#: edx_solutions_api_integration/users/views.py:1037
+msgid "course_id is missing"
+msgstr "Brak course_id"
+
+#: edx_solutions_api_integration/imports/views.py:78
+msgid "Empty field: {}"
+msgstr "Puste pole: {}"
+
+#: edx_solutions_api_integration/imports/views.py:78
+msgid "Processing Participant"
+msgstr "Przetwarzanie uczestnika"
+
+#: edx_solutions_api_integration/imports/views.py:84
+msgid "Status '{}' doesn't exist"
+msgstr "Status '{}' nie istnieje"
+
+#: edx_solutions_api_integration/imports/views.py:85
+#: edx_solutions_api_integration/imports/views.py:127
+#: edx_solutions_api_integration/imports/views.py:137
+#: edx_solutions_api_integration/imports/views.py:149
+msgid "Enrolling Participant in Course"
+msgstr "Rejestrowanie uczestnika na kurs"
+
+#: edx_solutions_api_integration/imports/views.py:94
+msgid "Email \"{}\" or username \"{}\" already exists"
+msgstr "Adres e-mail \"{}\" lub użytkownik \"{}\" już istnieją"
+
+#: edx_solutions_api_integration/imports/views.py:95
+#: edx_solutions_api_integration/imports/views.py:177
+msgid "Registering Participant"
+msgstr "Rejestrowanie uczestnika"
+
+#: edx_solutions_api_integration/imports/views.py:105
+msgid "Company {} doesn't exist"
+msgstr "Firma {} nie istnieje!"
+
+#: edx_solutions_api_integration/imports/views.py:106
+#: edx_solutions_api_integration/imports/views.py:186
+msgid "Enrolling Participant in Company"
+msgstr "Rejestrowanie uczestnika w firmie"
+
+#: edx_solutions_api_integration/imports/views.py:116
+msgid "User with email \"{}\" does not exist"
+msgstr "Użytkownik o adresie e-mail \"{}\" nie istnieje"
+
+#: edx_solutions_api_integration/imports/views.py:117
+msgid "Retrieving existing Participant"
+msgstr "Pobieranie danych istniejącego użytkownika"
+
+#: edx_solutions_api_integration/imports/views.py:126
+msgid "User with email \"{}\" is already enrolled"
+msgstr "Użytkownik o adresie e-mail \"{}\" jest już zarejestrowany"
+
+#: edx_solutions_api_integration/imports/views.py:136
+msgid "Course {} doesn't exist"
+msgstr "Kurs {} nie istnieje"
+
+#: edx_solutions_api_integration/imports/views.py:148
+msgid "Course {} is not Internal"
+msgstr "Kurs {} nie jest kursem wewnętrznym"
+
+#: edx_solutions_api_integration/imports/views.py:229
+msgid "Setting Participant's Status"
+msgstr "Ustawienie statusu uczestnika"
+
+#: edx_solutions_api_integration/imports/views.py:234
+msgid "Reason: {}, Activity: {}, Participant: {}"
+msgstr "Przyczyna: {}, Aktywność: {}, Uczestnik: {}"
+
+#: edx_solutions_api_integration/imports/views.py:234
+msgid "No email"
+msgstr "Brak adresu e-mail"
+
+#: edx_solutions_api_integration/sessions/views.py:79
+#: edx_solutions_api_integration/users/views.py:458
+msgid "username is missing"
+msgstr "brak nazwy użytkownika"
+
+#: edx_solutions_api_integration/sessions/views.py:83
+#: edx_solutions_api_integration/users/views.py:462
+msgid "password is missing"
+msgstr "brak hasła"
+
+#: edx_solutions_api_integration/users/views.py:446
+msgid "username or ids are missing"
+msgstr "brak nazwy użytkownika lub id "
+
+#: edx_solutions_api_integration/users/views.py:486
+#: edx_solutions_api_integration/users/views.py:785
+msgid "Password: "
+msgstr "Hasło:"
+
+#: edx_solutions_api_integration/users/views.py:504
+#, python-brace-format
+msgid "Username '{username}' or email '{email}' already exists"
+msgstr ""
+"Nazwa użytkownika '{username}' lub adres e-mail '{email}' są już "
+"zarejestrowane"
+
+#: edx_solutions_api_integration/users/views.py:724
+msgid "Invalid email address {}."
+msgstr "Nieprawidłowy adres e-mail {}."
+
+#: edx_solutions_api_integration/users/views.py:730
+msgid "A user with that email address already exists."
+msgstr "Użytkownik o tym adresie e-mail już istnieje!"
+
+#: edx_solutions_api_integration/users/views.py:744
+msgid "invalid_username"
+msgstr "invalid_username"
+
+#: edx_solutions_api_integration/users/views.py:768
+msgid "Could not update profile image"
+msgstr "Nie udało się zaktualizować zdjęcia profilowego"
+
+#: edx_solutions_api_integration/users/views.py:786
+msgid "invalid_password"
+msgstr "invalid_password"
+
+#: edx_solutions_api_integration/users/views.py:796
+#, python-brace-format
+msgid ""
+"You are re-using a password that you have used recently. You must have {0} "
+"distinct password(s) before reusing a previous password."
+msgstr ""
+"Używasz ponownie hasła, którego używałeś niedawno. Musisz ustawić {0} rożne "
+"hasło(-a), zanim powrócisz do poprzedniego."
+
+#: edx_solutions_api_integration/users/views.py:803
+#, python-brace-format
+msgid ""
+"You are resetting passwords too frequently. Due to security policies, {0} "
+"day(s) must elapse between password resets"
+msgstr ""
+"Zbyt często resetujesz swoje hasło. Ze względów bezpieczeństwa musi upłynąć "
+"{0} dni, zanim będziesz mógł zmienić hasło."
+
+#: edx_solutions_api_integration/users/views.py:1056
+#, python-brace-format
+msgid ""
+"Student {student} already added to cohort {cohort_name} for course {course}"
+msgstr ""
+"Uczeń {student} został już dodany do grupy kursantów {cohort_name} na kursie "
+"{course}"
+
+#: edx_solutions_api_integration/users/views.py:1319
+msgid "Student not enrolled in given course"
+msgstr "Uczeń nie jest zarejestrowany na tym kursie"
+
+#: edx_solutions_api_integration/users/views.py:1734
+msgid "read field is missing"
+msgstr "Brak pola odczytu"
+
+#: edx_notifications/server/web/templates/django/notifications_widget_header.html:27
+msgid "View unread"
+msgstr "Zobacz nieprzeczytane"
+
+#: edx_notifications/server/web/templates/django/notifications_widget_header.html:28
+msgid "View all"
+msgstr "Zobacz wszystkie"
+
+#: edx_notifications/server/web/templates/django/notifications_widget_header.html:29
+msgid "Mark as read"
+msgstr "Oznacz jako przeczytane"
+
+#: edx_notifications/server/web/templates/django/notifications_widget_header.html:32
+msgid "Hide"
+msgstr "Ukryj"
+
+#: edx_notifications/server/web/templates/django/notifications_widget_header.html:45
+msgid "You have no unread notifications."
+msgstr "Nie masz żadnych nieprzeczytanych powiadomień"
+
+#: edx_notifications/server/web/templates/django/notifications_widget_preferences_header.html:11
+msgid "Notification preferences"
+msgstr "Ustawienia powiadomień"
+
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: 'Discussion' refers to the tab in the courseware that leads to
+#. the discussion forums
+#: cms/djangoapps/contentstore/views/component.py
+#: lms/djangoapps/courseware/tabs.py lms/djangoapps/discussion/plugins.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+msgid "Discussion"
+msgstr "Dyskusja"
+
+#: common/djangoapps/course_modes/models.py
+#: common/lib/xmodule/xmodule/annotatable_module.py
+#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/conditional_module.py
+#: common/lib/xmodule/xmodule/discussion_module.py
+#: common/lib/xmodule/xmodule/html_module.py
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/lti_module.py
+#: common/lib/xmodule/xmodule/split_test_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+#: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/x_module.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion_course/xblock_discussion_course.py
+#: cms/templates/container.html cms/templates/library.html
+msgid "Display Name"
+msgstr "Wyświetlana nazwa"
+
+#: common/lib/xmodule/xmodule/annotatable_module.py
+#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/conditional_module.py
+#: common/lib/xmodule/xmodule/html_module.py
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_root_xblock.py
+#: common/lib/xmodule/xmodule/poll_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+#: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/x_module.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid "The display name for this component."
+msgstr "Wyświetlana nazwa dla tego komponentu"
+
+#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/discussion_module.py
+msgid "XML data for the problem"
+msgstr "Dane XML dla problemu"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Discussion Blackout Dates"
+msgstr "Daty niedostępności dyskusji"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter pairs of dates between which students cannot post to discussion "
+"forums. Inside the provided brackets, enter an additional set of square "
+"brackets surrounding each pair of dates you add. Format each pair of dates "
+"as [\"YYYY-MM-DD\", \"YYYY-MM-DD\"]. To specify times as well as dates, "
+"format each pair as [\"YYYY-MM-DDTHH:MM\", \"YYYY-MM-DDTHH:MM\"]. Be sure to "
+"include the \"T\" between the date and time. For example, an entry defining "
+"two blackout periods looks like this, including the outer pair of square "
+"brackets: [[\"2015-09-15\", \"2015-09-21\"], [\"2015-10-01\", "
+"\"2015-10-08\"]] "
+msgstr ""
+"Wprowadź pary dat podczas których uczniowie nie będą mogli publikować postów "
+"w dyskusji. Wewnątrz podanych nawiasów kwadratowych wprowadź dodatkowy "
+"zestaw nawiasów kwadratowych wokół każdej pary dat, które chcesz dodać. "
+"Każdą parę dat sformatuj jako [\"RRRR-MM-DD\", \"RRRR-MM-DD\"]. Aby ustawić "
+"także przedziały godzinowe, sformatuj każdą parę jako [\"RRRR-MM-DDTHH:MM\", "
+"\"RRRR-MM-DDTHH:MM\"]. Upewnij się, że litera T oddziela datę i przedział "
+"godzinowy. Na przykład zapis, który definiuje dwa czasy niedostępności "
+"wygląda następująco, włącznie z zewnętrznym dodatkowym nawiasem kwadratowym: "
+"[[\"2015-09-15\", \"2015-09-21\"], [\"2015-10-01\", \"2015-10-08\"]] "
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Discussion Topic Mapping"
+msgstr "Mapowanie tematów dyskusji"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter discussion categories in the following format: \"CategoryName\": {\"id"
+"\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For example, one "
+"discussion category may be \"Lydian Mode\": {\"id\": \"i4x-UniversityX-"
+"MUS101-course-2015_T1\"}. The \"id\" value for each category must be unique. "
+"In \"id\" values, the only special characters that are supported are "
+"underscore, hyphen, and period."
+msgstr ""
+"Wprowadź kategorie dyskusji w następującym formacie: \"NazwaKategorii\": "
+"{\"id\": \"i4x-NazwaInstytucji-NumerKursu-Kurs-EdycjaKursu\"}. Na przykład, "
+"jedną kategorią dyskusji może być „Moduł Lidyjski”: {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. Wartość id każdej kategorii musi być "
+"unikatowa. Jedyne obsługiwane znaki specjalne dla wartości id to "
+"podkreślnik, myślnik i kropka."
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Discussion Sorting Alphabetical"
+msgstr "Alfabetyczne sortowanie dyskusji"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, discussion categories and subcategories are "
+"sorted alphabetically. If false, they are sorted chronologically by creation "
+"date and time."
+msgstr ""
+"Wprowadź wartość true/false. Jeśli true, dyskusje i podkategorie będą "
+"sortowane alfabetycznie. Jeśli false, będą sortowane chronologiczne według "
+"momentu utworzenia."
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter policy keys and values to enable the cohort feature, define automated "
+"student assignment to groups, or identify any course-wide discussion topics "
+"as private to cohort members."
+msgstr ""
+"Wprowadź klucze i wartości polityki, aby włączyć funkcję grupy kursantów, "
+"zdefiniowanie automatyczne przydzielanie uczniów do grup lub określić tematy "
+"ogólnodostępne dla całego kursu jako tematy prywatne dla członków danej "
+"grupy kursantów."
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Allow Anonymous Discussion Posts"
+msgstr "Włącz możliwość anonimowego publikowania postów"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, students can create discussion posts that are "
+"anonymous to all users."
+msgstr ""
+"Wprowadź wartość true/false. Jeśli true, uczniowie mogą tworzyć posty, które "
+"są anonimowe dla wszystkich użytkowników."
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Allow Anonymous Discussion Posts to Peers"
+msgstr "Włącz możliwość anonimowego publikowania postów (tylko dla kolegów)"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, students can create discussion posts that are "
+"anonymous to other students. This setting does not make posts anonymous to "
+"course staff."
+msgstr ""
+"Wprowadź wartość true/false. Jeśli true, uczniowie mogą tworzyć posty, które "
+"są anonimowe dla innych uczestników kursu, ale nie dla pracowników obsługi "
+"kursu."
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Discussion Forum External Link"
+msgstr "Zewnętrzny link forum dyskusyjnego"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Allows specification of an external link to replace discussion forums."
+msgstr ""
+"Pozwól na określenie zewnętrznego linku, który zastąpi forum dyskusyjne."
+
+#: common/lib/xmodule/xmodule/discussion_module.py
+msgid "Discussion Id"
+msgstr "ID Dyskusji"
+
+#: common/lib/xmodule/xmodule/discussion_module.py
+msgid "The id is a unique identifier for the discussion. It is non editable."
+msgstr "ID to unikatowy numer identyfikujący dyskusji. Nie można go edytować."
+
+#: common/lib/xmodule/xmodule/discussion_module.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion_course/xblock_discussion_course.py
+msgid "Display name for this module"
+msgstr "Wyświetlana nazwa dla tego modułu"
+
+#: common/lib/xmodule/xmodule/discussion_module.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid "Category"
+msgstr "Kategoria"
+
+#: common/lib/xmodule/xmodule/discussion_module.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid ""
+"A category name for the discussion. This name appears in the left pane of "
+"the discussion forum for the course."
+msgstr ""
+"Nazwa kategorii dla tej dyskusji. Nazwa ta pojawi się w lewym panelu forum "
+"dyskusyjnego dla danego kursu."
+
+#: common/lib/xmodule/xmodule/discussion_module.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid "Subcategory"
+msgstr "Podkategoria"
+
+#: common/lib/xmodule/xmodule/discussion_module.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid ""
+"A subcategory name for the discussion. This name appears in the left pane of "
+"the discussion forum for the course."
+msgstr ""
+"Nazwa podkategorii dla tej dyskusji. Nazwa ta pojawi się w lewym panelu "
+"forum dyskusyjnego dla danego kursu."
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+#: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
+msgid "Discussions"
+msgstr "Dyskusje"
+
+#: common/templates/discussion/_discussion_course_studio.html
+msgid ""
+"To view live course discussions, click Preview or View Live in Unit Settings."
+msgstr ""
+"Aby zobaczyć aktywne dyskusje an kursie, kliknij Podgląd lub Zobacz aktywne "
+"w ustawieniach unitu. "
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
+#: lms/templates/discussion/_discussion_course_navigation.html
+msgid "Add a Post"
+msgstr "Dodaj post"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
+#: lms/templates/discussion/index.html
+msgid "Discussion thread list"
+msgstr "Lista wątków dyskusji"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
+#: lms/templates/discussion/index.html
+msgid "New topic form"
+msgstr "Formularz nowego tematu"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+#: lms/templates/discussion/index.html
+#: lms/templates/discussion/user_profile.html
+msgid "Discussion - {course_number}"
+msgstr "Dyskusja - {course_number}"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+#: lms/templates/discussion/__user_profile.html
+#, python-format
+msgid "%s discussion started"
+msgid_plural "%s discussions started"
+msgstr[0] "%s dyskusja rozpoczęta"
+msgstr[1] "%s dyskusji rozpoczętych"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+#: lms/templates/discussion/__user_profile.html
+#, python-format
+msgid "%s comment"
+msgid_plural "%s comments"
+msgstr[0] "%s komentarz"
+msgstr[1] "%s komentarze"
+
+#: lms/djangoapps/discussion/templates/discussion/maintenance_fragment.html
+msgid "Discussion unavailable"
+msgstr "Dyskusja niedostępna"
+
+#: lms/djangoapps/discussion/templates/discussion/maintenance_fragment.html
+msgid ""
+"The discussions are currently undergoing maintenance. We'll have them back "
+"up shortly!"
+msgstr ""
+"Te dyskusje są niedostępne ze względu na przerwę techniczną. Wkrótce "
+"udostępnimy je ponownie!"
+
+#: lms/templates/annotatable.html
+msgid "Guided Discussion"
+msgstr "Dyskusja moderowana"
+
+#: lms/templates/help_modal.html
+msgid ""
+"For {strong_start}questions on course lectures, homework, tools, or "
+"materials for this course{strong_end}, post in the {link_start}course "
+"discussion forum{link_end}."
+msgstr ""
+"Jeśli chciałbyś opublikować post dotyczący {strong_start}pytań na temat "
+"wykładów, zadań domowych, narzędzi lub materiałów związanych z tym "
+"kursem{strong_end}, dodaj go do {link_start}forum ogólnodostępnym "
+"kursu{link_end}."
+
+#: lms/templates/discussion/_discussion_inline.html
+msgid "Topic:"
+msgstr "Temat:"
+
+#: lms/templates/discussion/_discussion_inline.html
+msgid "Show Discussion"
+msgstr "Pokaż dyskusję"
+
+#: lms/templates/discussion/_discussion_inline_studio.html
+msgid "To view live discussions, click Preview or View Live in Unit Settings."
+msgstr ""
+"Aby zobaczyć aktywne dyskusje, kliknij Podgląd lub Zobacz aktywne w "
+"ustawieniach unitu. "
+
+#: lms/templates/discussion/_discussion_inline_studio.html
+msgid "Discussion ID: {discussion_id}"
+msgstr "Numer ID dyskusji” {discussion_id}"
+
+#: lms/templates/discussion/_filter_dropdown.html
+msgid "Discussion topics list"
+msgstr "Lista tematów dysk"
+
+#: lms/templates/discussion/_filter_dropdown.html
+msgid "Filter Topics"
+msgstr "Filtruj tematy"
+
+#: lms/templates/discussion/_filter_dropdown.html
+msgid "filter topics"
+msgstr "filtruj tematy"
+
+#: lms/templates/discussion/_filter_dropdown.html
+msgid "All Discussions"
+msgstr "Wszystkie dyskusje"
+
+#: lms/templates/discussion/_filter_dropdown.html
+msgid "Posts I'm Following"
+msgstr "Posty, które śledzę"
+
+#. Translators: This labels a filter menu in forum navigation
+#: lms/templates/discussion/_thread_list_template.html
+msgid "Filter:"
+msgstr "Filtruj wg.:"
+
+#. Translators: This is a menu option for showing all forum threads unfiltered
+#: lms/templates/discussion/_thread_list_template.html
+msgid "Show all posts"
+msgstr "Pokaż wszystkie posty"
+
+#. Translators: This is a menu option for showing only unread forum threads
+#: lms/templates/discussion/_thread_list_template.html
+msgid "Unread posts"
+msgstr "Nieprzeczytane posty"
+
+#. Translators: This is a menu option for showing only unanswered forum
+#. question threads
+#: lms/templates/discussion/_thread_list_template.html
+msgid "Unanswered posts"
+msgstr "Posty bez odpowiedzi"
+
+#. Translators: This is a menu option for showing only forum threads flagged
+#. for abuse
+#: lms/templates/discussion/_thread_list_template.html
+msgid "Flagged"
+msgstr "Oznaczone"
+
+#. Translators: This labels a group menu in forum navigation
+#: lms/templates/discussion/_thread_list_template.html
+msgid "Group:"
+msgstr "Grupa:"
+
+#: lms/templates/discussion/_thread_list_template.html
+msgid "in all groups"
+msgstr "we wszystkich grupach"
+
+#. Translators: This labels a sort menu in forum navigation
+#: lms/templates/discussion/_thread_list_template.html
+msgid "Sort:"
+msgstr "Sort wg.:"
+
+#. Translators: This is a menu option for sorting forum threads
+#: lms/templates/discussion/_thread_list_template.html
+msgid "by recent activity"
+msgstr "ostatnia aktywność"
+
+#. Translators: This is a menu option for sorting forum threads
+#: lms/templates/discussion/_thread_list_template.html
+msgid "by most activity"
+msgstr "największa aktywność"
+
+#. Translators: This is a menu option for sorting forum threads
+#: lms/templates/discussion/_thread_list_template.html
+msgid "by most votes"
+msgstr "najwięcej punktów"
+
+#: lms/templates/discussion/maintenance.html
+msgid "We're sorry"
+msgstr "Przepraszamy"
+
+#: lms/templates/discussion/maintenance.html
+msgid ""
+"The forums are currently undergoing maintenance. We'll have them back up "
+"shortly!"
+msgstr ""
+"Fora są niedostępne ze względu na przerwę techniczną. Wkrótce udostępnimy je "
+"ponownie!"
+
+#: lms/templates/discussion/user_profile.html
+msgid "User Profile"
+msgstr "Profil użytkownika"
+
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid "Week 1"
+msgstr "Tydzień 1"
+
+#: openedx/core/lib/xblock_builtin/xblock_discussion_course/xblock_discussion_course.py
+msgid "Discussion Course"
+msgstr "Kurs, do którego przynależy dyskusja"
