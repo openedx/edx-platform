@@ -13,6 +13,7 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, FULL_ACCESS, LIMITED_ACCESS
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import ContentTypeGatingPartition, create_content_gating_partition
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from student.tests.factories import GroupFactory
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, UserPartitionError
 
@@ -20,6 +21,7 @@ from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, UserPar
 class TestContentTypeGatingPartition(CacheIsolationTestCase):
     def setUp(self):
         self.course_key = CourseKey.from_string('course-v1:test+course+key')
+        CourseOverviewFactory.create(id=self.course_key)
 
     def test_create_content_gating_partition_happy_path(self):
 

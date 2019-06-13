@@ -44,6 +44,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
 )
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
+from openedx.core.djangolib.markup import HTML
 from openedx.features.course_duration_limits.config import EXPERIMENT_DATA_HOLDBACK_KEY, EXPERIMENT_ID
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
@@ -53,7 +54,6 @@ from openedx.features.course_experience import (
     SHOW_UPGRADE_MSG_ON_COURSE_HOME,
     UNIFIED_COURSE_TAB_FLAG
 )
-from openedx.features.discounts.applicability import DISCOUNT_APPLICABILITY_FLAG
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from util.date_utils import strftime_localized
@@ -973,7 +973,7 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
         self.assertIn('<a class="btn-brand btn-upgrade"', response.content)
         self.assertIn(url, response.content)
         self.assertIn(
-            u'Upgrade (${price})'.format(price=self.verified_mode.min_price),
+            u"Upgrade (<span class='price'>${price}</span>)".format(price=self.verified_mode.min_price),
             response.content.decode(response.charset)
         )
 
@@ -1004,27 +1004,15 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
         CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
         self.assert_upgrade_message_displayed()
 
-    @ddt.data(True, False)
-    def test_upgrade_message_discount(self, has_discount):
+    @mock.patch(
+        'openedx.features.course_experience.views.course_home.format_strikeout_price',
+        mock.Mock(return_value=(HTML("<span>DISCOUNT_PRICE</span>"), True))
+    )
+    def test_upgrade_message_discount(self):
         CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
 
-        self.verified_mode.min_price = 100
-        self.verified_mode.save()
+        with SHOW_UPGRADE_MSG_ON_COURSE_HOME.override(True):
+            response = self.client.get(self.url)
 
-        with FIRST_PURCHASE_OFFER_BANNER_DISPLAY.override(has_discount):
-            with DISCOUNT_APPLICABILITY_FLAG.override(has_discount):
-                response = self.client.get(self.url)
-
-        self.assertIn('section-upgrade', response.content)
-        url = EcommerceService().get_checkout_page_url(self.verified_mode.sku)
-        self.assertIn('<a class="btn-brand btn-upgrade"', response.content)
-        self.assertIn(url, response.content)
         content = response.content.decode(response.charset)
-        print(content)
-        if has_discount:
-            assert '$85' in content
-            assert '<del>$100</del>' in content
-        else:
-            assert u'$85' not in content
-            assert u'<del>' not in content
-            assert u'Upgrade ($100)' in content
+        assert "<span>DISCOUNT_PRICE</span>" in content

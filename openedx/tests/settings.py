@@ -86,6 +86,7 @@ INSTALLED_APPS = (
     'experiments',
     'openedx.features.content_type_gating',
     'openedx.features.course_duration_limits',
+    'openedx.features.discounts',
     'milestones',
     'celery_utils',
     'waffle',

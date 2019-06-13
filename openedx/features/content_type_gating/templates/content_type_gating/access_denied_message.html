@@ -12,12 +12,7 @@
         {% if not mobile_app and ecommerce_checkout_link %}
         <span class="certDIV_1" style="">
             <a href="{{ecommerce_checkout_link}}" class="certA_1">
-                {% trans "Upgrade to unlock" %}
-                {% if price_before_discount %}
-                    (${{min_price}} USD <del>${{price_before_discount}} USD</del>)
-                {% else %}
-                    (${{min_price}} USD)
-                {% endif %}
+                {% trans "Upgrade to unlock" %} ({{min_price}})
             </a>
         </span>
         {% endif %}

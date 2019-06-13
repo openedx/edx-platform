@@ -21,7 +21,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, FULL_ACCESS, LIMITED_ACCESS
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from openedx.features.discounts.applicability import discount_percentage, can_receive_discount
+from openedx.features.discounts.utils import format_strikeout_price
 from xmodule.partitions.partitions import UserPartition, UserPartitionError
 
 LOG = logging.getLogger(__name__)
@@ -88,18 +88,12 @@ class ContentTypeGatingPartition(UserPartition):
         ecommerce_checkout_link = self._get_checkout_link(user, verified_mode.sku)
         request = crum.get_current_request()
 
-        if can_receive_discount(user, course):
-            price_before_discount = verified_mode.min_price
-            upgrade_price = "{:0.2f}".format(price_before_discount * ((100.0 - discount_percentage()) / 100))
-        else:
-            price_before_discount = None
-            upgrade_price = verified_mode.min_price
+        upgrade_price, _ = format_strikeout_price(user, course)
 
         frag = Fragment(render_to_string('content_type_gating/access_denied_message.html', {
             'mobile_app': request and is_request_from_mobile_app(request),
             'ecommerce_checkout_link': ecommerce_checkout_link,
             'min_price': upgrade_price,
-            'price_before_discount': price_before_discount,
         }))
         return frag
 
