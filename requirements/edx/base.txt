@@ -112,7 +112,7 @@ edx-oauth2-provider==1.2.2
 edx-opaque-keys[django]==1.0.1
 edx-organizations==2.0.3
 edx-proctoring-proctortrack==1.0.5
-edx-proctoring==2.0.3
+edx-proctoring==2.0.4
 edx-rbac==0.2.1           # via edx-enterprise
 edx-rest-api-client==1.9.2
 edx-search==1.2.2
