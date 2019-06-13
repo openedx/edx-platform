@@ -587,12 +587,6 @@ def get_about_url():
 
 def get_home_url():
     """
-    Lookup and return home page url, lookup is performed in the following order
-
-    1. return marketing root URL, If marketing is enabled
-    2. Otherwise return dashboard URL.
+    Return Dashboard page url
     """
-    if settings.FEATURES.get('ENABLE_MKTG_SITE', False):
-        return marketing_link('ROOT')
-
     return reverse('dashboard')
