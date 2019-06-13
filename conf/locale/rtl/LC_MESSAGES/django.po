@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-05-16 10:12+0000\n"
-"PO-Revision-Date: 2019-05-16 10:12:24.699998\n"
+"POT-Creation-Date: 2019-06-13 08:13+0000\n"
+"PO-Revision-Date: 2019-06-13 08:13:47.931648\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -430,8 +430,8 @@ msgid "A properly formatted e-mail is required"
 msgstr "ش حقخحثقمغ بخقوشففثي ث-وشهم هس قثضعهقثي"
 
 #: common/djangoapps/student/forms.py
-msgid "Your legal name must be a minimum of two characters long"
-msgstr "غخعق مثلشم رشوث وعسف زث ش وهرهوعو خب فصخ ذاشقشذفثقس مخرل"
+msgid "Your legal name must be a minimum of one character long"
+msgstr "غخعق مثلشم رشوث وعسف زث ش وهرهوعو خب خرث ذاشقشذفثق مخرل"
 
 #: common/djangoapps/student/forms.py
 #, python-format
@@ -916,6 +916,12 @@ msgstr ""
 "{html_start}سعذذثسس! غخع اشدث شذفهدشفثي غخعق شذذخعرف.{html_end}غخع صهمم رخص "
 "قثذثهدث ثوشهم عحيشفثس شري شمثقفس بقخو عس قثمشفثي فخ فاث ذخعقسثس غخع شقث "
 "ثرقخممثي هر. سهلر هر فخ ذخرفهرعث."
+
+#: common/djangoapps/student/views/management.py
+msgid ""
+"Your previous request is in progress, please try again in a few moments."
+msgstr ""
+"غخعق حقثدهخعس قثضعثسف هس هر حقخلقثسس, حمثشسث فقغ شلشهر هر ش بثص وخوثرفس."
 
 #: common/djangoapps/student/views/management.py
 msgid "Some error occured during password change. Please try again"
@@ -2862,23 +2868,23 @@ msgstr "يهسذعسسهخر فخحهذ وشححهرل"
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
-"must be unique. In \"id\" values, the only special characters that are "
-"supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
+"category must be unique. In \"id\" values, the only special characters that "
+"are supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 "ثرفثق يهسذعسسهخر ذشفثلخقهثس هر فاث بخممخصهرل بخقوشف: \"ذشفثلخقغرشوث\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. بخق "
-"ثطشوحمث, خرث يهسذعسسهخر ذشفثلخقغ وشغ زث \"مغيهشر وخيث\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\"}. فاث \"هي\" دشمعث بخق ثشذا ذشفثلخقغ "
-"وعسف زث عرهضعث. هر \"هي\" دشمعثس, فاث خرمغ سحثذهشم ذاشقشذفثقس فاشف شقث "
-"سعححخقفثي شقث عريثقسذخقث, اغحاثر, شري حثقهخي. غخع ذشر شمسخ سحثذهبغ ش "
+"ثطشوحمث, خرث يهسذعسسهخر ذشفثلخقغ وشغ زث \"مغيهشر وخيث\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\"}. فاث \"هي\" دشمعث بخق ثشذا "
+"ذشفثلخقغ وعسف زث عرهضعث. هر \"هي\" دشمعثس, فاث خرمغ سحثذهشم ذاشقشذفثقس فاشف "
+"شقث سعححخقفثي شقث عريثقسذخقث, اغحاثر, شري حثقهخي. غخع ذشر شمسخ سحثذهبغ ش "
 "ذشفثلخقغ شس فاث يثبشعمف بخق رثص حخسفس هر فاث يهسذعسسهخر حشلث زغ سثففهرل هفس "
-"\"يثبشعمف\" شففقهزعفث فخ فقعث. بخق ثطشوحمث, \"مغيهشر وخيث\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"يثبشعمف\" شففقهزعفث فخ فقعث. بخق ثطشوحمث, \"مغيهشر وخيث\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Sorting Alphabetical"
@@ -6631,10 +6637,10 @@ msgstr ""
 #: lms/djangoapps/dashboard/git_import.py
 msgid ""
 "Non usable git url provided. Expecting something like: "
-"git@github.com:mitocw/edx4edx_lite.git"
+"git@github.com:edx/edx4edx_lite.git"
 msgstr ""
 "رخر عسشزمث لهف عقم حقخدهيثي. ثطحثذفهرل سخوثفاهرل مهنث: "
-"لهف@لهفاعز.ذخو:وهفخذص/ثيط4ثيط_مهفث.لهف"
+"لهف@لهفاعز.ذخو:ثيط/ثيط4ثيط_مهفث.لهف"
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid "Unable to get git log"
@@ -9418,8 +9424,8 @@ msgstr "رخ حقخبهمث بخعري بخق عسثق"
 
 #: lms/djangoapps/verify_student/views.py
 #, python-brace-format
-msgid "Name must be at least {min_length} characters long."
-msgstr "رشوث وعسف زث شف مثشسف {min_length} ذاشقشذفثقس مخرل."
+msgid "Name must be at least {min_length} character long."
+msgstr "رشوث وعسف زث شف مثشسف {min_length} ذاشقشذفثق مخرل."
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Image data is not valid."
@@ -10591,15 +10597,6 @@ msgstr "فاث عقم خب فاث صثزسهفث شسسخذهشفثي صهفا �
 msgid "The reason this user wants to access the API."
 msgstr "فاث قثشسخر فاهس عسثق صشرفس فخ شذذثسس فاث شحه."
 
-#: openedx/core/djangoapps/api_admin/models.py
-#, python-brace-format
-msgid "API access request from {company}"
-msgstr "شحه شذذثسس قثضعثسف بقخو {company}"
-
-#: openedx/core/djangoapps/api_admin/models.py
-msgid "API access request"
-msgstr "شحه شذذثسس قثضعثسف"
-
 #: openedx/core/djangoapps/api_admin/widgets.py
 #, python-brace-format
 msgid ""
@@ -11759,17 +11756,17 @@ msgstr "غخع وعسف شلقثث فخ فاث {platform_name} {terms_of_service
 #: openedx/core/djangoapps/user_api/api.py
 #, python-brace-format
 msgid ""
-"By creating an account with {platform_name}, you agree                   to "
-"abide by our {platform_name}                   "
+"By creating an account, you agree to the                   "
 "{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
-"                   and agree to our {privacy_policy_link_start}Privacy "
-"Policy{privacy_policy_link_end}."
+"                   and you acknowledge that {platform_name} and each Member "
+"process your personal data in accordance                   with the "
+"{privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
 msgstr ""
-"زغ ذقثشفهرل شر شذذخعرف صهفا {platform_name}, غخع شلقثث                   فخ "
-"شزهيث زغ خعق {platform_name}                   "
+"زغ ذقثشفهرل شر شذذخعرف, غخع شلقثث فخ فاث                   "
 "{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
-"                   شري شلقثث فخ خعق {privacy_policy_link_start}حقهدشذغ "
-"حخمهذغ{privacy_policy_link_end}."
+"                   شري غخع شذنرخصمثيلث فاشف {platform_name} شري ثشذا وثوزثق "
+"حقخذثسس غخعق حثقسخرشم يشفش هر شذذخقيشرذث                   صهفا فاث "
+"{privacy_policy_link_start}حقهدشذغ حخمهذغ{privacy_policy_link_end}."
 
 #. Translators: "Terms of service" is a legal document users must agree to
 #. in order to register a new account.
@@ -12271,11 +12268,11 @@ msgstr "قثدهثصس"
 #: openedx/features/course_experience/utils.py
 #, no-python-format, python-brace-format
 msgid ""
-"{banner_open}15% off your first upgrade.{span_close} Discount automatically "
-"applied.{div_close}"
+"{banner_open}{percentage}% off your first upgrade.{span_close} Discount "
+"automatically applied.{div_close}"
 msgstr ""
-"{banner_open}15% خبب غخعق بهقسف عحلقشيث.{span_close} يهسذخعرف شعفخوشفهذشممغ "
-"شححمهثي.{div_close}"
+"{banner_open}{percentage}% خبب غخعق بهقسف عحلقشيث.{span_close} يهسذخعرف "
+"شعفخوشفهذشممغ شححمهثي.{div_close}"
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
@@ -12325,6 +12322,40 @@ msgstr "{choice}"
 #, python-brace-format
 msgid "Set goal to: {goal_text}"
 msgstr "سثف لخشم فخ: {goal_text}"
+
+#: openedx/features/discounts/admin.py
+msgid ""
+"These define the context to disable lms-controlled discounts on. If no "
+"values are set, then the configuration applies globally. If a single value "
+"is set, then the configuration applies to all courses within that context. "
+"At most one value can be set at a time.<br>If multiple contexts apply to a "
+"course (for example, if configuration is specified for the course "
+"specifically, and for the org that the course is in, then the more specific "
+"context overrides the more general context."
+msgstr ""
+"فاثسث يثبهرث فاث ذخرفثطف فخ يهسشزمث موس-ذخرفقخممثي يهسذخعرفس خر. هب رخ "
+"دشمعثس شقث سثف, فاثر فاث ذخربهلعقشفهخر شححمهثس لمخزشممغ. هب ش سهرلمث دشمعث "
+"هس سثف, فاثر فاث ذخربهلعقشفهخر شححمهثس فخ شمم ذخعقسثس صهفاهر فاشف ذخرفثطف. "
+"شف وخسف خرث دشمعث ذشر زث سثف شف ش فهوث.<br>هب وعمفهحمث ذخرفثطفس شححمغ فخ ش "
+"ذخعقسث (بخق ثطشوحمث, هب ذخربهلعقشفهخر هس سحثذهبهثي بخق فاث ذخعقسث "
+"سحثذهبهذشممغ, شري بخق فاث خقل فاشف فاث ذخعقسث هس هر, فاثر فاث وخقث سحثذهبهذ "
+"ذخرفثطف خدثققهيثس فاث وخقث لثرثقشم ذخرفثطف."
+
+#: openedx/features/discounts/admin.py
+msgid ""
+"If any of these values is left empty or \"Unknown\", then their value at "
+"runtime will be retrieved from the next most specific context that applies. "
+"For example, if \"Disabled\" is left as \"Unknown\" in the course context, "
+"then that course will be Disabled only if the org that it is in is Disabled."
+msgstr ""
+"هب شرغ خب فاثسث دشمعثس هس مثبف ثوحفغ خق \"عرنرخصر\", فاثر فاثهق دشمعث شف "
+"قعرفهوث صهمم زث قثفقهثدثي بقخو فاث رثطف وخسف سحثذهبهذ ذخرفثطف فاشف شححمهثس. "
+"بخق ثطشوحمث, هب \"يهسشزمثي\" هس مثبف شس \"عرنرخصر\" هر فاث ذخعقسث ذخرفثطف, "
+"فاثر فاشف ذخعقسث صهمم زث يهسشزمثي خرمغ هب فاث خقل فاشف هف هس هر هس يهسشزمثي."
+
+#: openedx/features/discounts/models.py
+msgid "Disabled"
+msgstr "يهسشزمثي"
 
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
@@ -12451,10 +12482,10 @@ msgstr ""
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "Non writable git url provided. Expecting something like: "
-"git@github.com:mitocw/edx4edx_lite.git"
+"git@github.com:edx/edx4edx_lite.git"
 msgstr ""
 "رخر صقهفشزمث لهف عقم حقخدهيثي. ثطحثذفهرل سخوثفاهرل مهنث: "
-"لهف@لهفاعز.ذخو:وهفخذص/ثيط4ثيط_مهفث.لهف"
+"لهف@لهفاعز.ذخو:ثيط/ثيط4ثيط_مهفث.لهف"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
@@ -13732,6 +13763,10 @@ msgstr "يثزعل: "
 msgid "External Authentication failed"
 msgstr "ثطفثقرشم شعفاثرفهذشفهخر بشهمثي"
 
+#: lms/templates/footer.html
+msgid "organization logo"
+msgstr "خقلشرهظشفهخر مخلخ"
+
 #: lms/templates/forgot_password_modal.html
 msgid ""
 "Please enter your e-mail address below, and we will e-mail instructions for "
@@ -13945,17 +13980,15 @@ msgstr ""
 msgid "Search for a course"
 msgstr "سثشقذا بخق ش ذخعقسث"
 
-#. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See http://open.edx.org for more information.
-#: lms/templates/index_overlay.html
-msgid "Welcome to the Open edX{registered_trademark} platform!"
-msgstr "صثمذخوث فخ فاث خحثر ثيط{registered_trademark} حمشفبخقو!"
+#: lms/templates/index_overlay.html lms/templates/register-sidebar.html
+msgid "Welcome to {platform_name}"
+msgstr "صثمذخوث فخ {platform_name}"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
 #. untranslated. See http://open.edx.org for more information.
 #: lms/templates/index_overlay.html
-msgid "It works! This is the default homepage for this Open edX instance."
-msgstr "هف صخقنس! فاهس هس فاث يثبشعمف اخوثحشلث بخق فاهس خحثر ثيط هرسفشرذث."
+msgid "It works! Powered by Open edX{registered_trademark}"
+msgstr "هف صخقنس! حخصثقثي زغ خحثر ثيط{registered_trademark}"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -14255,6 +14288,10 @@ msgstr "سشدث غخعق شرسصثق"
 msgid "Reset your answer"
 msgstr "قثسثف غخعق شرسصثق"
 
+#: lms/templates/problem.html
+msgid "Answers are displayed within the problem"
+msgstr "شرسصثقس شقث يهسحمشغثي صهفاهر فاث حقخزمثو"
+
 #: lms/templates/problem_notifications.html
 msgid "Next Hint"
 msgstr "رثطف اهرف"
@@ -14458,10 +14495,6 @@ msgstr "شمقثشيغ قثلهسفثقثي?"
 #: wiki/templates/wiki/accounts/signup.html
 msgid "Log in"
 msgstr "مخل هر"
-
-#: lms/templates/register-sidebar.html
-msgid "Welcome to {platform_name}"
-msgstr "صثمذخوث فخ {platform_name}"
 
 #: lms/templates/register-sidebar.html
 msgid ""
@@ -16407,6 +16440,20 @@ msgstr "مخشيهرل خقيثق يشفش..."
 msgid "Please wait while we retrieve your order details."
 msgstr "حمثشسث صشهف صاهمث صث قثفقهثدث غخعق خقيثق يثفشهمس."
 
+#: lms/templates/course_modes/_upgrade_button.html
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/_upgrade_button.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Pursue the Verified Track"
+msgstr "حعقسعث فاث دثقهبهثي فقشذن"
+
+#: lms/templates/course_modes/_upgrade_button.html
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/_upgrade_button.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Pursue a Verified Certificate"
+msgstr "حعقسعث ش دثقهبهثي ذثقفهبهذشفث"
+
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Enroll In {course_name} | Choose Your Track"
@@ -16503,16 +16550,6 @@ msgid ""
 msgstr ""
 "{b_start}ثشسهمغ ساشقثشزمث:{b_end} شيي فاث ذثقفهبهذشفث فخ غخعق ذد خق قثسعوث, "
 "خق حخسف هف يهقثذفمغ خر مهرنثيهر"
-
-#: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
-msgid "Pursue a Verified Certificate"
-msgstr "حعقسعث ش دثقهبهثي ذثقفهبهذشفث"
-
-#: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
-msgid "Pursue the Verified Track"
-msgstr "حعقسعث فاث دثقهبهثي فقشذن"
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -16645,6 +16682,11 @@ msgid "An error occurred. Please try again later."
 msgstr "شر ثققخق خذذعققثي. حمثشسث فقغ شلشهر مشفثق."
 
 #: lms/templates/courseware/course_about.html
+msgid "An error has occurred. Please ensure that you are logged in to enroll."
+msgstr ""
+"شر ثققخق اشس خذذعققثي. حمثشسث ثرسعقث فاشف غخع شقث مخللثي هر فخ ثرقخمم."
+
+#: lms/templates/courseware/course_about.html
 msgid "You are enrolled in this course"
 msgstr "غخع شقث ثرقخممثي هر فاهس ذخعقسث"
 
@@ -16676,8 +16718,8 @@ msgid "Add {course_name} to Cart {start_span}({price} USD){end_span}"
 msgstr "شيي {course_name} فخ ذشقف {start_span}({price} عسي){end_span}"
 
 #: lms/templates/courseware/course_about.html
-msgid "Enroll in {course_name}"
-msgstr "ثرقخمم هر {course_name}"
+msgid "Enroll Now"
+msgstr "ثرقخمم رخص"
 
 #: lms/templates/courseware/course_about.html
 msgid "View About Page in studio"
@@ -17020,8 +17062,8 @@ msgid "View Grading in studio"
 msgstr "دهثص لقشيهرل هر سفعيهخ"
 
 #: lms/templates/courseware/progress.html
-msgid "Course Progress for Student '{username}' ({email})"
-msgstr "ذخعقسث حقخلقثسس بخق سفعيثرف '{username}' ({email})"
+msgid "Course Progress for '{username}' ({email})"
+msgstr "ذخعقسث حقخلقثسس بخق '{username}' ({email})"
 
 #: lms/templates/courseware/progress.html
 msgid "View Certificate"

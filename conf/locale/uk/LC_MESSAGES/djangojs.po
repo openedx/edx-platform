@@ -18,6 +18,7 @@
 # marichkafox <marichka.fox@gmail.com>, 2014
 # marichkafox <marichka.fox@gmail.com>, 2014
 # Maryna Holovnova <MGG-2008@yandex.ru>, 2014
+# Muhammad Adeel Khan <adeel@edx.org>, 2019
 # Natalia Vynogradenko <tannaha@gmail.com>, 2017-2018
 # olexiim <olexiim@gmail.com>, 2014-2016
 # Olga Filipova <chudaol@gmail.com>, 2015-2016
@@ -46,6 +47,7 @@
 # Denis <prohibiti@gmail.com>, 2015
 # Irene Korotkova <irca.gav@gmail.com>, 2017
 # IvanPrimachenko <jastudent1@gmail.com>, 2014
+# Muhammad Adeel Khan <adeel@edx.org>, 2019
 # Natalia Vynogradenko <tannaha@gmail.com>, 2017-2018
 # Zapadenska <oruda@ymail.com>, 2014
 # Zoriana Zaiats, 2015
@@ -96,7 +98,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-04-22 10:49+0000\n"
+"POT-Creation-Date: 2019-06-09 20:42+0000\n"
 "PO-Revision-Date: 2019-03-09 21:43+0000\n"
 "Last-Translator: Anastasiia Bondarenko <anastasiia.bondarenko@raccoongang.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/)\n"
@@ -3687,7 +3689,7 @@ msgid ""
 msgstr ""
 "Цей курс має автоматичний когортинг для перевірених учнів, але необхідна "
 "когорта не існує. Вам необхідно створити когорту вручну, з назвою "
-"'{verifyCohortName}', щоб функція працювала."
+"'{verifiedCohortName}', щоб функція працювала."
 
 #: lms/static/js/groups/views/verified_track_settings_notification.js
 msgid ""
@@ -4121,8 +4123,8 @@ msgid ""
 "Success! Problem attempts reset for problem '<%- problem_id %>' and student "
 "'<%- student_id %>'."
 msgstr ""
-"Спроби успішно скинуті для завдання '<% - problem_id%>' та учня '<% - "
-"student_id%>'."
+"Спроби успішно скинуті для завдання '<%- problem_id %>' та учня '<%- "
+"student_id %>'."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4130,15 +4132,15 @@ msgid ""
 " '<%- student_id %>'. Make sure that the problem and student identifiers are"
 " complete and correct."
 msgstr ""
-"Помилка при скиданнях спроб для завдання '<% = problem_id%>' та студента '<%"
-" - student_id%>'. Переконайтеся, що завдання та ідентифікатори студентів є "
-"повними та правильними."
+"Помилка при скиданнях спроб для завдання '<%= problem_id %>' та студента "
+"'<%- student_id %>'. Переконайтеся, що завдання та ідентифікатори студентів "
+"є повними та правильними."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Delete student '<%- student_id %>'s state on problem '<%- problem_id %>'?"
 msgstr ""
-"Видалити стан студента '<%- student_id %>' для проблеми '<%= problem_id %>'?"
+"Видалити стан студента '<%- student_id %>' для проблеми '<%- problem_id %>'?"
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4225,7 +4227,7 @@ msgid ""
 "Successfully started task to reset attempts for problem '<%- problem_id %>'."
 " Click the 'Show Task Status' button to see the status of the task."
 msgstr ""
-"Успішно розпочато задачу скинути спроби для завдання '<% - problem_id%>'. "
+"Успішно розпочато задачу скинути спроби для завдання '<%- problem_id %>'. "
 "Натисніть кнопку «Показати стан задачі», щоб побачити статус задачі."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4234,8 +4236,8 @@ msgid ""
 "problem_id %>'. Make sure that the problem identifier is complete and "
 "correct."
 msgstr ""
-"Помилка при запуску задачі для скидання спроб усіх студентів на завданні '<%"
-" - problem_id%>'. Переконайтеся, що ідентифікатор завдання є повним і "
+"Помилка при запуску задачі для скидання спроб усіх студентів на завданні "
+"'<%- problem_id %>'. Переконайтеся, що ідентифікатор завдання є повним і "
 "правильним."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4284,9 +4286,9 @@ msgid ""
 "student '<%- student_id %>'. Make sure that the the score and the problem "
 "and student identifiers are complete and correct."
 msgstr ""
-"Помилка запуску завдання для перевизначення оцінки для задачі \"<% - "
-"problem_id%> ' для студента\" <% - student_id%>'. Переконайтеся, що оцінка "
-"та ідентифікатори задачі та студента є повними та правильними."
+"Помилка запуску завдання для перевизначення оцінки для задачі '<%- "
+"problem_id %>' для студента '<%- student_id %>'. Переконайтеся, що оцінка та"
+" ідентифікатори задачі та студента є повними та правильними."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4640,7 +4642,7 @@ msgid ""
 "{htmlStart}Want to change your email, name, or password instead?{htmlEnd}"
 msgstr ""
 "{htmlStart}Бажаєте замінити адресу електронної пошти, імені або пароля? "
-"{HtmlEnd}"
+"{htmlEnd}"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -4652,7 +4654,7 @@ msgstr ""
 "{strongStart}Попередження: видалення Аккаунту є постійним. {strongEnd} Будь "
 "ласка, уважно прочитайте вище, перш ніж продовжити. Це незворотні дії, і "
 "{strongStart} ви більше не зможете використовувати ту саму пошту на edX. "
-"{StrongEnd}"
+"{strongEnd}"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "We’re sorry to see you go!"
@@ -4817,7 +4819,7 @@ msgstr ""
 "скидання пароля, переконайтеся, що ви ввели правильну адресу електронної "
 "пошти або перевірте папку зі спамом.{paragraphEnd}{paragraphStart}Якщо вам "
 "потрібна допомога, {anchorStart} зверніться до служби технічної підтримки "
-"{anchorEnd}. {ParagraphEnd}"
+"{anchorEnd}. {paragraphEnd}"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -5977,8 +5979,8 @@ msgstr "Тип"
 #: cms/static/js/views/assets.js
 msgid "File {filename} exceeds maximum size of {maxFileSizeInMBs} MB"
 msgstr ""
-"Файл {filename} перевищує максимально допустимий розмір в "
-"{maximum_size_in_megabytes} MБ"
+"Файл {filename} перевищує максимально допустимий розмір в {maxFileSizeInMBs}"
+" MБ"
 
 #: cms/static/js/views/assets.js
 msgid ""
@@ -7851,6 +7853,10 @@ msgid "Mark Exam As Completed"
 msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
+msgid "You are taking \"{exam_link}\" as {exam_type}. "
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
 msgid "a timed exam"
 msgstr ""
 
@@ -8624,7 +8630,8 @@ msgid "Register with Institution/Campus Credentials"
 msgstr ""
 
 #: lms/templates/student_account/institution_register.underscore
-msgid "Register through edX"
+#: lms/templates/student_account/register.underscore
+msgid "Create an Account"
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
@@ -8729,10 +8736,6 @@ msgstr ""
 
 #: lms/templates/student_account/register.underscore
 msgid "or create a new one here"
-msgstr ""
-
-#: lms/templates/student_account/register.underscore
-msgid "Create an Account"
 msgstr ""
 
 #: lms/templates/student_account/register.underscore

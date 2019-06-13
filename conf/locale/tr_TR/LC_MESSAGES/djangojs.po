@@ -107,8 +107,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-04-22 10:49+0000\n"
-"PO-Revision-Date: 2019-03-21 15:41+0000\n"
+"POT-Creation-Date: 2019-06-09 20:42+0000\n"
+"PO-Revision-Date: 2019-06-01 11:57+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)\n"
 "Language: tr_TR\n"
@@ -5663,7 +5663,7 @@ msgstr "Yüklemede bir sorun oluştu"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Organization:"
-msgstr ""
+msgstr "Kurum:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Number:"
@@ -5671,7 +5671,7 @@ msgstr "Ders Numarası:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Run:"
-msgstr ""
+msgstr "Ders Yayını:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "(Read-only)"
@@ -5679,8 +5679,9 @@ msgstr "(Salt-okunur)"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Re-run Course"
-msgstr ""
+msgstr "Dersi Yeniden Çalıştır"
 
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"
 msgstr "Canlı Görüntüle"
@@ -7821,6 +7822,10 @@ msgid "Mark Exam As Completed"
 msgstr "Sınavı Tamamlandı Olarak İşaretle"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
+msgid "You are taking \"{exam_link}\" as {exam_type}. "
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
 msgid "a timed exam"
 msgstr "bir süreli sınav"
 
@@ -8612,8 +8617,9 @@ msgid "Register with Institution/Campus Credentials"
 msgstr "Kurum / Kampüs Kimlik Bilgileri ile Kayıt"
 
 #: lms/templates/student_account/institution_register.underscore
-msgid "Register through edX"
-msgstr "edX'e Kayıt Ol"
+#: lms/templates/student_account/register.underscore
+msgid "Create an Account"
+msgstr "Bir Hesap Oluştur"
 
 #: lms/templates/student_account/login.underscore
 msgid "First time here?"
@@ -8721,10 +8727,6 @@ msgstr "%(providerName)s kullanarak bir hesap oluştur."
 #: lms/templates/student_account/register.underscore
 msgid "or create a new one here"
 msgstr "ya da burada yeni bir tane oluşturunuz"
-
-#: lms/templates/student_account/register.underscore
-msgid "Create an Account"
-msgstr "Bir Hesap Oluştur"
 
 #: lms/templates/student_account/register.underscore
 msgid "Support education research by providing additional information"
