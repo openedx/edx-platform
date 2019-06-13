@@ -11,6 +11,7 @@
 # JOHN MASANDA <translations_6@camara.ie>, 2017
 # Keith Magee <keithmagee@camara.ie>, 2016
 # Masoud Mohamed Ali <masoudali@camara.org>, 2016
+# Muhammad Adeel Khan <adeel@edx.org>, 2019
 # swaleh amin <mkupuofirstnameswaleh@yahoo.com>, 2016
 # swalehe manture <translations_3@camara.ie>, 2017
 # YAHAYA MWAVURIZI <translations_1@camara.ie>, 2017
@@ -24,6 +25,7 @@
 # Isihaka Issa <translations_8@camara.ie>, 2017
 # JOHN MASANDA <translations_6@camara.ie>, 2017
 # Mathieu Lacasse <mathieulacasse@camara.org>, 2017
+# Muhammad Adeel Khan <adeel@edx.org>, 2019
 # swaleh amin <mkupuofirstnameswaleh@yahoo.com>, 2016
 # swalehe manture <translations_3@camara.ie>, 2017
 # YAHAYA MWAVURIZI <translations_1@camara.ie>, 2017
@@ -69,7 +71,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-04-22 10:49+0000\n"
+"POT-Creation-Date: 2019-06-09 20:42+0000\n"
 "PO-Revision-Date: 2019-02-10 20:45+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Swahili (Kenya) (http://www.transifex.com/open-edx/edx-platform/language/sw_KE/)\n"
@@ -4058,9 +4060,8 @@ msgid ""
 "are complete and correct."
 msgstr ""
 "Kosa limetokea wakti wa kuanza shughuli ya utoaji upya alama za swali '<%- "
-"swali_kitambulisho %>' kwa ajili ya mwanafunzi '<%- mwanafunzi_kitambulisho "
-"%>'. Hakikisha vitambuzi vya swali na mwanafunzi viko sahihi na "
-"vimekamilika."
+"problem_id %>' kwa ajili ya mwanafunzi '<%- student_id %>'. Hakikisha "
+"vitambuzi vya swali na mwanafunzi viko sahihi na vimekamilika."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Please enter a score."
@@ -4098,17 +4099,16 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Rescore problem '<%- problem_id %>' for all students?"
-msgstr ""
-"Toa upya alama za swali '<%- swali _kitambulisho %>' kwa ajili ya wanafunzi?"
+msgstr "Toa upya alama za swali '<%- problem_id %>' kwa ajili ya wanafunzi?"
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Successfully started task to rescore problem '<%- problem_id %>' for all "
 "students. Click the 'Show Task Status' button to see the status of the task."
 msgstr ""
-"Imefanikiwa kuanza kushughulikia utoaji upya alama za swali '<%- "
-"swali_kitambulisho %>' kwa ajili ya wanafunzi wote. Bofya kibonye cha 'Show "
-"Task Status' kuona shughuli inavyoendele."
+"Imefanikiwa kuanza kushughulikia utoaji upya alama za swali '<%- problem_id "
+"%>' kwa ajili ya wanafunzi wote. Bofya kibonye cha 'Show Task Status' kuona "
+"shughuli inavyoendele."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4116,8 +4116,7 @@ msgid ""
 " the problem identifier is complete and correct."
 msgstr ""
 "Kosa limetokea katika kuanza kushughulikia utoaji upya alama za swali '<%- "
-"swali_kitambulisho %>'. Hakikisha kitambuzi cha swali kiko sahihi na "
-"kimekamilika."
+"problem_id %>'. Hakikisha kitambuzi cha swali kiko sahihi na kimekamilika."
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
@@ -5552,7 +5551,7 @@ msgstr "Tafadhali ingiza namba kamili isiyo hasi."
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Cannot drop more <%= types %> assignments than are assigned."
-msgstr "Haiwezi kutoa majaribio mengi zaidi <%=types%> ya yaliyotolewa."
+msgstr "Haiwezi kutoa majaribio mengi zaidi <%= types %> ya yaliyotolewa."
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
@@ -7480,6 +7479,10 @@ msgid "Mark Exam As Completed"
 msgstr "Usahihishaji wa Mtihani 'umekamilika'"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
+msgid "You are taking \"{exam_link}\" as {exam_type}. "
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
 msgid "a timed exam"
 msgstr ""
 
@@ -8256,8 +8259,9 @@ msgid "Register with Institution/Campus Credentials"
 msgstr "Jisajili na Sifa/Hati za Taasisi/Chuo "
 
 #: lms/templates/student_account/institution_register.underscore
-msgid "Register through edX"
-msgstr "Jiandikishe kupitia edX"
+#: lms/templates/student_account/register.underscore
+msgid "Create an Account"
+msgstr ""
 
 #: lms/templates/student_account/login.underscore
 msgid "First time here?"
@@ -8364,10 +8368,6 @@ msgstr "Tengeneza akaunti ukitumia %(providerName)s."
 #: lms/templates/student_account/register.underscore
 msgid "or create a new one here"
 msgstr "au unda moja mpya hapa"
-
-#: lms/templates/student_account/register.underscore
-msgid "Create an Account"
-msgstr ""
 
 #: lms/templates/student_account/register.underscore
 msgid "Support education research by providing additional information"

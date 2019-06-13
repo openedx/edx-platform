@@ -366,7 +366,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `auth_permission_content_type_id_codename_01ab375a_uniq` (`content_type_id`,`codename`),
   CONSTRAINT `auth_permission_content_type_id_2f476e4b_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2321 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2327 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -743,6 +743,23 @@ CREATE TABLE `bulk_email_target` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `target_type` varchar(64) NOT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `bulk_grades_scoreoverrider`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `bulk_grades_scoreoverrider` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `modified` datetime(6) NOT NULL,
+  `created` datetime(6) NOT NULL,
+  `module_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `bulk_grades_scoreove_module_id_33617068_fk_coursewar` (`module_id`),
+  KEY `bulk_grades_scoreoverrider_user_id_9768d9f6_fk_auth_user_id` (`user_id`),
+  KEY `bulk_grades_scoreoverrider_created_2d9c74a5` (`created`),
+  CONSTRAINT `bulk_grades_scoreove_module_id_33617068_fk_coursewar` FOREIGN KEY (`module_id`) REFERENCES `courseware_studentmodule` (`id`),
+  CONSTRAINT `bulk_grades_scoreoverrider_user_id_9768d9f6_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `catalog_catalogintegration`;
@@ -2277,7 +2294,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_model_76bd3d3b_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=771 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=773 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2288,7 +2305,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=555 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=558 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5730,6 +5747,25 @@ CREATE TABLE `submissions_submission` (
   KEY `submissions_submission_submitted_at_9653124d` (`submitted_at`),
   KEY `submissions_submission_created_at_01c4bf22` (`created_at`),
   CONSTRAINT `submissions_submissi_student_item_id_9d087470_fk_submissio` FOREIGN KEY (`student_item_id`) REFERENCES `submissions_studentitem` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `super_csv_csvoperation`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `super_csv_csvoperation` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `class_name` varchar(255) NOT NULL,
+  `unique_id` varchar(255) NOT NULL,
+  `operation` varchar(255) NOT NULL,
+  `data` varchar(255) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `super_csv_csvoperation_class_name_c8b5b4e2` (`class_name`),
+  KEY `super_csv_csvoperation_unique_id_08aa974e` (`unique_id`),
+  KEY `super_csv_csvoperation_user_id_f87de59a_fk_auth_user_id` (`user_id`),
+  CONSTRAINT `super_csv_csvoperation_user_id_f87de59a_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `survey_surveyanswer`;

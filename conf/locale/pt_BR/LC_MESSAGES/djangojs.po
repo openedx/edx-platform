@@ -71,7 +71,7 @@
 # Piero Lunelli, 2018
 # RenataBarboza, 2013
 # Renata Barboza, 2013-2016
-# Renato Monteiro <renato_city@yahoo.com.br>, 2019
+# Renato Monteiro da Silva <renato_city@yahoo.com.br>, 2019
 # Ricardo Pietrobon <pietr007@gmail.com>, 2013-2014
 # RODRIGOR77 <rodrigo_magalhaes_rodrigues_alve@yahoo.com.br>, 2014
 # RODRIGOR77 <rodrigo_magalhaes_rodrigues_alve@yahoo.com.br>, 2014
@@ -192,6 +192,7 @@
 # Monica Farias <monifar.tp@gmail.com>, 2015-2016
 # Drew Melim <nokostya.translation@gmail.com>, 2015
 # Piero Lunelli, 2018
+# Renato Monteiro da Silva <renato_city@yahoo.com.br>, 2019
 # Sergio Silva <sergiohrs@gmail.com>, 2016
 # sgtmarciosilva <sgtmarciosilva@ibest.com.br>, 2015
 # Thiago Perrotta <tbperrotta@gmail.com>, 2016
@@ -228,6 +229,7 @@
 # Paulo Romano <pauloromanocarvalho@gmail.com>, 2017
 # Piero Lunelli, 2018
 # Renata Barboza, 2015
+# Renato Monteiro da Silva <renato_city@yahoo.com.br>, 2019
 # Ricardo Pietrobon <pietr007@gmail.com>, 2014
 # Rodrigo Mozelli <romozelli@outlook.com>, 2016
 # Victor Hochgreb <victorfeec@gmail.com>, 2015
@@ -237,9 +239,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-04-22 10:49+0000\n"
-"PO-Revision-Date: 2019-04-17 22:49+0000\n"
-"Last-Translator: Renato Monteiro <renato_city@yahoo.com.br>\n"
+"POT-Creation-Date: 2019-06-09 20:42+0000\n"
+"PO-Revision-Date: 2019-04-25 22:44+0000\n"
+"Last-Translator: Renato Monteiro da Silva <renato_city@yahoo.com.br>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -7605,6 +7607,10 @@ msgid "Mark Exam As Completed"
 msgstr "Marcar avaliação como completa"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
+msgid "You are taking \"{exam_link}\" as {exam_type}. "
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
 msgid "a timed exam"
 msgstr ""
 
@@ -8381,8 +8387,9 @@ msgid "Register with Institution/Campus Credentials"
 msgstr "Cadastrar com Credenciais de Instituição/Campus"
 
 #: lms/templates/student_account/institution_register.underscore
-msgid "Register through edX"
-msgstr "Cadastrar pelo edX"
+#: lms/templates/student_account/register.underscore
+msgid "Create an Account"
+msgstr ""
 
 #: lms/templates/student_account/login.underscore
 msgid "First time here?"
@@ -8490,10 +8497,6 @@ msgstr "Criar uma conta usando %(providerName)s."
 #: lms/templates/student_account/register.underscore
 msgid "or create a new one here"
 msgstr "ou criar uma nova aqui"
-
-#: lms/templates/student_account/register.underscore
-msgid "Create an Account"
-msgstr ""
 
 #: lms/templates/student_account/register.underscore
 msgid "Support education research by providing additional information"

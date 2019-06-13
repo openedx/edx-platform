@@ -17,6 +17,7 @@
 # Hoang Ha <halink0803@gmail.com>, 2014
 # Minh Trang Dao <minhtrang@kaist.ac.kr>, 2015
 # Minh Tue Vo <mvo@edx.org>, 2014
+# Muhammad Adeel Khan <adeel@edx.org>, 2019
 # Minh Tue Vo <mvo@edx.org>, 2014
 # Ha Ngoc Chung <ngocchung75@gmail.com>, 2013
 # NGUYEN CONG NAM <congnam0409@gmail.com>, 2014
@@ -103,7 +104,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-04-22 10:49+0000\n"
+"POT-Creation-Date: 2019-06-09 20:42+0000\n"
 "PO-Revision-Date: 2019-04-25 10:55+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)\n"
@@ -4054,9 +4055,6 @@ msgid ""
 " '<%- student_id %>'. Make sure that the problem and student identifiers are"
 " complete and correct."
 msgstr ""
-"Lỗi khi tái thiết lập số lần có quyền nộp bài cho câu hỏi '<%= problem_id "
-"%>' cho học viên '<%= student_id %>'. Xin kiểm tra xem tên của câu hỏi và "
-"của học viên viết đã đầy đủ và đúng chưa."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4146,15 +4144,13 @@ msgstr ""
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Reset attempts for all students on problem '<%- problem_id %>'?"
 msgstr ""
-"Tái thiết lập số lần có quyền nộp bài của tất cả các học viên cho câu hỏi "
-"'<%= problem_id %>'?"
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Successfully started task to reset attempts for problem '<%- problem_id %>'."
 " Click the 'Show Task Status' button to see the status of the task."
 msgstr ""
-"Đã bắt đầu tác vụ tái thiết lập số lần có quyền nộp bài cho câu hỏi '<%= "
+"Đã bắt đầu tác vụ tái thiết lập số lần có quyền nộp bài cho câu hỏi '<%- "
 "problem_id %>'. Bấm nút 'Hiển thị lịch sử tác vụ' để xem trạng thái của tác "
 "vụ."
 
@@ -4165,7 +4161,7 @@ msgid ""
 "correct."
 msgstr ""
 "Lỗi khi bắt đầu tác vụ tái thiết lập số lần tất cả các học viên có quyền nộp"
-" bài đối với câu hỏi '<%= problem_id %>'. Xin kiểm tra xem tên của câu hỏi "
+" bài đối với câu hỏi '<%- problem_id %>'. Xin kiểm tra xem tên của câu hỏi "
 "viết đã đầy đủ và đúng chưa."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4178,8 +4174,6 @@ msgid ""
 "'<%- student_id %>'. Click the 'Show Task Status' button to see the status "
 "of the task."
 msgstr ""
-"Đã bắt đầu chấm lại câu hỏi '<%= problem_id %>' cho học viên '<%= student_id"
-" %>'. Nhấn nút 'Hiển thị Trạng thái Tác vụ' để xem trạng thái của tác vụ."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4187,9 +4181,6 @@ msgid ""
 "'<%- student_id %>'. Make sure that the the problem and student identifiers "
 "are complete and correct."
 msgstr ""
-"Lỗi khi bắt đầu việc chấm lại câu hỏi'<%= problem_id %>' cho học viên '<%= "
-"student_id %>'. Đề nghị kiểm tra câu hỏi và tên của học viên viết đã đầy đủ "
-"và đúng chưa."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Please enter a score."
@@ -4201,8 +4192,6 @@ msgid ""
 "student '<%- student_id %>'. Click the 'Show Task Status' button to see the "
 "status of the task."
 msgstr ""
-"Đã bắt đầu chấm lại câu hỏi '<%= problem_id %>' cho học viên '<%= student_id"
-" %>'. Nhấn nút 'Hiển thị Trạng thái Tác vụ' để xem trạng thái của tác vụ."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4210,9 +4199,6 @@ msgid ""
 "student '<%- student_id %>'. Make sure that the the score and the problem "
 "and student identifiers are complete and correct."
 msgstr ""
-"Lỗi khi bắt đầu việc cho điểm lại câu hỏi '<%= problem_id %>' cho học viên "
-"'<%= student_id %>'. Đề nghị kiểm tra điểm, câu hỏi và tên của học viên viết"
-" đã đầy đủ và đúng chưa."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4234,14 +4220,14 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Rescore problem '<%- problem_id %>' for all students?"
-msgstr "Chấm lại câu hỏi '<%= problem_id %>' cho tất cả các học viên?"
+msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Successfully started task to rescore problem '<%- problem_id %>' for all "
 "students. Click the 'Show Task Status' button to see the status of the task."
 msgstr ""
-"Đã bắt đầu tác vụ chấm lại câu hỏi '<%= problem_id %>' cho tất cả các học "
+"Đã bắt đầu tác vụ chấm lại câu hỏi '<%- problem_id %>' cho tất cả các học "
 "viên. Nhấn nút 'Hiển thị Trạng thái Tác vụ' để xem trạng thái của tác vụ."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4249,8 +4235,6 @@ msgid ""
 "Error starting a task to rescore problem '<%- problem_id %>'. Make sure that"
 " the problem identifier is complete and correct."
 msgstr ""
-"Lỗi khi bắt đầu tác vụ chấm lại bài '<%= problem_id %>'. Xin kiểm tra xem mã"
-" câu hỏi viết đã đầy đủ và đúng chưa."
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
@@ -7752,6 +7736,10 @@ msgid "Mark Exam As Completed"
 msgstr "Đánh dấu bài thi đã hoàn thành"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
+msgid "You are taking \"{exam_link}\" as {exam_type}. "
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
 msgid "a timed exam"
 msgstr ""
 
@@ -8510,8 +8498,9 @@ msgid "Register with Institution/Campus Credentials"
 msgstr "Đăng ký với thông tin của tổ chức / trường"
 
 #: lms/templates/student_account/institution_register.underscore
-msgid "Register through edX"
-msgstr "Đăng ký qua edX"
+#: lms/templates/student_account/register.underscore
+msgid "Create an Account"
+msgstr ""
 
 #: lms/templates/student_account/login.underscore
 msgid "First time here?"
@@ -8615,10 +8604,6 @@ msgstr ""
 
 #: lms/templates/student_account/register.underscore
 msgid "or create a new one here"
-msgstr ""
-
-#: lms/templates/student_account/register.underscore
-msgid "Create an Account"
 msgstr ""
 
 #: lms/templates/student_account/register.underscore
