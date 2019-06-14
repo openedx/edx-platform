@@ -68,27 +68,23 @@ class TestHelpers(TestCase):
         Tests to make sure the is_comprehensive_theming_enabled function works as expected.
         Here are different scenarios that we need to test
 
-        1. Theming is enabled, there is a SiteTheme record and microsite configuration for the current site.
+        1. Theming is enabled and there is a SiteTheme record.
             is_comprehensive_theming_enabled should return True
-        2. Theming is enabled, there is no SiteTheme record but there is microsite configuration for the current site.
+        2. Theming is enabled and there is no SiteTheme record.
             is_comprehensive_theming_enabled should return False
-        3. Theming is enabled, there is neither a SiteTheme record nor microsite configuration for the current site.
-            is_comprehensive_theming_enabled should return True
-        4. Theming is disabled, there is a SiteTheme record and microsite configuration for the current site.
+        3. Theming is disabled, there is a SiteTheme record for the current site.
             is_comprehensive_theming_enabled should return False
-        5. Theming is disabled, there is no SiteTheme record but there is microsite configuration for the current site.
-            is_comprehensive_theming_enabled should return False
-        6. Theming is disabled, there is neither a SiteTheme record nor microsite configuration for the current site.
+        4. Theming is disabled, there is no SiteTheme record.
             is_comprehensive_theming_enabled should return False
         """
-        # Theming is enabled, there is a SiteTheme record and microsite configuration for the current site
+        # Theming is enabled, there is a SiteTheme record
         with patch(
             "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
             Mock(return_value=True),
         ):
             self.assertTrue(theming_helpers.is_comprehensive_theming_enabled())
 
-        # Theming is enabled, there is neither a SiteTheme record nor microsite configuration for the current site.
+        # Theming is enabled, there is not a SiteTheme record
         with patch(
             "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
             Mock(return_value=False),
@@ -96,22 +92,14 @@ class TestHelpers(TestCase):
             self.assertTrue(theming_helpers.is_comprehensive_theming_enabled())
 
         with override_settings(ENABLE_COMPREHENSIVE_THEMING=False):
-            # Theming is disabled, there is a SiteTheme record and microsite configuration for the current site.
+            # Theming is disabled, there is a SiteTheme record
             with patch(
                 "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
                 Mock(return_value=True),
             ):
                 self.assertFalse(theming_helpers.is_comprehensive_theming_enabled())
 
-            # Theming is disabled, there is no SiteTheme record but
-            # there is microsite configuration for the current site.
-            with patch(
-                "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
-                Mock(return_value=False),
-            ):
-                self.assertFalse(theming_helpers.is_comprehensive_theming_enabled())
-
-            # Theming is disabled, there is neither a SiteTheme record nor microsite configuration for the current site.
+            # Theming is disabled, there is no SiteTheme record
             with patch(
                 "openedx.core.djangoapps.theming.helpers.current_request_has_associated_site_theme",
                 Mock(return_value=False),

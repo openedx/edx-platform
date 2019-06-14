@@ -40,14 +40,6 @@ def is_request_in_themed_site():
     return configuration_helpers.is_site_configuration_enabled()
 
 
-def get_template(uri):
-    """
-    This is a proxy function to hide microsite_configuration behind comprehensive theming.
-    :param uri: uri of the template
-    """
-    return None
-
-
 def get_template_path_with_theme(relative_path):
     """
     Returns template path in current site's theme if it finds one there otherwise returns same path.
