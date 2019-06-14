@@ -187,7 +187,6 @@ class EnterpriseApiClient(object):
                         "enterprise_customer": {
                             "uuid": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
                             "name": "TestShib",
-                            "catalog": 2,
                             "active": true,
                             "site": {
                                 "domain": "example.com",
