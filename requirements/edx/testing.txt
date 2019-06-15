@@ -251,7 +251,7 @@ pytest-cov==2.7.1
 pytest-django==3.5.0
 pytest-forked==1.0.2      # via pytest-xdist
 pytest-randomly==1.2.3
-pytest-xdist==1.28.0
+pytest-xdist==1.29.0
 pytest==4.5.0
 python-dateutil==2.4.0
 python-levenshtein==0.12.0
