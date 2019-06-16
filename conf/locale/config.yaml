@@ -2,7 +2,8 @@
 
 # This will copy each source language to a new directory at the end of the i18n generate step
 # which allows us to migrate to a new locale code without re-creating the Transifex project.
-edx_lang_map: {}
+edx_lang_map:
+    zh_CN: zh_HANS
 
 locales:
     - en  # English - Source Language
@@ -82,7 +83,7 @@ locales:
     # - ur  # Urdu
     # - uz  # Uzbek
     # - vi  # Vietnamese
-    # - zh_CN  # Chinese (China)
+    - zh_CN  # Chinese (China)
     # - zh_HK  # Chinese (Hong Kong)
     # - zh_TW  # Chinese (Taiwan)
 
