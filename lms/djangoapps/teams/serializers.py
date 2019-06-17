@@ -1,6 +1,9 @@
 """Defines serializers used by the Team API."""
+from __future__ import absolute_import
+
 from copy import deepcopy
 
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Count
@@ -18,13 +21,13 @@ class CountryField(serializers.Field):
     Field to serialize a country code.
     """
 
-    COUNTRY_CODES = dict(countries).keys()
+    COUNTRY_CODES = list(dict(countries).keys())
 
     def to_representation(self, obj):
         """
         Represent the country as a 2-character unicode identifier.
         """
-        return unicode(obj)
+        return six.text_type(obj)
 
     def to_internal_value(self, data):
         """
