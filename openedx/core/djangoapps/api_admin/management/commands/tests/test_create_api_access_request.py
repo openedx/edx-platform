@@ -24,6 +24,12 @@ class TestCreateApiAccessRequest(TestCase):
         cls.command = 'create_api_access_request'
         cls.user = UserFactory()
 
+    def setUp(self):
+        super(TestCreateApiAccessRequest, self).setUp()
+        patcher = patch('openedx.core.djangoapps.api_admin.models.send_request_email')
+        self.send_request_email = patcher.start()
+        self.addCleanup(patcher.stop)
+
     def assert_models_exist(self, expect_request_exists, expect_config_exists):
         self.assertEqual(
             ApiAccessRequest.objects.filter(user=self.user).exists(),
