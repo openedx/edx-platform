@@ -6611,7 +6611,7 @@ msgstr ""
 #: cms/static/js/factories/manage_users_lib.js
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Staff"
-msgstr ""
+msgstr "Équipe pédagogique"
 
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
@@ -7091,7 +7091,7 @@ msgstr ""
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "All Learners and Staff"
-msgstr ""
+msgstr "Tous les étudiants et l'équipe pédagogique"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Basic"
@@ -7468,7 +7468,7 @@ msgstr "Ne plus suivre"
 
 #: common/static/common/templates/discussion/forum-action-pin.underscore
 msgid "Pin"
-msgstr ""
+msgstr "Épingler"
 
 #: common/static/common/templates/discussion/forum-action-pin.underscore
 msgid "Unpin"
@@ -7505,7 +7505,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/new-post-visibility.underscore
 msgid "This post will be visible to everyone."
-msgstr ""
+msgstr "Ce message sera visible par tous."
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "Add a Post"
@@ -7551,7 +7551,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/post-user-display.underscore
 msgid "(Staff)"
-msgstr ""
+msgstr "(Équipe pédagogique)"
 
 #: common/static/common/templates/discussion/profile-thread.underscore
 #: common/static/common/templates/discussion/thread.underscore
@@ -10673,7 +10673,7 @@ msgstr "Brouillon (jamais publié)"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Visible to Staff Only"
-msgstr ""
+msgstr "Visible par l'équipe pédagogique seulement"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Published and Live"
@@ -10725,7 +10725,7 @@ msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Staff Only"
-msgstr ""
+msgstr "Réservé à l'équipe pédagogique"
 
 #: cms/templates/js/publish-xblock.underscore
 #, python-format
@@ -10734,7 +10734,7 @@ msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Staff and Learners"
-msgstr ""
+msgstr "Équipe pédagogique et apprenants"
 
 #: cms/templates/js/publish-xblock.underscore
 #: cms/templates/js/staff-lock-editor.underscore
