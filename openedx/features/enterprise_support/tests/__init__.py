@@ -12,6 +12,7 @@ FEATURES_WITH_ENTERPRISE_ENABLED['ENABLE_ENTERPRISE_INTEGRATION'] = True
 FAKE_ENTERPRISE_CUSTOMER = {
     'active': True,
     'branding_configuration': None,
+    'catalog': None,
     'enable_audit_enrollment': False,
     'enable_data_sharing_consent': False,
     'enforce_data_sharing_consent': 'at_enrollment',
