@@ -26,8 +26,8 @@ class TestCreateApiAccessRequest(TestCase):
 
     def setUp(self):
         super(TestCreateApiAccessRequest, self).setUp()
-        patcher = patch('openedx.core.djangoapps.api_admin.models.send_request_email')
-        self.send_request_email = patcher.start()
+        patcher = patch('openedx.core.djangoapps.api_admin.models.send_mail', autospec=True)
+        self.mocked_send_mail = patcher.start()
         self.addCleanup(patcher.stop)
 
     def assert_models_exist(self, expect_request_exists, expect_config_exists):
@@ -39,6 +39,8 @@ class TestCreateApiAccessRequest(TestCase):
             ApiAccessConfig.objects.filter(enabled=True).exists(),
             expect_config_exists
         )
+        if expect_request_exists:
+            self.assertTrue(self.mocked_send_mail.called)
 
     @ddt.data(False, True)
     def test_create_api_access_request(self, create_config):
@@ -76,6 +78,7 @@ class TestCreateApiAccessRequest(TestCase):
             call_command(self.command, self.user.username, create_config=True)
 
         self.assert_models_exist(True, False)
+        self.assertTrue(mocked_method)
 
     def test_optional_fields(self):
         self.assert_models_exist(False, False)
