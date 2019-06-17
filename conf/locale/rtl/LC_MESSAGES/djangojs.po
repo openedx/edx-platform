@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-06-13 08:13+0000\n"
-"PO-Revision-Date: 2019-06-13 08:13:47.491238\n"
+"POT-Creation-Date: 2019-06-16 20:50+0000\n"
+"PO-Revision-Date: 2019-06-16 20:50:43.326302\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -2407,17 +2407,71 @@ msgid "Course Name"
 msgstr "ذخعقسث رشوث"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Not specific to a course"
-msgstr "رخف سحثذهبهذ فخ ش ذخعقسث"
+msgid ""
+"For inquiries regarding assignments, grades, or structure of a specific "
+"course, please post in the discussion forums for that course directly."
+msgstr ""
+"بخق هرضعهقهثس قثلشقيهرل شسسهلروثرفس, لقشيثس, خق سفقعذفعقث خب ش سحثذهبهذ "
+"ذخعقسث, حمثشسث حخسف هر فاث يهسذعسسهخر بخقعوس بخق فاشف ذخعقسث يهقثذفمغ."
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "What can we help you with, {username}?"
-msgstr "صاشف ذشر صث اثمح غخع صهفا, {username}?"
+msgid "Not specific to a course"
+msgstr "رخف سحثذهبهذ فخ ش ذخعقسث"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Subject"
 msgstr "سعزتثذف"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+#: lms/templates/student_account/account_settings.underscore
+msgid "Account Settings"
+msgstr "شذذخعرف سثففهرلس"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Billing/Payment Options"
+msgstr "زهممهرل/حشغوثرف خحفهخرس"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Certificates"
+msgstr "ذثقفهبهذشفثس"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Course Content"
+msgstr "ذخعقسث ذخرفثرف"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Deadlines"
+msgstr "يثشيمهرثس"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Errors/Technical Issues"
+msgstr "ثققخقس/فثذارهذشم هسسعثس"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Financial Aid"
+msgstr "بهرشرذهشم شهي"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Masters"
+msgstr "وشسفثقس"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Photo Verification"
+msgstr "حاخفخ دثقهبهذشفهخر"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Proctoring"
+msgstr "حقخذفخقهرل"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+#: cms/templates/js/asset-library.underscore
+msgid "Other"
+msgstr "خفاثق"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "What can we help you with, {username}?"
+msgstr "صاشف ذشر صث اثمح غخع صهفا, {username}?"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
@@ -2454,8 +2508,8 @@ msgstr ""
 "قثضعثسف."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Enter a subject for your support request."
-msgstr "ثرفثق ش سعزتثذف بخق غخعق سعححخقف قثضعثسف."
+msgid "Select a subject for your support request."
+msgstr "سثمثذف ش سعزتثذف بخق غخعق سعححخقف قثضعثسف."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
@@ -8511,10 +8565,6 @@ msgstr "قثسثف حشسسصخقي"
 msgid "Switch Language Back"
 msgstr "سصهفذا مشرلعشلث زشذن"
 
-#: lms/templates/student_account/account_settings.underscore
-msgid "Account Settings"
-msgstr "شذذخعرف سثففهرلس"
-
 #: lms/templates/student_account/account_settings_section.underscore
 msgid "An error occurred. Please reload the page."
 msgstr "شر ثققخق خذذعققثي. حمثشسث قثمخشي فاث حشلث."
@@ -9448,10 +9498,6 @@ msgstr "- سخقفشزمث"
 #: cms/templates/js/asset-library.underscore
 msgid "Show All"
 msgstr "ساخص شمم"
-
-#: cms/templates/js/asset-library.underscore
-msgid "Other"
-msgstr "خفاثق"
 
 #: cms/templates/js/asset-library.underscore
 msgid "You haven't added any assets to this course yet."

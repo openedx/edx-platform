@@ -104,7 +104,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-06-09 20:42+0000\n"
+"POT-Creation-Date: 2019-06-16 20:42+0000\n"
 "PO-Revision-Date: 2019-04-25 10:55+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)\n"
@@ -2440,17 +2440,67 @@ msgid "Course Name"
 msgstr "Tên Khóa Học"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Not specific to a course"
-msgstr "Không cụ thể cho một khóa học"
+msgid ""
+"For inquiries regarding assignments, grades, or structure of a specific "
+"course, please post in the discussion forums for that course directly."
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "What can we help you with, {username}?"
-msgstr "Chúng tôi có thể giúp gì cho bạn, {username}?"
+msgid "Not specific to a course"
+msgstr "Không cụ thể cho một khóa học"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Subject"
 msgstr "Chủ đề"
+
+#: lms/templates/student_account/account_settings.underscore
+msgid "Account Settings"
+msgstr "Thiết lập tài khoản"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Billing/Payment Options"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Certificates"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Course Content"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Deadlines"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Errors/Technical Issues"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Financial Aid"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Masters"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Photo Verification"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Proctoring"
+msgstr ""
+
+#: cms/templates/js/asset-library.underscore
+msgid "Other"
+msgstr "Lựa chọn khác"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "What can we help you with, {username}?"
+msgstr "Chúng tôi có thể giúp gì cho bạn, {username}?"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
@@ -2486,8 +2536,8 @@ msgstr ""
 "trợ."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Enter a subject for your support request."
-msgstr "Nhập tiêu đề cho yêu cầu hỗ trợ của bạn."
+msgid "Select a subject for your support request."
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
@@ -4712,17 +4762,10 @@ msgid ""
 "address is associated with your {platform_name} account, we will send a "
 "message with password recovery instructions to this email "
 "address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
-" message, verify that you entered the correct email address, or check your "
-"spam folder.{paragraphEnd}{paragraphStart}If you need further assistance, "
-"{anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
+" message after 1 minute, verify that you entered the correct email address, "
+"or check your spam folder.{paragraphEnd}{paragraphStart}If you need further "
+"assistance, {anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
 msgstr ""
-"{paragraphStart}Bạn đã nhập {boldStart}{email}{boldEnd}. Nếu địa chỉ email "
-"này được liên kết với tài khoản {platform_name} của bạn, chúng tôi sẽ gửi "
-"tin nhắn với hướng dẫn khôi phục mật khẩu đến địa chỉ email "
-"này.{paragraphEnd}{paragraphStart}Nếu bạn không nhận được thông báo đặt lại "
-"mật khẩu, hãy xác minh rằng bạn đã nhập đúng địa chỉ email hoặc kiểm tra thư"
-" mục thư rác.{paragraphEnd}{paragraphStart}Nếu bạn cần hỗ trợ thêm, "
-"{anchorStart}liên hệ hỗ trợ kỹ thuật{anchorEnd}.{paragraphEnd}"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -6519,8 +6562,8 @@ msgid "Upload your video thumbnail image."
 msgstr "Tải lên hình ảnh đại diện video của bạn."
 
 #: cms/static/js/views/show_textbook.js
-msgid "Delete “<%= name %>”?"
-msgstr "Xóa “<%= name %>”?"
+msgid "Delete “<%- name %>”?"
+msgstr ""
 
 #: cms/static/js/views/show_textbook.js
 msgid ""
@@ -8449,10 +8492,6 @@ msgstr "Đặt Lại Mật Khẩu"
 msgid "Switch Language Back"
 msgstr ""
 
-#: lms/templates/student_account/account_settings.underscore
-msgid "Account Settings"
-msgstr "Thiết lập tài khoản"
-
 #: lms/templates/student_account/account_settings_section.underscore
 msgid "An error occurred. Please reload the page."
 msgstr "Có lỗi xảy ra. Hãy tải lại trang."
@@ -9344,10 +9383,6 @@ msgstr "-  Có thể sắp xếp"
 #: cms/templates/js/asset-library.underscore
 msgid "Show All"
 msgstr "Hiển thị tất cả"
-
-#: cms/templates/js/asset-library.underscore
-msgid "Other"
-msgstr "Lựa chọn khác"
 
 #: cms/templates/js/asset-library.underscore
 msgid "You haven't added any assets to this course yet."
