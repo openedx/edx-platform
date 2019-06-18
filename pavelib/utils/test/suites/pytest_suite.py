@@ -170,9 +170,9 @@ class SystemTestSuite(PytestSuite):
                 env_var_cmd = u'export DJANGO_SETTINGS_MODULE={} DISABLE_COURSEENROLLMENT_HISTORY={}'\
                     .format('{}.envs.{}'.format(self.root, self.settings),
                             self.disable_courseenrollment_history)
-                xdist_string = u'--tx {}*ssh="ubuntu@{} -o StrictHostKeyChecking=no"' \
-                               '//python="source /edx/app/edxapp/edxapp_env; {}; python"' \
-                               '//chdir="/edx/app/edxapp/edx-platform"' \
+                xdist_string = u'--tx {}*ssh="jenkins@{} -o StrictHostKeyChecking=no"' \
+                               '//python="source edx-venv/bin/activate; {}; python"' \
+                               '//chdir="edx-platform"' \
                                .format(xdist_remote_processes, ip, env_var_cmd)
                 cmd.append(xdist_string)
             for rsync_dir in Env.rsync_dirs():
@@ -295,9 +295,9 @@ class LibTestSuite(PytestSuite):
                 env_var_cmd = u'{} DISABLE_COURSEENROLLMENT_HISTORY={}' \
                     .format(django_env_var_cmd, self.disable_courseenrollment_history)
 
-                xdist_string = u'--tx {}*ssh="ubuntu@{} -o StrictHostKeyChecking=no"' \
-                               '//python="source /edx/app/edxapp/edxapp_env; {}; python"' \
-                               '//chdir="/edx/app/edxapp/edx-platform"' \
+                xdist_string = u'--tx {}*ssh="jenkins@{} -o StrictHostKeyChecking=no"' \
+                               '//python="source edx-venv/bin/activate; {}; python"' \
+                               '//chdir="edx-platform"' \
                                .format(xdist_remote_processes, ip, env_var_cmd)
                 cmd.append(xdist_string)
             for rsync_dir in Env.rsync_dirs():

@@ -347,7 +347,7 @@ class TestPaverRunQuality(PaverTestCase):
         # Assert nothing is raised
         pavelib.quality.run_quality("")
         # And assert that sh was called 7 times:
-        # 5 for pylint on each of the system directories
+        # 6 for pylint on each of the system directories
         # 1 for diff_quality for pylint
         # 1 for diff_quality for eslint
-        self.assertEqual(self._mock_paver_sh.call_count, 7)
+        self.assertEqual(self._mock_paver_sh.call_count, 8)
