@@ -20,7 +20,7 @@ from openedx.core.djangolib.markup import HTML
 from .utils.envs import Env
 from .utils.timer import timed
 
-ALL_SYSTEMS = 'lms,cms,common,openedx,pavelib'
+ALL_SYSTEMS = 'lms,cms,common,openedx,pavelib,scripts'
 JUNIT_XML_TEMPLATE = u"""<?xml version="1.0" encoding="UTF-8"?>
 <testsuite name="{name}" tests="1" errors="0" failures="{failure_count}" skip="0">
 <testcase classname="pavelib.quality" name="{name}" time="{seconds}">{failure_element}</testcase>

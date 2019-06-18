@@ -57,9 +57,9 @@ class TestPaverPytestCmd(unittest.TestCase):
 
                 env_var_cmd = "{} DISABLE_COURSEENROLLMENT_HISTORY=1".format(django_env_var_cmd)
 
-                xdist_string = u'--tx {}*ssh="ubuntu@{} -o StrictHostKeyChecking=no"' \
-                               '//python="source /edx/app/edxapp/edxapp_env; {}; python"' \
-                               '//chdir="/edx/app/edxapp/edx-platform"' \
+                xdist_string = u'--tx {}*ssh="jenkins@{} -o StrictHostKeyChecking=no"' \
+                               '//python="source edx-venv/bin/activate; {}; python"' \
+                               '//chdir="edx-platform"' \
                                .format(processes, ip, env_var_cmd)
                 expected_statement.append(xdist_string)
             for rsync_dir in Env.rsync_dirs():
