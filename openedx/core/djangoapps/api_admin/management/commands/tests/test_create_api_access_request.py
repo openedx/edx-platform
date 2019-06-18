@@ -26,7 +26,7 @@ class TestCreateApiAccessRequest(TestCase):
 
     def setUp(self):
         super(TestCreateApiAccessRequest, self).setUp()
-        patcher = patch('openedx.core.djangoapps.api_admin.models.send_mail', autospec=True)
+        patcher = patch('openedx.core.djangoapps.api_admin.models._send_new_pending_email', autospec=True)
         self.mocked_send_mail = patcher.start()
         self.addCleanup(patcher.stop)
 
