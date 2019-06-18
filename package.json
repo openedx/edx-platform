@@ -6,7 +6,7 @@
     "@edx/edx-bootstrap": "1.0.4",
     "@edx/edx-proctoring": "^1.5.0",
     "@edx/paragon": "2.6.4",
-    "@edx/studio-frontend": "1.16.14",
+    "@edx/studio-frontend": "1.16.17",
     "babel-core": "6.26.0",
     "babel-loader": "6.4.1",
     "babel-plugin-transform-class-properties": "6.24.1",
