@@ -139,7 +139,11 @@ class GradeViewMixin(DeveloperErrorViewMixin):
             enrollments_in_course = enrollments_in_course.select_related(*related_models)
 
         paged_enrollments = self.paginate_queryset(enrollments_in_course)
-        return [enrollment.user for enrollment in paged_enrollments]
+        retlist = []
+        for enrollment in paged_enrollments:
+            enrollment.user.enrollment_mode = enrollment.mode
+            retlist.append(enrollment.user)
+        return retlist
 
     def _serialize_user_grade(self, user, course_key, course_grade):
         """
@@ -147,7 +151,8 @@ class GradeViewMixin(DeveloperErrorViewMixin):
         """
         return {
             'username': user.username,
-            'email': user.email,
+            # per business requirements, email should only be visible for students in masters track only
+            'email': user.email if getattr(user, 'enrollment_mode', '') == 'masters' else '',
             'course_id': str(course_key),
             'passed': course_grade.passed,
             'percent': course_grade.percent,

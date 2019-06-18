@@ -556,7 +556,8 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
                     users, course_key=course_key, collected_block_structure=course_data.collected_structure
                 ):
                     if not exc:
-                        entries.append(self._gradebook_entry(user, course, graded_subsections, course_grade))
+                        entry = self._gradebook_entry(user, course, graded_subsections, course_grade)
+                        entries.append(entry)
 
             serializer = StudentGradebookEntrySerializer(entries, many=True)
             return self.get_paginated_response(serializer.data)

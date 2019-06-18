@@ -472,21 +472,21 @@ class GradebookViewTest(GradebookViewTestBase):
             OrderedDict([
                 ('user_id', self.student.id),
                 ('username', self.student.username),
-                ('email', self.student.email),
+                ('email', ''),
                 ('percent', 0.85),
                 ('section_breakdown', self.expected_subsection_grades()),
             ]),
             OrderedDict([
                 ('user_id', self.other_student.id),
                 ('username', self.other_student.username),
-                ('email', self.other_student.email),
+                ('email', ''),
                 ('percent', 0.45),
                 ('section_breakdown', self.expected_subsection_grades()),
             ]),
             OrderedDict([
                 ('user_id', self.program_student.id),
                 ('username', self.program_student.username),
-                ('email', self.program_student.email),
+                ('email', ''),
                 ('external_user_key', 'program_user_key_0'),
                 ('percent', 0.75),
                 ('section_breakdown', self.expected_subsection_grades()),
@@ -603,7 +603,7 @@ class GradebookViewTest(GradebookViewTestBase):
                 expected_results = OrderedDict([
                     ('user_id', self.student.id),
                     ('username', self.student.username),
-                    ('email', self.student.email),
+                    ('email', ''),
                     ('percent', 0.85),
                     ('section_breakdown', self.expected_subsection_grades()),
                 ])
@@ -686,7 +686,7 @@ class GradebookViewTest(GradebookViewTestBase):
                 expected_results = OrderedDict([
                     ('user_id', self.student.id),
                     ('username', self.student.username),
-                    ('email', self.student.email),
+                    ('email', ''),
                     ('percent', 0.85),
                     ('section_breakdown', self.expected_subsection_grades()),
                 ])
@@ -717,7 +717,59 @@ class GradebookViewTest(GradebookViewTestBase):
                     OrderedDict([
                         ('user_id', self.program_student.id),
                         ('username', self.program_student.username),
-                        ('email', self.program_student.email),
+                        ('email', ''),
+                        ('external_user_key', 'program_user_key_0'),
+                        ('percent', 0.75),
+                        ('section_breakdown', self.expected_subsection_grades()),
+                    ]),
+                    OrderedDict([
+                        ('user_id', self.program_masters_student.id),
+                        ('username', self.program_masters_student.username),
+                        ('email', self.program_masters_student.email),
+                        ('external_user_key', 'program_user_key_0'),
+                        ('percent', 0.75),
+                        ('section_breakdown', self.expected_subsection_grades()),
+                    ]),
+                ]
+
+                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                actual_data = dict(resp.data)
+                self.assertIsNone(actual_data['next'])
+                self.assertIsNone(actual_data['previous'])
+                self.assertEqual(expected_results, actual_data['results'])
+
+    @ddt.data(
+        'login_staff',
+        'login_course_admin',
+        'login_course_staff',
+    )
+    def test_gradebook_data_filter_masters_track_username_contains(self, login_method):
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
+            mock_grade.return_value = self.mock_course_grade(
+                self.program_masters_student, passed=True, percent=0.75
+            )
+
+            # need to create a masters track enrollment, which should return email
+            with override_waffle_flag(self.waffle_flag, active=True):
+                getattr(self, login_method)()
+
+                # check username contains "program"
+                resp = self.client.get(
+                    self.get_url(course_key=self.course.id, user_contains='program')
+                )
+                expected_results = [
+                    OrderedDict([
+                        ('user_id', self.program_student.id),
+                        ('username', self.program_student.username),
+                        ('email', ''),
+                        ('external_user_key', 'program_user_key_0'),
+                        ('percent', 0.75),
+                        ('section_breakdown', self.expected_subsection_grades()),
+                    ]),
+                    OrderedDict([
+                        ('user_id', self.program_masters_student.id),
+                        ('username', self.program_masters_student.username),
+                        ('email', self.program_masters_student.email),
                         ('external_user_key', 'program_user_key_0'),
                         ('percent', 0.75),
                         ('section_breakdown', self.expected_subsection_grades()),
@@ -752,7 +804,7 @@ class GradebookViewTest(GradebookViewTestBase):
                     OrderedDict([
                         ('user_id', self.other_student.id),
                         ('username', self.other_student.username),
-                        ('email', self.other_student.email),
+                        ('email', ''),
                         ('percent', 0.85),
                         ('section_breakdown', self.expected_subsection_grades()),
                     ]),
@@ -787,7 +839,15 @@ class GradebookViewTest(GradebookViewTestBase):
                     OrderedDict([
                         ('user_id', self.program_student.id),
                         ('username', self.program_student.username),
-                        ('email', self.program_student.email),
+                        ('email', ''),
+                        ('external_user_key', 'program_user_key_0'),
+                        ('percent', 0.75),
+                        ('section_breakdown', self.expected_subsection_grades()),
+                    ]),
+                    OrderedDict([
+                        ('user_id', self.program_masters_student.id),
+                        ('username', self.program_masters_student.username),
+                        ('email', self.program_masters_student.email),
                         ('external_user_key', 'program_user_key_0'),
                         ('percent', 0.75),
                         ('section_breakdown', self.expected_subsection_grades()),
@@ -798,7 +858,8 @@ class GradebookViewTest(GradebookViewTestBase):
                 actual_data = dict(resp.data)
                 self.assertIsNone(actual_data['next'])
                 self.assertIsNone(actual_data['previous'])
-                self.assertEqual(expected_results, actual_data['results'])
+                #self.assertEqual(expected_results, actual_data['results'])
+                assert expected_results == actual_data['results']
 
     @ddt.data(
         'login_staff',
@@ -841,7 +902,7 @@ class GradebookViewTest(GradebookViewTestBase):
                     OrderedDict([
                         ('user_id', self.student.id),
                         ('username', self.student.username),
-                        ('email', self.student.email),
+                        ('email', ''),
                         ('percent', 0.85),
                         ('section_breakdown', self.expected_subsection_grades()),
                     ]),
