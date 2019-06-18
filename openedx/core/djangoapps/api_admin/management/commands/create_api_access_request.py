@@ -107,8 +107,7 @@ class Command(BaseCommand):
                 site=site,
             )
         except Exception as e:
-            msg = u'Unable to create ApiAccessRequest for {}. Exception is {}'.format(user.username, e)
-
+            msg = u'Unable to create ApiAccessRequest for {}. Exception is {}.\n{}\n{}\n{}'.format(user.username, e, str(dir(e)), type(e).__name__, e.args)
             raise CommandError(msg)
         logger.info(u'Created ApiAccessRequest for user {}'.format(user.username))
 
