@@ -39,7 +39,7 @@ from shoppingcart.reports import (
     UniversityRevenueShareReport
 )
 from student.models import AlreadyEnrolledError, CourseEnrollment, CourseFullError, EnrollmentClosedError
-from util.bad_request_rate_limiter import BadRequestRateLimiter
+from util.request_rate_limiter import BadRequestRateLimiter
 from util.date_utils import get_default_time_display
 from util.json_request import JsonResponse
 
@@ -319,7 +319,7 @@ def get_reg_code_validity(registration_code, request, limiter):
     if not reg_code_is_valid:
         # tick the rate limiter counter
         AUDIT_LOG.info("Redemption of a invalid RegistrationCode %s", registration_code)
-        limiter.tick_bad_request_counter(request)
+        limiter.tick_request_counter(request)
         raise Http404()
 
     return reg_code_is_valid, reg_code_already_redeemed, course_registration

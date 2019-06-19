@@ -431,7 +431,10 @@ XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 # Used with Email sending
 RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS = 5
 RETRY_ACTIVATION_EMAIL_TIMEOUT = 0.5
-
+PASSWORD_RESET_EMAIL_RATE_LIMIT = {
+    'no_of_emails': 1,
+    'per_seconds': 60
+}
 # Deadline message configurations
 COURSE_MESSAGE_ALERT_DURATION_IN_DAYS = 14
 

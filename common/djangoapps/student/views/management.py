@@ -89,7 +89,7 @@ from student.models import (
 from student.signals import REFUND_ORDER
 from student.tasks import send_activation_email
 from student.text_me_the_app import TextMeTheAppFragmentView
-from util.bad_request_rate_limiter import BadRequestRateLimiter
+from util.request_rate_limiter import BadRequestRateLimiter, PasswordResetEmailRateLimiter
 from util.db import outer_atomic
 from util.json_request import JsonResponse
 from util.password_policy_validators import normalize_password, validate_password
@@ -668,10 +668,14 @@ def password_change_request_handler(request):
 
     """
 
-    limiter = BadRequestRateLimiter()
-    if limiter.is_rate_limit_exceeded(request):
+    password_reset_email_limiter = PasswordResetEmailRateLimiter()
+
+    if password_reset_email_limiter.is_rate_limit_exceeded(request):
         AUDIT_LOG.warning("Password reset rate limit exceeded")
-        return HttpResponseForbidden()
+        return HttpResponse(
+            _("Your previous request is in progress, please try again in a few moments."),
+            status=403
+        )
 
     user = request.user
     # Prefer logged-in user's email
@@ -685,9 +689,6 @@ def password_change_request_handler(request):
             destroy_oauth_tokens(user)
         except UserNotFound:
             AUDIT_LOG.info("Invalid password reset attempt")
-            # Increment the rate limit counter
-            limiter.tick_bad_request_counter(request)
-
             # If enabled, send an email saying that a password reset was attempted, but that there is
             # no user associated with the email
             if configuration_helpers.get_value('ENABLE_PASSWORD_RESET_FAILURE_EMAIL',
@@ -707,13 +708,13 @@ def password_change_request_handler(request):
                     language=settings.LANGUAGE_CODE,
                     user_context=message_context,
                 )
-
                 ace.send(msg)
         except UserAPIInternalError as err:
             log.exception('Error occured during password change for user {email}: {error}'
                           .format(email=email, error=err))
             return HttpResponse(_("Some error occured during password change. Please try again"), status=500)
 
+        password_reset_email_limiter.tick_request_counter(request)
         return HttpResponse(status=200)
     else:
         return HttpResponseBadRequest(_("No email address provided."))
@@ -742,8 +743,8 @@ def account_recovery_request_handler(request):
     if not is_secondary_email_feature_enabled():
         raise Http404
 
-    limiter = BadRequestRateLimiter()
-    if limiter.is_rate_limit_exceeded(request):
+    password_reset_email_limiter = PasswordResetEmailRateLimiter()
+    if password_reset_email_limiter.is_rate_limit_exceeded(request):
         AUDIT_LOG.warning("Account recovery rate limit exceeded")
         return HttpResponseForbidden()
 
@@ -766,8 +767,7 @@ def account_recovery_request_handler(request):
             AUDIT_LOG.warning(
                 "Account recovery attempt via invalid secondary email '{email}'.".format(email=email)
             )
-            limiter.tick_bad_request_counter(request)
-
+        password_reset_email_limiter.tick_request_counter(request)
         return HttpResponse(status=200)
     else:
         return HttpResponseBadRequest(_("No email address provided."))
@@ -806,7 +806,7 @@ def password_reset(request):
     else:
         # bad user? tick the rate limiter counter
         AUDIT_LOG.info("Bad password_reset user passed in.")
-        limiter.tick_bad_request_counter(request)
+        limiter.tick_request_counter(request)
 
     return JsonResponse({
         'success': True,
