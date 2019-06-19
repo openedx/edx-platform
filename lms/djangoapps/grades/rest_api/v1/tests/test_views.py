@@ -246,6 +246,14 @@ class CourseGradesViewTest(GradeViewTestMixin, APITestCase):
                     'percent': 0.0,
                     'letter_grade': None
                 },
+                {
+                    'username': self.program_student.username,
+                    'email': self.program_student.email,
+                    'course_id': str(self.course.id),
+                    'passed': False,
+                    'percent': 0.0,
+                    'letter_grade': None,
+                },
             ]),
         ])
 

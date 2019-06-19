@@ -44,6 +44,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
 )
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
+from openedx.core.djangolib.markup import HTML
 from openedx.features.course_duration_limits.config import EXPERIMENT_DATA_HOLDBACK_KEY, EXPERIMENT_ID
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
@@ -927,6 +928,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         self.assertNotContains(response, TEST_COURSE_GOAL_UPDATE_FIELD_HIDDEN)
 
 
+@ddt.ddt
 class CourseHomeFragmentViewTests(ModuleStoreTestCase):
     """
     Test Messages Displayed on the Course Home
@@ -971,7 +973,7 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
         self.assertIn('<a class="btn-brand btn-upgrade"', response.content)
         self.assertIn(url, response.content)
         self.assertIn(
-            u'Upgrade (${price})'.format(price=self.verified_mode.min_price),
+            u"Upgrade (<span class='price'>${price}</span>)".format(price=self.verified_mode.min_price),
             response.content.decode(response.charset)
         )
 
@@ -1001,3 +1003,16 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
     def test_display_upgrade_message_if_audit_and_deadline_not_passed(self):
         CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
         self.assert_upgrade_message_displayed()
+
+    @mock.patch(
+        'openedx.features.course_experience.views.course_home.format_strikeout_price',
+        mock.Mock(return_value=(HTML("<span>DISCOUNT_PRICE</span>"), True))
+    )
+    def test_upgrade_message_discount(self):
+        CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
+
+        with SHOW_UPGRADE_MSG_ON_COURSE_HOME.override(True):
+            response = self.client.get(self.url)
+
+        content = response.content.decode(response.charset)
+        assert "<span>DISCOUNT_PRICE</span>" in content

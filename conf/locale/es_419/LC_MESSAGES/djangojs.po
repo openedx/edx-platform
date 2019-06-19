@@ -161,7 +161,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-04-22 10:49+0000\n"
+"POT-Creation-Date: 2019-06-09 20:42+0000\n"
 "PO-Revision-Date: 2019-02-27 22:36+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -8034,6 +8034,10 @@ msgid "Mark Exam As Completed"
 msgstr "Marcar el examen como completado"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
+msgid "You are taking \"{exam_link}\" as {exam_type}. "
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
 msgid "a timed exam"
 msgstr "Un examen cronometrado"
 
@@ -8852,8 +8856,9 @@ msgid "Register with Institution/Campus Credentials"
 msgstr "Registrarse con las credenciales de la institución o el Campus"
 
 #: lms/templates/student_account/institution_register.underscore
-msgid "Register through edX"
-msgstr "Registrarse a través de edX"
+#: lms/templates/student_account/register.underscore
+msgid "Create an Account"
+msgstr "Crear una cuenta"
 
 #: lms/templates/student_account/login.underscore
 msgid "First time here?"
@@ -8973,10 +8978,6 @@ msgstr "Crear una cuenta usando %(providerName)s"
 #: lms/templates/student_account/register.underscore
 msgid "or create a new one here"
 msgstr "o crear una nueva aquí"
-
-#: lms/templates/student_account/register.underscore
-msgid "Create an Account"
-msgstr "Crear una cuenta"
 
 #: lms/templates/student_account/register.underscore
 msgid "Support education research by providing additional information"

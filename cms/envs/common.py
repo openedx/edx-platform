@@ -1177,6 +1177,7 @@ INSTALLED_APPS = [
 
     'openedx.features.course_duration_limits',
     'openedx.features.content_type_gating',
+    'openedx.features.discounts',
     'experiments',
 
 ]
@@ -1367,6 +1368,10 @@ ADVANCED_PROBLEM_TYPES = [
         'component': 'drag-and-drop-v2',
         'boilerplate_name': None
     },
+    {
+        'component': 'staffgradedpoints',
+        'boilerplate_name': None
+    }
 ]
 
 USERNAME_REPLACEMENT_WORKER = "REPLACE WITH VALID USERNAME"

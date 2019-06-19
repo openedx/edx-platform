@@ -6,6 +6,7 @@ from __future__ import absolute_import
 from contextlib import contextmanager
 
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.pagination import CursorPagination
@@ -119,20 +120,20 @@ class GradeViewMixin(DeveloperErrorViewMixin):
         """
         Args:
             course_key (CourseLocator): The course to retrieve grades for.
-            course_enrollment_filter: Optional dictionary of keyword arguments to pass
+            course_enrollment_filter: Optional list of Q objects to pass
             to `CourseEnrollment.filter()`.
             related_models: Optional list of related models to join to the CourseEnrollment table.
 
         Returns:
             A list of users, pulled from a paginated queryset of enrollments, who are enrolled in the given course.
         """
-        filter_kwargs = {
-            'course_id': course_key,
-            'is_active': True,
-        }
-        filter_kwargs.update(course_enrollment_filter or {})
+        filter_args = [
+            Q(course_id=course_key) & Q(is_active=True)
+        ]
+        filter_args.extend(course_enrollment_filter or [])
+
         enrollments_in_course = use_read_replica_if_available(
-            CourseEnrollment.objects.filter(**filter_kwargs)
+            CourseEnrollment.objects.filter(*filter_args)
         )
         if related_models:
             enrollments_in_course = enrollments_in_course.select_related(*related_models)

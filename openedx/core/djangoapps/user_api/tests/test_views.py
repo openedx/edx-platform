@@ -640,19 +640,6 @@ class LoginSessionViewTest(UserAPITestCase):
                 "supplementalText": "",
                 "supplementalLink": "",
             },
-            {
-                "name": "remember",
-                "defaultValue": False,
-                "type": "checkbox",
-                "required": False,
-                "label": "Remember me",
-                "placeholder": "",
-                "instructions": "",
-                "restrictions": {},
-                "errorMessages": {},
-                "supplementalText": "",
-                "supplementalLink": "",
-            },
         ])
 
     def test_login(self):

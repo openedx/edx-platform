@@ -83,9 +83,9 @@ class EcommerceServiceTests(TestCase):
         self.assertTrue(is_enabled)
 
     @patch('openedx.core.djangoapps.theming.helpers.is_request_in_themed_site')
-    def test_is_enabled_for_microsites(self, is_microsite):
-        """Verify that is_enabled() returns True if used for a microsite."""
-        is_microsite.return_value = True
+    def test_is_enabled_for_sites(self, is_site):
+        """Verify that is_enabled() returns True if used for a site."""
+        is_site.return_value = True
         is_enabled = EcommerceService().is_enabled(self.user)
         self.assertTrue(is_enabled)
 

@@ -50,6 +50,8 @@ class StudentGradebookEntrySerializer(serializers.Serializer):
     """
     user_id = serializers.IntegerField()
     username = serializers.CharField()
+    email = serializers.EmailField()
+    external_user_key = serializers.CharField(required=False)
     percent = serializers.FloatField()
     section_breakdown = SectionBreakdownSerializer(many=True)
 

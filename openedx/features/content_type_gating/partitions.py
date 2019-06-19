@@ -17,9 +17,11 @@ from web_fragments.fragment import Fragment
 
 from course_modes.models import CourseMode
 from lms.djangoapps.commerce.utils import EcommerceService
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, FULL_ACCESS, LIMITED_ACCESS
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from openedx.features.discounts.utils import format_strikeout_price
 from xmodule.partitions.partitions import UserPartition, UserPartitionError
 
 LOG = logging.getLogger(__name__)
@@ -76,7 +78,8 @@ class ContentTypeGatingPartition(UserPartition):
     """
     def access_denied_fragment(self, block, user, user_group, allowed_groups):
         course_key = self._get_course_key_from_course_block(block)
-        modes = CourseMode.modes_for_course_dict(course_key)
+        course = CourseOverview.get_from_id(course_key)
+        modes = CourseMode.modes_for_course_dict(course=course)
         verified_mode = modes.get(CourseMode.VERIFIED)
         if (verified_mode is None or user_group == FULL_ACCESS or
                 user_group in allowed_groups):
@@ -84,10 +87,13 @@ class ContentTypeGatingPartition(UserPartition):
 
         ecommerce_checkout_link = self._get_checkout_link(user, verified_mode.sku)
         request = crum.get_current_request()
+
+        upgrade_price, _ = format_strikeout_price(user, course)
+
         frag = Fragment(render_to_string('content_type_gating/access_denied_message.html', {
             'mobile_app': request and is_request_from_mobile_app(request),
             'ecommerce_checkout_link': ecommerce_checkout_link,
-            'min_price': str(verified_mode.min_price)
+            'min_price': upgrade_price,
         }))
         return frag
 

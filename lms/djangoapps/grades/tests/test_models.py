@@ -17,6 +17,7 @@ from django.test import TestCase
 from django.utils.timezone import now
 from freezegun import freeze_time
 from mock import patch
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 from lms.djangoapps.grades.constants import GradeOverrideFeatureEnum
@@ -457,7 +458,7 @@ class PersistentCourseGradesTest(GradesModelTestCase):
         ("percent_grade", "Not a float at all", ValueError),
         ("percent_grade", None, IntegrityError),
         ("letter_grade", None, IntegrityError),
-        ("course_id", "Not a course key at all", AssertionError),
+        ("course_id", "Not a course key at all", InvalidKeyError),
         ("user_id", None, IntegrityError),
         ("grading_policy_hash", None, IntegrityError),
     )

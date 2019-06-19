@@ -60,7 +60,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-04-22 10:50+0000\n"
+"POT-Creation-Date: 2019-06-09 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Georgian (https://www.transifex.com/open-edx/teams/6205/ka/)\n"
@@ -384,27 +384,6 @@ msgstr "მონიშნულია არასწორი რაოდე�
 msgid "No selected price or selected price is too low."
 msgstr "ფასი არ არის არჩეული, ან არჩეული ფასი ძალიან დაბალია"
 
-#: common/djangoapps/django_comment_common/models.py
-msgid "Administrator"
-msgstr "ადმინისტრატორი"
-
-#: common/djangoapps/django_comment_common/models.py
-msgid "Moderator"
-msgstr "მოდერატორი"
-
-#: common/djangoapps/django_comment_common/models.py
-msgid "Group Moderator"
-msgstr ""
-
-#: common/djangoapps/django_comment_common/models.py
-msgid "Community TA"
-msgstr "გაერთიანების ჯგუფხელი"
-
-#: common/djangoapps/django_comment_common/models.py
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Student"
-msgstr "სტუდენტი"
-
 #: common/djangoapps/student/admin.py
 msgid "User profile"
 msgstr "მომხმარებლის პროფილი"
@@ -466,8 +445,8 @@ msgid "A properly formatted e-mail is required"
 msgstr "მიუთითეთ ელფოსტის მისამართი სათანადო ფორმატით"
 
 #: common/djangoapps/student/forms.py
-msgid "Your legal name must be a minimum of two characters long"
-msgstr "თქვენი ნამდვილი სახელი სულ მცირე ორი სიმბოლო უნდა იყოს"
+msgid "Your legal name must be a minimum of one character long"
+msgstr ""
 
 #: common/djangoapps/student/forms.py
 #, python-format
@@ -856,11 +835,11 @@ msgstr "თქვენმიერ მოძიებულ კურსზე 
 
 #: common/djangoapps/student/views/management.py
 msgid "No inactive user with this e-mail exists"
-msgstr "არააქტიური მომხმარებელი ამ ელფოსტით არ არსებობს"
+msgstr ""
 
 #: common/djangoapps/student/views/management.py
 msgid "Unable to send reactivation email"
-msgstr "ხელახალი აქტივაციის შეტყობინების გაგზავნა ვერ მოხერხდა"
+msgstr ""
 
 #: common/djangoapps/student/views/management.py
 msgid "Course id not specified"
@@ -1009,6 +988,12 @@ msgid ""
 msgstr ""
 "მეორად მომწოდებლებს, \"ინსტიტუტის\"-ის სისტემაში შესულ მომწოდებულთა ცალკე "
 "სიაში, ნაკლებად თვალსაჩინო ადგილი უკავიათ."
+
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
+"optional. If this provider is an Organization, this attribute can be used "
+"reference users in that Organization"
+msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
 msgid "The Site that this provider configuration belongs to."
@@ -2847,13 +2832,13 @@ msgstr "განხილვის თემების სქემა"
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
-"must be unique. In \"id\" values, the only special characters that are "
-"supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
+"category must be unique. In \"id\" values, the only special characters that "
+"are supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -5320,17 +5305,17 @@ msgstr "გთხოვთ თქვენი ჩანაწერის სი
 msgid "Take free online courses at edX.org"
 msgstr ""
 
-#. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
+#. Translators: 'edX' and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
 #: lms/djangoapps/branding/api.py
 #, python-brace-format
 msgid ""
-"© {org_name}.  All rights reserved except where noted.  EdX, Open edX and "
-"their respective logos are trademarks or registered trademarks of edX Inc."
+"© {org_name}.  All rights reserved except where noted.  edX, Open edX and "
+"their respective logos are registered trademarks of edX Inc."
 msgstr ""
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: 'Open edX' is a brand, please keep this untranslated.
+#. Translators: 'Open edX' is a trademark, please keep this untranslated.
 #. See http://openedx.org for more information.
 #. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Open edX' is a brand, please keep this untranslated. See
@@ -6444,6 +6429,20 @@ msgid "To see course content, {sign_in_link} or {register_link}."
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
+#: openedx/features/course_experience/views/course_home_messages.py
+#, python-brace-format
+msgid "{sign_in_link} or {register_link}."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+#: openedx/features/course_experience/views/course_home_messages.py
+#: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation/navbar-not-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
+msgid "Sign in"
+msgstr "შესვლა"
+
+#: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid ""
 "You must be enrolled in the course to see course content."
@@ -6560,10 +6559,8 @@ msgstr ""
 #: lms/djangoapps/dashboard/git_import.py
 msgid ""
 "Non usable git url provided. Expecting something like: "
-"git@github.com:mitocw/edx4edx_lite.git"
+"git@github.com:edx/edx4edx_lite.git"
 msgstr ""
-"მოცემული git url-ი გამოუსადეგარია. ის უნდა იყოს დაახლოებით: "
-"git@github.com:mitocw/edx4edx_lite.git"
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid "Unable to get git log"
@@ -6747,6 +6744,33 @@ msgstr "როლი"
 msgid "full_name"
 msgstr "full_name"
 
+#: lms/djangoapps/discussion/django_comment_client/base/views.py
+msgid "Title can't be empty"
+msgstr "სათაური არ შეიძლება იყოს ცარიელი"
+
+#: lms/djangoapps/discussion/django_comment_client/base/views.py
+msgid "Body can't be empty"
+msgstr "სხეული არ შეიძლება იყოს ცარიელი"
+
+#: lms/djangoapps/discussion/django_comment_client/base/views.py
+msgid "Topic doesn't exist"
+msgstr "თემა არ არსებობს"
+
+#: lms/djangoapps/discussion/django_comment_client/base/views.py
+msgid "Comment level too deep"
+msgstr "კომენტარის დონე ძალიან ღრმაა"
+
+#: lms/djangoapps/discussion/django_comment_client/base/views.py
+msgid ""
+"Error uploading file. Please contact the site administrator. Thank you."
+msgstr ""
+"ფაილის ატვირთვისას დაფიქსირდა შეცდომა. გთხოვთ, დაუკავშირდეთ თქვენი საიტის "
+"ადმინისტრატორს. გმადლობთ."
+
+#: lms/djangoapps/discussion/django_comment_client/base/views.py
+msgid "Good"
+msgstr "კარგია"
+
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
 #, python-format
@@ -6762,33 +6786,6 @@ msgstr "დისკუსიის ნახვა"
 #, python-format
 msgid "Response to %(thread_title)s"
 msgstr ""
-
-#: lms/djangoapps/django_comment_client/base/views.py
-msgid "Title can't be empty"
-msgstr "სათაური არ შეიძლება იყოს ცარიელი"
-
-#: lms/djangoapps/django_comment_client/base/views.py
-msgid "Body can't be empty"
-msgstr "სხეული არ შეიძლება იყოს ცარიელი"
-
-#: lms/djangoapps/django_comment_client/base/views.py
-msgid "Topic doesn't exist"
-msgstr "თემა არ არსებობს"
-
-#: lms/djangoapps/django_comment_client/base/views.py
-msgid "Comment level too deep"
-msgstr "კომენტარის დონე ძალიან ღრმაა"
-
-#: lms/djangoapps/django_comment_client/base/views.py
-msgid ""
-"Error uploading file. Please contact the site administrator. Thank you."
-msgstr ""
-"ფაილის ატვირთვისას დაფიქსირდა შეცდომა. გთხოვთ, დაუკავშირდეთ თქვენი საიტის "
-"ადმინისტრატორს. გმადლობთ."
-
-#: lms/djangoapps/django_comment_client/base/views.py
-msgid "Good"
-msgstr "კარგია"
 
 #: lms/djangoapps/edxnotes/helpers.py
 msgid "EdxNotes Service is unavailable. Please try again in a few minutes."
@@ -6913,6 +6910,11 @@ msgstr "{platform_name} პერსონალი"
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "Course Staff"
 msgstr "კურსის პერსონალი"
+
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+#: openedx/core/djangoapps/django_comment_common/models.py
+msgid "Student"
+msgstr "სტუდენტი"
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 #: lms/templates/preview_menu.html
@@ -7761,11 +7763,6 @@ msgstr ""
 "ვადის გახანგრძლივების შემთხვევაში, საბოლოო ვადა უნდა იყოს უფრო გვიან, ვიდრე,"
 " თავდაპირველად განსაზღვრული თარიღი."
 
-#: lms/djangoapps/instructor/views/tools.py
-msgid "No due date extension is set for that student and unit."
-msgstr ""
-"აღნიშნული სტუდენტისა და ბლოკისთვის, ვადის გახანგრძლივება არ არის დაყენებული."
-
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's full name.
@@ -8234,6 +8231,10 @@ msgstr ""
 #: lms/djangoapps/notes/views.py lms/templates/notes.html
 msgid "My Notes"
 msgstr "ჩემი ჩანაწერები"
+
+#: lms/djangoapps/program_enrollments/models.py
+msgid "One of user or external_user_key must not be null."
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Order Payment Confirmation"
@@ -9353,8 +9354,8 @@ msgstr "მომხმარებლის ანგარიში ვერ 
 
 #: lms/djangoapps/verify_student/views.py
 #, python-brace-format
-msgid "Name must be at least {min_length} characters long."
-msgstr "სახელი უნდა შეიცავდეს სულ მცირე {min_length} სიმბოლოს."
+msgid "Name must be at least {min_length} character long."
+msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Image data is not valid."
@@ -9786,8 +9787,9 @@ msgid "Hello %(full_name)s,"
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
-msgid "Your %(platform_name)s ID verification has expired.\" "
+msgid "Your %(platform_name)s ID verification has expired. "
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
@@ -9836,11 +9838,6 @@ msgstr ""
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
 msgid "Hello %(full_name)s, "
-msgstr ""
-
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
-#, python-format
-msgid "Your %(platform_name)s ID verification has expired. "
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/subject.txt
@@ -10419,15 +10416,6 @@ msgstr "API მომხმარებელთან ასოცირებ�
 msgid "The reason this user wants to access the API."
 msgstr "მიზეზი, თუ რატომ სურს მომხმარებელს API-ზე დაშვება."
 
-#: openedx/core/djangoapps/api_admin/models.py
-#, python-brace-format
-msgid "API access request from {company}"
-msgstr "API წვდომის მოთხოვნა კომპანიისგან: {company}"
-
-#: openedx/core/djangoapps/api_admin/models.py
-msgid "API access request"
-msgstr "API-ზე წვდომის მოთხოვნა"
-
 #: openedx/core/djangoapps/api_admin/widgets.py
 #, python-brace-format
 msgid ""
@@ -10781,6 +10769,22 @@ msgstr ""
 #: openedx/core/djangoapps/debug/views.py
 msgid "This is a test error"
 msgstr ""
+
+#: openedx/core/djangoapps/django_comment_common/models.py
+msgid "Administrator"
+msgstr "ადმინისტრატორი"
+
+#: openedx/core/djangoapps/django_comment_common/models.py
+msgid "Moderator"
+msgstr "მოდერატორი"
+
+#: openedx/core/djangoapps/django_comment_common/models.py
+msgid "Group Moderator"
+msgstr ""
+
+#: openedx/core/djangoapps/django_comment_common/models.py
+msgid "Community TA"
+msgstr "გაერთიანების ჯგუფხელი"
 
 #: openedx/core/djangoapps/embargo/forms.py
 #: openedx/core/djangoapps/verified_track_content/forms.py
@@ -11349,8 +11353,11 @@ msgid "Specialty"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/utils.py
+#, python-brace-format
 msgid ""
-" Make sure that you are providing a valid username or a URL that contains \""
+"Make sure that you are providing a valid username or a URL that contains "
+"\"{url_stub}\". To remove the link from your edX profile, leave this field "
+"blank."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/views.py
@@ -11488,11 +11495,11 @@ msgstr "თქვენ უნდა დაეთანხმოთ {platform_na
 #: openedx/core/djangoapps/user_api/api.py
 #, python-brace-format
 msgid ""
-"By creating an account with {platform_name}, you agree                   to "
-"abide by our {platform_name}                   "
+"By creating an account, you agree to the                   "
 "{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
-"                   and agree to our {privacy_policy_link_start}Privacy "
-"Policy{privacy_policy_link_end}."
+"                   and you acknowledge that {platform_name} and each Member "
+"process your personal data in accordance                   with the "
+"{privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
 msgstr ""
 
 #. Translators: "Terms of service" is a legal document users must agree to
@@ -11929,17 +11936,17 @@ msgstr "განახლებები"
 msgid "Reviews"
 msgstr "მიმოხილვები"
 
+#: openedx/features/course_experience/utils.py
+#, no-python-format, python-brace-format
+msgid ""
+"{banner_open}{percentage}% off your first upgrade.{span_close} Discount "
+"automatically applied.{div_close}"
+msgstr ""
+
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
 msgid "{sign_in_link} or {register_link} and then enroll in this course."
 msgstr ""
-
-#: openedx/features/course_experience/views/course_home_messages.py
-#: lms/templates/header/navbar-not-authenticated.html
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
-msgid "Sign in"
-msgstr "შესვლა"
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
@@ -11978,6 +11985,29 @@ msgstr ""
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
 msgid "Set goal to: {goal_text}"
+msgstr ""
+
+#: openedx/features/discounts/admin.py
+msgid ""
+"These define the context to disable lms-controlled discounts on. If no "
+"values are set, then the configuration applies globally. If a single value "
+"is set, then the configuration applies to all courses within that context. "
+"At most one value can be set at a time.<br>If multiple contexts apply to a "
+"course (for example, if configuration is specified for the course "
+"specifically, and for the org that the course is in, then the more specific "
+"context overrides the more general context."
+msgstr ""
+
+#: openedx/features/discounts/admin.py
+msgid ""
+"If any of these values is left empty or \"Unknown\", then their value at "
+"runtime will be retrieved from the next most specific context that applies. "
+"For example, if \"Disabled\" is left as \"Unknown\" in the course context, "
+"then that course will be Disabled only if the org that it is in is Disabled."
+msgstr ""
+
+#: openedx/features/discounts/models.py
+msgid "Disabled"
 msgstr ""
 
 #: openedx/features/enterprise_support/api.py
@@ -12091,10 +12121,8 @@ msgstr ""
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "Non writable git url provided. Expecting something like: "
-"git@github.com:mitocw/edx4edx_lite.git"
+"git@github.com:edx/edx4edx_lite.git"
 msgstr ""
-"მითითებული git მისამართი არასწორია. საჭიროა შემდეგი ტიპის მისამართი: "
-"git@github.com:mitocw/edx4edx_lite.git"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
@@ -12954,6 +12982,15 @@ msgstr "პარამეტრების ჩამოყრა"
 msgid "Legal"
 msgstr "იურიდიული"
 
+#. Translators: 'edX' and 'Open edX' are trademarks of 'edX Inc.'. Please do
+#. not translate any of these trademarks and company names.
+#: cms/templates/widgets/footer.html
+#: themes/red-theme/lms/templates/footer.html
+msgid ""
+"edX, Open edX, and the edX and Open edX logos are registered trademarks of "
+"{link_start}edX Inc.{link_end}"
+msgstr ""
+
 #: cms/templates/widgets/header.html lms/templates/header/header.html
 #: lms/templates/navigation/navigation.html
 #: lms/templates/widgets/footer-language-selector.html
@@ -13345,6 +13382,10 @@ msgstr "დეფექტების აღმოფხვრა:"
 msgid "External Authentication failed"
 msgstr "გარე ავთენტიფიკაცია ვერ მოხერხდა"
 
+#: lms/templates/footer.html
+msgid "organization logo"
+msgstr ""
+
 #: lms/templates/forgot_password_modal.html
 msgid ""
 "Please enter your e-mail address below, and we will e-mail instructions for "
@@ -13555,17 +13596,15 @@ msgstr ""
 msgid "Search for a course"
 msgstr "კურსის ძიება"
 
-#. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See http://open.edx.org for more information.
-#: lms/templates/index_overlay.html
-msgid "Welcome to the Open edX{registered_trademark} platform!"
-msgstr "მოგესალმებით Open edX{registered_trademark} პლატფორმაზე!"
+#: lms/templates/index_overlay.html lms/templates/register-sidebar.html
+msgid "Welcome to {platform_name}"
+msgstr "კეთილი იყოს თქვენი მობრძანება {platform_name}-ში"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
 #. untranslated. See http://open.edx.org for more information.
 #: lms/templates/index_overlay.html
-msgid "It works! This is the default homepage for this Open edX instance."
-msgstr "მუშაობს! ეს არის ამ Open edX ასლის ნაგულისხმევი მთავარი გვერდი."
+msgid "It works! Powered by Open edX{registered_trademark}"
+msgstr ""
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -13871,6 +13910,10 @@ msgstr "თქვენი პასუხის შენახვა"
 msgid "Reset your answer"
 msgstr "თქვენი პასუხის ჩამოყრა"
 
+#: lms/templates/problem.html
+msgid "Answers are displayed within the problem"
+msgstr ""
+
 #: lms/templates/problem_notifications.html
 msgid "Next Hint"
 msgstr "მომდევნო მინიშნება"
@@ -14075,10 +14118,6 @@ msgstr "უკვე დარეგისტრირდით?"
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Log in"
 msgstr "შესვლა"
-
-#: lms/templates/register-sidebar.html
-msgid "Welcome to {platform_name}"
-msgstr "კეთილი იყოს თქვენი მობრძანება {platform_name}-ში"
 
 #: lms/templates/register-sidebar.html
 msgid ""
@@ -14447,11 +14486,6 @@ msgstr "კურსის ID ან კატალოგი"
 #: lms/templates/sysadmin_dashboard.html
 msgid "Delete course from site"
 msgstr "საიტიდან კურსის წაშლა"
-
-#. Translators: A version number appears after this string
-#: lms/templates/sysadmin_dashboard.html
-msgid "Platform Version"
-msgstr "პლატფორმის ვერსია"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Page {current_page} of {total_pages}"
@@ -15857,6 +15891,20 @@ msgstr "შესყიდვის მონაცემების ჩატ�
 msgid "Please wait while we retrieve your order details."
 msgstr "გთხოვთ, დაელოდოთ თქვენი შესყიდვის მონაცემებს ამოღებას."
 
+#: lms/templates/course_modes/_upgrade_button.html
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/_upgrade_button.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Pursue the Verified Track"
+msgstr ""
+
+#: lms/templates/course_modes/_upgrade_button.html
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/_upgrade_button.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Pursue a Verified Certificate"
+msgstr "მიიღეთ დამოწმებული სერტიფიკატი"
+
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Enroll In {course_name} | Choose Your Track"
@@ -15947,16 +15995,6 @@ msgid ""
 msgstr ""
 "{b_start}ადვილად გასაზიარებელი:{b_end} დაამატეთ სერტიფიკატი თქვენს "
 "ავტობიოგრაფიას ან რეზიუმეს, ან გამოაქვეყნეთ პირდაპირ LinkedIn-ზე"
-
-#: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
-msgid "Pursue a Verified Certificate"
-msgstr "მიიღეთ დამოწმებული სერტიფიკატი"
-
-#: lms/templates/course_modes/choose.html
-#: themes/edx.org/lms/templates/course_modes/choose.html
-msgid "Pursue the Verified Track"
-msgstr ""
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -16080,6 +16118,10 @@ msgstr "ეს შინაარსი შეფასებულია"
 #: lms/templates/courseware/course_about.html
 msgid "An error occurred. Please try again later."
 msgstr "დაფიქსირდა შეცდომა. გთხოვთ სცადოთ მოგვიანებით."
+
+#: lms/templates/courseware/course_about.html
+msgid "An error has occurred. Please ensure that you are logged in to enroll."
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "You are enrolled in this course"
@@ -16225,7 +16267,6 @@ msgstr "დააზუსტეთ თქვენი ძიება"
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
 #: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
-#: openedx/features/learner_analytics/templates/learner_analytics/dashboard.html
 msgid "{course_number} Courseware"
 msgstr "{course_number} კურსის შინაარსი"
 
@@ -16454,8 +16495,8 @@ msgid "View Grading in studio"
 msgstr "შეფასებების სტუდიოში ნახვა"
 
 #: lms/templates/courseware/progress.html
-msgid "Course Progress for Student '{username}' ({email})"
-msgstr "კურსის პროგრესი სტუდენტისთვის '{username}' ({email})"
+msgid "Course Progress for '{username}' ({email})"
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "View Certificate"
@@ -18542,15 +18583,9 @@ msgstr "ანგარიშები ხელმისაწვდომი�
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The reports listed below are available for download. A link to every report "
-"remains available on this page, identified by the UTC date and time of "
-"generation. Reports are not deleted, so you will always be able to access "
-"previously generated reports from this page."
+"The reports listed below are available for download, identified by UTC date "
+"and time of generation."
 msgstr ""
-"ქვემოთ ჩამოთვლილი ანგარიშები ხელმისაწვდომია ჩამოსატვირთად. ყველა ანგარიშის "
-"ბმული ხელმისაწვდომი იქნება ამ გვერდზე და მათი იდენტიფიცირება UTC თარიღითა და"
-" გენერაციის დროით ხდება. ანგარიშების წაშლა არ მოხდება, ასე რომ, ამ გვერდიდან"
-" ყოველთვის გექნებათ ადრე შექმნილ ანგარიშებზე წვდომის შესაძლებლობა."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -18566,13 +18601,13 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"{strong_start}Note{strong_end}: To keep student data secure, you cannot save"
-" or email these links for direct access. Copies of links expire within 5 "
-"minutes."
+"{strong_start}Note{strong_end}: {ul_start}{li_start}To keep student data "
+"secure, you cannot save or email these links for direct access. Copies of "
+"links expire within 5 minutes.{li_end}{li_start}Report files are deleted 90 "
+"days after generation. If you will need access to old reports, download and "
+"store the files, in accordance with your institution's data security "
+"policies.{li_end}{ul_end}"
 msgstr ""
-"{strong_start}შენიშვნა{strong_end}: სტუდენტის მონაცემების დაცულად "
-"შენახვისთვის, თქვენ ვერ შეინახავთ ან გააგზავნით ელექტრონულად ამ ბმულებს "
-"პირდაპირი დაშვებისთვის. ბმულების ასლების ვადა 5 წუთში იწურება."
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Enrollment Codes"
@@ -18968,15 +19003,11 @@ msgstr "გადახდის ვადის ინდივიდუალ�
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid ""
-"In this section, you have the ability to grant extensions on specific units "
-"to individual students. Please note that the latest date is always taken; "
-"you cannot use this tool to make an assignment due earlier for a particular "
-"student."
+"In this section, you have the ability to grant extensions on specific "
+"subsections to individual students. Please note that the latest date is "
+"always taken; you cannot use this tool to make an assignment due earlier for"
+" a particular student."
 msgstr ""
-"ამ სექციაში, შესაძლებლობა გაქვთ უზრუნველყოთ გარკვეულ ერთეულებზე ვადის "
-"გაგრძელებები ცალკეული სტუდენტებისთვის. გთხოვთ მიაქციოთ ყურადღება, "
-"უკანასკნელი თარიღი ყოველთვის დაკავებულია; ამ ინსტრუმენტს ვერ გამოიყენებთ "
-"კონკრეტული სტუდენტის დავალების დროზე ადრე შესასრულებლად. "
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid ""
@@ -18990,8 +19021,8 @@ msgid "Student Email or Username"
 msgstr "სტუდენტის ელფოსტა ან მომხმარებლის სახელი"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
-msgid "Choose the graded unit:"
-msgstr "აირჩიეთ დიფერენცირებული გაკვეთილი:"
+msgid "Choose the graded subsection:"
+msgstr ""
 
 #. Translators: "format_string" is the string MM/DD/YYYY HH:MM, as that is the
 #. format the system requires.
@@ -19004,6 +19035,10 @@ msgstr ""
 "{format_string})."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
+msgid "Reason for extension"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Change due date for student"
 msgstr "შეცვალეთ გადახდის ვადა სტუდენტისთვის"
 
@@ -19013,19 +19048,15 @@ msgstr "მინიჭებული გაგრძელების ნა�
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid ""
-"Here you can see what extensions have been granted on particular units or "
-"for a particular student."
+"Here you can see what extensions have been granted on particular subsection "
+"or for a particular student."
 msgstr ""
-"აქ თქვენ შეგიძლიათ ნახოთ თუ რა ტიპის გაგრძელებები გავრცელდა კონკრეტულ "
-"გაკვეთილზე ან კონკრეტული სტუდენტისთვის."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid ""
-"Choose a graded unit and click the button to obtain a list of all students "
-"who have extensions for the given unit."
+"Choose a graded subsection and click the button to obtain a list of all "
+"students who have extensions for the given subsection."
 msgstr ""
-"აირჩიეთ დიფერენცირებული გაკვეთილი და დააწკაპუნეთ ღილაკზე რათა მოცემული "
-"გაკვეთილისთვის იმ სტუდენტების სია მოიპოვოთ, რომელთაც აქვთ გაგრძელებები."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "List all students with due date extensions"
@@ -19046,12 +19077,13 @@ msgstr "გაგრძელებების გადატვირთვ�
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid ""
 "Resetting a problem's due date rescinds a due date extension for a student "
-"on a particular unit. This will revert the due date for the student back to "
-"the problem's original due date."
+"on a particular subsection. This will revert the due date for the student "
+"back to the problem's original due date."
 msgstr ""
-"ამოცანის შესასრულებლად გადახდის ვადის გადატვირთვა აუქმებს სტუდენტისთვის "
-"კონკრეტულ გაკვეთილზე ვადის გაგრძელებას. ამით გადახდის ვადა სტუდენტისთვის "
-"ამოცანის პირვანდელ გადახდის ვადას დაუბრუნდება. "
+
+#: lms/templates/instructor/instructor_dashboard_2/extensions.html
+msgid "Reason for reset"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Reset due date for student"
@@ -21227,10 +21259,6 @@ msgstr ""
 msgid "Explore journals and courses"
 msgstr ""
 
-#: openedx/features/learner_analytics/templates/learner_analytics/dashboard.html
-msgid "My Stats (Beta)"
-msgstr ""
-
 #. Translators: this section lists all the third-party authentication
 #. providers
 #. (for example, Google and LinkedIn) the user can link with or unlink from
@@ -21332,7 +21360,7 @@ msgid "© 2012–{year} edX Inc. "
 msgstr ""
 
 #: themes/edx.org/lms/templates/footer.html
-msgid "EdX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
+msgid "edX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
 msgstr ""
 
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
@@ -21398,7 +21426,7 @@ msgstr ""
 #: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
 msgid ""
 "All rights reserved except where noted. edX, Open edX and the edX and Open "
-"edX logos are registered trademarks or trademarks of edX Inc."
+"edX logos are registered trademarks of edX Inc."
 msgstr ""
 
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -21423,16 +21451,6 @@ msgstr "კურსების ძებნა"
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Schools & Partners"
 msgstr "უნივერსიტეტები და პატრნიორები"
-
-#. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
-#. Please do not translate any of these trademarks and company names.
-#: themes/red-theme/lms/templates/footer.html
-msgid ""
-"EdX, Open edX, and the edX and Open edX logos are registered trademarks or "
-"trademarks of {link_start}edX Inc.{link_end}"
-msgstr ""
-"EdX, Open edX, და edX და Open edX ლოგოები არის  რეგისტრირებული სავაჭრო "
-"ნიშნები ან {link_start}edX Inc.{link_end}-ის სავაჭრო ნიშნები."
 
 #: themes/red-theme/lms/templates/footer.html
 msgid ""
@@ -24841,9 +24859,6 @@ msgid ""
 "Thank you for signing up for {studio_name}! To activate your account, please"
 " copy and paste this address into your web browser's address bar:"
 msgstr ""
-"გმადლობთ, რომ დარეგისტრირდით {studio_name}-ში! თქვენი ანგარიშის "
-"გასააქტიურებლად, გთხოვთ, დააკოპიროთ და ჩასვათ ეს მისამართი თქვენი ვებ "
-"ბრაუზერის მისამართის ზოლში:"
 
 #: cms/templates/emails/activation_email.txt
 msgid ""
@@ -24851,14 +24866,10 @@ msgid ""
 " any more email from us. Please do not reply to this e-mail; if you require "
 "assistance, check the help section of the {studio_name} web site."
 msgstr ""
-"თუ ეს არ მოგითხოვიათ, თქვენი მხრიდან არანაირი ქმედება საჭირო არ არის; თქვენ "
-"აღარ მიიღებთ ჩვენგან ელფოსტას. გთხოვთ, არ უპასუხოთ ამ ელ-შეტყობინებას; თუ "
-"დახმარება გჭირდებათ, ეწვიეთ {studio_name}-ის ვებ საიტს და მონახეთ დახმარების"
-" განყოფილება."
 
 #: cms/templates/emails/activation_email_subject.txt
 msgid "Your account for {studio_name}"
-msgstr "თქვენი {studio_name}-ის ანგარიში"
+msgstr ""
 
 #: cms/templates/emails/course_creator_admin_subject.txt
 msgid "{email} has requested {studio_name} course creator privileges on edge"
@@ -25012,17 +25023,6 @@ msgstr ""
 #: cms/templates/widgets/footer.html
 msgid "LMS"
 msgstr ""
-
-#. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX
-#. Inc.'. Please do not translate any of these trademarks and company names.
-#: cms/templates/widgets/footer.html
-msgid ""
-"EdX, Open edX, Studio, and the edX and Open edX logos are registered "
-"trademarks or trademarks of {link_start}edX Inc.{link_end}"
-msgstr ""
-"EdX, Open edX, Studio, და the edX და Open edX ლოგოები წარმოადგენენ "
-"რეგისტრირებულ სავაჭრო ნიშნებს, ან {link_start}edX Inc.{link_end}-ის სავაჭრო "
-"ნიშნებს."
 
 #: cms/templates/widgets/header.html
 msgid "Current Course:"

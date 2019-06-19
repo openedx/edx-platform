@@ -15,11 +15,12 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib.auth.models import User
-from mock import patch
+from mock import patch, Mock
 from pyquery import PyQuery as pq
 
 from six.moves.html_parser import HTMLParser
 
+from course_modes.models import CourseMode
 from course_api.blocks.api import get_blocks
 from course_modes.tests.factories import CourseModeFactory
 from experiments.models import ExperimentData, ExperimentKeyValue
@@ -42,6 +43,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
 )
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from openedx.core.djangoapps.util.testing import TestConditionalContent
+from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, CONTENT_TYPE_GATE_GROUP_IDS
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
@@ -779,6 +781,22 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
             is_gated=False,
             request_factory=self.factory,
         )
+
+    @patch(
+        'openedx.features.content_type_gating.partitions.format_strikeout_price',
+        Mock(return_value=(HTML("<span>DISCOUNT_PRICE</span>"), True))
+    )
+    def test_discount_display(self):
+
+        with patch.object(ContentTypeGatingPartition, '_get_checkout_link', return_value='#'):
+            block_content = _get_content_from_lms_index(
+                block=self.blocks_dict['problem'],
+                user_id=self.audit_user.id,
+                course=self.course,
+                request_factory=self.factory,
+            )
+
+        assert '<span>DISCOUNT_PRICE</span>' in block_content
 
 
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(
