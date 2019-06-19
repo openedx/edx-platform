@@ -67,7 +67,6 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
     OLD_EMAIL = u"walter@graymattertech.com"
     NEW_EMAIL = u"walt@savewalterwhite.com"
 
-    INVALID_ATTEMPTS = 100
     INVALID_KEY = u"123abc"
 
     URLCONF_MODULES = ['student_accounts.urls']
@@ -237,17 +236,24 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
             logger.check((LOGGER_NAME, 'INFO', 'Invalid password reset attempt'))
 
     def test_password_change_rate_limited(self):
+        """
+        Tests that consective password reset requests are rate limited.
+        """
         # Log out the user created during test setup, to prevent the view from
         # selecting the logged-in user's email address over the email provided
         # in the POST data
         self.client.logout()
 
-        # Make many consecutive bad requests in an attempt to trigger the rate limiter
-        for __ in xrange(self.INVALID_ATTEMPTS):
-            self._change_password(email=self.NEW_EMAIL)
+        for status in [200, 403]:
+            response = self._change_password(email=self.NEW_EMAIL)
+            self.assertEqual(response.status_code, status)
 
-        response = self._change_password(email=self.NEW_EMAIL)
-        self.assertEqual(response.status_code, 403)
+        with mock.patch(
+            'util.request_rate_limiter.PasswordResetEmailRateLimiter.is_rate_limit_exceeded',
+            return_value=False
+        ):
+            response = self._change_password(email=self.NEW_EMAIL)
+            self.assertEqual(response.status_code, 200)
 
     @ddt.data(
         ('post', 'password_change_request', []),
@@ -314,17 +320,24 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
             )
 
     def test_password_change_rate_limited_during_account_recovery(self):
+        """
+        Tests that consective password reset requests during account recovery are rate limited.
+        """
         # Log out the user created during test setup, to prevent the view from
         # selecting the logged-in user's email address over the email provided
         # in the POST data
         self.client.logout()
 
-        # Make many consecutive bad requests in an attempt to trigger the rate limiter
-        for __ in xrange(self.INVALID_ATTEMPTS):
-            self._recover_account(email=self.NEW_EMAIL)
+        for status in [200, 403]:
+            response = self._recover_account(email=self.NEW_EMAIL)
+            self.assertEqual(response.status_code, status)
 
-        response = self._recover_account(email=self.NEW_EMAIL)
-        self.assertEqual(response.status_code, 403)
+        with mock.patch(
+            'util.request_rate_limiter.PasswordResetEmailRateLimiter.is_rate_limit_exceeded',
+            return_value=False
+        ):
+            response = self._recover_account(email=self.NEW_EMAIL)
+            self.assertEqual(response.status_code, 200)
 
     @ddt.data(
         ('post', 'account_recovery', []),
