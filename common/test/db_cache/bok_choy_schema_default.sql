@@ -2305,7 +2305,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=558 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=559 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2823,7 +2823,6 @@ CREATE TABLE `enterprise_enterprisecustomer` (
   `name` varchar(255) NOT NULL,
   `active` tinyint(1) NOT NULL,
   `site_id` int(11) NOT NULL,
-  `catalog` int(10) unsigned DEFAULT NULL,
   `enable_data_sharing_consent` tinyint(1) NOT NULL,
   `enforce_data_sharing_consent` varchar(25) NOT NULL,
   `enable_audit_enrollment` tinyint(1) NOT NULL,
@@ -3060,7 +3059,6 @@ CREATE TABLE `enterprise_historicalenterprisecustomer` (
   `history_type` varchar(1) NOT NULL,
   `history_user_id` int(11) DEFAULT NULL,
   `site_id` int(11) DEFAULT NULL,
-  `catalog` int(10) unsigned DEFAULT NULL,
   `enable_data_sharing_consent` tinyint(1) NOT NULL,
   `enforce_data_sharing_consent` varchar(25) NOT NULL,
   `enable_audit_enrollment` tinyint(1) NOT NULL,
