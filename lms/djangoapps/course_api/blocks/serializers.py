@@ -8,6 +8,25 @@ from rest_framework.reverse import reverse
 from .transformers import SUPPORTED_FIELDS
 
 
+# This lists the names of all fields that are allowed
+# to be show to users who do not have access to a particular piece
+# of content
+FIELDS_ALLOWED_IN_AUTH_DENIED_CONTENT = [
+    "display_name",
+    "block_id",
+    "student_view_url",
+    "student_view_multi_device",
+    "lms_web_url",
+    "type",
+    "id",
+    "block_counts",
+    "graded",
+    "descendants",
+    "authorization_denial_reason",
+    "authorization_denial_message",
+]
+
+
 class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Serializer for single course block
@@ -39,15 +58,6 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
         block_structure = self.context['block_structure']
         authorization_denial_reason = block_structure.get_xblock_field(block_key, 'authorization_denial_reason')
         authorization_denial_message = block_structure.get_xblock_field(block_key, 'authorization_denial_message')
-
-        if authorization_denial_reason and authorization_denial_message:
-            data = {
-                'id': unicode(block_key),
-                'block_id': unicode(block_key.block_id),
-                'authorization_denial_reason': authorization_denial_reason,
-                'authorization_denial_message': authorization_denial_message
-            }
-            return data
 
         data = {
             'id': unicode(block_key),
@@ -88,6 +98,13 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
             children = block_structure.get_children(block_key)
             if children:
                 data['children'] = [unicode(child) for child in children]
+
+        if authorization_denial_reason and authorization_denial_message:
+            data['authorization_denial_reason'] = authorization_denial_reason
+            data['authorization_denial_message'] = authorization_denial_message
+            for field in data.keys():  # pylint: disable=consider-iterating-dictionary
+                if field not in FIELDS_ALLOWED_IN_AUTH_DENIED_CONTENT:
+                    del data[field]
 
         return data
 
