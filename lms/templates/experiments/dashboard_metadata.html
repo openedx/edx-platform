@@ -1,11 +1,11 @@
-<%page args="course_prices" expression_filter="h"/>
+<%page args="course_info" expression_filter="h"/>
 <%!
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 %>
 
 <!-- TODO START: Clean up REVEM-205.-->
 <%
-dashboard_metadata = { 'course_prices': course_prices, 'course_info': course_info}
+dashboard_metadata = { 'course_info': course_info }
 %>
 
 <script type="application/json" id="dashboard-metadata">

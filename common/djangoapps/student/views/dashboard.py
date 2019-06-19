@@ -28,7 +28,7 @@ from courseware.access import has_access
 from edxmako.shortcuts import render_to_response, render_to_string
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
-from lms.djangoapps.experiments.utils import get_dashboard_course_info, get_experiment_dashboard_metadata_context
+from lms.djangoapps.experiments.utils import get_dashboard_course_info
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.utils import (
     get_programs,
@@ -61,12 +61,7 @@ from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.student")
 
-# TODO START: Delete waffle flag as part of REVEM-204
 experiments_namespace = WaffleFlagNamespace(name=u'student.experiments')
-DASHBOARD_METADATA_FLAG = WaffleFlag(experiments_namespace,
-                                     u'dashboard_metadata',
-                                     flag_undefined_default=True)
-# TODO END: REVEM-204
 
 
 def get_org_black_and_whitelist_for_site():
@@ -859,10 +854,6 @@ def student_dashboard(request):
         'empty_dashboard_message': empty_dashboard_message,
         'recovery_email_message': recovery_email_message,
         'recovery_email_activation_message': recovery_email_activation_message,
-        # TODO START: Clean up REVEM-205 & REVEM-204.
-        # The below context is for experiments in dashboard_metadata
-        'course_prices': get_experiment_dashboard_metadata_context(course_enrollments) if DASHBOARD_METADATA_FLAG.is_enabled() else None,
-        # TODO END: Clean up REVEM-205 & REVEM-204.
         # TODO START: clean up as part of REVEM-199 (START)
         'course_info': get_dashboard_course_info(user, course_enrollments),
         # TODO START: clean up as part of REVEM-199 (END)
