@@ -1,18 +1,21 @@
 """Capa's specialized use of codejail.safe_exec."""
 
-from codejail.safe_exec import safe_exec as codejail_safe_exec
-from codejail.safe_exec import not_safe_exec as codejail_not_safe_exec
-from codejail.safe_exec import json_safe, SafeExecException
-from . import lazymod
-from six import text_type
+from __future__ import absolute_import
 
 import hashlib
+
+from codejail.safe_exec import SafeExecException, json_safe
+from codejail.safe_exec import not_safe_exec as codejail_not_safe_exec
+from codejail.safe_exec import safe_exec as codejail_safe_exec
+from six import text_type
+
+from . import lazymod
 
 # Establish the Python environment for Capa.
 # Capa assumes float-friendly division always.
 # The name "random" is a properly-seeded stand-in for the random module.
 CODE_PROLOG = """\
-from __future__ import division
+from __future__ import absolute_import, division
 
 import os
 os.environ["OPENBLAS_NUM_THREADS"] = "1"    # See TNL-6456
