@@ -433,7 +433,7 @@ LOGIN_URL = reverse_lazy('login_redirect_to_lms')
 # use the ratelimit backend to prevent brute force attacks
 AUTHENTICATION_BACKENDS = [
     'rules.permissions.ObjectPermissionBackend',
-    'ratelimitbackend.backends.RateLimitModelBackend',
+    'openedx.core.djangoapps.oauth_dispatch.dot_overrides.backends.EdxRateLimitedAllowAllUsersModelBackend',
 ]
 
 LMS_BASE = None
