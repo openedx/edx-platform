@@ -53,7 +53,7 @@ class TestAccess(CacheIsolationTestCase):
             course_upgrade_deadline = None
 
         def format_date(date):
-            return strftime_localized(date, u'%b. %-d, %Y')
+            return strftime_localized(date, u'%b %-d, %Y')
 
         enrollment = CourseEnrollmentFactory.create(
             course__start=datetime(2018, 1, 1, tzinfo=UTC),

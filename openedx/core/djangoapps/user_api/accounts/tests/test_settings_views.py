@@ -1,28 +1,30 @@
 """ Tests for views related to account settings. """
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
 import mock
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.messages.middleware import MessageMiddleware
-from django.urls import reverse
 from django.http import HttpRequest
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.urls import reverse
 from edx_rest_api_client import exceptions
 
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.tests import factories
 from lms.djangoapps.commerce.tests.mocks import mock_get_orders
-from openedx.core.djangoapps.user_api.accounts.toggles import REDIRECT_TO_ACCOUNT_MICROFRONTEND
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref.tests.test_api import EN, LT_LT
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
-from openedx.core.djangoapps.user_api.tests.factories import UserPreferenceFactory
-from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context, get_user_orders
+from openedx.core.djangoapps.user_api.accounts.toggles import REDIRECT_TO_ACCOUNT_MICROFRONTEND
+from openedx.core.djangoapps.user_api.tests.factories import UserPreferenceFactory
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
 

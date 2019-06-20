@@ -365,7 +365,7 @@ To run JavaScript tests in a browser, run these commands::
 To debug these tests on devstack in a local browser:
 
 * first run the appropriate test_js_dev command from above which will open a browser using XQuartz
-* open http://192.168.33.10:9876/debug.html in your host system's browser of choice
+* open http://edx.devstack.lms:19876/debug.html in your host system's browser of choice
 * this will run all the tests and show you the results including details of any failures
 * you can click on an individually failing test and/or suite to re-run it by itself
 * you can now use the browser's developer tools to debug as you would any other JavaScript code

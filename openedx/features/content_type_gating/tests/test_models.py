@@ -1,12 +1,13 @@
-from datetime import timedelta, datetime
+from __future__ import absolute_import
+
 import itertools
+from datetime import datetime, timedelta
 
 import ddt
-from django.utils import timezone
-from mock import Mock
 import pytz
-
+from django.utils import timezone
 from edx_django_utils.cache import RequestCache
+from mock import Mock
 from opaque_keys.edx.locator import CourseLocator
 
 from course_modes.tests.factories import CourseModeFactory

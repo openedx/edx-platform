@@ -40,8 +40,15 @@ oauthlib==2.1.0
 # pytest-randomly dropped support for Python 2 with 2.0.0, and only supports Python 3.4+
 pytest-randomly<2.0.0
 
-# Tornado dropped support for Python 2.7 and 3.4 with version 6.0. Only Python 3.5.2+ is now supported
-tornado<6.0
-
 # python3-saml 1.6.0 breaks unittests in common/djangoapps/third_party_auth/tests/test_views.py::SAMLMetadataTest
 python3-saml==1.5.0
+
+# version 1.3.0 breaks make upgrade, as it requires py3.5 or above
+scipy<=1.2.1
+
+# Unless we constrain pytest to <4.6.0, it may break all tests inside of
+# xmodule.tests.test_resource_templates.ResourceTemplatesTests See TE-2391 for details.
+pytest<4.6.0
+
+# Pinning to older version of edx-rbac until ENT-2002 is resolved.
+edx-rbac==0.2.1

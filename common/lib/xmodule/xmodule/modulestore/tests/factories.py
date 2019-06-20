@@ -284,9 +284,14 @@ class ItemFactory(XModuleFactory):
     category = 'chapter'
     parent = None
 
+    descriptive_tag = None
+
     @lazy_attribute_sequence
     def display_name(self, n):
-        return "{} {}".format(self.category, n)
+        if self.descriptive_tag:
+            return "{} {} - {}".format(self.category, n, self.descriptive_tag)
+        else:
+            return "{} {}".format(self.category, n)
 
     @lazy_attribute
     def location(self):
@@ -354,6 +359,10 @@ class ItemFactory(XModuleFactory):
         location = kwargs.pop('location')
         user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
         publish_item = kwargs.pop('publish_item', True)
+
+        # Remove the descriptive_tag, it's just for generating display_name,
+        # and doesn't need to be passed into the object constructor
+        kwargs.pop('descriptive_tag')
 
         assert isinstance(location, UsageKey)
         assert location != parent_location

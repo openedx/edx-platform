@@ -1,6 +1,8 @@
 """
 Dummy factories for tests
 """
+from __future__ import absolute_import
+
 from factory import Sequence, SubFactory
 from factory.django import DjangoModelFactory
 

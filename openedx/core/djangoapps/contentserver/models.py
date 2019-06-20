@@ -2,6 +2,10 @@
 Models for contentserver
 """
 
+from __future__ import absolute_import
+
+import six
+
 from config_models.models import ConfigurationModel
 from django.db.models.fields import PositiveIntegerField, TextField
 
@@ -30,7 +34,7 @@ class CourseAssetCacheTtlConfig(ConfigurationModel):
         return '<CourseAssetCacheTtlConfig(cache_ttl={})>'.format(self.get_cache_ttl())
 
     def __unicode__(self):
-        return unicode(repr(self))
+        return six.text_type(repr(self))
 
 
 class CdnUserAgentsConfig(ConfigurationModel):
@@ -57,4 +61,4 @@ class CdnUserAgentsConfig(ConfigurationModel):
         return '<WhitelistedCdnConfig(cdn_user_agents={})>'.format(self.get_cdn_user_agents())
 
     def __unicode__(self):
-        return unicode(repr(self))
+        return six.text_type(repr(self))

@@ -1,6 +1,8 @@
 """
 Django views for the Notifier.
 """
+from __future__ import absolute_import
+
 from django.contrib.auth.models import User
 from rest_framework import pagination
 from rest_framework.response import Response

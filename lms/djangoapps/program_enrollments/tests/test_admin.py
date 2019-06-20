@@ -1,14 +1,14 @@
 """
 Unit tests for the ProgramEnrollment admin classes.
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
+import mock
 from django.contrib.admin.sites import AdminSite
 from django.test import TestCase
-import mock
 
-from lms.djangoapps.program_enrollments.admin import ProgramEnrollmentAdmin, ProgramCourseEnrollmentAdmin
-from lms.djangoapps.program_enrollments.models import ProgramEnrollment, ProgramCourseEnrollment
+from lms.djangoapps.program_enrollments.admin import ProgramCourseEnrollmentAdmin, ProgramEnrollmentAdmin
+from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 
 
 class ProgramEnrollmentAdminTests(TestCase):

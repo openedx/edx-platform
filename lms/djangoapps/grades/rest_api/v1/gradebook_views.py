@@ -1,51 +1,46 @@
 """
 Defines an endpoint for gradebook data related to a course.
 """
+from __future__ import absolute_import
+
 import logging
 from collections import namedtuple
 from contextlib import contextmanager
 from functools import wraps
 
+import six
+from django.db.models import Q
 from django.urls import reverse
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from six import text_type
-from util.date_utils import to_timestamp
 
 from courseware.courses import get_course_by_id
-from lms.djangoapps.grades.api import (
-    CourseGradeFactory,
-    is_writable_gradebook_enabled,
-    prefetch_course_and_subsection_grades,
-    clear_prefetched_course_and_subsection_grades,
-    constants as grades_constants,
-    context as grades_context,
-    events as grades_events,
-)
+from lms.djangoapps.grades.api import CourseGradeFactory, clear_prefetched_course_and_subsection_grades
+from lms.djangoapps.grades.api import constants as grades_constants
+from lms.djangoapps.grades.api import context as grades_context
+from lms.djangoapps.grades.api import events as grades_events
+from lms.djangoapps.grades.api import is_writable_gradebook_enabled, prefetch_course_and_subsection_grades
 from lms.djangoapps.grades.course_data import CourseData
+from lms.djangoapps.grades.grade_utils import are_grades_frozen
 # TODO these imports break abstraction of the core Grades layer. This code needs
 # to be refactored so Gradebook views only access public Grades APIs.
 from lms.djangoapps.grades.models import (
     PersistentSubsectionGrade,
     PersistentSubsectionGradeOverride,
-    PersistentSubsectionGradeOverrideHistory,
+    PersistentSubsectionGradeOverrideHistory
 )
 from lms.djangoapps.grades.rest_api.serializers import (
     StudentGradebookEntrySerializer,
-    SubsectionGradeResponseSerializer,
+    SubsectionGradeResponseSerializer
 )
-from lms.djangoapps.grades.rest_api.v1.utils import (
-    USER_MODEL,
-    CourseEnrollmentPagination,
-    GradeViewMixin,
-)
+from lms.djangoapps.grades.rest_api.v1.utils import USER_MODEL, CourseEnrollmentPagination, GradeViewMixin
 from lms.djangoapps.grades.subsection_grade import CreateSubsectionGrade
 from lms.djangoapps.grades.tasks import recalculate_subsection_grade_v3
-from lms.djangoapps.grades.grade_utils import are_grades_frozen
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.util.forms import to_bool
 from openedx.core.lib.api.view_utils import (
@@ -53,7 +48,7 @@ from openedx.core.lib.api.view_utils import (
     PaginatedAPIView,
     get_course_key,
     verify_course_exists,
-    view_auth_classes,
+    view_auth_classes
 )
 from openedx.core.lib.cache_utils import request_cached
 from student.auth import has_course_author_access
@@ -65,6 +60,7 @@ from track.event_transaction_utils import (
     get_event_transaction_type,
     set_event_transaction_type
 )
+from util.date_utils import to_timestamp
 from xmodule.modulestore.django import modulestore
 from xmodule.util.misc import get_default_short_labeler
 
@@ -337,12 +333,15 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
     **Example Request**
         GET /api/grades/v1/gradebook/{course_id}/                       - Get gradebook entries for all users in course
         GET /api/grades/v1/gradebook/{course_id}/?username={username}   - Get grades for specific user in course
+        GET /api/grades/v1/gradebook/{course_id}/?user_contains={user_contains}
         GET /api/grades/v1/gradebook/{course_id}/?username_contains={username_contains}
         GET /api/grades/v1/gradebook/{course_id}/?cohort_id={cohort_id}
         GET /api/grades/v1/gradebook/{course_id}/?enrollment_mode={enrollment_mode}
     **GET Parameters**
         A GET request may include the following query parameters.
         * username:  (optional) A string representation of a user's username.
+        * user_contains: (optional) A substring against which a case-insensitive substring filter will be performed
+          on the USER_MODEL.username, or the USER_MODEL.email, or the PROGRAM_ENROLLMENT.external_user_key fields.
         * username_contains: (optional) A substring against which a case-insensitive substring filter will be performed
           on the USER_MODEL.username field.
         * cohort_id: (optional) The id of a cohort in this course.  If present, will return grades
@@ -489,7 +488,16 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
         user_entry['user_id'] = user.id
         user_entry['full_name'] = user.get_full_name()
 
+        external_user_key = self._get_external_user_key(user, course.id)
+        if external_user_key:
+            user_entry['external_user_key'] = external_user_key
+
         return user_entry
+
+    @staticmethod
+    def _get_external_user_key(user, course_id):
+        program_enrollment = CourseEnrollment.get_program_enrollment(user, course_id)
+        return getattr(program_enrollment, 'external_user_key', None)
 
     @verify_course_exists
     @verify_writable_gradebook_enabled
@@ -520,22 +528,28 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             serializer = StudentGradebookEntrySerializer(entry)
             return Response(serializer.data)
         else:
-            filter_kwargs = {}
-            related_models = []
+            q_objects = []
+            if request.GET.get('user_contains'):
+                search_term = request.GET.get('user_contains')
+                q_objects.append(
+                    Q(user__username__icontains=search_term) |
+                    Q(programcourseenrollment__program_enrollment__external_user_key__icontains=search_term) |
+                    Q(user__email__icontains=search_term)
+                )
             if request.GET.get('username_contains'):
-                filter_kwargs['user__username__icontains'] = request.GET.get('username_contains')
-                related_models.append('user')
+                q_objects.append(Q(user__username__icontains=request.GET.get('username_contains')))
             if request.GET.get('cohort_id'):
                 cohort = cohorts.get_cohort_by_id(course_key, request.GET.get('cohort_id'))
                 if cohort:
-                    filter_kwargs['user__in'] = cohort.users.all()
+                    q_objects.append(Q(user__in=cohort.users.all()))
                 else:
-                    filter_kwargs['user__in'] = []
+                    q_objects.append(Q(user__in=[]))
             if request.GET.get('enrollment_mode'):
-                filter_kwargs['mode'] = request.GET.get('enrollment_mode')
+                q_objects.append(Q(mode=request.GET.get('enrollment_mode')))
 
             entries = []
-            users = self._paginate_users(course_key, filter_kwargs, related_models)
+            related_models = ['user']
+            users = self._paginate_users(course_key, q_objects, related_models)
 
             with bulk_gradebook_view_context(course_key, users):
                 for user, course_grade, exc in CourseGradeFactory().iter(
@@ -740,8 +754,8 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
                 only_if_higher=False,
                 expected_modified_time=to_timestamp(override.modified),
                 score_deleted=False,
-                event_transaction_id=unicode(get_event_transaction_id()),
-                event_transaction_type=unicode(get_event_transaction_type()),
+                event_transaction_id=six.text_type(get_event_transaction_id()),
+                event_transaction_type=six.text_type(get_event_transaction_type()),
                 score_db_table=grades_constants.ScoreDatabaseTableEnum.overrides,
                 force_update_subsections=True,
             )

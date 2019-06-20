@@ -3,14 +3,17 @@
 A mixin class for LTI 2.0 functionality.  This is really just done to refactor the code to
 keep the LTIModule class from getting too big
 """
+from __future__ import absolute_import
+
 import base64
 import hashlib
 import json
 import logging
 import re
-import urllib
 
 import mock
+import six
+import six.moves.urllib.parse
 from oauthlib.oauth1 import Client
 from six import text_type
 from webob import Response
@@ -106,16 +109,16 @@ class LTI20ModuleMixin(object):
         """
         sha1 = hashlib.sha1()
         sha1.update(request.body)
-        oauth_body_hash = unicode(base64.b64encode(sha1.digest()))
+        oauth_body_hash = six.text_type(base64.b64encode(sha1.digest()))
         log.debug("[LTI] oauth_body_hash = {}".format(oauth_body_hash))
         client_key, client_secret = self.get_client_key_secret()
         client = Client(client_key, client_secret)
         mock_request = mock.Mock(
-            uri=unicode(urllib.unquote(request.url)),
+            uri=six.text_type(six.moves.urllib.parse.unquote(request.url)),
             headers=request.headers,
             body=u"",
             decoded_body=u"",
-            http_method=unicode(request.method),
+            http_method=six.text_type(request.method),
         )
         params = client.get_oauth_params(mock_request)
         mock_request.oauth_params = params

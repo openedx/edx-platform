@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """Tests for static_replace"""
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import re
 from cStringIO import StringIO
-from urlparse import parse_qsl, urlparse, urlunparse
+from six.moves.urllib.parse import parse_qsl, urlparse, urlunparse
 
 import ddt
 import pytest

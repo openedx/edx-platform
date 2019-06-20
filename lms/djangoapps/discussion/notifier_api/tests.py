@@ -1,8 +1,11 @@
 # pylint: disable=missing-docstring
 from __future__ import absolute_import
+
 import itertools
 
 import ddt
+import six
+from six.moves import range
 from django.conf import settings
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
@@ -20,8 +23,6 @@ from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-import six
-from six.moves import range
 
 
 @ddt.ddt

@@ -60,6 +60,7 @@ can't yet be deleted, for example if there are straggling course overrides.
     than implicit.
 
 """
+from __future__ import absolute_import
 import crum
 import logging
 from abc import ABCMeta
@@ -74,7 +75,7 @@ from openedx.core.lib.cache_utils import get_cache as get_request_cache
 log = logging.getLogger(__name__)
 
 
-class WaffleNamespace(object):
+class WaffleNamespace(six.with_metaclass(ABCMeta, object)):
     """
     A base class for a request cached namespace for waffle flags/switches.
 
@@ -82,7 +83,6 @@ class WaffleNamespace(object):
     (e.g. "course_experience"), and can be used to work with a set of
     flags or switches that will all share this namespace.
     """
-    __metaclass__ = ABCMeta
 
     def __init__(self, name, log_prefix=None):
         """
@@ -216,14 +216,13 @@ class WaffleSwitch(object):
             yield
 
 
-class WaffleFlagNamespace(WaffleNamespace):
+class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
     """
     Provides a single namespace for a set of waffle flags.
 
     All namespaced flag values are stored in a single request cache containing
     all flags for all namespaces.
     """
-    __metaclass__ = ABCMeta
 
     @property
     def _cached_flags(self):
@@ -371,7 +370,7 @@ class CourseWaffleFlag(WaffleFlag):
             """
             # Import is placed here to avoid model import at project startup.
             from .models import WaffleFlagCourseOverrideModel
-            cache_key = u'{}.{}'.format(namespaced_flag_name, unicode(course_key))
+            cache_key = u'{}.{}'.format(namespaced_flag_name, six.text_type(course_key))
             force_override = self.waffle_namespace._cached_flags.get(cache_key)
 
             if force_override is None:

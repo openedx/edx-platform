@@ -2,7 +2,10 @@
 Tests for the LTI outcome service handlers, both in outcomes.py and in tasks.py
 """
 
+from __future__ import absolute_import
+
 import ddt
+import six
 from django.test import TestCase
 from mock import MagicMock, patch
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
@@ -121,7 +124,7 @@ class SendCompositeOutcomeTest(BaseOutcomeTest):
     def test_outcome_with_score_score(self, earned, possible, expected):
         self.course_grade.score_for_module = MagicMock(return_value=(earned, possible))
         tasks.send_composite_outcome(
-            self.user.id, unicode(self.course_key), self.assignment.id, 1
+            self.user.id, six.text_type(self.course_key), self.assignment.id, 1
         )
         self.send_score_update_mock.assert_called_once_with(self.assignment, expected)
 
@@ -129,6 +132,6 @@ class SendCompositeOutcomeTest(BaseOutcomeTest):
         self.assignment.version_number = 2
         self.assignment.save()
         tasks.send_composite_outcome(
-            self.user.id, unicode(self.course_key), self.assignment.id, 1
+            self.user.id, six.text_type(self.course_key), self.assignment.id, 1
         )
         self.assertEqual(self.course_grade_mock.call_count, 0)

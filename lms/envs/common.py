@@ -197,6 +197,18 @@ FEATURES = {
     # Toggle to enable certificates of courses on dashboard
     'ENABLE_VERIFIED_CERTIFICATES': False,
 
+    # .. toggle_name: DISABLE_HONOR_CERTIFICATES
+    # .. toggle_type: feature_flag
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to disable honor certificates. Typically used when your installation only allows verified certificates, like courses.edx.org.
+    # .. toggle_category: certificates
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2019-05-14
+    # .. toggle_expiration_date: None
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/PROD-269
+    # .. toggle_status: supported
+    'DISABLE_HONOR_CERTIFICATES': False,  # Toggle to disable honor certificates
+
     # for acceptance and load testing
     'AUTOMATIC_AUTH_FOR_TESTING': False,
 
@@ -433,7 +445,10 @@ XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 # Used with Email sending
 RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS = 5
 RETRY_ACTIVATION_EMAIL_TIMEOUT = 0.5
-
+PASSWORD_RESET_EMAIL_RATE_LIMIT = {
+    'no_of_emails': 1,
+    'per_seconds': 60
+}
 # Deadline message configurations
 COURSE_MESSAGE_ALERT_DURATION_IN_DAYS = 14
 
@@ -574,7 +589,6 @@ def _make_mako_template_dirs(settings):
 CONTEXT_PROCESSORS = [
     'django.template.context_processors.request',
     'django.template.context_processors.static',
-    'django.contrib.messages.context_processors.messages',
     'django.template.context_processors.i18n',
     'django.contrib.auth.context_processors.auth',  # this is required for admin
     'django.template.context_processors.csrf',
@@ -1323,6 +1337,9 @@ MIDDLEWARE_CLASSES = [
     'edx_rest_framework_extensions.middleware.RequestMetricsMiddleware',
 
     'edx_rest_framework_extensions.auth.jwt.middleware.EnsureJWTAuthSettingsMiddleware',
+
+    # Handles automatically storing user ids in django-simple-history tables when possible.
+    'simple_history.middleware.HistoryRequestMiddleware',
 
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
@@ -2142,7 +2159,7 @@ INSTALLED_APPS = [
     'course_modes.apps.CourseModesConfig',
 
     # Enrollment API
-    'enrollment',
+    'openedx.core.djangoapps.enrollments',
 
     # Entitlement API
     'entitlements.apps.EntitlementsConfig',
@@ -2266,7 +2283,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.waffle_utils',
 
     # Course Goals
-    'lms.djangoapps.course_goals',
+    'lms.djangoapps.course_goals.apps.CourseGoalsConfig',
 
     # Features
     'openedx.features.course_bookmarks',
@@ -2276,6 +2293,7 @@ INSTALLED_APPS = [
     'openedx.features.learner_profile',
     'openedx.features.course_duration_limits',
     'openedx.features.content_type_gating',
+    'openedx.features.discounts',
 
     'experiments',
 
@@ -2465,6 +2483,14 @@ VERIFY_STUDENT = {
     # The variable represents the window within which a verification is considered to be "expiring soon."
     "EXPIRING_SOON_WINDOW": 28,
 }
+
+################# Student Verification Expiry Email #################
+VERIFICATION_EXPIRY_EMAIL = {
+    "RESEND_DAYS": 15,
+    "DAYS_RANGE": 1,
+    "DEFAULT_EMAILS": 2,
+}
+
 DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH = "verify_student_disable_account_activation_requirement"
 
 ### This enables the Metrics tab for the Instructor dashboard ###########
@@ -2865,6 +2891,7 @@ OPTIONAL_APPS = [
     ('integrated_channels.integrated_channel', None),
     ('integrated_channels.degreed', None),
     ('integrated_channels.sap_success_factors', None),
+    ('integrated_channels.cornerstone', None),
     ('integrated_channels.xapi', None),
 
     # Required by the Enterprise App
@@ -3169,6 +3196,12 @@ JWT_AUTH = {
     'JWT_AUDIENCE': 'change-me',
 }
 
+EDX_DRF_EXTENSIONS = {
+    # Set this value to an empty dict in order to prevent automatically updating
+    # user data from values in (possibly stale) JWTs.
+    'JWT_PAYLOAD_USER_ATTRIBUTE_MAPPING': {},
+}
+
 ################################ Settings for Microsites ################################
 
 ### Select an implementation for the microsite backend
@@ -3350,7 +3383,9 @@ SYSTEM_TO_FEATURE_ROLE_MAPPING = {
     ],
 }
 
-DATA_CONSENT_SHARE_CACHE_TIMEOUT = None  # Never expire
+DATA_CONSENT_SHARE_CACHE_TIMEOUT = 8 * 60 * 60  # 8 hours
+
+ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
 
 ############## Settings for Course Enrollment Modes ######################
 # The min_price key refers to the minimum price allowed for an instance

@@ -1,18 +1,20 @@
 # pylint: skip-file
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
 import datetime
 import json
 
 import ddt
 import mock
-
-from django.urls import reverse
 from django.test import RequestFactory, TestCase
+from django.urls import reverse
 from edx_django_utils.cache import RequestCache
 from mock import Mock, patch
 from pytz import UTC
 from six import text_type
 
+import lms.djangoapps.discussion.django_comment_client.utils as utils
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.tabs import get_course_tab_list
@@ -21,17 +23,19 @@ from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from lms.djangoapps.discussion.django_comment_client.tests.unicode import UnicodeTestMixin
 from lms.djangoapps.discussion.django_comment_client.tests.utils import config_course_discussions, topic_name_to_id
-import lms.djangoapps.discussion.django_comment_client.utils as utils
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory, config_course_cohorts
-from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientMaintenanceError, perform_request
+from openedx.core.djangoapps.django_comment_common.comment_client.utils import (
+    CommentClientMaintenanceError,
+    perform_request
+)
 from openedx.core.djangoapps.django_comment_common.models import (
     CourseDiscussionSettings,
-    ForumsConfig,
-    assign_role,
     DiscussionsIdMapping,
+    ForumsConfig,
+    assign_role
 )
 from openedx.core.djangoapps.django_comment_common.utils import (
     get_course_discussion_settings,
@@ -1680,14 +1684,8 @@ class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
         # Create course, seed permissions roles, and create team
         self.course = CourseFactory.create()
         seed_permissions_roles(self.course.id)
-        verified_coursemode = CourseModeFactory.create(
-            course_id=self.course.id,
-            mode_slug=CourseMode.VERIFIED
-        )
-        audit_coursemode = CourseModeFactory.create(
-            course_id=self.course.id,
-            mode_slug=CourseMode.AUDIT
-        )
+        verified_coursemode = CourseMode.VERIFIED
+        audit_coursemode = CourseMode.AUDIT
 
         # Create four users: group_moderator (who is within the verified enrollment track and in the cohort),
         # verified_user (who is in the verified enrollment track but not the cohort),
@@ -1773,18 +1771,6 @@ class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
         set_discussion_division_settings(self.course.id, enable_cohorts=True,
                                          division_scheme=CourseDiscussionSettings.COHORT)
         content = {'user_id': self.cohorted_user.id, 'type': 'thread', 'username': self.cohorted_user.username}
-        self.assertEqual(utils.get_ability(self.course.id, content, self.group_moderator), {
-            'editable': True,
-            'can_reply': True,
-            'can_delete': True,
-            'can_openclose': True,
-            'can_vote': True,
-            'can_report': True
-        })
-        RequestCache.clear_all_namespaces()
-
-        set_discussion_division_settings(self.course.id, division_scheme=CourseDiscussionSettings.ENROLLMENT_TRACK)
-        content = {'user_id': self.verified_user.id, 'type': 'thread', 'username': self.verified_user.username}
         self.assertEqual(utils.get_ability(self.course.id, content, self.group_moderator), {
             'editable': True,
             'can_reply': True,

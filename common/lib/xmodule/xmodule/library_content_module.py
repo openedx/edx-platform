@@ -2,23 +2,27 @@
 """
 LibraryContent: The XBlock used to include blocks from a library in a course.
 """
+from __future__ import absolute_import
+
 import json
 import logging
 import random
 from copy import copy
 from gettext import ngettext
 
+from pkg_resources import resource_string
+
+import six
+from capa.responsetypes import registry
 from lazy import lazy
 from lxml import etree
 from opaque_keys.edx.locator import LibraryLocator
-from pkg_resources import resource_string
 from six import text_type
+from six.moves import zip
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlock
 from xblock.fields import Integer, List, Scope, String
-
-from capa.responsetypes import registry
 from xmodule.studio_editable import StudioEditableDescriptor, StudioEditableModule
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.x_module import STUDENT_VIEW, XModule
@@ -154,40 +158,37 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         """
         rand = random.Random()
 
-        selected_keys = set(tuple(k) for k in selected)  # set of (block_type, block_id) tuples assigned to this student
+        selected = set(tuple(k) for k in selected)  # set of (block_type, block_id) tuples assigned to this student
 
         # Determine which of our children we will show:
         valid_block_keys = set([(c.block_type, c.block_id) for c in children])
 
         # Remove any selected blocks that are no longer valid:
-        invalid_block_keys = (selected_keys - valid_block_keys)
+        invalid_block_keys = (selected - valid_block_keys)
         if invalid_block_keys:
-            selected_keys -= invalid_block_keys
+            selected -= invalid_block_keys
 
         # If max_count has been decreased, we may have to drop some previously selected blocks:
         overlimit_block_keys = set()
-        if len(selected_keys) > max_count:
-            num_to_remove = len(selected_keys) - max_count
-            overlimit_block_keys = set(rand.sample(selected_keys, num_to_remove))
-            selected_keys -= overlimit_block_keys
+        if len(selected) > max_count:
+            num_to_remove = len(selected) - max_count
+            overlimit_block_keys = set(rand.sample(selected, num_to_remove))
+            selected -= overlimit_block_keys
 
         # Do we have enough blocks now?
-        num_to_add = max_count - len(selected_keys)
+        num_to_add = max_count - len(selected)
 
         added_block_keys = None
         if num_to_add > 0:
             # We need to select [more] blocks to display to this user:
-            pool = valid_block_keys - selected_keys
+            pool = valid_block_keys - selected
             if mode == "random":
                 num_to_add = min(len(pool), num_to_add)
                 added_block_keys = set(rand.sample(pool, num_to_add))
                 # We now have the correct n random children to show for this user.
             else:
                 raise NotImplementedError("Unsupported mode.")
-            selected_keys |= added_block_keys
-
-        if any([invalid_block_keys, overlimit_block_keys, added_block_keys]):
-            selected = selected_keys
+            selected |= added_block_keys
 
         return {
             'selected': selected,
@@ -201,7 +202,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         Helper method to publish an event for analytics purposes
         """
         event_data = {
-            "location": unicode(self.location),
+            "location": six.text_type(self.location),
             "result": result,
             "previous_count": getattr(self, "_last_event_result_count", len(self.selected)),
             "max_count": self.max_count,
@@ -267,15 +268,19 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
 
     def selected_children(self):
         """
-        Returns a list() of block_ids indicating which of the possible children
+        Returns a set() of block_ids indicating which of the possible children
         have been selected to display to the current user.
 
         This reads and updates the "selected" field, which has user_state scope.
 
-        Note: the return value (self.selected) contains block_ids. To get
+        Note: self.selected and the return value contain block_ids. To get
         actual BlockUsageLocators, it is necessary to use self.children,
         because the block_ids alone do not specify the block type.
         """
+        if hasattr(self, "_selected_set"):
+            # Already done:
+            return self._selected_set  # pylint: disable=access-member-before-definition
+
         block_keys = self.make_selection(self.selected, self.children, self.max_count, "random")  # pylint: disable=no-member
 
         # Publish events for analytics purposes:
@@ -287,13 +292,13 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             self._publish_event,
         )
 
-        if any(block_keys[changed] for changed in ('invalid', 'overlimit', 'added')):
-            # Save our selections to the user state, to ensure consistency:
-            selected = list(block_keys['selected'])
-            random.shuffle(selected)
-            self.selected = selected  # TODO: this doesn't save from the LMS "Progress" page.
+        # Save our selections to the user state, to ensure consistency:
+        selected = block_keys['selected']
+        self.selected = list(selected)  # TODO: this doesn't save from the LMS "Progress" page.
+        # Cache the results
+        self._selected_set = selected  # pylint: disable=attribute-defined-outside-init
 
-        return self.selected
+        return selected
 
     def _get_selected_child_blocks(self):
         """
@@ -303,7 +308,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         for block_type, block_id in self.selected_children():
             child = self.runtime.get_block(self.location.course_key.make_usage_key(block_type, block_id))
             if child is None:
-                logger.info("Child not found for {} {}".format(str(block_type), str(block_id)))
+                logger.info("Child not found for %s %s", str(block_type), str(block_id))
             yield child
 
     def student_view(self, context):
@@ -441,7 +446,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         """
         Copy any overrides the user has made on blocks in this library.
         """
-        for field in source.fields.itervalues():
+        for field in six.itervalues(source.fields):
             if field.scope == Scope.settings and field.is_set_on(source):
                 setattr(dest, field.name, field.read_from(source))
         if source.has_children:
@@ -478,7 +483,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         """
         latest_version = lib_tools.get_library_version(library_key)
         if latest_version is not None:
-            if version is None or version != unicode(latest_version):
+            if version is None or version != six.text_type(latest_version):
                 validation.set_summary(
                     StudioValidationMessage(
                         StudioValidationMessage.WARNING,
@@ -588,13 +593,13 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         all_libraries = [
             (key, name) for key, name in lib_tools.list_available_libraries()
-            if user_perms.can_read(key) or self.source_library_id == unicode(key)
+            if user_perms.can_read(key) or self.source_library_id == six.text_type(key)
         ]
         all_libraries.sort(key=lambda entry: entry[1])  # Sort by name
         if self.source_library_id and self.source_library_key not in [entry[0] for entry in all_libraries]:
             all_libraries.append((self.source_library_id, _(u"Invalid Library")))
         all_libraries = [(u"", _("No Library Selected"))] + all_libraries
-        values = [{"display_name": name, "value": unicode(key)} for key, name in all_libraries]
+        values = [{"display_name": name, "value": six.text_type(key)} for key, name in all_libraries]
         return values
 
     def editor_saved(self, user, old_metadata, old_content):
@@ -647,11 +652,11 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         for child in self.get_children():
             self.runtime.add_block_as_child_node(child, xml_object)
         # Set node attributes based on our fields.
-        for field_name, field in self.fields.iteritems():  # pylint: disable=no-member
+        for field_name, field in six.iteritems(self.fields):  # pylint: disable=no-member
             if field_name in ('children', 'parent', 'content'):
                 continue
             if field.is_set_on(self):
-                xml_object.set(field_name, unicode(field.read_from(self)))
+                xml_object.set(field_name, six.text_type(field.read_from(self)))
         return xml_object
 
 

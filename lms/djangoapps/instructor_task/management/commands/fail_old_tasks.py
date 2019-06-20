@@ -1,4 +1,7 @@
-from __future__ import print_function, unicode_literals
+"""
+Commands to fail old tasks
+"""
+from __future__ import absolute_import, print_function, unicode_literals
 
 from datetime import datetime
 

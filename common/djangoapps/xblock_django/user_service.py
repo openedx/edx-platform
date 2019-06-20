@@ -1,12 +1,15 @@
 """
 Support for converting a django user to an XBlock user
 """
+from __future__ import absolute_import
+
 from django.contrib.auth.models import User
 from opaque_keys.edx.keys import CourseKey
 from xblock.reference.user_service import UserService, XBlockUser
 
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from student.models import anonymous_id_for_user, get_user_by_username_or_email
+
 
 ATTR_KEY_IS_AUTHENTICATED = 'edx-platform.is_authenticated'
 ATTR_KEY_USER_ID = 'edx-platform.user_id'

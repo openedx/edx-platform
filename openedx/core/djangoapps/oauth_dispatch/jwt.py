@@ -1,19 +1,20 @@
 """Utilities for working with ID tokens."""
+from __future__ import absolute_import
+
 import json
 from time import time
 
 from django.conf import settings
+from edx_django_utils.monitoring import set_custom_metric
+from edx_rbac.utils import create_role_auth_claim_for_user
 from jwkest import jwk
 from jwkest.jws import JWS
 
-from edx_rbac.utils import create_role_auth_claim_for_user
-
-from edx_django_utils.monitoring import set_custom_metric
 from openedx.core.djangoapps.oauth_dispatch.toggles import ENFORCE_JWT_SCOPES
 from student.models import UserProfile, anonymous_id_for_user
 
 
-def create_jwt_for_user(user, secret=None, aud=None, additional_claims=None):
+def create_jwt_for_user(user, secret=None, aud=None, additional_claims=None, scopes=None):
     """
     Returns a JWT to identify the given user.
 
@@ -24,6 +25,8 @@ def create_jwt_for_user(user, secret=None, aud=None, additional_claims=None):
 
     Arguments:
         user (User): User for which to generate the JWT.
+        scopes (list): Optional. Scopes that limit access to the token bearer and
+            controls which optional claims are included in the token.
 
     Deprecated Arguments (to be removed):
         secret (string): Overrides configured JWT secret (signing) key.
@@ -33,6 +36,7 @@ def create_jwt_for_user(user, secret=None, aud=None, additional_claims=None):
     expires_in = settings.OAUTH_ID_TOKEN_EXPIRATION
     return _create_jwt(
         user,
+        scopes=scopes,
         expires_in=expires_in,
         aud=aud,
         additional_claims=additional_claims,
@@ -197,6 +201,7 @@ def _attach_profile_claim(payload, user):
         'family_name': user.last_name,
         'given_name': user.first_name,
         'administrator': user.is_staff,
+        'superuser': user.is_superuser,
     })
 
 

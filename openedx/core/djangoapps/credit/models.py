@@ -449,7 +449,7 @@ class CreditRequirementStatus(TimeStampedModel):
 
     class Meta(object):
         unique_together = ('username', 'requirement')
-        verbose_name_plural = _('Credit requirement statuses')
+        verbose_name_plural = ugettext_lazy('Credit requirement statuses')
 
     @classmethod
     def get_statuses(cls, requirements, username):
@@ -786,9 +786,9 @@ class CreditConfig(ConfigurationModel):
     CACHE_KEY = 'credit.providers.api.data'
 
     cache_ttl = models.PositiveIntegerField(
-        verbose_name=_("Cache Time To Live"),
+        verbose_name=ugettext_lazy("Cache Time To Live"),
         default=0,
-        help_text=_(
+        help_text=ugettext_lazy(
             "Specified in seconds. Enable caching by setting this to a value greater than 0."
         )
     )

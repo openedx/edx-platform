@@ -3,16 +3,20 @@
 Module for checking permissions with the comment_client backend
 """
 
+from __future__ import absolute_import
+
 import logging
 from types import NoneType
 
+import six
 from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
 from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.teams.models import CourseTeam
 from openedx.core.djangoapps.django_comment_common.comment_client import Thread
 from openedx.core.djangoapps.django_comment_common.models import (
-    CourseDiscussionSettings, all_permissions_for_user_in_course,
+    CourseDiscussionSettings,
+    all_permissions_for_user_in_course
 )
 from openedx.core.djangoapps.django_comment_common.utils import get_course_discussion_settings
 from openedx.core.lib.cache_utils import request_cached
@@ -137,7 +141,7 @@ def _check_conditions_permissions(user, permissions, course_id, content, user_gr
     """
 
     def test(user, per, operator="or"):
-        if isinstance(per, basestring):
+        if isinstance(per, six.string_types):
             if per in CONDITIONS:
                 return _check_condition(user, per, content)
             if 'group_' in per:

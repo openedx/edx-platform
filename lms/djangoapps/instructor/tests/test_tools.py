@@ -15,7 +15,7 @@ from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
-from edx_when import signals, api
+from edx_when import api, signals
 from edx_when.field_data import DateLookupFieldData
 from student.tests.factories import UserFactory
 from xmodule.fields import Date

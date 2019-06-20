@@ -11,6 +11,7 @@
 # JOHN MASANDA <translations_6@camara.ie>, 2017
 # Keith Magee <keithmagee@camara.ie>, 2016
 # Masoud Mohamed Ali <masoudali@camara.org>, 2016
+# Muhammad Adeel Khan <adeel@edx.org>, 2019
 # swaleh amin <mkupuofirstnameswaleh@yahoo.com>, 2016
 # swalehe manture <translations_3@camara.ie>, 2017
 # YAHAYA MWAVURIZI <translations_1@camara.ie>, 2017
@@ -24,6 +25,7 @@
 # Isihaka Issa <translations_8@camara.ie>, 2017
 # JOHN MASANDA <translations_6@camara.ie>, 2017
 # Mathieu Lacasse <mathieulacasse@camara.org>, 2017
+# Muhammad Adeel Khan <adeel@edx.org>, 2019
 # swaleh amin <mkupuofirstnameswaleh@yahoo.com>, 2016
 # swalehe manture <translations_3@camara.ie>, 2017
 # YAHAYA MWAVURIZI <translations_1@camara.ie>, 2017
@@ -69,7 +71,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-04-22 10:49+0000\n"
+"POT-Creation-Date: 2019-06-16 20:42+0000\n"
 "PO-Revision-Date: 2019-02-10 20:45+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Swahili (Kenya) (http://www.transifex.com/open-edx/edx-platform/language/sw_KE/)\n"
@@ -2358,16 +2360,66 @@ msgid "Course Name"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Not specific to a course"
+msgid ""
+"For inquiries regarding assignments, grades, or structure of a specific "
+"course, please post in the discussion forums for that course directly."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "What can we help you with, {username}?"
+msgid "Not specific to a course"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Subject"
+msgstr ""
+
+#: lms/templates/student_account/account_settings.underscore
+msgid "Account Settings"
+msgstr "Mikakati ya Akaunti"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Billing/Payment Options"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Certificates"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Course Content"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Deadlines"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Errors/Technical Issues"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Financial Aid"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Masters"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Photo Verification"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Proctoring"
+msgstr ""
+
+#: cms/templates/js/asset-library.underscore
+msgid "Other"
+msgstr "Nyingine"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "What can we help you with, {username}?"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
@@ -2401,7 +2453,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Enter a subject for your support request."
+msgid "Select a subject for your support request."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
@@ -4058,9 +4110,8 @@ msgid ""
 "are complete and correct."
 msgstr ""
 "Kosa limetokea wakti wa kuanza shughuli ya utoaji upya alama za swali '<%- "
-"swali_kitambulisho %>' kwa ajili ya mwanafunzi '<%- mwanafunzi_kitambulisho "
-"%>'. Hakikisha vitambuzi vya swali na mwanafunzi viko sahihi na "
-"vimekamilika."
+"problem_id %>' kwa ajili ya mwanafunzi '<%- student_id %>'. Hakikisha "
+"vitambuzi vya swali na mwanafunzi viko sahihi na vimekamilika."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Please enter a score."
@@ -4098,17 +4149,16 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Rescore problem '<%- problem_id %>' for all students?"
-msgstr ""
-"Toa upya alama za swali '<%- swali _kitambulisho %>' kwa ajili ya wanafunzi?"
+msgstr "Toa upya alama za swali '<%- problem_id %>' kwa ajili ya wanafunzi?"
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Successfully started task to rescore problem '<%- problem_id %>' for all "
 "students. Click the 'Show Task Status' button to see the status of the task."
 msgstr ""
-"Imefanikiwa kuanza kushughulikia utoaji upya alama za swali '<%- "
-"swali_kitambulisho %>' kwa ajili ya wanafunzi wote. Bofya kibonye cha 'Show "
-"Task Status' kuona shughuli inavyoendele."
+"Imefanikiwa kuanza kushughulikia utoaji upya alama za swali '<%- problem_id "
+"%>' kwa ajili ya wanafunzi wote. Bofya kibonye cha 'Show Task Status' kuona "
+"shughuli inavyoendele."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4116,8 +4166,7 @@ msgid ""
 " the problem identifier is complete and correct."
 msgstr ""
 "Kosa limetokea katika kuanza kushughulikia utoaji upya alama za swali '<%- "
-"swali_kitambulisho %>'. Hakikisha kitambuzi cha swali kiko sahihi na "
-"kimekamilika."
+"problem_id %>'. Hakikisha kitambuzi cha swali kiko sahihi na kimekamilika."
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
@@ -4558,9 +4607,9 @@ msgid ""
 "address is associated with your {platform_name} account, we will send a "
 "message with password recovery instructions to this email "
 "address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
-" message, verify that you entered the correct email address, or check your "
-"spam folder.{paragraphEnd}{paragraphStart}If you need further assistance, "
-"{anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
+" message after 1 minute, verify that you entered the correct email address, "
+"or check your spam folder.{paragraphEnd}{paragraphStart}If you need further "
+"assistance, {anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
 msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
@@ -5552,7 +5601,7 @@ msgstr "Tafadhali ingiza namba kamili isiyo hasi."
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Cannot drop more <%= types %> assignments than are assigned."
-msgstr "Haiwezi kutoa majaribio mengi zaidi <%=types%> ya yaliyotolewa."
+msgstr "Haiwezi kutoa majaribio mengi zaidi <%= types %> ya yaliyotolewa."
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
@@ -6288,7 +6337,7 @@ msgid "Upload your video thumbnail image."
 msgstr ""
 
 #: cms/static/js/views/show_textbook.js
-msgid "Delete “<%= name %>”?"
+msgid "Delete “<%- name %>”?"
 msgstr ""
 
 #: cms/static/js/views/show_textbook.js
@@ -7480,6 +7529,10 @@ msgid "Mark Exam As Completed"
 msgstr "Usahihishaji wa Mtihani 'umekamilika'"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
+msgid "You are taking \"{exam_link}\" as {exam_type}. "
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
 msgid "a timed exam"
 msgstr ""
 
@@ -8205,10 +8258,6 @@ msgstr "Unda upya Nywila"
 msgid "Switch Language Back"
 msgstr ""
 
-#: lms/templates/student_account/account_settings.underscore
-msgid "Account Settings"
-msgstr "Mikakati ya Akaunti"
-
 #: lms/templates/student_account/account_settings_section.underscore
 msgid "An error occurred. Please reload the page."
 msgstr "Hitilafu imetokea. Tafadhali pakia upya ukurasa."
@@ -8256,8 +8305,9 @@ msgid "Register with Institution/Campus Credentials"
 msgstr "Jisajili na Sifa/Hati za Taasisi/Chuo "
 
 #: lms/templates/student_account/institution_register.underscore
-msgid "Register through edX"
-msgstr "Jiandikishe kupitia edX"
+#: lms/templates/student_account/register.underscore
+msgid "Create an Account"
+msgstr ""
 
 #: lms/templates/student_account/login.underscore
 msgid "First time here?"
@@ -8364,10 +8414,6 @@ msgstr "Tengeneza akaunti ukitumia %(providerName)s."
 #: lms/templates/student_account/register.underscore
 msgid "or create a new one here"
 msgstr "au unda moja mpya hapa"
-
-#: lms/templates/student_account/register.underscore
-msgid "Create an Account"
-msgstr ""
 
 #: lms/templates/student_account/register.underscore
 msgid "Support education research by providing additional information"
@@ -9148,10 +9194,6 @@ msgstr "Kuchagulika"
 #: cms/templates/js/asset-library.underscore
 msgid "Show All"
 msgstr "Onesha Zote"
-
-#: cms/templates/js/asset-library.underscore
-msgid "Other"
-msgstr "Nyingine"
 
 #: cms/templates/js/asset-library.underscore
 msgid "You haven't added any assets to this course yet."

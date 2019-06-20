@@ -316,6 +316,10 @@ ENABLE_COMPREHENSIVE_THEMING = ENV_TOKENS.get('ENABLE_COMPREHENSIVE_THEMING', EN
 
 # Marketing link overrides
 MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
+ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = ENV_TOKENS.get(
+    'ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS',
+    ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS
+)
 
 # Intentional defaults.
 SUPPORT_SITE_LINK = ENV_TOKENS.get('SUPPORT_SITE_LINK', SUPPORT_SITE_LINK)
@@ -674,6 +678,7 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
         'social_core.backends.linkedin.LinkedinOAuth2',
         'social_core.backends.facebook.FacebookOAuth2',
         'social_core.backends.azuread.AzureADOAuth2',
+        'third_party_auth.identityserver3.IdentityServer3',
         'third_party_auth.saml.SAMLAuthBackend',
         'third_party_auth.lti.LTIAuthBackend',
     ])
@@ -1045,6 +1050,7 @@ COURSES_API_CACHE_TIMEOUT = ENV_TOKENS.get('COURSES_API_CACHE_TIMEOUT', COURSES_
 
 # Add an ICP license for serving content in China if your organization is registered to do so
 ICP_LICENSE = ENV_TOKENS.get('ICP_LICENSE', None)
+ICP_LICENSE_INFO = ENV_TOKENS.get('ICP_LICENSE_INFO', {})
 
 ############## Settings for CourseGraph ############################
 COURSEGRAPH_JOB_QUEUE = ENV_TOKENS.get('COURSEGRAPH_JOB_QUEUE', DEFAULT_PRIORITY_QUEUE)
@@ -1119,3 +1125,7 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_c
 ########################## Derive Any Derived Settings  #######################
 
 derive_settings(__name__)
+
+######################### Overriding custom enrollment roles ###############
+
+MANUAL_ENROLLMENT_ROLE_CHOICES = ENV_TOKENS.get('MANUAL_ENROLLMENT_ROLE_CHOICES', MANUAL_ENROLLMENT_ROLE_CHOICES)

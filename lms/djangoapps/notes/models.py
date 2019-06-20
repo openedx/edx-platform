@@ -1,9 +1,14 @@
+"""
+Notes models
+"""
+from __future__ import absolute_import
+
 import json
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.urls import reverse
 from django.db import models
+from django.urls import reverse
 from django.utils.html import strip_tags
 from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type

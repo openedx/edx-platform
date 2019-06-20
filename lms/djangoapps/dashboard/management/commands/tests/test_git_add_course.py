@@ -1,6 +1,8 @@
 """
 Provide tests for git_add_course management command.
 """
+from __future__ import absolute_import
+
 import logging
 import os
 import shutil
@@ -48,7 +50,7 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
     """
     Tests the git_add_course management command for proper functions.
     """
-    TEST_REPO = 'https://github.com/mitocw/edx4edx_lite.git'
+    TEST_REPO = 'https://github.com/edx/edx4edx_lite.git'
     TEST_COURSE = 'MITx/edx4edx/edx4edx'
     TEST_BRANCH = 'testing_do_not_delete'
     TEST_BRANCH_COURSE = CourseKey.from_string('MITx/edx4edx_branch/edx4edx')

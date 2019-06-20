@@ -1,11 +1,13 @@
+from __future__ import absolute_import
+
 import logging
-from exceptions import SerializationError
 
 from lxml import etree
 from xblock.fields import Scope, String
-
 from xmodule.editing_module import XMLEditingDescriptor
 from xmodule.xml_module import XmlDescriptor
+
+from .exceptions import SerializationError
 
 log = logging.getLogger(__name__)
 
@@ -78,7 +80,7 @@ class EmptyDataRawDescriptor(XmlDescriptor, XMLEditingDescriptor):
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
-        if len(xml_object) == 0 and len(xml_object.items()) == 0:
+        if len(xml_object) == 0 and len(list(xml_object.items())) == 0:
             return {'data': ''}, []
         return {'data': etree.tostring(xml_object, pretty_print=True, encoding='unicode')}, []
 

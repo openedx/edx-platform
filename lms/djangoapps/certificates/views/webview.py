@@ -2,24 +2,33 @@
 """
 Certificate HTML webview.
 """
+from __future__ import absolute_import
+
 import logging
-import urllib
 from datetime import datetime
 from uuid import uuid4
 
 import pytz
+import six
+import six.moves.urllib.error  # pylint: disable=import-error
+import six.moves.urllib.parse  # pylint: disable=import-error
+import six.moves.urllib.request  # pylint: disable=import-error
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import Http404, HttpResponse
 from django.template import RequestContext
-from django.utils.encoding import smart_str
 from django.utils import translation
+from django.utils.encoding import smart_str
 from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from badges.events.course_complete import get_completion_badge
 from badges.utils import badges_enabled
+from courseware.access import has_access
+from courseware.courses import get_course_by_id
+from edxmako.shortcuts import render_to_response
+from edxmako.template import Template
 from lms.djangoapps.certificates.api import (
     emit_certificate_event,
     get_active_web_certificate,
@@ -35,20 +44,15 @@ from lms.djangoapps.certificates.models import (
     CertificateStatuses,
     GeneratedCertificate
 )
-from courseware.access import has_access
-from courseware.courses import get_course_by_id
-from edxmako.shortcuts import render_to_response
-from edxmako.template import Template
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
+from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course, display_date_for_certificate
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.courses import course_image_url
-from openedx.core.djangoapps.certificates.api import display_date_for_certificate, certificates_viewable_for_course
 from student.models import LinkedInAddToProfileConfiguration
 from util import organizations_helpers as organization_api
 from util.date_utils import strftime_localized
 from util.views import handle_500
-
 
 log = logging.getLogger(__name__)
 _ = translation.ugettext
@@ -145,8 +149,7 @@ def _update_certificate_context(context, course, user_certificate, platform_name
                                                 u"certificates, which are awarded for course activities "
                                                 u"that {platform_name} students complete.").format(
         platform_name=platform_name,
-        tos_url=context.get('company_tos_url'),
-        verified_cert_url=context.get('company_verified_certificate_url'))
+    )
 
 
 def _update_context_with_basic_info(context, course_id, platform_name, configuration):
@@ -282,7 +285,7 @@ def _update_social_context(request, context, course, user, user_certificate, pla
     if context.get('twitter_share_enabled', False):
         twitter_url = 'https://twitter.com/intent/tweet?text={twitter_share_text}&url={share_url}'.format(
             twitter_share_text=smart_str(context['twitter_share_text']),
-            share_url=urllib.quote_plus(smart_str(share_url))
+            share_url=six.moves.urllib.parse.quote_plus(smart_str(share_url))
         )
     context['twitter_url'] = twitter_url
     context['linked_in_url'] = None
@@ -346,7 +349,7 @@ def _get_user_certificate(request, user, course_key, course, preview_mode=None):
                 modified_date = datetime.now().date()
             user_certificate = GeneratedCertificate(
                 mode=preview_mode,
-                verify_uuid=unicode(uuid4().hex),
+                verify_uuid=six.text_type(uuid4().hex),
                 modified_date=modified_date
             )
     elif certificates_viewable_for_course(course):
@@ -388,7 +391,7 @@ def _track_certificate_events(request, context, course, user, user_certificate):
                     'badge_generator': badge.backend,
                     'issuing_component': badge.badge_class.issuing_component,
                     'user_id': user.id,
-                    'course_id': unicode(course_key),
+                    'course_id': six.text_type(course_key),
                     'enrollment_mode': badge.badge_class.mode,
                     'assertion_id': badge.id,
                     'assertion_image_url': badge.image_url,
@@ -405,31 +408,11 @@ def _track_certificate_events(request, context, course, user, user_certificate):
 
     # track certificate evidence_visited event for analytics when certificate_user and accessing_user are different
     if request.user and request.user.id != user.id:
-        emit_certificate_event('evidence_visited', user, unicode(course.id), course, {
+        emit_certificate_event('evidence_visited', user, six.text_type(course.id), course, {
             'certificate_id': user_certificate.verify_uuid,
             'enrollment_mode': user_certificate.mode,
             'social_network': CertificateSocialNetworks.linkedin
         })
-
-
-def _update_configuration_context(context, configuration):
-    """
-    Site Configuration will need to be able to override any hard coded
-    content that was put into the context in the
-    _update_certificate_context() call above. For example the
-    'company_about_description' talks about edX, which we most likely
-    do not want to keep in configurations.
-    So we need to re-apply any configuration/content that
-    we are sourcing from the database. This is somewhat duplicative of
-    the code at the beginning of this method, but we
-    need the configuration at the top as some error code paths
-    require that to be set up early on in the pipeline
-    """
-
-    config_key = configuration_helpers.get_value('domain_prefix')
-    config = configuration.get("microsites", {})
-    if config_key and config:
-        context.update(config.get(config_key, {}))
 
 
 def _update_badge_context(context, course, user):
@@ -473,7 +456,7 @@ def render_cert_by_uuid(request, certificate_uuid):
             verify_uuid=certificate_uuid,
             status=CertificateStatuses.downloadable
         )
-        return render_html_view(request, certificate.user.id, unicode(certificate.course_id))
+        return render_html_view(request, certificate.user.id, six.text_type(certificate.course_id))
     except GeneratedCertificate.DoesNotExist:
         raise Http404
 
@@ -603,9 +586,6 @@ def render_html_view(request, user_id, course_id):
 
         # Append badge info
         _update_badge_context(context, course, user)
-
-        # Append site configuration overrides
-        _update_configuration_context(context, configuration)
 
         # Add certificate header/footer data to current context
         context.update(get_certificate_header_context(is_secure=request.is_secure()))

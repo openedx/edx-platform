@@ -5,6 +5,7 @@ import logging
 from openedx.core.djangoapps.catalog.utils import get_programs
 from organizations.models import Organization
 from social_django.models import UserSocialAuth
+from third_party_auth.models import SAMLProviderConfig
 
 log = logging.getLogger(__name__)
 
@@ -77,10 +78,16 @@ def get_user_by_organization(external_user_id, organization):
         ProviderDoesNotExistException if there is no SAML provider configured for the related organization.
     """
     try:
-        provider_slug = organization.samlproviderconfig.provider_id.strip('saml-')
-    except Organization.samlproviderconfig.RelatedObjectDoesNotExist:
+        provider_slug = organization.samlproviderconfig_set.current_set().get().provider_id.strip('saml-')
+    except SAMLProviderConfig.DoesNotExist:
         log.error(u'No SAML provider found for organization id [%s]', organization.id)
         raise ProviderDoesNotExistException
+    except SAMLProviderConfig.MultipleObjectsReturned:
+        log.error(
+            u'Multiple active SAML configurations found for organization=%s. Expected one.',
+            organization.short_name,
+        )
+        raise UserLookupException
 
     try:
         social_auth_uid = '{0}:{1}'.format(provider_slug, external_user_id)

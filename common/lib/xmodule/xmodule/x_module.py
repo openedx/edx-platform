@@ -1,44 +1,48 @@
+from __future__ import absolute_import
+
 import logging
 import os
 import sys
 import time
-import yaml
-
-from contracts import contract, new_contract
-from functools import partial
-from lxml import etree
 from collections import namedtuple
-from pkg_resources import (
-    resource_exists,
-    resource_listdir,
-    resource_string,
-    resource_isdir,
-)
+from functools import partial
+
+from pkg_resources import resource_exists, resource_isdir, resource_listdir, resource_string
+
+import six
+import yaml
+from contracts import contract, new_contract
+from lazy import lazy
+from lxml import etree
+from opaque_keys.edx.asides import AsideDefinitionKeyV2, AsideUsageKeyV2
+from opaque_keys.edx.keys import UsageKey
+from openedx.core.djangolib.markup import HTML
 from six import text_type
+from six.moves import map
 from web_fragments.fragment import Fragment
 from webob import Response
 from webob.multidict import MultiDict
-from lazy import lazy
-
 from xblock.core import XBlock, XBlockAside
 from xblock.fields import (
-    Scope, Integer, Float, List,
-    String, Dict, ScopeIds, Reference, ReferenceList,
-    ReferenceValueDict, UserScope
+    Dict,
+    Float,
+    Integer,
+    List,
+    Reference,
+    ReferenceList,
+    ReferenceValueDict,
+    Scope,
+    ScopeIds,
+    String,
+    UserScope
 )
-
-from xblock.runtime import Runtime, IdReader, IdGenerator
+from xblock.runtime import IdGenerator, IdReader, Runtime
 from xmodule import block_metadata_utils
-from xmodule.fields import RelativeTime
 from xmodule.errortracker import exc_info_to_str
+from xmodule.exceptions import UndefinedContext
+from xmodule.fields import RelativeTime
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.xmodule_django import add_webpack_to_fragment
-
-from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.asides import AsideUsageKeyV2, AsideDefinitionKeyV2
-from xmodule.exceptions import UndefinedContext
-
-from openedx.core.djangolib.markup import HTML
 
 log = logging.getLogger(__name__)
 
@@ -908,9 +912,9 @@ class XModuleToXBlockMixin(object):
         # WebOb requests have multiple entries for uploaded files.  handle_ajax
         # expects a single entry as a list.
         request_post = MultiDict(request.POST)
-        for key in set(request.POST.iterkeys()):
+        for key in set(six.iterkeys(request.POST)):
             if hasattr(request.POST[key], "file"):
-                request_post[key] = map(FileObjForWebobFiles, request.POST.getall(key))
+                request_post[key] = list(map(FileObjForWebobFiles, request.POST.getall(key)))
 
         response_data = self.handle_ajax(suffix, request_post)
         return Response(response_data, content_type='application/json', charset='UTF-8')
@@ -1239,7 +1243,7 @@ class XModuleDescriptor(XModuleDescriptorToXBlockMixin, HTMLSnippet, ResourceTem
     def __eq__(self, other):
         return (hasattr(other, 'scope_ids') and
                 self.scope_ids == other.scope_ids and
-                self.fields.keys() == other.fields.keys() and
+                list(self.fields.keys()) == list(other.fields.keys()) and
                 all(getattr(self, field.name) == getattr(other, field.name)
                     for field in self.fields.values()))
 
@@ -1718,7 +1722,7 @@ class XMLParsingSystem(DescriptorSystem):
         """
         course_key = xblock.scope_ids.usage_id.course_key
 
-        for field in xblock.fields.itervalues():
+        for field in six.itervalues(xblock.fields):
             if field.is_set_on(xblock):
                 field_value = getattr(xblock, field.name)
                 if field_value is None:
@@ -1728,8 +1732,8 @@ class XMLParsingSystem(DescriptorSystem):
                 elif isinstance(field, ReferenceList):
                     setattr(xblock, field.name, [self._make_usage_key(course_key, ele) for ele in field_value])
                 elif isinstance(field, ReferenceValueDict):
-                    for key, subvalue in field_value.iteritems():
-                        assert isinstance(subvalue, basestring)
+                    for key, subvalue in six.iteritems(field_value):
+                        assert isinstance(subvalue, six.string_types)
                         field_value[key] = self._make_usage_key(course_key, subvalue)
                     setattr(xblock, field.name, field_value)
 

@@ -1,25 +1,27 @@
+from __future__ import absolute_import
+
 from datetime import datetime
-from mock import Mock, patch
+
 from django.conf import settings
 from django.test import RequestFactory
+from mock import Mock, patch
+from opaque_keys.edx.keys import CourseKey
 
 from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
-from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, FULL_ACCESS, LIMITED_ACCESS
-from openedx.features.content_type_gating.partitions import (
-    create_content_gating_partition,
-    ContentTypeGatingPartition
-)
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from openedx.features.content_type_gating.partitions import ContentTypeGatingPartition, create_content_gating_partition
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from student.tests.factories import GroupFactory
-from xmodule.partitions.partitions import UserPartitionError, ENROLLMENT_TRACK_PARTITION_ID
+from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, UserPartitionError
 
 
 class TestContentTypeGatingPartition(CacheIsolationTestCase):
     def setUp(self):
         self.course_key = CourseKey.from_string('course-v1:test+course+key')
+        CourseOverviewFactory.create(id=self.course_key)
 
     def test_create_content_gating_partition_happy_path(self):
 
@@ -117,7 +119,7 @@ class TestContentTypeGatingPartition(CacheIsolationTestCase):
             message = partition.access_denied_message(mock_block.scope_ids.usage_id, global_staff, FULL_ACCESS, 'test_allowed_group')
             self.assertIsNone(message)
 
-    def test_acess_denied_fragment_for_null_request(self):
+    def test_access_denied_fragment_for_null_request(self):
         """
         Verifies the access denied fragment is visible when HTTP request is not available.
 

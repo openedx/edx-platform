@@ -3,11 +3,14 @@ This file contains tasks that are designed to perform background operations on t
 running state of a course.
 
 """
+from __future__ import absolute_import
+
 import logging
 from collections import OrderedDict
 from datetime import datetime
 from time import time
 
+import six
 import unicodecsv
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -52,7 +55,7 @@ def upload_course_survey_report(_xmodule_instance_args, _entry_id, course_id, _t
 
     for survey_field_record in survey_answers_for_course:
         user_id = survey_field_record.user.id
-        if user_id not in user_survey_answers.keys():
+        if user_id not in list(user_survey_answers.keys()):
             user_survey_answers[user_id] = {
                 'username': survey_field_record.user.username,
                 'email': survey_field_record.user.email
@@ -102,6 +105,8 @@ def upload_proctored_exam_results_report(_xmodule_instance_args, _entry_id, cour
     # Compute result table and format it
     query_features = [
         'course_id',
+        'provider',
+        'track',
         'exam_name',
         'username',
         'email',
@@ -117,6 +122,7 @@ def upload_proctored_exam_results_report(_xmodule_instance_args, _entry_id, cour
         'Rules Violation Count',
         'Rules Violation Comments'
     ]
+
     student_data = get_proctored_exam_results(course_id, query_features)
     header, rows = format_dictlist(student_data, query_features)
 
@@ -228,7 +234,7 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
             else status_dict[column_name]
             for column_name in output_header
         ]
-        for _cohort_name, status_dict in cohorts_status.iteritems()
+        for _cohort_name, status_dict in six.iteritems(cohorts_status)
     ]
     output_rows.insert(0, output_header)
     upload_csv_to_report_store(output_rows, 'cohort_results', course_id, start_date)

@@ -62,7 +62,7 @@ username = get_enterprise_learner_generic_name(request) or student.username
                 </div>
                 % endif
                 <h2 class="hd hd-2 progress-certificates-title">
-                    ${_("Course Progress for Student '{username}' ({email})").format(username=username, email=student.email)}
+                    ${_("Course Progress for '{username}' ({email})").format(username=username, email=student.email)}
                 </h2>
                 % if course_expiration_fragment:
                     ${HTML(course_expiration_fragment.content)}
@@ -191,7 +191,7 @@ username = get_enterprise_learner_generic_name(request) or student.username
                                             %if section.format is not None:
                                                 ${section.format}
                                             %endif
-                                            %if section.due is not None:
+                                            %if section.due is not None and pacing_type != 'self_paced':
                                                 <em class="localized-datetime" data-datetime="${section.due}" data-string="${_('due {date}')}" data-timezone="${user_timezone}" data-language="${user_language}"></em>
                                             %endif
                                         </p>

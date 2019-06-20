@@ -4,32 +4,34 @@ Views for login / logout and associated functionality
 Much of this file was broken out from views.py, previous history can be found there.
 """
 
+from __future__ import absolute_import
+
 import logging
 
 from django.conf import settings
-from django.contrib.auth import authenticate, login as django_login
+from django.contrib.auth import authenticate
+from django.contrib.auth import login as django_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from ratelimitbackend.exceptions import RateLimitException
 
-from edxmako.shortcuts import render_to_response
-from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies, refresh_jwt_cookies
-from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
-from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.util.user_messages import PageLevelMessages
-from openedx.core.djangolib.markup import HTML, Text
-from student.models import LoginFailures
-from student.views import send_reactivation_email_for_user
-from student.forms import send_password_reset_email_for_user
-from track import segment
 import third_party_auth
 from third_party_auth import pipeline, provider
+from edxmako.shortcuts import render_to_response
+from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_authn.cookies import refresh_jwt_cookies, set_logged_in_cookies
+from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
+from openedx.core.djangoapps.util.user_messages import PageLevelMessages
+from openedx.core.djangolib.markup import HTML, Text
+from student.forms import send_password_reset_email_for_user
+from student.models import LoginFailures
+from student.views import send_reactivation_email_for_user
+from track import segment
 from util.json_request import JsonResponse
 from util.password_policy_validators import normalize_password
 
@@ -189,7 +191,7 @@ def _authenticate_first_party(request, unauthenticated_user):
         raise AuthFailedError(_('Too many failed login attempts. Try again later.'))
 
 
-def _handle_failed_authentication(user):
+def _handle_failed_authentication(user, has_authentication):
     """
     Handles updating the failed login count, inactive user notifications, and logging failed authentications.
     """
@@ -197,7 +199,7 @@ def _handle_failed_authentication(user):
         if LoginFailures.is_feature_enabled():
             LoginFailures.increment_lockout_counter(user)
 
-        if not user.is_active:
+        if has_authentication and not user.is_active:
             _log_and_raise_inactive_user_auth_error(user)
 
         # if we didn't find this username earlier, the account for this email
@@ -333,7 +335,7 @@ def login_user(request):
                 _enforce_password_policy_compliance(request, possibly_authenticated_user)
 
         if possibly_authenticated_user is None or not possibly_authenticated_user.is_active:
-            _handle_failed_authentication(email_user)
+            _handle_failed_authentication(email_user, possibly_authenticated_user)
 
         _handle_successful_authentication_and_login(possibly_authenticated_user, request)
 

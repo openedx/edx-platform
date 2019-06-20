@@ -128,6 +128,9 @@ from lms.envs.common import (
     CONTACT_EMAIL,
 
     DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH,
+
+    GENERATE_PROFILE_SCORES,
+
     # Video Image settings
     VIDEO_IMAGE_SETTINGS,
     VIDEO_TRANSCRIPTS_SETTINGS,
@@ -433,7 +436,7 @@ LOGIN_URL = reverse_lazy('login_redirect_to_lms')
 # use the ratelimit backend to prevent brute force attacks
 AUTHENTICATION_BACKENDS = [
     'rules.permissions.ObjectPermissionBackend',
-    'ratelimitbackend.backends.RateLimitModelBackend',
+    'openedx.core.djangoapps.oauth_dispatch.dot_overrides.backends.EdxRateLimitedAllowAllUsersModelBackend',
 ]
 
 LMS_BASE = None
@@ -544,6 +547,9 @@ MIDDLEWARE_CLASSES = [
     'edx_rest_framework_extensions.middleware.RequestMetricsMiddleware',
 
     'edx_rest_framework_extensions.auth.jwt.middleware.EnsureJWTAuthSettingsMiddleware',
+
+    # Handles automatically storing user ids in django-simple-history tables when possible.
+    'simple_history.middleware.HistoryRequestMiddleware',
 
     # This must be last so that it runs first in the process_response chain
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
@@ -1171,7 +1177,9 @@ INSTALLED_APPS = [
 
     'openedx.features.course_duration_limits',
     'openedx.features.content_type_gating',
+    'openedx.features.discounts',
     'experiments',
+
 ]
 
 
@@ -1358,6 +1366,10 @@ ADVANCED_PROBLEM_TYPES = [
     },
     {
         'component': 'drag-and-drop-v2',
+        'boilerplate_name': None
+    },
+    {
+        'component': 'staffgradedpoints',
         'boilerplate_name': None
     }
 ]

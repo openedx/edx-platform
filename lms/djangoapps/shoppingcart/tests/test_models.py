@@ -1,6 +1,8 @@
 """
 Tests for the Shopping Cart Models
 """
+from __future__ import absolute_import
+
 import copy
 import datetime
 import json
@@ -10,16 +12,18 @@ from decimal import Decimal
 
 import ddt
 import pytz
+import six
+from six.moves import range
 from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core import mail
 from django.core.mail.message import EmailMessage
-from django.urls import reverse
 from django.db import DatabaseError
 from django.test import TestCase
 from django.test.utils import override_settings
-from mock import Mock, MagicMock, patch
+from django.urls import reverse
+from mock import MagicMock, Mock, patch
 from opaque_keys.edx.locator import CourseLocator
 
 from course_modes.models import CourseMode
@@ -69,7 +73,7 @@ class OrderTest(ModuleStoreTestCase):
         course = CourseFactory.create()
         self.course_key = course.id
         self.other_course_keys = []
-        for __ in xrange(1, 5):
+        for __ in range(1, 5):
             course_key = CourseFactory.create().id
             CourseMode.objects.create(
                 course_id=course_key,
@@ -265,7 +269,7 @@ class OrderTest(ModuleStoreTestCase):
         self.assertEquals(len(mail.outbox), 1)
         self.assertEquals('Order Payment Confirmation', mail.outbox[0].subject)
         self.assertIn(settings.PAYMENT_SUPPORT_EMAIL, mail.outbox[0].body)
-        self.assertIn(unicode(cart.total_cost), mail.outbox[0].body)
+        self.assertIn(six.text_type(cart.total_cost), mail.outbox[0].body)
         self.assertIn(item.additional_instruction_text(), mail.outbox[0].body)
 
         # Verify Google Analytics event fired for purchase
@@ -280,8 +284,8 @@ class OrderTest(ModuleStoreTestCase):
                 'products': [
                     {
                         'sku': u'CertificateItem.honor',
-                        'name': unicode(self.course_key),
-                        'category': unicode(self.course_key.org),
+                        'name': six.text_type(self.course_key),
+                        'category': six.text_type(self.course_key.org),
                         'price': '40.00',
                         'id': 1,
                         'quantity': 1
@@ -879,8 +883,8 @@ class CertificateItemTest(ModuleStoreTestCase):
                 'products': [
                     {
                         'sku': u'CertificateItem.verified',
-                        'name': unicode(self.course_key),
-                        'category': unicode(self.course_key.org),
+                        'name': six.text_type(self.course_key),
+                        'category': six.text_type(self.course_key.org),
                         'price': '40.00',
                         'id': 1,
                         'quantity': 1
@@ -1277,7 +1281,7 @@ class InvoiceHistoryTest(TestCase):
             'qty': 1,
             'unit_price': '123.45',
             'currency': 'usd',
-            'course_id': unicode(self.course_key)
+            'course_id': six.text_type(self.course_key)
         }])
 
         # Create a second invoice item
@@ -1292,13 +1296,13 @@ class InvoiceHistoryTest(TestCase):
                 'qty': 1,
                 'unit_price': '123.45',
                 'currency': 'usd',
-                'course_id': unicode(self.course_key)
+                'course_id': six.text_type(self.course_key)
             },
             {
                 'qty': 2,
                 'unit_price': '456.78',
                 'currency': 'usd',
-                'course_id': unicode(self.course_key)
+                'course_id': six.text_type(self.course_key)
             }
         ])
 
@@ -1366,7 +1370,7 @@ class InvoiceHistoryTest(TestCase):
     def _assert_history_contact_info(self, **kwargs):
         """Check contact info in the latest history record. """
         contact_info = self._latest_history()['contact_info']
-        for key, value in kwargs.iteritems():
+        for key, value in six.iteritems(kwargs):
             self.assertEqual(contact_info[key], value)
 
     def _assert_history_items(self, expected_items):

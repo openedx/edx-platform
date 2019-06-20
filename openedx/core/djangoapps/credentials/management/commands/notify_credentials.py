@@ -178,7 +178,6 @@ class Command(BaseCommand):
         if not (course_keys or options['start_date'] or options['end_date']):
             raise CommandError('You must specify a filter (e.g. --courses= or --start-date)')
 
-        # pylint: disable=no-member
         certs = get_recently_modified_certificates(course_keys, options['start_date'], options['end_date'])
         grades = get_recently_modified_grades(course_keys, options['start_date'], options['end_date'])
 

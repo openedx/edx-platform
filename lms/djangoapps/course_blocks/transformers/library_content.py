@@ -1,9 +1,11 @@
 """
 Content Library Transformer.
 """
-import json
-import random
+from __future__ import absolute_import
 
+import json
+
+import six
 from eventtracking import tracker
 
 from courseware.models import StudentModule
@@ -53,9 +55,9 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
             """ Basic information about the given block """
             orig_key, orig_version = store.get_block_original_usage(usage_key)
             return {
-                "usage_key": unicode(usage_key),
-                "original_usage_key": unicode(orig_key) if orig_key else None,
-                "original_usage_version": unicode(orig_version) if orig_version else None,
+                "usage_key": six.text_type(usage_key),
+                "original_usage_key": six.text_type(orig_key) if orig_key else None,
+                "original_usage_version": six.text_type(orig_version) if orig_version else None,
             }
 
         # For each block check if block is library_content.
@@ -100,7 +102,6 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
                 # Save back any changes
                 if any(block_keys[changed] for changed in ('invalid', 'overlimit', 'added')):
                     state_dict['selected'] = list(selected)
-                    random.shuffle(state_dict['selected'])
                     StudentModule.save_state(
                         student=usage_info.user,
                         course_id=usage_info.course_key,
@@ -160,7 +161,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
             Helper function to publish an event for analytics purposes
             """
             event_data = {
-                "location": unicode(location),
+                "location": six.text_type(location),
                 "previous_count": previous_count,
                 "result": result,
                 "max_count": max_count,
@@ -178,48 +179,3 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
             format_block_keys,
             publish_event,
         )
-
-
-class ContentLibraryOrderTransformer(BlockStructureTransformer):
-    """
-    A transformer that manipulates the block structure by modifying the order of the
-    selected blocks within a library_content module to match the order of the selections
-    made by the ContentLibraryTransformer or the corresponding XBlock. So this transformer
-    requires the selections for the randomized content block to be already
-    made either by the ContentLibraryTransformer or the XBlock.
-
-    Staff users are *not* exempted from library content pathways/
-    """
-    WRITE_VERSION = 1
-    READ_VERSION = 1
-
-    @classmethod
-    def name(cls):
-        """
-        Unique identifier for the transformer's class;
-        same identifier used in setup.py
-        """
-        return "library_content_randomize"
-
-    @classmethod
-    def collect(cls, block_structure):
-        """
-        Collects any information that's necessary to execute this
-        transformer's transform method.
-        """
-        # There is nothing to collect.
-        pass
-
-    def transform(self, usage_info, block_structure):
-        """
-        Transforms the order of the children of the randomized content block
-        to match the order of the selections made and stored in the XBlock 'selected' field.
-        """
-        for block_key in block_structure:
-            if block_key.block_type != 'library_content':
-                continue
-
-            state_dict = get_student_module_as_dict(usage_info.user, usage_info.course_key, block_key)
-            library_children = block_structure.get_children(block_key)
-            ordering_data = {block[1]: position for position, block in enumerate(state_dict['selected'])}
-            library_children.sort(key=lambda block, data=ordering_data: data[block.block_id])

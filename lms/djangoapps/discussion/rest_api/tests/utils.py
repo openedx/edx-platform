@@ -1,7 +1,7 @@
 """
 Discussion API test utilities
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import hashlib
 import json
@@ -10,6 +10,7 @@ from contextlib import closing
 from datetime import datetime
 
 import httpretty
+import six
 from PIL import Image
 from pytz import UTC
 
@@ -391,7 +392,7 @@ class CommentsServiceMockMixin(object):
             "voted": False,
             "vote_count": 0,
             "editable_fields": ["abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"],
-            "course_id": unicode(self.course.id),
+            "course_id": six.text_type(self.course.id),
             "topic_id": "test_topic",
             "group_id": None,
             "group_name": None,

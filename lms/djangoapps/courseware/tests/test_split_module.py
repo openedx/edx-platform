@@ -1,6 +1,9 @@
 """
 Test for split test XModule
 """
+from __future__ import absolute_import
+
+import six
 from django.urls import reverse
 from mock import MagicMock
 from six import text_type
@@ -134,10 +137,10 @@ class SplitTestBase(SharedModuleStoreTestCase):
 
         unicode_content = content.decode("utf-8")
         for key in self.included_usage_keys[user_tag]:
-            self.assertIn(unicode(key), unicode_content)
+            self.assertIn(six.text_type(key), unicode_content)
 
         for key in self.excluded_usage_keys[user_tag]:
-            self.assertNotIn(unicode(key), unicode_content)
+            self.assertNotIn(six.text_type(key), unicode_content)
 
         # Assert that we can see the data from the appropriate test condition
         for visible in self.VISIBLE_CONTENT[user_tag]:

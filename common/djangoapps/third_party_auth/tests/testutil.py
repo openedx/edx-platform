@@ -157,6 +157,12 @@ class ThirdPartyAuthTestMixin(object):
         return cls.configure_oauth_provider(**kwargs)
 
     @classmethod
+    def configure_identityServer3_provider(cls, **kwargs):
+        kwargs.setdefault("name", "identityServer3TestConfig")
+        kwargs.setdefault("backend_name", "identityServer3")
+        return cls.configure_oauth_provider(**kwargs)
+
+    @classmethod
     def verify_user_email(cls, email):
         """ Mark the user with the given email as verified """
         user = User.objects.get(email=email)

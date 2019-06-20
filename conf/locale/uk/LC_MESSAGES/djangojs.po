@@ -18,6 +18,7 @@
 # marichkafox <marichka.fox@gmail.com>, 2014
 # marichkafox <marichka.fox@gmail.com>, 2014
 # Maryna Holovnova <MGG-2008@yandex.ru>, 2014
+# Muhammad Adeel Khan <adeel@edx.org>, 2019
 # Natalia Vynogradenko <tannaha@gmail.com>, 2017-2018
 # olexiim <olexiim@gmail.com>, 2014-2016
 # Olga Filipova <chudaol@gmail.com>, 2015-2016
@@ -46,6 +47,7 @@
 # Denis <prohibiti@gmail.com>, 2015
 # Irene Korotkova <irca.gav@gmail.com>, 2017
 # IvanPrimachenko <jastudent1@gmail.com>, 2014
+# Muhammad Adeel Khan <adeel@edx.org>, 2019
 # Natalia Vynogradenko <tannaha@gmail.com>, 2017-2018
 # Zapadenska <oruda@ymail.com>, 2014
 # Zoriana Zaiats, 2015
@@ -96,7 +98,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-04-22 10:49+0000\n"
+"POT-Creation-Date: 2019-06-16 20:42+0000\n"
 "PO-Revision-Date: 2019-03-09 21:43+0000\n"
 "Last-Translator: Anastasiia Bondarenko <anastasiia.bondarenko@raccoongang.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/)\n"
@@ -2487,17 +2489,68 @@ msgid "Course Name"
 msgstr "Назва курсу"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Not specific to a course"
-msgstr "Неспецифічне для курсу"
+msgid ""
+"For inquiries regarding assignments, grades, or structure of a specific "
+"course, please post in the discussion forums for that course directly."
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "What can we help you with, {username}?"
-msgstr ""
+msgid "Not specific to a course"
+msgstr "Неспецифічне для курсу"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Subject"
 msgstr "Предмет"
+
+#: lms/templates/student_account/account_settings.underscore
+msgid "Account Settings"
+msgstr "Налаштування облікового запису"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Billing/Payment Options"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Certificates"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Course Content"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Deadlines"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Errors/Technical Issues"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Financial Aid"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Masters"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Photo Verification"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Proctoring"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+#: cms/templates/js/asset-library.underscore
+msgid "Other"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "What can we help you with, {username}?"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
@@ -2533,8 +2586,8 @@ msgstr ""
 "підтримку."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Enter a subject for your support request."
-msgstr "Введіть тему для підтримки вашого запиту."
+msgid "Select a subject for your support request."
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
@@ -3687,7 +3740,7 @@ msgid ""
 msgstr ""
 "Цей курс має автоматичний когортинг для перевірених учнів, але необхідна "
 "когорта не існує. Вам необхідно створити когорту вручну, з назвою "
-"'{verifyCohortName}', щоб функція працювала."
+"'{verifiedCohortName}', щоб функція працювала."
 
 #: lms/static/js/groups/views/verified_track_settings_notification.js
 msgid ""
@@ -4121,8 +4174,8 @@ msgid ""
 "Success! Problem attempts reset for problem '<%- problem_id %>' and student "
 "'<%- student_id %>'."
 msgstr ""
-"Спроби успішно скинуті для завдання '<% - problem_id%>' та учня '<% - "
-"student_id%>'."
+"Спроби успішно скинуті для завдання '<%- problem_id %>' та учня '<%- "
+"student_id %>'."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4130,15 +4183,15 @@ msgid ""
 " '<%- student_id %>'. Make sure that the problem and student identifiers are"
 " complete and correct."
 msgstr ""
-"Помилка при скиданнях спроб для завдання '<% = problem_id%>' та студента '<%"
-" - student_id%>'. Переконайтеся, що завдання та ідентифікатори студентів є "
-"повними та правильними."
+"Помилка при скиданнях спроб для завдання '<%= problem_id %>' та студента "
+"'<%- student_id %>'. Переконайтеся, що завдання та ідентифікатори студентів "
+"є повними та правильними."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Delete student '<%- student_id %>'s state on problem '<%- problem_id %>'?"
 msgstr ""
-"Видалити стан студента '<%- student_id %>' для проблеми '<%= problem_id %>'?"
+"Видалити стан студента '<%- student_id %>' для проблеми '<%- problem_id %>'?"
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4225,7 +4278,7 @@ msgid ""
 "Successfully started task to reset attempts for problem '<%- problem_id %>'."
 " Click the 'Show Task Status' button to see the status of the task."
 msgstr ""
-"Успішно розпочато задачу скинути спроби для завдання '<% - problem_id%>'. "
+"Успішно розпочато задачу скинути спроби для завдання '<%- problem_id %>'. "
 "Натисніть кнопку «Показати стан задачі», щоб побачити статус задачі."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4234,8 +4287,8 @@ msgid ""
 "problem_id %>'. Make sure that the problem identifier is complete and "
 "correct."
 msgstr ""
-"Помилка при запуску задачі для скидання спроб усіх студентів на завданні '<%"
-" - problem_id%>'. Переконайтеся, що ідентифікатор завдання є повним і "
+"Помилка при запуску задачі для скидання спроб усіх студентів на завданні "
+"'<%- problem_id %>'. Переконайтеся, що ідентифікатор завдання є повним і "
 "правильним."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4284,9 +4337,9 @@ msgid ""
 "student '<%- student_id %>'. Make sure that the the score and the problem "
 "and student identifiers are complete and correct."
 msgstr ""
-"Помилка запуску завдання для перевизначення оцінки для задачі \"<% - "
-"problem_id%> ' для студента\" <% - student_id%>'. Переконайтеся, що оцінка "
-"та ідентифікатори задачі та студента є повними та правильними."
+"Помилка запуску завдання для перевизначення оцінки для задачі '<%- "
+"problem_id %>' для студента '<%- student_id %>'. Переконайтеся, що оцінка та"
+" ідентифікатори задачі та студента є повними та правильними."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4640,7 +4693,7 @@ msgid ""
 "{htmlStart}Want to change your email, name, or password instead?{htmlEnd}"
 msgstr ""
 "{htmlStart}Бажаєте замінити адресу електронної пошти, імені або пароля? "
-"{HtmlEnd}"
+"{htmlEnd}"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -4652,7 +4705,7 @@ msgstr ""
 "{strongStart}Попередження: видалення Аккаунту є постійним. {strongEnd} Будь "
 "ласка, уважно прочитайте вище, перш ніж продовжити. Це незворотні дії, і "
 "{strongStart} ви більше не зможете використовувати ту саму пошту на edX. "
-"{StrongEnd}"
+"{strongEnd}"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "We’re sorry to see you go!"
@@ -4806,18 +4859,10 @@ msgid ""
 "address is associated with your {platform_name} account, we will send a "
 "message with password recovery instructions to this email "
 "address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
-" message, verify that you entered the correct email address, or check your "
-"spam folder.{paragraphEnd}{paragraphStart}If you need further assistance, "
-"{anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
+" message after 1 minute, verify that you entered the correct email address, "
+"or check your spam folder.{paragraphEnd}{paragraphStart}If you need further "
+"assistance, {anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
 msgstr ""
-"{paragraphStart}Ви увійшли {boldStart}{email}{boldEnd}. Якщо ця адреса "
-"пов`язана з вашим {platform_name} аккаунтом, то вам буде надіслано "
-"повідомлення з інструкціями щодо відновлення "
-"пароля.{paragraphEnd}{paragraphStart}Якщо ви не отримали повідомлення про "
-"скидання пароля, переконайтеся, що ви ввели правильну адресу електронної "
-"пошти або перевірте папку зі спамом.{paragraphEnd}{paragraphStart}Якщо вам "
-"потрібна допомога, {anchorStart} зверніться до служби технічної підтримки "
-"{anchorEnd}. {ParagraphEnd}"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -5977,8 +6022,8 @@ msgstr "Тип"
 #: cms/static/js/views/assets.js
 msgid "File {filename} exceeds maximum size of {maxFileSizeInMBs} MB"
 msgstr ""
-"Файл {filename} перевищує максимально допустимий розмір в "
-"{maximum_size_in_megabytes} MБ"
+"Файл {filename} перевищує максимально допустимий розмір в {maxFileSizeInMBs}"
+" MБ"
 
 #: cms/static/js/views/assets.js
 msgid ""
@@ -6634,8 +6679,8 @@ msgid "Upload your video thumbnail image."
 msgstr "Завантажити зображення-мініатюру до відео"
 
 #: cms/static/js/views/show_textbook.js
-msgid "Delete “<%= name %>”?"
-msgstr "Видалити “<%= name %>”?"
+msgid "Delete “<%- name %>”?"
+msgstr ""
 
 #: cms/static/js/views/show_textbook.js
 msgid ""
@@ -7851,6 +7896,10 @@ msgid "Mark Exam As Completed"
 msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
+msgid "You are taking \"{exam_link}\" as {exam_type}. "
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
 msgid "a timed exam"
 msgstr ""
 
@@ -8575,10 +8624,6 @@ msgstr ""
 msgid "Switch Language Back"
 msgstr ""
 
-#: lms/templates/student_account/account_settings.underscore
-msgid "Account Settings"
-msgstr "Налаштування облікового запису"
-
 #: lms/templates/student_account/account_settings_section.underscore
 msgid "An error occurred. Please reload the page."
 msgstr ""
@@ -8624,7 +8669,8 @@ msgid "Register with Institution/Campus Credentials"
 msgstr ""
 
 #: lms/templates/student_account/institution_register.underscore
-msgid "Register through edX"
+#: lms/templates/student_account/register.underscore
+msgid "Create an Account"
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
@@ -8729,10 +8775,6 @@ msgstr ""
 
 #: lms/templates/student_account/register.underscore
 msgid "or create a new one here"
-msgstr ""
-
-#: lms/templates/student_account/register.underscore
-msgid "Create an Account"
 msgstr ""
 
 #: lms/templates/student_account/register.underscore
@@ -9428,10 +9470,6 @@ msgstr ""
 #: cms/templates/js/asset-library.underscore
 msgid "Show All"
 msgstr "Показати усе"
-
-#: cms/templates/js/asset-library.underscore
-msgid "Other"
-msgstr ""
 
 #: cms/templates/js/asset-library.underscore
 msgid "You haven't added any assets to this course yet."

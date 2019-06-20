@@ -2,16 +2,18 @@
 Test signal handlers for completion.
 """
 
+from __future__ import absolute_import
+
 from datetime import datetime
 
+import ddt
+import six
 from completion import handlers
 from completion.models import BlockCompletion
 from completion.test_utils import CompletionSetUpMixin
-import ddt
 from django.test import TestCase
 from mock import patch
 from pytz import utc
-import six
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 

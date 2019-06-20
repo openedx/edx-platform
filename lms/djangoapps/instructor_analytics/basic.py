@@ -3,21 +3,24 @@ Student and course analytics.
 
 Serve miscellaneous course and student data
 """
+from __future__ import absolute_import
+
 import datetime
 import json
 
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
-from django.urls import reverse
 from django.db.models import Count, Q
+from django.urls import reverse
 from edx_proctoring.api import get_exam_violation_report
-from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.keys import UsageKey, CourseKey
 from six import text_type
 
-from courseware.models import StudentModule
 import xmodule.graders as xmgraders
+from courseware.models import StudentModule
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.grades.api import context as grades_context
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -31,6 +34,7 @@ from shoppingcart.models import (
     RegistrationCodeRedemption
 )
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
+
 
 STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email')
 PROFILE_FEATURES = ('name', 'language', 'location', 'year_of_birth', 'gender',
@@ -114,7 +118,7 @@ def sale_order_record_features(course_id, features):
             coupon_codes = [redemption.coupon.code for redemption in coupon_redemption]
             order_item_dict.update({'coupon_code': ", ".join(coupon_codes)})
 
-        sale_order_dict.update(dict(order_item_dict.items()))
+        sale_order_dict.update(dict(list(order_item_dict.items())))
 
         return sale_order_dict
 
@@ -172,7 +176,7 @@ def sale_record_features(course_id, features):
 
         course_reg_dict['course_id'] = text_type(course_id)
         course_reg_dict.update({'codes': ", ".join(codes)})
-        sale_dict.update(dict(course_reg_dict.items()))
+        sale_dict.update(dict(list(course_reg_dict.items())))
 
         return sale_dict
 
@@ -240,7 +244,7 @@ def enrolled_students_features(course_key, features):
             DjangoJSONEncoder().default(attr)
             return attr
         except TypeError:
-            return unicode(attr)
+            return six.text_type(attr)
 
     def extract_student(student, features):
         """ convert student to dictionary """
@@ -330,7 +334,7 @@ def get_proctored_exam_results(course_key, features):
     """
     comment_statuses = ['Rules Violation', 'Suspicious']
 
-    def extract_details(exam_attempt, features):
+    def extract_details(exam_attempt, features, course_enrollments):
         """
         Build dict containing information about a single student exam_attempt.
         """
@@ -347,11 +351,29 @@ def get_proctored_exam_results(course_key, features):
                 u'{status} Count'.format(status=status): len(comment_list),
                 u'{status} Comments'.format(status=status): '; '.join(comment_list),
             })
-
+        try:
+            proctored_exam['track'] = course_enrollments[exam_attempt['user_id']]
+        except KeyError:
+            proctored_exam['track'] = 'Unknown'
         return proctored_exam
 
     exam_attempts = get_exam_violation_report(course_key)
-    return [extract_details(exam_attempt, features) for exam_attempt in exam_attempts]
+    course_enrollments = get_enrollments_for_course(exam_attempts)
+    return [extract_details(exam_attempt, features, course_enrollments) for exam_attempt in exam_attempts]
+
+
+def get_enrollments_for_course(exam_attempts):
+    """
+     Returns all enrollments from a list of attempts. user_id is passed from proctoring.
+     """
+    if exam_attempts:
+        users = []
+        for e in exam_attempts:
+            users.append(e['user_id'])
+
+        enrollments = {c.user_id: c.mode for c in CourseEnrollment.objects.filter(
+            course_id=CourseKey.from_string(exam_attempts[0]['course_id']), user_id__in=users)}
+        return enrollments
 
 
 def coupon_codes_features(features, coupons_list, course_id):
@@ -528,7 +550,7 @@ def dump_grading_context(course):
     gcontext = grades_context.grading_context_for_course(course)
     msg += "graded sections:\n"
 
-    msg += '%s\n' % gcontext['all_graded_subsections_by_type'].keys()
+    msg += '%s\n' % list(gcontext['all_graded_subsections_by_type'].keys())
     for (gsomething, gsvals) in gcontext['all_graded_subsections_by_type'].items():
         msg += u"--> Section %s:\n" % (gsomething)
         for sec in gsvals:

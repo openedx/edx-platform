@@ -1,10 +1,13 @@
 """
 API Serializers
 """
+from __future__ import absolute_import
+
 from rest_framework import serializers
 from six import text_type
 
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
+from lms.djangoapps.program_enrollments.api.v1.constants import CourseRunProgressStatuses
 
 
 # pylint: disable=abstract-method
@@ -19,8 +22,15 @@ class ProgramEnrollmentSerializer(serializers.ModelSerializer):
         validators = []
 
     def validate(self, attrs):
-        enrollment = ProgramEnrollment(**attrs)
-        enrollment.full_clean()
+        """ This modifies self.instance in the case of updates """
+        if not self.instance:
+            enrollment = ProgramEnrollment(**attrs)
+            enrollment.full_clean()
+        else:
+            for key, value in attrs.items():
+                setattr(self.instance, key, value)
+            self.instance.full_clean()
+
         return attrs
 
     def create(self, validated_data):
@@ -91,3 +101,42 @@ class ProgramCourseEnrollmentListSerializer(serializers.Serializer):
 
     def get_curriculum_uuid(self, obj):
         return text_type(obj.program_enrollment.curriculum_uuid)
+
+
+class DueDateSerializer(serializers.Serializer):
+    """
+    Serializer for a due date.
+    """
+    name = serializers.CharField()
+    url = serializers.CharField()
+    date = serializers.DateTimeField()
+
+
+class CourseRunOverviewSerializer(serializers.Serializer):
+    """
+    Serializer for a course run overview.
+    """
+    STATUS_CHOICES = [
+        CourseRunProgressStatuses.IN_PROGRESS,
+        CourseRunProgressStatuses.UPCOMING,
+        CourseRunProgressStatuses.COMPLETED
+    ]
+
+    course_run_id = serializers.CharField()
+    display_name = serializers.CharField()
+    resume_course_run_url = serializers.CharField(required=False)
+    course_run_url = serializers.CharField()
+    start_date = serializers.DateTimeField()
+    end_date = serializers.DateTimeField()
+    course_run_status = serializers.ChoiceField(allow_blank=False, choices=STATUS_CHOICES)
+    emails_enabled = serializers.BooleanField(required=False)
+    due_dates = serializers.ListField(child=DueDateSerializer())
+    micromasters_title = serializers.CharField(required=False)
+    certificate_download_url = serializers.CharField(required=False)
+
+
+class CourseRunOverviewListSerializer(serializers.Serializer):
+    """
+    Serializer for a list of course run overviews.
+    """
+    course_runs = serializers.ListField(child=CourseRunOverviewSerializer())

@@ -2,15 +2,16 @@
 Account constants
 """
 
+from __future__ import absolute_import
+
 from django.utils.text import format_lazy
 from django.utils.translation import ugettext_lazy as _
-
 
 # The maximum length for the bio ("about me") account field
 BIO_MAX_LENGTH = 300
 
 # The minimum and maximum length for the name ("full name") account field
-NAME_MIN_LENGTH = 2
+NAME_MIN_LENGTH = 1
 NAME_MAX_LENGTH = 255
 
 # The minimum and maximum length for the username account field

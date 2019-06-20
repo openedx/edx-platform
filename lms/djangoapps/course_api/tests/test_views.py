@@ -1,26 +1,30 @@
 """
 Tests for Course API views.
 """
+from __future__ import absolute_import
+
 from datetime import datetime
-import ddt
 from hashlib import md5
 
+import ddt
+import six
+from six.moves import range
 from django.core.exceptions import ImproperlyConfigured
-from django.urls import reverse
 from django.test import RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
+from edx_django_utils.cache import RequestCache
 from search.tests.test_course_discovery import DemoCourse
 from search.tests.tests import TEST_INDEX_NAME
 from search.tests.utils import SearcherMixin
+from waffle.testutils import override_switch
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from edx_django_utils.cache import RequestCache
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from waffle.testutils import override_switch
 
 from ..views import CourseDetailView, CourseListUserThrottle
 from .mixins import TEST_PASSWORD, CourseApiFactoryMixin
@@ -198,7 +202,7 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
             response = self.verify_response(params=params)
             self.assertEquals(
                 {course['course_id'] for course in response.data['results']},
-                {unicode(course.id) for course in expected_courses},
+                {six.text_type(course.id) for course in expected_courses},
                 u"testing course_api.views.CourseListView with filter_={}".format(filter_),
             )
 

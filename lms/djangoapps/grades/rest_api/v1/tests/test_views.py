@@ -1,7 +1,8 @@
 """
 Tests for v1 views
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
+
 from collections import OrderedDict
 
 import ddt
@@ -244,6 +245,14 @@ class CourseGradesViewTest(GradeViewTestMixin, APITestCase):
                     'passed': False,
                     'percent': 0.0,
                     'letter_grade': None
+                },
+                {
+                    'username': self.program_student.username,
+                    'email': self.program_student.email,
+                    'course_id': str(self.course.id),
+                    'passed': False,
+                    'percent': 0.0,
+                    'letter_grade': None,
                 },
             ]),
         ])

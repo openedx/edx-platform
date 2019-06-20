@@ -12,9 +12,11 @@ are consistent across the LMS and other sites (such as
 the marketing site and blog).
 
 """
-import logging
-import urlparse
+from __future__ import absolute_import
 
+import logging
+
+import six
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse
@@ -22,8 +24,8 @@ from django.utils.translation import ugettext as _
 
 from branding.models import BrandingApiConfig
 from edxmako.shortcuts import marketing_link
-
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+
 
 log = logging.getLogger("edx.footer")
 EMPTY_URL = '#'
@@ -120,11 +122,11 @@ def _footer_copyright():
 
     """
     return _(
-        # Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
+        # Translators: 'edX' and 'Open edX' are trademarks of 'edX Inc.'.
         # Please do not translate any of these trademarks and company names.
         u"\u00A9 {org_name}.  All rights reserved except where noted.  "
-        u"EdX, Open edX and their respective logos are trademarks "
-        u"or registered trademarks of edX Inc."
+        u"edX, Open edX and their respective logos are "
+        u"registered trademarks of edX Inc."
     ).format(org_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME))
 
 
@@ -137,7 +139,7 @@ def _footer_openedx_link():
     Returns: dict
 
     """
-    # Translators: 'Open edX' is a brand, please keep this untranslated.
+    # Translators: 'Open edX' is a trademark, please keep this untranslated.
     # See http://openedx.org for more information.
     title = _("Powered by Open edX")
     return {
@@ -161,10 +163,10 @@ def _footer_social_links():
         links.append(
             {
                 "name": social_name,
-                "title": unicode(display.get("title", "")),
+                "title": six.text_type(display.get("title", "")),
                 "url": settings.SOCIAL_MEDIA_FOOTER_URLS.get(social_name, "#"),
                 "icon-class": display.get("icon", ""),
-                "action": unicode(display.get("action", "")).format(platform_name=platform_name),
+                "action": six.text_type(display.get("action", "")).format(platform_name=platform_name),
             }
         )
     return links
@@ -311,13 +313,24 @@ def _footer_legal_links(language=settings.LANGUAGE_CODE):
     ]
 
 
+def _add_enterprise_marketing_footer_query_params(url):
+    """Add query params to url if they exist in the settings"""
+    params = settings.ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS
+    if params:
+        return "{url}/?{params}".format(
+            url=url,
+            params=six.moves.urllib.parse.urlencode(params),
+        )
+    return url
+
+
 def _footer_business_links(language=settings.LANGUAGE_CODE):
     """Return the business links to display in the footer. """
     platform_name = configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
     links = [
         ("about", (marketing_link("ABOUT"), _("About"))),
         ("enterprise", (
-            marketing_link("ENTERPRISE"),
+            _add_enterprise_marketing_footer_query_params(marketing_link("ENTERPRISE")),
             _(u"{platform_name} for Business").format(platform_name=platform_name)
         )),
     ]
@@ -459,7 +472,7 @@ def _absolute_url(is_secure, url_path):
     """
     site_name = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
     parts = ("https" if is_secure else "http", site_name, url_path, '', '', '')
-    return urlparse.urlunparse(parts)
+    return six.moves.urllib.parse.urlunparse(parts)  # pylint: disable=too-many-function-args
 
 
 def _absolute_url_staticfile(is_secure, name):
@@ -478,7 +491,7 @@ def _absolute_url_staticfile(is_secure, name):
     # In production, the static files URL will be an absolute
     # URL pointing to a CDN.  If this happens, we can just
     # return the URL.
-    if urlparse.urlparse(url_path).netloc:
+    if six.moves.urllib.parse.urlparse(url_path).netloc:
         return url_path
 
     # For local development, the returned URL will be relative,
@@ -574,12 +587,6 @@ def get_about_url():
 
 def get_home_url():
     """
-    Lookup and return home page url, lookup is performed in the following order
-
-    1. return marketing root URL, If marketing is enabled
-    2. Otherwise return dashboard URL.
+    Return Dashboard page url
     """
-    if settings.FEATURES.get('ENABLE_MKTG_SITE', False):
-        return marketing_link('ROOT')
-
     return reverse('dashboard')

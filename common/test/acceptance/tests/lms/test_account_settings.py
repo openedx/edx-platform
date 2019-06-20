@@ -291,7 +291,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             u'name',
             u'Full Name',
             self.full_name,
-            u'@',
+            u' ',
             [u'<h1>another name<h1>', u'<script>'],
             'Full Name cannot contain the following characters: < >',
             False
@@ -362,26 +362,6 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             u'English',
             [u'Dummy Language (Esperanto)', u'English'],
             reloads_on_save=True,
-        )
-
-    def test_gender_field(self):
-        """
-        Test behaviour of "Gender" field.
-        """
-        self._test_dropdown_field(
-            u'gender',
-            u'Gender',
-            u'',
-            [u'Female', u''],
-        )
-
-        actual_events = self.wait_for_events(event_filter=self.settings_changed_event_filter, number_of_matches=2)
-        self.assert_events_match(
-            [
-                self.expected_settings_changed_event('gender', None, 'f'),
-                self.expected_settings_changed_event('gender', 'f', None),
-            ],
-            actual_events
         )
 
     def test_country_field(self):

@@ -47,22 +47,23 @@ from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
+from simple_history.models import HistoricalRecords
 from six import text_type
 from six.moves import range
 from six.moves.urllib.parse import urlencode
 from slumber.exceptions import HttpClientError, HttpServerError
 from user_util import user_util
 
-import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from course_modes.models import CourseMode, get_cosmetic_verified_display_price
 from courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
     DynamicUpgradeDeadlineConfiguration,
     OrgDynamicUpgradeDeadlineConfiguration
 )
-from enrollment.api import _default_course_mode
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+import openedx.core.djangoapps.django_comment_common.comment_client as cc
+from openedx.core.djangoapps.enrollments.api import _default_course_mode
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
@@ -1130,6 +1131,14 @@ class CourseEnrollment(models.Model):
     # list of possible values.
     mode = models.CharField(default=CourseMode.DEFAULT_MODE_SLUG, max_length=100)
 
+    # An audit row will be created for every change to a CourseEnrollment. This
+    # will create a new model behind the scenes - HistoricalCourseEnrollment and a
+    # table named 'student_courseenrollment_history'.
+    history = HistoricalRecords(
+        history_id_field=models.UUIDField(default=uuid.uuid4),
+        table_name='student_courseenrollment_history'
+    )
+
     objects = CourseEnrollmentManager()
 
     # cache key format e.g enrollment.<username>.<course_key>.mode = 'honor'
@@ -1233,6 +1242,26 @@ class CourseEnrollment(models.Model):
                 course_id=course_key
             )
         except cls.DoesNotExist:
+            return None
+
+    @classmethod
+    def get_program_enrollment(cls, user, course_id):
+        """
+        Return the ProgramEnrollment associated with the CourseEnrollment specified
+        by the user and course_id.
+        Return None if there is no ProgramEnrollment.
+
+        Arguments:
+            user (User): the user for whom we want the program enrollment
+            coure_id (CourseKey): the id of the course the user has a course enrollment in
+
+        Returns:
+            ProgramEnrollment object or None
+        """
+        try:
+            course_enrollment = cls.objects.get(user=user, course_id=course_id)
+            return course_enrollment.programcourseenrollment.program_enrollment
+        except (ObjectDoesNotExist):
             return None
 
     @classmethod

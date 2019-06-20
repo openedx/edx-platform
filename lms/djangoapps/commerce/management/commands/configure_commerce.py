@@ -3,7 +3,7 @@ Command for managing commerce configuration for lms.
 We can use this command to enable/disable commerce configuration or disable checkout to E-Commerce service.
 """
 
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import logging
 

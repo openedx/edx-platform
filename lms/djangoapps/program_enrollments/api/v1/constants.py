@@ -6,6 +6,9 @@
 PROGRAM_UUID_PATTERN = r'(?P<program_uuid>[A-Fa-f0-9-]+)'
 MAX_ENROLLMENT_RECORDS = 25
 
+# The name of the key that identifies students for POST/PATCH requests
+REQUEST_STUDENT_KEY = 'student_key'
+
 
 class CourseEnrollmentResponseStatuses(object):
     """
@@ -30,3 +33,12 @@ class CourseEnrollmentResponseStatuses(object):
         NOT_FOUND,
         INTERNAL_ERROR,
     )
+
+
+class CourseRunProgressStatuses(object):
+    """
+    Class to group statuses that a course run can be in with respect to user progress.
+    """
+    IN_PROGRESS = 'in_progress'
+    UPCOMING = 'upcoming'
+    COMPLETED = 'completed'

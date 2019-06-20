@@ -1,8 +1,11 @@
 """
 Discussion API forms
 """
-import urllib
+from __future__ import absolute_import
 
+import six.moves.urllib.error  # pylint: disable=import-error
+import six.moves.urllib.parse  # pylint: disable=import-error
+import six.moves.urllib.request  # pylint: disable=import-error
 from django.core.exceptions import ValidationError
 from django.forms import BooleanField, CharField, ChoiceField, Form, IntegerField
 from opaque_keys import InvalidKeyError
@@ -12,7 +15,10 @@ from six import text_type
 
 from courseware.courses import get_course_with_access
 from openedx.core.djangoapps.django_comment_common.models import (
-    Role, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_GROUP_MODERATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_GROUP_MODERATOR,
+    FORUM_ROLE_MODERATOR,
+    Role
 )
 from openedx.core.djangoapps.util.forms import ExtendedNullBooleanField, MultiValueField
 
@@ -167,7 +173,8 @@ class CourseDiscussionRolesForm(CourseDiscussionSettingsForm):
 
     def clean_rolename(self):
         """Validate the 'rolename' value."""
-        rolename = urllib.unquote(self.cleaned_data.get('rolename'))
+        # pylint: disable=too-many-function-args
+        rolename = six.moves.urllib.parse.unquote(self.cleaned_data.get('rolename'))
         course_id = self.cleaned_data.get('course_key')
         if course_id and rolename:
             try:

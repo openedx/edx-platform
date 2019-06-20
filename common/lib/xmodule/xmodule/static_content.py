@@ -4,6 +4,8 @@ This module has utility functions for gathering up the static content
 that is defined by XModules and XModuleDescriptors (javascript and css)
 """
 
+from __future__ import absolute_import
+
 import errno
 import hashlib
 import json
@@ -14,12 +16,12 @@ import textwrap
 from collections import defaultdict
 
 import django
+import six
 from docopt import docopt
 from path import Path as path
-
 from xmodule.x_module import XModuleDescriptor
-from capa_module import ProblemBlock
 
+from .capa_module import ProblemBlock
 
 LOG = logging.getLogger(__name__)
 
@@ -183,7 +185,7 @@ def _write_files(output_root, contents, generated_suffix_map=None):
     for extra_file in to_delete:
         (output_root / extra_file).remove_p()
 
-    for filename, file_content in contents.iteritems():
+    for filename, file_content in six.iteritems(contents):
         output_file = output_root / filename
 
         not_file = not output_file.isfile()
@@ -209,7 +211,7 @@ def write_webpack(output_file, module_files, descriptor_files):
     config = {
         'entry': {}
     }
-    for (owner, files) in module_files.items() + descriptor_files.items():
+    for (owner, files) in list(module_files.items()) + list(descriptor_files.items()):
         unique_files = sorted(set('./{}'.format(file) for file in files))
         if len(unique_files) == 1:
             unique_files = unique_files[0]

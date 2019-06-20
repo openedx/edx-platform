@@ -1,26 +1,32 @@
 """
 Tests for Discussion API views
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import json
 from datetime import datetime
-from urlparse import urlparse
 
 import ddt
 import httpretty
 import mock
 from django.urls import reverse
-from edx_oauth2_provider.tests.factories import ClientFactory, AccessTokenFactory
+from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient, APITestCase
 from six import text_type
+from six.moves import range
+from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
 from common.test.utils import disable_signal
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from lms.djangoapps.discussion.django_comment_client.tests.utils import (
+    ForumsEnableMixin,
+    config_course_discussions,
+    topic_name_to_id
+)
 from lms.djangoapps.discussion.rest_api import api
 from lms.djangoapps.discussion.rest_api.tests.utils import (
     CommentsServiceMockMixin,
@@ -29,17 +35,14 @@ from lms.djangoapps.discussion.rest_api.tests.utils import (
     make_minimal_cs_thread,
     make_paginated_api_response
 )
-from lms.djangoapps.discussion.django_comment_client.tests.utils import (
-    ForumsEnableMixin, config_course_discussions, topic_name_to_id,
-)
+from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
-from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_storage
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
 from student.models import get_retired_username_by_username
-from student.tests.factories import CourseEnrollmentFactory, UserFactory, SuperuserFactory
+from student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
 from util.testing import PatchMediaTypeMixin, UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore

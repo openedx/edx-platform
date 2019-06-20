@@ -5,21 +5,24 @@ These are used together to allow course content to be blocked for a subset
 of audit learners.
 """
 
+from __future__ import absolute_import
+
 import logging
 
 import crum
-from django.apps import apps
-from django.conf import settings
+import six
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from web_fragments.fragment import Fragment
 
 from course_modes.models import CourseMode
 from lms.djangoapps.commerce.utils import EcommerceService
-from xmodule.partitions.partitions import UserPartition, UserPartitionError, ENROLLMENT_TRACK_PARTITION_ID
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
-from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, FULL_ACCESS, LIMITED_ACCESS
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from openedx.features.discounts.utils import format_strikeout_price
+from xmodule.partitions.partitions import UserPartition, UserPartitionError
 
 LOG = logging.getLogger(__name__)
 
@@ -55,7 +58,7 @@ def create_content_gating_partition(course):
             CONTENT_TYPE_GATING_SCHEME,
             CONTENT_GATING_PARTITION_ID,
             _get_partition_from_id(course.user_partitions, CONTENT_GATING_PARTITION_ID).name,
-            unicode(course.id),
+            six.text_type(course.id),
         )
         return None
 
@@ -63,7 +66,7 @@ def create_content_gating_partition(course):
         id=CONTENT_GATING_PARTITION_ID,
         name=_(u"Feature-based Enrollments"),
         description=_(u"Partition for segmenting users by access to gated content types"),
-        parameters={"course_id": unicode(course.id)}
+        parameters={"course_id": six.text_type(course.id)}
     )
     return partition
 
@@ -75,7 +78,8 @@ class ContentTypeGatingPartition(UserPartition):
     """
     def access_denied_fragment(self, block, user, user_group, allowed_groups):
         course_key = self._get_course_key_from_course_block(block)
-        modes = CourseMode.modes_for_course_dict(course_key)
+        course = CourseOverview.get_from_id(course_key)
+        modes = CourseMode.modes_for_course_dict(course=course)
         verified_mode = modes.get(CourseMode.VERIFIED)
         if (verified_mode is None or user_group == FULL_ACCESS or
                 user_group in allowed_groups):
@@ -83,10 +87,13 @@ class ContentTypeGatingPartition(UserPartition):
 
         ecommerce_checkout_link = self._get_checkout_link(user, verified_mode.sku)
         request = crum.get_current_request()
+
+        upgrade_price, _ = format_strikeout_price(user, course)
+
         frag = Fragment(render_to_string('content_type_gating/access_denied_message.html', {
             'mobile_app': request and is_request_from_mobile_app(request),
             'ecommerce_checkout_link': ecommerce_checkout_link,
-            'min_price': str(verified_mode.min_price)
+            'min_price': upgrade_price,
         }))
         return frag
 
@@ -157,8 +164,8 @@ class ContentTypeGatingPartitionScheme(object):
         """
         return ContentTypeGatingPartition(
             id,
-            unicode(name),
-            unicode(description),
+            six.text_type(name),
+            six.text_type(description),
             [
                 LIMITED_ACCESS,
                 FULL_ACCESS,

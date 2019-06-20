@@ -1,16 +1,18 @@
 """
 Tests for the CourseGradeFactory class.
 """
+from __future__ import absolute_import
+
 import itertools
 
 import ddt
-from courseware.access import has_access
 from django.conf import settings
-from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
 from mock import patch
-from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
 from six import text_type
 
+from courseware.access import has_access
+from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
+from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

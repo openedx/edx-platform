@@ -1,6 +1,7 @@
 """
 Django template context processors.
 """
+from __future__ import absolute_import
 
 from django.conf import settings
 from django.utils.http import urlquote_plus
@@ -8,7 +9,7 @@ from django.utils.http import urlquote_plus
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
-def configuration_context(request):  # pylint: disable=unused-argument
+def configuration_context(request):
     """
     Configuration context for django templates.
     """

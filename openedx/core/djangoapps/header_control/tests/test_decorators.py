@@ -1,6 +1,9 @@
 """Tests for remove_headers and force_header decorator. """
+from __future__ import absolute_import
+
 from django.http import HttpRequest, HttpResponse
 from django.test import TestCase
+
 from openedx.core.djangoapps.header_control.decorators import force_header, remove_headers
 
 

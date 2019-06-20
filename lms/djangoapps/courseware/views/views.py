@@ -21,7 +21,8 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.http import urlquote_plus
 from django.utils.text import slugify
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext
 from django.views.decorators.cache import cache_control
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -59,7 +60,6 @@ from courseware.models import BaseStudentModuleHistory, StudentModule
 from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
-from enrollment.api import add_enrollment
 from ipware.ip import get_ip
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.certificates import api as certs_api
@@ -80,6 +80,7 @@ from openedx.core.djangoapps.credit.api import (
     is_credit_course,
     is_user_eligible_for_credit
 )
+from openedx.core.djangoapps.enrollments.api import add_enrollment
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.programs.utils import ProgramMarketingDataExtender
@@ -142,6 +143,11 @@ HONOR_PASSING_CERT_DATA = CertData(
     download_url=None,
     cert_web_view_url=None
 )
+
+INELIGIBLE_PASSING_CERT_DATA = {
+    CourseMode.AUDIT: AUDIT_PASSING_CERT_DATA,
+    CourseMode.HONOR: HONOR_PASSING_CERT_DATA
+}
 
 GENERATING_CERT_DATA = CertData(
     CertificateStatuses.generating,
@@ -317,7 +323,13 @@ def course_info(request, course_id):
             course.id, request.user, course, depth=2
         )
         course_module = get_module_for_descriptor(
-            user, request, course, field_data_cache, course.id, course=course
+            user,
+            request,
+            course,
+            field_data_cache,
+            course.id,
+            course=course,
+            will_recheck_access=True,
         )
         chapter_module = get_current_child(course_module)
         if chapter_module is not None:
@@ -1097,7 +1109,7 @@ def _get_cert_data(student, course, enrollment_mode, course_grade=None):
         returns dict if course certificate is available else None.
     """
     if not CourseMode.is_eligible_for_certificate(enrollment_mode):
-        return AUDIT_PASSING_CERT_DATA if enrollment_mode == CourseMode.AUDIT else HONOR_PASSING_CERT_DATA
+        return INELIGIBLE_PASSING_CERT_DATA.get(enrollment_mode)
 
     certificates_enabled_for_course = certs_api.cert_generation_enabled(course.id)
     if course_grade is None:
@@ -1681,7 +1693,7 @@ def financial_assistance_form(request):
                 'defaultValue': '',
                 'required': True,
                 'options': enrolled_courses,
-                'instructions': _(
+                'instructions': ugettext(
                     'Select the course for which you want to earn a verified certificate. If'
                     ' the course does not appear in the list, make sure that you have enrolled'
                     ' in the audit track for the course.'

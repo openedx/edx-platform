@@ -1,5 +1,8 @@
 """ Handlers for OpenID Connect provider. """
 
+from __future__ import absolute_import
+
+import six
 from django.conf import settings
 from django.core.cache import cache
 
@@ -209,7 +212,7 @@ class CourseAccessHandler(object):
             if not GlobalStaff().has_user(user):
                 course_keys = [course_key for course_key in course_keys if has_access(user, access_type, course_key)]
 
-            course_ids = [unicode(course_key) for course_key in course_keys]
+            course_ids = [six.text_type(course_key) for course_key in course_keys]
 
             cache.set(key, course_ids, self.COURSE_CACHE_TIMEOUT)
 

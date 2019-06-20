@@ -88,13 +88,3 @@ BOKCHOY_OPTS = [
         help="deprecated in favor of save-screenshots"
     ),
 ]
-
-PA11Y_SINGLE_URL = make_option('--single-url', help='Crawl only the specified url')
-PA11Y_HTML = ('with-html', 'w', 'Include html reports')
-PA11Y_COURSE_KEY = make_option('--course-key', help='Course key for test course')
-PA11Y_FETCH_COURSE = make_option(
-    "--fetch-course",
-    action="store_true",
-    dest="should_fetch_course",
-    help='Course key for test course',
-)

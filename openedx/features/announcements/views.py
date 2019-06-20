@@ -2,6 +2,8 @@
 Views to show announcements.
 """
 
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.http import JsonResponse
 from django.views.generic.list import ListView

@@ -1,21 +1,26 @@
 """
 Unit tests for program_enrollments utils.
 """
+from __future__ import absolute_import
+
 from uuid import uuid4
+
 import pytest
 from django.core.cache import cache
+from organizations.tests.factories import OrganizationFactory
+from social_django.models import UserSocialAuth
 
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL
-from openedx.core.djangoapps.catalog.tests.factories import (
-    OrganizationFactory as CatalogOrganizationFactory, ProgramFactory
-)
+from openedx.core.djangoapps.catalog.tests.factories import OrganizationFactory as CatalogOrganizationFactory
+from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from organizations.tests.factories import OrganizationFactory
 from program_enrollments.utils import (
-    get_user_by_program_id, ProgramDoesNotExistException, OrganizationDoesNotExistException,
-    ProviderDoesNotExistException
+    OrganizationDoesNotExistException,
+    ProgramDoesNotExistException,
+    ProviderDoesNotExistException,
+    UserLookupException,
+    get_user_by_program_id
 )
-from social_django.models import UserSocialAuth
 from student.tests.factories import UserFactory
 from third_party_auth.tests.factories import SAMLProviderConfigFactory
 
@@ -115,9 +120,25 @@ class GetPlatformUserTests(CacheIsolationTestCase):
 
     def test_saml_provider_not_found(self):
         """
-        Test an sdf is thrown if no SAML provider exists for this program's organization
+        Test an exception is thrown if no SAML provider exists for this program's organization
         """
         OrganizationFactory.create(short_name=self.organization_key)
 
         with pytest.raises(ProviderDoesNotExistException):
+            get_user_by_program_id(self.external_user_id, self.program_uuid)
+
+    def test_multiple_active_saml_providers(self):
+        """
+        If multiple samlprovider records exist with the same organization
+        an exception is raised
+        """
+        organization = OrganizationFactory.create(short_name=self.organization_key)
+        provider = SAMLProviderConfigFactory.create(organization=organization)
+
+        self.create_social_auth_entry(self.user, provider, self.external_user_id)
+
+        # create a second active config for the same organization
+        SAMLProviderConfigFactory.create(organization=organization, slug='foox')
+
+        with pytest.raises(UserLookupException):
             get_user_by_program_id(self.external_user_id, self.program_uuid)

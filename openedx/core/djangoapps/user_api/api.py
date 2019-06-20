@@ -120,14 +120,6 @@ def get_login_session_form(request):
         restrictions={'max_length': DEFAULT_MAX_PASSWORD_LENGTH}
     )
 
-    form_desc.add_field(
-        "remember",
-        field_type="checkbox",
-        label=_("Remember me"),
-        default=False,
-        required=False,
-    )
-
     return form_desc
 
 
@@ -825,10 +817,10 @@ class RegistrationFormFactory(object):
 
             pp_link = marketing_link("PRIVACY")
             label = Text(_(
-                u"By creating an account with {platform_name}, you agree \
-                  to abide by our {platform_name} \
+                u"By creating an account, you agree to the \
                   {terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end} \
-                  and agree to our {privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
+                  and you acknowledge that {platform_name} and each Member process your personal data in accordance \
+                  with the {privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
             )).format(
                 platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
                 terms_of_service=terms_label,

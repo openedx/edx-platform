@@ -7,7 +7,9 @@ import json
 import logging
 import random
 import re
+import time
 from collections import Counter
+from datetime import datetime
 from smtplib import SMTPConnectError, SMTPDataError, SMTPException, SMTPServerDisconnected
 from time import sleep
 
@@ -277,8 +279,8 @@ def send_course_email(entry_id, email_id, to_list, global_email_context, subtask
     current_task_id = subtask_status.task_id
     num_to_send = len(to_list)
     log.info((u"Preparing to send email %s to %d recipients as subtask %s "
-              u"for instructor task %d: context = %s, status=%s"),
-             email_id, num_to_send, current_task_id, entry_id, global_email_context, subtask_status)
+              u"for instructor task %d: context = %s, status=%s, time=%s"),
+             email_id, num_to_send, current_task_id, entry_id, global_email_context, subtask_status, datetime.now())
 
     # Check that the requested subtask is actually known to the current InstructorTask entry.
     # If this fails, it throws an exception, which should fail this subtask immediately.
@@ -295,12 +297,19 @@ def send_course_email(entry_id, email_id, to_list, global_email_context, subtask
     new_subtask_status = None
     try:
         course_title = global_email_context['course_title']
+        start_time = time.time()
         new_subtask_status, send_exception = _send_course_email(
             entry_id,
             email_id,
             to_list,
             global_email_context,
             subtask_status,
+        )
+        log.info(
+            u"BulkEmail ==> _send_course_email completed in : %s for task : %s with recipient count: %s",
+            time.time() - start_time,
+            subtask_status.task_id,
+            len(to_list)
         )
     except Exception:
         # Unexpected exception. Try to write out the failure to the entry before failing.
@@ -504,6 +513,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
         email_context = {'name': '', 'email': ''}
         email_context.update(global_email_context)
 
+        start_time = time.time()
         while to_list:
             # Update context with user-specific values from the user at the end of the list.
             # At the end of processing this user, they will be popped off of the to_list.
@@ -640,14 +650,15 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
 
         log.info(
             u"BulkEmail ==> Task: %s, SubTask: %s, EmailId: %s, Total Successful Recipients: %s/%s, \
-            Failed Recipients: %s/%s",
+            Failed Recipients: %s/%s, Time Taken: %s",
             parent_task_id,
             task_id,
             email_id,
             total_recipients_successful,
             total_recipients,
             total_recipients_failed,
-            total_recipients
+            total_recipients,
+            time.time() - start_time
         )
         duplicate_recipients = [u"{0} ({1})".format(email, repetition)
                                 for email, repetition in recipients_info.most_common() if repetition > 1]

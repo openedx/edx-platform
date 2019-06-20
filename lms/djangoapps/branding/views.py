@@ -1,14 +1,16 @@
 """Views for the branding app. """
-import logging
-import urllib
+from __future__ import absolute_import
 
+import logging
+
+import six
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.cache import cache
-from django.urls import reverse
 from django.db import transaction
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils import translation
 from django.utils.translation.trans_real import get_supported_language_variant
 from django.views.decorators.cache import cache_control
@@ -207,7 +209,7 @@ def footer(request):
                 "image": "http://example.com/openedx.png"
             },
             "logo_image": "http://example.com/static/images/logo.png",
-            "copyright": "EdX, Open edX and their respective logos are trademarks or registered trademarks of edX Inc."
+            "copyright": "edX, Open edX and their respective logos are registered trademarks of edX Inc."
         }
 
 
@@ -273,7 +275,7 @@ def footer(request):
         }
         if include_language_selector:
             cache_params['language_selector_options'] = ','.join(sorted([lang.code for lang in released_languages()]))
-        cache_key = u"branding.footer.{params}.html".format(params=urllib.urlencode(cache_params))
+        cache_key = u"branding.footer.{params}.html".format(params=six.moves.urllib.parse.urlencode(cache_params))
 
         content = cache.get(cache_key)
         if content is None:
@@ -286,7 +288,7 @@ def footer(request):
 
     elif 'application/json' in accepts:
         cache_key = u"branding.footer.{params}.json".format(
-            params=urllib.urlencode({
+            params=six.moves.urllib.parse.urlencode({
                 'language': language,
                 'is_secure': request.is_secure(),
             })

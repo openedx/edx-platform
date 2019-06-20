@@ -2,25 +2,29 @@
 Utilities to facilitate experimentation
 """
 
+from __future__ import absolute_import
+
 import hashlib
-import re
 import logging
+import re
 from decimal import Decimal
-from student.models import CourseEnrollment
+
+import six
 from django.utils.timezone import now
-from lms.djangoapps.commerce.utils import EcommerceService
-from course_modes.models import get_cosmetic_verified_display_price, format_course_price
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+
+from course_modes.models import format_course_price, get_cosmetic_verified_display_price
 from courseware.access import has_staff_access_to_preview_mode
 from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
-from xmodule.partitions.partitions_service import get_user_partition_groups, get_all_partitions_for_course
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys import InvalidKeyError
+from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.django_comment_common.models import Role
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-
+from student.models import CourseEnrollment
+from xmodule.partitions.partitions_service import get_all_partitions_for_course, get_user_partition_groups
 
 logger = logging.getLogger(__name__)
 
@@ -60,23 +64,6 @@ DASHBOARD_INFO_FLAG = WaffleFlag(experiments_namespace,
                                  u'add_dashboard_info',
                                  flag_undefined_default=True)
 # TODO END: clean up as part of REVEM-199 (End)
-
-# .. toggle_name: experiments.add_audit_deadline
-# .. toggle_type: feature_flag
-# .. toggle_default: True
-# .. toggle_description: Toggle for adding the current course's audit deadline
-# .. toggle_category: experiments
-# .. toggle_use_cases: monitored_rollout
-# .. toggle_creation_date: 2019-5-7
-# .. toggle_expiration_date: None
-# .. toggle_warnings: None
-# .. toggle_tickets: REVEM-329
-# .. toggle_status: supported
-AUDIT_DEADLINE_FLAG = WaffleFlag(
-    waffle_namespace=experiments_namespace,
-    flag_name=u'add_audit_deadline',
-    flag_undefined_default=True
-)
 
 
 def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
@@ -153,7 +140,7 @@ def get_program_price_and_skus(courses):
         skus = None
     else:
         program_price = format_course_price(program_price)
-        program_price = unicode(program_price)
+        program_price = six.text_type(program_price)
 
     return program_price, skus
 
@@ -267,82 +254,23 @@ def get_experiment_user_metadata_context(course, user):
     """
     Return a context dictionary with the keys used by the user_metadata.html.
     """
-    # TODO: call get_base_experiment_metadata_context(), and then add in the bits that are only needed by user_metadata
-    enrollment_mode = None
-    enrollment_time = None
     enrollment = None
     # TODO: clean up as part of REVO-28 (START)
-    has_non_audit_enrollments = None
-    # TODO: clean up as part of REVO-28 (END)
-    # TODO: clean up as part of REVEM-199 (START)
-    program_key = None
-    # TODO: clean up as part of REVEM-199 (END)
+    user_enrollments = None
+    audit_enrollments = None
+    has_non_audit_enrollments = False
     try:
-        # TODO: clean up as part of REVO-28 (START)
         user_enrollments = CourseEnrollment.objects.select_related('course').filter(user_id=user.id)
         audit_enrollments = user_enrollments.filter(mode='audit')
         has_non_audit_enrollments = (len(audit_enrollments) != len(user_enrollments))
         # TODO: clean up as part of REVO-28 (END)
-        # TODO: clean up as part of REVEM-199 (START)
-        if PROGRAM_INFO_FLAG.is_enabled():
-            programs = get_programs(course=course.id)
-            if programs:
-                # A course can be in multiple programs, but we're just grabbing the first one
-                program = programs[0]
-                complete_enrollment = False
-                has_courses_left_to_purchase = False
-                total_courses = None
-                courses = program.get('courses')
-                courses_left_to_purchase_price = None
-                courses_left_to_purchase_url = None
-                program_uuid = program.get('uuid')
-                status = None
-                is_eligible_for_one_click_purchase = None
-                if courses is not None:
-                    total_courses = len(courses)
-                    complete_enrollment = is_enrolled_in_all_courses(courses, user_enrollments)
-                    status = program.get('status')
-                    is_eligible_for_one_click_purchase = program.get('is_program_eligible_for_one_click_purchase')
-                    # Get the price and purchase URL of the program courses the user has yet to purchase. Say a
-                    # program has 3 courses (A, B and C), and the user previously purchased a certificate for A.
-                    # The user is enrolled in audit mode for B. The "left to purchase price" should be the price of
-                    # B+C.
-                    non_audit_enrollments = [en for en in user_enrollments if en not in
-                                             audit_enrollments]
-                    courses_left_to_purchase = get_unenrolled_courses(courses, non_audit_enrollments)
-                    if courses_left_to_purchase:
-                        has_courses_left_to_purchase = True
-                        if is_eligible_for_one_click_purchase:
-                            courses_left_to_purchase_price, courses_left_to_purchase_skus = \
-                                get_program_price_and_skus(courses_left_to_purchase)
-                            if courses_left_to_purchase_skus:
-                                courses_left_to_purchase_url = EcommerceService().get_checkout_page_url(
-                                    *courses_left_to_purchase_skus, program_uuid=program_uuid)
-
-                program_key = {
-                    'uuid': program_uuid,
-                    'title': program.get('title'),
-                    'marketing_url': program.get('marketing_url'),
-                    'status': status,
-                    'is_eligible_for_one_click_purchase': is_eligible_for_one_click_purchase,
-                    'total_courses': total_courses,
-                    'complete_enrollment': complete_enrollment,
-                    'has_courses_left_to_purchase': has_courses_left_to_purchase,
-                    'courses_left_to_purchase_price': courses_left_to_purchase_price,
-                    'courses_left_to_purchase_url': courses_left_to_purchase_url,
-                }
-        # TODO: clean up as part of REVEM-199 (END)
         enrollment = CourseEnrollment.objects.select_related(
             'course'
         ).get(user_id=user.id, course_id=course.id)
-        if enrollment.is_active:
-            enrollment_mode = enrollment.mode
-            enrollment_time = enrollment.created
     except CourseEnrollment.DoesNotExist:
-        pass  # Not enrolled, used the default None values
+        pass  # Not enrolled, use the default values
 
-    # upgrade_link and upgrade_date should be None if user has passed their dynamic pacing deadline.
-    upgrade_link, upgrade_date = check_and_get_upgrade_link_and_date(user, enrollment, course)
+    context = get_base_experiment_metadata_context(course, user, enrollment, user_enrollments, audit_enrollments)
     has_staff_access = has_staff_access_to_preview_mode(user, course.id)
     forum_roles = []
     if user.is_authenticated:
@@ -355,9 +283,34 @@ def get_experiment_user_metadata_context(course, user):
     else:
         user_partitions = {}
 
+    # TODO: clean up as part of REVO-28 (START)
+    context['has_non_audit_enrollments'] = has_non_audit_enrollments
+    # TODO: clean up as part of REVO-28 (END)
+    context['has_staff_access'] = has_staff_access
+    context['forum_roles'] = forum_roles
+    context['partition_groups'] = user_partitions
+    return context
+
+
+def get_base_experiment_metadata_context(course, user, enrollment, user_enrollments, audit_enrollments):
+    """
+    Return a context dictionary with the keys used by dashboard_metadata.html and user_metadata.html
+    """
+    enrollment_mode = None
+    enrollment_time = None
+    # TODO: clean up as part of REVEM-199 (START)
+    program_key = get_program_context(course, user_enrollments, audit_enrollments)
+    # TODO: clean up as part of REVEM-199 (END)
+    if enrollment and enrollment.is_active:
+        enrollment_mode = enrollment.mode
+        enrollment_time = enrollment.created
+
+    # upgrade_link and upgrade_date should be None if user has passed their dynamic pacing deadline.
+    upgrade_link, upgrade_date = check_and_get_upgrade_link_and_date(user, enrollment, course)
+
     return {
         'upgrade_link': upgrade_link,
-        'upgrade_price': unicode(get_cosmetic_verified_display_price(course)),
+        'upgrade_price': six.text_type(get_cosmetic_verified_display_price(course)),
         'enrollment_mode': enrollment_mode,
         'enrollment_time': enrollment_time,
         'pacing_type': 'self_paced' if course.self_paced else 'instructor_paced',
@@ -366,12 +319,6 @@ def get_experiment_user_metadata_context(course, user):
         'course_key': course.id,
         'course_start': course.start,
         'course_end': course.end,
-        'has_staff_access': has_staff_access,
-        'forum_roles': forum_roles,
-        'partition_groups': user_partitions,
-        # TODO: clean up as part of REVO-28 (START)
-        'has_non_audit_enrollments': has_non_audit_enrollments,
-        # TODO: clean up as part of REVO-28 (END)
         # TODO: clean up as part of REVEM-199 (START)
         'program_key_fields': program_key,
         # TODO: clean up as part of REVEM-199 (END)
@@ -382,45 +329,10 @@ def get_audit_access_expiration(user, course):
     """
     Return the expiration date for the user's audit access to this course.
     """
-    if AUDIT_DEADLINE_FLAG.is_enabled():
-        if not CourseDurationLimitConfig.enabled_for_enrollment(user=user, course_key=course.id):
-            return None
+    if not CourseDurationLimitConfig.enabled_for_enrollment(user=user, course_key=course.id):
+        return None
 
-        return get_user_course_expiration_date(user, course)
-    return None
-
-
-def get_base_experiment_metadata_context(course, user, enrollment, user_enrollments, audit_enrollments):
-    """
-    Return a context dictionary with the keys used by dashboard_metadata.html.
-    """
-    enrollment_mode = None
-    enrollment_time = None
-    # TODO: clean up as part of REVEM-199 (START)
-    program_key = get_program_context(course, user_enrollments, audit_enrollments)
-    # TODO: clean up as part of REVEM-199 (END)
-    if enrollment.is_active:
-        enrollment_mode = enrollment.mode
-        enrollment_time = enrollment.created
-
-    # upgrade_link and upgrade_date should be None if user has passed their dynamic pacing deadline.
-    upgrade_link, upgrade_date = check_and_get_upgrade_link_and_date(user, enrollment, course)
-
-    return {
-        'upgrade_link': upgrade_link,
-        'upgrade_price': unicode(get_cosmetic_verified_display_price(course)),
-        'enrollment_mode': enrollment_mode,
-        'enrollment_time': enrollment_time,
-        'pacing_type': 'self_paced' if course.self_paced else 'instructor_paced',
-        'upgrade_deadline': upgrade_date,
-        'audit_access_deadline': get_audit_access_expiration(user, course),
-        'course_key': course.id,
-        'course_start': course.start,
-        'course_end': course.end,
-        # TODO: clean up as part of REVEM-199 (START)
-        'program_key_fields': program_key,
-        # TODO: clean up as part of REVEM-199 (END)
-    }
+    return get_user_course_expiration_date(user, course)
 
 
 # TODO: clean up as part of REVEM-199 (START)

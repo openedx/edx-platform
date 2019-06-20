@@ -19,7 +19,7 @@ When reports are generated, we need to handle:
 The command will always use the read replica database if one is configured.
 
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import contextlib
 import csv
@@ -34,6 +34,7 @@ from django.db import connections
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
+from six.moves import range
 
 from xmodule.modulestore.django import modulestore
 
@@ -43,7 +44,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 def chunks(sequence, chunk_size):
-    return (sequence[index: index + chunk_size] for index in xrange(0, len(sequence), chunk_size))
+    return (sequence[index: index + chunk_size] for index in range(0, len(sequence), chunk_size))
 
 
 class Command(BaseCommand):

@@ -29,11 +29,11 @@ from .config.waffle import DISABLE_REGRADE_ON_POLICY_CHANGE, waffle
 from .constants import ScoreDatabaseTableEnum
 from .course_grade_factory import CourseGradeFactory
 from .exceptions import DatabaseNotReadyError
-from .services import GradesService
 from .signals.signals import SUBSECTION_SCORE_CHANGED
 from .subsection_grade_factory import SubsectionGradeFactory
 from .transformer import GradesTransformer
 from .grade_utils import are_grades_frozen
+
 
 log = getLogger(__name__)
 
@@ -269,7 +269,8 @@ def _has_db_updated_with_new_score(self, scored_block_usage_key, **kwargs):
         found_modified_time = score['created_at'] if score is not None else None
     else:
         assert kwargs['score_db_table'] == ScoreDatabaseTableEnum.overrides
-        score = GradesService().get_subsection_grade_override(
+        from . import api
+        score = api.get_subsection_grade_override(
             user_id=kwargs['user_id'],
             course_key_or_id=kwargs['course_id'],
             usage_key_or_id=kwargs['usage_id']

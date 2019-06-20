@@ -1,6 +1,8 @@
 """
 Tests for the LMS/lib utils
 """
+from __future__ import absolute_import
+
 from lms.lib import utils
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

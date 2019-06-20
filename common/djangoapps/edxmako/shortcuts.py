@@ -12,8 +12,11 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+from __future__ import absolute_import
+
 import logging
-from urlparse import urljoin
+import six
+from six.moves.urllib.parse import urljoin
 
 from django.conf import settings
 from django.urls import reverse
@@ -52,6 +55,12 @@ def marketing_link(name):
         # special case for when we only want the root marketing URL
         if name == 'ROOT':
             return marketing_urls.get('ROOT')
+        # special case for new enterprise marketing url with custom tracking query params
+        if name == 'ENTERPRISE':
+            enterprise_url = marketing_urls.get(name)
+            # if url is not relative, then return it without joining to root
+            if not enterprise_url.startswith('/'):
+                return enterprise_url
         # Using urljoin here allows us to enable a marketing site and set
         # a site ROOT, but still specify absolute URLs for other marketing
         # URLs in the MKTG_URLS setting
@@ -113,8 +122,8 @@ def marketing_link_context_processor(request):
         [
             ("MKTG_URL_" + k, marketing_link(k))
             for k in (
-                settings.MKTG_URL_LINK_MAP.viewkeys() |
-                marketing_urls.viewkeys()
+                six.viewkeys(settings.MKTG_URL_LINK_MAP) |
+                six.viewkeys(marketing_urls)
             )
         ]
     )

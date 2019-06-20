@@ -1,9 +1,12 @@
 """
 Tests for celery tasks defined in tasks module
 """
+from __future__ import absolute_import
+
 import contextlib
 
 import mock
+import six
 from ccx_keys.locator import CCXLocator
 
 from lms.djangoapps.ccx.tasks import send_ccx_course_published
@@ -51,7 +54,7 @@ class TestSendCCXCoursePublished(ModuleStoreTestCase):
         """
         Call the function under test
         """
-        send_ccx_course_published(unicode(course_key))
+        send_ccx_course_published(six.text_type(course_key))
 
     def test_signal_not_sent_for_ccx(self):
         """

@@ -2,7 +2,9 @@
 This module contains various configuration settings via
 waffle switches for the Grades app.
 """
-from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace, WaffleFlagNamespace, CourseWaffleFlag
+from __future__ import absolute_import
+
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace, WaffleSwitchNamespace
 
 # Namespace
 WAFFLE_NAMESPACE = u'grades'

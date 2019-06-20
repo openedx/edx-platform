@@ -640,19 +640,6 @@ class LoginSessionViewTest(UserAPITestCase):
                 "supplementalText": "",
                 "supplementalLink": "",
             },
-            {
-                "name": "remember",
-                "defaultValue": False,
-                "type": "checkbox",
-                "required": False,
-                "label": "Remember me",
-                "placeholder": "",
-                "instructions": "",
-                "restrictions": {},
-                "errorMessages": {},
-                "supplementalText": "",
-                "supplementalLink": "",
-            },
         ])
 
     def test_login(self):
@@ -1687,10 +1674,11 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             {"honor_code": "required"},
             {
-                "label": (u"By creating an account with {platform_name}, you agree {spacing}"
-                          u"to abide by our {platform_name} {spacing}"
+                "label": (u"By creating an account, you agree to the {spacing}"
                           u"{link_label} {spacing}"
-                          u"and agree to our {link_label2}.").format(
+                          u"and you acknowledge that {platform_name} and each Member process your "
+                          u"personal data in accordance {spacing}"
+                          u"with the {link_label2}.").format(
                     platform_name=settings.PLATFORM_NAME,
                     link_label=link_template.format(link_label=link_label),
                     link_label2=link_template2.format(link_label=link_label2),
@@ -1718,10 +1706,11 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             {"honor_code": "required"},
             {
-                "label": (u"By creating an account with {platform_name}, you agree {spacing}"
-                          u"to abide by our {platform_name} {spacing}"
+                "label": (u"By creating an account, you agree to the {spacing}"
                           u"{link_label} {spacing}"
-                          u"and agree to our {link_label2}.").format(
+                          u"and you acknowledge that {platform_name} and each Member process your "
+                          u"personal data in accordance {spacing}"
+                          u"with the {link_label2}.").format(
                     platform_name=settings.PLATFORM_NAME,
                     link_label=self.link_template.format(link_label=link_label),
                     link_label2=link_template.format(link_label=link_label2),
