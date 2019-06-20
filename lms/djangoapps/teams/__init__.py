@@ -2,8 +2,9 @@
 Defines common methods shared by Teams classes
 """
 
-from django.conf import settings
+from __future__ import absolute_import
 
+from django.conf import settings
 
 TEAM_DISCUSSION_CONTEXT = 'standalone'
 
