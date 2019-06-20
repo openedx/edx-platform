@@ -19,6 +19,7 @@ from django.utils.translation import ugettext_lazy as _
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.keys import CourseKey
+from simple_history.models import HistoricalRecords
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.cache_utils import request_cached
@@ -139,6 +140,8 @@ class CourseMode(models.Model):
             u"This is the bulk SKU (stock keeping unit) of this mode in the external ecommerce service."
         )
     )
+
+    history = HistoricalRecords()
 
     HONOR = 'honor'
     PROFESSIONAL = 'professional'
