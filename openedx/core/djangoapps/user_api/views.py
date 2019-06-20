@@ -264,7 +264,6 @@ class UpdateEmailOptInPreference(APIView):
     permission_classes = (IsAuthenticated,)
 
     @method_decorator(require_post_params(["course_id", "email_opt_in"]))
-    @method_decorator(ensure_csrf_cookie)
     def post(self, request):
         """ Post function for updating the email opt in preference.
 
