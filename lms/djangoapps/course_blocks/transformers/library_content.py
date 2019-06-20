@@ -26,7 +26,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
     blocks within a library_content module to which a user should not
     have access.
 
-    Staff users are to exempted from library content pathways.
+    Staff users are not to be exempted from library content pathways.
     """
     WRITE_VERSION = 1
     READ_VERSION = 1
@@ -127,10 +127,8 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
             Return True if selected block should be removed.
 
             Block is removed if it is part of library_content, but has
-            not been selected for current user, with staff as an exemption.
+            not been selected for current user.
             """
-            if usage_info.has_staff_access:
-                return False
             if block_key not in all_library_children:
                 return False
             if block_key in all_selected_children:
