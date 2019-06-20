@@ -352,6 +352,7 @@
             };
 
             DiscussionThreadListView.prototype.renderThread = function(thread) {
+                this.getUserName(thread);
                 var threadCommentCount = thread.get('comments_count'),
                     threadUnreadCommentCount = thread.get('unread_comments_count'),
                     neverRead = !thread.get('read') && threadUnreadCommentCount === threadCommentCount,
@@ -369,6 +370,15 @@
                 return $(this.threadListItemTemplate(context).toString());
             };
 
+            DiscussionThreadListView.prototype.getUserName = function(thread) {
+                var firstName, lastName, displayName;
+                firstName = thread.get('first_name');
+                lastName = thread.get('last_name');
+                if (typeof firstName !== 'undefined' && typeof lastName !== 'undefined') {
+                    displayName = firstName + ' ' + lastName[0];
+                    thread.set('username', displayName);
+                }
+            };
             DiscussionThreadListView.prototype.threadSelected = function(e) {
                 var threadId;
                 threadId = $(e.target).closest('.forum-nav-thread').attr('data-id');

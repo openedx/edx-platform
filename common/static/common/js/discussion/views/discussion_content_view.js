@@ -494,11 +494,23 @@
 
             DiscussionContentShowView.prototype.getAuthorDisplay = function() {
                 return _.template($('#post-user-display-template').html())({
-                    username: this.model.get('username') || null,
+                    username: this.getDisplayName(),
                     user_url: this.model.get('user_url'),
                     is_community_ta: this.model.get('community_ta_authored'),
                     is_staff: this.model.get('staff_authored')
                 });
+            };
+
+            DiscussionContentShowView.prototype.getDisplayName = function() {
+                var firstName, lastName, displayName;
+                firstName = this.model.get('first_name');
+                lastName = this.model.get('last_name');
+                if (typeof firstName === 'undefined' || typeof lastName === 'undefined') {
+                    displayName = this.model.get('username');
+                } else {
+                    displayName = firstName + ' ' + lastName[0];
+                }
+                return displayName;
             };
 
             DiscussionContentShowView.prototype.getEndorserDisplay = function() {

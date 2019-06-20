@@ -393,6 +393,8 @@
                     body: body,
                     created_at: (new Date()).toISOString(),
                     username: window.user.get('username'),
+                    first_name: window.user.get('first_name'),
+                    last_name: window.user.get('last_name'),
                     votes: {
                         up_count: 0
                     },

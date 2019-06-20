@@ -688,7 +688,7 @@ def prepare_content(content, course_key, is_staff=False, discussion_division_ena
     ]
 
     if (content.get('anonymous') is False) and ((content.get('anonymous_to_peers') is False) or is_staff):
-        fields += ['username', 'user_id']
+        fields += ['username', 'user_id', 'first_name', 'last_name']
 
     content = strip_none(extract(content, fields))
 

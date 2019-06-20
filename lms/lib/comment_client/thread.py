@@ -29,13 +29,15 @@ class Thread(models.Model):
         'highlighted_body', 'endorsed', 'read', 'group_id', 'group_name', 'pinned',
         'abuse_flaggers', 'resp_skip', 'resp_limit', 'resp_total', 'thread_type',
         'endorsed_responses', 'non_endorsed_responses', 'non_endorsed_resp_total',
-        'context', 'last_activity_at',
+        'context', 'last_activity_at', 'first_name', 'last_name'
     ]
 
     # updateable_fields are sent in PUT requests
     updatable_fields = [
         'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id', 'read',
-        'closed', 'user_id', 'commentable_id', 'group_id', 'group_name', 'pinned', 'thread_type'
+        'closed', 'user_id', 'commentable_id', 'group_id', 'group_name', 'pinned', 'thread_type',
+        'first_name', 'last_name'
+
     ]
 
     # metric_tag_fields are used by Datadog to record metrics about the model
