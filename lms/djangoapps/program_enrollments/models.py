@@ -2,20 +2,21 @@
 """
 Django model specifications for the Program Enrollments API
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
+
 import logging
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from course_modes.models import CourseMode
-from lms.djangoapps.program_enrollments.api.v1.constants import (
-    CourseEnrollmentResponseStatuses as ProgramCourseEnrollmentResponseStatuses
-)
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 from simple_history.models import HistoricalRecords
+
+from course_modes.models import CourseMode
+from lms.djangoapps.program_enrollments.api.v1.constants import \
+    CourseEnrollmentResponseStatuses as ProgramCourseEnrollmentResponseStatuses
 from student.models import AlreadyEnrolledError, CourseEnrollment
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
@@ -75,7 +76,7 @@ class ProgramEnrollment(TimeStampedModel):  # pylint: disable=model-missing-unic
         """
         return cls.objects.filter(
             program_uuid=program_uuid,
-            external_user_key__in=student_data.keys(),
+            external_user_key__in=list(student_data.keys()),
         )
 
     @classmethod

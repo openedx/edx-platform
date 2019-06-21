@@ -1,10 +1,14 @@
 """
 utility functions for program enrollments
 """
+from __future__ import absolute_import
+
 import logging
-from openedx.core.djangoapps.catalog.utils import get_programs
+
 from organizations.models import Organization
 from social_django.models import UserSocialAuth
+
+from openedx.core.djangoapps.catalog.utils import get_programs
 from third_party_auth.models import SAMLProviderConfig
 
 log = logging.getLogger(__name__)
