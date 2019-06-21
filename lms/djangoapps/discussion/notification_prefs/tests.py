@@ -1,18 +1,24 @@
 # pylint: disable=missing-docstring,consider-iterating-dictionary
+from __future__ import absolute_import
+
 import json
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
-from django.urls import reverse
 from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import patch
 
 from lms.djangoapps.discussion.notification_prefs import NOTIFICATION_PREF_KEY
 from lms.djangoapps.discussion.notification_prefs.views import (
-    UsernameCipher, ajax_disable, ajax_enable, ajax_status, set_subscription,
+    UsernameCipher,
+    ajax_disable,
+    ajax_enable,
+    ajax_status,
+    set_subscription
 )
 from openedx.core.djangoapps.user_api.models import UserPreference
 from student.tests.factories import UserFactory
