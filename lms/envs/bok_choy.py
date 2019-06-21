@@ -11,11 +11,16 @@ support both generating static assets to a directory and also serving static
 from the same directory.
 """
 
+from __future__ import absolute_import
+
+# Silence noisy logs
+import logging
 import os
-from path import Path as path
 from tempfile import mkdtemp
 
 from django.utils.translation import ugettext_lazy
+from path import Path as path
+
 from openedx.core.release import RELEASE_LINE
 
 CONFIG_ROOT = path(__file__).abspath().dirname()
@@ -31,7 +36,6 @@ os.environ['SERVICE_VARIANT'] = 'bok_choy_docker' if 'BOK_CHOY_HOSTNAME' in os.e
 os.environ['CONFIG_ROOT'] = CONFIG_ROOT
 os.environ['LMS_CFG'] = str.format("{config_root}/{service_variant}.yml",
                                    config_root=os.environ['CONFIG_ROOT'], service_variant=os.environ['SERVICE_VARIANT'])
-
 
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-position
 
@@ -122,15 +126,11 @@ XQUEUE_INTERFACE['url'] = 'http://localhost:8040'
 EDXNOTES_PUBLIC_API = 'http://localhost:8042/api/v1'
 EDXNOTES_INTERNAL_API = 'http://localhost:8042/api/v1'
 
-
 EDXNOTES_CONNECT_TIMEOUT = 10  # time in seconds
 EDXNOTES_READ_TIMEOUT = 10  # time in seconds
 
-
 NOTES_DISABLED_TABS = []
 
-# Silence noisy logs
-import logging
 LOG_OVERRIDES = [
     ('track.middleware', logging.CRITICAL),
     ('edxmako.shortcuts', logging.ERROR),
