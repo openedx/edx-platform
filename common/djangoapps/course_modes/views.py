@@ -5,6 +5,7 @@ from __future__ import absolute_import, unicode_literals
 
 import decimal
 import json
+import logging
 
 import six
 import six.moves.urllib.error
@@ -21,6 +22,7 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import get_language, to_locale
 from django.utils.translation import ugettext as _
 from django.views.generic.base import View
+from edx_django_utils.monitoring.utils import increment
 from ipware.ip import get_ip
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
@@ -39,6 +41,9 @@ from openedx.features.discounts.applicability import discount_percentage
 from student.models import CourseEnrollment
 from util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
+
+
+LOG = logging.getLogger(__name__)
 
 
 class ChooseModeView(View):
@@ -94,6 +99,13 @@ class ChooseModeView(View):
             return redirect(embargo_redirect)
 
         enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(request.user, course_key)
+
+        increment('track-selection.{}.{}'.format(enrollment_mode, 'active' if is_active else 'inactive'))
+        increment('track-selection.views')
+
+        if enrollment_mode is None:
+            LOG.info('Rendering track selection for unenrolled user, referred by %s', request.META.get('HTTP_REFERER'))
+
         modes = CourseMode.modes_for_course_dict(course_key)
         ecommerce_service = EcommerceService()
 
