@@ -189,7 +189,7 @@ kombu==3.0.37
 lazy-object-proxy==1.3.1  # via astroid
 lazy==1.1
 lepl==5.1.3
-libsass==0.10.0
+libsass==0.11.1
 linecache2==1.0.0         # via traceback2
 loremipsum==1.0.5
 lxml==3.8.0
