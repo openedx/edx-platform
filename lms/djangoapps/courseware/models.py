@@ -26,6 +26,7 @@ from django.db.models.signals import post_save
 from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import BlockTypeKeyField, CourseKeyField, UsageKeyField
+from courseware.fields import UnsignedBigIntAutoField
 from six import text_type
 from six.moves import range
 
@@ -94,6 +95,9 @@ class StudentModule(models.Model):
                     ('chapter', 'Section'),
                     ('sequential', 'Subsection'),
                     ('library_content', 'Library Content'))
+
+    id = UnsignedBigIntAutoField(primary_key=True)  # pylint: disable=invalid-name
+
     ## These three are the key for the object
     module_type = models.CharField(max_length=32, choices=MODULE_TYPES, default='problem', db_index=True)
 

@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from __future__ import absolute_import
 from django.db import migrations, models
 import django.db.models.deletion
-import coursewarehistoryextended.fields
+from courseware.fields import UnsignedBigIntAutoField
 from django.conf import settings
 
 def bump_pk_start(apps, schema_editor):
