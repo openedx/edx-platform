@@ -4,6 +4,7 @@ Settings for Appsembler on devstack, both LMS and CMS.
 from __future__ import print_function
 import sys
 
+
 def plugin_settings(settings):
     """
     Appsembler overrides devstack, both LMS and CMS.
