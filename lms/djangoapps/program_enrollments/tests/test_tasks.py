@@ -1,17 +1,19 @@
 """
 Unit tests for program_course_enrollments tasks
 """
+from __future__ import absolute_import
+
 from datetime import timedelta
+
 from django.db.models.base import ObjectDoesNotExist
 from django.test import TestCase
 from django.utils import timezone
 from freezegun import freeze_time
 from testfixtures import LogCapture
-from lms.djangoapps.program_enrollments.models import ProgramEnrollment, ProgramCourseEnrollment
+
+from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 from lms.djangoapps.program_enrollments.tasks import expire_waiting_enrollments, log
-from lms.djangoapps.program_enrollments.tests.factories import (
-    ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
-)
+from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
 from student.tests.factories import UserFactory
 
 
