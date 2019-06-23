@@ -85,7 +85,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-06-16 20:42+0000\n"
+"POT-Creation-Date: 2019-06-23 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Swahili (Kenya) (https://www.transifex.com/open-edx/teams/6205/sw_KE/)\n"
@@ -10786,10 +10786,6 @@ msgstr "jina la mtumiaji@domain.com"
 msgid "The email address you used to register with {platform_name}"
 msgstr "Anwani ya barua pepe uliyotumia kujisajili na{platform_name}"
 
-#: openedx/core/djangoapps/user_api/api.py lms/templates/login.html
-msgid "Remember me"
-msgstr "Nikumbuke"
-
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's email address.
@@ -11397,6 +11393,13 @@ msgstr ""
 
 #: openedx/features/discounts/models.py
 msgid "Disabled"
+msgstr ""
+
+#: openedx/features/discounts/utils.py
+#, python-brace-format
+msgid ""
+"{s_sr}Original price: {s_op}{original_price}{e_p}, discount price: "
+"{e_sr}{formatted_discount_price}"
 msgstr ""
 
 #: openedx/features/enterprise_support/api.py
@@ -13108,10 +13111,6 @@ msgstr ""
 "Tafadhali toa taarifa zifuatazo uweze kuingia mtandaoni kwa akaunti yako ya "
 "{platform_name} . Sehemu zinazohitajika zimenukuliwa na <strong "
 "class=\"indicator\">maandishi manene na maandishi ya mlazo(*)</strong>."
-
-#: lms/templates/login.html
-msgid "Account Preferences"
-msgstr "Pendekezo za Akaunti"
 
 #: lms/templates/login.html
 msgid "Sign in with {provider_name}"
@@ -17450,6 +17449,7 @@ msgid "Journals"
 msgstr ""
 
 #: lms/templates/header/navbar-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
 msgstr ""
 

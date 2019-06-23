@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-06-16 20:50+0000\n"
-"PO-Revision-Date: 2019-06-16 20:50:43.070759\n"
+"POT-Creation-Date: 2019-06-23 20:51+0000\n"
+"PO-Revision-Date: 2019-06-23 20:51:08.439610\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -10545,10 +10545,6 @@ msgstr ""
 msgid "The email address you used to register with {platform_name}"
 msgstr ""
 
-#: openedx/core/djangoapps/user_api/api.py lms/templates/login.html
-msgid "Remember me"
-msgstr ""
-
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's email address.
@@ -11139,6 +11135,13 @@ msgstr ""
 
 #: openedx/features/discounts/models.py
 msgid "Disabled"
+msgstr ""
+
+#: openedx/features/discounts/utils.py
+#, python-brace-format
+msgid ""
+"{s_sr}Original price: {s_op}{original_price}{e_p}, discount price: "
+"{e_sr}{formatted_discount_price}"
 msgstr ""
 
 #: openedx/features/enterprise_support/api.py
@@ -12776,10 +12779,6 @@ msgid ""
 "Please provide the following information to log into your {platform_name} "
 "account. Required fields are noted by <strong class=\"indicator\">bold text "
 "and an asterisk (*)</strong>."
-msgstr ""
-
-#: lms/templates/login.html
-msgid "Account Preferences"
 msgstr ""
 
 #: lms/templates/login.html
@@ -16766,6 +16765,7 @@ msgid "Journals"
 msgstr ""
 
 #: lms/templates/header/navbar-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
 msgstr ""
 
