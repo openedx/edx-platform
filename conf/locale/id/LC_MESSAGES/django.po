@@ -93,7 +93,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-06-09 20:42+0000\n"
+"POT-Creation-Date: 2019-06-16 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Indonesian (https://www.transifex.com/open-edx/teams/6205/id/)\n"
@@ -966,6 +966,11 @@ msgstr ""
 "{html_start} Berhasil! Anda telah mengaktifkan akun Anda. {html_end} "
 "Sekarang Anda akan menerima email pembaruan dan peringatan dari kami terkait"
 " dengan kursus yang Anda ikuti. Sign In untuk melanjutkan."
+
+#: common/djangoapps/student/views/management.py
+msgid ""
+"Your previous request is in progress, please try again in a few moments."
+msgstr ""
 
 #: common/djangoapps/student/views/management.py
 msgid "Some error occured during password change. Please try again"
@@ -16258,8 +16263,8 @@ msgstr ""
 "USD){end_span}"
 
 #: lms/templates/courseware/course_about.html
-msgid "Enroll in {course_name}"
-msgstr "Mendaftar untuk {course_name}"
+msgid "Enroll Now"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "View About Page in studio"

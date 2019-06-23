@@ -128,7 +128,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-06-16 20:42+0000\n"
+"POT-Creation-Date: 2019-06-23 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2019\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -11620,10 +11620,6 @@ msgid "The email address you used to register with {platform_name}"
 msgstr ""
 " {platform_name} sistemine kayıt olurken kullandığınız e-posta adresidir."
 
-#: openedx/core/djangoapps/user_api/api.py lms/templates/login.html
-msgid "Remember me"
-msgstr "Beni hatırla"
-
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's email address.
@@ -12250,6 +12246,13 @@ msgstr ""
 
 #: openedx/features/discounts/models.py
 msgid "Disabled"
+msgstr ""
+
+#: openedx/features/discounts/utils.py
+#, python-brace-format
+msgid ""
+"{s_sr}Original price: {s_op}{original_price}{e_p}, discount price: "
+"{e_sr}{formatted_discount_price}"
 msgstr ""
 
 #: openedx/features/enterprise_support/api.py
@@ -13997,10 +14000,6 @@ msgstr ""
 "{platform_name} hesabınıza giriş yapmak için lütfen aşağıdaki bilgileri "
 "tamamlayın. Gerekli kısımlar  <strong class=\"indicator\"> (*) ve koyu "
 "yazıyla vurgulanmıştır </strong>."
-
-#: lms/templates/login.html
-msgid "Account Preferences"
-msgstr "Hesap Ayarları"
 
 #: lms/templates/login.html
 msgid "Sign in with {provider_name}"
@@ -18317,6 +18316,7 @@ msgid "Journals"
 msgstr ""
 
 #: lms/templates/header/navbar-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
 msgstr "Dersleri Keşfet"
 

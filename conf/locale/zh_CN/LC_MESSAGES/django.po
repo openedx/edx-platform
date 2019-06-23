@@ -392,7 +392,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-06-16 20:42+0000\n"
+"POT-Creation-Date: 2019-06-23 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: ifLab <webmaster@iflab.org>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/open-edx/teams/6205/zh_CN/)\n"
@@ -11083,10 +11083,6 @@ msgstr "username@domain.com"
 msgid "The email address you used to register with {platform_name}"
 msgstr "您在{platform_name}上注册的邮箱"
 
-#: openedx/core/djangoapps/user_api/api.py lms/templates/login.html
-msgid "Remember me"
-msgstr "记住我"
-
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's email address.
@@ -11696,6 +11692,13 @@ msgstr ""
 
 #: openedx/features/discounts/models.py
 msgid "Disabled"
+msgstr ""
+
+#: openedx/features/discounts/utils.py
+#, python-brace-format
+msgid ""
+"{s_sr}Original price: {s_op}{original_price}{e_p}, discount price: "
+"{e_sr}{formatted_discount_price}"
 msgstr ""
 
 #: openedx/features/enterprise_support/api.py
@@ -13354,10 +13357,6 @@ msgid ""
 msgstr ""
 "请提供下面的信息以登录进入您的 {platform_name} 账号，必须填写的信息已经被 <strong "
 "class=\"indicator\">加粗和用 (*)标出</strong>。"
-
-#: lms/templates/login.html
-msgid "Account Preferences"
-msgstr "账号参数"
 
 #: lms/templates/login.html
 msgid "Sign in with {provider_name}"
@@ -17443,6 +17442,7 @@ msgid "Journals"
 msgstr "文章"
 
 #: lms/templates/header/navbar-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
 msgstr "马上探索课程"
 

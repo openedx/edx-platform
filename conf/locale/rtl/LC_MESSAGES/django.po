@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-06-16 20:50+0000\n"
-"PO-Revision-Date: 2019-06-16 20:50:43.070759\n"
+"POT-Creation-Date: 2019-06-23 20:51+0000\n"
+"PO-Revision-Date: 2019-06-23 20:51:08.439610\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -11665,10 +11665,6 @@ msgstr "عسثقرشوث@يخوشهر.ذخو"
 msgid "The email address you used to register with {platform_name}"
 msgstr "فاث ثوشهم شييقثسس غخع عسثي فخ قثلهسفثق صهفا {platform_name}"
 
-#: openedx/core/djangoapps/user_api/api.py lms/templates/login.html
-msgid "Remember me"
-msgstr "قثوثوزثق وث"
-
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's email address.
@@ -12356,6 +12352,15 @@ msgstr ""
 #: openedx/features/discounts/models.py
 msgid "Disabled"
 msgstr "يهسشزمثي"
+
+#: openedx/features/discounts/utils.py
+#, python-brace-format
+msgid ""
+"{s_sr}Original price: {s_op}{original_price}{e_p}, discount price: "
+"{e_sr}{formatted_discount_price}"
+msgstr ""
+"{s_sr}خقهلهرشم حقهذث: {s_op}{original_price}{e_p}, يهسذخعرف حقهذث: "
+"{e_sr}{formatted_discount_price}"
 
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
@@ -14108,10 +14113,6 @@ msgstr ""
 "حمثشسث حقخدهيث فاث بخممخصهرل هربخقوشفهخر فخ مخل هرفخ غخعق {platform_name} "
 "شذذخعرف. قثضعهقثي بهثميس شقث رخفثي زغ <strong class=\"indicator\">زخمي فثطف "
 "شري شر شسفثقهسن (*)</strong>."
-
-#: lms/templates/login.html
-msgid "Account Preferences"
-msgstr "شذذخعرف حقثبثقثرذثس"
 
 #: lms/templates/login.html
 msgid "Sign in with {provider_name}"
@@ -18699,6 +18700,7 @@ msgid "Journals"
 msgstr "تخعقرشمس"
 
 #: lms/templates/header/navbar-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
 msgstr "يهسذخدثق رثص"
 

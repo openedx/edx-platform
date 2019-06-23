@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-06-16 20:50+0000\n"
-"PO-Revision-Date: 2019-06-16 20:50:43.070759\n"
+"POT-Creation-Date: 2019-06-23 20:51+0000\n"
+"PO-Revision-Date: 2019-06-23 20:51:08.439610\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -13485,10 +13485,6 @@ msgstr ""
 "Thé émäïl äddréss ýöü üséd tö régïstér wïth {platform_name} Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
-#: openedx/core/djangoapps/user_api/api.py lms/templates/login.html
-msgid "Remember me"
-msgstr "Rémémßér mé Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's email address.
@@ -14283,6 +14279,15 @@ msgstr ""
 #: openedx/features/discounts/models.py
 msgid "Disabled"
 msgstr "Dïsäßléd Ⱡ'σяєм ιρѕυм ∂#"
+
+#: openedx/features/discounts/utils.py
+#, python-brace-format
+msgid ""
+"{s_sr}Original price: {s_op}{original_price}{e_p}, discount price: "
+"{e_sr}{formatted_discount_price}"
+msgstr ""
+"{s_sr}Örïgïnäl prïçé: {s_op}{original_price}{e_p}, dïsçöünt prïçé: "
+"{e_sr}{formatted_discount_price} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
@@ -16259,10 +16264,6 @@ msgstr ""
 "яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
 "ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι "
 "σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσя#"
-
-#: lms/templates/login.html
-msgid "Account Preferences"
-msgstr "Àççöünt Préférénçés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/templates/login.html
 msgid "Sign in with {provider_name}"
@@ -21446,6 +21447,7 @@ msgid "Journals"
 msgstr "Jöürnäls Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/header/navbar-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
 msgstr "Dïsçövér Néw Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
