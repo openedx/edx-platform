@@ -1057,31 +1057,6 @@ class FormulaProblemRandomizeTest(ProblemsTest):
         )
 
     @ddt.data(
-        ('R_1/R_3', 'incorrect')
-    )
-    @ddt.unpack
-    def test_reset_problem_after_submission(self, input_value, correctness):
-        """
-        Scenario: Test that reset button works regardless the submission correctness status.
-
-        Given I am attempting a formula problem type with randomization:always configuration
-        When I input the answer
-        Then I should be able to see the MathJax generated preview
-        When I submit the problem
-        Then I should be able to see the reset button
-        When reset button is clicked
-        Then the input pane contents should be clear
-        """
-        problem_page = ProblemPage(self.browser)
-        problem_page.fill_answer_numerical(input_value)
-        problem_page.verify_mathjax_rendered_in_preview()
-        problem_page.click_submit()
-        self.assertEqual(problem_page.get_simpleprob_correctness(), correctness)
-        self.assertTrue(problem_page.is_reset_button_present())
-        problem_page.click_reset()
-        self.assertEqual(problem_page.get_numerical_input_value, '')
-
-    @ddt.data(
         ('R_1*R_2', 'incorrect', 'R_1*R_2/R_3'),
         ('R_1*R_2/R_3', 'correct', 'R_1/R_3')
     )
