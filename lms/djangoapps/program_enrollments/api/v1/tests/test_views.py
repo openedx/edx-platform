@@ -574,16 +574,17 @@ class CourseEnrollmentPostTests(BaseCourseEnrollmentTestsMixin, APITestCase):
 
 
 @ddt.ddt
-class CourseEnrollmentPatchTests(BaseCourseEnrollmentTestsMixin, APITestCase):
-    """ Tests for course enrollment PATCH """
-
-    def request(self, path, data):
-        return self.client.patch(path, data, format='json')
+class CourseEnrollmentModificationTestBase(BaseCourseEnrollmentTestsMixin):
+    """
+    Base class for both the PATCH and PUT endpoints for Course Enrollment API
+    Children needs to implement assert_user_not_enrolled_test_result and
+    setup_change_test_data
+    """
 
     def test_207_multistatus(self):
         self.create_program_and_course_enrollments('learner-1')
-        post_data = [self.learner_enrollment("learner-1"), self.learner_enrollment("learner-2")]
-        response = self.request(self.default_url, post_data)
+        mod_data = [self.learner_enrollment("learner-1"), self.learner_enrollment("learner-2")]
+        response = self.request(self.default_url, mod_data)
         self.assertEqual(207, response.status_code)
         self.assertDictEqual(
             {'learner-1': CourseStatuses.ACTIVE, 'learner-2': CourseStatuses.NOT_IN_PROGRAM},
@@ -594,8 +595,13 @@ class CourseEnrollmentPatchTests(BaseCourseEnrollmentTestsMixin, APITestCase):
         self.create_program_enrollment('learner-1')
         patch_data = [self.learner_enrollment('learner-1')]
         response = self.request(self.default_url, patch_data)
-        self.assertEqual(422, response.status_code)
-        self.assertDictEqual({'learner-1': CourseStatuses.NOT_FOUND}, response.data)
+        self.assert_user_not_enrolled_test_result(response)
+
+    def assert_user_not_enrolled_test_result(self, response):
+        pass
+
+    def setup_change_test_data(self, initial_statuses):
+        pass
 
     @ddt.data(
         ('active', 'inactive', 'active', 'inactive'),
@@ -604,17 +610,14 @@ class CourseEnrollmentPatchTests(BaseCourseEnrollmentTestsMixin, APITestCase):
         ('inactive', 'inactive', 'inactive', 'inactive'),
     )
     def test_change_status(self, initial_statuses):
-        self.create_program_and_course_enrollments('learner-1', course_status=initial_statuses[0])
-        self.create_program_and_course_enrollments('learner-2', course_status=initial_statuses[1])
-        self.create_program_and_course_enrollments('learner-3', course_status=initial_statuses[2], user=None)
-        self.create_program_and_course_enrollments('learner-4', course_status=initial_statuses[3], user=None)
-        patch_data = [
+        self.setup_change_test_data(initial_statuses)
+        mod_data = [
             self.learner_enrollment('learner-1', 'inactive'),
             self.learner_enrollment('learner-2', 'active'),
             self.learner_enrollment('learner-3', 'inactive'),
             self.learner_enrollment('learner-4', 'active'),
         ]
-        response = self.request(self.default_url, patch_data)
+        response = self.request(self.default_url, mod_data)
         self.assertEqual(200, response.status_code)
         self.assertDictEqual(
             {
@@ -629,6 +632,40 @@ class CourseEnrollmentPatchTests(BaseCourseEnrollmentTestsMixin, APITestCase):
         self.assert_program_course_enrollment('learner-2', 'active', True)
         self.assert_program_course_enrollment('learner-3', 'inactive', False)
         self.assert_program_course_enrollment('learner-4', 'active', False)
+
+
+class CourseEnrollmentPatchTests(CourseEnrollmentModificationTestBase, APITestCase):
+    """ Tests for course enrollment PATCH """
+
+    def request(self, path, data):
+        return self.client.patch(path, data, format='json')
+
+    def assert_user_not_enrolled_test_result(self, response):
+        self.assertEqual(422, response.status_code)
+        self.assertDictEqual({'learner-1': CourseStatuses.NOT_FOUND}, response.data)
+
+    def setup_change_test_data(self, initial_statuses):
+        self.create_program_and_course_enrollments('learner-1', course_status=initial_statuses[0])
+        self.create_program_and_course_enrollments('learner-2', course_status=initial_statuses[1])
+        self.create_program_and_course_enrollments('learner-3', course_status=initial_statuses[2], user=None)
+        self.create_program_and_course_enrollments('learner-4', course_status=initial_statuses[3], user=None)
+
+
+class CourseEnrollmentPutTests(CourseEnrollmentModificationTestBase, APITestCase):
+    """ Tests for course enrollment PUT """
+
+    def request(self, path, data):
+        return self.client.put(path, data, format='json')
+
+    def assert_user_not_enrolled_test_result(self, response):
+        self.assertEqual(200, response.status_code)
+        self.assertDictEqual({'learner-1': CourseStatuses.ACTIVE}, response.data)
+
+    def setup_change_test_data(self, initial_statuses):
+        self.create_program_and_course_enrollments('learner-1', course_status=initial_statuses[0])
+        self.create_program_enrollment('learner-2')
+        self.create_program_enrollment('learner-3', user=None)
+        self.create_program_and_course_enrollments('learner-4', course_status=initial_statuses[3], user=None)
 
 
 class ProgramCourseEnrollmentListTest(ListViewTestMixin, APITestCase):

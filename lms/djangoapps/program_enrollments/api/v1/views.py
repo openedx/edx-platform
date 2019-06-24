@@ -588,13 +588,13 @@ class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpec
 
     Path: ``/api/program_enrollments/v1/programs/{program_uuid}/courses/{course_id}/enrollments/``
 
-    Accepts: [GET, POST]
+    Accepts: [GET, POST, PATCH, PUT]
 
     For GET requests, the path can contain an optional `page_size?=N` query parameter.
     The default page size is 100.
 
     ------------------------------------------------------------------------------------
-    POST
+    POST, PATCH, PUT
     ------------------------------------------------------------------------------------
 
     **Returns**
@@ -700,6 +700,19 @@ class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpec
             request,
             program_uuid,
             self.modify_learner_enrollment_status
+        )
+
+    @verify_program_exists
+    @verify_course_exists_and_in_program
+    # pylint: disable=unused-argument
+    def put(self, request, program_uuid=None, course_id=None):
+        """
+        Create or Update the program course enrollments of a list of learners
+        """
+        return self.create_or_modify_enrollments(
+            request,
+            program_uuid,
+            self.create_or_update_learner_enrollment
         )
 
     def create_or_modify_enrollments(self, request, program_uuid, operation):
@@ -811,6 +824,22 @@ class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpec
         if program_course_enrollment is None:
             return CourseEnrollmentResponseStatuses.NOT_FOUND
         return program_course_enrollment.change_status(enrollment_request['status'])
+
+    def create_or_update_learner_enrollment(self, enrollment_request, program_enrollment, program_course_enrollment):
+        """
+        Attempts to create or update the specified user's enrollment in the given course
+        in the given program
+        """
+        if program_course_enrollment is None:
+            # create the course enrollment
+            return ProgramCourseEnrollment.create_program_course_enrollment(
+                program_enrollment,
+                self.course_key,
+                enrollment_request['status']
+            )
+        else:
+            # Update course enrollment
+            return program_course_enrollment.change_status(enrollment_request['status'])
 
 
 class ProgramCourseEnrollmentOverviewView(DeveloperErrorViewMixin, ProgramSpecificViewMixin, APIView):
