@@ -139,6 +139,8 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
         factory_kwargs.setdefault('start', target_day)
         factory_kwargs.setdefault('upgrade_deadline', upgrade_deadline)
         factory_kwargs.setdefault('enrollment__course__self_paced', True)
+        # Make all schedules in the same course
+        factory_kwargs.setdefault('enrollment__course__run', '2012_Fall')
         if hasattr(self, 'experience_type'):
             factory_kwargs.setdefault('experience__experience_type', self.experience_type)
         schedule = ScheduleFactory(**factory_kwargs)
