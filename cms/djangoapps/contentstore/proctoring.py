@@ -74,7 +74,7 @@ def register_special_exams(course_key):
         exam_metadata = {
             'exam_name': timed_exam.display_name,
             'time_limit_mins': timed_exam.default_time_limit_minutes,
-            'due_date': timed_exam.due,
+            'due_date': timed_exam.due if not course.self_paced else None,
             'is_proctored': timed_exam.is_proctored_exam,
             # backends that support onboarding exams will treat onboarding exams as practice
             'is_practice_exam': timed_exam.is_practice_exam or timed_exam.is_onboarding_exam,
