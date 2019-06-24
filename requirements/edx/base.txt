@@ -226,7 +226,7 @@ social-auth-app-django==2.1.0
 social-auth-core==1.7.0
 sorl-thumbnail==12.3
 sortedcontainers==2.1.0
-soupsieve==1.9.1          # via beautifulsoup4
+soupsieve==1.9.2          # via beautifulsoup4
 sqlparse==0.3.0
 git+https://github.com/edx/staff_graded-xblock.git@a1ebad3e379555617bcbd3ceaee65294e2c93c4c#egg=staff_graded-xblock==0.1
 stevedore==1.30.1
