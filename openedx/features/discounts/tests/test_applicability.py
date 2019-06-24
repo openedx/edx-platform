@@ -7,6 +7,7 @@ from django.utils.timezone import now
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from entitlements.tests.factories import CourseEntitlementFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.discounts.models import DiscountRestrictionConfig
@@ -78,3 +79,19 @@ class TestApplicability(ModuleStoreTestCase):
 
         applicability = can_receive_discount(user=self.user, course=self.course)
         assert applicability == all(mode in CourseMode.UPSELL_TO_VERIFIED_MODES for mode in existing_enrollments)
+
+    @ddt.data(
+        None,
+        CourseMode.VERIFIED,
+        CourseMode.PROFESSIONAL,
+    )
+    @override_waffle_flag(DISCOUNT_APPLICABILITY_FLAG, active=True)
+    def test_can_receive_discount_entitlement(self, entitlement_mode):
+        """
+        Ensure that only users who have not already purchased courses receive the discount.
+        """
+        if entitlement_mode is not None:
+            CourseEntitlementFactory.create(mode=entitlement_mode, user=self.user)
+
+        applicability = can_receive_discount(user=self.user, course=self.course)
+        assert applicability == (entitlement_mode is None)
