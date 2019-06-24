@@ -1082,35 +1082,6 @@ class FormulaProblemRandomizeTest(ProblemsTest):
         self.assertEqual(problem_page.get_numerical_input_value, '')
 
     @ddt.data(
-        ('R_1*R_2', 'incorrect', '0/1 point (ungraded)', '0/1 point (ungraded)'),
-        ('R_1*R_2/R_3', 'correct', '1/1 point (ungraded)', '0/1 point (ungraded)'),
-        ('R_1/R_2', 'incorrect', '0/1 point (ungraded)', '0/1 point (ungraded)')
-    )
-    @ddt.unpack
-    def test_score_reset_after_resetting_problem(self, input_value, correctness, score_before_reset, score_after_reset):
-        """
-        Scenario: Test that score resets after the formula problem is resetted.
-
-        Given I am attempting a formula problem type with randomization:always configuration
-        When I input the answer
-        Then I should be able to see the MathJax generated preview
-        When I submit the problem
-        Then I should be able to view the score that I received
-        And The reset button should be present and is clickable
-        When the reset button is clicked
-        Then the score resets to zero
-        """
-        problem_page = ProblemPage(self.browser)
-        problem_page.fill_answer_numerical(input_value)
-        problem_page.verify_mathjax_rendered_in_preview()
-        problem_page.click_submit()
-        self.assertEqual(problem_page.get_simpleprob_correctness(), correctness)
-        self.assertIn(score_before_reset, problem_page.problem_progress_graded_value)
-        self.assertTrue(problem_page.is_reset_button_present())
-        problem_page.click_reset()
-        self.assertIn(score_after_reset, problem_page.problem_progress_graded_value)
-
-    @ddt.data(
         ('R_1*R_2', 'incorrect', 'R_1*R_2/R_3'),
         ('R_1*R_2/R_3', 'correct', 'R_1/R_3')
     )
