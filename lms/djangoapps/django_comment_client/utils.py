@@ -710,7 +710,10 @@ def prepare_content(content, course_key, is_staff=False, discussion_division_ena
                 endorser and
                 ("username" in fields or has_permission(endorser, "endorse_comment", course_key))
         ):
-            endorsement["username"] = endorser.username
+            if endorser.first_name and endorser.last_name:
+                endorsement["username"] = '{} {}'.format(endorser.first_name, endorser.last_name[0])
+            else:
+                endorsement["username"] = endorser.username
         else:
             del endorsement["user_id"]
 

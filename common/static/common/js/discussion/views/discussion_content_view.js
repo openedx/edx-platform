@@ -365,16 +365,17 @@
             };
 
             DiscussionContentShowView.prototype.toggleEndorse = function(event) {
-                var isEndorsing, msg, updates, url,
+                var isEndorsing, msg, updates, url, user,
                     self = this;
                 event.preventDefault();
                 isEndorsing = !this.model.get('endorsed');
                 url = this.model.urlFor('endorse');
+                user = DiscussionUtil.getUser();
                 updates = {
                     endorsed: isEndorsing,
                     endorsement: isEndorsing ? {
-                        username: DiscussionUtil.getUser().get('username'),
-                        user_id: DiscussionUtil.getUser().id,
+                        username: this.getDisplayName(user),
+                        user_id: user.id,
                         time: new Date().toISOString()
                     } : null
                 };
@@ -494,19 +495,19 @@
 
             DiscussionContentShowView.prototype.getAuthorDisplay = function() {
                 return _.template($('#post-user-display-template').html())({
-                    username: this.getDisplayName(),
+                    username: this.getDisplayName(this.model),
                     user_url: this.model.get('user_url'),
                     is_community_ta: this.model.get('community_ta_authored'),
                     is_staff: this.model.get('staff_authored')
                 });
             };
 
-            DiscussionContentShowView.prototype.getDisplayName = function() {
+            DiscussionContentShowView.prototype.getDisplayName = function(user) {
                 var firstName, lastName, displayName;
-                firstName = this.model.get('first_name');
-                lastName = this.model.get('last_name');
+                firstName = user.get('first_name');
+                lastName = user.get('last_name');
                 if (typeof firstName === 'undefined' || typeof lastName === 'undefined') {
-                    displayName = this.model.get('username');
+                    displayName = user.get('username');
                 } else {
                     displayName = firstName + ' ' + lastName[0];
                 }
