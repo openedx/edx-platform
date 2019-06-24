@@ -94,6 +94,7 @@ INSTALLED_APPS = (
 
     # Django 1.11 demands to have imported models supported by installed apps.
     'completion',
+    'entitlements',
 )
 
 LMS_ROOT_URL = "http://localhost:8000"
