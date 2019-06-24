@@ -2,19 +2,22 @@
 # -*- coding: utf-8 -*-
 
 from datetime import timedelta
+import ddt
 from django.utils.timezone import now
 
+from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.discounts.models import DiscountRestrictionConfig
-from student.tests.factories import UserFactory
+from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..applicability import can_receive_discount, DISCOUNT_APPLICABILITY_FLAG
 
 
+@ddt.ddt
 class TestApplicability(ModuleStoreTestCase):
     """
     Applicability determines if this combination of user and course can receive a discount. Make
@@ -54,3 +57,24 @@ class TestApplicability(ModuleStoreTestCase):
         DiscountRestrictionConfig.objects.create(disabled=True, course=disabled_course_overview)
         applicability = can_receive_discount(user=self.user, course=disabled_course)
         self.assertEqual(applicability, False)
+
+    @ddt.data(*(
+        [[]] +
+        [[mode] for mode in CourseMode.ALL_MODES] +
+        [
+            [mode1, mode2]
+            for mode1 in CourseMode.ALL_MODES
+            for mode2 in CourseMode.ALL_MODES
+            if mode1 != mode2
+        ]
+    ))
+    @override_waffle_flag(DISCOUNT_APPLICABILITY_FLAG, active=True)
+    def test_can_receive_discount_previous_verified_enrollment(self, existing_enrollments):
+        """
+        Ensure that only users who have not already purchased courses receive the discount.
+        """
+        for mode in existing_enrollments:
+            CourseEnrollmentFactory.create(mode=mode, user=self.user)
+
+        applicability = can_receive_discount(user=self.user, course=self.course)
+        assert applicability == all(mode in CourseMode.UPSELL_TO_VERIFIED_MODES for mode in existing_enrollments)
