@@ -282,6 +282,7 @@ def i18n_release_pull():
     resources = find_release_resources()
     sh("i18n_tool transifex pull " + " ".join(resources))
 
+
 @task
 @needs(
     "pavelib.i18n.i18n_clean",
