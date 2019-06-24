@@ -34,11 +34,9 @@ experiments_namespace = WaffleFlagNamespace(name=u'experiments')
 
 # .. toggle_name: experiments.add_programs
 # .. toggle_type: feature_flag
-# .. toggle_default: True
+# .. toggle_default: False
 # .. toggle_description: Toggle for adding the current course's program information to user metadata
 # .. toggle_category: experiments
-# .. toggle_use_cases: monitored_rollout
-# .. toggle_creation_date: 2019-2-25
 # .. toggle_expiration_date: None
 # .. toggle_warnings: None
 # .. toggle_tickets: REVEM-63, REVEM-198
@@ -46,23 +44,21 @@ experiments_namespace = WaffleFlagNamespace(name=u'experiments')
 PROGRAM_INFO_FLAG = WaffleFlag(
     waffle_namespace=experiments_namespace,
     flag_name=u'add_programs',
-    flag_undefined_default=True
+    flag_undefined_default=False
 )
 
 # .. toggle_name: experiments.add_dashboard_info
 # .. toggle_type: feature_flag
-# .. toggle_default: True
+# .. toggle_default: False
 # .. toggle_description: Toggle for adding info about each course to the dashboard metadata
 # .. toggle_category: experiments
-# .. toggle_use_cases: monitored_rollout
-# .. toggle_creation_date: 2019-3-28
 # .. toggle_expiration_date: None
 # .. toggle_warnings: None
 # .. toggle_tickets: REVEM-118
 # .. toggle_status: supported
 DASHBOARD_INFO_FLAG = WaffleFlag(experiments_namespace,
                                  u'add_dashboard_info',
-                                 flag_undefined_default=True)
+                                 flag_undefined_default=False)
 # TODO END: clean up as part of REVEM-199 (End)
 
 
