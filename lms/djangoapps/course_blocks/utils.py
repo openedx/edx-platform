@@ -1,6 +1,8 @@
 """
 Common utilities for use along with the course blocks.
 """
+from __future__ import absolute_import
+
 import json
 
 from courseware.models import StudentModule
