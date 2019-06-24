@@ -271,3 +271,40 @@ class TestProctoredExams(ModuleStoreTestCase):
         # advanced setting flag
         exams = get_all_exams_for_course(unicode(self.course.id))
         self.assertEqual(len(exams), expected_count)
+
+    def test_self_paced_no_due_dates(self):
+        self.course = CourseFactory.create(
+            org='edX',
+            course='901',
+            run='test_run2',
+            enable_proctored_exams=True,
+            enable_timed_exams=True,
+            self_paced=True,
+        )
+        chapter = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
+        ItemFactory.create(
+            parent=chapter,
+            category='sequential',
+            display_name='Test Proctored Exam',
+            graded=True,
+            is_time_limited=True,
+            default_time_limit_minutes=60,
+            is_proctored_exam=False,
+            is_practice_exam=False,
+            due=datetime.now(UTC) + timedelta(minutes=60),
+            exam_review_rules="allow_use_of_paper",
+            hide_after_due=True,
+            is_onboarding_exam=False,
+        )
+        listen_for_course_publish(self, self.course.id)
+        exams = get_all_exams_for_course(unicode(self.course.id))
+        # self-paced courses should ignore due dates
+        assert exams[0]['due_date'] is None
+
+        # now switch to instructor paced
+        # the exam will be updated with a due date
+        self.course.self_paced = False
+        self.course = self.update_course(self.course, 1)
+        listen_for_course_publish(self, self.course.id)
+        exams = get_all_exams_for_course(unicode(self.course.id))
+        assert exams[0]['due_date'] is not None
