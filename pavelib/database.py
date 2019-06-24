@@ -92,11 +92,11 @@ def update_local_bokchoy_db_from_s3(options):
     fingerprints_match = does_fingerprint_on_disk_match(fingerprint)
 
     if fingerprints_match:
-        print ("DB cache files match the current migrations.")
+        print("DB cache files match the current migrations.")
         reset_test_db(BOKCHOY_DB_FILES, update_cache_files=False)
 
     elif is_fingerprint_in_bucket(fingerprint, CACHE_BUCKET_NAME):
-        print ("Found updated bokchoy db files at S3.")
+        print("Found updated bokchoy db files at S3.")
         refresh_bokchoy_db_cache_from_s3(fingerprint, CACHE_BUCKET_NAME, BOKCHOY_DB_FILES)
         reset_test_db(BOKCHOY_DB_FILES, update_cache_files=False)
 
@@ -106,7 +106,7 @@ def update_local_bokchoy_db_from_s3(options):
             "Loading the bokchoy db files from disk",
             "and running migrations."
         )
-        print (msg)
+        print(msg)
         reset_test_db(BOKCHOY_DB_FILES, update_cache_files=True)
         # Check one last time to see if the fingerprint is present in
         # the s3 bucket. This could occur because the bokchoy job is
