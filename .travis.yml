@@ -2,6 +2,11 @@ language: python
 python:
   - "2.7"
 
+before_install:
+  - sudo rm -f /etc/boto.cfg
+  - travis_retry sudo apt-get update
+  - travis_retry sudo apt-get install python-dev libxml2-dev libxmlsec1-dev
+
 install:
   - pip install tox
 
