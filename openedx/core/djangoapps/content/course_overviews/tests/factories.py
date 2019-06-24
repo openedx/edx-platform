@@ -13,10 +13,12 @@ class CourseOverviewFactory(DjangoModelFactory):
     class Meta(object):
         model = CourseOverview
         django_get_or_create = ('id', )
+        exclude = ('run', )
 
     version = CourseOverview.VERSION
     pre_requisite_courses = []
     org = 'edX'
+    run = factory.Sequence('2012_Fall_{}'.format)
 
     @factory.lazy_attribute
     def _pre_requisite_courses_json(self):
@@ -28,7 +30,7 @@ class CourseOverviewFactory(DjangoModelFactory):
 
     @factory.lazy_attribute
     def id(self):
-        return CourseLocator(self.org, 'toy', '2012_Fall')
+        return CourseLocator(self.org, 'toy', self.run)
 
     @factory.lazy_attribute
     def display_name(self):
