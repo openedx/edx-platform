@@ -57,7 +57,8 @@ configparser==3.7.4       # via entrypoints, flake8, importlib-metadata, pylint
 contextlib2==0.5.5        # via importlib-metadata
 coreapi==2.3.3
 coreschema==0.0.4
-coverage==4.4
+git+https://github.com/nedbat/coveragepy.git@e9e703c7885840412295a0aaf3c84b5244483881#egg=coverage==5.0a6
+git+https://github.com/nedbat/coverage_pytest_plugin.git@75a4cf064d34d8615cf5aae73d9d800e7474b28a#egg=coverage_pytest_plugin
 git+https://github.com/edx/crowdsourcehinter.git@518605f0a95190949fe77bd39158450639e2e1dc#egg=crowdsourcehinter-xblock==0.1
 cryptography==2.7
 cssselect==1.0.3
