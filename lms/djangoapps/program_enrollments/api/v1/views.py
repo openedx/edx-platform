@@ -356,7 +356,7 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
         if None in student_data:
             return Response(
                 'invalid enrollment record',
-                status.HTTP_422_UNPROCESSABLE_ENTITY
+                status.HTTP_400_BAD_REQUEST
             )
 
         response_data = {}
@@ -385,7 +385,7 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
                 else:
                     return Response(
                         'invalid enrollment record',
-                        status.HTTP_422_UNPROCESSABLE_ENTITY
+                        status.HTTP_400_BAD_REQUEST
                     )
 
         # TODO: make this a bulk save - https://openedx.atlassian.net/browse/EDUCATOR-4305
@@ -410,7 +410,7 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
         if None in student_data:
             return Response(
                 'invalid enrollment record',
-                status.HTTP_422_UNPROCESSABLE_ENTITY
+                status.HTTP_400_BAD_REQUEST
             )
 
         response_data = {}
@@ -725,7 +725,7 @@ class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpec
         enrollments = []
 
         if not isinstance(request.data, list):
-            return Response('invalid enrollment record', status.HTTP_422_UNPROCESSABLE_ENTITY)
+            return Response('invalid enrollment record', status.HTTP_400_BAD_REQUEST)
         if len(request.data) > MAX_ENROLLMENT_RECORDS:
             return Response(
                 'enrollment limit 25', status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
@@ -739,11 +739,11 @@ class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpec
                 else:
                     enrollments.append(enrollment_request)
         except KeyError:  # student_key is not in enrollment_request
-            return Response('invalid enrollment record', status.HTTP_422_UNPROCESSABLE_ENTITY)
+            return Response('invalid enrollment record', status.HTTP_400_BAD_REQUEST)
         except TypeError:  # enrollment_request isn't a dict
-            return Response('invalid enrollment record', status.HTTP_422_UNPROCESSABLE_ENTITY)
+            return Response('invalid enrollment record', status.HTTP_400_BAD_REQUEST)
         except ValidationError:  # there was some other error raised by the serializer
-            return Response('invalid enrollment record', status.HTTP_422_UNPROCESSABLE_ENTITY)
+            return Response('invalid enrollment record', status.HTTP_400_BAD_REQUEST)
 
         program_enrollments = self.get_existing_program_enrollments(program_uuid, enrollments)
         for enrollment in enrollments:

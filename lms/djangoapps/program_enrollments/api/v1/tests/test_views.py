@@ -474,7 +474,7 @@ class BaseCourseEnrollmentTestsMixin(ProgramCacheTestCaseMixin):
     )
     def test_422_unprocessable_entity_bad_data(self, request_data):
         response = self.request(self.default_url, request_data)
-        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.status_code, 400)
         self.assertIn('invalid enrollment record', response.data)
 
     @ddt.data(
@@ -487,7 +487,7 @@ class BaseCourseEnrollmentTestsMixin(ProgramCacheTestCaseMixin):
         request_data.extend(bad_records)
         response = self.request(self.default_url, request_data)
 
-        self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        self.assertEqual(response.status_code, 400)
         self.assertIn('invalid enrollment record', response.data)
 
 
@@ -976,7 +976,8 @@ class ProgramEnrollmentViewPostTests(APITestCase):
                     content_type='application/json'
                 )
 
-        self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, 'invalid enrollment record')
 
     def test_unauthenticated(self):
         self.client.logout()
@@ -1056,7 +1057,7 @@ class ProgramEnrollmentViewPostTests(APITestCase):
             ):
                 response = self.client.post(url, json.dumps(enrollments), content_type='application/json')
 
-        self.assertEqual(422, response.status_code)
+        self.assertEqual(400, response.status_code)
         self.assertEqual('invalid enrollment record', response.data)
 
     @ddt.data(REQUEST_STUDENT_KEY, 'status', 'curriculum_uuid')
@@ -1074,7 +1075,7 @@ class ProgramEnrollmentViewPostTests(APITestCase):
             ):
                 response = self.client.post(url, json.dumps(enrollments), content_type='application/json')
 
-        self.assertEqual(422, response.status_code)
+        self.assertEqual(400, response.status_code)
         self.assertEqual('invalid enrollment record', response.data)
 
     @ddt.data(
@@ -1094,7 +1095,7 @@ class ProgramEnrollmentViewPostTests(APITestCase):
             ):
                 response = self.client.post(url, json.dumps(enrollments), content_type='application/json')
 
-        self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        self.assertEqual(response.status_code, 400)
         self.assertEqual('invalid enrollment record', response.data)
 
 
@@ -1229,7 +1230,8 @@ class ProgramEnrollmentViewPatchTests(APITestCase):
                 content_type='application/json'
             )
 
-        self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, 'invalid enrollment record')
 
     def test_duplicate_enrollment(self):
         enrollments = {}
@@ -1332,7 +1334,7 @@ class ProgramEnrollmentViewPatchTests(APITestCase):
         with mock.patch('lms.djangoapps.program_enrollments.api.v1.views.get_programs', autospec=True):
             response = self.client.patch(url, json.dumps(enrollments), content_type='application/json')
 
-        self.assertEqual(422, response.status_code)
+        self.assertEqual(400, response.status_code)
         self.assertEqual('invalid enrollment record', response.data)
 
 
