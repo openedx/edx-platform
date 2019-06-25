@@ -209,7 +209,7 @@ moto==0.3.1
 mpmath==1.1.0
 mysqlclient==1.4.2.post1
 networkx==1.7
-newrelic==4.20.0.120
+newrelic==4.20.1.121
 nltk==3.4.3
 nodeenv==1.1.1
 numpy==1.16.4
@@ -219,7 +219,7 @@ openapi-codec==1.3.2
 git+https://github.com/edx/edx-ora2.git@2.2.3#egg=ora2==2.2.3
 packaging==19.0
 path.py==8.2.1
-pathlib2==2.3.3
+pathlib2==2.3.4
 pathtools==0.1.2
 paver==1.3.4
 pbr==5.3.1
@@ -299,7 +299,7 @@ social-auth-app-django==2.1.0
 social-auth-core==1.7.0
 sorl-thumbnail==12.3
 sortedcontainers==2.1.0
-soupsieve==1.9.1
+soupsieve==1.9.2
 sphinx==1.8.5
 sphinxcontrib-websupport==1.1.2  # via sphinx
 sqlparse==0.3.0
@@ -312,7 +312,7 @@ text-unidecode==1.2
 tincan==0.0.5
 toml==0.10.0
 tox-battery==0.5.1
-tox==3.12.1
+tox==3.13.0
 transifex-client==0.13.6
 typing==3.7.4
 unicodecsv==0.14.1
@@ -336,9 +336,8 @@ xblock-utils==1.2.1
 xblock==1.2.2
 xmlsec==1.3.3
 xmltodict==0.12.0
-xss-utils==0.1.0
 zendesk==1.1.1
 zipp==0.5.1
 
 # The following packages are considered to be unsafe in a requirements file:
-# setuptools==41.0.1        # via caniusepython3, fs, lazy, pytest, python-levenshtein, sphinx, tox
+# setuptools==41.0.1        # via caniusepython3, fs, lazy, pytest, python-levenshtein, sphinx
