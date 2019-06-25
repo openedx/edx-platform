@@ -4,6 +4,8 @@ Certificates Application Configuration
 Signal handlers are connected here.
 """
 
+from __future__ import absolute_import
+
 from django.apps import AppConfig
 from django.conf import settings
 from edx_proctoring.runtime import set_runtime_service
