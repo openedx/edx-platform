@@ -130,6 +130,11 @@ class BasketsView(APIView):
         # Accept either honor or audit as an enrollment mode to
         # maintain backwards compatibility with existing courses
         default_enrollment_mode = audit_mode or honor_mode
+        course_name = None
+        course_announcement = None
+        if course is not None:
+            course_name = course.display_name
+            course_announcement = course.announcement
         if default_enrollment_mode:
             msg = Messages.ENROLL_DIRECTLY.format(
                 username=user.username,
@@ -140,7 +145,9 @@ class BasketsView(APIView):
                 msg = Messages.NO_SKU_ENROLLED.format(
                     enrollment_mode=default_enrollment_mode.slug,
                     course_id=course_id,
-                    username=user.username
+                    course_name=course_name,
+                    username=user.username,
+                    announcement=course_announcement
                 )
             log.info(msg)
             self._enroll(course_key, user, default_enrollment_mode.slug)

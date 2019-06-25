@@ -156,7 +156,9 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         msg = Messages.NO_SKU_ENROLLED.format(
             enrollment_mode=enrollment_mode,
             course_id=self.course.id,
-            username=self.user.username
+            course_name=self.course.display_name,
+            username=self.user.username,
+            announcement=self.course.announcement
         )
         self.assertResponseMessage(response, msg)
 
