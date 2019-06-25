@@ -14,9 +14,10 @@ from django.utils.timezone import now
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import format_course_price, get_cosmetic_verified_display_price
+from course_modes.models import format_course_price, get_cosmetic_verified_display_price, CourseMode
 from courseware.access import has_staff_access_to_preview_mode
 from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
+from entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.django_comment_common.models import Role
@@ -232,14 +233,12 @@ def get_dashboard_course_info(user, dashboard_enrollments):
     if DASHBOARD_INFO_FLAG.is_enabled():
         # Get the enrollments here since the dashboard filters out those with completed entitlements
         user_enrollments = CourseEnrollment.objects.select_related('course').filter(user_id=user.id)
-        audit_enrollments = user_enrollments.filter(mode='audit')
 
         course_info = {
             str(dashboard_enrollment.course): get_base_experiment_metadata_context(dashboard_enrollment.course,
                                                                                    user,
                                                                                    dashboard_enrollment,
-                                                                                   user_enrollments,
-                                                                                   audit_enrollments)
+                                                                                   user_enrollments)
             for dashboard_enrollment in dashboard_enrollments
         }
     return course_info
@@ -257,8 +256,7 @@ def get_experiment_user_metadata_context(course, user):
     has_non_audit_enrollments = False
     try:
         user_enrollments = CourseEnrollment.objects.select_related('course').filter(user_id=user.id)
-        audit_enrollments = user_enrollments.filter(mode='audit')
-        has_non_audit_enrollments = (len(audit_enrollments) != len(user_enrollments))
+        has_non_audit_enrollments = user_enrollments.exclude(mode__in=CourseMode.UPSELL_TO_VERIFIED_MODES).exists()
         # TODO: clean up as part of REVO-28 (END)
         enrollment = CourseEnrollment.objects.select_related(
             'course'
@@ -266,7 +264,11 @@ def get_experiment_user_metadata_context(course, user):
     except CourseEnrollment.DoesNotExist:
         pass  # Not enrolled, use the default values
 
-    context = get_base_experiment_metadata_context(course, user, enrollment, user_enrollments, audit_enrollments)
+    has_entitlements = False
+    if user.is_authenticated():
+        has_entitlements = CourseEntitlement.objects.filter(user=user).exists()
+
+    context = get_base_experiment_metadata_context(course, user, enrollment, user_enrollments)
     has_staff_access = has_staff_access_to_preview_mode(user, course.id)
     forum_roles = []
     if user.is_authenticated:
@@ -280,7 +282,7 @@ def get_experiment_user_metadata_context(course, user):
         user_partitions = {}
 
     # TODO: clean up as part of REVO-28 (START)
-    context['has_non_audit_enrollments'] = has_non_audit_enrollments
+    context['has_non_audit_enrollments'] = has_non_audit_enrollments or has_entitlements
     # TODO: clean up as part of REVO-28 (END)
     context['has_staff_access'] = has_staff_access
     context['forum_roles'] = forum_roles
@@ -288,14 +290,14 @@ def get_experiment_user_metadata_context(course, user):
     return context
 
 
-def get_base_experiment_metadata_context(course, user, enrollment, user_enrollments, audit_enrollments):
+def get_base_experiment_metadata_context(course, user, enrollment, user_enrollments):
     """
     Return a context dictionary with the keys used by dashboard_metadata.html and user_metadata.html
     """
     enrollment_mode = None
     enrollment_time = None
     # TODO: clean up as part of REVEM-199 (START)
-    program_key = get_program_context(course, user_enrollments, audit_enrollments)
+    program_key = get_program_context(course, user_enrollments)
     # TODO: clean up as part of REVEM-199 (END)
     if enrollment and enrollment.is_active:
         enrollment_mode = enrollment.mode
@@ -332,11 +334,13 @@ def get_audit_access_expiration(user, course):
 
 
 # TODO: clean up as part of REVEM-199 (START)
-def get_program_context(course, user_enrollments, audit_enrollments):
+def get_program_context(course, user_enrollments):
     """
     Return a context dictionary with program information.
     """
     program_key = None
+    non_audit_enrollments = user_enrollments.exclude(mode__in=CourseMode.UPSELL_TO_VERIFIED_MODES)
+
     if PROGRAM_INFO_FLAG.is_enabled():
         programs = get_programs(course=course.id)
         if programs:
@@ -358,7 +362,6 @@ def get_program_context(course, user_enrollments, audit_enrollments):
                 # program has 3 courses (A, B and C), and the user previously purchased a certificate for A.
                 # The user is enrolled in audit mode for B. The "left to purchase price" should be the price of
                 # B+C.
-                non_audit_enrollments = [en for en in user_enrollments if en not in audit_enrollments]
                 courses_left_to_purchase = get_unenrolled_courses(courses, non_audit_enrollments)
                 if courses_left_to_purchase:
                     has_courses_left_to_purchase = True

@@ -516,7 +516,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         course_overview = CourseOverviewFactory(
             start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
         )
-        course_enrollment = CourseEnrollmentFactory(user=self.user)
+        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=course_overview.id)
         entitlement = CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment)
         course_runs = [{
             'key': six.text_type(course_overview.id),
