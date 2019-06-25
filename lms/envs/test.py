@@ -125,6 +125,8 @@ XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 MOCK_STAFF_GRADING = True
 MOCK_PEER_GRADING = True
 
+COMMENTS_SERVICE_URL = 'http://localhost:4567'
+
 ############################ STATIC FILES #############################
 
 # TODO (cpennington): We need to figure out how envs/test.py can inject things
@@ -261,6 +263,7 @@ OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
 FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
 # don't cache courses for testing
 OIDC_COURSE_HANDLER_CACHE_TIMEOUT = 0
+OAUTH_ENFORCE_SECURE = False
 
 ########################### External REST APIs #################################
 FEATURES['ENABLE_MOBILE_REST_API'] = True
@@ -553,12 +556,14 @@ COURSE_CATALOG_API_URL = 'https://catalog.example.com/api/v1'
 
 COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "themes", REPO_ROOT / "common/test"]
 COMPREHENSIVE_THEME_LOCALE_PATHS = [REPO_ROOT / "themes/conf/locale", ]
+ENABLE_COMPREHENSIVE_THEMING = True
 
 LMS_ROOT_URL = "http://localhost:8000"
 
 FRONTEND_LOGOUT_URL = LMS_ROOT_URL + '/logout'
 
 ECOMMERCE_API_URL = 'https://ecommerce.example.com/api/v2/'
+ECOMMERCE_PUBLIC_URL_ROOT = None
 ENTERPRISE_API_URL = 'http://enterprise.example.com/enterprise/api/v1/'
 ENTERPRISE_CONSENT_API_URL = 'http://enterprise.example.com/consent/api/v1/'
 
@@ -616,3 +621,26 @@ derive_settings(__name__)
 
 ############### Settings for edx-rbac  ###############
 SYSTEM_WIDE_ROLE_CLASSES = os.environ.get("SYSTEM_WIDE_ROLE_CLASSES", [])
+
+###################### Grade Downloads ######################
+# These keys are used for all of our asynchronous downloadable files, including
+# the ones that contain information other than grades.
+
+GRADES_DOWNLOAD = {
+    'STORAGE_TYPE': 'localfs',
+    'BUCKET': 'edx-grades',
+    'ROOT_PATH': '/tmp/edx-s3/grades',
+}
+
+# Configuration used for generating PDF Receipts/Invoices
+
+PDF_RECEIPT_TAX_ID = 'add here'
+PDF_RECEIPT_FOOTER_TEXT = 'add your own specific footer text here'
+PDF_RECEIPT_DISCLAIMER_TEXT = 'add your own specific disclaimer text here'
+PDF_RECEIPT_BILLING_ADDRESS = 'add your own billing address here with appropriate line feed characters'
+PDF_RECEIPT_TERMS_AND_CONDITIONS = 'add your own terms and conditions'
+PDF_RECEIPT_TAX_ID_LABEL = 'Tax ID'
+
+PROFILE_MICROFRONTEND_URL = "http://profile-mfe/abc/"
+ORDER_HISTORY_MICROFRONTEND_URL = "http://order-history-mfe/"
+ACCOUNT_MICROFRONTEND_URL = "http://account-mfe/"

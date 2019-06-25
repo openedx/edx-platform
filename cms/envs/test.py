@@ -33,6 +33,7 @@ from lms.envs.test import (
     MEDIA_ROOT,
     MEDIA_URL,
     COMPREHENSIVE_THEME_DIRS,
+    ENABLE_COMPREHENSIVE_THEMING,
     JWT_AUTH,
     REGISTRATION_EXTRA_FIELDS,
     ECOMMERCE_API_URL,
@@ -357,3 +358,5 @@ derive_settings(__name__)
 
 ############### Settings for edx-rbac  ###############
 SYSTEM_WIDE_ROLE_CLASSES = os.environ.get("SYSTEM_WIDE_ROLE_CLASSES", [])
+
+DEFAULT_MOBILE_AVAILABLE = True

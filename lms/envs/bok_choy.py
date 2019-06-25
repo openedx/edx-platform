@@ -144,6 +144,7 @@ FEATURES['MILESTONES_APP'] = True
 
 # Enable oauth authentication, which we test.
 FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
+OAUTH_ENFORCE_SECURE = False
 
 # Enable pre-requisite course
 FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
