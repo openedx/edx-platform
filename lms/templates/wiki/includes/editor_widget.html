@@ -1,7 +1,9 @@
 {% load i18n %}
 <p id="hint_id_content" class="help-block">
+    {% filter force_escape %}
     {% blocktrans with start_link="<a id='cheatsheetLink' href='#cheatsheetModal' rel='leanModal'>" end_link="</a>" trimmed %}
         Markdown syntax is allowed. See the {{ start_link }}cheatsheet{{ end_link }} for help.
     {% endblocktrans %}
+    {% endfilter %}
 </p>
 <textarea {{ attrs }}>{{ content }}</textarea>
