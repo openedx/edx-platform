@@ -76,15 +76,23 @@ class SubsectionGradeSerializer(serializers.Serializer):
     possible_graded = serializers.FloatField()
 
 
-class SubsectionGradeOverrideHistorySerializer(serializers.Serializer):
+class SubsectionGradeOverrideSimpleHistorySerializer(serializers.Serializer):
     """
     Serializer for subsection grade override history.
     """
-    user = serializers.CharField()
-    comments = serializers.CharField()
     created = serializers.DateTimeField()
-    feature = serializers.CharField()
-    action = serializers.CharField()
+    grade_id = serializers.IntegerField()
+    history_id = serializers.IntegerField()
+    earned_all_override = serializers.FloatField()
+    earned_graded_override = serializers.FloatField()
+    history_change_reason = serializers.CharField()
+    history_date = serializers.DateTimeField()
+    history_type = serializers.CharField()
+    history_user = serializers.CharField()
+    history_user_id = serializers.IntegerField()
+    id = serializers.IntegerField()
+    possible_all_override = serializers.FloatField()
+    possible_graded_override = serializers.FloatField()
 
 
 class SubsectionGradeResponseSerializer(serializers.Serializer):
@@ -96,4 +104,4 @@ class SubsectionGradeResponseSerializer(serializers.Serializer):
     course_id = serializers.CharField()
     original_grade = SubsectionGradeSerializer()
     override = SubsectionGradeOverrideSerializer()
-    history = SubsectionGradeOverrideHistorySerializer(many=True)
+    history = SubsectionGradeOverrideSimpleHistorySerializer(many=True)
