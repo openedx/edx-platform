@@ -17,6 +17,7 @@ from opaque_keys.edx.keys import CourseKey
 from course_modes.models import format_course_price, get_cosmetic_verified_display_price, CourseMode
 from courseware.access import has_staff_access_to_preview_mode
 from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
+from entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.django_comment_common.models import Role
@@ -263,6 +264,10 @@ def get_experiment_user_metadata_context(course, user):
     except CourseEnrollment.DoesNotExist:
         pass  # Not enrolled, use the default values
 
+    has_entitlements = False
+    if user.is_authenticated():
+        has_entitlements = CourseEntitlement.objects.filter(user=user).exists()
+
     context = get_base_experiment_metadata_context(course, user, enrollment, user_enrollments)
     has_staff_access = has_staff_access_to_preview_mode(user, course.id)
     forum_roles = []
@@ -277,7 +282,7 @@ def get_experiment_user_metadata_context(course, user):
         user_partitions = {}
 
     # TODO: clean up as part of REVO-28 (START)
-    context['has_non_audit_enrollments'] = has_non_audit_enrollments
+    context['has_non_audit_enrollments'] = has_non_audit_enrollments or has_entitlements
     # TODO: clean up as part of REVO-28 (END)
     context['has_staff_access'] = has_staff_access
     context['forum_roles'] = forum_roles
