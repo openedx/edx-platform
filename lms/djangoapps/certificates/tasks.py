@@ -1,6 +1,7 @@
+from __future__ import absolute_import
+
 from celery import task
 from logging import getLogger
-
 from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from django.contrib.auth.models import User
 from lms.djangoapps.verify_student.services import IDVerificationService
