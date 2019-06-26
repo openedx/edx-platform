@@ -223,7 +223,7 @@ class LazySequence(Sequence):
     It is immutable, and accepts an estimated length in order to support __len__
     without exhausting the underlying sequence
     """
-    def __init__(self, iterable, est_len=None):  # pylint: disable=super-init-not-called
+    def __init__(self, iterable, est_len=None):
         self.iterable = iterable
         self.est_len = est_len
         self._data = []
