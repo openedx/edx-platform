@@ -2,6 +2,8 @@
 Django models related to teams functionality.
 """
 
+from __future__ import absolute_import
+
 from datetime import datetime
 from uuid import uuid4
 
@@ -10,11 +12,14 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.dispatch import receiver
+from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy
 from django_countries.fields import CountryField
 from model_utils import FieldTracker
 from opaque_keys.edx.django.models import CourseKeyField
 
+from lms.djangoapps.teams import TEAM_DISCUSSION_CONTEXT
+from lms.djangoapps.teams.utils import emit_team_event
 from openedx.core.djangoapps.django_comment_common.signals import (
     comment_created,
     comment_deleted,
@@ -24,14 +29,11 @@ from openedx.core.djangoapps.django_comment_common.signals import (
     thread_created,
     thread_deleted,
     thread_edited,
-    thread_voted,
     thread_followed,
     thread_unfollowed,
+    thread_voted
 )
-from lms.djangoapps.teams import TEAM_DISCUSSION_CONTEXT
-from lms.djangoapps.teams.utils import emit_team_event
 from student.models import CourseEnrollment, LanguageField
-from django.utils.text import slugify
 
 from .errors import AlreadyOnTeamInCourse, ImmutableMembershipFieldException, NotEnrolledInCourseForTeam
 
@@ -68,7 +70,7 @@ def post_edit_delete_handler(sender, **kwargs):  # pylint: disable=unused-argume
     post.
     """
     post = kwargs['post']
-    handle_activity(kwargs['user'], post, long(post.user_id))
+    handle_activity(kwargs['user'], post, int(post.user_id))
 
 
 @receiver(comment_endorsed)
@@ -77,7 +79,7 @@ def comment_endorsed_handler(sender, **kwargs):  # pylint: disable=unused-argume
     Update the user's last activity date upon endorsing a comment.
     """
     comment = kwargs['post']
-    handle_activity(kwargs['user'], comment, long(comment.thread.user_id))
+    handle_activity(kwargs['user'], comment, int(comment.thread.user_id))
 
 
 def handle_activity(user, post, original_author_id=None):
