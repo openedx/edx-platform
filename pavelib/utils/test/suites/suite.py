@@ -92,6 +92,8 @@ class TestSuite(object):
         sys.stdout.write(msg)
         sys.stdout.flush()
 
+        import os
+        os.environ['TEST_SUITE'] = self.root.replace("/", "_")
         kwargs = {'shell': True, 'cwd': None}
         process = None
 
