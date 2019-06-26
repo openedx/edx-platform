@@ -1,11 +1,14 @@
 """ Tasks for program enrollments """
-from datetime import timedelta
+from __future__ import absolute_import
+
 import logging
+from datetime import timedelta
+
 from celery import task
 from celery_utils.logged_task import LoggedTask
 from django.utils import timezone
 
-from lms.djangoapps.program_enrollments.models import ProgramEnrollment, ProgramCourseEnrollment
+from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 
 log = logging.getLogger(__name__)
 

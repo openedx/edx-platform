@@ -1,6 +1,10 @@
 """ Management command to cleanup old waiting enrollments """
+from __future__ import absolute_import
+
 import logging
+
 from django.core.management.base import BaseCommand
+
 from ... import tasks
 
 logger = logging.getLogger(__name__)
