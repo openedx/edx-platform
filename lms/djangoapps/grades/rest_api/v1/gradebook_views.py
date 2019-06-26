@@ -925,7 +925,7 @@ class SubsectionGradeView(GradeViewMixin, APIView):
 
         try:
             override = original_grade.override
-            history = PersistentSubsectionGradeOverrideHistory.objects.filter(override_id=override.id)
+            history = override.history.all()
         except PersistentSubsectionGradeOverride.DoesNotExist:
             override = None
             history = []
@@ -938,5 +938,4 @@ class SubsectionGradeView(GradeViewMixin, APIView):
             'user_id': original_grade.user_id,
             'course_id': original_grade.course_id,
         })
-
         return Response(results.data)

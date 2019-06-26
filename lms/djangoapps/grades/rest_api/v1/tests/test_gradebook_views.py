@@ -1447,7 +1447,8 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         'login_course_admin',
         'login_course_staff',
     )
-    def test_with_override_no_history(self, login_method):
+    @freeze_time('2019-01-01')
+    def test_with_override_no_modification(self, login_method):
         getattr(self, login_method)()
 
         override = PersistentSubsectionGradeOverride.objects.create(
@@ -1478,10 +1479,24 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
             ]),
             'course_id': text_type(self.course_key),
             'subsection_id': text_type(self.usage_key),
-            'history': []
+            'history': [OrderedDict([
+                ('created', '2019-01-01T00:00:00Z'),
+                ('grade_id', 1),
+                ('history_id', 1),
+                ('earned_all_override', 0.0),
+                ('earned_graded_override', 0.0),
+                ('history_change_reason', None),
+                ('history_date', '2019-01-01T00:00:00Z'),
+                ('history_type', u'+'),
+                ('history_user', None),
+                ('history_user_id', None),
+                ('id', 1),
+                ('possible_all_override', 12.0),
+                ('possible_graded_override', 8.0),
+            ])],
         }
 
-        self.assertEqual(expected_data, resp.data)
+        assert expected_data == resp.data
 
     @ddt.data(
         'login_staff',
@@ -1520,16 +1535,24 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
             ]),
             'course_id': text_type(self.course_key),
             'subsection_id': text_type(self.usage_key),
-            'history': [{
-                'user': self.global_staff.username,
-                'comments': None,
-                'created': '2019-01-01T00:00:00Z',
-                'feature': 'GRADEBOOK',
-                'action': 'CREATEORUPDATE'
-            }]
+            'history': [OrderedDict([
+                ('created', '2019-01-01T00:00:00Z'),
+                ('grade_id', 1),
+                ('history_id', 1),
+                ('earned_all_override', 0.0),
+                ('earned_graded_override', 0.0),
+                ('history_change_reason', 'GRADEBOOK'),
+                ('history_date', '2019-01-01T00:00:00Z'),
+                ('history_type', u'+'),
+                ('history_user', None),
+                ('history_user_id', None),
+                ('id', 1),
+                ('possible_all_override', 12.0),
+                ('possible_graded_override', 8.0),
+            ])],
         }
 
-        self.assertEqual(expected_data, resp.data)
+        assert expected_data == resp.data
 
     @ddt.data(
         'login_staff',
