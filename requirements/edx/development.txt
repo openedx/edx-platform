@@ -6,7 +6,6 @@
 #
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
 -e common/lib/capa
-git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0
 -e git+https://github.com/edx/codejail.git@a320d43ce6b9c93b17636b2491f724d9e433be47#egg=codejail
 -e git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c4aee6e76b9abe61cc808#egg=django-debug-toolbar-mongo==0.1.10
 -e git+https://github.com/edx/django-wiki.git@v0.0.21#egg=django-wiki
@@ -51,6 +50,7 @@ celery==3.1.25
 certifi==2019.6.16
 cffi==1.12.3
 chardet==3.0.4
+git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0
 click-log==0.3.2
 click==7.0
 code-annotations==0.3.2
@@ -177,7 +177,7 @@ inflect==2.1.0
 inflection==0.3.1
 ipaddress==1.0.22
 isodate==0.6.0
-isort==4.3.20
+isort==4.3.21
 itsdangerous==1.1.0
 itypes==1.1.0
 jinja2-pluralize==0.3.0
@@ -210,7 +210,7 @@ moto==0.3.1
 mpmath==1.1.0
 mysqlclient==1.4.2.post1
 networkx==1.7
-newrelic==4.20.0.120
+newrelic==4.20.1.121
 nltk==3.4.3
 nodeenv==1.1.1
 numpy==1.16.4
@@ -219,7 +219,7 @@ oauthlib==2.1.0
 git+https://github.com/edx/edx-ora2.git@2.2.3#egg=ora2==2.2.3
 packaging==19.0
 path.py==8.2.1
-pathlib2==2.3.3
+pathlib2==2.3.4
 pathtools==0.1.2
 paver==1.3.4
 pbr==5.3.1
@@ -296,12 +296,12 @@ singledispatch==3.4.0.3
 six==1.11.0
 slumber==0.7.1
 snakefood==1.4
-snowballstemmer==1.2.1    # via sphinx
+snowballstemmer==1.9.0    # via sphinx
 social-auth-app-django==2.1.0
 social-auth-core==1.7.0
 sorl-thumbnail==12.3
 sortedcontainers==2.1.0
-soupsieve==1.9.1
+soupsieve==1.9.2
 sphinx==1.8.5
 sphinxcontrib-websupport==1.1.2  # via sphinx
 sqlparse==0.3.0
@@ -314,7 +314,7 @@ text-unidecode==1.2
 tincan==0.0.5
 toml==0.10.0
 tox-battery==0.5.1
-tox==3.12.1
+tox==3.13.1
 transifex-client==0.13.6
 typing==3.7.4
 unicodecsv==0.14.1
@@ -338,9 +338,9 @@ xblock-utils==1.2.1
 xblock==1.2.2
 xmlsec==1.3.3
 xmltodict==0.12.0
-xss-utils==0.1.0
+xss-utils==0.1.1
 zendesk==1.1.1
 zipp==0.5.1
 
 # The following packages are considered to be unsafe in a requirements file:
-# setuptools==41.0.1        # via caniusepython3, fs, lazy, pytest, python-levenshtein, sphinx, tox
+# setuptools==41.0.1        # via caniusepython3, fs, lazy, pytest, python-levenshtein, sphinx
