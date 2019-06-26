@@ -6,7 +6,6 @@
 #
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
 -e common/lib/capa
-git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0
 -e git+https://github.com/edx/codejail.git@a320d43ce6b9c93b17636b2491f724d9e433be47#egg=codejail
 -e git+https://github.com/edx/django-wiki.git@v0.0.21#egg=django-wiki
 -e git+https://github.com/edx/DoneXBlock.git@01a14f3bd80ae47dd08cdbbe2f88f3eb88d00fba#egg=done-xblock
@@ -49,6 +48,7 @@ celery==3.1.25
 certifi==2019.6.16
 cffi==1.12.3
 chardet==3.0.4
+git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0
 click-log==0.3.2          # via edx-lint
 click==7.0
 code-annotations==0.3.2
@@ -166,12 +166,12 @@ html5lib==1.0.1
 httplib2==0.13.0
 httpretty==0.9.6
 idna==2.8
-importlib-metadata==0.18  # via pluggy
+importlib-metadata==0.18  # via pluggy, tox
 inflect==2.1.0
 inflection==0.3.1
 ipaddress==1.0.22
 isodate==0.6.0
-isort==4.3.20
+isort==4.3.21
 itsdangerous==1.1.0       # via flask
 itypes==1.1.0
 jinja2-pluralize==0.3.0
@@ -203,16 +203,16 @@ moto==0.3.1
 mpmath==1.1.0
 mysqlclient==1.4.2.post1
 networkx==1.7
-newrelic==4.20.0.120
+newrelic==4.20.1.121
 nltk==3.4.3
 nodeenv==1.1.1
 numpy==1.16.4
 oauth2==1.9.0.post1
 oauthlib==2.1.0
 git+https://github.com/edx/edx-ora2.git@2.2.3#egg=ora2==2.2.3
-packaging==19.0           # via caniusepython3
+packaging==19.0           # via caniusepython3, tox
 path.py==8.2.1
-pathlib2==2.3.3           # via importlib-metadata, pytest, pytest-django
+pathlib2==2.3.4           # via importlib-metadata, pytest, pytest-django
 pathtools==0.1.2
 paver==1.3.4
 pbr==5.3.1
@@ -290,7 +290,7 @@ social-auth-app-django==2.1.0
 social-auth-core==1.7.0
 sorl-thumbnail==12.3
 sortedcontainers==2.1.0
-soupsieve==1.9.1
+soupsieve==1.9.2
 sqlparse==0.3.0
 git+https://github.com/edx/staff_graded-xblock.git@a1ebad3e379555617bcbd3ceaee65294e2c93c4c#egg=staff_graded-xblock==0.1
 stevedore==1.30.1
@@ -301,7 +301,7 @@ text-unidecode==1.2       # via faker
 tincan==0.0.5
 toml==0.10.0              # via tox
 tox-battery==0.5.1
-tox==3.12.1
+tox==3.13.1
 transifex-client==0.13.6
 typing==3.7.4             # via flake8
 unicodecsv==0.14.1
@@ -324,9 +324,8 @@ xblock-utils==1.2.1
 xblock==1.2.2
 xmlsec==1.3.3
 xmltodict==0.12.0         # via moto
-xss-utils==0.1.0
 zendesk==1.1.1
 zipp==0.5.1               # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
-# setuptools==41.0.1        # via caniusepython3, fs, lazy, pytest, python-levenshtein, tox
+# setuptools==41.0.1        # via caniusepython3, fs, lazy, pytest, python-levenshtein

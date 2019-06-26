@@ -9,8 +9,8 @@ common/lib/symmath
 asn1crypto==0.24.0
 backports-abc==0.5        # via tornado
 git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4
-git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0
 cffi==1.12.3
+git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0
 cryptography==2.7
 enum34==1.1.6
 futures==3.2.0 ; python_version == "2.7"  # via tornado
