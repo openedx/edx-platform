@@ -1098,7 +1098,7 @@ urlpatterns += (
 urlpatterns += (
     url(r'^tahoe/api/',
         include('openedx.core.djangoapps.appsembler.api.urls',
-        namespace='tahoe-api')),
+                namespace='tahoe-api')),
 )
 
 if 'figures' in settings.INSTALLED_APPS:

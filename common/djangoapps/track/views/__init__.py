@@ -97,10 +97,10 @@ def server_track(request, event_type, event, page=None):
         username = "anonymous"
 
     if isinstance(event, basestring) and event:
-       try:
-           event = json.loads(event)
-       except ValueError:
-           pass  # Don't decode, but pass the string as is
+        try:
+            event = json.loads(event)
+        except ValueError:
+            pass  # Don't decode, but pass the string as is
 
     context_override = dict()
     context_override.update(eventtracker.get_tracker().resolve_context())

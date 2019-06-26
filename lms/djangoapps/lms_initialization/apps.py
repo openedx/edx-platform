@@ -36,4 +36,3 @@ class LMSInitializationConfig(AppConfig):
 
             if settings.LMS_SEGMENT_SITE:
                 analytics.default_client = DefaultMultipleSegmentClient()
-

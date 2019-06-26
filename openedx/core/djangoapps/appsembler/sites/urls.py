@@ -34,4 +34,3 @@ if settings.APPSEMBLER_FEATURES.get('ENABLE_FILE_HOST_API', True):
     urlpatterns += [
         url(r'^host_files', HostFilesView.as_view()),
     ]
-

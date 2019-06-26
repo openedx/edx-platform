@@ -42,8 +42,8 @@ locales:
     - fr_CA # French (Canada)
     # - gl  # Galician
     # - gu  # Gujarati
-    - he  # Hebrew
-    - hi  # Hindi
+    # - he  # Hebrew
+    # - hi  # Hindi
     # - hr  # Croatian
     # - hu  # Hungarian
     # - hy_AM  # Armenian (Armenia)
@@ -53,7 +53,7 @@ locales:
     # - kk_KZ  # Kazakh (Kazakhstan)
     # - km_KH  # Khmer (Cambodia)
     # - kn  # Kannada
-    - ko_KR  # Korean (Korea)
+    # - ko_KR  # Korean (Korea)
     # - lt_LT  # Lithuanian (Lithuania)
     # - ml  # Malayalam
     # - mn  # Mongolian
@@ -67,7 +67,7 @@ locales:
     - pt_BR  # Portuguese (Brazil)
     # - pt_PT  # Portuguese (Portugal)
     # - ro  # Romanian
-    - ru  # Russian
+    # - ru  # Russian
     # - si  # Sinhala
     # - sk  # Slovak
     # - sl  # Slovenian
