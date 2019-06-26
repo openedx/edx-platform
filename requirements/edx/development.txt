@@ -59,7 +59,7 @@ configparser==3.7.4
 contextlib2==0.5.5
 coreapi==2.3.3
 coreschema==0.0.4
-coverage==4.4
+coverage==5.0a5
 git+https://github.com/edx/crowdsourcehinter.git@518605f0a95190949fe77bd39158450639e2e1dc#egg=crowdsourcehinter-xblock==0.1
 cryptography==2.7
 cssselect==1.0.3
