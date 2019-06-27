@@ -12,6 +12,8 @@ file and check it in at the same time as your model changes. To do that,
 ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 """
+from __future__ import absolute_import
+
 import codecs
 import csv
 import hashlib
@@ -20,6 +22,7 @@ import logging
 import os.path
 from uuid import uuid4
 
+import six
 from boto.exception import BotoServerError
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -87,7 +90,7 @@ class InstructorTask(models.Model):
         },)
 
     def __unicode__(self):
-        return unicode(repr(self))
+        return six.text_type(repr(self))
 
     @classmethod
     def create(cls, course_id, task_type, task_key, task_input, requester):
@@ -226,7 +229,7 @@ class ReportStore(object):
         compatibility.
         """
         for row in rows:
-            yield [unicode(item).encode('utf-8') for item in row]
+            yield [six.text_type(item).encode('utf-8') for item in row]
 
 
 class DjangoStorageReportStore(ReportStore):
