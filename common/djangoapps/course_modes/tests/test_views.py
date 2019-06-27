@@ -24,7 +24,6 @@ from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from openedx.features.course_experience import FIRST_PURCHASE_OFFER_BANNER_DISPLAY
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
@@ -401,7 +400,6 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
 
     @patch('openedx.features.course_experience.utils.can_receive_discount')
     @patch('openedx.features.course_experience.utils.discount_percentage')
-    @override_waffle_flag(FIRST_PURCHASE_OFFER_BANNER_DISPLAY, active=True)
     def test_discount_on_track_selection(self, discount_percentage_mock, can_receive_discount_mock):
         can_receive_discount_mock.return_value = True
         discount_percentage_mock.return_value = 15
