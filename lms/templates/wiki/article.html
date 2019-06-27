@@ -27,7 +27,7 @@
         {% include "wiki/includes/article_menu.html" %}
       </ul>
       <div class="timestamp">
-        <span class="label">{% trans "Last modified:" % as tmsg} | {{ tmsg | force_escape}}</span><br />
+        <span class="label">{% trans "Last modified:" as tmsg %} {{ tmsg | force_escape}}</span><br />
         <span class="date">{{ article.current_revision.modified }}</span>
       </div>
 
