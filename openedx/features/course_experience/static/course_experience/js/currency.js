@@ -1,4 +1,3 @@
-import whichCountry from 'which-country';
 import 'jquery.cookie';
 import $ from 'jquery'; // eslint-disable-line import/extensions
 
