@@ -305,7 +305,7 @@ soupsieve==1.9.2
 sphinx==1.8.5
 sphinxcontrib-websupport==1.1.2  # via sphinx
 sqlparse==0.3.0
-git+https://github.com/edx/staff_graded-xblock.git@a1ebad3e379555617bcbd3ceaee65294e2c93c4c#egg=staff_graded-xblock==0.1
+staff-graded-xblock==0.2
 stevedore==1.30.1
 git+https://github.com/edx/super-csv@1a9dcc89eb65c3ed434b509b84062f8fcabd901b#egg=super-csv==0.2
 sympy==1.4
