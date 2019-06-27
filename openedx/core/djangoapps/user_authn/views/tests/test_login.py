@@ -1,4 +1,4 @@
-#coding:utf-8
+# coding:utf-8
 """
 Tests for student activation and login
 """
@@ -7,6 +7,7 @@ import unicodedata
 import unittest
 
 import ddt
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
@@ -17,6 +18,7 @@ from django.test.utils import override_settings
 from django.urls import NoReverseMatch, reverse
 from mock import patch
 from six import text_type
+from six.moves import range
 
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.password_policy.compliance import (
@@ -39,51 +41,54 @@ class LoginTest(CacheIsolationTestCase):
     """
 
     ENABLED_CACHES = ['default']
+    LOGIN_FAILED_WARNING = 'Email or password is incorrect'
+    ACTIVATE_ACCOUNT_WARNING = 'In order to sign in, you need to activate your account'
+    username = 'test'
+    user_email = 'test@edx.org'
+    password = 'test_password'
 
     def setUp(self):
+        """Setup a test user along with its registration and profile"""
         super(LoginTest, self).setUp()
-        # Create one user and save it to the database
-        self.user = UserFactory.build(username='test', email='test@edx.org')
-        self.user.set_password('test_password')
+        self.user = UserFactory.build(username=self.username, email=self.user_email)
+        self.user.set_password(self.password)
         self.user.save()
 
-        # Create a registration for the user
         RegistrationFactory(user=self.user)
-
-        # Create a profile for the user
         UserProfileFactory(user=self.user)
 
-        # Create the test client
         self.client = Client()
         cache.clear()
 
-        # Store the login url
         try:
             self.url = reverse('login_post')
         except NoReverseMatch:
             self.url = reverse('login')
 
     def test_login_success(self):
-        response, mock_audit_log = self._login_response('test@edx.org', 'test_password',
-                                                        patched_audit_log='student.models.AUDIT_LOG')
+        response, mock_audit_log = self._login_response(
+            self.user_email, self.password, patched_audit_log='student.models.AUDIT_LOG'
+        )
         self._assert_response(response, success=True)
-        self._assert_audit_log(mock_audit_log, 'info', [u'Login success', u'test@edx.org'])
+        self._assert_audit_log(mock_audit_log, 'info', [u'Login success', self.user_email])
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_success_no_pii(self):
-        response, mock_audit_log = self._login_response('test@edx.org', 'test_password',
-                                                        patched_audit_log='student.models.AUDIT_LOG')
+        response, mock_audit_log = self._login_response(
+            self.user_email, self.password, patched_audit_log='student.models.AUDIT_LOG'
+        )
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success'])
-        self._assert_not_in_audit_log(mock_audit_log, 'info', [u'test@edx.org'])
+        self._assert_not_in_audit_log(mock_audit_log, 'info', [self.user_email])
 
     def test_login_success_unicode_email(self):
-        unicode_email = u'test' + unichr(40960) + u'@edx.org'
+        unicode_email = u'test' + six.unichr(40960) + u'@edx.org'
         self.user.email = unicode_email
         self.user.save()
 
-        response, mock_audit_log = self._login_response(unicode_email, 'test_password',
-                                                        patched_audit_log='student.models.AUDIT_LOG')
+        response, mock_audit_log = self._login_response(
+            unicode_email, self.password, patched_audit_log='student.models.AUDIT_LOG'
+        )
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success', unicode_email])
 
@@ -104,20 +109,9 @@ class LoginTest(CacheIsolationTestCase):
         nonexistent_email = u'not_a_user@edx.org'
         response, mock_audit_log = self._login_response(
             nonexistent_email,
-            'test_password',
+            self.password,
         )
-        self._assert_response(response, success=False,
-                              value='Email or password is incorrect')
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email', nonexistent_email])
-
-    def test_login_fail_incorrect_email(self):
-        nonexistent_email = u'not_a_user@edx.org'
-        response, mock_audit_log = self._login_response(
-            nonexistent_email,
-            'test_password',
-        )
-        self._assert_response(response, success=False,
-                              value='Email or password is incorrect')
+        self._assert_response(response, success=False, value=self.LOGIN_FAILED_WARNING)
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email', nonexistent_email])
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
@@ -125,47 +119,27 @@ class LoginTest(CacheIsolationTestCase):
         nonexistent_email = u'not_a_user@edx.org'
         response, mock_audit_log = self._login_response(
             nonexistent_email,
-            'test_password',
+            self.password,
         )
-        self._assert_response(response, success=False,
-                              value='Email or password is incorrect')
+        self._assert_response(response, success=False, value=self.LOGIN_FAILED_WARNING)
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email'])
         self._assert_not_in_audit_log(mock_audit_log, 'warning', [nonexistent_email])
 
     def test_login_fail_wrong_password(self):
         response, mock_audit_log = self._login_response(
-            'test@edx.org',
+            self.user_email,
             'wrong_password',
         )
-        self._assert_response(response, success=False,
-                              value='Email or password is incorrect')
+        self._assert_response(response, success=False, value=self.LOGIN_FAILED_WARNING)
         self._assert_audit_log(mock_audit_log, 'warning',
-                               [u'Login failed', u'password for', u'test@edx.org', u'invalid'])
+                               [u'Login failed', u'password for', self.user_email, u'invalid'])
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_fail_wrong_password_no_pii(self):
-        response, mock_audit_log = self._login_response(
-            'test@edx.org',
-            'wrong_password',
-        )
-        self._assert_response(response, success=False,
-                              value='Email or password is incorrect')
+        response, mock_audit_log = self._login_response(self.user_email, 'wrong_password')
+        self._assert_response(response, success=False, value=self.LOGIN_FAILED_WARNING)
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'password for', u'invalid'])
-        self._assert_not_in_audit_log(mock_audit_log, 'warning', [u'test@edx.org'])
-
-    def test_login_not_activated(self):
-        # De-activate the user
-        self.user.is_active = False
-        self.user.save()
-
-        # Should now be unable to login
-        response, mock_audit_log = self._login_response(
-            'test@edx.org',
-            'test_password',
-        )
-        self._assert_response(response, success=False,
-                              value="In order to sign in, you need to activate your account.")
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Account not active for user'])
+        self._assert_not_in_audit_log(mock_audit_log, 'warning', [self.user_email])
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_not_activated_no_pii(self):
@@ -175,35 +149,65 @@ class LoginTest(CacheIsolationTestCase):
 
         # Should now be unable to login
         response, mock_audit_log = self._login_response(
-            'test@edx.org',
-            'test_password',
+            self.user_email,
+            self.password
         )
         self._assert_response(response, success=False,
                               value="In order to sign in, you need to activate your account.")
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Account not active for user'])
         self._assert_not_in_audit_log(mock_audit_log, 'warning', [u'test'])
 
+    def test_login_not_activated_with_correct_credentials(self):
+        """
+        Tests that when user login with the correct credentials but with an inactive
+        account, the system, send account activation email notification to the user.
+        """
+        self.user.is_active = False
+        self.user.save()
+
+        response, mock_audit_log = self._login_response(
+            self.user_email,
+            self.password,
+        )
+        self._assert_response(response, success=False, value=self.ACTIVATE_ACCOUNT_WARNING)
+        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Account not active for user'])
+
+    @patch('openedx.core.djangoapps.user_authn.views.login._log_and_raise_inactive_user_auth_error')
+    def test_login_inactivated_user_with_incorrect_credentials(self, mock_inactive_user_email_and_error):
+        """
+        Tests that when user login with incorrect credentials and an inactive account,
+        the system does *not* send account activation email notification to the user.
+        """
+        nonexistent_email = 'incorrect@email.com'
+        self.user.is_active = False
+        self.user.save()
+        response, mock_audit_log = self._login_response(nonexistent_email, 'incorrect_password')
+
+        self.assertFalse(mock_inactive_user_email_and_error.called)
+        self._assert_response(response, success=False, value=self.LOGIN_FAILED_WARNING)
+        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email', nonexistent_email])
+
     def test_login_unicode_email(self):
-        unicode_email = u'test@edx.org' + unichr(40960)
+        unicode_email = self.user_email + six.unichr(40960)
         response, mock_audit_log = self._login_response(
             unicode_email,
-            'test_password',
+            self.password,
         )
         self._assert_response(response, success=False)
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', unicode_email])
 
     def test_login_unicode_password(self):
-        unicode_password = u'test_password' + unichr(1972)
+        unicode_password = self.password + six.unichr(1972)
         response, mock_audit_log = self._login_response(
-            'test@edx.org',
+            self.user_email,
             unicode_password,
         )
         self._assert_response(response, success=False)
         self._assert_audit_log(mock_audit_log, 'warning',
-                               [u'Login failed', u'password for', u'test@edx.org', u'invalid'])
+                               [u'Login failed', u'password for', self.user_email, u'invalid'])
 
     def test_logout_logging(self):
-        response, _ = self._login_response('test@edx.org', 'test_password')
+        response, _ = self._login_response(self.user_email, self.password)
         self._assert_response(response, success=True)
         logout_url = reverse('logout')
         with patch('student.models.AUDIT_LOG') as mock_audit_log:
@@ -212,7 +216,7 @@ class LoginTest(CacheIsolationTestCase):
         self._assert_audit_log(mock_audit_log, 'info', [u'Logout', u'test'])
 
     def test_login_user_info_cookie(self):
-        response, _ = self._login_response('test@edx.org', 'test_password')
+        response, _ = self._login_response(self.user_email, self.password)
         self._assert_response(response, success=True)
 
         # Verify the format of the "user info" cookie set on login
@@ -227,7 +231,7 @@ class LoginTest(CacheIsolationTestCase):
             self.assertIn("http://testserver/", url)
 
     def test_logout_deletes_mktg_cookies(self):
-        response, _ = self._login_response('test@edx.org', 'test_password')
+        response, _ = self._login_response(self.user_email, self.password)
         self._assert_response(response, success=True)
 
         # Check that the marketing site cookies have been set
@@ -252,7 +256,7 @@ class LoginTest(CacheIsolationTestCase):
         # When logged in cookie names are loaded from JSON files, they may
         # have type `unicode` instead of `str`, which can cause errors
         # when calling Django cookie manipulation functions.
-        response, _ = self._login_response('test@edx.org', 'test_password')
+        response, _ = self._login_response(self.user_email, self.password)
         self._assert_response(response, success=True)
 
         response = self.client.post(reverse('logout'))
@@ -263,7 +267,7 @@ class LoginTest(CacheIsolationTestCase):
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_logout_logging_no_pii(self):
-        response, _ = self._login_response('test@edx.org', 'test_password')
+        response, _ = self._login_response(self.user_email, self.password)
         self._assert_response(response, success=True)
         logout_url = reverse('logout')
         with patch('student.models.AUDIT_LOG') as mock_audit_log:
@@ -275,22 +279,22 @@ class LoginTest(CacheIsolationTestCase):
     def test_login_ratelimited_success(self):
         # Try (and fail) logging in with fewer attempts than the limit of 30
         # and verify that you can still successfully log in afterwards.
-        for i in xrange(20):
+        for i in range(20):
             password = u'test_password{0}'.format(i)
-            response, _audit_log = self._login_response('test@edx.org', password)
+            response, _audit_log = self._login_response(self.user_email, password)
             self._assert_response(response, success=False)
         # now try logging in with a valid password
-        response, _audit_log = self._login_response('test@edx.org', 'test_password')
+        response, _audit_log = self._login_response(self.user_email, self.password)
         self._assert_response(response, success=True)
 
     def test_login_ratelimited(self):
         # try logging in 30 times, the default limit in the number of failed
         # login attempts in one 5 minute period before the rate gets limited
-        for i in xrange(30):
+        for i in range(30):
             password = u'test_password{0}'.format(i)
-            self._login_response('test@edx.org', password)
+            self._login_response(self.user_email, password)
         # check to see if this response indicates that this was ratelimited
-        response, _audit_log = self._login_response('test@edx.org', 'wrong_password')
+        response, _audit_log = self._login_response(self.user_email, 'wrong_password')
         self._assert_response(response, success=False, value='Too many failed login attempts')
 
     @patch.dict("django.conf.settings.FEATURES", {"DISABLE_SET_JWT_COOKIES_FOR_TESTS": False})
@@ -300,7 +304,7 @@ class LoginTest(CacheIsolationTestCase):
             self.assertIn(jwt_cookies.jwt_refresh_cookie_name(), self.client.cookies)
 
         setup_login_oauth_client()
-        response, _ = self._login_response('test@edx.org', 'test_password')
+        response, _ = self._login_response(self.user_email, self.password)
         _assert_jwt_cookie_present(response)
 
         response = self.client.post(reverse('login_refresh'))
@@ -308,7 +312,7 @@ class LoginTest(CacheIsolationTestCase):
 
     @patch.dict("django.conf.settings.FEATURES", {'PREVENT_CONCURRENT_LOGINS': True})
     def test_single_session(self):
-        creds = {'email': 'test@edx.org', 'password': 'test_password'}
+        creds = {'email': self.user_email, 'password': self.password}
         client1 = Client()
         client2 = Client()
 
@@ -343,13 +347,13 @@ class LoginTest(CacheIsolationTestCase):
         cms
         """
         user = UserFactory.build(username='tester', email='tester@edx.org')
-        user.set_password('test_password')
+        user.set_password(self.password)
         user.save()
 
         # Assert that no profile is created.
         self.assertFalse(hasattr(user, 'profile'))
 
-        creds = {'email': 'tester@edx.org', 'password': 'test_password'}
+        creds = {'email': 'tester@edx.org', 'password': self.password}
         client1 = Client()
         client2 = Client()
 
@@ -382,7 +386,7 @@ class LoginTest(CacheIsolationTestCase):
         # accessing logout url as it does not have login-required decorator it will avoid redirect
         # and go inside the enforce_single_login
 
-        creds = {'email': 'test@edx.org', 'password': 'test_password'}
+        creds = {'email': self.user_email, 'password': self.password}
         client1 = Client()
         client2 = Client()
 
@@ -413,9 +417,7 @@ class LoginTest(CacheIsolationTestCase):
         with patch('student.views.change_enrollment') as mock_change_enrollment:
             mock_change_enrollment.return_value = HttpResponseBadRequest("I am a 400")
             response, _ = self._login_response(
-                'test@edx.org',
-                'test_password',
-                extra_post_params=extra_post_params,
+                self.user_email, self.password, extra_post_params=extra_post_params,
             )
         response_content = json.loads(response.content)
         self.assertIsNone(response_content["redirect_url"])
@@ -431,9 +433,7 @@ class LoginTest(CacheIsolationTestCase):
         with patch('student.views.change_enrollment') as mock_change_enrollment:
             mock_change_enrollment.return_value = HttpResponse()
             response, _ = self._login_response(
-                'test@edx.org',
-                'test_password',
-                extra_post_params=extra_post_params,
+                self.user_email, self.password, extra_post_params=extra_post_params,
             )
         response_content = json.loads(response.content)
         self.assertIsNone(response_content["redirect_url"])
@@ -447,10 +447,7 @@ class LoginTest(CacheIsolationTestCase):
         enforce_compliance_path = 'openedx.core.djangoapps.password_policy.compliance.enforce_compliance_on_login'
         with patch(enforce_compliance_path) as mock_check_password_policy_compliance:
             mock_check_password_policy_compliance.return_value = HttpResponse()
-            response, _ = self._login_response(
-                'test@edx.org',
-                'test_password',
-            )
+            response, _ = self._login_response(self.user_email, self.password)
             response_content = json.loads(response.content)
         self.assertTrue(response_content.get('success'))
 
@@ -459,12 +456,12 @@ class LoginTest(CacheIsolationTestCase):
         """
         Tests _enforce_password_policy_compliance fails with an exception thrown
         """
-        with patch('openedx.core.djangoapps.password_policy.compliance.enforce_compliance_on_login') as \
-                mock_enforce_compliance_on_login:
+        enforce_compliance_on_login = 'openedx.core.djangoapps.password_policy.compliance.enforce_compliance_on_login'
+        with patch(enforce_compliance_on_login) as mock_enforce_compliance_on_login:
             mock_enforce_compliance_on_login.side_effect = NonCompliantPasswordException()
             response, _ = self._login_response(
-                'test@edx.org',
-                'test_password'
+                self.user_email,
+                self.password
             )
             response_content = json.loads(response.content)
         self.assertFalse(response_content.get('success'))
@@ -476,13 +473,10 @@ class LoginTest(CacheIsolationTestCase):
         """
         Tests _enforce_password_policy_compliance succeeds with a warning thrown
         """
-        with patch('openedx.core.djangoapps.password_policy.compliance.enforce_compliance_on_login') as \
-                mock_enforce_compliance_on_login:
+        enforce_compliance_on_login = 'openedx.core.djangoapps.password_policy.compliance.enforce_compliance_on_login'
+        with patch(enforce_compliance_on_login) as mock_enforce_compliance_on_login:
             mock_enforce_compliance_on_login.side_effect = NonCompliantPasswordWarning('Test warning')
-            response, _ = self._login_response(
-                'test@edx.org',
-                'test_password'
-            )
+            response, _ = self._login_response(self.user_email, self.password)
             response_content = json.loads(response.content)
             self.assertIn('Test warning', self.client.session['_messages'])
         self.assertTrue(response_content.get('success'))
