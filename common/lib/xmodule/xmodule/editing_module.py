@@ -51,17 +51,11 @@ class EditingDescriptor(EditingMixin, MakoModuleDescriptor):
     pass
 
 
-class TabsEditingDescriptor(EditingFields, MakoModuleDescriptor):
+class TabsEditingMixin(EditingFields, MakoTemplateBlockBase):
     """
-    Module that provides a raw editing view of its data and children.  It does not
-    perform any validation on its definition---just passes it along to the browser.
-
-    This class is intended to be used as a mixin.
-
-    Engine (module_edit.js) wants for metadata editor
-    template to be always loaded, so don't forget to include
-    settings tab in your module descriptor.
+    Common code between TabsEditingDescriptor and XBlocks converted from XModules.
     """
+
     mako_template = "widgets/tabs-aggregator.html"
     css = {'scss': [resource_string(__name__, 'css/tabs/tabs.scss')]}
     js = {'js': [resource_string(
@@ -70,7 +64,7 @@ class TabsEditingDescriptor(EditingFields, MakoModuleDescriptor):
     tabs = []
 
     def get_context(self):
-        _context = super(TabsEditingDescriptor, self).get_context()
+        _context = MakoTemplateBlockBase.get_context(self)
         _context.update({
             'tabs': self.tabs,
             'html_id': self.location.html_id(),  # element_id
@@ -89,6 +83,20 @@ class TabsEditingDescriptor(EditingFields, MakoModuleDescriptor):
                 else:
                     cls.css[css_type] = css_content
         return cls.css
+
+
+class TabsEditingDescriptor(TabsEditingMixin, MakoModuleDescriptor):
+    """
+    Module that provides a raw editing view of its data and children.  It does not
+    perform any validation on its definition---just passes it along to the browser.
+
+    This class is intended to be used as a mixin.
+
+    Engine (module_edit.js) wants for metadata editor
+    template to be always loaded, so don't forget to include
+    settings tab in your module descriptor.
+    """
+    pass
 
 
 class XMLEditingDescriptor(EditingDescriptor):

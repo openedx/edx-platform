@@ -730,7 +730,7 @@ class Transcript(object):
 class VideoTranscriptsMixin(object):
     """Mixin class for transcript functionality.
 
-    This is necessary for both VideoModule and VideoDescriptor.
+    This is necessary for VideoBlock.
     """
 
     def available_translations(self, transcripts, verify_assets=None, is_bumper=False):
@@ -740,7 +740,7 @@ class VideoTranscriptsMixin(object):
         Arguments:
             verify_assets (boolean): If True, checks to ensure that the transcripts
                 really exist in the contentstore. If False, we just look at the
-                VideoDescriptor fields and do not query the contentstore. One reason
+                VideoBlock fields and do not query the contentstore. One reason
                 we might do this is to avoid slamming contentstore() with queries
                 when trying to make a listing of videos and their languages.
 

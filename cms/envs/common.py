@@ -1424,10 +1424,8 @@ ELASTIC_FIELD_MAPPINGS = {
 }
 
 XBLOCK_SETTINGS = {
-    "VideoDescriptor": {
-        "licensing_enabled": FEATURES.get("LICENSING", False)
-    },
-    'VideoModule': {
+    "VideoBlock": {
+        "licensing_enabled": FEATURES.get("LICENSING", False),
         'YOUTUBE_API_KEY': YOUTUBE_API_KEY
     }
 }

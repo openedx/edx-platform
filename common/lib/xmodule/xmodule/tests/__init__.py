@@ -179,8 +179,8 @@ def mock_render_template(*args, **kwargs):
 class ModelsTest(unittest.TestCase):
 
     def test_load_class(self):
-        vc = XModuleDescriptor.load_class('video')
-        vc_str = "<class 'xmodule.video_module.video_module.VideoDescriptor'>"
+        vc = XModuleDescriptor.load_class('sequential')
+        vc_str = "<class 'xmodule.seq_module.SequenceDescriptor'>"
         self.assertEqual(str(vc), vc_str)
 
 
