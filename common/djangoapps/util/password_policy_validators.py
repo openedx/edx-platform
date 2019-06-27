@@ -95,6 +95,8 @@ def validate_password_complexity(value):
             digits.append(character)
         elif character in string.punctuation:
             punctuation.append(character)
+        elif character in string.whitespace:
+            punctuation.append(character)
         else:
             non_ascii.append(character)
 
