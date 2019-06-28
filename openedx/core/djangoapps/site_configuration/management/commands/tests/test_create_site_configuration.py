@@ -4,12 +4,13 @@ Test create_site_configuration management command
 import json
 
 from django.contrib.sites.models import Site
-from django.core.management import CommandError, call_command
+from django.core.management import call_command
 from django.test import TestCase
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
-class TestCreateSiteConfiguration(TestCase):
 
+class TestCreateSiteConfiguration(TestCase):
+    """ Test create_site_configuration command """
     def setUp(self):
         super(TestCreateSiteConfiguration, self).setUp()
         self.site_domain = 'example.com'
@@ -17,7 +18,7 @@ class TestCreateSiteConfiguration(TestCase):
             'FEATURE_FLAG': True,
             'SERVICE_URL': 'https://foo.bar'
         }
-    
+
     def _validate_site_configuration(self, site):
         site_configuration = SiteConfiguration.objects.get(site_id=site.id)
         self.assertDictEqual(site_configuration.values, self.input_configuration)
@@ -36,7 +37,7 @@ class TestCreateSiteConfiguration(TestCase):
         self._validate_site_configuration(site)
 
     def test_create_for_existing_site(self):
-        site, created = Site.objects.get_or_create(
+        site, created = Site.objects.get_or_create(  # pylint: disable=unused-variable
             name=self.site_domain,
             domain=self.site_domain,
         )
