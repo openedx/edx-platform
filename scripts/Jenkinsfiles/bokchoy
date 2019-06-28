@@ -26,6 +26,7 @@ pipeline {
     agent { label "jenkins-worker" }
     options {
         sendSplunkConsoleLog()
+        timestamps()
         timeout(60)
     }
     stages {
