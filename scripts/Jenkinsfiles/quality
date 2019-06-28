@@ -42,7 +42,7 @@ def qualityTestCleanup() {
 pipeline {
     agent { label "jenkins-worker" }
     options {
-        timestamps()
+        sendSplunkConsoleLog()
         timeout(60)
     }
     stages {
