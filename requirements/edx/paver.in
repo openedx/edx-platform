@@ -10,7 +10,7 @@
 
 -c ../constraints.txt
 
-edx-opaque-keys                     # Create and introspect course and xblock identities
+edx-opaque-keys==0.4.4              # Create and introspect course and xblock identities
 lazy==1.1                           # Lazily-evaluated attributes for Python objects
 libsass==0.10.0                     # Python bindings for the LibSass CSS compiler
 markupsafe                          # XML/HTML/XHTML Markup safe strings
