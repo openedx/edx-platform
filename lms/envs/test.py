@@ -127,6 +127,12 @@ MOCK_PEER_GRADING = True
 
 COMMENTS_SERVICE_URL = 'http://localhost:4567'
 
+DJFS = {
+    'type': 'osfs',
+    'directory_root': '{}/django-pyfs/static/django-pyfs'.format(DATA_DIR),
+    'url_root': '/static/django-pyfs',
+}
+
 ############################ STATIC FILES #############################
 
 # TODO (cpennington): We need to figure out how envs/test.py can inject things
