@@ -87,7 +87,6 @@ git+https://github.com/edx/crowdsourcehinter.git@518605f0a95190949fe77bd39158450
 git+https://github.com/edx/xblock-lti-consumer.git@v1.1.8#egg=lti_consumer-xblock==1.1.8
 git+https://github.com/edx/super-csv@1a9dcc89eb65c3ed434b509b84062f8fcabd901b#egg=super-csv==0.2
 git+https://github.com/edx/edx-bulk-grades@f58f9fa01d95c01211fc94ebb92f0fb1a04bf32b#egg=edx-bulk-grades==0.1.1
-git+https://github.com/edx/staff_graded-xblock.git@a1ebad3e379555617bcbd3ceaee65294e2c93c4c#egg=staff_graded-xblock==0.1
 
 
 # Third Party XBlocks

@@ -1369,7 +1369,7 @@ ADVANCED_PROBLEM_TYPES = [
         'boilerplate_name': None
     },
     {
-        'component': 'staffgradedpoints',
+        'component': 'staffgradedxblock',
         'boilerplate_name': None
     }
 ]
