@@ -96,7 +96,7 @@ docutils==0.14            # via botocore
 drf-yasg==1.16.0
 edx-ace==0.1.10
 edx-analytics-data-api-client==0.15.3
-git+https://github.com/edx/edx-bulk-grades@f58f9fa01d95c01211fc94ebb92f0fb1a04bf32b#egg=edx-bulk-grades==0.1.1
+edx-bulk-grades==0.1.4
 edx-ccx-keys==0.2.2
 edx-celeryutils==0.2.7
 edx-completion==2.0.0
@@ -230,9 +230,9 @@ sorl-thumbnail==12.3
 sortedcontainers==2.1.0
 soupsieve==1.9.2          # via beautifulsoup4
 sqlparse==0.3.0
-staff-graded-xblock==0.2
+staff-graded-xblock==0.3
 stevedore==1.30.1
-git+https://github.com/edx/super-csv@1a9dcc89eb65c3ed434b509b84062f8fcabd901b#egg=super-csv==0.2
+super-csv==0.4
 sympy==1.4
 tincan==0.0.5             # via edx-enterprise
 unicodecsv==0.14.1
