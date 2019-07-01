@@ -8,8 +8,10 @@ Keep in mind that the code in this file only applies to discounts controlled in 
 not other discounts like coupons or enterprise/program offers configured in ecommerce.
 
 """
+import crum
 from course_modes.models import CourseMode
 from entitlements.models import CourseEntitlement
+from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.features.discounts.models import DiscountRestrictionConfig
 from student.models import CourseEnrollment
