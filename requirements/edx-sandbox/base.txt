@@ -12,20 +12,21 @@ asn1crypto==0.24.0
 backports-abc==0.5        # via tornado
 cffi==1.11.5
 cryptography==2.4.2
+cycler==0.10.0            # via matplotlib
 enum34==1.1.6
 futures==3.2.0            # via tornado
 idna==2.8
 ipaddress==1.0.22
 lxml==3.8.0
 markupsafe==1.1.0
-matplotlib==1.3.1
+matplotlib==1.5.3
 networkx==1.7
 nltk==3.4
-nose==1.3.7               # via matplotlib
 numpy==1.6.2
 pycparser==2.19
 pyparsing==2.2.0
 python-dateutil==2.7.5    # via matplotlib
+pytz==2019.1              # via matplotlib
 scipy==0.14.0
 singledispatch==3.4.0.3
 six==1.11.0
