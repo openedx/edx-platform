@@ -1,0 +1,27 @@
+# -*- coding: utf-8 -*-
+<%page expression_filter="h"/>
+<%! from django.utils.translation import ugettext as _ %>
+<%inherit file="../main.html" />
+<main id="main" aria-label="Content" tabindex="-1" class="static_pages">
+<h1>Validación de certificados</h1>
+    <div style="text-align: center">
+        <form method="POST">
+            <input type="hidden" name="csrfmiddlewaretoken" value="${ csrftoken }"/>
+            <div class="form-group" style="margin: 15px 15px;">
+                <label for="cert-id" style="line-height: 33px; text-align: right; clear: both; margin-right: 15px; font-style: normal; font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif">ID de certificado:</label>
+                % if context.get('_id', UNDEFINED) is not UNDEFINED:
+                    <input style="min-width: 400px; font-style: normal; font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif" type="text" name='cert-id' value="${_id}"></input>
+                % else:
+                    <input style="min-width: 400px; font-style: normal; font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif" type="text" name='cert-id' placeholder="9c7f2edd26f7477a8b9fb05f763f869c"></input>
+                % endif
+            </div>
+            % if context.get('exists', UNDEFINED) is not UNDEFINED:
+                % if context.get('exists') is False:
+                    <p style="color:firebrick; margin-bottom: 15px;">Certificado no encontrado</p>
+                % endif
+            % endif
+            <input type="submit" style="text-shadow: none; border-color:white; background-color: #0075b4; background-image: none; display:block; margin: auto" value="Enviar">
+        </form>
+    </div>
+</main>
+
