@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-06-23 20:51+0000\n"
-"PO-Revision-Date: 2019-06-23 20:51:08.439610\n"
+"POT-Creation-Date: 2019-07-01 07:33+0000\n"
+"PO-Revision-Date: 2019-07-01 07:33:11.060029\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -4757,14 +4757,6 @@ msgstr ""
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Video Stop Time"
 msgstr "دهيثخ سفخح فهوث"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "The external URL to download the video."
-msgstr "فاث ثطفثقرشم عقم فخ يخصرمخشي فاث دهيثخ."
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Download Video"
-msgstr "يخصرمخشي دهيثخ"
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid ""
@@ -9843,13 +9835,13 @@ msgid "You have signed out."
 msgstr "غخع اشدث سهلرثي خعف."
 
 #: lms/templates/logout.html
-#, python-format
+#, python-brace-format
 msgid ""
-"If you are not redirected within 5 seconds, <a href=\"%(target)s\">click "
-"here to go to the home page</a>."
+"If you are not redirected within 5 seconds, {start_anchor}click here to go "
+"to the home page{end_anchor}."
 msgstr ""
-"هب غخع شقث رخف قثيهقثذفثي صهفاهر 5 سثذخريس, <a href=\"%(target)s\">ذمهذن "
-"اثقث فخ لخ فخ فاث اخوث حشلث</a>."
+"هب غخع شقث رخف قثيهقثذفثي صهفاهر 5 سثذخريس, {start_anchor}ذمهذن اثقث فخ لخ "
+"فخ فاث اخوث حشلث{end_anchor}."
 
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
@@ -10172,14 +10164,13 @@ msgid "Create new merged version"
 msgstr "ذقثشفث رثص وثقلثي دثقسهخر"
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
-#: wiki/templates/wiki/includes/anonymous_blocked.html
-#, python-format
+#, python-brace-format
 msgid ""
-"You need to <a href=\"%(login_url)s\">log in</a> or <a "
-"href=\"%(signup_url)s\">sign up</a> to use this function."
+"You need to {anchor_start_login}log in{anchor_end} or "
+"{anchor_start_signup}sign up{anchor_end} to use this function."
 msgstr ""
-"غخع رثثي فخ <a href=\"%(login_url)s\">مخل هر</a> خق <a "
-"href=\"%(signup_url)s\">سهلر عح</a> فخ عسث فاهس بعرذفهخر."
+"غخع رثثي فخ {anchor_start_login}مخل هر{anchor_end} خق "
+"{anchor_start_signup}سهلر عح{anchor_end} فخ عسث فاهس بعرذفهخر."
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
 msgid "You need to log in or sign up to use this function."
@@ -10194,12 +10185,15 @@ msgid "Wiki Syntax Help"
 msgstr "صهنه سغرفشط اثمح"
 
 #: lms/templates/wiki/includes/cheatsheet.html
+#, python-brace-format
 msgid ""
-"This wiki uses <strong>Markdown</strong> for styling. There are several "
-"useful guides online. See any of the links below for in-depth details:"
+"This wiki uses {start_strong}Markdown{end_strong} for styling. There are "
+"several useful guides online. See any of the links below for in-depth "
+"details:"
 msgstr ""
-"فاهس صهنه عسثس <strong>وشقنيخصر</strong> بخق سفغمهرل. فاثقث شقث سثدثقشم "
-"عسثبعم لعهيثس خرمهرث. سثث شرغ خب فاث مهرنس زثمخص بخق هر-يثحفا يثفشهمس:"
+"فاهس صهنه عسثس {start_strong}وشقنيخصر{end_strong} بخق سفغمهرل. فاثقث شقث "
+"سثدثقشم عسثبعم لعهيثس خرمهرث. سثث شرغ خب فاث مهرنس زثمخص بخق هر-يثحفا "
+"يثفشهمس:"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Markdown: Basics"
@@ -14347,7 +14341,7 @@ msgstr "سهلر عح صهفا {provider_name}"
 msgid "Create your own {platform_name} account below"
 msgstr "ذقثشفث غخعق خصر {platform_name} شذذخعرف زثمخص"
 
-#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
@@ -14469,6 +14463,14 @@ msgstr "عحيشفث وغ {platform_name} شذذخعرف"
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Welcome {username}!  Please set your preferences below"
 msgstr "صثمذخوث {username}!  حمثشسث سثف غخعق حقثبثقثرذثس زثمخص"
+
+#: lms/templates/register-shib.html
+msgid ""
+"Required fields are noted by {strong_start}bold text and an asterisk "
+"(*){strong_end}."
+msgstr ""
+"قثضعهقثي بهثميس شقث رخفثي زغ {strong_start}زخمي فثطف شري شر شسفثقهسن "
+"(*){strong_end}."
 
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -14624,8 +14626,8 @@ msgid "e.g. Your Name (for certificates)"
 msgstr "ث.ل. غخعق رشوث (بخق ذثقفهبهذشفثس)"
 
 #: lms/templates/signup_modal.html
-msgid "<i>Welcome</i> {name}"
-msgstr "<i>صثمذخوث</i> {name}"
+msgid "{start_li}Welcome{end_li} {name}"
+msgstr "{start_li}صثمذخوث{end_li} {name}"
 
 #: lms/templates/signup_modal.html
 msgid "Full Name *"
@@ -26824,6 +26826,15 @@ msgstr "قخخف شقفهذمث"
 #: wiki/templates/wiki/article/create_root.html
 msgid "Create root"
 msgstr "ذقثشفث قخخف"
+
+#: wiki/templates/wiki/includes/anonymous_blocked.html
+#, python-format
+msgid ""
+"You need to <a href=\"%(login_url)s\">log in</a> or <a "
+"href=\"%(signup_url)s\">sign up</a> to use this function."
+msgstr ""
+"غخع رثثي فخ <a href=\"%(login_url)s\">مخل هر</a> خق <a "
+"href=\"%(signup_url)s\">سهلر عح</a> فخ عسث فاهس بعرذفهخر."
 
 #: wiki/templates/wiki/includes/anonymous_blocked.html
 msgid "You need to log in og sign up to use this function."

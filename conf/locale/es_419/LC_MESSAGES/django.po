@@ -246,7 +246,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-06-16 20:42+0000\n"
+"POT-Creation-Date: 2019-06-30 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -5100,14 +5100,6 @@ msgstr ""
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Video Stop Time"
 msgstr "Tiempo de detencion del video"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "The external URL to download the video."
-msgstr "URL externa para descargar el video"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Download Video"
-msgstr "Descargar Video"
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid ""
@@ -10296,13 +10288,11 @@ msgid "You have signed out."
 msgstr "Ha cerrado su sesión."
 
 #: lms/templates/logout.html
-#, python-format
+#, python-brace-format
 msgid ""
-"If you are not redirected within 5 seconds, <a href=\"%(target)s\">click "
-"here to go to the home page</a>."
+"If you are not redirected within 5 seconds, {start_anchor}click here to go "
+"to the home page{end_anchor}."
 msgstr ""
-"Si no es redirigido en 5 segundos, <a href=\"%(target)s\">de click aquí para"
-" ser redirigido a la página de inicio</a>."
 
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
@@ -10622,14 +10612,11 @@ msgid "Create new merged version"
 msgstr "Crear una nueva versión fusionada."
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
-#: wiki/templates/wiki/includes/anonymous_blocked.html
-#, python-format
+#, python-brace-format
 msgid ""
-"You need to <a href=\"%(login_url)s\">log in</a> or <a "
-"href=\"%(signup_url)s\">sign up</a> to use this function."
+"You need to {anchor_start_login}log in{anchor_end} or "
+"{anchor_start_signup}sign up{anchor_end} to use this function."
 msgstr ""
-"  Debe <a href=\"%(login_url)s\">iniciar sesión</a> o <a "
-"href=\"%(signup_url)s\">registrarse</a> para usar esta función.  "
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
 msgid "You need to log in or sign up to use this function."
@@ -10644,13 +10631,12 @@ msgid "Wiki Syntax Help"
 msgstr "Ayuda de la Sintaxis del Wiki"
 
 #: lms/templates/wiki/includes/cheatsheet.html
+#, python-brace-format
 msgid ""
-"This wiki uses <strong>Markdown</strong> for styling. There are several "
-"useful guides online. See any of the links below for in-depth details:"
+"This wiki uses {start_strong}Markdown{end_strong} for styling. There are "
+"several useful guides online. See any of the links below for in-depth "
+"details:"
 msgstr ""
-"Este wiki usa <strong>Markdown</strong> para el estilo. Hay varias guías "
-"útiles online. Mira alguno de los siguientes enlaces para detalles en "
-"profundidad."
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Markdown: Basics"
@@ -12138,10 +12124,6 @@ msgstr ""
 "La dirección de correo electrónico que utilizó para registrarse con "
 "{platform_name}"
 
-#: openedx/core/djangoapps/user_api/api.py lms/templates/login.html
-msgid "Remember me"
-msgstr "Recordarme"
-
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's email address.
@@ -12807,6 +12789,13 @@ msgstr ""
 
 #: openedx/features/discounts/models.py
 msgid "Disabled"
+msgstr ""
+
+#: openedx/features/discounts/utils.py
+#, python-brace-format
+msgid ""
+"{s_sr}Original price: {s_op}{original_price}{e_p}, discount price: "
+"{e_sr}{formatted_discount_price}"
 msgstr ""
 
 #: openedx/features/enterprise_support/api.py
@@ -14580,10 +14569,6 @@ msgstr ""
 "class=\"indicator\">texto en negrita y un asterisco (*)</strong>."
 
 #: lms/templates/login.html
-msgid "Account Preferences"
-msgstr "Preferencias de la Cuenta"
-
-#: lms/templates/login.html
 msgid "Sign in with {provider_name}"
 msgstr "Iniciar sesión con {provider_name}"
 
@@ -14820,7 +14805,7 @@ msgstr "Ingresar con {provider_name}"
 msgid "Create your own {platform_name} account below"
 msgstr "Crea tu cuenta en {platform_name} a continuación:"
 
-#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
@@ -14944,6 +14929,12 @@ msgstr "Actualizar mi cuenta de {platform_name}"
 msgid "Welcome {username}!  Please set your preferences below"
 msgstr ""
 "Bienvenido {username}! Por favor ajusta tus preferencias a continuación"
+
+#: lms/templates/register-shib.html
+msgid ""
+"Required fields are noted by {strong_start}bold text and an asterisk "
+"(*){strong_end}."
+msgstr ""
 
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -15105,8 +15096,8 @@ msgid "e.g. Your Name (for certificates)"
 msgstr "Ej: Tu nombre (así aparecerá en los certificados)"
 
 #: lms/templates/signup_modal.html
-msgid "<i>Welcome</i> {name}"
-msgstr "<i>Bienvenido</i> {name}"
+msgid "{start_li}Welcome{end_li} {name}"
+msgstr ""
 
 #: lms/templates/signup_modal.html
 msgid "Full Name *"
@@ -19259,6 +19250,7 @@ msgid "Journals"
 msgstr "Registros diario"
 
 #: lms/templates/header/navbar-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
 msgstr "Encontrar curso"
 
@@ -27557,6 +27549,15 @@ msgstr "Artículo raíz"
 #: wiki/templates/wiki/article/create_root.html
 msgid "Create root"
 msgstr "Crear raíz"
+
+#: wiki/templates/wiki/includes/anonymous_blocked.html
+#, python-format
+msgid ""
+"You need to <a href=\"%(login_url)s\">log in</a> or <a "
+"href=\"%(signup_url)s\">sign up</a> to use this function."
+msgstr ""
+"  Debe <a href=\"%(login_url)s\">iniciar sesión</a> o <a "
+"href=\"%(signup_url)s\">registrarse</a> para usar esta función.  "
 
 #: wiki/templates/wiki/includes/anonymous_blocked.html
 msgid "You need to log in og sign up to use this function."
