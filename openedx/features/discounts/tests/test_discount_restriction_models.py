@@ -91,12 +91,6 @@ class TestDiscountRestrictionConfig(CacheIsolationTestCase):
         self.assertEqual(expected_org_setting, DiscountRestrictionConfig.current(org=test_course.org).disabled)
         self.assertEqual(expected_course_setting, DiscountRestrictionConfig.current(course_key=test_course.id).disabled)
 
-    def test_dump_sqlite_version(self):
-        import sqlite3
-        print "sqlite adapter version {}".format(sqlite3.version)
-        print "sqlite version {}".format(sqlite3.sqlite_version)
-        assert "{} - {}".format(sqlite3.version, sqlite3.sqlite_version) is None
-
     def _resolve_settings(self, settings):
         if all(setting is None for setting in settings):
             return None

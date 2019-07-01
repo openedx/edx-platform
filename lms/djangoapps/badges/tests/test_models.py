@@ -3,6 +3,8 @@ Tests for the Badges app models.
 """
 from __future__ import absolute_import
 
+import logging
+
 from django.core.exceptions import ValidationError
 from django.core.files.images import ImageFile
 from django.core.files.storage import default_storage
@@ -25,6 +27,9 @@ from lms.djangoapps.certificates.tests.test_models import TEST_DATA_ROOT
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+
+log = logging.getLogger(__name__)
 
 
 def get_image(name):
@@ -293,3 +298,9 @@ class ValidBadgeImageTest(TestCase):
         """
         large = get_image('large')
         self.assertRaises(ValidationError, validate_badge_image, large)
+
+    def test_dump_sqlite_version(self):
+        import sqlite3
+        log.warn("sqlite adapter version {}".format(sqlite3.version))
+        log.warn("sqlite version {}".format(sqlite3.sqlite_version))
+        assert "{} - {}".format(sqlite3.version, sqlite3.sqlite_version) is None
