@@ -128,7 +128,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-06-23 20:42+0000\n"
+"POT-Creation-Date: 2019-06-30 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2019\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -4820,14 +4820,6 @@ msgstr ""
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Video Stop Time"
 msgstr "Video Durma Zamanı"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "The external URL to download the video."
-msgstr "Video indirmek için harici URL"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Download Video"
-msgstr "Video indir"
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid ""
@@ -9860,13 +9852,11 @@ msgid "You have signed out."
 msgstr "Çıkış yaptınız."
 
 #: lms/templates/logout.html
-#, python-format
+#, python-brace-format
 msgid ""
-"If you are not redirected within 5 seconds, <a href=\"%(target)s\">click "
-"here to go to the home page</a>."
+"If you are not redirected within 5 seconds, {start_anchor}click here to go "
+"to the home page{end_anchor}."
 msgstr ""
-"5 saniye içinde yönlendirilmeniz yapılmadıysa,  <a "
-"href=\"%(target)s\">anasayfaya dönmek için lütfen buraya tıklayınız</a>."
 
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
@@ -10185,14 +10175,11 @@ msgid "Create new merged version"
 msgstr "Yeni birleştirilmiş sürüm oluştur"
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
-#: wiki/templates/wiki/includes/anonymous_blocked.html
-#, python-format
+#, python-brace-format
 msgid ""
-"You need to <a href=\"%(login_url)s\">log in</a> or <a "
-"href=\"%(signup_url)s\">sign up</a> to use this function."
+"You need to {anchor_start_login}log in{anchor_end} or "
+"{anchor_start_signup}sign up{anchor_end} to use this function."
 msgstr ""
-"Bu özelliği kullanmak için <a href=\"%(login_url)s\">giriş</a> ya da <a "
-"href=\"%(signup_url)s\">kayıt</a> yapmak zorundasınız."
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
 msgid "You need to log in or sign up to use this function."
@@ -10209,13 +10196,12 @@ msgid "Wiki Syntax Help"
 msgstr "Wiki Yazım Kuralları Yardımı"
 
 #: lms/templates/wiki/includes/cheatsheet.html
+#, python-brace-format
 msgid ""
-"This wiki uses <strong>Markdown</strong> for styling. There are several "
-"useful guides online. See any of the links below for in-depth details:"
+"This wiki uses {start_strong}Markdown{end_strong} for styling. There are "
+"several useful guides online. See any of the links below for in-depth "
+"details:"
 msgstr ""
-"Bu wiki <strong>Markdown</strong> işaretleme dilini kullanıyor. Çevrimiçi "
-"çeşitli yardımcı kılavuzlar mevcut. Bu işin derinliklerini öğrenmek "
-"istiyorsan aşağıdaki bağlantılara göz atabilirsin:"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Markdown: Basics"
@@ -14235,7 +14221,7 @@ msgstr "{provider_name} ile kayıt ol"
 msgid "Create your own {platform_name} account below"
 msgstr "Kendi {platform_name} hesabınızı oluşturun "
 
-#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
@@ -14356,6 +14342,12 @@ msgstr " {platform_name} Hesabımı Güncelleyin"
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Welcome {username}!  Please set your preferences below"
 msgstr "Hoş geldin, {username}! Lütfen tercihlerinizi aşağıda işaretleyin"
+
+#: lms/templates/register-shib.html
+msgid ""
+"Required fields are noted by {strong_start}bold text and an asterisk "
+"(*){strong_end}."
+msgstr ""
 
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -14512,8 +14504,8 @@ msgid "e.g. Your Name (for certificates)"
 msgstr "ör. İsminiz (sertifikada gözükecek)"
 
 #: lms/templates/signup_modal.html
-msgid "<i>Welcome</i> {name}"
-msgstr "<i>Hoşgeldiniz</i> {name}"
+msgid "{start_li}Welcome{end_li} {name}"
+msgstr ""
 
 #: lms/templates/signup_modal.html
 msgid "Full Name *"
@@ -26395,6 +26387,15 @@ msgstr "Kök madde"
 #: wiki/templates/wiki/article/create_root.html
 msgid "Create root"
 msgstr "Kök oluştur"
+
+#: wiki/templates/wiki/includes/anonymous_blocked.html
+#, python-format
+msgid ""
+"You need to <a href=\"%(login_url)s\">log in</a> or <a "
+"href=\"%(signup_url)s\">sign up</a> to use this function."
+msgstr ""
+"Bu özelliği kullanmak için <a href=\"%(login_url)s\">giriş</a> ya da <a "
+"href=\"%(signup_url)s\">kayıt</a> yapmak zorundasınız."
 
 #: wiki/templates/wiki/includes/anonymous_blocked.html
 msgid "You need to log in og sign up to use this function."

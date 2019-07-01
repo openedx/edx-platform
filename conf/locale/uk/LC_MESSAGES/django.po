@@ -121,7 +121,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-06-23 20:42+0000\n"
+"POT-Creation-Date: 2019-06-30 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Ukrainian (https://www.transifex.com/open-edx/teams/6205/uk/)\n"
@@ -4956,14 +4956,6 @@ msgstr ""
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Video Stop Time"
 msgstr "Час закінчення відео"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "The external URL to download the video."
-msgstr "Зовнішнє посилання URL для скачування відео."
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Download Video"
-msgstr "Завантажити відео"
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid ""
@@ -9975,13 +9967,11 @@ msgid "You have signed out."
 msgstr "Ви вийшли."
 
 #: lms/templates/logout.html
-#, python-format
+#, python-brace-format
 msgid ""
-"If you are not redirected within 5 seconds, <a href=\"%(target)s\">click "
-"here to go to the home page</a>."
+"If you are not redirected within 5 seconds, {start_anchor}click here to go "
+"to the home page{end_anchor}."
 msgstr ""
-"Якщо вас не буде перенаправлено протягом 5 секунд, <a "
-"href=\"%(target)s\">натисніть тут для переходу на домашню сторінку</a>."
 
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
@@ -10288,15 +10278,11 @@ msgid "Create new merged version"
 msgstr "Створити нову з'єднану редакцію."
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
-#: wiki/templates/wiki/includes/anonymous_blocked.html
-#, python-format
+#, python-brace-format
 msgid ""
-"You need to <a href=\"%(login_url)s\">log in</a> or <a "
-"href=\"%(signup_url)s\">sign up</a> to use this function."
+"You need to {anchor_start_login}log in{anchor_end} or "
+"{anchor_start_signup}sign up{anchor_end} to use this function."
 msgstr ""
-"Щоб скористатися цією функцією, потрібно <a "
-"href=\"%(login_url)s\">ввійти</a> або <a "
-"href=\"%(signup_url)s\">зареєструватися</a>."
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
 msgid "You need to log in or sign up to use this function."
@@ -10312,13 +10298,12 @@ msgid "Wiki Syntax Help"
 msgstr "Допомога по синтаксису вікі"
 
 #: lms/templates/wiki/includes/cheatsheet.html
+#, python-brace-format
 msgid ""
-"This wiki uses <strong>Markdown</strong> for styling. There are several "
-"useful guides online. See any of the links below for in-depth details:"
+"This wiki uses {start_strong}Markdown{end_strong} for styling. There are "
+"several useful guides online. See any of the links below for in-depth "
+"details:"
 msgstr ""
-"Ця вікі використовує <strong>Markdown</strong> для опису стилів. Онлайн є "
-"кілька корисних керівництв користувача. Зверніться до будь-якого з наступних"
-" посилань за детальною інформацією:"
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Markdown: Basics"
@@ -14346,7 +14331,7 @@ msgstr ""
 msgid "Create your own {platform_name} account below"
 msgstr ""
 
-#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
@@ -14462,6 +14447,12 @@ msgstr ""
 #: lms/templates/register-shib.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Welcome {username}!  Please set your preferences below"
+msgstr ""
+
+#: lms/templates/register-shib.html
+msgid ""
+"Required fields are noted by {strong_start}bold text and an asterisk "
+"(*){strong_end}."
 msgstr ""
 
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
@@ -14604,7 +14595,7 @@ msgid "e.g. Your Name (for certificates)"
 msgstr "наприклад: Ваше Ім'я (для сертифікатів)"
 
 #: lms/templates/signup_modal.html
-msgid "<i>Welcome</i> {name}"
+msgid "{start_li}Welcome{end_li} {name}"
 msgstr ""
 
 #: lms/templates/signup_modal.html
@@ -25677,6 +25668,16 @@ msgstr "Основна стаття"
 #: wiki/templates/wiki/article/create_root.html
 msgid "Create root"
 msgstr "Створити основу"
+
+#: wiki/templates/wiki/includes/anonymous_blocked.html
+#, python-format
+msgid ""
+"You need to <a href=\"%(login_url)s\">log in</a> or <a "
+"href=\"%(signup_url)s\">sign up</a> to use this function."
+msgstr ""
+"Щоб скористатися цією функцією, потрібно <a "
+"href=\"%(login_url)s\">ввійти</a> або <a "
+"href=\"%(signup_url)s\">зареєструватися</a>."
 
 #: wiki/templates/wiki/includes/anonymous_blocked.html
 msgid "You need to log in og sign up to use this function."
