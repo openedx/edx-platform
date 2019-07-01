@@ -45,6 +45,7 @@ REQ_FILES = \
 	requirements/edx/pip-tools \
 	requirements/edx/coverage \
 	requirements/edx/paver \
+	requirements/edx-sandbox/pre \
 	requirements/edx-sandbox/shared \
 	requirements/edx-sandbox/base \
 	requirements/edx/base \
