@@ -58,7 +58,8 @@ class UserPreference(models.Model):
 
         Returns: Set of (preference type, value) pairs for each of the user's preferences
         """
-        return dict([(pref.key, pref.value) for pref in user.preferences.all()])
+        default_preferences = configuration_helpers.get_value('USER_API_DEFAULT_PREFERENCES', getattr(settings, 'USER_API_DEFAULT_PREFERENCES', {}))
+        return dict(default_preferences, **dict([(pref.key, pref.value) for pref in user.preferences.all()]))
 
     @classmethod
     def get_value(cls, user, preference_key, default=None):
@@ -81,7 +82,8 @@ class UserPreference(models.Model):
             user_preference = cls.objects.get(user=user, key=preference_key)
             return user_preference.value
         except cls.DoesNotExist:
-            return default
+            default_preferences = configuration_helpers.get_value('USER_API_DEFAULT_PREFERENCES', getattr(settings, 'USER_API_DEFAULT_PREFERENCES', {}))
+            return default_preferences.get(preference_key, default)
 
     @classmethod
     def has_value(cls, user, preference_key):
