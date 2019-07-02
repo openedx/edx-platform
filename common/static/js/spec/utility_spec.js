@@ -17,14 +17,16 @@ describe('utility.rewriteStaticLinks', function() {
     });
 });
 describe('utility.rewriteCdnLinksToStatic', function() {
+    'use strict';
     it('does not replace of "cdn url" to "static url" if url is not absolute url', function() {
         expect(
-            rewriteCdnLinksToStatic('<img src="/assets/foo.x"/>')
+            rewriteCdnLinksToStatic('<img src="/assets/foo.x"/>') // eslint-disable-line no-undef
         ).toBe('<img src="/assets/foo.x"/>');
     });
     it('does a replace of "cdn url" to "static url" if url is part of absolute url', function() {
         expect(
-            rewriteCdnLinksToStatic('<img src="//prod-edxapp.edx-cdn.org/assets/foo.x"/>')
+            rewriteCdnLinksToStatic( // eslint-disable-line no-undef
+              '<img src="//prod-edxapp.edx-cdn.org/assets/foo.x"/>')
         ).toBe('<img src="/static/foo.x"/>');
     });
 });
