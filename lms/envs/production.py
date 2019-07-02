@@ -17,22 +17,24 @@ Common traits:
 # and throws spurious errors. Therefore, we disable invalid-name checking.
 # pylint: disable=invalid-name
 
+from __future__ import absolute_import
+
 import codecs
 import datetime
-import yaml
-
 import os
-import dateutil
 
+import dateutil
+import yaml
 from corsheaders.defaults import default_headers as corsheaders_default_headers
-from path import Path as path
-from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
-from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
 from django.core.exceptions import ImproperlyConfigured
+from path import Path as path
+
+from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
+from openedx.core.lib.derived import derive_settings
+from openedx.core.lib.logsettings import get_logger_config
+from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
 
 from .common import *
-from openedx.core.lib.derived import derive_settings  # pylint: disable=wrong-import-order
-from openedx.core.lib.logsettings import get_logger_config  # pylint: disable=wrong-import-order
 
 
 def get_env_setting(setting):
@@ -295,7 +297,7 @@ CELERY_QUEUES.update(
     {
         alternate: {}
         for alternate in ALTERNATE_QUEUES
-        if alternate not in CELERY_QUEUES.keys()
+        if alternate not in list(CELERY_QUEUES.keys())
     }
 )
 
