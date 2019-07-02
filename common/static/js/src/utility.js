@@ -39,6 +39,7 @@ window.rewriteStaticLinks = function(content, from, to) {
     return content.replace(regex, replacer);
 };
 
+// Utility method for replacing absolute URLs
 window.rewriteCdnLinksToStatic = function(content) {
     'use strict';
     var regex = new RegExp('((https?:)|[/][/](www.)?[-a-zA-Z0-9@:%._+~#=]{2,256}[a-z]{2,6}([-a-zA-Z0-9@:%_+~#?&//=]*)|[a-z-]{14})[/]', 'g');// eslint-disable-line max-len

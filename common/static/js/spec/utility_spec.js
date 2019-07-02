@@ -16,3 +16,15 @@ describe('utility.rewriteStaticLinks', function() {
         ).toBe('<img src="http://www.mysite.org/static/foo.x"/>');
     });
 });
+describe('utility.rewriteCdnLinksToStatic', function() {
+    it('does not replace of "cdn url" to "static url" if url is not absolute url', function() {
+        expect(
+            rewriteCdnLinksToStatic('<img src="/assets/foo.x"/>')
+        ).toBe('<img src="/assets/foo.x"/>');
+    });
+    it('does a replace of "cdn url" to "static url" if url is part of absolute url', function() {
+        expect(
+            rewriteCdnLinksToStatic('<img src="//prod-edxapp.edx-cdn.org/assets/foo.x"/>')
+        ).toBe('<img src="/static/foo.x"/>');
+    });
+});
