@@ -12,7 +12,6 @@ from django.contrib.admin import autodiscover as django_autodiscover
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import RedirectView
 from ratelimitbackend import admin
-from rest_framework_swagger.views import get_swagger_view
 
 from branding import views as branding_views
 from courseware.masquerade import handle_ajax as courseware_masquerade_handle_ajax
