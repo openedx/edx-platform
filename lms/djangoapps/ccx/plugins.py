@@ -2,6 +2,8 @@
 Registers the CCX feature for the edX platform.
 """
 
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.utils.translation import ugettext_noop
 
