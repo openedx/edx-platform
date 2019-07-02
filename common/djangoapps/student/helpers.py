@@ -383,7 +383,7 @@ def destroy_oauth_tokens(user):
     dop_access_query = dop_access_token.objects.filter(user=user.id)
     dop_refresh_query = dop_refresh_token.objects.filter(user=user.id)
 
-    if settings.FEATURES.get('KEEP_TRUSTED_CONFIDENTIAL_CLIENT_TOKENS', False):
+    if not settings.FEATURES.get('KEEP_TRUSTED_CONFIDENTIAL_CLIENT_TOKENS', True):
         # Appsembler: Avoid deleting the trusted confidential clients such as the Appsembler Management Console
         trusted_clients = Client.objects.filter(
             client_type=CONFIDENTIAL,
