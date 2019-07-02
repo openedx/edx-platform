@@ -24,7 +24,8 @@ do
     'git clone --branch master --depth 1 -q https://github.com/edx/edx-platform.git; cd edx-platform;
     git fetch -fq origin ${XDIST_GIT_REFSPEC}; git checkout -q ${XDIST_GIT_BRANCH};
     source ../edx-venv/bin/activate;
-    pip install -q ${DJANGO_REQUIREMENT} -r requirements/edx/testing.txt; mkdir reports' & "
+    pip install -q ${DJANGO_REQUIREMENT} -r requirements/edx/testing.txt; bash scripts/upgrade_pysqlite.sh;
+    mkdir reports' & "
 
     cmd=$cmd$worker_reqs_cmd
 done
