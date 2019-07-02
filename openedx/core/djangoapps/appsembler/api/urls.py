@@ -5,7 +5,7 @@ Use this URL handler module to manage versioned Tahoe APIs
 
 from django.conf.urls import include, url
 
-from .v1 import urls as v1_urls
+from openedx.core.djangoapps.appsembler.api.v1 import urls as v1_urls
 
 
 urlpatterns = [

@@ -4,26 +4,73 @@ Only include view classes here. See the tests/test_permissions.py:get_api_classe
 method.
 """
 
+from functools import partial
 import logging
 import random
 import string
 
+
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.conf import settings
 from django.db import transaction
+from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
+import django.contrib.sites.shortcuts
 
-from rest_framework import viewsets
-from rest_framework.authentication import TokenAuthentication
+
+from rest_framework import status, viewsets
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework.exceptions import NotFound
+from rest_framework.filters import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from opaque_keys.edx.keys import CourseKey
+
+from enrollment.serializers import CourseEnrollmentSerializer
+
+# from courseware.courses import get_course_by_id, get_course_with_access
+from courseware.courses import get_course_by_id
+
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
 from student.forms import PasswordResetFormNoActive
+from student.models import CourseEnrollment
 from student.views import create_account_with_params
 
-from ..permissions import IsSiteAdminUser, TahoeAPIUserThrottle
+from lms.djangoapps.instructor.enrollment import (
+    enroll_email,
+    get_email_params,
+    # get_user_email_language,
+    # send_beta_role_email,
+    # send_mail_to_student,
+    # unenroll_email
+)
+
+from openedx.core.djangoapps.appsembler.api.helpers import as_course_key
+from openedx.core.djangoapps.appsembler.api.v1.api import enroll_learners_in_course
+from openedx.core.djangoapps.appsembler.api.v1.filters import (
+    CourseEnrollmentFilter,
+    CourseOverviewFilter
+)
+from openedx.core.djangoapps.appsembler.api.v1.pagination import (
+    TahoeLimitOffsetPagination
+)
+from openedx.core.djangoapps.appsembler.api.v1.serializers import (
+    CourseOverviewSerializer, BulkEnrollmentSerializer
+)
+
+# TODO: Just move into v1 directory
+from openedx.core.djangoapps.appsembler.api.permissions import (
+    IsSiteAdminUser, TahoeAPIUserThrottle
+)
+from openedx.core.djangoapps.appsembler.api.sites import (
+    get_courses_for_site,
+    get_site_for_course,
+    get_enrollments_for_site,
+    course_belongs_to_site,
+)
 
 
 log = logging.getLogger(__name__)
@@ -71,6 +118,7 @@ class TahoeAuthMixin(object):
     """Provides a common authorization base for the Tahoe multi-site aware API views
     """
     authentication_classes = (
+        SessionAuthentication,
         TokenAuthentication,
     )
     permission_classes = (
@@ -170,3 +218,135 @@ class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):
             }
             return Response(errors, status=400)
         return Response({'user_id ': user_id}, status=200)
+
+
+class CourseViewSet(TahoeAuthMixin, viewsets.ReadOnlyModelViewSet):
+    """Provides course information
+
+    To provide data for all courses on your site::
+
+        GET /tahoe/api/v1/courses/
+
+    To provide details on a specific course::
+
+        GET /tahoe/api/v1/courses/<course id>/
+
+    """
+    model = CourseOverview
+    pagination_class = TahoeLimitOffsetPagination
+    serializer_class = CourseOverviewSerializer
+    throttle_classes = (TahoeAPIUserThrottle,)
+    filter_backends = (DjangoFilterBackend, )
+    filter_class = CourseOverviewFilter
+
+    def get_queryset(self):
+        site = django.contrib.sites.shortcuts.get_current_site(self.request)
+        queryset = get_courses_for_site(site)
+        return queryset
+
+    def retrieve(self, request, *args, **kwargs):
+        course_id_str = kwargs.get('pk', '')
+        course_key = as_course_key(course_id_str.replace(' ', '+'))
+        site = django.contrib.sites.shortcuts.get_current_site(request)
+        if site != get_site_for_course(course_key):
+            # Raising NotFound instead of PermissionDenied
+            raise NotFound()
+        course_overview = get_object_or_404(CourseOverview, pk=course_key)
+        return Response(CourseOverviewSerializer(course_overview).data)
+
+
+# @can_disable_rate_limit
+class EnrollmentViewSet(TahoeAuthMixin, viewsets.ModelViewSet):
+    """Provides course information
+
+    To provide data for all enrollments on your site::
+
+        GET /tahoe/api/v1/enrollments/
+
+    To provide enrollments for a specific course::
+
+        GET /tahoe/api/v1/enrollments/<course id>/
+
+    """
+    model = CourseEnrollment
+    pagination_class = TahoeLimitOffsetPagination
+    serializer_class = CourseEnrollmentSerializer
+    throttle_classes = (TahoeAPIUserThrottle,)
+    filter_backends = (DjangoFilterBackend, )
+    filter_class = CourseEnrollmentFilter
+
+    def get_queryset(self):
+        site = django.contrib.sites.shortcuts.get_current_site(self.request)
+        queryset = get_enrollments_for_site(site)
+        return queryset
+
+    def retrieve(self, request, *args, **kwargs):
+        course_id_str = kwargs.get('pk', '')
+        course_key = as_course_key(course_id_str.replace(' ', '+'))
+        site = django.contrib.sites.shortcuts.get_current_site(request)
+        if site != get_site_for_course(course_key):
+            # Raising NotFound instead of PermissionDenied
+            raise NotFound()
+        course_overview = get_object_or_404(CourseOverview, pk=course_key)
+        return Response(CourseOverviewSerializer(course_overview).data)
+
+    def create(self, request, *args, **kwargs):
+        """
+        Adapts interface from bulk enrollment
+
+        """
+        site = django.contrib.sites.shortcuts.get_current_site(request)
+        serializer = BulkEnrollmentSerializer(data=request.data)
+        if serializer.is_valid():
+            # TODO: Follow-on: Wrap in transaction
+            # TODO: trap error on each attempt and log
+            # IMPORTANT: THIS IS A WIP to get this working quickly
+            # Being clean inside is secondary
+
+            invalid_course_ids = [course_id for course_id in serializer.data.get('courses')
+                                  if not course_belongs_to_site(site, course_id)]
+
+            if invalid_course_ids:
+                # Don't do bulk enrollment. Return error message and failing
+                # course ids
+                response_data = {
+                    'error': 'invalid-course-ids',
+                    'invalid_course_ids' : invalid_course_ids,
+                }
+                response_code = status.HTTP_400_BAD_REQUEST
+            else:
+                # Do bulk enrollment
+                email_learners = serializer.data.get('email_learners')
+                identifiers = serializer.data.get('identifiers')
+                auto_enroll = serializer.data.get('auto_enroll')
+                for course_id in serializer.data.get('courses'):
+                    course_key = as_course_key(course_id)
+                    if email_learners:
+                        email_params = get_email_params(course=get_course_by_id(course_key),
+                                                        auto_enroll=auto_enroll,
+                                                        secure=request.is_secure())
+                    else:
+                        email_params = {}
+                    results = enroll_learners_in_course(
+                            course_id=course_key,
+                            identifiers=identifiers,
+                            enroll_func=partial(enroll_email,
+                                                auto_enroll=auto_enroll,
+                                                email_students=email_learners,
+                                                email_params=email_params),
+                            request_user=request.user)
+
+                response_data = {
+                    'auto_enroll': serializer.data.get('auto_enroll'),
+                    'email_learners': serializer.data.get('email_learners'),
+                    'action': serializer.data.get('action'),
+                    'courses': serializer.data.get('courses'),
+                    'results': results,
+                }
+                response_code = status.HTTP_201_CREATED
+        else:
+            # Don't do bulk enrollment. Return serializer error as response body
+            response_data = serializer.errors
+            response_code = status.HTTP_400_BAD_REQUEST
+
+        return Response(response_data, status=response_code)
