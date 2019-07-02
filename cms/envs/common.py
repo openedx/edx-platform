@@ -1128,6 +1128,9 @@ INSTALLED_APPS = [
     'lms.djangoapps.verify_student.apps.VerifyStudentConfig',
     'completion',
 
+    # System Wide Roles
+    'openedx.core.djangoapps.system_wide_roles',
+
     # Microsite configuration application
     'microsite_configuration',
 
