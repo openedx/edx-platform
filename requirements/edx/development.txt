@@ -305,7 +305,7 @@ soupsieve==1.9.2
 sphinx==1.8.5
 sphinxcontrib-websupport==1.1.2  # via sphinx
 sqlparse==0.3.0
-staff-graded-xblock==0.2
+staff-graded-xblock==0.3
 stevedore==1.30.1
 git+https://github.com/edx/super-csv@1a9dcc89eb65c3ed434b509b84062f8fcabd901b#egg=super-csv==0.2
 sympy==1.4
@@ -314,7 +314,7 @@ text-unidecode==1.2
 tincan==0.0.5
 toml==0.10.0
 tox-battery==0.5.1
-tox==3.13.1
+tox==3.13.2
 transifex-client==0.13.6
 typing==3.7.4
 unicodecsv==0.14.1
