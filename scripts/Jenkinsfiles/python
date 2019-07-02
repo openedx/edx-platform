@@ -7,7 +7,6 @@ def runPythonTests() {
             doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', honorRefspec: true,
             noTags: true, shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-worker',
             refspec: git_refspec, url: "git@github.com:edx/${REPO_NAME}.git"]]]
-        sh 'bash scripts/upgrade_pysqlite.sh'
         sh 'bash scripts/all-tests.sh'
         stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}-reports"
     }
