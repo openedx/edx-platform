@@ -32,7 +32,7 @@ def pytest_configure(config):
         # recognizable, like "py_xdist_gw0", for the benefit of tools like
         # New Relic Infrastructure and top
         old_name = getproctitle()
-        new_name = 'py_xdist_{}'.format(config.workerinput['workerid'])
+        new_name = 'python_xdist_experiment{}'.format(config.workerinput['workerid'])
         setproctitle(old_name.replace('python', new_name, 1))
     enable_contracts = os.environ.get('ENABLE_CONTRACTS', False)
     if not enable_contracts:
