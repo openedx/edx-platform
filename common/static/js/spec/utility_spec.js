@@ -18,7 +18,11 @@ describe('utility.rewriteStaticLinks', function() {
 });
 describe('utility.rewriteCdnLinksToStatic', function() {
     'use strict';
-    it('does not replace of "cdn url" to "static url" if url is not absolute url', function() {
+    it('does not replace "url" to "static url" if url is not following "cdn url" pattern', function() {
+        expect(
+            rewriteCdnLinksToStatic( // eslint-disable-line no-undef
+            '<img src="/asset-v1:UCentralLah+Cs201+2019_1+type@asset+block/foo.x"/>')
+        ).toBe('<img src="/asset-v1:UCentralLah+Cs201+2019_1+type@asset+block/foo.x"/>');
         expect(
             rewriteCdnLinksToStatic('<img src="/assets/foo.x"/>') // eslint-disable-line no-undef
         ).toBe('<img src="/assets/foo.x"/>');
@@ -27,6 +31,10 @@ describe('utility.rewriteCdnLinksToStatic', function() {
         expect(
             rewriteCdnLinksToStatic( // eslint-disable-line no-undef
               '<img src="//prod-edxapp.edx-cdn.org/assets/foo.x"/>')
+        ).toBe('<img src="/static/foo.x"/>');
+        expect(
+          rewriteCdnLinksToStatic( // eslint-disable-line no-undef
+            '<img src="https://prod-edxapp.edx-cdn.org/assets/foo.x"/>')
         ).toBe('<img src="/static/foo.x"/>');
     });
 });
