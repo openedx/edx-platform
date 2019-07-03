@@ -636,3 +636,17 @@ SAVE_FOR_LATER_EMAIL_RATE_LIMIT = '5/m'
 #################### Network configuration ####################
 # Tests are not behind any proxies
 CLOSEST_CLIENT_IP_FROM_HEADERS = []
+
+COURSE_ENROLLMENT_MODES['test'] = {
+    "id": 13,
+    "slug": "test",
+    "display_name": "Test",
+    "min_price": 0
+}
+
+COURSE_ENROLLMENT_MODES['test_mode'] = {
+    "id": 14,
+    "slug": "test_mode",
+    "display_name": "Test Mode",
+    "min_price": 0
+}

@@ -9,23 +9,21 @@ from logging import getLogger
 
 from django.conf import settings
 from pytz import UTC
+from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
+from xmodule.util.xmodule_django import get_current_request_hostname
+
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseBetaTesterRole
 from lms.djangoapps.courseware.access_response import (
     AccessResponse,
-    StartDateError,
-    EnrollmentRequiredAccessError,
     AuthenticationRequiredAccessError,
+    EnrollmentRequiredAccessError,
+    StartDateError
 )
 from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_student
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.djangolib.markup import HTML  # lint-amnesty, pylint: disable=unused-import
-from openedx.features.course_experience import (
-    COURSE_PRE_START_ACCESS_FLAG,
-    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
-)
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.roles import CourseBetaTesterRole
-from xmodule.util.xmodule_django import get_current_request_hostname  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.course_module import COURSE_VISIBILITY_PUBLIC  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, COURSE_PRE_START_ACCESS_FLAG
 
 DEBUG_ACCESS = False
 log = getLogger(__name__)
@@ -75,7 +73,7 @@ def check_start_date(user, days_early_for_beta, start, course_key, display_error
     Returns:
         AccessResponse: Either ACCESS_GRANTED or StartDateError.
     """
-    start_dates_disabled = settings.FEATURES['DISABLE_START_DATES']
+    start_dates_disabled = settings.FEATURES.get('DISABLE_START_DATES', False)
     masquerading_as_student = is_masquerading_as_student(user, course_key)
 
     if start_dates_disabled and not masquerading_as_student:
