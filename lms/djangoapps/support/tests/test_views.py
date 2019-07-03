@@ -369,7 +369,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             'course_id': str(self.course.id),
             'old_mode': CourseMode.AUDIT,
             'new_mode': CourseMode.VERIFIED,
-            'reason': 'Financial Assistance'
+            'reason': u'Financial Assistance'
         })
         entitlement.refresh_from_db()
         assert response.status_code == 200
