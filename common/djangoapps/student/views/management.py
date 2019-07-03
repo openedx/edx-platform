@@ -64,7 +64,6 @@ from openedx.core.djangoapps.user_api.errors import UserAPIInternalError, UserNo
 from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.features.journals.api import get_journals_context
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
 from student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info, generate_activation_email_context
 from student.message_types import EmailChange, EmailChangeConfirmation, PasswordReset, RecoveryEmailCreate
@@ -175,9 +174,6 @@ def index(request, extra_context=None, user=AnonymousUser()):
 
     # Add marketable programs to the context.
     context['programs_list'] = get_programs_with_type(request.site, include_hidden=False)
-
-    # TODO: Course Listing Plugin required
-    context['journal_info'] = get_journals_context(request)
 
     return render_to_response('index.html', context)
 
