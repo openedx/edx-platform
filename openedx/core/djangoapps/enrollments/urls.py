@@ -13,6 +13,7 @@ from .views import (
     EnrollmentListView,
     EnrollmentUserRolesView,
     EnrollmentView,
+    SubmissionHistoryView,
     UnenrollmentView
 )
 
@@ -29,4 +30,5 @@ urlpatterns = [
         EnrollmentCourseDetailView.as_view(), name='courseenrollmentdetails'),
     url(r'^unenroll/$', UnenrollmentView.as_view(), name='unenrollment'),
     url(r'^roles/$', EnrollmentUserRolesView.as_view(), name='roles'),
+    url(r'^submission_history$', SubmissionHistoryView.as_view(), name='submissionhistory'),
 ]
