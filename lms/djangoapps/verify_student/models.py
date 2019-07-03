@@ -929,6 +929,41 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         """Whether or not the status from this attempt should be displayed to the user."""
         return True
 
+    @classmethod
+    def get_recent_verification(cls, user):
+        """
+        Return the most recent approved verification of user
+
+        Keyword Arguments:
+            user (User): The user for which the most recent approved verification is fetched
+
+        Returns:
+            SoftwareSecurePhotoVerification (object) or None
+        """
+        recent_verification = SoftwareSecurePhotoVerification.objects.filter(status='approved', user_id=user.id)
+        return recent_verification.latest('updated_at') if recent_verification.exists() else None
+
+    @classmethod
+    def update_expiry_email_date_for_user(cls, user, email_config):
+        """
+        Updates the expiry_email_date to send expiry email if the most recent approved
+        verification for the user is expired.
+
+        Keyword Arguments:
+            user (User): user object
+            email_config (dict): Contains configuration related to verification expiry email
+
+        """
+        today = now().replace(hour=0, minute=0, second=0, microsecond=0)
+        recently_expired_date = today - timedelta(days=email_config['DAYS_RANGE'])
+
+        verification = SoftwareSecurePhotoVerification.get_recent_verification(user)
+
+        if verification and verification.expiry_date < recently_expired_date and not verification.expiry_email_date:
+            expiry_email_date = today - timedelta(days=email_config['RESEND_DAYS'])
+            SoftwareSecurePhotoVerification.objects.filter(pk=verification.pk).update(
+                expiry_email_date=expiry_email_date)
+
 
 class VerificationDeadline(TimeStampedModel):
     """
