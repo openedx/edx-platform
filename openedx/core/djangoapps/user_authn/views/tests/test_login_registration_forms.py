@@ -150,7 +150,7 @@ class LoginFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStoreTes
 
         # Verify that the parameters are sent on to the next page correctly
         post_login_handler = _finish_auth_url(params)
-        js_success_var = u'var nextUrl = "{}";'.format(post_login_handler)
+        js_success_var = u'var nextUrl = "{}";'.format(js_escaped_string(post_login_handler))
         self.assertContains(response, js_success_var)
 
         # Verify that the login link preserves the querystring params
