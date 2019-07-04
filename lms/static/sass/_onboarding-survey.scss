@@ -1,0 +1,150 @@
+
+.survey-step-title {
+    overflow: auto;
+    
+    h1 {
+        margin-top: 30px;
+    }
+}
+
+.survey-steps {
+    text-align: center;
+    
+    .circle {
+        width: 60px;
+        height: 60px;
+        text-align: center;
+        color: #fff;
+        line-height: 60px;
+        margin: 0 15px;
+        
+        &.deactivate {
+           color: #002c85;
+        }
+    }
+}
+
+.step-info {
+    text-align: center;
+    max-width: 800px;
+    line-height: normal;
+    margin: 0 auto 30px;
+    font-size: 20px;
+}
+
+.survey-form {
+    width: 800px;
+    margin: auto;
+    margin-bottom: 30px;
+    
+    > p {
+        width: 50%;
+        float: left;
+        padding: 0 15px;
+        margin: 0 0 20px;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        
+        label {
+            display: none;
+            
+            &[for='id_is_emp_location_different'] {
+                display: block;
+                float: right;
+                width: calc(100% - 30px);
+                
+                + input {
+                    overflow: hidden;
+                    display: block;
+                    width: auto;
+                    height: 26px;
+                }
+            }
+        }
+        
+        input,
+        select {
+            width: 100%;
+            height: 50px;
+        }
+        
+        &:nth-child(7) {
+            width: 100%;
+        }
+    }
+
+    &.interests {
+
+        p {
+            width: 100%;
+            margin-bottom: 10px;
+
+            label {
+                display: block;
+            }
+        }
+
+        ul {
+
+            li {
+                display: inline-block;
+                vertical-align: middle;
+                margin: 0 auto 15px;
+                width: 45%;
+
+                input {
+                    margin-right: 8px;
+                }
+
+                &:nth-child(odd) {
+                    padding-right: 10px;
+                }
+
+                &:nth-child(even) {
+                    padding-left: 10px;
+                }
+            }
+        }
+    }
+
+    ul {
+        list-style: none;
+        overflow: auto;
+        margin-bottom: 30px;
+    }
+    
+    .submit-survey {
+        width: 100%;
+        clear: both;
+        float: none;
+        text-align: center;
+        
+        input {
+            width: 770px;
+            margin: 0 auto;
+            height: 50px;
+        }
+    }
+
+}
+
+.errorlist {
+    color: #B20610;
+    overflow: inherit !important;
+}
+
+.website-url {
+    position: relative;
+
+    &:before {
+        content: 'https://';
+        position: absolute;
+        left: 30px;
+        top: 21px;
+    }
+
+    input {
+        padding-left: 63px !important;
+    }
+}
