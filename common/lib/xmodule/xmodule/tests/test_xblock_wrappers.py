@@ -33,7 +33,7 @@ from xblock.fields import ScopeIds
 from xmodule.annotatable_module import AnnotatableDescriptor
 from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.course_module import CourseDescriptor
-from xmodule.html_module import HtmlDescriptor
+from xmodule.html_module import HtmlBlock
 from xmodule.poll_module import PollDescriptor
 from xmodule.randomize_module import RandomizeDescriptor
 from xmodule.seq_module import SequenceDescriptor
@@ -56,7 +56,7 @@ from xmodule.x_module import (
 # TODO: Add more types of sample data
 LEAF_XMODULES = {
     AnnotatableDescriptor: [{}],
-    HtmlDescriptor: [{}],
+    HtmlBlock: [{}],
     PollDescriptor: [{'display_name': 'Poll Display Name'}],
     WordCloudDescriptor: [{}],
 }
@@ -136,7 +136,7 @@ class ContainerModuleRuntimeFactory(ModuleSystemFactory):
         """
         # pylint: disable=no-member
         if depth == 0:
-            self.get_module.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlDescriptor)
+            self.get_module.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlBlock)
         else:
             self.get_module.side_effect = lambda x: ContainerModuleFactory(
                 descriptor_cls=VerticalBlock,
@@ -164,7 +164,7 @@ class ContainerDescriptorRuntimeFactory(DescriptorSystemFactory):
         """
         # pylint: disable=no-member
         if depth == 0:
-            self.load_item.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlDescriptor)
+            self.load_item.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlBlock)
         else:
             self.load_item.side_effect = lambda x: ContainerModuleFactory(
                 descriptor_cls=VerticalBlock,

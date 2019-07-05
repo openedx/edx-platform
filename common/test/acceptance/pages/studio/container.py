@@ -213,8 +213,8 @@ class ContainerPage(PageObject, HelpMixin):
         Returns:
             list: A list containing inner HTMl
         """
-        self.wait_for_element_visibility('.xmodule_HtmlModule', 'Xblock content is visible')
-        html = self.q(css='.xmodule_HtmlModule').html
+        self.wait_for_element_visibility('.xmodule_HtmlBlock', 'Xblock content is visible')
+        html = self.q(css='.xmodule_HtmlBlock').html
         html = html[0].strip()
         return html
 

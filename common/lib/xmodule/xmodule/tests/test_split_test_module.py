@@ -168,9 +168,9 @@ class SplitTestModuleLMSTest(SplitTestModuleTest):
         )
 
     # Patch the definition_to_xml for the html children.
-    @patch('xmodule.html_module.HtmlDescriptor.definition_to_xml')
+    @patch('xmodule.html_module.HtmlBlock.definition_to_xml')
     def test_export_import_round_trip(self, def_to_xml):
-        # The HtmlDescriptor definition_to_xml tries to write to the filesystem
+        # The HtmlBlock definition_to_xml tries to write to the filesystem
         # before returning an xml object. Patch this to just return the xml.
         def_to_xml.return_value = lxml.etree.Element('html')
 
