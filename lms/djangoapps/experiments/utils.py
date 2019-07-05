@@ -4,9 +4,7 @@ Utilities to facilitate experimentation
 
 from __future__ import absolute_import
 
-import hashlib
 import logging
-import re
 from decimal import Decimal
 
 import six
@@ -26,6 +24,9 @@ from openedx.features.course_duration_limits.access import get_user_course_expir
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from student.models import CourseEnrollment
 from xmodule.partitions.partitions_service import get_all_partitions_for_course, get_user_partition_groups
+
+# Import this for backwards compatibility (so that anyone importing this function from here doesn't break)
+from .stable_bucketing import stable_bucketing_hash_group  # pylint: disable=unused-import
 
 logger = logging.getLogger(__name__)
 
@@ -386,23 +387,3 @@ def get_program_context(course, user_enrollments):
             }
     return program_key
 # TODO: clean up as part of REVEM-199 (START)
-
-
-def stable_bucketing_hash_group(group_name, group_count, username):
-    """
-    Return the bucket that a user should be in for a given stable bucketing assignment.
-
-    This function has been verified to return the same values as the stable bucketing
-    functions in javascript and the master experiments table.
-
-    Arguments:
-        group_name: The name of the grouping/experiment.
-        group_count: How many groups to bucket users into.
-        username: The username of the user being bucketed.
-    """
-    hasher = hashlib.md5()
-    hasher.update(group_name.encode('utf-8'))
-    hasher.update(username.encode('utf-8'))
-    hash_str = hasher.hexdigest()
-
-    return int(re.sub('[8-9a-f]', '1', re.sub('[0-7]', '0', hash_str)), 2) % group_count
