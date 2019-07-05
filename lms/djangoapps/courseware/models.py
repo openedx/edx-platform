@@ -242,7 +242,7 @@ class StudentModuleHistory(BaseStudentModuleHistory):
         app_label = "courseware"
         get_latest_by = "created"
 
-    student_module = models.ForeignKey(StudentModule, db_index=True, on_delete=models.CASCADE)
+    student_module = models.ForeignKey(StudentModule, db_index=True, db_constraint=False, on_delete=models.CASCADE)
 
     def __unicode__(self):
         return unicode(repr(self))
