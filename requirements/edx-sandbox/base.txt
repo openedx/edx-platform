@@ -20,7 +20,7 @@ lxml==3.8.0
 markupsafe==1.1.1
 matplotlib==1.5.3
 networkx==1.7
-nltk==3.4.3
+nltk==3.4.4
 numpy==1.6.2
 pycparser==2.19
 pyparsing==2.2.0
