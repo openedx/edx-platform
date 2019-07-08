@@ -14,6 +14,7 @@
 # Daniel Le Berre, 2015
 # Daniel Le Berre, 2015
 # Dosto92 <hakim.poubelle@gmail.com>, 2014
+# Education Sahel <tech.sahel.education@gmail.com>, 2019
 # Encolpe Degoute <inactive+encolpe@transifex.com>, 2013
 # Encolpe Degoute <inactive+encolpe@transifex.com>, 2013
 # Eric Fortin, 2014,2016
@@ -198,7 +199,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-06-30 20:42+0000\n"
+"POT-Creation-Date: 2019-07-07 20:42+0000\n"
 "PO-Revision-Date: 2019-06-14 12:41+0000\n"
 "Last-Translator: Margie Rosero <margie.rosero@fun-mooc.fr>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"

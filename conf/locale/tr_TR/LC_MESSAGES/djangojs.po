@@ -107,8 +107,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-06-30 20:42+0000\n"
-"PO-Revision-Date: 2019-06-01 11:57+0000\n"
+"POT-Creation-Date: 2019-07-07 20:42+0000\n"
+"PO-Revision-Date: 2019-07-03 13:15+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)\n"
 "Language: tr_TR\n"
@@ -2016,7 +2016,7 @@ msgid ""
 "language."
 msgstr ""
 "Dil menüsüne girmek için YUKARI ok tuşuna basın, dil seçeneklerinde gezinmek"
-" içinse YUKARI ve AŞAĞI ok tuşuna kullanın. Seçilen dili belirlemek için "
+" içinse YUKARI ve AŞAĞI ok tuşlarını kullanın. Seçilen dili belirlemek için "
 "GİRİŞ tuşuna basın."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
@@ -2507,6 +2507,7 @@ msgstr "Bir derse özel değil"
 msgid "Subject"
 msgstr "Konu"
 
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "Hesap Ayarları"
@@ -2517,11 +2518,11 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Certificates"
-msgstr ""
+msgstr "Sertifikalar"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Course Content"
-msgstr ""
+msgstr "Ders İçeriği"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Deadlines"
@@ -2547,6 +2548,7 @@ msgstr ""
 msgid "Proctoring"
 msgstr ""
 
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: cms/templates/js/asset-library.underscore
 msgid "Other"
 msgstr "Diğer"
@@ -3411,7 +3413,7 @@ msgstr ""
 msgid "Viewing %s course"
 msgid_plural "Viewing %s courses"
 msgstr[0] ""
-msgstr[1] "%s dersleri görüntüleme"
+msgstr[1] "%s ders görüntüleniyor"
 
 #: lms/static/js/discovery/views/search_form.js
 #, javascript-format
@@ -9926,7 +9928,7 @@ msgstr "Görünen Ad"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Proctoring Settings"
-msgstr ""
+msgstr "Gözetmen Ayarları"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Configure"
@@ -10333,7 +10335,7 @@ msgstr "Renkli vurgulama {highlight_index}"
 
 #: cms/templates/js/highlights-editor.underscore
 msgid "A highlight to look forward to this week."
-msgstr ""
+msgstr "Bu hafta yapılacaklara bir göz atalım."
 
 #: cms/templates/js/license-selector.underscore
 msgid "License Type"
@@ -10647,7 +10649,7 @@ msgstr ""
 
 #: cms/templates/js/show-textbook.underscore
 msgid "PDF Chapters"
-msgstr ""
+msgstr "PDF Bölümleri"
 
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/signatory-editor.underscore
