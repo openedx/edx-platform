@@ -2333,7 +2333,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=562 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=563 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3411,6 +3411,8 @@ CREATE TABLE `grades_historicalpersistentsubsectiongradeoverride` (
   `history_type` varchar(1) NOT NULL,
   `grade_id` bigint(20) unsigned DEFAULT NULL,
   `history_user_id` int(11) DEFAULT NULL,
+  `override_reason` varchar(300) DEFAULT NULL,
+  `system` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`history_id`),
   KEY `grades_historicalper_history_user_id_05000562_fk_auth_user` (`history_user_id`),
   KEY `grades_historicalpersistentsubsectiongradeoverride_id_e30d8953` (`id`),
@@ -3494,6 +3496,8 @@ CREATE TABLE `grades_persistentsubsectiongradeoverride` (
   `earned_graded_override` double DEFAULT NULL,
   `possible_graded_override` double DEFAULT NULL,
   `grade_id` bigint(20) unsigned NOT NULL,
+  `override_reason` varchar(300) DEFAULT NULL,
+  `system` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `grade_id` (`grade_id`),
   KEY `grades_persistentsubsectiongradeoverride_created_f80819d0` (`created`),
