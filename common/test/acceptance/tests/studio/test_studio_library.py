@@ -1,7 +1,10 @@
 """
 Acceptance tests for Content Libraries in Studio
 """
+from __future__ import absolute_import
+
 from ddt import data, ddt
+from six.moves import range
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -204,7 +207,7 @@ class LibraryNavigationTest(StudioLibraryTest):
         Create four pages worth of XBlocks, and offset by one so each is named
         after the number they should be in line by the user's perception.
         """
-        self.blocks = [XBlockFixtureDesc('html', str(i)) for i in xrange(1, 41)]
+        self.blocks = [XBlockFixtureDesc('html', str(i)) for i in range(1, 41)]
         library_fixture.add_children(*self.blocks)
 
     def test_arbitrary_page_selection(self):

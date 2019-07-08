@@ -3,8 +3,10 @@
 Bok choy acceptance tests for problems in the LMS
 """
 from __future__ import absolute_import
-from textwrap import dedent
+
 import time
+from textwrap import dedent
+
 import ddt
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc

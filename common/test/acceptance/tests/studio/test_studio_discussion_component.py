@@ -1,11 +1,13 @@
 """
 Acceptance tests for discussion component in studio
 """
-from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
+from __future__ import absolute_import
+
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.studio.container import ContainerPage
-from common.test.acceptance.pages.studio.utils import add_component
 from common.test.acceptance.pages.studio.discussion_component_editor import DiscussionComponentEditor
+from common.test.acceptance.pages.studio.utils import add_component
+from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
 
 
 class DiscussionComponentTest(ContainerBase):

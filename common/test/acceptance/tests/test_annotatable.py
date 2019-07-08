@@ -3,7 +3,11 @@
 E2E tests for the LMS.
 """
 
+from __future__ import absolute_import
+
 from textwrap import dedent
+
+from six.moves import range
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -83,21 +87,21 @@ class AnnotatableProblemTest(UniqueCourseTest):
                     XBlockFixtureDesc('vertical', 'Test Annotation Vertical').add_children(
                         XBlockFixtureDesc('annotatable', 'Test Annotation Module',
                                           data=self.DATA_TEMPLATE.format("\n".join(
-                                              self.ANNOTATION_TEMPLATE.format(i) for i in xrange(self.annotation_count)
+                                              self.ANNOTATION_TEMPLATE.format(i) for i in range(self.annotation_count)
                                           ))),
                         XBlockFixtureDesc('problem', 'Test Annotation Problem 0',
                                           data=self.PROBLEM_TEMPLATE.format(number=0, options="\n".join(
                                               self.OPTION_TEMPLATE.format(
                                                   number=k,
                                                   correctness=_correctness(k, 0))
-                                              for k in xrange(self.annotation_count)
+                                              for k in range(self.annotation_count)
                                           ))),
                         XBlockFixtureDesc('problem', 'Test Annotation Problem 1',
                                           data=self.PROBLEM_TEMPLATE.format(number=1, options="\n".join(
                                               self.OPTION_TEMPLATE.format(
                                                   number=k,
                                                   correctness=_correctness(k, 1))
-                                              for k in xrange(self.annotation_count)
+                                              for k in range(self.annotation_count)
                                           )))
                     )
                 )
@@ -128,7 +132,7 @@ class AnnotatableProblemTest(UniqueCourseTest):
         # This will avoid scrolling related problems on different browsers and instead directly jump on the problem
         disable_animations(annotation_component_page)
 
-        for i in xrange(self.annotation_count):
+        for i in range(self.annotation_count):
             annotation_component_page.click_reply_annotation(i)
             self.assertTrue(annotation_component_page.check_scroll_to_problem())
 
