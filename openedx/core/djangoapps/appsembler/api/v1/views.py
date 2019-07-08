@@ -311,7 +311,7 @@ class EnrollmentViewSet(TahoeAuthMixin, viewsets.ModelViewSet):
                 # course ids
                 response_data = {
                     'error': 'invalid-course-ids',
-                    'invalid_course_ids' : invalid_course_ids,
+                    'invalid_course_ids': invalid_course_ids,
                 }
                 response_code = status.HTTP_400_BAD_REQUEST
             else:
@@ -328,13 +328,13 @@ class EnrollmentViewSet(TahoeAuthMixin, viewsets.ModelViewSet):
                     else:
                         email_params = {}
                     results = enroll_learners_in_course(
-                            course_id=course_key,
-                            identifiers=identifiers,
-                            enroll_func=partial(enroll_email,
-                                                auto_enroll=auto_enroll,
-                                                email_students=email_learners,
-                                                email_params=email_params),
-                            request_user=request.user)
+                        course_id=course_key,
+                        identifiers=identifiers,
+                        enroll_func=partial(enroll_email,
+                                            auto_enroll=auto_enroll,
+                                            email_students=email_learners,
+                                            email_params=email_params),
+                        request_user=request.user)
 
                 response_data = {
                     'auto_enroll': serializer.data.get('auto_enroll'),

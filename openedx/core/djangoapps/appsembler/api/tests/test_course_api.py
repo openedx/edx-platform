@@ -75,7 +75,7 @@ class CourseApiTest(TestCase):
         results = response.data['results']
         self.assertEqual(response.status_code, 200)
         expected_keys = [str(co.id) for co in self.my_course_overviews]
-        self.assertEqual(set([obj['id'] for obj in results]), set(expected_keys) )
+        self.assertEqual(set([obj['id'] for obj in results]), set(expected_keys))
 
     def test_get_single(self):
         course_id = str(self.my_course_overviews[0].id)

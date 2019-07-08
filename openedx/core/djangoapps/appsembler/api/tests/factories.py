@@ -101,4 +101,3 @@ class OrganizationCourseFactory(factory.DjangoModelFactory):
     course_id = factory.Sequence(lambda n: COURSE_ID_STR_TEMPLATE.format(n))
     organization = factory.SubFactory(OrganizationFactory)
     active = True
-

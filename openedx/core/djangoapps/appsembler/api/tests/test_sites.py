@@ -32,7 +32,7 @@ from openedx.core.djangoapps.appsembler.api.tests.factories import (
     OrganizationFactory,
     OrganizationCourseFactory,
     UserOrganizationMappingFactory,
-    )
+)
 
 
 class SitesModuleTests(TestCase):
@@ -79,16 +79,17 @@ class SitesModuleTests(TestCase):
     def test_my_course_belongs_to_my_site(self):
         for co in self.my_course_overviews:
             assert aapi_sites.course_belongs_to_site(site=self.my_site,
-                                                    course_id=co.id)
+                                                     course_id=co.id)
+
     def test_my_course_not_belongs_to_other_site(self):
         for co in self.my_course_overviews:
             assert not aapi_sites.course_belongs_to_site(site=self.other_site,
-                                                        course_id=co.id)
+                                                         course_id=co.id)
 
     def test_other_course_not_belongs_to_my_site(self):
         for co in self.other_course_overviews:
             assert not aapi_sites.course_belongs_to_site(site=self.my_site,
-                                                        course_id=co.id)
+                                                         course_id=co.id)
 
     def test_invalid_course_not_belongs_to_site(self):
         for site in Site.objects.all():

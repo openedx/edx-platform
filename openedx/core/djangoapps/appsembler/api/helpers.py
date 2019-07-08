@@ -1,5 +1,5 @@
-
 from opaque_keys.edx.keys import CourseKey
+
 
 def as_course_key(course_id):
     '''Returns course id as a CourseKey instance

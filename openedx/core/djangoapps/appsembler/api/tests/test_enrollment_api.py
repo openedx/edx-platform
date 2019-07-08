@@ -56,7 +56,7 @@ class EnrollmentApiGetTest(ModuleStoreTestCase):
         self.other_site_org = OrganizationFactory(sites=[self.other_site])
         self.my_site_org = OrganizationFactory(sites=[self.my_site])
 
-        self.my_courses = [CourseFactory.create() for i in range(0,2)]
+        self.my_courses = [CourseFactory.create() for i in range(0, 2)]
         self.my_course_overviews = [
             CourseOverviewFactory(id=course.id) for course in self.my_courses
         ]
@@ -77,7 +77,7 @@ class EnrollmentApiGetTest(ModuleStoreTestCase):
         self.other_enrollments = [CourseEnrollmentFactory()]
         OrganizationCourseFactory(organization=self.other_site_org,
                                   course_id=str(
-                                    self.other_enrollments[0].course_overview.id))
+                                      self.other_enrollments[0].course_overview.id))
 
         self.caller = UserFactory()
         UserOrganizationMappingFactory(user=self.caller,
@@ -129,7 +129,6 @@ class EnrollmentApiGetTest(ModuleStoreTestCase):
     def test_get_single_enrollment(self):
         pass
 
-
     def test_invalid_enroll_data_no_learners(self):
         """
         This does a partial test
@@ -174,7 +173,6 @@ class EnrollmentApiGetTest(ModuleStoreTestCase):
         response = view(request)
         response.render()
 
-
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
@@ -189,7 +187,7 @@ class EnrollmentApiPostTest(ModuleStoreTestCase):
         self.other_site_org = OrganizationFactory(sites=[self.other_site])
         self.my_site_org = OrganizationFactory(sites=[self.my_site])
 
-        self.my_courses = [CourseFactory.create() for i in range(0,2)]
+        self.my_courses = [CourseFactory.create() for i in range(0, 2)]
         self.my_course_overviews = [
             CourseOverviewFactory(id=course.id) for course in self.my_courses
         ]
@@ -210,7 +208,7 @@ class EnrollmentApiPostTest(ModuleStoreTestCase):
         self.other_enrollments = [CourseEnrollmentFactory()]
         OrganizationCourseFactory(organization=self.other_site_org,
                                   course_id=str(
-                                    self.other_enrollments[0].course_overview.id))
+                                      self.other_enrollments[0].course_overview.id))
 
         self.caller = UserFactory()
         UserOrganizationMappingFactory(user=self.caller,
@@ -244,7 +242,7 @@ class EnrollmentApiPostTest(ModuleStoreTestCase):
         for user_email in new_users:
             assert not CourseEnrollmentAllowed.objects.filter(email=user_email).exists()
 
-        url = reverse('tahoe-api:v1:enrollments-list') 
+        url = reverse('tahoe-api:v1:enrollments-list')
         request = APIRequestFactory().post(url, payload)
         request.META['HTTP_HOST'] = self.my_site.domain
         force_authenticate(request, user=self.caller)
@@ -287,7 +285,7 @@ class EnrollmentApiPostTest(ModuleStoreTestCase):
         assert CourseEnrollmentAllowed.objects.count() == len(new_users)
 
         for rec in results:
-            assert not rec.has_key('error')
+            assert 'error' not in rec
             if rec['identifier'] in new_users:
                 assert CourseEnrollmentAllowed.objects.filter(
                     email=rec['identifier']).exists()

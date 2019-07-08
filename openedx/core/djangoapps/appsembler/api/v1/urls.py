@@ -16,13 +16,13 @@ router.register(
     r'courses',
     views.CourseViewSet,
     'courses',
-    )
+)
 
 router.register(
     r'enrollments',
     views.EnrollmentViewSet,
     'enrollments',
-    )
+)
 
 router.register(
     r'registrations',
