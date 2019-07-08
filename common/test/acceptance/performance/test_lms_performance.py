@@ -1,6 +1,8 @@
 """
 Single page performance tests for LMS.
 """
+from __future__ import absolute_import
+
 from bok_choy.web_app_test import with_cache
 
 from common.test.acceptance.fixtures.course import CourseFixture, CourseUpdateDesc, XBlockFixtureDesc

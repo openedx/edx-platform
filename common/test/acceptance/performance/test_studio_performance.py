@@ -1,6 +1,8 @@
 """
 Single page performance tests for Studio.
 """
+from __future__ import absolute_import
+
 from bok_choy.web_app_test import with_cache
 
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
