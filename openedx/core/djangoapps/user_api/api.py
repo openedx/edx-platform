@@ -1,5 +1,6 @@
 import copy
 import crum
+import json
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -153,6 +154,14 @@ def _apply_third_party_auth_overrides(request, form_desc):
                         "max_length": accounts.EMAIL_MAX_LENGTH,
                     }
                 )
+
+            other_settings = json.loads(current_provider.other_settings)
+            if 'PROVIDER_READ_ONLY_FIELDS' in other_settings:
+                for field in other_settings['PROVIDER_READ_ONLY_FIELDS']:
+                    form_desc.override_field_properties(
+                        field,
+                        restrictions={"readonly": "readonly"}
+                    )
 
 
 class RegistrationFormFactory(object):
