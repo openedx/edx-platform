@@ -28,6 +28,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
+from openedx.features.course_card.helpers import get_related_card_id
 from six import text_type
 
 from contentstore.course_group_config import (
@@ -918,8 +919,10 @@ def rerun_course(user, source_course_key, org, number, run, fields, background=T
     # so the user can see the updated status for that course
     add_instructor(destination_course_key, user, user)
 
+    parent_course_key = get_related_card_id(source_course_key)
+
     # Mark the action as initiated
-    CourseRerunState.objects.initiated(source_course_key, destination_course_key, user, fields['display_name'])
+    CourseRerunState.objects.initiated(parent_course_key, destination_course_key, user, fields['display_name'])
 
     # Clear the fields that must be reset for the rerun
     fields['advertised_start'] = None
