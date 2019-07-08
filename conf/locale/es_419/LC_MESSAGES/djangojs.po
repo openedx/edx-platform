@@ -35,6 +35,7 @@
 # Marina Pastor <mpastor@edx.org>, 2018
 # Mecabotware <mecabotware.ideas@gmail.com>, 2015
 # Michael Terry <mterry@edx.org>, 2018
+# Miguel Bonilla <mbonilla@edx.org>, 2019
 # Natalia, 2013
 # Natalia, 2013-2014,2016,2018
 # Ned Batchelder <ned@edx.org>, 2017
@@ -161,7 +162,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-06-30 20:42+0000\n"
+"POT-Creation-Date: 2019-07-07 20:42+0000\n"
 "PO-Revision-Date: 2019-02-27 22:36+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -2567,6 +2568,8 @@ msgid ""
 "For inquiries regarding assignments, grades, or structure of a specific "
 "course, please post in the discussion forums for that course directly."
 msgstr ""
+"Para preguntas sobre las tareas, notas o estructura de un curso específico, "
+"por favor publica tu pregunta directamente en el foro de discusión."
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Not specific to a course"
@@ -2583,7 +2586,7 @@ msgstr "Configuración de cuenta"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Billing/Payment Options"
-msgstr ""
+msgstr "Facturación/Opciones de pago"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Certificates"
@@ -2595,23 +2598,23 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Deadlines"
-msgstr ""
+msgstr "Fechas de entrega"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Errors/Technical Issues"
-msgstr ""
+msgstr "Problemas técnicos/errores"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Financial Aid"
-msgstr ""
+msgstr "Ayuda financiera"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Masters"
-msgstr ""
+msgstr "Maestrías"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Photo Verification"
-msgstr ""
+msgstr "Verificación fotográfica"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Proctoring"
@@ -2623,7 +2626,7 @@ msgstr "Otro"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "What can we help you with, {username}?"
-msgstr ""
+msgstr "¿En qué podemos ayudarte, {username}?"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
@@ -2660,7 +2663,7 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Select a subject for your support request."
-msgstr ""
+msgstr "Elige un tema para tu petición de ayuda."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
@@ -3452,22 +3455,30 @@ msgid ""
 "Are you sure you want to unenroll from the purchased course {courseName} "
 "({courseNumber})?"
 msgstr ""
+"¿Seguro que quieres cancelar tu inscripción al curso pagado {courseName} "
+"({courseNumber})?"
 
 #: lms/static/js/dashboard/legacy.js
 msgid "Are you sure you want to unenroll from {courseName} ({courseNumber})?"
 msgstr ""
+"¿Seguro que quieres cancelar tu inscripción al curso {courseName} "
+"({courseNumber})?"
 
 #: lms/static/js/dashboard/legacy.js
 msgid ""
 "Are you sure you want to unenroll from the verified {certNameLong}  track of"
 " {courseName}  ({courseNumber})?"
 msgstr ""
+"¿Seguro que quieres cancelar tu inscripción a la opción verificada "
+"{certNameLong} de {courseName} ({courseNumber})?"
 
 #: lms/static/js/dashboard/legacy.js
 msgid ""
 "Are you sure you want to unenroll from the verified {certNameLong} track of "
 "{courseName} ({courseNumber})?"
 msgstr ""
+"¿Seguro que quieres cancelar tu inscripción a la opción verificada "
+"{certNameLong} de {courseName} ({courseNumber})?"
 
 #: lms/static/js/dashboard/legacy.js
 msgid ""
@@ -4994,6 +5005,14 @@ msgid ""
 "or check your spam folder.{paragraphEnd}{paragraphStart}If you need further "
 "assistance, {anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
 msgstr ""
+"{paragraphStart}Has escrito {boldStart}{email}{boldEnd}. Si este correo "
+"electrónico está asociado a tu cuenta {platform_name}, te enviaremos un "
+"correo con las instrucciones para recuperar tu contraseña a este correo "
+"electrónico. {paragraphEnd}{paragraphStart}Si no recibes el correo de "
+"restablecimiento de contraseña después de 1 minuto, verifica que escribiste "
+"la dirección de correo correcta o mira en tu carpeta de correo no "
+"deseado.{paragraphEnd}{paragraphStart}Si necesitas más ayuda, "
+"{anchorStart}contacta con soporte técnico{anchorEnd}.{paragraphEnd}"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""

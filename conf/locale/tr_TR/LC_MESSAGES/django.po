@@ -128,7 +128,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-06-30 20:42+0000\n"
+"POT-Creation-Date: 2019-07-07 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2019\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -5388,6 +5388,8 @@ msgid ""
 "© {org_name}.  All rights reserved except where noted.  edX, Open edX and "
 "their respective logos are registered trademarks of edX Inc."
 msgstr ""
+"© {org_name}.  Belirtilen yerler dışında tüm hakları saklıdır. edX, Open edX"
+" ve ilgili logoları edX Inc'in tescilli ticari markalarıdır."
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Open edX' is a trademark, please keep this untranslated.
@@ -9797,6 +9799,9 @@ msgid ""
 "                    You have been enrolled in %(course_name)s\n"
 "                "
 msgstr ""
+"\n"
+"                    %(course_name)s dersine kaydoldunuz\n"
+"                "
 
 #: lms/templates/instructor/edx_ace/enrollenrolled/email/body.html
 #: lms/templates/instructor/edx_ace/enrollenrolled/email/body.txt
@@ -13502,6 +13507,14 @@ msgid "Dashboard"
 msgstr "Ana Panel"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+msgid "results successfully populated,"
+msgstr ""
+
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
+msgid "Click to load all enrolled courses"
+msgstr ""
+
+#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "You are not enrolled in any courses yet."
 msgstr "Henüz bir derse kayıt olmadınız."
 
@@ -13644,7 +13657,7 @@ msgstr "Harici Kimlik Denetleme başarısız oldu"
 
 #: lms/templates/footer.html
 msgid "organization logo"
-msgstr ""
+msgstr "kurum logosu"
 
 #: lms/templates/forgot_password_modal.html
 msgid ""
@@ -13867,7 +13880,7 @@ msgstr "{platform_name} platformuna hoş geldiniz"
 #. untranslated. See http://open.edx.org for more information.
 #: lms/templates/index_overlay.html
 msgid "It works! Powered by Open edX{registered_trademark}"
-msgstr ""
+msgstr "Çalışıyor! İçinde Open edX{registered_trademark} Var"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -13980,12 +13993,9 @@ msgstr "{platform_name} ortamında oturum açarken hata oluştu."
 #: lms/templates/login.html
 msgid ""
 "Please provide the following information to log into your {platform_name} "
-"account. Required fields are noted by <strong class=\"indicator\">bold text "
-"and an asterisk (*)</strong>."
+"account. Required fields are noted by {strong_start}bold text and an "
+"asterisk (*){strong_end}."
 msgstr ""
-"{platform_name} hesabınıza giriş yapmak için lütfen aşağıdaki bilgileri "
-"tamamlayın. Gerekli kısımlar  <strong class=\"indicator\"> (*) ve koyu "
-"yazıyla vurgulanmıştır </strong>."
 
 #: lms/templates/login.html
 msgid "Sign in with {provider_name}"
@@ -14505,7 +14515,7 @@ msgstr "ör. İsminiz (sertifikada gözükecek)"
 
 #: lms/templates/signup_modal.html
 msgid "{start_li}Welcome{end_li} {name}"
-msgstr ""
+msgstr "{start_li}Hoş geldin{end_li} {name}"
 
 #: lms/templates/signup_modal.html
 msgid "Full Name *"
@@ -16333,7 +16343,7 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Enroll Now"
-msgstr ""
+msgstr "Hemen Kaydol"
 
 #: lms/templates/courseware/course_about.html
 msgid "View About Page in studio"
@@ -20931,7 +20941,7 @@ msgstr ""
 
 #: lms/templates/support/feature_based_enrollments.html
 msgid "Course Duration Limits"
-msgstr ""
+msgstr "Ders Süresi Sınırları"
 
 #: lms/templates/support/feature_based_enrollments.html
 msgid "Is Enabled"
