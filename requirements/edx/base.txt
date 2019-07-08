@@ -96,7 +96,7 @@ docutils==0.14            # via botocore
 drf-yasg==1.16.0
 edx-ace==0.1.10
 edx-analytics-data-api-client==0.15.3
-edx-bulk-grades==0.1.4
+edx-bulk-grades==0.1.5
 edx-ccx-keys==0.2.2
 edx-celeryutils==0.2.7
 edx-completion==2.0.0
@@ -232,7 +232,7 @@ soupsieve==1.9.2          # via beautifulsoup4
 sqlparse==0.3.0
 staff-graded-xblock==0.3
 stevedore==1.30.1
-super-csv==0.4
+super-csv==0.5.1
 sympy==1.4
 tincan==0.0.5             # via edx-enterprise
 unicodecsv==0.14.1
