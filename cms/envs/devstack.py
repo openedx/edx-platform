@@ -186,3 +186,34 @@ MODULESTORE = convert_module_store_setting_if_needed(MODULESTORE)
 
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
+
+############## Settings for edX Notifications App ######################
+
+NOTIFICATION_STORE_PROVIDER = {
+    "class": "edx_notifications.stores.sql.store_provider.SQLNotificationStoreProvider",
+    "options": {
+    }
+}
+
+MAX_NOTIFICATION_LIST_SIZE = 100
+
+# list all known channel providers
+NOTIFICATION_CHANNEL_PROVIDERS = {
+    'durable': {
+        'class': 'edx_notifications.channels.durable.BaseDurableNotificationChannel',
+        'options': {}
+    },
+    'null': {
+        'class': 'edx_notifications.channels.null.NullNotificationChannel',
+        'options': {}
+    }
+}
+
+# list all of the mappings of notification types to channel
+NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = {
+    '*': 'durable',  # default global mapping
+}
+
+# NodeBB settings
+NODEBB_ENDPOINT = ENV_TOKENS.get('NODEBB_ENDPOINT', None)

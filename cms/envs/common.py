@@ -503,6 +503,10 @@ MIDDLEWARE_CLASSES = [
     'openedx.core.djangoapps.cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
 
     'student.middleware.UserStandingMiddleware',
+
+    # Enable session sharing b/w edx and nodebb platform
+    'student.middleware.UserSessionSharingMiddleware',
+
     'openedx.core.djangoapps.contentserver.middleware.StaticContentServer',
 
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -742,7 +746,8 @@ PIPELINE_CSS = {
         'source_filenames': [
             'css/tinymce-studio-content-fonts.css',
             'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/content.min.css',
-            'css/tinymce-studio-content.css'
+            'css/tinymce-studio-content.css',
+            'css/tinymce-content-philu-overrides.css'
         ],
         'output_filename': 'css/cms-style-vendor-tinymce-content.css',
     },
@@ -1122,6 +1127,7 @@ INSTALLED_APPS = [
     'courseware',
     'survey.apps.SurveyConfig',
     'lms.djangoapps.verify_student.apps.VerifyStudentConfig',
+    'lms.djangoapps.onboarding',
     'completion',
 
     # Microsite configuration application
@@ -1174,6 +1180,16 @@ INSTALLED_APPS = [
     'openedx.features.course_duration_limits',
     'openedx.features.content_type_gating',
     'experiments',
+
+    # Course teams
+    # Nodebb app has dependency on this app that's why we are adding it here
+    'lms.djangoapps.teams',
+
+    # NodeBB app
+    'nodebb',
+
+    # Custom settings app
+    'custom_settings',
 ]
 
 
@@ -1568,3 +1584,35 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_c
 # setting for the FileWrapper class used to iterate over the export file data.
 # See: https://docs.python.org/2/library/wsgiref.html#wsgiref.util.FileWrapper
 COURSE_EXPORT_DOWNLOAD_CHUNK_SIZE = 8192
+
+
+# Enabled this setting to add Course Instructors through User Interface in CMS.
+FEATURES['ENABLE_EXTENDED_COURSE_DETAILS'] = True
+
+
+############## Settings for edX Notifications App ######################
+
+NOTIFICATION_STORE_PROVIDER = {
+    "class": "edx_notifications.stores.sql.store_provider.SQLNotificationStoreProvider",
+    "options": {
+    }
+}
+
+MAX_NOTIFICATION_LIST_SIZE = 100
+
+# list all known channel providers
+NOTIFICATION_CHANNEL_PROVIDERS = {
+    'durable': {
+        'class': 'edx_notifications.channels.durable.BaseDurableNotificationChannel',
+        'options': {}
+    },
+    'null': {
+        'class': 'edx_notifications.channels.null.NullNotificationChannel',
+        'options': {}
+    }
+}
+
+# list all of the mappings of notification types to channel
+NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = {
+    '*': 'durable',  # default global mapping
+}
