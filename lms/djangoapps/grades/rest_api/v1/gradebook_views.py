@@ -938,7 +938,7 @@ class SubsectionGradeView(GradeViewMixin, APIView):
         try:
             override = original_grade.override
             if limit_history_request_value is not None:
-                history = override.history.all().order_by('history_date')[:history_record_limit]
+                history = reversed(list(override.history.all().order_by('-history_date')[:history_record_limit]))
             else:
                 history = override.history.all().order_by('history_date')
         except PersistentSubsectionGradeOverride.DoesNotExist:
