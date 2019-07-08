@@ -1,0 +1,14 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.conf import settings %>
+% if full_name is not UNDEFINED and full_name is not None:
+${_(u"Hi {name},").format(name=full_name)}
+% else:
+${_(u"Hi,")}
+% endif
+
+${_(u"Welcome to week: ")} ${course_week} ${_(u" of Course: ")} ${course_name}
+
+<a href="${course_link}">Go to course</a>
+
+${_(u"Sincerely,")}
+${settings.PLATFORM_NAME}

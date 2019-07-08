@@ -1,0 +1,1 @@
+<% if (roomID[teamID]) { print('<p class="meta-detail team-group"><a class="link" href="' + nodeBBUrl + '/chats/' + roomID[teamID] + '">Team Discussion</a></p>'); } %>

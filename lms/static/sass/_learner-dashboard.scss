@@ -1,0 +1,175 @@
+//
+// Courses grid view
+//
+.courses-grid-view {
+    @extend .clearfix;
+    margin-bottom: 30px;
+    
+    .courses-listing {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        
+        .courses-listing-item {
+            float: left;
+            display: block;
+            width: 33.33%;
+            padding: 0 15px;
+            margin-bottom: 40px;
+            max-height: 420px;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            
+            &:first-child,
+            &:nth-child(4n) {
+                padding-left: 0;
+            }
+            
+            &:last-child,
+            &:nth-child(3n) {
+                padding-right: 0;
+            }
+            
+            article.course {
+                border: 1px solid #bebebe;
+                margin: 0 0 15px;
+                border-radius: 2px;
+                box-sizing: border-box;
+                transition: all 0.125s linear 0s;
+                position: relative;
+                border-bottom: 3px solid #126f9a;
+                box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.125), inset 0 0 0 1px rgba(255, 255, 255, 0.75);
+                background: #f5f5f5;
+                width: 100%;
+                
+                a {
+                    display: block;
+                    position: relative;
+                    
+                    &:hover,
+                    &:focus {
+                        text-decoration: none;
+                    }
+                }
+                
+                header {
+                    
+                    .cover-image {
+                        height: 160px;
+                        overflow: hidden;
+                        
+                        img {
+                            width: 100%;
+                            height: auto;
+                        }
+                        
+                        .learn-more {
+                            left: calc(50% - 100px);
+                            box-sizing: border-box;
+                            position: absolute;
+                            top: 55px;
+                            padding: 0 20px;
+                            width: 200px;
+                            height: 50px;
+                            border-color: #0074b4;
+                            border-radius: 3px;
+                            background: #0074b4;
+                            color: #fff;
+                            line-height: 50px;
+                            text-align: center;
+                            opacity: 0;
+                            text-transform: none;
+                        }
+                        
+                        &:before {
+                            content: '';
+                            left: 0;
+                            position: absolute;
+                            top: 0;
+                            opacity: 0;
+                            background: #000;
+                            width: 100%;
+                            height: 160px;
+                            transition: all 0.125s linear 0s;
+                        }
+                    }
+                }
+                
+                .course-info {
+                    height: 200px;
+                    font-family: "Open Sans", Verdana, Geneva, sans-serif, sans-serif;
+                    
+                    h2,
+                    h1 {
+                        color: #646464;
+                        font: normal 1.2em/1.2em Georgia, Cambria, "Times New Roman", Times, serif;
+                        font-family: "Open Sans", Verdana, Geneva, sans-serif, sans-serif;
+                        letter-spacing: 1px;
+                        margin-bottom: 15px;
+                        text-transform: uppercase;
+                        -webkit-font-smoothing: antialiased;
+                    }
+                    
+                    .course-organization, .course-code, .course-date {
+                        @extend %t-icon6;
+                        color: $gray-d2;
+                    }
+                    
+                    .course-organization, .course-code, .course-title {
+                        display: block;
+                        text-transform: none;
+                    }
+                    
+                    .course-organization {
+                        @include line-height(11);
+                        padding: ($baseline/4) ($baseline*0.75) ($baseline/10) ($baseline*0.75);
+                    }
+                    
+                    .course-code {
+                        padding: 0 ($baseline*0.75);
+                    }
+                    
+                    .course-title {
+                        @include line-height(16);
+                        @extend %t-icon4;
+                        margin: ($baseline*0.25) 0 ($baseline*1.75) 0;
+                        padding: 0 ($baseline*0.75);
+                        height: $course-title-height;
+                        color: $link-color;
+                    }
+                    
+                    .course-date {
+                        padding: ($baseline/10) ($baseline*0.75);
+                    }
+                }
+                
+                &:hover {
+                    background: #f5f5f5;
+                    border-color: #bebebe;
+                    box-shadow: 0 1px 4px 0 rgba(0, 121, 188, 0.4);
+                    
+                    header {
+                        
+                        .cover-image {
+                            
+                            .learn-more {
+                                opacity: 1;
+                            }
+                            
+                            &:before {
+                                opacity: 0.6;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            > p {
+                font-size: 14px;
+                color: #474747;
+                text-align: center;
+            }
+        }
+    }
+}

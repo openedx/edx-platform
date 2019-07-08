@@ -1,0 +1,490 @@
+/*
+** Philanthropy University courseware specific styles
+*/
+
+/*Centering rules for whole page*/
+
+.xmodule_display.xmodule_HtmlModule .body {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/*Centering rules for 1000px-wide images*/
+
+.xmodule_display.xmodule_HtmlModule .largeimage {
+    max-width: 1000px !important;
+    margin: 0 auto;
+}
+
+
+/*Centering rules for 350px-wide images*/
+
+.xmodule_display.xmodule_HtmlModule .smallimage {
+    max-width: 350px !important;
+    margin: 0 auto;
+}
+
+/*Centering rules for 175px-wide images*/
+
+.xmodule_display.xmodule_HtmlModule .tinyimage {
+    max-width: 175px !important;
+    margin: 0 auto;
+}
+
+/*Styling rules for common elements*/
+
+.xmodule_display.xmodule_HtmlModule p {
+	color: red !important;
+    line-height: 1.5em !important;
+    margin-top: 8pt !important;
+    margin-bottom: 8pt !important;
+    font-size: 13pt !important;
+    font-family: "Montserrat", "Arial", sans-serif !important;
+    color: #083954 !important;
+    font-weight: 400 !important;
+}
+
+.xmodule_display.xmodule_HtmlModule h1 {
+    line-height: 1.5em !important;
+    margin-top: 18pt !important;
+    margin-bottom: 12pt !important;
+    border-bottom: solid #083954 2pt !important;
+    font-size: 32pt !important;
+    font-family: "Arial", sans-serif !important;
+    font-weight: bold !important;
+    color: #083954 !important;
+}
+
+.xmodule_display.xmodule_HtmlModule h2 {
+    line-height: 1.5em !important;
+    margin-top: 24pt !important;
+    margin-bottom: 12pt !important;
+    font-size: 22pt !important ;
+    font-family: "Arial", sans-serif !important;
+    color: #083954 !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;"
+}
+
+.xmodule_display.xmodule_HtmlModule ul {
+    margin-top: 8pt !important;
+    margin-bottom: 8pt !important;
+    margin-left: 16pt !important;
+    list-style-type: disc !important;
+    font-size: 13pt !important;
+    color: #083954 !important;
+    font-weight: 400 !important;
+    font-family: "Montserrat", "Arial", sans-serif !important;
+}
+
+.xmodule_display.xmodule_HtmlModule ul li ul { /* targets all ul elements within an li element, itself within a ul */
+    margin-top: 8pt !important;
+    margin-bottom: 8pt !important;
+    margin-left: 24pt !important;
+    list-style-type: circle !important;
+    font-size: 13pt !important;
+    color: #083954 !important;
+    font-weight: 400 !important;
+    font-family: "Montserrat", "Arial", sans-serif !important;
+}
+
+.xmodule_display.xmodule_HtmlModule ol {
+    margin-top: 8pt !important;
+    margin-bottom: 8pt !important;
+    margin-left: 24pt !important;
+    list-style-type: number !important;
+    font-size: 13pt !important;
+    color: #083954 !important;
+    font-weight: 400 !important;
+    font-family: "Montserrat", "Arial", sans-serif !important;
+}
+
+.xmodule_display.xmodule_HtmlModule ol li ol{ /* targets all ol elements within an li element, itself within a ol */
+    margin-top: 8pt !important;
+    margin-bottom: 8pt !important;
+    margin-left: 24pt !important;
+    list-style-type: lower-alpha!important;
+    font-size: 13pt !important;
+    color: #083954 !important;
+    font-weight: 400 !important;
+    font-family: "Montserrat", "Arial", sans-serif !important;
+}
+
+.xmodule_display.xmodule_HtmlModule .button {
+    margin-top: 8pt !important;
+    margin-bottom: 8pt !important;
+    background-color: #0079C2 !important;
+    border: none !important;
+    color: white !important;
+    padding: 16px 24px !important;
+    text-align: center !important;
+    display: inline-block !important;
+    font-size: 12pt !important;
+    font-weight: 400 !important;
+    font-family: "Montserrat", "Arial", sans-serif !important;
+    border-radius: 4px !important;
+    text-transform: uppercase !important;
+    min-width: 175px !important;
+}
+
+.xmodule_display.xmodule_HtmlModule .button:hover {
+    background-color: #1E8AD3 !important;
+    cursor: pointer !important;
+    box-shadow: none !important;
+}
+
+
+
+
+
+.xmodule_display.xmodule_HtmlModule sup {
+    font-size: 8pt !important;
+    color: #083954 !important;
+    font-weight: 400 !important;
+    font-family: "Montserrat", "Arial", sans-serif !important;
+}
+
+/*Styling rules for less common elements*/
+.xmodule_display.xmodule_HtmlModule .orangebanner {
+	border-top: 8px solid #ff9a56 !important;
+}
+
+.xmodule_display.xmodule_HtmlModule .lightbluebanner {
+	border-top: 8px solid #61b4e4 !important;
+}
+
+.xmodule_display.xmodule_HtmlModule .darkbluebanner {
+	border-top: 8px solid #083954 !important;
+
+}
+
+.xmodule_display.xmodule_HtmlModule .redbanner {
+	border-top: 8px solid #fb3449 !important;
+}
+
+.xmodule_display.xmodule_HtmlModule .greenbanner {
+    border-top: 8px solid #00afaa !important;
+}
+
+.xmodule_display.xmodule_HtmlModule .headingimage { /*Page spanning images for top of page*/
+    width:100%;
+    max-height:300px;
+    margin-bottom:18px;
+    overflow: hidden;
+    display: block !important;
+    justify-content: center !important;
+}
+
+.xmodule_display.xmodule_HtmlModule .image {
+    margin-bottom: 12px !important;
+    margin-top: 12px !important;
+    display: block !important;
+    justify-content: center !important;
+}
+
+.xmodule_display.xmodule_HtmlModule .largeinfobox {
+    max-width: 100% !important;
+    background: #083954 !important;
+    padding: 26pt !important;
+    line-height: 1.2 !important;
+    margin-top: 26pt !important;
+    margin-bottom: 26pt !important;
+    font-size: 18pt !important;
+    font-family: "Montserrat", "Arial", sans-serif !important;
+    color: #fff !important;
+    font-weight: 400 !important;
+}
+
+.xmodule_display.xmodule_HtmlModule .containerbox {
+    max-width: 100% !important;
+    border: solid #083954 2pt !important;
+    padding: 12pt 26pt 12pt 26pt !important;
+    line-height: 1.2 !important;
+    margin-top: 26pt !important;
+    margin-bottom: 26pt !important;
+}
+
+.xmodule_display.xmodule_HtmlModule .smallinfobox {
+    max-width: 100% !important;
+    border: solid #083954 2pt !important;
+    padding: 26pt !important;
+    line-height: 1.2 !important;
+    margin-top: 26pt !important;
+    margin-bottom: 26pt !important;
+    font-size: 13pt !important;
+    font-family:"Montserrat", "Arial", sans-serif !important;
+    color: #083954 !important;
+    font-weight: 400 !important;
+}
+
+.xmodule_display.xmodule_HtmlModule .caption {
+    text-align: center !important;
+    max-width: 100% !important;
+    line-height: 1.2 !important;
+    margin-top: 4pt !important;
+    margin-bottom: 16pt !important;
+    font-size: 11pt !important;
+    font-family: "Montserrat", "Arial", sans-serif !important;
+    color: #083954 !important;
+    font-weight: 400 !important;
+}
+
+.xmodule_display.xmodule_HtmlModule .quote {
+    max-width: 300px !important;
+    width: 50% !important;
+    float: left  !important;
+    line-height: 1.2 !important;
+    margin-top: 8pt !important;
+    margin-bottom: 8pt !important;
+    margin-right: 18pt !important;
+    font-size: 18pt !important;
+    font-family: "Montserrat", "Arial", sans-serif !important;
+    color: #61b4e4 !important;
+    font-weight: 400 !important;
+    font-style: italic !important;
+}
+
+/*Styling rules for table elements*/
+
+.xmodule_display.xmodule_HtmlModule table{
+    margin-top: 8pt !important;
+    margin-bottom: 8pt !important;
+    width: 100% !important;
+}
+
+.xmodule_display.xmodule_HtmlModule th{
+    background: #00afaa !important;
+    color: #fff !important;
+    font-weight: bold !important;
+    font-family: "Montserrat", "Arial", sans-serif !important;
+    font-size: 13pt !important;
+    border: 2px solid #fff !important;
+    text-align: center !important;
+}
+
+.xmodule_display.xmodule_HtmlModule td{
+    color: #083954 !important;
+    font-weight: 400 !important;
+    font-family: "Montserrat", "Arial", sans-serif !important;
+    font-size: 13pt !important;
+    border: 2px solid #fff !important;
+    text-align: left !important;
+}
+
+.xmodule_display.xmodule_HtmlModule td.blue{
+    background: #61b4e4 !important;
+    color: #fff !important;
+    font-weight: 400 !important;
+    font-family: "Montserrat", "Arial", sans-serif !important;
+    font-size: 13pt !important;
+    border: 2px solid #fff !important;
+    text-align: left !important;
+}
+
+.xmodule_display.xmodule_HtmlModule tr:nth-child(even) {background-color: #f2f2f2;}
+
+.xmodule_display.xmodule_HtmlModule tr:nth-child(odd) {background-color: #d1d1d1;}
+
+
+/* Tooltip container */
+.xmodule_display.xmodule_HtmlModule .tooltip {
+    position: relative !important;
+    display: inline-block !important;
+    border-bottom: 1px solid #083954 !important;
+}
+
+/* Tooltip text */
+.xmodule_display.xmodule_HtmlModule .tooltip .tooltiptext {
+    visibility: hidden !important;
+    width: 120px !important;
+    background-color: #a9a8a9 !important;
+    color: #fff !important;
+    text-align: center;
+    font-family: "Montserrat", "Arial", sans-serif !important;
+    padding: 5px 0 !important;
+    border-radius: 4px !important;
+
+    /* Position the tooltip text */
+    position: absolute !important;
+    z-index: 1 !important;
+    bottom: 125% !important;
+    left: 50% !important;
+    margin-left: -60px !important;
+
+    /* Fade in tooltip */
+    opacity: 0 !important;
+    transition: opacity 0.3s !important;
+}
+
+/* Tooltip arrow */
+.xmodule_display.xmodule_HtmlModule .tooltip .tooltiptext:after {
+    content: "" !important;
+    position: absolute !important;
+    top: 100% !important;
+    left: 50% !important;
+    margin-left: -5px !important;
+    border-width: 5px !important;
+    border-style: solid;
+    border-color: #a9a8a9 transparent transparent transparent !important;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.xmodule_display.xmodule_HtmlModule .tooltip:hover .tooltiptext {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/*Styling rules for icons*/
+
+.xmodule_display.xmodule_HtmlModule .icon {
+    width: 50px !important;
+    vertical-align: middle !important;
+    display: inline !important;
+}
+
+.xmodule_display.xmodule_HtmlModule .headingicon {
+    width: 100px !important;
+    vertical-align: middle !important;
+    display: inline !important;
+}
+
+.xmodule_display.xmodule_HtmlModule .readingicon {
+    width: 100px !important;
+    vertical-align: middle !important;
+    display: inline !important;
+    content: url(https://static.philanthropyu.org/course-data/Icons/Visually+Designed+Icons/Small/Phil+U_Reading+Icon.png);
+}
+
+.xmodule_display.xmodule_HtmlModule .audioicon {
+    width: 100px !important;
+    vertical-align: middle !important;
+    display: inline !important;
+    content: url(https://static.philanthropyu.org/course-data/Icons/Visually+Designed+Icons/Small/Phil+U_Audio+Icon.png);
+}
+
+.xmodule_display.xmodule_HtmlModule .quizicon {
+    width: 100px !important;
+    vertical-align: middle !important;
+    display: inline !important;
+    content: url(https://static.philanthropyu.org/course-data/Icons/Visually+Designed+Icons/Small/Phil+U_Quiz+Icon.png);
+}
+
+.xmodule_display.xmodule_HtmlModule .assignmenticon {
+    width: 100px !important;
+    vertical-align: middle !important;
+    display: inline !important;
+    content: url(https://static.philanthropyu.org/course-data/Icons/Visually+Designed+Icons/Small/Phil+U_Assignment+Icon.png);
+}
+
+.xmodule_display.xmodule_HtmlModule .videoicon {
+    width: 100px !important;
+    vertical-align: middle !important;
+    display: inline !important;
+    content: url(https://static.philanthropyu.org/course-data/Icons/Visually+Designed+Icons/Small/Phil+U_Video+Icon.png);
+}
+
+.xmodule_display.xmodule_HtmlModule .discussionicon {
+    width: 100px !important;
+    vertical-align: middle !important;
+    display: inline !important;
+    content: url(https://static.philanthropyu.org/course-data/Icons/Visually+Designed+Icons/Small/Phil+U_Discussion+Icon.png);
+}
+
+.xmodule_display.xmodule_HtmlModule .clockicon {
+    width: 25px !important;
+    vertical-align: top !important;
+    display: inline !important;
+    content: url(https://static.philanthropyu.org/course-data/Icons/PU_Icons_Clock_Small.png);
+}
+
+/* Tooltips*/
+
+
+a.tooltips {
+  position: relative;
+  display: inline;
+}
+a.tooltips span {
+padding: 5px;
+    position: absolute;
+    width: 500px !important;
+  color: #FFFFFF;
+  background: #083954;
+  text-align: center;
+  visibility: hidden;
+  border-radius: 6px;
+}
+a.tooltips span:after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -8px;
+  width: 0; height: 0;
+  border-top: 8px solid #083954;
+  border-right: 8px solid transparent;
+  border-left: 8px solid transparent;
+}
+a:hover.tooltips span {
+  visibility: visible;
+  opacity: 1;
+    bottom: 105%;
+    left: 50%;
+    margin-left: -250px;
+  z-index: 999;
+}
+
+/* Legacy Code*/
+
+.xmodule_display.xmodule_HtmlModule .body1 {
+    max-width: 700px;
+    float: left !important;
+    position: relative !important;
+    left: 50% !important;
+}
+
+.xmodule_display.xmodule_HtmlModule .body2 {
+    float: left !important;
+    position: relative !important;
+    left: -50% !important;
+}
+
+
+
+.xmodule_display.xmodule_HtmlModule .largeimage1 {
+    max-width: 1000px !important;
+    float: left !important;
+    position: relative !important;
+    left: 50% !important;
+}
+
+.xmodule_display.xmodule_HtmlModule .largeimage2 {
+    float: left !important;
+    position: relative !important;
+    left: -50% !important;
+}
+
+
+.xmodule_display.xmodule_HtmlModule .smallimage1 {
+    max-width: 350px !important;
+    float: left !important;
+    position: relative !important;
+    left: 50% !important;
+}
+
+.xmodule_display.xmodule_HtmlModule .smallimage2 {
+    float: left !important;
+    position: relative !important;
+    left: -50% !important;
+}
+
+.view-settings .group-settings.advanced-policies .course-advanced-policy-list-item .field input {
+    width: 100%;
+    box-sizing: border-box;
+    color: #cb9c40;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1) inset;
+    background-color: #edf1f5;
+    background-image: -webkit-linear-gradient(#edf1f5,#fdfefe);
+    background-image: linear-gradient(#edf1f5,#fdfefe);
+    border: 1px solid #b0b6c2;
+}
