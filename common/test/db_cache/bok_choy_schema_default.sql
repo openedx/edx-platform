@@ -366,7 +366,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `auth_permission_content_type_id_codename_01ab375a_uniq` (`content_type_id`,`codename`),
   CONSTRAINT `auth_permission_content_type_id_2f476e4b_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2330 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2333 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -758,7 +758,6 @@ CREATE TABLE `bulk_grades_scoreoverrider` (
   KEY `bulk_grades_scoreove_module_id_33617068_fk_coursewar` (`module_id`),
   KEY `bulk_grades_scoreoverrider_user_id_9768d9f6_fk_auth_user_id` (`user_id`),
   KEY `bulk_grades_scoreoverrider_created_2d9c74a5` (`created`),
-  CONSTRAINT `bulk_grades_scoreove_module_id_33617068_fk_coursewar` FOREIGN KEY (`module_id`) REFERENCES `courseware_studentmodule` (`id`),
   CONSTRAINT `bulk_grades_scoreoverrider_user_id_9768d9f6_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1717,6 +1716,62 @@ CREATE TABLE `course_overviews_courseoverviewtab` (
   CONSTRAINT `course_overviews_cou_course_overview_id_71fa6321_fk_course_ov` FOREIGN KEY (`course_overview_id`) REFERENCES `course_overviews_courseoverview` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `course_overviews_historicalcourseoverview`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `course_overviews_historicalcourseoverview` (
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `version` int(11) NOT NULL,
+  `id` varchar(255) NOT NULL,
+  `_location` varchar(255) NOT NULL,
+  `org` longtext NOT NULL,
+  `display_name` longtext,
+  `display_number_with_default` longtext NOT NULL,
+  `display_org_with_default` longtext NOT NULL,
+  `start` datetime(6) DEFAULT NULL,
+  `end` datetime(6) DEFAULT NULL,
+  `advertised_start` longtext,
+  `announcement` datetime(6) DEFAULT NULL,
+  `course_image_url` longtext NOT NULL,
+  `social_sharing_url` longtext,
+  `end_of_course_survey_url` longtext,
+  `certificates_display_behavior` longtext,
+  `certificates_show_before_end` tinyint(1) NOT NULL,
+  `cert_html_view_enabled` tinyint(1) NOT NULL,
+  `has_any_active_web_certificate` tinyint(1) NOT NULL,
+  `cert_name_short` longtext NOT NULL,
+  `cert_name_long` longtext NOT NULL,
+  `certificate_available_date` datetime(6) DEFAULT NULL,
+  `lowest_passing_grade` decimal(5,2) DEFAULT NULL,
+  `days_early_for_beta` double DEFAULT NULL,
+  `mobile_available` tinyint(1) NOT NULL,
+  `visible_to_staff_only` tinyint(1) NOT NULL,
+  `_pre_requisite_courses_json` longtext NOT NULL,
+  `enrollment_start` datetime(6) DEFAULT NULL,
+  `enrollment_end` datetime(6) DEFAULT NULL,
+  `enrollment_domain` longtext,
+  `invitation_only` tinyint(1) NOT NULL,
+  `max_student_enrollments_allowed` int(11) DEFAULT NULL,
+  `catalog_visibility` longtext,
+  `short_description` longtext,
+  `course_video_url` longtext,
+  `effort` longtext,
+  `self_paced` tinyint(1) NOT NULL,
+  `marketing_url` longtext,
+  `eligible_for_financial_aid` tinyint(1) NOT NULL,
+  `language` longtext,
+  `history_id` int(11) NOT NULL AUTO_INCREMENT,
+  `history_date` datetime(6) NOT NULL,
+  `history_change_reason` varchar(100) DEFAULT NULL,
+  `history_type` varchar(1) NOT NULL,
+  `history_user_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`history_id`),
+  KEY `course_overviews_his_history_user_id_e21063d9_fk_auth_user` (`history_user_id`),
+  KEY `course_overviews_historicalcourseoverview_id_647043f0` (`id`),
+  CONSTRAINT `course_overviews_his_history_user_id_e21063d9_fk_auth_user` FOREIGN KEY (`history_user_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `courseware_coursedynamicupgradedeadlineconfiguration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -2322,7 +2377,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_model_76bd3d3b_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=774 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=775 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2333,7 +2388,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=562 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=565 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3411,6 +3466,8 @@ CREATE TABLE `grades_historicalpersistentsubsectiongradeoverride` (
   `history_type` varchar(1) NOT NULL,
   `grade_id` bigint(20) unsigned DEFAULT NULL,
   `history_user_id` int(11) DEFAULT NULL,
+  `override_reason` varchar(300) DEFAULT NULL,
+  `system` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`history_id`),
   KEY `grades_historicalper_history_user_id_05000562_fk_auth_user` (`history_user_id`),
   KEY `grades_historicalpersistentsubsectiongradeoverride_id_e30d8953` (`id`),
@@ -3494,6 +3551,8 @@ CREATE TABLE `grades_persistentsubsectiongradeoverride` (
   `earned_graded_override` double DEFAULT NULL,
   `possible_graded_override` double DEFAULT NULL,
   `grade_id` bigint(20) unsigned NOT NULL,
+  `override_reason` varchar(300) DEFAULT NULL,
+  `system` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `grade_id` (`grade_id`),
   KEY `grades_persistentsubsectiongradeoverride_created_f80819d0` (`created`),
