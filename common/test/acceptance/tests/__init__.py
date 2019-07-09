@@ -1,3 +1,8 @@
+"""
+Contains the Acceptance tests.
+"""
+from __future__ import absolute_import
+
 import logging
 
 # Silence noisy loggers
