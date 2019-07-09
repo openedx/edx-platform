@@ -1,6 +1,8 @@
 """
 unit tests for course_info views and models.
 """
+from __future__ import absolute_import
+
 import json
 
 from django.test.utils import override_settings

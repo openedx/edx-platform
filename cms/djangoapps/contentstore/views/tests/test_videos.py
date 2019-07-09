@@ -2,48 +2,52 @@
 """
 Unit tests for video-related REST APIs.
 """
+from __future__ import absolute_import
+
 import csv
 import json
 import re
+from contextlib import contextmanager
 from datetime import datetime
 from functools import wraps
 from StringIO import StringIO
-from contextlib import contextmanager
 
 import dateutil.parser
 import ddt
 import pytz
+import six
 from django.conf import settings
 from django.test.utils import override_settings
 from edxval.api import (
+    create_or_update_transcript_preferences,
+    create_or_update_video_transcript,
     create_profile,
     create_video,
-    get_video_info,
     get_course_video_image_url,
-    create_or_update_video_transcript
+    get_transcript_preferences,
+    get_video_info
 )
 from mock import Mock, patch
+from waffle.testutils import override_flag
 
 from contentstore.models import VideoUploadConfig
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
 from contentstore.views.videos import (
-    _get_default_video_image_url,
-    VIDEO_IMAGE_UPLOAD_ENABLED,
     ENABLE_VIDEO_UPLOAD_PAGINATION,
+    KEY_EXPIRATION_IN_SECONDS,
+    VIDEO_IMAGE_UPLOAD_ENABLED,
     WAFFLE_SWITCHES,
-    TranscriptProvider
+    StatusDisplayStrings,
+    TranscriptProvider,
+    _get_default_video_image_url,
+    convert_video_status
 )
-from contentstore.views.videos import KEY_EXPIRATION_IN_SECONDS, StatusDisplayStrings, convert_video_status
-from xmodule.modulestore.tests.factories import CourseFactory
-
-from openedx.core.djangoapps.video_pipeline.config.waffle import waffle_flags, DEPRECATE_YOUTUBE
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
+from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE, waffle_flags
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-
-from edxval.api import create_or_update_transcript_preferences, get_transcript_preferences
-from waffle.testutils import override_flag
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 def override_switch(switch, active):
@@ -91,7 +95,7 @@ class VideoUploadTestBase(object):
         self.store.update_item(self.course2, self.user.id)
 
         # course ids for videos
-        course_ids = [unicode(self.course.id), unicode(self.course2.id)]
+        course_ids = [six.text_type(self.course.id), six.text_type(self.course2.id)]
         created = datetime.now(pytz.utc)
 
         self.profiles = ["profile1", "profile2"]
@@ -156,7 +160,7 @@ class VideoUploadTestBase(object):
                 "encoded_videos": [],
             }
             for status in (
-                StatusDisplayStrings._STATUS_MAP.keys() +  # pylint:disable=protected-access
+                list(StatusDisplayStrings._STATUS_MAP.keys()) +  # pylint:disable=protected-access
                 ["non_existent_status"]
             )
         ]
@@ -519,7 +523,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
                 'client_video_id',
                 file_info['file_name']
             )
-            mock_key_instance.set_metadata.assert_any_call('course_key', unicode(self.course.id))
+            mock_key_instance.set_metadata.assert_any_call('course_key', six.text_type(self.course.id))
             mock_key_instance.generate_url.assert_called_once_with(
                 KEY_EXPIRATION_IN_SECONDS,
                 'PUT',
@@ -532,7 +536,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             self.assertEqual(val_info['client_video_id'], file_info['file_name'])
             self.assertEqual(val_info['status'], 'upload')
             self.assertEqual(val_info['duration'], 0)
-            self.assertEqual(val_info['courses'], [{unicode(self.course.id): None}])
+            self.assertEqual(val_info['courses'], [{six.text_type(self.course.id): None}])
 
             # Ensure response is correct
             response_file = response_obj['files'][i]
@@ -681,7 +685,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         self.assertEqual(status, StatusDisplayStrings.get('file_complete'))
 
         # for all other status, there should not be any conversion
-        statuses = StatusDisplayStrings._STATUS_MAP.keys()  # pylint: disable=protected-access
+        statuses = list(StatusDisplayStrings._STATUS_MAP.keys())  # pylint: disable=protected-access
         statuses.remove('invalid_token')
         statuses.remove('transcript_ready')
         for status in statuses:
@@ -932,7 +936,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
                 'extension': '.tiff'
             },
             u'This image file type is not supported. Supported file types are {supported_file_formats}.'.format(
-                supported_file_formats=settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS.keys()
+                supported_file_formats=list(settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS.keys())
             )
         ),
         # Image file size validation
@@ -1287,7 +1291,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
         Test that transcript handler removes transcript preferences correctly.
         """
         # First add course wide transcript preferences.
-        preferences = create_or_update_transcript_preferences(unicode(self.course.id))
+        preferences = create_or_update_transcript_preferences(six.text_type(self.course.id))
 
         # Verify transcript preferences exist
         self.assertIsNotNone(preferences)
@@ -1300,7 +1304,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
         self.assertEqual(response.status_code, 204)
 
         # Verify transcript preferences no loger exist
-        preferences = get_transcript_preferences(unicode(self.course.id))
+        preferences = get_transcript_preferences(six.text_type(self.course.id))
         self.assertIsNone(preferences)
 
     def test_remove_transcript_preferences_not_found(self):
