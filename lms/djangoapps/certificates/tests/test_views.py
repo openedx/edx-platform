@@ -1,16 +1,20 @@
 """Tests for certificates views. """
 
+from __future__ import absolute_import
+
+import datetime
 import json
 from uuid import uuid4
 
 import ddt
-import datetime
+import six
 from django.conf import settings
 from django.core.cache import cache
-from django.urls import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
+from django.urls import reverse
 from opaque_keys.edx.locator import CourseLocator
+from six.moves import range
 
 from lms.djangoapps.certificates.api import get_certificate_url
 from lms.djangoapps.certificates.models import (
@@ -255,7 +259,7 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
                 'organization': 'Signatory_Organization ' + str(i),
                 'signature_image_path': '/static/certificates/images/demo-sig{}.png'.format(i),
                 'id': i,
-            } for i in xrange(signatory_count)
+            } for i in range(signatory_count)
 
         ]
 
@@ -268,7 +272,7 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
                 'signatories': signatories,
                 'version': 1,
                 'is_active': is_active
-            } for i in xrange(count)
+            } for i in range(count)
         ]
 
         self.course.certificates = {'certificates': certificates}
@@ -281,7 +285,7 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
     def test_html_view_for_site(self):
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id)
         )
         self._add_course_certificates(count=1, signatory_count=2)
         response = self.client.get(test_url)
@@ -293,7 +297,7 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
     def test_html_view_site_configuration_missing(self):
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=unicode(self.course.id)
+            course_id=six.text_type(self.course.id)
         )
         self._add_course_certificates(count=1, signatory_count=2)
         response = self.client.get(test_url)

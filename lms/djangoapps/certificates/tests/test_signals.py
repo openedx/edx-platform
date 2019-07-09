@@ -2,17 +2,20 @@
 Unit tests for enabling self-generated certificates for self-paced courses
 and disabling for instructor-paced courses.
 """
+from __future__ import absolute_import
+
 import ddt
 import mock
+import six
 
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
-    CertificateWhitelist,
-    GeneratedCertificate,
     CertificateStatuses,
+    CertificateWhitelist,
+    GeneratedCertificate
 )
-from lms.djangoapps.certificates.signals import fire_ungenerated_certificate_task, CERTIFICATE_DELAY_SECONDS
+from lms.djangoapps.certificates.signals import CERTIFICATE_DELAY_SECONDS, fire_ungenerated_certificate_task
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.models import IDVerificationAttempt, SoftwareSecurePhotoVerification
@@ -95,8 +98,8 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                 mock_generate_certificate_apply_async.assert_called_with(
                     countdown=CERTIFICATE_DELAY_SECONDS,
                     kwargs={
-                        'student': unicode(self.user.id),
-                        'course_key': unicode(self.course.id),
+                        'student': six.text_type(self.user.id),
+                        'course_key': six.text_type(self.course.id),
                     }
                 )
 
@@ -123,8 +126,8 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
                 mock_generate_certificate_apply_async.assert_called_with(
                     countdown=CERTIFICATE_DELAY_SECONDS,
                     kwargs={
-                        'student': unicode(self.user.id),
-                        'course_key': unicode(self.ip_course.id),
+                        'student': six.text_type(self.user.id),
+                        'course_key': six.text_type(self.ip_course.id),
                     }
                 )
 
@@ -175,8 +178,8 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
                     mock_generate_certificate_apply_async.assert_called_with(
                         countdown=CERTIFICATE_DELAY_SECONDS,
                         kwargs={
-                            'student': unicode(self.user.id),
-                            'course_key': unicode(self.course.id),
+                            'student': six.text_type(self.user.id),
+                            'course_key': six.text_type(self.course.id),
                         }
                     )
 
@@ -196,8 +199,8 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
                     mock_generate_certificate_apply_async.assert_called_with(
                         countdown=CERTIFICATE_DELAY_SECONDS,
                         kwargs={
-                            'student': unicode(self.user.id),
-                            'course_key': unicode(self.ip_course.id),
+                            'student': six.text_type(self.user.id),
+                            'course_key': six.text_type(self.ip_course.id),
                         }
                     )
 
@@ -319,8 +322,8 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
                 mock_generate_certificate_apply_async.assert_called_with(
                     countdown=CERTIFICATE_DELAY_SECONDS,
                     kwargs={
-                        'student': unicode(self.user_one.id),
-                        'course_key': unicode(self.course_one.id),
+                        'student': six.text_type(self.user_one.id),
+                        'course_key': six.text_type(self.course_one.id),
                         'expected_verification_status': IDVerificationAttempt.STATUS.approved,
                     }
                 )
@@ -340,8 +343,8 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
                 mock_generate_certificate_apply_async.assert_called_with(
                     countdown=CERTIFICATE_DELAY_SECONDS,
                     kwargs={
-                        'student': unicode(self.user_two.id),
-                        'course_key': unicode(self.course_two.id),
+                        'student': six.text_type(self.user_two.id),
+                        'course_key': six.text_type(self.course_two.id),
                         'expected_verification_status': IDVerificationAttempt.STATUS.approved,
                     }
                 )
