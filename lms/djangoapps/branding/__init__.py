@@ -13,7 +13,7 @@ from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
-def get_visible_courses(org=None, filter_=None):
+def get_visible_courses(org=None, filter_=None, exclude_=None):
     """
     Return the set of CourseOverviews that should be visible in this branded
     instance.
@@ -22,6 +22,8 @@ def get_visible_courses(org=None, filter_=None):
         org (string): Optional parameter that allows case-insensitive
             filtering by organization.
         filter_ (dict): Optional parameter that allows custom filtering by
+            fields on the course.
+        exclude_ (dict): Optional parameter that allows custom excludes by
             fields on the course.
     """
     # Import is placed here to avoid model import at project startup.
@@ -33,12 +35,12 @@ def get_visible_courses(org=None, filter_=None):
     if org:
         # Check the current site's orgs to make sure the org's courses should be displayed
         if not current_site_orgs or org in current_site_orgs:
-            courses = CourseOverview.get_all_courses(orgs=[org], filter_=filter_)
+            courses = CourseOverview.get_all_courses(orgs=[org], filter_=filter_, exclude_=exclude_)
     elif current_site_orgs:
         # Only display courses that should be displayed on this site
-        courses = CourseOverview.get_all_courses(orgs=current_site_orgs, filter_=filter_)
+        courses = CourseOverview.get_all_courses(orgs=current_site_orgs, filter_=filter_, exclude_=exclude_)
     else:
-        courses = CourseOverview.get_all_courses(filter_=filter_)
+        courses = CourseOverview.get_all_courses(filter_=filter_, exclude_=exclude_)
 
     courses = sorted(courses, key=lambda course: course.number)
 
