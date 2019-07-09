@@ -1,11 +1,14 @@
 """
 Test view handler for rerun (and eventually create)
 """
+from __future__ import absolute_import
+
 import datetime
 
 import ddt
-from django.urls import reverse
+import six
 from django.test.client import RequestFactory
+from django.urls import reverse
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
 
@@ -68,7 +71,7 @@ class TestCourseListing(ModuleStoreTestCase):
         Just testing the functionality the view handler adds over the tasks tested in test_clone_course
         """
         response = self.client.ajax_post(self.course_create_rerun_url, {
-            'source_course_key': unicode(self.source_course_key),
+            'source_course_key': six.text_type(self.source_course_key),
             'org': self.source_course_key.org, 'course': self.source_course_key.course, 'run': 'copy',
             'display_name': 'not the same old name',
         })
