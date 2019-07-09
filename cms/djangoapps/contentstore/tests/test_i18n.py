@@ -2,6 +2,8 @@
 """
 Tests for validate Internationalization and Module i18n service.
 """
+from __future__ import absolute_import
+
 import gettext
 from unittest import skip
 
