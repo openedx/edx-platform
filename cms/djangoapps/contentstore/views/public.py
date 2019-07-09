@@ -1,18 +1,19 @@
 """
 Public views
 """
+from __future__ import absolute_import
+
 from django.conf import settings
-from django.template.context_processors import csrf
-from django.urls import reverse
-from django.utils.http import urlquote_plus
 from django.shortcuts import redirect
+from django.template.context_processors import csrf
+from django.utils.http import urlquote_plus
 from django.views.decorators.clickjacking import xframe_options_deny
 from django.views.decorators.csrf import ensure_csrf_cookie
+from waffle.decorators import waffle_switch
 
+from contentstore.config import waffle
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from waffle.decorators import waffle_switch
-from contentstore.config import waffle
 
 __all__ = ['signup', 'login_page', 'login_redirect_to_lms', 'howitworks', 'accessibility']
 
