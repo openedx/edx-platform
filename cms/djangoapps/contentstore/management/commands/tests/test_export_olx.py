@@ -2,6 +2,8 @@
 Tests for exporting OLX content.
 """
 
+from __future__ import absolute_import
+
 import shutil
 import tarfile
 import unittest
@@ -9,6 +11,7 @@ from StringIO import StringIO
 from tempfile import mkdtemp
 
 import ddt
+import six
 from django.core.management import CommandError, call_command
 from path import Path as path
 
@@ -79,7 +82,7 @@ class TestCourseExportOlx(ModuleStoreTestCase):
         tmp_dir = path(mkdtemp())
         self.addCleanup(shutil.rmtree, tmp_dir)
         filename = tmp_dir / 'test.tar.gz'
-        call_command('export_olx', '--output', filename, unicode(test_course_key))
+        call_command('export_olx', '--output', filename, six.text_type(test_course_key))
         with tarfile.open(filename) as tar_file:
             self.check_export_file(tar_file, test_course_key)
 
@@ -87,7 +90,7 @@ class TestCourseExportOlx(ModuleStoreTestCase):
     def test_export_course_stdout(self, store_type):
         test_course_key = self.create_dummy_course(store_type)
         out = StringIO()
-        call_command('export_olx', unicode(test_course_key), stdout=out)
+        call_command('export_olx', six.text_type(test_course_key), stdout=out)
         out.seek(0)
         output = out.read()
         with tarfile.open(fileobj=StringIO(output)) as tar_file:
