@@ -216,6 +216,8 @@
             attemptsUsed = this.el.data('attempts-used');
             graded = this.el.data('graded');
 
+            var showGrades = $('.show-grades-el-hidden').length;
+
             // The problem is ungraded if it's explicitly marked as such, or if the total possible score is 0
             if (graded === 'True' && totalScore !== 0) {
                 graded = true;
@@ -284,7 +286,19 @@
                     possible: totalScore
                 }, true
             );
-            return this.$('.problem-progress').text(progress);
+            
+            if (showGrades) {
+                return this.$('.problem-progress').text(progress);
+            } else {
+                this.$('.indicator-container, span.message, span.status, div.notification.error, div.notification.success').remove();
+
+                this.$('div.correct').removeClass("correct");
+                this.$('div.incorrect').removeClass("incorrect");
+                this.$('label.choicegroup_correct').removeClass("choicegroup_correct");
+                this.$('label.choicegroup_incorrect').removeClass("choicegroup_incorrect");
+                return this.$('.problem-progress').text("");
+            }
+
         };
 
         Problem.prototype.updateProgress = function(response) {
@@ -631,10 +645,20 @@
                 case 'submitted':
                 case 'incorrect':
                 case 'correct':
-                    window.SR.readTexts(that.get_sr_status(response.contents));
-                    that.el.trigger('contentChanged', [that.id, response.contents, response]);
-                    that.render(response.contents, that.focus_on_submit_notification);
-                    that.updateProgress(response);
+                    var showGrades = $('.show-grades-el-hidden').length;
+
+                    if (showGrades) {
+                        window.SR.readTexts(that.get_sr_status(response.contents));
+                        that.el.trigger('contentChanged', [that.id, response.contents, response]);
+                        that.render(response.contents, that.focus_on_submit_notification);
+                        that.updateProgress(response);
+                    } else {
+                        window.SR.readTexts(that.get_sr_status(response.contents));
+                        that.el.trigger('contentChanged', [that.id, response.contents, response]);
+                        that.saveNotification.hide();
+                        that.custom_alert("Answer submitted successfully");
+                    }
+
                     break;
                 default:
                     that.saveNotification.hide();
@@ -778,6 +802,18 @@
                 edx.HtmlUtils.HTML(msg)
             );
             this.clear_all_notifications();
+            this.gentleAlertNotification.show();
+            this.gentleAlertNotification.focus();
+        };
+
+        Problem.prototype.custom_alert = function(msg) {
+            edx.HtmlUtils.setHtml(
+                this.el.find('.notification-gentle-alert .notification-message'),
+                edx.HtmlUtils.HTML(msg)
+            );
+            this.clear_all_notifications();
+            this.gentleAlertNotification.removeClass('warning').addClass('success');
+            this.gentleAlertNotification.find('.fa-exclamation-circle').removeClass('fa-exclamation-circle').addClass('fa-check-circle');
             this.gentleAlertNotification.show();
             this.gentleAlertNotification.focus();
         };
