@@ -6,11 +6,12 @@ For now, this is needed because of difference in CMS and LMS that have
 not yet been cleaned up.
 
 """
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.conf.urls import url
 
-from .views import auto_auth, login, logout, deprecated
-
+from .views import auto_auth, deprecated, login, logout
 
 urlpatterns = [
     url(r'^create_account$', deprecated.create_account, name='create_account'),

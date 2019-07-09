@@ -14,6 +14,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 
+import third_party_auth
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
@@ -32,7 +33,6 @@ from openedx.features.enterprise_support.utils import (
     update_logistration_context_for_enterprise
 )
 from student.helpers import get_next_url_for_login_page
-import third_party_auth
 from third_party_auth import pipeline
 from third_party_auth.decorators import xframe_allow_whitelisted
 

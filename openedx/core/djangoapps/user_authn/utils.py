@@ -1,6 +1,8 @@
 """
 Utility functions used during user authentication.
 """
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.utils import http
 from oauth2_provider.models import Application
