@@ -68,7 +68,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
                                                    display_name='fullchrome',
                                                    chrome='accordion,tabs')
         cls.tabtest = ItemFactory.create(parent=cls.chapterchrome,
-                                         display_name='progress_tab',
+                                         display_name='pdf_textbooks_tab',
                                          default_tab='progress')
 
         cls.staff_user = GlobalStaffFactory()
@@ -132,7 +132,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         response = self.client.get(reverse('courseware_section', kwargs={
             'course_id': text_type(self.course.id),
             'chapter': 'Chrome',
-            'section': 'progress_tab',
+            'section': 'pdf_textbooks_tab',
         }))
 
         self.assertTabActive('progress', response)

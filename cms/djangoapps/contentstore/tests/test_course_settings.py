@@ -797,7 +797,6 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.fullcourse = CourseFactory.create()
         self.course_setting_url = get_url(self.course.id, 'advanced_settings_handler')
         self.fullcourse_setting_url = get_url(self.fullcourse.id, 'advanced_settings_handler')
-        self.notes_tab = {"type": "notes", "name": "My Notes"}
 
         self.request = RequestFactory().request()
         self.user = UserFactory()
@@ -1126,60 +1125,6 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertEqual(test_model['display_name']['value'], 'jolly roger', "not expected value")
         self.assertIn('advertised_start', test_model, 'Missing revised advertised_start metadata field')
         self.assertEqual(test_model['advertised_start']['value'], 'start B', "advertised_start not expected value")
-
-    def test_advanced_components_munge_tabs(self):
-        """
-        Test that adding and removing specific advanced components adds and removes tabs.
-        """
-        # First ensure that none of the tabs are visible
-        self.assertNotIn(self.notes_tab, self.course.tabs)
-
-        # Now enable student notes and verify that the "My Notes" tab has been added
-        self.client.ajax_post(self.course_setting_url, {
-            'advanced_modules': {"value": ["notes"]}
-        })
-        course = modulestore().get_course(self.course.id)
-        self.assertIn(self.notes_tab, course.tabs)
-
-        # Disable student notes and verify that the "My Notes" tab is gone
-        self.client.ajax_post(self.course_setting_url, {
-            'advanced_modules': {"value": [""]}
-        })
-        course = modulestore().get_course(self.course.id)
-        self.assertNotIn(self.notes_tab, course.tabs)
-
-    def test_advanced_components_munge_tabs_validation_failure(self):
-        with patch('contentstore.views.course._refresh_course_tabs', side_effect=InvalidTabsException):
-            resp = self.client.ajax_post(self.course_setting_url, {
-                'advanced_modules': {"value": ["notes"]}
-            })
-            self.assertEqual(resp.status_code, 400)
-
-            error_msg = [
-                {
-                    'message': 'An error occurred while trying to save your tabs',
-                    'model': {'display_name': 'Tabs Exception'}
-                }
-            ]
-            self.assertEqual(json.loads(resp.content.decode('utf-8')), error_msg)
-
-            # verify that the course wasn't saved into the modulestore
-            course = modulestore().get_course(self.course.id)
-            self.assertNotIn("notes", course.advanced_modules)
-
-    @ddt.data(
-        [{'type': 'course_info'}, {'type': 'courseware'}, {'type': 'wiki', 'is_hidden': True}],
-        [{'type': 'course_info', 'name': 'Home'}, {'type': 'courseware', 'name': 'Course'}],
-    )
-    def test_course_tab_configurations(self, tab_list):
-        self.course.tabs = tab_list
-        modulestore().update_item(self.course, self.user.id)
-        self.client.ajax_post(self.course_setting_url, {
-            'advanced_modules': {"value": ["notes"]}
-        })
-        course = modulestore().get_course(self.course.id)
-        tab_list.append(self.notes_tab)
-        self.assertEqual(tab_list, course.tabs)
 
     @patch.dict(settings.FEATURES, {'ENABLE_EDXNOTES': True})
     @patch('xmodule.util.xmodule_django.get_current_request')

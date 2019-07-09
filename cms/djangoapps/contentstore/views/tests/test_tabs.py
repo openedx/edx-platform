@@ -214,16 +214,16 @@ class PrimitiveTabEdit(ModuleStoreTestCase):
     def test_insert(self):
         """Test primitive tab insertion."""
         course = CourseFactory.create()
-        tabs.primitive_insert(course, 2, 'notes', 'aname')
-        self.assertEquals(course.tabs[2], {'type': 'notes', 'name': 'aname'})
+        tabs.primitive_insert(course, 2, 'pdf_textbooks', 'aname')
+        self.assertEquals(course.tabs[2], {'type': 'pdf_textbooks', 'name': 'aname'})
         with self.assertRaises(ValueError):
-            tabs.primitive_insert(course, 0, 'notes', 'aname')
+            tabs.primitive_insert(course, 0, 'pdf_textbooks', 'aname')
         with self.assertRaises(ValueError):
             tabs.primitive_insert(course, 3, 'static_tab', 'aname')
 
     def test_save(self):
         """Test course saving."""
         course = CourseFactory.create()
-        tabs.primitive_insert(course, 3, 'notes', 'aname')
+        tabs.primitive_insert(course, 3, 'pdf_textbooks', 'aname')
         course2 = modulestore().get_course(course.id)
-        self.assertEquals(course2.tabs[3], {'type': 'notes', 'name': 'aname'})
+        self.assertEquals(course2.tabs[3], {'type': 'pdf_textbooks', 'name': 'aname'})
