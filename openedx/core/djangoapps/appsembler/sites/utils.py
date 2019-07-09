@@ -306,10 +306,10 @@ def bootstrap_site(site, org_data=None, user_email=None):
     return organization, site, user
 
 
-def delete_site(site_id):
-    site = Site.objects.get(id=site_id)
+def delete_site(site):
     site.configuration.delete()
-    site.themes.delete()
+    site.themes.all().delete()
+
     site.delete()
 
 

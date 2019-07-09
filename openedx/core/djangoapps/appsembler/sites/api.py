@@ -67,6 +67,17 @@ class SiteConfigurationViewSet(viewsets.ModelViewSet):
         return super(SiteConfigurationViewSet, self).get_serializer_class()
 
     def perform_destroy(self, instance):
+        delete_site(instance.site)
+
+
+class OffboardOrganizationAPIView(generics.DestroyAPIView):
+    authentication_classes = (OAuth2AuthenticationAllowInactiveUser,)
+    permission_classes = (IsAuthenticated, AMCAdminPermission)
+    queryset = Site.objects.all()
+    serializer_class = SiteSerializer
+    lookup_field = 'domain'
+
+    def perform_destroy(self, instance):
         delete_site(instance)
 
 
