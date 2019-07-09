@@ -391,6 +391,19 @@ class CoursewareIndex(View):
         save_child_position(self.course, self.chapter_url_name)
         save_child_position(self.chapter, self.section_url_name)
 
+    #TODO move this method in philu app
+    def can_view_score(self):
+        """
+        Check if user is allowed to view score
+        :return: Boolean
+        """
+        from lms.djangoapps.philu_api.helpers import get_course_custom_settings
+        from courseware.access import get_user_role
+        course_custom_settings = get_course_custom_settings(self.course.course_id)
+        current_user_role = get_user_role(self.request.user, self.course.course_id)
+
+        return course_custom_settings.show_grades or current_user_role in ["staff", 'instructor']
+
     def _create_courseware_context(self, request):
         """
         Returns and creates the rendering context for the courseware.
@@ -398,8 +411,10 @@ class CoursewareIndex(View):
         """
         course_url_name = default_course_url_name(self.course.id)
         course_url = reverse(course_url_name, kwargs={'course_id': unicode(self.course.id)})
+        show_grades = self.can_view_score()
 
         courseware_context = {
+            'show_grades': show_grades,
             'csrf': csrf(self.request)['csrf_token'],
             'course': self.course,
             'course_url': course_url,
@@ -433,6 +448,19 @@ class CoursewareIndex(View):
             self.section_url_name,
             self.field_data_cache,
         )
+
+        # TODO: Move this section out as we are changing built in edx code
+        default_chapter = ''
+        if self.chapter:
+            default_chapter = self.chapter.display_name
+
+            if self.section:
+                default_chapter = "%s-%s" % (default_chapter, self.section.display_name)
+
+        active_tab = self.request.GET.get('active_tab', default_chapter)
+
+        courseware_context['toc'] = table_of_contents
+        courseware_context['active_tab'] = active_tab
         courseware_context['accordion'] = render_accordion(
             self.request,
             self.course,

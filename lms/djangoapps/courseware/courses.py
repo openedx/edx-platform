@@ -450,12 +450,12 @@ def get_course_syllabus_section(course, section_key):
     raise KeyError("Invalid about key " + str(section_key))
 
 
-def get_courses(user, org=None, filter_=None):
+def get_courses(user, org=None, filter_=None, exclude_=None):
     """
     Returns a list of courses available, sorted by course.number and optionally
     filtered by org code (case-insensitive).
     """
-    courses = branding.get_visible_courses(org=org, filter_=filter_)
+    courses = branding.get_visible_courses(org=org, filter_=filter_, exclude_=exclude_)
 
     permission_name = configuration_helpers.get_value(
         'COURSE_CATALOG_VISIBILITY_PERMISSION',
