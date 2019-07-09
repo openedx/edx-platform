@@ -1,4 +1,6 @@
-from django.core.management.base import BaseCommand, CommandError
+from __future__ import absolute_import
+
+from django.core.management.base import BaseCommand
 
 from xmodule.contentstore.utils import restore_asset_from_trashcan
 
