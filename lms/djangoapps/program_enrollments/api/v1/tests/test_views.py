@@ -337,6 +337,9 @@ class BaseCourseEnrollmentTestsMixin(ProgramCacheTestCaseMixin):
     def request(self, path, data):
         pass
 
+    def prepare_student(self, key):
+        pass
+
     def create_program_enrollment(self, external_user_key, user=False):
         """
         Creates and returns a ProgramEnrollment for the given external_user_key and
@@ -491,12 +494,28 @@ class BaseCourseEnrollmentTestsMixin(ProgramCacheTestCaseMixin):
         self.assertEqual(response.status_code, 400)
         self.assertIn('invalid enrollment record', response.data)
 
+    def test_extra_field(self):
+        self.prepare_student('learner-1')
+        enrollment = self.learner_enrollment('learner-1', 'inactive')
+        enrollment['favorite_author'] = 'Hemingway'
+        request_data = [enrollment]
+        response = self.request(self.default_url, request_data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(
+            response.data,
+            {'learner-1': 'inactive'}
+        )
+
 
 class CourseEnrollmentPostTests(BaseCourseEnrollmentTestsMixin, APITestCase):
     """ Tests for course enrollment POST """
 
     def request(self, path, data):
         return self.client.post(path, data, format='json')
+
+    def prepare_student(self, key):
+        self.create_program_enrollment(key)
 
     def test_create_enrollments(self):
         self.create_program_enrollment('learner-1')
@@ -581,6 +600,9 @@ class CourseEnrollmentModificationTestBase(BaseCourseEnrollmentTestsMixin):
     Children needs to implement assert_user_not_enrolled_test_result and
     setup_change_test_data
     """
+
+    def prepare_student(self, key):
+        self.create_program_and_course_enrollments(key)
 
     def test_207_multistatus(self):
         self.create_program_and_course_enrollments('learner-1')
@@ -805,6 +827,8 @@ class ProgramCourseEnrollmentListTest(ListViewTestMixin, APITestCase):
 class BaseProgramEnrollmentWriteTestsMixin(object):
     """ Mixin class that defines common tests for program enrollment write endpoints """
     add_uuid = False
+    program_uuid = '00000000-1111-2222-3333-444444444444'
+    success_status = 200
 
     def student_enrollment(self, enrollment_status, external_user_key=None, prepare_student=False):
         """ Convenience method to create a student enrollment record """
@@ -896,6 +920,25 @@ class BaseProgramEnrollmentWriteTestsMixin(object):
         self.assertEqual(422, response.status_code)
         self.assertEqual('invalid enrollment record', response.data)
 
+    def test_extra_field(self):
+        self.student_enrollment('pending', 'learner-01', prepare_student=True)
+        enrollment = self.student_enrollment('enrolled', 'learner-01')
+        enrollment['favorite_pokemon'] = 'bulbasaur'
+        enrollments = [enrollment]
+        with mock.patch('lms.djangoapps.program_enrollments.api.v1.views.get_programs', autospec=True):
+            with mock.patch(
+                'lms.djangoapps.program_enrollments.api.v1.views.get_user_by_program_id',
+                autospec=True,
+                return_value=None
+            ):
+                url = self.get_url(program_uuid=self.program_uuid)
+                response = self.request(url, json.dumps(enrollments), content_type='application/json')
+        self.assertEqual(self.success_status, response.status_code)
+        self.assertDictEqual(
+            response.data,
+            {'learner-01': 'enrolled'}
+        )
+
 
 @ddt.ddt
 class ProgramEnrollmentViewPostTests(BaseProgramEnrollmentWriteTestsMixin, APITestCase):
@@ -904,6 +947,7 @@ class ProgramEnrollmentViewPostTests(BaseProgramEnrollmentWriteTestsMixin, APITe
     """
     add_uuid = True
     success_status = status.HTTP_201_CREATED
+    success_status = 201
 
     def setUp(self):
         super(ProgramEnrollmentViewPostTests, self).setUp()
@@ -1030,7 +1074,6 @@ class ProgramEnrollmentViewPatchTests(BaseProgramEnrollmentWriteTestsMixin, APIT
         super(ProgramEnrollmentViewPatchTests, self).setUp()
         self.request = self.client.patch
 
-        self.program_uuid = '00000000-1111-2222-3333-444444444444'
         self.curriculum_uuid = 'aaaaaaaa-1111-2222-3333-444444444444'
         self.other_curriculum_uuid = 'bbbbbbbb-1111-2222-3333-444444444444'
 
