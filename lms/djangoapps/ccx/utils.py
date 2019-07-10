@@ -3,6 +3,8 @@ CCX Enrollment operations for use by Coach APIs.
 
 Does not include any access control, be sure to check access before calling.
 """
+from __future__ import absolute_import
+
 import datetime
 import logging
 from contextlib import contextmanager
@@ -11,9 +13,10 @@ from smtplib import SMTPException
 import pytz
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.urls import reverse
 from django.core.validators import validate_email
+from django.urls import reverse
 from django.utils.translation import ugettext as _
+from six.moves import map
 
 from courseware.courses import get_course_by_id
 from lms.djangoapps.ccx.custom_exception import CCXUserValidationException
@@ -26,7 +29,6 @@ from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment, CourseEnrollmentException
 from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
-
 
 log = logging.getLogger("edx.ccx")
 
@@ -143,8 +145,8 @@ def parse_date(datestring):
     """
     if datestring:
         date, time = datestring.split(' ')
-        year, month, day = map(int, date.split('-'))
-        hour, minute = map(int, time.split(':'))
+        year, month, day = list(map(int, date.split('-')))
+        hour, minute = list(map(int, time.split(':')))
         if validate_date(year, month, day, hour, minute):
             return datetime.datetime(
                 year, month, day, hour, minute, tzinfo=pytz.UTC)
