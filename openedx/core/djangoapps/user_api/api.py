@@ -1,23 +1,31 @@
-import copy
-import crum
+"""
+User Api.
+"""
+from __future__ import absolute_import
 
+import copy
+
+import crum
+import six
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django_countries import countries
 
-import accounts
 import third_party_auth
 from edxmako.shortcuts import marketing_link
-from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.helpers import FormDescription
+from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from student.forms import get_registration_extension_form
 from student.models import UserProfile
 from util.password_policy_validators import (
-    password_validators_instruction_texts, password_validators_restrictions, DEFAULT_MAX_PASSWORD_LENGTH,
+    DEFAULT_MAX_PASSWORD_LENGTH,
+    password_validators_instruction_texts,
+    password_validators_restrictions
 )
 
 
@@ -476,7 +484,7 @@ class RegistrationFormFactory(object):
         # form used to select the user's year of birth.
         yob_label = _(u"Year of birth")
 
-        options = [(unicode(year), unicode(year)) for year in UserProfile.VALID_YEARS]
+        options = [(six.text_type(year), six.text_type(year)) for year in UserProfile.VALID_YEARS]
         form_desc.add_field(
             "year_of_birth",
             label=yob_label,
@@ -512,7 +520,7 @@ class RegistrationFormFactory(object):
             field_type = "select"
             include_default_option = True
             field_options = extra_field_options.get(field_name)
-            options = [(unicode(option.lower()), option) for option in field_options]
+            options = [(six.text_type(option.lower()), option) for option in field_options]
             error_msg = ''
             error_msg = getattr(accounts, u'REQUIRED_FIELD_{}_SELECT_MSG'.format(field_name.upper()))
 

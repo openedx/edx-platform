@@ -1,11 +1,13 @@
 """
 Django REST Framework serializers for the User API application
 """
+from __future__ import absolute_import
+
 from django.contrib.auth.models import User
 from django.utils.timezone import now
 from rest_framework import serializers
 
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSOVerification, ManualVerification
+from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
 
 from .models import UserPreference
 
