@@ -1,16 +1,19 @@
 """
 Platform related Operations for Mobile APP
 """
+from __future__ import absolute_import
+
 import abc
 import re
 
+import six
 
-class MobilePlatform:
+
+class MobilePlatform(six.with_metaclass(abc.ABCMeta)):
     """
     MobilePlatform class creates an instance of platform based on user agent and supports platform
     related operations.
     """
-    __metaclass__ = abc.ABCMeta
     version = None
 
     def __init__(self, version):
