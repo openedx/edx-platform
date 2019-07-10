@@ -1,6 +1,7 @@
-<div class="<%- jsHook %> status">
-    <div class="message-copy">
-        <%= HtmlUtils.ensureHtml(message) %>
-    </p>
+<div class="<%- jsHook %>">
+    <div class="social-success-message">
+        <i class="fa fa-check-circle"></i>
+        <%= HtmlUtils.ensureHtml(messageHtml) %>
+    </div>
+    <hr/>
 </div>
-
