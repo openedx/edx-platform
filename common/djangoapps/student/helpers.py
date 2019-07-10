@@ -277,7 +277,11 @@ def get_next_url_for_login_page(request):
     redirect_to = _get_redirect_to(request)
     if not redirect_to:
         try:
-            redirect_to = reverse('dashboard')
+            course_id = request.GET.get('course_id', None)
+            if course_id:
+                redirect_to = reverse('info', args=[course_id])
+            else:
+                redirect_to = reverse('dashboard')
         except NoReverseMatch:
             redirect_to = reverse('home')
 

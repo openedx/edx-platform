@@ -8,6 +8,7 @@ import urllib
 
 import waffle
 from babel.dates import format_datetime
+from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -24,6 +25,7 @@ from six import text_type
 from course_modes.models import CourseMode
 from courseware.access import has_access
 from edxmako.shortcuts import render_to_response
+from common.djangoapps.student.views import get_course_related_keys
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from openedx.core.djangoapps.catalog.utils import get_currency_data
@@ -109,18 +111,27 @@ class ChooseModeView(View):
             return redirect(redirect_url)
 
         course = modulestore().get_course(course_key)
+        # TODO: Move out this piece of code as we are making changes in edx code.
+        today_date = timezone.now()
+        course_start_date = course.start
+        if course_start_date > today_date:
+            course_target = reverse('about_course', args=[unicode(course_id)])
+        else:
+            first_chapter_url, first_section = get_course_related_keys(request, course)
+            course_target = reverse('courseware_section', args=[course.id.to_deprecated_string(), first_chapter_url,
+                                                            first_section])
 
         # If there isn't a verified mode available, then there's nothing
         # to do on this page.  Send the user to the dashboard.
         if not CourseMode.has_verified_mode(modes):
-            return redirect(reverse('dashboard'))
+            return redirect(course_target)
 
         # If a user has already paid, redirect them to the dashboard.
         if is_active and (enrollment_mode in CourseMode.VERIFIED_MODES + [CourseMode.NO_ID_PROFESSIONAL_MODE]):
             # If the course has started redirect to course home instead
             if course.has_started():
                 return redirect(reverse('openedx.course_experience.course_home', kwargs={'course_id': course_key}))
-            return redirect(reverse('dashboard'))
+            return redirect(course_target)
 
         donation_for_course = request.session.get("donation_for_course", {})
         chosen_price = donation_for_course.get(unicode(course_key), None)
@@ -272,6 +283,16 @@ class ChooseModeView(View):
         if requested_mode not in allowed_modes:
             return HttpResponseBadRequest(_("Enrollment mode not supported"))
 
+        # TODO: Move out this piece of code as we are making changes in edx code.
+        today_date = timezone.now()
+        course_start_date = course.start
+        if course_start_date > today_date:
+            course_target = reverse('about_course', args=[unicode(course_id)])
+        else:
+            first_chapter_url, first_section = get_course_related_keys(request, course)
+            course_target = reverse('courseware_section', args=[course.id.to_deprecated_string(), first_chapter_url,
+                                                                first_section])
+
         if requested_mode == 'audit':
             # If the learner has arrived at this screen via the traditional enrollment workflow,
             # then they should already be enrolled in an audit mode for the course, assuming one has
@@ -282,14 +303,14 @@ class ChooseModeView(View):
             # If the course has started redirect to course home instead
             if course.has_started():
                 return redirect(reverse('openedx.course_experience.course_home', kwargs={'course_id': course_key}))
-            return redirect(reverse('dashboard'))
+            return redirect(course_target)
 
         if requested_mode == 'honor':
             CourseEnrollment.enroll(user, course_key, mode=requested_mode)
             # If the course has started redirect to course home instead
             if course.has_started():
                 return redirect(reverse('openedx.course_experience.course_home', kwargs={'course_id': course_key}))
-            return redirect(reverse('dashboard'))
+            return redirect(course_target)
 
         mode_info = allowed_modes[requested_mode]
 
