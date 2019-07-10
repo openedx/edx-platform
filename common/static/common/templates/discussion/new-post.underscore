@@ -1,0 +1,75 @@
+<form class="forum-new-post-form">
+    <h<%- startHeader %> class="thread-title"><%- gettext("Add a Post") %></h<%- startHeader %>>
+
+    <% if (mode === 'inline') { %>
+        <button class="btn btn-outline-primary btn-default add-post-cancel">
+            <span class="sr"><%- gettext('Cancel') %></span>
+            <span class="fa fa-close" aria-hidden="true"></span>
+        </button>
+    <% } %>
+    <ul class="post-errors" style="display: none"></ul>
+    <div class="forum-new-post-form-wrapper"></div>
+    <% if (group_options) { %>
+    <div class="post-field group-selector-wrapper <% if (!is_commentable_divided) { print('disabled'); } %>">
+        <label class="field-label">
+            <span class="field-label-text">
+                <% //Translators: This labels the selector for which group of students can view a post %>
+                <%- gettext("Visible to") %>
+            </span>
+            <div class="field-help" id="field_help_visible_to">
+                <%- gettext("Discussion admins, moderators, and TAs can make their posts visible to all students or specify a single group.") %>
+            </div>
+            <div class="field-input">
+                <select aria-describedby="field_help_visible_to" class="post-topic field-input js-group-select" name="group_id" <% if (!is_commentable_divided) { print("disabled"); } %>>
+                    <option value=""><%- gettext("All Groups") %></option>
+                    <% _.each(group_options, function(opt) { %>
+                    <option value="<%- opt.value %>" <% if (opt.selected) { print("selected"); } %>><%- opt.text %></option>
+                    <% }); %>
+                </select>
+            </div>
+        </label>
+    </div>
+    <% } %>
+    <div class="post-field group-visibility" id="wrapper-visibility-message"></div>
+    <div class="post-field">
+        <label class="field-label" for='discussion-forum-title'>
+            <span class="field-label-text"><%- gettext("Title") %></span>
+
+            <div class="field-help" id="field_help_title">
+                <%- gettext("Add a clear and descriptive title to encourage participation. (Required)") %>
+            </div>
+            <div>
+                <input id='discussion-forum-title' aria-describedby="field_help_title" type="text" class="js-post-title field-input" name="title">
+            </div>
+        </label>
+    </div>
+
+    <div>
+        <span class="field-label-text field-label-text-full" id="new-post-editor-description"><%- gettext('Your question or idea (required)') %></span>
+        <div class="js-post-body editor" aria-describedby="new-post-editor-description" name="body"></div>
+    </div>
+    <div class="post-options">
+        <label for= "follow" class="field-label label-inline">
+            <input id="follow" type="checkbox" name="follow" class="field-input input-checkbox" checked>
+            <span class="field-input-label">
+                <span class="icon fa fa-star" aria-hidden="true"></span><%- gettext("follow this post") %>
+            </span>
+        </label>
+        <% if (allow_anonymous) { %>
+        <label for="anonymous" class="field-label label-inline">
+            <input id="anonymous" type="checkbox" name="anonymous" class="field-input input-checkbox">
+            <span class="field-input-label"><%- gettext("post anonymously") %></span>
+        </label>
+        <% } %>
+        <% if (allow_anonymous_to_peers) { %>
+        <label for="anonymous_to_peers" class="field-label label-inline">
+            <input id="anonymous_to_peers" type="checkbox" name="anonymous_to_peers" class="field-input input-checkbox">
+            <span class="field-input-label"><%- gettext("post anonymously to classmates") %></span>
+        </div>
+        <% } %>
+    </div>
+    <div>
+        <button type="submit" class="btn btn-primary submit"><%- gettext('Submit') %></button>
+        <button type="button" class="btn btn-outline-primary cancel"><%- gettext('Cancel') %></button>
+    </div>
+</form>
