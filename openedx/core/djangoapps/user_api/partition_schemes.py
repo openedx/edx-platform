@@ -1,13 +1,16 @@
 """
 Provides partition support to the user service.
 """
+from __future__ import absolute_import
+
 import logging
 import random
-import course_tag.api as course_tag_api
 
 from eventtracking import tracker
 
-from xmodule.partitions.partitions import UserPartitionError, NoSuchUserPartitionGroupError
+from xmodule.partitions.partitions import NoSuchUserPartitionGroupError, UserPartitionError
+
+from .course_tag import api as course_tag_api
 
 log = logging.getLogger(__name__)
 
