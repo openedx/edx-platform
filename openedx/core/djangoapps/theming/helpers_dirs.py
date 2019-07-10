@@ -2,7 +2,10 @@
 Code which dynamically discovers comprehensive themes. Deliberately uses no Django settings,
 as the discovery happens during the initial setup of Django settings.
 """
+from __future__ import absolute_import
+
 import os
+
 from path import Path
 
 
@@ -127,7 +130,8 @@ class Theme(object):
         return hash((self.theme_dir_name, self.path))
 
     def __unicode__(self):
-        return u"<Theme: {name} at '{path}'>".format(name=self.name, path=self.path)
+        # pylint: disable=line-too-long
+        return u"<Theme: {name} at '{path}'>".format(name=self.name, path=self.path)  # xss-lint: disable=python-wrap-html
 
     def __repr__(self):
         return self.__unicode__()
