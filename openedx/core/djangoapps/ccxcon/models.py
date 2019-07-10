@@ -2,6 +2,9 @@
 Models for the ccxcon
 """
 
+from __future__ import absolute_import
+
+import six
 from django.db import models
 
 
@@ -29,4 +32,4 @@ class CCXCon(models.Model):
         return self.title
 
     def __unicode__(self):
-        return unicode(self.__str__())
+        return six.text_type(self.__str__())
