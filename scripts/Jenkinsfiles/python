@@ -38,7 +38,6 @@ def xdist_git_refspec() {
 pipeline {
     agent { label "jenkins-worker" }
     options {
-        sendSplunkConsoleLog()
         timestamps()
         timeout(60)
     }
