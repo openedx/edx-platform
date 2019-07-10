@@ -1,13 +1,14 @@
 """Unit tests for the Paver server tasks."""
 
 from __future__ import absolute_import
+
 import os
 from unittest import TestCase
 from uuid import uuid4
 
+import six
 from paver import tasks
 from paver.easy import BuildFailure
-import six
 
 
 class PaverTestCase(TestCase):
