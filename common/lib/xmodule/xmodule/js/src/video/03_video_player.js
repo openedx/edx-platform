@@ -141,7 +141,8 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _, Time) {
             showinfo: 0,
             enablejsapi: 1,
             modestbranding: 1,
-            cc_load_policy: 0
+            cc_load_policy: 0,
+            playsinline: 1
         };
 
         if (!state.isFlashMode()) {
