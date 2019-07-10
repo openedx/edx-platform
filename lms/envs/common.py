@@ -49,7 +49,7 @@ from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
-PLATFORM_NAME = _('Your Platform Name Here')
+PLATFORM_NAME = _('Philanthropy U Team')
 PLATFORM_DESCRIPTION = _('Your Platform Description Here')
 CC_MERCHANT_NAME = PLATFORM_NAME
 
@@ -269,7 +269,7 @@ FEATURES = {
     'ENABLE_MOBILE_REST_API': False,
 
     # Enable the combined login/registration form
-    'ENABLE_COMBINED_LOGIN_REGISTRATION': False,
+    'ENABLE_COMBINED_LOGIN_REGISTRATION': True,
     'ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER': False,
 
     # Enable organizational email opt-in
@@ -539,6 +539,33 @@ OAUTH_ID_TOKEN_EXPIRATION = 60 * 60
 TPA_PROVIDER_BURST_THROTTLE = '10/min'
 TPA_PROVIDER_SUSTAINED_THROTTLE = '50/hr'
 
+############## Settings for edX Notifications App ######################
+
+NOTIFICATION_STORE_PROVIDER = {
+    "class": "edx_notifications.stores.sql.store_provider.SQLNotificationStoreProvider",
+    "options": {
+    }
+}
+
+MAX_NOTIFICATION_LIST_SIZE = 100
+
+# list all known channel providers
+NOTIFICATION_CHANNEL_PROVIDERS = {
+    'durable': {
+        'class': 'edx_notifications.channels.durable.BaseDurableNotificationChannel',
+        'options': {}
+    },
+    'null': {
+        'class': 'edx_notifications.channels.null.NullNotificationChannel',
+        'options': {}
+    }
+}
+
+# list all of the mappings of notification types to channel
+NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = {
+    '*': 'durable',  # default global mapping
+}
+
 ################################## TEMPLATE CONFIGURATION #####################################
 # Mako templating
 import tempfile
@@ -570,6 +597,7 @@ def _make_mako_template_dirs(settings):
 
 
 CONTEXT_PROCESSORS = [
+    'lms.djangoapps.homepage.custom_context_processors.notifications_configs',
     'django.template.context_processors.request',
     'django.template.context_processors.static',
     'django.contrib.messages.context_processors.messages',
@@ -592,12 +620,21 @@ CONTEXT_PROCESSORS = [
     # Timezone processor (sends language and time_zone preference)
     'courseware.context_processor.user_timezone_locale_prefs',
 
+    # Alert message processor
+    'philu_overrides.context_processor.get_global_alert_messages',
+
     # Allows the open edX footer to be leveraged in Django Templates.
     'edxmako.shortcuts.footer_context_processor',
 
     # Online contextual help
     'help_tokens.context_processor',
     'openedx.core.djangoapps.site_configuration.context_processors.configuration_context',
+
+    # PhilU context processors
+    'lms.djangoapps.philu_overrides.context_processor.add_nodebb_endpoint',
+
+    # Philu CDN context processor
+    'lms.djangoapps.philu_overrides.context_processor.get_cdn_link',
 
     # Mobile App processor (Detects if request is from the mobile app)
     'mobile_api.context_processor.is_from_mobile_app'
@@ -1251,6 +1288,7 @@ MIDDLEWARE_CLASSES = [
     'openedx.core.djangoapps.cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
 
     'student.middleware.UserStandingMiddleware',
+    'student.middleware.UserSessionSharingMiddleware',
     'openedx.core.djangoapps.contentserver.middleware.StaticContentServer',
 
     # Adds user tags to tracking events
@@ -1302,6 +1340,7 @@ MIDDLEWARE_CLASSES = [
     'course_wiki.middleware.WikiAccessMiddleware',
 
     'openedx.core.djangoapps.theming.middleware.CurrentSiteThemeMiddleware',
+    'lms.djangoapps.onboarding.middleware.RedirectMiddleware',
 
     'waffle.middleware.WaffleMiddleware',
 
@@ -2024,6 +2063,9 @@ INSTALLED_APPS = [
     # History tables
     'simple_history',
 
+    # Philu management commands
+    'philu_commands',
+
     # Database-backed configuration
     'config_models',
     'openedx.core.djangoapps.config_model_utils',
@@ -2040,6 +2082,10 @@ INSTALLED_APPS = [
     'pipeline',
     'static_replace',
     'webpack_loader',
+
+    # Edx-Notifications
+    'edx_notifications',
+    'edx_notifications.server.api',
 
     # For user interface plugins
     'web_fragments',
@@ -2290,6 +2336,54 @@ INSTALLED_APPS = [
 
     # edx-drf-extensions
     'csrf.apps.CsrfAppConfig',  # Enables frontend apps to retrieve CSRF tokens.
+
+    # Split Registration
+    'openedx.features.split_registration',
+
+    'lms.djangoapps.onboarding',
+
+    # OEF survey
+    'lms.djangoapps.oef',
+
+    # Dynamic FAQ page
+    'lms.djangoapps.faq',
+
+    # NodeBB
+    'nodebb',
+
+    'mailchimp_pipeline',
+
+    # Custom settings App
+    'custom_settings',
+
+    # RestAPI
+    'lms.djangoapps.philu_api',
+
+    # Philu Overrides
+    'lms.djangoapps.philu_overrides',
+
+    # Philu Features
+    'openedx.features.student_certificates',
+
+    #third party surveys
+    'lms.djangoapps.third_party_surveys',
+
+    # timed notification and periodic tasks
+    'openedx.core.djangoapps.timed_notification',
+
+    # student_dashboard App
+    'lms.djangoapps.student_dashboard',
+
+    # Data extraction App
+    'openedx.features.data_extract',
+
+    # Course cards app
+    'openedx.features.course_card',
+
+    # User Leads app
+    'openedx.features.user_leads',
+
+    'channels'
 ]
 
 ######################### CSRF #########################################
@@ -2334,7 +2428,7 @@ MKTG_URL_LINK_MAP = {
     'PRIVACY': 'privacy',
     'PRESS': 'press',
     'BLOG': 'blog',
-    'DONATE': 'donate',
+
     'SITEMAP.XML': 'sitemap_xml',
 
     # Verified Certificates
@@ -2367,16 +2461,25 @@ SOCIAL_SHARING_SETTINGS = {
     'TWITTER_BRAND': None
 }
 
+# Each tuple represents social share url, the parameter for course url
+SOCIAL_SHARING_URLS = {
+    'facebook': {'url': 'https://www.facebook.com/sharer/sharer.php', 'url_param': 'u', 'utm_source': 'Facebook'},
+    'linkedin': {'url': 'http://www.linkedin.com/shareArticle?mini=true', 'url_param': 'url', 'utm_source': 'LinkedIn'},
+    'twitter': {'url': 'https://twitter.com/share', 'url_param': 'url', 'utm_source': 'Twitter'},
+    'email': {'url': None, 'url_param': None, 'utm_source': 'AddThis'}
+}
+
+TWITTER_MESSAGE_FORMAT = 'Check out {} on @PhilanthropyUni'
+DEFAULT_IMAGE_NAME = 'images_course_image.jpg'
+
 ################# Social Media Footer Links #######################
 # The names list controls the order of social media
 # links in the footer.
 SOCIAL_MEDIA_FOOTER_NAMES = [
+    "linkedin",
     "facebook",
     "twitter",
     "youtube",
-    "linkedin",
-    "google_plus",
-    "reddit",
 ]
 
 # The footer URLs dictionary maps social footer names
@@ -2386,11 +2489,18 @@ SOCIAL_MEDIA_FOOTER_URLS = {}
 # The display dictionary defines the title
 # and icon class for each social media link.
 SOCIAL_MEDIA_FOOTER_DISPLAY = {
+    "linkedin": {
+        # Translators: This is the website name of www.linkedin.com.  Please
+        # translate this the way that LinkedIn advertises in your language.
+        "title": _("LinkedIn"),
+        "icon": "fa-linkedin-square",
+        "action": _("Follow {platform_name} on LinkedIn")
+    },
     "facebook": {
         # Translators: This is the website name of www.facebook.com.  Please
         # translate this the way that Facebook advertises in your language.
         "title": _("Facebook"),
-        "icon": "fa-facebook-square",
+        "icon": "fa-facebook",
         "action": _("Like {platform_name} on Facebook")
     },
     "twitter": {
@@ -2399,51 +2509,6 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         "title": _("Twitter"),
         "icon": "fa-twitter-square",
         "action": _("Follow {platform_name} on Twitter")
-    },
-    "linkedin": {
-        # Translators: This is the website name of www.linkedin.com.  Please
-        # translate this the way that LinkedIn advertises in your language.
-        "title": _("LinkedIn"),
-        "icon": "fa-linkedin-square",
-        "action": _("Follow {platform_name} on LinkedIn")
-    },
-    "google_plus": {
-        # Translators: This is the website name of plus.google.com.  Please
-        # translate this the way that Google+ advertises in your language.
-        "title": _("Google+"),
-        "icon": "fa-google-plus-square",
-        "action": _("Follow {platform_name} on Google+")
-    },
-    "tumblr": {
-        # Translators: This is the website name of www.tumblr.com.  Please
-        # translate this the way that Tumblr advertises in your language.
-        "title": _("Tumblr"),
-        "icon": "fa-tumblr"
-    },
-    "meetup": {
-        # Translators: This is the website name of www.meetup.com.  Please
-        # translate this the way that MeetUp advertises in your language.
-        "title": _("Meetup"),
-        "icon": "fa-calendar"
-    },
-    "reddit": {
-        # Translators: This is the website name of www.reddit.com.  Please
-        # translate this the way that Reddit advertises in your language.
-        "title": _("Reddit"),
-        "icon": "fa-reddit-square",
-        "action": _("Subscribe to the {platform_name} subreddit"),
-    },
-    "vk": {
-        # Translators: This is the website name of https://vk.com.  Please
-        # translate this the way that VK advertises in your language.
-        "title": _("VK"),
-        "icon": "fa-vk"
-    },
-    "weibo": {
-        # Translators: This is the website name of http://www.weibo.com.  Please
-        # translate this the way that Weibo advertises in your language.
-        "title": _("Weibo"),
-        "icon": "fa-weibo"
     },
     "youtube": {
         # Translators: This is the website name of www.youtube.com.  Please
@@ -2516,18 +2581,7 @@ LOGIN_REDIRECT_WHITELIST = [CMS_BASE]
 # - 'optional': to display the field, and make it non-mandatory
 # - 'hidden': to not display the field
 
-REGISTRATION_EXTRA_FIELDS = {
-    'confirm_email': 'hidden',
-    'level_of_education': 'optional',
-    'gender': 'optional',
-    'year_of_birth': 'optional',
-    'mailing_address': 'optional',
-    'goals': 'optional',
-    'honor_code': 'required',
-    'terms_of_service': 'hidden',
-    'city': 'hidden',
-    'country': 'hidden',
-}
+REGISTRATION_EXTRA_FIELDS = {}
 
 REGISTRATION_FIELD_ORDER = [
     "name",
@@ -2885,6 +2939,7 @@ OPTIONAL_APPS = [
 
     # Required by the Enterprise App
     ('django_object_actions', None),  # https://github.com/crccheck/django-object-actions
+
 ]
 
 for app_name, insert_before in OPTIONAL_APPS:
@@ -3101,7 +3156,7 @@ PROFILE_IMAGE_SIZES_MAP = {
 
 # Sets the maximum number of courses listed on the homepage
 # If set to None, all courses will be listed on the homepage
-HOMEPAGE_COURSE_MAX = None
+HOMEPAGE_COURSE_MAX = 4
 
 ################################ Settings for Credit Courses ################################
 # Initial delay used for retrying tasks.
@@ -3226,7 +3281,8 @@ FINANCIAL_ASSISTANCE_MAX_LENGTH = 2500
 # need to add the model's app to the ADDL_INSTALLED_APPS array in your
 # lms.env.json file.
 
-REGISTRATION_EXTENSION_FORM = None
+REGISTRATION_EXTENSION_FORM = 'onboarding.forms.RegModelForm'
+REGISTRATION_EXTENSION_FORM_V2 = 'openedx.features.split_registration.forms.RegModelForm'
 
 # Identifier included in the User Agent from open edX mobile apps.
 MOBILE_APP_USER_AGENT_REGEXES = [
@@ -3481,3 +3537,19 @@ USER_STATE_BATCH_SIZE = 5000
 from openedx.core.djangoapps.plugins import plugin_apps, plugin_settings, constants as plugin_constants
 INSTALLED_APPS.extend(plugin_apps.get_apps(plugin_constants.ProjectType.LMS))
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_constants.SettingsType.COMMON)
+
+# Notification email settings
+NOTIFICATION_FROM_EMAIL = 'info@philanthropyu.org'
+NOTIFICATION_EMAIL_SUBJECT = 'Philanthropy-U-Team Course Notification'
+
+
+# Google Place API key
+GOOGLE_PLACE_API_KEY = 'AIzaSyDhkKEySp0g2Ip8bovRHCI5KE257DSAJkA'
+
+# OEF renewal
+
+OEF_RENEWAL_DAYS = 180
+
+# CDN LINK
+
+CDN_LINK = "https://static.philanthropyu.org/"
