@@ -145,8 +145,8 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
             start_date = strftime_localized(course.start, 'SHORT_DATE')
             params = QueryDict(mutable=True)
             params['notlive'] = start_date
-            raise CourseAccessRedirect('{dashboard_url}?{params}'.format(
-                dashboard_url=reverse('dashboard'),
+            raise CourseAccessRedirect('{course_about_url}?{params}'.format(
+                course_about_url=reverse('about_course', args=[unicode(course_key)]),
                 params=params.urlencode()
             ), access_response)
 

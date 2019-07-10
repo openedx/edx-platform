@@ -229,6 +229,7 @@ def _recalculate_subsection_grade(self, **kwargs):
         has_database_updated = _has_db_updated_with_new_score(self, scored_block_usage_key, **kwargs)
 
         if not has_database_updated:
+            log.info("user is not updated with new score")
             raise DatabaseNotReadyError
 
         _update_subsection_grades(
@@ -245,6 +246,12 @@ def _recalculate_subsection_grade(self, **kwargs):
                 repr(exc),
                 self.request.id,
                 kwargs,
+            ))
+
+        log.info("regrading failure: {} - {}. kwargs={}".format(
+                str(exc),
+                repr(exc),
+                kwargs
             ))
         raise self.retry(kwargs=kwargs, exc=exc)
 
