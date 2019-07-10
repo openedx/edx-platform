@@ -2,15 +2,17 @@
 Course API Views
 """
 
+from __future__ import absolute_import
+
 import search
+import six
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from edx_rest_framework_extensions.paginators import NamespacedPageNumberPagination
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.throttling import UserRateThrottle
 
-from edx_rest_framework_extensions.paginators import NamespacedPageNumberPagination
-from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
-from openedx.core.lib.api.view_utils import LazySequence
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, LazySequence, view_auth_classes
 
 from . import USE_RATE_LIMIT_2_FOR_COURSE_LIST_API, USE_RATE_LIMIT_10_FOR_COURSE_LIST_API
 from .api import course_detail, list_courses
@@ -270,7 +272,7 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
         return LazySequence(
             (
                 course for course in db_courses
-                if unicode(course.id) in search_courses_ids
+                if six.text_type(course.id) in search_courses_ids
             ),
             est_len=len(db_courses)
         )
