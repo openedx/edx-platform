@@ -1,11 +1,14 @@
 """Tests of openedx.features.discounts.applicability"""
 # -*- coding: utf-8 -*-
 
-from datetime import timedelta, datetime
+from __future__ import absolute_import
+
+from datetime import datetime, timedelta
+
 import ddt
-from django.utils.timezone import now
-from mock import patch, Mock
 import pytz
+from django.utils.timezone import now
+from mock import Mock, patch
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -13,11 +16,11 @@ from entitlements.tests.factories import CourseEntitlementFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.discounts.models import DiscountRestrictionConfig
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..applicability import can_receive_discount, DISCOUNT_APPLICABILITY_FLAG, _is_in_holdback
+from ..applicability import DISCOUNT_APPLICABILITY_FLAG, _is_in_holdback, can_receive_discount
 
 
 @ddt.ddt
