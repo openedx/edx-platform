@@ -61,6 +61,7 @@ from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
 from enrollment.api import add_enrollment
 from ipware.ip import get_ip
+from common.djangoapps.student.views import get_course_related_keys
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import CertificateStatuses
@@ -101,6 +102,7 @@ from openedx.features.enterprise_support.api import data_sharing_consent_require
 from openedx.features.journals.api import get_journals_context
 from shoppingcart.utils import is_shopping_cart_enabled
 from student.models import CourseEnrollment, UserTestGroup
+from student.views import get_course_enrollments
 from track import segment
 from util.cache import cache, cache_if_anonymous
 from util.db import outer_atomic
@@ -239,6 +241,9 @@ def courses(request):
 
     # Add marketable programs to the context.
     programs_list = get_programs_with_type(request.site, include_hidden=False)
+
+    if request.user.is_authenticated():
+        add_tag_to_enrolled_courses(request.user, courses_list)
 
     return render_to_response(
         "courseware/courses.html",
@@ -787,7 +792,9 @@ def course_about(request, course_id):
         studio_url = get_studio_url(course, 'settings/details')
 
         if has_access(request.user, 'load', course):
-            course_target = reverse(course_home_url_name(course.id), args=[text_type(course.id)])
+            first_chapter_url, first_section = get_course_related_keys(request, course)
+            course_target = reverse('courseware_section', args=[course.id.to_deprecated_string(), 
+                                                        first_chapter_url, first_section])
         else:
             course_target = reverse('about_course', args=[text_type(course.id)])
 
@@ -1757,3 +1764,40 @@ def get_financial_aid_courses(user):
             )
 
     return financial_aid_courses
+
+
+def get_enrolled_courses(user):
+
+    course_org_filter = configuration_helpers.get_value('course_org_filter')
+
+    # Let's filter out any courses in an "org" that has been declared to be
+    # in a configuration
+    org_filter_out_set = configuration_helpers.get_all_orgs()
+
+    # remove our current org from the "filter out" list, if applicable
+    if course_org_filter:
+        org_filter_out_set.remove(course_org_filter)
+
+    # Build our (course, enrollment) list for the user, but ignore any courses that no
+    # longer exist (because the course IDs have changed). Still, we don't delete those
+    # enrollments, because it could have been a data push snafu.
+    course_enrollments = list(get_course_enrollments(user, course_org_filter, org_filter_out_set))
+
+    # sort the enrollment pairs by the enrollment date
+    course_enrollments.sort(key=lambda x: x.created, reverse=True)
+
+    # construct enrolled courses list
+    courses = list()
+    for course_enrollment in course_enrollments:
+        courses.append(course_enrollment.course_overview)
+
+    return courses
+
+
+def add_tag_to_enrolled_courses(user, courses_list):
+    enrolled_courses = get_enrolled_courses(user)
+    for course in courses_list:
+        if course in enrolled_courses:
+            course.enrolled = True
+        else:
+            course.enrolled = False
