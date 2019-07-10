@@ -2,9 +2,10 @@
 """
 A class used for defining and running test suites
 """
-from __future__ import print_function
-import sys
+from __future__ import absolute_import, print_function
+
 import subprocess
+import sys
 
 from paver import tasks
 

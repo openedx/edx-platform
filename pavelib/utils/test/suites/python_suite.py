@@ -1,12 +1,14 @@
 """
 Classes used for defining and running python test suites
 """
+from __future__ import absolute_import
+
 import os
 
-from pavelib.utils.test import utils as test_utils
-from pavelib.utils.test.suites.suite import TestSuite
-from pavelib.utils.test.suites.pytest_suite import LibTestSuite, SystemTestSuite
 from pavelib.utils.envs import Env
+from pavelib.utils.test import utils as test_utils
+from pavelib.utils.test.suites.pytest_suite import LibTestSuite, SystemTestSuite
+from pavelib.utils.test.suites.suite import TestSuite
 
 __test__ = False  # do not collect
 
