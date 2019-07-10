@@ -1,5 +1,5 @@
 """
-User Api.
+User Apis.
 """
 from __future__ import absolute_import
 
