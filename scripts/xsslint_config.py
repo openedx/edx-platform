@@ -1,4 +1,6 @@
 # xsslint config module for edx-platform
+from __future__ import absolute_import
+
 import os
 import sys
 
@@ -7,8 +9,7 @@ import sys
 scripts_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(scripts_dir, 'xsslint'))
 
-from xsslint.linters import JavaScriptLinter, MakoTemplateLinter, PythonLinter, UnderscoreTemplateLinter
-
+from xsslint.linters import JavaScriptLinter, MakoTemplateLinter, PythonLinter, UnderscoreTemplateLinter  # pylint: disable=import-error,wrong-import-position
 
 # Define the directories that should be ignored by the script.
 SKIP_DIRS = (
