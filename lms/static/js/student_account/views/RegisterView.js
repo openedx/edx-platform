@@ -474,18 +474,26 @@
                 },
 
                 renderAuthWarning: function() {
-                    var msgPart1 = gettext('You\'ve successfully signed into %(currentProvider)s.'),
-                        msgPart2 = gettext(
-                            'We just need a little more information before you start learning with %(platformName)s.'
-                        ),
-                        fullMsg = _.sprintf(
-                            msgPart1 + ' ' + msgPart2,
-                            {currentProvider: this.currentProvider, platformName: this.platformName}
+                    var fullMsgHtml = HtmlUtils.interpolateHtml(
+                        gettext('{paragraphStart}You have successfully signed into {currentProvider}. We just need a ' +
+                            'little more information before you start learning with {platformName}.{paragraphEnd}' +
+                            '{paragraphStart}Please check your information and complete the fields below to create ' +
+                            'an account.{paragraphEnd}'),
+                        { // eslint-disable-line max-len
+                                paragraphStart: HtmlUtils.HTML('<p>'),
+                                paragraphEnd: HtmlUtils.HTML('</p>'),
+                                platformName: this.platformName,
+                                currentProvider: this.currentProvider
+                        }
                         );
-
+                    var createPasswordMessage = _.sprintf(
+                            'Please create a password for your %(platformName)s account',
+                            {platformName: this.platformName}
+                        );
                     this.renderFormFeedback(this.formStatusTpl, {
                         jsHook: this.authWarningJsHook,
-                        message: fullMsg
+                        messageHtml: fullMsgHtml,
+                        createPasswordMessage: createPasswordMessage
                     });
                 },
 
