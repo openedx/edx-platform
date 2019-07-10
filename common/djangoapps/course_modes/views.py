@@ -112,7 +112,6 @@ class ChooseModeView(View):
 
         course = modulestore().get_course(course_key)
         # TODO: Move out this piece of code as we are making changes in edx code.
-        # TODO: IRONWOOD, This code can be moved to a method which returns course_target. as it is repeated in post method as well.
         today_date = timezone.now()
         course_start_date = course.start
         if course_start_date > today_date:
@@ -285,7 +284,6 @@ class ChooseModeView(View):
             return HttpResponseBadRequest(_("Enrollment mode not supported"))
 
         # TODO: Move out this piece of code as we are making changes in edx code.
-        course = modulestore().get_course(course_key)
         today_date = timezone.now()
         course_start_date = course.start
         if course_start_date > today_date:
