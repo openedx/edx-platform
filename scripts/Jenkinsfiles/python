@@ -94,6 +94,7 @@ pipeline {
                         always {
                             script {
                                 pythonTestCleanup()
+                                sendSplunkFile excludes: '', includes: '*.log', publishFromSlave: true, sizeLimit: '100MB'
                             }
                         }
                     }
