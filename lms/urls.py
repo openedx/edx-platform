@@ -295,7 +295,11 @@ urlpatterns += [
         courseware_views.course_about,
         name='about_course',
     ),
-
+    url(
+        r'^courses/yt_video_metadata$',
+        courseware_views.yt_video_metadata,
+        name='yt_video_metadata',
+    ),
     url(
         r'^courses/{}/enroll_staff$'.format(
             settings.COURSE_ID_PATTERN,
