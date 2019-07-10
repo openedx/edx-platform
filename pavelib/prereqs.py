@@ -1,17 +1,18 @@
 """
 Install Python and Node prerequisites.
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import hashlib
+import io
 import os
 import re
-import sys
 import subprocess
-import io
+import sys
 from distutils import sysconfig
 
 from paver.easy import BuildFailure, sh, task
+from six.moves import range
 
 from .utils.envs import Env
 from .utils.timer import timed
