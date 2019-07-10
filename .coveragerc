@@ -10,6 +10,7 @@ source =
     lms
     openedx
     pavelib
+    openedx/features/course_card
 
 omit =
     cms/envs/*
@@ -26,6 +27,7 @@ omit =
     common/djangoapps/*/migrations/*
     openedx/core/djangoapps/*/migrations/*
     openedx/core/djangoapps/debug/*
+    openedx/features/course_card/migrations/*
     openedx/features/*/migrations/*
 
 concurrency=multiprocessing
