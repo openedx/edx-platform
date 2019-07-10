@@ -11,11 +11,18 @@ support both generating static assets to a directory and also serving static
 from the same directory.
 """
 
+from __future__ import absolute_import
+
+# Silence noisy logs
+import logging
 import os
-from path import Path as path
 
 from django.utils.translation import ugettext_lazy
+from path import Path as path
+
 from openedx.core.release import RELEASE_LINE
+
+from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-position
 
 ########################## Prod-like settings ###################################
 # These should be as close as possible to the settings we use in production.
@@ -29,7 +36,6 @@ os.environ['STUDIO_CFG'] = str.format("{config_root}/{service_variant}.yml",
                                       config_root=os.environ['CONFIG_ROOT'],
                                       service_variant=os.environ['SERVICE_VARIANT'])
 
-from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-position
 
 ######################### Testing overrides ####################################
 
@@ -82,8 +88,6 @@ MEDIA_ROOT = TEST_ROOT / "uploads"
 
 WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = TEST_ROOT / "staticfiles" / "cms" / "webpack-stats.json"
 
-# Silence noisy logs
-import logging
 LOG_OVERRIDES = [
     ('track.middleware', logging.CRITICAL),
     ('edx.discussion', logging.CRITICAL),
