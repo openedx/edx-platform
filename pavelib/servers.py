@@ -1,7 +1,7 @@
 """
 Run and manage servers for local development.
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import argparse
 import sys
@@ -25,7 +25,7 @@ ASSET_SETTINGS_HELP = (
 
 
 def run_server(
-        system, fast=False, settings=None, asset_settings=None, port=None, contracts=False
+    system, fast=False, settings=None, asset_settings=None, port=None, contracts=False
 ):
     """Start the server for LMS or Studio.
 
@@ -255,7 +255,8 @@ def update_db(options):
     fake = "--fake-initial" if getattr(options, 'fake_initial', False) else ""
     for system in ('lms', 'cms'):
         # pylint: disable=line-too-long
-        sh(u"NO_EDXAPP_SUDO=1 EDX_PLATFORM_SETTINGS_OVERRIDE={settings} /edx/bin/edxapp-migrate-{system} --traceback --pythonpath=. {fake}".format(
+        sh(u"NO_EDXAPP_SUDO=1 EDX_PLATFORM_SETTINGS_OVERRIDE={settings} /edx/bin/edxapp-migrate-{system} --traceback "
+           u"--pythonpath=. {fake}".format(
             settings=settings,
             system=system,
             fake=fake))

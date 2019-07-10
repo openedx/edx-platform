@@ -1,22 +1,23 @@
 """
 Tests for the Paver commands for updating test databases and its utility methods
 """
+from __future__ import absolute_import
+
+import os
 import shutil
 import tarfile
 from tempfile import mkdtemp
-import os
 from unittest import TestCase
 
 import boto
-from mock import patch, call
+from mock import call, patch
 
 from common.test.utils import MockS3Mixin
-from pavelib.utils.envs import Env
-from pavelib.utils.db_utils import (
-    is_fingerprint_in_bucket, extract_files_from_zip,
-)
-from pavelib.utils import db_utils
 from pavelib import database
+from pavelib.utils import db_utils
+from pavelib.utils.db_utils import extract_files_from_zip, is_fingerprint_in_bucket
+from pavelib.utils.envs import Env
+
 from .utils import PaverTestCase
 
 

@@ -2,14 +2,16 @@
 Tests covering the Open edX Paver prequisites installation workflow
 """
 
+from __future__ import absolute_import
+
 import os
 import unittest
 
 from mock import patch
 from paver.easy import BuildFailure
 
-from pavelib.paver_tests.utils import PaverTestCase, fail_on_npm_install, unexpected_fail_on_npm_install
 import pavelib.prereqs
+from pavelib.paver_tests.utils import PaverTestCase, fail_on_npm_install, unexpected_fail_on_npm_install
 
 
 class TestPaverPrereqInstall(unittest.TestCase):
