@@ -40,6 +40,10 @@ LIBRARY_KEY_PATTERN = r'(?P<library_key_string>library-v1:[^/+]+\+[^/+]+)'
 urlpatterns = [
     url(r'', include('openedx.core.djangoapps.user_authn.urls_common')),
     url(r'', include('student.urls')),
+
+    # URL for custom_settings APP
+    url(r'', include('custom_settings.urls')),
+
     url(r'^transcripts/upload$', contentstore.views.upload_transcripts, name='upload_transcripts'),
     url(r'^transcripts/download$', contentstore.views.download_transcripts, name='download_transcripts'),
     url(r'^transcripts/check$', contentstore.views.check_transcripts, name='check_transcripts'),
