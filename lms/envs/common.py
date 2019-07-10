@@ -2321,6 +2321,9 @@ INSTALLED_APPS = [
     # defined by oauth_provider.  If those tables don't exist, an error can occur.
     'oauth_provider',
 
+    # System Wide Roles
+    'openedx.core.djangoapps.system_wide_roles',
+
     'openedx.core.djangoapps.auth_exchange',
 
     # For the wiki
