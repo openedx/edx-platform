@@ -4,15 +4,12 @@ Course API Views
 
 from __future__ import absolute_import
 
-import search
-import six
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from edx_rest_framework_extensions.paginators import NamespacedPageNumberPagination
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.throttling import UserRateThrottle
 
-from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, LazySequence, view_auth_classes
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 
 from . import USE_RATE_LIMIT_2_FOR_COURSE_LIST_API, USE_RATE_LIMIT_10_FOR_COURSE_LIST_API
 from .api import course_detail, list_courses
@@ -193,9 +190,11 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
             provided org code (e.g., "HarvardX") are returned.
             Case-insensitive.
 
-        mobile (optional):
-            If specified, only visible `CourseOverview` objects that are
-            designated as mobile_available are returned.
+        role (optional):
+            If specified, visible `CourseOverview` objects are filtered
+            such that only those for which the user has the specified role
+            are returned. Multiple role parameters can be specified.
+            Case-insensitive.
 
     **Returns**
 
@@ -239,11 +238,6 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
     serializer_class = CourseSerializer
     throttle_classes = (CourseListUserThrottle,)
 
-    # Return all the results, 10K is the maximum allowed value for ElasticSearch.
-    # We should use 0 after upgrading to 1.1+:
-    #   - https://github.com/elastic/elasticsearch/commit/8b0a863d427b4ebcbcfb1dcd69c996c52e7ae05e
-    results_size_infinity = 10000
-
     def get_queryset(self):
         """
         Yield courses visible to the user.
@@ -252,27 +246,11 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
         if not form.is_valid():
             raise ValidationError(form.errors)
 
-        db_courses = list_courses(
+        return list_courses(
             self.request,
             form.cleaned_data['username'],
             org=form.cleaned_data['org'],
+            roles=form.cleaned_data['role'],
             filter_=form.cleaned_data['filter_'],
-        )
-
-        if not settings.FEATURES['ENABLE_COURSEWARE_SEARCH'] or not form.cleaned_data['search_term']:
-            return db_courses
-
-        search_courses = search.api.course_discovery_search(
-            form.cleaned_data['search_term'],
-            size=self.results_size_infinity,
-        )
-
-        search_courses_ids = {course['data']['id'] for course in search_courses['results']}
-
-        return LazySequence(
-            (
-                course for course in db_courses
-                if six.text_type(course.id) in search_courses_ids
-            ),
-            est_len=len(db_courses)
+            search_term=form.cleaned_data['search_term']
         )
