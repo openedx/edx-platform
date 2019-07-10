@@ -105,6 +105,7 @@
           Necessary to preserve relative URLs to our images.
            */
           convert_urls: false,
+          body_class : "xmodule_display xmodule_HtmlModule",
 
           /*
           Sniff UI direction from `.wrapper-view` in studio or `.window-wrap` in LMS
@@ -122,7 +123,7 @@
           Disable visual aid on borderless table.
            */
           visual: false,
-          plugins: "textcolor, link, image, codemirror",
+          plugins: "textcolor, link, image, codemirror, table, media",
           codemirror: {
             path: baseUrl + "/js/vendor"
           },
@@ -135,9 +136,11 @@
             "alignleft aligncenter alignright alignjustify | " +
             "bullist numlist outdent indent blockquote | link unlink " +
             ((this.new_image_modal ? 'insertImage' : 'image') + " | code"),
-          block_formats: interpolate("%(paragraph)s=p;%(preformatted)s=pre;%(heading3)s=h3;%(heading4)s=h4;%(heading5)s=h5;%(heading6)s=h6", {
+          block_formats: interpolate("%(paragraph)s=p;%(preformatted)s=pre;%(heading1)s=h1;%(heading2)s=h2;%(heading3)s=h3;%(heading4)s=h4;%(heading5)s=h5;%(heading6)s=h6", {
             paragraph: gettext("Paragraph"),
             preformatted: gettext("Preformatted"),
+            heading1: gettext("Heading 1"),
+            heading2: gettext("Heading 2"),
             heading3: gettext("Heading 3"),
             heading4: gettext("Heading 4"),
             heading5: gettext("Heading 5"),
@@ -145,7 +148,7 @@
           }, true),
           width: '100%',
           height: '400px',
-          menubar: false,
+          menubar: true,
           statusbar: false,
 
           /*
