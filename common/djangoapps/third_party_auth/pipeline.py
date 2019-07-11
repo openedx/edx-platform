@@ -57,37 +57,41 @@ rather than spreading them across two functions in the pipeline.
 See https://python-social-auth.readthedocs.io/en/latest/pipeline.html for more docs.
 """
 
+from __future__ import absolute_import
+
 import base64
 import hashlib
 import hmac
 import json
-import urllib
 from collections import OrderedDict
 from logging import getLogger
 from smtplib import SMTPException
 from uuid import uuid4
 
+import six
+import six.moves.urllib.error  # pylint: disable=import-error
+import six.moves.urllib.parse  # pylint: disable=import-error
+import six.moves.urllib.request  # pylint: disable=import-error
+import social_django
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.mail.message import EmailMessage
-from django.urls import reverse
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
-import social_django
+from django.urls import reverse
 from social_core.exceptions import AuthException
 from social_core.pipeline import partial
 from social_core.pipeline.social_auth import associate_by_email
-from social_core.utils import slugify, module_member
+from social_core.utils import module_member, slugify
 
 from edxmako.shortcuts import render_to_string
-
-from util.json_request import JsonResponse
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
 from lms.djangoapps.verify_student.models import SSOVerification
 from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
 from third_party_auth.utils import user_exists
 from track import segment
+from util.json_request import JsonResponse
 
 from . import provider
 
@@ -149,7 +153,7 @@ _AUTH_ENTRY_CHOICES = frozenset([
     AUTH_ENTRY_ACCOUNT_SETTINGS,
     AUTH_ENTRY_LOGIN_API,
     AUTH_ENTRY_REGISTER_API,
-] + AUTH_ENTRY_CUSTOM.keys())
+] + list(AUTH_ENTRY_CUSTOM.keys()))
 
 USER_FIELDS = ['username', 'email']
 
@@ -305,7 +309,7 @@ def _get_url(view_name, backend_name, auth_entry=None, redirect_url=None,
 
     return u"{url}?{params}".format(
         url=url,
-        params=urllib.urlencode(query_params)
+        params=six.moves.urllib.parse.urlencode(query_params)
     )
 
 
@@ -496,7 +500,7 @@ def redirect_to_custom_form(request, auth_entry, details, kwargs):
     provider_id = provider.Registry.get_from_pipeline({'backend': backend_name, 'kwargs': kwargs}).provider_id
     form_info = AUTH_ENTRY_CUSTOM[auth_entry]
     secret_key = form_info['secret_key']
-    if isinstance(secret_key, unicode):
+    if isinstance(secret_key, six.text_type):
         secret_key = secret_key.encode('utf-8')
     custom_form_url = form_info['url']
     data_str = json.dumps({
@@ -757,7 +761,7 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
         if changed:
             logger.info(
                 u"User [%s] performed SSO through [%s] who synchronizes profile data, and the "
-                u"following fields were changed: %s", user.username, current_provider.name, changed.keys(),
+                u"following fields were changed: %s", user.username, current_provider.name, list(changed.keys()),
             )
 
             # Save changes to user and user.profile models.
