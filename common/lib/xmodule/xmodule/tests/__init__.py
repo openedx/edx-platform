@@ -7,6 +7,8 @@ Run like this:
 
 """
 
+from __future__ import absolute_import
+
 import inspect
 import json
 import os
@@ -14,17 +16,18 @@ import pprint
 import sys
 import traceback
 import unittest
-
 from contextlib import contextmanager, nested
-from django.test import TestCase
 from functools import wraps
+
+import six
+from django.test import TestCase
 from mock import Mock
+from opaque_keys.edx.keys import CourseKey
 from path import Path as path
 from six import text_type
-
-from opaque_keys.edx.keys import CourseKey
 from xblock.field_data import DictFieldData
-from xblock.fields import ScopeIds, Reference, ReferenceList, ReferenceValueDict
+from xblock.fields import Reference, ReferenceList, ReferenceValueDict, ScopeIds
+
 from xmodule.assetstore import AssetMetadata
 from xmodule.error_module import ErrorDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
@@ -53,7 +56,7 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
 
     def handler_url(self, block, handler, suffix='', query='', thirdparty=False):
         return '{usage_id}/{handler}{suffix}?{query}'.format(
-            usage_id=unicode(block.scope_ids.usage_id),
+            usage_id=six.text_type(block.scope_ids.usage_id),
             handler=handler,
             suffix=suffix,
             query=query,
@@ -61,7 +64,7 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
 
     def local_resource_url(self, block, uri):
         return 'resource/{usage_id}/{uri}'.format(
-            usage_id=unicode(block.scope_ids.usage_id),
+            usage_id=six.text_type(block.scope_ids.usage_id),
             uri=uri,
         )
 
@@ -218,7 +221,7 @@ def map_references(value, field, actual_course_key):
     if isinstance(field, ReferenceList):
         return [sub.map_into_course(actual_course_key) for sub in value]
     if isinstance(field, ReferenceValueDict):
-        return {key: ele.map_into_course(actual_course_key) for key, ele in value.iteritems()}
+        return {key: ele.map_into_course(actual_course_key) for key, ele in six.iteritems(value)}
     return value
 
 
@@ -388,13 +391,13 @@ class LazyFormat(object):
         return self._message
 
     def __repr__(self):
-        return unicode(self)
+        return six.text_type(self)
 
     def __len__(self):
-        return len(unicode(self))
+        return len(six.text_type(self))
 
     def __getitem__(self, index):
-        return unicode(self)[index]
+        return six.text_type(self)[index]
 
 
 class CourseComparisonTest(BulkAssertionTest):
@@ -446,8 +449,8 @@ class CourseComparisonTest(BulkAssertionTest):
             expected = [extract_key(key) for key in expected]
             actual = [extract_key(key) for key in actual]
         elif isinstance(reference_field, ReferenceValueDict):
-            expected = {key: extract_key(val) for (key, val) in expected.iteritems()}
-            actual = {key: extract_key(val) for (key, val) in actual.iteritems()}
+            expected = {key: extract_key(val) for (key, val) in six.iteritems(expected)}
+            actual = {key: extract_key(val) for (key, val) in six.iteritems(actual)}
         self.assertEqual(
             expected,
             actual,
@@ -560,7 +563,7 @@ class CourseComparisonTest(BulkAssertionTest):
                     actual_item = actual_item_map.get(map_key(actual_item_location))
 
                 # Formatting the message slows down tests of large courses significantly, so only do it if it would be used
-                self.assertIn(map_key(actual_item_location), actual_item_map.keys())
+                self.assertIn(map_key(actual_item_location), list(actual_item_map.keys()))
 
                 if actual_item is None:
                     continue
@@ -568,7 +571,7 @@ class CourseComparisonTest(BulkAssertionTest):
                 # compare fields
                 self.assertEqual(expected_item.fields, actual_item.fields)
 
-                for field_name, field in expected_item.fields.iteritems():
+                for field_name, field in six.iteritems(expected_item.fields):
                     if (expected_item.scope_ids.usage_id, field_name) in self.field_exclusions:
                         continue
 
