@@ -171,7 +171,7 @@ def get_login_session_form(request):
     form_desc.add_field(
         "remember",
         field_type="checkbox",
-        label=_("Remember me"),
+        label=_("Remember my login credentials so I don't need to fill up these fields every time I log in."),
         default=False,
         required=False,
     )
@@ -214,7 +214,7 @@ def _apply_third_party_auth_overrides(request, form_desc):
 class RegistrationFormFactory(object):
     """HTTP end-points for creating a new user. """
 
-    DEFAULT_FIELDS = ["email", "name", "username", "password"]
+    DEFAULT_FIELDS = ["email", "username", "password"]
 
     EXTRA_FIELDS = [
         "confirm_email",
@@ -231,10 +231,10 @@ class RegistrationFormFactory(object):
         "title",
         "mailing_address",
         "goals",
-        "honor_code",
         "terms_of_service",
         "profession",
         "specialty",
+        "honor_code",
     ]
 
     def _is_field_visible(self, field_name):
@@ -362,6 +362,10 @@ class RegistrationFormFactory(object):
         # meant to hold the user's email address.
         email_label = _(u"Email")
 
+        # Translators: This example email address is used as a placeholder in
+        # a field on the registration form meant to hold the user's email address.
+        email_placeholder = _(u"username@domain.com")
+
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's email address.
         email_instructions = _(u"This is what you will use to login.")
@@ -370,10 +374,15 @@ class RegistrationFormFactory(object):
             "email",
             field_type="email",
             label=email_label,
+            placeholder=email_placeholder,
             instructions=email_instructions,
             restrictions={
                 "min_length": accounts.EMAIL_MIN_LENGTH,
                 "max_length": accounts.EMAIL_MAX_LENGTH,
+            },
+            error_messages={
+                "email": "The email you entered is not valid. Please provide"
+                         " a valid email in order to create an account."
             },
             required=required
         )
@@ -411,6 +420,10 @@ class RegistrationFormFactory(object):
         # meant to hold the user's full name.
         name_label = _(u"Full Name")
 
+        # Translators: This example name is used as a placeholder in
+        # a field on the registration form meant to hold the user's name.
+        name_placeholder = _(u"Jane Doe")
+
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's full name.
         name_instructions = _(u"This name will be used on any certificates that you earn.")
@@ -418,6 +431,7 @@ class RegistrationFormFactory(object):
         form_desc.add_field(
             "name",
             label=name_label,
+            placeholder=name_placeholder,
             instructions=name_instructions,
             restrictions={
                 "max_length": accounts.NAME_MAX_LENGTH,
@@ -442,10 +456,16 @@ class RegistrationFormFactory(object):
             u"The name that will identify you in your courses. "
             u"It cannot be changed later."
         )
+
+        # Translators: This example username is used as a placeholder in
+        # a field on the registration form meant to hold the user's username.
+        username_placeholder = _(u"Public Username")
+
         form_desc.add_field(
             "username",
             label=username_label,
             instructions=username_instructions,
+            placeholder=username_placeholder,
             restrictions={
                 "min_length": accounts.USERNAME_MIN_LENGTH,
                 "max_length": accounts.USERNAME_MAX_LENGTH,
@@ -470,7 +490,8 @@ class RegistrationFormFactory(object):
             field_type="password",
             instructions=password_validators_instruction_texts(),
             restrictions=password_validators_restrictions(),
-            required=required
+            required=required,
+            placeholder='Password'
         )
 
     def _add_level_of_education_field(self, form_desc, required=True):
@@ -765,7 +786,8 @@ class RegistrationFormFactory(object):
         form_desc.add_field(
             "first_name",
             label=first_name_label,
-            required=required
+            required=required,
+            placeholder='First Name'
         )
 
     def _add_last_name_field(self, form_desc, required=False):
@@ -782,7 +804,8 @@ class RegistrationFormFactory(object):
         form_desc.add_field(
             "last_name",
             label=last_name_label,
-            required=required
+            required=required,
+            placeholder='Last Name'
         )
 
     def _add_country_field(self, form_desc, required=True):
@@ -828,73 +851,48 @@ class RegistrationFormFactory(object):
 
     def _add_honor_code_field(self, form_desc, required=True):
         """Add an honor code field to a form description.
+
         Arguments:
             form_desc: A form description
+
         Keyword Arguments:
             required (bool): Whether this field is required; defaults to True
-        """
 
-        separate_honor_and_tos = self._is_field_visible("terms_of_service")
+        """
         # Separate terms of service and honor code checkboxes
-        if separate_honor_and_tos:
+        if self._is_field_visible("terms_of_service"):
             terms_label = _(u"Honor Code")
             terms_link = marketing_link("HONOR")
+            terms_text = _(u"Review the Honor Code")
 
         # Combine terms of service and honor code checkboxes
         else:
             # Translators: This is a legal document users must agree to
             # in order to register a new account.
             terms_label = _(u"Terms of Service and Honor Code")
-            terms_link = marketing_link("HONOR")
+            terms_link = "https://philanthropyu.org/terms-of-use/"
+            terms_text = _(u"Terms of Use")
 
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
-        label = Text(_(
-            u"I agree to the {platform_name} {terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
-        )).format(
-            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
-            terms_of_service=terms_label,
-            terms_of_service_link_start=HTML("<a href='{terms_link}' target='_blank'>").format(terms_link=terms_link),
-            terms_of_service_link_end=HTML("</a>"),
-        )
+        label = _(u"Check here if you agree to be bound by, and to comply with, our ")
 
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
-        error_msg = _(u"You must agree to the {platform_name} {terms_of_service}").format(
-            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
-            terms_of_service=terms_label
-        )
-        field_type = 'checkbox'
-
-        if not separate_honor_and_tos:
-            current_request = crum.get_current_request()
-
-            field_type = 'plaintext'
-
-            pp_link = marketing_link("PRIVACY")
-            label = Text(_(
-                u"By creating an account with {platform_name}, you agree \
-                  to abide by our {platform_name} \
-                  {terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end} \
-                  and agree to our {privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
-            )).format(
-                platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
-                terms_of_service=terms_label,
-                terms_of_service_link_start=HTML("<a href='{terms_url}' target='_blank'>").format(terms_url=terms_link),
-                terms_of_service_link_end=HTML("</a>"),
-                privacy_policy_link_start=HTML("<a href='{pp_url}' target='_blank'>").format(pp_url=pp_link),
-                privacy_policy_link_end=HTML("</a>"),
-            )
+        error_msg = "Please accept our Terms and Conditions by checking the Terms and Conditions" \
+                    " checkbox before creating an account."
 
         form_desc.add_field(
             "honor_code",
             label=label,
-            field_type=field_type,
+            field_type="checkbox",
             default=False,
             required=required,
             error_messages={
                 "required": error_msg
             },
+            supplementalLink=terms_link,
+            supplementalText=terms_text
         )
 
     def _add_terms_of_service_field(self, form_desc, required=True):
@@ -908,6 +906,7 @@ class RegistrationFormFactory(object):
         # in order to register a new account.
         terms_label = _(u"Terms of Service")
         terms_link = marketing_link("TOS")
+        terms_text = _(u"Click here to read the Terms and Conditions.")
 
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
@@ -934,6 +933,8 @@ class RegistrationFormFactory(object):
             error_messages={
                 "required": error_msg
             },
+            supplementalLink=terms_link,
+            supplementalText=terms_text
         )
 
     def _apply_third_party_auth_overrides(self, request, form_desc):
