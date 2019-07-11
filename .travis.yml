@@ -2,6 +2,14 @@ language: python
 python:
   - "2.7"
 
+node_js: 6
+
+cache:
+  directories:
+    - $HOME/edxapp_toxenv/
+  pip: true
+  npm: true
+
 before_install:
   - sudo rm -f /etc/boto.cfg
   - travis_retry sudo apt-get update

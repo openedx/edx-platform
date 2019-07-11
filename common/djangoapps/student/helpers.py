@@ -15,15 +15,19 @@ from django.core.validators import ValidationError
 from django.contrib.auth import load_backend
 from django.contrib.auth.models import User
 from django.db import IntegrityError, transaction
+from django.db.models import Subquery
 from django.utils import http
 from django.utils.translation import ugettext as _
 from oauth2_provider.models import AccessToken as dot_access_token
 from oauth2_provider.models import RefreshToken as dot_refresh_token
+from provider.constants import CONFIDENTIAL
 from provider.oauth2.models import AccessToken as dop_access_token
+from provider.oauth2.models import Client
 from provider.oauth2.models import RefreshToken as dop_refresh_token
 from pytz import UTC
 from six import iteritems, text_type
 import third_party_auth
+from edx_oauth2_provider.models import TrustedClient
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import (
     get_certificate_url,
@@ -376,8 +380,22 @@ def destroy_oauth_tokens(user):
     """
     Destroys ALL OAuth access and refresh tokens for the given user.
     """
-    dop_access_token.objects.filter(user=user.id).delete()
-    dop_refresh_token.objects.filter(user=user.id).delete()
+    dop_access_query = dop_access_token.objects.filter(user=user.id)
+    dop_refresh_query = dop_refresh_token.objects.filter(user=user.id)
+
+    if not settings.FEATURES.get('KEEP_TRUSTED_CONFIDENTIAL_CLIENT_TOKENS', True):
+        # Appsembler: Avoid deleting the trusted confidential clients such as the Appsembler Management Console
+        trusted_clients = Client.objects.filter(
+            client_type=CONFIDENTIAL,
+            pk__in=Subquery(TrustedClient.objects.all().values('id')),
+        )
+
+        dop_access_query = dop_access_query.exclude(client__in=trusted_clients)
+        dop_refresh_query = dop_refresh_query.exclude(client__in=trusted_clients)
+
+    dop_access_query.delete()
+    dop_refresh_query.delete()
+
     dot_access_token.objects.filter(user=user.id).delete()
     dot_refresh_token.objects.filter(user=user.id).delete()
 
