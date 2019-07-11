@@ -2,14 +2,16 @@
 """
 Basic unit tests for LibraryRoot
 """
-from mock import patch
+from __future__ import absolute_import
 
+from mock import patch
+from six.moves import range
 from web_fragments.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
-from xmodule.x_module import AUTHOR_VIEW
 
-from xmodule.modulestore.tests.factories import LibraryFactory, ItemFactory
+from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
+from xmodule.x_module import AUTHOR_VIEW
 
 dummy_render = lambda block, _: Fragment(block.data)  # pylint: disable=invalid-name
 
