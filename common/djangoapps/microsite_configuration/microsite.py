@@ -6,6 +6,8 @@ A microsite enables the following features:
 2) Present a landing page with a listing of courses that are specific to the 'brand'
 3) Ability to swap out some branding elements in the website
 """
+from __future__ import absolute_import
+
 import inspect
 from importlib import import_module
 

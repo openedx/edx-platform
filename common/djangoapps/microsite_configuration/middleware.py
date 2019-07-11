@@ -7,6 +7,8 @@ A microsite enables the following features:
 3) Ability to swap out some branding elements in the website
 """
 
+from __future__ import absolute_import
+
 from microsite_configuration import microsite
 
 
