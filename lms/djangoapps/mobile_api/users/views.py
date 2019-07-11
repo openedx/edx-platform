@@ -4,8 +4,6 @@ Views for user API
 
 from __future__ import absolute_import
 
-import json
-
 import six
 from django.shortcuts import redirect
 from django.utils import dateparse
