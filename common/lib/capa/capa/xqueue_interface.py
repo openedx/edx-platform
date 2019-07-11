@@ -104,8 +104,7 @@ class XQueueInterface(object):
                 log.debug("Failed to login to queue: %s", content)
                 log.info(
                     u"Login failed content information:{content} "
-                    u"Login failed error information:{error} "
-                        .format(content=content, error=error)
+                    u"Login failed error information:{error} ".format(content=content, error=error)
                 )
                 return (error, content)
             if files_to_upload is not None:
