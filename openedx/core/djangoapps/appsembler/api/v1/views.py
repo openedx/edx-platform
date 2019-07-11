@@ -25,8 +25,6 @@ from rest_framework.filters import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from opaque_keys.edx.keys import CourseKey
-
 from enrollment.serializers import CourseEnrollmentSerializer
 
 # from courseware.courses import get_course_by_id, get_course_with_access
@@ -315,35 +313,44 @@ class EnrollmentViewSet(TahoeAuthMixin, viewsets.ModelViewSet):
                 }
                 response_code = status.HTTP_400_BAD_REQUEST
             else:
-                # Do bulk enrollment
-                email_learners = serializer.data.get('email_learners')
-                identifiers = serializer.data.get('identifiers')
-                auto_enroll = serializer.data.get('auto_enroll')
-                for course_id in serializer.data.get('courses'):
-                    course_key = as_course_key(course_id)
-                    if email_learners:
-                        email_params = get_email_params(course=get_course_by_id(course_key),
-                                                        auto_enroll=auto_enroll,
-                                                        secure=request.is_secure())
-                    else:
-                        email_params = {}
-                    results = enroll_learners_in_course(
-                        course_id=course_key,
-                        identifiers=identifiers,
-                        enroll_func=partial(enroll_email,
-                                            auto_enroll=auto_enroll,
-                                            email_students=email_learners,
-                                            email_params=email_params),
-                        request_user=request.user)
+                action = serializer.data.get('action')
+                if action == 'enroll':
+                    # Do bulk enrollment
+                    email_learners = serializer.data.get('email_learners')
+                    identifiers = serializer.data.get('identifiers')
+                    auto_enroll = serializer.data.get('auto_enroll')
+                    for course_id in serializer.data.get('courses'):
+                        course_key = as_course_key(course_id)
+                        if email_learners:
+                            email_params = get_email_params(course=get_course_by_id(course_key),
+                                                            auto_enroll=auto_enroll,
+                                                            secure=request.is_secure())
+                        else:
+                            email_params = {}
+                        results = enroll_learners_in_course(course_id=course_key,
+                                                            identifiers=identifiers,
+                                                            enroll_func=partial(enroll_email,
+                                                                                auto_enroll=auto_enroll,
+                                                                                email_students=email_learners,
+                                                                                email_params=email_params),
+                                                            request_user=request.user)
 
-                response_data = {
-                    'auto_enroll': serializer.data.get('auto_enroll'),
-                    'email_learners': serializer.data.get('email_learners'),
-                    'action': serializer.data.get('action'),
-                    'courses': serializer.data.get('courses'),
-                    'results': results,
-                }
-                response_code = status.HTTP_201_CREATED
+                    response_data = {
+                        'auto_enroll': serializer.data.get('auto_enroll'),
+                        'email_learners': serializer.data.get('email_learners'),
+                        'action': serializer.data.get('action'),
+                        'courses': serializer.data.get('courses'),
+                        'results': results,
+                    }
+                    response_code = status.HTTP_201_CREATED
+                else:
+                    # Only 'enroll' is supported. Will add 'unenroll' as follow
+                    # on work
+                    response_data = {
+                        'error': 'action-not-supported',
+                        'action_not_supported': action
+                    }
+                    response_code = status.HTTP_400_BAD_REQUEST
         else:
             # Don't do bulk enrollment. Return serializer error as response body
             response_data = serializer.errors
