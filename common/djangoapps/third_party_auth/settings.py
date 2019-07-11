@@ -10,6 +10,8 @@ If true, it:
     b) calls apply_settings(), passing in the Django settings
 """
 
+from __future__ import absolute_import
+
 from openedx.features.enterprise_support.api import insert_enterprise_pipeline_elements
 
 
