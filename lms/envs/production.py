@@ -168,6 +168,7 @@ AWS_SES_REGION_ENDPOINT = ENV_TOKENS.get('AWS_SES_REGION_ENDPOINT', 'email.us-ea
 
 REGISTRATION_EXTRA_FIELDS = ENV_TOKENS.get('REGISTRATION_EXTRA_FIELDS', REGISTRATION_EXTRA_FIELDS)
 REGISTRATION_EXTENSION_FORM = ENV_TOKENS.get('REGISTRATION_EXTENSION_FORM', REGISTRATION_EXTENSION_FORM)
+REGISTRATION_EXTENSION_FORM_V2 = ENV_TOKENS.get('REGISTRATION_EXTENSION_FORM_V2', REGISTRATION_EXTENSION_FORM_V2)
 REGISTRATION_EMAIL_PATTERNS_ALLOWED = ENV_TOKENS.get('REGISTRATION_EMAIL_PATTERNS_ALLOWED')
 REGISTRATION_FIELD_ORDER = ENV_TOKENS.get('REGISTRATION_FIELD_ORDER', REGISTRATION_FIELD_ORDER)
 
@@ -178,6 +179,7 @@ EDXMKTG_LOGGED_IN_COOKIE_NAME = ENV_TOKENS.get('EDXMKTG_LOGGED_IN_COOKIE_NAME', 
 EDXMKTG_USER_INFO_COOKIE_NAME = ENV_TOKENS.get('EDXMKTG_USER_INFO_COOKIE_NAME', EDXMKTG_USER_INFO_COOKIE_NAME)
 
 LMS_ROOT_URL = ENV_TOKENS.get('LMS_ROOT_URL')
+LMS_BASE = ENV_TOKENS.get('LMS_BASE')
 LMS_INTERNAL_ROOT_URL = ENV_TOKENS.get('LMS_INTERNAL_ROOT_URL', LMS_ROOT_URL)
 
 # List of logout URIs for each IDA that the learner should be logged out of when they logout of the LMS. Only applies to
@@ -680,10 +682,10 @@ X_FRAME_OPTIONS = ENV_TOKENS.get('X_FRAME_OPTIONS', X_FRAME_OPTIONS)
 ##### Third-party auth options ################################################
 if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
     tmp_backends = ENV_TOKENS.get('THIRD_PARTY_AUTH_BACKENDS', [
-        'social_core.backends.google.GoogleOAuth2',
         'social_core.backends.linkedin.LinkedinOAuth2',
-        'social_core.backends.facebook.FacebookOAuth2',
         'social_core.backends.azuread.AzureADOAuth2',
+        'lms.djangoapps.philu_overrides.philu_third_party_auth.custom_backends.CustomFacebookOAuth',
+        'lms.djangoapps.philu_overrides.philu_third_party_auth.custom_backends.CustomGoogleOAuth',
         'third_party_auth.saml.SAMLAuthBackend',
         'third_party_auth.lti.LTIAuthBackend',
     ])
@@ -1102,6 +1104,38 @@ COURSE_ENROLLMENT_MODES = ENV_TOKENS.get('COURSE_ENROLLMENT_MODES', COURSE_ENROL
 
 ############## Settings for Writable Gradebook  #########################
 WRITABLE_GRADEBOOK_URL = ENV_TOKENS.get('WRITABLE_GRADEBOOK_URL', WRITABLE_GRADEBOOK_URL)
+
+############## Philu Specific Settings  #########################
+# Project Base URL
+LMS_BASE_URL = ENV_TOKENS.get('LMS_BASE_URL', None)
+
+# Mandrill API_KEY
+MANDRILL_API_KEY = AUTH_TOKENS.get('MANDRILL_API_KEY', None)
+MAILCHIMP_API_KEY = AUTH_TOKENS.get('MAILCHIMP_API_KEY', None)
+MAILCHIMP_LEARNERS_LIST_ID = AUTH_TOKENS.get('MAILCHIMP_LEARNERS_LIST_ID', None)
+
+# NodeBB settings
+NODEBB_MASTER_TOKEN = AUTH_TOKENS.get('NODEBB_MASTER_TOKEN', None)
+NODEBB_ENDPOINT = ENV_TOKENS.get('NODEBB_ENDPOINT', None)
+NODEBB_RETRY_DELAY = 60
+
+# SurveyGizmo settings
+SURVEY_GIZMO_TOKEN = AUTH_TOKENS.get('SURVEY_GIZMO_TOKEN', None)
+SURVEY_GIZMO_TOKEN_SECRET = AUTH_TOKENS.get('SURVEY_GIZMO_TOKEN_SECRET', None)
+	# Django channels settings
+CELERY_BROKER_HOSTNAME = ENV_TOKENS.get('CELERY_BROKER_HOSTNAME', None)
+
+# django channel/sockets settings
+# Notifications plus chats
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "asgi_redis.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(ENV_TOKENS.get('REDIS_HOST', None), ENV_TOKENS.get('REDIS_PORT', None))],
+        },
+        "ROUTING": "edx_notifications.server.socket.routing.channel_routing",
+    }
+}
 
 ############################### Plugin Settings ###############################
 
