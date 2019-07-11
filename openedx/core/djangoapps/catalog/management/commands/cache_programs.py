@@ -53,7 +53,7 @@ class Command(BaseCommand):
         courses = {}
         for site in Site.objects.all():
             site_config = getattr(site, 'configuration', None)
-            if site_config is None or not site_config.get_value('COURSE_CATALOG_API_URL'):
+            if site_config is None:
                 logger.info(u'Skipping site {domain}. No configuration.'.format(domain=site.domain))
                 cache.set(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [], None)
                 cache.set(SITE_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=site.domain), [], None)
