@@ -2,12 +2,17 @@
 Unit tests for third_party_auth SAML auth providers
 """
 
+from __future__ import absolute_import
+
 import mock
 
-from third_party_auth.tests.testutil import SAMLTestCase
 from third_party_auth.saml import EdXSAMLIdentityProvider, get_saml_idp_class
-from third_party_auth.tests.data.saml_identity_provider_mock_data import mock_conf, mock_attributes,\
-    expected_user_details
+from third_party_auth.tests.data.saml_identity_provider_mock_data import (
+    expected_user_details,
+    mock_attributes,
+    mock_conf
+)
+from third_party_auth.tests.testutil import SAMLTestCase
 
 
 class TestEdXSAMLIdentityProvider(SAMLTestCase):
