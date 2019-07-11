@@ -1,13 +1,17 @@
 """
 Course Grading Settings page.
 """
-from common.test.acceptance.pages.studio.settings import SettingsPage
-from common.test.acceptance.pages.studio.utils import press_the_notification_button
-from common.test.acceptance.pages.common.utils import click_css
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.common.keys import Keys
+from __future__ import absolute_import
+
 from bok_choy.javascript import requirejs
 from bok_choy.promise import BrokenPromise
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
+from six.moves import range
+
+from common.test.acceptance.pages.common.utils import click_css
+from common.test.acceptance.pages.studio.settings import SettingsPage
+from common.test.acceptance.pages.studio.utils import press_the_notification_button
 
 
 @requirejs('js/factories/settings_graders')
@@ -127,7 +131,7 @@ class GradingPage(SettingsPage):
         """
         weight_id = '#course-grading-assignment-gradeweight'
         f = self.q(css=weight_id).results[-1]
-        for __ in xrange(len(assignment_name)):
+        for __ in range(len(assignment_name)):
             f.send_keys(Keys.END, Keys.BACK_SPACE)
         f.send_keys(weight)
 

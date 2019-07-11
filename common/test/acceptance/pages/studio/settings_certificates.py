@@ -8,10 +8,13 @@ The methods in these classes are organized into several conceptual buckets:
     * Workflows: Complex orchestrations involving any/all of the above
 
 """
+from __future__ import absolute_import
+
 import os
 
 from bok_choy.promise import EmptyPromise
 from selenium.webdriver import ActionChains
+from six.moves import range
 
 from common.test.acceptance.pages.studio.course_page import CoursePage
 from common.test.acceptance.tests.helpers import disable_animations
@@ -86,7 +89,7 @@ class CertificatesPage(CoursePage):
         Return list of the certificates for the course.
         """
         css = self.certficate_css + ' .wrapper-collection'
-        return [CertificateSectionPage(self, self.certficate_css, index) for index in xrange(len(self.q(css=css)))]
+        return [CertificateSectionPage(self, self.certficate_css, index) for index in range(len(self.q(css=css)))]
 
     @property
     def no_certificates_message_shown(self):
@@ -314,7 +317,7 @@ class CertificateSectionPage(CertificatesPage):
         Return list of the signatories for the certificate.
         """
         css = self.selector + ' .signatory-' + self.mode
-        return [SignatorySectionPage(self, self.selector, self.mode, index) for index in xrange(len(self.q(css=css)))]
+        return [SignatorySectionPage(self, self.selector, self.mode, index) for index in range(len(self.q(css=css)))]
 
     ################
     # Wait Actions
