@@ -3,14 +3,18 @@
 """
 Certificates Tests.
 """
+from __future__ import absolute_import
+
 import itertools
 import json
 
 import ddt
 import mock
+import six
 from django.conf import settings
 from django.test.utils import override_settings
 from opaque_keys.edx.keys import AssetKey
+from six.moves import range
 
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import get_lms_link_for_certificate_web_view, reverse_course_url
@@ -80,7 +84,7 @@ class HelperMethods(object):
                 'title': 'Title ' + str(i),
                 'signature_image_path': asset_path_format.format(i),
                 'id': i
-            } for i in xrange(signatory_count)
+            } for i in range(signatory_count)
 
         ]
 
@@ -95,7 +99,7 @@ class HelperMethods(object):
                 'signatories': signatories,
                 'version': CERTIFICATE_SCHEMA_VERSION,
                 'is_active': is_active
-            } for i in xrange(count)
+            } for i in range(count)
         ]
         self.course.certificates = {'certificates': certificates}
         self.save_course()
@@ -236,7 +240,7 @@ class CertificatesListHandlerTestCase(
         self.assertEqual(content, expected)
         self.assert_event_emitted(
             'edx.certificate.configuration.created',
-            course_id=unicode(self.course.id),
+            course_id=six.text_type(self.course.id),
             configuration_id=certificate_id,
         )
 
@@ -265,7 +269,7 @@ class CertificatesListHandlerTestCase(
     @override_settings(LMS_BASE="lms_base_url")
     def test_lms_link_for_certificate_web_view(self):
         test_url = "//lms_base_url/certificates/user/" \
-                   + str(self.user.id) + "/course/" + unicode(self.course.id) + '?preview=honor'
+                   + str(self.user.id) + "/course/" + six.text_type(self.course.id) + '?preview=honor'
         link = get_lms_link_for_certificate_web_view(
             user_id=self.user.id,
             course_key=self.course.id,
@@ -471,7 +475,7 @@ class CertificatesDetailHandlerTestCase(
         self.assertEqual(content, expected)
         self.assert_event_emitted(
             'edx.certificate.configuration.created',
-            course_id=unicode(self.course.id),
+            course_id=six.text_type(self.course.id),
             configuration_id=666,
         )
 
@@ -503,7 +507,7 @@ class CertificatesDetailHandlerTestCase(
         self.assertEqual(content, expected)
         self.assert_event_emitted(
             'edx.certificate.configuration.modified',
-            course_id=unicode(self.course.id),
+            course_id=six.text_type(self.course.id),
             configuration_id=1,
         )
         self.reload_course()
@@ -568,7 +572,7 @@ class CertificatesDetailHandlerTestCase(
         self.assertEqual(response.status_code, 204)
         self.assert_event_emitted(
             'edx.certificate.configuration.deleted',
-            course_id=unicode(self.course.id),
+            course_id=six.text_type(self.course.id),
             configuration_id='1',
         )
         self.reload_course()
@@ -592,7 +596,7 @@ class CertificatesDetailHandlerTestCase(
         self.assertEqual(response.status_code, 204)
         self.assert_event_emitted(
             'edx.certificate.configuration.deleted',
-            course_id=unicode(self.course.id),
+            course_id=six.text_type(self.course.id),
             configuration_id='1',
         )
         self.reload_course()
@@ -617,7 +621,7 @@ class CertificatesDetailHandlerTestCase(
         self.assertEqual(response.status_code, 204)
         self.assert_event_emitted(
             'edx.certificate.configuration.deleted',
-            course_id=unicode(self.course.id),
+            course_id=six.text_type(self.course.id),
             configuration_id='1',
         )
         self.reload_course()
@@ -785,7 +789,7 @@ class CertificatesDetailHandlerTestCase(
             cert_event_type = 'activated' if is_active else 'deactivated'
             self.assert_event_emitted(
                 '.'.join(['edx.certificate.configuration', cert_event_type]),
-                course_id=unicode(self.course.id),
+                course_id=six.text_type(self.course.id),
             )
 
     @ddt.data(*itertools.product([True, False], [C4X_SIGNATORY_PATH, SIGNATORY_PATH]))
