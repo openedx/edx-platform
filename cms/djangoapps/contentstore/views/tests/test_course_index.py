@@ -1,6 +1,8 @@
 """
 Unit tests for getting the list of courses and the course outline.
 """
+from __future__ import absolute_import
+
 import datetime
 import json
 
@@ -8,24 +10,25 @@ import ddt
 import lxml
 import mock
 import pytz
+import six
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.test.utils import override_settings
 from django.utils.translation import ugettext as _
+from edx_django_utils.monitoring.middleware import _DEFAULT_NAMESPACE as DJANGO_UTILS_NAMESPACE
 from opaque_keys.edx.locator import CourseLocator
 from search.api import perform_search
-from edx_django_utils.monitoring.middleware import _DEFAULT_NAMESPACE as DJANGO_UTILS_NAMESPACE
 
+from contentstore.config.waffle import WAFFLE_NAMESPACE as STUDIO_WAFFLE_NAMESPACE
 from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import add_instructor, reverse_course_url, reverse_usage_url
+from contentstore.views.course import WAFFLE_NAMESPACE as COURSE_WAFFLE_NAMESPACE
 from contentstore.views.course import (
     _deprecated_blocks_info,
     course_outline_initial_state,
     reindex_course_and_check_access
 )
-from contentstore.config.waffle import WAFFLE_NAMESPACE as STUDIO_WAFFLE_NAMESPACE
-from contentstore.views.course import WAFFLE_NAMESPACE as COURSE_WAFFLE_NAMESPACE
 from contentstore.views.item import VisibilityState, create_xblock_info
 from course_action_state.managers import CourseRerunUIStateManager
 from course_action_state.models import CourseRerunState
@@ -143,7 +146,7 @@ class TestCourseIndex(CourseTestCase):
 
         # First spot check some values in the root response
         self.assertEqual(json_response['category'], 'course')
-        self.assertEqual(json_response['id'], unicode(self.course.location))
+        self.assertEqual(json_response['id'], six.text_type(self.course.location))
         self.assertEqual(json_response['display_name'], self.course.display_name)
         self.assertTrue(json_response['published'])
         self.assertIsNone(json_response['visibility_state'])
@@ -153,7 +156,7 @@ class TestCourseIndex(CourseTestCase):
         self.assertGreater(len(children), 0)
         first_child_response = children[0]
         self.assertEqual(first_child_response['category'], 'chapter')
-        self.assertEqual(first_child_response['id'], unicode(chapter.location))
+        self.assertEqual(first_child_response['id'], six.text_type(chapter.location))
         self.assertEqual(first_child_response['display_name'], 'Week 1')
         self.assertTrue(json_response['published'])
         self.assertEqual(first_child_response['visibility_state'], VisibilityState.unscheduled)
@@ -465,7 +468,7 @@ class TestCourseOutline(CourseTestCase):
 
         # First spot check some values in the root response
         self.assertEqual(json_response['category'], 'course')
-        self.assertEqual(json_response['id'], unicode(self.course.location))
+        self.assertEqual(json_response['id'], six.text_type(self.course.location))
         self.assertEqual(json_response['display_name'], self.course.display_name)
         self.assertNotEqual(json_response.get('published', False), is_concise)
         self.assertIsNone(json_response.get('visibility_state'))
@@ -475,7 +478,7 @@ class TestCourseOutline(CourseTestCase):
         self.assertGreater(len(children), 0)
         first_child_response = children[0]
         self.assertEqual(first_child_response['category'], 'chapter')
-        self.assertEqual(first_child_response['id'], unicode(self.chapter.location))
+        self.assertEqual(first_child_response['id'], six.text_type(self.chapter.location))
         self.assertEqual(first_child_response['display_name'], 'Week 1')
         self.assertNotEqual(json_response.get('published', False), is_concise)
         if not is_concise:
@@ -509,12 +512,12 @@ class TestCourseOutline(CourseTestCase):
         self.assertIsNone(course_outline_initial_state('no-such-locator', course_structure))
 
         # Verify that the correct initial state is returned for the test chapter
-        chapter_locator = unicode(self.chapter.location)
+        chapter_locator = six.text_type(self.chapter.location)
         initial_state = course_outline_initial_state(chapter_locator, course_structure)
         self.assertEqual(initial_state['locator_to_show'], chapter_locator)
         expanded_locators = initial_state['expanded_locators']
-        self.assertIn(unicode(self.sequential.location), expanded_locators)
-        self.assertIn(unicode(self.vertical.location), expanded_locators)
+        self.assertIn(six.text_type(self.sequential.location), expanded_locators)
+        self.assertIn(six.text_type(self.vertical.location), expanded_locators)
 
     def _create_test_data(self, course_module, create_blocks=False, publish=True, block_types=None):
         """
@@ -703,7 +706,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=unicode(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
         # Start manual reindex
@@ -715,7 +718,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=unicode(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
     @mock.patch('xmodule.video_module.VideoBlock.index_dictionary')
@@ -729,7 +732,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=unicode(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
         # set mocked exception response
@@ -751,7 +754,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=unicode(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
         # set mocked exception response
@@ -773,7 +776,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=unicode(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
         # set mocked exception response
@@ -813,7 +816,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=unicode(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
         # Start manual reindex
@@ -825,7 +828,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=unicode(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
     @mock.patch('xmodule.video_module.VideoBlock.index_dictionary')
@@ -839,7 +842,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=unicode(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
         # set mocked exception response
@@ -861,7 +864,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=unicode(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
         # set mocked exception response
@@ -883,7 +886,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=unicode(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
         # set mocked exception response

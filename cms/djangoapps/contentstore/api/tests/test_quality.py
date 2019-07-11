@@ -1,6 +1,8 @@
 """
 Tests for the course import API views
 """
+from __future__ import absolute_import
+
 from rest_framework import status
 
 from .base import BaseCourseViewTest

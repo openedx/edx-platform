@@ -1,0 +1,25 @@
+<section class="discussion inline-discussion" data-discussion-id="<%- discussionId %>">
+    <div class="add_post_btn_container <%if (read_only) {%>is-hidden<%} %>">
+        <button class="btn-link new-post-btn"><%- gettext("Add a Post") %></button>
+    </div>
+
+    <article class="new-post-article is-hidden"></article>
+
+    <div class="inline-discussion-thread-container">
+        <section class="inline-threads" data-discussion-id="<%- discussionId %>">
+        </section>
+
+        <div class="inline-thread">
+            <div class="forum-nav-bar">
+                <button class="btn-link all-posts-btn">
+                    <span class="icon fa fa-chevron-prev" aria-hidden="true"></span>
+                    <span aria-hidden="true"><%- gettext('All Posts') %></span>
+                    <span class="sr-only"><%- gettext('Return to all posts') %></span>
+                </button>
+            </div>
+            <div class="forum-content">
+            </div>
+        </div>
+    </div>
+</section>
+

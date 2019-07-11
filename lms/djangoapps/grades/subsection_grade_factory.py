@@ -1,7 +1,14 @@
+"""
+SubsectionGrade Factory Class
+"""
+
+from __future__ import absolute_import
+
 from collections import OrderedDict
 from logging import getLogger
 
 from lazy import lazy
+from submissions import api as submissions_api
 
 from courseware.model_data import ScoresClient
 from lms.djangoapps.grades.config import assume_zero_if_absent, should_persist_grades
@@ -9,7 +16,6 @@ from lms.djangoapps.grades.models import PersistentSubsectionGrade
 from lms.djangoapps.grades.scores import possibly_scored
 from openedx.core.lib.grade_utils import is_score_higher_or_equal
 from student.models import anonymous_id_for_user
-from submissions import api as submissions_api
 
 from .course_data import CourseData
 from .subsection_grade import CreateSubsectionGrade, ReadSubsectionGrade, ZeroSubsectionGrade
@@ -59,7 +65,7 @@ class SubsectionGradeFactory(object):
         Bulk creates all the unsaved subsection_grades to this point.
         """
         CreateSubsectionGrade.bulk_create_models(
-            self.student, self._unsaved_subsection_grades.values(), self.course_data.course_key
+            self.student, list(self._unsaved_subsection_grades.values()), self.course_data.course_key
         )
         self._unsaved_subsection_grades.clear()
 

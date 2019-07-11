@@ -2,9 +2,11 @@
 User Authentication Configuration
 """
 
+from __future__ import absolute_import
+
 from django.apps import AppConfig
 
-from openedx.core.djangoapps.plugins.constants import ProjectType, PluginURLs
+from openedx.core.djangoapps.plugins.constants import PluginURLs, ProjectType
 
 
 class UserAuthnConfig(AppConfig):

@@ -8,9 +8,8 @@ import random
 
 from eventtracking import tracker
 
+import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from xmodule.partitions.partitions import NoSuchUserPartitionGroupError, UserPartitionError
-
-from .course_tag import api as course_tag_api
 
 log = logging.getLogger(__name__)
 
