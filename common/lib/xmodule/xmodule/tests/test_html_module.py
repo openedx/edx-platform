@@ -1,17 +1,18 @@
+from __future__ import absolute_import
+
 import unittest
-from mock import Mock
+
 import ddt
-
 from django.test.utils import override_settings
-
+from mock import Mock
 from opaque_keys.edx.locator import CourseLocator
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from xmodule.html_module import CourseInfoModule, HtmlDescriptor, HtmlModule
 
-from . import get_test_descriptor_system, get_test_system
 from ..x_module import PUBLIC_VIEW, STUDENT_VIEW
+from . import get_test_descriptor_system, get_test_system
 
 
 def instantiate_descriptor(**field_data):

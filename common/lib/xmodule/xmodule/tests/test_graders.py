@@ -2,17 +2,18 @@
 Grading tests
 """
 
+from __future__ import absolute_import
+
 import unittest
 from datetime import datetime, timedelta
 
 import ddt
 from pytz import UTC
-from lms.djangoapps.grades.scores import compute_percent
 from six import text_type
+
+from lms.djangoapps.grades.scores import compute_percent
 from xmodule import graders
-from xmodule.graders import (
-    AggregatedScore, ProblemScore, ShowCorrectness, aggregate_scores
-)
+from xmodule.graders import AggregatedScore, ProblemScore, ShowCorrectness, aggregate_scores
 
 
 class GradesheetTest(unittest.TestCase):
