@@ -74,6 +74,7 @@
                 this.$form = $container.find('form');
                 this.$formFeedback = $container.find('.js-form-feedback');
                 this.$submitButton = $container.find(this.submitButton);
+                this.$createPasswordMessage = $container.find('.create-password-message');
             },
 
             buildForm: function(data) {
@@ -173,11 +174,9 @@
                         if (validation.isValid) {
                             obj[key] = $el.attr('type') === 'checkbox' ? $el.is(':checked') : $el.val();
                             $el.removeClass('error');
-                            $label.removeClass('error');
                         } else {
                             errors.push(validation.message);
                             $el.addClass('error');
-                            $label.addClass('error');
                         }
                     }
                 }
@@ -204,6 +203,9 @@
              * our calls to renderFormFeedback are for rendering error messages.
              */
             renderErrors: function(title, errorMessages) {
+                // Remove loader icon from button
+                $('.ladda-button').removeClass('has-spinner');
+
                 this.clearFormErrors();
                 this.renderFormFeedback(this.formErrorsTpl, {
                     jsHook: this.formErrorsJsHook,
@@ -215,6 +217,13 @@
             renderFormFeedback: function(template, context) {
                 var tpl = HtmlUtils.template(template);
                 HtmlUtils.prepend(this.$formFeedback, tpl(context));
+
+                if (this.$createPasswordMessage){
+                    if (context.jsHook === 'js-auth-warning'){
+                        HtmlUtils.append(this.$createPasswordMessage, context.createPasswordMessage);
+                        this.$createPasswordMessage.removeClass('hidden');
+                    }
+                }
             },
 
             /* Allows extended views to add non-form attributes
@@ -237,6 +246,8 @@
                     data = this.setExtraData(data);
                     this.model.set(data);
                     this.model.save();
+                    trackEvent(GTM_EVENT_CATEGORY.registration, GTM_EVENT_ACTION.registrationPage0,
+                        GTM_EVENT_LABEL.registrationPage0);
                     this.clearFormErrors();
                 } else {
                     this.renderErrors(this.defaultFormErrorsTitle, this.errors);
