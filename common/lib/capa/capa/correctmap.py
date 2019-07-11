@@ -1,4 +1,4 @@
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # class used to store graded responses to CAPA questions
 #
 # Used by responsetypes and capa_problem
@@ -22,6 +22,7 @@ class CorrectMap(object):
 
     Behaves as a dict.
     """
+
     def __init__(self, *args, **kwargs):
         # start with empty dict
         self.cmap = dict()
@@ -46,7 +47,7 @@ class CorrectMap(object):
         hint='',
         hintmode=None,
         queuestate=None,
-        answervariable=None,    # pylint: disable=C0330
+        answervariable=None,  # pylint: disable=C0330
         **kwargs
     ):
 
@@ -95,7 +96,7 @@ class CorrectMap(object):
             return
 
         # create new dict entries
-        if not isinstance(correct_map.values()[0], dict):
+        if not isinstance(list(correct_map.values())[0], dict):
             # special migration
             for k in correct_map:
                 self.set(k, correctness=correct_map[k])
