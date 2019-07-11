@@ -86,7 +86,9 @@ pipeline {
                     }
                     steps {
                         script {
-                            runPythonTests()
+                            sendSplunkConsoleLog {
+                                runPythonTests()
+                            }
                         }
                     }
                     post {
