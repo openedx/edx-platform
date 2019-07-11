@@ -18,6 +18,8 @@ from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, reverse
 from mock import patch
+from six.moves import range
+
 from openedx.core.djangoapps.password_policy.compliance import (
     NonCompliantPasswordException,
     NonCompliantPasswordWarning
@@ -26,7 +28,6 @@ from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRI
 from openedx.core.djangoapps.user_authn.cookies import jwt_cookies
 from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from six.moves import range
 from student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
 
 
