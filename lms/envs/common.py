@@ -2583,27 +2583,7 @@ LOGIN_REDIRECT_WHITELIST = [CMS_BASE]
 
 REGISTRATION_EXTRA_FIELDS = {}
 
-REGISTRATION_FIELD_ORDER = [
-    "name",
-    "first_name",
-    "last_name",
-    "username",
-    "email",
-    "confirm_email",
-    "password",
-    "city",
-    "state",
-    "country",
-    "gender",
-    "year_of_birth",
-    "level_of_education",
-    "company",
-    "title",
-    "mailing_address",
-    "goals",
-    "honor_code",
-    "terms_of_service",
-]
+REGISTRATION_FIELD_ORDER = []
 
 # Optional setting to restrict registration / account creation to only emails
 # that match a regex in this list. Set to None to allow any email (default).
