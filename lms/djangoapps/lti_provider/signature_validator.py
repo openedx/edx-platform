@@ -2,6 +2,9 @@
 Subclass of oauthlib's RequestValidator that checks an OAuth signature.
 """
 
+from __future__ import absolute_import
+
+import six
 from oauthlib.oauth1 import RequestValidator, SignatureOnlyEndpoint
 
 
@@ -97,7 +100,7 @@ class SignatureValidator(RequestValidator):
         :return: True if the signature matches, False if it does not.
         """
 
-        method = unicode(request.method)
+        method = six.text_type(request.method)
         url = request.build_absolute_uri()
         body = request.body
 

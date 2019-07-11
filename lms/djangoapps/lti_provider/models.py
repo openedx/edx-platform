@@ -8,6 +8,8 @@ changes. To do that,
 1. Go to the edx-platform dir
 2. ./manage.py lms schemamigration lti_provider --auto "description" --settings=devstack
 """
+from __future__ import absolute_import
+
 import logging
 
 from django.contrib.auth.models import User
