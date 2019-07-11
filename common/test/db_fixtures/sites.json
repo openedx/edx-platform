@@ -19,7 +19,7 @@
   },
   {
     "pk": 1,
-    "model": "site_configuration.SiteConfiguration",
+    "model": "site_configuration.siteconfiguration",
     "fields": {
       "site": 2,
       "enabled": true,
