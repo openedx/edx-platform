@@ -1,11 +1,16 @@
 """
 Command to back-populate domain of the site the user account was created on.
 """
+from __future__ import absolute_import
+
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand, CommandError
 
-from student.models import UserAttribute, Registration
+from student.models import Registration, UserAttribute
+import six
+
+
 CREATED_ON_SITE = 'created_on_site'
 
 
@@ -51,7 +56,8 @@ class Command(BaseCommand):
         except Site.DoesNotExist:
             question = "The site you specified is not configured as a Site in the system. " \
                        "Are you sure you want to continue? (y/n):"
-            if str(raw_input(question)).lower().strip()[0] != 'y':
+
+            if str(six.moves.input(question)).lower().strip()[0] != 'y':
                 return
 
         for user_id in user_ids:
