@@ -4,7 +4,8 @@
 """
 Check code quality using pycodestyle, pylint, and diff_quality.
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+
 import io
 import json
 import os
@@ -535,7 +536,7 @@ def run_xsslint(options):
     error_message = ""
 
     # Test total violations against threshold.
-    if 'total' in violation_thresholds.keys():
+    if 'total' in list(violation_thresholds.keys()):
         if violation_thresholds['total'] < xsslint_counts['total']:
             error_message = u"Too many violations total ({count}).\nThe limit is {violations_limit}.".format(
                 count=xsslint_counts['total'], violations_limit=violation_thresholds['total']
