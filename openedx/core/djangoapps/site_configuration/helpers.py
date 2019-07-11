@@ -21,7 +21,7 @@ def get_current_site_configuration():
 
     # Import is placed here to avoid model import at project startup.
     from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-    default = SiteConfiguration(site=site, enabled=True, values={})
+    default = SiteConfiguration(site=site, enabled=True)
     try:
         return getattr(site, "configuration", default)
     except SiteConfiguration.DoesNotExist:

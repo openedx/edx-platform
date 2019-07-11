@@ -16,5 +16,14 @@
       "domain": "localhost:8031",
       "name": "cms"
     }
+  },
+  {
+    "pk": 1,
+    "model": "site_configuration.SiteConfiguration",
+    "fields": {
+      "site": 2,
+      "enabled": true,
+      "values": "{\"COURSE_CATALOG_API\": \"https://catalog.example.com/api/v1\"}"
+    }
   }
 ]
