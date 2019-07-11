@@ -723,7 +723,9 @@ def _validate_email(email):
     except (UnicodeError, errors.AccountDataBadType, errors.AccountDataBadLength) as invalid_email_err:
         raise errors.AccountEmailInvalid(text_type(invalid_email_err))
     except ValidationError as validation_err:
-        raise errors.AccountEmailInvalid(validation_err.message)
+        raise errors.AccountEmailInvalid(
+            "The email you entered is not valid. Please provide a valid email in order to create an account."
+        )
 
 
 def _validate_confirm_email(confirm_email, email):

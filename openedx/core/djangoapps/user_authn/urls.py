@@ -19,10 +19,15 @@ urlpatterns = [
 if settings.FEATURES.get('ENABLE_COMBINED_LOGIN_REGISTRATION'):
     # Backwards compatibility with old URL structure, but serve the new views
     urlpatterns += [
-        url(r'^login$', login_form.login_and_registration_form,
-            {'initial_mode': 'login'}, name='signin_user'),
-        url(r'^register$', login_form.login_and_registration_form,
-            {'initial_mode': 'register'}, name='register_user'),
+        url(r'^login$', 'philu_overrides.views.login_and_registration_form',
+            {'initial_mode': 'login'}, name="signin_user"),
+        url(r'^register$', 'philu_overrides.views.login_and_registration_form',
+            {'initial_mode': 'register'}, name="register_user"),
+        url(r'^signup', 'openedx.features.student_account.views.login_and_registration_form',
+            {'initial_mode': 'register'}, name="register_user"),
+        url(r'^register/(?P<org_name>[^/]*)/(?P<admin_email>[^/]*)/$',
+            'philu_overrides.views.login_and_registration_form',
+            {'initial_mode': 'register'}, name="register_user"),
     ]
 else:
     # Serve the old views
