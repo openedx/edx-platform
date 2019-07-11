@@ -188,6 +188,10 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
         generate_pdf=generate_pdf,
         forced_grade=forced_grade
     )
+
+    message = u'Queued Certificate Generation task for {user} : {course}'
+    log.info(message.format(user=student.id, course=course_key))
+
     # If cert_status is not present in certificate valid_statuses (for example unverified) then
     # add_cert returns None and raises AttributeError while accesing cert attributes.
     if cert is None:
