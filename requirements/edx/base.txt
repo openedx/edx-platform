@@ -105,7 +105,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==1.0.5
 edx-drf-extensions==2.3.1
-edx-enterprise==1.6.19
+edx-enterprise==1.6.20
 edx-i18n-tools==0.4.8
 edx-milestones==0.2.3
 edx-oauth2-provider==1.2.2
