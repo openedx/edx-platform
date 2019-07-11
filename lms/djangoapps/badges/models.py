@@ -1,8 +1,11 @@
 """
 Database models for the badges app
 """
+from __future__ import absolute_import
+
 from importlib import import_module
 
+import six
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -310,12 +313,12 @@ class CourseEventBadgesConfiguration(ConfigurationModel):
             try:
                 self.completed_settings
             except (ValueError, InvalidKeyError):
-                errors['courses_completed'] = [unicode(error_message)]
+                errors['courses_completed'] = [six.text_type(error_message)]
         if 'courses_enrolled' not in exclude:
             try:
                 self.enrolled_settings
             except (ValueError, InvalidKeyError):
-                errors['courses_enrolled'] = [unicode(error_message)]
+                errors['courses_enrolled'] = [six.text_type(error_message)]
         if 'course_groups' not in exclude:
             store = modulestore()
             try:
@@ -324,7 +327,7 @@ class CourseEventBadgesConfiguration(ConfigurationModel):
                         if not store.get_course(course_key):
                             ValueError(u"The course {course_key} does not exist.".format(course_key=course_key))
             except (ValueError, InvalidKeyError):
-                errors['course_groups'] = [unicode(error_message)]
+                errors['course_groups'] = [six.text_type(error_message)]
         if errors:
             raise ValidationError(errors)
 
