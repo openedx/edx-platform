@@ -19,8 +19,7 @@ from lms.djangoapps.verify_student.models import (
     SoftwareSecurePhotoVerification,
     SSOVerification,
     ManualVerification,
-    VerificationDeadline,
-    VerificationException
+    VerificationException,
 )
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
@@ -438,47 +437,3 @@ class ManualVerificationTest(TestVerification):
         user = UserFactory.create()
         verification = ManualVerification.objects.create(user=user)
         self.verification_active_at_datetime(verification)
-
-
-class VerificationDeadlineTest(CacheIsolationTestCase):
-    """
-    Tests for the VerificationDeadline model.
-    """
-
-    ENABLED_CACHES = ['default']
-
-    def test_caching(self):
-        deadlines = {
-            CourseKey.from_string("edX/DemoX/Fall"): now(),
-            CourseKey.from_string("edX/DemoX/Spring"): now() + timedelta(days=1)
-        }
-        course_keys = deadlines.keys()
-
-        # Initially, no deadlines are set
-        with self.assertNumQueries(1):
-            all_deadlines = VerificationDeadline.deadlines_for_courses(course_keys)
-            self.assertEqual(all_deadlines, {})
-
-        # Create the deadlines
-        for course_key, deadline in deadlines.iteritems():
-            VerificationDeadline.objects.create(
-                course_key=course_key,
-                deadline=deadline,
-            )
-
-        # Warm the cache
-        with self.assertNumQueries(1):
-            VerificationDeadline.deadlines_for_courses(course_keys)
-
-        # Load the deadlines from the cache
-        with self.assertNumQueries(0):
-            all_deadlines = VerificationDeadline.deadlines_for_courses(course_keys)
-            self.assertEqual(all_deadlines, deadlines)
-
-        # Delete the deadlines
-        VerificationDeadline.objects.all().delete()
-
-        # Verify that the deadlines are updated correctly
-        with self.assertNumQueries(1):
-            all_deadlines = VerificationDeadline.deadlines_for_courses(course_keys)
-            self.assertEqual(all_deadlines, {})
