@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
 import json
 from io import BytesIO
 
 import ddt
+import six
 from django.test.testcases import TestCase
 from django.urls import reverse
 from edxval import api
@@ -241,7 +244,7 @@ class TranscriptDownloadTest(CourseTestCase):
         # Assert the actual response
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, expected_content)
-        for attribute, value in expected_headers.iteritems():
+        for attribute, value in six.iteritems(expected_headers):
             self.assertEqual(response.get(attribute), value)
 
     @ddt.data(
