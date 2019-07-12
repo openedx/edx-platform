@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-07-08 07:40+0000\n"
-"PO-Revision-Date: 2019-07-08 07:40:20.407890\n"
+"POT-Creation-Date: 2019-07-12 22:14+0000\n"
+"PO-Revision-Date: 2019-07-12 22:14:37.224405\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -13598,8 +13598,6 @@ msgid "You do not have access to this dependency module."
 msgstr "غخع يخ رخف اشدث شذذثسس فخ فاهس يثحثريثرذغ وخيعمث."
 
 #: lms/templates/course.html
-#: openedx/features/journals/templates/journals/bundle_card.html
-#: openedx/features/journals/templates/journals/journal_card.html
 msgid "LEARN MORE"
 msgstr "مثشقر وخقث"
 
@@ -14349,15 +14347,13 @@ msgstr "سهلر عح صهفا {provider_name}"
 msgid "Create your own {platform_name} account below"
 msgstr "ذقثشفث غخعق خصر {platform_name} شذذخعرف زثمخص"
 
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
+#: lms/templates/register-form.html lms/templates/register-shib.html
 msgid ""
-"Required fields are noted by <strong class=\"indicator\">bold text and an "
-"asterisk (*)</strong>."
+"Required fields are noted by {strong_start}bold text and an asterisk "
+"(*){strong_end}."
 msgstr ""
-"قثضعهقثي بهثميس شقث رخفثي زغ <strong class=\"indicator\">زخمي فثطف شري شر "
-"شسفثقهسن (*)</strong>."
+"قثضعهقثي بهثميس شقث رخفثي زغ {strong_start}زخمي فثطف شري شر شسفثقهسن "
+"(*){strong_end}."
 
 #. Translators: selected_provider is the name of an external, third-party user
 #. authentication service (like Google or LinkedIn).
@@ -14471,14 +14467,6 @@ msgstr "عحيشفث وغ {platform_name} شذذخعرف"
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Welcome {username}!  Please set your preferences below"
 msgstr "صثمذخوث {username}!  حمثشسث سثف غخعق حقثبثقثرذثس زثمخص"
-
-#: lms/templates/register-shib.html
-msgid ""
-"Required fields are noted by {strong_start}bold text and an asterisk "
-"(*){strong_end}."
-msgstr ""
-"قثضعهقثي بهثميس شقث رخفثي زغ {strong_start}زخمي فثطف شري شر شسفثقهسن "
-"(*){strong_end}."
 
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -16435,13 +16423,13 @@ msgstr "ذاثذنخعف ثققخق"
 
 #: lms/templates/commerce/checkout_error.html
 msgid ""
-"An error has occurred with your payment. <b>You have not been charged.</b> "
-"Please try to submit your payment again. If this problem persists, contact "
-"{email}."
+"An error has occurred with your payment. {b_start}You have not been "
+"charged.{b_end} Please try to submit your payment again. If this problem "
+"persists, contact {email}."
 msgstr ""
-"شر ثققخق اشس خذذعققثي صهفا غخعق حشغوثرف. <b>غخع اشدث رخف زثثر ذاشقلثي.</b> "
-"حمثشسث فقغ فخ سعزوهف غخعق حشغوثرف شلشهر. هب فاهس حقخزمثو حثقسهسفس, ذخرفشذف "
-"{email}."
+"شر ثققخق اشس خذذعققثي صهفا غخعق حشغوثرف. {b_start}غخع اشدث رخف زثثر "
+"ذاشقلثي.{b_end} حمثشسث فقغ فخ سعزوهف غخعق حشغوثرف شلشهر. هب فاهس حقخزمثو "
+"حثقسهسفس, ذخرفشذف {email}."
 
 #: lms/templates/commerce/checkout_receipt.html
 msgid "Loading Order Data..."
@@ -16704,7 +16692,6 @@ msgstr "غخع شقث ثرقخممثي هر فاهس ذخعقسث"
 #: lms/templates/courseware/course_about.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/shoppingcart/registration_code_receipt.html
-#: openedx/features/journals/templates/journals/bundle_about.html
 msgid "View Course"
 msgstr "دهثص ذخعقسث"
 
@@ -16780,12 +16767,12 @@ msgid "I just enrolled in {number} {title} through {account}: {url}"
 msgstr "ه تعسف ثرقخممثي هر {number} {title} فاقخعلا {account}: {url}"
 
 #: lms/templates/courseware/course_about_sidebar_header.html
-msgid "Take a course with {platform} online"
-msgstr "فشنث ش ذخعقسث صهفا {platform} خرمهرث"
-
-#: lms/templates/courseware/course_about_sidebar_header.html
 msgid "I just enrolled in {number} {title} through {platform} {url}"
 msgstr "ه تعسف ثرقخممثي هر {number} {title} فاقخعلا {platform} {url}"
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+msgid "Take a course with {platform} online"
+msgstr "فشنث ش ذخعقسث صهفا {platform} خرمهرث"
 
 #: lms/templates/courseware/course_about_sidebar_header.html
 #: themes/stanford-style/lms/templates/courseware/course_about_sidebar_header.html
@@ -16952,7 +16939,6 @@ msgid "Purchase the Program ("
 msgstr "حعقذاشسث فاث حقخلقشو ("
 
 #: lms/templates/courseware/program_marketing.html
-#: openedx/features/journals/templates/journals/bundle_about.html
 msgid "Original Price"
 msgstr "خقهلهرشم حقهذث"
 
@@ -16961,7 +16947,6 @@ msgid "${oldPrice}"
 msgstr "${oldPrice}"
 
 #: lms/templates/courseware/program_marketing.html
-#: openedx/features/journals/templates/journals/bundle_about.html
 msgid "Discounted Price"
 msgstr "يهسذخعرفثي حقهذث"
 
@@ -17060,7 +17045,6 @@ msgid "Courses in the {}"
 msgstr "ذخعقسثس هر فاث {}"
 
 #: lms/templates/courseware/program_marketing.html
-#: openedx/features/journals/templates/journals/bundle_about.html
 msgid "Starts on {}"
 msgstr "سفشقفس خر {}"
 
@@ -17620,10 +17604,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
 "You have completed this course and are eligible to purchase course credit. "
-"Select <strong>Get Credit</strong> to get started."
+"Select {strong_start}Get Credit{strong_end} to get started."
 msgstr ""
 "غخع اشدث ذخوحمثفثي فاهس ذخعقسث شري شقث ثمهلهزمث فخ حعقذاشسث ذخعقسث ذقثيهف. "
-"سثمثذف <strong>لثف ذقثيهف</strong> فخ لثف سفشقفثي."
+"سثمثذف {strong_start}لثف ذقثيهف{strong_end} فخ لثف سفشقفثي."
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "You are now eligible for credit from {provider}. Congratulations!"
@@ -17639,12 +17623,12 @@ msgstr "لثف ذقثيهف"
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
 "Thank you for your payment. To receive course credit, you must now request "
-"credit at the {link_to_provider_site} website. Select <b>Request Credit</b> "
-"to get started."
+"credit at the {link_to_provider_site} website. Select {start_bold}Request "
+"Credit{end_bold} to get started."
 msgstr ""
 "فاشرن غخع بخق غخعق حشغوثرف. فخ قثذثهدث ذخعقسث ذقثيهف, غخع وعسف رخص قثضعثسف "
-"ذقثيهف شف فاث {link_to_provider_site} صثزسهفث. سثمثذف <b>قثضعثسف ذقثيهف</b> "
-"فخ لثف سفشقفثي."
+"ذقثيهف شف فاث {link_to_provider_site} صثزسهفث. سثمثذف {start_bold}قثضعثسف "
+"ذقثيهف{end_bold} فخ لثف سفشقفثي."
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "Request Credit"
@@ -17668,13 +17652,13 @@ msgstr "دهثص يثفشهمس"
 #. provider.
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"<b>Congratulations!</b> {provider_name} has approved your request for course"
-" credit. To see your course credit, visit the {link_to_provider_site} "
-"website."
+"{start_bold}Congratulations!{end_bold} {provider_name} has approved your "
+"request for course credit. To see your course credit, visit the "
+"{link_to_provider_site} website."
 msgstr ""
-"<b>ذخرلقشفعمشفهخرس!</b> {provider_name} اشس شححقخدثي غخعق قثضعثسف بخق ذخعقسث"
-" ذقثيهف. فخ سثث غخعق ذخعقسث ذقثيهف, دهسهف فاث {link_to_provider_site} "
-"صثزسهفث."
+"{start_bold}ذخرلقشفعمشفهخرس!{end_bold} {provider_name} اشس شححقخدثي غخعق "
+"قثضعثسف بخق ذخعقسث ذقثيهف. فخ سثث غخعق ذخعقسث ذقثيهف, دهسهف فاث "
+"{link_to_provider_site} صثزسهفث."
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "View Credit"
@@ -18701,13 +18685,6 @@ msgstr ""
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Programs"
 msgstr "حقخلقشوس"
-
-#: lms/templates/header/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Journals"
-msgstr "تخعقرشمس"
 
 #: lms/templates/header/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
@@ -20531,10 +20508,6 @@ msgstr "ساخص فاث سفشفعس بخق فاث فشسنس فاشف غخع س
 msgid "My Courses"
 msgstr "وغ ذخعقسثس"
 
-#: lms/templates/learner_dashboard/_dashboard_navigation_journals.html
-msgid "My Journals"
-msgstr "وغ تخعقرشمس"
-
 #: lms/templates/learner_dashboard/program_details.html
 msgid "Program Details"
 msgstr "حقخلقشو يثفشهمس"
@@ -21813,77 +21786,6 @@ msgstr "مشفثسف عحيشفث"
 msgid "Search Results"
 msgstr "سثشقذا قثسعمفس"
 
-#: openedx/features/journals/templates/journals/bundle_about.html
-msgid "Purchase the Bundle ("
-msgstr "حعقذاشسث فاث زعريمث ("
-
-#: openedx/features/journals/templates/journals/bundle_about.html
-msgid "Courses included"
-msgstr "ذخعقسثس هرذمعيثي"
-
-#: openedx/features/journals/templates/journals/bundle_about.html
-msgid "Journals included"
-msgstr "تخعقرشمس هرذمعيثي"
-
-#: openedx/features/journals/templates/journals/bundle_about.html
-msgid "{access_length} Day Access"
-msgstr "{access_length} يشغ شذذثسس"
-
-#: openedx/features/journals/templates/journals/bundle_about.html
-#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
-msgid "View Journal"
-msgstr "دهثص تخعقرشم"
-
-#: openedx/features/journals/templates/journals/bundle_card.html
-msgid "Bundle"
-msgstr "زعريمث"
-
-#: openedx/features/journals/templates/journals/journal_card.html
-msgid "Journal"
-msgstr "تخعقرشم"
-
-#: openedx/features/journals/templates/journals/journal_card.html
-msgid "{num_months} month"
-msgid_plural "{num_months} months"
-msgstr[0] "{num_months} وخرفا"
-msgstr[1] "{num_months} وخرفاس"
-
-#: openedx/features/journals/templates/journals/journal_card.html
-msgid "unlimited"
-msgstr "عرمهوهفثي"
-
-#: openedx/features/journals/templates/journals/journal_card.html
-msgid "Access Length"
-msgstr "شذذثسس مثرلفا"
-
-#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
-msgid "Journal Dashboard"
-msgstr "تخعقرشم يشسازخشقي"
-
-#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
-msgid "{journal_title} Cover Image"
-msgstr "{journal_title} ذخدثق هوشلث"
-
-#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
-msgid "Access Expired: {date}"
-msgstr "شذذثسس ثطحهقثي: {date}"
-
-#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
-msgid "Access Expires: {date}"
-msgstr "شذذثسس ثطحهقثس: {date}"
-
-#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
-msgid "Renew Access"
-msgstr "قثرثص شذذثسس"
-
-#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
-msgid "You have not purchased access to any journals yet."
-msgstr "غخع اشدث رخف حعقذاشسثي شذذثسس فخ شرغ تخعقرشمس غثف."
-
-#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
-msgid "Explore journals and courses"
-msgstr "ثطحمخقث تخعقرشمس شري ذخعقسثس"
-
 #. Translators: this section lists all the third-party authentication
 #. providers
 #. (for example, Google and LinkedIn) the user can link with or unlink from
@@ -22115,6 +22017,15 @@ msgstr "ذخحغقهلاف {year}. شمم قهلافس قثسثقدثي."
 #: themes/stanford-style/lms/templates/index.html
 msgid "For anyone, anywhere, anytime"
 msgstr "بخق شرغخرث, شرغصاثقث, شرغفهوث"
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid ""
+"Required fields are noted by <strong class=\"indicator\">bold text and an "
+"asterisk (*)</strong>."
+msgstr ""
+"قثضعهقثي بهثميس شقث رخفثي زغ <strong class=\"indicator\">زخمي فثطف شري شر "
+"شسفثقهسن (*)</strong>."
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
