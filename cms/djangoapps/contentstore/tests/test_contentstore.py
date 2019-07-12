@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import copy
 import shutil
@@ -14,6 +14,7 @@ from uuid import uuid4
 import ddt
 import lxml.html
 import mock
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.middleware.csrf import _compare_salted_tokens
@@ -27,12 +28,13 @@ from opaque_keys.edx.keys import AssetKey, CourseKey, UsageKey
 from opaque_keys.edx.locations import CourseLocator
 from path import Path as path
 from six import text_type
+from six.moves import range
 from waffle.testutils import override_switch
 
+from contentstore.config import waffle
 from contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, get_url, parse_json
 from contentstore.utils import delete_course, reverse_course_url, reverse_url
 from contentstore.views.component import ADVANCED_COMPONENT_TYPES
-from contentstore.config import waffle
 from course_action_state.managers import CourseActionStateItemNotFoundError
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from openedx.core.djangoapps.django_comment_common.utils import are_permissions_roles_seeded
@@ -1930,7 +1932,7 @@ class RerunCourseTest(ContentStoreTestCase):
             'course_key': destination_course_key,
             'should_display': True,
         }
-        for field_name, expected_value in expected_states.iteritems():
+        for field_name, expected_value in six.iteritems(expected_states):
             self.assertEquals(getattr(rerun_state, field_name), expected_value)
 
         # Verify that the creator is now enrolled in the course.

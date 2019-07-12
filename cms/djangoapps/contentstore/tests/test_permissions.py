@@ -1,9 +1,12 @@
 """
 Test CRUD for authorization.
 """
+from __future__ import absolute_import
+
 import copy
 
 from django.contrib.auth.models import User
+from six.moves import range
 
 from contentstore.tests.utils import AjaxEnabledTestClient
 from contentstore.utils import reverse_course_url, reverse_url

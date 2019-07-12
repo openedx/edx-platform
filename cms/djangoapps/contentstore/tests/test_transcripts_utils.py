@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """ Tests for transcripts_utils. """
+from __future__ import absolute_import
+
 import copy
 import json
 import tempfile
