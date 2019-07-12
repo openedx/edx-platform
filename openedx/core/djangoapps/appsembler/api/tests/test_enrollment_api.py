@@ -23,7 +23,9 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from organizations.models import UserOrganizationMapping
-from openedx.core.djangoapps.appsembler.api.sites import get_enrollments_for_site
+from openedx.core.djangoapps.appsembler.api.sites import (
+    get_enrollments_for_site,
+)
 
 from openedx.core.djangoapps.appsembler.api.tests.factories import (
     CourseOverviewFactory,
@@ -119,6 +121,44 @@ class EnrollmentApiGetTest(ModuleStoreTestCase):
 
     def test_get_single_enrollment(self):
         pass
+
+    @ddt.data(('user_id', 'id'), ('username', 'username'))
+    @ddt.unpack
+    def test_get_enrollments_for_user(self, query_param, attr_name):
+        # Set up additional test data
+        user = UserFactory()
+        UserOrganizationMappingFactory(user=self.caller,
+                                       organization=self.my_site_org,
+                                       is_amc_admin=True)
+        courses = [CourseFactory.create() for i in range(0, 3)]
+        course_overviews = []
+        course_enrollments = []
+        for course in courses:
+            OrganizationCourseFactory(organization=self.my_site_org,
+                                      course_id=str(course.id))
+            course_overview = CourseOverviewFactory(id=course.id)
+            course_enrollment = CourseEnrollmentFactory(course=course_overview,
+                                                        user=user)
+            course_overviews.append(course_overview)
+            course_enrollments.append(course_enrollment)
+
+        # Set up our request
+        url = reverse('tahoe-api:v1:enrollments-list')
+        # Need to resolve without the query parameters
+        view = resolve(url).func
+        url += '?{}={}'.format(query_param, getattr(user, attr_name))
+        request = APIRequestFactory().get(url)
+        request.META['HTTP_HOST'] = self.my_site.domain
+        force_authenticate(request, user=self.caller)
+        response = view(request)
+        response.render()
+        results = response.data['results']
+
+        expected_course_ids = [str(co.id) for co in course_overviews]
+        found_course_ids = [obj['course_details']['course_id'] for obj in results]
+        assert set(found_course_ids) == set(expected_course_ids)
+        for result in results:
+            assert result['user'] == user.username
 
     def test_invalid_enroll_data_no_learners(self):
         """

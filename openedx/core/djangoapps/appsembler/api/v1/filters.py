@@ -48,6 +48,8 @@ class CourseEnrollmentFilter(django_filters.FilterSet):
     '''
     course_id = django_filters.CharFilter(method='filter_course_id')
     is_active = django_filters.BooleanFilter(name='is_active',)
+    user_id = django_filters.CharFilter(name='user__id')
+    username = django_filters.CharFilter(name='user__username')
 
     def filter_course_id(self, queryset, name, value):
         '''
@@ -65,4 +67,4 @@ class CourseEnrollmentFilter(django_filters.FilterSet):
 
     class Meta:
         model = CourseEnrollment
-        fields = ['course_id', 'user_id', 'is_active', ]
+        fields = ['course_id', 'user_id', 'username', 'is_active', ]

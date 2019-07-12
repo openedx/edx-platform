@@ -30,6 +30,12 @@ router.register(
     'registrations',
 )
 
+router.register(
+    r'users',
+    views.UserIndexViewSet,
+    'users',
+)
+
 urlpatterns = [
     url(r'', include(router.urls, )),
 ]
