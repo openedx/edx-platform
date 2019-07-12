@@ -26,6 +26,9 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lms.envs.aws")
 import lms.startup as startup
 startup.run()
 
+from edx_notifications.load_notification_startup import start_up as notification_startup
+notification_startup()
+
 from xmodule.modulestore.django import modulestore
 
 # Trigger a forced initialization of our modulestores since this can take a

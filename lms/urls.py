@@ -52,6 +52,7 @@ from student import views as student_views
 from track import views as track_views
 from util import views as util_views
 
+
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     django_autodiscover()
     admin.site.site_header = _('LMS Administration')
@@ -63,16 +64,26 @@ if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
 # Custom error pages
 # These are used by Django to render these error codes. Do not remove.
 # pylint: disable=invalid-name
-handler404 = static_template_view_views.render_404
+handler404 = 'philu_overrides.views.render_404'
 handler500 = static_template_view_views.render_500
 
 urlpatterns = [
+    # URL for home page
+    url(r'', include('homepage.urls', namespace='homepage')),
+
+    url(r'', include('lms.djangoapps.onboarding.urls')),
+    url(r'', include('openedx.features.split_registration.urls')),
+    url(r'^oef/', include('lms.djangoapps.oef.urls')),
+    url(r'', include('edx_notifications.server.urls')),
     url(r'^$', branding_views.index, name='root'),   # Main marketing page, or redirect to courseware
 
     url(r'', include('student.urls')),
     # TODO: Move lms specific student views out of common code
     url(r'^dashboard/?$', student_views.student_dashboard, name='dashboard'),
     url(r'^change_enrollment$', student_views.change_enrollment, name='change_enrollment'),
+
+    # philu features
+    url(r'', include('openedx.features.student_certificates.urls')),
 
     # Event tracking endpoints
     url(r'', include('track.urls')),
@@ -104,6 +115,11 @@ urlpatterns = [
 
     # Course API
     url(r'^api/courses/', include('course_api.urls')),
+
+    url(r'^404$', 'philu_overrides.views.render_404'),
+    url(r'^500$', 'philu_overrides.views.render_500'),
+
+    url(r'^philu/api/', include('lms.djangoapps.philu_api.urls')),
 
     # Completion API
     url(r'^api/completion/', include('completion.api.urls', namespace='completion_api')),
@@ -140,6 +156,9 @@ urlpatterns = [
 
     # URLs for API access management
     url(r'^api-admin/', include('openedx.core.djangoapps.api_admin.urls', namespace='api_admin')),
+
+    # URL for dynamic faq page
+    url(r'^platform_faq/', include('faq.urls', namespace='faq')),
 
     url(r'^dashboard/', include('learner_dashboard.urls')),
     url(r'^api/experiments/', include('experiments.urls', namespace='api_experiments')),
@@ -285,15 +304,24 @@ urlpatterns += [
     # TODO: These views need to be updated before they work
     url(r'^calculate$', util_views.calculate),
 
-    url(r'^courses/?$', branding_views.courses, name='courses'),
+    url(r'^courses/?$', 'openedx.features.course_card.views.get_course_cards', name="courses"),
 
     #About the course
     url(
         r'^courses/{}/about$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        courseware_views.course_about,
+        'lms.djangoapps.philu_overrides.views.course_about',
         name='about_course',
+    ),
+
+    # Auto enroll course view
+    url(
+        r'^courses/{}/enroll$'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        'lms.djangoapps.philu_overrides.views.course_auto_enroll',
+        name='course_auto_enroll',
     ),
 
     url(
@@ -676,8 +704,8 @@ if settings.FEATURES.get('ENABLE_TEAMS'):
             r'^courses/{}/teams/'.format(
                 settings.COURSE_ID_PATTERN,
             ),
-            include('lms.djangoapps.teams.urls'),
-            name='teams_endpoints',
+            include('openedx.features.teams.urls'),
+            name='philu_teams_endpoints',
         ),
     ]
 
@@ -698,7 +726,7 @@ urlpatterns += [
         r'^courses/{}/generate_user_cert'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        courseware_views.generate_user_cert,
+        'philu_overrides.courseware.views.views.generate_user_cert',
         name='generate_user_cert',
     ),
 ]
@@ -715,6 +743,16 @@ if settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
                 settings.COURSE_ID_PATTERN,
             ),
             include('django_comment_client.urls')
+        ),
+        url(
+            r'^courses/{}/discussion/nodebb/'.format(
+                settings.COURSE_ID_PATTERN,
+            ),
+            include('nodebb.urls')
+        ),
+        url(
+            r'^courses/discussion/nodebb/?',
+            'nodebb.views.nodebb_embedded_topic'
         ),
         url(
             r'^notification_prefs/enable/',
