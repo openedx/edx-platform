@@ -15,7 +15,7 @@ An RSA private key can be in any of the following formats:
 * PKCS#1 RSAPrivateKey DER SEQUENCE (binary or PEM encoding)
 * PKCS#8 PrivateKeyInfo DER SEQUENCE (binary or PEM encoding)
 """
-from __future__ import division
+from __future__ import absolute_import, division
 
 import base64
 import binascii
@@ -23,7 +23,6 @@ import hmac
 import logging
 import os
 from hashlib import md5, sha256
-from six import text_type
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
@@ -33,6 +32,7 @@ from cryptography.hazmat.primitives.ciphers.algorithms import AES
 from cryptography.hazmat.primitives.ciphers.modes import CBC
 from cryptography.hazmat.primitives.hashes import SHA1
 from cryptography.hazmat.primitives.padding import PKCS7
+from six import text_type
 
 log = logging.getLogger(__name__)
 
