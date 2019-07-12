@@ -1,6 +1,11 @@
 
+from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
-from organizations.models import Organization, OrganizationCourse
+from organizations.models import (
+    Organization,
+    OrganizationCourse,
+    UserOrganizationMapping,
+)
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
@@ -67,3 +72,14 @@ def course_belongs_to_site(site, course_id):
 def get_enrollments_for_site(site):
     course_keys = get_course_keys_for_site(site)
     return CourseEnrollment.objects.filter(course_id__in=course_keys)
+
+
+def get_user_ids_for_site(site):
+    orgs = Organization.objects.filter(sites__in=[site])
+    mappings = UserOrganizationMapping.objects.filter(organization__in=orgs)
+    return mappings.values_list('user_id', flat=True)
+
+
+def get_users_for_site(site):
+    user_ids = get_user_ids_for_site(site)
+    return get_user_model().objects.filter(id__in=user_ids)
