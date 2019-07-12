@@ -1,6 +1,8 @@
 """
 General testing utilities.
 """
+from __future__ import absolute_import
+
 import functools
 import sys
 from contextlib import contextmanager
