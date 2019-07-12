@@ -420,6 +420,9 @@ class PhotoVerification(IDVerificationAttempt):
             user=self.user
         )
 
+        message = u'LEARNER_NOW_VERIFIED signal fired for {user}'
+        log.info(message.format(user=self.user.username))
+
     @status_before_must_be("must_retry", "submitted", "approved", "denied")
     def deny(self,
              error_msg,

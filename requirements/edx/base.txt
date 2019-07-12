@@ -96,7 +96,7 @@ docutils==0.14            # via botocore
 drf-yasg==1.16.0
 edx-ace==0.1.10
 edx-analytics-data-api-client==0.15.3
-edx-bulk-grades==0.1.4
+edx-bulk-grades==0.1.5
 edx-ccx-keys==0.2.2
 edx-celeryutils==0.2.7
 edx-completion==2.0.0
@@ -105,14 +105,14 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==1.0.5
 edx-drf-extensions==2.3.1
-edx-enterprise==1.6.17
+edx-enterprise==1.6.19
 edx-i18n-tools==0.4.8
 edx-milestones==0.2.3
 edx-oauth2-provider==1.2.2
 edx-opaque-keys[django]==1.0.1
 edx-organizations==2.0.3
 edx-proctoring-proctortrack==1.0.5
-edx-proctoring==2.0.4
+edx-proctoring==2.0.5
 edx-rbac==0.2.1           # via edx-enterprise
 edx-rest-api-client==1.9.2
 edx-search==1.2.2
@@ -232,7 +232,7 @@ soupsieve==1.9.2          # via beautifulsoup4
 sqlparse==0.3.0
 staff-graded-xblock==0.3
 stevedore==1.30.1
-super-csv==0.4
+super-csv==0.5.1
 sympy==1.4
 tincan==0.0.5             # via edx-enterprise
 unicodecsv==0.14.1

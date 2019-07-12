@@ -27,7 +27,6 @@ from coursewarehistoryextended.fields import UnsignedBigIntAutoField, UnsignedBi
 from lms.djangoapps.grades import events, constants
 from openedx.core.lib.cache_utils import get_cache
 from simple_history.models import HistoricalRecords
-from simple_history.utils import update_change_reason
 
 log = logging.getLogger(__name__)
 
@@ -652,6 +651,10 @@ class PersistentSubsectionGradeOverride(models.Model):
     possible_all_override = models.FloatField(null=True, blank=True)
     earned_graded_override = models.FloatField(null=True, blank=True)
     possible_graded_override = models.FloatField(null=True, blank=True)
+    # store the source of the system that caused the override
+    system = models.CharField(max_length=100, blank=True, null=True)
+    # store the reason for the override
+    override_reason = models.CharField(max_length=300, blank=True, null=True)
 
     _CACHE_NAMESPACE = u"grades.models.PersistentSubsectionGradeOverride"
 
@@ -707,11 +710,13 @@ class PersistentSubsectionGradeOverride(models.Model):
             subsection_grade_model: The PersistentSubsectionGrade object associated with this override.
             override_data: The parameters of score values used to create the override record.
         """
+        grade_defaults = cls._prepare_override_params(subsection_grade_model, override_data)
+        grade_defaults['override_reason'] = override_data['comment'] if 'comment' in override_data else None
+        grade_defaults['system'] = override_data['system'] if 'system' in override_data else None
         override, _ = PersistentSubsectionGradeOverride.objects.update_or_create(
             grade=subsection_grade_model,
-            defaults=cls._prepare_override_params(subsection_grade_model, override_data),
+            defaults=grade_defaults,
         )
-        update_change_reason(override, feature)
 
         action = action or PersistentSubsectionGradeOverrideHistory.CREATE_OR_UPDATE
 

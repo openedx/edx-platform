@@ -1,6 +1,8 @@
 """
 Decorators for Mobile APIs.
 """
+from __future__ import absolute_import
+
 import functools
 
 from django.http import Http404

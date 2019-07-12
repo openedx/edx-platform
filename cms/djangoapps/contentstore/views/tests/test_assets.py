@@ -1,11 +1,14 @@
 """
 Unit tests for the asset upload endpoint.
 """
+from __future__ import absolute_import
+
 import json
 from datetime import datetime
 from io import BytesIO
 
 import mock
+import six
 from ddt import data, ddt
 from django.conf import settings
 from django.test.utils import override_settings
@@ -301,7 +304,9 @@ class PaginationTestCase(AssetsTestCase):
                 for content_type in content_types:
                     # content_type is either not any defined type (i.e. OTHER) or is a defined type (if multiple
                     # parameters including OTHER are used)
-                    self.assertTrue(content_type in requested_file_extensions or content_type not in all_file_extensions)
+                    self.assertTrue(
+                        content_type in requested_file_extensions or content_type not in all_file_extensions
+                    )
             else:
                 for content_type in content_types:
                     self.assertIn(content_type, requested_file_extensions)
@@ -329,7 +334,7 @@ class PaginationTestCase(AssetsTestCase):
 
         for asset_response in assets_response:
             for token in text_search_tokens:
-                self.assertTrue(token.lower() in asset_response['display_name'].lower())
+                self.assertIn(token.lower(), asset_response['display_name'].lower())
 
 
 @ddt
@@ -424,10 +429,12 @@ class AssetToJsonTestCase(AssetsTestCase):
         self.assertEquals(output["display_name"], "my_file")
         self.assertEquals(output["date_added"], "Jun 01, 2013 at 10:30 UTC")
         self.assertEquals(output["url"], "/asset-v1:org+class+run+type@asset+block@my_file_name.jpg")
-        self.assertEquals(output["external_url"], "lms_base_url/asset-v1:org+class+run+type@asset+block@my_file_name.jpg")
+        self.assertEquals(
+            output["external_url"], "lms_base_url/asset-v1:org+class+run+type@asset+block@my_file_name.jpg"
+        )
         self.assertEquals(output["portable_url"], "/static/my_file_name.jpg")
         self.assertEquals(output["thumbnail"], "/asset-v1:org+class+run+type@thumbnail+block@my_file_name_thumb.jpg")
-        self.assertEquals(output["id"], unicode(location))
+        self.assertEquals(output["id"], six.text_type(location))
         self.assertEquals(output['locked'], True)
 
         output = assets._get_asset_json("name", content_type, upload_date, location, None, False)
@@ -454,7 +461,9 @@ class LockAssetTestCase(AssetsTestCase):
             content_type = 'application/txt'
             upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=UTC)
             asset_location = course.id.make_asset_key('asset', 'sample_static.html')
-            url = reverse_course_url('assets_handler', course.id, kwargs={'asset_key_string': unicode(asset_location)})
+            url = reverse_course_url(
+                'assets_handler', course.id, kwargs={'asset_key_string': six.text_type(asset_location)}
+            )
 
             resp = self.client.post(
                 url,
@@ -513,7 +522,7 @@ class DeleteAssetTestCase(AssetsTestCase):
     def test_delete_asset(self):
         """ Tests the happy path :) """
         test_url = reverse_course_url(
-            'assets_handler', self.course.id, kwargs={'asset_key_string': unicode(self.uploaded_url)})
+            'assets_handler', self.course.id, kwargs={'asset_key_string': six.text_type(self.uploaded_url)})
         resp = self.client.delete(test_url, HTTP_ACCEPT="application/json")
         self.assertEquals(resp.status_code, 204)
 
@@ -542,21 +551,23 @@ class DeleteAssetTestCase(AssetsTestCase):
             mock_asset_key.return_value = thumbnail_location
 
             test_url = reverse_course_url(
-                'assets_handler', self.course.id, kwargs={'asset_key_string': unicode(uploaded_image_url)})
+                'assets_handler', self.course.id, kwargs={'asset_key_string': six.text_type(uploaded_image_url)})
             resp = self.client.delete(test_url, HTTP_ACCEPT="application/json")
             self.assertEquals(resp.status_code, 204)
 
     def test_delete_asset_with_invalid_asset(self):
         """ Tests the sad path :( """
         test_url = reverse_course_url(
-            'assets_handler', self.course.id, kwargs={'asset_key_string': unicode("/c4x/edX/toy/asset/invalid.pdf")})
+            'assets_handler',
+            self.course.id, kwargs={'asset_key_string': six.text_type("/c4x/edX/toy/asset/invalid.pdf")}
+        )
         resp = self.client.delete(test_url, HTTP_ACCEPT="application/json")
         self.assertEquals(resp.status_code, 404)
 
     def test_delete_asset_with_invalid_thumbnail(self):
         """ Tests the sad path :( """
         test_url = reverse_course_url(
-            'assets_handler', self.course.id, kwargs={'asset_key_string': unicode(self.uploaded_url)})
+            'assets_handler', self.course.id, kwargs={'asset_key_string': six.text_type(self.uploaded_url)})
         self.content.thumbnail_location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/invalid')
         contentstore().save(self.content)
         resp = self.client.delete(test_url, HTTP_ACCEPT="application/json")

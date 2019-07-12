@@ -1,6 +1,8 @@
 """
 Acceptance tests for Studio related to the textbooks.
 """
+from __future__ import absolute_import
+
 from common.test.acceptance.pages.lms.textbook_view import TextbookViewPage
 from common.test.acceptance.pages.studio.textbook_upload import TextbookUploadPage
 from common.test.acceptance.tests.helpers import disable_animations

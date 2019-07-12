@@ -3,23 +3,26 @@ Acceptance tests for Studio related to the container page.
 The container page is used both for displaying units, and
 for displaying containers within units.
 """
+from __future__ import absolute_import
+
 import datetime
 
 import ddt
 
-from base_studio_test import ContainerBase
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
 from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
-from common.test.acceptance.pages.studio.xblock_editor import XBlockEditorView, XBlockVisibilityEditorView
 from common.test.acceptance.pages.studio.container import ContainerPage
 from common.test.acceptance.pages.studio.html_component_editor import HtmlXBlockEditorView
 from common.test.acceptance.pages.studio.move_xblock import MoveModalView
 from common.test.acceptance.pages.studio.utils import add_discussion
+from common.test.acceptance.pages.studio.xblock_editor import XBlockEditorView, XBlockVisibilityEditorView
 from common.test.acceptance.tests.helpers import create_user_partition_json
 from openedx.core.lib.tests import attr
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID, Group
+
+from .base_studio_test import ContainerBase
 
 
 class NestedVerticalTest(ContainerBase):

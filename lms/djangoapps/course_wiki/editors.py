@@ -2,6 +2,8 @@
 Support for using the CodeMirror code editor as a wiki content editor.
 """
 
+from __future__ import absolute_import
+
 from django import forms
 from django.forms.utils import flatatt
 from django.template.loader import render_to_string

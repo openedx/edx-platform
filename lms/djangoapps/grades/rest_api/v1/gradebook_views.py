@@ -333,6 +333,8 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
     **Example Request**
         GET /api/grades/v1/gradebook/{course_id}/                       - Get gradebook entries for all users in course
         GET /api/grades/v1/gradebook/{course_id}/?username={username}   - Get grades for specific user in course
+        GET /api/grades/v1/gradebook/{course_id}/?username={username}?history_record_limit={number}
+            - Get grades for specific user in course, only show {number} latest records
         GET /api/grades/v1/gradebook/{course_id}/?user_contains={user_contains}
         GET /api/grades/v1/gradebook/{course_id}/?username_contains={username_contains}
         GET /api/grades/v1/gradebook/{course_id}/?cohort_id={cohort_id}
@@ -589,7 +591,8 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
               "earned_all_override": 11,
               "possible_all_override": 11,
               "earned_graded_override": 11,
-              "possible_graded_override": 11
+              "possible_graded_override": 11,
+              "comment": "reason for override"
             }
           },
           {
@@ -599,7 +602,8 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
               "earned_all_override": 10,
               "possible_all_override": 15,
               "earned_graded_override": 9,
-              "possible_graded_override": 12
+              "possible_graded_override": 12,
+              "comment": "reason for override"
             }
           }
         ]
@@ -736,6 +740,7 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
         Helper method to create a `PersistentSubsectionGradeOverride` object
         and send a `SUBSECTION_OVERRIDE_CHANGED` signal.
         """
+        override_data['system'] = grades_constants.GradeOverrideFeatureEnum.gradebook
         override = PersistentSubsectionGradeOverride.update_or_create_override(
             requesting_user=request_user,
             subsection_grade_model=subsection_grade_model,
@@ -923,9 +928,19 @@ class SubsectionGradeView(GradeViewMixin, APIView):
 
             return Response(results.data)
 
+        limit_history_request_value = request.GET.get('history_record_limit')
+        if limit_history_request_value is not None:
+            try:
+                history_record_limit = int(limit_history_request_value)
+            except ValueError:
+                history_record_limit = 0
+
         try:
             override = original_grade.override
-            history = override.history.all()
+            if limit_history_request_value is not None:
+                history = reversed(list(override.history.all().order_by('-history_date')[:history_record_limit]))
+            else:
+                history = override.history.all().order_by('history_date')
         except PersistentSubsectionGradeOverride.DoesNotExist:
             override = None
             history = []

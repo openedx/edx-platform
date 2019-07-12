@@ -146,6 +146,9 @@ def fire_ungenerated_certificate_task(user, course_key, expected_verification_st
     traffic to workers.
     """
 
+    message = u'Entered into Ungenerated Certificate task for {user} : {course}'
+    log.info(message.format(user=user.id, course=course_key))
+
     allowed_enrollment_modes_list = [
         CourseMode.VERIFIED,
         CourseMode.CREDIT_MODE,
@@ -169,3 +172,6 @@ def fire_ungenerated_certificate_task(user, course_key, expected_verification_st
             kwargs['expected_verification_status'] = six.text_type(expected_verification_status)
         generate_certificate.apply_async(countdown=CERTIFICATE_DELAY_SECONDS, kwargs=kwargs)
         return True
+
+    message = u'Certificate Generation task failed for {user} : {course}'
+    log.info(message.format(user=user.id, course=course_key))

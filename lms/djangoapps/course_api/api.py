@@ -2,6 +2,8 @@
 Course API
 """
 
+from __future__ import absolute_import
+
 from django.contrib.auth.models import AnonymousUser, User
 from rest_framework.exceptions import PermissionDenied
 

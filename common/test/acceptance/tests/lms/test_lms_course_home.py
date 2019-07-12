@@ -11,6 +11,7 @@ import six
 
 from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
 from openedx.core.lib.tests import attr
+
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.lms.bookmarks import BookmarksPage
 from ...pages.lms.course_home import CourseHomePage

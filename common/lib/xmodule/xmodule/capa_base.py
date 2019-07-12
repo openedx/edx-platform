@@ -387,8 +387,11 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         """
         For now, just return weighted earned / weighted possible
         """
-        raw_earned = self.score.raw_earned
-        raw_possible = self.score.raw_possible
+        if self.score:
+            raw_earned = self.score.raw_earned
+            raw_possible = self.score.raw_possible
+        else:
+            raw_earned = raw_possible = 0
 
         if raw_possible > 0:
             if self.weight is not None:
@@ -438,6 +441,18 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             'content': self.get_problem_html(encapsulate=False),
             'graded': self.graded,
         })
+
+    def handle_fatal_lcp_error(self, error):
+        if error:
+            return(
+                HTML(u'<p>Error formatting HTML for problem:</p><p><pre style="color:red">{msg}</pre></p>').format(
+                    msg=text_type(error))
+            )
+        else:
+            return HTML(
+                u'<p>Could not format HTML for problem. '
+                u'Contact course staff in the discussion forum for assistance.</p>'
+            )
 
     def submit_button_name(self):
         """
@@ -549,8 +564,8 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         # TODO (vshnayder): another switch on DEBUG.
         if self.runtime.DEBUG:
             msg = HTML(
-                u'[courseware.capa.capa_module] <font size="+1" color="red">'
-                u'Failed to generate HTML for problem {url}</font>'
+                u'[courseware.capa.capa_module] '
+                u'Failed to generate HTML for problem {url}'
             ).format(
                 url=text_type(self.location)
             )
@@ -564,6 +579,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
             # Presumably, student submission has corrupted LoncapaProblem HTML.
             #   First, pull down all student answers
+
             student_answers = self.lcp.student_answers
             answer_ids = list(student_answers.keys())
 

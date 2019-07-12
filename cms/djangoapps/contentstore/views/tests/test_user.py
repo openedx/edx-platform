@@ -1,6 +1,8 @@
 """
 Tests for contentstore/views/user.py.
 """
+from __future__ import absolute_import
+
 import json
 
 from django.contrib.auth.models import User

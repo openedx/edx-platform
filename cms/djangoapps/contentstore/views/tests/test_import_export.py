@@ -1,6 +1,8 @@
 """
 Unit tests for course import and export
 """
+from __future__ import absolute_import
+
 import copy
 import json
 import logging
@@ -14,6 +16,7 @@ from uuid import uuid4
 
 import ddt
 import lxml
+import six
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.test.utils import override_settings
@@ -21,6 +24,7 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 from opaque_keys.edx.locator import LibraryLocator
 from path import Path as path
+from six.moves import zip
 from storages.backends.s3boto import S3BotoStorage
 from user_tasks.models import UserTaskStatus
 
@@ -103,7 +107,7 @@ class ImportEntranceExamTestCase(CourseTestCase, MilestonesTestCaseMixin):
         """
         Check that pre existed entrance exam content should be overwrite with the imported course.
         """
-        exam_url = '/course/{}/entrance_exam/'.format(unicode(self.course.id))
+        exam_url = '/course/{}/entrance_exam/'.format(six.text_type(self.course.id))
         resp = self.client.post(exam_url, {'entrance_exam_minimum_score_pct': 0.5}, http_accept='application/json')
         self.assertEqual(resp.status_code, 201)
 
@@ -113,9 +117,9 @@ class ImportEntranceExamTestCase(CourseTestCase, MilestonesTestCaseMixin):
         self.assertTrue(metadata['entrance_exam_enabled'])
         self.assertIsNotNone(metadata['entrance_exam_minimum_score_pct'])
         self.assertEqual(metadata['entrance_exam_minimum_score_pct']['value'], 0.5)
-        self.assertTrue(len(milestones_helpers.get_course_milestones(unicode(self.course.id))))
+        self.assertTrue(len(milestones_helpers.get_course_milestones(six.text_type(self.course.id))))
         content_milestones = milestones_helpers.get_course_content_milestones(
-            unicode(self.course.id),
+            six.text_type(self.course.id),
             metadata['entrance_exam_id']['value'],
             milestones_helpers.get_milestone_relationship_types()['FULFILLS']
         )
@@ -149,7 +153,7 @@ class ImportTestCase(CourseTestCase):
 
         def touch(name):
             """ Equivalent to shell's 'touch'"""
-            with file(name, 'a'):
+            with open(name, 'a'):  # pylint: disable=W6005
                 os.utime(name, None)
 
         # Create tar test files -----------------------------------------------

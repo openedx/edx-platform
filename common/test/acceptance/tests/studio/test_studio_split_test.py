@@ -2,12 +2,13 @@
 Acceptance tests for Studio related to the split_test module.
 """
 
+from __future__ import absolute_import
+
 import math
 
 from bok_choy.promise import Promise
 from selenium.webdriver.support.ui import Select
 
-from base_studio_test import StudioCourseTest
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.studio.container import ContainerPage
@@ -16,8 +17,10 @@ from common.test.acceptance.pages.studio.settings_group_configurations import Gr
 from common.test.acceptance.pages.studio.utils import add_advanced_component
 from common.test.acceptance.pages.studio.xblock_editor import XBlockEditorView
 from common.test.acceptance.tests.helpers import create_user_partition_json
-from test_studio_container import ContainerBase
 from xmodule.partitions.partitions import Group
+
+from .base_studio_test import StudioCourseTest
+from .test_studio_container import ContainerBase
 
 
 class SplitTestMixin(object):

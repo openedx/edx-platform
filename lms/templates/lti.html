@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%!
 import json
 from django.utils.translation import ugettext as _
@@ -61,7 +62,7 @@ from django.utils.translation import ugettext as _
     <h4 class="hd hd-4 problem-feedback-label">${_("Feedback on your work from the grader:")}</h4>
     <div class="problem-feedback">
         ## sanitized with bleach in view
-        ${comment}
+        ${comment | n, decode.utf8}
     </div>
 % endif
 
