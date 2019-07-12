@@ -1,8 +1,10 @@
 """Tests covering the Organizations listing on the Studio home."""
+from __future__ import absolute_import
+
 import json
 
-from django.urls import reverse
 from django.test import TestCase
+from django.urls import reverse
 from mock import patch
 
 from student.tests.factories import UserFactory
