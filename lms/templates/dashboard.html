@@ -48,7 +48,7 @@ from openedx.core.djangolib.markup import HTML, Text
     });
   </script>
   % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
-    <%static:require_module module_name="js/search/dashboard/dashboard_search_factory" class_name="DashboardSearchFactory">
+    <%static:require_module module_name="course_search/js/dashboard_search_factory" class_name="DashboardSearchFactory">
         DashboardSearchFactory();
     </%static:require_module>
   % endif
