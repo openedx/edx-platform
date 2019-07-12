@@ -8,12 +8,15 @@ a student's score or the course grading policy changes. As they are
 persisted, course grades are also immune to changes in course content.
 """
 
+from __future__ import absolute_import
+
 import json
 import logging
 from base64 import b64encode
 from collections import defaultdict, namedtuple
 from hashlib import sha1
 
+import six
 from django.apps import apps
 from django.contrib.auth.models import User
 from django.db import models
@@ -22,11 +25,12 @@ from lazy import lazy
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from simple_history.models import HistoricalRecords
+from six.moves import map
 
 from coursewarehistoryextended.fields import UnsignedBigIntAutoField, UnsignedBigIntOneToOneField
-from lms.djangoapps.grades import events, constants
+from lms.djangoapps.grades import constants, events
 from openedx.core.lib.cache_utils import get_cache
-from simple_history.models import HistoricalRecords
 
 log = logging.getLogger(__name__)
 
@@ -85,10 +89,10 @@ class BlockRecordList(object):
         """
         list_of_block_dicts = [block._asdict() for block in self.blocks]
         for block_dict in list_of_block_dicts:
-            block_dict['locator'] = unicode(block_dict['locator'])  # BlockUsageLocator is not json-serializable
+            block_dict['locator'] = six.text_type(block_dict['locator'])  # BlockUsageLocator is not json-serializable
         data = {
             u'blocks': list_of_block_dicts,
-            u'course_key': unicode(self.course_key),
+            u'course_key': six.text_type(self.course_key),
             u'version': self.version,
         }
         return json.dumps(
@@ -450,11 +454,11 @@ class PersistentSubsectionGrade(TimeStampedModel):
 
         PersistentSubsectionGradeOverride.prefetch(user_id, course_key)
 
-        map(cls._prepare_params, grade_params_iter)
+        list(map(cls._prepare_params, grade_params_iter))
         VisibleBlocks.bulk_get_or_create(
             user_id, course_key, [params['visible_blocks'] for params in grade_params_iter]
         )
-        map(cls._prepare_params_visible_blocks_id, grade_params_iter)
+        list(map(cls._prepare_params_visible_blocks_id, grade_params_iter))
 
         grades = [PersistentSubsectionGrade(**params) for params in grade_params_iter]
         grades = cls.objects.bulk_create(grades)
