@@ -49,6 +49,3 @@ scipy<=1.2.1
 # Unless we constrain pytest to <4.6.0, it may break all tests inside of
 # xmodule.tests.test_resource_templates.ResourceTemplatesTests See TE-2391 for details.
 pytest<4.6.0
-
-# Pinning to older version of edx-rbac until ENT-2002 is resolved.
-edx-rbac==0.2.1
