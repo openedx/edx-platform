@@ -1,13 +1,16 @@
 """
 Functionality for problem scores.
 """
+from __future__ import absolute_import
+
 from logging import getLogger
 
+import six
+from numpy import around
 from xblock.core import XBlock
 
 from openedx.core.lib.cache_utils import process_cached
 from xmodule.graders import ProblemScore
-from numpy import around
 
 from .transformer import GradesTransformer
 
@@ -160,7 +163,7 @@ def _get_score_from_submissions(submissions_scores, block):
     Returns the score values from the submissions API if found.
     """
     if submissions_scores:
-        submission_value = submissions_scores.get(unicode(block.location))
+        submission_value = submissions_scores.get(six.text_type(block.location))
         if submission_value:
             first_attempted = submission_value['created_at']
             weighted_earned = submission_value['points_earned']
