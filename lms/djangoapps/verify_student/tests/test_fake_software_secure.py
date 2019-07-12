@@ -2,6 +2,8 @@
 Tests for the fake software secure response.
 """
 
+from __future__ import absolute_import
+
 from django.test import TestCase
 from mock import patch
 
