@@ -1,9 +1,11 @@
 """
 Class for manipulating groups configuration on a course object.
 """
-from collections import defaultdict
+from __future__ import absolute_import
+
 import json
 import logging
+from collections import defaultdict
 
 from django.utils.translation import ugettext as _
 
