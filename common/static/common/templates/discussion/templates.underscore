@@ -175,7 +175,7 @@
 <script aria-hidden="true" type="text/template" id="thread-response-show-template">
 <header class="response-header">
   <div class="response-header-content">
-    <%- author_display %>
+    <%= HtmlUtils.HTML(author_display) %>
     <p class="posted-details">
         <span class="timeago" title="<%= HtmlUtils.HTML(created_at) %>"><%= HtmlUtils.HTML(created_at) %></span>
         <% if (obj.endorsement && obj.endorsed) { %>
