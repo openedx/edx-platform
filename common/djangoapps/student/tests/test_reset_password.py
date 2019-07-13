@@ -124,8 +124,10 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         cache.clear()
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
-    @ddt.data('plain_text', 'html')
-    def test_reset_password_email(self, body_type):
+    @ddt.data(('plain_text', "You're receiving this e-mail because you requested a password reset"),
+              ('html', "You&#39;re receiving this e-mail because you requested a password reset"))
+    @ddt.unpack
+    def test_reset_password_email(self, body_type, expected_output):
         """Tests contents of reset password email, and that user is not active"""
         good_req = self.request_factory.post('/password_reset/', {'email': self.user.email})
         good_req.user = self.user
@@ -157,7 +159,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         body = bodies[body_type]
 
         self.assertIn("Password reset", sent_message.subject)
-        self.assertIn("You're receiving this e-mail because you requested a password reset", body)
+        self.assertIn(expected_output, body)
         self.assertEquals(sent_message.from_email, from_email)
         self.assertEquals(len(sent_message.to), 1)
         self.assertIn(self.user.email, sent_message.to)
