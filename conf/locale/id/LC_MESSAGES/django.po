@@ -77,7 +77,7 @@
 #
 # Translators:
 # Al Firdaus, 2014
-# Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2018
+# Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2018-2019
 # lusiana <lusiana.rumintang@gmail.com>, 2014
 # Muhammad Redho Ayassa <redhoyasa@gmail.com>, 2016
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
@@ -228,6 +228,7 @@ msgid "Documentation"
 msgstr "Dokumentasi"
 
 #: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
+#: wiki/templates/wiki/base.html
 msgid "Log out"
 msgstr "Log out"
 
@@ -9830,37 +9831,48 @@ msgstr "Modifikasi terakhir:"
 msgid "See all children"
 msgstr "Lihat semua cabang"
 
-#: lms/templates/wiki/article.html
+#: lms/templates/wiki/article.html wiki/templates/wiki/article.html
 msgid "This article was last modified:"
 msgstr "Artikel ini dimodifikasi terakhir kali:"
 
-#: lms/templates/wiki/create.html
+#: lms/templates/wiki/create.html wiki/templates/wiki/create.html
 msgid "Add new article"
 msgstr "Tambah artikel baru"
 
-#: lms/templates/wiki/create.html
+#: lms/templates/wiki/create.html wiki/templates/wiki/create.html
 msgid "Create article"
 msgstr "Buat artikel"
 
 #: lms/templates/wiki/create.html lms/templates/wiki/delete.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+#: wiki/plugins/images/templates/wiki/plugins/images/purge.html
+#: wiki/plugins/images/templates/wiki/plugins/images/revision_add.html
+#: wiki/templates/wiki/create.html wiki/templates/wiki/delete.html
 msgid "Go back"
 msgstr "Kembali"
 
 #: lms/templates/wiki/delete.html lms/templates/wiki/edit.html
+#: wiki/templates/wiki/delete.html wiki/templates/wiki/edit.html
 msgid "Delete article"
 msgstr "Hapus artikel"
 
 #: lms/templates/wiki/delete.html
 #: lms/templates/wiki/plugins/attachments/index.html
 #: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
+#: wiki/templates/wiki/delete.html
 msgid "Delete"
 msgstr "Hapus"
 
-#: lms/templates/wiki/delete.html
+#: lms/templates/wiki/delete.html wiki/templates/wiki/delete.html
 msgid "You cannot delete a root article."
 msgstr "Anda tidak dapat menghapus artikel utama."
 
-#: lms/templates/wiki/delete.html
+#: lms/templates/wiki/delete.html wiki/templates/wiki/delete.html
 msgid ""
 "You cannot delete this article because you do not have permission to delete "
 "articles with children. Try to remove the children manually one-by-one."
@@ -9868,7 +9880,7 @@ msgstr ""
 "Anda tidak dapat menghapus artikel ini karena Anda tidak punya ijin untuk "
 "menghapus artikel dengan cabang. Coba hapus cabang artikel satu satu."
 
-#: lms/templates/wiki/delete.html
+#: lms/templates/wiki/delete.html wiki/templates/wiki/delete.html
 msgid ""
 "You are deleting an article. This means that its children will be deleted as"
 " well. If you choose to purge, children will also be purged!"
@@ -9876,30 +9888,33 @@ msgstr ""
 "Anda menghapus sebuah artikel. Ini berarti cabang artikel juga akan dihapus."
 " Jika Anda pilih untuk membersihkan, cabang juga akan dibersihkan!"
 
-#: lms/templates/wiki/delete.html
+#: lms/templates/wiki/delete.html wiki/templates/wiki/delete.html
 msgid "Articles that will be deleted"
 msgstr "Artikel yang akan dihapus"
 
-#: lms/templates/wiki/delete.html
+#: lms/templates/wiki/delete.html wiki/templates/wiki/delete.html
 msgid "...and more!"
 msgstr ".. dan banyak lagi!"
 
-#: lms/templates/wiki/delete.html
+#: lms/templates/wiki/delete.html wiki/templates/wiki/delete.html
 msgid "You are deleting an article. Please confirm."
 msgstr "Anda akan menghapus artikel. Mohon konfirmasi."
 
 #: lms/templates/wiki/edit.html cms/templates/component.html
 #: cms/templates/container.html cms/templates/studio_xblock_wrapper.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/wiki/includes/article_menu.html
+#: lms/templates/wiki/includes/article_menu.html wiki/templates/wiki/edit.html
+#: wiki/templates/wiki/includes/article_menu.html
 msgid "Edit"
 msgstr "Ubah"
 
 #: lms/templates/wiki/edit.html lms/templates/ccx/schedule.html
+#: wiki/templates/wiki/edit.html wiki/templates/wiki/settings.html
 msgid "Save changes"
 msgstr "Simpan perubahan"
 
 #: lms/templates/wiki/edit.html cms/templates/container.html
+#: wiki/templates/wiki/edit.html
 msgid "Preview"
 msgstr "Pratinjau"
 
@@ -9919,15 +9934,17 @@ msgstr "Pratinjau Wiki"
 msgid "window open"
 msgstr "jendela terbuka"
 
-#: lms/templates/wiki/edit.html
+#: lms/templates/wiki/edit.html wiki/templates/wiki/edit.html
 msgid "Back to editor"
 msgstr "Kembali ke editor"
 
 #: lms/templates/wiki/history.html
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
+#: wiki/templates/wiki/history.html
 msgid "History"
 msgstr "Sejarah"
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid ""
 "Click each revision to see a list of edited lines. Click the Preview button "
 "to see how the article looked at this stage. At the bottom of this page, you"
@@ -9943,23 +9960,24 @@ msgstr ""
 msgid "(no log message)"
 msgstr ""
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Preview this revision"
 msgstr "Pratinjau revisi ini"
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Auto log:"
 msgstr "Log otomatis:"
 
 #: lms/templates/wiki/history.html cms/templates/videos_index_pagination.html
+#: wiki/templates/wiki/history.html
 msgid "Change"
 msgstr "Ganti"
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Merge selected with current..."
 msgstr "Gabungkan tersorot dengan saat ini..."
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Switch to selected version"
 msgstr "Pindah ke versi tersorot"
 
@@ -9967,11 +9985,11 @@ msgstr "Pindah ke versi tersorot"
 msgid "Wiki Revision Preview"
 msgstr "Pratinjau Revisi Wiki"
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Back to history view"
 msgstr "Kembali ke tampilan terdahulu"
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Switch to this version"
 msgstr "Ganti ke versi ini"
 
@@ -9979,11 +9997,11 @@ msgstr "Ganti ke versi ini"
 msgid "Merge Revision"
 msgstr "Gabung Revisi"
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Merge with current"
 msgstr "Gabung dengan terkini"
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid ""
 "When you merge a revision with the current, all data will be retained from "
 "both versions and merged at its approximate location from each revision."
@@ -9991,11 +10009,11 @@ msgstr ""
 "Ketika Anda menggabung revisi dengan terkini, seluruh data akan disimpan "
 "dari kedua versi dan digabung dari lokasi terkira pada tiap revisinya."
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "After this, it's important to do a manual review."
 msgstr "Setelah ini, penting untuk review manual."
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Create new merged version"
 msgstr "Buat versi tergabung yang baru"
 
@@ -10039,6 +10057,7 @@ msgid "Miniature Markdown Guide"
 msgstr "Miniatur Panduan Markdown"
 
 #: lms/templates/wiki/includes/cheatsheet.html
+#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
 msgid ""
 "To create a new wiki article, create a link to it. Clicking the link gives "
 "you the creation page."
@@ -10128,10 +10147,12 @@ msgid "Attachments"
 msgstr "Sisipan"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Upload new file"
 msgstr "Unggah berkas baru"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Search and add file"
 msgstr "Cari dan tambah berkas"
 
@@ -10140,14 +10161,17 @@ msgid "Upload File"
 msgstr "Unggah Berkas"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Upload file"
 msgstr "Unggah berkas"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "Search files and articles"
 msgstr "Cari berkas dan artikel"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid ""
 "You can reuse files from other articles. These files are subject to updates "
 "on other articles which may or may not be a good thing."
@@ -10166,10 +10190,12 @@ msgstr ""
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
 #: themes/edx.org/lms/templates/dashboard.html
 #: themes/stanford-style/lms/templates/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Search"
 msgstr "Cari"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid ""
 "The following files are available for this article. Copy the markdown tag to"
 " directly refer to a file from the article text."
@@ -10178,14 +10204,23 @@ msgstr ""
 "mengacu secara langsung ke berkas dari teks artikel."
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "Markdown tag"
 msgstr "Label Markdown"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "Uploaded by"
 msgstr "Diunggah oleh"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "Size"
 msgstr "Ukuran"
 
@@ -10194,30 +10229,40 @@ msgid "File History"
 msgstr "Sejarah Berkas"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Detach"
 msgstr "Lepas kaitan"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
+#: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
 msgid "Replace"
 msgstr "Ganti"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
+#: wiki/templates/wiki/deleted.html
 msgid "Restore"
 msgstr "Kembalikan Semula"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/templates/wiki/includes/revision_info.html
 msgid "anonymous (IP logged)"
 msgstr "anonim (IP tercatat)"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "File history"
 msgstr "Sejarah berkas"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "revisions"
 msgstr "revisi"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "There are no attachments for this article."
 msgstr "Tidak ada sisipan di artikel ini."
 
@@ -10230,10 +10275,12 @@ msgid "Previewing a merge between two revisions:"
 msgstr "Pratinjau penggabungan 2 revisi:"
 
 #: lms/templates/wiki/preview_inline.html
+#: wiki/templates/wiki/preview_inline.html
 msgid "This revision has been deleted."
 msgstr "Revisi telah dihapus."
 
 #: lms/templates/wiki/preview_inline.html
+#: wiki/templates/wiki/preview_inline.html
 msgid "Restoring to this revision will mark the article as deleted."
 msgstr "Mengembalikan ke revisi ini akan menandai artikel sebagai terhapus."
 
@@ -11300,10 +11347,9 @@ msgstr ""
 msgid "Email or password is incorrect."
 msgstr "Email atau sandi tidak benar."
 
-#: openedx/core/djangoapps/user_api/admin.py
 #: wiki/templates/wiki/permission_denied.html
 msgid "Permission Denied"
-msgstr ""
+msgstr "Izin Ditolak"
 
 #: openedx/core/djangoapps/user_api/admin.py
 msgid "Retirement does not exist!"
@@ -12710,6 +12756,8 @@ msgstr "Konten"
 #: cms/templates/settings.html cms/templates/settings_advanced.html
 #: cms/templates/settings_graders.html cms/templates/widgets/header.html
 #: lms/templates/wiki/includes/article_menu.html
+#: wiki/templates/wiki/settings.html
+#: wiki/templates/wiki/includes/article_menu.html
 msgid "Settings"
 msgstr "Setelan"
 
@@ -12839,9 +12887,11 @@ msgstr "Kebutuhan"
 msgid "Details"
 msgstr "Detil"
 
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a verb describing the action of viewing more details
 #: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/wiki/includes/article_menu.html
+#: wiki/templates/wiki/includes/article_menu.html
 msgid "View"
 msgstr "Tampilkan"
 
@@ -13596,7 +13646,7 @@ msgstr "Akses Kursus Saya"
 msgid "Processing your account information"
 msgstr "Memproses informasi akun anda"
 
-#: lms/templates/login.html
+#: lms/templates/login.html wiki/templates/wiki/accounts/login.html
 msgid "Please log in"
 msgstr "Harap masuk"
 
@@ -14008,6 +14058,8 @@ msgstr "Sudah terdaftar?"
 
 #: lms/templates/register-sidebar.html
 #: themes/stanford-style/lms/templates/register-sidebar.html
+#: wiki/templates/wiki/base.html wiki/templates/wiki/accounts/login.html
+#: wiki/templates/wiki/accounts/signup.html
 msgid "Log in"
 msgstr "Masuk"
 
@@ -14393,6 +14445,8 @@ msgstr "Aktivitas git load terbaru untuk {course_id}"
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "Date"
 msgstr "Tanggal"
 
@@ -20789,6 +20843,7 @@ msgid "Decrease"
 msgstr "Turun"
 
 #: lms/templates/shoppingcart/shopping_cart.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid "Remove"
 msgstr "Hapus"
 
@@ -21223,6 +21278,7 @@ msgid "{span_start}(active){span_end}"
 msgstr "{span_start}(aktif){span_end}"
 
 #: lms/templates/wiki/includes/article_menu.html
+#: wiki/templates/wiki/includes/article_menu.html
 msgid "Changes"
 msgstr "Perubahan"
 
@@ -21234,7 +21290,7 @@ msgstr "{span_start}aktif{span_end}"
 msgid "Course Wiki"
 msgstr "Course Wiki"
 
-#: lms/templates/wiki/includes/breadcrumbs.html
+#: lms/templates/wiki/includes/breadcrumbs.html wiki/templates/wiki/dir.html
 msgid "Add article"
 msgstr "Tambahkan artikel"
 
@@ -25433,52 +25489,57 @@ msgid ""
 "will loose their references to this file. The following articles reference "
 "this file:"
 msgstr ""
+"File mungkin dijadikan rujukan oleh artikel lain. Jika file ini dihapus "
+"artikel tersebut akan kehilangan referensi ke file ini. Berikut artikel yang"
+" merujuk ke file ini:"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid "Delete it!"
-msgstr ""
+msgstr "Hapus!"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid ""
 "You can remove a reference to a file, but it will retain its references on "
 "other articles."
 msgstr ""
+"Anda dapat menghapus referensi ke suatu file, namun referensi di artikel "
+"lain tidak terhapus."
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid "Remove reference"
-msgstr ""
+msgstr "Hapus referensi"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 msgid "History of"
-msgstr ""
+msgstr "Riwayat"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 msgid "User"
-msgstr ""
+msgstr "Pengguna"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "File"
-msgstr ""
+msgstr "Berkas"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "Action"
-msgstr ""
+msgstr "Tindakan"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "<em>No description</em>"
-msgstr ""
+msgstr "<em>Tidak ada deskripsi</em>"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "Download"
-msgstr ""
+msgstr "Unduh"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 msgid "Use this!"
-msgstr ""
+msgstr "Gunakan ini!"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #, python-format
@@ -25491,10 +25552,17 @@ msgid ""
 "for the listed articles where necessary. This way of working is more "
 "efficient...."
 msgstr ""
+"Mengganti lampiran berarti menambahkan file baru yang akan menggantikan "
+"lampiran lama. Semua referensi ke file akan digantikan dengan file yang baru"
+" di unggah dan file akan ter unduh sebagai <strong>%(filename)s</strong>. "
+"Mohon perhatikan bahwa lampiran ini digunakan di artikel lain, sehingga Anda"
+" dapat mengganggu konten lainnya. Meski demikian, jangan ragu untuk "
+"meneruskan dan menyesuaikan perubahan pada artikel di bawah jika diperlukan."
+" Hal ini akan lebih efisien...."
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 msgid "Articles using"
-msgstr ""
+msgstr "Artikel menggunakan"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #, python-format
@@ -25503,58 +25571,62 @@ msgid ""
 "place. All references to the file will be replaced by the one you upload and"
 " the file will be downloaded as <strong>%(filename)s</strong>."
 msgstr ""
+"Mengganti lampiran berarti menambahkan file baru yang akan menggantikan "
+"lampiran lama. Semua referensi ke file akan digantikan dengan file yang baru"
+" di unggah dan file akan ter unduh sebagai <strong>%(filename)s</strong>. "
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #: wiki/plugins/images/templates/wiki/plugins/images/revision_add.html
 msgid "Upload replacement"
-msgstr ""
+msgstr "Unggah pengganti"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "Add file to"
-msgstr ""
+msgstr "Tambahkan file ke"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "Add attachment from other article"
-msgstr ""
+msgstr "Tambahkan lampiran dari artikel lain"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "Main article"
-msgstr ""
+msgstr "Artikel utama"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "Add to article"
-msgstr ""
+msgstr "Tambahkan ke artikel"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "Your search did not return any results"
-msgstr ""
+msgstr "Pencarian Anda tidak menemukan hasil"
 
 #: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
 msgid "Adding new articles"
-msgstr ""
+msgstr "Tambahkan artikel baru"
 
 #: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
 #: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
 msgid "An external link"
-msgstr ""
+msgstr "Tautan eksternal"
 
 #: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
 msgid "Headers"
-msgstr ""
+msgstr "Headers"
 
 #: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
 msgid ""
 "Use these codes for headers and to automatically generate Tables of "
 "Contents."
 msgstr ""
+"Gunakan kode ini untuk header dan untuk membuat Daftar Isi secara otomatis."
 
 #: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
 msgid "Typography"
-msgstr ""
+msgstr "Tipografi"
 
 #: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
 msgid "Lists"
-msgstr ""
+msgstr "Daftar"
 
 #: wiki/plugins/images/forms.py
 #, python-format
@@ -25634,96 +25706,98 @@ msgid ""
 "The following images are available for this article. Copy the markdown tag "
 "to directly refer to an image from the article text."
 msgstr ""
+"Gambar berikut tersedia untuk artikel ini. Salin label markdown untuk "
+"merujuk langsung ke sebuah gambar dari teks artikel."
 
 #: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "Back to edit page"
-msgstr ""
+msgstr "Kembali ke halaman edit"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "No file"
-msgstr ""
+msgstr "Tidak ada file"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "Upload new image"
-msgstr ""
+msgstr "Unggah gambar baru"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "Restore image"
-msgstr ""
+msgstr "Kembalikan gambar"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "Remove image"
-msgstr ""
+msgstr "Hapus gambar"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "Completely delete"
-msgstr ""
+msgstr "Hapus seluruhnya"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "Revert to this version"
-msgstr ""
+msgstr "Kembalikan ke versi ini"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "There are no images for this article."
-msgstr ""
+msgstr "Tidak ada gambar untuk artikel ini."
 
 #: wiki/plugins/images/templates/wiki/plugins/images/purge.html
 #: wiki/templates/wiki/deleted.html
 msgid "Purge deletion"
-msgstr ""
+msgstr "Bersihkan hapusan"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/purge.html
 msgid "Purge image: Completely remove image file and all revisions."
-msgstr ""
+msgstr "Bersihkan gambar: Hapus seluruh file gambar dan semua revisinya."
 
 #: wiki/plugins/images/templates/wiki/plugins/images/purge.html
 msgid "Remove it completely!"
-msgstr ""
+msgstr "Hapus seluruhnya!"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/render.html
 msgid "Image not found"
-msgstr ""
+msgstr "Gambar tidak ditemukan"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/revision_add.html
 msgid "Replace image"
-msgstr ""
+msgstr "Ganti gambar"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/revision_add.html
 msgid "Choose an image file to replace current image."
-msgstr ""
+msgstr "Pilih file gambar untuk menggantikan gambar saat ini."
 
 #: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
 msgid "Image id"
-msgstr ""
+msgstr "Id gambar"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
 #: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
 msgid "Insert"
-msgstr ""
+msgstr "sisipkan"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
 msgid "No images found for this article"
-msgstr ""
+msgstr "Tidak ada gambar untuk artikel ini"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
 msgid "Manage images"
-msgstr ""
+msgstr "Kelola gambar"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
 msgid "Add new image"
-msgstr ""
+msgstr "Tambah gambar baru"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
 msgid "Add image"
-msgstr ""
+msgstr "Tambah gambar"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
 msgid "You do not have permissions to add images."
-msgstr ""
+msgstr "Anda tidak memiliki izin untuk menambahkan gambar."
 
 #: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
 msgid "How to use images"
-msgstr ""
+msgstr "Bagaimana cara menggunakan gambar"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
 msgid ""
@@ -25735,6 +25809,13 @@ msgid ""
 "Markdown in the caption. The markdown code syntax for images looks like "
 "this, possible values for align are left/center/right:"
 msgstr ""
+"Setelah menggunggah gambar, gambar akan menempel pada artikel tertentu dan "
+"hanya dapat digunakan di sini. Pengguna lain dapat mengganti gambar, namun "
+"versi lama akan tersimpan. Anda mungkin ingin memberikan caption untuk "
+"gambar ini. Untuk melakukannya, tekan tombol Sisipkan dan isi kolom caption "
+"dan pilih posisi gambar di kanan atau kiri konten. Anda dapat menggunakan "
+"Markdown dalam caption. Syntax kode markdown untuk gambar tampak seperti "
+"ini, pilihan rata adalah kiri/tengah/kanan:"
 
 #: wiki/plugins/links/wiki_plugin.py
 msgid "Links"
@@ -25742,19 +25823,24 @@ msgstr "Tautan"
 
 #: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
 msgid "Link to another wiki page"
-msgstr ""
+msgstr "Tautkan ke halaman wiki lainnya"
 
 #: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
 msgid ""
 "Type in something from another wiki page's title and auto-complete will help"
 " you create a tag for you wiki link. Tags for links look like this:"
 msgstr ""
+"Masukkan sesuatu dari judul halaman wiki lainnya dan auto-complete akan "
+"membantu Anda membuat tag atau label untuk tautan wiki Anda. Label untuk "
+"tautan tampak sebagai berikut:"
 
 #: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
 msgid ""
 "You can link to another website simply by inserting an address example.com "
 "or http://example.com or by using the markdown syntax:"
 msgstr ""
+"Anda dapat memasukkan laman web lain dengan memasukkan alamat example.com "
+"atau http://example.com atau dengan menggunakan syntax markdown:"
 
 #: wiki/plugins/notifications/forms.py
 msgid "Notifications"
@@ -25798,132 +25884,140 @@ msgstr "Artikel baru yang dibuat: %s"
 
 #: wiki/plugins/notifications/templates/wiki/plugins/notifications/menubaritem.html
 msgid "notifications"
-msgstr ""
+msgstr "notifikasi"
 
 #: wiki/plugins/notifications/templates/wiki/plugins/notifications/menubaritem.html
 msgid "No notifications"
-msgstr ""
+msgstr "Tidak ada notifikasi"
 
 #: wiki/plugins/notifications/templates/wiki/plugins/notifications/menubaritem.html
 msgid "Clear notifications list"
-msgstr ""
+msgstr "Hapus daftar notifikasi"
 
 #: wiki/templates/wiki/base.html
 msgid "Search..."
-msgstr ""
+msgstr "Cari"
 
 #: wiki/templates/wiki/base.html wiki/templates/wiki/accounts/login.html
 #: wiki/templates/wiki/accounts/signup.html
 msgid "Sign up"
-msgstr ""
+msgstr "Daftar"
 
 #: wiki/templates/wiki/deleted.html
 msgid "Article deleted"
-msgstr ""
+msgstr "Artikel telah dihapus"
 
 #: wiki/templates/wiki/deleted.html
 msgid "Article Deleted"
-msgstr ""
+msgstr "Artikel telah dihapus"
 
 #: wiki/templates/wiki/deleted.html
 msgid "The article you were looking for has been deleted."
-msgstr ""
+msgstr "Artikel yang Anda cari telah dihapus."
 
 #: wiki/templates/wiki/deleted.html
 msgid "You may restore this article and its children by clicking restore."
 msgstr ""
+"Anda dapat mengembalikan artikel ini dan anak artikelnya dengan menekan "
+"kembalikan."
 
 #: wiki/templates/wiki/deleted.html
 msgid ""
 "You may remove this article and any children permanently and free their "
 "slugs by clicking the below button. This action cannot be undone."
 msgstr ""
+"Anda dapat menghapus artikel ini dan anak artikelnya secara permanen dan "
+"membebaskan slugnya dengan menekan tombol di bawah. Tindakan ini tidak dapat"
+" dibatalkan."
 
 #: wiki/templates/wiki/dir.html
 msgid "Listing articles in"
-msgstr ""
+msgstr "Mendaftar artikel di"
 
 #: wiki/templates/wiki/dir.html
 msgid "Up one level"
-msgstr ""
+msgstr "Naik satu tingkat"
 
 #: wiki/templates/wiki/dir.html
 msgid "clear"
-msgstr ""
+msgstr "hapus"
 
 #: wiki/templates/wiki/dir.html
 msgid "article,articles"
-msgstr ""
+msgstr "artikel,artikel"
 
 #: wiki/templates/wiki/dir.html
 msgid "matches,match"
-msgstr ""
+msgstr "cocok dengan,cocok dengan"
 
 #: wiki/templates/wiki/dir.html
 #, python-format
 msgid "%(cnt)s %(articles_plur)s in this level %(match_plur)s your search."
 msgstr ""
+"%(cnt)s %(articles_plur)s di tingkatan ini %(match_plur)s pencarian Anda."
 
 #: wiki/templates/wiki/dir.html
 msgid "is,are"
-msgstr ""
+msgstr " , "
 
 #: wiki/templates/wiki/dir.html
 #, python-format
 msgid "There %(articles_plur_verb)s %(cnt)s %(articles_plur)s in this level."
 msgstr ""
+"Terdapat %(articles_plur_verb)s %(cnt)s %(articles_plur)s pada tingkatan "
+"ini."
 
 #: wiki/templates/wiki/dir.html
 msgid "Last modified"
-msgstr ""
+msgstr "Modifikasi terakhir"
 
 #: wiki/templates/wiki/history.html
 msgid "no log message"
-msgstr ""
+msgstr "tidak ada pesan log"
 
 #: wiki/templates/wiki/permission_denied.html
 msgid "Sorry, you don't have permission to view this page."
-msgstr ""
+msgstr "Maaf, Anda tidak memiliki izin untuk melihat halaman ini."
 
 #: wiki/templates/wiki/preview_inline.html
 msgid "Previewing revision"
-msgstr ""
+msgstr "Pratinjau revisi"
 
 #: wiki/templates/wiki/preview_inline.html
 msgid "Previewing merge between"
-msgstr ""
+msgstr "Pratinjau antar penggabungan"
 
 #: wiki/templates/wiki/preview_inline.html
 msgid "and"
-msgstr ""
+msgstr "dan"
 
 #: wiki/templates/wiki/source.html
 msgid "Source of"
-msgstr ""
+msgstr "Sumber dari"
 
 #: wiki/templates/wiki/source.html
 msgid "This article is currently locked for editing."
-msgstr ""
+msgstr "Artikel ini sedang dikunci untuk pengeditan"
 
 #: wiki/templates/wiki/accounts/login.html
 msgid "Log me in..."
-msgstr ""
+msgstr "Masukkan saya..."
 
 #: wiki/templates/wiki/accounts/login.html
 msgid "Don't have an account?"
-msgstr ""
+msgstr "Belum punya akun?"
 
 #: wiki/templates/wiki/accounts/signup.html
 msgid "Sign me up..."
-msgstr ""
+msgstr "Daftarkan saya..."
 
 #: wiki/templates/wiki/article/create_root.html
 msgid "Create root article"
-msgstr ""
+msgstr "Buat artikel utama"
 
 #: wiki/templates/wiki/article/create_root.html
 msgid "Congratulations!"
-msgstr ""
+msgstr "Selamat!"
 
 #: wiki/templates/wiki/article/create_root.html
 msgid ""
@@ -25931,14 +26025,18 @@ msgid ""
 " create the first one, the root article. In the beginning, it will only be "
 "editable by administrators, but you can define permissions after."
 msgstr ""
+"Django-wiki telah terinstal... namun tidak terdapat artikel. Ini saatnya "
+"untuk membuat artikel pertama, yaitu artikel utama. Pada awalnya, artikel "
+"ini hanya dapat diedit oleh administrator, namun setelahnya Anda dapat "
+"menentukan izin."
 
 #: wiki/templates/wiki/article/create_root.html
 msgid "Root article"
-msgstr ""
+msgstr "Artikel utama"
 
 #: wiki/templates/wiki/article/create_root.html
 msgid "Create root"
-msgstr ""
+msgstr "Buat artikel utama"
 
 #: wiki/templates/wiki/includes/anonymous_blocked.html
 #, python-format
@@ -25946,50 +26044,52 @@ msgid ""
 "You need to <a href=\"%(login_url)s\">log in</a> or <a "
 "href=\"%(signup_url)s\">sign up</a> to use this function."
 msgstr ""
+"Anda harus <a href=\"%(login_url)s\">log ini </a> atau <a "
+"href=\"%(signup_url)s\">mendaftar</a> untuk menggunakan fungsi ini."
 
 #: wiki/templates/wiki/includes/anonymous_blocked.html
 msgid "You need to log in og sign up to use this function."
-msgstr ""
+msgstr "Anda harus log ini atau mendaftar untuk menggunakan fungsi ini."
 
 #: wiki/templates/wiki/includes/article_menu.html
 msgid "View Source"
-msgstr ""
+msgstr "Lihat Sumber"
 
 #: wiki/templates/wiki/includes/breadcrumbs.html
 msgid "Sub-articles for"
-msgstr ""
+msgstr "Sub-artikel untuk"
 
 #: wiki/templates/wiki/includes/breadcrumbs.html
 msgid "No sub-articles"
-msgstr ""
+msgstr "Tidak terdapat sub-artikel"
 
 #: wiki/templates/wiki/includes/breadcrumbs.html
 msgid "...and more"
-msgstr ""
+msgstr "...dan lainnya"
 
 #: wiki/templates/wiki/includes/breadcrumbs.html
 msgid "Browse articles in this level"
-msgstr ""
+msgstr "Jelajahi artikel di tingkat ini"
 
 #: wiki/templates/wiki/includes/breadcrumbs.html
 msgid "New article next to"
-msgstr ""
+msgstr "Artikel baru sesudah"
 
 #: wiki/templates/wiki/includes/breadcrumbs.html
 msgid "New article below"
-msgstr ""
+msgstr "Artikel baru di bawah"
 
 #: wiki/templates/wiki/includes/revision_info.html
 msgid "by"
-msgstr ""
+msgstr "oleh"
 
 #: wiki/templates/wiki/includes/revision_info.html
 msgid "restored"
-msgstr ""
+msgstr "dikembalikan"
 
 #: wiki/templates/wiki/includes/revision_info.html
 msgid "unlocked"
-msgstr ""
+msgstr "tidak terkunci"
 
 #: wiki/views/accounts.py
 msgid "You are now sign up... and now you can sign in!"
