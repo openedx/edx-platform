@@ -52,3 +52,6 @@ pytest<4.6.0
 
 # Pinning to older version of edx-rbac until ENT-2002 is resolved.
 edx-rbac==0.2.1
+
+# transifex-client 0.13.6 requires python-slugify 1.2.6, but the latest version is 3.0.2
+python-slugify==1.2.6
