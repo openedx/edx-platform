@@ -864,7 +864,7 @@ def student_dashboard(request):
         'empty_dashboard_message': empty_dashboard_message,
         'recovery_email_message': recovery_email_message,
         'recovery_email_activation_message': recovery_email_activation_message,
-        'alert_messages': get_non_active_course(user)
+        'alert_messages': get_non_active_course(user),
         'is_poc': user.extended_profile.is_organization_admin,
     }
 
