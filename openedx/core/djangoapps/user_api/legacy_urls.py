@@ -7,6 +7,7 @@ from django.conf.urls import include, url
 from rest_framework import routers
 
 from . import views as user_api_views
+from lms.djangoapps.philu_overrides.user_api import views as user_api_views_custom
 from .models import UserPreference
 
 USER_API_ROUTER = routers.DefaultRouter()
@@ -37,10 +38,12 @@ urlpatterns = [
 
 if settings.FEATURES.get('ENABLE_COMBINED_LOGIN_REGISTRATION'):
     urlpatterns += [
-        url(r'^v1/account/login_session/$', user_api_views.LoginSessionView.as_view(),
+        url(r'^v1/account/login_session/$', user_api_views_custom.LoginSessionViewCustom.as_view(),
             name="user_api_login_session"),
-        url(r'^v1/account/registration/$', user_api_views.RegistrationView.as_view(),
+        url(r'^v1/account/registration/$', user_api_views_custom.RegistrationViewCustom.as_view(),
             name="user_api_registration"),
+        url(r'^v2/account/registration/$', user_api_views_custom.RegistrationViewCustomV2.as_view(),
+            name="user_api_registration_v2"),
         url(r'^v1/account/password_reset/$', user_api_views.PasswordResetView.as_view(),
             name="user_api_password_reset"),
     ]
