@@ -46,6 +46,8 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.verified_track_content import views as verified_track_content_views
 from openedx.core.openapi import schema_view
 from openedx.features.enterprise_support.api import enterprise_enabled
+from openedx.testing.coverage_context_listener.apps import CoverageContextListenerConfig
+from ratelimitbackend import admin
 from static_template_view import views as static_template_view_views
 from staticbook import views as staticbook_views
 from student import views as student_views
@@ -975,5 +977,10 @@ if settings.FEATURES.get('ENABLE_API_DOCS'):
 urlpatterns += [
     url(r'', include('csrf.urls')),
 ]
+
+if CoverageContextListenerConfig.name in settings.INSTALLED_APPS:
+    urlpatterns += [
+        url(r'coverage_context', include('openedx.testing.coverage_context_listener.urls'))
+    ]
 
 urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.LMS))

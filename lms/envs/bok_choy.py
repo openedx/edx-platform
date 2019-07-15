@@ -22,6 +22,7 @@ from django.utils.translation import ugettext_lazy
 from path import Path as path
 
 from openedx.core.release import RELEASE_LINE
+from openedx.testing.coverage_context_listener.apps import CoverageContextListenerConfig
 
 CONFIG_ROOT = path(__file__).abspath().dirname()
 TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
@@ -263,6 +264,8 @@ ECOMMERCE_API_URL = 'http://localhost:8043/api/v2/'
 LMS_ROOT_URL = "http://localhost:{}".format(os.environ.get('BOK_CHOY_LMS_PORT', 8003))
 CMS_BASE = "localhost:{}".format(os.environ.get('BOK_CHOY_CMS_PORT', 8031))
 LOGIN_REDIRECT_WHITELIST = [CMS_BASE]
+
+INSTALLED_APPS.append(CoverageContextListenerConfig.name)
 
 if RELEASE_LINE == "master":
     # On master, acceptance tests use edX books, not the default Open edX books.

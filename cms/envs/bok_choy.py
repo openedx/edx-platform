@@ -21,6 +21,7 @@ from django.utils.translation import ugettext_lazy
 from path import Path as path
 
 from openedx.core.release import RELEASE_LINE
+from openedx.testing.coverage_context_listener.apps import CoverageContextListenerConfig
 
 ########################## Prod-like settings ###################################
 # These should be as close as possible to the settings we use in production.
@@ -171,6 +172,8 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
     ),
     DIRECTORY_PREFIX='video-transcripts/',
 )
+
+INSTALLED_APPS.append(CoverageContextListenerConfig.name)
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.

@@ -12,6 +12,8 @@ import openedx.core.djangoapps.debug.views
 import openedx.core.djangoapps.lang_pref.views
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
+from openedx.testing.coverage_context_listener.apps import CoverageContextListenerConfig
+
 
 from ratelimitbackend import admin
 
@@ -269,6 +271,11 @@ if settings.FEATURES.get('ENABLE_API_DOCS'):
         url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
         url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
         url(r'^api-docs/$', schema_view.with_ui('swagger', cache_timeout=0)),
+    ]
+
+if CoverageContextListenerConfig.name in settings.INSTALLED_APPS:
+    urlpatterns += [
+        url(r'coverage_context', include('openedx.testing.coverage_context_listener.urls'))
     ]
 
 from openedx.core.djangoapps.plugins import constants as plugin_constants, plugin_urls
