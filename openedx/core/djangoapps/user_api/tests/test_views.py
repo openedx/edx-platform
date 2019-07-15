@@ -1380,6 +1380,45 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 }
             )
 
+    def test_third_party_auth_disable_registration_fields(self):
+        no_extra_fields_setting = {}
+        provider = self.configure_google_provider(enabled=True,
+                                                  other_settings='{"PROVIDER_READ_ONLY_FIELDS": ["email", "name"]}')
+        with simulate_running_pipeline(
+            "openedx.core.djangoapps.user_api.api.third_party_auth.pipeline", "google-oauth2",
+            email="bob@example.com",
+            fullname="Bob",
+        ):
+            self._assert_reg_field(
+                no_extra_fields_setting,
+                {
+                    u"name": u"name",
+                    u"defaultValue": u"Bob",
+                    u"type": u"text",
+                    u"required": True,
+                    u"label": u"Full Name",
+                    u"instructions": u"This name will be used on any certificates that you earn.",
+                    u"restrictions": {
+                        "readonly": "readonly",
+                    }
+                }
+            )
+
+            self._assert_reg_field(
+                no_extra_fields_setting,
+                {
+                    u"name": u"email",
+                    u"defaultValue": u"bob@example.com",
+                    u"type": u"email",
+                    u"required": True,
+                    u"label": u"Email",
+                    u"instructions": u"This is what you will use to login.",
+                    u"restrictions": {
+                        "readonly": "readonly",
+                    },
+                }
+            )
+
     def test_register_form_level_of_education(self):
         self._assert_reg_field(
             {"level_of_education": "optional"},

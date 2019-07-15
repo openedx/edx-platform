@@ -100,7 +100,7 @@ def require_post_params(required_params):
     """
     def _decorator(func):  # pylint: disable=missing-docstring
         @wraps(func)
-        def _wrapped(*args, **_kwargs):
+        def _wrapped(*args, **_kwargs):  # pylint: disable=missing-docstring
             request = args[0]
             missing_params = set(required_params) - set(request.POST.keys())
             if len(missing_params) > 0:
@@ -128,6 +128,7 @@ class FormDescription(object):
         "password": ["min_length", "max_length", "min_upper", "min_lower",
                      "min_punctuation", "min_symbol", "min_numeric", "min_alphabetic"],
         "email": ["min_length", "max_length", "readonly"],
+        "name": ["readonly"],
     }
 
     FIELD_TYPE_MAP = {

@@ -1,5 +1,6 @@
 import copy
 import crum
+import json
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -1006,3 +1007,14 @@ class RegistrationFormFactory(object):
                         default=current_provider.name if current_provider.name else "Third Party",
                         required=False,
                     )
+
+                    if current_provider.other_settings:
+                        # Provider config values are parsed as string. Convert into dictionary.
+                        other_settings = json.loads(current_provider.other_settings)
+
+                        if 'PROVIDER_READ_ONLY_FIELDS' in other_settings:
+                            for field in other_settings['PROVIDER_READ_ONLY_FIELDS']:
+                                form_desc.override_field_properties(
+                                    field,
+                                    restrictions={"readonly": "readonly"}
+                                )
