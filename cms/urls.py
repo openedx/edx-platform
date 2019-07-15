@@ -19,6 +19,7 @@ from openedx.core.djangoapps.password_policy import compliance as password_polic
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
 from openedx.core.openapi import schema_view
 
+
 django_autodiscover()
 admin.site.site_header = _('Studio Administration')
 admin.site.site_title = admin.site.site_header
@@ -273,6 +274,11 @@ if settings.FEATURES.get('ENABLE_API_DOCS'):
         url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
         url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
         url(r'^api-docs/$', schema_view.with_ui('swagger', cache_timeout=0)),
+    ]
+
+if 'openedx.testing.coverage_context_listener' in settings.INSTALLED_APPS:
+    urlpatterns += [
+        url(r'coverage_context', include('openedx.testing.coverage_context_listener.urls'))
     ]
 
 from openedx.core.djangoapps.plugins import constants as plugin_constants, plugin_urls

@@ -264,6 +264,8 @@ LMS_ROOT_URL = "http://localhost:{}".format(os.environ.get('BOK_CHOY_LMS_PORT', 
 CMS_BASE = "localhost:{}".format(os.environ.get('BOK_CHOY_CMS_PORT', 8031))
 LOGIN_REDIRECT_WHITELIST = [CMS_BASE]
 
+INSTALLED_APPS.append('openedx.testing.coverage_context_listener')
+
 if RELEASE_LINE == "master":
     # On master, acceptance tests use edX books, not the default Open edX books.
     HELP_TOKENS_BOOKS = {

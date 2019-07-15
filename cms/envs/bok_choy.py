@@ -172,6 +172,8 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
     DIRECTORY_PREFIX='video-transcripts/',
 )
 
+INSTALLED_APPS.append('openedx.testing.coverage_context_listener')
+
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
