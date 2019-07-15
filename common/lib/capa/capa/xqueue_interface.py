@@ -102,6 +102,8 @@ class XQueueInterface(object):
             if error != 0:
                 # when the login fails
                 log.debug("Failed to login to queue: %s", content)
+                log.info(u"Login failed content information : {content} with error: {error}".format(
+                    content=content, error=error))
                 return (error, content)
             if files_to_upload is not None:
                 # Need to rewind file pointers
