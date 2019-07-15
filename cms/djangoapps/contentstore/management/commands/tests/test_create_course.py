@@ -1,14 +1,18 @@
 """
 Unittests for creating a course in an chosen modulestore
 """
+from __future__ import absolute_import
+
 from StringIO import StringIO
+
 import ddt
+import six
 from django.core.management import CommandError, call_command
 from django.test import TestCase
 
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class TestArgParsing(TestCase):
@@ -108,7 +112,7 @@ class TestCreateCourse(ModuleStoreTestCase):
                 )
                 course = self.store.get_course(lowercase_course_id)
                 self.assertIsNotNone(course, 'Course not found using lowercase course key.')
-                self.assertEqual(unicode(course.id), unicode(lowercase_course_id))
+                self.assertEqual(six.text_type(course.id), six.text_type(lowercase_course_id))
 
                 # Verify store does not return course with different case.
                 uppercase_course_id = self.store.make_course_key(org.upper(), number.upper(), run.upper())

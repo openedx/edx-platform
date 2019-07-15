@@ -1,16 +1,17 @@
 """ Tests for course reindex command """
+from __future__ import absolute_import
+
 import ddt
-from django.core.management import call_command, CommandError
 import mock
+from django.core.management import CommandError, call_command
 from six import text_type
 
+from contentstore.courseware_index import SearchIndexingError
+from contentstore.management.commands.reindex_course import Command as ReindexCommand
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory
-
-from contentstore.management.commands.reindex_course import Command as ReindexCommand
-from contentstore.courseware_index import SearchIndexingError
 
 
 @ddt.ddt
