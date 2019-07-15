@@ -577,16 +577,17 @@ def get_module_system_for_user(
         """
         Submit a grade for the block.
         """
-        grades_signals.SCORE_PUBLISHED.send(
-            sender=None,
-            block=block,
-            user=user,
-            raw_earned=event['value'],
-            raw_possible=event['max_value'],
-            only_if_higher=event.get('only_if_higher'),
-            score_deleted=event.get('score_deleted'),
-            grader_response=event.get('grader_response')
-        )
+        if not user.is_anonymous():
+            grades_signals.SCORE_PUBLISHED.send(
+                sender=None,
+                block=block,
+                user=user,
+                raw_earned=event['value'],
+                raw_possible=event['max_value'],
+                only_if_higher=event.get('only_if_higher'),
+                score_deleted=event.get('score_deleted'),
+                grader_response=event.get('grader_response')
+            )
 
     def handle_deprecated_progress_event(block, event):
         """
