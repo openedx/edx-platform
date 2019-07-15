@@ -1,13 +1,16 @@
 """
 Unittests for migrating a course to split mongo
 """
+from __future__ import absolute_import
+
 from django.core.management import CommandError, call_command
 from django.test import TestCase
+
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class TestArgParsing(TestCase):
