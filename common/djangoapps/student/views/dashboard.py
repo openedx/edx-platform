@@ -549,6 +549,9 @@ def student_dashboard(request):
         The dashboard response.
 
     """
+
+    from openedx.features.student_account.helpers import get_non_active_course
+
     user = request.user
     if not UserProfile.objects.filter(user=user).exists():
         return redirect(reverse('account_settings'))
@@ -861,6 +864,8 @@ def student_dashboard(request):
         'empty_dashboard_message': empty_dashboard_message,
         'recovery_email_message': recovery_email_message,
         'recovery_email_activation_message': recovery_email_activation_message,
+        'alert_messages': get_non_active_course(user),
+        'is_poc': user.extended_profile.is_organization_admin,
     }
 
     if ecommerce_service.is_enabled(request.user):

@@ -103,6 +103,7 @@ AUTH_REDIRECT_KEY = 'next'
 # The following are various possible values for the AUTH_ENTRY_KEY.
 AUTH_ENTRY_LOGIN = 'login'
 AUTH_ENTRY_REGISTER = 'register'
+AUTH_ENTRY_REGISTER_V2 = 'signup'
 AUTH_ENTRY_ACCOUNT_SETTINGS = 'account_settings'
 
 # Entry modes into the authentication process by a remote API call (as opposed to a browser session).
@@ -136,12 +137,14 @@ def is_api(auth_entry):
 AUTH_DISPATCH_URLS = {
     AUTH_ENTRY_LOGIN: '/login',
     AUTH_ENTRY_REGISTER: '/register',
+    AUTH_ENTRY_REGISTER_V2: '/signup',
     AUTH_ENTRY_ACCOUNT_SETTINGS: '/account/settings',
 }
 
 _AUTH_ENTRY_CHOICES = frozenset([
     AUTH_ENTRY_LOGIN,
     AUTH_ENTRY_REGISTER,
+    AUTH_ENTRY_REGISTER_V2,
     AUTH_ENTRY_ACCOUNT_SETTINGS,
     AUTH_ENTRY_LOGIN_API,
     AUTH_ENTRY_REGISTER_API,
@@ -533,9 +536,9 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
         """Redirects to the login page."""
         return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN])
 
-    def dispatch_to_register():
+    def dispatch_to_register(auth_entry_register=AUTH_ENTRY_REGISTER):
         """Redirects to the registration page."""
-        return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER])
+        return redirect(AUTH_DISPATCH_URLS[auth_entry_register])
 
     def should_force_account_creation():
         """ For some third party providers, we auto-create user accounts """
@@ -557,10 +560,10 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
             if should_force_account_creation():
                 return dispatch_to_register()
             return dispatch_to_login()
-        elif auth_entry == AUTH_ENTRY_REGISTER:
+        elif auth_entry == AUTH_ENTRY_REGISTER or auth_entry == AUTH_ENTRY_REGISTER_V2:
             # User has authenticated with the third party provider and now wants to finish
             # creating their edX account.
-            return dispatch_to_register()
+            return dispatch_to_register(auth_entry)
         elif auth_entry == AUTH_ENTRY_ACCOUNT_SETTINGS:
             raise AuthEntryError(backend, 'auth_entry is wrong. Settings requires a user.')
         elif auth_entry in AUTH_ENTRY_CUSTOM:
