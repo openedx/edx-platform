@@ -28,7 +28,8 @@ profile_image_url = get_profile_image_urls_for_user(self.real_user)['medium']
                 <a class="dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${username}</a>
                 <ul role="menu" class="dropdown-menu dropdown-menu-right" id="${_("Usermenu")}" aria-labelledby="dropdownMenuLink" tabindex="-1">
                     <li role="presentation"><a role="menuitem" class="dropdown-item" href="${reverse('dashboard')}">${_("Dashboard")}</a></li>
-                    <li role="presentation"><a role="menuitem" class="dropdown-item" href="${reverse('account_settings')}">${_("Account")}</a></li>
+                    <li class="dropdown-item item has-block-link"><a href="${reverse('update_account_settings')}" role="menuitem" class="action dropdown-menuitem">Account Settings</a></li>
+                    <li class="dropdown-item item has-block-link"><a href="${reverse('user_info')}" role="menuitem" class="action dropdown-menuitem">Surveys</a></li>
                     <li role="presentation"><a role="menuitem" class="dropdown-item" href="${reverse('logout')}">${_("Sign Out")}</a></li>
                 </ul>
             </div>
