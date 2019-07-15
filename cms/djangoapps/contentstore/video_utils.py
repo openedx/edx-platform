@@ -2,16 +2,18 @@
 """
 Utils related to the videos.
 """
-import logging
-from urlparse import urljoin
-import requests
+from __future__ import absolute_import
 
+import logging
+
+import requests
+import six
 from django.conf import settings
 from django.core.files.images import get_image_dimensions
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils.translation import ugettext as _
 from edxval.api import get_course_video_image_url, update_video_image
-
+from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
 
 # Youtube thumbnail sizes.
 # https://img.youtube.com/vi/{youtube_id}/{thumbnail_quality}.jpg
@@ -40,9 +42,9 @@ def validate_video_image(image_file, skip_aspect_ratio=False):
 
     if not all(hasattr(image_file, attr) for attr in ['name', 'content_type', 'size']):
         error = _('The image must have name, content type, and size information.')
-    elif image_file.content_type not in settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS.values():
+    elif image_file.content_type not in list(settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS.values()):
         error = _(u'This image file type is not supported. Supported file types are {supported_file_formats}.').format(
-            supported_file_formats=settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS.keys()
+            supported_file_formats=list(settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS.keys())
         )
     elif image_file.size > settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MAX_BYTES']:
         error = _(u'This image file must be smaller than {image_max_size}.').format(
@@ -126,7 +128,7 @@ def scrape_youtube_thumbnail(course_id, edx_video_id, youtube_id):
     # Scrape when course video image does not exist for edx_video_id.
     if not get_course_video_image_url(course_id, edx_video_id):
         thumbnail_content, thumbnail_content_type = download_youtube_video_thumbnail(youtube_id)
-        supported_content_types = {v: k for k, v in settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS.iteritems()}
+        supported_content_types = {v: k for k, v in six.iteritems(settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS)}
         image_filename = '{youtube_id}{image_extention}'.format(
             youtube_id=youtube_id,
             image_extention=supported_content_types.get(
