@@ -1,20 +1,18 @@
 """ Course run serializers. """
-from __future__ import absolute_import
-
 import logging
-
+import time  # pylint: disable=unused-import
 import six
-from contentstore.views.assets import update_course_run_asset
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from rest_framework.fields import empty
-from student.models import CourseAccessRole
-from xmodule.modulestore.django import modulestore
 
 from cms.djangoapps.contentstore.views.course import create_new_course, get_course_and_check_access, rerun_course
+from contentstore.views.assets import update_course_run_asset
 from openedx.core.lib.courses import course_image_url
+from student.models import CourseAccessRole
+from xmodule.modulestore.django import modulestore
 
 IMAGE_TYPES = {
     'image/jpeg': 'jpg',
@@ -84,7 +82,7 @@ class CourseRunTeamSerializerMixin(serializers.Serializer):
 
 def image_is_jpeg_or_png(value):
     content_type = value.content_type
-    if content_type not in list(IMAGE_TYPES.keys()):
+    if content_type not in IMAGE_TYPES.keys():
         raise serializers.ValidationError(
             u'Only JPEG and PNG image types are supported. {} is not valid'.format(content_type))
 
