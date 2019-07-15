@@ -29,6 +29,8 @@ if 'TOXENV' in os.environ:
 else:
     PYTHON_REQ_FILES = ['requirements/edx/development.txt']
 
+PYTHON_REQ_FILES.append('requirements/philu/base.txt')
+
 # Developers can have private requirements, for local copies of github repos,
 # or favorite debugging tools, etc.
 PRIVATE_REQS = 'requirements/private.txt'

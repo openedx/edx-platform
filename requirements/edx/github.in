@@ -89,7 +89,8 @@
 # Our libraries:
 -e git+https://github.com/edx/codejail.git@a320d43ce6b9c93b17636b2491f724d9e433be47#egg=codejail
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
--e git+https://github.com/edx/edx-ora2.git@2.2.0#egg=ora2==2.2.0
+-e git+https://github.com/philanthropy-u/edx-ora2.git@eec9c36bde08cf6b7465c5b43b872f3b2db3889d#egg=ora2==1.1.13.2
+
 -e git+https://github.com/edx/RecommenderXBlock.git@1.4.0#egg=recommender-xblock==1.4.0
 -e git+https://github.com/solashirai/crowdsourcehinter.git@518605f0a95190949fe77bd39158450639e2e1dc#egg=crowdsourcehinter-xblock==0.1
 -e git+https://github.com/edx/RateXBlock.git@367e19c0f6eac8a5f002fd0f1559555f8e74bfff#egg=rate-xblock
@@ -100,5 +101,11 @@
 # Third Party XBlocks
 
 -e git+https://github.com/mitodl/edx-sga.git@3828ba9e413080a81b907a3381e5ffa05e063f81#egg=edx-sga==0.8.3
--e git+https://github.com/open-craft/xblock-poll@add89e14558c30f3c8dc7431e5cd6536fff6d941#egg=xblock-poll==1.5.1
+# -e git+https://github.com/open-craft/xblock-poll@add89e14558c30f3c8dc7431e5cd6536fff6d941#egg=xblock-poll==1.5.1
+-e git+https://github.com/philanthropy-u/AudioXBlock.git#egg=audio-xblock==1.0.2
+-e git+https://github.com/adlnet-archive/Table-XBlock.git#egg=table-xblock==1.0
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.1.6#egg=xblock-drag-and-drop-v2==2.1.6
+
+# edx-notifications
+# -e git+https://github.com/philanthropy-u/edx-notifications.git@0770571453072a7c8e185bdbdd778545c9c7ef59#egg=edx-notifications
+-e git+https://github.com/philanthropy-u/django-simple-history.git@9187c9b4907da5a2a0564eff45929fd15b784309#egg=django-simple-history
