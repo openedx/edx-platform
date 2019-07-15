@@ -1,20 +1,13 @@
-"""Course run Tests"""
-
-from __future__ import absolute_import
-
 import datetime
 
 import ddt
 import pytz
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import RequestFactory
 from django.urls import reverse
+from django.test import RequestFactory
 from opaque_keys.edx.keys import CourseKey
-from rest_framework.test import APIClient
-
 from openedx.core.lib.courses import course_image_url
-from student.models import CourseAccessRole
-from student.tests.factories import TEST_PASSWORD, AdminFactory, UserFactory
+from rest_framework.test import APIClient
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
@@ -22,8 +15,10 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ToyCourseFactory
 
-from ...serializers.course_runs import CourseRunSerializer
+from student.models import CourseAccessRole
+from student.tests.factories import AdminFactory, TEST_PASSWORD, UserFactory
 from ..utils import serialize_datetime
+from ...serializers.course_runs import CourseRunSerializer
 
 
 @ddt.ddt
