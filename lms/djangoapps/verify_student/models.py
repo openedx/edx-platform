@@ -24,7 +24,6 @@ from django.core.cache import cache
 from django.core.files.base import ContentFile
 from django.urls import reverse
 from django.db import models
-from django.db.models import Subquery
 from django.dispatch import receiver
 from django.utils.functional import cached_property
 from django.utils.timezone import now
@@ -1052,7 +1051,7 @@ class VerificationDeadline(TimeStampedModel):
             dict: Map of course keys to datetimes (verification deadlines)
         """
         verification_deadlines = VerificationDeadline.objects.filter(
-            course_key__in=Subquery(enrollments_qs.values('course_id'))
+            course_key__in=enrollments_qs.values('course_id')
         )
         return {
             deadline.course_key: deadline.deadline
