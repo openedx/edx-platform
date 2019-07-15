@@ -10,6 +10,7 @@ from collections import namedtuple
 from bulk_email.models import Optout
 from courseware.courses import get_courses, sort_by_announcement, sort_by_start_date
 from django.conf import settings
+from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser, User
@@ -93,6 +94,8 @@ from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.db import outer_atomic
 from util.json_request import JsonResponse
 from util.password_policy_validators import normalize_password, validate_password
+from courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.module_render import get_module_for_descriptor
 
 log = logging.getLogger("edx.student")
 
@@ -184,6 +187,30 @@ def index(request, extra_context=None, user=AnonymousUser()):
     context['journal_info'] = get_journals_context(request)
 
     return render_to_response('index.html', context)
+
+
+def get_course_related_keys(request, course):
+    """
+        Get course first chapter & first section keys
+    """
+    first_chapter_url = ""
+    first_section = ""
+
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        course.id, request.user, course, depth=2,
+    )
+    course_module = get_module_for_descriptor(
+        request.user, request, course, field_data_cache, course.id, course=course
+    )
+
+    chapters = course_module.get_display_items()
+    if chapters:
+        first_chapter = chapters[0]
+        first_chapter_url = first_chapter.url_name
+        subsections = first_chapter.get_display_items()
+        first_section = subsections[0].url_name if subsections else ""
+
+    return first_chapter_url, first_section
 
 
 def compose_and_send_activation_email(user, profile, user_registration=None):
@@ -417,7 +444,18 @@ def change_enrollment(request, check_access=True):
             )
 
         # Otherwise, there is only one mode available (the default)
-        return HttpResponse()
+
+        # TODO: Move this section out because we are making changes in the built in code
+        current_course = modulestore().get_course(course_id)
+        today_date = timezone.now()
+        course_start_date = current_course.start
+        if course_start_date > today_date:
+            course_target = reverse('about_course', args=[unicode(course_id)])
+        else:
+            first_chapter_url, first_section = get_course_related_keys(request, current_course)
+            course_target = reverse('courseware_section', args=[course_id, first_chapter_url, first_section])
+
+        return JsonResponse({'course_target': course_target})
     elif action == "unenroll":
         enrollment = CourseEnrollment.get_enrollment(user, course_id)
         if not enrollment:

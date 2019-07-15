@@ -69,7 +69,7 @@ def apply_settings(django_settings):
     django_settings.SOCIAL_AUTH_STRATEGY = 'third_party_auth.strategy.ConfigurationModelStrategy'
 
     # We let the user specify their email address during signup.
-    django_settings.SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['email']
+    django_settings.SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['email', 'first_name', 'last_name']
 
     # Disable exceptions by default for prod so you get redirect behavior
     # instead of a Django error page. During development you may want to
