@@ -60,3 +60,7 @@ python-slugify==1.2.6
 # lms.djangoapps.course_api.tests.test_views.CourseListSearchViewTest.test_list_all_with_search_term
 # acceptance.tests.lms.test_lms_course_discovery.CourseDiscoveryTest.test_search
 edx-search==1.2.2
+
+# This ruamel.ordereddict will not be supported in python3 but is a dependency of ruamel.yaml
+# install it only on python 2.7
+ruamel.ordereddict; python_version == "2.7"

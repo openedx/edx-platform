@@ -271,7 +271,7 @@ requests-oauthlib==1.1.0
 requests==2.22.0
 rest-condition==1.0.3
 rfc6266-parser==0.0.5.post2
-ruamel.ordereddict==0.4.13
+ruamel.ordereddict==0.4.13 ; python_version == "2.7"
 ruamel.yaml==0.15.99
 rules==2.0.1
 s3transfer==0.1.13
