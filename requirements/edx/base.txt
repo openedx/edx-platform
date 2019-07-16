@@ -20,10 +20,10 @@
 -e openedx/core/lib/xblock_builtin/xblock_discussion
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
 -e common/lib/xmodule
-amqp==1.4.9               # via kombu
+amqp==1.4.9               # via edx-enterprise, kombu
 analytics-python==1.2.9
-aniso8601==7.0.0          # via tincan
-anyjson==0.3.3            # via kombu
+aniso8601==7.0.0          # via edx-enterprise, tincan
+anyjson==0.3.3            # via edx-enterprise, kombu
 appdirs==1.4.3            # via fs
 argh==0.26.2
 asn1crypto==0.24.0
@@ -31,7 +31,7 @@ attrs==17.4.0
 babel==1.3
 backports.functools-lru-cache==1.5  # via soupsieve
 beautifulsoup4==4.7.1     # via pynliner
-billiard==3.3.0.23        # via celery
+billiard==3.3.0.23        # via celery, edx-enterprise
 bleach==2.1.4
 boto3==1.4.8
 boto==2.39.0
@@ -42,7 +42,8 @@ certifi==2019.6.16
 cffi==1.12.3
 chardet==3.0.4
 git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0
-click==7.0                # via user-util
+click==7.0                # via code-annotations, edx-enterprise, user-util
+code-annotations==0.3.1   # via edx-enterprise
 coreapi==2.3.3            # via drf-yasg
 coreschema==0.0.4         # via coreapi, drf-yasg
 git+https://github.com/edx/crowdsourcehinter.git@518605f0a95190949fe77bd39158450639e2e1dc#egg=crowdsourcehinter-xblock==0.1
@@ -98,14 +99,14 @@ edx-ace==0.1.10
 edx-analytics-data-api-client==0.15.3
 edx-bulk-grades==0.1.5
 edx-ccx-keys==0.2.2
-edx-celeryutils==0.2.7
+edx-celeryutils==0.3.0
 edx-completion==2.0.0
 edx-django-oauth2-provider==1.3.5
 edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
-edx-django-utils==1.0.5
+edx-django-utils==2.0.0
 edx-drf-extensions==2.3.1
-edx-enterprise==1.6.22
+edx-enterprise==1.7.0
 edx-i18n-tools==0.4.8
 edx-milestones==0.2.3
 edx-oauth2-provider==1.2.2
@@ -115,7 +116,7 @@ edx-proctoring-proctortrack==1.0.5
 edx-proctoring==2.0.6
 edx-rbac==0.2.1           # via edx-enterprise
 edx-rest-api-client==1.9.2
-edx-search==1.2.2
+edx-search==1.2.3
 git+https://github.com/mitodl/edx-sga.git@3828ba9e413080a81b907a3381e5ffa05e063f81#egg=edx-sga==0.8.3
 edx-submissions==2.1.1
 edx-user-state-client==1.1.1
@@ -128,8 +129,8 @@ feedparser==5.1.3
 firebase-token-generator==1.3.2
 fs-s3fs==0.1.8
 fs==2.0.18
-future==0.17.1            # via pyjwkest
-futures==3.2.0 ; python_version == "2.7"  # via django-pipeline, python-swiftclient, s3transfer, xblock-utils
+future==0.17.1            # via edx-celeryutils, edx-enterprise, pyjwkest
+futures==3.3.0 ; python_version == "2.7"  # via django-pipeline, python-swiftclient, s3transfer, xblock-utils
 geoip2==2.9.0
 glob2==0.7
 gunicorn==19.9.0
@@ -141,11 +142,11 @@ inflection==0.3.1         # via drf-yasg
 ipaddress==1.0.22
 isodate==0.6.0            # via python3-saml
 itypes==1.1.0             # via coreapi
-jinja2==2.10.1            # via coreschema
+jinja2==2.10.1            # via code-annotations, coreschema, edx-enterprise
 jmespath==0.9.4           # via boto3, botocore
 jsondiff==1.1.1           # via edx-enterprise
 jsonfield==2.0.2
-kombu==3.0.37             # via celery
+kombu==3.0.37             # via celery, edx-enterprise
 lazy==1.1
 lepl==5.1.3               # via rfc6266-parser
 libsass==0.10.0
@@ -165,7 +166,7 @@ mpmath==1.1.0             # via sympy
 mysqlclient==1.4.2.post1
 networkx==1.7
 newrelic==4.20.1.121
-nltk==3.4.3
+nltk==3.4.4
 nodeenv==1.1.1
 numpy==1.16.4
 oauth2==1.9.0.post1
@@ -174,7 +175,7 @@ git+https://github.com/edx/edx-ora2.git@2.2.3#egg=ora2==2.2.3
 path.py==8.2.1
 pathtools==0.1.2
 paver==1.3.4
-pbr==5.3.1
+pbr==5.4.0
 pdfminer.six==20181108
 piexif==1.0.2
 pillow==6.1.0
@@ -183,7 +184,7 @@ polib==1.1.0              # via edx-i18n-tools
 psutil==1.2.1
 py2neo==3.1.2
 pycontracts==1.7.1
-pycountry==18.12.8
+pycountry==19.7.15
 pycparser==2.19
 pycryptodome==3.8.2       # via pdfminer.six
 pycryptodomex==3.4.7
@@ -199,7 +200,8 @@ python-dateutil==2.4.0
 python-levenshtein==0.12.0
 python-memcached==1.59
 python-openid==2.2.5 ; python_version == "2.7"  # via social-auth-core
-python-swiftclient==3.7.0
+python-slugify==1.2.6     # via code-annotations, edx-enterprise
+python-swiftclient==3.8.0
 python3-saml==1.5.0
 pytz==2019.1
 pyuca==1.1
@@ -212,18 +214,18 @@ requests==2.22.0
 rest-condition==1.0.3
 rfc6266-parser==0.0.5.post2
 ruamel.ordereddict==0.4.13  # via ruamel.yaml
-ruamel.yaml==0.15.97      # via drf-yasg
+ruamel.yaml==0.15.99      # via drf-yasg
 rules==2.0.1
 s3transfer==0.1.13        # via boto3
 sailthru-client==2.2.3
 scipy==1.2.1
-semantic-version==2.6.0   # via edx-drf-extensions
+semantic-version==2.6.0   # via edx-drf-extensions, edx-enterprise
 shapely==1.6.4.post2
-shortuuid==0.5.0          # via edx-django-oauth2-provider
+shortuuid==0.5.0          # via edx-django-oauth2-provider, edx-enterprise
 simplejson==3.16.0        # via mailsnake, sailthru-client, zendesk
 singledispatch==3.4.0.3
 six==1.11.0
-slumber==0.7.1            # via edx-rest-api-client
+slumber==0.7.1            # via edx-enterprise, edx-rest-api-client
 social-auth-app-django==2.1.0
 social-auth-core==1.7.0
 sorl-thumbnail==12.3
@@ -232,17 +234,19 @@ soupsieve==1.9.2          # via beautifulsoup4
 sqlparse==0.3.0
 staff-graded-xblock==0.3
 stevedore==1.30.1
-super-csv==0.5.1
+super-csv==0.6
 sympy==1.4
+testfixtures==6.10.0      # via edx-enterprise
 tincan==0.0.5             # via edx-enterprise
 unicodecsv==0.14.1
+unidecode==1.1.1          # via edx-enterprise, python-slugify
 uritemplate==3.0.0        # via coreapi, drf-yasg
 urllib3==1.23
 user-util==0.1.5
 voluptuous==0.11.5
 watchdog==0.9.0
 web-fragments==0.3.0
-webencodings==0.5.1       # via html5lib
+webencodings==0.5.1       # via edx-enterprise, html5lib
 webob==1.8.5              # via xblock
 wrapt==1.10.5
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.1#egg=xblock-drag-and-drop-v2==2.2.1
