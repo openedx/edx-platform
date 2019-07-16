@@ -52,3 +52,6 @@ pytest<4.6.0
 
 # Pinning to older version of edx-rbac until ENT-2002 is resolved.
 edx-rbac==0.2.1
+
+# 2.0.0 is a dummy package, because faulthandler has been incorporated into pytest 5.0
+pytest-faulthandler<2.0.0

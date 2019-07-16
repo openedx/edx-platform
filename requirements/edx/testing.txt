@@ -57,7 +57,8 @@ configparser==3.7.4       # via entrypoints, flake8, importlib-metadata, pylint
 contextlib2==0.5.5        # via importlib-metadata
 coreapi==2.3.3
 coreschema==0.0.4
-coverage==4.4
+coverage==5.0a6
+git+https://github.com/nedbat/coverage_pytest_plugin.git@423752f00ebe62b8697fc13c7038cdc866e72df4#egg=coverage_pytest_plugin==0.0
 git+https://github.com/edx/crowdsourcehinter.git@518605f0a95190949fe77bd39158450639e2e1dc#egg=crowdsourcehinter-xblock==0.1
 cryptography==2.7
 cssselect==1.0.3
@@ -247,8 +248,9 @@ pyquery==1.4.0
 pysqlite==2.8.3 ; python_version == "2.7"
 pysrt==1.1.1
 pytest-attrib==0.1.3
-pytest-cov==2.7.1
+git+https://github.com/nedbat/pytest-cov.git@nedbat/cov5-combine#egg=pytest-cov==0.0
 pytest-django==3.5.1
+pytest-faulthandler==1.6.0
 pytest-forked==1.0.2      # via pytest-xdist
 pytest-randomly==1.2.3
 pytest-xdist==1.29.0
@@ -306,6 +308,7 @@ transifex-client==0.13.6
 typing==3.7.4             # via flake8
 unicodecsv==0.14.1
 unidecode==1.1.1          # via python-slugify
+unidiff==0.5.5
 uritemplate==3.0.0
 urllib3==1.23
 user-util==0.1.5
