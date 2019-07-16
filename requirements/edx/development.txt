@@ -297,8 +297,8 @@ six==1.11.0
 slumber==0.7.1
 snakefood==1.4
 snowballstemmer==1.9.0    # via sphinx
-social-auth-app-django==2.1.0
-social-auth-core==1.7.0
+social-auth-app-django==3.1.0
+social-auth-core==3.2.0
 sorl-thumbnail==12.3
 sortedcontainers==2.1.0
 soupsieve==1.9.2
