@@ -37,8 +37,10 @@ from util.enterprise_helpers import data_sharing_consent_requirement_at_login, i
 from util.json_request import JsonResponse
 from lms.djangoapps.onboarding.models import RegistrationType, GranteeOptIn
 
-from common.djangoapps.student.views import AccountValidationError, social_utils, REGISTER_USER, \
-    _enroll_user_in_pending_courses, record_registration_attributions
+from common.djangoapps.student.views import _enroll_user_in_pending_courses
+from social_django import utils as social_utils
+from common.djangoapps.student.helpers import AccountValidationError
+from openedx.core.djangoapps.user_authn.views.register import REGISTER_USER, record_registration_attributions
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
@@ -413,7 +415,7 @@ def create_account_with_params_custom(request, params, is_alquity_user):
         )
 
     # Announce registration
-    REGISTER_USER.send(sender=None, user=user, profile=profile)
+    REGISTER_USER.send(sender=None, user=user, registration=registration)
 
     create_comments_service_user(user)
 
@@ -685,7 +687,7 @@ def create_account_with_params_custom_v2(request, params, is_alquity_user):
         )
 
     # Announce registration
-    REGISTER_USER.send(sender=None, user=user, profile=profile)
+    REGISTER_USER.send(sender=None, user=user, registration=registration)
 
     create_comments_service_user(user)
 

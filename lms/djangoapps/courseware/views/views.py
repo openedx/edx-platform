@@ -61,7 +61,7 @@ from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
 from enrollment.api import add_enrollment
 from ipware.ip import get_ip
-from common.djangoapps.student.views import get_course_related_keys
+from common.djangoapps.student.views.management import get_course_related_keys
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import CertificateStatuses

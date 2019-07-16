@@ -14,7 +14,7 @@ from courseware.courses import get_course
 from certificates.models import (
     GeneratedCertificate,
     CertificateStatuses)
-from common.djangoapps.student.views import get_course_enrollments
+from common.djangoapps.student.views.dashboard import get_course_enrollments
 
 from helpers import get_certificate_image_url, get_philu_certificate_social_context
 
