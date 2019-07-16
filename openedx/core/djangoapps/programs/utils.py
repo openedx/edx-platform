@@ -9,7 +9,6 @@ from copy import deepcopy
 from itertools import chain
 
 import six
-from six.moves.urllib.parse import urljoin, urlparse, urlunparse  # pylint: disable=import-error
 from dateutil.parser import parse
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -20,6 +19,7 @@ from edx_rest_api_client.exceptions import SlumberBaseException
 from opaque_keys.edx.keys import CourseKey
 from pytz import utc
 from requests.exceptions import ConnectionError, Timeout
+from six.moves.urllib.parse import urljoin, urlparse, urlunparse  # pylint: disable=import-error
 
 from course_modes.models import CourseMode
 from entitlements.models import CourseEntitlement
