@@ -10,6 +10,7 @@ from paver.easy import cmdopts, sh, task
 
 from pavelib.utils.envs import Env
 from pavelib.utils.timer import timed
+from pavelib.utils.db_utils import get_file_from_s3, upload_to_s3
 
 try:
     from bok_choy.browser import browser
@@ -18,6 +19,12 @@ except ImportError:
 
 MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
 MINIMUM_FIREFOX_VERSION = 28.0
+
+COVERAGE_CACHE_BUCKET = "edx-tools-coverage-caches"
+COVERAGE_CACHE_BASEPATH = "test_root/who_tests_what"
+COVERAGE_CACHE_BASELINE = "who_tests_what.baseline"
+WHO_TESTS_WHAT_DIFF = "who_tests_what.diff"
+
 
 __test__ = False  # do not collect
 
@@ -149,3 +156,35 @@ def check_firefox_version():
                 debian_path=debian_path
             )
         )
+
+
+@task
+@cmdopts([
+    ("compare-branch=", "b", "Branch to compare against, defaults to origin/master"),
+], share_with=['coverage'])
+@timed
+def fetch_coverage_test_selection_data(options):
+    """
+    Set up the datafiles needed to run coverage-driven test selection (who-tests-what)
+    """
+
+    try:
+        os.makedirs(COVERAGE_CACHE_BASEPATH)
+    except OSError:
+        pass  # Directory already exists
+
+    sh('git diff $(git merge-base {} HEAD) > {}/{}'.format(
+        getattr(options, 'compare_branch', 'origin/master'),
+        COVERAGE_CACHE_BASEPATH,
+        WHO_TESTS_WHAT_DIFF
+    ))
+    get_file_from_s3(COVERAGE_CACHE_BUCKET, COVERAGE_CACHE_BASELINE, COVERAGE_CACHE_BASEPATH)
+
+
+@task
+def upload_coverage_to_s3(options):
+    upload_to_s3(
+        COVERAGE_CACHE_BASELINE,
+        '{}/{}'.format(COVERAGE_CACHE_BASEPATH, 'reports/.coverage'),
+        COVERAGE_CACHE_BUCKET
+    )

@@ -27,3 +27,7 @@ fi
 # JUnit test reporter will fail the build
 # if it thinks test results are old
 touch `find . -name *.xml` || true
+
+if [[ -n "$PYTEST_CONTEXTS"]]; then
+    paver upload_coverage_to_s3
+fi

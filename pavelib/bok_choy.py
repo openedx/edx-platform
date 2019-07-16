@@ -6,7 +6,7 @@ from __future__ import print_function
 
 import os
 
-from paver.easy import cmdopts, needs, sh, task
+from paver.easy import cmdopts, needs, sh, task, might_call
 
 from pavelib.utils.envs import Env
 from pavelib.utils.passthrough_opts import PassthroughTask
@@ -14,7 +14,7 @@ from pavelib.utils.test.bokchoy_options import (
     BOKCHOY_OPTS,
 )
 from pavelib.utils.test.suites.bokchoy_suite import BokChoyTestSuite
-from pavelib.utils.test.utils import check_firefox_version
+from pavelib.utils.test.utils import check_firefox_version, fetch_coverage_test_selection_data
 from pavelib.utils.timer import timed
 
 try:
@@ -26,7 +26,8 @@ __test__ = False  # do not collect
 
 
 @needs('pavelib.prereqs.install_prereqs')
-@cmdopts(BOKCHOY_OPTS)
+@cmdopts(BOKCHOY_OPTS, share_with=['pavelib.utils.test.utils.fetch_coverage_test_selection_data'])
+@might_call('pavelib.utils.test.utils.fetch_coverage_test_selection_data')
 @PassthroughTask
 @timed
 def test_bokchoy(options, passthrough_options):
@@ -52,6 +53,9 @@ def test_bokchoy(options, passthrough_options):
 
     if validate_firefox:
         check_firefox_version()
+
+    if options.test_bokchoy.with_wtw:
+        fetch_coverage_test_selection_data()
 
     run_bokchoy(options.test_bokchoy, passthrough_options)
 

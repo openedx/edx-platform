@@ -7,12 +7,13 @@ import re
 import sys
 from optparse import make_option
 
-from paver.easy import cmdopts, needs, sh, task
+from paver.easy import cmdopts, needs, sh, task, might_call
 
 from pavelib.utils.envs import Env
 from pavelib.utils.passthrough_opts import PassthroughTask
 from pavelib.utils.test import suites
 from pavelib.utils.timer import timed
+from pavelib.utils.test.utils import fetch_coverage_test_selection_data
 
 try:
     from pygments.console import colorize
@@ -87,8 +88,20 @@ __test__ = False  # do not collect
         '--xdist_ip_addresses',
         dest='xdist_ip_addresses',
         help="Comma separated string of ip addresses to shard tests to via xdist."
-    )
-], share_with=['pavelib.utils.test.utils.clean_reports_dir'])
+    ),
+    make_option(
+        '--with-wtw',
+        dest='with_wtw',
+        action='store_true',
+        default=False
+        help="Only run tests based on the lines changed relative to the specified branch"
+    ),
+    ("compare-branch=", "b", "Branch to compare against, defaults to origin/master"),
+], share_with=[
+    'pavelib.utils.test.utils.clean_reports_dir',
+    'pavelib.utils.test.utils.fetch_coverage_test_selection_data',
+])
+@might_call('pavelib.utils.test.utils.fetch_coverage_test_selection_data')
 @PassthroughTask
 @timed
 def test_system(options, passthrough_options):
@@ -101,6 +114,9 @@ def test_system(options, passthrough_options):
 
     assert system in (None, 'lms', 'cms')
     assert django_version in (None, '1.8', '1.9', '1.10', '1.11')
+
+    if options.test_system.with_wtw:
+        fetch_coverage_test_selection_data()
 
     if test_id:
         # Testing a single test ID.
