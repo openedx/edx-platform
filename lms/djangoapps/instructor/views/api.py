@@ -5,6 +5,8 @@ JSON views which the instructor dashboard requests.
 
 Many of these GETs may become PUTs in the future.
 """
+from __future__ import absolute_import
+
 import csv
 import decimal
 import json
@@ -15,6 +17,7 @@ import string
 import StringIO
 import time
 
+import six
 import unicodecsv
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -39,6 +42,7 @@ from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from six import text_type
+from six.moves import map, range
 from submissions import api as sub_api  # installed from the edx-submissions repository
 
 import instructor_analytics.basic
@@ -49,12 +53,6 @@ from bulk_email.models import CourseEmail
 from courseware.access import has_access
 from courseware.courses import get_course_by_id, get_course_with_access
 from courseware.models import StudentModule
-from lms.djangoapps.discussion.django_comment_client.utils import (
-    get_course_discussion_settings,
-    get_group_id_for_user,
-    get_group_name,
-    has_forum_access
-)
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
@@ -62,6 +60,12 @@ from lms.djangoapps.certificates.models import (
     CertificateStatuses,
     CertificateWhitelist,
     GeneratedCertificate
+)
+from lms.djangoapps.discussion.django_comment_client.utils import (
+    get_course_discussion_settings,
+    get_group_id_for_user,
+    get_group_name,
+    has_forum_access
 )
 from lms.djangoapps.instructor import enrollment
 from lms.djangoapps.instructor.access import ROLES, allow_access, list_with_level, revoke_access, update_forum_role
@@ -168,7 +172,7 @@ def common_exceptions_400(func):
         except MultipleObjectsReturned:
             message = _('Found a conflict with given identifier. Please try an alternative identifier')
         except (AlreadyRunningError, QueueConnectionError) as err:
-            message = unicode(err)
+            message = six.text_type(err)
 
         if use_json:
             return JsonResponseBadRequest(message)
@@ -997,9 +1001,9 @@ def list_course_role_members(request, course_id):
 
     response_payload = {
         'course_id': text_type(course_id),
-        rolename: map(extract_user_info, list_with_level(
+        rolename: list(map(extract_user_info, list_with_level(
             course, rolename
-        )),
+        ))),
     }
     return JsonResponse(response_payload)
 
@@ -1317,7 +1321,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
     if not csv:
         student_data = instructor_analytics.basic.enrolled_students_features(course_key, query_features)
         response_payload = {
-            'course_id': unicode(course_key),
+            'course_id': six.text_type(course_key),
             'students': student_data,
             'students_count': len(student_data),
             'queried_features': query_features,
@@ -1404,7 +1408,7 @@ def add_users_to_cohorts(request, course_id):
         # The task will assume the default file storage.
         task_api.submit_cohort_students(request, course_key, filename)
     except (FileValidationException, PermissionDenied) as err:
-        return JsonResponse({"error": unicode(err)}, status=400)
+        return JsonResponse({"error": six.text_type(err)}, status=400)
 
     return JsonResponse()
 
@@ -1583,7 +1587,7 @@ def save_registration_code(user, course_id, mode_slug, invoice=None, order=None,
 
     course_registration = CourseRegistrationCode(
         code=code,
-        course_id=unicode(course_id),
+        course_id=six.text_type(course_id),
         created_by=user,
         invoice=invoice,
         order=order,
@@ -2388,7 +2392,7 @@ def list_background_email_tasks(request, course_id):  # pylint: disable=unused-a
     )
 
     response_payload = {
-        'tasks': map(extract_task_features, tasks),
+        'tasks': list(map(extract_task_features, tasks)),
     }
     return JsonResponse(response_payload)
 
@@ -2407,7 +2411,7 @@ def list_email_content(request, course_id):  # pylint: disable=unused-argument
     emails = task_api.get_instructor_task_history(course_id, task_type=task_type)
 
     response_payload = {
-        'emails': map(extract_email_features, emails),
+        'emails': list(map(extract_email_features, emails)),
     }
     return JsonResponse(response_payload)
 
@@ -2453,7 +2457,7 @@ def list_instructor_tasks(request, course_id):
         tasks = task_api.get_running_instructor_tasks(course_id)
 
     response_payload = {
-        'tasks': map(extract_task_features, tasks),
+        'tasks': list(map(extract_task_features, tasks)),
     }
     return JsonResponse(response_payload)
 
@@ -2495,7 +2499,7 @@ def list_entrance_exam_instructor_tasks(request, course_id):
         )
 
     response_payload = {
-        'tasks': map(extract_task_features, tasks),
+        'tasks': list(map(extract_task_features, tasks)),
     }
     return JsonResponse(response_payload)
 
@@ -2668,7 +2672,7 @@ def list_forum_members(request, course_id):
 
     response_payload = {
         'course_id': text_type(course_id),
-        rolename: map(extract_user_info, users),
+        rolename: list(map(extract_user_info, users)),
         'division_scheme': course_discussion_settings.division_scheme,
     }
     return JsonResponse(response_payload)
@@ -2959,7 +2963,7 @@ def _instructor_dash_url(course_key, section=None):
         unicode: The URL of a section in the instructor dashboard.
 
     """
-    url = reverse('instructor_dashboard', kwargs={'course_id': unicode(course_key)})
+    url = reverse('instructor_dashboard', kwargs={'course_id': six.text_type(course_key)})
     if section is not None:
         url += u'#view-{section}'.format(section=section)
     return url
