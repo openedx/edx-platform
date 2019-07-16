@@ -1,16 +1,17 @@
 """
 Test the heartbeat
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+
 import json
 
-from django.urls import reverse
 from django.db.utils import DatabaseError
 from django.test.client import Client
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from django.urls import reverse
 from mock import patch
 
 from xmodule.exceptions import HeartbeatFailure
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class HeartbeatTestCase(ModuleStoreTestCase):
