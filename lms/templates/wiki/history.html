@@ -215,10 +215,10 @@
         {% trans "Back to history view" as tmsg %}{{tmsg|force_escape}}
       </a>
       {% if article|can_write:user %}
-        <button type="button" class="btn btn-large btn-primary switch-to-revision">
+        <a type="button" class="btn btn-large btn-primary switch-to-revision">
           <span class="icon fa fa-flag" aria-hidden="true"></span>
           {% trans "Switch to this version" as tmsg %}{{tmsg|force_escape}}
-        </button>
+        </a>
       {% else %}
         <button type="button" class="btn btn-large btn-primary disabled">
           <span class="icon fa fa-lock" aria-hidden="true"></span>
