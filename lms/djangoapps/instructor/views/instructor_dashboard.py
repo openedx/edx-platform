@@ -282,25 +282,48 @@ def _section_e_commerce(course, access, paid_mode, coupons_enabled, reports_enab
         'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
         'ajax_remove_coupon_url': reverse('remove_coupon', kwargs={'course_id': six.text_type(course_key)}),
         'ajax_get_coupon_info': reverse('get_coupon_info', kwargs={'course_id': six.text_type(course_key)}),
-        'get_user_invoice_preference_url': reverse('get_user_invoice_preference', kwargs={'course_id': six.text_type(course_key)}),
+        'get_user_invoice_preference_url': reverse(
+            'get_user_invoice_preference',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
         'sale_validation_url': reverse('sale_validation', kwargs={'course_id': six.text_type(course_key)}),
         'ajax_update_coupon': reverse('update_coupon', kwargs={'course_id': six.text_type(course_key)}),
         'ajax_add_coupon': reverse('add_coupon', kwargs={'course_id': six.text_type(course_key)}),
         'get_sale_records_url': reverse('get_sale_records', kwargs={'course_id': six.text_type(course_key)}),
-        'get_sale_order_records_url': reverse('get_sale_order_records', kwargs={'course_id': six.text_type(course_key)}),
+        'get_sale_order_records_url': reverse(
+            'get_sale_order_records',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
         'instructor_url': reverse('instructor_dashboard', kwargs={'course_id': six.text_type(course_key)}),
-        'get_registration_code_csv_url': reverse('get_registration_codes', kwargs={'course_id': six.text_type(course_key)}),
-        'generate_registration_code_csv_url': reverse('generate_registration_codes', kwargs={'course_id': six.text_type(course_key)}),
-        'active_registration_code_csv_url': reverse('active_registration_codes', kwargs={'course_id': six.text_type(course_key)}),
-        'spent_registration_code_csv_url': reverse('spent_registration_codes', kwargs={'course_id': six.text_type(course_key)}),
+        'get_registration_code_csv_url': reverse(
+            'get_registration_codes',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
+        'generate_registration_code_csv_url': reverse(
+            'generate_registration_codes',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
+        'active_registration_code_csv_url': reverse(
+            'active_registration_codes',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
+        'spent_registration_code_csv_url': reverse(
+            'spent_registration_codes',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
         'set_course_mode_url': reverse('set_course_mode_price', kwargs={'course_id': six.text_type(course_key)}),
         'download_coupon_codes_url': reverse('get_coupon_codes', kwargs={'course_id': six.text_type(course_key)}),
         'enrollment_report_url': reverse('get_enrollment_report', kwargs={'course_id': six.text_type(course_key)}),
         'exec_summary_report_url': reverse('get_exec_summary_report', kwargs={'course_id': six.text_type(course_key)}),
-        'list_financial_report_downloads_url': reverse('list_financial_report_downloads',
-                                                       kwargs={'course_id': six.text_type(course_key)}),
+        'list_financial_report_downloads_url': reverse(
+            'list_financial_report_downloads',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': six.text_type(course_key)}),
-        'look_up_registration_code': reverse('look_up_registration_code', kwargs={'course_id': six.text_type(course_key)}),
+        'look_up_registration_code': reverse(
+            'look_up_registration_code',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
         'coupons': coupons,
         'sales_admin': access['sales_admin'],
         'coupons_enabled': coupons_enabled,
@@ -468,11 +491,16 @@ def _section_course_info(course, access):
         #  dashboard_link is already made safe in _get_dashboard_link
         dashboard_link = _get_dashboard_link(course_key)
         #  so we can use Text() here so it's not double-escaped and rendering HTML on the front-end
-        message = Text(_(u"Enrollment data is now available in {dashboard_link}.")).format(dashboard_link=dashboard_link)
+        message = Text(
+            _(u"Enrollment data is now available in {dashboard_link}.")
+        ).format(dashboard_link=dashboard_link)
         section_data['enrollment_message'] = message
 
     if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'):
-        section_data['detailed_gitlogs_url'] = reverse('gitlogs_detail', kwargs={'course_id': six.text_type(course_key)})
+        section_data['detailed_gitlogs_url'] = reverse(
+            'gitlogs_detail',
+            kwargs={'course_id': six.text_type(course_key)}
+        )
 
     try:
         sorted_cutoffs = sorted(list(course.grade_cutoffs.items()), key=lambda i: i[1], reverse=True)
@@ -503,12 +531,24 @@ def _section_membership(course, access):
         'ccx_is_enabled': ccx_enabled,
         'enroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': six.text_type(course_key)}),
         'unenroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': six.text_type(course_key)}),
-        'upload_student_csv_button_url': reverse('register_and_enroll_students', kwargs={'course_id': six.text_type(course_key)}),
-        'modify_beta_testers_button_url': reverse('bulk_beta_modify_access', kwargs={'course_id': six.text_type(course_key)}),
-        'list_course_role_members_url': reverse('list_course_role_members', kwargs={'course_id': six.text_type(course_key)}),
+        'upload_student_csv_button_url': reverse(
+            'register_and_enroll_students',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
+        'modify_beta_testers_button_url': reverse(
+            'bulk_beta_modify_access',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
+        'list_course_role_members_url': reverse(
+            'list_course_role_members',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
         'modify_access_url': reverse('modify_access', kwargs={'course_id': six.text_type(course_key)}),
         'list_forum_members_url': reverse('list_forum_members', kwargs={'course_id': six.text_type(course_key)}),
-        'update_forum_role_membership_url': reverse('update_forum_role_membership', kwargs={'course_id': six.text_type(course_key)}),
+        'update_forum_role_membership_url': reverse(
+            'update_forum_role_membership',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
         'enrollment_role_choices': enrollment_role_choices
     }
     return section_data
@@ -578,23 +618,34 @@ def _section_student_admin(course, access):
             'get_student_enrollment_status',
             kwargs={'course_id': six.text_type(course_key)}
         ),
-        'get_student_progress_url_url': reverse('get_student_progress_url', kwargs={'course_id': six.text_type(course_key)}),
+        'get_student_progress_url_url': reverse(
+            'get_student_progress_url',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
         'enrollment_url': reverse('students_update_enrollment', kwargs={'course_id': six.text_type(course_key)}),
-        'reset_student_attempts_url': reverse('reset_student_attempts', kwargs={'course_id': six.text_type(course_key)}),
+        'reset_student_attempts_url': reverse(
+            'reset_student_attempts',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
         'reset_student_attempts_for_entrance_exam_url': reverse(
             'reset_student_attempts_for_entrance_exam',
             kwargs={'course_id': six.text_type(course_key)},
         ),
         'rescore_problem_url': reverse('rescore_problem', kwargs={'course_id': six.text_type(course_key)}),
-        'override_problem_score_url': reverse('override_problem_score', kwargs={'course_id': six.text_type(course_key)}),
+        'override_problem_score_url': reverse(
+            'override_problem_score',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
         'rescore_entrance_exam_url': reverse('rescore_entrance_exam', kwargs={'course_id': six.text_type(course_key)}),
         'student_can_skip_entrance_exam_url': reverse(
             'mark_student_can_skip_entrance_exam',
             kwargs={'course_id': six.text_type(course_key)},
         ),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': six.text_type(course_key)}),
-        'list_entrace_exam_instructor_tasks_url': reverse('list_entrance_exam_instructor_tasks',
-                                                          kwargs={'course_id': six.text_type(course_key)}),
+        'list_entrace_exam_instructor_tasks_url': reverse(
+            'list_entrance_exam_instructor_tasks',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
         'spoc_gradebook_url': reverse('spoc_gradebook', kwargs={'course_id': six.text_type(course_key)}),
     }
     if is_writable_gradebook_enabled(course_key) and settings.WRITABLE_GRADEBOOK_URL:
@@ -612,7 +663,10 @@ def _section_extensions(course):
         'change_due_date_url': reverse('change_due_date', kwargs={'course_id': six.text_type(course.id)}),
         'reset_due_date_url': reverse('reset_due_date', kwargs={'course_id': six.text_type(course.id)}),
         'show_unit_extensions_url': reverse('show_unit_extensions', kwargs={'course_id': six.text_type(course.id)}),
-        'show_student_extensions_url': reverse('show_student_extensions', kwargs={'course_id': six.text_type(course.id)}),
+        'show_student_extensions_url': reverse(
+            'show_student_extensions',
+            kwargs={'course_id': six.text_type(course.id)}
+        ),
     }
     return section_data
 
@@ -641,13 +695,17 @@ def _section_data_download(course, access):
             'get_students_who_may_enroll', kwargs={'course_id': six.text_type(course_key)}
         ),
         'get_anon_ids_url': reverse('get_anon_ids', kwargs={'course_id': six.text_type(course_key)}),
-        'list_proctored_results_url': reverse('get_proctored_exam_results', kwargs={'course_id': six.text_type(course_key)}),
+        'list_proctored_results_url': reverse(
+            'get_proctored_exam_results', kwargs={'course_id': six.text_type(course_key)}
+        ),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': six.text_type(course_key)}),
         'list_report_downloads_url': reverse('list_report_downloads', kwargs={'course_id': six.text_type(course_key)}),
         'calculate_grades_csv_url': reverse('calculate_grades_csv', kwargs={'course_id': six.text_type(course_key)}),
         'problem_grade_report_url': reverse('problem_grade_report', kwargs={'course_id': six.text_type(course_key)}),
         'course_has_survey': True if course.course_survey_name else False,
-        'course_survey_results_url': reverse('get_course_survey_results', kwargs={'course_id': six.text_type(course_key)}),
+        'course_survey_results_url': reverse(
+            'get_course_survey_results', kwargs={'course_id': six.text_type(course_key)}
+        ),
         'export_ora2_data_url': reverse('export_ora2_data', kwargs={'course_id': six.text_type(course_key)}),
     }
     return section_data
