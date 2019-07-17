@@ -66,7 +66,7 @@ class GeneratedCertificateAdmin(admin.ModelAdmin):
     raw_id_fields = ('user',)
     show_full_result_count = False
     search_fields = ('course_id', 'user__username')
-    list_display = ('id', 'course_id', 'mode', 'user')
+    list_display = ('id', 'course_id', 'mode', 'user', 'status')
 
 
 class CertificateGenerationCourseSettingAdmin(admin.ModelAdmin):
