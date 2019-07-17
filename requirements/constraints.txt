@@ -64,3 +64,6 @@ edx-search==1.2.2
 # This ruamel.ordereddict will not be supported in python3 but is a dependency of ruamel.yaml
 # install it only on python 2.7
 ruamel.ordereddict; python_version == "2.7"
+
+# 1.16.1 requires djangorestframework>=3.8
+drf-yasg==1.16
