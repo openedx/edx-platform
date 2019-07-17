@@ -11,8 +11,6 @@ from django.dispatch import receiver
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 
-from openedx.core.djangolib.model_mixins import DeletableByUserValue
-
 # Currently, the "student" app is responsible for
 # accounts, profiles, enrollments, and the student dashboard.
 # We are trying to move some of this functionality into separate apps,
@@ -20,6 +18,7 @@ from openedx.core.djangolib.model_mixins import DeletableByUserValue
 # certain models.  For now we will leave the models in "student" and
 # create an alias in "user_api".
 
+from openedx.core.djangolib.model_mixins import DeletableByUserValue
 # pylint: disable=unused-import
 from student.models import (
     PendingEmailChange,
