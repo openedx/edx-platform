@@ -155,6 +155,7 @@ def normalize_repr(func):
     """
     return reprwrapper(func)
 
+
 # Decorator for skipping tests that are not ready to be run with Python 3.x.
 # While we expect many tests to fail with Python 3.x as we transition, this
 # is specifically for tests that rely on external or large scale fixes. It can
