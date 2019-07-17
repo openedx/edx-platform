@@ -54,6 +54,7 @@ from edx_django_utils.cache import RequestCache
 import lms.lib.comment_client as cc
 from student.signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED
 from lms.djangoapps.certificates.models import GeneratedCertificate
+from lms.djangoapps.philu_overrides.courseware.tasks import task_enroll_user_in_pending_courses
 from course_modes.models import CourseMode
 from courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
@@ -660,23 +661,8 @@ def user_post_save_callback(sender, **kwargs):
 
     if 'is_active' in changed_fields or 'email' in changed_fields:
         if user.is_active:
-            ceas = CourseEnrollmentAllowed.for_user(user).filter(auto_enroll=True)
-
-            for cea in ceas:
-                enrollment = CourseEnrollment.enroll(user, cea.course_id)
-
-                manual_enrollment_audit = ManualEnrollmentAudit.get_manual_enrollment_by_email(user.email)
-                if manual_enrollment_audit is not None:
-                    # get the enrolled by user and reason from the ManualEnrollmentAudit table.
-                    # then create a new ManualEnrollmentAudit table entry for the same email
-                    # different transition state.
-                    ManualEnrollmentAudit.create_manual_enrollment_audit(
-                        manual_enrollment_audit.enrolled_by,
-                        user.email,
-                        ALLOWEDTOENROLL_TO_ENROLLED,
-                        manual_enrollment_audit.reason,
-                        enrollment
-                    )
+            data = {'user_id': user.id}
+            task_enroll_user_in_pending_courses.delay(data)
 
     # Because `emit_field_changed_events` removes the record of the fields that
     # were changed, wait to do that until after we've checked them as part of
