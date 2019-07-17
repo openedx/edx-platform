@@ -10,6 +10,7 @@ from uuid import uuid4
 import pytz
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
 from django.template import RequestContext
 from django.utils.encoding import smart_str
@@ -42,6 +43,7 @@ from edxmako.template import Template
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from openedx.core.lib.courses import course_image_url
 from openedx.core.djangoapps.certificates.api import display_date_for_certificate, certificates_viewable_for_course
 from student.models import LinkedInAddToProfileConfiguration
@@ -55,6 +57,19 @@ _ = translation.ugettext
 
 
 INVALID_CERTIFICATE_TEMPLATE_PATH = 'certificates/invalid.html'
+
+
+def certs_login_required(view):
+    """
+    Require login when the 'certificates.require_login' is enabled
+    """
+    def wrap(request, user_id, course_id, *args, **kwargs):
+        course_key = CourseKey.from_string(course_id)
+        if CourseWaffleFlag('certificates', 'require_login').is_enabled(course_key):
+            return login_required(view)(request, user_id, course_id, *args, **kwargs)
+        else:
+            return view(request, user_id, course_id, *args, **kwargs)
+    return wrap
 
 
 def get_certificate_description(mode, certificate_type, platform_name):
@@ -482,6 +497,7 @@ def render_cert_by_uuid(request, certificate_uuid):
     template_path="certificates/server-error.html",
     test_func=lambda request: request.GET.get('preview', None)
 )
+@certs_login_required
 def render_html_view(request, user_id, course_id):
     """
     This public view generates an HTML representation of the specified user and course
