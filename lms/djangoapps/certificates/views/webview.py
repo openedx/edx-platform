@@ -19,6 +19,7 @@ from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from organizations import api as organizations_api
+from edx_django_utils.plugins import pluggable_override
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.edxmako.template import Template
@@ -474,10 +475,12 @@ def render_cert_by_uuid(request, certificate_uuid):
     template_path="certificates/server-error.html",
     test_func=lambda request: request.GET.get('preview', None)
 )
+@pluggable_override('OVERRIDE_RENDER_CERTIFICATE_VIEW')
 def render_html_view(request, course_id, certificate=None):
     """
     This public view generates an HTML representation of the specified user and course
     If a certificate is not available, we display a "Sorry!" screen instead
+    It can be overridden by setting `OVERRIDE_RENDER_CERTIFICATE_VIEW` to an alternative implementation.
     """
     user = certificate.user if certificate else request.user
     user_id = user.id
