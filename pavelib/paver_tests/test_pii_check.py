@@ -1,6 +1,7 @@
 """
 Tests for Paver's PII checker task.
 """
+from __future__ import absolute_import
 import io
 import six
 from mock import patch
