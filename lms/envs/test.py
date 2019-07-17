@@ -18,7 +18,7 @@ import logging
 import os
 from collections import OrderedDict
 from random import choice
-from string import digits, letters, punctuation
+from string import digits, ascii_letters, punctuation
 from uuid import uuid4
 
 import openid.oidutil
@@ -292,7 +292,7 @@ FEATURES['ENABLE_PAYMENT_FAKE'] = True
 # the same settings, we can generate this randomly and guarantee
 # that they are using the same secret.
 RANDOM_SHARED_SECRET = ''.join(
-    choice(letters + digits + punctuation)
+    choice(ascii_letters + digits + punctuation)
     for x in range(250)
 )
 
