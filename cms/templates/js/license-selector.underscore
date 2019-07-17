@@ -1,6 +1,6 @@
 <div class="wrapper-license">
     <h3 class="label setting-label">
-        <%= gettext("License Type") %>
+        <%- gettext("License Type") %>
     </h3>
     <ul class="license-types">
         <% var link_start_tpl = '<a href="{url}" target="_blank">'; %>
@@ -14,8 +14,8 @@
                 </button>
                 <p class="tip">
                     <% if(license.url) { %>
-                        <a href="<%- license.url %>" target="_blank">
-                            <%= gettext("Learn more about {license_name}")
+                        <a href="<%- license.url %>" rel="noopener" target="_blank">
+                            <%- gettext("Learn more about {license_name}")
                                         .replace("{license_name}", license.name)
                             %>
                         </a>
@@ -71,15 +71,15 @@
 <% if (showPreview) { %>
     <div class="wrapper-license-preview">
         <h4 class="label setting-label">
-            <%= gettext("License Display") %>
+            <%- gettext("License Display") %>
         </h4>
         <p class="tip">
-            <%= gettext("The following message will be displayed at the bottom of the courseware pages within your course:") %>
+            <%- gettext("The following message will be displayed at the bottom of the courseware pages within your course:") %>
         </p>
         <div class="license-preview">
         <% // keep this synchronized with the contents of common/templates/license.html %>
         <% if (model.type === "all-rights-reserved") { %>
-            © <span class="license-text"><%= gettext("All Rights Reserved") %></span>
+            © <span class="license-text"><%- gettext("All Rights Reserved") %></span>
         <% } else if (model.type === "creative-commons") {
              var possible = ["by", "nc", "nd", "sa"];
              var enabled = _.filter(possible, function(option) {
@@ -98,16 +98,16 @@
                     />
             <% } else { %>
 	        <% //<span> must come before <i> icon or else spacing gets messed up %>
-                <span class="sr"><%= gettext("Creative Commons licensed content, with terms as follow:") %>&nbsp;</span><span aria-hidden="true" class="icon-cc"></span>
+                <span class="sr"><%- gettext("Creative Commons licensed content, with terms as follow:") %>&nbsp;</span><span aria-hidden="true" class="icon-cc"></span>
                 <% _.each(enabled, function(option) { %>
                         <span class="sr"><%- license.options[option.toUpperCase()].name %>&nbsp;</span><span aria-hidden="true" class="icon-cc-<%- option %>"></span>
                 <% }); %>
-                <span class="license-text"><%= gettext("Some Rights Reserved") %></span>
+                <span class="license-text"><%- gettext("Some Rights Reserved") %></span>
             <% } %>
         <% } else { %>
-            <%= typeof licenseString == "string" ? licenseString : "" %>
+            <%- typeof licenseString == "string" ? licenseString : "" %>
             <% // Default to ARR license %>
-            © <span class="license-text"><%= gettext("All Rights Reserved") %></span>
+            © <span class="license-text"><%- gettext("All Rights Reserved") %></span>
         <% } %>
         </a>
     </div>

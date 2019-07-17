@@ -4,6 +4,7 @@
 <%!
 from django.urls import reverse
 from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import js_escaped_string
 %>
 
 <%namespace name='static' file='/static_content.html'/>
@@ -13,8 +14,8 @@ from django.utils.translation import ugettext as _
 <%block name="js_extra">
 <%static:require_module module_name="js/api_admin/catalog_preview_factory" class_name="CatalogPreviewFactory">
   CatalogPreviewFactory({
-    previewUrl: "${preview_url}",
-    catalogApiUrl: "${catalog_api_url}",
+    previewUrl: "${preview_url | n, js_escaped_string}",
+    catalogApiUrl: "${catalog_api_url | n, js_escaped_string}",
   });
 </%static:require_module>
 </%block>
@@ -37,7 +38,7 @@ from django.utils.translation import ugettext as _
           <input type="checkbox" id="delete-catalog" name="delete-catalog" />
           <label class="api-checkbox-label" for="delete-catalog">${_("Delete this catalog")}</label>
         </p>
-        ${form.as_p() | n}
+        ${form.as_p() | n, decode.utf8}
         <input id="catalog-create-submit" type="submit" value="${_('Update Catalog')}"/>
       </form>
     </div>
