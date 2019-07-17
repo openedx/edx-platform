@@ -10,6 +10,7 @@ import random
 import string
 from argparse import RawTextHelpFormatter
 
+import yaml
 from Cryptodome.PublicKey import RSA
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -66,6 +67,12 @@ class Command(BaseCommand):
             dest='add_previous_public_keys',
             help='Whether to NOT add the previous set of public keys to the new public key set',
         )
+        parser.add_argument(
+            '--output-file',
+            action='store',
+            type=str,
+            help='Optional YML file in which output should be stored. Needs to be absolute path.',
+        )
 
         group = parser.add_mutually_exclusive_group()
         group.add_argument(
@@ -88,8 +95,15 @@ class Command(BaseCommand):
             options['key_size'],
             options['key_id'] or self._generate_key_id(options['key_id_size']),
         )
-        self._output_public_keys(jwk_key, options['add_previous_public_keys'])
-        self._output_private_keys(jwk_key)
+        public_keys = self._output_public_keys(jwk_key, options['add_previous_public_keys'])
+        private_keys = self._output_private_keys(jwk_key)
+        if options['output_file']:
+            jwt_auth_data = {
+                'JWT_AUTH': public_keys,
+            }
+            jwt_auth_data['JWT_AUTH'].update(private_keys)
+            with open(options['output_file'], 'w') as f_out:  # pylint: disable=open-builtin
+                yaml.safe_dump(jwt_auth_data, stream=f_out)
 
     def _generate_key_id(self, size, chars=string.ascii_uppercase + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))
@@ -120,6 +134,9 @@ class Command(BaseCommand):
         )
         print("  ")
         print("  COMMON_JWT_PUBLIC_SIGNING_JWK_SET: '{}'".format(serialized_public_keys))
+        return {
+            'COMMON_JWT_PUBLIC_SIGNING_JWK_SET': serialized_public_keys,
+        }
 
     def _add_previous_public_keys(self, public_keys):
         previous_signing_keys = settings.JWT_AUTH.get('JWT_PUBLIC_SIGNING_JWK_SET')
@@ -144,3 +161,7 @@ class Command(BaseCommand):
         print("  EDXAPP_JWT_PRIVATE_SIGNING_JWK: '{}'".format(serialized_keypair_json))
         print("  ")
         print("  EDXAPP_JWT_SIGNING_ALGORITHM: 'RS512'")
+        return {
+            'EDXAPP_JWT_PRIVATE_SIGNING_JWK': serialized_keypair_json,
+            'EDXAPP_JWT_SIGNING_ALGORITHM': 'RS512',
+        }
