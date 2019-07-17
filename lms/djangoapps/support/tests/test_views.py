@@ -15,13 +15,14 @@ import six
 from django.contrib.auth.models import User
 from django.db.models import signals
 from django.urls import reverse
+from mock import patch
 from pytz import UTC
 
 from common.test.utils import disable_signal
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
-from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, ManualEnrollmentAudit
+from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAttribute, ManualEnrollmentAudit
 from student.roles import GlobalStaff, SupportStaffRole
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -257,7 +258,8 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         }, data[0])
         self.assertEqual(
             {CourseMode.VERIFIED, CourseMode.AUDIT, CourseMode.HONOR,
-             CourseMode.NO_ID_PROFESSIONAL_MODE, CourseMode.PROFESSIONAL},
+             CourseMode.NO_ID_PROFESSIONAL_MODE, CourseMode.PROFESSIONAL,
+             CourseMode.CREDIT_MODE},
             {mode['slug'] for mode in data[0]['course_modes']}
         )
 
@@ -329,10 +331,9 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         self.assertIsNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
 
     @disable_signal(signals, 'post_save')
-    @ddt.data('honor', 'audit', 'verified', 'professional', 'no-id-professional')
+    @ddt.data('honor', 'audit', 'verified', 'professional', 'no-id-professional', 'credit')
     def test_update_enrollment_for_all_modes(self, new_mode):
-        """ Verify support can changed the enrollment to all available modes
-        except credit. """
+        """ Verify support can changed the enrollment to all available modes"""
         self.assert_update_enrollment('username', new_mode)
 
     @disable_signal(signals, 'post_save')
@@ -341,10 +342,6 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         """ Verify support can changed the enrollment of archived course. """
         self.set_course_end_date_and_expiry()
         self.assert_update_enrollment('username', new_mode)
-
-    def test_update_enrollment_with_credit_mode_throws_error(self):
-        """ Verify that enrollment cannot be changed to credit mode. """
-        self.assert_update_enrollment('username', CourseMode.CREDIT_MODE)
 
     @ddt.data('username', 'email')
     def test_get_enrollments_with_expired_mode(self, search_string_type):
@@ -367,7 +364,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
 
     def _assert_generated_modes(self, response):
         """Dry method to generate course modes dict and test with response data."""
-        modes = CourseMode.modes_for_course(self.course.id, include_expired=True)
+        modes = CourseMode.modes_for_course(self.course.id, include_expired=True, exclude_credit=False)
         modes_data = []
         for mode in modes:
             expiry = mode.expiration_datetime.strftime('%Y-%m-%dT%H:%M:%SZ') if mode.expiration_datetime else None
@@ -394,7 +391,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
 
         self.assertEqual(
             {CourseMode.VERIFIED, CourseMode.AUDIT, CourseMode.NO_ID_PROFESSIONAL_MODE,
-             CourseMode.PROFESSIONAL, CourseMode.HONOR},
+             CourseMode.PROFESSIONAL, CourseMode.HONOR, CourseMode.CREDIT_MODE},
             {mode['slug'] for mode in data[0]['course_modes']}
         )
 
@@ -405,19 +402,25 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             'support:enrollment_list',
             kwargs={'username_or_email': getattr(self.student, search_string_type)}
         )
-        response = self.client.post(url, data={
-            'course_id': six.text_type(self.course.id),
-            'old_mode': CourseMode.AUDIT,
-            'new_mode': new_mode,
-            'reason': 'Financial Assistance'
-        })
-        # Enrollment cannot be changed to credit mode.
-        if new_mode == CourseMode.CREDIT_MODE:
-            self.assertEqual(response.status_code, 400)
-        else:
-            self.assertEqual(response.status_code, 200)
-            self.assertIsNotNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
-            self.assert_enrollment(new_mode)
+
+        with patch('support.views.enrollments.get_credit_provider_attribute_values') as mock_method:
+            credit_provider = (
+                [u'Arizona State University'], 'You are now eligible for credit from Arizona State University'
+            )
+            mock_method.return_value = credit_provider
+            response = self.client.post(url, data={
+                'course_id': six.text_type(self.course.id),
+                'old_mode': CourseMode.AUDIT,
+                'new_mode': new_mode,
+                'reason': 'Financial Assistance'
+            })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
+        self.assert_enrollment(new_mode)
+        if new_mode == 'credit':
+            enrollment_attr = CourseEnrollmentAttribute.objects.first()
+            self.assertEqual(enrollment_attr.value, unicode(credit_provider[0]))
 
     def set_course_end_date_and_expiry(self):
         """ Set the course-end date and expire its verified mode."""

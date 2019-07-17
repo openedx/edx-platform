@@ -333,7 +333,9 @@ class CourseMode(models.Model):
 
     @classmethod
     @request_cached(CACHE_NAMESPACE)
-    def modes_for_course(cls, course_id=None, include_expired=False, only_selectable=True, course=None):
+    def modes_for_course(
+        cls, course_id=None, include_expired=False, only_selectable=True, course=None, exclude_credit=True
+    ):
         """
         Returns a list of the non-expired modes for a given course id
 
@@ -384,7 +386,7 @@ class CourseMode(models.Model):
         if only_selectable:
             if course is not None and hasattr(course, 'selectable_modes'):
                 found_course_modes = course.selectable_modes
-            else:
+            elif exclude_credit:
                 found_course_modes = found_course_modes.exclude(mode_slug__in=cls.CREDIT_MODES)
 
         modes = ([mode.to_tuple() for mode in found_course_modes])
