@@ -37,6 +37,7 @@ from lms.envs.test import (
     JWT_AUTH,
     REGISTRATION_EXTRA_FIELDS,
     ECOMMERCE_API_URL,
+    GRADES_DOWNLOAD,
 )
 
 
@@ -87,6 +88,8 @@ STATICFILES_DIRS += [
 # http://stackoverflow.com/questions/12816941/unit-testing-with-django-pipeline
 STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineStorage'
 STATIC_URL = "/static/"
+
+BLOCK_STRUCTURES_SETTINGS['PRUNING_ACTIVE'] = True
 
 # Update module store settings per defaults for tests
 update_module_store_settings(
