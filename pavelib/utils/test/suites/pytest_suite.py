@@ -2,11 +2,14 @@
 """
 Classes used for defining and running pytest test suites
 """
+from __future__ import absolute_import
+
 import os
 from glob import glob
+
+from pavelib.utils.envs import Env
 from pavelib.utils.test import utils as test_utils
 from pavelib.utils.test.suites.suite import TestSuite
-from pavelib.utils.envs import Env
 
 __test__ = False  # do not collect
 
