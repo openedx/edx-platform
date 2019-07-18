@@ -9,7 +9,7 @@ import logging
 import random
 import string
 
-
+from django.contrib.auth import get_user_model
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.conf import settings
 from django.db import transaction
@@ -56,7 +56,9 @@ from openedx.core.djangoapps.appsembler.api.v1.pagination import (
     TahoeLimitOffsetPagination
 )
 from openedx.core.djangoapps.appsembler.api.v1.serializers import (
-    CourseOverviewSerializer, BulkEnrollmentSerializer
+    CourseOverviewSerializer,
+    BulkEnrollmentSerializer,
+    UserIndexSerializer,
 )
 
 # TODO: Just move into v1 directory
@@ -68,6 +70,7 @@ from openedx.core.djangoapps.appsembler.api.sites import (
     get_site_for_course,
     get_enrollments_for_site,
     course_belongs_to_site,
+    get_users_for_site,
 )
 
 
@@ -357,3 +360,27 @@ class EnrollmentViewSet(TahoeAuthMixin, viewsets.ModelViewSet):
             response_code = status.HTTP_400_BAD_REQUEST
 
         return Response(response_data, status=response_code)
+
+
+class UserIndexViewSet(TahoeAuthMixin, viewsets.ReadOnlyModelViewSet):
+    """Provides course information
+
+    To provide data for all learners on your site::
+
+        GET /tahoe/api/v1/users/
+
+    To provide details on a specific learner:
+
+        GET /tahoe/api/v1/users/<user id>/
+
+    """
+    model = get_user_model()
+    pagination_class = TahoeLimitOffsetPagination
+    serializer_class = UserIndexSerializer
+    throttle_classes = (TahoeAPIUserThrottle,)
+    filter_backends = (DjangoFilterBackend, )
+
+    def get_queryset(self):
+        site = django.contrib.sites.shortcuts.get_current_site(self.request)
+        queryset = get_users_for_site(site)
+        return queryset

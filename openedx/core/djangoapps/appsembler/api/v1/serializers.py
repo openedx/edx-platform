@@ -1,4 +1,6 @@
 
+from django.contrib.auth import get_user_model
+
 from rest_framework import serializers
 
 from opaque_keys import InvalidKeyError
@@ -57,3 +59,18 @@ class BulkEnrollmentSerializer(serializers.Serializer):
                 'identifiers must be a list, not a {}'.format(type(value)))
         # TODO: Do we want to enforce identifier type (like email, username)
         return value
+
+
+class UserIndexSerializer(serializers.ModelSerializer):
+    """Provides a limited set of user information for summary display
+    """
+    id = serializers.IntegerField(read_only=True)
+    username = serializers.CharField(read_only=True)
+    fullname = serializers.CharField(
+        source='profile.name', default=None, read_only=True)
+
+    class Meta:
+        model = get_user_model()
+        fields = (
+            'id', 'username', 'fullname', 'email',
+        )
