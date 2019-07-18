@@ -1,6 +1,7 @@
 # Default xsslint config module.
-from xsslint.linters import JavaScriptLinter, MakoTemplateLinter, PythonLinter, UnderscoreTemplateLinter
+from __future__ import absolute_import
 
+from xsslint.linters import JavaScriptLinter, MakoTemplateLinter, PythonLinter, UnderscoreTemplateLinter
 
 # Define the directories that should be ignored by the script.
 SKIP_DIRS = (

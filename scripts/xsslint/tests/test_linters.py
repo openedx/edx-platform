@@ -2,12 +2,13 @@
 """
 Tests for linters.py
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import textwrap
 from unittest import TestCase
 
 from ddt import data, ddt
+from six.moves import range, zip
 
 from xsslint.linters import JavaScriptLinter, MakoTemplateLinter, PythonLinter, UnderscoreTemplateLinter
 from xsslint.reporting import FileResults

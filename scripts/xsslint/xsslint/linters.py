@@ -1,6 +1,8 @@
 """
 Linter classes containing logic for checking various filetypes.
 """
+from __future__ import absolute_import
+
 import ast
 import os
 import re
