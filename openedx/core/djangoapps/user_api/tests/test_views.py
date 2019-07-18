@@ -1379,7 +1379,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                     },
                 }
             )
-    
+
     def test_third_party_auth_disable_registration_fields(self):
         no_extra_fields_setting = {}
         provider = self.configure_google_provider(enabled=True,
