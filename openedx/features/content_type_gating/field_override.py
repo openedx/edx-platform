@@ -52,9 +52,11 @@ class ContentTypeGatingFieldOverride(FieldOverrideProvider):
             # For Feature Based Enrollments, we want to inherit group access configurations
             # from parent blocks. The use case is to allow granting access
             # to all graded problems in a unit at the unit level
-            merged_group_access = block.get_parent().merged_group_access
-            if merged_group_access and CONTENT_GATING_PARTITION_ID in merged_group_access:
-                return original_group_access
+            parent = block.get_parent()
+            if parent is not None:
+                merged_group_access = parent.merged_group_access
+                if merged_group_access and CONTENT_GATING_PARTITION_ID in merged_group_access:
+                    return original_group_access
 
         original_group_access.setdefault(
             CONTENT_GATING_PARTITION_ID,
