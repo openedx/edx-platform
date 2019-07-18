@@ -2,11 +2,14 @@
 Views to show a course's bookmarks.
 """
 
+from __future__ import absolute_import
+
+import six
 from django.contrib.auth.decorators import login_required
-from django.template.context_processors import csrf
-from django.urls import reverse
 from django.shortcuts import render_to_response
+from django.template.context_processors import csrf
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
@@ -41,7 +44,7 @@ class CourseBookmarksView(View):
         course_key = CourseKey.from_string(course_id)
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
         course_url_name = default_course_url_name(course.id)
-        course_url = reverse(course_url_name, kwargs={'course_id': unicode(course.id)})
+        course_url = reverse(course_url_name, kwargs={'course_id': six.text_type(course.id)})
 
         # Render the bookmarks list as a fragment
         bookmarks_fragment = CourseBookmarksFragmentView().render_to_fragment(request, course_id=course_id)
