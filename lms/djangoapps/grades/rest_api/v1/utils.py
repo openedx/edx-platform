@@ -40,6 +40,17 @@ class CourseEnrollmentPagination(CursorPagination):
 
         return self.page_size
 
+    def get_paginated_response(self, data, **kwargs):  # pylint: disable=arguments-differ
+        """
+        Return a response given serialized page data and kwargs. Each key-value pair is added to the response.
+        """
+        resp = super(CourseEnrollmentPagination, self).get_paginated_response(data)
+
+        for (key, value) in kwargs.items():
+            resp.data[key] = value
+
+        return resp
+
 
 class GradeViewMixin(DeveloperErrorViewMixin):
     """

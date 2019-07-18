@@ -337,12 +337,12 @@ class PaginatedAPIView(APIView):
             return None
         return self.paginator.paginate_queryset(queryset, self.request, view=self)
 
-    def get_paginated_response(self, data):
+    def get_paginated_response(self, data, *args, **kwargs):
         """
         Return a paginated style `Response` object for the given output data.
         """
         assert self.paginator is not None
-        return self.paginator.get_paginated_response(data)
+        return self.paginator.get_paginated_response(data, *args, **kwargs)
 
 
 def get_course_key(request, course_id=None):
