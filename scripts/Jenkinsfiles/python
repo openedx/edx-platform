@@ -19,11 +19,11 @@ def pythonTestCleanup() {
     bash scripts/xdist/terminate_xdist_nodes.sh'''
 }
 
-def xdist_git_branch() {
+def xdist_git_checkout() {
     if (env.ghprbActualCommit) {
         return "${ghprbActualCommit}"
     } else {
-        return "${BRANCH_NAME}"
+        return "origin/${BRANCH_NAME} -b ${BRANCH_NAME}"
     }
 }
 
@@ -42,7 +42,7 @@ pipeline {
         timeout(60)
     }
     environment {
-        XDIST_GIT_BRANCH = xdist_git_branch()
+        XDIST_GIT_CHECKOUT = xdist_git_checkout()
         XDIST_GIT_REFSPEC = xdist_git_refspec()
         XDIST_INSTANCE_TYPE = "c5d.large"
         XDIST_WORKER_AMI = credentials('XDIST_WORKER_AMI')
