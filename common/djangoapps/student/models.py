@@ -1101,7 +1101,7 @@ class CourseEnrollment(models.Model):
 
     # Represents the modes that are possible. We'll update this later with a
     # list of possible values.
-    mode = models.CharField(default=CourseMode.DEFAULT_MODE_SLUG, max_length=100)
+    mode = models.CharField(default=CourseMode.get_default_mode_slug, max_length=100)
 
     # An audit row will be created for every change to a CourseEnrollment. This
     # will create a new model behind the scenes - HistoricalCourseEnrollment and a

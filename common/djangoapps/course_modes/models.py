@@ -256,6 +256,14 @@ class CourseMode(models.Model):
         self._expiration_datetime = new_datetime
 
     @classmethod
+    def get_default_mode_slug(cls):
+        """
+        Returns the default mode slug to be used in the CourseEnrollment model mode field
+        as the default value.
+        """
+        return cls.DEFAULT_MODE_SLUG
+
+    @classmethod
     def all_modes_for_courses(cls, course_id_list):
         """Find all modes for a list of course IDs, including expired modes.
 
