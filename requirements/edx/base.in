@@ -68,7 +68,6 @@ djangorestframework-jwt
 drf-yasg                            # Replacement for django-rest-swagger
 edx-ace==0.1.10
 edx-analytics-data-api-client
-edx-bulk-grades
 edx-ccx-keys
 edx-celeryutils
 edx-completion
