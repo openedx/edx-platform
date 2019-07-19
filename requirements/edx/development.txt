@@ -307,7 +307,7 @@ sphinxcontrib-websupport==1.1.2  # via sphinx
 sqlparse==0.3.0
 staff-graded-xblock==0.3
 stevedore==1.30.1
-super-csv==0.7
+super-csv==0.7.1
 sympy==1.4
 testfixtures==6.10.0
 text-unidecode==1.2
