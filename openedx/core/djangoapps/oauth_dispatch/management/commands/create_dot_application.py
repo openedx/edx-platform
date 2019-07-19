@@ -73,7 +73,6 @@ class Command(BaseCommand):
                             dest='update',
                             help='If application and/or access already exist, update values.')
 
-
     def _create_application(self, user, app_name, application_kwargs):
         """
         Create new application with given User, name, and option values.
@@ -134,7 +133,6 @@ class Command(BaseCommand):
                 application_access.scopes,
             ))
 
-
     def handle(self, *args, **options):
         username = options['username']
         user = User.objects.get(username=username)
@@ -168,7 +166,7 @@ class Command(BaseCommand):
                 username
             ))
         else:
-            application = self._create_new_application(user, app_name, application_kwargs)
+            application = self._create_application(user, app_name, application_kwargs)
 
         scopes = options['scopes']
         if scopes:
