@@ -40,7 +40,7 @@ class TestCreateDotApplication(TestCase):
             self.user.username,
             "--update",
             "--grant-type",
-            APPLICATION.GRANT_CLIENT_CREDENTIALS,
+            Application.GRANT_CLIENT_CREDENTIALS,
             "--public",
             "--redirect-uris",
         ]
@@ -50,7 +50,7 @@ class TestCreateDotApplication(TestCase):
         call_command(Command(), *call_args)
         app = Application.objects.get(name=APP_NAME)
         self.assertEqual(app.redirect_uris, URI_OLD)
-        self.assertRaises(ApplicationAccess.DoesNotExist):
+        with self.assertRaises(ApplicationAccess.DoesNotExist):
             ApplicationAccess.objects.get(application_id=app.id)
 
         # Make sure we can call again with no changes
@@ -58,7 +58,7 @@ class TestCreateDotApplication(TestCase):
         call_command(Command(), *call_args)
         app = Application.objects.get(name=APP_NAME)
         self.assertEqual(app.redirect_uris, URI_OLD)
-        self.assertRaises(ApplicationAccess.DoesNotExist):
+        with self.assertRaises(ApplicationAccess.DoesNotExist):
             ApplicationAccess.objects.get(application_id=app.id)
 
         # Make sure calling with new URI changes URI, but does not add access
@@ -66,7 +66,7 @@ class TestCreateDotApplication(TestCase):
         call_command(Command(), *call_args)
         app = Application.objects.get(name=APP_NAME)
         self.assertEqual(app.redirect_uris, URI_NEW)
-        self.assertRaises(ApplicationAccess.DoesNotExist):
+        with self.assertRaises(ApplicationAccess.DoesNotExist):
             ApplicationAccess.objects.get(application_id=app.id)
 
         # Make sure calling with scopes adds access
