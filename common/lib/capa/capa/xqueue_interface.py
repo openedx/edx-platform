@@ -1,12 +1,14 @@
 #
 #  LMS Interface to external queueing system (xqueue)
 #
+from __future__ import absolute_import
+
 import hashlib
 import json
 import logging
 
 import requests
-
+import six
 
 log = logging.getLogger(__name__)
 dateformat = '%Y%m%d%H%M%S'
@@ -70,7 +72,7 @@ class XQueueInterface(object):
     """
 
     def __init__(self, url, django_auth, requests_auth=None):
-        self.url = unicode(url)
+        self.url = six.text_type(url)
         self.auth = django_auth
         self.session = requests.Session()
         self.session.auth = requests_auth

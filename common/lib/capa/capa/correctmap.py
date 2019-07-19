@@ -95,7 +95,7 @@ class CorrectMap(object):
             return
 
         # create new dict entries
-        if not isinstance(correct_map.values()[0], dict):
+        if not isinstance(list(correct_map.values())[0], dict):
             # special migration
             for k in correct_map:
                 self.set(k, correctness=correct_map[k])

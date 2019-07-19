@@ -6,6 +6,8 @@ These tags do not have state, so they just get passed the system (for access to 
 and the xml element.
 """
 
+from __future__ import absolute_import
+
 import logging
 import re
 import xml.sax.saxutils as saxutils
