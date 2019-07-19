@@ -96,7 +96,7 @@ class Command(BaseCommand):
             setattr(application, key, value)
         application.save()
         logger.info('Updated {} application with id: {}, client_id: {}, and client_secret: {}'.format(
-            app_name,
+            application.name,
             application.id,
             application.client_id,
             application.client_secret,
@@ -117,7 +117,7 @@ class Command(BaseCommand):
             access.save()
             logger.info('Updated application access for {} with scopes: {}'.format(
                 application.name,
-                application_access.scopes,
+                scopes,
             ))
         elif access:
             logger.info('Application access for application {} already exists.'.format(

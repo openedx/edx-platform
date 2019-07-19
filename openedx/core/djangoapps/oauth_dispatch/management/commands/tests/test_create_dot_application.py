@@ -29,7 +29,7 @@ class TestCreateDotApplication(TestCase):
         super(TestCreateDotApplication, self).tearDown()
         Application.objects.filter(user=self.user).delete()
 
-    def test_update_dot_application(self)
+    def test_update_dot_application(self):
         APP_NAME = "update_test_application"
         URI_OLD = "https://example.com/old"
         URI_NEW = "https://example.com/new"
@@ -84,7 +84,6 @@ class TestCreateDotApplication(TestCase):
         self.assertEqual(app.redirect_uris, URI_NEW)
         access = ApplicationAccess.objects.get(application_id=app.id)
         self.assertEqual(access.scopes, SCOPES_Y)
-
 
     @ddt.data(
         (None, None, None, None, False, None),
