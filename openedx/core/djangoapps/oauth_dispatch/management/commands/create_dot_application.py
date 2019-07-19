@@ -92,7 +92,7 @@ class Command(BaseCommand):
         """
         Update given application with option values.
         """
-        for key, value in application_kwargs:
+        for key, value in application_kwargs.items():
             setattr(application, key, value)
         application.save()
         logger.info('Updated {} application with id: {}, client_id: {}, and client_secret: {}'.format(
