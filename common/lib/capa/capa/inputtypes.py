@@ -38,6 +38,8 @@ graded status as'status'
 # makes sense, but a bunch of problems have markup that assumes block.  Bigger TODO: figure out a
 # general css and layout strategy for capa, document it, then implement it.
 
+from __future__ import absolute_import
+
 import json
 import logging
 import re
@@ -49,16 +51,17 @@ from datetime import datetime
 import bleach
 import html5lib
 import pyparsing
+import six
+from calc.preview import latex_preview
 from lxml import etree
 from six import text_type
 
-import xqueue_interface
-from calc.preview import latex_preview
 from capa.xqueue_interface import XQUEUE_TIMEOUT
 from chem import chemcalc
 from openedx.core.djangolib.markup import HTML, Text
 from xmodule.stringify import stringify_children
 
+from . import xqueue_interface
 from .registry import TagRegistry
 from .util import sanitize_html
 
@@ -82,7 +85,7 @@ class Status(object):
     }
     __slots__ = ('classname', '_status', 'display_name', 'display_tooltip')
 
-    def __init__(self, status, gettext_func=unicode):
+    def __init__(self, status, gettext_func=six.text_type):
         self.classname = self.css_classes.get(status, status)
         _ = gettext_func
         names = {
@@ -107,7 +110,7 @@ class Status(object):
                 ['incomplete', 'unanswered', 'unsubmitted'], _('Not yet answered.')
             )
         )
-        self.display_name = names.get(status, unicode(status))
+        self.display_name = names.get(status, six.text_type(status))
         self.display_tooltip = tooltips.get(status, u'')
         self._status = status or ''
 
@@ -253,7 +256,7 @@ class InputTypeBase(object):
             # Something went wrong: add xml to message, but keep the traceback
             msg = u"Error in xml '{x}': {err} ".format(
                 x=etree.tostring(xml), err=text_type(err))
-            raise Exception, msg, sys.exc_info()[2]
+            six.reraise(Exception, msg, sys.exc_info()[2])
 
     @classmethod
     def get_attributes(cls):
@@ -341,14 +344,14 @@ class InputTypeBase(object):
         # Every list should contain the status id
         status_id = 'status_' + self.input_id
         descriptions.append(status_id)
-        descriptions.extend(self.response_data.get('descriptions', {}).keys())
+        descriptions.extend(list(self.response_data.get('descriptions', {}).keys()))
         description_ids = ' '.join(descriptions)
         context.update(
             {'describedby_html': HTML('aria-describedby="{}"').format(description_ids)}
         )
 
         context.update(
-            (a, v) for (a, v) in self.loaded_attributes.iteritems() if a in self.to_render
+            (a, v) for (a, v) in six.iteritems(self.loaded_attributes) if a in self.to_render
         )
         context.update(self._extra_context())
         if self.answervariable:
@@ -554,7 +557,7 @@ class ChoiceGroup(InputTypeBase):
         return choices
 
     def get_user_visible_answer(self, internal_answer):
-        if isinstance(internal_answer, basestring):
+        if isinstance(internal_answer, six.string_types):
             return self._choices_map[internal_answer]
 
         return [self._choices_map[i] for i in internal_answer]
@@ -689,7 +692,7 @@ class TextLine(InputTypeBase):
                 'class_name': self.loaded_attributes['preprocessorClassName'],
                 'script_src': self.loaded_attributes['preprocessorSrc'],
             }
-            if None in self.preprocessor.values():
+            if None in list(self.preprocessor.values()):
                 self.preprocessor = None
 
     def _extra_context(self):
@@ -1594,7 +1597,7 @@ class AnnotationInput(InputTypeBase):
             d = {}
 
         comment_value = d.get('comment', '')
-        if not isinstance(comment_value, basestring):
+        if not isinstance(comment_value, six.string_types):
             comment_value = ''
 
         options_value = d.get('options', [])
@@ -1790,6 +1793,7 @@ class ChoiceTextGroup(InputTypeBase):
                 msg = Text("[capa.inputtypes.extract_choices] {0}").format(
                     # Translators: a "tag" is an XML element, such as "<b>" in HTML
                     Text(_("Expected a {expected_tag} tag; got {given_tag} instead")).format(
+                        # xss-lint: disable=python-wrap-html
                         expected_tag="<choice>",
                         given_tag=choice.tag,
                     )

@@ -1,16 +1,17 @@
 """
 Utility functions for capa.
 """
+from __future__ import absolute_import
+
 import re
+from cmath import isinf, isnan
 from decimal import Decimal
 
 import bleach
+from calc import evaluator
 from lxml import etree
 
-from calc import evaluator
-from cmath import isinf, isnan
 from openedx.core.djangolib.markup import HTML
-
 
 #-----------------------------------------------------------------------------
 #

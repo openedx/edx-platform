@@ -2,18 +2,17 @@
 """
 Commandline tool for doing operations on Problems
 """
-from __future__ import unicode_literals
-from __future__ import print_function
+from __future__ import absolute_import, print_function, unicode_literals
 
 import argparse
 import logging
 import sys
 from io import BytesIO
 
+from calc import UndefinedVariable
 from mako.lookup import TemplateLookup
 from path import Path as path
 
-from calc import UndefinedVariable
 from capa.capa_problem import LoncapaProblem
 
 logging.basicConfig(format="%(levelname)s %(message)s")
