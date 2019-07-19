@@ -6,6 +6,7 @@ import logging
 import six
 from datetime import datetime
 from django.urls import reverse
+from django.utils import timezone
 from edx_rest_api_client import exceptions
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from opaque_keys import InvalidKeyError
@@ -19,10 +20,13 @@ from six import text_type
 from course_modes.models import CourseMode
 from courseware import courses
 from entitlements.models import CourseEntitlement
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.lib.exceptions import CourseNotFoundError
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.catalog.utils import get_course_runs_for_course
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.enrollments.api import add_enrollment
+
 from openedx.core.djangoapps.enrollments.views import EnrollmentCrossDomainSessionAuth
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
@@ -120,6 +124,20 @@ class BasketsView(APIView):
                     u'Failed to handle marketing opt-in flag: user="%s", course="%s"', user.username, course_key
                 )
 
+    def _is_course_archived(self, course_key):
+        is_archived = False
+        try:
+            course = CourseOverview.get_from_id(course_key)
+            if course.end and course.end < datetime.now(timezone.utc):
+                is_archived = True
+        except CourseOverview.DoesNotExist:
+            msg = u"Requested enrollment information for unknown course {course}".format(
+                course=six.text_type(course_key))
+            log.warning(msg)
+            raise CourseNotFoundError(msg)
+
+        return is_archived
+
     def post(self, request, *args, **kwargs):
         """
         Attempt to enroll the user.
@@ -186,6 +204,7 @@ class BasketsView(APIView):
                 )
             log.info(msg)
             self._enroll(course_key, user, default_enrollment_mode.slug)
+            is_course_archived = self._is_course_archived(course_key)
             mode = CourseMode.AUDIT if audit_mode else CourseMode.HONOR
             SAILTHRU_AUDIT_PURCHASE.send(
                 sender=None, user=user, mode=mode, course_id=course_id
