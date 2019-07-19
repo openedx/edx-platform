@@ -93,7 +93,7 @@ __test__ = False  # do not collect
         '--with-wtw',
         dest='with_wtw',
         action='store_true',
-        default=False
+        default=False,
         help="Only run tests based on the lines changed relative to the specified branch"
     ),
     ("compare-branch=", "b", "Branch to compare against, defaults to origin/master"),
