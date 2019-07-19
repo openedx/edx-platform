@@ -201,7 +201,7 @@ def create_account_with_params(request, params):
     create_comments_service_user(user)
 
     try:
-        _record_registration_attributions(request, new_user)
+        record_registration_attributions(request, new_user)
     # Don't prevent a user from registering due to attribution errors.
     except Exception:   # pylint: disable=broad-except
         log.exception('Error while attributing cookies to user registration.')
@@ -407,7 +407,7 @@ def _skip_activation_email(user, do_external_auth, running_pipeline, third_party
     )
 
 
-def _record_registration_attributions(request, user):
+def record_registration_attributions(request, user):
     """
     Attribute this user's registration based on referrer cookies.
     """

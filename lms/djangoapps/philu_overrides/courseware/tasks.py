@@ -32,4 +32,3 @@ def task_correct_polls_data():
         except Exception as ex:
             log.error('Code failed for ' + str(module.id) + ' and error is ' + str(ex.message))
 
-
