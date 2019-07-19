@@ -2,6 +2,8 @@
 Tests of the encryption and decryption utilities in the ssencrypt module.
 """
 
+from __future__ import absolute_import
+
 import base64
 
 from lms.djangoapps.verify_student.ssencrypt import (
