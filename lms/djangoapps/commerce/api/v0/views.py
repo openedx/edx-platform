@@ -4,6 +4,7 @@ from __future__ import absolute_import
 import logging
 
 import six
+from datetime import datetime
 from django.urls import reverse
 from edx_rest_api_client import exceptions
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -19,6 +20,7 @@ from course_modes.models import CourseMode
 from courseware import courses
 from entitlements.models import CourseEntitlement
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+from openedx.core.djangoapps.catalog.utils import get_course_runs_for_course
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.enrollments.api import add_enrollment
 from openedx.core.djangoapps.enrollments.views import EnrollmentCrossDomainSessionAuth
@@ -70,7 +72,37 @@ class BasketsView(APIView):
 
     def _enroll(self, course_key, user, mode=CourseMode.DEFAULT_MODE_SLUG):
         """ Enroll the user in the course. """
+        course_key = self.get_latest_course_run(course_key)
         add_enrollment(user.username, six.text_type(course_key), mode)
+
+    def get_latest_course_run(self, course_key):
+        """
+        Purpose of the method is to check if latest run exist then
+        learner should be enrolled in latest run instead of old run.
+
+        Arguments
+            course_key -- CourseLocator object
+
+        Returns:
+             Object CourseLocator(('org', 'course', 'run', 'branch', 'version_guid'))
+        """
+        try:
+            course_uuid = '{org}+{course}'.format(org=course_key.org, course=course_key.course)
+            course_runs = get_course_runs_for_course(course_uuid=course_uuid)
+            if not course_runs:
+                return course_key
+
+            published_course_runs = filter(lambda run: run['status'] == 'published', course_runs)
+            if len(published_course_runs) > 1:
+                # sort published course runs based on the start date
+                published_course_runs = sorted(published_course_runs, key=lambda run:
+                                               datetime.strptime(run['start'], '%Y-%m-%dT%H:%M:%SZ'), reverse=True)
+
+            course_key = published_course_runs[0]["key"] if published_course_runs else course_key
+
+            return CourseKey.from_string(course_key)
+        except:  # pylint: disable=bare-except
+            return course_key
 
     def _handle_marketing_opt_in(self, request, course_key, user):
         """
