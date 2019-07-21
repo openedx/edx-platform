@@ -238,7 +238,6 @@ def _get_user_info_cookie_data(request, user):
         'version': settings.EDXMKTG_USER_INFO_COOKIE_VERSION,
         'username': user.username,
         'header_urls': header_urls,
-        'enrollmentStatusHash': CourseEnrollment.generate_enrollment_status_hash(user)
     }
 
     return user_info

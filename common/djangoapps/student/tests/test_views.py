@@ -214,19 +214,6 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         course_overview.save()
 
-    def test_user_info_cookie(self):
-        """
-        Verify visiting the learner dashboard sets the user info cookie.
-        """
-        self.assertNotIn(settings.EDXMKTG_USER_INFO_COOKIE_NAME, self.client.cookies)
-
-        request = RequestFactory().get(self.path)
-        request.user = self.user
-        expected = json.dumps(_get_user_info_cookie_data(request, self.user))
-        self.client.get(self.path)
-        actual = self.client.cookies[settings.EDXMKTG_USER_INFO_COOKIE_NAME].value
-        self.assertEqual(actual, expected)
-
     def test_redirect_account_settings(self):
         """
         Verify if user does not have profile he/she is redirected to account_settings.
