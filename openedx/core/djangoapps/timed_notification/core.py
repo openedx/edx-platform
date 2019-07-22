@@ -1,6 +1,6 @@
 import logging
 
-from common.djangoapps.student.views.management import get_course_related_keys
+from common.djangoapps.student.views import get_course_related_keys
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.views.views import get_last_accessed_courseware
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
