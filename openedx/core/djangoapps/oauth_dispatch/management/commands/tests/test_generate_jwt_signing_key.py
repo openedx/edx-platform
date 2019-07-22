@@ -46,10 +46,12 @@ class TestGenerateJwtSigningKey(TestCase):
         )
         self.assertEqual(log_message_exists, expected_to_exist)
 
-    def _assert_key_output(self, output_stream, filename):
-        expected_in_output = (
-            'EDXAPP_JWT_PRIVATE_SIGNING_JWK', 'EDXAPP_JWT_SIGNING_ALGORITHM', 'COMMON_JWT_PUBLIC_SIGNING_JWK_SET'
-        )
+    def _assert_key_output(self, output_stream, filename, strip_key_prefix):
+        expected_in_output = [
+            '{}JWT_PRIVATE_SIGNING_JWK'.format('' if strip_key_prefix else 'EDXAPP_'),
+            '{}JWT_SIGNING_ALGORITHM'.format('' if strip_key_prefix else 'EDXAPP_'),
+            '{}JWT_PUBLIC_SIGNING_JWK_SET'.format('' if strip_key_prefix else 'COMMON_'),
+        ]
         for expected in expected_in_output:
             self.assertIn(expected, output_stream.getvalue())
 
@@ -70,12 +72,12 @@ class TestGenerateJwtSigningKey(TestCase):
             self.assertEqual(len(key_id), key_id_size or 8)
 
     @ddt.data(
-        dict(add_previous_public_keys=True, provide_key_id=False, key_id_size=None),
-        dict(add_previous_public_keys=True, provide_key_id=False, key_id_size=16),
-        dict(add_previous_public_keys=False, provide_key_id=True, key_id_size=None),
+        dict(add_previous_public_keys=True, provide_key_id=False, key_id_size=None, strip_key_prefix=True),
+        dict(add_previous_public_keys=True, provide_key_id=False, key_id_size=16, strip_key_prefix=False),
+        dict(add_previous_public_keys=False, provide_key_id=True, key_id_size=None, strip_key_prefix=False),
     )
     @ddt.unpack
-    def test_command(self, add_previous_public_keys, provide_key_id, key_id_size):
+    def test_command(self, add_previous_public_keys, provide_key_id, key_id_size, strip_key_prefix):
         command_options = dict(add_previous_public_keys=add_previous_public_keys)
         if provide_key_id:
             command_options['key_id'] = TEST_KEY_IDENTIFIER
@@ -83,12 +85,13 @@ class TestGenerateJwtSigningKey(TestCase):
             command_options['key_id_size'] = key_id_size
         _, filename = tempfile.mkstemp(suffix='.yml')
         command_options['output_file'] = filename
+        command_options['strip_key_prefix'] = strip_key_prefix
 
         with self._captured_output() as (output_stream, _):
             with patch(LOGGER) as mock_log:
                 call_command(COMMAND_NAME, **command_options)
 
-        self._assert_key_output(output_stream, filename)
+        self._assert_key_output(output_stream, filename, strip_key_prefix)
         self._assert_presence_of_old_keys(mock_log, add_previous_public_keys)
         self._assert_presence_of_key_id(mock_log, output_stream, provide_key_id, key_id_size)
         os.remove(filename)
