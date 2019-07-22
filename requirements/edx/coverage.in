@@ -12,6 +12,6 @@
 
 -c ../constraints.txt
 
-coverage==4.4                       # Code coverage testing for Python
+coverage==5.0a6                     # Code coverage testing for Python
 diff-cover==0.9.8                   # Automatically find diff lines that need test coverage
 six==1.11.0                         # Pinned because diff-cover needs it, but later transifex-client says ==1.11.0
