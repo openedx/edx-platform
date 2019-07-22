@@ -903,6 +903,4 @@ def student_dashboard(request):
         'resume_button_urls': resume_button_urls
     })
 
-    response = render_to_response('dashboard.html', context)
-    set_logged_in_cookies(request, response, user)
-    return response
+    return render_to_response('dashboard.html', context)
