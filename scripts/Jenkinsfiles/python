@@ -1,6 +1,6 @@
 def runPythonTests() {
     // Determine git refspec, branch, and clone type
-    git_branch = xdist_git_branch()
+    git_branch = xdist_git_checkout()
     git_refspec = xdist_git_refspec()
     sshagent(credentials: ['jenkins-worker', 'jenkins-worker-pem'], ignoreMissing: true) {
         checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: git_branch]],
