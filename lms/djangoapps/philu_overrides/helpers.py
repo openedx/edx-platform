@@ -143,7 +143,7 @@ def get_user_current_enrolled_class(request, course):
     from datetime import datetime
     from django.core.urlresolvers import reverse
     from opaque_keys.edx.locations import SlashSeparatedCourseKey
-    from common.djangoapps.student.views.management import get_course_related_keys
+    from common.djangoapps.student.views import get_course_related_keys
     from student.models import CourseEnrollment
     from course_action_state.models import CourseRerunState
 

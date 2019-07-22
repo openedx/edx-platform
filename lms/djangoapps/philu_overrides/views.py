@@ -31,7 +31,7 @@ from third_party_auth.decorators import xframe_allow_whitelisted
 from util.cache import cache_if_anonymous
 from util.enterprise_helpers import set_enterprise_branding_filter_param
 from xmodule.modulestore.django import modulestore
-from common.djangoapps.student.views.management import get_course_related_keys
+from common.djangoapps.student.views import get_course_related_keys
 from lms.djangoapps.courseware.access import has_access, _can_enroll_courselike
 from lms.djangoapps.courseware.courses import get_courses, sort_by_start_date, get_course_by_id, sort_by_announcement
 from lms.djangoapps.courseware.views.views import get_last_accessed_courseware
