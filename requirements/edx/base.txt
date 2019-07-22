@@ -227,8 +227,8 @@ simplejson==3.16.0        # via mailsnake, sailthru-client
 singledispatch==3.4.0.3
 six==1.12.0
 slumber==0.7.1            # via edx-bulk-grades, edx-enterprise, edx-rest-api-client
-social-auth-app-django==2.1.0
-social-auth-core==1.7.0
+social-auth-app-django==3.1.0
+social-auth-core==3.2.0
 sorl-thumbnail==12.3
 sortedcontainers==2.1.0
 soupsieve==1.9.3          # via beautifulsoup4

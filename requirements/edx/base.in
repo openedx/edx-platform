@@ -131,8 +131,8 @@ pyuca==1.1                          # For more accurate sorting of translated co
 reportlab                           # Used for shopping cart's pdf invoice/receipt generation
 rest-condition                      # DRF's recommendation for supporting complex permissions
 rfc6266-parser                      # Used to generate Content-Disposition headers.
-social-auth-app-django<3.0.0
-social-auth-core<2.0.0
+social-auth-app-django
+social-auth-core
 pysrt                               # Support for SubRip subtitle files, used in the video XModule
 pytz                                # Time zone information database
 PyYAML                              # Used to parse XModule resource templates
