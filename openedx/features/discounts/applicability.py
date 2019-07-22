@@ -8,6 +8,8 @@ Keep in mind that the code in this file only applies to discounts controlled in 
 not other discounts like coupons or enterprise/program offers configured in ecommerce.
 
 """
+from __future__ import absolute_import
+
 from datetime import datetime
 
 import crum

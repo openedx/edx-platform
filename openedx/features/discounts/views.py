@@ -4,20 +4,21 @@ The Discount API Views should return information about discounts that apply to t
 """
 # -*- coding: utf-8 -*-
 
+from __future__ import absolute_import
+
+from django.utils.decorators import method_decorator
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
-
 from opaque_keys.edx.keys import CourseKey
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermissionIsAuthenticated
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
-
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from django.utils.decorators import method_decorator
 
 from .applicability import can_receive_discount, discount_percentage
 

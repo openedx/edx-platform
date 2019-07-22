@@ -1,13 +1,15 @@
 """Tests of openedx.features.discounts.views"""
 # -*- coding: utf-8 -*-
-import jwt
+from __future__ import absolute_import
 
+import jwt
+import six
 from django.test.client import Client
 from django.urls import reverse
 
-from xmodule.modulestore.tests.factories import CourseFactory
+from student.tests.factories import TEST_PASSWORD, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from student.tests.factories import UserFactory, TEST_PASSWORD
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class TestCourseUserDiscount(ModuleStoreTestCase):
@@ -21,13 +23,16 @@ class TestCourseUserDiscount(ModuleStoreTestCase):
         self.user = UserFactory.create()
         self.course = CourseFactory.create(run='test', display_name='test')
         self.client = Client()
-        self.url = reverse('api_discounts:course_user_discount', kwargs={'course_key_string': unicode(self.course.id)})
+        self.url = reverse(
+            'api_discounts:course_user_discount',
+            kwargs={'course_key_string': six.text_type(self.course.id)}
+        )
 
     def test_url(self):
         """
         Test that the url hasn't changed
         """
-        assert self.url == ('/api/discounts/course/' + unicode(self.course.id))
+        assert self.url == ('/api/discounts/course/' + six.text_type(self.course.id))
 
     def test_course_user_discount(self):
         """
@@ -44,7 +49,7 @@ class TestCourseUserDiscount(ModuleStoreTestCase):
 
         # make sure that the response matches the expected response
         response_payload = jwt.decode(response.data['jwt'], verify=False)
-        assert all(item in response_payload.items() for item in expected_payload.items())
+        assert all(item in list(response_payload.items()) for item in expected_payload.items())
 
     def test_course_user_discount_no_user(self):
         """
