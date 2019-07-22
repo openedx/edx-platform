@@ -1,26 +1,28 @@
 """
 Tests for Studio Course Settings.
 """
+from __future__ import absolute_import
+
 import copy
 import datetime
 import json
 import unittest
 
 import ddt
+import mock
+import six
+from crum import set_current_request
 from django.conf import settings
 from django.test import RequestFactory
 from django.test.utils import override_settings
-from pytz import UTC
-import mock
-from mock import Mock, patch
-from crum import set_current_request
-from milestones.tests.utils import MilestonesTestCaseMixin
-
-
-from contentstore.utils import reverse_course_url, reverse_usage_url
-from contentstore.config.waffle import ENABLE_PROCTORING_PROVIDER_OVERRIDES
 from milestones.models import MilestoneRelationshipType
-from models.settings.course_grading import CourseGradingModel, GRADING_POLICY_CHANGED_EVENT_TYPE, hash_grading_policy
+from milestones.tests.utils import MilestonesTestCaseMixin
+from mock import Mock, patch
+from pytz import UTC
+
+from contentstore.config.waffle import ENABLE_PROCTORING_PROVIDER_OVERRIDES
+from contentstore.utils import reverse_course_url, reverse_usage_url
+from models.settings.course_grading import GRADING_POLICY_CHANGED_EVENT_TYPE, CourseGradingModel, hash_grading_policy
 from models.settings.course_metadata import CourseMetadata
 from models.settings.encoder import CourseSettingsEncoder
 from openedx.core.djangoapps.models.course_details import CourseDetails
@@ -197,7 +199,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         # update pre requisite courses with a new course keys
         pre_requisite_course = CourseFactory.create(org='edX', course='900', run='test_run')
         pre_requisite_course2 = CourseFactory.create(org='edX', course='902', run='test_run')
-        pre_requisite_course_keys = [unicode(pre_requisite_course.id), unicode(pre_requisite_course2.id)]
+        pre_requisite_course_keys = [six.text_type(pre_requisite_course.id), six.text_type(pre_requisite_course2.id)]
         course_detail_json['pre_requisite_courses'] = pre_requisite_course_keys
         self.client.ajax_post(url, course_detail_json)
 
@@ -227,7 +229,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
 
         # update pre requisite courses one valid and one invalid key
         pre_requisite_course = CourseFactory.create(org='edX', course='900', run='test_run')
-        pre_requisite_course_keys = [unicode(pre_requisite_course.id), 'invalid_key']
+        pre_requisite_course_keys = [six.text_type(pre_requisite_course.id), 'invalid_key']
         course_detail_json['pre_requisite_courses'] = pre_requisite_course_keys
         response = self.client.ajax_post(url, course_detail_json)
         self.assertEqual(400, response.status_code)
@@ -513,10 +515,10 @@ class CourseGradingTest(CourseTestCase):
             mock.call(
                 GRADING_POLICY_CHANGED_EVENT_TYPE,
                 {
-                    'course_id': unicode(self.course.id),
+                    'course_id': six.text_type(self.course.id),
                     'event_transaction_type': 'edx.grades.grading_policy_changed',
                     'grading_policy_hash': policy_hash,
-                    'user_id': unicode(self.user.id),
+                    'user_id': six.text_type(self.user.id),
                     'event_transaction_id': 'mockUUID',
                 }
             ) for policy_hash in (
@@ -562,10 +564,10 @@ class CourseGradingTest(CourseTestCase):
             mock.call(
                 GRADING_POLICY_CHANGED_EVENT_TYPE,
                 {
-                    'course_id': unicode(self.course.id),
+                    'course_id': six.text_type(self.course.id),
                     'event_transaction_type': 'edx.grades.grading_policy_changed',
                     'grading_policy_hash': policy_hash,
-                    'user_id': unicode(self.user.id),
+                    'user_id': six.text_type(self.user.id),
                     'event_transaction_id': 'mockUUID',
                 }
             ) for policy_hash in {grading_policy_1, grading_policy_2, grading_policy_3}
@@ -600,10 +602,10 @@ class CourseGradingTest(CourseTestCase):
             mock.call(
                 GRADING_POLICY_CHANGED_EVENT_TYPE,
                 {
-                    'course_id': unicode(self.course.id),
+                    'course_id': six.text_type(self.course.id),
                     'event_transaction_type': 'edx.grades.grading_policy_changed',
                     'grading_policy_hash': policy_hash,
-                    'user_id': unicode(self.user.id),
+                    'user_id': six.text_type(self.user.id),
                     'event_transaction_id': 'mockUUID',
                 }
             ) for policy_hash in (grading_policy_1, grading_policy_2, grading_policy_3)
@@ -677,10 +679,10 @@ class CourseGradingTest(CourseTestCase):
             mock.call(
                 GRADING_POLICY_CHANGED_EVENT_TYPE,
                 {
-                    'course_id': unicode(self.course.id),
+                    'course_id': six.text_type(self.course.id),
                     'event_transaction_type': 'edx.grades.grading_policy_changed',
                     'grading_policy_hash': policy_hash,
-                    'user_id': unicode(self.user.id),
+                    'user_id': six.text_type(self.user.id),
                     'event_transaction_id': 'mockUUID',
                 }
             ) for policy_hash in (grading_policy_1, grading_policy_2)
@@ -1491,7 +1493,7 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
         """
         super(CourseEnrollmentEndFieldTest, self).setUp()
         self.course = CourseFactory.create(org='edX', number='dummy', display_name='Marketing Site Course')
-        self.course_details_url = reverse_course_url('settings_handler', unicode(self.course.id))
+        self.course_details_url = reverse_course_url('settings_handler', six.text_type(self.course.id))
 
     def _get_course_details_response(self, global_staff):
         """
