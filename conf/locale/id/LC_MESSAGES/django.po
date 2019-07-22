@@ -93,7 +93,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-07-07 20:42+0000\n"
+"POT-Creation-Date: 2019-07-21 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Indonesian (https://www.transifex.com/open-edx/teams/6205/id/)\n"
@@ -13163,8 +13163,6 @@ msgid "You do not have access to this dependency module."
 msgstr "Anda tidak memiliki akses terhadap modul dependensi ini."
 
 #: lms/templates/course.html
-#: openedx/features/journals/templates/journals/bundle_card.html
-#: openedx/features/journals/templates/journals/journal_card.html
 msgid "LEARN MORE"
 msgstr "Pelajari lebih lanjut"
 
@@ -13908,15 +13906,11 @@ msgstr "Daftar menggunakan {provider_name}"
 msgid "Create your own {platform_name} account below"
 msgstr "Buat akun anda {platform_name} di bawah"
 
-#: lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
+#: lms/templates/register-form.html lms/templates/register-shib.html
 msgid ""
-"Required fields are noted by <strong class=\"indicator\">bold text and an "
-"asterisk (*)</strong>."
+"Required fields are noted by {strong_start}bold text and an asterisk "
+"(*){strong_end}."
 msgstr ""
-"Isian yang wajib ditandai dengan <strong class=\"indicator\">teks tebal dan "
-"tanda bintang (*)</strong>."
 
 #. Translators: selected_provider is the name of an external, third-party user
 #. authentication service (like Google or LinkedIn).
@@ -14029,12 +14023,6 @@ msgstr "Perbaharui Akun {platform_name} saya"
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Welcome {username}!  Please set your preferences below"
 msgstr "Selamat datang {username}! Harap tentukan pilihan Anda di bawah"
-
-#: lms/templates/register-shib.html
-msgid ""
-"Required fields are noted by {strong_start}bold text and an asterisk "
-"(*){strong_end}."
-msgstr ""
 
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -16019,13 +16007,10 @@ msgstr "Terjadi kesalahan saat checkout"
 
 #: lms/templates/commerce/checkout_error.html
 msgid ""
-"An error has occurred with your payment. <b>You have not been charged.</b> "
-"Please try to submit your payment again. If this problem persists, contact "
-"{email}."
+"An error has occurred with your payment. {b_start}You have not been "
+"charged.{b_end} Please try to submit your payment again. If this problem "
+"persists, contact {email}."
 msgstr ""
-"Terjadi kesalahan dengan pembayaran Anda. <b>Anda belum ditagih.</b> Silakan"
-" ulangi pengiriman pembayaran Anda. Jika permasalahan tetap terjadi, hubungi"
-" {email}."
 
 #: lms/templates/commerce/checkout_receipt.html
 msgid "Loading Order Data..."
@@ -16289,7 +16274,6 @@ msgstr "Anda terdaftar pada pelatihan ini"
 #: lms/templates/courseware/course_about.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/shoppingcart/registration_code_receipt.html
-#: openedx/features/journals/templates/journals/bundle_about.html
 msgid "View Course"
 msgstr "Lihat Kursus"
 
@@ -16369,12 +16353,12 @@ msgid "I just enrolled in {number} {title} through {account}: {url}"
 msgstr "Saya baru saja mendaftar di {number} {title} melalui {account}: {url}"
 
 #: lms/templates/courseware/course_about_sidebar_header.html
-msgid "Take a course with {platform} online"
-msgstr "Ikuti kursus dengan {platform} online"
-
-#: lms/templates/courseware/course_about_sidebar_header.html
 msgid "I just enrolled in {number} {title} through {platform} {url}"
 msgstr "Saya baru saja mendaftar di {number} {title} melalui {platform} {url}"
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+msgid "Take a course with {platform} online"
+msgstr "Ikuti kursus dengan {platform} online"
 
 #: lms/templates/courseware/course_about_sidebar_header.html
 #: themes/stanford-style/lms/templates/courseware/course_about_sidebar_header.html
@@ -16548,7 +16532,6 @@ msgid "Purchase the Program ("
 msgstr "Beli program ("
 
 #: lms/templates/courseware/program_marketing.html
-#: openedx/features/journals/templates/journals/bundle_about.html
 msgid "Original Price"
 msgstr "Harga asli"
 
@@ -16557,7 +16540,6 @@ msgid "${oldPrice}"
 msgstr "${oldPrice}"
 
 #: lms/templates/courseware/program_marketing.html
-#: openedx/features/journals/templates/journals/bundle_about.html
 msgid "Discounted Price"
 msgstr "Harga yang telah didiskon"
 
@@ -16656,7 +16638,6 @@ msgid "Courses in the {}"
 msgstr "Pelatihan di {}"
 
 #: lms/templates/courseware/program_marketing.html
-#: openedx/features/journals/templates/journals/bundle_about.html
 msgid "Starts on {}"
 msgstr "Mulai dari {}"
 
@@ -17226,10 +17207,8 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
 "You have completed this course and are eligible to purchase course credit. "
-"Select <strong>Get Credit</strong> to get started."
+"Select {strong_start}Get Credit{strong_end} to get started."
 msgstr ""
-"Anda telah menyelesaikan kursus dan berhak untuk membeli kredit kursus. "
-"Pilih <strong>Dapatkan Kredit</strong> untuk memulai."
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "You are now eligible for credit from {provider}. Congratulations!"
@@ -17245,12 +17224,9 @@ msgstr "Dapatkan kredit"
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
 "Thank you for your payment. To receive course credit, you must now request "
-"credit at the {link_to_provider_site} website. Select <b>Request Credit</b> "
-"to get started."
+"credit at the {link_to_provider_site} website. Select {start_bold}Request "
+"Credit{end_bold} to get started."
 msgstr ""
-"Terima kasih atas pembayaran Anda. Untuk mendapatkan kredit kursus, Anda "
-"harus meminta kredit melalui tautan website {link_to_provider_site}. Pilih "
-"<b>Minta Kredit</b>untuk memulai."
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "Request Credit"
@@ -17274,13 +17250,10 @@ msgstr "Lihat detail"
 #. provider.
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid ""
-"<b>Congratulations!</b> {provider_name} has approved your request for course"
-" credit. To see your course credit, visit the {link_to_provider_site} "
-"website."
+"{start_bold}Congratulations!{end_bold} {provider_name} has approved your "
+"request for course credit. To see your course credit, visit the "
+"{link_to_provider_site} website."
 msgstr ""
-"<b>Selamat!</b> {provider_name} telah menyetujui permintaan kredit kursus "
-"Anda. Unutk melihat kredit kursus Anda, kunjungi website "
-"{link_to_provider_site}."
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "View Credit"
@@ -18328,13 +18301,6 @@ msgstr ""
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Programs"
 msgstr "Program"
-
-#: lms/templates/header/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Journals"
-msgstr "Jurnal"
 
 #: lms/templates/header/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
@@ -20177,10 +20143,6 @@ msgstr "Tampilkan status tugas yang Anda kirimkan untuk masalah ini."
 msgid "My Courses"
 msgstr "Kursus Saya"
 
-#: lms/templates/learner_dashboard/_dashboard_navigation_journals.html
-msgid "My Journals"
-msgstr "Jurnal Saya"
-
 #: lms/templates/learner_dashboard/program_details.html
 msgid "Program Details"
 msgstr "Detail Program"
@@ -21472,76 +21434,6 @@ msgstr "Perbaruan terakhir"
 msgid "Search Results"
 msgstr "Hasil pencarian"
 
-#: openedx/features/journals/templates/journals/bundle_about.html
-msgid "Purchase the Bundle ("
-msgstr "Beli Paket ("
-
-#: openedx/features/journals/templates/journals/bundle_about.html
-msgid "Courses included"
-msgstr "Kursus termasuk"
-
-#: openedx/features/journals/templates/journals/bundle_about.html
-msgid "Journals included"
-msgstr "Jurnal termasuk"
-
-#: openedx/features/journals/templates/journals/bundle_about.html
-msgid "{access_length} Day Access"
-msgstr "{access_length} Akses Hari"
-
-#: openedx/features/journals/templates/journals/bundle_about.html
-#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
-msgid "View Journal"
-msgstr "Lihat Jurnal"
-
-#: openedx/features/journals/templates/journals/bundle_card.html
-msgid "Bundle"
-msgstr "Paket"
-
-#: openedx/features/journals/templates/journals/journal_card.html
-msgid "Journal"
-msgstr "Jurnal"
-
-#: openedx/features/journals/templates/journals/journal_card.html
-msgid "{num_months} month"
-msgid_plural "{num_months} months"
-msgstr[0] "{num_months} bulan"
-
-#: openedx/features/journals/templates/journals/journal_card.html
-msgid "unlimited"
-msgstr "tak terbatas"
-
-#: openedx/features/journals/templates/journals/journal_card.html
-msgid "Access Length"
-msgstr "Lama Akses"
-
-#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
-msgid "Journal Dashboard"
-msgstr "Dashboard Jurnal"
-
-#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
-msgid "{journal_title} Cover Image"
-msgstr "{journal_title} Gambar Sampul"
-
-#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
-msgid "Access Expired: {date}"
-msgstr "Akses Telah Berakhir: {date}"
-
-#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
-msgid "Access Expires: {date}"
-msgstr "Akses Telah Berakhir: {date}"
-
-#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
-msgid "Renew Access"
-msgstr "Perbarui Akses"
-
-#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
-msgid "You have not purchased access to any journals yet."
-msgstr "Anda belum membeli akses untuk jurnal."
-
-#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
-msgid "Explore journals and courses"
-msgstr "Telusuri jurnal dan kursus"
-
 #. Translators: this section lists all the third-party authentication
 #. providers
 #. (for example, Google and LinkedIn) the user can link with or unlink from
@@ -21775,6 +21667,15 @@ msgstr "Hak Cipta {year}. Hak cipta dilindungi"
 #: themes/stanford-style/lms/templates/index.html
 msgid "For anyone, anywhere, anytime"
 msgstr "Untuk siapa saja, di mana saja, kapan saja"
+
+#: themes/stanford-style/lms/templates/register-form.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid ""
+"Required fields are noted by <strong class=\"indicator\">bold text and an "
+"asterisk (*)</strong>."
+msgstr ""
+"Isian yang wajib ditandai dengan <strong class=\"indicator\">teks tebal dan "
+"tanda bintang (*)</strong>."
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
