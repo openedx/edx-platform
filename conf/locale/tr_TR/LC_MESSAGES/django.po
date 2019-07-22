@@ -128,7 +128,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-07-14 20:42+0000\n"
+"POT-Creation-Date: 2019-07-21 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2019\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -2710,7 +2710,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Conditional Attribute"
-msgstr ""
+msgstr "Koşul Etiketleri"
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid ""
@@ -6946,7 +6946,7 @@ msgstr ""
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru send template to use on enrolling for audit. "
-msgstr ""
+msgstr "Denetime kaydolurken kullanılacak Sailthru gönderi şablonu."
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru send template to use on passed ID verification."
@@ -9846,7 +9846,7 @@ msgstr ""
 #: lms/templates/instructor/edx_ace/removebetatester/email/subject.txt
 #, python-format
 msgid "You have been removed from a beta test for %(course_name)s"
-msgstr ""
+msgstr "%(course_name)s için beta testinden çıkarıldınız"
 
 #: lms/templates/logout.html
 msgid "Signed Out"
@@ -11226,6 +11226,10 @@ msgid ""
 "completing more problems every week, and participating in the discussion "
 "forums. What do you want to do to keep learning?"
 msgstr ""
+"%(platform_name)s platformundaki pek çok "
+"<strong>%(course_name)s</strong>öğrencisi her hafta çok sayıda problem "
+"çözüyor ve tartışma forumlarına katılıyor. Öğrenmeye devam etmek istiyor "
+"musunuz?  "
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
@@ -12060,7 +12064,7 @@ msgstr ""
 
 #: openedx/features/content_type_gating/templates/content_type_gating/access_denied_message.html
 msgid "Content available only to verified track learners"
-msgstr ""
+msgstr "İçerik sadece doğrulanmış kayıtlanma öğrencilerine açık"
 
 #: openedx/features/content_type_gating/templates/content_type_gating/access_denied_message.html
 msgid "Verified Track Access"
