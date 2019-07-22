@@ -2,12 +2,15 @@
 Common test utilities for courseware functionality
 """
 
+from __future__ import absolute_import
+
 from abc import ABCMeta, abstractmethod
 from datetime import datetime, timedelta
-from urllib import urlencode
 
 import ddt
+import six
 from mock import patch
+from six.moves.urllib.parse import urlencode  # pylint: disable=import-error
 
 from lms.djangoapps.courseware.field_overrides import OverrideModulestoreFieldData
 from lms.djangoapps.courseware.url_helpers import get_redirect_url
@@ -19,12 +22,11 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 
 
 @ddt.ddt
-class RenderXBlockTestMixin(object):
+class RenderXBlockTestMixin(six.with_metaclass(ABCMeta, object)):
     """
     Mixin for testing the courseware.render_xblock function.
     It can be used for testing any higher-level endpoint that calls this method.
     """
-    __metaclass__ = ABCMeta
 
     # DOM elements that appear in the LMS Courseware,
     # but are excluded from the xBlock-only rendering.
@@ -68,7 +70,7 @@ class RenderXBlockTestMixin(object):
             usage_key: The course block usage key. This ensures that the positive and negative tests stay in sync.
             url_encoded_params: URL encoded parameters that should be appended to the requested URL.
         """
-        pass   # pragma: no cover
+        pass  # pragma: no cover
 
     def login(self):
         """
@@ -270,6 +272,7 @@ class FieldOverrideTestMixin(object):
     """
     A Mixin helper class for classes that test Field Overrides.
     """
+
     def setUp(self):
         super(FieldOverrideTestMixin, self).setUp()
         OverrideModulestoreFieldData.provider_classes = None
