@@ -33,8 +33,8 @@ class TestCreateDotApplication(TestCase):
         APP_NAME = "update_test_application"
         URI_OLD = "https://example.com/old"
         URI_NEW = "https://example.com/new"
-        SCOPES_X = "email,profile,user_id"
-        SCOPES_Y = "email,profile"
+        SCOPES_X = ["email", "profile", "user_id"]
+        SCOPES_Y = ["email", "profile"]
         base_call_args = [
             APP_NAME,
             self.user.username,
@@ -70,7 +70,7 @@ class TestCreateDotApplication(TestCase):
             ApplicationAccess.objects.get(application_id=app.id)
 
         # Make sure calling with scopes adds access
-        call_args = base_call_args + [URI_NEW, "--scopes", SCOPES_X]
+        call_args = base_call_args + [URI_NEW, "--scopes", ",".join(SCOPES_X)]
         call_command(Command(), *call_args)
         app = Application.objects.get(name=APP_NAME)
         self.assertEqual(app.redirect_uris, URI_NEW)
@@ -78,7 +78,7 @@ class TestCreateDotApplication(TestCase):
         self.assertEqual(access.scopes, SCOPES_X)
 
         # Make sure calling with new scopes changes them
-        call_args = base_call_args + [URI_NEW, "--scopes", SCOPES_Y]
+        call_args = base_call_args + [URI_NEW, "--scopes", ",".join(SCOPES_Y)]
         call_command(Command(), *call_args)
         app = Application.objects.get(name=APP_NAME)
         self.assertEqual(app.redirect_uris, URI_NEW)
