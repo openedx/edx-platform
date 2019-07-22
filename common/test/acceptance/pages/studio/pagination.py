@@ -1,6 +1,8 @@
 """
 Mixin to include for Paginated container pages
 """
+from __future__ import absolute_import
+
 from selenium.webdriver.common.keys import Keys
 
 
