@@ -18,12 +18,12 @@ import edx_theme
 import six
 from path import Path
 
-root = Path('..').abspath()
+root = Path('../..').abspath()
 
 # Hack the PYTHONPATH to match what LMS and Studio use so all the code
 # can be successfully imported
 sys.path.insert(0, root)
-sys.path.append(root / "docs")
+sys.path.append(root / "docs/guides")
 sys.path.append(root / "cms/djangoapps")
 sys.path.append(root / "common/djangoapps")
 sys.path.append(root / "common/lib/capa")
@@ -284,7 +284,7 @@ def on_init(app):  # pylint: disable=unused-argument
     Read the Docs won't run tox or custom shell commands, so we need this to
     avoid checking in the generated reStructuredText files.
     """
-    docs_path = root / 'docs'
+    docs_path = root / 'docs' / 'guides'
     apidoc_path = 'sphinx-apidoc'
     if hasattr(sys, 'real_prefix'):  # Check to see if we are in a virtualenv
         # If we are, assemble the path manually
