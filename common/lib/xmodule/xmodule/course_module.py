@@ -268,12 +268,11 @@ def get_available_providers():
     available_providers.sort()
     return available_providers
 
+
 class DiscussionTopicMapping(Dict):
     """
     DiscussionTopicMapping field, which includes validation of the topic id
     """
-
-
     def from_json(self, value):
         """
         Return python dict type. Performs validation on id key for each discussion topic
@@ -281,7 +280,7 @@ class DiscussionTopicMapping(Dict):
         if value is None:
             return None
         """
-        if statement checks to make sure value is a dict, 
+        if statement checks to make sure value is a dict,
         each topic in dict has a key id and the id value only has valid characters
         """
         if isinstance(value, dict):
@@ -295,18 +294,14 @@ class DiscussionTopicMapping(Dict):
             raise TypeError('Value stored in a Dict must be None or a dict, found %s' % type(value))
         return value
 
-
-
-    def _validate_topic_id_value(self,value):
+    def _validate_topic_id_value(self, value):
         if value.isalnum():
             return True
-        elif not ''.join(filter(lambda x: not (x.isalnum() or x=="-" or x=="_" or x=="."),value)):
+        elif not ''.join(filter(lambda x: not (x.isalnum() or x == "-" or x == "_" or x == "."), value)):
             # elif checks to make sure only characters in value are alphabetic, numberic, underscore, hyphen, and period
             return True
         return False
-
-
-
+        
 
 class CourseFields(object):
     lti_passports = List(
