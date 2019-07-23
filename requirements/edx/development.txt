@@ -257,10 +257,9 @@ pyjwt==1.5.2
 pylint-celery==0.3
 pylint-django==0.7.2
 pylint-plugin-utils==0.3
-pylint==1.7.1
-pymongo==2.9.1
-pynliner==0.5.2
-pyopenssl==18.0.0
+pylint==1.7.6
+pymongo==3.9.0
+pynliner==0.8.0
 pyparsing==2.2.0
 pyquery==1.4.0
 pysqlite==2.8.3
