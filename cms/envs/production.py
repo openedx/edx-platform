@@ -4,22 +4,25 @@ This is the default template for our main set of AWS servers.
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=wildcard-import, unused-wildcard-import
+# pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-order
+
+from __future__ import absolute_import
 
 import codecs
 import os
 import yaml
 
-from path import Path as path
-from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
-from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse_lazy
+from path import Path as path
 
 from .common import *
 
-from openedx.core.lib.derived import derive_settings  # pylint: disable=wrong-import-order
-from openedx.core.lib.logsettings import get_logger_config  # pylint: disable=wrong-import-order
+from openedx.core.djangoapps.plugins import constants as plugin_constants
+from openedx.core.djangoapps.plugins import plugin_settings
+from openedx.core.lib.derived import derive_settings
+from openedx.core.lib.logsettings import get_logger_config
+from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
 
 
 def get_env_setting(setting):
@@ -442,7 +445,7 @@ CELERY_QUEUES.update(
     {
         alternate: {}
         for alternate in ALTERNATE_QUEUES
-        if alternate not in CELERY_QUEUES.keys()
+        if alternate not in list(CELERY_QUEUES.keys())
     }
 )
 
