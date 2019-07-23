@@ -46,7 +46,7 @@ from third_party_auth import pipeline, provider
 from util.json_request import JsonResponse
 from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
-from student.models import (LoginFailures, PasswordHistory, CourseEnrollment)
+from student.models import (LoginFailures, CourseEnrollment)
 from ratelimitbackend.exceptions import RateLimitException
 from django.contrib.auth import authenticate, login
 import analytics
@@ -387,14 +387,6 @@ def login_user_custom(request, error=""):  # pylint: disable=too-many-statements
                 "value": lockout_message,
             })  # TODO: this should be status code 429  # pylint: disable=fixme
 
-    # see if the user must reset his/her password due to any policy settings
-    if user_found_by_email_lookup and PasswordHistory.should_user_reset_password_now(user_found_by_email_lookup):
-        return JsonResponse({
-            "success": False,
-            "value": _('Your password has expired due to password policy on this account. You must '
-                       'reset your password before you can log in again. Please click the '
-                       '"Forgot Password" link on this page to reset your password before logging in again.'),
-        })  # TODO: this should be status code 403  # pylint: disable=fixme
 
     # if the user doesn't exist, we want to set the username to an invalid
     # username so that authentication is guaranteed to fail and we can take
