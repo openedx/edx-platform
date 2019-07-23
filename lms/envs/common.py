@@ -2631,17 +2631,33 @@ POLICY_CHANGE_TASK_RATE_LIMIT = '300/h'
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "OPTIONS": {
+            "user_attributes": ["username"],
+            "max_similarity": 1
+        }
     },
     {
         "NAME": "util.password_policy_validators.MinimumLengthValidator",
         "OPTIONS": {
-            "min_length": 2
+            "min_length": 6
         }
     },
     {
-        "NAME": "util.password_policy_validators.MaximumLengthValidator",
+        "NAME": "util.password_policy_validators.UppercaseValidator",
         "OPTIONS": {
-            "max_length": 75
+            "min_upper": 1
+        }
+    },
+    {
+        "NAME": "util.password_policy_validators.LowercaseValidator",
+        "OPTIONS": {
+            "min_lower": 1
+        }
+    },
+    {
+        "NAME": "util.password_policy_validators.NumericValidator",
+        "OPTIONS": {
+            "min_numeric": 1
         }
     },
 ]

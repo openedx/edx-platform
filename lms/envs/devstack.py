@@ -142,16 +142,9 @@ FEATURES['ENABLE_MOBILE_REST_API'] = True
 FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
 
 ########################## SECURITY #######################
-FEATURES['ENFORCE_PASSWORD_POLICY'] = True
 FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS'] = False
 FEATURES['SQUELCH_PII_IN_LOGS'] = False
 FEATURES['PREVENT_CONCURRENT_LOGINS'] = False
-PASSWORD_MIN_LENGTH = 6
-PASSWORD_COMPLEXITY = {
-    'UPPER': 1,
-    'LOWER': 1,
-    'DIGITS': 1
-}
 
 ########################### Milestones #################################
 FEATURES['MILESTONES_APP'] = True
