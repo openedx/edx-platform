@@ -9,7 +9,6 @@ from django.test.utils import override_settings
 from mock import patch
 from opaque_keys.edx.keys import UsageKey
 
-from contentstore.models import PushNotificationConfig
 from contentstore.tests.test_course_settings import CourseTestCase
 from contentstore.utils import reverse_course_url, reverse_usage_url
 from xmodule.modulestore.django import modulestore
@@ -239,7 +238,7 @@ class CourseUpdateTest(CourseTestCase):
         payload = json.loads(resp.content)
         self.assertEqual(len(payload), 1)
 
-    def post_course_update(self, send_push_notification=False):
+    def post_course_update(self):
         """
         Posts an update to the course
         """
@@ -250,8 +249,6 @@ class CourseUpdateTest(CourseTestCase):
 
         content = u"Sample update"
         payload = {'content': content, 'date': 'January 8, 2013'}
-        if send_push_notification:
-            payload['push_notification_selected'] = True
         resp = self.client.ajax_post(course_update_url, payload)
 
         # check that response status is 200 not 400
@@ -260,15 +257,11 @@ class CourseUpdateTest(CourseTestCase):
         payload = json.loads(resp.content)
         self.assertHTMLEqual(payload['content'], content)
 
-    @patch("contentstore.push_notification.send_push_course_update")
-    def test_post_course_update(self, mock_push_update):
+    def test_post_course_update(self):
         """
         Test that a user can successfully post on course updates and handouts of a course
         """
         self.post_course_update()
-
-        # check that push notifications are not sent
-        self.assertFalse(mock_push_update.called)
 
         updates_location = self.course.id.make_usage_key('course_info', 'updates')
         self.assertTrue(isinstance(updates_location, UsageKey))
@@ -287,32 +280,3 @@ class CourseUpdateTest(CourseTestCase):
 
         payload = json.loads(resp.content)
         self.assertHTMLEqual(payload['data'], content)
-
-    @patch("contentstore.push_notification.send_push_course_update")
-    def test_notifications_enabled_but_not_requested(self, mock_push_update):
-        PushNotificationConfig(enabled=True).save()
-        self.post_course_update()
-        self.assertFalse(mock_push_update.called)
-
-    @patch("contentstore.push_notification.send_push_course_update")
-    def test_notifications_enabled_and_sent(self, mock_push_update):
-        PushNotificationConfig(enabled=True).save()
-        self.post_course_update(send_push_notification=True)
-        self.assertTrue(mock_push_update.called)
-
-    @override_settings(PARSE_KEYS={"APPLICATION_ID": "TEST_APPLICATION_ID", "REST_API_KEY": "TEST_REST_API_KEY"})
-    @patch("contentstore.push_notification.Push")
-    def test_notifications_sent_to_parse(self, mock_parse_push):
-        PushNotificationConfig(enabled=True).save()
-        self.post_course_update(send_push_notification=True)
-        self.assertEquals(mock_parse_push.alert.call_count, 2)
-
-    @override_settings(PARSE_KEYS={"APPLICATION_ID": "TEST_APPLICATION_ID", "REST_API_KEY": "TEST_REST_API_KEY"})
-    @patch("contentstore.push_notification.log_exception")
-    @patch("contentstore.push_notification.Push")
-    def test_notifications_error_from_parse(self, mock_parse_push, mock_log_exception):
-        PushNotificationConfig(enabled=True).save()
-        from parse_rest.core import ParseError
-        mock_parse_push.alert.side_effect = ParseError
-        self.post_course_update(send_push_notification=True)
-        self.assertTrue(mock_log_exception.called)

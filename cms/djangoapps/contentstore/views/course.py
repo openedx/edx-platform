@@ -39,7 +39,6 @@ from contentstore.course_group_config import (
 )
 from contentstore.course_info_model import delete_course_update, get_course_updates, update_course_updates
 from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
-from contentstore.push_notification import push_notification_enabled
 from contentstore.tasks import rerun_course as rerun_course_task
 from contentstore.utils import (
     add_instructor,
@@ -966,7 +965,6 @@ def course_info_handler(request, course_key_string):
                     'updates_url': reverse_course_url('course_info_update_handler', course_key),
                     'handouts_locator': course_key.make_usage_key('course_info', 'handouts'),
                     'base_asset_url': StaticContent.get_base_url_path_for_course_assets(course_module.id),
-                    'push_notification_enabled': push_notification_enabled()
                 }
             )
         else:

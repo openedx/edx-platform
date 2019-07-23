@@ -8,7 +8,6 @@ import time
 
 import mock
 import pytest
-from contentstore.models import PushNotificationConfig
 from contentstore.tests.test_course_settings import CourseTestCase
 from contentstore.tests.utils import AjaxEnabledTestClient, parse_json, registration, user
 from ddt import data, ddt, unpack
@@ -417,16 +416,3 @@ class CourseKeyVerificationTestCase(CourseTestCase):
         )
         resp = self.client.get_html(url)
         self.assertEqual(resp.status_code, status_code)
-
-
-class PushNotificationConfigTestCase(TestCase):
-    """
-    Tests PushNotificationConfig.
-    """
-
-    def test_notifications_defaults(self):
-        self.assertFalse(PushNotificationConfig.is_enabled())
-
-    def test_notifications_enabled(self):
-        PushNotificationConfig(enabled=True).save()
-        self.assertTrue(PushNotificationConfig.is_enabled())
