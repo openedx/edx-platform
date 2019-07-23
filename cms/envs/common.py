@@ -1483,6 +1483,7 @@ OPTIONAL_APPS = (
     ('integrated_channels.degreed', None),
     ('integrated_channels.sap_success_factors', None),
     ('integrated_channels.xapi', None),
+    ('integrated_channels.cornerstone', None),
 )
 
 
