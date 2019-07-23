@@ -153,11 +153,9 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
 
     &:hover {
       .btn-play {
-        color: theme-color("primary");
-      }
-
-      .btn-play::after {
-        background: theme-color("inverse");
+        opacity: unset;
+        color: rgb(14, 166, 236);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
       }
     }
 
@@ -200,10 +198,10 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
       top: 46%;
       left: 50%;
       font-size: 4em;
+      opacity: 0.7;
       cursor: pointer;
 
       &::after {
-        background: $white;
         position: absolute;
         width: 50%;
         height: 50%;
