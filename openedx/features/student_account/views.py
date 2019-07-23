@@ -250,7 +250,7 @@ from mailchimp_pipeline.signals.handlers import task_send_account_activation_ema
 from student.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.user_api.helpers import shim_student_view, require_post_params
 from student.forms import AccountCreationForm, get_registration_extension_form
-from student.models import Registration, create_comments_service_user, PasswordHistory, UserProfile
+from student.models import Registration, create_comments_service_user, UserProfile
 from third_party_auth import pipeline, provider
 from util.enterprise_helpers import data_sharing_consent_requirement_at_login
 from util.json_request import JsonResponse
@@ -321,11 +321,6 @@ def _do_create_account_custom(form, custom_form=None, is_alquity_user=False):
             )
         else:
             raise
-
-    # add this account creation to password history
-    # NOTE, this will be a NOP unless the feature has been turned on in configuration
-    password_history_entry = PasswordHistory()
-    password_history_entry.create(user)
 
     registration.register(user)
 
