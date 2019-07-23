@@ -268,6 +268,45 @@ def get_available_providers():
     available_providers.sort()
     return available_providers
 
+class DiscussionTopicMapping(Dict):
+    """
+    DiscussionTopicMapping field, which includes validation of the topic id
+    """
+
+
+    def from_json(self, value):
+        """
+        Return python dict type. Performs validation on id key for each discussion topic
+        """
+        if value is None:
+            return None
+        """
+        if statement checks to make sure value is a dict, 
+        each topic in dict has a key id and the id value only has valid characters
+        """
+        if isinstance(value, dict):
+            for key in value:
+                if "id" in value[key].keys():
+                    if not self._validate_topic_id_value(value[key]["id"]):
+                        raise ValueError("The only special characters that are supported in the id key are underscore, hyphen, and period.")
+                else:
+                    raise ValueError("All topics need a id key")
+        else:
+            raise TypeError('Value stored in a Dict must be None or a dict, found %s' % type(value))
+        return value
+
+
+
+    def _validate_topic_id_value(self,value):
+        if value.isalnum():
+            return True
+        elif not ''.join(filter(lambda x: not (x.isalnum() or x=="-" or x=="_" or x=="."),value)):
+            # elif checks to make sure only characters in value are alphabetic, numberic, underscore, hyphen, and period
+            return True
+        return False
+
+
+
 
 class CourseFields(object):
     lti_passports = List(
@@ -360,7 +399,7 @@ class CourseFields(object):
         ),
         scope=Scope.settings
     )
-    discussion_topics = Dict(
+    discussion_topics = DiscussionTopicMapping(
         display_name=_("Discussion Topic Mapping"),
         help=_(
             'Enter discussion categories in the following format: "CategoryName": '
