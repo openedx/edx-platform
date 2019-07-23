@@ -1568,17 +1568,13 @@ FINANCIAL_ASSISTANCE_HEADER = _(
 
 
 FA_INCOME_LABEL = _('Annual Household Income')
-FA_REASON_FOR_APPLYING_LABEL = _(
-    'Tell us about your current financial situation. Why do you need assistance?'
-)
-FA_GOALS_LABEL = _(
-    'Tell us about your learning or professional goals. How will a Verified Certificate in'
-    ' this course help you achieve these goals?'
-)
-FA_EFFORT_LABEL = _(
-    'Tell us about your plans for this course. What steps will you take to help you complete'
-    ' the course work and receive a certificate?'
-)
+FA_REASON_FOR_APPLYING_LABEL = 'Tell us about your current financial situation. Why do you need assistance?'
+FA_GOALS_LABEL = 'Tell us about your learning or professional goals. How will a Verified Certificate in ' \
+                 'this course help you achieve these goals?'
+
+FA_EFFORT_LABEL = 'Tell us about your plans for this course. What steps will you take to help you complete ' \
+                  'the course work and receive a certificate?'
+
 FA_SHORT_ANSWER_INSTRUCTIONS = _('Use between 250 and 500 words or so in your response.')
 
 
@@ -1710,7 +1706,7 @@ def financial_assistance_form(request):
             {
                 'name': 'reason_for_applying',
                 'type': 'textarea',
-                'label': FA_REASON_FOR_APPLYING_LABEL,
+                'label': _(FA_REASON_FOR_APPLYING_LABEL),  # pylint: disable=translation-of-non-string
                 'placeholder': '',
                 'defaultValue': '',
                 'required': True,
@@ -1723,7 +1719,7 @@ def financial_assistance_form(request):
             {
                 'name': 'goals',
                 'type': 'textarea',
-                'label': FA_GOALS_LABEL,
+                'label': _(FA_GOALS_LABEL),  # pylint: disable=translation-of-non-string
                 'placeholder': '',
                 'defaultValue': '',
                 'required': True,
@@ -1736,7 +1732,7 @@ def financial_assistance_form(request):
             {
                 'name': 'effort',
                 'type': 'textarea',
-                'label': FA_EFFORT_LABEL,
+                'label': _(FA_EFFORT_LABEL),  # pylint: disable=translation-of-non-string
                 'placeholder': '',
                 'defaultValue': '',
                 'required': True,
