@@ -4,6 +4,7 @@ A class used for defining and running test suites
 """
 from __future__ import absolute_import, print_function
 
+import os
 import subprocess
 import sys
 
@@ -93,6 +94,8 @@ class TestSuite(object):
         sys.stdout.write(msg)
         sys.stdout.flush()
 
+        if 'TEST_SUITE' not in os.environ:
+            os.environ['TEST_SUITE'] = self.root.replace("/", "_")
         kwargs = {'shell': True, 'cwd': None}
         process = None
 
