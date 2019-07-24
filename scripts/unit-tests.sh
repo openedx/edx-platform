@@ -51,7 +51,7 @@ else
 fi
 
 if [[ -n "$WHO_TESTS_WHAT" ]]; then
-    PAVER_ARGS="$PAVER_ARGS --with-wtw"
+    PAVER_ARGS="$PAVER_ARGS --with-wtw=origin/master"
 fi
 if [[ -n "$PYTEST_CONTEXTS" ]]; then
     PAVER_ARGS="$PAVER_ARGS --pytest-contexts"
