@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 import boto
 import ddt
@@ -380,6 +380,7 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
             # Make an approved verification
             attempt = SoftwareSecurePhotoVerification(user=user)
             attempt.status = 'approved'
+            attempt.expiry_date = datetime.now()
             attempt.save()
 
         # Test method 'get_recent_verification' returns the most recent
@@ -387,6 +388,25 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
         recent_verification = SoftwareSecurePhotoVerification.get_recent_verification(user=user)
         self.assertIsNotNone(recent_verification)
         self.assertEqual(recent_verification.id, attempt.id)
+
+    def test_get_recent_verification_expiry_null(self):
+        """Test that method 'get_recent_verification' of model
+        'SoftwareSecurePhotoVerification' will return None when expiry_date
+        is NULL for 'approved' verifications based on updated_at value.
+        """
+        user = UserFactory.create()
+        attempt = None
+
+        for _ in range(2):
+            # Make an approved verification
+            attempt = SoftwareSecurePhotoVerification(user=user)
+            attempt.status = 'approved'
+            attempt.save()
+
+        # Test method 'get_recent_verification' returns None
+        # as attempts don't have an expiry_date
+        recent_verification = SoftwareSecurePhotoVerification.get_recent_verification(user=user)
+        self.assertIsNone(recent_verification)
 
     def test_no_approved_verification(self):
         """Test that method 'get_recent_verification' of model
