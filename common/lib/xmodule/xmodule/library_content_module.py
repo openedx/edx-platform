@@ -158,37 +158,40 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         """
         rand = random.Random()
 
-        selected = set(tuple(k) for k in selected)  # set of (block_type, block_id) tuples assigned to this student
+        selected_keys = set(tuple(k) for k in selected)  # set of (block_type, block_id) tuples assigned to this student
 
         # Determine which of our children we will show:
         valid_block_keys = set([(c.block_type, c.block_id) for c in children])
 
         # Remove any selected blocks that are no longer valid:
-        invalid_block_keys = (selected - valid_block_keys)
+        invalid_block_keys = (selected_keys - valid_block_keys)
         if invalid_block_keys:
-            selected -= invalid_block_keys
+            selected_keys -= invalid_block_keys
 
         # If max_count has been decreased, we may have to drop some previously selected blocks:
         overlimit_block_keys = set()
-        if len(selected) > max_count:
-            num_to_remove = len(selected) - max_count
-            overlimit_block_keys = set(rand.sample(selected, num_to_remove))
-            selected -= overlimit_block_keys
+        if len(selected_keys) > max_count:
+            num_to_remove = len(selected_keys) - max_count
+            overlimit_block_keys = set(rand.sample(selected_keys, num_to_remove))
+            selected_keys -= overlimit_block_keys
 
         # Do we have enough blocks now?
-        num_to_add = max_count - len(selected)
+        num_to_add = max_count - len(selected_keys)
 
         added_block_keys = None
         if num_to_add > 0:
             # We need to select [more] blocks to display to this user:
-            pool = valid_block_keys - selected
+            pool = valid_block_keys - selected_keys
             if mode == "random":
                 num_to_add = min(len(pool), num_to_add)
                 added_block_keys = set(rand.sample(pool, num_to_add))
                 # We now have the correct n random children to show for this user.
             else:
                 raise NotImplementedError("Unsupported mode.")
-            selected |= added_block_keys
+            selected_keys |= added_block_keys
+
+        if any([invalid_block_keys, overlimit_block_keys, added_block_keys]):
+            selected = selected_keys
 
         return {
             'selected': selected,
@@ -268,19 +271,15 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
 
     def selected_children(self):
         """
-        Returns a set() of block_ids indicating which of the possible children
+        Returns a list() of block_ids indicating which of the possible children
         have been selected to display to the current user.
 
         This reads and updates the "selected" field, which has user_state scope.
 
-        Note: self.selected and the return value contain block_ids. To get
+        Note: the return value (self.selected) contains block_ids. To get
         actual BlockUsageLocators, it is necessary to use self.children,
         because the block_ids alone do not specify the block type.
         """
-        if hasattr(self, "_selected_set"):
-            # Already done:
-            return self._selected_set  # pylint: disable=access-member-before-definition
-
         block_keys = self.make_selection(self.selected, self.children, self.max_count, "random")  # pylint: disable=no-member
 
         # Publish events for analytics purposes:
@@ -292,13 +291,13 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             self._publish_event,
         )
 
-        # Save our selections to the user state, to ensure consistency:
-        selected = block_keys['selected']
-        self.selected = list(selected)  # TODO: this doesn't save from the LMS "Progress" page.
-        # Cache the results
-        self._selected_set = selected  # pylint: disable=attribute-defined-outside-init
+        if any(block_keys[changed] for changed in ('invalid', 'overlimit', 'added')):
+            # Save our selections to the user state, to ensure consistency:
+            selected = list(block_keys['selected'])
+            random.shuffle(selected)
+            self.selected = selected  # TODO: this doesn't save from the LMS "Progress" page.
 
-        return selected
+        return self.selected
 
     def _get_selected_child_blocks(self):
         """

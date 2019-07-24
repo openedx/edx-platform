@@ -39,6 +39,7 @@ def get_course_block_access_transformers(user):
     """
     course_block_access_transformers = [
         library_content.ContentLibraryTransformer(),
+        library_content.ContentLibraryOrderTransformer(),
         start_date.StartDateTransformer(),
         ContentTypeGateTransformer(),
         user_partitions.UserPartitionTransformer(),
