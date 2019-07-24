@@ -1,6 +1,8 @@
 """
 This test will run for annotator_token.py
 """
+from __future__ import absolute_import
+
 import unittest
 
 from xmodule.annotator_token import retrieve_token
