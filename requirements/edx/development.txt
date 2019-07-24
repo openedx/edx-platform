@@ -188,6 +188,7 @@ jmespath==0.9.4
 jsondiff==1.2.0
 jsonfield==2.0.2
 kombu==3.0.37
+laboratory==1.0.2
 lazy-object-proxy==1.4.1
 lazy==1.1
 lepl==5.1.3
