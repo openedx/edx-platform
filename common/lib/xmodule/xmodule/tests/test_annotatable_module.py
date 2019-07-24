@@ -1,14 +1,16 @@
 """Module annotatable tests"""
 
+from __future__ import absolute_import
+
 import unittest
 
 from lxml import etree
 from mock import Mock
-
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
+
 from xmodule.annotatable_module import AnnotatableModule
-from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 from . import get_test_system
 

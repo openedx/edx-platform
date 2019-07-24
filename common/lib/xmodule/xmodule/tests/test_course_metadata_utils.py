@@ -1,31 +1,33 @@
 """
 Tests for course_metadata_utils.
 """
+from __future__ import absolute_import
+
 from collections import namedtuple
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 from unittest import TestCase
 
 from pytz import utc
+
 from xmodule.block_metadata_utils import (
-    url_name_for_block,
     display_name_with_default,
     display_name_with_default_escaped,
+    url_name_for_block
 )
 from xmodule.course_metadata_utils import (
-    clean_course_key,
-    number_for_course_location,
-    has_course_started,
-    has_course_ended,
     DEFAULT_START_DATE,
+    clean_course_key,
     course_start_date_is_default,
+    has_course_ended,
+    has_course_started,
     may_certify_for_course,
+    number_for_course_location
 )
 from xmodule.modulestore.tests.utils import (
+    MixedModulestoreBuilder,
     MongoModulestoreBuilder,
-    VersioningModulestoreBuilder,
-    MixedModulestoreBuilder
+    VersioningModulestoreBuilder
 )
-
 
 _TODAY = datetime.now(utc)
 _LAST_MONTH = _TODAY - timedelta(days=30)

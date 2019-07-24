@@ -1,6 +1,10 @@
-import ddt
+from __future__ import absolute_import
+
 import itertools
-from xmodule.tests import BulkAssertionTest, BulkAssertionError
+
+import ddt
+
+from xmodule.tests import BulkAssertionError, BulkAssertionTest
 
 ASSERTION_METHODS_DICT = {
     "GETITEM_SPECIAL_METHOD": {}.__getitem__,
