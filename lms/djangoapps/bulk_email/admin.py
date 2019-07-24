@@ -1,6 +1,8 @@
 """
 Django admin page for bulk email models
 """
+from __future__ import absolute_import
+
 from config_models.admin import ConfigurationModelAdmin
 from django.contrib import admin
 
@@ -78,6 +80,7 @@ To enable email for the course, check the "Email enabled" box, then click "Save"
 '''
         }),
     )
+
 
 admin.site.register(CourseEmail, CourseEmailAdmin)
 admin.site.register(Optout, OptoutAdmin)
