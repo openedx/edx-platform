@@ -301,7 +301,7 @@ class DiscussionTopicMapping(Dict):
             # elif checks to make sure only characters in value are alphabetic, numberic, underscore, hyphen, and period
             return True
         return False
-        
+
 
 class CourseFields(object):
     lti_passports = List(
