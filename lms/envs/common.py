@@ -28,7 +28,7 @@ Longer TODO:
 # and throws spurious errors. Therefore, we disable invalid-name checking.
 # pylint: disable=invalid-name, wrong-import-position
 
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import
 
 import imp
 import sys
@@ -967,10 +967,10 @@ COURSE_LISTINGS = {}
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (
-    'lms.djangoapps.lms_xblock.mixin.LmsBlockMixin',
-    'xmodule.modulestore.inheritance.InheritanceMixin',
-    'xmodule.x_module.XModuleMixin',
-    'xmodule.modulestore.edit_info.EditInfoMixin',
+    u'lms.djangoapps.lms_xblock.mixin.LmsBlockMixin',
+    u'xmodule.modulestore.inheritance.InheritanceMixin',
+    u'xmodule.x_module.XModuleMixin',
+    u'xmodule.modulestore.edit_info.EditInfoMixin',
 )
 
 # Import after sys.path fixup

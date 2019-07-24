@@ -39,7 +39,7 @@ When refering to XBlocks, we use the entry-point name. For example,
 # want to import all variables from base settings files
 # pylint: disable=unused-import
 
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import
 
 import imp
 import os
@@ -612,11 +612,11 @@ P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (
-    'lms.djangoapps.lms_xblock.mixin.LmsBlockMixin',
-    'xmodule.modulestore.inheritance.InheritanceMixin',
-    'xmodule.x_module.XModuleMixin',
-    'xmodule.modulestore.edit_info.EditInfoMixin',
-    'cms.lib.xblock.authoring_mixin.AuthoringMixin',
+    u'lms.djangoapps.lms_xblock.mixin.LmsBlockMixin',
+    u'xmodule.modulestore.inheritance.InheritanceMixin',
+    u'xmodule.x_module.XModuleMixin',
+    u'xmodule.modulestore.edit_info.EditInfoMixin',
+    u'cms.lib.xblock.authoring_mixin.AuthoringMixin',
 )
 
 # Import after sys.path fixup
