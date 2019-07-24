@@ -28,7 +28,7 @@ Longer TODO:
 # and throws spurious errors. Therefore, we disable invalid-name checking.
 # pylint: disable=invalid-name, wrong-import-position
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import imp
 import sys
@@ -53,8 +53,6 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
 from openedx.core.lib.derived import derived, derived_collection_entry
 from openedx.core.release import doc_version
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
-from xmodule.modulestore.edit_info import EditInfoMixin
-from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
@@ -965,16 +963,18 @@ COURSE_LISTINGS = {}
 
 ############# XBlock Configuration ##########
 
-# Import after sys.path fixup
-from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore import prefer_xmodules
-from xmodule.x_module import XModuleMixin
-
 # These are the Mixins that should be added to every XBlock.
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
-XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin, EditInfoMixin)
+XBLOCK_MIXINS = (
+    'lms.djangoapps.lms_xblock.mixin.LmsBlockMixin',
+    'xmodule.modulestore.inheritance.InheritanceMixin',
+    'xmodule.x_module.XModuleMixin',
+    'xmodule.modulestore.edit_info.EditInfoMixin',
+)
 
+# Import after sys.path fixup
+from xmodule.modulestore import prefer_xmodules
 # Allow any XBlock in the LMS
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
 

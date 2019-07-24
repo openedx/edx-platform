@@ -39,7 +39,7 @@ When refering to XBlocks, we use the entry-point name. For example,
 # want to import all variables from base settings files
 # pylint: disable=unused-import
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import imp
 import os
@@ -111,9 +111,6 @@ from lms.envs.common import (
 from path import Path as path
 from django.core.urlresolvers import reverse_lazy
 
-from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
-from cms.lib.xblock.authoring_mixin import AuthoringMixin
-from xmodule.modulestore.edit_info import EditInfoMixin
 from openedx.core.djangoapps.theming.helpers_dirs import (
     get_themes_unchecked,
     get_theme_base_dirs_from_settings
@@ -610,21 +607,20 @@ P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
 
 ############# XBlock Configuration ##########
 
-# Import after sys.path fixup
-from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore import prefer_xmodules
-from xmodule.x_module import XModuleMixin
 
 # These are the Mixins that should be added to every XBlock.
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (
-    LmsBlockMixin,
-    InheritanceMixin,
-    XModuleMixin,
-    EditInfoMixin,
-    AuthoringMixin,
+    'lms.djangoapps.lms_xblock.mixin.LmsBlockMixin',
+    'xmodule.modulestore.inheritance.InheritanceMixin',
+    'xmodule.x_module.XModuleMixin',
+    'xmodule.modulestore.edit_info.EditInfoMixin',
+    'cms.lib.xblock.authoring_mixin.AuthoringMixin',
 )
+
+# Import after sys.path fixup
+from xmodule.modulestore import prefer_xmodules
 
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
