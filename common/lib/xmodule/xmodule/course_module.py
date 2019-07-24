@@ -285,6 +285,7 @@ class DiscussionTopicMapping(Dict):
         """
         if isinstance(value, dict):
             for key in value:
+                print("Checking for iddddddddddd..d..d.d.d.d..d.d.d.d.d.d.d.d.d.d.d..d.d.d.d.d.d.d.d.d..d.d.d.d.d.d.d")
                 if "id" in value[key].keys():
                     if not self._validate_topic_id_value(value[key]["id"]):
                         raise ValueError("The only special characters that are supported in the id key are underscore, hyphen, and period.")
