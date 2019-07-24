@@ -1042,10 +1042,11 @@ msgstr "El curso que busca está cerrado desde {date}."
 #: common/djangoapps/student/views/management.py
 msgid "No inactive user with this e-mail exists"
 msgstr ""
+"No existe un usuario inactivo con esta dirección de correo electrónico"
 
 #: common/djangoapps/student/views/management.py
 msgid "Unable to send reactivation email"
-msgstr ""
+msgstr "No fue posible enviar el correo de reactivación"
 
 #: common/djangoapps/student/views/management.py
 msgid "Course id not specified"
