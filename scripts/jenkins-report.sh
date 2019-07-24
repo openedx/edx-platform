@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -e
+set -x
 
 # This script generates coverage and diff cover reports, and optionally
 # reports this data to codecov.io. The following environment variables must be
@@ -14,6 +15,10 @@ source scripts/jenkins-common.sh
 # Get the diff coverage and html reports for unit tests
 paver coverage -b $TARGET_BRANCH
 
+if [[ -n "$PYTEST_CONTEXTS" ]]; then
+    paver upload_coverage_to_s3
+fi
+
 # Test for the CodeCov API token
 if [ -z $CODE_COV_TOKEN ]; then
     echo "codecov.io API token not set."
@@ -27,7 +32,3 @@ fi
 # JUnit test reporter will fail the build
 # if it thinks test results are old
 touch `find . -name *.xml` || true
-
-if [[ -n "$PYTEST_CONTEXTS" ]]; then
-    paver upload_coverage_to_s3
-fi
