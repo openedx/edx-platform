@@ -943,7 +943,10 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         Returns:
             SoftwareSecurePhotoVerification (object) or None
         """
-        recent_verification = SoftwareSecurePhotoVerification.objects.filter(status='approved', user_id=user.id)
+        recent_verification = SoftwareSecurePhotoVerification.objects.filter(status='approved',
+                                                                             user_id=user.id,
+                                                                             expiry_date__isnull=False)
+
         return recent_verification.latest('updated_at') if recent_verification.exists() else None
 
     @classmethod
