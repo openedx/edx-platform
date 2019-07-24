@@ -2062,15 +2062,15 @@ msgstr "Ver items hijos"
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Navigate up"
-msgstr ""
+msgstr "Navegue hacia arriba"
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Browsing"
-msgstr ""
+msgstr "Explorando"
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 msgid "Select"
-msgstr ""
+msgstr "Seleccionar"
 
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
@@ -2514,7 +2514,7 @@ msgstr "(Opcional)"
 
 #: lms/djangoapps/support/static/support/jsx/file_upload.jsx
 msgid "Remove file"
-msgstr ""
+msgstr "Remover archivo"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Course Name"
@@ -2537,6 +2537,7 @@ msgstr "No específico para un curso"
 msgid "Subject"
 msgstr "Asunto"
 
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "Configuración de cuenta"
@@ -2547,11 +2548,11 @@ msgstr "Facturación/Opciones de pago"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Certificates"
-msgstr ""
+msgstr "Certificados"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Course Content"
-msgstr ""
+msgstr "Contenidos del curso"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Deadlines"
@@ -2575,8 +2576,9 @@ msgstr "Verificación fotográfica"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Proctoring"
-msgstr ""
+msgstr "Supervisión"
 
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: cms/templates/js/asset-library.underscore
 msgid "Other"
 msgstr "Otro"
@@ -2606,6 +2608,8 @@ msgstr "Ingrese a  {platform} para que podamos ayudarle mejor."
 msgid ""
 "If you are unable to access your account contact us via email using {email}."
 msgstr ""
+"Si no puedes acceder a tu cuenta, contáctanos por correo electrónico a "
+"{email}."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid ""
@@ -2635,7 +2639,7 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Search the {platform} Help Center"
-msgstr ""
+msgstr "Busca en el Centro de Ayuda de {platform}"
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid "Go to my Dashboard"
@@ -2649,10 +2653,12 @@ msgstr "Ir a la página inicial de {platform}"
 msgid ""
 "Thank you for submitting a request! We will contact you within 24 hours."
 msgstr ""
+"Gracias por mandarnos un mensaje. Te contactaremos dentro de las siguientes "
+"24 horas."
 
 #: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
 msgid "Cancel upload"
-msgstr ""
+msgstr "Cancelar subida del archivo"
 
 #: lms/djangoapps/teams/static/teams/js/collections/team.js
 msgid "last activity"
@@ -4721,7 +4727,7 @@ msgstr ""
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Enter and confirm your new password."
-msgstr ""
+msgstr "Ingrese y confirme su nueva contraseña."
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "New Password"
@@ -4729,15 +4735,15 @@ msgstr "Nueva Contraseña"
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Confirm Password"
-msgstr ""
+msgstr "Confirmar Contraseña"
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Passwords do not match."
-msgstr ""
+msgstr "Las contraseñas no son iguales."
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Reset My Password"
-msgstr ""
+msgstr "Restablecer mi contraseña"
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 #: lms/static/js/student_account/views/account_settings_factory.js
