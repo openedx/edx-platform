@@ -1,12 +1,14 @@
 """Module progress tests"""
 
-import unittest
-from mock import Mock
+from __future__ import absolute_import
 
+import unittest
+
+from mock import Mock
 from xblock.field_data import DictFieldData
 
-from xmodule.progress import Progress
 from xmodule import x_module
+from xmodule.progress import Progress
 
 from . import get_test_system
 

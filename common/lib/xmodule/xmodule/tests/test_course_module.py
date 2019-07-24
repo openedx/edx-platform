@@ -1,22 +1,22 @@
 """Tests the course modules and their functions"""
-from __future__ import print_function
-import ddt
-import unittest
-from datetime import datetime, timedelta
-from dateutil import parser
+from __future__ import absolute_import, print_function
 
 import itertools
-from fs.memoryfs import MemoryFS
-from mock import Mock, patch
-from pytz import utc
-from xblock.runtime import KvsFieldData, DictKeyValueStore
+import unittest
+from datetime import datetime, timedelta
+
+import ddt
+from dateutil import parser
 from django.conf import settings
 from django.test import override_settings
+from fs.memoryfs import MemoryFS
+from mock import Mock, patch
+from opaque_keys.edx.keys import CourseKey
+from pytz import utc
+from xblock.runtime import DictKeyValueStore, KvsFieldData
 
 import xmodule.course_module
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
-from opaque_keys.edx.keys import CourseKey
-
 
 ORG = 'test_org'
 COURSE = 'test_course'
@@ -290,7 +290,7 @@ class TeamsConfigurationTestCase(unittest.TestCase):
 
     def make_topic(self):
         """ Make a sample topic dictionary. """
-        next_num = self.count.next()
+        next_num = next(self.count)
         topic_id = "topic_id_{}".format(next_num)
         name = "Name {}".format(next_num)
         description = "Description {}".format(next_num)
