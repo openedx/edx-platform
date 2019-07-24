@@ -60,7 +60,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-07-21 20:42+0000\n"
+"POT-Creation-Date: 2019-07-24 06:10+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Georgian (https://www.transifex.com/open-edx/teams/6205/ka/)\n"
@@ -6495,28 +6495,6 @@ msgstr ""
 #: lms/djangoapps/courseware/views/views.py
 msgid "Annual Household Income"
 msgstr "ოჯახის წლიური შემოსავალი"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your current financial situation. Why do you need assistance?"
-msgstr ""
-"აღწერეთ თქვენი ამჟამინდელი ფინანსური მდგომარეობა. რატომ გჭირდებათ დახმარება?"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your learning or professional goals. How will a Verified "
-"Certificate in this course help you achieve these goals?"
-msgstr ""
-"გვიამბეთ თქვენი სასწავლო და პროფესიული მიზნების შესახებ. როგორ დაგეხმარებათ "
-"ამ კურსის დამოწმებული სერტიფიკატი აღნიშნული მიზნების მიღწევაში?"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your plans for this course. What steps will you take to help "
-"you complete the course work and receive a certificate?"
-msgstr ""
-"გვიამბეთ ამ კურსზე თქვენი გეგმების შესახებ. რას მოიმოქმედებთ, რომ დაასრულოთ "
-"კურსის სამუშაო და მიიღოთ სერტიფიკატი?"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Use between 250 and 500 words or so in your response."
