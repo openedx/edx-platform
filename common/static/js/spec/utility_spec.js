@@ -36,5 +36,9 @@ describe('utility.rewriteCdnLinksToStatic', function() {
           rewriteCdnLinksToStatic( // eslint-disable-line no-undef
             '<img src="https://prod-edxapp.edx-cdn.org/assets/foo.x"/>')
         ).toBe('<img src="/static/foo.x"/>');
+        expect(
+          rewriteCdnLinksToStatic( // eslint-disable-line no-undef
+            '<img src="//prod-edxapp.edx-cdn.org/assets/v1/TestCourse_6.0x/foo.x"/>')
+        ).toBe('<img src="/static/foo.x"/>');
     });
 });
