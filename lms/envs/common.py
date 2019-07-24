@@ -2556,7 +2556,23 @@ EDXMKTG_USER_INFO_COOKIE_NAME = 'edx-user-info'
 EDXMKTG_USER_INFO_COOKIE_VERSION = 1
 
 MKTG_URLS = {}
-MKTG_URL_LINK_MAP = {}
+MKTG_URL_LINK_MAP = {
+    'ABOUT': 'about',
+    'CONTACT': 'contact',
+    'FAQ': 'help',
+    'COURSES': 'courses',
+    'ROOT': 'root',
+    'TOS': 'tos',
+    'HONOR': 'honor',  # If your site does not have an honor code, simply delete this line.
+    'PRIVACY': 'privacy',
+    'PRESS': 'press',
+    'BLOG': 'blog',
+    'DONATE': 'donate',
+    'SITEMAP.XML': 'sitemap_xml',
+
+    # Verified Certificates
+    'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
+}
 
 STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION = 'html'
 
