@@ -8,7 +8,7 @@ import re
 import sys
 from optparse import make_option
 
-from paver.easy import cmdopts, needs, sh, task
+from paver.easy import cmdopts, needs, sh, task, call_task
 
 from pavelib.utils.envs import Env
 from pavelib.utils.passthrough_opts import PassthroughTask
@@ -88,8 +88,16 @@ __test__ = False  # do not collect
         '--xdist_ip_addresses',
         dest='xdist_ip_addresses',
         help="Comma separated string of ip addresses to shard tests to via xdist."
-    )
-], share_with=['pavelib.utils.test.utils.clean_reports_dir'])
+    ),
+    make_option(
+        '--with-wtw',
+        dest='with_wtw',
+        action='store',
+        help="Only run tests based on the lines changed relative to the specified branch"
+    ),
+], share_with=[
+    'pavelib.utils.test.utils.clean_reports_dir',
+])
 @PassthroughTask
 @timed
 def test_system(options, passthrough_options):
@@ -102,6 +110,11 @@ def test_system(options, passthrough_options):
 
     assert system in (None, 'lms', 'cms')
     assert django_version in (None, '1.8', '1.9', '1.10', '1.11')
+
+    if hasattr(options.test_system, 'with_wtw'):
+        call_task('fetch_coverage_test_selection_data', options={
+            'compare_branch': options.test_system.with_wtw
+        })
 
     if test_id:
         # Testing a single test ID.

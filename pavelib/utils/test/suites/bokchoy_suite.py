@@ -204,7 +204,7 @@ class BokChoyTestSuite(TestSuite):
         check_services()
 
         if not self.testsonly:
-            call_task('prepare_bokchoy_run', options={'log_dir': self.log_dir})
+            call_task('prepare_bokchoy_run', options={'log_dir': self.log_dir, 'coveragerc': self.coveragerc})
         else:
             # load data in db_fixtures
             load_bok_choy_data()  # pylint: disable=no-value-for-parameter
@@ -322,8 +322,14 @@ class BokChoyTestSuite(TestSuite):
         cmd += [
             "-m",
             "pytest",
-            test_spec,
-        ] + self.verbosity_processes_command
+        ]
+        if self.coveragerc:
+            cmd.extend([
+                '-p',
+                'openedx.testing.coverage_context_listener.pytest_plugin',
+            ])
+        cmd.append(test_spec)
+        cmd.extend(self.verbosity_processes_command)
         if self.extra_args:
             cmd.append(self.extra_args)
         cmd.extend(self.passthrough_options)

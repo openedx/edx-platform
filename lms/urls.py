@@ -976,4 +976,9 @@ urlpatterns += [
     url(r'', include('csrf.urls')),
 ]
 
+if 'openedx.testing.coverage_context_listener' in settings.INSTALLED_APPS:
+    urlpatterns += [
+        url(r'coverage_context', include('openedx.testing.coverage_context_listener.urls'))
+    ]
+
 urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.LMS))

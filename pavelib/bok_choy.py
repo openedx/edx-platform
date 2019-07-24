@@ -6,7 +6,7 @@ from __future__ import absolute_import, print_function
 
 import os
 
-from paver.easy import cmdopts, needs, sh, task
+from paver.easy import cmdopts, needs, sh, task, call_task
 
 from pavelib.utils.envs import Env
 from pavelib.utils.passthrough_opts import PassthroughTask
@@ -50,6 +50,11 @@ def test_bokchoy(options, passthrough_options):
 
     if validate_firefox:
         check_firefox_version()
+
+    if hasattr(options.test_bokchoy, 'with_wtw'):
+        call_task('fetch_coverage_test_selection_data', options={
+            'compare_branch': options.test_bokchoy.with_wtw
+        })
 
     run_bokchoy(options.test_bokchoy, passthrough_options)
 
