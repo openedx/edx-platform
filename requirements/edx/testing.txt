@@ -211,7 +211,7 @@ nodeenv==1.1.1
 numpy==1.16.4
 oauth2==1.9.0.post1
 oauthlib==2.1.0
-git+https://github.com/edx/edx-ora2.git@2.2.3#egg=ora2==2.2.3
+git+https://github.com/edx/edx-ora2.git@2.2.6#egg=ora2==2.2.6
 packaging==19.0           # via caniusepython3, tox
 path.py==8.2.1
 pathlib2==2.3.4           # via importlib-metadata, pytest, pytest-django
