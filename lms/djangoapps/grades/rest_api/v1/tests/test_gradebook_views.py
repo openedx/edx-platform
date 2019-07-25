@@ -696,11 +696,12 @@ class GradebookViewTest(GradebookViewTestBase):
                 self.assertEqual(expected_results, actual_data)
 
     @ddt.data(
-        'login_staff',
-        'login_course_admin',
-        'login_course_staff',
+        ['login_staff', 4],
+        ['login_course_admin', 5],
+        ['login_course_staff', 5]
     )
-    def test_gradebook_data_filter_username_contains(self, login_method):
+    @ddt.unpack
+    def test_gradebook_data_filter_username_contains(self, login_method, num_enrollments):
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
             mock_grade.return_value = self.mock_course_grade(
                 self.program_student, passed=True, percent=0.75
@@ -738,12 +739,16 @@ class GradebookViewTest(GradebookViewTestBase):
                 self.assertIsNone(actual_data['previous'])
                 self.assertEqual(expected_results, actual_data['results'])
 
+                self.assertEqual(actual_data['total_users_count'], num_enrollments)
+                self.assertEqual(actual_data['filtered_users_count'], 2)
+
     @ddt.data(
-        'login_staff',
-        'login_course_admin',
-        'login_course_staff',
+        ['login_staff', 4],
+        ['login_course_admin', 5],
+        ['login_course_staff', 5]
     )
-    def test_gradebook_data_filter_masters_track_username_contains(self, login_method):
+    @ddt.unpack
+    def test_gradebook_data_filter_masters_track_username_contains(self, login_method, num_enrollments):
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
             mock_grade.return_value = self.mock_course_grade(
                 self.program_masters_student, passed=True, percent=0.75
@@ -782,12 +787,16 @@ class GradebookViewTest(GradebookViewTestBase):
                 self.assertIsNone(actual_data['previous'])
                 self.assertEqual(expected_results, actual_data['results'])
 
+                self.assertEqual(actual_data['total_users_count'], num_enrollments)
+                self.assertEqual(actual_data['filtered_users_count'], 2)
+
     @ddt.data(
-        'login_staff',
-        'login_course_admin',
-        'login_course_staff',
+        ['login_staff', 4],
+        ['login_course_admin', 5],
+        ['login_course_staff', 5]
     )
-    def test_gradebook_data_filter_email_contains(self, login_method):
+    @ddt.unpack
+    def test_gradebook_data_filter_email_contains(self, login_method, num_enrollments):
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
             mock_grade.return_value = self.mock_course_grade(
                 self.other_student, passed=True, percent=0.85
@@ -816,12 +825,16 @@ class GradebookViewTest(GradebookViewTestBase):
                 self.assertIsNone(actual_data['previous'])
                 self.assertEqual(expected_results, actual_data['results'])
 
+                self.assertEqual(actual_data['total_users_count'], num_enrollments)
+                self.assertEqual(actual_data['filtered_users_count'], 1)
+
     @ddt.data(
-        'login_staff',
-        'login_course_admin',
-        'login_course_staff',
+        ['login_staff', 4],
+        ['login_course_admin', 5],
+        ['login_course_staff', 5]
     )
-    def test_gradebook_data_filter_external_user_key_contains(self, login_method):
+    @ddt.unpack
+    def test_gradebook_data_filter_external_user_key_contains(self, login_method, num_enrollments):
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
             mock_grade.return_value = self.mock_course_grade(
                 self.program_student, passed=True, percent=0.75
@@ -858,8 +871,9 @@ class GradebookViewTest(GradebookViewTestBase):
                 actual_data = dict(resp.data)
                 self.assertIsNone(actual_data['next'])
                 self.assertIsNone(actual_data['previous'])
-                #self.assertEqual(expected_results, actual_data['results'])
-                assert expected_results == actual_data['results']
+                self.assertEqual(expected_results, actual_data['results'])
+                self.assertEqual(actual_data['total_users_count'], num_enrollments)
+                self.assertEqual(actual_data['filtered_users_count'], 2)
 
     @ddt.data(
         'login_staff',
@@ -880,11 +894,12 @@ class GradebookViewTest(GradebookViewTestBase):
                 self._assert_empty_response(resp)
 
     @ddt.data(
-        'login_staff',
-        'login_course_admin',
-        'login_course_staff',
+        ['login_staff', 4],
+        ['login_course_admin', 5],
+        ['login_course_staff', 5]
     )
-    def test_filter_cohort_id_and_enrollment_mode(self, login_method):
+    @ddt.unpack
+    def test_filter_cohort_id_and_enrollment_mode(self, login_method, num_enrollments):
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
             mock_grade.return_value = self.mock_course_grade(self.student, passed=True, percent=0.85)
 
@@ -913,6 +928,8 @@ class GradebookViewTest(GradebookViewTestBase):
                 self.assertIsNone(actual_data['next'])
                 self.assertIsNone(actual_data['previous'])
                 self.assertEqual(expected_results, actual_data['results'])
+                self.assertEqual(actual_data['total_users_count'], num_enrollments)
+                self.assertEqual(actual_data['filtered_users_count'], 1)
 
     @ddt.data(
         'login_staff',
@@ -932,11 +949,12 @@ class GradebookViewTest(GradebookViewTestBase):
                 self._assert_empty_response(resp)
 
     @ddt.data(
-        'login_staff',
-        'login_course_admin',
-        'login_course_staff',
+        ['login_staff', 5, 3],
+        ['login_course_admin', 6, 4],
+        ['login_course_staff', 6, 4],
     )
-    def test_filter_enrollment_mode(self, login_method):
+    @ddt.unpack
+    def test_filter_enrollment_mode(self, login_method, num_enrollments, num_filtered_enrollments):
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
             mock_grade.side_effect = [
                 self.mock_course_grade(self.student, passed=True, percent=0.85),
@@ -959,6 +977,10 @@ class GradebookViewTest(GradebookViewTestBase):
                 )
 
                 self._assert_data_all_users(resp)
+                actual_data = dict(resp.data)
+
+                self.assertEqual(actual_data['total_users_count'], num_enrollments)
+                self.assertEqual(actual_data['filtered_users_count'], num_filtered_enrollments)
 
     @ddt.data(
         'login_staff',

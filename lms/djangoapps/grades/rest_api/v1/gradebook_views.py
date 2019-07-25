@@ -32,7 +32,6 @@ from lms.djangoapps.grades.grade_utils import are_grades_frozen
 from lms.djangoapps.grades.models import (
     PersistentSubsectionGrade,
     PersistentSubsectionGradeOverride,
-    PersistentSubsectionGradeOverrideHistory
 )
 from lms.djangoapps.grades.rest_api.serializers import (
     StudentGradebookEntrySerializer,
@@ -406,10 +405,12 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
         }
     **Paginated GET response**
         When requesting gradebook entries for all users, the response is paginated and contains the following values:
-        * count: The total number of user gradebook entries for this course.
         * next: The URL containing the next page of data.
         * previous: The URL containing the previous page of data.
         * results: A list of user gradebook entries, structured as above.
+        * total_users_count: The total number of active users in the course.
+        * filtered_users_count: The total number of active users that match
+            the filter associated with the provided query parameters.
 
     Note: It's important that `GradeViewMixin` is the first inherited class here, so that
     self.api_error returns error responses as expected.
@@ -553,6 +554,8 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             related_models = ['user']
             users = self._paginate_users(course_key, q_objects, related_models)
 
+            users_counts = self._get_users_counts(course_key, q_objects)
+
             with bulk_gradebook_view_context(course_key, users):
                 for user, course_grade, exc in CourseGradeFactory().iter(
                     users, course_key=course_key, collected_block_structure=course_data.collected_structure
@@ -562,7 +565,43 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
                         entries.append(entry)
 
             serializer = StudentGradebookEntrySerializer(entries, many=True)
-            return self.get_paginated_response(serializer.data)
+            return self.get_paginated_response(serializer.data, **users_counts)
+
+    def _get_users_counts(self, course_key, course_enrollment_filters):
+        """
+        Return a dictionary containing data about the total number of users and total number
+        of users matching a given filter in a given course.
+
+        Arguments:
+            course_key: the opaque key for the course
+            course_enrollment_filters: a list of Q objects representing filters to be applied to CourseEnrollments
+
+        Returns:
+            dict:
+                total_users_count: the number of total active users in the course
+                filtered_users_count: the number of active users in the course that match
+                    the given course_enrollment_filters
+        """
+
+        filter_args = [
+            Q(course_id=course_key) & Q(is_active=True)
+        ]
+
+        total_users_count = CourseEnrollment.objects.filter(*filter_args).count()
+
+        filter_args.extend(course_enrollment_filters or [])
+
+        # if course_enrollment_filters is empty, then the number of filtered users will equal the total number of users
+        filtered_users_count = (
+            total_users_count
+            if not course_enrollment_filters
+            else CourseEnrollment.objects.filter(*filter_args).count()
+        )
+
+        return {
+            'total_users_count': total_users_count,
+            'filtered_users_count': filtered_users_count,
+        }
 
 
 GradebookUpdateResponseItem = namedtuple('GradebookUpdateResponseItem', ['user_id', 'usage_id', 'success', 'reason'])
