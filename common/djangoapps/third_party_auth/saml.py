@@ -94,7 +94,8 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
             return super(SAMLAuthBackend, self).get_user_id(details, response)
         except KeyError as ex:
             log.warning(
-                u"Error in SAML authentication flow of IdP '{idp_name}': {message}".format(
+                u'[THIRD_PARTY_AUTH] Error in SAML authentication flow. '
+                u'Provider: {idp_name}, Message: {message}'.format(
                     message=ex.message,
                     idp_name=response.get('idp_name')
                 )
@@ -124,7 +125,7 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         raise Http404 if SAML authentication is disabled.
         """
         if not self._config.enabled:
-            log.error('SAML authentication is not enabled')
+            log.error('[THIRD_PARTY_AUTH] SAML authentication is not enabled')
             raise Http404
 
         return super(SAMLAuthBackend, self).auth_url()
@@ -169,7 +170,11 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
             for expected in idp.conf['requiredEntitlements']:
                 if expected not in entitlements:
                     log.warning(
-                        u"SAML user from IdP %s rejected due to missing eduPersonEntitlement %s", idp.name, expected)
+                        u'[THIRD_PARTY_AUTH] SAML user rejected due to missing eduPersonEntitlement. '
+                        u'Provider: {provider}, Entitlement: {entitlement}'.format(
+                            provider=idp.name,
+                            entitlement=expected)
+                    )
                     raise AuthForbidden(self)
 
     def _create_saml_auth(self, idp):
@@ -237,7 +242,8 @@ class EdXSAMLIdentityProvider(SAMLIdentityProvider):
             try:
                 return attributes[key][0]
             except IndexError:
-                log.warning(u'SAML attribute "%s" value not found.', key)
+                log.warning(u'[THIRD_PARTY_AUTH] SAML attribute value not found. '
+                            u'SamlAttribute: {attribute}'.format(attribute=key))
         return self.conf['attr_defaults'].get(conf_key) or None
 
     @property
@@ -381,9 +387,10 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         if not all(var in self.conf for var in self.required_variables):
             missing = [var for var in self.required_variables if var not in self.conf]
             log.warning(
-                u"To retrieve rich user data for an SAP SuccessFactors identity provider, the following keys in "
-                u"'other_settings' are required, but were missing: %s",
-                missing
+                u'[THIRD_PARTY_AUTH] To retrieve rich user data for a SAP SuccessFactors identity provider, '
+                u'the following keys in other_settings are required, but were missing. MissingKeys: {keys}'.format(
+                    keys=missing
+                )
             )
             return missing
 
@@ -562,7 +569,7 @@ def get_saml_idp_class(idp_identifier_string):
     }
     if idp_identifier_string not in choices:
         log.error(
-            u'%s is not a valid EdXSAMLIdentityProvider subclass; using EdXSAMLIdentityProvider base class.',
-            idp_identifier_string
+            u'[THIRD_PARTY_AUTH] Invalid EdXSAMLIdentityProvider subclass--'
+            u'using EdXSAMLIdentityProvider base class. Provider: {provider}'.format(provider=idp_identifier_string)
         )
     return choices.get(idp_identifier_string, EdXSAMLIdentityProvider)
