@@ -2,6 +2,9 @@
 Fixture to create a Content Library
 """
 
+from __future__ import absolute_import
+
+import six
 from opaque_keys.edx.keys import CourseKey
 
 from common.test.acceptance.fixtures import STUDIO_BASE_URL
@@ -62,7 +65,7 @@ class LibraryFixture(XBlockContainerFixture):
         Return the locator string for the LibraryRoot XBlock that is the root of the library hierarchy.
         """
         lib_key = CourseKey.from_string(self._library_key)
-        return unicode(lib_key.make_usage_key('library', 'library'))
+        return six.text_type(lib_key.make_usage_key('library', 'library'))
 
     def _create_library(self):
         """
