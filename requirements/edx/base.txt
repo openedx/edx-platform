@@ -11,7 +11,6 @@
 -e git+https://github.com/edx/DoneXBlock.git@01a14f3bd80ae47dd08cdbbe2f88f3eb88d00fba#egg=done-xblock
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
 -e .
--e git+https://github.com/dgrtwo/ParsePy.git@7949b9f754d1445eff8e8f20d0e967b9a6420639#egg=parse_rest
 -e git+https://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
 -e git+https://github.com/edx/RateXBlock.git@367e19c0f6eac8a5f002fd0f1559555f8e74bfff#egg=rate-xblock
 -e common/lib/safe_lxml
