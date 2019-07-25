@@ -112,7 +112,7 @@ git+https://github.com/edx/django-rest-framework-oauth.git@0a43e8525f1e3048efe4b
 djangorestframework-xml==1.4.0
 djangorestframework==3.7.7
 docopt==0.6.2
-docutils==0.15.1
+docutils==0.15.1.post1
 drf-yasg==1.16
 edx-ace==0.1.10
 edx-analytics-data-api-client==0.15.3
@@ -125,7 +125,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==2.0.0
 edx-drf-extensions==2.3.7
-edx-enterprise==1.8.4
+edx-enterprise==1.8.5
 edx-i18n-tools==0.4.8
 edx-lint==1.3.0
 edx-milestones==0.2.3
@@ -325,7 +325,7 @@ unidiff==0.5.5
 uritemplate==3.0.0
 urllib3==1.23
 user-util==0.1.5
-virtualenv==16.7.0
+virtualenv==16.7.1
 voluptuous==0.11.5
 vulture==1.0
 watchdog==0.9.0
@@ -338,7 +338,7 @@ wrapt==1.10.5
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.1#egg=xblock-drag-and-drop-v2==2.2.1
 git+https://github.com/open-craft/xblock-poll@add89e14558c30f3c8dc7431e5cd6536fff6d941#egg=xblock-poll==1.5.1
 xblock-utils==1.2.1
-xblock==1.2.2
+xblock==1.2.3
 xmlsec==1.3.3
 xmltodict==0.12.0
 xss-utils==0.1.1
