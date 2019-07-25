@@ -252,7 +252,6 @@ from openedx.core.djangoapps.user_api.helpers import shim_student_view, require_
 from student.forms import AccountCreationForm, get_registration_extension_form
 from student.models import Registration, create_comments_service_user, UserProfile
 from third_party_auth import pipeline, provider
-from util.enterprise_helpers import data_sharing_consent_requirement_at_login
 from util.json_request import JsonResponse
 
 from social_django import utils as social_utils
@@ -390,10 +389,6 @@ def create_account_with_params_custom(request, params, is_alquity_user):
 
     if should_link_with_social_auth or (third_party_auth.is_enabled() and pipeline.running(request)):
         params["password"] = pipeline.make_random_password()
-
-    # Add a form requirement for data sharing consent if the EnterpriseCustomer
-    # for the request requires it at login
-    extra_fields['data_sharing_consent'] = data_sharing_consent_requirement_at_login(request)
 
     # if doing signup for an external authorization, then get email, password, name from the eamap
     # don't use the ones from the form, since the user could have hacked those
