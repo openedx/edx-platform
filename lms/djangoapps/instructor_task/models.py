@@ -28,6 +28,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.db import models, transaction
+from django.utils.translation import ugettext as _
 from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
 
@@ -38,6 +39,7 @@ logger = logging.getLogger(__name__)
 # define custom states used by InstructorTask
 QUEUING = 'QUEUING'
 PROGRESS = 'PROGRESS'
+TASK_INPUT_LENGTH = 10000
 
 
 class InstructorTask(models.Model):
@@ -100,6 +102,17 @@ class InstructorTask(models.Model):
         # create the task_id here, and pass it into celery:
         task_id = str(uuid4())
         json_task_input = json.dumps(task_input)
+
+        # check length of task_input, and return an exception if it's too long
+        if len(json_task_input) > TASK_INPUT_LENGTH:
+            logger.error(
+                u'Task input longer than: `%s` for `%s` of course: `%s`',
+                TASK_INPUT_LENGTH,
+                task_type,
+                course_id
+            )
+            error_msg = _('An error has occurred. Task was not created.')
+            raise AttributeError(error_msg)
 
         # create the task, then save it:
         instructor_task = cls(

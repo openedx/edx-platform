@@ -185,7 +185,7 @@ def common_exceptions_400(func):
             message = _('User does not exist.')
         except MultipleObjectsReturned:
             message = _('Found a conflict with given identifier. Please try an alternative identifier')
-        except (AlreadyRunningError, QueueConnectionError) as err:
+        except (AlreadyRunningError, QueueConnectionError, AttributeError) as err:
             message = six.text_type(err)
 
         if use_json:
