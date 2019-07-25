@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
 import json
 from datetime import datetime, timedelta
 
@@ -11,8 +13,10 @@ from django.test import TestCase
 from django.utils.timezone import now
 from freezegun import freeze_time
 from mock import patch
-from opaque_keys.edx.keys import CourseKey
+from six.moves import range
+from student.tests.factories import UserFactory
 from testfixtures import LogCapture
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from common.test.utils import MockS3Mixin
 from lms.djangoapps.verify_student.models import (
@@ -21,9 +25,6 @@ from lms.djangoapps.verify_student.models import (
     ManualVerification,
     VerificationException,
 )
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 FAKE_SETTINGS = {
     "SOFTWARE_SECURE": {
@@ -93,6 +94,7 @@ class TestVerification(TestCase):
     """
     Common tests across all types of Verications (e.g., SoftwareSecurePhotoVerication, SSOVerification)
     """
+
     def verification_active_at_datetime(self, attempt):
         """
         Tests to ensure the Verification is active or inactive at the appropriate datetimes.
@@ -443,6 +445,7 @@ class SSOVerificationTest(TestVerification):
     """
     Tests for the SSOVerification model
     """
+
     def test_active_at_datetime(self):
         user = UserFactory.create()
         attempt = SSOVerification.objects.create(user=user)
@@ -453,6 +456,7 @@ class ManualVerificationTest(TestVerification):
     """
     Tests for the ManualVerification model
     """
+
     def test_active_at_datetime(self):
         user = UserFactory.create()
         verification = ManualVerification.objects.create(user=user)

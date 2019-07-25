@@ -8,6 +8,8 @@ of a student over a period of time. Right now, the only models are the abstract
 `SoftwareSecurePhotoVerification`. The hope is to keep as much of the
 photo verification process as generic as possible.
 """
+from __future__ import absolute_import
+
 import functools
 import json
 import logging
@@ -20,11 +22,9 @@ import requests
 import six
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.cache import cache
 from django.core.files.base import ContentFile
-from django.urls import reverse
 from django.db import models
-from django.dispatch import receiver
+from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy
@@ -40,7 +40,6 @@ from lms.djangoapps.verify_student.ssencrypt import (
 )
 from openedx.core.djangoapps.signals.signals import LEARNER_NOW_VERIFIED
 from openedx.core.storage import get_storage
-
 from .utils import earliest_allowed_verification_date
 
 log = logging.getLogger(__name__)
