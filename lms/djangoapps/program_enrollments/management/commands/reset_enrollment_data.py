@@ -51,8 +51,8 @@ class Command(BaseCommand):
 
         log.info(
             u'The following records will be deleted:\n%s\n%s\n',
-                deleted_course_enrollment_models,
-                deleted_program_enrollment_models
+            deleted_course_enrollment_models,
+            deleted_program_enrollment_models,
         )
 
         if not options['force']:
