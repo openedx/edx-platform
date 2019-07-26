@@ -3,12 +3,14 @@ Defines an endpoint for gradebook data related to a course.
 """
 from __future__ import absolute_import
 
+import hashlib
 import logging
 from collections import namedtuple
 from contextlib import contextmanager
 from functools import wraps
 
 import six
+from django.core.cache import cache
 from django.db.models import Q
 from django.urls import reverse
 from opaque_keys import InvalidKeyError
@@ -567,6 +569,22 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             serializer = StudentGradebookEntrySerializer(entries, many=True)
             return self.get_paginated_response(serializer.data, **users_counts)
 
+    def _get_user_count(self, query_args, cache_time=3600):
+        """
+        Return the user count for the given query arguments to CourseEnrollment.
+
+        caches the count for cache_time seconds.
+        """
+        hasher = hashlib.md5()
+        for arg in query_args:
+            hasher.update(bytes(arg))
+        cache_key = 'usercount.%s' % hasher.hexdigest()
+        user_count = cache.get(cache_key, None)
+        if user_count is None:
+            user_count = CourseEnrollment.objects.filter(*query_args).count()
+            cache.set(cache_key, user_count, cache_time)
+        return user_count
+
     def _get_users_counts(self, course_key, course_enrollment_filters):
         """
         Return a dictionary containing data about the total number of users and total number
@@ -587,7 +605,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             Q(course_id=course_key) & Q(is_active=True)
         ]
 
-        total_users_count = CourseEnrollment.objects.filter(*filter_args).count()
+        total_users_count = self._get_user_count(filter_args)
 
         filter_args.extend(course_enrollment_filters or [])
 
@@ -595,7 +613,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
         filtered_users_count = (
             total_users_count
             if not course_enrollment_filters
-            else CourseEnrollment.objects.filter(*filter_args).count()
+            else self._get_user_count(filter_args)
         )
 
         return {
