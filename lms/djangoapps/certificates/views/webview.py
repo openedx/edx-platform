@@ -43,7 +43,7 @@ from edxmako.template import Template
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace
 from openedx.core.lib.courses import course_image_url
 from openedx.core.djangoapps.certificates.api import display_date_for_certificate, certificates_viewable_for_course
 from student.models import LinkedInAddToProfileConfiguration
@@ -57,6 +57,8 @@ _ = translation.ugettext
 
 
 INVALID_CERTIFICATE_TEMPLATE_PATH = 'certificates/invalid.html'
+WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='certificates')
+LOGIN_REQUIRED_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'require_login')
 
 
 def certs_login_required(view):
@@ -65,7 +67,7 @@ def certs_login_required(view):
     """
     def wrap(request, user_id, course_id, *args, **kwargs):
         course_key = CourseKey.from_string(course_id)
-        if CourseWaffleFlag('certificates', 'require_login').is_enabled(course_key):
+        if LOGIN_REQUIRED_FLAG.is_enabled(course_key):
             return login_required(view)(request, user_id, course_id, *args, **kwargs)
         else:
             return view(request, user_id, course_id, *args, **kwargs)
