@@ -56,7 +56,7 @@ git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce8
 git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0
 
 # Third-party:
--e git+https://github.com/edx/django-wiki.git@v0.0.21#egg=django-wiki
+-e git+https://github.com/edx/django-wiki.git@v0.0.22#egg=django-wiki
 git+https://github.com/edx/django-openid-auth.git@0.15.1#egg=django-openid-auth==0.15.1
 git+https://github.com/edx/MongoDBProxy.git@25b99097615bda06bd7cdfe5669ed80dc2a7fed0#egg=MongoDBProxy==0.1.0
 -e git+https://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
