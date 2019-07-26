@@ -9550,7 +9550,8 @@ msgid ""
 "Last published {lastPublishedStart}{publishedOn}{lastPublishedEnd} by "
 "{publishedByStart}{publishedBy}{publishedByEnd}"
 msgstr ""
-" {publishedByStart}{publishedBy}{publishedByEnd}により{lastPublishedStart}{publishedOn}{lastPublishedEnd}に最新公開"
+" "
+"{publishedByStart}{publishedBy}{publishedByEnd}により{lastPublishedStart}{publishedOn}{lastPublishedEnd}に最新公開"
 
 #: cms/templates/js/publish-xblock.underscore
 #, python-format

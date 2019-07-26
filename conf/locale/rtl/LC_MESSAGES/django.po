@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-07-24 14:40+0000\n"
-"PO-Revision-Date: 2019-07-24 14:40:10.294786\n"
+"POT-Creation-Date: 2019-07-26 10:12+0000\n"
+"PO-Revision-Date: 2019-07-26 10:12:09.300595\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -2868,23 +2868,23 @@ msgstr "يهسذعسسهخر فخحهذ وشححهرل"
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
-"category must be unique. In \"id\" values, the only special characters that "
-"are supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
+"must be unique. In \"id\" values, the only special characters that are "
+"supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 "ثرفثق يهسذعسسهخر ذشفثلخقهثس هر فاث بخممخصهرل بخقوشف: \"ذشفثلخقغرشوث\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. بخق "
-"ثطشوحمث, خرث يهسذعسسهخر ذشفثلخقغ وشغ زث \"مغيهشر وخيث\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. فاث \"هي\" دشمعث بخق ثشذا "
-"ذشفثلخقغ وعسف زث عرهضعث. هر \"هي\" دشمعثس, فاث خرمغ سحثذهشم ذاشقشذفثقس فاشف "
-"شقث سعححخقفثي شقث عريثقسذخقث, اغحاثر, شري حثقهخي. غخع ذشر شمسخ سحثذهبغ ش "
+"ثطشوحمث, خرث يهسذعسسهخر ذشفثلخقغ وشغ زث \"مغيهشر وخيث\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. فاث \"هي\" دشمعث بخق ثشذا ذشفثلخقغ "
+"وعسف زث عرهضعث. هر \"هي\" دشمعثس, فاث خرمغ سحثذهشم ذاشقشذفثقس فاشف شقث "
+"سعححخقفثي شقث عريثقسذخقث, اغحاثر, شري حثقهخي. غخع ذشر شمسخ سحثذهبغ ش "
 "ذشفثلخقغ شس فاث يثبشعمف بخق رثص حخسفس هر فاث يهسذعسسهخر حشلث زغ سثففهرل هفس "
-"\"يثبشعمف\" شففقهزعفث فخ فقعث. بخق ثطشوحمث, \"مغيهشر وخيث\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"يثبشعمف\" شففقهزعفث فخ فقعث. بخق ثطشوحمث, \"مغيهشر وخيث\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Sorting Alphabetical"
@@ -9426,15 +9426,10 @@ msgid "Are you sure you want to cancel retirement for user \"%(username)s\"? "
 msgstr "شقث غخع سعقث غخع صشرف فخ ذشرذثم قثفهقثوثرف بخق عسثق \"%(username)s\"? "
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
 #, python-format
-msgid ""
-"\n"
-"                    Welcome to %(course_name)s\n"
-"                "
-msgstr ""
-"\n"
-"                    صثمذخوث فخ %(course_name)s\n"
-"                "
+msgid "Welcome to %(course_name)s"
+msgstr "صثمذخوث فخ %(course_name)s"
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
 #, python-format
@@ -9467,11 +9462,6 @@ msgstr "هف هس قثذخووثريثي فاشف غخع ذاشرلث غخعق �
 #, python-format
 msgid "Sincerely yours, The %(course_name)s Team"
 msgstr "سهرذثقثمغ غخعقس, فاث %(course_name)s فثشو"
-
-#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
-#, python-format
-msgid "Welcome to %(course_name)s"
-msgstr "صثمذخوث فخ %(course_name)s"
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
 #, python-format
@@ -9518,8 +9508,12 @@ msgstr "دهسهف %(course_name)s"
 
 #: lms/templates/instructor/edx_ace/addbetatester/email/body.html
 #, python-format
-msgid "Visit %(site_name)s"
-msgstr "دهسهف %(site_name)s"
+msgid ""
+"Visit %(site_name)s\n"
+"                "
+msgstr ""
+"دهسهف %(site_name)s\n"
+"                "
 
 #: lms/templates/instructor/edx_ace/addbetatester/email/body.html
 #: lms/templates/instructor/edx_ace/addbetatester/email/body.txt
@@ -11160,13 +11154,13 @@ msgid "Welcome to week %(week_num)s of %(course_name)s!"
 msgstr "صثمذخوث فخ صثثن %(week_num)s خب %(course_name)s!"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
-"We hope you're enjoying <strong>%(course_name)s</strong>! We want to let you"
-" know what you can look forward to in week %(week_num)s:"
+"We hope you're enjoying {start_strong}%(course_name)s{end_strong}! We want "
+"to let you know what you can look forward to in week %(week_num)s:"
 msgstr ""
-"صث اخحث غخع'قث ثرتخغهرل <strong>%(course_name)s</strong>! صث صشرف فخ مثف غخع"
-" نرخص صاشف غخع ذشر مخخن بخقصشقي فخ هر صثثن %(week_num)s:"
+"صث اخحث غخع'قث ثرتخغهرل {start_strong}%(course_name)s{end_strong}! صث صشرف "
+"فخ مثف غخع نرخص صاشف غخع ذشر مخخن بخقصشقي فخ هر صثثن %(week_num)s:"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.txt
@@ -11227,15 +11221,15 @@ msgid "Keep up the momentum!"
 msgstr "نثثح عح فاث وخوثرفعو!"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
-"Many %(platform_name)s learners in <strong>%(course_name)s</strong> are "
-"completing more problems every week, and participating in the discussion "
-"forums. What do you want to do to keep learning?"
+"Many %(platform_name)s learners in {start_strong}%(course_name)s{end_strong}"
+" are completing more problems every week, and participating in the "
+"discussion forums. What do you want to do to keep learning?"
 msgstr ""
-"وشرغ %(platform_name)s مثشقرثقس هر <strong>%(course_name)s</strong> شقث "
-"ذخوحمثفهرل وخقث حقخزمثوس ثدثقغ صثثن, شري حشقفهذهحشفهرل هر فاث يهسذعسسهخر "
-"بخقعوس. صاشف يخ غخع صشرف فخ يخ فخ نثثح مثشقرهرل?"
+"وشرغ %(platform_name)s مثشقرثقس هر {start_strong}%(course_name)s{end_strong}"
+" شقث ذخوحمثفهرل وخقث حقخزمثوس ثدثقغ صثثن, شري حشقفهذهحشفهرل هر فاث "
+"يهسذعسسهخر بخقعوس. صاشف يخ غخع صشرف فخ يخ فخ نثثح مثشقرهرل?"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
@@ -11269,24 +11263,24 @@ msgid "Keep learning today"
 msgstr "نثثح مثشقرهرل فخيشغ"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
-"Remember when you enrolled in <strong>%(course_name)s</strong>, and other "
-"courses on %(platform_name)s? We do, and we’re glad to have you! Come see "
-"what everyone is learning."
+"Remember when you enrolled in {start_strong}%(course_name)s{end_strong}, and"
+" other courses on %(platform_name)s? We do, and we’re glad to have you! Come"
+" see what everyone is learning."
 msgstr ""
-"قثوثوزثق صاثر غخع ثرقخممثي هر <strong>%(course_name)s</strong>, شري خفاثق "
-"ذخعقسثس خر %(platform_name)s? صث يخ, شري صث’قث لمشي فخ اشدث غخع! ذخوث سثث "
-"صاشف ثدثقغخرث هس مثشقرهرل."
+"قثوثوزثق صاثر غخع ثرقخممثي هر {start_strong}%(course_name)s{end_strong}, شري"
+" خفاثق ذخعقسثس خر %(platform_name)s? صث يخ, شري صث’قث لمشي فخ اشدث غخع! ذخوث"
+" سثث صاشف ثدثقغخرث هس مثشقرهرل."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
-"Remember when you enrolled in <strong>%(course_name)s</strong> on "
+"Remember when you enrolled in {start_strong}%(course_name)s{end_strong} on "
 "%(platform_name)s? We do, and we’re glad to have you! Come see what everyone"
 " is learning."
 msgstr ""
-"قثوثوزثق صاثر غخع ثرقخممثي هر <strong>%(course_name)s</strong> خر "
+"قثوثوزثق صاثر غخع ثرقخممثي هر {start_strong}%(course_name)s{end_strong} خر "
 "%(platform_name)s? صث يخ, شري صث’قث لمشي فخ اشدث غخع! ذخوث سثث صاشف ثدثقغخرث"
 " هس مثشقرهرل."
 
@@ -11339,35 +11333,39 @@ msgid "Upgrade now"
 msgstr "عحلقشيث رخص"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
 "We hope you are enjoying learning with us so far on "
-"<strong>%(platform_name)s</strong>! A verified certificate allows you to "
-"highlight your new knowledge and skills. An %(platform_name)s certificate is"
-" official and easily shareable."
+"{start_strong}%(platform_name)s{end_strong}! A verified certificate allows "
+"you to highlight your new knowledge and skills. An %(platform_name)s "
+"certificate is official and easily shareable."
 msgstr ""
 "صث اخحث غخع شقث ثرتخغهرل مثشقرهرل صهفا عس سخ بشق خر "
-"<strong>%(platform_name)s</strong>! ش دثقهبهثي ذثقفهبهذشفث شممخصس غخع فخ "
-"اهلامهلاف غخعق رثص نرخصمثيلث شري سنهممس. شر %(platform_name)s ذثقفهبهذشفث هس"
-" خببهذهشم شري ثشسهمغ ساشقثشزمث."
+"{start_strong}%(platform_name)s{end_strong}! ش دثقهبهثي ذثقفهبهذشفث شممخصس "
+"غخع فخ اهلامهلاف غخعق رثص نرخصمثيلث شري سنهممس. شر %(platform_name)s "
+"ذثقفهبهذشفث هس خببهذهشم شري ثشسهمغ ساشقثشزمث."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
 "We hope you are enjoying learning with us so far in "
-"<strong>%(first_course_name)s</strong>! A verified certificate allows you to"
-" highlight your new knowledge and skills. An %(platform_name)s certificate "
-"is official and easily shareable."
+"{start_strong}%(first_course_name)s{end_strong}! A verified certificate "
+"allows you to highlight your new knowledge and skills. An %(platform_name)s "
+"certificate is official and easily shareable."
 msgstr ""
 "صث اخحث غخع شقث ثرتخغهرل مثشقرهرل صهفا عس سخ بشق هر "
-"<strong>%(first_course_name)s</strong>! ش دثقهبهثي ذثقفهبهذشفث شممخصس غخع فخ"
-" اهلامهلاف غخعق رثص نرخصمثيلث شري سنهممس. شر %(platform_name)s ذثقفهبهذشفث "
-"هس خببهذهشم شري ثشسهمغ ساشقثشزمث."
+"{start_strong}%(first_course_name)s{end_strong}! ش دثقهبهثي ذثقفهبهذشفث "
+"شممخصس غخع فخ اهلامهلاف غخعق رثص نرخصمثيلث شري سنهممس. شر %(platform_name)s "
+"ذثقفهبهذشفث هس خببهذهشم شري ثشسهمغ ساشقثشزمث."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
-#, python-format
-msgid "Upgrade by <strong>%(user_schedule_upgrade_deadline_time)s</strong>."
-msgstr "عحلقشيث زغ <strong>%(user_schedule_upgrade_deadline_time)s</strong>."
+#, python-format, python-brace-format
+msgid ""
+"Upgrade by "
+"{start_strong}%(user_schedule_upgrade_deadline_time)s{end_strong}."
+msgstr ""
+"عحلقشيث زغ "
+"{start_strong}%(user_schedule_upgrade_deadline_time)s{end_strong}."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
 msgid "You are eligible to upgrade in these courses:"

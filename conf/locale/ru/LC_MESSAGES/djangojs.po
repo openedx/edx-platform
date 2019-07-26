@@ -7,6 +7,7 @@
 # dfxedx <ah532@ya.ru>, 2014
 # Alena Koneva <alenakoneva@ya.ru>, 2014
 # Alexander Eroshkin <gjrfytne@gmail.com>, 2019
+# Alexander Kireev <alexx6x@gmail.com>, 2019
 # Alexandr Kosharny <acosarnii@gmail.com>, 2016
 # Alexey Yuriev <yurievac@gmail.com>, 2018
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
@@ -529,8 +530,8 @@ msgstr "Вы отправили файл {filename}; разрешены толь
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Your file {filename} is too large (max size: {maxSize}MB)."
 msgstr ""
-"Файл «{filename}» слишком велик (максимально допустимый размер: "
-"{maxSize} Мб)."
+"Файл «{filename}» слишком велик (максимально допустимый размер: {maxSize} "
+"Мб)."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "You did not submit the required files: {requiredFiles}."

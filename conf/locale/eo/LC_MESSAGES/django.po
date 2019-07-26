@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-07-24 14:40+0000\n"
-"PO-Revision-Date: 2019-07-24 14:40:10.294786\n"
+"POT-Creation-Date: 2019-07-26 10:12+0000\n"
+"PO-Revision-Date: 2019-07-26 10:12:09.300595\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -3278,23 +3278,23 @@ msgstr "Dïsçüssïön Töpïç Mäppïng Ⱡ'σяєм ιρѕυм ∂σłσя �
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
-"category must be unique. In \"id\" values, the only special characters that "
-"are supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
+"must be unique. In \"id\" values, the only special characters that are "
+"supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 "Éntér dïsçüssïön çätégörïés ïn thé föllöwïng förmät: \"ÇätégörýNämé\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. För "
-"éxämplé, öné dïsçüssïön çätégörý mäý ßé \"Lýdïän Mödé\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. Thé \"ïd\" välüé för éäçh "
-"çätégörý müst ßé ünïqüé. Ìn \"ïd\" välüés, thé önlý spéçïäl çhäräçtérs thät "
-"äré süppörtéd äré ündérsçöré, hýphén, änd pérïöd. Ýöü çän älsö spéçïfý ä "
+"éxämplé, öné dïsçüssïön çätégörý mäý ßé \"Lýdïän Mödé\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. Thé \"ïd\" välüé för éäçh çätégörý "
+"müst ßé ünïqüé. Ìn \"ïd\" välüés, thé önlý spéçïäl çhäräçtérs thät äré "
+"süppörtéd äré ündérsçöré, hýphén, änd pérïöd. Ýöü çän älsö spéçïfý ä "
 "çätégörý äs thé défäült för néw pösts ïn thé Dïsçüssïön pägé ßý séttïng ïts "
-"\"défäült\" ättrïßüté tö trüé. För éxämplé, \"Lýdïän Mödé\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}.#"
+"\"défäült\" ättrïßüté tö trüé. För éxämplé, \"Lýdïän Mödé\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\", \"default\": true}.#"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Sorting Alphabetical"
@@ -10907,15 +10907,10 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
 #, python-format
-msgid ""
-"\n"
-"                    Welcome to %(course_name)s\n"
-"                "
-msgstr ""
-"\n"
-"                    Wélçömé tö %(course_name)s\n"
-"                 Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+msgid "Welcome to %(course_name)s"
+msgstr "Wélçömé tö %(course_name)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
 #, python-format
@@ -10956,11 +10951,6 @@ msgid "Sincerely yours, The %(course_name)s Team"
 msgstr ""
 "Sïnçérélý ýöürs, Thé %(course_name)s Téäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢#"
-
-#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
-#, python-format
-msgid "Welcome to %(course_name)s"
-msgstr "Wélçömé tö %(course_name)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
 #, python-format
@@ -11015,8 +11005,12 @@ msgstr "Vïsït %(course_name)s Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/templates/instructor/edx_ace/addbetatester/email/body.html
 #, python-format
-msgid "Visit %(site_name)s"
-msgstr "Vïsït %(site_name)s Ⱡ'σяєм ιρѕυм ∂σł#"
+msgid ""
+"Visit %(site_name)s\n"
+"                "
+msgstr ""
+"Vïsït %(site_name)s\n"
+"                 Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/templates/instructor/edx_ace/addbetatester/email/body.html
 #: lms/templates/instructor/edx_ace/addbetatester/email/body.txt
@@ -12891,14 +12885,14 @@ msgstr ""
 "αмєт, ¢σηѕє#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
-"We hope you're enjoying <strong>%(course_name)s</strong>! We want to let you"
-" know what you can look forward to in week %(week_num)s:"
+"We hope you're enjoying {start_strong}%(course_name)s{end_strong}! We want "
+"to let you know what you can look forward to in week %(week_num)s:"
 msgstr ""
-"Wé höpé ýöü'ré énjöýïng <strong>%(course_name)s</strong>! Wé wänt tö lét ýöü"
-" knöw whät ýöü çän löök förwärd tö ïn wéék %(week_num)s: Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт#"
+"Wé höpé ýöü'ré énjöýïng {start_strong}%(course_name)s{end_strong}! Wé wänt "
+"tö lét ýöü knöw whät ýöü çän löök förwärd tö ïn wéék %(week_num)s: Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.txt
@@ -12976,21 +12970,21 @@ msgid "Keep up the momentum!"
 msgstr "Kéép üp thé möméntüm! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
-"Many %(platform_name)s learners in <strong>%(course_name)s</strong> are "
-"completing more problems every week, and participating in the discussion "
-"forums. What do you want to do to keep learning?"
+"Many %(platform_name)s learners in {start_strong}%(course_name)s{end_strong}"
+" are completing more problems every week, and participating in the "
+"discussion forums. What do you want to do to keep learning?"
 msgstr ""
-"Mäný %(platform_name)s léärnérs ïn <strong>%(course_name)s</strong> äré "
-"çömplétïng möré prößléms évérý wéék, änd pärtïçïpätïng ïn thé dïsçüssïön "
-"förüms. Whät dö ýöü wänt tö dö tö kéép léärnïng? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
-"łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
-"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
-"αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ "
-"ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт "
-"ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσ#"
+"Mäný %(platform_name)s léärnérs ïn {start_strong}%(course_name)s{end_strong}"
+" äré çömplétïng möré prößléms évérý wéék, änd pärtïçïpätïng ïn thé "
+"dïsçüssïön förüms. Whät dö ýöü wänt tö dö tö kéép léärnïng? Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσ#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
@@ -13025,15 +13019,15 @@ msgid "Keep learning today"
 msgstr "Kéép léärnïng tödäý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
-"Remember when you enrolled in <strong>%(course_name)s</strong>, and other "
-"courses on %(platform_name)s? We do, and we’re glad to have you! Come see "
-"what everyone is learning."
+"Remember when you enrolled in {start_strong}%(course_name)s{end_strong}, and"
+" other courses on %(platform_name)s? We do, and we’re glad to have you! Come"
+" see what everyone is learning."
 msgstr ""
-"Rémémßér whén ýöü énrölléd ïn <strong>%(course_name)s</strong>, änd öthér "
-"çöürsés ön %(platform_name)s? Wé dö, änd wé’ré gläd tö hävé ýöü! Çömé séé "
-"whät évérýöné ïs léärnïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"Rémémßér whén ýöü énrölléd ïn {start_strong}%(course_name)s{end_strong}, änd"
+" öthér çöürsés ön %(platform_name)s? Wé dö, änd wé’ré gläd tö hävé ýöü! Çömé"
+" séé whät évérýöné ïs léärnïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
 "α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
 " αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
 "ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
@@ -13042,13 +13036,13 @@ msgstr ""
 "σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσ#"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
-"Remember when you enrolled in <strong>%(course_name)s</strong> on "
+"Remember when you enrolled in {start_strong}%(course_name)s{end_strong} on "
 "%(platform_name)s? We do, and we’re glad to have you! Come see what everyone"
 " is learning."
 msgstr ""
-"Rémémßér whén ýöü énrölléd ïn <strong>%(course_name)s</strong> ön "
+"Rémémßér whén ýöü énrölléd ïn {start_strong}%(course_name)s{end_strong} ön "
 "%(platform_name)s? Wé dö, änd wé’ré gläd tö hävé ýöü! Çömé séé whät évérýöné"
 " ïs léärnïng. Ⱡ'σяєм ιρѕυм #"
 
@@ -13111,46 +13105,49 @@ msgid "Upgrade now"
 msgstr "Ûpgrädé nöw Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
 "We hope you are enjoying learning with us so far on "
-"<strong>%(platform_name)s</strong>! A verified certificate allows you to "
-"highlight your new knowledge and skills. An %(platform_name)s certificate is"
-" official and easily shareable."
+"{start_strong}%(platform_name)s{end_strong}! A verified certificate allows "
+"you to highlight your new knowledge and skills. An %(platform_name)s "
+"certificate is official and easily shareable."
 msgstr ""
 "Wé höpé ýöü äré énjöýïng léärnïng wïth üs sö fär ön "
-"<strong>%(platform_name)s</strong>! À vérïfïéd çértïfïçäté ällöws ýöü tö "
-"hïghlïght ýöür néw knöwlédgé änd skïlls. Àn %(platform_name)s çértïfïçäté ïs"
-" öffïçïäl änd éäsïlý shäréäßlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
-" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
-"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
-"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
-"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт #"
+"{start_strong}%(platform_name)s{end_strong}! À vérïfïéd çértïfïçäté ällöws "
+"ýöü tö hïghlïght ýöür néw knöwlédgé änd skïlls. Àn %(platform_name)s "
+"çértïfïçäté ïs öffïçïäl änd éäsïlý shäréäßlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
+"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
+"∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
+" ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт #"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
 "We hope you are enjoying learning with us so far in "
-"<strong>%(first_course_name)s</strong>! A verified certificate allows you to"
-" highlight your new knowledge and skills. An %(platform_name)s certificate "
-"is official and easily shareable."
+"{start_strong}%(first_course_name)s{end_strong}! A verified certificate "
+"allows you to highlight your new knowledge and skills. An %(platform_name)s "
+"certificate is official and easily shareable."
 msgstr ""
 "Wé höpé ýöü äré énjöýïng léärnïng wïth üs sö fär ïn "
-"<strong>%(first_course_name)s</strong>! À vérïfïéd çértïfïçäté ällöws ýöü tö"
-" hïghlïght ýöür néw knöwlédgé änd skïlls. Àn %(platform_name)s çértïfïçäté "
-"ïs öffïçïäl änd éäsïlý shäréäßlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
-" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
-"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
-"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
-"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт #"
+"{start_strong}%(first_course_name)s{end_strong}! À vérïfïéd çértïfïçäté "
+"ällöws ýöü tö hïghlïght ýöür néw knöwlédgé änd skïlls. Àn %(platform_name)s "
+"çértïfïçäté ïs öffïçïäl änd éäsïlý shäréäßlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
+"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
+"∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
+" ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт #"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
-#, python-format
-msgid "Upgrade by <strong>%(user_schedule_upgrade_deadline_time)s</strong>."
+#, python-format, python-brace-format
+msgid ""
+"Upgrade by "
+"{start_strong}%(user_schedule_upgrade_deadline_time)s{end_strong}."
 msgstr ""
-"Ûpgrädé ßý <strong>%(user_schedule_upgrade_deadline_time)s</strong>. Ⱡ'σяєм "
+"Ûpgrädé ßý "
+"{start_strong}%(user_schedule_upgrade_deadline_time)s{end_strong}. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
