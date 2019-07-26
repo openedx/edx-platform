@@ -810,7 +810,7 @@ def course_about(request, course_id):
         staff_access = bool(has_access(request.user, 'staff', course))
         studio_url = get_studio_url(course, 'settings/details')
 
-        if has_access(request.user, 'load', course):
+        if request.user.has_perm('courseware.view_course_home', course):
             course_target = reverse(course_home_url_name(course.id), args=[text_type(course.id)])
         else:
             course_target = reverse('about_course', args=[text_type(course.id)])
