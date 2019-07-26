@@ -222,7 +222,6 @@ class MigrationTests(TestCase):
     """
     Tests for migrations.
     """
-    @unittest.skip("Migration will delete a model. Need to ship not referencing it first. DEPR-41.")
     @override_settings(MIGRATION_MODULES={})
     def test_migrations_are_in_sync(self):
         """
