@@ -10,12 +10,11 @@
 -c ../constraints.txt
 
 -r shared.txt                       # Dependencies in common with LMS and Studio
-matplotlib==1.5.3                   # 2D plotting library
-numpy==1.6.2                        # Numeric array processing utilities; used by scipy
+matplotlib==2.2.4                   # 2D plotting library
+numpy==1.7.2                        # Numeric array processing utilities; used by scipy
 pyparsing==2.2.0                    # Python Parsing module
 scipy==0.14.0                       # Math, science, and engineering library
 sympy==0.7.1                        # Symbolic math library
-tornado<6.0                         # via matplotlib; tornado dropped support for Python 2.7 and 3.4 with version 6.0
 git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4
 git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0
 
