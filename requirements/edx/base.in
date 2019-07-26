@@ -153,6 +153,5 @@ web-fragments                       # Provides the ability to render fragments o
 XBlock                              # Courseware component architecture
 xblock-utils                        # Provides utilities used by the Discussion XBlock
 xss-utils                           # https://github.com/edx/edx-platform/pull/20633 Fix XSS via Translations
-zendesk                             # Python API for the Zendesk customer support system
 geoip2==2.9.0                       # Python API for the GeoIP web services and databases
 edx-bulk-grades                     # LMS REST API for managing bulk grading operations
