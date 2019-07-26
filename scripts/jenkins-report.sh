@@ -15,7 +15,7 @@ source scripts/jenkins-common.sh
 # Get the diff coverage and html reports for unit tests
 paver coverage -b $TARGET_BRANCH
 
-if [[ -n "$PYTEST_CONTEXTS" ]]; then
+if [[ -n "$COLLECT_WHO_TESTS_WHAT" ]]; then
     paver upload_coverage_to_s3
 fi
 

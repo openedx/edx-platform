@@ -82,7 +82,7 @@ pipeline {
         stage("Combine Coverage") {
             when {
                 // Only combine coverage during context-collection
-                environment name: 'PYTEST_CONTEXTS', value: 'true'
+                environment name: 'COLLECT_WHO_TESTS_WHAT', value: 'true'
             }
             steps {
                 script {
