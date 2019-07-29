@@ -620,7 +620,7 @@ XBLOCK_MIXINS = (
 )
 
 # Import after sys.path fixup
-from xmodule.modulestore import prefer_xmodules
+from xmodule.modulestore import prefer_xmodules  # pylint: disable=wrong-import-position
 
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
