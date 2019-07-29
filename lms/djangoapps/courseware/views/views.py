@@ -63,7 +63,7 @@ from courseware.courses import (
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache
 from courseware.models import BaseStudentModuleHistory, StudentModule
-from courseware.permissions import VIEW_COURSE_HOME, MASQUERADE_AS_STUDENT
+from courseware.permissions import MASQUERADE_AS_STUDENT, VIEW_COURSE_HOME, VIEW_COURSEWARE
 from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
@@ -828,7 +828,7 @@ def course_about(request, course_id):
 
         show_courseware_link = bool(
             (
-                has_access(request.user, 'load', course)
+                request.user.has_perm(VIEW_COURSEWARE, course)
             ) or settings.FEATURES.get('ENABLE_LMS_MIGRATION')
         )
 
