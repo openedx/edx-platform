@@ -22,8 +22,9 @@ from openedx.core.djangoapps.config_model_utils.models import StackedConfigurati
 from openedx.core.djangoapps.config_model_utils.utils import is_in_holdback
 from openedx.features.content_type_gating.helpers import FULL_ACCESS, LIMITED_ACCESS, correct_modes_for_fbe
 from student.models import CourseEnrollment
-from student.role_helpers import has_staff_roles
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
+
+from .permissions import CONTENT_TYPE_GATING_BYPASS_FBE
 
 
 @python_2_unicode_compatible
@@ -66,7 +67,7 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
         """
         if student_masquerade:
             # If a request is masquerading as a specific user, the user variable will represent the correct user.
-            if user and user.id and has_staff_roles(user, course_key):
+            if user and user.id and user.has_perm(CONTENT_TYPE_GATING_BYPASS_FBE, course_key):
                 return True
         elif user_partition:
             # If the current user is masquerading as a generic student in a specific group,
@@ -130,7 +131,7 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
                                                       user_partition):
                 return False
         # When a request is not in a masquerade state the user variable represents the correct user.
-        elif user and user.id and has_staff_roles(user, course_key):
+        elif user and user.id and user.has_perm(CONTENT_TYPE_GATING_BYPASS_FBE, course_key):
             return False
 
         # check if user is in holdback

@@ -26,8 +26,9 @@ from openedx.features.content_type_gating.helpers import (
     correct_modes_for_fbe
 )
 from student.models import CourseEnrollment
-from student.role_helpers import has_staff_roles
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
+
+from .permissions import COURSE_DURATION_LIMITS_BYPASS_FBE
 
 
 @python_2_unicode_compatible
@@ -73,7 +74,7 @@ class CourseDurationLimitConfig(StackedConfigurationModel):
         # When masquerading as a specific user, we can check that user's staff roles as we would with a normal user
         is_staff_role = False
         if course_masquerade.user_name:
-            is_staff_role = has_staff_roles(user, course_key)
+            is_staff_role = user.has_perm(COURSE_DURATION_LIMITS_BYPASS_FBE, course_key)
 
         if is_verified or is_full_access or is_staff or is_staff_role:
             return True
@@ -120,7 +121,7 @@ class CourseDurationLimitConfig(StackedConfigurationModel):
             if course_masquerade:
                 if cls.has_full_access_role_in_masquerade(user, course_key, course_masquerade):
                     return False
-            elif has_staff_roles(user, course_key):
+            elif user.has_perm(COURSE_DURATION_LIMITS_BYPASS_FBE, course_key):
                 return False
 
         is_masquerading = get_course_masquerade(user, course_key)

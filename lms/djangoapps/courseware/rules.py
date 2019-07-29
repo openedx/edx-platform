@@ -8,6 +8,7 @@ from course_modes.models import CourseMode
 from django.db.models import Q
 from opaque_keys.edx.keys import CourseKey
 from student.models import CourseEnrollment
+from student.role_helpers import has_staff_roles
 
 from .access import has_access
 
@@ -46,3 +47,15 @@ class HasAccessRule(Rule):
         # that is used to determine if the rule should allow a user
         # into django admin
         return Q(pk__in=[])
+
+
+class HasStaffRolesRule(Rule):
+    """
+    A rule that checks whether a user has one of the following roles in a course:
+    Staff, Instructor, Beta Tester, Forum Community TA, Forum Group Moderator, Forum Moderator, Forum Administrator
+    """
+    def check(self, user, course_key):
+        return has_staff_roles(user, course_key)
+
+    def query(self, user):
+        raise NotImplementedError()
