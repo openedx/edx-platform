@@ -321,18 +321,18 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         contentstore().find(content_key)
 
     @ddt.data(
-        ('instructor_paced', False),
-        ('self_paced', True),
+        ('instructor_paced', False, 'NotOriginalNumber1x'),
+        ('self_paced', True, None),
     )
     @ddt.unpack
-    def test_rerun(self, pacing_type, expected_self_paced_value):
-        course_run = ToyCourseFactory()
+    def test_rerun(self, pacing_type, expected_self_paced_value, number):
+        original_course_run = ToyCourseFactory()
         start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
         end = start + datetime.timedelta(days=30)
         user = UserFactory()
         role = 'instructor'
         run = '3T2017'
-        url = reverse('api:v1:course_run-rerun', kwargs={'pk': str(course_run.id)})
+        url = reverse('api:v1:course_run-rerun', kwargs={'pk': str(original_course_run.id)})
         data = {
             'run': run,
             'schedule': {
@@ -347,13 +347,25 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
             ],
             'pacing_type': pacing_type,
         }
+        # If number is supplied, this should become the course number used in the course run key
+        # If not, it should default to the original course run number that the rerun is based on.
+        if number:
+            data.update({'number': number})
         response = self.client.post(url, data, format='json')
         assert response.status_code == 201
 
         course_run_key = CourseKey.from_string(response.data['id'])
         course_run = modulestore().get_course(course_run_key)
+
         assert course_run.id.run == run
         assert course_run.self_paced is expected_self_paced_value
+
+        if number:
+            assert course_run.id.course == number
+            assert course_run.id.course != original_course_run.id.course
+        else:
+            assert course_run.id.course == original_course_run.id.course
+
         self.assert_course_run_schedule(course_run, start, end)
         self.assert_access_role(course_run, user, role)
         self.assert_course_access_role_count(course_run, 1)
@@ -367,3 +379,16 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         response = self.client.post(url, data, format='json')
         assert response.status_code == 400
         assert response.data == {'run': [u'Course run {key} already exists'.format(key=course_run.id)]}
+
+    def test_rerun_invalid_number(self):
+        course_run = ToyCourseFactory()
+        url = reverse('api:v1:course_run-rerun', kwargs={'pk': str(course_run.id)})
+        data = {
+            'run': '2T2019',
+            'number': '!@#$%^&*()',
+        }
+        response = self.client.post(url, data, format='json')
+        assert response.status_code == 400
+        assert response.data == {'non_field_errors': [
+            u'Invalid key supplied. Ensure there are no special characters in the Course Number.'
+        ]}
