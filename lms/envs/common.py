@@ -966,9 +966,12 @@ COURSE_LISTINGS = {}
 # These are the Mixins that should be added to every XBlock.
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
+from xmodule.modulestore.inheritance import InheritanceMixin
+
 XBLOCK_MIXINS = (
     u'lms.djangoapps.lms_xblock.mixin.LmsBlockMixin',
-    u'xmodule.modulestore.inheritance.InheritanceMixin',
+    InheritanceMixin,
+#    u'xmodule.modulestore.inheritance.InheritanceMixin',
     u'xmodule.x_module.XModuleMixin',
     u'xmodule.modulestore.edit_info.EditInfoMixin',
 )
