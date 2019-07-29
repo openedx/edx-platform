@@ -8663,7 +8663,7 @@ msgstr "Réinitialiser mon mot de passe"
 
 #: lms/templates/student_account/register.underscore
 msgid "Already have an {platformName} account?"
-msgstr ""
+msgstr "Vous possédez déjà un compte {platformName} ?"
 
 #: lms/templates/student_account/register.underscore
 msgid "Sign in."
