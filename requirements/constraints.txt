@@ -72,3 +72,9 @@ drf-yasg==1.16
 
 # 2.0.0 is a dummy package, because faulthandler has been incorporated into pytest 5.0
 pytest-faulthandler<2.0.0
+
+# faulthandler is part of core python staring with python 3.3
+faulthandler; python_version == "2.7"
+
+# Numpy 1.17.0 only supports python >= 3.5
+numpy<1.17.0
