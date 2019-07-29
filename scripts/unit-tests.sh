@@ -50,10 +50,10 @@ else
     PARALLEL="--processes=-1"
 fi
 
-if [[ -n "$WHO_TESTS_WHAT" ]]; then
-    PAVER_ARGS="$PAVER_ARGS --with-wtw"
+if [[ -n "$FILTER_WHO_TESTS_WHAT" ]]; then
+    PAVER_ARGS="$PAVER_ARGS --with-wtw=origin/master"
 fi
-if [[ -n "$PYTEST_CONTEXTS" ]]; then
+if [[ -n "$COLLECT_WHO_TESTS_WHAT" ]]; then
     PAVER_ARGS="$PAVER_ARGS --pytest-contexts"
 fi
 

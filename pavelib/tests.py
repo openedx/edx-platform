@@ -322,21 +322,24 @@ def test(options, passthrough_options):
 @needs('pavelib.prereqs.install_coverage_prereqs')
 @cmdopts([
     ("compare-branch=", "b", "Branch to compare against, defaults to origin/master"),
+    ("rcfile=", "c", "Coveragerc file to use, defaults to .coveragerc"),
 ])
 @timed
-def coverage():
+def coverage(options):
     """
     Build the html, xml, and diff coverage reports
     """
     report_dir = Env.REPORT_DIR
-    rcfile = Env.PYTHON_COVERAGERC
+    rcfile = getattr(options.coverage, 'rcfile', Env.PYTHON_COVERAGERC)
 
-    if not (report_dir / '.coverage').isfile():
+    combined_report_file = report_dir / '{}.coverage'.format(os.environ.get('TEST_SUITE', ''))
+
+    if not combined_report_file.isfile():
         # This may be that the coverage files were generated using -p,
         # try to combine them to the one file that we need.
         sh(u"coverage combine --rcfile={}".format(rcfile))
 
-    if not os.path.getsize(report_dir / '.coverage') > 50:
+    if not os.path.getsize(combined_report_file) > 50:
         # Check if the .coverage data file is larger than the base file,
         # because coverage combine will always at least make the "empty" data
         # file even when there isn't any data to be combined.
