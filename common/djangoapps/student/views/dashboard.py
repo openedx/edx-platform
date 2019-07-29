@@ -696,7 +696,7 @@ def student_dashboard(request):
         errored_courses = modulestore().get_errored_courses()
 
     show_courseware_links_for = {
-        enrollment.course_id: has_access(request.user, 'load', enrollment.course_overview)
+        enrollment.course_id: request.user.has_perm('dashboard.view_courseware_links', enrollment.course_overview)
         for enrollment in course_enrollments
     }
 
