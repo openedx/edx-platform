@@ -3,7 +3,6 @@ Support for inheritance of fields down an XBlock hierarchy.
 """
 from __future__ import absolute_import
 
-from django.conf import settings
 from django.utils import timezone
 
 from xmodule.partitions.partitions import UserPartition
@@ -189,8 +188,6 @@ class InheritanceMixin(XBlockMixin):
         scope=Scope.settings
     )
 
-    reset_key = "DEFAULT_SHOW_RESET_BUTTON"
-    default_reset_button = getattr(settings, reset_key) if hasattr(settings, reset_key) else False
     show_reset_button = Boolean(
         display_name=_("Show Reset Button for Problems"),
         help=_(
@@ -199,7 +196,7 @@ class InheritanceMixin(XBlockMixin):
             "this course-wide setting is changed."
         ),
         scope=Scope.settings,
-        default=default_reset_button
+        default=False
     )
     edxnotes = Boolean(
         display_name=_("Enable Student Notes"),
