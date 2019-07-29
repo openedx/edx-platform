@@ -55,9 +55,7 @@
                      if (this.stream) {
                          video = this.getVideo();
                          canvas = this.getCanvas();
-                         canvas.width = video.videoWidth;
-                         canvas.height = video.videoHeight;
-                         canvas.getContext('2d').drawImage(video, 0, 0);
+                         canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
                          video.pause();
                          return true;
                      }
