@@ -168,29 +168,48 @@ class CourseRunCreateSerializer(CourseRunSerializer):
 class CourseRunRerunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTeamSerializerMixin,
                                serializers.Serializer):
     title = serializers.CharField(source='display_name', required=False)
+    number = serializers.CharField(source='id.course', required=False)
     run = serializers.CharField(source='id.run')
 
-    def validate_run(self, value):
+    # def validate_run(self, value):
+    #     course_run_key = self.instance.id
+    #     store = modulestore()
+    #     with store.default_store('split'):
+    #         new_course_run_key = store.make_course_key(course_run_key.org, course_run_key.course, value)
+    #     if store.has_course(new_course_run_key, ignore_case=True):
+    #         raise serializers.ValidationError(u'Course run {key} already exists'.format(key=new_course_run_key))
+    #     return value
+
+    def validate(self, data):
+        log.critical('Validate run')
+        log.critical(data)
         course_run_key = self.instance.id
+        log.critical(self.instance)
+        _id = data.get('id')
+        number = _id.get('course') or course_run_key.course
+        run = _id['run']
         store = modulestore()
         with store.default_store('split'):
-            new_course_run_key = store.make_course_key(course_run_key.org, course_run_key.course, value)
+            new_course_run_key = store.make_course_key(course_run_key.org, number, run)
         if store.has_course(new_course_run_key, ignore_case=True):
             raise serializers.ValidationError(u'Course run {key} already exists'.format(key=new_course_run_key))
-        return value
+        return data
 
     def update(self, instance, validated_data):
+        log.critical('Update')
+        log.critical(instance)
+        log.critical(validated_data)
         course_run_key = instance.id
         _id = validated_data.pop('id')
+        number = _id.get('course') or course_run_key.course
+        run = _id['run']
         team = validated_data.pop('team', [])
         user = self.context['request'].user
         fields = {
             'display_name': instance.display_name
         }
         fields.update(validated_data)
-        new_course_run_key = rerun_course(
-            user, course_run_key, course_run_key.org, course_run_key.course, _id['run'], fields, False
-        )
+        new_course_run_key = rerun_course(user, course_run_key, course_run_key.org, number, run, fields, False)
 
         course_run = get_course_and_check_access(new_course_run_key, user)
         self.update_team(course_run, team)
