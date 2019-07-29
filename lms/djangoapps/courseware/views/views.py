@@ -817,7 +817,7 @@ def course_about(request, course_id):
 
         show_courseware_link = bool(
             (
-                has_access(request.user, 'load', course)
+                request.user.has_perm('courseware.perm_does_not_exist', course)
             ) or settings.FEATURES.get('ENABLE_LMS_MIGRATION')
         )
 
