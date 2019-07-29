@@ -94,6 +94,7 @@ from openedx.core.djangoapps.programs.utils import ProgramMarketingDataExtender
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
+from openedx.core.djangoapps.zendesk_proxy.utils import create_zendesk_ticket
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from openedx.features.course_experience import (
@@ -112,7 +113,7 @@ from track import segment
 from util.cache import cache, cache_if_anonymous
 from util.db import outer_atomic
 from util.milestones_helpers import get_prerequisite_courses_display
-from util.views import _record_feedback_in_zendesk, ensure_valid_course_key, ensure_valid_usage_key
+from util.views import ensure_valid_course_key, ensure_valid_usage_key
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
@@ -1625,7 +1626,7 @@ def financial_assistance_request(request):
         # Thrown if fields are missing
         return HttpResponseBadRequest(u'The field {} is required.'.format(text_type(err)))
 
-    zendesk_submitted = _record_feedback_in_zendesk(
+    zendesk_submitted = create_zendesk_ticket(
         legal_name,
         email,
         u'Financial assistance request for learner {username} in course {course_name}'.format(
@@ -1633,12 +1634,12 @@ def financial_assistance_request(request):
             course_name=course.display_name
         ),
         u'Financial Assistance Request',
-        {'course_id': course_id},
+        tags={'course_id': course_id},
         # Send the application as additional info on the ticket so
         # that it is not shown when support replies. This uses
         # OrderedDict so that information is presented in the right
         # order.
-        OrderedDict((
+        additional_info=OrderedDict((
             ('Username', username),
             ('Full Name', legal_name),
             ('Course ID', course_id),
@@ -1650,8 +1651,7 @@ def financial_assistance_request(request):
             (FA_EFFORT_LABEL, '\n' + effort + '\n\n'),
             ('Client IP', ip_address),
         )),
-        group_name='Financial Assistance',
-        require_update=True
+        group='Financial Assistance',
     )
 
     if not zendesk_submitted:
