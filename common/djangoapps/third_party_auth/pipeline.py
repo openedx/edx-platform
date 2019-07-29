@@ -796,7 +796,7 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
                     email.send()
                 except SMTPException:
                     logger.exception('[THIRD_PARTY_AUTH] Error sending IdP learner data sync-initiated email change '
-                                     u'notification email. Username {username}'.format(username=user.username))
+                                     u'notification email. Username: {username}'.format(username=user.username))
 
 
 def set_id_verification_status(auth_entry, strategy, details, user=None, *args, **kwargs):
@@ -878,7 +878,7 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):
         while not final_username or user_exists({'username': final_username}):
             username = short_username + uuid4().hex[:uuid_length]
             final_username = slug_func(clean_func(username[:max_length]))
-            logger.info(u'[THIRD_PARTY_AUTH] New username generated. Username {username}'.format(
+            logger.info(u'[THIRD_PARTY_AUTH] New username generated. Username: {username}'.format(
                 username=final_username))
     else:
         final_username = storage.user.get_username(user)
