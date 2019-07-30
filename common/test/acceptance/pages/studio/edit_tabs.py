@@ -1,10 +1,13 @@
 """
 Pages page for a course.
 """
-from common.test.acceptance.pages.common.utils import click_css, confirm_prompt
-from common.test.acceptance.pages.studio.course_page import CoursePage
+from __future__ import absolute_import
+
 from bok_choy.promise import EmptyPromise
 from selenium.webdriver import ActionChains
+
+from common.test.acceptance.pages.common.utils import click_css, confirm_prompt
+from common.test.acceptance.pages.studio.course_page import CoursePage
 
 
 class PagesPage(CoursePage):
