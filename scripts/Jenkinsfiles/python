@@ -175,7 +175,7 @@ pipeline {
             post {
                 always {
                     script {
-                        archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/${TEST_SUITE}.coverage'
+                        archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.coverage'
                         publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true,
                             reportDir: 'reports/cover', reportFiles: 'index.html',
                             reportName: 'Coverage.py Report', reportTitles: ''])
