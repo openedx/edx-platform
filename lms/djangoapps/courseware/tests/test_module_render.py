@@ -49,7 +49,7 @@ from courseware.access_response import AccessResponse
 from courseware.courses import get_course_info_section, get_course_with_access
 from courseware.masquerade import CourseMasquerade
 from courseware.model_data import FieldDataCache
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.models import StudentModule
 from courseware.module_render import get_module_for_descriptor, hash_resource
 from courseware.tests.factories import GlobalStaffFactory, RequestFactoryNoCsrf, StudentModuleFactory, UserFactory
 from courseware.tests.test_submitting_problems import TestSubmittingProblems

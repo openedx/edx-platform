@@ -22,9 +22,10 @@ from six import text_type
 
 import branding
 from course_modes.models import CourseMode
-from courseware.access import has_access
-from courseware.access_response import MilestoneAccessError, StartDateError
-from courseware.date_summary import (
+from edxmako.shortcuts import render_to_string
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.access_response import MilestoneAccessError, StartDateError
+from lms.djangoapps.courseware.date_summary import (
     CertificateAvailableDate,
     CourseEndDate,
     CourseStartDate,
@@ -32,13 +33,13 @@ from courseware.date_summary import (
     VerificationDeadlineDate,
     VerifiedUpgradeDeadlineDate
 )
-from courseware.masquerade import check_content_start_date_for_masquerade_user
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module
-from edxmako.shortcuts import render_to_string
+from lms.djangoapps.courseware.masquerade import check_content_start_date_for_masquerade_user
+from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.module_render import get_module
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from lms.djangoapps.courseware.permissions import ACCESS_COURSE
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.enrollments.api import get_course_enrollment_details
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -139,7 +140,7 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
     check_survey_complete: If true, additionally verifies that the user has completed the survey.
     """
     # Allow staff full access to the course even if not enrolled
-    if has_access(user, 'staff', course.id):
+    if user.has_perm(ACCESS_COURSE, course.id):
         return
 
     request = get_current_request()

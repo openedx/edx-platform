@@ -14,7 +14,7 @@ from django.conf import settings
 from django.test import TestCase
 from mock import patch
 
-from courseware.models import BaseStudentModuleHistory, StudentModule, StudentModuleHistory
+from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule, StudentModuleHistory
 from courseware.tests.factories import StudentModuleFactory, course_id, location
 
 
