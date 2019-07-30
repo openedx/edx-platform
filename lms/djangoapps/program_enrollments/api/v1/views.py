@@ -26,6 +26,7 @@ from rest_framework.response import Response
 
 from six import iteritems
 
+from ccx_keys.locator import CCXLocator
 from bulk_email.api import is_bulk_email_feature_enabled, is_user_opted_out_for_course
 from course_modes.models import CourseMode
 from edx_when.api import get_dates_for_course
@@ -48,8 +49,14 @@ from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, P
 from lms.djangoapps.program_enrollments.utils import get_user_by_program_id, ProviderDoesNotExistException
 from student.helpers import get_resume_urls_for_enrollments
 from student.models import CourseEnrollment
+from student.roles import CourseInstructorRole, CourseStaffRole, UserBasedRole
 from xmodule.modulestore.django import modulestore
-from openedx.core.djangoapps.catalog.utils import get_programs, course_run_keys_for_program
+from openedx.core.djangoapps.catalog.utils import (
+    course_run_keys_for_program,
+    get_programs,
+    get_programs_by_type,
+    normalize_program_type,
+)
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, PaginatedAPIView, verify_course_exists
@@ -513,18 +520,29 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
         )
 
 
-class LearnerProgramEnrollmentsView(DeveloperErrorViewMixin, APIView):
+class UserProgramReadOnlyAccessView(DeveloperErrorViewMixin, PaginatedAPIView):
     """
-    A view for checking the currently logged-in learner's program enrollments
+    A view for checking the currently logged-in user's program read only access
+    There are three major categories of users this API is differentiating. See the table below.
+
+    --------------------------------------------------------------------------------------------
+    | User Type        | API Returns                                                           |
+    --------------------------------------------------------------------------------------------
+    | edX staff        | All programs                                                          |
+    --------------------------------------------------------------------------------------------
+    | course staff     | All programs containing the courses of which the user is course staff |
+    --------------------------------------------------------------------------------------------
+    | learner          | All programs the learner is enrolled in                               |
+    --------------------------------------------------------------------------------------------
 
     Path: `/api/program_enrollments/v1/programs/enrollments/`
 
     Returns:
-      * 200: OK - Contains a list of all programs in which the learner is enrolled.
+      * 200: OK - Contains a list of all programs in which the user has read only acccess to.
       * 401: The requesting user is not authenticated.
 
     The list will be a list of objects with the following keys:
-      * `uuid` - the identifier of the program in which the learner is enrolled.
+      * `uuid` - the identifier of the program in which the user has read only access to.
       * `slug` - the string from which a link to the corresponding program page can be constructed.
 
     Example:
@@ -546,23 +564,79 @@ class LearnerProgramEnrollmentsView(DeveloperErrorViewMixin, APIView):
     )
     permission_classes = (IsAuthenticated,)
 
+    DEFAULT_PROGRAM_TYPE = 'masters'
+
     def get(self, request):
         """
         How to respond to a GET request to this endpoint
         """
-        program_enrollments = ProgramEnrollment.objects.filter(
-            user=request.user,
-            status__in=('enrolled', 'pending')
-        )
 
-        uuids = [enrollment.program_uuid for enrollment in program_enrollments]
+        request_user = request.user
 
-        catalog_data_of_programs = get_programs(uuids=uuids) or []
-        programs_in_which_learner_is_enrolled = [{'uuid': program['uuid'], 'slug': program['marketing_slug']}
-                                                 for program
-                                                 in catalog_data_of_programs]
+        programs = []
+        requested_program_type = normalize_program_type(request.GET.get('type', self.DEFAULT_PROGRAM_TYPE))
 
-        return Response(programs_in_which_learner_is_enrolled, status.HTTP_200_OK)
+        if request_user.is_staff:
+            programs = get_programs_by_type(request.site, requested_program_type)
+        elif self.is_course_staff(request_user):
+            programs = self.get_programs_user_is_course_staff_for(request_user, requested_program_type)
+        else:
+            program_enrollments = ProgramEnrollment.objects.filter(
+                user=request.user,
+                status__in=('enrolled', 'pending')
+            )
+
+            uuids = [enrollment.program_uuid for enrollment in program_enrollments]
+
+            programs = get_programs(uuids=uuids) or []
+
+        programs_in_which_user_has_access = [
+            {'uuid': program['uuid'], 'slug': program['marketing_slug']}
+            for program in programs
+        ]
+
+        return Response(programs_in_which_user_has_access, status.HTTP_200_OK)
+
+    def is_course_staff(self, user):
+        """
+        Returns true if the user is a course_staff member of any course within a program
+        """
+        staff_course_keys = self.get_course_keys_user_is_staff_for(user)
+        return len(staff_course_keys)
+
+    def get_course_keys_user_is_staff_for(self, user):
+        """
+        Return all the course keys the user is course instructor or course staff role for
+        """
+        # Get all the courses of which the user is course staff for. If None, return false
+        def filter_ccx(course_access):
+            """ CCXs cannot be edited in Studio and should not be filtered """
+            return not isinstance(course_access.course_id, CCXLocator)
+
+        instructor_courses = UserBasedRole(user, CourseInstructorRole.ROLE).courses_with_role()
+        staff_courses = UserBasedRole(user, CourseStaffRole.ROLE).courses_with_role()
+        all_courses = list(filter(filter_ccx, instructor_courses | staff_courses))
+        course_keys = {}
+        for course_access in all_courses:
+            if course_access.course_id is not None:
+                course_keys[course_access.course_id] = course_access.course_id
+
+        return list(course_keys.values())
+
+    def get_programs_user_is_course_staff_for(self, user, program_type_filter):
+        """
+        Return a list of programs the user is course staff for.
+        This function would take a list of course runs the user is staff of, and then
+        try to get the Masters program associated with each course_runs.
+        """
+        program_list = []
+        for course_key in self.get_course_keys_user_is_staff_for(user):
+            course_run_programs = get_programs(course=course_key)
+            for course_run_program in course_run_programs:
+                if course_run_program and course_run_program.get('type').lower() == program_type_filter:
+                    program_list.append(course_run_program)
+
+        return program_list
 
 
 class ProgramSpecificViewMixin(object):
