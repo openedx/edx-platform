@@ -450,6 +450,7 @@ LOGIN_URL = reverse_lazy('login_redirect_to_lms')
 AUTHENTICATION_BACKENDS = [
     'rules.permissions.ObjectPermissionBackend',
     'openedx.core.djangoapps.oauth_dispatch.dot_overrides.backends.EdxRateLimitedAllowAllUsersModelBackend',
+    'bridgekeeper.backends.RulePermissionBackend',
 ]
 
 STATIC_ROOT_BASE = '/edx/var/edxapp/staticfiles'
@@ -1312,6 +1313,7 @@ INSTALLED_APPS = [
 
     # rule-based authorization
     'rules.apps.AutodiscoverRulesConfig',
+    'bridgekeeper',
 
     # management of user-triggered async tasks (course import/export, etc.)
     'user_tasks',

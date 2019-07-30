@@ -41,6 +41,7 @@ bok-choy==1.0.0
 boto3==1.4.8
 boto==2.39.0
 botocore==1.8.17
+git+https://github.com/edx/bridgekeeper.git@4e34894e4ac5d0467ed1901811a81fd87ee01937#egg=bridgekeeper==0.0
 git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4
 caniusepython3==7.1.0
 celery==3.1.25

@@ -74,6 +74,11 @@ git+https://github.com/edx/django-rest-framework-oauth.git@0a43e8525f1e3048efe4b
 # This dependency will be removed by the Celery 4 upgrade: https://openedx.atlassian.net/browse/PLAT-1684
 git+https://github.com/edx/django-celery.git@756cb57aad765cb2b0d37372c1855b8f5f37e6b0#egg=django-celery==3.2.1+edx.2
 
+# Forked to add support for python2.7 and to fix predicate inversion
+# Once https://github.com/excitedleigh/bridgekeeper/pull/10 is merged, and we get to python3 and django 2, we can
+# remove this fork
+git+https://github.com/edx/bridgekeeper.git@4e34894e4ac5d0467ed1901811a81fd87ee01937#egg=bridgekeeper==0.0
+
 # Our libraries:
 -e git+https://github.com/edx/codejail.git@a320d43ce6b9c93b17636b2491f724d9e433be47#egg=codejail
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
