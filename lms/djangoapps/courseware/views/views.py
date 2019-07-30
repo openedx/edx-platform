@@ -63,7 +63,7 @@ from courseware.courses import (
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache
 from courseware.models import BaseStudentModuleHistory, StudentModule
-from courseware.permissions import VIEW_COURSE_HOME, VIEW_COURSEWARE
+from courseware.permissions import VIEW_COURSE_HOME, VIEW_COURSEWARE, VIEW_XQA_INTERFACE
 from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
@@ -1551,7 +1551,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'disable_footer': True,
             'disable_window_wrap': True,
             'enable_completion_on_view_service': enable_completion_on_view_service,
-            'staff_access': bool(has_access(request.user, 'staff', course)),
+            'staff_access': bool(request.user.has_perm(VIEW_XQA_INTERFACE, course)),
             'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://your_xqa_server.com'),
         }
         return render_to_response('courseware/courseware-chromeless.html', context)
