@@ -104,6 +104,13 @@ pipeline {
                     }
                 }
             }
+            post {
+                always {
+                    script {
+                        archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.coverage'
+                    }
+                }
+            }
         }
     }
     post {
