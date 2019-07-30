@@ -78,3 +78,12 @@ faulthandler; python_version == "2.7"
 
 # Numpy 1.17.0 only supports python >= 3.5
 numpy<1.17.0
+
+# Pinned by moto to this but since moto is only a test requirement, we don't
+# see the constraint when generating base.txt
+#
+# There are incompatible versions in the resolved dependencies:
+#  jsondiff (from edx-enterprise==1.8.6->-r requirements/edx/base.txt (line 108))
+#  jsondiff==1.1.1 (from moto==1.2.0->-r requirements/edx/testing.in (line 33))
+#  jsondiff==1.2.0 (from -r requirements/edx/base.txt (line 146))
+jsondiff==1.1.1
