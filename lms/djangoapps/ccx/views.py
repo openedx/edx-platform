@@ -36,6 +36,7 @@ from lms.djangoapps.ccx.overrides import (
     get_override_for_ccx,
     override_field_for_ccx
 )
+from lms.djangoapps.ccx.permissions import VIEW_CCX_COACH_DASHBOARD
 from lms.djangoapps.ccx.utils import (
     add_master_course_staff_to_ccx,
     assign_staff_role_to_ccx,
@@ -90,10 +91,7 @@ def coach_dashboard(view):
         if not course.enable_ccx:
             raise Http404
         else:
-            is_staff = has_access(request.user, 'staff', course)
-            is_instructor = has_access(request.user, 'instructor', course)
-
-            if is_staff or is_instructor:
+            if bool(request.user.has_perm(VIEW_CCX_COACH_DASHBOARD, course)):
                 # if user is staff or instructor then he can view ccx coach dashboard.
                 return view(request, course, ccx)
             else:
