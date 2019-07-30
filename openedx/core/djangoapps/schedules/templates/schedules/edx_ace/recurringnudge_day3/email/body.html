@@ -41,7 +41,7 @@
                     {% interpolate_html tmsg start_strong='<strong>'|safe end_strong='</strong>'|safe %}
                 {% endif %}
             </p>
-            ## xss-lint: disable=django-trans-missing-escape
+            {# xss-lint: disable=django-trans-missing-escape #}
             {% trans "Start learning now" as course_cta_text %}
             {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text%}
 
