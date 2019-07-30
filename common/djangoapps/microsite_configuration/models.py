@@ -5,6 +5,8 @@ The object is stored as a json representation of the python dict
 that would have been used in the settings.
 
 """
+from __future__ import absolute_import
+
 import collections
 
 from django.contrib.sites.models import Site

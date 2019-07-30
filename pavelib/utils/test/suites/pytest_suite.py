@@ -2,11 +2,15 @@
 """
 Classes used for defining and running pytest test suites
 """
+from __future__ import absolute_import
+
 import os
 from glob import glob
+
+from pavelib.utils.envs import Env
 from pavelib.utils.test import utils as test_utils
 from pavelib.utils.test.suites.suite import TestSuite
-from pavelib.utils.envs import Env
+from pavelib.utils.test.utils import COVERAGE_CACHE_BASELINE, COVERAGE_CACHE_BASEPATH, WHO_TESTS_WHAT_DIFF
 
 __test__ = False  # do not collect
 
@@ -44,6 +48,7 @@ class PytestSuite(TestSuite):
         self.xunit_report = self.report_dir / "nosetests.xml"
 
         self.cov_args = kwargs.get('cov_args', '')
+        self.with_wtw = kwargs.get('with_wtw', False)
 
     def __enter__(self):
         super(PytestSuite, self).__enter__()
@@ -100,6 +105,14 @@ class PytestSuite(TestSuite):
 
         if self.fail_fast or env_fail_fast_set:
             opts.append("--exitfirst")
+
+        if self.with_wtw:
+            opts.extend([
+                '--wtw',
+                '{}/{}'.format(COVERAGE_CACHE_BASEPATH, WHO_TESTS_WHAT_DIFF),
+                '--wtwdb',
+                '{}/{}'.format(COVERAGE_CACHE_BASEPATH, COVERAGE_CACHE_BASELINE)
+            ])
 
         return opts
 

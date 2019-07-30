@@ -1,7 +1,11 @@
 ''' useful functions for finding content and its position '''
+from __future__ import absolute_import
+
 from logging import getLogger
 
-from .exceptions import (ItemNotFoundError, NoPathToItem)
+from six.moves import range
+
+from .exceptions import ItemNotFoundError, NoPathToItem
 
 LOGGER = getLogger(__name__)
 

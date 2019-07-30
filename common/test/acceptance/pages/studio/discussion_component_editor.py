@@ -1,8 +1,10 @@
 """
 Discussion component editor in studio
 """
-from common.test.acceptance.pages.studio.xblock_editor import XBlockEditorView
+from __future__ import absolute_import
+
 from common.test.acceptance.pages.common.utils import click_css
+from common.test.acceptance.pages.studio.xblock_editor import XBlockEditorView
 
 
 class DiscussionComponentEditor(XBlockEditorView):

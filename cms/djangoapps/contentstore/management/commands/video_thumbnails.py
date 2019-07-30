@@ -1,17 +1,19 @@
 """
 Command to scrape thumbnails and add them to the course-videos.
 """
+from __future__ import absolute_import
+
 import logging
-from six import text_type
 
 import edxval.api as edxval_api
 from django.core.management import BaseCommand
 from django.core.management.base import CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
-from openedx.core.djangoapps.video_config.models import VideoThumbnailSetting
 from cms.djangoapps.contentstore.tasks import enqueue_update_thumbnail_tasks
+from openedx.core.djangoapps.video_config.models import VideoThumbnailSetting
 
 log = logging.getLogger(__name__)
 

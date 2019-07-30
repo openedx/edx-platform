@@ -1,21 +1,21 @@
 """
 Tests for paver quality tasks
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+
 import os
 import shutil
 import tempfile
 import textwrap
 import unittest
 
-from ddt import ddt, file_data, data, unpack
+from ddt import data, ddt, file_data, unpack
 from mock import MagicMock, mock_open, patch
 from path import Path as path
 from paver.easy import BuildFailure
 
 import pavelib.quality
-from pavelib.paver_tests.utils import fail_on_eslint
-from pavelib.paver_tests.utils import PaverTestCase
+from pavelib.paver_tests.utils import PaverTestCase, fail_on_eslint
 
 
 @ddt

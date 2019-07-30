@@ -2,6 +2,8 @@
 Tools for creating edxnotes content fixture data.
 """
 
+from __future__ import absolute_import
+
 import json
 
 import factory

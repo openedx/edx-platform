@@ -2,12 +2,15 @@
 Fixture to create a course and course components (XBlocks).
 """
 
+from __future__ import absolute_import
+
 import datetime
 import json
 import mimetypes
 from collections import namedtuple
 from textwrap import dedent
 
+import six
 from opaque_keys.edx.keys import CourseKey
 from path import Path
 
@@ -255,7 +258,7 @@ class CourseFixture(XBlockContainerFixture):
             block_id = self._course_dict['run']
         else:
             block_id = 'course'
-        return unicode(course_key.make_usage_key('course', block_id))
+        return six.text_type(course_key.make_usage_key('course', block_id))
 
     @property
     def _assets_url(self):
@@ -270,7 +273,7 @@ class CourseFixture(XBlockContainerFixture):
         Return the locator string for the course handouts
         """
         course_key = CourseKey.from_string(self._course_key)
-        return unicode(course_key.make_usage_key('course_info', 'handouts'))
+        return six.text_type(course_key.make_usage_key('course_info', 'handouts'))
 
     def _create_course(self):
         """

@@ -19,8 +19,7 @@ clean: ## archive and delete most git-ignored files
 	rm $(PRIVATE_FILES)
 
 docs: ## build the developer documentation for this repository
-	rm -rf docs/_build docs/cms docs/common docs/lms docs/openedx
-	cd docs; make html
+	cd docs/guides; make clean html
 
 extract_translations: ## extract localizable strings from sources
 	i18n_tool extract -v

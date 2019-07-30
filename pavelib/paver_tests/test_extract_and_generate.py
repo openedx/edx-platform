@@ -1,6 +1,8 @@
 """
 This test tests that i18n extraction (`paver i18n_extract -v`) works properly.
 """
+from __future__ import absolute_import
+
 import os
 import random
 import re
@@ -13,6 +15,7 @@ from unittest import TestCase
 from i18n import config, dummy, extract, generate
 from polib import pofile
 from pytz import UTC
+from six.moves import range
 
 
 class TestGenerate(TestCase):

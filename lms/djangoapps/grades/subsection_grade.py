@@ -1,26 +1,28 @@
 """
 SubsectionGrade Class
 """
+from __future__ import absolute_import
+
 from abc import ABCMeta
 from collections import OrderedDict
 from logging import getLogger
 
+import six
 from django.utils.html import escape
 from lazy import lazy
 
 from lms.djangoapps.grades.models import BlockRecord, PersistentSubsectionGrade
-from lms.djangoapps.grades.scores import get_score, possibly_scored, compute_percent
+from lms.djangoapps.grades.scores import compute_percent, get_score, possibly_scored
 from xmodule import block_metadata_utils, graders
 from xmodule.graders import AggregatedScore, ShowCorrectness
 
 log = getLogger(__name__)
 
 
-class SubsectionGradeBase(object):
+class SubsectionGradeBase(six.with_metaclass(ABCMeta, object)):
     """
     Abstract base class for Subsection Grades.
     """
-    __metaclass__ = ABCMeta
 
     def __init__(self, subsection):
         self.location = subsection.location
@@ -110,7 +112,7 @@ class ZeroSubsectionGrade(SubsectionGradeBase):
 
     @lazy
     def _aggregate_scores(self):
-        return graders.aggregate_scores(self.problem_scores.values())
+        return graders.aggregate_scores(list(self.problem_scores.values()))
 
     @lazy
     def problem_scores(self):
@@ -137,12 +139,11 @@ class ZeroSubsectionGrade(SubsectionGradeBase):
         return locations
 
 
-class NonZeroSubsectionGrade(SubsectionGradeBase):
+class NonZeroSubsectionGrade(six.with_metaclass(ABCMeta, SubsectionGradeBase)):
     """
     Abstract base class for Subsection Grades with
     possibly NonZero values.
     """
-    __metaclass__ = ABCMeta
 
     def __init__(self, subsection, all_total, graded_total, override=None):
         super(NonZeroSubsectionGrade, self).__init__(subsection)
@@ -264,7 +265,7 @@ class CreateSubsectionGrade(NonZeroSubsectionGrade):
             if problem_score:
                 self.problem_scores[block_key] = problem_score
 
-        all_total, graded_total = graders.aggregate_scores(self.problem_scores.values())
+        all_total, graded_total = graders.aggregate_scores(list(self.problem_scores.values()))
 
         super(CreateSubsectionGrade, self).__init__(subsection, all_total, graded_total)
 
@@ -343,5 +344,5 @@ class CreateSubsectionGrade(NonZeroSubsectionGrade):
         return [
             BlockRecord(location, score.weight, score.raw_possible, score.graded)
             for location, score in
-            self.problem_scores.iteritems()
+            six.iteritems(self.problem_scores)
         ]

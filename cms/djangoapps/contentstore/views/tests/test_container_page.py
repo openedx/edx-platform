@@ -1,9 +1,12 @@
 """
 Unit tests for the container page.
 """
+from __future__ import absolute_import
+
 import datetime
 import re
 
+import six
 from django.http import Http404
 from django.test.client import RequestFactory
 from django.utils import http
@@ -64,8 +67,8 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
                 ur'<a href="/course/{course}{subsection_parameters}" class="{classes}">\s*Lesson 1\s*</a>\s*'
                 ur'<a href="/container/{unit}" class="{classes}">\s*Unit\s*</a>'
             ).format(
-                course=re.escape(unicode(self.course.id)),
-                unit=re.escape(unicode(self.vertical.location)),
+                course=re.escape(six.text_type(self.course.id)),
+                unit=re.escape(six.text_type(self.vertical.location)),
                 classes='navigation-item navigation-link navigation-parent',
                 section_parameters=re.escape(u'?show={}'.format(http.urlquote(self.chapter.location))),
                 subsection_parameters=re.escape(u'?show={}'.format(http.urlquote(self.sequential.location))),
@@ -93,9 +96,9 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
                     ur'<a href="/container/{unit}" class="{classes}">\s*Unit\s*</a>\s*'
                     ur'<a href="/container/{split_test}" class="{classes}">\s*Split Test\s*</a>'
                 ).format(
-                    course=re.escape(unicode(self.course.id)),
-                    unit=re.escape(unicode(self.vertical.location)),
-                    split_test=re.escape(unicode(self.child_container.location)),
+                    course=re.escape(six.text_type(self.course.id)),
+                    unit=re.escape(six.text_type(self.vertical.location)),
+                    split_test=re.escape(six.text_type(self.child_container.location)),
                     classes=u'navigation-item navigation-link navigation-parent',
                     section_parameters=re.escape(u'?show={}'.format(http.urlquote(self.chapter.location))),
                     subsection_parameters=re.escape(u'?show={}'.format(http.urlquote(self.sequential.location))),
@@ -223,6 +226,6 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         # Check 200 response if 'usage_key_string' is correct
         response = views.container_handler(
             request=request,
-            usage_key_string=unicode(self.vertical.location)
+            usage_key_string=six.text_type(self.vertical.location)
         )
         self.assertEqual(response.status_code, 200)

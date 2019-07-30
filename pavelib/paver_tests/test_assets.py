@@ -1,12 +1,14 @@
 """Unit tests for the Paver asset tasks."""
 
+from __future__ import absolute_import
+
 import os
 from unittest import TestCase
 
 import ddt
+import paver.tasks
 from mock import patch
 from paver.easy import call_task, path
-import paver.tasks
 from watchdog.observers import Observer
 
 from pavelib.assets import COLLECTSTATIC_LOG_DIR_ARG, collect_assets

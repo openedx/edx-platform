@@ -1,5 +1,7 @@
 """Unit tests for the Paver server tasks."""
 
+from __future__ import absolute_import
+
 import ddt
 from paver.easy import call_task
 

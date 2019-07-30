@@ -1,9 +1,12 @@
 """
 Common code shared by course and library fixtures.
 """
+from __future__ import absolute_import
+
 import json
 
 import requests
+import six
 from lazy import lazy
 
 from common.test.acceptance.fixtures import STUDIO_BASE_URL
@@ -164,7 +167,7 @@ class XBlockContainerFixture(StudioApiFixture):
         Encode `post_dict` (a dictionary) as UTF-8 encoded JSON.
         """
         return json.dumps({
-            k: v.encode('utf-8') if isinstance(v, basestring) else v
+            k: v.encode('utf-8') if isinstance(v, six.string_types) else v
             for k, v in post_dict.items()
         })
 

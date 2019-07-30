@@ -1283,7 +1283,10 @@ LANGUAGES = [
 LANGUAGE_DICT = dict(LANGUAGES)
 
 # Languages supported for custom course certificate templates
-CERTIFICATE_TEMPLATE_LANGUAGES = {}
+CERTIFICATE_TEMPLATE_LANGUAGES = {
+    'en': 'English',
+    'es': 'Español',
+}
 
 USE_I18N = True
 USE_L10N = True
@@ -2553,7 +2556,23 @@ EDXMKTG_USER_INFO_COOKIE_NAME = 'edx-user-info'
 EDXMKTG_USER_INFO_COOKIE_VERSION = 1
 
 MKTG_URLS = {}
-MKTG_URL_LINK_MAP = {}
+MKTG_URL_LINK_MAP = {
+    'ABOUT': 'about',
+    'CONTACT': 'contact',
+    'FAQ': 'help',
+    'COURSES': 'courses',
+    'ROOT': 'root',
+    'TOS': 'tos',
+    'HONOR': 'honor',  # If your site does not have an honor code, simply delete this line.
+    'PRIVACY': 'privacy',
+    'PRESS': 'press',
+    'BLOG': 'blog',
+    'DONATE': 'donate',
+    'SITEMAP.XML': 'sitemap_xml',
+
+    # Verified Certificates
+    'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
+}
 
 STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION = 'html'
 
@@ -2841,8 +2860,8 @@ FILE_UPLOAD_STORAGE_BUCKET_NAME = 'SET-ME-PLEASE (ex. bucket-name)'
 FILE_UPLOAD_STORAGE_PREFIX = 'submissions_attachments'
 
 ##### ACCOUNT LOCKOUT DEFAULT PARAMETERS #####
-MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 5
-MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 15 * 60
+MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 6
+MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 30 * 60
 
 
 ##### LMS DEADLINE DISPLAY TIME_ZONE #######

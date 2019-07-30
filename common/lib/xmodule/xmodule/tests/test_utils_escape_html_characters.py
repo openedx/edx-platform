@@ -1,6 +1,9 @@
 """Tests for methods defined in util/misc.py"""
-from xmodule.util.misc import escape_html_characters
+from __future__ import absolute_import
+
 from unittest import TestCase
+
+from xmodule.util.misc import escape_html_characters
 
 
 class UtilHtmlEscapeTests(TestCase):

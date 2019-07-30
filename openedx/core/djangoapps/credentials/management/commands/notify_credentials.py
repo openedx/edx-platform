@@ -9,11 +9,12 @@ This management command will manually trigger the receivers we care about.
 (We don't want to trigger all receivers for these signals, since these are busy
 signals.)
 """
-from __future__ import print_function, division
+from __future__ import absolute_import, division, print_function
+
 import logging
 import math
-import time
 import sys
+import time
 
 import dateutil.parser
 from django.contrib.auth.models import User
@@ -21,6 +22,7 @@ from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
+from six.moves import range
 
 from lms.djangoapps.certificates.api import get_recently_modified_certificates
 from lms.djangoapps.grades.api import get_recently_modified_grades
@@ -28,7 +30,6 @@ from openedx.core.djangoapps.credentials.models import NotifyCredentialsConfig
 from openedx.core.djangoapps.credentials.signals import handle_cert_change, send_grade_if_interesting
 from openedx.core.djangoapps.programs.signals import handle_course_cert_changed
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-
 
 log = logging.getLogger(__name__)
 

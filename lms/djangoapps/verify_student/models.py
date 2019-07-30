@@ -8,6 +8,8 @@ of a student over a period of time. Right now, the only models are the abstract
 `SoftwareSecurePhotoVerification`. The hope is to keep as much of the
 photo verification process as generic as possible.
 """
+from __future__ import absolute_import
+
 import functools
 import json
 import logging
@@ -20,11 +22,9 @@ import requests
 import six
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.cache import cache
 from django.core.files.base import ContentFile
-from django.urls import reverse
 from django.db import models
-from django.dispatch import receiver
+from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy
@@ -40,7 +40,6 @@ from lms.djangoapps.verify_student.ssencrypt import (
 )
 from openedx.core.djangoapps.signals.signals import LEARNER_NOW_VERIFIED
 from openedx.core.storage import get_storage
-
 from .utils import earliest_allowed_verification_date
 
 log = logging.getLogger(__name__)
@@ -943,7 +942,10 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         Returns:
             SoftwareSecurePhotoVerification (object) or None
         """
-        recent_verification = SoftwareSecurePhotoVerification.objects.filter(status='approved', user_id=user.id)
+        recent_verification = SoftwareSecurePhotoVerification.objects.filter(status='approved',
+                                                                             user_id=user.id,
+                                                                             expiry_date__isnull=False)
+
         return recent_verification.latest('updated_at') if recent_verification.exists() else None
 
     @classmethod
@@ -1007,8 +1009,6 @@ class VerificationDeadline(TimeStampedModel):
     # overwrite the manual setting of the field.
     deadline_is_explicit = models.BooleanField(default=False)
 
-    ALL_DEADLINES_CACHE_KEY = "verify_student.all_verification_deadlines"
-
     @classmethod
     def set_deadline(cls, course_key, deadline, is_explicit=False):
         """
@@ -1037,29 +1037,27 @@ class VerificationDeadline(TimeStampedModel):
                 record.save()
 
     @classmethod
-    def deadlines_for_courses(cls, course_keys):
+    def deadlines_for_enrollments(cls, enrollments_qs):
         """
-        Retrieve verification deadlines for particular courses.
+        Retrieve verification deadlines for a user's enrolled courses.
 
         Arguments:
-            course_keys (list): List of `CourseKey`s.
+            enrollments_qs: CourseEnrollment queryset. For performance reasons
+                            we want the queryset here instead of passing in a
+                            big list of course_keys in an "SELECT IN" query.
+                            If we have a queryset, Django is smart enough to do
+                            a performant subquery at the MySQL layer instead of
+                            passing down all the course_keys through Python.
 
         Returns:
             dict: Map of course keys to datetimes (verification deadlines)
-
         """
-        all_deadlines = cache.get(cls.ALL_DEADLINES_CACHE_KEY)
-        if all_deadlines is None:
-            all_deadlines = {
-                deadline.course_key: deadline.deadline
-                for deadline in VerificationDeadline.objects.all()
-            }
-            cache.set(cls.ALL_DEADLINES_CACHE_KEY, all_deadlines)
-
+        verification_deadlines = VerificationDeadline.objects.filter(
+            course_key__in=enrollments_qs.values('course_id')
+        )
         return {
-            course_key: all_deadlines[course_key]
-            for course_key in course_keys
-            if course_key in all_deadlines
+            deadline.course_key: deadline.deadline
+            for deadline in verification_deadlines
         }
 
     @classmethod
@@ -1079,10 +1077,3 @@ class VerificationDeadline(TimeStampedModel):
             return deadline.deadline
         except cls.DoesNotExist:
             return None
-
-
-@receiver(models.signals.post_save, sender=VerificationDeadline)
-@receiver(models.signals.post_delete, sender=VerificationDeadline)
-def invalidate_deadline_caches(sender, **kwargs):  # pylint: disable=unused-argument
-    """Invalidate the cached verification deadline information. """
-    cache.delete(VerificationDeadline.ALL_DEADLINES_CACHE_KEY)

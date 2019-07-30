@@ -1,4 +1,6 @@
 """ Commerce API v0 view tests. """
+from __future__ import absolute_import
+
 import itertools
 import json
 from datetime import datetime, timedelta
@@ -7,10 +9,11 @@ from uuid import uuid4
 import ddt
 import mock
 import pytz
+import six
 from django.conf import settings
-from django.urls import reverse, reverse_lazy
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.urls import reverse, reverse_lazy
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -50,7 +53,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         :return: Response
         """
         payload = {
-            "course_id": unicode(course_id or self.course.id)
+            "course_id": six.text_type(course_id or self.course.id)
         }
         if marketing_email_opt_in:
             payload["email_opt_in"] = True
@@ -249,7 +252,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         CourseEnrollment.enroll(self.user, self.course.id)
         CourseEnrollment.unenroll(self.user, self.course.id, True)
         self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course.id))
-        self.assertIsNotNone(get_enrollment(self.user.username, unicode(self.course.id)))
+        self.assertIsNotNone(get_enrollment(self.user.username, six.text_type(self.course.id)))
 
     @mock.patch('lms.djangoapps.commerce.api.v0.views.update_email_opt_in')
     @ddt.data(*itertools.product((False, True), (False, True), (False, True)))

@@ -1,6 +1,8 @@
 """
 API Serializers
 """
+from __future__ import absolute_import
+
 from collections import defaultdict
 
 from rest_framework import serializers

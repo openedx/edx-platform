@@ -11,10 +11,10 @@ import unittest
 
 import pytest
 import six
-from six import text_type, unichr
-from six.moves import range
 from codejail.jail_code import is_configured
 from codejail.safe_exec import SafeExecException
+from six import text_type, unichr
+from six.moves import range
 
 from capa.safe_exec import safe_exec, update_hash
 

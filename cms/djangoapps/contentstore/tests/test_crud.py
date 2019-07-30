@@ -1,3 +1,7 @@
+"""Tests for CRUD Operations"""
+
+from __future__ import absolute_import
+
 from xmodule import templates
 from xmodule.capa_module import ProblemBlock
 from xmodule.course_module import CourseDescriptor

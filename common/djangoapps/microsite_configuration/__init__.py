@@ -8,6 +8,8 @@ with:
 
 from microsite_configuration import settings
 """
+from __future__ import absolute_import
+
 from django.conf import settings as base_settings
 
 from microsite_configuration import microsite

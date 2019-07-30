@@ -1,7 +1,10 @@
 """
 Tests for library tools service.
 """
+from __future__ import absolute_import
+
 from mock import patch
+
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore.tests.factories import LibraryFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase

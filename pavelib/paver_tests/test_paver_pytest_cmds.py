@@ -3,13 +3,15 @@
 Tests for the pytest paver commands themselves.
 Run just this test with: paver test_lib -t pavelib/paver_tests/test_paver_pytest_cmds.py
 """
-import unittest
+from __future__ import absolute_import
+
 import os
+import unittest
+
 import ddt
 
-from pavelib.utils.test.suites import SystemTestSuite, LibTestSuite
 from pavelib.utils.envs import Env
-
+from pavelib.utils.test.suites import LibTestSuite, SystemTestSuite
 
 XDIST_TESTING_IP_ADDRESS_LIST = '0.0.0.1,0.0.0.2,0.0.0.3'
 

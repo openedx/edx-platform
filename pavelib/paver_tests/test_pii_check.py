@@ -1,13 +1,16 @@
 """
 Tests for Paver's PII checker task.
 """
+from __future__ import absolute_import
+
 import io
+
 import six
 from mock import patch
 from paver.easy import call_task
-from pavelib.utils.envs import Env
 
 import pavelib.quality
+from pavelib.utils.envs import Env
 
 
 @patch.object(pavelib.quality.run_pii_check, 'needs')

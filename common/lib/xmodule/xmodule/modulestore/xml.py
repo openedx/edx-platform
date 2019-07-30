@@ -1,3 +1,6 @@
+from __future__ import absolute_import
+
+import glob
 import hashlib
 import itertools
 import json
@@ -5,37 +8,38 @@ import logging
 import os
 import re
 import sys
-import glob
 from collections import defaultdict
+from contextlib import contextmanager
+from importlib import import_module
 from io import BytesIO
 
+import six
 from fs.osfs import OSFS
-from importlib import import_module
-from lxml import etree
-from path import Path as path
-from contextlib import contextmanager
 from lazy import lazy
+from lxml import etree
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryLocator
+from path import Path as path
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
+from xblock.runtime import DictKeyValueStore
 
 from xmodule.error_module import ErrorDescriptor
-from xmodule.errortracker import make_error_tracker, exc_info_to_str
+from xmodule.errortracker import exc_info_to_str, make_error_tracker
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.x_module import (
-    XMLParsingSystem, policy_key,
-    OpaqueKeyReader, AsideKeyGenerator, DEPRECATION_VSCOMPAT_EVENT
-)
+from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT, ModuleStoreEnum, ModuleStoreReadBase
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
-from xmodule.modulestore import ModuleStoreEnum, ModuleStoreReadBase, LIBRARY_ROOT, COURSE_ROOT
 from xmodule.tabs import CourseTabList
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locator import CourseLocator, LibraryLocator, BlockUsageLocator
-
-from xblock.field_data import DictFieldData
-from xblock.runtime import DictKeyValueStore
-from xblock.fields import ScopeIds
+from xmodule.x_module import (
+    DEPRECATION_VSCOMPAT_EVENT,
+    AsideKeyGenerator,
+    OpaqueKeyReader,
+    XMLParsingSystem,
+    policy_key
+)
 
 from .exceptions import ItemNotFoundError
-from .inheritance import compute_inherited_metadata, inheriting_field_data, InheritanceKeyValueStore
-
+from .inheritance import InheritanceKeyValueStore, compute_inherited_metadata, inheriting_field_data
 
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
                                  remove_comments=True, remove_blank_text=True)
@@ -190,14 +194,14 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 msg = "Error loading from xml. %s"
                 log.warning(
                     msg,
-                    unicode(err)[:200],
+                    six.text_type(err)[:200],
                     # Normally, we don't want lots of exception traces in our logs from common
                     # content problems.  But if you're debugging the xml loading code itself,
                     # uncomment the next line.
                     # exc_info=True
                 )
 
-                msg = msg % (unicode(err)[:200])
+                msg = msg % (six.text_type(err)[:200])
 
                 self.error_tracker(msg)
                 err_msg = msg + "\n" + exc_info_to_str(sys.exc_info())
@@ -277,7 +281,7 @@ class CourseLocationManager(OpaqueKeyReader, AsideKeyGenerator):
     def create_definition(self, block_type, slug=None):
         assert block_type is not None
         if slug is None:
-            slug = 'autogen_{}_{}'.format(block_type, self.autogen_ids.next())
+            slug = 'autogen_{}_{}'.format(block_type, next(self.autogen_ids))
         return self.course_id.make_usage_key(block_type, slug)
 
     def get_definition_id(self, usage_id):
@@ -387,7 +391,7 @@ class XMLModuleStore(ModuleStoreReadBase):
             course_descriptor = self.load_course(course_dir, course_ids, errorlog.tracker, target_course_id)
         except Exception as exc:  # pylint: disable=broad-except
             msg = "ERROR: Failed to load courselike '{0}': {1}".format(
-                course_dir.encode("utf-8"), unicode(exc)
+                course_dir.encode("utf-8"), six.text_type(exc)
             )
             log.exception(msg)
             errorlog.tracker(msg)
@@ -651,7 +655,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                             try:
                                 # get and update data field in xblock runtime
                                 module = system.load_item(loc)
-                                for key, value in data_content.iteritems():
+                                for key, value in six.iteritems(data_content):
                                     setattr(module, key, value)
                                 module.save()
                             except ItemNotFoundError:
@@ -694,8 +698,8 @@ class XMLModuleStore(ModuleStoreReadBase):
                         self.modules[course_descriptor.id][module.scope_ids.usage_id] = module
                 except Exception as exc:  # pylint: disable=broad-except
                     logging.exception("Failed to load %s. Skipping... \
-                            Exception: %s", filepath, unicode(exc))
-                    system.error_tracker("ERROR: " + unicode(exc))
+                            Exception: %s", filepath, six.text_type(exc))
+                    system.error_tracker("ERROR: " + six.text_type(exc))
 
     def has_item(self, usage_key):
         """
@@ -769,7 +773,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                 for fields in [settings, content, qualifiers]
             )
 
-        for mod_loc, module in self.modules[course_id].iteritems():
+        for mod_loc, module in six.iteritems(self.modules[course_id]):
             if _block_matches_all(mod_loc, module):
                 items.append(module)
 
@@ -796,7 +800,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         Returns a list of course descriptors.  If there were errors on loading,
         some of these may be ErrorDescriptors instead.
         """
-        return self.courses.values()
+        return list(self.courses.values())
 
     def get_course_summaries(self, **kwargs):
         """

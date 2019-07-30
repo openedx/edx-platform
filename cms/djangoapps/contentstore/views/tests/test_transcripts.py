@@ -1,5 +1,7 @@
 """Tests for items views."""
 
+from __future__ import absolute_import
+
 import copy
 import json
 import tempfile
@@ -8,6 +10,7 @@ from codecs import BOM_UTF8
 from uuid import uuid4
 
 import ddt
+import six
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
@@ -26,7 +29,7 @@ from xmodule.video_module.transcripts_utils import (
     GetTranscriptsFromYouTubeException,
     Transcript,
     get_video_transcript_content,
-    remove_subs_from_store,
+    remove_subs_from_store
 )
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
@@ -84,7 +87,7 @@ class BaseTranscripts(CourseTestCase):
 
         # Add video module
         data = {
-            'parent_locator': unicode(self.course.location),
+            'parent_locator': six.text_type(self.course.location),
             'category': 'video',
             'type': 'video'
         }
@@ -125,7 +128,7 @@ class BaseTranscripts(CourseTestCase):
         Setup non video module for tests.
         """
         data = {
-            'parent_locator': unicode(self.course.location),
+            'parent_locator': six.text_type(self.course.location),
             'category': 'non_video',
             'type': 'non_video'
         }
@@ -172,7 +175,7 @@ class TestUploadTranscripts(BaseTranscripts):
             'client_video_id': u'Test Video',
             'duration': 0,
             'encoded_videos': [],
-            'courses': [unicode(self.course.id)]
+            'courses': [six.text_type(self.course.id)]
         })
 
         # Add clean up handler
@@ -399,7 +402,7 @@ class TestChooseTranscripts(BaseTranscripts):
             'client_video_id': u'Test Video',
             'duration': 0,
             'encoded_videos': [],
-            'courses': [unicode(self.course.id)]
+            'courses': [six.text_type(self.course.id)]
         })
 
     def choose_transcript(self, locator, chosen_html5_id):
@@ -408,7 +411,7 @@ class TestChooseTranscripts(BaseTranscripts):
         """
         payload = {}
         if locator:
-            payload.update({'locator': unicode(locator)})
+            payload.update({'locator': six.text_type(locator)})
 
         if chosen_html5_id:
             payload.update({'html5_id': chosen_html5_id})
@@ -519,7 +522,7 @@ class TestRenameTranscripts(BaseTranscripts):
             'client_video_id': u'Test Video',
             'duration': 0,
             'encoded_videos': [],
-            'courses': [unicode(self.course.id)]
+            'courses': [six.text_type(self.course.id)]
         })
 
     def rename_transcript(self, locator):
@@ -528,7 +531,7 @@ class TestRenameTranscripts(BaseTranscripts):
         """
         payload = {}
         if locator:
-            payload.update({'locator': unicode(locator)})
+            payload.update({'locator': six.text_type(locator)})
 
         rename_transcript_url = reverse('rename_transcripts')
         response = self.client.get(rename_transcript_url, {'data': json.dumps(payload)})
@@ -637,7 +640,7 @@ class TestReplaceTranscripts(BaseTranscripts):
             'client_video_id': u'Test Video',
             'duration': 0,
             'encoded_videos': [],
-            'courses': [unicode(self.course.id)]
+            'courses': [six.text_type(self.course.id)]
         })
 
     def replace_transcript(self, locator, youtube_id):
@@ -646,7 +649,7 @@ class TestReplaceTranscripts(BaseTranscripts):
         """
         payload = {}
         if locator:
-            payload.update({'locator': unicode(locator)})
+            payload.update({'locator': six.text_type(locator)})
 
         if youtube_id:
             payload.update({
@@ -775,7 +778,7 @@ class TestDownloadTranscripts(BaseTranscripts):
         """
         payload = {}
         if locator:
-            payload.update({'locator': unicode(locator)})
+            payload.update({'locator': six.text_type(locator)})
 
         download_transcript_url = reverse('download_transcripts')
         response = self.client.get(download_transcript_url, payload)
@@ -865,7 +868,7 @@ class TestCheckTranscripts(BaseTranscripts):
         self.save_subs_to_store(subs, subs_id)
 
         data = {
-            'locator': unicode(self.video_usage_key),
+            'locator': six.text_type(self.video_usage_key),
             'videos': [{
                 'type': 'html5',
                 'video': subs_id,
@@ -883,9 +886,9 @@ class TestCheckTranscripts(BaseTranscripts):
                 u'is_youtube_mode': False,
                 u'youtube_server': False,
                 u'command': u'found',
-                u'current_item_subs': unicode(subs_id),
+                u'current_item_subs': six.text_type(subs_id),
                 u'youtube_diff': True,
-                u'html5_local': [unicode(subs_id)],
+                u'html5_local': [six.text_type(subs_id)],
                 u'html5_equal': False,
             }
         )
@@ -908,7 +911,7 @@ class TestCheckTranscripts(BaseTranscripts):
         self.save_subs_to_store(subs, 'JMD_ifUUfsU')
         link = reverse('check_transcripts')
         data = {
-            'locator': unicode(self.video_usage_key),
+            'locator': six.text_type(self.video_usage_key),
             'videos': [{
                 'type': 'youtube',
                 'video': 'JMD_ifUUfsU',
@@ -954,7 +957,7 @@ class TestCheckTranscripts(BaseTranscripts):
         self.save_subs_to_store(subs, 'good_id_2')
         link = reverse('check_transcripts')
         data = {
-            'locator': unicode(self.video_usage_key),
+            'locator': six.text_type(self.video_usage_key),
             'videos': [{
                 'type': 'youtube',
                 'video': 'good_id_2',
@@ -1030,7 +1033,7 @@ class TestCheckTranscripts(BaseTranscripts):
     def test_fail_for_non_video_module(self):
         # Not video module: setup
         data = {
-            'parent_locator': unicode(self.course.location),
+            'parent_locator': six.text_type(self.course.location),
             'category': 'not_video',
             'type': 'not_video'
         }
@@ -1059,7 +1062,7 @@ class TestCheckTranscripts(BaseTranscripts):
         self.save_subs_to_store(subs, subs_id)
 
         data = {
-            'locator': unicode(usage_key),
+            'locator': six.text_type(usage_key),
             'videos': [{
                 'type': '',
                 'video': '',
@@ -1097,7 +1100,7 @@ class TestCheckTranscripts(BaseTranscripts):
 
         # Make request to check transcript view
         data = {
-            'locator': unicode(self.video_usage_key),
+            'locator': six.text_type(self.video_usage_key),
             'videos': [{
                 'type': 'html5',
                 'video': "",

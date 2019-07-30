@@ -2,12 +2,14 @@
 Test xblock/validation.py
 """
 
+from __future__ import absolute_import
+
 import unittest
 
 import pytest
-
-from xmodule.validation import StudioValidationMessage, StudioValidation
 from xblock.validation import Validation, ValidationMessage
+
+from xmodule.validation import StudioValidation, StudioValidationMessage
 
 
 class StudioValidationMessageTest(unittest.TestCase):

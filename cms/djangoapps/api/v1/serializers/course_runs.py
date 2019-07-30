@@ -1,6 +1,9 @@
 """ Course run serializers. """
+from __future__ import absolute_import
+
 import logging
-import time
+import time  # pylint: disable=unused-import
+
 import six
 from django.contrib.auth import get_user_model
 from django.db import transaction
@@ -82,7 +85,7 @@ class CourseRunTeamSerializerMixin(serializers.Serializer):
 
 def image_is_jpeg_or_png(value):
     content_type = value.content_type
-    if content_type not in IMAGE_TYPES.keys():
+    if content_type not in list(IMAGE_TYPES.keys()):
         raise serializers.ValidationError(
             u'Only JPEG and PNG image types are supported. {} is not valid'.format(content_type))
 

@@ -1,6 +1,8 @@
 """
 Third-party auth provider configuration API.
 """
+from __future__ import absolute_import
+
 from django.contrib.sites.models import Site
 
 from openedx.core.djangoapps.theming.helpers import get_current_request

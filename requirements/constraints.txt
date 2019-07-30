@@ -14,6 +14,11 @@ futures ; python_version == "2.7"
 python-openid ; python_version == "2.7"
 pysqlite ; python_version == "2.7"
 
+# pip-tools 3.9.0 has a few problems:
+#   https://github.com/jazzband/pip-tools/issues/851
+#   https://github.com/jazzband/pip-tools/issues/852
+pip-tools==3.8.0
+
 # six is at 1.12.0, but transifex-client requires ==1.11.0
 # https://github.com/transifex/transifex-client/issues/252
 six==1.11.0
@@ -50,5 +55,26 @@ scipy<=1.2.1
 # xmodule.tests.test_resource_templates.ResourceTemplatesTests See TE-2391 for details.
 pytest<4.6.0
 
-# Pinning to older version of edx-rbac until ENT-2002 is resolved.
-edx-rbac==0.2.1
+# transifex-client 0.13.6 requires python-slugify 1.2.6, but the latest version is 3.0.2
+python-slugify==1.2.6
+
+# 1.2.3 breaks unittest in
+# lms.djangoapps.course_api.tests.test_views.CourseListSearchViewTest.test_list_all_with_search_term
+# acceptance.tests.lms.test_lms_course_discovery.CourseDiscoveryTest.test_search
+edx-search==1.2.2
+
+# This ruamel.ordereddict will not be supported in python3 but is a dependency of ruamel.yaml
+# install it only on python 2.7
+ruamel.ordereddict; python_version == "2.7"
+
+# 1.16.1 requires djangorestframework>=3.8
+drf-yasg==1.16
+
+# 2.0.0 is a dummy package, because faulthandler has been incorporated into pytest 5.0
+pytest-faulthandler<2.0.0
+
+# faulthandler is part of core python staring with python 3.3
+faulthandler; python_version == "2.7"
+
+# Numpy 1.17.0 only supports python >= 3.5
+numpy<1.17.0

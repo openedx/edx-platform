@@ -550,16 +550,6 @@ def update_library_index(library_id, triggered_time_isoformat):
         LOGGER.debug(u'Search indexing successful for library %s', library_id)
 
 
-@task()
-def push_course_update_task(course_key_string, course_subscription_id, course_display_name):
-    """
-    Sends a push notification for a course update.
-    """
-    # TODO Use edx-notifications library instead (MA-638).
-    from .push_notification import send_push_course_update
-    send_push_course_update(course_key_string, course_subscription_id, course_display_name)
-
-
 class CourseExportTask(UserTask):  # pylint: disable=abstract-method
     """
     Base class for course and library export tasks.

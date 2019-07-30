@@ -2,9 +2,12 @@
 A collection of helper utility functions for working with instructor
 tasks.
 """
+from __future__ import absolute_import
+
 import json
 import logging
 
+import six
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 
@@ -63,7 +66,7 @@ def extract_email_features(email_task):
         'requester': str(email_task.requester),
     }
     features = ['subject', 'html_message', 'id']
-    email_info = {feature: unicode(getattr(email, feature)) for feature in features}
+    email_info = {feature: six.text_type(getattr(email, feature)) for feature in features}
 
     # Pass along email as an object with the information we desire
     email_feature_dict['email'] = email_info

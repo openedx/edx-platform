@@ -4,11 +4,14 @@ Enrollment operations for use by instructor APIs.
 Does not include any access control, be sure to check access before calling.
 """
 
+from __future__ import absolute_import
+
 import json
 import logging
 from datetime import datetime
 
 import pytz
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
@@ -17,38 +20,31 @@ from django.urls import reverse
 from django.utils.translation import override as override_language
 from edx_ace import ace
 from edx_ace.recipient import Recipient
+from eventtracking import tracker
 from six import text_type
+from submissions import api as sub_api  # installed from the edx-submissions repository
+from submissions.models import score_set
 
 from course_modes.models import CourseMode
 from courseware.models import StudentModule
-from eventtracking import tracker
-from lms.djangoapps.grades.api import (
-    constants as grades_constants,
-    events as grades_events,
-    signals as grades_signals,
-    disconnect_submissions_signal_receiver,
-)
+from lms.djangoapps.grades.api import constants as grades_constants
+from lms.djangoapps.grades.api import disconnect_submissions_signal_receiver
+from lms.djangoapps.grades.api import events as grades_events
+from lms.djangoapps.grades.api import signals as grades_signals
 from lms.djangoapps.instructor.message_types import (
     AccountCreationAndEnrollment,
     AddBetaTester,
     AllowedEnroll,
     AllowedUnenroll,
-    EnrollEnrolled,
     EnrolledUnenroll,
-    RemoveBetaTester,
+    EnrollEnrolled,
+    RemoveBetaTester
 )
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.models import UserPreference
-from student.models import (
-    CourseEnrollment,
-    CourseEnrollmentAllowed,
-    anonymous_id_for_user,
-    is_email_retired,
-)
 from openedx.core.djangolib.markup import Text
-from submissions import api as sub_api  # installed from the edx-submissions repository
-from submissions.models import score_set
+from student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user, is_email_retired
 from track.event_transaction_utils import (
     create_new_event_transaction_id,
     get_event_transaction_id,
@@ -270,8 +266,8 @@ def reset_student_attempts(course_id, student, module_state_key, requesting_user
                 with disconnect_submissions_signal_receiver(score_set):
                     clear_student_state(
                         user_id=user_id,
-                        course_id=unicode(course_id),
-                        item_id=unicode(module_state_key),
+                        course_id=six.text_type(course_id),
+                        item_id=six.text_type(module_state_key),
                         requesting_user_id=requesting_user_id
                     )
                 submission_cleared = True
@@ -302,14 +298,14 @@ def reset_student_attempts(course_id, student, module_state_key, requesting_user
         create_new_event_transaction_id()
         set_event_transaction_type(grades_events.STATE_DELETED_EVENT_TYPE)
         tracker.emit(
-            unicode(grades_events.STATE_DELETED_EVENT_TYPE),
+            six.text_type(grades_events.STATE_DELETED_EVENT_TYPE),
             {
-                'user_id': unicode(student.id),
-                'course_id': unicode(course_id),
-                'problem_id': unicode(module_state_key),
-                'instructor_id': unicode(requesting_user.id),
-                'event_transaction_id': unicode(get_event_transaction_id()),
-                'event_transaction_type': unicode(grades_events.STATE_DELETED_EVENT_TYPE),
+                'user_id': six.text_type(student.id),
+                'course_id': six.text_type(course_id),
+                'problem_id': six.text_type(module_state_key),
+                'instructor_id': six.text_type(requesting_user.id),
+                'event_transaction_id': six.text_type(get_event_transaction_id()),
+                'event_transaction_type': six.text_type(grades_events.STATE_DELETED_EVENT_TYPE),
             }
         )
         if not submission_cleared:
@@ -359,8 +355,8 @@ def _fire_score_changed_for_block(
                 raw_possible=max_score,
                 weight=getattr(block, 'weight', None),
                 user_id=student.id,
-                course_id=unicode(course_id),
-                usage_id=unicode(module_state_key),
+                course_id=six.text_type(course_id),
+                usage_id=six.text_type(module_state_key),
                 score_deleted=True,
                 only_if_higher=False,
                 modified=datetime.now().replace(tzinfo=pytz.UTC),

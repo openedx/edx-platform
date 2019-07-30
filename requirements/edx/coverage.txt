@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-coverage==4.4
+coverage==5.0a6
 diff-cover==0.9.8
 inflect==2.1.0            # via jinja2-pluralize
 jinja2-pluralize==0.3.0   # via diff-cover

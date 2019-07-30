@@ -94,7 +94,6 @@ class CookieTests(TestCase):
             'version': settings.EDXMKTG_USER_INFO_COOKIE_VERSION,
             'username': self.user.username,
             'header_urls': self._get_expected_header_urls(),
-            'enrollmentStatusHash': CourseEnrollment.generate_enrollment_status_hash(self.user)
         }
 
         self.assertDictEqual(actual, expected)

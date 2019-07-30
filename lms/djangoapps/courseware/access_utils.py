@@ -3,6 +3,8 @@ Simple utility functions for computing access.
 It allows us to share code between access.py and block transformers.
 """
 
+from __future__ import absolute_import
+
 from datetime import datetime, timedelta
 from logging import getLogger
 
@@ -11,10 +13,7 @@ from django.utils.translation import ugettext as _
 from pytz import UTC
 
 from courseware.access_response import AccessResponse, StartDateError
-from courseware.masquerade import (
-    get_course_masquerade,
-    is_masquerading_as_student
-)
+from courseware.masquerade import get_course_masquerade, is_masquerading_as_student
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_experience import COURSE_PRE_START_ACCESS_FLAG

@@ -5,10 +5,13 @@ Includes:
     StudioConfig: A ConfigurationModel for managing Studio.
 """
 
+from __future__ import absolute_import
+
+import six
 from config_models.models import ConfigurationModel
 from django.db.models import TextField
-
 from opaque_keys.edx.django.models import CourseKeyField
+
 from openedx.core.lib.cache_utils import request_cached
 
 
@@ -80,6 +83,6 @@ class CourseEditLTIFieldsEnabledFlag(ConfigurationModel):
             en = ""
 
         return u"Course '{course_id}': Edit LTI access to Learner information {en}Enabled".format(
-            course_id=unicode(self.course_id),
+            course_id=six.text_type(self.course_id),
             en=en,
         )
