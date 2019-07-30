@@ -3,14 +3,14 @@ Utility functions for zendesk interaction.
 """
 
 from __future__ import absolute_import
+
 import json
 import logging
-from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
 
-from django.conf import settings
 import requests
+from django.conf import settings
 from rest_framework import status
-
+from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
 
 log = logging.getLogger(__name__)
 
@@ -26,7 +26,18 @@ def _get_request_headers():
         'Authorization': u"Bearer {}".format(settings.ZENDESK_OAUTH_ACCESS_TOKEN),
     }
 
-def create_zendesk_ticket(requester_name, requester_email, subject, body, group=None, custom_fields=None, uploads=None, tags=None, additional_info=None):
+
+def create_zendesk_ticket(
+        requester_name,
+        requester_email,
+        subject,
+        body,
+        group=None,
+        custom_fields=None,
+        uploads=None,
+        tags=None,
+        additional_info=None
+):
     """
     Create a Zendesk ticket via API.
     """
@@ -96,15 +107,15 @@ def get_zendesk_group_by_name(name):
     url = urljoin(settings.ZENDESK_URL, '/api/v2/groups.json')
 
     try:
-        response = requests.post(url, headers=_get_request_headers())
+        response = requests.get(url, headers=_get_request_headers())
 
         groups = json.loads(response.text)['groups']
         for group in groups:
             if group['name'] == name:
                 return group['id']
-    except Exception as e:  # pylint: disable=broad-except
+    except Exception:  # pylint: disable=broad-except
         log.exception(_std_error_message('Internal server error', 'None'))
-    
+
         return status.HTTP_500_INTERNAL_SERVER_ERROR
     log.exception(_std_error_message('Tried to get zendesk group which does not exist', name))
     raise Exception
@@ -113,7 +124,7 @@ def get_zendesk_group_by_name(name):
 def post_additional_info_as_comment(ticket_id, additional_info):
     """
     Post the Additional Provided as a comment, So that it is only visible
-    to management and not students. 
+    to management and not students.
     """
     additional_info_string = (
         u"Additional information:\n\n" +
@@ -133,7 +144,7 @@ def post_additional_info_as_comment(ticket_id, additional_info):
 
     try:
         response = requests.put(url, data=json.dumps(data), headers=_get_request_headers())
-        if response.status_code == 200:
+        if response.status_code >= 200 and response.status_code < 300:
             log.debug(u'Successfully created comment for ticket {}'.format(ticket_id))
         else:
             log.error(
