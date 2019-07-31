@@ -486,12 +486,13 @@ def _absolute_url_staticfile(is_secure, name):
         unicode
 
     """
-    # In production, the static file name will be an absolute
-    # URL pointing to a CDN. In this case, we can just return the URL.
-    if six.moves.urllib.parse.urlparse(name).netloc:
-        return name
-
     url_path = staticfiles_storage.url(name)
+
+    # In production, the static files URL will be an absolute
+    # URL pointing to a CDN.  If this happens, we can just
+    # return the URL.
+    if six.moves.urllib.parse.urlparse(url_path).netloc:
+        return url_path
 
     # For local development, the returned URL will be relative,
     # so we need to make it absolute.
