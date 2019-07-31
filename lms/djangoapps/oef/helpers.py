@@ -1,8 +1,8 @@
 import datetime
 from django.conf import settings
 
-from lms.djangoapps.oef.models import OefSurvey, TopicQuestion, OptionLevel, OrganizationOefScore, Instruction
-from lms.djangoapps.oef.messages import NON_APPLICABLE_OEF, PENDING_DRAFT
+from oef.models import OefSurvey, TopicQuestion, OptionLevel, OrganizationOefScore, Instruction
+from oef.messages import NON_APPLICABLE_OEF, PENDING_DRAFT
 
 def get_user_survey_status(user, create_new_survey=True):
     """

@@ -9,7 +9,7 @@ from django.core import serializers
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from lms.djangoapps.onboarding.models import Organization, OrganizationMetricUpdatePrompt, PartnerNetwork
-from lms.djangoapps.oef.models import OrganizationOefUpdatePrompt
+from oef.models import OrganizationOefUpdatePrompt
 
 
 utc = pytz.UTC

@@ -2,7 +2,7 @@ import base64
 
 from django.conf import settings
 from crum import get_current_request
-from util.request import safe_get_host
+from openedx.core.lib.request_utils import safe_get_host
 from common.lib.mandrill_client.client import MandrillClient
 
 

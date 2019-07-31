@@ -10,7 +10,7 @@ from django.dispatch import receiver
 from mailchimp_pipeline.signals.handlers import sync_metric_update_prompt_with_mail_chimp
 from lms.djangoapps.onboarding.models import Organization, OrganizationMetric,\
         OrganizationMetricUpdatePrompt, MetricUpdatePromptRecord
-from lms.djangoapps.oef.models import OrganizationOefUpdatePrompt
+from oef.models import OrganizationOefUpdatePrompt
 from lms.djangoapps.onboarding.constants import  REMIND_ME_LATER_KEY, TAKE_ME_THERE_KEY, NOT_INTERESTED_KEY
 from lms.djangoapps.onboarding.helpers import its_been_year, its_been_year_month, \
     its_been_year_three_month, its_been_year_six_month

@@ -13,8 +13,8 @@ from django.core.urlresolvers import reverse
 from openedx.features.course_card.helpers import get_related_card_id
 from opaque_keys.edx.keys import CourseKey
 
-from common.djangoapps.nodebb.helpers import get_course_related_tabs, get_all_course_progress
-from nodebb.models import DiscussionCommunity, TeamGroupChat
+from helpers import get_course_related_tabs, get_all_course_progress
+from models import DiscussionCommunity, TeamGroupChat
 
 log = logging.getLogger("edx.nodebb")
 

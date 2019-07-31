@@ -3,12 +3,11 @@ import json
 import logging
 
 import analytics
-import dogstats_wrapper as dog_stats_api
 import third_party_auth
 from celery.task import task
 from lms.djangoapps.onboarding.constants import ORG_PARTNERSHIP_END_DATE_PLACEHOLDER
 
-from common.djangoapps.util.request import safe_get_host
+from openedx.core.lib.request_utils import safe_get_host
 from django.conf import settings
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login
@@ -24,9 +23,9 @@ from eventtracking import tracker
 from notification_prefs.views import enable_notifications
 from pytz import UTC
 from requests import HTTPError
-from social.exceptions import AuthException, AuthAlreadyAssociated
+from social_core.exceptions import AuthException, AuthAlreadyAssociated
 from mailchimp_pipeline.signals.handlers import task_send_account_activation_email
-from student.cookies import set_logged_in_cookies
+from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 
 from lms.djangoapps.philu_overrides.helpers import save_user_partner_network_consent
 from openedx.core.djangoapps.user_api.helpers import shim_student_view, require_post_params
@@ -37,13 +36,13 @@ from util.json_request import JsonResponse
 from lms.djangoapps.onboarding.models import RegistrationType, GranteeOptIn
 
 from social_django import utils as social_utils
-from common.djangoapps.student.helpers import AccountValidationError
 from openedx.core.djangoapps.user_authn.views.register import REGISTER_USER, record_registration_attributions
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_api.views import RegistrationView, LoginSessionView
+from openedx.core.djangoapps.user_api.api import RegistrationFormFactory
 from openedx.core.djangoapps.user_api.helpers import FormDescription
 from openedx.features.split_registration.forms import get_registration_extension_form_override
 
@@ -62,6 +61,8 @@ def _do_create_account_custom(form, custom_form=None, is_alquity_user=False):
 
     Note: this function is also used for creating test users.
     """
+    from openedx.core.djangoapps.user_api.errors import AccountValidationError
+
     errors = {}
     errors.update(form.errors)
     if custom_form:
@@ -138,6 +139,8 @@ def _do_create_account_custom_v2(form, custom_form=None, is_alquity_user=False):
 
     Note: this function is also used for creating test users.
     """
+    from common.djangoapps.student.helpers import AccountValidationError
+
     errors = {}
     errors.update(form.errors)
     if custom_form:
@@ -336,8 +339,6 @@ def create_account_with_params_custom(request, params, is_alquity_user):
             enable_notifications(user)
         except Exception:  # pylint: disable=broad-except
             log.exception("Enable discussion notifications failed for user {id}.".format(id=user.id))
-
-    dog_stats_api.increment("common.student.account_created")
 
     # If the user is registering via 3rd party auth, track which provider they use
     third_party_provider = None
@@ -598,8 +599,6 @@ def create_account_with_params_custom_v2(request, params, is_alquity_user):
         except Exception:  # pylint: disable=broad-except
             log.exception("Enable discussion notifications failed for user {id}.".format(id=user.id))
 
-    dog_stats_api.increment("common.student.account_created")
-
     # If the user is registering via 3rd party auth, track which provider they use
     third_party_provider = None
     running_pipeline = None
@@ -738,7 +737,7 @@ def get_params_for_activation_email(request, registration, user):
 # noinspection PyMethodMayBeStatic
 class RegistrationViewCustom(RegistrationView):
     """HTTP custom end-points for creating a new user. """
-    THIRD_PARTY_OVERRIDE_FIELDS = RegistrationView.DEFAULT_FIELDS + ["first_name", "last_name"]
+    THIRD_PARTY_OVERRIDE_FIELDS = RegistrationFormFactory.DEFAULT_FIELDS + ["first_name", "last_name"]
 
     @method_decorator(csrf_exempt)
     def post(self, request):
@@ -890,7 +889,8 @@ class RegistrationViewCustom(RegistrationView):
 
 class RegistrationViewCustomV2(RegistrationView):
     """HTTP custom end-points for creating a new user. """
-    THIRD_PARTY_OVERRIDE_FIELDS = RegistrationView.DEFAULT_FIELDS + ["first_name", "last_name"]
+    DEFAULT_FIELDS = RegistrationFormFactory.DEFAULT_FIELDS
+    THIRD_PARTY_OVERRIDE_FIELDS = DEFAULT_FIELDS + ["first_name", "last_name"]
 
     @method_decorator(ensure_csrf_cookie)
     def get(self, request):

@@ -1,2 +1,1 @@
-# to make sure handlers are execute-able
-import handlers
+default_app_config = 'openedx.features.student_certificates.apps.StudentCertificatesConfig'

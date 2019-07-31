@@ -18,28 +18,24 @@ from django.views.decorators.http import require_http_methods
 from django.utils.translation import ugettext as _
 from edxmako.shortcuts import render_to_response, render_to_string
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from openedx.core.djangoapps.catalog.utils import get_programs_data
+from openedx.core.djangoapps.catalog.utils import get_programs_with_type
 from philu_overrides.helpers import reactivation_email_for_user_custom, get_course_next_classes, \
     get_user_current_enrolled_class, get_next_url_for_login_page_override, is_user_enrolled_in_any_class
 from lms.djangoapps.philu_overrides.constants import ENROLL_SHARE_TITLE_FORMAT, ENROLL_SHARE_DESC_FORMAT
 from lms.djangoapps.courseware.views.views import add_tag_to_enrolled_courses
-from student.views import (
+from openedx.core.djangoapps.user_authn.views.deprecated import (
     signin_user as old_login_view,
     register_user as old_register_view
 )
 from third_party_auth.decorators import xframe_allow_whitelisted
 from util.cache import cache_if_anonymous
-from util.enterprise_helpers import set_enterprise_branding_filter_param
 from xmodule.modulestore.django import modulestore
-from common.djangoapps.student.views import get_course_related_keys
+from lms.djangoapps.philu_overrides.courseware.views.views import get_course_related_keys
 from lms.djangoapps.courseware.access import has_access, _can_enroll_courselike
 from lms.djangoapps.courseware.courses import get_courses, sort_by_start_date, get_course_by_id, sort_by_announcement
-from lms.djangoapps.courseware.views.views import get_last_accessed_courseware
 from lms.djangoapps.onboarding.helpers import reorder_registration_form_fields, get_alquity_community_url
 from lms.djangoapps.philu_api.helpers import get_course_custom_settings, get_social_sharing_urls, \
     user_org_survey_completion_status
-from lms.djangoapps.student_account.views import _local_server_get, _get_form_descriptions, _external_auth_intercept, \
-    _third_party_auth_context
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 from third_party_auth import pipeline, provider
@@ -51,7 +47,7 @@ from ratelimitbackend.exceptions import RateLimitException
 from django.contrib.auth import authenticate, login
 import analytics
 from eventtracking import tracker
-from student.cookies import set_logged_in_cookies
+from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 
 AUDIT_LOG = logging.getLogger("audit")
 log = logging.getLogger(__name__)
@@ -83,7 +79,12 @@ def login_and_registration_form(request, initial_mode="login", org_name=None, ad
 
     """
     # Determine the URL to redirect to following login/registration/third_party_auth
-    _local_server_get('/user_api/v1/account/registration/', request.session)
+    from openedx.features.student_account.views import local_server_get, _get_form_descriptions, \
+        _third_party_auth_context
+    from openedx.core.djangoapps.user_authn.views.login_form import _external_auth_intercept
+
+
+    local_server_get('/user_api/v1/account/registration/', request.session)
     redirect_to = get_next_url_for_login_page_override(request)
     # If we're already logged in, redirect to the dashboard
     if request.user.is_authenticated():
@@ -105,7 +106,6 @@ def login_and_registration_form(request, initial_mode="login", org_name=None, ad
         except (KeyError, ValueError, IndexError):
             pass
 
-    set_enterprise_branding_filter_param(request=request, provider_id=third_party_auth_hint)
 
     # If this is a themed site, revert to the old login/registration pages.
     # We need to do this for now to support existing themes.
@@ -123,7 +123,7 @@ def login_and_registration_form(request, initial_mode="login", org_name=None, ad
     if ext_auth_response is not None:
         return ext_auth_response
 
-    from common.djangoapps.util.philu_utils import extract_utm_params
+    from util.philu_utils import extract_utm_params
 
     utm_params = extract_utm_params(request.GET)
 
@@ -184,6 +184,8 @@ def courses_custom(request):
     """
     Render "find courses" page.  The course selection work is done in courseware.courses.
     """
+    from lms.djangoapps.courseware.views.views import get_last_accessed_courseware
+
     courses_list = []
     programs_list = []
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
@@ -203,7 +205,7 @@ def courses_custom(request):
     # for edx-pattern-library is added.
     if configuration_helpers.get_value("DISPLAY_PROGRAMS_ON_MARKETING_PAGES",
                                        settings.FEATURES.get("DISPLAY_PROGRAMS_ON_MARKETING_PAGES")):
-        programs_list = get_programs_data(request.user)
+        programs_list = get_programs_with_type(request.user)
 
     if request.user.is_authenticated():
         add_tag_to_enrolled_courses(request.user, courses_list)

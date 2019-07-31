@@ -94,8 +94,6 @@ from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.db import outer_atomic
 from util.json_request import JsonResponse
 from util.password_policy_validators import normalize_password, validate_password
-from courseware.model_data import FieldDataCache
-from lms.djangoapps.courseware.module_render import get_module_for_descriptor
 
 log = logging.getLogger("edx.student")
 
@@ -187,30 +185,6 @@ def index(request, extra_context=None, user=AnonymousUser()):
     context['journal_info'] = get_journals_context(request)
 
     return render_to_response('index.html', context)
-
-
-def get_course_related_keys(request, course):
-    """
-        Get course first chapter & first section keys
-    """
-    first_chapter_url = ""
-    first_section = ""
-
-    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-        course.id, request.user, course, depth=2,
-    )
-    course_module = get_module_for_descriptor(
-        request.user, request, course, field_data_cache, course.id, course=course
-    )
-
-    chapters = course_module.get_display_items()
-    if chapters:
-        first_chapter = chapters[0]
-        first_chapter_url = first_chapter.url_name
-        subsections = first_chapter.get_display_items()
-        first_section = subsections[0].url_name if subsections else ""
-
-    return first_chapter_url, first_section
 
 
 def compose_and_send_activation_email(user, profile, user_registration=None):
@@ -360,6 +334,9 @@ def change_enrollment(request, check_access=True):
         Response
 
     """
+
+    from lms.djangoapps.philu_overrides.courseware.views.views import get_course_related_keys
+
     # Get the user
     user = request.user
 

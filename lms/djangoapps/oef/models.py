@@ -6,6 +6,9 @@ from student.models import User
 
 
 class OefSurvey(TimeStampedModel):
+    class Meta:
+        app_label = 'oef'
+
     title = models.CharField(max_length=256)
     is_enabled = models.BooleanField(default=False)
     description = models.TextField()
@@ -15,6 +18,9 @@ class OefSurvey(TimeStampedModel):
 
 
 class OptionLevel(TimeStampedModel):
+    class Meta:
+        app_label = 'oef'
+
     label = models.CharField(max_length=50)
     value = models.FloatField()
     caption = models.CharField(max_length=10, null=True, blank=True)
@@ -24,6 +30,9 @@ class OptionLevel(TimeStampedModel):
 
 
 class TopicQuestion(TimeStampedModel):
+    class Meta:
+        app_label = 'oef'
+
     survey = models.ForeignKey(OefSurvey, related_name='topics')
     title = models.TextField()
     score_name = models.CharField(max_length=50)
@@ -35,6 +44,9 @@ class TopicQuestion(TimeStampedModel):
 
 
 class Option(TimeStampedModel):
+    class Meta:
+        app_label = 'oef'
+
     topic = models.ForeignKey(TopicQuestion, related_name='options')
     level = models.ForeignKey(OptionLevel)
     text = models.TextField()
@@ -45,6 +57,9 @@ class Option(TimeStampedModel):
 
 
 class OrganizationOefScore(TimeStampedModel):
+    class Meta:
+        app_label = 'oef'
+
     org = models.ForeignKey(Organization, related_name="organization_oef_scores")
     user = models.ForeignKey(User, related_name="organization_oef_scores")
     start_date = models.DateField()
@@ -63,6 +78,9 @@ class OrganizationOefScore(TimeStampedModel):
 
 
 class OrganizationOefUpdatePrompt(models.Model):
+    class Meta:
+        app_label = 'oef'
+
     org = models.ForeignKey(Organization, related_name="organization_oef_update_prompts")
     responsible_user = models.ForeignKey(User, related_name="organization_oef_update_prompts")
     latest_finish_date = models.DateTimeField()
@@ -70,6 +88,9 @@ class OrganizationOefUpdatePrompt(models.Model):
 
 
 class Instruction(TimeStampedModel):
+    class Meta:
+        app_label = 'oef'
+
     question_index = models.IntegerField()
     question = models.TextField()
     answer = models.TextField()

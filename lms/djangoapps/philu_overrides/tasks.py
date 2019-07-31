@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from celery.task import task
-from common.djangoapps.student.models import (
+from student.models import (
                                 CourseEnrollmentAllowed,
                                 CourseEnrollment,
                                 ManualEnrollmentAudit,
