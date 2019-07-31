@@ -1,5 +1,5 @@
-from social.backends.facebook import FacebookOAuth2
-from social.backends.google import GoogleOAuth2
+from social_core.backends.facebook import FacebookOAuth2
+from social_core.backends.google import GoogleOAuth2
 
 
 class CustomFacebookOAuth(FacebookOAuth2):

@@ -11,7 +11,6 @@ from django.utils.translation import ugettext as _
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from common.lib.mandrill_client.client import MandrillClient
 from lms.djangoapps.certificates.api import get_certificate_url
-from lms.djangoapps.courseware.views.views import is_course_passed, _track_successful_certificate_generation
 from openedx.core.djangoapps.timed_notification.core import get_course_link
 log = logging.getLogger("edx.courseware")
 
@@ -39,6 +38,7 @@ def generate_user_cert(request, course_id):
         HttpResponse: 200 on success, 400 if a new certificate cannot be generated.
 
     """
+    from lms.djangoapps.courseware.views.views import is_course_passed, _track_successful_certificate_generation
 
     if not request.user.is_authenticated():
         log.info(u"Anon user trying to generate certificate for %s", course_id)
@@ -94,3 +94,30 @@ def generate_user_cert(request, course_id):
         certs_api.generate_user_certificates(student, course.id, course=course, generation_mode='self')
         _track_successful_certificate_generation(student.id, course.id)
         return HttpResponse()
+
+
+def get_course_related_keys(request, course):
+    """
+        Get course first chapter & first section keys
+    """
+    from courseware.model_data import FieldDataCache
+    from lms.djangoapps.courseware.module_render import get_module_for_descriptor
+
+    first_chapter_url = ""
+    first_section = ""
+
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        course.id, request.user, course, depth=2,
+    )
+    course_module = get_module_for_descriptor(
+        request.user, request, course, field_data_cache, course.id, course=course
+    )
+
+    chapters = course_module.get_display_items()
+    if chapters:
+        first_chapter = chapters[0]
+        first_chapter_url = first_chapter.url_name
+        subsections = first_chapter.get_display_items()
+        first_section = subsections[0].url_name if subsections else ""
+
+    return first_chapter_url, first_section

@@ -15,7 +15,7 @@ from django.utils.translation import ugettext_noop
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from lms.djangoapps.onboarding.constants import ORG_PARTNERSHIP_END_DATE_PLACEHOLDER
-from rest_framework.compat import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from lms.djangoapps.onboarding.email_utils import send_admin_activation_email
 from lms.djangoapps.onboarding.helpers import COUNTRIES, LANGUAGES, get_country_iso, get_sorted_choices_from_dict, \
