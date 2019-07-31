@@ -150,6 +150,7 @@ from .tools import (
 
 from ..permissions import (
     ALLOW_STUDENT_TO_BYPASS_ENTRANCE_EXAM,
+    ASSIGN_TO_COHORTS,
     VIEW_ISSUED_CERTIFICATES,
 )
 
@@ -1416,7 +1417,7 @@ def _cohorts_csv_validator(file_storage, file_to_validate):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_POST
-@require_level('staff')
+@require_course_permission(ASSIGN_TO_COHORTS)
 @common_exceptions_400
 def add_users_to_cohorts(request, course_id):
     """
