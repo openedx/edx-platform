@@ -438,6 +438,11 @@
       margin: ($baseline/2);
       padding: ($baseline/2);
       overflow: hidden;
+
+      code::before,
+      code::after {
+        @include display-left-to-right();
+      }
     }
 
     // STATE: container/component with children - abbreviated preview
