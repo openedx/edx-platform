@@ -5,6 +5,7 @@ from django.conf.urls import url
 
 from lms.djangoapps.program_enrollments.api.v1.constants import PROGRAM_UUID_PATTERN
 from lms.djangoapps.program_enrollments.api.v1.views import (
+    EnrollmentDataResetView,
     ProgramEnrollmentsView,
     ProgramCourseEnrollmentsView,
     ProgramCourseGradesView,
@@ -54,4 +55,9 @@ urlpatterns = [
         ProgramCourseEnrollmentOverviewView.as_view(),
         name="program_course_enrollments_overview"
     ),
+    url(
+        r'^integration-reset',
+        EnrollmentDataResetView.as_view(),
+        name="reset_enrollment_data",
+    )
 ]

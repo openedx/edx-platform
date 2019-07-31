@@ -1,8 +1,9 @@
 """"Management command to add program information to the cache."""
 from __future__ import absolute_import
-from collections import defaultdict
+
 import logging
 import sys
+from collections import defaultdict
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
@@ -14,15 +15,16 @@ from openedx.core.djangoapps.catalog.cache import (
     COURSE_PROGRAMS_CACHE_KEY_TPL,
     PATHWAY_CACHE_KEY_TPL,
     PROGRAM_CACHE_KEY_TPL,
+    PROGRAMS_BY_ORGANIZATION_CACHE_KEY_TPL,
     PROGRAMS_BY_TYPE_CACHE_KEY_TPL,
     SITE_PATHWAY_IDS_CACHE_KEY_TPL,
-    SITE_PROGRAM_UUIDS_CACHE_KEY_TPL,
+    SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 )
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.catalog.utils import (
-    create_catalog_api_client,
     course_run_keys_for_program,
-    normalize_program_type,
+    create_catalog_api_client,
+    normalize_program_type
 )
 
 logger = logging.getLogger(__name__)
@@ -59,6 +61,7 @@ class Command(BaseCommand):
         pathways = {}
         courses = {}
         programs_by_type = {}
+        organizations = {}
         for site in Site.objects.all():
             site_config = getattr(site, 'configuration', None)
             if site_config is None or not site_config.get_value('COURSE_CATALOG_API_URL'):
@@ -86,6 +89,7 @@ class Command(BaseCommand):
             pathways.update(new_pathways)
             courses.update(self.get_courses(new_programs))
             programs_by_type.update(self.get_programs_by_type(site, new_programs))
+            organizations.update(self.get_programs_by_organization(new_programs))
 
             logger.info(u'Caching UUIDs for {total} programs for site {site_name}.'.format(
                 total=len(uuids),
@@ -111,6 +115,9 @@ class Command(BaseCommand):
 
         logger.info(text_type('Caching program UUIDs by {} program types.'.format(len(programs_by_type))))
         cache.set_many(programs_by_type, None)
+
+        logger.info(u'Caching programs uuids for {} organizations'.format(len(organizations)))
+        cache.set_many(organizations, None)
 
         if failure:
             sys.exit(1)
@@ -236,3 +243,14 @@ class Command(BaseCommand):
             cache_key = PROGRAMS_BY_TYPE_CACHE_KEY_TPL.format(site_id=site.id, program_type=program_type)
             programs_by_type[cache_key].append(program['uuid'])
         return programs_by_type
+
+    def get_programs_by_organization(self, programs):
+        """
+        Returns a dictionary mapping organization keys to lists of program uuids authored by that org
+        """
+        organizations = defaultdict(list)
+        for program in programs.values():
+            for org in program['authoring_organizations']:
+                org_cache_key = PROGRAMS_BY_ORGANIZATION_CACHE_KEY_TPL.format(org_key=org['key'])
+                organizations[org_cache_key].append(program['uuid'])
+        return organizations

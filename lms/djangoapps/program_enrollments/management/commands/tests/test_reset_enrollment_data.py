@@ -5,12 +5,12 @@ from __future__ import absolute_import
 
 import sys
 from contextlib import contextmanager
-from six import StringIO
 from uuid import uuid4
 
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
+from six import StringIO
 
 from lms.djangoapps.program_enrollments.management.commands import reset_enrollment_data
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
