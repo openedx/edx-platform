@@ -148,7 +148,11 @@ from .tools import (
     strip_if_string
 )
 
-from ..permissions import VIEW_ISSUED_CERTIFICATES
+from ..permissions import (
+    ALLOW_STUDENT_TO_BYPASS_ENTRANCE_EXAM,
+    VIEW_ISSUED_CERTIFICATES,
+)
+
 
 log = logging.getLogger(__name__)
 
@@ -3030,7 +3034,7 @@ def enable_certificate_generation(request, course_id=None):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
+@require_course_permission(ALLOW_STUDENT_TO_BYPASS_ENTRANCE_EXAM)
 @require_POST
 def mark_student_can_skip_entrance_exam(request, course_id):
     """
