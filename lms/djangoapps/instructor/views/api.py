@@ -148,6 +148,8 @@ from .tools import (
     strip_if_string
 )
 
+from ..permissions import VIEW_ISSUED_CERTIFICATES
+
 log = logging.getLogger(__name__)
 
 TASK_SUBMISSION_OK = 'created'
@@ -1232,7 +1234,7 @@ def re_validate_invoice(obj_invoice):
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
+@require_course_permission(VIEW_ISSUED_CERTIFICATES)
 def get_issued_certificates(request, course_id):
     """
     Responds with JSON if CSV is not required. contains a list of issued certificates.
