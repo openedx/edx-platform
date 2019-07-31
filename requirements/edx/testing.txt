@@ -31,8 +31,12 @@ asn1crypto==0.24.0
 astroid==1.5.3            # via pylint, pylint-celery
 atomicwrites==1.3.0       # via pytest
 attrs==17.4.0
+aws-xray-sdk==0.95        # via moto
 babel==1.3
 backports.functools-lru-cache==1.5
+backports.ssl-match-hostname==3.7.0.1  # via docker
+backports.tempfile==1.0   # via moto
+backports.weakref==1.0.post1  # via backports.tempfile
 beautifulsoup4==4.8.0
 before-after==1.0.1
 billiard==3.3.0.23
@@ -55,6 +59,7 @@ code-annotations==0.3.2
 colorama==0.4.1           # via radon
 configparser==3.7.4       # via entrypoints, flake8, importlib-metadata, pylint
 contextlib2==0.5.5        # via importlib-metadata
+cookies==2.2.1            # via moto
 coreapi==2.3.3
 coreschema==0.0.4
 coverage==5.0a6
@@ -66,7 +71,6 @@ cssutils==1.0.2
 ddt==1.2.1
 decorator==4.4.0
 defusedxml==0.5.0
-dicttoxml==1.7.4          # via moto
 diff-cover==0.9.8
 distlib==0.2.9.post0      # via caniusepython3
 django-appconf==1.0.3
@@ -108,6 +112,7 @@ djangorestframework-jwt==1.11.0
 git+https://github.com/edx/django-rest-framework-oauth.git@0a43e8525f1e3048efe4bc70c03de308a277197c#egg=djangorestframework-oauth==1.1.1
 djangorestframework-xml==1.4.0
 djangorestframework==3.7.7
+docker==4.0.2             # via moto
 docopt==0.6.2
 docutils==0.15.2
 drf-yasg==1.16
@@ -151,7 +156,6 @@ feedparser==5.1.3
 filelock==3.0.12          # via tox
 flake8-polyfill==1.0.2    # via radon
 flake8==3.7.8             # via flake8-polyfill
-flask==1.1.1              # via moto
 freezegun==0.3.12
 fs-s3fs==0.1.8
 fs==2.0.18
@@ -173,13 +177,13 @@ inflection==0.3.1
 ipaddress==1.0.22
 isodate==0.6.0
 isort==4.3.21
-itsdangerous==1.1.0       # via flask
 itypes==1.1.0
 jinja2-pluralize==0.3.0
 jinja2==2.10.1
 jmespath==0.9.4
-jsondiff==1.2.0
+jsondiff==1.1.1
 jsonfield==2.0.2
+jsonpickle==1.2           # via aws-xray-sdk
 kombu==3.0.37
 laboratory==1.0.2
 lazy-object-proxy==1.4.1  # via astroid
@@ -201,7 +205,7 @@ mock==1.0.1
 git+https://github.com/edx/MongoDBProxy.git@25b99097615bda06bd7cdfe5669ed80dc2a7fed0#egg=MongoDBProxy==0.1.0
 mongoengine==0.10.0
 more-itertools==5.0.0     # via pytest
-moto==0.3.1
+moto==1.3.1
 mpmath==1.1.0
 mysqlclient==1.4.2.post1
 networkx==1.7
@@ -227,6 +231,7 @@ polib==1.1.0
 psutil==1.2.1
 py2neo==3.1.2
 py==1.8.0                 # via pytest, tox
+pyaml==19.4.1             # via moto
 pycodestyle==2.5.0
 pycontracts==1.7.1
 pycountry==19.7.15
@@ -321,7 +326,8 @@ wcwidth==0.1.7            # via pytest
 web-fragments==0.3.0
 webencodings==0.5.1
 webob==1.8.5
-werkzeug==0.15.5          # via flask
+websocket-client==0.56.0  # via docker
+werkzeug==0.15.5          # via moto
 wrapt==1.10.5
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.4#egg=xblock-drag-and-drop-v2==2.2.4
 git+https://github.com/open-craft/xblock-poll@add89e14558c30f3c8dc7431e5cd6536fff6d941#egg=xblock-poll==1.5.1
