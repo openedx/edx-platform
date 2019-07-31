@@ -50,11 +50,15 @@
                  },
 
                  snapshot: function() {
-                     var video, canvas;
+                     var video, canvas, aspectRatio;
 
                      if (this.stream) {
                          video = this.getVideo();
                          canvas = this.getCanvas();
+                         // keep canvas aspect ratio same as video while drawing image.
+                         aspectRatio = canvas.width / video.videoWidth;
+                         canvas.width = video.videoWidth * aspectRatio;
+                         canvas.height = video.videoHeight * aspectRatio;
                          canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
                          video.pause();
                          return true;
