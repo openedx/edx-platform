@@ -44,6 +44,7 @@ from lms.djangoapps.certificates.models import (
     CertificateStatuses,
     GeneratedCertificate
 )
+from lms.djangoapps.certificates.permissions import PREVIEW_CERTIFICATES
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course, display_date_for_certificate
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
@@ -342,7 +343,7 @@ def _get_user_certificate(request, user, course_key, course, preview_mode=None):
     user_certificate = None
     if preview_mode:
         # certificate is being previewed from studio
-        if has_access(request.user, 'instructor', course) or has_access(request.user, 'staff', course):
+        if request.user.has_perm(PREVIEW_CERTIFICATES, course):
             if course.certificate_available_date and not course.self_paced:
                 modified_date = course.certificate_available_date
             else:
