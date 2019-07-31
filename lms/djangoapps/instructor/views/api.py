@@ -151,6 +151,7 @@ from .tools import (
 from ..permissions import (
     ALLOW_STUDENT_TO_BYPASS_ENTRANCE_EXAM,
     ASSIGN_TO_COHORTS,
+    EDIT_COURSE_ACCESS,
     VIEW_ISSUED_CERTIFICATES,
 )
 
@@ -906,7 +907,7 @@ def bulk_beta_modify_access(request, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('instructor')
+@require_course_permission(EDIT_COURSE_ACCESS)
 @require_post_params(
     unique_student_identifier="email or username of user to change access",
     rolename="'instructor', 'staff', 'beta', or 'ccx_coach'",
