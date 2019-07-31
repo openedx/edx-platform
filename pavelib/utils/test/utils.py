@@ -186,6 +186,6 @@ def fetch_coverage_test_selection_data(options):
 def upload_coverage_to_s3():
     upload_to_s3(
         COVERAGE_CACHE_BASELINE,
-        '{}/{}'.format(COVERAGE_CACHE_BASEPATH, 'reports/{}.coverage'.format(os.environ.get('TEST_SUITE', ''))),
+        'reports/{}.coverage'.format(os.environ.get('TEST_SUITE', '')),
         COVERAGE_CACHE_BUCKET
     )
