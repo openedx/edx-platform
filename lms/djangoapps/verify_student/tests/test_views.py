@@ -1489,7 +1489,7 @@ class TestSubmitPhotosForVerification(TestCase):
         "DAYS_GOOD_FOR": 10,
     })
     @httpretty.activate
-    @moto.mock_s3
+    @moto.mock_s3_deprecated
     def test_submit_photos_for_reverification(self):
         # Create the S3 bucket for photo upload
         conn = boto.connect_s3()
