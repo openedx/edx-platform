@@ -83,7 +83,11 @@ class PytestWorkerManager():
         ip_addresses = []
         all_running = False
         for attempt in range(0, self.WORKER_BOOTUP_TIMEOUT_MINUTES * 12):
-            list_workers_response = self.ec2.describe_instances(InstanceIds=not_running)
+            try:
+                list_workers_response = self.ec2.describe_instances(InstanceIds=not_running)
+            except:
+                logger.info("Exception hit trying to describe instances.")
+                continue
             del not_running[:]
             for reservations in list_workers_response['Reservations']:
                 for instance_info in reservations['Instances']:
