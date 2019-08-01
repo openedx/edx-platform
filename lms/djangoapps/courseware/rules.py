@@ -4,14 +4,14 @@ django-rules and Bridgekeeper rules for courseware related features
 from __future__ import absolute_import
 
 from bridgekeeper.rules import Rule
-from course_modes.models import CourseMode
 from django.db.models import Q
 from opaque_keys.edx.keys import CourseKey
+
+import rules
+from course_modes.models import CourseMode
 from student.models import CourseEnrollment
 
 from .access import has_access
-
-import rules
 
 
 @rules.predicate
