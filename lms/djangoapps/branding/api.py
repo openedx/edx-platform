@@ -25,6 +25,7 @@ from django.utils.translation import ugettext as _
 from branding.models import BrandingApiConfig
 from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
 
 
 log = logging.getLogger("edx.footer")
@@ -223,18 +224,21 @@ def _build_support_form_url(full_path=False):
 
 def _build_help_center_url(language):
     """
-    Return the help-center URL based on the
-    language selected on the homepage.
+    Return the help-center URL based on the language selected on the homepage.
+
     :param language: selected language
     :return: help-center URL
     """
     support_url = settings.SUPPORT_SITE_LINK
-    enabled_languages = {
-        'en': 'hc/en-us',
-        'es-419': 'hc/es-419'
-    }
-    if language in enabled_languages:
-        support_url += '/' + enabled_languages[language]
+    # Changing the site url only for the Edx.org and not for OpenEdx.
+    if support_url and 'support.edx.org' in support_url:
+        enabled_languages = {
+            'en': 'hc/en-us',
+            'es-419': 'hc/es-419'
+        }
+        if language in enabled_languages:
+            support_url = urljoin(support_url, enabled_languages[language])
+
     return support_url
 
 
