@@ -62,14 +62,48 @@ def course_detail(request, username, course_key):
     )
 
 
-def _filter_courses_by_role(course_queryset, user, access_type):
+def _filter_by_role(course_queryset, user, roles):
     """
-    Return a course queryset filtered by the access type for which the user has access.
+    Filters a course queryset by the roles for which the user has access.
     """
+    # Global staff have access to all courses. Filter course roles for non-global staff only.
+    if not user.is_staff:
+        if roles:
+            for role in roles:
+                # Filter the courses again to return only the courses for which the user has each specified role.
+                course_queryset = LazySequence(
+                    (
+                        course for course in course_queryset
+                        if has_access(user, role, course.id)
+                    ),
+                    est_len=len(course_queryset)
+                )
+    return course_queryset
+
+
+def _filter_by_search(course_queryset, search_term):
+    """
+    Filters a course queryset by the specified search term.
+    """
+    if not settings.FEATURES['ENABLE_COURSEWARE_SEARCH'] or not search_term:
+        return course_queryset
+
+    # Return all the results, 10K is the maximum allowed value for ElasticSearch.
+    # We should use 0 after upgrading to 1.1+:
+    #   - https://github.com/elastic/elasticsearch/commit/8b0a863d427b4ebcbcfb1dcd69c996c52e7ae05e
+    results_size_infinity = 10000
+
+    search_courses = search.api.course_discovery_search(
+        search_term,
+        size=results_size_infinity,
+    )
+
+    search_courses_ids = {course['data']['id'] for course in search_courses['results']}
+
     return LazySequence(
         (
             course for course in course_queryset
-            if has_access(user, access_type, course.id)
+            if six.text_type(course.id) in search_courses_ids
         ),
         est_len=len(course_queryset)
     )
@@ -111,33 +145,6 @@ def list_courses(request, username, org=None, roles=None, filter_=None, search_t
     """
     user = get_effective_user(request.user, username)
     course_qs = get_courses(user, org=org, filter_=filter_)
-
-    # Global staff have access to all courses. Filter course roles for non-global staff only.
-    if not user.is_staff:
-        if roles:
-            for role in roles:
-                # Filter the courses again to return only the courses for which the user has the specified roles.
-                course_qs = _filter_courses_by_role(course_qs, user, role)
-
-    if not settings.FEATURES['ENABLE_COURSEWARE_SEARCH'] or not search_term:
-        return course_qs
-
-    # Return all the results, 10K is the maximum allowed value for ElasticSearch.
-    # We should use 0 after upgrading to 1.1+:
-    #   - https://github.com/elastic/elasticsearch/commit/8b0a863d427b4ebcbcfb1dcd69c996c52e7ae05e
-    results_size_infinity = 10000
-
-    search_courses = search.api.course_discovery_search(
-        search_term,
-        size=results_size_infinity,
-    )
-
-    search_courses_ids = {course['data']['id'] for course in search_courses['results']}
-
-    return LazySequence(
-        (
-            course for course in course_qs
-            if six.text_type(course.id) in search_courses_ids
-        ),
-        est_len=len(course_qs)
-    )
+    course_qs = _filter_by_role(course_qs, user, roles)
+    course_qs = _filter_by_search(course_qs, search_term)
+    return course_qs
