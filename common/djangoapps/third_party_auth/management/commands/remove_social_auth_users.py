@@ -1,11 +1,12 @@
 """
 Management command to remove social auth users.  Intended for use in masters
-integration sandboxes to allow partners to repeat tests.
+integration sandboxes to allow partners reset users and enrollment data.
 """
 from __future__ import absolute_import
 
 import logging
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
@@ -22,7 +23,7 @@ class Command(BaseCommand):
     users for a given IDP.
 
     Usage:
-        manage.py blah
+        manage.py remove_social_auth_users gtx
     """
     confirmation_prompt = "Type 'confirm' to continue with deletion\n"
 
@@ -38,10 +39,13 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         slug = options['IDP']
 
+        if not settings.FEATURES.get('ENABLE_ENROLLMENT_RESET'):
+            raise CommandError('ENABLE_ENROLLMENT_RESET feature not enabled on this enviroment')
+
         try:
             SAMLProviderConfig.objects.current_set().get(slug=slug)
         except SAMLProviderConfig.DoesNotExist:
-            raise CommandError('No SAML provider found for slug {}'.format(slug))
+            raise CommandError(u'No SAML provider found for slug {}'.format(slug))
 
         users = User.objects.filter(social_auth__provider=slug)
         user_count = len(users)
