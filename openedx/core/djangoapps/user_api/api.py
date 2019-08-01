@@ -5,8 +5,8 @@ from __future__ import absolute_import
 
 import copy
 
-import crum
 import json
+import crum
 import six
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
