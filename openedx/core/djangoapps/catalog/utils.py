@@ -543,3 +543,56 @@ def get_course_run_details(course_run_key, fields):
         course_run_details = get_edx_api_data(catalog_integration, 'course_runs', api, resource_id=course_run_key,
                                               cache_key=cache_key, many=False, traverse_pagination=False, fields=fields)
     return course_run_details
+
+
+def course_run_keys_for_program(parent_program):
+    """
+    All of the course run keys associated with this ``parent_program``, either
+    via its ``curriculum`` field (looking at both the curriculum's courses
+    and child programs), or through the many-to-many ``courses`` field on the program.
+    """
+    keys = set()
+    for program in [parent_program] + child_programs(parent_program):
+        curriculum = _primary_active_curriculum(program)
+        if curriculum:
+            keys.update(_course_runs_from_container(curriculum))
+        keys.update(_course_runs_from_container(program))
+    return keys
+
+
+def child_programs(program):
+    """
+    Given a program, recursively find all child programs related
+    to this program through its curricula.
+    """
+    curriculum = _primary_active_curriculum(program)
+    if not curriculum:
+        return []
+    result = []
+    for child in curriculum.get('programs', []):
+        result.append(child)
+        result.extend(child_programs(child))
+    return result
+
+
+def _primary_active_curriculum(program):
+    """
+    Returns the first active curriculum in the given program, or None.
+    """
+    try:
+        return next(c for c in program.get('curricula', []) if c.get('is_active'))
+    except StopIteration:
+        return
+
+
+def _course_runs_from_container(container):
+    """
+    Pluck nested course runs out of a ``container`` dictionary,
+    which is either the ``curriculum`` field of a program, or
+    a program itself (since either may contain a ``courses`` list).
+    """
+    return [
+        course_run.get('key')
+        for course in container.get('courses', [])
+        for course_run in course.get('course_runs', [])
+    ]

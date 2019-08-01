@@ -1327,8 +1327,8 @@ class ProgramCourseEnrollmentOverviewViewTests(ProgramCacheTestCaseMixin, Shared
         # only freeze time when defining these values and not on the whole test case
         # as test_multiple_enrollments_all_enrolled relies on actual differences in modified datetimes
         with freeze_time('2019-01-01'):
-            cls.yesterday = datetime.now() - timedelta(1)
-            cls.tomorrow = datetime.now() + timedelta(1)
+            cls.yesterday = datetime.utcnow() - timedelta(1)
+            cls.tomorrow = datetime.utcnow() + timedelta(1)
 
         cls.certificate_download_url = 'www.certificates.com'
 
@@ -1670,7 +1670,7 @@ class ProgramCourseEnrollmentOverviewViewTests(ProgramCacheTestCaseMixin, Shared
 
         # course run has not ended and user has earned a passing certificate more than 30 days ago
         certificate = self.create_generated_certificate()
-        certificate.created_date = datetime.now() - timedelta(30)
+        certificate.created_date = datetime.utcnow() - timedelta(30)
         certificate.save()
         mock_has_ended.return_value = False
 
@@ -1704,7 +1704,7 @@ class ProgramCourseEnrollmentOverviewViewTests(ProgramCacheTestCaseMixin, Shared
 
         # course run has not ended and user has earned a passing certificate fewer than 30 days ago
         certificate = self.create_generated_certificate()
-        certificate.created_date = datetime.now() - timedelta(5)
+        certificate.created_date = datetime.utcnow() - timedelta(5)
         certificate.save()
 
         response = self.client.get(self.get_url(self.program_uuid))

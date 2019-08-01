@@ -12,6 +12,7 @@ from pytz import UTC
 from django.http import Http404
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
+from django.utils.functional import cached_property
 from edx_rest_framework_extensions import permissions
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -567,7 +568,7 @@ class ProgramSpecificViewMixin(object):
     A mixin for views that operate on or within a specific program.
     """
 
-    @property
+    @cached_property
     def program(self):
         """
         The program specified by the `program_uuid` URL parameter.
@@ -956,23 +957,77 @@ class ProgramCourseEnrollmentOverviewView(DeveloperErrorViewMixin, ProgramSpecif
         for a user as part of a program.
         """
         user = request.user
+        program_enrollment = self._get_program_enrollment(user, program_uuid)
 
-        user_program_enrollment = ProgramEnrollment.objects.filter(
+        program_course_enrollments = ProgramCourseEnrollment.objects.filter(
+            program_enrollment=program_enrollment
+        ).select_related('course_enrollment')
+
+        enrollments_by_course_key = {
+            enrollment.course_key: enrollment.course_enrollment
+            for enrollment in program_course_enrollments
+        }
+
+        overviews = CourseOverview.get_from_ids_if_exists(enrollments_by_course_key.keys())
+
+        course_run_resume_urls = get_resume_urls_for_enrollments(user, enrollments_by_course_key.values())
+
+        course_runs = []
+
+        for enrollment in program_course_enrollments:
+            overview = overviews[enrollment.course_key]
+
+            certificate_info = get_certificate_for_user(user.username, enrollment.course_key) or {}
+
+            course_run_dict = {
+                'course_run_id': enrollment.course_key,
+                'display_name': overview.display_name_with_default,
+                'course_run_status': self.get_course_run_status(overview, certificate_info),
+                'course_run_url': self.get_course_run_url(request, enrollment.course_key),
+                'start_date': overview.start,
+                'end_date': overview.end,
+                'due_dates': self.get_due_dates(request, enrollment.course_key, user),
+            }
+
+            emails_enabled = self.get_emails_enabled(user, enrollment.course_key)
+            if emails_enabled is not None:
+                course_run_dict['emails_enabled'] = emails_enabled
+
+            if certificate_info.get('download_url'):
+                course_run_dict['certificate_download_url'] = certificate_info['download_url']
+
+            if self.program['type'] == 'MicroMasters':
+                course_run_dict['micromasters_title'] = self.program['title']
+
+            if course_run_resume_urls.get(enrollment.course_key):
+                course_run_dict['resume_course_run_url'] = course_run_resume_urls.get(enrollment.course_key)
+
+            course_runs.append(course_run_dict)
+
+        serializer = CourseRunOverviewListSerializer({'course_runs': course_runs})
+        return Response(serializer.data)
+
+    @staticmethod
+    def _get_program_enrollment(user, program_uuid):
+        """
+        Returns the ``ProgramEnrollment`` record for the given program UUID in which the given
+        user is actively enrolled.
+        In the unusual and unlikely case of a user having two active program enrollments
+        for the same program, returns the most recently modified enrollment and logs
+        a warning.
+
+        Raises ``PermissionDenied`` if the user is not enrolled in the program with the given UUID.
+        """
+        program_enrollment = ProgramEnrollment.objects.filter(
             program_uuid=program_uuid,
             user=user,
             status='enrolled',
-        ).order_by(
-            '-modified',
-        )
+        ).order_by('-modified')
 
-        user_program_enrollment_count = user_program_enrollment.count()
+        program_enrollment_count = program_enrollment.count()
 
-        if user_program_enrollment_count > 1:
-            # in the unusual and unlikely case of a user having two
-            # active program enrollments for the same program,
-            # choose the most recently modified enrollment and log
-            # a warning
-            user_program_enrollment = user_program_enrollment[0]
+        if program_enrollment_count > 1:
+            program_enrollment = program_enrollment[0]
             logger.warning(
                 ('User with user_id {} has more than program enrollment'
                  'with an enrolled status for program uuid {}.').format(
@@ -980,68 +1035,10 @@ class ProgramCourseEnrollmentOverviewView(DeveloperErrorViewMixin, ProgramSpecif
                     program_uuid,
                 )
             )
-        elif user_program_enrollment_count == 0:
-            # if the user is not enrolled in the program, they are not authorized
-            # to view the information returned by this endpoint
+        elif program_enrollment_count == 0:
             raise PermissionDenied
 
-        user_program_course_enrollments = ProgramCourseEnrollment.objects.filter(
-            program_enrollment=user_program_enrollment
-        ).select_related('course_enrollment')
-
-        enrollment_dict = {enrollment.course_key: enrollment.course_enrollment for enrollment in user_program_course_enrollments}
-
-        overviews = CourseOverview.get_from_ids_if_exists(enrollment_dict.keys())
-
-        resume_course_run_urls = get_resume_urls_for_enrollments(user, enrollment_dict.values())
-
-        response = {
-            'course_runs': [],
-        }
-
-        for enrollment in user_program_course_enrollments:
-            overview = overviews[enrollment.course_key]
-
-            certificate_download_url = None
-            is_certificate_passing = None
-            certificate_creation_date = None
-            certificate_info = get_certificate_for_user(user.username, enrollment.course_key)
-
-            if certificate_info:
-                certificate_download_url = certificate_info['download_url']
-                is_certificate_passing = certificate_info['is_passing']
-                certificate_creation_date = certificate_info['created']
-
-            course_run_dict = {
-                'course_run_id': enrollment.course_key,
-                'display_name': overview.display_name_with_default,
-                'course_run_status': self.get_course_run_status(overview, is_certificate_passing, certificate_creation_date),
-                'course_run_url': self.get_course_run_url(request, enrollment.course_key),
-                'start_date': overview.start,
-                'end_date': overview.end,
-                'due_dates': self.get_due_dates(request, enrollment.course_key, user),
-            }
-
-            if certificate_download_url:
-                course_run_dict['certificate_download_url'] = certificate_download_url
-
-            emails_enabled = self.get_emails_enabled(user, enrollment.course_key)
-            if emails_enabled is not None:
-                course_run_dict['emails_enabled'] = emails_enabled
-
-            micromasters_title = self.program['title'] if self.program['type'] == 'MicroMasters' else None
-            if micromasters_title:
-                course_run_dict['micromasters_title'] = micromasters_title
-
-            # if the url is '', then the url is None so we can omit it from the response
-            resume_course_run_url = resume_course_run_urls[enrollment.course_key]
-            if resume_course_run_url:
-                course_run_dict['resume_course_run_url'] = resume_course_run_url
-
-            response['course_runs'].append(course_run_dict)
-
-        serializer = CourseRunOverviewListSerializer(response)
-        return Response(serializer.data)
+        return program_enrollment
 
     @staticmethod
     def get_due_dates(request, course_key, user):
@@ -1113,25 +1110,32 @@ class ProgramCourseEnrollmentOverviewView(DeveloperErrorViewMixin, ProgramSpecif
         """
         if is_bulk_email_feature_enabled(course_id=course_id):
             return not is_user_opted_out_for_course(user=user, course_id=course_id)
-        else:
-            return None
+        return None
 
     @staticmethod
-    def get_course_run_status(course_overview, is_certificate_passing, certificate_creation_date):
+    def get_course_run_status(course_overview, certificate_info):
         """
-        Get the progress status of a course run.
+        Get the progress status of a course run, given the state of a user's certificate in the course.
+
+        In the case of self-paced course runs, the run is considered completed when either the course run has ended
+        OR the user has earned a passing certificate 30 days ago or longer.
 
         Arguments:
             course_overview (CourseOverview): the overview for the course run
-            is_certificate_passing (bool): True if the user has a passing certificate in
-                this course run; False otherwise
-            certificate_creation_date: the date the certificate was created
+            certificate_info: A dict containing the following keys:
+                ``is_passing``: whether the  user has a passing certificate in the course run
+                ``created``: the date the certificate was created
 
         Returns:
-            status: one of CourseRunProgressStatuses.COMPLETE,
+            status: one of (
+                CourseRunProgressStatuses.COMPLETE,
                 CourseRunProgressStatuses.IN_PROGRESS,
-                or CourseRunProgressStatuses.UPCOMING
+                CourseRunProgressStatuses.UPCOMING,
+            )
         """
+        is_certificate_passing = certificate_info.get('is_passing', False)
+        certificate_creation_date = certificate_info.get('created', datetime.max)
+
         if course_overview.pacing == 'instructor':
             if course_overview.has_ended():
                 return CourseRunProgressStatuses.COMPLETED
@@ -1140,11 +1144,9 @@ class ProgramCourseEnrollmentOverviewView(DeveloperErrorViewMixin, ProgramSpecif
             else:
                 return CourseRunProgressStatuses.UPCOMING
         elif course_overview.pacing == 'self':
-            has_ended = course_overview.has_ended()
             thirty_days_ago = datetime.now(UTC) - timedelta(30)
-            # a self paced course run is completed when either the course run has ended
-            # OR the user has earned a certificate 30 days ago or more
-            if has_ended or is_certificate_passing and (certificate_creation_date and certificate_creation_date <= thirty_days_ago):
+            certificate_completed = is_certificate_passing and (certificate_creation_date <= thirty_days_ago)
+            if course_overview.has_ended() or certificate_completed:
                 return CourseRunProgressStatuses.COMPLETED
             elif course_overview.has_started():
                 return CourseRunProgressStatuses.IN_PROGRESS
