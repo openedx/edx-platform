@@ -63,7 +63,7 @@ from courseware.courses import (
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache
 from courseware.models import BaseStudentModuleHistory, StudentModule
-from courseware.permissions import MASQUERADE_AS_STUDENT, VIEW_COURSE_HOME, VIEW_COURSEWARE
+from courseware.permissions import VIEW_COURSE_HOME, VIEW_COURSEWARE
 from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
@@ -356,8 +356,8 @@ def course_info(request, course_id):
     with modulestore().bulk_operations(course_key):
         course = get_course_with_access(request.user, 'load', course_key)
 
-        can_masquerade = request.user.has_perm(MASQUERADE_AS_STUDENT, course)
-        masquerade, user = setup_masquerade(request, course_key, can_masquerade, reset_masquerade_data=True)
+        staff_access = has_access(request.user, 'staff', course)
+        masquerade, user = setup_masquerade(request, course_key, staff_access, reset_masquerade_data=True)
 
         # LEARNER-612: CCX redirect handled by new Course Home (DONE)
         # LEARNER-1697: Transition banner messages to new Course Home (DONE)
@@ -433,7 +433,7 @@ def course_info(request, course_id):
             'course_subtitle': course_subtitle,
             'show_subtitle': course_homepage_show_subtitle,
             'show_org': course_homepage_show_org,
-            'can_masquerade': can_masquerade,
+            'staff_access': staff_access,
             'masquerade': masquerade,
             'supports_preview_menu': True,
             'studio_url': get_studio_url(course, 'course_info'),
@@ -646,16 +646,11 @@ class CourseTabView(EdxFragmentView):
         """
         Creates the context for the fragment's template.
         """
-        can_masquerade = request.user.has_perm(MASQUERADE_AS_STUDENT, course)
+        staff_access = has_access(request.user, 'staff', course)
         supports_preview_menu = tab.get('supports_preview_menu', False)
         uses_bootstrap = self.uses_bootstrap(request, course, tab=tab)
         if supports_preview_menu:
-            masquerade, masquerade_user = setup_masquerade(
-                request,
-                course.id,
-                can_masquerade,
-                reset_masquerade_data=True,
-            )
+            masquerade, masquerade_user = setup_masquerade(request, course.id, staff_access, reset_masquerade_data=True)
             request.user = masquerade_user
         else:
             masquerade = None
@@ -664,7 +659,7 @@ class CourseTabView(EdxFragmentView):
             'course': course,
             'tab': tab,
             'active_page': tab.get('type', None),
-            'can_masquerade': can_masquerade,
+            'staff_access': staff_access,
             'masquerade': masquerade,
             'supports_preview_menu': supports_preview_menu,
             'uses_bootstrap': uses_bootstrap,
@@ -994,12 +989,11 @@ def _progress(request, course_key, student_id):
     course = get_course_with_access(request.user, 'load', course_key)
 
     staff_access = bool(has_access(request.user, 'staff', course))
-    can_masquerade = request.user.has_perm(MASQUERADE_AS_STUDENT, course)
 
     masquerade = None
     if student_id is None or student_id == request.user.id:
         # This will be a no-op for non-staff users, returning request.user
-        masquerade, student = setup_masquerade(request, course_key, can_masquerade, reset_masquerade_data=True)
+        masquerade, student = setup_masquerade(request, course_key, staff_access, reset_masquerade_data=True)
     else:
         try:
             coach_access = has_ccx_coach_role(request.user, course_key)
@@ -1042,7 +1036,6 @@ def _progress(request, course_key, student_id):
         'courseware_summary': courseware_summary,
         'studio_url': studio_url,
         'grade_summary': course_grade.summary,
-        'can_masquerade': can_masquerade,
         'staff_access': staff_access,
         'masquerade': masquerade,
         'supports_preview_menu': True,

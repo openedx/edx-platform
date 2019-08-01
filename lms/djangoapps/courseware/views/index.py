@@ -66,10 +66,7 @@ from ..entrance_exams import (
 from ..masquerade import check_content_start_date_for_masquerade_user, setup_masquerade
 from ..model_data import FieldDataCache
 from ..module_render import get_module_for_descriptor, toc_for_course
-from ..permissions import MASQUERADE_AS_STUDENT
-
 from .views import CourseTabView
-
 
 log = logging.getLogger("edx.courseware.views.index")
 
@@ -155,7 +152,6 @@ class CoursewareIndex(View):
                         # If the user is considered enrolled show the default XBlock student_view.
                         pass
 
-                self.can_masquerade = request.user.has_perm(MASQUERADE_AS_STUDENT, self.course)
                 self.is_staff = has_access(request.user, 'staff', self.course)
                 self._setup_masquerade_for_effective_user()
 
@@ -172,7 +168,7 @@ class CoursewareIndex(View):
         self.masquerade, self.effective_user = setup_masquerade(
             self.request,
             self.course_key,
-            self.can_masquerade,
+            self.is_staff,
             reset_masquerade_data=True
         )
         # Set the user in the request to the effective user.
@@ -419,7 +415,6 @@ class CoursewareIndex(View):
             'init': '',
             'fragment': Fragment(),
             'staff_access': self.is_staff,
-            'can_masquerade': self.can_masquerade,
             'masquerade': self.masquerade,
             'supports_preview_menu': True,
             'studio_url': get_studio_url(self.course, 'course'),
