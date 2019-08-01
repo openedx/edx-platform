@@ -7,7 +7,6 @@ import csv
 import json
 import logging
 import smtplib
-import StringIO
 from collections import namedtuple
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -341,7 +340,7 @@ class Order(models.Model):
         this function generates the csv file
         """
         course_names = []
-        csv_file = StringIO.StringIO()
+        csv_file = six.StringIO()
         csv_writer = csv.writer(csv_file)
         csv_writer.writerow(['Course Name', 'Registration Code', 'URL'])
         for item in orderitems:
@@ -424,7 +423,7 @@ class Order(models.Model):
                 if pdf_file is not None:
                     email.attach(u'ReceiptOrder{}.pdf'.format(str(self.id)), pdf_file.getvalue(), 'application/pdf')
                 else:
-                    file_buffer = StringIO.StringIO(_('pdf download unavailable right now, please contact support.'))
+                    file_buffer = six.StringIO(_('pdf download unavailable right now, please contact support.'))
                     email.attach(u'pdf_not_available.txt', file_buffer.getvalue(), 'text/plain')
                 email.send()
         except (smtplib.SMTPException, BotoServerError):  # sadly need to handle diff. mail backends individually

@@ -93,7 +93,7 @@ git+https://github.com/edx/django-rest-framework-oauth.git@0a43e8525f1e3048efe4b
 djangorestframework-xml==1.4.0  # via edx-enterprise
 djangorestframework==3.7.7
 docopt==0.6.2
-docutils==0.15.1.post1    # via botocore
+docutils==0.15.2          # via botocore
 drf-yasg==1.16
 edx-ace==0.1.10
 edx-analytics-data-api-client==0.15.3
@@ -106,7 +106,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==2.0.0
 edx-drf-extensions==2.3.8
-edx-enterprise==1.8.6
+edx-enterprise==1.8.7
 edx-i18n-tools==0.4.8
 edx-milestones==0.2.3
 edx-oauth2-provider==1.2.3
@@ -147,6 +147,7 @@ jmespath==0.9.4           # via boto3, botocore
 jsondiff==1.2.0           # via edx-enterprise
 jsonfield==2.0.2
 kombu==3.0.37             # via celery
+laboratory==1.0.2
 lazy==1.1
 lepl==5.1.3               # via rfc6266-parser
 libsass==0.10.0
