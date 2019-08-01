@@ -97,7 +97,7 @@ class PagesPage(CoursePage):
             '.wrapper-component-action-header .component-actions',
             "Tab's edit button is visible"
         )
-        return self.q(css='div.xmodule_StaticTabModule').text
+        return self.q(css='div.xmodule_StaticTabBlock').text
 
     @property
     def built_in_page_titles(self):

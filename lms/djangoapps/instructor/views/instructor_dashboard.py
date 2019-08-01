@@ -58,7 +58,7 @@ from shoppingcart.models import Coupon, CourseRegCodeItem, PaidCourseRegistratio
 from student.models import CourseEnrollment
 from student.roles import CourseFinanceAdminRole, CourseInstructorRole, CourseSalesAdminRole, CourseStaffRole
 from util.json_request import JsonResponse
-from xmodule.html_module import HtmlDescriptor
+from xmodule.html_module import HtmlBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab
 
@@ -714,7 +714,7 @@ def _section_data_download(course, access):
 def null_applicable_aside_types(block):  # pylint: disable=unused-argument
     """
     get_aside method for monkey-patching into applicable_aside_types
-    while rendering an HtmlDescriptor for email text editing. This returns
+    while rendering an HtmlBlock for email text editing. This returns
     an empty list.
     """
     return []
@@ -726,8 +726,8 @@ def _section_send_email(course, access):
 
     # Monkey-patch applicable_aside_types to return no asides for the duration of this render
     with patch.object(course.runtime, 'applicable_aside_types', null_applicable_aside_types):
-        # This HtmlDescriptor is only being used to generate a nice text editor.
-        html_module = HtmlDescriptor(
+        # This HtmlBlock is only being used to generate a nice text editor.
+        html_module = HtmlBlock(
             course.system,
             DictFieldData({'data': ''}),
             ScopeIds(None, None, None, course_key.make_usage_key('html', 'fake'))

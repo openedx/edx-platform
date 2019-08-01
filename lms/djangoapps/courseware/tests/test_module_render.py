@@ -66,6 +66,7 @@ from student.models import CourseEnrollment, anonymous_id_for_user
 from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from xblock_django.models import XBlockConfiguration
 from xmodule.capa_module import ProblemBlock
+from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
 from xmodule.lti_module import LTIDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -1544,7 +1545,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         )
         result_fragment = module.render(STUDENT_VIEW)
 
-        self.assertEquals(len(PyQuery(result_fragment.content)('div.xblock.xblock-student_view.xmodule_HtmlModule')), 1)
+        self.assertEquals(len(PyQuery(result_fragment.content)('div.xblock.xblock-student_view.xmodule_HtmlBlock')), 1)
 
     def test_xmodule_display_wrapper_disabled(self):
         module = render.get_module(
@@ -1556,7 +1557,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         )
         result_fragment = module.render(STUDENT_VIEW)
 
-        self.assertNotIn('div class="xblock xblock-student_view xmodule_display xmodule_HtmlModule"',
+        self.assertNotIn('div class="xblock xblock-student_view xmodule_display xmodule_HtmlBlock"',
                          result_fragment.content)
 
     def test_static_link_rewrite(self):
@@ -1953,7 +1954,11 @@ class TestStaffDebugInfo(SharedModuleStoreTestCase):
 
 PER_COURSE_ANONYMIZED_DESCRIPTORS = (LTIDescriptor, )
 PER_STUDENT_ANONYMIZED_XBLOCKS = [
+    AboutBlock,
+    CourseInfoBlock,
+    HtmlBlock,
     ProblemBlock,
+    StaticTabBlock,
     VideoBlock,
 ]
 
