@@ -51,7 +51,7 @@ class Command(BaseCommand):
         user_count = len(users)
         count, models = users.delete()
         log.info(
-            u'%s users and their related models will be deleted:\n%s\n',
+            u'\n%s users and their related models will be deleted:\n%s\n',
             user_count,
             models,
         )

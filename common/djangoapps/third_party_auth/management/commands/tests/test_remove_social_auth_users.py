@@ -4,6 +4,7 @@ Tests for `remove_social_auth_users` management command
 from __future__ import absolute_import
 
 import sys
+import unittest
 from contextlib import contextmanager
 from StringIO import StringIO
 from uuid import uuid4
@@ -23,6 +24,7 @@ FEATURES_WITH_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_ENABLED['ENABLE_ENROLLMENT_RESET'] = True
 
 
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestRemoveSocialAuthUsersCommand(TestCase):
     """
     Test django management command
