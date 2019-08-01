@@ -95,7 +95,7 @@ class TestFooter(TestCase):
                 {'url': 'https://business.edx.org', 'name': 'enterprise', 'title': '\xe9dX for Business'},
                 {'url': 'https://edx.org/edx-blog', 'name': 'blog', 'title': 'Blog'},
                 {'url': 'https://edx.org/news-announcements', 'name': 'news', 'title': 'News'},
-                {'url': 'https://support.example.com', 'name': 'help-center', 'title': 'Help Center'},
+                {'url': 'https://support.example.com/hc/en-us', 'name': 'help-center', 'title': 'Help Center'},
                 {'url': '/support/contact_us', 'name': 'contact', 'title': 'Contact'},
                 {'url': 'https://edx.org/careers', 'name': 'careers', 'title': 'Careers'},
                 {'url': 'https://edx.org/donate', 'name': 'donate', 'title': 'Donate'}
@@ -125,7 +125,7 @@ class TestFooter(TestCase):
                 {'url': 'https://edx.org/edx-blog', 'name': 'blog', 'title': 'Blog'},
                 # pylint: disable=line-too-long
                 {'url': '{base_url}/support/contact_us'.format(base_url=settings.LMS_ROOT_URL), 'name': 'contact', 'title': 'Contact Us'},
-                {'url': 'https://support.example.com', 'name': 'help-center', 'title': 'Help Center'},
+                {'url': 'https://support.example.com/hc/en-us', 'name': 'help-center', 'title': 'Help Center'},
                 {'url': 'https://edx.org/media-kit', 'name': 'media_kit', 'title': 'Media Kit'},
                 {'url': 'https://edx.org/donate', 'name': 'donate', 'title': 'Donate'}
             ],
