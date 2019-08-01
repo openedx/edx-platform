@@ -9,6 +9,7 @@ from django.core.cache import cache
 from django.core.management import call_command
 
 from openedx.core.djangoapps.catalog.cache import (
+    COURSE_PROGRAMS_CACHE_KEY_TPL,
     PATHWAY_CACHE_KEY_TPL,
     PROGRAM_CACHE_KEY_TPL,
     SITE_PATHWAY_IDS_CACHE_KEY_TPL,
@@ -24,6 +25,9 @@ from student.tests.factories import UserFactory
 @skip_unless_lms
 @httpretty.activate
 class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMixin):
+    """
+    Defines tests for the ``cache_programs`` management command.
+    """
     ENABLED_CACHES = ['default']
 
     def setUp(self):
@@ -46,6 +50,10 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
 
         self.programs = ProgramFactory.create_batch(3)
         self.pathways = PathwayFactory.create_batch(3)
+        self.child_program = ProgramFactory.create()
+
+        self.programs[0]['curricula'][0]['programs'].append(self.child_program)
+        self.programs.append(self.child_program)
 
         for pathway in self.pathways:
             self.programs += pathway['programs']
@@ -57,7 +65,10 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         self.pathways[1]['programs'].append(self.programs[0])
 
     def mock_list(self):
+        """ Mock the data returned by the program listing API endpoint. """
+        # pylint: disable=unused-argument
         def list_callback(request, uri, headers):
+            """ The mock listing callback. """
             expected = {
                 'exclude_utm': ['1'],
                 'status': ['active', 'retired'],
@@ -75,7 +86,10 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         )
 
     def mock_detail(self, uuid, program):
+        """ Mock the data returned by the program detail API endpoint. """
+        # pylint: disable=unused-argument
         def detail_callback(request, uri, headers):
+            """ The mock detail callback. """
             expected = {
                 'exclude_utm': ['1'],
             }
@@ -91,13 +105,9 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         )
 
     def mock_pathways(self, pathways, page_number=1, final=True):
-        """
-        Mock the data for discovery's credit pathways endpoint
-        """
+        """ Mock the data for discovery's credit pathways endpoint. """
         def pathways_callback(request, uri, headers):  # pylint: disable=unused-argument
-            """
-            Mocks response
-            """
+            """ Mocks the pathways response. """
 
             expected = {
                 'exclude_utm': ['1'],
@@ -170,6 +180,15 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
             # cached programs have a pathways field added to them, remove before comparing
             del program['pathway_ids']
             self.assertEqual(program, programs[key])
+
+        # the courses in the child program's first curriculum (the active one)
+        # should point to both the child program and the first program
+        # in the cache.
+        for course in self.child_program['curricula'][0]['courses']:
+            for course_run in course['course_runs']:
+                course_run_cache_key = COURSE_PROGRAMS_CACHE_KEY_TPL.format(course_run_id=course_run['key'])
+                self.assertIn(self.programs[0]['uuid'], cache.get(course_run_cache_key))
+                self.assertIn(self.child_program['uuid'], cache.get(course_run_cache_key))
 
     def test_handle_pathways(self):
         """

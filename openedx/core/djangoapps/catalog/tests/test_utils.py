@@ -35,6 +35,8 @@ from openedx.core.djangoapps.catalog.tests.factories import (
 )
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.catalog.utils import (
+    child_programs,
+    course_run_keys_for_program,
     get_course_run_details,
     get_course_runs,
     get_course_runs_for_course,
@@ -663,3 +665,123 @@ class TestGetCourseRunDetails(CatalogIntegrationMixin, TestCase):
         data = get_course_run_details(course_run['key'], ['content_language', 'weeks_to_complete', 'max_effort'])
         self.assertTrue(mock_get_edx_api_data.called)
         self.assertEqual(data, course_run_details)
+
+
+class TestProgramCourseRunCrawling(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super(TestProgramCourseRunCrawling, cls).setUpClass()
+        cls.grandchild_1 = {
+            'title': 'grandchild 1',
+            'curricula': [{'is_active': True, 'courses': [], 'programs': []}],
+        }
+        cls.grandchild_2 = {
+            'title': 'grandchild 2',
+            'curricula': [
+                {
+                    'is_active': True,
+                    'courses': [{
+                        'course_runs': [
+                            {'key': 'course-run-4'},
+                        ],
+                    }],
+                    'programs': [],
+                },
+            ],
+        }
+        cls.grandchild_3 = {
+            'title': 'grandchild 3',
+            'curricula': [{'is_active': False}],
+        }
+        cls.child_1 = {
+            'title': 'child 1',
+            'curricula': [{'is_active': True, 'courses': [], 'programs': [cls.grandchild_1]}],
+        }
+        cls.child_2 = {
+            'title': 'child 2',
+            'curricula': [
+                {
+                    'is_active': True,
+                    'courses': [{
+                        'course_runs': [
+                            {'key': 'course-run-3'},
+                        ],
+                    }],
+                    'programs': [cls.grandchild_2, cls.grandchild_3],
+                },
+            ],
+        }
+        cls.complex_program = {
+            'title': 'complex program',
+            'curricula': [
+                {
+                    'is_active': True,
+                    'courses': [{
+                        'course_runs': [
+                            {'key': 'course-run-2'},
+                        ],
+                    }],
+                    'programs': [cls.child_1, cls.child_2],
+                },
+            ],
+        }
+        cls.simple_program = {
+            'title': 'simple program',
+            'curricula': [
+                {
+                    'is_active': True,
+                    'courses': [{
+                        'course_runs': [
+                            {'key': 'course-run-1'},
+                        ],
+                    }],
+                    'programs': [cls.grandchild_1]
+                },
+            ],
+        }
+        cls.empty_program = {
+            'title': 'notice that I have a curriculum, but no programs inside it',
+            'curricula': [
+                {
+                    'is_active': True,
+                    'courses': [],
+                    'programs': [],
+                },
+            ],
+        }
+
+    def test_child_programs_no_curriculum(self):
+        program = {
+            'title': 'notice that I do not have a curriculum',
+        }
+        self.assertEqual([], child_programs(program))
+
+    def test_child_programs_no_children(self):
+        self.assertEqual([], child_programs(self.empty_program))
+
+    def test_child_programs_one_child(self):
+        self.assertEqual([self.grandchild_1], child_programs(self.simple_program))
+
+    def test_child_programs_many_children(self):
+        expected_children = [
+            self.child_1,
+            self.grandchild_1,
+            self.child_2,
+            self.grandchild_2,
+            self.grandchild_3,
+        ]
+        self.assertEqual(expected_children, child_programs(self.complex_program))
+
+    def test_course_run_keys_for_program_no_courses(self):
+        self.assertEqual(set(), course_run_keys_for_program(self.empty_program))
+
+    def test_course_run_keys_for_program_one_course(self):
+        self.assertEqual({'course-run-1'}, course_run_keys_for_program(self.simple_program))
+
+    def test_course_run_keys_for_program_many_courses(self):
+        expected_course_runs = {
+            'course-run-2',
+            'course-run-3',
+            'course-run-4',
+        }
+        self.assertEqual(expected_course_runs, course_run_keys_for_program(self.complex_program))

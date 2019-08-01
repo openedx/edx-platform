@@ -17,7 +17,7 @@ from openedx.core.djangoapps.catalog.cache import (
     SITE_PROGRAM_UUIDS_CACHE_KEY_TPL,
 )
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
-from openedx.core.djangoapps.catalog.utils import create_catalog_api_client
+from openedx.core.djangoapps.catalog.utils import create_catalog_api_client, course_run_keys_for_program
 
 logger = logging.getLogger(__name__)
 User = get_user_model()  # pylint: disable=invalid-name
@@ -218,8 +218,7 @@ class Command(BaseCommand):
         failure = False
 
         for program in programs.values():
-            for course in program['courses']:
-                for course_run in course['course_runs']:
-                    course_run_cache_key = COURSE_PROGRAMS_CACHE_KEY_TPL.format(course_run_id=course_run['key'])
-                    course_runs[course_run_cache_key].append(program['uuid'])
+            for course_run_key in course_run_keys_for_program(program):
+                course_run_cache_key = COURSE_PROGRAMS_CACHE_KEY_TPL.format(course_run_id=course_run_key)
+                course_runs[course_run_cache_key].append(program['uuid'])
         return course_runs, failure
