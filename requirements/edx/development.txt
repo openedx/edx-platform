@@ -154,7 +154,6 @@ faker==2.0.0
 faulthandler==3.1 ; python_version == "2.7"
 feedparser==5.1.3
 filelock==3.0.12
-firebase-token-generator==1.3.2
 flake8-polyfill==1.0.2
 flake8==3.7.8
 flask==1.1.1

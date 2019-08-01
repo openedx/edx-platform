@@ -91,7 +91,6 @@ edxval
 enum34==1.1.6                       # Backport of Enum from Python 3.4+
 event-tracking
 feedparser==5.1.3
-firebase-token-generator==1.3.2
 fs==2.0.18
 fs-s3fs==0.1.8
 glob2                               # Enhanced glob module, used in openedx.core.lib.rooted_paths
