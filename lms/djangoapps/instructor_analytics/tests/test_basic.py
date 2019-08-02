@@ -20,7 +20,7 @@ from six.moves import range, zip
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import InstructorFactory
-from instructor_analytics.basic import (
+from lms.djangoapps.instructor_analytics.basic import (
     AVAILABLE_FEATURES,
     PROFILE_FEATURES,
     STUDENT_FEATURES,

@@ -18,8 +18,8 @@ from django.core.files.storage import DefaultStorage
 from openassessment.data import OraAggregateData
 from pytz import UTC
 
-from instructor_analytics.basic import get_proctored_exam_results
-from instructor_analytics.csvs import format_dictlist
+from lms.djangoapps.instructor_analytics.basic import get_proctored_exam_results
+from lms.djangoapps.instructor_analytics.csvs import format_dictlist
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from survey.models import SurveyAnswer
