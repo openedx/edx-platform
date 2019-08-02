@@ -64,7 +64,7 @@ git+https://github.com/edx/MongoDBProxy.git@25b99097615bda06bd7cdfe5669ed80dc2a7
 
 # Forked to get Django 1.10+ compat that is in origin BitBucket repo, without an official build.
 # This can go away when we update auth to not use django-rest-framework-oauth
-git+https://github.com/edx/django-oauth-plus.git@01ec2a161dfc3465f9d35b9211ae790177418316#egg=django-oauth-plus==2.2.9.edx-1
+git+https://github.com/edx/django-oauth-plus.git@66155b545b23ebc01ec438849d303077e8198dfd#egg=django-oauth-plus==2.2.9.edx-3
 
 # Why a drf-oauth fork? To add Django 1.11 compatibility to the abandoned repo.
 # This dependency will be removed by this work: https://openedx.atlassian.net/browse/PLAT-1660
@@ -93,6 +93,7 @@ git+https://github.com/edx/xblock-lti-consumer.git@v1.1.8#egg=lti_consumer-xbloc
 
 # Third Party XBlocks
 
+git+https://github.com/joestump/python-oauth2.git@b94f69b1ad195513547924e380d9265133e995fa#egg=oauth2
 git+https://github.com/mitodl/edx-sga.git@3828ba9e413080a81b907a3381e5ffa05e063f81#egg=edx-sga==0.8.3
 git+https://github.com/open-craft/xblock-poll@add89e14558c30f3c8dc7431e5cd6536fff6d941#egg=xblock-poll==1.5.1
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.4#egg=xblock-drag-and-drop-v2==2.2.4
