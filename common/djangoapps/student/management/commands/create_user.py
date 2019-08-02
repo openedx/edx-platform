@@ -1,16 +1,14 @@
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils import translation
-
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
 from student.forms import AccountCreationForm
-from student.helpers import do_create_account
+from student.helpers import AccountValidationError, do_create_account
 from student.models import CourseEnrollment, create_comments_service_user
-from student.helpers import AccountValidationError
 from track.management.tracked_command import TrackedCommand
 
 
