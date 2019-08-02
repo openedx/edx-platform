@@ -113,7 +113,7 @@ docutils==0.15.2
 drf-yasg==1.16
 edx-ace==0.1.10
 edx-analytics-data-api-client==0.15.3
-edx-bulk-grades==0.2
+edx-bulk-grades==0.4
 edx-ccx-keys==0.2.2
 edx-celeryutils==0.3.0
 edx-completion==2.0.0
@@ -122,7 +122,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==2.0.0
 edx-drf-extensions==2.3.8
-edx-enterprise==1.8.7
+edx-enterprise==1.8.8
 edx-i18n-tools==0.4.8
 edx-lint==1.3.0
 edx-milestones==0.2.3
@@ -264,9 +264,9 @@ python-openid==2.2.5 ; python_version == "2.7"
 python-slugify==1.2.6
 python-swiftclient==3.8.0
 python3-saml==1.5.0
-pytz==2019.1
+pytz==2019.2
 pyuca==1.1
-pyyaml==5.1.1
+pyyaml==5.1.2
 radon==3.0.3
 git+https://github.com/edx/RecommenderXBlock.git@1.4.0#egg=recommender-xblock==1.4.0
 redis==2.10.6
@@ -297,7 +297,7 @@ sorl-thumbnail==12.3
 sortedcontainers==2.1.0
 soupsieve==1.9.2
 sqlparse==0.3.0
-staff-graded-xblock==0.3
+staff-graded-xblock==0.4
 stevedore==1.30.1
 super-csv==0.8
 sympy==1.4
