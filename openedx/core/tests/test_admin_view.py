@@ -16,9 +16,21 @@ class TestAdminView(TestCase):
     def setUp(self):
         super(TestAdminView, self).setUp()
         self.client = Client()
-        self.staff_user = UserFactory.create(is_staff=True)
-        self.client.login(username=self.staff_user.username, password=TEST_PASSWORD)
 
-    def test_admin_view_loads(self):
+    def test_admin_view_loads_for_is_staff(self):
+        staff_user = UserFactory.create(is_staff=True)
+        self.client.login(username=staff_user.username, password=TEST_PASSWORD)
         response = self.client.get(reverse('admin:index'))
         assert response.status_code == 200
+
+    def test_admin_view_loads_for_is_superuser(self):
+        superuser = UserFactory.create(is_superuser=True, is_staff=True)
+        self.client.login(username=superuser.username, password=TEST_PASSWORD)
+        response = self.client.get(reverse('admin:index'))
+        assert response.status_code == 200
+
+    def test_admin_view_doesnt_load_for_student(self):
+        student = UserFactory.create()
+        self.client.login(username=student.username, password=TEST_PASSWORD)
+        response = self.client.get(reverse('admin:index'))
+        assert response.status_code == 302

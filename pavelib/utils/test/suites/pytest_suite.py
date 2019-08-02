@@ -233,6 +233,7 @@ class SystemTestSuite(PytestSuite):
         if self.root == 'lms':
             default_test_globs.append("{system}/tests.py".format(system=self.root))
             default_test_globs.append("openedx/core/djangolib/*")
+            default_test_globs.append("openedx/core/tests/*")
             default_test_globs.append("openedx/features")
 
         def included(path):
