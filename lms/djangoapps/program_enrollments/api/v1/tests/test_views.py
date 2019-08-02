@@ -46,7 +46,31 @@ from xmodule.modulestore.tests.factories import CourseFactory as ModulestoreCour
 from xmodule.modulestore.tests.factories import ItemFactory
 
 
-class ListViewTestMixin(object):
+class ProgramCacheTestCaseMixin(CacheIsolationMixin):
+    """
+    Mixin for using program cache in tests
+    """
+    ENABLED_CACHES = ['default']
+
+    @staticmethod
+    def setup_catalog_cache(program_uuid, organization_key):
+        """
+        helper function to initialize a cached program with an single authoring_organization
+        """
+        catalog_org = CatalogOrganizationFactory.create(key=organization_key)
+        program = ProgramFactory.create(
+            uuid=program_uuid,
+            authoring_organizations=[catalog_org]
+        )
+        cache.set(PROGRAM_CACHE_KEY_TPL.format(uuid=program_uuid), program, None)
+        return program
+
+    @staticmethod
+    def set_program_in_catalog_cache(program_uuid, program):
+        cache.set(PROGRAM_CACHE_KEY_TPL.format(uuid=program_uuid), program, None)
+
+
+class ListViewTestMixin(ProgramCacheTestCaseMixin):
     """
     Mixin to define some shared test data objects for program/course enrollment
     list view tests.
@@ -56,10 +80,14 @@ class ListViewTestMixin(object):
     @classmethod
     def setUpClass(cls):
         super(ListViewTestMixin, cls).setUpClass()
+        cls.start_cache_isolation()
         cls.program_uuid = '00000000-1111-2222-3333-444444444444'
         cls.program_uuid_tmpl = '00000000-1111-2222-3333-4444444444{0:02d}'
         cls.curriculum_uuid = 'aaaaaaaa-1111-2222-3333-444444444444'
         cls.other_curriculum_uuid = 'bbbbbbbb-1111-2222-3333-444444444444'
+        cls.organization_key = "orgkey"
+
+        cls.program = cls.setup_catalog_cache(cls.program_uuid, cls.organization_key)
 
         cls.course_id = CourseKey.from_string('course-v1:edX+ToyX+Toy_Course')
         _ = CourseOverviewFactory.create(id=cls.course_id)
@@ -71,14 +99,36 @@ class ListViewTestMixin(object):
     @classmethod
     def tearDownClass(cls):
         super(ListViewTestMixin, cls).tearDownClass()
+        cls.end_cache_isolation()
+
+    def setUp(self):
+        super(ListViewTestMixin, self).setUp()
+
+        self.set_program_in_catalog_cache(self.program_uuid, self.program)
+        self.curriculum = next(c for c in self.program['curricula'] if c['is_active'])
+        self.course = self.curriculum['courses'][0]
+        self.course_run = self.course["course_runs"][0]
+        self.course_key = CourseKey.from_string(self.course_run["key"])
+        CourseOverviewFactory(id=self.course_key)
+        self.course_not_in_program = CourseFactory()
+        self.course_not_in_program_key = CourseKey.from_string(
+            self.course_not_in_program["course_runs"][0]["key"]
+        )
+        CourseOverviewFactory(id=self.course_not_in_program_key)
 
     def get_url(self, program_uuid=None, course_id=None):
         """ Returns the primary URL requested by the test case. """
         kwargs = {'program_uuid': program_uuid or self.program_uuid}
         if course_id:
-            kwargs['course_id'] = course_id or self.course_id
+            kwargs['course_id'] = course_id
 
         return reverse(self.view_name, kwargs=kwargs)
+
+    def log_in_non_staff(self):
+        self.client.login(username=self.student.username, password=self.password)
+
+    def log_in_staff(self):
+        self.client.login(username=self.global_staff.username, password=self.password)
 
 
 @ddt.ddt
@@ -340,85 +390,13 @@ class ProgramEnrollmentListTest(ListViewTestMixin, APITestCase):
             assert '?cursor=' in next_response.data['previous']
 
 
-class ProgramCacheTestCaseMixin(CacheIsolationMixin):
-    """
-    Mixin for using program cache in tests
-    """
-    ENABLED_CACHES = ['default']
-
-    def setup_catalog_cache(self, program_uuid, organization_key):
-        """
-        helper function to initialize a cached program with an single authoring_organization
-        """
-        catalog_org = CatalogOrganizationFactory.create(key=organization_key)
-        program = ProgramFactory.create(
-            uuid=program_uuid,
-            authoring_organizations=[catalog_org]
-        )
-        self.set_program_in_catalog_cache(program_uuid, program)
-        return program
-
-    def set_program_in_catalog_cache(self, program_uuid, program):
-        cache.set(PROGRAM_CACHE_KEY_TPL.format(uuid=program_uuid), program, None)
-
-
-@ddt.ddt
-class BaseCourseEnrollmentTestsMixin(ProgramCacheTestCaseMixin):
-    """
-    A base for tests for course enrollment.
-    Children should override self.request()
-    """
-
-    @classmethod
-    def setUpClass(cls):
-        super(BaseCourseEnrollmentTestsMixin, cls).setUpClass()
-        cls.start_cache_isolation()
-        cls.password = 'password'
-        cls.student = UserFactory.create(username='student', password=cls.password)
-        cls.global_staff = GlobalStaffFactory.create(username='global-staff', password=cls.password)
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.end_cache_isolation()
-        super(BaseCourseEnrollmentTestsMixin, cls).tearDownClass()
-
-    def setUp(self):
-        super(BaseCourseEnrollmentTestsMixin, self).setUp()
-        self.clear_caches()
-        self.addCleanup(self.clear_caches)
-        self.program_uuid = uuid4()
-        self.organization_key = "orgkey"
-        self.program = self.setup_catalog_cache(self.program_uuid, self.organization_key)
-        curriculum = next(c for c in self.program['curricula'] if c['is_active'])
-        self.course = curriculum['courses'][0]
-        self.course_run = self.course["course_runs"][0]
-        self.course_key = CourseKey.from_string(self.course_run["key"])
-        CourseOverviewFactory(id=self.course_key)
-        self.course_not_in_program = CourseFactory()
-        self.course_not_in_program_key = CourseKey.from_string(
-            self.course_not_in_program["course_runs"][0]["key"]
-        )
-        CourseOverviewFactory(id=self.course_not_in_program_key)
-        self.default_url = self.get_url(self.program_uuid, self.course_key)
-        self.client.login(username=self.global_staff, password=self.password)
-
+class ProgramEnrollmentDataMixin(object):
+    """ Provides methods for creating ProgramEnrollments and ProgramCourseEnrollments. """
     def learner_enrollment(self, student_key, enrollment_status="active"):
         """
         Convenience method to create a learner enrollment record
         """
         return {"student_key": student_key, "status": enrollment_status}
-
-    def get_url(self, program_uuid, course_id):
-        """
-        Convenience method to build a path for a program course enrollment request
-        """
-        return reverse(
-            'programs_api:v1:program_course_enrollments',
-            kwargs={
-                'program_uuid': str(program_uuid),
-                'course_id': str(course_id)
-            }
-        )
 
     def request(self, path, data):
         pass
@@ -454,7 +432,7 @@ class BaseCourseEnrollmentTestsMixin(ProgramCacheTestCaseMixin):
             )
             course_enrollment.is_active = course_status == "active"
             course_enrollment.save()
-        return ProgramCourseEnrollmentFactory(
+        return ProgramCourseEnrollmentFactory.create(
             program_enrollment=program_enrollment,
             course_key=self.course_key,
             course_enrollment=course_enrollment,
@@ -464,6 +442,30 @@ class BaseCourseEnrollmentTestsMixin(ProgramCacheTestCaseMixin):
     def create_program_and_course_enrollments(self, external_user_key, user=False, course_status='active'):
         program_enrollment = self.create_program_enrollment(external_user_key, user)
         return self.create_program_course_enrollment(program_enrollment, course_status=course_status)
+
+
+@ddt.ddt
+class BaseCourseEnrollmentTestsMixin(ProgramEnrollmentDataMixin, ListViewTestMixin, ProgramCacheTestCaseMixin):
+    """
+    A base for tests for course enrollment.
+    Children should override self.request()
+    """
+    view_name = 'programs_api:v1:program_course_enrollments'
+
+    @classmethod
+    def setUpClass(cls):
+        super(BaseCourseEnrollmentTestsMixin, cls).setUpClass()
+        cls.start_cache_isolation()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.end_cache_isolation()
+        super(BaseCourseEnrollmentTestsMixin, cls).tearDownClass()
+
+    def setUp(self):
+        super(BaseCourseEnrollmentTestsMixin, self).setUp()
+        self.default_url = self.get_url(self.program_uuid, self.course_key)
+        self.log_in_staff()
 
     def assert_program_course_enrollment(self, external_user_key, expected_status, has_user, mode=CourseMode.MASTERS):
         """
@@ -493,7 +495,7 @@ class BaseCourseEnrollmentTestsMixin(ProgramCacheTestCaseMixin):
 
     def test_403_forbidden(self):
         self.client.logout()
-        self.client.login(username=self.student, password=self.password)
+        self.log_in_non_staff()
         request_data = [self.learner_enrollment("learner-1")]
         response = self.request(self.default_url, request_data)
         self.assertEqual(403, response.status_code)
@@ -516,11 +518,11 @@ class BaseCourseEnrollmentTestsMixin(ProgramCacheTestCaseMixin):
             self.assertEqual(404, response.status_code)
 
     def test_404_no_curriculum(self):
-        self.program['curricula'] = []
-        self.set_program_in_catalog_cache(self.program_uuid, self.program)
-        request_data = [self.learner_enrollment("learner-1")]
-        response = self.request(self.default_url, request_data)
-        self.assertEqual(404, response.status_code)
+        with mock.patch.dict(self.program, curricula=[]):
+            self.set_program_in_catalog_cache(self.program_uuid, self.program)
+            request_data = [self.learner_enrollment("learner-1")]
+            response = self.request(self.default_url, request_data)
+            self.assertEqual(404, response.status_code)
 
     def test_duplicate_learner(self):
         request_data = [
@@ -679,9 +681,8 @@ class CourseEnrollmentPostTests(BaseCourseEnrollmentTestsMixin, APITestCase):
         )
 
 
-# pylint: disable=no-member
 @ddt.ddt
-class CourseEnrollmentModificationTestBase(BaseCourseEnrollmentTestsMixin):
+class CourseEnrollmentModificationTestMixin(BaseCourseEnrollmentTestsMixin):
     """
     Base class for both the PATCH and PUT endpoints for Course Enrollment API
     Children needs to implement assert_user_not_enrolled_test_result and
@@ -744,7 +745,7 @@ class CourseEnrollmentModificationTestBase(BaseCourseEnrollmentTestsMixin):
         self.assert_program_course_enrollment('learner-4', 'active', False)
 
 
-class CourseEnrollmentPatchTests(CourseEnrollmentModificationTestBase, APITestCase):
+class CourseEnrollmentPatchTests(CourseEnrollmentModificationTestMixin, APITestCase):
     """ Tests for course enrollment PATCH """
 
     def request(self, path, data):
@@ -761,7 +762,7 @@ class CourseEnrollmentPatchTests(CourseEnrollmentModificationTestBase, APITestCa
         self.create_program_and_course_enrollments('learner-4', course_status=initial_statuses[3], user=None)
 
 
-class CourseEnrollmentPutTests(CourseEnrollmentModificationTestBase, APITestCase):
+class CourseEnrollmentPutTests(CourseEnrollmentModificationTestMixin, APITestCase):
     """ Tests for course enrollment PUT """
 
     def request(self, path, data):
@@ -1842,3 +1843,128 @@ class ProgramCourseEnrollmentOverviewViewTests(ProgramCacheTestCaseMixin, Shared
         response = self.client.get(self.get_url(self.program_uuid))
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertIn('micromasters_title', response.data['course_runs'][0])
+
+
+class ProgramCourseGradeListTest(ProgramEnrollmentDataMixin, ListViewTestMixin, APITestCase):
+    """
+    Tests for GET calls to the Program Course Grades API.
+    """
+    view_name = 'programs_api:v1:program_course_grades'
+
+    @staticmethod
+    def mock_course_grade(percent=75.0, passed=True, letter_grade='B'):
+        return mock.MagicMock(percent=percent, passed=passed, letter_grade=letter_grade)
+
+    @mock.patch('lms.djangoapps.program_enrollments.api.v1.views.CourseGradeFactory')
+    def test_204_no_grades_to_return(self, mock_course_grade_factory):
+        mock_course_grade_factory.return_value.iter.return_value = []
+        self.log_in_staff()
+        url = self.get_url(program_uuid=self.program_uuid, course_id=self.course_key)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(response.data['results'], [])
+
+    def test_401_if_unauthenticated(self):
+        url = self.get_url(program_uuid=self.program_uuid, course_id=self.course_key)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_403_if_not_staff(self):
+        self.log_in_non_staff()
+        url = self.get_url(program_uuid=self.program_uuid, course_id=self.course_key)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_404_not_found(self):
+        fake_program_uuid = self.program_uuid_tmpl.format(99)
+        self.log_in_staff()
+        url = self.get_url(program_uuid=fake_program_uuid, course_id=self.course_key)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    @mock.patch('lms.djangoapps.program_enrollments.api.v1.views.CourseGradeFactory')
+    def test_200_grades_with_no_exceptions(self, mock_course_grade_factory):
+        other_student = UserFactory.create(username='other_student')
+        self.create_program_and_course_enrollments('student-key', user=self.student)
+        self.create_program_and_course_enrollments('other-student-key', user=other_student)
+        mock_course_grades = [
+            (self.student, self.mock_course_grade(), None),
+            (other_student, self.mock_course_grade(percent=40.0, passed=False, letter_grade='F'), None),
+        ]
+        mock_course_grade_factory.return_value.iter.return_value = mock_course_grades
+
+        self.log_in_staff()
+        url = self.get_url(program_uuid=self.program_uuid, course_id=self.course_key)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        expected_results = [
+            {
+                'student_key': 'student-key',
+                'passed': True,
+                'percent': 75.0,
+                'letter_grade': 'B',
+            },
+            {
+                'student_key': 'other-student-key',
+                'passed': False,
+                'percent': 40.0,
+                'letter_grade': 'F',
+            },
+        ]
+        self.assertEqual(response.data['results'], expected_results)
+
+    @mock.patch('lms.djangoapps.program_enrollments.api.v1.views.CourseGradeFactory')
+    def test_207_grades_with_some_exceptions(self, mock_course_grade_factory):
+        other_student = UserFactory.create(username='other_student')
+        self.create_program_and_course_enrollments('student-key', user=self.student)
+        self.create_program_and_course_enrollments('other-student-key', user=other_student)
+        mock_course_grades = [
+            (self.student, None, Exception('Bad Data')),
+            (other_student, self.mock_course_grade(percent=40.0, passed=False, letter_grade='F'), None),
+        ]
+        mock_course_grade_factory.return_value.iter.return_value = mock_course_grades
+
+        self.log_in_staff()
+        url = self.get_url(program_uuid=self.program_uuid, course_id=self.course_key)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_207_MULTI_STATUS)
+        expected_results = [
+            {
+                'student_key': 'student-key',
+                'error': 'Bad Data',
+            },
+            {
+                'student_key': 'other-student-key',
+                'passed': False,
+                'percent': 40.0,
+                'letter_grade': 'F',
+            },
+        ]
+        self.assertEqual(response.data['results'], expected_results)
+
+    @mock.patch('lms.djangoapps.program_enrollments.api.v1.views.CourseGradeFactory')
+    def test_422_grades_with_only_exceptions(self, mock_course_grade_factory):
+        other_student = UserFactory.create(username='other_student')
+        self.create_program_and_course_enrollments('student-key', user=self.student)
+        self.create_program_and_course_enrollments('other-student-key', user=other_student)
+        mock_course_grades = [
+            (self.student, None, Exception('Bad Data')),
+            (other_student, None, Exception('Timeout')),
+        ]
+        mock_course_grade_factory.return_value.iter.return_value = mock_course_grades
+
+        self.log_in_staff()
+        url = self.get_url(program_uuid=self.program_uuid, course_id=self.course_key)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        expected_results = [
+            {
+                'student_key': 'student-key',
+                'error': 'Bad Data',
+            },
+            {
+                'student_key': 'other-student-key',
+                'error': 'Timeout',
+            },
+        ]
+        self.assertEqual(response.data['results'], expected_results)

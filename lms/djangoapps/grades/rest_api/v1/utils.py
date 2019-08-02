@@ -40,15 +40,17 @@ class CourseEnrollmentPagination(CursorPagination):
 
         return self.page_size
 
-    def get_paginated_response(self, data, **kwargs):  # pylint: disable=arguments-differ
+    def get_paginated_response(self, data, status_code=200, **kwargs):  # pylint: disable=arguments-differ
         """
-        Return a response given serialized page data and kwargs. Each key-value pair is added to the response.
+        Return a response given serialized page data, optional status_code (defaults to 200),
+        and kwargs. Each key-value pair of kwargs is added to the response data.
         """
         resp = super(CourseEnrollmentPagination, self).get_paginated_response(data)
 
         for (key, value) in kwargs.items():
             resp.data[key] = value
 
+        resp.status_code = status_code
         return resp
 
 
