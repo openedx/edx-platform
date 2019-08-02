@@ -30,7 +30,7 @@ factory_boy==2.8.1        # Library for creating test fixtures, used in many tes
 freezegun                 # Allows tests to mock the output of assorted datetime module functions
 httpretty                 # Library for mocking HTTP requests, used in many tests
 isort                     # For checking and fixing the order of imports
-moto==0.3.1               # Lets tests mock AWS access via the boto library
+moto==1.3.1               # Lets tests mock AWS access via the boto library
 pycodestyle               # Checker for compliance with the Python style guide (PEP 8)
 polib                     # Library for manipulating gettext translation files, used to test paver i18n commands
 pyquery                   # jQuery-like API for retrieving fragments of HTML and XML files in tests
