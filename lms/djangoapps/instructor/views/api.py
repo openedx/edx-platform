@@ -153,6 +153,7 @@ from ..permissions import (
     ASSIGN_TO_COHORTS,
     EDIT_COURSE_ACCESS,
     EDIT_FORUM_ROLES,
+    EDIT_INVOICE_VALIDATION,
     VIEW_ISSUED_CERTIFICATES,
 )
 
@@ -1174,7 +1175,7 @@ def get_sale_order_records(request, course_id):  # pylint: disable=unused-argume
     return instructor_analytics.csvs.create_csv_response("e-commerce_sale_order_records.csv", csv_columns, datarows)
 
 
-@require_level('staff')
+@require_course_permission(EDIT_INVOICE_VALIDATION)
 @require_POST
 def sale_validation(request, course_id):
     """
