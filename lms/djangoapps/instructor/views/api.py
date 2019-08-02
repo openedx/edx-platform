@@ -155,6 +155,7 @@ from ..permissions import (
     EDIT_FORUM_ROLES,
     EDIT_INVOICE_VALIDATION,
     ENABLE_CERTIFICATE_GENERATION,
+    GENERATE_CERTIFICATE_EXCEPTIONS,
     GENERATE_BULK_CERTIFICATE_EXCEPTIONS,
     GIVE_STUDENT_EXTENSION,
     VIEW_ISSUED_CERTIFICATES,
@@ -3305,7 +3306,7 @@ def get_student(username_or_email, course_key):
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_global_staff
+@require_course_permission(GENERATE_CERTIFICATE_EXCEPTIONS)
 @require_POST
 @common_exceptions_400
 def generate_certificate_exceptions(request, course_id, generate_for=None):
