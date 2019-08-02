@@ -2908,7 +2908,7 @@ def change_due_date(request, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
+@require_course_permission(GIVE_STUDENT_EXTENSION)
 @require_post_params('student', 'url')
 def reset_due_date(request, course_id):
     """
