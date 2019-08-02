@@ -154,6 +154,7 @@ from ..permissions import (
     EDIT_COURSE_ACCESS,
     EDIT_FORUM_ROLES,
     EDIT_INVOICE_VALIDATION,
+    GIVE_STUDENT_EXTENSION,
     VIEW_ISSUED_CERTIFICATES,
 )
 
@@ -2883,7 +2884,7 @@ def _display_unit(unit):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
+@require_course_permission(GIVE_STUDENT_EXTENSION)
 @require_post_params('student', 'url', 'due_datetime')
 def change_due_date(request, course_id):
     """

@@ -10,6 +10,7 @@ ASSIGN_TO_COHORTS = 'instructor.assign_to_cohorts'
 EDIT_COURSE_ACCESS = 'instructor.edit_course_access'
 EDIT_FORUM_ROLES = 'instructor.edit_forum_roles'
 EDIT_INVOICE_VALIDATION = 'instructor.edit_invoice_validation'
+GIVE_STUDENT_EXTENSION = 'instructor.give_student_extension'
 VIEW_ISSUED_CERTIFICATES = 'instructor.view_issued_certificates'
 
 
@@ -18,4 +19,5 @@ perms[ASSIGN_TO_COHORTS] = HasAccessRule('staff')
 perms[EDIT_COURSE_ACCESS] = HasAccessRule('instructor')
 perms[EDIT_FORUM_ROLES] = HasAccessRule('staff')
 perms[EDIT_INVOICE_VALIDATION] = HasAccessRule('staff')
+perms[GIVE_STUDENT_EXTENSION] = HasAccessRule('staff')
 perms[VIEW_ISSUED_CERTIFICATES] = HasAccessRule('staff')
