@@ -9,7 +9,7 @@
 # This is required for A2E courses that were created with the temporary (xblock-drag-and-drop-v2-new) DnDv2 branch to continue to work.
 # FIXME: bump version to 2.1.6 when https://github.com/edx-solutions/xblock-drag-and-drop-v2/pull/154 merged and tagged
 -e git+https://github.com/open-craft/xblock-drag-and-drop-v2.git@82c9dc5e16d10793e8b79e60661e1a78893fce25#egg=xblock-drag-and-drop-v2-new
--e git+https://github.com/edx-solutions/xblock-ooyala.git@v2.1.3#egg=xblock-ooyala==2.1.3
+-e git+https://github.com/edx-solutions/xblock-ooyala.git@v2.1.4#egg=xblock-ooyala==2.1.4
 git+https://github.com/edx-solutions/xblock-group-project.git@0.1.2#egg=xblock-group-project==0.1.2
 -e git+https://github.com/edx-solutions/xblock-adventure.git@v0.1.1#egg=xblock-adventure==0.1.1
 -e git+https://github.com/open-craft/xblock-poll.git@v1.8.6#egg=xblock-poll==1.8.6
