@@ -131,6 +131,63 @@ class ProgramCourseEnrollmentListSerializer(serializers.Serializer):
         return text_type(obj.program_enrollment.curriculum_uuid)
 
 
+class ProgramCourseGradeResult(object):
+    """
+    Represents a courserun grade for a user enrolled through a program.
+
+    Can be passed to ProgramCourseGradeResultSerializer.
+    """
+    is_error = False
+
+    def __init__(self, program_course_enrollment, course_grade):
+        """
+        Creates a new grade result given a ProgramCourseEnrollment object
+        and a course grade object.
+        """
+        self.student_key = program_course_enrollment.program_enrollment.external_user_key
+        self.passed = course_grade.passed
+        self.percent = course_grade.percent
+        self.letter_grade = course_grade.letter_grade
+
+
+class ProgramCourseGradeErrorResult(object):
+    """
+    Represents a failure to load a courserun grade for a user enrolled through
+    a program.
+
+    Can be passed to ProgramCourseGradeResultSerializer.
+    """
+    is_error = True
+
+    def __init__(self, program_course_enrollment, exception=None):
+        """
+        Creates a new course grade error object given a
+        ProgramCourseEnrollment and an exception.
+        """
+        self.student_key = program_course_enrollment.program_enrollment.external_user_key
+        self.error = text_type(exception) if exception else u"Unknown error"
+
+
+class ProgramCourseGradeResultSerializer(serializers.Serializer):
+    """
+    Serializer for a user's grade in a program courserun.
+
+    Meant to be used with ProgramCourseGradeResult
+    or ProgramCourseGradeErrorResult as input.
+    Absence of fields other than `student_key` will be ignored.
+    """
+    # Required
+    student_key = serializers.CharField()
+
+    # From ProgramCourseGradeResult only
+    passed = serializers.BooleanField(required=False)
+    percent = serializers.FloatField(required=False)
+    letter_grade = serializers.CharField(required=False)
+
+    # From ProgramCourseGradeErrorResult only
+    error = serializers.CharField(required=False)
+
+
 class DueDateSerializer(serializers.Serializer):
     """
     Serializer for a due date.

@@ -7,6 +7,7 @@ from lms.djangoapps.program_enrollments.api.v1.constants import PROGRAM_UUID_PAT
 from lms.djangoapps.program_enrollments.api.v1.views import (
     ProgramEnrollmentsView,
     ProgramCourseEnrollmentsView,
+    ProgramCourseGradesView,
     ProgramCourseEnrollmentOverviewView,
     UserProgramReadOnlyAccessView,
 )
@@ -37,6 +38,14 @@ urlpatterns = [
         ),
         ProgramCourseEnrollmentsView.as_view(),
         name="program_course_enrollments"
+    ),
+    url(
+        r'^programs/{program_uuid}/courses/{course_id}/grades/'.format(
+            program_uuid=PROGRAM_UUID_PATTERN,
+            course_id=COURSE_ID_PATTERN
+        ),
+        ProgramCourseGradesView.as_view(),
+        name="program_course_grades"
     ),
     url(
         r'^programs/{program_uuid}/overview/'.format(

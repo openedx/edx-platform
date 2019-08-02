@@ -20,17 +20,23 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError
-from rest_framework.pagination import CursorPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from six import iteritems
+from six import iteritems, text_type
+from six.moves import zip
 
 from ccx_keys.locator import CCXLocator
 from bulk_email.api import is_bulk_email_feature_enabled, is_user_opted_out_for_course
 from course_modes.models import CourseMode
 from edx_when.api import get_dates_for_course
 from lms.djangoapps.certificates.api import get_certificate_for_user
+from lms.djangoapps.grades.api import (
+    CourseGradeFactory,
+    clear_prefetched_course_grades,
+    prefetch_course_grades,
+)
+from lms.djangoapps.grades.rest_api.v1.utils import CourseEnrollmentPagination
 from lms.djangoapps.program_enrollments.api.v1.constants import (
     CourseEnrollmentResponseStatuses,
     CourseRunProgressStatuses,
@@ -41,6 +47,9 @@ from lms.djangoapps.program_enrollments.api.v1.serializers import (
     CourseRunOverviewListSerializer,
     ProgramCourseEnrollmentListSerializer,
     ProgramCourseEnrollmentRequestSerializer,
+    ProgramCourseGradeResult,
+    ProgramCourseGradeErrorResult,
+    ProgramCourseGradeResultSerializer,
     ProgramEnrollmentCreateRequestSerializer,
     ProgramEnrollmentListSerializer,
     ProgramEnrollmentModifyRequestSerializer,
@@ -133,25 +142,11 @@ def verify_course_exists_and_in_program(view_func):
     return wrapped_function
 
 
-class ProgramEnrollmentPagination(CursorPagination):
+class ProgramEnrollmentPagination(CourseEnrollmentPagination):
     """
-    Pagination class for Program Enrollments.
+    Pagination class for views in the Program Enrollments app.
     """
-    ordering = 'id'
     page_size = 100
-    page_size_query_param = 'page_size'
-
-    def get_page_size(self, request):
-        """
-        Get the page size based on the defined page size parameter if defined.
-        """
-        try:
-            page_size_string = request.query_params[self.page_size_query_param]
-            return int(page_size_string)
-        except (KeyError, ValueError):
-            pass
-
-        return self.page_size
 
 
 class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
@@ -1209,3 +1204,188 @@ class ProgramCourseEnrollmentOverviewView(DeveloperErrorViewMixin, ProgramSpecif
             else:
                 return CourseRunProgressStatuses.UPCOMING
         return None
+
+
+class ProgramCourseGradesView(
+        DeveloperErrorViewMixin,
+        ProgramCourseRunSpecificViewMixin,
+        PaginatedAPIView,
+):
+    """
+    A view for retrieving a paginated list of grades for all students enrolled
+    in a given courserun through a given program.
+
+    Path: ``/api/program_enrollments/v1/programs/{program_uuid}/courses/{course_id}/grades/``
+
+    Accepts: [GET]
+
+    For GET requests, the path can contain an optional `page_size?=N` query parameter.
+    The default page size is 100.
+
+    ------------------------------------------------------------------------------------
+    GETs
+    ------------------------------------------------------------------------------------
+
+    **Returns**
+
+        * 200: OK - Contains a paginated set of program courserun grades.
+        * 204: No Content - No grades to return
+        * 207: Mixed result - Contains mixed list of program courserun grades
+               and grade-fetching errors
+        * 422: All failed - Contains list of grade-fetching errors
+        * 401: The requesting user is not authenticated.
+        * 403: The requesting user lacks access for the given program/course.
+        * 404: The requested program or course does not exist.
+
+    **Response**
+
+        In the case of a 200/207/422 response code, the response will include a
+        paginated data set.  The `results` section of the response consists of a
+        list of grade records, where each successfully loaded record contains:
+          * student_key: The identifier of the student enrolled in the program and course.
+          * letter_grade: A letter grade as defined in grading policy
+            (e.g. 'A' 'B' 'C' for 6.002x) or None.
+          * passed: Boolean representing whether the course has been
+            passed according to the course's grading policy.
+          * percent: A float representing the overall grade for the course.
+        and failed-to-load records contain:
+          * student_key
+          * error: error message from grades Exception
+
+    **Example**
+
+        207 Multi-Status
+        {
+            "next": null,
+            "previous": "http://example.com/api/program_enrollments/v1/programs/{program_uuid}/courses/{course_id}/grades/?cursor=abcd",
+            "results": [;
+                {
+                    "student_key": "01709bffeae2807b6a7317",
+                    "letter_grade": "Pass",
+                    "percent": 0.95,
+                    "passed": true
+                },
+                {
+                    "student_key": "2cfe15e3380a52e7198237",
+                    "error": "Timeout while calculating grade"
+                },
+                ...
+            ],
+        }
+
+    """
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (permissions.JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS,)
+    pagination_class = ProgramEnrollmentPagination
+
+    @verify_course_exists
+    @verify_program_exists
+    def get(self, request, program_uuid=None, course_id=None):
+        """
+        Defines the GET list endpoint for ProgramCourseGrade objects.
+        """
+        course_key = CourseKey.from_string(course_id)
+        grade_results = self._load_grade_results(program_uuid, course_key)
+        serializer = ProgramCourseGradeResultSerializer(grade_results, many=True)
+        response_code = self._calc_response_code(grade_results)
+        return self.get_paginated_response(serializer.data, status_code=response_code)
+
+    def _load_grade_results(self, program_uuid, course_key):
+        """
+        Load grades (or grading errors) for a given program courserun.
+
+        Arguments:
+            program_uuid (str)
+            course_key (CourseKey)
+
+        Returns: list[ProgramCourseGradeResult|ProgramCourseGradeErrorResult]
+        """
+        enrollments_qs = use_read_replica_if_available(
+            ProgramCourseEnrollment.objects.filter(
+                program_enrollment__program_uuid=program_uuid,
+                program_enrollment__user__isnull=False,
+                course_key=course_key,
+            ).select_related(
+                'program_enrollment',
+                'program_enrollment__user',
+            )
+        )
+        paginated_enrollments = self.paginate_queryset(enrollments_qs)
+        if not paginated_enrollments:
+            return []
+
+        # Hint: `zip(*(list))` can be read as "unzip(list)"
+        enrollments, users = zip(*(
+            (enrollment, enrollment.program_enrollment.user)
+            for enrollment in paginated_enrollments
+        ))
+        enrollment_grade_pairs = zip(
+            enrollments, self._iter_grades(course_key, list(users))
+        )
+        grade_results = [
+            (
+                ProgramCourseGradeResult(enrollment, grade)
+                if grade
+                else ProgramCourseGradeErrorResult(enrollment, exception)
+            )
+            for enrollment, (grade, exception) in enrollment_grade_pairs
+        ]
+        return grade_results
+
+    @staticmethod
+    def _iter_grades(course_key, users):
+        """
+        Load a user grades for a course, using bulk fetching for efficiency.
+
+        Arguments:
+            course_key (CourseKey)
+            users (list[User])
+
+        Returns: iterable[( CourseGradeBase|NoneType, Exception|NoneType )]
+            Iterable of pairs, in same order as `users`.
+            The first item in the pair is the grade, or None if loading the
+                grade failed.
+            The second item in the pair is an exception or None.
+        """
+        prefetch_course_grades(course_key, users)
+        try:
+            grades_iter = CourseGradeFactory().iter(users, course_key=course_key)
+            for user, course_grade, exception in grades_iter:
+                if not course_grade:
+                    fmt = 'Failed to load course grade for user ID {} in {}: {}'
+                    err_str = fmt.format(
+                        user.id,
+                        course_key,
+                        text_type(exception) if exception else 'Unknown error'
+                    )
+                    logger.error(err_str)
+                yield course_grade, exception
+        finally:
+            clear_prefetched_course_grades(course_key)
+
+    @staticmethod
+    def _calc_response_code(grade_results):
+        """
+        Returns HTTP status code appropriate for list of results,
+        which may be grades or errors.
+
+        Arguments:
+            enrollment_grade_results: list[ProgramCourseGradeResult]
+
+        Returns: int
+          * 200 for all success
+          * 207 for mixed result
+          * 422 for all failure
+          * 204 for empty
+        """
+        if not grade_results:
+            return status.HTTP_204_NO_CONTENT
+        if all(result.is_error for result in grade_results):
+            return status.HTTP_422_UNPROCESSABLE_ENTITY
+        if any(result.is_error for result in grade_results):
+            return status.HTTP_207_MULTI_STATUS
+        return status.HTTP_200_OK
