@@ -9,6 +9,7 @@ import json
 import time
 import traceback
 from datetime import datetime, timedelta
+from textwrap import dedent
 
 import six.moves.urllib.parse  # pylint: disable=import-error
 from django.contrib.auth.models import User
@@ -28,6 +29,7 @@ class Command(BaseCommand):
     Command to create contacts in hubspot for those partner who has enabled hubspot integration.
     This command is suppose to sync contact with hubspot on daily basis.
     """
+    help = dedent(__doc__).strip()
 
     def _get_hubspot_enabled_sites(self):
         """
