@@ -7,6 +7,7 @@ Intented for use in integration sandbox environments
 from __future__ import absolute_import
 
 import logging
+from textwrap import dedent
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
@@ -25,6 +26,7 @@ class Command(BaseCommand):
     Example usage:
         $ ./manage.py lms reset_enrollment_data ca73b4af-676a-4bb3-a9a5-f6b5a3dedd,1c5f61b9-0be5-4a90-9ea5-582d5e066c
     """
+    help = dedent(__doc__).strip()
     confirmation_prompt = "Type 'confirm' to continue with deletion\n"
 
     def add_arguments(self, parser):
