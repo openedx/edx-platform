@@ -12,7 +12,7 @@ from django.forms import CharField, Form
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from openedx.core.djangoapps.util.forms import ExtendedNullBooleanField
+from openedx.core.djangoapps.util.forms import ExtendedNullBooleanField, MultiValueField
 
 
 class UsernameValidatorMixin(object):
@@ -54,6 +54,7 @@ class CourseListGetForm(UsernameValidatorMixin, Form):
     search_term = CharField(required=False)
     username = CharField(required=False)
     org = CharField(required=False)
+    role = MultiValueField(required=False)
 
     # white list of all supported filter fields
     filter_type = namedtuple('filter_type', ['param_name', 'field_name'])

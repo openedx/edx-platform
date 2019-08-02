@@ -23,6 +23,9 @@ from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+from student.auth import add_users
+from student.roles import CourseInstructorRole, CourseStaffRole
+from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -159,6 +162,7 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
         self.url = reverse('course-list')
         self.staff_user = self.create_user(username='staff', is_staff=True)
         self.honor_user = self.create_user(username='honor', is_staff=False)
+        self.global_admin = AdminFactory()
 
     def test_filter_by_org(self):
         """Verify that CourseOverviews are filtered by the provided org key."""
@@ -205,6 +209,86 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
                 {six.text_type(course.id) for course in expected_courses},
                 u"testing course_api.views.CourseListView with filter_={}".format(filter_),
             )
+
+    def test_filter_by_roles_global_staff(self):
+        """
+        Verify that global staff are always returned all courses irregardless of role filter.
+        """
+        self.setup_user(self.staff_user)
+
+        # Create a second course to be filtered out of queries.
+        alternate_course = self.create_course(org=md5(self.course.org).hexdigest())
+
+        # Request the courses as the staff user with the different roles specified.
+        for roles in ('', 'staff', 'staff,instructor'):
+            filtered_response = self.verify_response(params={'username': self.staff_user.username, 'role': roles})
+            # Both courses should be returned in the course list.
+            for org in [self.course.org, alternate_course.org]:
+                self.assertTrue(
+                    any(course['org'] == org for course in filtered_response.data['results'])
+                )
+
+    def test_filter_by_roles_non_staff(self):
+        """
+        Verify that a non-staff user can't access CourseOverviews by role.
+        """
+
+        # Requesting the courses as the non-staff user should *not* be allowed.
+        self.setup_user(self.honor_user)
+        filtered_response = self.verify_response(params={'username': self.honor_user.username, 'role': 'staff'})
+        self.assertEquals(len(filtered_response.data['results']), 0)
+
+    def test_filter_by_roles_course_staff(self):
+        """
+        Verify that CourseOverviews are filtered by the provided roles.
+        """
+        # Make this user a course staff user for the course.
+        course_staff_user = self.create_user(username='course_staff', is_staff=False)
+        add_users(self.global_admin, CourseStaffRole(self.course.id), course_staff_user)
+
+        # Create a second course to be filtered out of queries, along with an instructor user for it.
+        alternate_course = self.create_course(org=md5(self.course.org).hexdigest())
+        course_instructor_user = self.create_user(username='course_instructor', is_staff=False)
+        add_users(self.global_admin, CourseInstructorRole(alternate_course.id), course_instructor_user)
+
+        # Requesting the courses for which the course staff user is staff should return *only* the single course.
+        self.setup_user(self.staff_user)
+        filtered_response = self.verify_response(params={
+            'username': course_staff_user.username,
+            'role': 'staff'
+        })
+        self.assertEquals(len(filtered_response.data['results']), 1)
+        self.assertEquals(filtered_response.data['results'][0]['org'], self.course.org)
+
+        # The course staff user does *not* have the course instructor role on any courses.
+        filtered_response = self.verify_response(params={
+            'username': course_staff_user.username,
+            'role': 'instructor'
+        })
+        self.assertEquals(len(filtered_response.data['results']), 0)
+
+        # The course instructor user only has the course instructor role on one course.
+        filtered_response = self.verify_response(params={
+            'username': course_instructor_user.username,
+            'role': 'instructor'
+        })
+        self.assertEquals(len(filtered_response.data['results']), 1)
+        self.assertEquals(filtered_response.data['results'][0]['org'], alternate_course.org)
+
+        # The honor user does *not* have the course staff -or- instructor role on any courses.
+        filtered_response = self.verify_response(params={
+            'username': self.honor_user.username,
+            'role': 'staff,instructor'
+        })
+        self.assertEquals(len(filtered_response.data['results']), 0)
+
+        # The course instructor user has the inferred course staff role on one course.
+        self.setup_user(course_instructor_user)
+        filtered_response = self.verify_response(params={
+            'username': course_instructor_user.username,
+            'role': 'staff'
+        })
+        self.assertEquals(len(filtered_response.data['results']), 1)
 
 
 class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
