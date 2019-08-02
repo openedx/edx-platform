@@ -932,7 +932,7 @@ USE_TZ = True
 SESSION_COOKIE_SECURE = False
 SESSION_SAVE_EVERY_REQUEST = False
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
-SESSION_COOKIE_AGE = 86400
+SESSION_COOKIE_AGE = 86400 # Default: 24 hours, in seconds
 
 # CMS base
 CMS_BASE = 'localhost:8001'
