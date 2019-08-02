@@ -68,7 +68,7 @@ class TestPaverDatabaseTasks(MockS3Mixin, PaverTestCase):
     def setUp(self):
         super(TestPaverDatabaseTasks, self).setUp()
         conn = boto.connect_s3()
-        conn.create_bucket('moto_test_bucket')
+        conn.create_bucket('moto_test_bucket', policy='public-read')
         self.bucket = conn.get_bucket('moto_test_bucket')
         # This value is the actual sha1 fingerprint calculated for the dummy
         # files used in these tests
