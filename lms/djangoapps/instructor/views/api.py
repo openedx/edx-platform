@@ -152,6 +152,7 @@ from ..permissions import (
     ALLOW_STUDENT_TO_BYPASS_ENTRANCE_EXAM,
     ASSIGN_TO_COHORTS,
     EDIT_COURSE_ACCESS,
+    EDIT_FORUM_ROLES,
     VIEW_ISSUED_CERTIFICATES,
 )
 
@@ -2788,7 +2789,7 @@ def send_email(request, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
+@require_course_permission(EDIT_FORUM_ROLES)
 @require_post_params(
     unique_student_identifier="email or username of user to change access",
     rolename="the forum role",
