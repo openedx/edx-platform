@@ -89,7 +89,7 @@ def setup_students_and_grades(context):
         context.student = student = UserFactory.create()
         CourseEnrollmentFactory.create(user=student, course_id=context.course.id)
 
-        context.student2 = student2 = UserFactory.create()
+        context.student2 = student2 = UserFactory.create(username=u'u\u0131\u028c\u0279\u0250\u026f')
         CourseEnrollmentFactory.create(user=student2, course_id=context.course.id)
 
         # create grades for self.student as if they'd submitted the ccx
