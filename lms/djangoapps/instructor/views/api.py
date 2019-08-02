@@ -154,6 +154,7 @@ from ..permissions import (
     EDIT_COURSE_ACCESS,
     EDIT_FORUM_ROLES,
     EDIT_INVOICE_VALIDATION,
+    ENABLE_CERTIFICATE_GENERATION,
     GIVE_STUDENT_EXTENSION,
     VIEW_ISSUED_CERTIFICATES,
 )
@@ -3019,7 +3020,7 @@ def generate_example_certificates(request, course_id=None):  # pylint: disable=u
     return redirect(_instructor_dash_url(course_key, section='certificates'))
 
 
-@require_global_staff
+@require_course_permission(ENABLE_CERTIFICATE_GENERATION)
 @require_POST
 def enable_certificate_generation(request, course_id=None):
     """Enable/disable self-generated certificates for a course.
