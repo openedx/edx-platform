@@ -45,6 +45,7 @@ from models.settings.course_metadata import CourseMetadata
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
 from openedx.core.lib.extract_tar import safetar_extractall
 from student.auth import has_course_author_access
+from util.organizations_helpers import add_organization_course, get_organization_by_short_name
 from xmodule.contentstore.django import contentstore
 from xmodule.course_module import CourseFields
 from xmodule.exceptions import SerializationError
@@ -484,6 +485,8 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
             for country_access_rule in country_access_rules:
                 clone_instance(country_access_rule, {'restricted_course': new_restricted_course})
 
+        org_data = get_organization_by_short_name(source_course_key.org)
+        add_organization_course(org_data, destination_course_key)
         return "succeeded"
 
     except DuplicateCourseError:

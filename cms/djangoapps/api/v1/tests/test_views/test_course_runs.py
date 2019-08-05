@@ -9,12 +9,14 @@ import pytz
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import RequestFactory
 from django.urls import reverse
+from mock import patch
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.test import APIClient
 
 from openedx.core.lib.courses import course_image_url
 from student.models import CourseAccessRole
 from student.tests.factories import TEST_PASSWORD, AdminFactory, UserFactory
+from util.organizations_helpers import add_organization, get_course_organizations
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
@@ -320,6 +322,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         # There should now be an image stored
         contentstore().find(content_key)
 
+    @patch.dict('django.conf.settings.FEATURES', {'ORGANIZATIONS_APP': True})
     @ddt.data(
         ('instructor_paced', False, 'NotOriginalNumber1x'),
         ('self_paced', True, None),
@@ -327,6 +330,11 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
     @ddt.unpack
     def test_rerun(self, pacing_type, expected_self_paced_value, number):
         original_course_run = ToyCourseFactory()
+        add_organization({
+            'name': 'Test Organization',
+            'short_name': original_course_run.id.org,
+            'description': 'Testing Organization Description',
+        })
         start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
         end = start + datetime.timedelta(days=30)
         user = UserFactory()
@@ -369,6 +377,9 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         self.assert_course_run_schedule(course_run, start, end)
         self.assert_access_role(course_run, user, role)
         self.assert_course_access_role_count(course_run, 1)
+        course_orgs = get_course_organizations(course_run_key)
+        self.assertEqual(len(course_orgs), 1)
+        self.assertEqual(course_orgs[0]['short_name'], original_course_run.id.org)
 
     def test_rerun_duplicate_run(self):
         course_run = ToyCourseFactory()
