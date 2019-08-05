@@ -4,6 +4,7 @@ django-rules and Bridgekeeper rules for courseware related features
 from __future__ import absolute_import
 
 import logging
+import traceback
 
 import laboratory
 import rules
@@ -63,15 +64,16 @@ class HasAccessRule(Rule):
 
 class StaffAccessExperiment(laboratory.Experiment):
     def compare(self, control, candidate):
-        return bool(control) == candidate
+        return bool(control.value) == candidate.value
 
     def publish(self, result):
         if not result.match:
+
             LOG.warning(
-                u"StaffAccessExperiment: control=%r, candidate=%r",
+                u"StaffAccessExperiment: control=%r, candidate=%r\n%s",
                 result.control,
                 result.candidates[0],
-                exc_info=True
+                "".join(traceback.format_stack(limit=10))
             )
 
 
