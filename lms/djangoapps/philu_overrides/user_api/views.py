@@ -61,6 +61,7 @@ def _do_create_account_custom(form, custom_form=None, is_alquity_user=False):
 
     Note: this function is also used for creating test users.
     """
+
     from openedx.core.djangoapps.user_api.errors import AccountValidationError
 
     errors = {}
