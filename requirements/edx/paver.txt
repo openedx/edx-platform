@@ -20,7 +20,7 @@ pbr==5.4.1                # via stevedore
 psutil==1.2.1
 pymongo==2.9.1
 python-memcached==1.59
-pyyaml==5.1.1             # via watchdog
+pyyaml==5.1.2             # via watchdog
 requests==2.22.0
 six==1.11.0
 stevedore==1.30.1
