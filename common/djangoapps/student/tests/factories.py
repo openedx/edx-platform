@@ -69,7 +69,7 @@ class RegistrationFactory(DjangoModelFactory):
         model = Registration
 
     user = None
-    activation_key = uuid4().hex.decode('ascii')
+    activation_key = six.text_type(uuid4().hex)
 
 
 class UserFactory(DjangoModelFactory):
