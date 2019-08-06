@@ -112,7 +112,7 @@ class TestRemoveSocialAuthUsersCommand(TestCase):
         self.assertEqual(len(User.objects.all()), 3)
         self.assertEqual(len(UserSocialAuth.objects.all()), 2)
 
-    def test_feature_default_diables(self):
+    def test_feature_default_disabled(self):
         """ By default this command should not be enabled """
         err_string = 'ENABLE_ENROLLMENT_RESET feature not enabled on this enviroment'
         with self.assertRaisesRegexp(CommandError, err_string):
