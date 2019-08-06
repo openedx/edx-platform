@@ -10,7 +10,6 @@ import re
 from contextlib import contextmanager
 from datetime import datetime
 from functools import wraps
-from StringIO import StringIO
 
 import dateutil.parser
 import ddt
@@ -1417,7 +1416,7 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
             response["Content-Disposition"],
             u"attachment; filename={course}_video_urls.csv".format(course=self.course.id.course)
         )
-        response_reader = StringIO(response.content)
+        response_reader = six.StringIO(response.content)
         reader = csv.DictReader(response_reader, dialect=csv.excel)
         self.assertEqual(
             reader.fieldnames,
