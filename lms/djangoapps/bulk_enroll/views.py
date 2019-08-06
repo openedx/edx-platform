@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from bulk_enroll.serializers import BulkEnrollmentSerializer
-from instructor.views.api import students_update_enrollment
+from lms.djangoapps.instructor.views.api import students_update_enrollment
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, get_cohort_by_name
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.enrollments.views import EnrollmentUserThrottle

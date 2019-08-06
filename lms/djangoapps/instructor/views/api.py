@@ -148,6 +148,20 @@ from .tools import (
     strip_if_string
 )
 
+from ..permissions import (
+    ALLOW_STUDENT_TO_BYPASS_ENTRANCE_EXAM,
+    ASSIGN_TO_COHORTS,
+    EDIT_COURSE_ACCESS,
+    EDIT_FORUM_ROLES,
+    EDIT_INVOICE_VALIDATION,
+    ENABLE_CERTIFICATE_GENERATION,
+    GENERATE_CERTIFICATE_EXCEPTIONS,
+    GENERATE_BULK_CERTIFICATE_EXCEPTIONS,
+    GIVE_STUDENT_EXTENSION,
+    VIEW_ISSUED_CERTIFICATES,
+)
+
+
 log = logging.getLogger(__name__)
 
 TASK_SUBMISSION_OK = 'created'
@@ -242,6 +256,28 @@ def require_level(level):
             course = get_course_by_id(CourseKey.from_string(kwargs['course_id']))
 
             if has_access(request.user, level, course):
+                return func(*args, **kwargs)
+            else:
+                return HttpResponseForbidden()
+        return wrapped
+    return decorator
+
+
+def require_course_permission(permission):
+    """
+    Decorator with argument that requires a specific permission of the requesting
+    user. If the requirement is not satisfied, returns an
+    HttpResponseForbidden (403).
+
+    Assumes that request is in args[0].
+    Assumes that course_id is in kwargs['course_id'].
+    """
+    def decorator(func):  # pylint: disable=missing-docstring
+        def wrapped(*args, **kwargs):
+            request = args[0]
+            course = get_course_by_id(CourseKey.from_string(kwargs['course_id']))
+
+            if request.user.has_perm(permission, course):
                 return func(*args, **kwargs)
             else:
                 return HttpResponseForbidden()
@@ -877,7 +913,7 @@ def bulk_beta_modify_access(request, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('instructor')
+@require_course_permission(EDIT_COURSE_ACCESS)
 @require_post_params(
     unique_student_identifier="email or username of user to change access",
     rolename="'instructor', 'staff', 'beta', or 'ccx_coach'",
@@ -1143,7 +1179,7 @@ def get_sale_order_records(request, course_id):  # pylint: disable=unused-argume
     return instructor_analytics.csvs.create_csv_response("e-commerce_sale_order_records.csv", csv_columns, datarows)
 
 
-@require_level('staff')
+@require_course_permission(EDIT_INVOICE_VALIDATION)
 @require_POST
 def sale_validation(request, course_id):
     """
@@ -1210,7 +1246,7 @@ def re_validate_invoice(obj_invoice):
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
+@require_course_permission(VIEW_ISSUED_CERTIFICATES)
 def get_issued_certificates(request, course_id):
     """
     Responds with JSON if CSV is not required. contains a list of issued certificates.
@@ -1388,7 +1424,7 @@ def _cohorts_csv_validator(file_storage, file_to_validate):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_POST
-@require_level('staff')
+@require_course_permission(ASSIGN_TO_COHORTS)
 @common_exceptions_400
 def add_users_to_cohorts(request, course_id):
     """
@@ -2758,7 +2794,7 @@ def send_email(request, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
+@require_course_permission(EDIT_FORUM_ROLES)
 @require_post_params(
     unique_student_identifier="email or username of user to change access",
     rolename="the forum role",
@@ -2851,7 +2887,7 @@ def _display_unit(unit):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
+@require_course_permission(GIVE_STUDENT_EXTENSION)
 @require_post_params('student', 'url', 'due_datetime')
 def change_due_date(request, course_id):
     """
@@ -2875,7 +2911,7 @@ def change_due_date(request, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
+@require_course_permission(GIVE_STUDENT_EXTENSION)
 @require_post_params('student', 'url')
 def reset_due_date(request, course_id):
     """
@@ -2986,7 +3022,7 @@ def generate_example_certificates(request, course_id=None):  # pylint: disable=u
     return redirect(_instructor_dash_url(course_key, section='certificates'))
 
 
-@require_global_staff
+@require_course_permission(ENABLE_CERTIFICATE_GENERATION)
 @require_POST
 def enable_certificate_generation(request, course_id=None):
     """Enable/disable self-generated certificates for a course.
@@ -3006,7 +3042,7 @@ def enable_certificate_generation(request, course_id=None):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
+@require_course_permission(ALLOW_STUDENT_TO_BYPASS_ENTRANCE_EXAM)
 @require_POST
 def mark_student_can_skip_entrance_exam(request, course_id):
     """
@@ -3270,7 +3306,7 @@ def get_student(username_or_email, course_key):
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_global_staff
+@require_course_permission(GENERATE_CERTIFICATE_EXCEPTIONS)
 @require_POST
 @common_exceptions_400
 def generate_certificate_exceptions(request, course_id, generate_for=None):
@@ -3312,7 +3348,7 @@ def generate_certificate_exceptions(request, course_id, generate_for=None):
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_global_staff
+@require_course_permission(GENERATE_BULK_CERTIFICATE_EXCEPTIONS)
 @require_POST
 def generate_bulk_certificate_exceptions(request, course_id):
     """

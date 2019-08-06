@@ -6,7 +6,7 @@ import pytest
 from django.test import TestCase
 from six.moves import range
 
-from instructor_analytics.csvs import create_csv_response, format_dictlist, format_instances
+from lms.djangoapps.instructor_analytics.csvs import create_csv_response, format_dictlist, format_instances
 
 
 class TestAnalyticsCSVS(TestCase):
