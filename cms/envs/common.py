@@ -1244,7 +1244,6 @@ INSTALLED_APPS = [
     'mptt',
     'sekizai',
     'openedx.core.djangoapps.user_api',
-    'django_openid_auth',
 
     # Country embargo support
     'openedx.core.djangoapps.embargo',
