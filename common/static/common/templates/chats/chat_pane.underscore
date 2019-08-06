@@ -1,0 +1,25 @@
+<li class="xns-item <% if(room.unread) {%>unread<%}%>">
+    <span class="img-box">
+        <% if(room.teaser.user.picture !== "") {%>
+            <img class="profile" src="<%=room.teaser.user.picture%>" alt="<%=room.teaser.user.username%>" />
+        <% } else { %>
+            <span class="profile-icon" style="background-color: <%=room.teaser.user['icon:bgColor']%>;">
+                <%=room.teaser.user['icon:text']%>
+            </span>
+        <% } %>
+    </span>
+
+    <span class="chat-text">
+        <span class="text">
+            <% if (room.roomName !== "") { %>
+                <%=room.roomName%>
+            <% } else { %>
+                <%=room.usernames%>
+            <% } %>
+        </span>
+
+        <span class="room-content">
+            <%=room.teaser.content%>
+        </span>
+    </span>
+</li>
