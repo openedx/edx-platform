@@ -116,10 +116,8 @@ class TestHelpers(TestCase):
         with with_site_configuration_context(configuration=test_config):
             self.assertTrue(configuration_helpers.is_site_configuration_enabled())
 
-            # Test with a disabled Site Configuration
-            site_configuration = configuration_helpers.get_current_site_configuration()
-            site_configuration.enabled = False
-            self.assertFalse(configuration_helpers.is_site_configuration_enabled())
+        # Test without a Site Configuration
+        self.assertFalse(configuration_helpers.is_site_configuration_enabled())
 
     def test_get_value_for_org(self):
         """
