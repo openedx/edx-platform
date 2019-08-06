@@ -90,6 +90,10 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
         self.assertIn('start_date', filter_dictionary)
         self.assertEqual(0, len(field_dictionary['course']))
 
+    @patch(
+        'openedx.core.djangoapps.site_configuration.helpers.get_all_orgs',
+        Mock(return_value=["LogistrationX", "TestSiteX"])
+    )
     def test_excludes_site_org(self):
         """
         By default site orgs not belonging to current site org should be excluded.
