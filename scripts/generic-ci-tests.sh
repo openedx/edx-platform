@@ -179,7 +179,7 @@ case "$TEST_SUITE" in
             PAVER_ARGS="$PAVER_ARGS --with-wtw=origin/master"
         fi
         if [[ -n "$COLLECT_WHO_TESTS_WHAT" ]]; then
-            PAVER_ARGS="$PAVER_ARGS --pytest-contexts --coveragerc=common/test/acceptance/.coveragerc"
+            PAVER_ARGS="$PAVER_ARGS --pytest-remote-contexts --coveragerc=common/test/acceptance/.coveragerc"
         fi
         export BOKCHOY_HEADLESS=true
 
