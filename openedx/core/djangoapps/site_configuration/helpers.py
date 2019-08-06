@@ -107,8 +107,8 @@ def get_value(val_name, default=None, **kwargs):
         Configuration value for the given key.
     """
 
-    # Retrieve the requested field/value from the site configuration
     if is_site_configuration_enabled():
+        # Retrieve the requested field/value from the site configuration
         configuration_value = get_configuration_value(val_name, default=default)
     else:
         configuration_value = default
