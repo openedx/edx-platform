@@ -78,7 +78,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         # TODO Verify this is the best method to create CourseMode objects.
         # TODO Find/create constants for the modes.
         for mode in [CourseMode.HONOR, CourseMode.VERIFIED, CourseMode.AUDIT]:
-            sku_string = uuid4().hex.decode('ascii')
+            sku_string = six.text_type(uuid4().hex)
             CourseModeFactory.create(
                 course_id=self.course.id,
                 mode_slug=mode,
@@ -200,7 +200,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
 
         CourseMode.objects.filter(course_id=self.course.id).delete()
         mode = CourseMode.NO_ID_PROFESSIONAL_MODE
-        sku_string = uuid4().hex.decode('ascii')
+        sku_string = six.text_type(uuid4().hex)
         CourseModeFactory.create(course_id=self.course.id, mode_slug=mode, mode_display_name=mode,
                                  sku=sku_string, bulk_sku='BULK-{}'.format(sku_string))
         response = self._post_to_view()
