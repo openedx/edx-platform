@@ -35,7 +35,7 @@ from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnro
 from lms.djangoapps.program_enrollments.models import ProgramEnrollment, ProgramCourseEnrollment
 from lms.djangoapps.program_enrollments.utils import ProviderDoesNotExistException
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL
-from openedx.core.djangoapps.catalog.tests.factories import CourseFactory
+from openedx.core.djangoapps.catalog.tests.factories import CourseFactory, CourseRunFactory
 from openedx.core.djangoapps.catalog.tests.factories import OrganizationFactory as CatalogOrganizationFactory
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -593,6 +593,7 @@ class CourseEnrollmentPostTests(BaseCourseEnrollmentTestsMixin, APITestCase):
         )
 
 
+# pylint: disable=no-member
 @ddt.ddt
 class CourseEnrollmentModificationTestBase(BaseCourseEnrollmentTestsMixin):
     """
@@ -1320,6 +1321,8 @@ class ProgramCourseEnrollmentOverviewViewTests(ProgramCacheTestCaseMixin, Shared
         cls.other_curriculum_uuid = 'bbbbbbbb-1111-2222-3333-444444444444'
 
         cls.course_id = CourseKey.from_string('course-v1:edX+ToyX+Toy_Course')
+        cls.course_run = CourseRunFactory.create(key=text_type(cls.course_id))
+        cls.course = CourseFactory.create(course_runs=[cls.course_run])
 
         cls.password = 'password'
         cls.student = UserFactory.create(username='student', password=cls.password)
@@ -1335,9 +1338,6 @@ class ProgramCourseEnrollmentOverviewViewTests(ProgramCacheTestCaseMixin, Shared
     def setUp(self):
         super(ProgramCourseEnrollmentOverviewViewTests, self).setUp()
 
-        # create program
-        self.program = self.setup_catalog_cache(self.program_uuid, 'organization_key')
-
         # create program enrollment
         self.program_enrollment = ProgramEnrollmentFactory.create(
             program_uuid=self.program_uuid,
@@ -1346,9 +1346,10 @@ class ProgramCourseEnrollmentOverviewViewTests(ProgramCacheTestCaseMixin, Shared
         )
 
         # create course enrollment
-        self.course_enrollment = CourseEnrollmentFactory(
+        self.course_enrollment = CourseEnrollmentFactory.create(
             course_id=self.course_id,
             user=self.student,
+            mode=CourseMode.MASTERS,
         )
 
         # create course overview
@@ -1365,6 +1366,11 @@ class ProgramCourseEnrollmentOverviewViewTests(ProgramCacheTestCaseMixin, Shared
             course_key=self.course_id,
             status='active',
         )
+
+        # create program
+        self.program = self.setup_catalog_cache(self.program_uuid, 'organization_key')
+        self.program['curricula'][0]['courses'].append(self.course)
+        self.set_program_in_catalog_cache(self.program_uuid, self.program)
 
     def create_generated_certificate(self):
         return GeneratedCertificateFactory.create(
@@ -1401,91 +1407,39 @@ class ProgramCourseEnrollmentOverviewViewTests(ProgramCacheTestCaseMixin, Shared
         response = self.client.get(self.get_url(self.program_uuid))
         assert status.HTTP_403_FORBIDDEN == response.status_code
 
-    @ddt.data(
-        'pending',
-        'suspended',
-        'canceled',
-    )
-    def test_multiple_enrollments_with_not_enrolled(self, program_enrollment_status):
-        # add a second program enrollment
-        program_enrollment = ProgramEnrollmentFactory.create(
-            program_uuid=self.program_uuid,
-            curriculum_uuid=self.other_curriculum_uuid,
-            user=self.student,
-            status=program_enrollment_status,
-        )
-
-        other_course_key_string = 'course-v1:edX+ToyX+Other_Course'
-        other_course_key = CourseKey.from_string(other_course_key_string)
-
-        # add a second course enrollment
-        course_enrollment = CourseEnrollmentFactory(
-            course_id=other_course_key,
-            user=self.student,
-        )
-
-        # add a second program course enrollment
-        ProgramCourseEnrollmentFactory.create(
-            program_enrollment=program_enrollment,
-            course_enrollment=course_enrollment,
-            course_key=other_course_key,
-            status='active',
-        )
-
-        # add a course over view for other_course_key
+    def _add_new_course_to_program(self, course_run_key, program):
+        """
+        Helper method to create another course, an overview for it,
+        add it to the program, and re-load the cache.
+        """
+        other_course_run = CourseRunFactory.create(key=text_type(course_run_key))
+        other_course = CourseFactory.create(course_runs=[other_course_run])
+        program['courses'].append(other_course)
+        self.set_program_in_catalog_cache(program['uuid'], program)
         CourseOverviewFactory.create(
-            id=other_course_key,
+            id=course_run_key,
             start=self.yesterday,
-        )
-
-        self.client.login(username=self.student.username, password=self.password)
-        response = self.client.get(self.get_url(self.program_uuid))
-
-        self.assertEqual(status.HTTP_200_OK, response.status_code)
-        # we expect data associated with the last modified program enrollment
-        # with 'enrolled' status
-        self.assertEqual(
-            text_type(self.program_course_enrollment.course_key),
-            response.data['course_runs'][0]['course_run_id']
         )
 
     def test_multiple_enrollments_all_enrolled(self):
-        # add a second program enrollment
-        program_enrollment = ProgramEnrollmentFactory.create(
-            program_uuid=self.program_uuid,
-            curriculum_uuid=self.other_curriculum_uuid,
-            user=self.student,
-        )
+        other_course_key = CourseKey.from_string('course-v1:edX+ToyX+Other_Course')
+        self._add_new_course_to_program(other_course_key, self.program)
 
-        other_course_key_string = 'course-v1:edX+ToyX+Other_Course'
-        other_course_key = CourseKey.from_string(other_course_key_string)
-
-        # add a second course enrollment
-        course_enrollment = CourseEnrollmentFactory(
+        # add a second course enrollment, which doesn't need a ProgramCourseEnrollment
+        # to be returned.
+        CourseEnrollmentFactory.create(
             course_id=other_course_key,
-            user=self.student
-        )
-
-        # add a second program course enrollment
-        ProgramCourseEnrollmentFactory.create(
-            program_enrollment=program_enrollment,
-            course_enrollment=course_enrollment,
-            course_key=other_course_key,
-            status='active',
-        )
-
-        # add a course over view for other_course_key
-        CourseOverviewFactory.create(
-            id=other_course_key,
-            start=self.yesterday,
+            user=self.student,
+            mode=CourseMode.VERIFIED,
         )
 
         self.client.login(username=self.student.username, password=self.password)
         response = self.client.get(self.get_url(self.program_uuid))
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
-        # we expect data associated with the last modified program enrollment
-        self.assertEqual(other_course_key_string, response.data['course_runs'][0]['course_run_id'])
+        actual_course_run_ids = {run['course_run_id'] for run in response.data['course_runs']}
+        expected_course_run_ids = {text_type(other_course_key), text_type(self.course_id)}
+        self.assertEqual(expected_course_run_ids, actual_course_run_ids)
 
     @mock.patch('lms.djangoapps.program_enrollments.api.v1.views.get_resume_urls_for_enrollments')
     def test_resume_urls(self, mock_get_resume_urls):

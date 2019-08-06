@@ -27,6 +27,7 @@ from rest_framework.response import Response
 from six import iteritems
 
 from bulk_email.api import is_bulk_email_feature_enabled, is_user_opted_out_for_course
+from course_modes.models import CourseMode
 from edx_when.api import get_dates_for_course
 from lms.djangoapps.certificates.api import get_certificate_for_user
 from lms.djangoapps.program_enrollments.api.v1.constants import (
@@ -46,8 +47,9 @@ from lms.djangoapps.program_enrollments.api.v1.serializers import (
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 from lms.djangoapps.program_enrollments.utils import get_user_by_program_id, ProviderDoesNotExistException
 from student.helpers import get_resume_urls_for_enrollments
+from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
-from openedx.core.djangoapps.catalog.utils import get_programs
+from openedx.core.djangoapps.catalog.utils import get_programs, course_run_keys_for_program
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, PaginatedAPIView, verify_course_exists
@@ -957,39 +959,39 @@ class ProgramCourseEnrollmentOverviewView(DeveloperErrorViewMixin, ProgramSpecif
         for a user as part of a program.
         """
         user = request.user
-        program_enrollment = self._get_program_enrollment(user, program_uuid)
+        self._check_program_enrollment_exists(user, program_uuid)
 
-        program_course_enrollments = ProgramCourseEnrollment.objects.filter(
-            program_enrollment=program_enrollment
-        ).select_related('course_enrollment')
+        program = get_programs(uuid=program_uuid)
+        course_run_keys = [CourseKey.from_string(key) for key in course_run_keys_for_program(program)]
 
-        enrollments_by_course_key = {
-            enrollment.course_key: enrollment.course_enrollment
-            for enrollment in program_course_enrollments
-        }
+        course_enrollments = CourseEnrollment.objects.filter(
+            user=user,
+            course_id__in=course_run_keys,
+            mode__in=[CourseMode.VERIFIED, CourseMode.MASTERS],
+        )
 
-        overviews = CourseOverview.get_from_ids_if_exists(enrollments_by_course_key.keys())
+        overviews = CourseOverview.get_from_ids_if_exists(course_run_keys)
 
-        course_run_resume_urls = get_resume_urls_for_enrollments(user, enrollments_by_course_key.values())
+        course_run_resume_urls = get_resume_urls_for_enrollments(user, course_enrollments)
 
         course_runs = []
 
-        for enrollment in program_course_enrollments:
-            overview = overviews[enrollment.course_key]
+        for enrollment in course_enrollments:
+            overview = overviews[enrollment.course_id]
 
-            certificate_info = get_certificate_for_user(user.username, enrollment.course_key) or {}
+            certificate_info = get_certificate_for_user(user.username, enrollment.course_id) or {}
 
             course_run_dict = {
-                'course_run_id': enrollment.course_key,
+                'course_run_id': enrollment.course_id,
                 'display_name': overview.display_name_with_default,
                 'course_run_status': self.get_course_run_status(overview, certificate_info),
-                'course_run_url': self.get_course_run_url(request, enrollment.course_key),
+                'course_run_url': self.get_course_run_url(request, enrollment.course_id),
                 'start_date': overview.start,
                 'end_date': overview.end,
-                'due_dates': self.get_due_dates(request, enrollment.course_key, user),
+                'due_dates': self.get_due_dates(request, enrollment.course_id, user),
             }
 
-            emails_enabled = self.get_emails_enabled(user, enrollment.course_key)
+            emails_enabled = self.get_emails_enabled(user, enrollment.course_id)
             if emails_enabled is not None:
                 course_run_dict['emails_enabled'] = emails_enabled
 
@@ -999,8 +1001,8 @@ class ProgramCourseEnrollmentOverviewView(DeveloperErrorViewMixin, ProgramSpecif
             if self.program['type'] == 'MicroMasters':
                 course_run_dict['micromasters_title'] = self.program['title']
 
-            if course_run_resume_urls.get(enrollment.course_key):
-                course_run_dict['resume_course_run_url'] = course_run_resume_urls.get(enrollment.course_key)
+            if course_run_resume_urls.get(enrollment.course_id):
+                course_run_dict['resume_course_run_url'] = course_run_resume_urls.get(enrollment.course_id)
 
             course_runs.append(course_run_dict)
 
@@ -1008,37 +1010,17 @@ class ProgramCourseEnrollmentOverviewView(DeveloperErrorViewMixin, ProgramSpecif
         return Response(serializer.data)
 
     @staticmethod
-    def _get_program_enrollment(user, program_uuid):
+    def _check_program_enrollment_exists(user, program_uuid):
         """
-        Returns the ``ProgramEnrollment`` record for the given program UUID in which the given
-        user is actively enrolled.
-        In the unusual and unlikely case of a user having two active program enrollments
-        for the same program, returns the most recently modified enrollment and logs
-        a warning.
-
         Raises ``PermissionDenied`` if the user is not enrolled in the program with the given UUID.
         """
-        program_enrollment = ProgramEnrollment.objects.filter(
+        program_enrollments = ProgramEnrollment.objects.filter(
             program_uuid=program_uuid,
             user=user,
             status='enrolled',
-        ).order_by('-modified')
-
-        program_enrollment_count = program_enrollment.count()
-
-        if program_enrollment_count > 1:
-            program_enrollment = program_enrollment[0]
-            logger.warning(
-                ('User with user_id {} has more than program enrollment'
-                 'with an enrolled status for program uuid {}.').format(
-                    user.id,
-                    program_uuid,
-                )
-            )
-        elif program_enrollment_count == 0:
+        )
+        if not program_enrollments:
             raise PermissionDenied
-
-        return program_enrollment
 
     @staticmethod
     def get_due_dates(request, course_key, user):
