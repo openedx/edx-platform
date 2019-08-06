@@ -44,8 +44,8 @@ def pytest_configure(config):
 def pytest_addoption(parser):
     group = parser.getgroup("coverage")
     group.addoption(
-        "--pytest-contexts",
+        "--pytest-remote-contexts",
         action="store_true",
         dest="pytest-contexts",
-        help="Capture the pytest contexts that coverage is being captured in",
+        help="Capture the pytest contexts that coverage is being captured in in another process",
     )
