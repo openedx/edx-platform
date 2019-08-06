@@ -21,11 +21,10 @@ def get_current_site_configuration():
 
     # Import is placed here to avoid model import at project startup.
     from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-    default = SiteConfiguration(site=site, enabled=True, values={})
     try:
-        return getattr(site, "configuration", default)
+        return getattr(site, "configuration", None)
     except SiteConfiguration.DoesNotExist:
-        return default
+        return None
 
 
 def is_site_configuration_enabled():
@@ -109,7 +108,10 @@ def get_value(val_name, default=None, **kwargs):
     """
 
     # Retrieve the requested field/value from the site configuration
-    configuration_value = get_configuration_value(val_name, default=default)
+    if is_site_configuration_enabled():
+        configuration_value = get_configuration_value(val_name, default=default)
+    else:
+        configuration_value = default
 
     # Attempt to perform a dictionary update using the provided default
     # This will fail if the default value is not a dictionary
@@ -141,7 +143,11 @@ def get_dict(name, default=None):
         Configuration value for the given key or returns `{}` if configuration not found.
     """
     default = default or {}
-    return get_configuration_dict(name, default)
+
+    if is_site_configuration_enabled():
+        return get_configuration_dict(name, default)
+    else:
+        return default.copy()
 
 
 def has_override_value(name):
@@ -155,7 +161,10 @@ def has_override_value(name):
     Returns:
         (bool): True if given key is present in the configuration.
     """
-    return has_configuration_override(name)
+    if is_site_configuration_enabled():
+        return has_configuration_override(name)
+    else:
+        return False
 
 
 def get_value_for_org(org, val_name, default=None):
@@ -165,7 +174,7 @@ def get_value_for_org(org, val_name, default=None):
 
     Args:
         org (str): Course org filter, this value will be used to filter out the correct site configuration.
-        name (str): Name of the key for which to return configuration value.
+        val_name (str): Name of the key for which to return configuration value.
         default: default value to return if key is not present in the configuration
 
     Returns:
@@ -174,7 +183,10 @@ def get_value_for_org(org, val_name, default=None):
     """
     # Import is placed here to avoid model import at project startup.
     from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-    return SiteConfiguration.get_value_for_org(org, val_name, default)
+    if SiteConfiguration.has_org(org):
+        return SiteConfiguration.get_value_for_org(org, val_name, default)
+    else:
+        return default
 
 
 def get_current_site_orgs():
