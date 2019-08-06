@@ -59,6 +59,7 @@ class SiteMixin(object):
             values=site_configuration_values
         )
         self.use_site(site)
+        return site
 
     def use_site(self, site):
         """

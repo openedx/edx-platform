@@ -12,9 +12,11 @@ from openedx.core.djangoapps.catalog.cache import (
     COURSE_PROGRAMS_CACHE_KEY_TPL,
     PATHWAY_CACHE_KEY_TPL,
     PROGRAM_CACHE_KEY_TPL,
+    PROGRAMS_BY_TYPE_CACHE_KEY_TPL,
     SITE_PATHWAY_IDS_CACHE_KEY_TPL,
     SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 )
+from openedx.core.djangoapps.catalog.utils import normalize_program_type
 from openedx.core.djangoapps.catalog.tests.factories import PathwayFactory, ProgramFactory
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
@@ -37,7 +39,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
 
         self.catalog_integration = self.create_catalog_integration()
         self.site_domain = 'testsite.com'
-        self.set_up_site(
+        self.site = self.set_up_site(
             self.site_domain,
             {
                 'COURSE_CATALOG_API_URL': self.catalog_integration.get_internal_api_url().rstrip('/')
@@ -189,6 +191,15 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
                 course_run_cache_key = COURSE_PROGRAMS_CACHE_KEY_TPL.format(course_run_id=course_run['key'])
                 self.assertIn(self.programs[0]['uuid'], cache.get(course_run_cache_key))
                 self.assertIn(self.child_program['uuid'], cache.get(course_run_cache_key))
+
+        # for each program, assert that the program's UUID is in a cached list of
+        # program UUIDS by program type
+        for program in self.programs:
+            program_type = normalize_program_type(program.get('type', 'None'))
+            program_type_cache_key = PROGRAMS_BY_TYPE_CACHE_KEY_TPL.format(
+                site_id=self.site.id, program_type=program_type
+            )
+            self.assertIn(program['uuid'], cache.get(program_type_cache_key))
 
     def test_handle_pathways(self):
         """

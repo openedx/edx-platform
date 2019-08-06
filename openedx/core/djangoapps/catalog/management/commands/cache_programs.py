@@ -8,16 +8,22 @@ from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.management import BaseCommand
+from six import text_type
 
 from openedx.core.djangoapps.catalog.cache import (
     COURSE_PROGRAMS_CACHE_KEY_TPL,
     PATHWAY_CACHE_KEY_TPL,
     PROGRAM_CACHE_KEY_TPL,
+    PROGRAMS_BY_TYPE_CACHE_KEY_TPL,
     SITE_PATHWAY_IDS_CACHE_KEY_TPL,
     SITE_PROGRAM_UUIDS_CACHE_KEY_TPL,
 )
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
-from openedx.core.djangoapps.catalog.utils import create_catalog_api_client, course_run_keys_for_program
+from openedx.core.djangoapps.catalog.utils import (
+    create_catalog_api_client,
+    course_run_keys_for_program,
+    normalize_program_type,
+)
 
 logger = logging.getLogger(__name__)
 User = get_user_model()  # pylint: disable=invalid-name
@@ -33,6 +39,7 @@ class Command(BaseCommand):
     """
     help = "Rebuild the LMS' cache of program data."
 
+    # pylint: disable=unicode-format-string
     def handle(self, *args, **options):
         failure = False
         logger.info('populate-multitenant-programs switch is ON')
@@ -51,6 +58,7 @@ class Command(BaseCommand):
         programs = {}
         pathways = {}
         courses = {}
+        programs_by_type = {}
         for site in Site.objects.all():
             site_config = getattr(site, 'configuration', None)
             if site_config is None or not site_config.get_value('COURSE_CATALOG_API_URL'):
@@ -63,21 +71,21 @@ class Command(BaseCommand):
             uuids, program_uuids_failed = self.get_site_program_uuids(client, site)
             new_programs, program_details_failed = self.fetch_program_details(client, uuids)
             new_pathways, pathways_failed = self.get_pathways(client, site)
-            new_pathways, new_programs, pathway_processing_failed = self.process_pathways(site, new_pathways,
-                                                                                          new_programs)
-            new_courses, courses_failed = self.get_courses(new_programs)
+            new_pathways, new_programs, pathway_processing_failed = self.process_pathways(
+                site, new_pathways, new_programs
+            )
 
             failure = any([
                 program_uuids_failed,
                 program_details_failed,
                 pathways_failed,
                 pathway_processing_failed,
-                courses_failed,
             ])
 
             programs.update(new_programs)
             pathways.update(new_pathways)
-            courses.update(new_courses)
+            courses.update(self.get_courses(new_programs))
+            programs_by_type.update(self.get_programs_by_type(site, new_programs))
 
             logger.info(u'Caching UUIDs for {total} programs for site {site_name}.'.format(
                 total=len(uuids),
@@ -92,24 +100,19 @@ class Command(BaseCommand):
             ))
             cache.set(SITE_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=site.domain), pathway_ids, None)
 
-        successful_programs = len(programs)
-        logger.info(u'Caching details for {successful_programs} programs.'.format(
-            successful_programs=successful_programs))
+        logger.info(u'Caching details for {} programs.'.format(len(programs)))
         cache.set_many(programs, None)
 
-        successful_pathways = len(pathways)
-        logger.info(u'Caching details for {successful_pathways} pathways.'.format(
-            successful_pathways=successful_pathways))
+        logger.info(u'Caching details for {} pathways.'.format(len(pathways)))
         cache.set_many(pathways, None)
 
-        successful_courses = len(courses)
-        logger.info(u'Caching programs uuids for {successful_courses} courses.'.format(
-            successful_courses=successful_courses))
+        logger.info(u'Caching programs uuids for {} courses.'.format(len(courses)))
         cache.set_many(courses, None)
 
+        logger.info(text_type('Caching program UUIDs by {} program types.'.format(len(programs_by_type))))
+        cache.set_many(programs_by_type, None)
+
         if failure:
-            # This will fail a Jenkins job running this command, letting site
-            # operators know that there was a problem.
             sys.exit(1)
 
     def get_site_program_uuids(self, client, site):
@@ -215,10 +218,21 @@ class Command(BaseCommand):
         course not in a program.
         """
         course_runs = defaultdict(list)
-        failure = False
 
         for program in programs.values():
             for course_run_key in course_run_keys_for_program(program):
                 course_run_cache_key = COURSE_PROGRAMS_CACHE_KEY_TPL.format(course_run_id=course_run_key)
                 course_runs[course_run_cache_key].append(program['uuid'])
-        return course_runs, failure
+        return course_runs
+
+    def get_programs_by_type(self, site, programs):
+        """
+        Returns a dictionary mapping site-aware cache keys corresponding to program types
+        to lists of program uuids with that type.
+        """
+        programs_by_type = defaultdict(list)
+        for program in programs.values():
+            program_type = normalize_program_type(program.get('type'))
+            cache_key = PROGRAMS_BY_TYPE_CACHE_KEY_TPL.format(site_id=site.id, program_type=program_type)
+            programs_by_type[cache_key].append(program['uuid'])
+        return programs_by_type
