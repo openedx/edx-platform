@@ -9,7 +9,7 @@ import logging
 import os
 import re
 import shutil
-import StringIO
+from six import StringIO
 import tarfile
 import tempfile
 from uuid import uuid4
@@ -574,7 +574,7 @@ class ExportTestCase(CourseTestCase):
         resp = self.client.get(output_url)
         self._verify_export_succeeded(resp)
 
-        buff = StringIO.StringIO(b"".join(resp.streaming_content))
+        buff = StringIO("".join(resp.streaming_content))
         return tarfile.open(fileobj=buff)
 
     def _verify_export_succeeded(self, resp):

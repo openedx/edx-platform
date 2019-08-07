@@ -6,7 +6,7 @@ from __future__ import absolute_import
 import sys
 import unittest
 from contextlib import contextmanager
-from StringIO import StringIO
+from six import StringIO
 from uuid import uuid4
 
 from django.conf import settings

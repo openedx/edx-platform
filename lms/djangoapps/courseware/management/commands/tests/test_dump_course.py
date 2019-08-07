@@ -7,7 +7,7 @@ Tests for Django management commands
 from __future__ import absolute_import
 
 import json
-from StringIO import StringIO
+from six import StringIO
 
 import factory
 import six

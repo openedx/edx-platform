@@ -5,7 +5,7 @@ Tests for the Shopping Cart Models
 from __future__ import absolute_import
 
 import datetime
-import StringIO
+from six import StringIO
 from textwrap import dedent
 
 import pytz
@@ -139,7 +139,7 @@ class ReportTypeTests(ModuleStoreTestCase):
         Tests that a generated purchase report CSV is as we expect
         """
         report = initialize_report("refund_report", self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
-        csv_file = StringIO.StringIO()
+        csv_file = StringIO()
         report.write_csv(csv_file)
         csv = csv_file.getvalue()
         csv_file.close()
@@ -148,14 +148,14 @@ class ReportTypeTests(ModuleStoreTestCase):
 
     def test_basic_cert_status_csv(self):
         report = initialize_report("certificate_status", self.now - self.FIVE_MINS, self.now + self.FIVE_MINS, 'A', 'Z')
-        csv_file = StringIO.StringIO()
+        csv_file = StringIO()
         report.write_csv(csv_file)
         csv = csv_file.getvalue()
         self.assertEqual(csv.replace('\r\n', '\n').strip(), self.CORRECT_CERT_STATUS_CSV.strip())
 
     def test_basic_uni_revenue_share_csv(self):
         report = initialize_report("university_revenue_share", self.now - self.FIVE_MINS, self.now + self.FIVE_MINS, 'A', 'Z')
-        csv_file = StringIO.StringIO()
+        csv_file = StringIO()
         report.write_csv(csv_file)
         csv = csv_file.getvalue()
         self.assertEqual(csv.replace('\r\n', '\n').strip(), self.CORRECT_UNI_REVENUE_SHARE_CSV.strip())
@@ -227,7 +227,7 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
         Tests that a generated purchase report CSV is as we expect
         """
         report = initialize_report("itemized_purchase_report", self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
-        csv_file = StringIO.StringIO()
+        csv_file = StringIO()
         report.write_csv(csv_file)
         csv = csv_file.getvalue()
         csv_file.close()

@@ -5,7 +5,7 @@ from __future__ import absolute_import
 
 import logging
 from datetime import datetime
-from StringIO import StringIO
+from six import StringIO
 from time import time
 
 from django.conf import settings

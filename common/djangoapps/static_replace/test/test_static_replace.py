@@ -3,7 +3,7 @@
 from __future__ import absolute_import, print_function
 
 import re
-from cStringIO import StringIO
+from six import StringIO
 from six.moves.urllib.parse import parse_qsl, urlparse, urlunparse
 
 import ddt
@@ -192,7 +192,9 @@ def test_static_paths_out(mock_modulestore, mock_storage):
     static_course_url = '/c4x/org/course/asset/LAlec04_controller.swf?csConfigFile=%2Fc4x%2Forg%2Fcourse%2Fasset%2FLAlec04_config.xml&name1=value1&name2=value2'
     raw_url = '/static/js/capa/protex/protex.nocache.js?raw'
     xblock_url = '/static/xblock/resources/babys_first.lil_xblock/public/images/pacifier.png'
+    # xss-lint: disable=python-wrap-html
     pre_text = 'EMBED src ="{}" xblock={} text <tag a="{}"/><div class="'.format(static_url, xblock_url, raw_url)
+    # xss-lint: disable=python-wrap-html
     post_text = 'EMBED src ="{}" xblock={} text <tag a="{}"/><div class="'.format(static_course_url, xblock_url, raw_url)
     static_paths = []
     assert replace_static_urls(pre_text, DATA_DIRECTORY, COURSE_KEY, static_paths_out=static_paths) == post_text
