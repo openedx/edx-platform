@@ -66,7 +66,7 @@ coreapi==2.3.3
 coreschema==0.0.4
 coverage==5.0a6
 git+https://github.com/nedbat/coverage_pytest_plugin.git@29de030251471e200ff255eb9e549218cd60e872#egg=coverage_pytest_plugin==0.0
-git+https://github.com/edx/crowdsourcehinter.git@518605f0a95190949fe77bd39158450639e2e1dc#egg=crowdsourcehinter-xblock==0.1
+git+https://github.com/edx/crowdsourcehinter.git@a7ffc85b134b7d8909bf1fefd23dbdb8eb28e467#egg=crowdsourcehinter-xblock==0.2
 cryptography==2.7
 cssselect==1.0.3
 cssutils==1.0.2
@@ -215,7 +215,7 @@ moto==1.3.1
 mpmath==1.1.0
 mysqlclient==1.4.2.post1
 networkx==1.7
-newrelic==4.20.1.121
+newrelic==5.0.0.124
 nltk==3.4.4
 nodeenv==1.1.1
 numpy==1.16.4
@@ -227,7 +227,7 @@ path.py==8.2.1
 pathlib2==2.3.4
 pathtools==0.1.2
 paver==1.3.4
-pbr==5.4.1
+pbr==5.4.2
 pdfminer.six==20181108
 piexif==1.0.2
 pillow==6.1.0
@@ -313,7 +313,7 @@ soupsieve==1.9.2
 sphinx==1.8.5
 sphinxcontrib-websupport==1.1.2  # via sphinx
 sqlparse==0.3.0
-staff-graded-xblock==0.4
+staff-graded-xblock==0.5
 stevedore==1.30.1
 super-csv==0.8
 sympy==1.4
@@ -344,7 +344,7 @@ werkzeug==0.15.5
 wrapt==1.10.5
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.4#egg=xblock-drag-and-drop-v2==2.2.4
 git+https://github.com/open-craft/xblock-poll@add89e14558c30f3c8dc7431e5cd6536fff6d941#egg=xblock-poll==1.5.1
-xblock-utils==1.2.1
+xblock-utils==1.2.2
 xblock==1.2.3
 xmlsec==1.3.3
 xmltodict==0.12.0
