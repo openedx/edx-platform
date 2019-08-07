@@ -982,13 +982,6 @@ ENTERPRISE_SUPPORT_URL = ENV_TOKENS.get(
     ENTERPRISE_SUPPORT_URL
 )
 
-# A shared secret to be used for encrypting passwords passed from the enterprise api
-# to the enteprise reporting script.
-ENTERPRISE_REPORTING_SECRET = AUTH_TOKENS.get(
-    'ENTERPRISE_REPORTING_SECRET',
-    ENTERPRISE_REPORTING_SECRET
-)
-
 # A default dictionary to be used for filtering out enterprise customer catalog.
 ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = ENV_TOKENS.get(
     'ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER',
