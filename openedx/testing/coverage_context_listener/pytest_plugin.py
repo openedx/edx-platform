@@ -7,7 +7,7 @@ import pytest
 import requests
 
 
-class ContextPlugin(object):
+class RemoteContextPlugin(object):
     """
     Pytest plugin for reporting pytests contexts to coverage running in another process
     """
@@ -38,7 +38,7 @@ class ContextPlugin(object):
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_configure(config):
-    config.pluginmanager.register(ContextPlugin(config), "contextplugin")
+    config.pluginmanager.register(RemoteContextPlugin(config), "remotecontextplugin")
 
 
 def pytest_addoption(parser):
