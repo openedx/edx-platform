@@ -14,7 +14,7 @@ from openedx.core.djangoapps.ccxcon import api
 log = get_task_logger(__name__)
 
 
-@task()
+@task(name='openedx.core.djangoapps.ccxcon.tasks.update_ccxcon')
 def update_ccxcon(course_id, cur_retry=0):
     """
     Pass through function to update course information on CCXCon.
