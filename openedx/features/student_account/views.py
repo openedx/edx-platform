@@ -73,7 +73,7 @@ def _get_form_descriptions(request):
     """
     return {
         'login': local_server_get('/user_api/v1/account/login_session/', request.session),
-        'registration': local_server_get('/user_api/v2/account/registration/', request.session),
+        'registration': local_server_get('/user_api/v1/account/registration/', request.session),
         'password_reset': local_server_get('/user_api/v1/account/password_reset/', request.session)
     }
 

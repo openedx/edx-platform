@@ -79,9 +79,8 @@ def login_and_registration_form(request, initial_mode="login", org_name=None, ad
 
     """
     # Determine the URL to redirect to following login/registration/third_party_auth
-    from openedx.features.student_account.views import local_server_get, _get_form_descriptions, \
-        _third_party_auth_context
-    from openedx.core.djangoapps.user_authn.views.login_form import _external_auth_intercept
+    from openedx.features.student_account.views import local_server_get, _third_party_auth_context
+    from openedx.core.djangoapps.user_authn.views.login_form import _external_auth_intercept, _get_form_descriptions
 
 
     local_server_get('/user_api/v1/account/registration/', request.session)
