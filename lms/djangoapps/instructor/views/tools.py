@@ -11,7 +11,7 @@ from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import UsageKey
 from six import text_type, string_types
 
-from student.models import get_user_by_username_or_email
+from student.models import get_user_by_username_or_email_inside_organization
 from courseware.field_overrides import disable_overrides
 from courseware.models import StudentFieldOverride
 from courseware.student_field_overrides import clear_override_for_user, get_override_for_user, override_field_for_user
@@ -67,7 +67,9 @@ def get_student_from_identifier(unique_student_identifier):
 
     DEPRECATED: use student.models.get_user_by_username_or_email instead.
     """
-    return get_user_by_username_or_email(unique_student_identifier)
+    # Appsembler Specific: We call our custom method insted the default one,
+    # to make sure the user is get inside the org.
+    return get_user_by_username_or_email_inside_organization(unique_student_identifier)
 
 
 def require_student_from_identifier(unique_student_identifier):

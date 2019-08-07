@@ -49,6 +49,8 @@ from pytz import UTC
 from six import text_type
 from slumber.exceptions import HttpClientError, HttpServerError
 from user_util import user_util
+from organizations.models import Organization, UserOrganizationMapping
+from openedx.core.djangoapps.theming.helpers import get_current_site
 
 import lms.lib.comment_client as cc
 from student.signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED
@@ -1572,6 +1574,52 @@ class CourseEnrollment(models.Model):
             raise
 
     @classmethod
+    def enroll_by_email_in_organization(cls, email, course_id, mode=None, ignore_errors=True):
+        """
+        Appsembler Specific: This method is a copy of enroll_by_email written
+        above. It does mostly the same, with the difference that looks for the
+        user by email, but inside the organization. If the user is registered
+        but in a different organization, it won't be enrolled.
+
+        Enroll a user in a course given their email and looking by the current
+        organization. This saves immediately.
+
+        Note that  enrolling by email is generally done in big batches and the
+        error rate is high. For that reason, we supress User lookup errors by
+        default.
+
+        Returns a CourseEnrollment object. If the User does not exist and
+        `ignore_errors` is set to `True`, it will return None.
+
+        `email` Email address of the User to add to enroll in the course.
+
+        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+
+        `mode` is a string specifying what kind of enrollment this is. The
+               default is the default course mode, 'audit'. Other options
+               include 'professional', 'verified', 'honor',
+               'no-id-professional' and 'credit'.
+               See CourseMode in common/djangoapps/course_modes/models.py.
+
+        `ignore_errors` is a boolean indicating whether we should suppress
+                        `User.DoesNotExist` errors (returning None) or let it
+                        bubble up.
+
+        It is expected that this method is called from a method which has already
+        verified the user authentication and access.
+        """
+        try:
+            organization = get_current_site().organizations.first()
+            user = organization.userorganizationmapping_set.get(user__email=email).user
+            return cls.enroll(user, course_id, mode)
+        except UserOrganizationMapping.DoesNotExist:
+            err_msg = u"Tried to enroll email {} into course {}, but user not found"
+            log.error(err_msg.format(email, course_id))
+            if ignore_errors:
+                return None
+            raise
+
+    @classmethod
     def unenroll(cls, user, course_id, skip_refund=False):
         """
         Remove the user from a given course. If the relevant `CourseEnrollment`
@@ -2316,6 +2364,39 @@ def get_user_by_username_or_email(username_or_email):
             raise User.DoesNotExist
     return user
 
+def get_user_by_username_or_email_inside_organization(username_or_email):
+    """
+    Appsembler Specific: This funtion is a copy of
+    the get_user_by_username_or_email written above, it basically does the same
+    with the difference that the user search is done inside the organization,
+    making sure to not return users that exists in other organizations.
+
+    Return a User object by looking up a user against username_or_email but
+    inside a certain organization.
+
+    Raises:
+        User.DoesNotExist if no user object can be found, the user was
+        retired, or the user is in the process of being retired.
+
+        MultipleObjectsReturned if one user has same email as username of
+        second user
+
+        MultipleObjectsReturned if more than one user has same email or
+        username
+    """
+    username_or_email = strip_if_string(username_or_email)
+    # there should be one user with either username or email equal to username_or_email
+    organization = get_current_site().organizations.first()
+    try:
+        user = organization.userorganizationmapping_set.get(Q(user__email=username_or_email) | Q(user__username=username_or_email)).user
+    except UserOrganizationMapping.DoesNotExist:
+        raise User.DoesNotExist
+
+    if user.username == username_or_email:
+        UserRetirementRequest = apps.get_model('user_api', 'UserRetirementRequest')
+        if UserRetirementRequest.has_user_requested_retirement(user):
+            raise User.DoesNotExist
+    return user
 
 def get_user(email):
     user = User.objects.get(email=email)
