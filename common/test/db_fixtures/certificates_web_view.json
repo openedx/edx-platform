@@ -14,7 +14,7 @@
     "fields": {
       "modified": "2015-06-18 11:02:13.007790+00:00",
       "course_key": "course-v1:test_org+3355358979513794782079645765720179311111+test_run",
-      "enabled": true
+      "self_generation_enabled": true
     }
   },
   {

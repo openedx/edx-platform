@@ -1,7 +1,14 @@
 """
 Split Test Block Transformer
 """
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer, FilteringTransformerMixin
+from __future__ import absolute_import
+
+import six
+
+from openedx.core.djangoapps.content.block_structure.transformer import (
+    BlockStructureTransformer,
+    FilteringTransformerMixin
+)
 
 
 class SplitTestTransformer(FilteringTransformerMixin, BlockStructureTransformer):
@@ -19,7 +26,8 @@ class SplitTestTransformer(FilteringTransformerMixin, BlockStructureTransformer)
     to actually enforce the access using the 'user_partitions' and
     'group_access' fields.
     """
-    VERSION = 1
+    WRITE_VERSION = 1
+    READ_VERSION = 1
 
     @classmethod
     def name(cls):
@@ -57,7 +65,7 @@ class SplitTestTransformer(FilteringTransformerMixin, BlockStructureTransformer)
             # Create dict of child location to group_id, using the
             # group_id_to_child field on the split_test module.
             child_to_group = {
-                xblock.group_id_to_child.get(unicode(group.id), None): group.id
+                xblock.group_id_to_child.get(six.text_type(group.id), None): group.id
                 for group in partition_for_this_block.groups
             }
 

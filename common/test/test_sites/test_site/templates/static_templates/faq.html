@@ -1,8 +1,9 @@
+<%page expression_filter="h"/>
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 %>
 
 <%block name="title"><title>${_("FAQ")}</title></%block>
@@ -135,6 +136,6 @@ from django.core.urlresolvers import reverse
   </section>
 </section>
 
-%if user.is_authenticated():
+%if user.is_authenticated:
 <%include file="../signup_modal.html" />
 %endif

@@ -1,8 +1,10 @@
 """
 Helpers methods for site configuration.
 """
+from __future__ import absolute_import
+
 from django.conf import settings
-from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+
 from microsite_configuration import microsite
 
 
@@ -19,6 +21,8 @@ def get_current_site_configuration():
     from openedx.core.djangoapps.theming.helpers import get_current_site
     site = get_current_site()
 
+    # Import is placed here to avoid model import at project startup.
+    from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
     try:
         return getattr(site, "configuration", None)
     except SiteConfiguration.DoesNotExist:
@@ -182,10 +186,27 @@ def get_value_for_org(org, val_name, default=None):
     """
     # Here we first look for the asked org inside site configuration, and if org is not present in site configuration
     # then we go ahead and look it inside microsite configuration.
+    # Import is placed here to avoid model import at project startup.
+    from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
     if SiteConfiguration.has_org(org):
         return SiteConfiguration.get_value_for_org(org, val_name, default)
     else:
         return microsite.get_value_for_org(org, val_name, default)
+
+
+def get_current_site_orgs():
+    """
+    This returns the orgs configured in site configuration or microsite configuration for the current site.
+
+    Returns:
+        list: A list of organization names.
+    """
+    course_org_filter = get_value('course_org_filter')
+    # Make sure we have a list
+    if course_org_filter and not isinstance(course_org_filter, list):
+        course_org_filter = [course_org_filter]
+
+    return course_org_filter
 
 
 def get_all_orgs():
@@ -196,6 +217,8 @@ def get_all_orgs():
     Returns:
         A list of all organizations present in either microsite configuration or site configuration.
     """
+    # Import is placed here to avoid model import at project startup.
+    from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
     site_configuration_orgs = SiteConfiguration.get_all_orgs()
     microsite_orgs = microsite.get_all_orgs()
 
@@ -211,6 +234,7 @@ def page_title_breadcrumbs(*crumbs, **kwargs):
     """
     platform_name = get_value('platform_name', settings.PLATFORM_NAME)
     separator = kwargs.get("separator", " | ")
+    crumbs = [c for c in crumbs if c is not None]
     if crumbs:
         return u'{}{}{}'.format(separator.join(crumbs), separator, platform_name)
     else:

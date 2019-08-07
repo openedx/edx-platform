@@ -8,7 +8,7 @@ function(gettext, _, $, Backbone, templateUtils) {
         activeClassName: 'is-active',
 
         events: {
-            'click': 'selectHandler',
+            click: 'selectHandler',
             'click a': function(event) { event.preventDefault(); },
             'click .action-close': 'closeHandler'
         },
@@ -21,14 +21,14 @@ function(gettext, _, $, Backbone, templateUtils) {
                     this.$el.toggleClass(this.activeClassName, value);
                     if (value) {
                         this.$('.tab-label').prepend($('<span />', {
-                            'class': 'tab-aria-label sr',
-                            'text': gettext('Current tab')
+                            class: 'tab-aria-label sr',
+                            text: gettext('Current tab')
                         }));
                     } else {
                         this.$('.tab-aria-label').remove();
                     }
                 },
-                'destroy': this.remove
+                destroy: this.remove
             });
         },
 

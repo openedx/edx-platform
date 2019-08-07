@@ -3,13 +3,16 @@ Management command `manage_user` is used to idempotently create or remove
 Django users, set/unset permission bits, and associate groups by name.
 """
 
+from __future__ import absolute_import
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import is_password_usable
-from django.contrib.auth.models import Group, BaseUserManager
+from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.utils.translation import gettext as _
 
+from openedx.core.djangoapps.user_api.accounts.utils import generate_password
 from student.models import UserProfile
 
 
@@ -92,7 +95,7 @@ class Command(BaseCommand):
                 # Set the password to a random, unknown, but usable password
                 # allowing self-service password resetting.  Cases where unusable
                 # passwords are required, should be explicit, and will be handled below.
-                user.set_password(BaseUserManager().make_random_password(25))
+                user.set_password(generate_password(length=25))
             self.stderr.write(_('Created new user: "{}"').format(user))
         else:
             # NOTE, we will not update the email address of an existing user.

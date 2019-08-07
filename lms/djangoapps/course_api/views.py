@@ -2,14 +2,19 @@
 Course API Views
 """
 
-from django.core.exceptions import ValidationError
-from rest_framework.generics import ListAPIView, RetrieveAPIView
+from __future__ import absolute_import
 
-from openedx.core.lib.api.paginators import NamespacedPageNumberPagination
-from openedx.core.lib.api.view_utils import view_auth_classes, DeveloperErrorViewMixin
+from django.core.exceptions import ValidationError
+from edx_rest_framework_extensions.paginators import NamespacedPageNumberPagination
+from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework.throttling import UserRateThrottle
+
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+
+from . import USE_RATE_LIMIT_2_FOR_COURSE_LIST_API, USE_RATE_LIMIT_10_FOR_COURSE_LIST_API
 from .api import course_detail, list_courses
 from .forms import CourseDetailGetForm, CourseListGetForm
-from .serializers import CourseSerializer, CourseDetailSerializer
+from .serializers import CourseDetailSerializer, CourseSerializer
 
 
 @view_auth_classes(is_authenticated=False)
@@ -120,6 +125,41 @@ class CourseDetailView(DeveloperErrorViewMixin, RetrieveAPIView):
         )
 
 
+class CourseListUserThrottle(UserRateThrottle):
+    """Limit the number of requests users can make to the course list API."""
+    # The course list endpoint is likely being inefficient with how it's querying
+    # various parts of the code and can take courseware down, it needs to be rate
+    # limited until optimized. LEARNER-5527
+
+    THROTTLE_RATES = {
+        'user': '20/minute',
+        'staff': '40/minute',
+    }
+
+    def check_for_switches(self):
+        if USE_RATE_LIMIT_2_FOR_COURSE_LIST_API.is_enabled():
+            self.THROTTLE_RATES = {
+                'user': '2/minute',
+                'staff': '10/minute',
+            }
+        elif USE_RATE_LIMIT_10_FOR_COURSE_LIST_API.is_enabled():
+            self.THROTTLE_RATES = {
+                'user': '10/minute',
+                'staff': '20/minute',
+            }
+
+    def allow_request(self, request, view):
+        self.check_for_switches()
+        # Use a special scope for staff to allow for a separate throttle rate
+        user = request.user
+        if user.is_authenticated and (user.is_staff or user.is_superuser):
+            self.scope = 'staff'
+            self.rate = self.get_rate()
+            self.num_requests, self.duration = self.parse_rate(self.rate)
+
+        return super(CourseListUserThrottle, self).allow_request(request, view)
+
+
 @view_auth_classes(is_authenticated=False)
 class CourseListView(DeveloperErrorViewMixin, ListAPIView):
     """
@@ -136,6 +176,8 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
         Body comprises a list of objects as returned by `CourseDetailView`.
 
     **Parameters**
+        search_term (optional):
+            Search term to filter courses (used by ElasticSearch).
 
         username (optional):
             The username of the specified user whose visible courses we
@@ -148,9 +190,11 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
             provided org code (e.g., "HarvardX") are returned.
             Case-insensitive.
 
-        mobile (optional):
-            If specified, only visible `CourseOverview` objects that are
-            designated as mobile_available are returned.
+        role (optional):
+            If specified, visible `CourseOverview` objects are filtered
+            such that only those for which the user has the specified role
+            are returned. Multiple role parameters can be specified.
+            Case-insensitive.
 
     **Returns**
 
@@ -190,11 +234,13 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
     """
 
     pagination_class = NamespacedPageNumberPagination
+    pagination_class.max_page_size = 100
     serializer_class = CourseSerializer
+    throttle_classes = (CourseListUserThrottle,)
 
     def get_queryset(self):
         """
-        Return a list of courses visible to the user.
+        Yield courses visible to the user.
         """
         form = CourseListGetForm(self.request.query_params, initial={'requesting_user': self.request.user})
         if not form.is_valid():
@@ -204,5 +250,7 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
             self.request,
             form.cleaned_data['username'],
             org=form.cleaned_data['org'],
+            roles=form.cleaned_data['role'],
             filter_=form.cleaned_data['filter_'],
+            search_term=form.cleaned_data['search_term']
         )

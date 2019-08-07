@@ -33,10 +33,9 @@
              if (this.model.get('shown')) {
                  $(this.el).show();
                  $('html, body').animate({scrollTop: 0});
-             }
-             else {
+             } else {
                  $(this.el).hide();
              }
          }
      });
- })($, _, Backbone);
+ }($, _, Backbone));

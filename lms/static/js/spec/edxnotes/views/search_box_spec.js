@@ -12,13 +12,13 @@ define([
         var getSearchBox, submitForm, assertBoxIsEnabled, assertBoxIsDisabled, searchResponse;
 
         searchResponse = {
-            'count': 2,
-            'current_page': 1,
-            'num_pages': 1,
-            'start': 0,
-            'next': null,
-            'previous': null,
-            'results': [null, null]
+            count: 2,
+            current_page: 1,
+            num_pages: 1,
+            start: 0,
+            next: null,
+            previous: null,
+            results: [null, null]
         };
 
         getSearchBox = function(options) {
@@ -95,8 +95,8 @@ define([
             AjaxHelpers.respondWithJson(requests, searchResponse);
 
             expect(Logger.log).toHaveBeenCalledWith('edx.course.student_notes.searched', {
-                'number_of_results': 2,
-                'search_string': 'test_text'
+                number_of_results: 2,
+                search_string: 'test_text'
             });
         });
 

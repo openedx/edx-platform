@@ -1,6 +1,12 @@
+"""
+Show Event outputs.
+"""
+from __future__ import absolute_import, print_function
+
 import json
 import sys
 import traceback
+
 try:
     import dateutil.parser
 except ImportError:
@@ -13,12 +19,12 @@ else:
 
 
 def display(message):
-    print '{} - {}'.format(date_string(message['time']), message['event_type'])
+    print('{} - {}'.format(date_string(message['time']), message['event_type']))
     if message.get('event'):
         event = json.loads(message['event'])
         for k in sorted(event):
-            print '\t{}: {}'.format(k, event[k])
-    print
+            print('\t{}: {}'.format(k, event[k]))
+    print()
 
 while 1:
     line = sys.stdin.readline()

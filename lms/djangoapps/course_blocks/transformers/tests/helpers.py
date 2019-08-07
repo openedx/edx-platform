@@ -1,15 +1,21 @@
 """
 Test helpers for testing course block transformers.
 """
+from __future__ import absolute_import
+
+import six
+from six.moves import range
 from mock import patch
+
 from course_modes.models import CourseMode
-from openedx.core.lib.block_structure.transformers import BlockStructureTransformers
+from lms.djangoapps.courseware.access import has_access
+from openedx.core.djangoapps.content.block_structure.tests.helpers import clear_registered_transformers_cache
+from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from lms.djangoapps.courseware.access import has_access
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from ...api import get_course_blocks
 
@@ -22,7 +28,8 @@ class TransformerRegistryTestMixin(object):
     def setUp(self):
         super(TransformerRegistryTestMixin, self).setUp()
         self.patcher = patch(
-            'openedx.core.lib.block_structure.transformer_registry.TransformerRegistry.get_registered_transformers'
+            'openedx.core.djangoapps.content.block_structure.transformer_registry.'
+            'TransformerRegistry.get_registered_transformers'
         )
         mock_registry = self.patcher.start()
         mock_registry.return_value = {self.TRANSFORMER_CLASS_TO_TEST}
@@ -30,6 +37,7 @@ class TransformerRegistryTestMixin(object):
 
     def tearDown(self):
         self.patcher.stop()
+        clear_registered_transformers_cache()
 
 
 class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase):
@@ -69,11 +77,11 @@ class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
         block_type = block_hierarchy['#type']
         block_ref = block_hierarchy['#ref']
         factory = (CourseFactory if block_type == 'course' else ItemFactory)
-        kwargs = {key: value for key, value in block_hierarchy.iteritems() if key[0] != '#'}
+        kwargs = {key: value for key, value in six.iteritems(block_hierarchy) if key[0] != '#'}
 
         if block_type != 'course':
             kwargs['category'] = block_type
-            kwargs['publish_item'] = True,
+            kwargs['publish_item'] = True
         if parent:
             kwargs['parent'] = parent
 
@@ -212,8 +220,8 @@ class BlockParentsMapTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
     # children.
     parents_map = [[], [0], [0], [1], [1], [2], [2, 4]]
 
-    def setUp(self, **kwargs):
-        super(BlockParentsMapTestCase, self).setUp(**kwargs)
+    def setUp(self):
+        super(BlockParentsMapTestCase, self).setUp()
 
         # create the course
         self.course = CourseFactory.create()
@@ -319,7 +327,7 @@ class BlockParentsMapTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
             self.assertEquals(
                 block_structure_result,
                 i in expected_accessible_blocks,
-                "block_structure return value {0} not equal to expected value for block {1} for user {2}".format(
+                u"block_structure return value {0} not equal to expected value for block {1} for user {2}".format(
                     block_structure_result, i, user.username
                 )
             )
@@ -331,7 +339,7 @@ class BlockParentsMapTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
                     self.assertNotEqual(
                         block_structure_result,
                         has_access_result,
-                        "block structure ({0}) & has_access ({1}) results are equal for block {2} for user {3}".format(
+                        u"block structure ({0}) & has_access ({1}) results are equal for block {2} for user {3}".format(
                             block_structure_result, has_access_result, i, user.username
                         )
                     )
@@ -339,7 +347,7 @@ class BlockParentsMapTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
                     self.assertEquals(
                         block_structure_result,
                         has_access_result,
-                        "block structure ({0}) & has_access ({1}) results not equal for block {2} for user {3}".format(
+                        u"block structure ({0}) & has_access ({1}) results not equal for block {2} for user {3}".format(
                             block_structure_result, has_access_result, i, user.username
                         )
                     )

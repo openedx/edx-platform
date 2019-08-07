@@ -30,10 +30,12 @@
 
 .ui-loading-base {
   @include animation(fadeIn $tmg-f2 linear 1);
+
   @extend %t-copy-base;
 
   .spin {
     @extend %anim-rotateCW;
+
     display: inline-block;
   }
 
@@ -45,6 +47,7 @@
 .ui-loading {
   @extend .ui-loading-base;
   @extend %ui-well;
+
   opacity: 0.6;
   background-color: $white;
   padding: ($baseline*1.5) $baseline;
@@ -67,20 +70,21 @@
 
 // for verify_student/make_payment_step.underscore
 .payment-buttons {
-
   .purchase {
     float: left;
-    padding: ($baseline*.5) 0;
+    padding: ($baseline*0.5) 0;
 
     .product-info, .product-name, .price {
       @extend %t-ultrastrong;
+
       color: $m-blue-d3;
     }
   }
 
   .payment-button {
     float: right;
-    @include margin-left( ($baseline/2) );
+
+    @include margin-left(($baseline/2));
 
     &.is-selected {
       background: $m-green-s1 !important;
@@ -94,13 +98,14 @@
 .view-teams {
   .wrapper-msg {
     @include clearfix();
+
     max-width: grid-width(12);
     margin: 0 auto;
     border-top: 3px solid $orange;
 
     .left-floater {
       @include float(left);
-      text-transform: uppercase;
+
       font-weight: $font-semibold;
       color: $white;
       line-height: $body-line-height;
@@ -108,6 +113,7 @@
 
     .right-floater {
       @include float(right);
+
       line-height: $body-line-height;
 
       button {
@@ -126,7 +132,7 @@
         }
 
         &:focus {
-         box-shadow: 0 0 0 0;
+          box-shadow: 0 0 0 0;
         }
       }
     }
@@ -135,6 +141,7 @@
   .members-info {
     margin: 0;
     padding: 0;
+
     li {
       display: inline;
     }
@@ -151,6 +158,7 @@
     .member-info-container {
       display: inline-block;
       vertical-align: middle;
+
       @include margin-left($baseline/2);
 
       .primary {
@@ -191,6 +199,7 @@
 //along with some "hide the inherited value, we want none" action
 .prompt.warning button {
   @extend %btn-no-style;
+
   box-shadow: none;
   text-shadow: none;
 
@@ -211,6 +220,7 @@
 //along with some "hide the inherited value, we want none" action
 .prompt.warning button {
   @extend %btn-no-style;
+
   box-shadow: none;
   text-shadow: none;
 
@@ -223,66 +233,5 @@
   &:focus {
     box-shadow: none;
     border: 0;
-  }
-}
-
-// pfogg - ECOM-2604
-// styling for date summary blocks on the course info page
-.date-summary-container {
-  .date-summary {
-    @include clearfix;
-    padding: 10px;
-    @include border-left(3px solid $gray-l3);
-
-    .heading {
-      @extend %t-title7;
-      color: $gray-d2;
-    }
-
-    .description {
-      margin-top: $baseline/2;
-      margin-bottom: $baseline/2;
-      display: inline-block;
-      color: $gray-d1;
-      @extend %t-title8;
-    }
-
-    .date-summary-link {
-      @extend %t-title8;
-      font-weight: $font-semibold;
-      a {
-        color: $link-color;
-        font-weight: normal;
-      }
-    }
-
-    .date {
-      color: $gray-d1;
-      @extend %t-title9;
-    }
-
-    &-todays-date {
-      @include border-left(3px solid $blue);
-
-      .heading {
-        @extend %t-title8;
-      }
-    }
-
-    &-verified-upgrade-deadline {
-      @include border-left(3px solid $green);
-    }
-
-    &-verification-deadline-passed {
-      @include border-left(3px solid $red);
-    }
-
-    &-verification-deadline-retry {
-      @include border-left(3px solid $red);
-    }
-
-    &-verification-deadline-upcoming {
-      @include border-left(3px solid $orange);
-    }
   }
 }

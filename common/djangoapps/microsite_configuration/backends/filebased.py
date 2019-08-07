@@ -2,11 +2,9 @@
 Microsite backend that reads the configuration from a file
 
 """
+from __future__ import absolute_import
 
-from microsite_configuration.backends.base import (
-    BaseMicrositeBackend,
-    BaseMicrositeTemplateBackend,
-)
+from microsite_configuration.backends.base import BaseMicrositeBackend, BaseMicrositeTemplateBackend
 
 
 class FilebasedMicrositeBackend(BaseMicrositeBackend):

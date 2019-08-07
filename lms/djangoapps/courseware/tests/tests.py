@@ -1,25 +1,24 @@
 """
 Test for LMS courseware app.
 """
+from __future__ import absolute_import
+
 from textwrap import dedent
 from unittest import TestCase
 
-from django.core.urlresolvers import reverse
 import mock
-from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from django.urls import reverse
+from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase, TEST_DATA_MIXED_MODULESTORE
-)
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 
-@attr(shard=1)
 class ActivateLoginTest(LoginEnrollmentTestCase):
     """
     Test logging in and logging out.
@@ -46,7 +45,7 @@ class ActivateLoginTest(LoginEnrollmentTestCase):
         has 'is_from_log_out' attribute set to true.
         """
         response = self.client.get(reverse('logout'))
-        self.assertTrue(getattr(response.wsgi_request, 'is_from_logout', False))  # pylint: disable=no-member
+        self.assertTrue(getattr(response.wsgi_request, 'is_from_logout', False))
 
 
 class PageLoaderTestCase(LoginEnrollmentTestCase):
@@ -77,22 +76,22 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
 
             if descriptor.location.category == 'about':
                 self._assert_loads('about_course',
-                                   {'course_id': course_key.to_deprecated_string()},
+                                   {'course_id': text_type(course_key)},
                                    descriptor)
 
             elif descriptor.location.category == 'static_tab':
-                kwargs = {'course_id': course_key.to_deprecated_string(),
+                kwargs = {'course_id': text_type(course_key),
                           'tab_slug': descriptor.location.name}
                 self._assert_loads('static_tab', kwargs, descriptor)
 
             elif descriptor.location.category == 'course_info':
-                self._assert_loads('info', {'course_id': course_key.to_deprecated_string()},
+                self._assert_loads('info', {'course_id': text_type(course_key)},
                                    descriptor)
 
             else:
 
-                kwargs = {'course_id': course_key.to_deprecated_string(),
-                          'location': descriptor.location.to_deprecated_string()}
+                kwargs = {'course_id': text_type(course_key),
+                          'location': text_type(descriptor.location)}
 
                 self._assert_loads('jump_to', kwargs, descriptor,
                                    expect_redirect=True,
@@ -112,7 +111,7 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
         response = self.client.get(url, follow=True)
 
         if response.status_code != 200:
-            self.fail('Status %d for page %s' %
+            self.fail(u'Status %d for page %s' %
                       (response.status_code, descriptor.location))
 
         if expect_redirect:
@@ -123,7 +122,6 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
             self.assertNotIsInstance(descriptor, ErrorDescriptor)
 
 
-@attr(shard=1)
 class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
     """
     Check that all pages in test courses load properly from Mongo.
@@ -147,20 +145,18 @@ class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
         self.assertGreater(len(course.textbooks), 0)
 
 
-@attr(shard=1)
 class TestDraftModuleStore(ModuleStoreTestCase):
     def test_get_items_with_course_items(self):
         store = modulestore()
 
         # fix was to allow get_items() to take the course_id parameter
-        store.get_items(SlashSeparatedCourseKey('abc', 'def', 'ghi'), qualifiers={'category': 'vertical'})
+        store.get_items(CourseKey.from_string('abc/def/ghi'), qualifiers={'category': 'vertical'})
 
         # test success is just getting through the above statement.
         # The bug was that 'course_id' argument was
         # not allowed to be passed in (i.e. was throwing exception)
 
 
-@attr(shard=1)
 class TestLmsFieldData(TestCase):
     """
     Tests of the LmsFieldData class

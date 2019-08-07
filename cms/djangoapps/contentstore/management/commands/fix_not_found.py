@@ -1,10 +1,13 @@
 """
 Script for fixing the item not found errors in a course
 """
+from __future__ import absolute_import
+
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys.edx.keys import CourseKey
-from xmodule.modulestore.django import modulestore
+
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 
 # To run from command line: ./manage.py cms fix_not_found course-v1:org+course+run
 
@@ -18,7 +21,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """Execute the command"""
-        course_id = options.get('course_id', None)
+        course_id = options['course_id']
 
         course_key = CourseKey.from_string(course_id)
         # for now only support on split mongo

@@ -26,10 +26,11 @@ CMS.URL.TEXTBOOKS = "${textbook_url}"
 CMS.URL.LMS_BASE = "${settings.LMS_BASE}"
 </script>
 </%block>
-<%block name="requirejs">
-    require(["js/factories/textbooks"], function(TextbooksFactory) {
-        TextbooksFactory(${textbooks | n, dump_js_escaped_json});
-    });
+
+<%block name="page_bundle">
+  <%static:webpack entry="js/factories/textbooks">
+    TextbooksFactory(${textbooks | n, dump_js_escaped_json});
+  </%static:webpack>
 </%block>
 
 <%block name="content">
@@ -53,9 +54,7 @@ CMS.URL.LMS_BASE = "${settings.LMS_BASE}"
 
   <div class="wrapper-content wrapper">
     <section class="content">
-      <article class="content-primary" role="main">
-
-      </article>
+      <article class="content-primary" role="main"></article>
       <aside class="content-supplementary" role="complementary">
         <div class="bit">
           <h3 class="title-3">${_("Why should I break my textbook into chapters?")}</h3>

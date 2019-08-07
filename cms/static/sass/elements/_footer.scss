@@ -9,7 +9,9 @@
 
   footer.primary {
     @extend %t-copy-sub2;
+
     @include clearfix();
+
     max-width: $fg-max-width;
     min-width: $fg-min-width;
     width: flex-grid(12);
@@ -22,25 +24,29 @@
 
     .colophon {
       width: flex-grid(4, 12);
+
       @include float(left);
       @include margin-right(flex-gutter(2));
     }
 
     a {
-      color: $uxpl-blue-base;
+      color: theme-color("primary");
 
-      &:hover, &:active {
+      &:hover,
+      &:active {
         color: $uxpl-blue-hover-active;
       }
     }
 
     .nav-peripheral {
       width: flex-grid(6, 12);
+
       @include float(right);
       @include text-align(right);
 
       .nav-item {
         display: inline-block;
+
         @include margin-right($baseline/4);
 
         &:last-child {
@@ -54,9 +60,12 @@
 
           .icon {
             @include transition(top $tmg-f2 ease-in-out $tmg-f2);
+
             @extend %t-action3;
+
             display: inline-block;
             vertical-align: middle;
+
             @include margin-right($baseline/4);
           }
         }
@@ -65,10 +74,12 @@
 
     .footer-content-secondary {
       @include clearfix();
+
       margin-top: $baseline;
     }
 
-    .footer-about-copyright, .footer-about-openedx {
+    .footer-about-copyright,
+    .footer-about-openedx {
       display: inline-block;
       vertical-align: middle;
     }
@@ -76,6 +87,7 @@
     // platform trademarks
     .footer-about-copyright {
       width: flex-grid(4, 12);
+
       @include float(left);
       @include margin-right(flex-gutter(2));
     }

@@ -1,0 +1,74 @@
+<aside class="aside js-program-progress program-progress">
+    <% if (programCertificate) { %>
+        <h2 class="progress-heading certificate-heading"><%- StringUtils.interpolate(gettext('Your {program} Certificate'), {program: type}, true) %></h2>
+
+        <a href="<%- programCertificate.url %>" class="program-cert-link">
+            <img src="<%- programCertificate.img %>" class="program-cert" alt="<%- interpolate(gettext('Open the certificate you earned for the %(title)s program.'), {title: programCertificate.title}, true) %>" />
+        </a>
+    <% } %>
+</aside>
+<aside class="aside js-course-certificates"></aside>
+<aside class="aside js-program-record program-record">
+    <h2 class="divider-heading"><%- gettext('Program Record') %></h2>
+    <div class="motivating-section">
+        <p class="motivating-message"><%- gettext('Once you complete one of the program requirements you have a program record. This record is marked complete once you meet all program requirements. A program record can be used to continue your learning journey and demonstrate your learning to others.') %></p>
+    </div>
+    <% if (programRecordUrl) { %>
+        <div class="sidebar-button-wrapper">
+            <a href="<%- programRecordUrl %>" class="program-record-link">
+                <button class="btn sidebar-button"><%- gettext('View Program Record') %></button>
+            </a>
+        </div>
+    <% } %>
+</aside>
+<% if (creditPathways.length > 0) { %>
+    <aside class="aside js-program-pathways program-credit-pathways">
+        <h2 class = "divider-heading"><%- gettext('Additional Credit Opportunities') %></h2>
+
+        <% for (var i = 0; i < creditPathways.length; i++) {
+            var pathway = creditPathways[i];
+        %>
+           <div class="pathway-wrapper">
+               <div class = "pathway-info">
+                    <h2 class="pathway-heading">  <%- pathway.name %> </h2>
+                    <% if (pathway.description) { %>
+                        <p> <%- pathway.description %> </p>
+                    <% } %>
+                    <% if (pathway.destination_url) { %>
+                        <div class="sidebar-button-wrapper">
+                            <a href="<%- pathway.destination_url %>" class="pathway-link">
+                                <button class="btn pathway-button sidebar-button" data-pathway-uuid="<%- pathway.uuid %>" data-pathway-name="<%- pathway.name %>"><%- gettext('Learn More') %></button>
+                            </a>
+                        </div>
+                    <% } %>
+               </div>
+           </div>
+       <% } %>
+    </aside>
+<% } %>
+
+<% if (industryPathways.length > 0) { %>
+    <aside class="aside js-program-pathways program-industry-pathways">
+        <h2 class = "divider-heading"><%- gettext('Additional Professional Opportunities') %></h2>
+
+        <% for (var i = 0; i < industryPathways.length; i++) {
+            var pathway = industryPathways[i];
+        %>
+           <div class="pathway-wrapper">
+               <div class = "pathway-info">
+                    <h2 class="pathway-heading">  <%- pathway.name %> </h2>
+                    <% if (pathway.description) { %>
+                        <p> <%- pathway.description %> </p>
+                    <% } %>
+                    <% if (pathway.destination_url) { %>
+                        <div class="sidebar-button-wrapper">
+                            <a href="<%- pathway.destination_url %>" class="pathway-link">
+                                <button class="btn pathway-button sidebar-button" data-pathway-uuid="<%- pathway.uuid %>" data-pathway-name="<%- pathway.name %>"><%- gettext('Learn More') %></button>
+                            </a>
+                        </div>
+                    <% } %>
+               </div>
+           </div>
+       <% } %>
+    </aside>
+<% } %>

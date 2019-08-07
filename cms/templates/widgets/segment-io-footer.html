@@ -4,7 +4,7 @@
 % if settings.CMS_SEGMENT_KEY:
     <!-- begin segment footer -->
     <script type="text/javascript">
-    % if user.is_authenticated():
+    % if user.is_authenticated:
         // We can't use JQuery's on load method because it
         // screws up RequireJS' JQuery initialization.
         var onLoadCallback = function() {

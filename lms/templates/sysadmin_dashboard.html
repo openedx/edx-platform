@@ -1,14 +1,13 @@
+<%page expression_filter="h"/>
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 <%!
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 %>
 
 <%block name="headextra">
   <%static:css group='style-course'/>
-  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
 </%block>
 
 <style type="text/css">
@@ -192,31 +191,8 @@ textarea {
       </table>
     </p>
 %endif
-
-%if plots:
-
-    %for plot in plots:
-      <br/>
-      <h3>${plot['title']}</h3>
-      <br/>
-      <p>${plot['info']}</p>
-      <br/>
-      <div id="plot_${plot['id']}" style="width:600px;height:300px;"></div>
-      <script type="text/javascript">
-          $(function () {
-              ${plot['data']}
-              $.plot($("#plot_${plot['id']}"), ${plot['cmd']}  );
-          });
-      </script>
-      <br/>
-      <br/>
-    %endfor
-
-%endif
-
   </section>
   <div style="text-align:right; float: right"><span id="djangopid">'Django PID': ${djangopid}</span>
-  ## Translators: A version number appears after this string
-  | <span id="edxver">${_('Platform Version')}: ${edx_platform_version}</span></div>
+  </div>
 </div>
 </section>

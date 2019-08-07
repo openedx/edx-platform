@@ -1,76 +1,69 @@
-<div class="status submission-error hidden" aria-live="polite">
-    <h4 class="message-title"><%- gettext("We couldn't create your account.") %></h4>
-    <ul class="message-copy"></ul>
+<div class="js-form-feedback" aria-live="assertive" tabindex="-1">
 </div>
+
+<% if (!context.syncLearnerProfileData) { %>
+	<div class="toggle-form">
+		<span class="text"><%- edx.StringUtils.interpolate(gettext('Already have an {platformName} account?'), {platformName: context.platformName }) %></span>
+		<a href="#login" class="form-toggle" data-type="login"><%- gettext("Sign in.") %></a>
+	</div>
+<% } %>
 
 <form id="register" class="register-form" autocomplete="off" tabindex="-1" method="POST">
 
-    <% if (context.errorMessage) { %>
-        <div class="status submission-error">
-            <h4 class="message-title"><%- gettext("An error occurred.") %></h4>
-            <ul class="message-copy"><%- context.errorMessage %></ul>
-        </div>
-    <% } %>
+    <% if (!context.currentProvider) { %>
+        <% if (context.providers.length > 0 || context.hasSecondaryProviders) { %>
+            <div class="login-providers">
+                <div class="section-title lines">
+                    <h3>
+                        <span class="text"><%- gettext("Create an account using") %></span>
+                    </h3>
+                </div>
+                <%
+                _.each( context.providers, function( provider) {
+                    if ( provider.registerUrl ) { %>
+                        <button type="button" class="button button-primary button-<%- provider.id %> login-provider register-<%- provider.id %>" data-provider-url="<%- provider.registerUrl %>">
+                            <div class="icon <% if ( provider.iconClass ) { %>fa <%- provider.iconClass %><% } %>" aria-hidden="true">
+                                <% if ( provider.iconImage ) { %>
+                                    <img class="icon-image" src="<%- provider.iconImage %>" alt="<%- provider.name %> icon" />
+                                <% } %>
+                            </div>
+                            <span aria-hidden="true"><%- provider.name %></span>
+                            <span class="sr"><%- _.sprintf( gettext("Create account using %(providerName)s."), {providerName: provider.name} ) %></span>
+                        </button>
+                <%  }
+                }); %>
 
-    <% if (context.currentProvider) { %>
-        <div class="status" aria-hidden="false">
-            <p class="message-copy">
-                <%- _.sprintf( gettext("You've successfully signed into %(currentProvider)s."), context ) %>
-                <%- _.sprintf( gettext("We just need a little more information before you start learning with %(platformName)s."), context ) %>
-            </p>
-        </div>
-    <% } else if ( context.providers.length > 0 || context.hasSecondaryProviders ) {  %>
-        <div class="login-providers">
-            <div class="section-title lines">
-                <h2>
-                    <span class="text"><%- gettext("Create an account using") %></span>
-                </h2>
-            </div>
-            <%
-            _.each( context.providers, function( provider) {
-                if ( provider.registerUrl ) { %>
-                    <button type="button" class="button button-primary button-<%- provider.id %> login-provider register-<%- provider.id %>" data-provider-url="<%- provider.registerUrl %>">
-                        <div class="icon <% if ( provider.iconClass ) { %>fa <%- provider.iconClass %><% } %>" aria-hidden="true">
-                            <% if ( provider.iconImage ) { %>
-                                <img class="icon-image" src="<%- provider.iconImage %>" alt="<%- provider.name %> icon" />
-                            <% } %>
-                        </div>
-                        <span aria-hidden="true"><%- provider.name %></span>
-                        <span class="sr"><%- _.sprintf( gettext("Create account using %(providerName)s."), {providerName: provider.name} ) %></span>
+                <% if ( context.hasSecondaryProviders ) { %>
+                    <button type="button" class="button-secondary-login form-toggle" data-type="institution_login">
+                        <%- gettext("Use my institution/campus credentials") %>
                     </button>
-            <%  }
-            }); %>
-
-            <% if ( context.hasSecondaryProviders ) { %>
-                <button type="button" class="button-secondary-login form-toggle" data-type="institution_login">
-                    <%- gettext("Use my institution/campus credentials") %>
-                </button>
-            <% } %>
-        </div>
-        <div class="section-title lines">
-            <h2>
-                <span class="text"><%- gettext("or create a new one here") %></span>
-            </h2>
-        </div>
-    <% } else { %>
-        <div class="section-title lines">
-            <h2>
-                <span class="text"><%- gettext("Create a new account") %></span>
-            </h2>
-        </div>
+                <% } %>
+            </div>
+            <div class="section-title lines">
+                <h3>
+                    <span class="text"><%- gettext("or create a new one here") %></span>
+                </h3>
+            </div>
+        <% } else { %>
+            <h2><%- gettext('Create an Account')%></h2>
+        <% } %>
+    <% } else if (context.autoRegisterWelcomeMessage) { %>
+        <span class="auto-register-message"><%- context.autoRegisterWelcomeMessage %></span>
     <% } %>
 
     <%= context.fields %>
 
-    <button type="submit" class="action action-primary action-update js-register register-button"><%- gettext("Create your account") %></button>
-    <p class="note">* <%- gettext("Required field") %></p>
-</form>
-
-<div class="toggle-form">
-    <div class="section-title">
-        <h2>
-            <span class="text"><%- gettext("Already have an account?") %></span>
-        </h2>
+    <div class="form-field checkbox-optional_fields_toggle">
+        <input type="checkbox" id="toggle_optional_fields" class="input-block checkbox"">
+        <label for="toggle_optional_fields">
+            <span class="label-text">
+                <%- gettext("Support education research by providing additional information") %>
+            </span>
+        </label>
     </div>
-    <button class="nav-btn form-toggle" data-type="login"><%- gettext("Sign in") %></button>
-</div>
+
+
+    <button type="submit" class="action action-primary action-update js-register register-button">
+    	<% if ( context.registerFormSubmitButtonText ) { %><%- context.registerFormSubmitButtonText %><% } else { %><%- gettext("Create Account") %><% } %>
+    </button>
+</form>

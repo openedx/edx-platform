@@ -1,18 +1,22 @@
 """
 Acceptance tests for Studio.
 """
+from __future__ import absolute_import
+
 import uuid
 
-from base_studio_test import StudioCourseTest
+from selenium.webdriver.common.keys import Keys
+
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
-from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.studio import LMS_URL
+from common.test.acceptance.pages.studio.asset_index import AssetIndexPageStudioFrontend
 from common.test.acceptance.pages.studio.course_info import CourseUpdatesPage
 from common.test.acceptance.pages.studio.edit_tabs import PagesPage
 from common.test.acceptance.pages.studio.import_export import ExportCoursePage, ImportCoursePage
-from common.test.acceptance.pages.studio.index import DashboardPage, HomePage, IndexPage
-from common.test.acceptance.pages.studio.login import LoginPage, CourseOutlineSignInRedirectPage
+from common.test.acceptance.pages.studio.index import AccessibilityPage, DashboardPage, HomePage, IndexPage
+from common.test.acceptance.pages.studio.login import CourseOutlineSignInRedirectPage, LoginPage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage
-from common.test.acceptance.pages.studio.asset_index import AssetIndexPage
 from common.test.acceptance.pages.studio.settings import SettingsPage
 from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettingsPage
 from common.test.acceptance.pages.studio.settings_graders import GradingPage
@@ -21,14 +25,19 @@ from common.test.acceptance.pages.studio.textbook_upload import TextbookUploadPa
 from common.test.acceptance.pages.studio.users import CourseTeamPage
 from common.test.acceptance.tests.helpers import AcceptanceTest, UniqueCourseTest
 
+from .base_studio_test import StudioCourseTest
+
 
 class LoggedOutTest(AcceptanceTest):
     """
     Smoke test for pages in Studio that are visible when logged out.
     """
+    shard = 21
+
     def setUp(self):
         super(LoggedOutTest, self).setUp()
-        self.pages = [LoginPage(self.browser), IndexPage(self.browser), SignupPage(self.browser)]
+        self.pages = [LoginPage(self.browser), IndexPage(self.browser), SignupPage(self.browser),
+                      AccessibilityPage(self.browser)]
 
     def test_page_existence(self):
         """
@@ -44,6 +53,8 @@ class LoggedInPagesTest(AcceptanceTest):
     """
     Verify the pages in Studio that you can get to when logged in and do not have a course yet.
     """
+    shard = 21
+
     def setUp(self):
         super(LoggedInPagesTest, self).setUp()
         self.auth_page = AutoAuthPage(self.browser, staff=True)
@@ -63,7 +74,9 @@ class SignUpAndSignInTest(UniqueCourseTest):
     """
     Test studio sign-up and sign-in
     """
-    def setUp(self):  # pylint: disable=arguments-differ
+    shard = 21
+
+    def setUp(self):
         super(SignUpAndSignInTest, self).setUp()
         self.sign_up_page = SignupPage(self.browser)
         self.login_page = LoginPage(self.browser)
@@ -109,17 +122,34 @@ class SignUpAndSignInTest(UniqueCourseTest):
         index_page.visit()
         index_page.click_sign_up()
 
-        unique_number = uuid.uuid4().hex[:4]
-        registration_dic = {
-            '#email': '{}-email@host.com'.format(unique_number),
-            '#name': '{}-name'.format(unique_number),
-            '#username': '{}-username'.format(unique_number),
-            '#password': '{}-password'.format(unique_number),
-        }
         # Register the user.
-        self.sign_up_page.sign_up_user(registration_dic)
+        unique_number = uuid.uuid4().hex[:4]
+        self.sign_up_page.sign_up_user(
+            '{}-email@host.com'.format(unique_number),
+            '{}-name'.format(unique_number),
+            '{}-username'.format(unique_number),
+            '{}-password'.format(unique_number),
+        )
         home = HomePage(self.browser)
         home.wait_for_page()
+
+    def test_sign_up_with_bad_password(self):
+        """
+        Scenario: Sign up from the homepage
+        Given I visit the Studio homepage
+        When I click the link with the text "Sign Up"
+        And I fill in the registration form
+        When I enter an insufficient password and focus out
+        I should see an error message
+        """
+        index_page = IndexPage(self.browser)
+        index_page.visit()
+        index_page.click_sign_up()
+
+        password_input = self.sign_up_page.input_password('a')  # Arbitrary short password that will fail
+        password_input.send_keys(Keys.TAB)  # Focus out of the element
+        index_page.wait_for_element_visibility('#register-password-validation-error', 'Password Error Message')
+        self.assertIsNotNone(index_page.q(css='#register-password-validation-error-msg'))  # Error message should exist
 
     def test_login_with_valid_redirect(self):
         """
@@ -157,9 +187,8 @@ class SignUpAndSignInTest(UniqueCourseTest):
         self.browser.get(self.browser.current_url.split('=')[0] + '=http://www.google.com')
         # Login
         self.course_outline_sign_in_redirect_page.login(self.user['email'], self.user['password'])
-        home = HomePage(self.browser)
-        home.wait_for_page()
-        self.assertEqual(self.browser.current_url, home.url)
+        # Verify that we land in LMS instead of the invalid redirect url
+        self.assertEqual(self.browser.current_url, LMS_URL + "/dashboard")
 
     def test_login_with_mistyped_credentials(self):
         """
@@ -192,15 +221,8 @@ class SignUpAndSignInTest(UniqueCourseTest):
         )
         # Verify that login error is shown
         self.course_outline_sign_in_redirect_page.wait_for_element_visibility(
-            '#login_error',
+            ".js-form-errors.status.submission-error",
             'Login error is visible'
-        )
-        # Change the password
-        self.course_outline_sign_in_redirect_page.fill_field('input#password', 'changed_password')
-        # Login error should not be visible
-        self.course_outline_sign_in_redirect_page.wait_for_element_invisibility(
-            '#login_error',
-            'Login error is not visible'
         )
         # Login with correct credentials
         self.course_outline_sign_in_redirect_page.login(self.user['email'], self.user['password'])
@@ -214,7 +236,7 @@ class CoursePagesTest(StudioCourseTest):
     Tests that verify the pages in Studio that you can get to when logged
     in and have a course.
     """
-
+    shard = 21
     COURSE_ID_SEPARATOR = "."
 
     def setUp(self):
@@ -226,7 +248,7 @@ class CoursePagesTest(StudioCourseTest):
         self.pages = [
             clz(self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run'])
             for clz in [
-                AssetIndexPage,
+                AssetIndexPageStudioFrontend,
                 CourseUpdatesPage,
                 PagesPage, ExportCoursePage, ImportCoursePage, CourseTeamPage, CourseOutlinePage, SettingsPage,
                 AdvancedSettingsPage, GradingPage, TextbookUploadPage
@@ -266,6 +288,7 @@ class DiscussionPreviewTest(StudioCourseTest):
     """
     Tests that Inline Discussions are rendered with a custom preview in Studio
     """
+    shard = 21
 
     def setUp(self):
         super(DiscussionPreviewTest, self).setUp()

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from __future__ import absolute_import
 from django.db import migrations, models
 import django.db.models.deletion
 import coursewarehistoryextended.fields
@@ -53,5 +54,5 @@ class Migration(migrations.Migration):
                 'get_latest_by': 'created',
             },
         ),
-        migrations.RunPython(bump_pk_start, reverse_code=migrations.RunPython.noop),
+        migrations.RunPython(bump_pk_start, reverse_code=migrations.RunPython.noop, atomic=False),
     ]

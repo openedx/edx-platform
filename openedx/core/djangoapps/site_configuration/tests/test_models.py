@@ -1,6 +1,8 @@
 """
 Tests for site configuration's django models.
 """
+from __future__ import absolute_import
+
 from mock import patch
 
 from django.test import TestCase
@@ -273,6 +275,34 @@ class SiteConfigurationTests(TestCase):
                 "platform_name",
                 "dummy-default-value"),
             "dummy-default-value",
+        )
+
+    def test_get_site_for_org(self):
+        """
+        Test that get_value_for_org returns correct value for any given key.
+        """
+        # add SiteConfiguration to database
+        config1 = SiteConfigurationFactory.create(
+            site=self.site,
+            values=self.test_config1,
+        )
+        config2 = SiteConfigurationFactory.create(
+            site=self.site2,
+            values=self.test_config2,
+        )
+
+        # Make sure entry is saved and retrieved correctly
+        self.assertEqual(
+            SiteConfiguration.get_configuration_for_org(self.test_config1['course_org_filter']),
+            config1,
+        )
+        self.assertEqual(
+            SiteConfiguration.get_configuration_for_org(self.test_config2['course_org_filter']),
+            config2,
+        )
+        self.assertEqual(
+            SiteConfiguration.get_configuration_for_org('something else'),
+            None,
         )
 
     def test_get_all_orgs(self):

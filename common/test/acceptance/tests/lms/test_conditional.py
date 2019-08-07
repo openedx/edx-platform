@@ -2,21 +2,22 @@
 Bok choy acceptance tests for conditionals in the LMS
 """
 
-from flaky import flaky
+from __future__ import absolute_import
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
-from common.test.acceptance.tests.helpers import UniqueCourseTest
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.conditional import POLL_ANSWER, ConditionalPage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.conditional import ConditionalPage, POLL_ANSWER
 from common.test.acceptance.pages.lms.problem import ProblemPage
-from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.tests.helpers import UniqueCourseTest
 
 
 class ConditionalTest(UniqueCourseTest):
     """
     Test the conditional module in the lms.
     """
+    shard = 23
 
     def setUp(self):
         super(ConditionalTest, self).setUp()
@@ -115,7 +116,6 @@ class ConditionalTest(UniqueCourseTest):
         conditional_page = ConditionalPage(self.browser)
         self.assertTrue(conditional_page.is_content_visible())
 
-    @flaky  # TNL-5770
     def test_conditional_handles_polls(self):
         self.install_course_fixture(block_type='poll')
         self.courseware_page.visit()

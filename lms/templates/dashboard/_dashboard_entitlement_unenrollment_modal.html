@@ -1,0 +1,32 @@
+<%page expression_filter="h"/>
+
+<%!
+from django.utils.translation import ugettext as _
+%>
+
+<div id="entitlement-unenrollment-modal" class="entitlement-unenrollment-modal js-entitlement-unenrollment-modal js-modal" aria-hidden="true">
+  <div class="entitlement-unenrollment-modal-inner-wrapper" role="dialog" aria-modal="true" aria-labelledby="entitlement-unenrollment-modal-title" aria-live="polite">
+    <button class="entitlement-unenrollment-modal-close-btn js-entitlement-unenrollment-modal-close-btn">
+      <span class="icon fa fa-remove" aria-hidden="true"></span>
+      <span class="sr">
+        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+        ${_("Close")}
+      </span>
+    </button>
+
+    <header class="entitlement-unenrollment-modal-header">
+      <h2 id="entitlement-unenrollment-modal-title">
+        <span class='js-entitlement-unenrollment-modal-header-text'></span>
+        <span class="sr">,
+          ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
+          ${_("window open")}
+        </span>
+      </h2>
+      <hr/>
+    </header>
+    <div class="entitlement-unenrollment-modal-error-text js-entitlement-unenrollment-modal-error-text"></div>
+    <div class="entitlement-unenrollment-modal-submit-wrapper">
+      <button class="entitlement-unenrollment-modal-submit js-entitlement-unenrollment-modal-submit">${_("Unenroll")}</button>
+    </div>
+  </div>
+</div>

@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from wiki.core.plugins.base import BasePlugin
+from __future__ import absolute_import
+
 from wiki.core.plugins import registry as plugin_registry
+from wiki.core.plugins.base import BasePlugin
 
 from course_wiki.plugins.markdownedx import mdx_mathjax, mdx_video
 
@@ -12,8 +14,8 @@ class ExtendMarkdownPlugin(BasePlugin):
     """
 
     markdown_extensions = [
-        mdx_mathjax.MathJaxExtension(configs={}),
-        mdx_video.VideoExtension(configs={}),
+        mdx_mathjax.MathJaxExtension(),
+        mdx_video.VideoExtension(),
     ]
 
 plugin_registry.register(ExtendMarkdownPlugin)

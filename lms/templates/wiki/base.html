@@ -1,9 +1,9 @@
 {% extends "main_django.html" %}
 {% with online_help_token="wiki" %}
-{% load theme_pipeline %}{% load sekizai_tags i18n configuration %}{% load url from future %}{% load staticfiles %}
+{% load theme_pipeline %}{% load sekizai_tags i18n configuration %}{% load staticfiles %}
 
 {% block title %}
-  {% block pagetitle %}{% endblock %} | {% trans "Wiki" %} | {% platform_name %}
+  {% block pagetitle %}{% endblock %} | {% trans "Wiki" as tmsg%}{{tmsg|force_escape}} | {% platform_name %}
 {% endblock %}
 
 {% block bodyclass %}view-in-course view-wiki{% endblock %}
@@ -12,6 +12,8 @@
   {% stylesheet 'course' %}
   {% stylesheet 'style-course-vendor' %}
   {% stylesheet 'style-course' %}
+
+	<link rel="stylesheet" type="text/css" href="{% static 'paragon/static/paragon.min.css' %}" />
 
   <script type="text/javascript">
     function ajaxError(){}
@@ -35,6 +37,8 @@
     }
   </script>
 
+  {% comment %} The wiki page does not use the main.html template {% endcomment %}
+  <script type="text/javascript" src="{% static 'js/header/header.js' %}"></script>
 
   {% addtoblock 'js' %}
     {% comment %} These scripts load at the bottom of the body {% endcomment %}
@@ -56,29 +60,43 @@
   {% endwith %}
   {% endif %}
 
-<main id="main" aria-label="Content" tabindex="-1">
-  <section class="container wiki {{ selected_tab }}" id="wiki-content">
-    <div class="wiki-wrapper">
-      {% block wiki_body %}
+<div class="container">
+    {% load render_bundle from webpack_loader %}
+    {% render_bundle "AlertStatusBar" %}
 
-        {% block wiki_breadcrumbs %}{% endblock %}
+  <div class="wiki-wrapper">
+    <main id="main" aria-label="Content" tabindex="-1">
+          <section class="wiki {{ selected_tab }}" id="wiki-content"
+            {% if request.course.language %}
+              lang="{{ request.course.language }}"
+            {% endif %}
+          >
+        {% block wiki_body %}
 
-        {% if messages %}
-          {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-              <a class="close" data-dismiss="alert" href="#">&times;</a>
-              {{ message }}
-            </div>
-          {% endfor %}
-        {% endif %}
+          {% block wiki_breadcrumbs %}{% endblock %}
 
-        {% block wiki_contents %}{% endblock %}
+          {% if messages %}
+            {% for message in messages %}
+              <div id="alert_stat_bar"></div>
+              <script type="text/javascript">
+                new StatusAlertRenderer(
+                  "{{ message }}",
+                  "#alert_stat_bar",
+                  ".nav nav-tabs"
+                );
+              </script>
 
-      {% endblock %}
-    </div>
+            {% endfor %}
+          {% endif %}
 
-  </section>
-</main>
+          {% block wiki_contents %}{% endblock %}
+
+        {% endblock %}
+
+      </section>
+    </main>
+  </div>
+</div>
 
 {% endblock %}
 {% endwith %}

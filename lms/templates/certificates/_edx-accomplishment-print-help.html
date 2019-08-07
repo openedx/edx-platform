@@ -1,0 +1,17 @@
+<%page expression_filter="h"/>
+<%! 
+from django.utils.translation import ugettext as _ 
+from openedx.core.djangolib.markup import HTML, Text
+%>
+<div class="wrapper-accomplishment-support">
+    <div class="accomplishment-support">
+        <div class="accomplishment-support-print">
+            <p class="accomplishment-metadata-copy">
+                ${Text(_("For tips and tricks on printing your certificate, view the {link_start}Web Certificates help documentation{link_end}.")).format(
+                    link_start=HTML('<a href="https://edx.readthedocs.org/projects/edx-guide-for-students/en/latest/SFD_certificates.html#web-certificates">'),
+                    link_end=HTML('</a>'),
+                )}
+            </p>
+        </div>
+    </div>
+</div>

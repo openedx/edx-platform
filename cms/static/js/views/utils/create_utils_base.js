@@ -39,8 +39,7 @@ define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_util
                     element.addClass(self.classes.error);
                     element.children(self.selectors.tipError).addClass(self.classes.showing).removeClass(self.classes.hiding).text(message);
                     self.toggleSaveButton(false);
-                }
-                else {
+                } else {
                     element.removeClass(self.classes.error);
                     element.children(self.selectors.tipError).addClass(self.classes.hiding).removeClass(self.classes.showing);
                     // One "error" div is always present, but hidden or shown

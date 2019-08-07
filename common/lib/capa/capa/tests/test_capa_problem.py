@@ -1,12 +1,19 @@
 """
 Test capa problem.
 """
-import ddt
+from __future__ import absolute_import
+
 import textwrap
-from lxml import etree
 import unittest
 
+import ddt
+import six
+from lxml import etree
+from markupsafe import Markup
+from mock import patch
+
 from capa.tests.helpers import new_loncapa_problem
+from openedx.core.djangolib.markup import HTML
 
 
 @ddt.ddt
@@ -143,7 +150,6 @@ class CAPAProblemTest(unittest.TestCase):
                     'descriptions': {}
                 }
             }
-
         )
         for question in (question1, question2):
             self.assertEqual(
@@ -465,16 +471,21 @@ class CAPAMultiInputProblemTest(unittest.TestCase):
         """
         return new_loncapa_problem(xml, use_capa_render_template=True)
 
-    def assert_problem_html(self, problme_html, group_label, *input_labels):
+    def assert_problem_data(self, problem_data):
+        """Verify problem data is in expected state"""
+        for problem_value in six.viewvalues(problem_data):
+            self.assertIsInstance(problem_value['label'], Markup)
+
+    def assert_problem_html(self, problem_html, group_label, *input_labels):
         """
         Verify that correct html is rendered for multiple inputtypes.
 
         Arguments:
-            problme_html (str): problem HTML
+            problem_html (str): problem HTML
             group_label (str or None): multi input group label or None if label is not present
             input_labels (tuple): individual input labels
         """
-        html = etree.XML(problme_html)
+        html = etree.XML(problem_html)
 
         # verify that only one multi input group div is present at correct path
         multi_inputs_group = html.xpath(
@@ -521,6 +532,7 @@ class CAPAMultiInputProblemTest(unittest.TestCase):
         """.format(label_html=label_html, input1_label=input1_label, input2_label=input2_label)
         problem = self.capa_problem(xml)
         self.assert_problem_html(problem.get_html(), group_label, input1_label, input2_label)
+        self.assert_problem_data(problem.problem_data)
 
     @ddt.unpack
     @ddt.data(
@@ -550,6 +562,7 @@ class CAPAMultiInputProblemTest(unittest.TestCase):
         """.format(group_label, input1_label, input2_label, inputtype=inputtype))
         problem = self.capa_problem(xml)
         self.assert_problem_html(problem.get_html(), group_label, input1_label, input2_label)
+        self.assert_problem_data(problem.problem_data)
 
     @ddt.unpack
     @ddt.data(
@@ -590,3 +603,119 @@ class CAPAMultiInputProblemTest(unittest.TestCase):
             description_element = multi_inputs_group.xpath('//p[@id="{}"]'.format(description_id))
             self.assertEqual(len(description_element), 1)
             self.assertEqual(description_element[0].text, descriptions[index])
+
+
+@ddt.ddt
+class CAPAProblemReportHelpersTest(unittest.TestCase):
+    """ TestCase for CAPA methods for finding question labels and answer text """
+
+    @ddt.data(
+        ('answerid_2_1', 'label', 'label'),
+        ('answerid_2_2', 'label <some>html</some>', 'label html'),
+        ('answerid_2_2', '<more html="yes"/>label <some>html</some>', 'label html'),
+        ('answerid_2_3', None, 'Question 1'),
+        ('answerid_2_3', '', 'Question 1'),
+        ('answerid_3_3', '', 'Question 2'),
+    )
+    @ddt.unpack
+    def test_find_question_label(self, answer_id, label, stripped_label):
+        problem = new_loncapa_problem(
+            '<problem><some-problem id="{}"/></problem>'.format(answer_id)
+        )
+        mock_problem_data = {
+            answer_id: {
+                'label': HTML(label) if label else ''
+            }
+        }
+        with patch.object(problem, 'problem_data', mock_problem_data):
+            self.assertEqual(problem.find_question_label(answer_id), stripped_label)
+
+    @ddt.data(None, dict(), [None])
+    def test_find_answer_test_not_implemented(self, current_answer):
+        problem = new_loncapa_problem('<problem/>')
+        self.assertRaises(NotImplementedError, problem.find_answer_text, '', current_answer)
+
+    @ddt.data(
+        ('1_2_1', 'choice_0', 'over-suspicious'),
+        ('1_2_1', 'choice_1', 'funny'),
+        ('1_3_1', 'choice_0', 'The iPad'),
+        ('1_3_1', 'choice_2', 'The iPod'),
+        ('1_3_1', ['choice_0', 'choice_1'], 'The iPad, Napster'),
+        ('1_4_1', 'yellow', 'yellow'),
+        ('1_4_1', 'blue', 'blue'),
+    )
+    @ddt.unpack
+    def test_find_answer_text_choices(self, answer_id, choice_id, answer_text):
+        problem = new_loncapa_problem(
+            """
+            <problem>
+                <choiceresponse>
+                    <checkboxgroup label="Select the correct synonym of paranoid?">
+                        <choice correct="true">over-suspicious</choice>
+                        <choice correct="false">funny</choice>
+                    </checkboxgroup>
+                </choiceresponse>
+                <multiplechoiceresponse>
+                    <choicegroup type="MultipleChoice">
+                        <choice correct="false">The iPad</choice>
+                        <choice correct="false">Napster</choice>
+                        <choice correct="true">The iPod</choice>
+                    </choicegroup>
+                </multiplechoiceresponse>
+                <optionresponse>
+                    <optioninput options="('yellow','blue','green')" correct="blue" label="Color_1"/>
+                </optionresponse>
+            </problem>
+            """
+        )
+        self.assertEquals(problem.find_answer_text(answer_id, choice_id), answer_text)
+
+    @ddt.data(
+        # Test for ChoiceResponse
+        ('1_2_1', 'over-suspicious'),
+        # Test for MultipleChoiceResponse
+        ('1_3_1', 'The iPad, Napster'),
+        # Test for OptionResponse
+        ('1_4_1', 'blue'),
+    )
+    @ddt.unpack
+    def test_find_correct_answer_text_choices(self, answer_id, answer_text):
+        """
+        Verify that ``find_correct_answer_text`` can find the correct answer for
+        ChoiceResponse, MultipleChoiceResponse and OptionResponse problems.
+        """
+        problem = new_loncapa_problem(
+            """
+            <problem>
+                <choiceresponse>
+                    <checkboxgroup label="Select the correct synonym of paranoid?">
+                        <choice correct="true">over-suspicious</choice>
+                        <choice correct="false">funny</choice>
+                    </checkboxgroup>
+                </choiceresponse>
+                <multiplechoiceresponse>
+                    <choicegroup type="MultipleChoice">
+                        <choice correct="true">The iPad</choice>
+                        <choice correct="true">Napster</choice>
+                        <choice correct="false">The iPod</choice>
+                    </choicegroup>
+                </multiplechoiceresponse>
+                <optionresponse>
+                    <optioninput options="('yellow','blue','green')" correct="blue" label="Color_1"/>
+                </optionresponse>
+            </problem>
+            """
+        )
+        self.assertEquals(problem.find_correct_answer_text(answer_id), answer_text)
+
+    def test_find_answer_text_textinput(self):
+        problem = new_loncapa_problem(
+            """
+            <problem>
+                <stringresponse answer="hide" type="ci">
+                    <textline size="40"/>
+                </stringresponse>
+            </problem>
+            """
+        )
+        self.assertEquals(problem.find_answer_text('1_2_1', 'hide'), 'hide')

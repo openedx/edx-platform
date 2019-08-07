@@ -5,18 +5,27 @@
 .forum-new-post-form,
 .edit-post-form {
   @include clearfix();
+
   box-sizing: border-box;
   margin: 0;
   border-radius: $forum-border-radius;
-  padding: $baseline;
-  max-width: 1180px;
+  max-width: map-get($container-max-widths, xl);
 
   label,
   .field-label-text {
     -webkit-font-smoothing: initial;
   }
 
+  .post-type {
+    text-shadow: none;
+  }
+
+  .post-type {
+    margin-bottom: 0;
+  }
+
   .post-errors {
+    margin: 0 0 $baseline;
     padding: 0 !important;
     list-style: none !important;
   }
@@ -29,8 +38,8 @@
 
       .field-input {
         display: inline-block;
-        width: 70%;
         vertical-align: top;
+
         &:not([type="text"]) {
           border-width: 0;
           padding: 0;
@@ -38,7 +47,6 @@
       }
 
       .field-label-text {
-        margin: $baseline 0 0 0;
         display: block;
       }
 
@@ -58,11 +66,11 @@
       line-height: 1.5;
 
       &#field_help_post_type {
-        margin-top: ($baseline / 2) 0 ($baseline / 3) 0;
+        @include margin($baseline / 4, 0, $baseline * 0.75, 0);
       }
 
       &#new-post-editor-description {
-          @include padding-left(0);
+        @include padding-left(0);
       }
     }
 
@@ -73,7 +81,59 @@
   }
 
   .post-options {
-    margin-bottom: ($baseline/2);
+    margin: $baseline 0;
+
+    .field-label {
+      @include margin-right($baseline);
+    }
+
+    .icon {
+      @include margin-right($baseline / 4);
+    }
+  }
+}
+
+.edit-post-form {
+  @include clearfix();
+
+  box-sizing: border-box;
+  width: 100%;
+  padding-top: 0;
+
+  h1 {
+    font-size: $forum-large-font-size;
+  }
+
+  .form-row {
+    margin-top: $baseline;
+  }
+
+  .post-cancel {
+    @include float(left);
+    @include margin($baseline/2, 0, 0, $baseline*0.75);
+  }
+
+  .post-update {
+    @include float(left);
+
+    margin-top: ($baseline/2);
+
+    &:hover, &:focus {
+      border-color: #222;
+    }
+  }
+
+  .edit-post-title {
+    box-sizing: border-box;
+    border: 1px solid $forum-color-border;
+    border-radius: $forum-border-radius;
+    padding: 0 ($baseline/2);
+    width: 100%;
+    height: 40px;
+    box-shadow: 0 1px 3px $shadow-l1 inset;
+    color: theme-color("gray-dark");
+    font-size: $forum-large-font-size;
+    font-family: $font-family-sans-serif;
   }
 }
 
@@ -87,39 +147,10 @@
 // UI: inputs
 .forum-new-post-form,
 .edit-post-form {
-  .post-type-input {
-    @extend %text-sr;
-  }
-
   .post-type-label {
-    @include margin(0, $baseline / 2, 0, 0);
-    @include white-button;
-    font-size: $forum-base-font-size;
-    box-sizing: border-box;
-    display: inline-block;
-    padding: 0 $baseline;
-    height: 36px;
-    text-align: center;
-    color: $gray-d3;
-    border: 1px solid $forum-color-border;
-    font-weight: 600;
-    line-height: 36px;
+    @include margin-right($baseline);
 
-    .icon {
-      @include margin-right($baseline/4);
-    }
-  }
-
-  .post-type-input:checked + .post-type-label {
-    border: none;
-    background-color: $forum-color-active-thread;
-    color: $forum-color-active-text;
-    background-image: none;
-    box-shadow: none;
-  }
-
-  .post-type-input:focus + .post-type-label {
-    box-shadow: 0 1px 1px rgba(0, 0,  0, 0.4) inset, 0 0 2px 2px $blue;
+    color: theme-color("gray-dark");
   }
 
   input[type=text].field-input {
@@ -127,6 +158,7 @@
     border: 1px solid $forum-color-border;
     border-radius: $forum-border-radius;
     padding: 0 $baseline/2;
+    width: 70%;
     height: 40px;
     color: #333;
     font-size: $forum-large-font-size;
@@ -138,10 +170,16 @@
     height: 40px;
   }
 
+  .post-topic.field-input {
+    width: 100%;
+  }
+
   .post-option {
     box-sizing: border-box;
     display: inline-block;
+
     @include margin-right($baseline);
+
     border-radius: $forum-border-radius;
     padding: ($baseline/2);
     cursor: pointer;
@@ -153,27 +191,5 @@
     .icon {
       @include margin-right($baseline / 4);
     }
-  }
-}
-
-// ====================
-
-// UI: actions
-.forum-new-post-form,
-.edit-post-form {
-  .submit {
-    @include margin-right($baseline/2);
-  }
-}
-
-// ====================
-
-// UI: errors - new post creation
-.forum-new-post-form,
-.edit-post-form {
-  .post-errors {
-    padding: 0;
-    margin: 0 0 $baseline 0;
-    list-style: none;
   }
 }

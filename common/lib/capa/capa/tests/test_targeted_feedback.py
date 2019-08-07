@@ -3,9 +3,14 @@ Tests the logic of the "targeted-feedback" attribute for MultipleChoice question
 i.e. those with the <multiplechoiceresponse> element
 """
 
-import unittest
+from __future__ import absolute_import
+
 import textwrap
-from capa.tests.helpers import test_capa_system, new_loncapa_problem, load_fixture
+import unittest
+
+# Changes formatting of empty elements; import here to avoid test order dependence
+import xmodule.modulestore.xml  # pylint: disable=unused-import
+from capa.tests.helpers import load_fixture, new_loncapa_problem, test_capa_system
 
 
 class CapaTargetedFeedbackTest(unittest.TestCase):
@@ -579,8 +584,7 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         # Q1 and Q2 have no feedback
         self.assertRegexpMatches(
             without_new_lines,
-            r'<targetedfeedbackset.*?>\s*</targetedfeedbackset>.*' +
-            r'<targetedfeedbackset.*?>\s*</targetedfeedbackset>'
+            r'<targetedfeedbackset>\s*</targetedfeedbackset>.*<targetedfeedbackset>\s*</targetedfeedbackset>'
         )
 
     def test_targeted_feedback_multiple_answer_1(self):
@@ -593,7 +597,7 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         self.assertRegexpMatches(
             without_new_lines,
             r'<targetedfeedbackset.*?>.*?explanation-id="feedback1".*?</targetedfeedbackset>.*' +
-            r'<targetedfeedbackset.*?>\s*</targetedfeedbackset>'
+            r'<targetedfeedbackset>\s*</targetedfeedbackset>'
         )
 
     def test_targeted_feedback_multiple_answer_2(self):

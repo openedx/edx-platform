@@ -53,7 +53,7 @@
                 ),
                     THIRD_PARTY_COMPLETE_URL = '/auth/complete/provider/';
 
-                var ajaxSpyAndInitialize = function(that, mode, nextUrl, finishAuthUrl) {
+                var ajaxSpyAndInitialize = function(that, mode, nextUrl, finishAuthUrl, createAccountOption) {
                     var options = {
                             initial_mode: mode,
                             third_party_auth: {
@@ -66,7 +66,8 @@
                             platform_name: 'edX',
                             login_form_desc: FORM_DESCRIPTION,
                             registration_form_desc: FORM_DESCRIPTION,
-                            password_reset_form_desc: FORM_DESCRIPTION
+                            password_reset_form_desc: FORM_DESCRIPTION,
+                            account_creation_allowed: createAccountOption
                         },
                         $logistrationElement = $('#login-and-registration-container');
 
@@ -216,14 +217,18 @@
                     expect(view.redirect).toHaveBeenCalledWith(FORWARD_URL);
                 });
 
-                it('ignores redirect to external URLs', function() {
-                    ajaxSpyAndInitialize(this, 'register', 'http://www.example.com');
+                it('hides create an account section', function() {
+                    ajaxSpyAndInitialize(this, 'login', '', '', false);
 
-                // Trigger auth complete
-                    view.subview.register.trigger('auth-complete');
+                    // Expect the Create an account section is hidden
+                    expect((view.$el.find('.toggle-form')).length).toEqual(0);
+                });
 
-                // Expect that we ignore the external URL and redirect to the dashboard
-                    expect(view.redirect).toHaveBeenCalledWith('/dashboard');
+                it('shows create an account section', function() {
+                    ajaxSpyAndInitialize(this, 'login', '', '', true);
+
+                    // Expect the Create an account section is visible
+                    expect((view.$el.find('.toggle-form')).length).toEqual(1);
                 });
             });
         });

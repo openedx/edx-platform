@@ -2,16 +2,13 @@
 Tests for the bok-choy paver commands themselves.
 Run just this test with: paver test_lib -t pavelib/paver_tests/test_paver_bok_choy_cmds.py
 """
+from __future__ import absolute_import
+
 import os
 import unittest
-from textwrap import dedent
-
-import ddt
-from mock import patch, call, Mock
 from test.test_support import EnvironmentVarGuard
-from paver.easy import BuildFailure, call_task, environment
-from pavelib.utils.test.suites import BokChoyTestSuite, Pa11yCrawler
-from pavelib.utils.test.suites.bokchoy_suite import DEMO_COURSE_TAR_GZ, DEMO_COURSE_IMPORT_DIR
+
+from pavelib.utils.test.suites import BokChoyTestSuite
 
 REPO_DIR = os.getcwd()
 
@@ -39,10 +36,13 @@ class TestPaverBokChoyCmd(unittest.TestCase):
             ),
             "SELENIUM_DRIVER_LOG_DIR='{}/test_root/log{}'".format(REPO_DIR, shard_str),
             "VERIFY_XSS='{}'".format(verify_xss),
-            "nosetests",
+            "python",
+            "-Wd",
+            "-m",
+            "pytest",
             "{}/common/test/acceptance/{}".format(REPO_DIR, name),
-            "--xunit-file={}/reports/bok_choy{}/xunit.xml".format(REPO_DIR, shard_str),
-            "--verbosity=2",
+            "--junitxml={}/reports/bok_choy{}/xunit.xml".format(REPO_DIR, shard_str),
+            "--verbose",
         ]
         return expected_statement
 
@@ -121,11 +121,11 @@ class TestPaverBokChoyCmd(unittest.TestCase):
         Using 1 process means paver should ask for the traditional xunit plugin for plugin results
         """
         expected_verbosity_command = [
-            "--xunit-file={repo_dir}/reports/bok_choy{shard_str}/xunit.xml".format(
+            "--junitxml={repo_dir}/reports/bok_choy{shard_str}/xunit.xml".format(
                 repo_dir=REPO_DIR,
                 shard_str='/shard_' + self.shard if self.shard else ''
             ),
-            "--verbosity=2",
+            "--verbose",
         ]
         suite = BokChoyTestSuite('', num_processes=1)
         self.assertEqual(suite.verbosity_processes_command, expected_verbosity_command)
@@ -137,13 +137,13 @@ class TestPaverBokChoyCmd(unittest.TestCase):
         """
         process_count = 2
         expected_verbosity_command = [
-            "--xunitmp-file={repo_dir}/reports/bok_choy{shard_str}/xunit.xml".format(
+            "--junitxml={repo_dir}/reports/bok_choy{shard_str}/xunit.xml".format(
                 repo_dir=REPO_DIR,
                 shard_str='/shard_' + self.shard if self.shard else '',
             ),
-            "--processes={}".format(process_count),
-            "--no-color",
-            "--process-timeout=1200",
+            u"-n {}".format(process_count),
+            "--color=no",
+            "--verbose",
         ]
         suite = BokChoyTestSuite('', num_processes=process_count)
         self.assertEqual(suite.verbosity_processes_command, expected_verbosity_command)
@@ -154,156 +154,13 @@ class TestPaverBokChoyCmd(unittest.TestCase):
         """
         process_count = 3
         expected_verbosity_command = [
-            "--xunitmp-file={repo_dir}/reports/bok_choy{shard_str}/xunit.xml".format(
+            "--junitxml={repo_dir}/reports/bok_choy{shard_str}/xunit.xml".format(
                 repo_dir=REPO_DIR,
                 shard_str='/shard_' + self.shard if self.shard else '',
             ),
-            "--processes={}".format(process_count),
-            "--no-color",
-            "--process-timeout=1200",
+            u"-n {}".format(process_count),
+            "--color=no",
+            "--verbose",
         ]
         suite = BokChoyTestSuite('', num_processes=process_count)
         self.assertEqual(suite.verbosity_processes_command, expected_verbosity_command)
-
-    def test_invalid_verbosity_and_processes(self):
-        """
-        If an invalid combination of verbosity and number of processors is passed in, a
-        BuildFailure should be raised
-        """
-        suite = BokChoyTestSuite('', num_processes=2, verbosity=3)
-        with self.assertRaises(BuildFailure):
-            # pylint: disable=pointless-statement
-            suite.verbosity_processes_command
-
-
-@ddt.ddt
-class TestPaverPa11yCrawlerCmd(unittest.TestCase):
-
-    """
-    Paver pa11ycrawler command test cases.  Most of the functionality is
-    inherited from BokChoyTestSuite, so those tests aren't duplicated.
-    """
-
-    def setUp(self):
-        super(TestPaverPa11yCrawlerCmd, self).setUp()
-
-        # Mock shell commands
-        mock_sh = patch('pavelib.utils.test.suites.bokchoy_suite.sh')
-        self._mock_sh = mock_sh.start()
-
-        # Cleanup mocks
-        self.addCleanup(mock_sh.stop)
-
-        # reset the options for all tasks
-        environment.options.clear()
-
-    def test_default(self):
-        suite = Pa11yCrawler(
-            'pa11ycrawler', course_key="course-v1:edX+Test101+course",
-        )
-        ignore = (
-            "pa11y_ignore_rules_url="
-            "https://raw.githubusercontent.com/singingwolfboy/"
-            "pa11ycrawler-ignore/master/ignore.yaml"
-        )
-        expected_cmd = [
-            "scrapy",
-            "crawl",
-            "edx",
-            "-a",
-            "port=8003",
-            "-a",
-            "course_key=course-v1:edX+Test101+course",
-            "-a",
-            ignore,
-            "-a",
-            "data_dir=/edx/app/edxapp/edx-platform/reports/pa11ycrawler/data",
-        ]
-        actual_cmd = suite.cmd
-        # verify that the final section of this command is for specifying the
-        # data directory
-        self.assertEqual(actual_cmd[-2], "-a")
-        self.assertTrue(actual_cmd[-1].startswith("data_dir="))
-        # chop off the `data_dir` argument when comparing,
-        # since it is highly dependent on who is running this paver command,
-        # and where it's being run (devstack, jenkins, etc)
-        self.assertEqual(actual_cmd[0:-2], expected_cmd[0:-2])
-
-    @ddt.data(
-        (True, True, None),
-        (True, False, None),
-        (False, True, DEMO_COURSE_IMPORT_DIR),
-        (False, False, None),
-    )
-    @ddt.unpack
-    def test_get_test_course(self, import_dir_set, should_fetch_course_set, downloaded_to):
-        options = {}
-        if import_dir_set:
-            options['imports_dir'] = 'some_import_dir'
-        if should_fetch_course_set:
-            options['should_fetch_course'] = True
-
-        call_task('pavelib.utils.test.suites.bokchoy_suite.get_test_course', options=options)
-
-        if downloaded_to is None:
-            self._mock_sh.assert_has_calls([])
-        else:
-            self._mock_sh.assert_has_calls([
-                call(
-                    'wget {targz} -O {dir}demo_course.tar.gz'.format(targz=DEMO_COURSE_TAR_GZ, dir=downloaded_to)),
-                call(
-                    'tar zxf {dir}demo_course.tar.gz -C {dir}'.format(dir=downloaded_to)),
-            ])
-
-    @patch("pavelib.utils.test.suites.bokchoy_suite.path")
-    def test_scrapy_cfg_exists(self, mocked_path_func):
-        # setup
-        mock_path = Mock()
-        mock_path.expand.return_value = mock_path
-        mock_path.isfile.return_value = True
-        mocked_path_func.return_value = mock_path
-
-        # test
-        Pa11yCrawler('pa11ycrawler')
-
-        # check
-        mocked_path_func.assert_called_with("~/.config/scrapy.cfg")
-        self.assertTrue(mock_path.isfile.called)
-        self.assertFalse(mock_path.write_text.called)
-
-    @patch("pavelib.utils.test.suites.bokchoy_suite.path")
-    def test_scrapy_cfg_not_exists(self, mocked_path_func):
-        # setup
-        mock_path = Mock()
-        mock_path.expand.return_value = mock_path
-        mock_path.isfile.return_value = False
-        mocked_path_func.return_value = mock_path
-
-        # test
-        Pa11yCrawler('pa11ycrawler')
-
-        # check
-        mocked_path_func.assert_called_with("~/.config/scrapy.cfg")
-        self.assertTrue(mock_path.isfile.called)
-        self.assertTrue(mock_path.parent.makedirs_p.called)
-        content = dedent("""
-            [settings]
-            default = pa11ycrawler.settings
-
-            [deploy]
-            project = pa11ycrawler
-        """)
-        mock_path.write_text.assert_called_with(content)
-
-    def test_generate_html_reports(self):
-        suite = Pa11yCrawler('pa11ycrawler')
-        suite.generate_html_reports()
-        self._mock_sh.assert_has_calls([
-            call([
-                'pa11ycrawler-html',
-                '--data-dir',
-                os.path.join(suite.report_dir, "data"),
-                '--output-dir',
-                os.path.join(suite.report_dir, "html"),
-            ])
-        ])

@@ -18,6 +18,9 @@
          * done.
          */
         modules: getModulesList([
+            'course_bookmarks/js/course_bookmarks_factory',
+            'course_search/js/course_search_factory',
+            'course_search/js/dashboard_search_factory',
             'discussion/js/discussion_board_factory',
             'discussion/js/discussion_profile_page_factory',
             'js/api_admin/catalog_preview_factory',
@@ -27,19 +30,17 @@
             'js/edxnotes/views/page_factory',
             'js/financial-assistance/financial_assistance_form_factory',
             'js/groups/views/cohorts_dashboard_factory',
+            'js/discussions_management/views/discussions_dashboard_factory',
             'js/header_factory',
-            'js/learner_dashboard/program_details_factory',
-            'js/learner_dashboard/program_list_factory',
-            'js/search/course/course_search_factory',
-            'js/search/dashboard/dashboard_search_factory',
             'js/student_account/logistration_factory',
             'js/student_account/views/account_settings_factory',
             'js/student_account/views/finish_auth_factory',
-            'js/student_profile/views/learner_profile_factory',
             'js/views/message_banner',
+            'learner_profile/js/learner_profile_factory',
             'lms/js/preview/preview_factory',
             'support/js/certificates_factory',
             'support/js/enrollment_factory',
+            'support/js/manage_user_factory',
             'teams/js/teams_tab_factory',
             'js/dateutil_factory'
         ]),
@@ -67,20 +68,21 @@
          * file should be skipped because it has no dependencies.
          */
         paths: {
-            'gettext': 'empty:',
-            'coffee/src/ajax_prefix': 'empty:',
-            'jquery': 'empty:',
+            gettext: 'empty:',
+            'js/src/ajax_prefix': 'empty:',
+            jquery: 'empty:',
             'jquery-migrate': 'empty:',
             'jquery.cookie': 'empty:',
             'jquery.url': 'empty:',
-            'backbone': 'empty:',
-            'underscore': 'empty:',
+            backbone: 'empty:',
+            underscore: 'empty:',
             'underscore.string': 'empty:',
-            'logger': 'empty:',
-            'utility': 'empty:',
-            'URI': 'empty:',
+            logger: 'empty:',
+            utility: 'empty:',
+            URI: 'empty:',
             'common/js/discussion/views/discussion_inline_view': 'empty:',
-            'modernizr': 'empty',
+            modernizr: 'empty',
+            'which-country': 'empty',
 
             // Don't bundle UI Toolkit helpers as they are loaded into the "edx" namespace
             'edx-ui-toolkit/js/utils/html-utils': 'empty:',

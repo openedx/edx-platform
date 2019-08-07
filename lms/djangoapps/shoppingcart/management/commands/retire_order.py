@@ -2,10 +2,13 @@
 Script for retiring order that went through cybersource but weren't
 marked as "purchased" in the db
 """
+from __future__ import absolute_import, print_function
 
 from django.core.management.base import BaseCommand
+from six import text_type
+
+from shoppingcart.exceptions import InvalidStatusToRetire, UnexpectedOrderItemStatus
 from shoppingcart.models import Order
-from shoppingcart.exceptions import UnexpectedOrderItemStatus, InvalidStatusToRetire
 
 
 class Command(BaseCommand):
@@ -34,12 +37,12 @@ class Command(BaseCommand):
             try:
                 order.retire()
             except (UnexpectedOrderItemStatus, InvalidStatusToRetire) as err:
-                print "Did not retire order {order}: {message}".format(
-                    order=order.id, message=err.message
-                )
+                print(u"Did not retire order {order}: {message}".format(
+                    order=order.id, message=text_type(err)
+                ))
             else:
-                print "retired order {order_id} from status {old_status} to status {new_status}".format(
+                print(u"retired order {order_id} from status {old_status} to status {new_status}".format(
                     order_id=order.id,
                     old_status=old_status,
                     new_status=order.status,
-                )
+                ))

@@ -1,25 +1,103 @@
 """
 Utility functions for validating forms
 """
-from importlib import import_module
+from __future__ import absolute_import
+
 import re
+from importlib import import_module
 
 from django import forms
-from django.forms import widgets
-from django.core.exceptions import ValidationError
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
+from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
-
+from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator, slug_re
+from django.forms import widgets
+from django.urls import reverse
 from django.utils.http import int_to_base36
 from django.utils.translation import ugettext_lazy as _
-from django.template import loader
+from edx_ace import ace
+from edx_ace.recipient import Recipient
 
-from django.conf import settings
-from student.models import CourseEnrollmentAllowed
-from util.password_policy_validators import validate_password_strength
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.theming.helpers import get_current_site
+from openedx.core.djangoapps.user_api import accounts as accounts_settings
+from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
+from student.message_types import AccountRecovery as AccountRecoveryMessage
+from student.message_types import PasswordReset
+from student.models import AccountRecovery, CourseEnrollmentAllowed, email_exists_or_retired
+from util.password_policy_validators import validate_password
+
+
+def send_password_reset_email_for_user(user, request, preferred_email=None):
+    """
+    Send out a password reset email for the given user.
+
+    Arguments:
+        user (User): Django User object
+        request (HttpRequest): Django request object
+        preferred_email (str): Send email to this address if present, otherwise fallback to user's email address.
+    """
+    site = get_current_site()
+    message_context = get_base_template_context(site)
+    message_context.update({
+        'request': request,  # Used by google_analytics_tracking_pixel
+        # TODO: This overrides `platform_name` from `get_base_template_context` to make the tests passes
+        'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+        'reset_link': '{protocol}://{site}{link}?track=pwreset'.format(
+            protocol='https' if request.is_secure() else 'http',
+            site=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
+            link=reverse('password_reset_confirm', kwargs={
+                'uidb36': int_to_base36(user.id),
+                'token': default_token_generator.make_token(user),
+            }),
+        )
+    })
+
+    msg = PasswordReset().personalize(
+        recipient=Recipient(user.username, preferred_email or user.email),
+        language=get_user_preference(user, LANGUAGE_KEY),
+        user_context=message_context,
+    )
+    ace.send(msg)
+
+
+def send_account_recovery_email_for_user(user, request, email=None):
+    """
+    Send out a account recovery email for the given user.
+
+    Arguments:
+        user (User): Django User object
+        request (HttpRequest): Django request object
+        email (str): Send email to this address.
+    """
+    site = get_current_site()
+    message_context = get_base_template_context(site)
+    message_context.update({
+        'request': request,  # Used by google_analytics_tracking_pixel
+        'email': email,
+        'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+        'reset_link': '{protocol}://{site}{link}?is_account_recovery=true'.format(
+            protocol='https' if request.is_secure() else 'http',
+            site=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
+            link=reverse('password_reset_confirm', kwargs={
+                'uidb36': int_to_base36(user.id),
+                'token': default_token_generator.make_token(user),
+            }),
+        )
+    })
+
+    msg = AccountRecoveryMessage().personalize(
+        recipient=Recipient(user.username, email),
+        language=get_user_preference(user, LANGUAGE_KEY),
+        user_context=message_context,
+    )
+    ace.send(msg)
 
 
 class PasswordResetFormNoActive(PasswordResetForm):
@@ -30,6 +108,8 @@ class PasswordResetFormNoActive(PasswordResetForm):
                       "address cannot reset the password."),
     }
 
+    is_account_recovery = True
+
     def clean_email(self):
         """
         This is a literal copy from Django 1.4.5's django.contrib.auth.forms.PasswordResetForm
@@ -39,6 +119,14 @@ class PasswordResetFormNoActive(PasswordResetForm):
         email = self.cleaned_data["email"]
         #The line below contains the only change, removing is_active=True
         self.users_cache = User.objects.filter(email__iexact=email)
+
+        if len(self.users_cache) == 0 and is_secondary_email_feature_enabled():
+            # Check if user has entered the secondary email.
+            self.users_cache = User.objects.filter(
+                id__in=AccountRecovery.objects.filter(secondary_email__iexact=email, is_active=True).values_list('user')
+            )
+            self.is_account_recovery = not bool(self.users_cache)
+
         if not len(self.users_cache):
             raise forms.ValidationError(self.error_messages['unknown'])
         if any((user.password.startswith(UNUSABLE_PASSWORD_PREFIX))
@@ -46,45 +134,20 @@ class PasswordResetFormNoActive(PasswordResetForm):
             raise forms.ValidationError(self.error_messages['unusable'])
         return email
 
-    def save(
-            self,
-            domain_override=None,
-            subject_template_name='registration/password_reset_subject.txt',
-            email_template_name='registration/password_reset_email.html',
-            use_https=False,
-            token_generator=default_token_generator,
-            from_email=configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
-            request=None
-    ):
+    def save(self,  # pylint: disable=arguments-differ
+             use_https=False,
+             token_generator=default_token_generator,
+             request=None,
+             **_kwargs):
         """
         Generates a one-use only link for resetting password and sends to the
         user.
         """
-        # This import is here because we are copying and modifying the .save from Django 1.4.5's
-        # django.contrib.auth.forms.PasswordResetForm directly, which has this import in this place.
-        from django.core.mail import send_mail
         for user in self.users_cache:
-            if not domain_override:
-                site_name = configuration_helpers.get_value(
-                    'SITE_NAME',
-                    settings.SITE_NAME
-                )
+            if self.is_account_recovery:
+                send_password_reset_email_for_user(user, request)
             else:
-                site_name = domain_override
-            context = {
-                'email': user.email,
-                'site_name': site_name,
-                'uid': int_to_base36(user.id),
-                'user': user,
-                'token': token_generator.make_token(user),
-                'protocol': 'https' if use_https else 'http',
-                'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
-            }
-            subject = loader.render_to_string(subject_template_name, context)
-            # Email subject *must not* contain newlines
-            subject = subject.replace('\n', '')
-            email = loader.render_to_string(email_template_name, context)
-            send_mail(subject, email, from_email, [user.email])
+                send_account_recovery_email_for_user(user, request, user.account_recovery.secondary_email)
 
 
 class TrueCheckbox(widgets.CheckboxInput):
@@ -103,10 +166,79 @@ class TrueField(forms.BooleanField):
     widget = TrueCheckbox
 
 
-_USERNAME_TOO_SHORT_MSG = _("Username must be minimum of two characters long")
-_EMAIL_INVALID_MSG = _("A properly formatted e-mail is required")
-_PASSWORD_INVALID_MSG = _("A valid password is required")
-_NAME_TOO_SHORT_MSG = _("Your legal name must be a minimum of two characters long")
+def validate_username(username):
+    """
+    Verifies a username is valid, raises a ValidationError otherwise.
+    Args:
+        username (unicode): The username to validate.
+
+    This function is configurable with `ENABLE_UNICODE_USERNAME` feature.
+    """
+
+    username_re = slug_re
+    flags = None
+    message = accounts_settings.USERNAME_INVALID_CHARS_ASCII
+
+    if settings.FEATURES.get("ENABLE_UNICODE_USERNAME"):
+        username_re = r"^{regex}$".format(regex=settings.USERNAME_REGEX_PARTIAL)
+        flags = re.UNICODE
+        message = accounts_settings.USERNAME_INVALID_CHARS_UNICODE
+
+    validator = RegexValidator(
+        regex=username_re,
+        flags=flags,
+        message=message,
+        code='invalid',
+    )
+
+    validator(username)
+
+
+def contains_html(value):
+    """
+    Validator method to check whether name contains html tags
+    """
+    regex = re.compile('(<|>)', re.UNICODE)
+    return bool(regex.search(value))
+
+
+def validate_name(name):
+    """
+    Verifies a Full_Name is valid, raises a ValidationError otherwise.
+    Args:
+        name (unicode): The name to validate.
+    """
+    if contains_html(name):
+        raise forms.ValidationError(_('Full Name cannot contain the following characters: < >'))
+
+
+class UsernameField(forms.CharField):
+    """
+    A CharField that validates usernames based on the `ENABLE_UNICODE_USERNAME` feature.
+    """
+
+    default_validators = [validate_username]
+
+    def __init__(self, *args, **kwargs):
+        super(UsernameField, self).__init__(
+            min_length=accounts_settings.USERNAME_MIN_LENGTH,
+            max_length=accounts_settings.USERNAME_MAX_LENGTH,
+            error_messages={
+                "required": accounts_settings.USERNAME_BAD_LENGTH_MSG,
+                "min_length": accounts_settings.USERNAME_BAD_LENGTH_MSG,
+                "max_length": accounts_settings.USERNAME_BAD_LENGTH_MSG,
+            }
+        )
+
+    def clean(self, value):
+        """
+        Strips the spaces from the username.
+
+        Similar to what `django.forms.SlugField` does.
+        """
+
+        value = self.to_python(value).strip()
+        return super(UsernameField, self).clean(value)
 
 
 class AccountCreationForm(forms.Form):
@@ -114,39 +246,33 @@ class AccountCreationForm(forms.Form):
     A form to for account creation data. It is currently only used for
     validation, not rendering.
     """
+
+    _EMAIL_INVALID_MSG = _("A properly formatted e-mail is required")
+    _NAME_TOO_SHORT_MSG = _("Your legal name must be a minimum of one character long")
+
     # TODO: Resolve repetition
-    username = forms.SlugField(
-        min_length=2,
-        max_length=30,
-        error_messages={
-            "required": _USERNAME_TOO_SHORT_MSG,
-            "invalid": _("Usernames can only contain Roman letters, western numerals (0-9), underscores (_), and "
-                         "hyphens (-)."),
-            "min_length": _USERNAME_TOO_SHORT_MSG,
-            "max_length": _("Username cannot be more than %(limit_value)s characters long"),
-        }
-    )
+
+    username = UsernameField()
+
     email = forms.EmailField(
-        max_length=254,  # Limit per RFCs is 254
+        max_length=accounts_settings.EMAIL_MAX_LENGTH,
+        min_length=accounts_settings.EMAIL_MIN_LENGTH,
         error_messages={
             "required": _EMAIL_INVALID_MSG,
             "invalid": _EMAIL_INVALID_MSG,
             "max_length": _("Email cannot be more than %(limit_value)s characters long"),
         }
     )
-    password = forms.CharField(
-        min_length=2,
-        error_messages={
-            "required": _PASSWORD_INVALID_MSG,
-            "min_length": _PASSWORD_INVALID_MSG,
-        }
-    )
+
+    password = forms.CharField()
+
     name = forms.CharField(
-        min_length=2,
+        min_length=accounts_settings.NAME_MIN_LENGTH,
         error_messages={
             "required": _NAME_TOO_SHORT_MSG,
             "min_length": _NAME_TOO_SHORT_MSG,
-        }
+        },
+        validators=[validate_name]
     )
 
     def __init__(
@@ -154,16 +280,14 @@ class AccountCreationForm(forms.Form):
             data=None,
             extra_fields=None,
             extended_profile_fields=None,
-            enforce_username_neq_password=False,
-            enforce_password_policy=False,
+            do_third_party_auth=True,
             tos_required=True
     ):
         super(AccountCreationForm, self).__init__(data)
 
         extra_fields = extra_fields or {}
         self.extended_profile_fields = extended_profile_fields or {}
-        self.enforce_username_neq_password = enforce_username_neq_password
-        self.enforce_password_policy = enforce_password_policy
+        self.do_third_party_auth = do_third_party_auth
         if tos_required:
             self.fields["terms_of_service"] = TrueField(
                 error_messages={"required": _("You must accept the terms of service.")}
@@ -188,19 +312,6 @@ class AccountCreationForm(forms.Form):
                                 "required": _("To enroll, you must follow the honor code.")
                             }
                         )
-                elif field_name == 'data_sharing_consent':
-                    if field_value == "required":
-                        self.fields[field_name] = TrueField(
-                            error_messages={
-                                "required": _(
-                                    "You must consent to data sharing to register."
-                                )
-                            }
-                        )
-                    elif field_value == 'optional':
-                        self.fields[field_name] = forms.BooleanField(
-                            required=False
-                        )
                 else:
                     required = field_value == "required"
                     min_length = 1 if field_name in ("gender", "level_of_education") else 2
@@ -224,17 +335,13 @@ class AccountCreationForm(forms.Form):
     def clean_password(self):
         """Enforce password policies (if applicable)"""
         password = self.cleaned_data["password"]
-        if (
-                self.enforce_username_neq_password and
-                "username" in self.cleaned_data and
-                self.cleaned_data["username"] == password
-        ):
-            raise ValidationError(_("Username and password fields cannot match"))
-        if self.enforce_password_policy:
-            try:
-                validate_password_strength(password)
-            except ValidationError, err:
-                raise ValidationError(_("Password: ") + "; ".join(err.messages))
+        if not self.do_third_party_auth:
+            # Creating a temporary user object to test password against username
+            # This user should NOT be saved
+            username = self.cleaned_data.get('username')
+            email = self.cleaned_data.get('email')
+            temp_user = User(username=username, email=email) if username else None
+            validate_password(password, temp_user)
         return password
 
     def clean_email(self):
@@ -251,7 +358,7 @@ class AccountCreationForm(forms.Form):
                 # reject the registration.
                 if not CourseEnrollmentAllowed.objects.filter(email=email).exists():
                     raise ValidationError(_("Unauthorized email address."))
-        if User.objects.filter(email__iexact=email).exists():
+        if email_exists_or_retired(email):
             raise ValidationError(
                 _(
                     "It looks like {email} belongs to an existing account. Try again with a different email address."

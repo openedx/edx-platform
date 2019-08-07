@@ -12,12 +12,15 @@ file and check it in at the same time as your model changes. To do that,
 ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 """
+from __future__ import absolute_import
+
+import six
 from django.db import models
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
+from courseware.models import BaseStudentModuleHistory, StudentModule
 from coursewarehistoryextended.fields import UnsignedBigIntAutoField
-from courseware.models import StudentModule, BaseStudentModuleHistory
 
 
 class StudentModuleHistoryExtended(BaseStudentModuleHistory):
@@ -62,4 +65,4 @@ class StudentModuleHistoryExtended(BaseStudentModuleHistory):
         StudentModuleHistoryExtended.objects.filter(student_module=instance).all().delete()
 
     def __unicode__(self):
-        return unicode(repr(self))
+        return six.text_type(repr(self))

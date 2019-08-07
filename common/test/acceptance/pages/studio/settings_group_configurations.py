@@ -1,6 +1,10 @@
 """
 Course Group Configurations page.
 """
+from __future__ import absolute_import
+
+from six.moves import range
+
 from common.test.acceptance.pages.common.utils import confirm_prompt
 from common.test.acceptance.pages.studio.course_page import CoursePage
 
@@ -42,7 +46,7 @@ class GroupConfigurationsPage(CoursePage):
         Return list of the group-configurations-list-item's of specified type for the course.
         """
         css = prefix + ' .wrapper-collection'
-        return [GroupConfiguration(self, prefix, index) for index in xrange(len(self.q(css=css)))]
+        return [GroupConfiguration(self, prefix, index) for index in range(len(self.q(css=css)))]
 
     def create_experiment_group_configuration(self):
         """
@@ -91,6 +95,17 @@ class GroupConfigurationsPage(CoursePage):
         """
         return self.q(css=self.experiment_groups_css).present or self.q(css=".experiment-groups-doc").present
 
+    @property
+    def enrollment_track_section_present(self):
+        return self.q(css='.wrapper-groups.content-groups.enrollment_track').present
+
+    @property
+    def enrollment_track_edit_present(self):
+        return self.q(css='.wrapper-groups.content-groups.enrollment_track .action.action-edit').present
+
+    def get_enrollment_groups(self):
+        return self.q(css='.wrapper-groups.content-groups.enrollment_track .collection-details .title').text
+
 
 class GroupConfiguration(object):
     """
@@ -99,7 +114,7 @@ class GroupConfiguration(object):
 
     def __init__(self, page, prefix, index):
         self.page = page
-        self.SELECTOR = prefix + ' .wrapper-collection-{}'.format(index)
+        self.SELECTOR = prefix + u' .wrapper-collection-{}'.format(index)
         self.index = index
 
     def get_selector(self, css=''):
@@ -229,7 +244,7 @@ class GroupConfiguration(object):
         """
         Set group configuration name.
         """
-        self.find_css('.collection-name-input').first.fill(value)
+        return self.find_css('.collection-name-input').first.fill(value)
 
     @property
     def description(self):

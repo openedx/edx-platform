@@ -3,6 +3,8 @@ Middleware for user api.
 Adds user's tags to tracking event context.
 """
 
+from __future__ import absolute_import
+
 from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -35,7 +37,7 @@ class UserTagsEventContextMiddleware(object):
         if course_id:
             context['course_id'] = course_id
 
-            if request.user.is_authenticated():
+            if request.user.is_authenticated:
                 context['course_user_tags'] = dict(
                     UserCourseTag.objects.filter(
                         user=request.user.pk,

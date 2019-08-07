@@ -7,10 +7,8 @@
 </div>
 
 <form class="financial-assistance-form" method="POST">
-	<div class="status submission-error hidden" aria-live="polite">
-	    <h4 class="message-title"><%- gettext('Unable to submit application') %></h4>
-	    <ul class="message-copy"></ul>
-	</div>
+  <div class="js-form-feedback" aria-live="assertive" tabindex="-1">
+  </div>
 
 	<div class="user-info">
 		<h2><%- gettext('About You') %></h2>

@@ -1,6 +1,8 @@
 """
 Tests for xmodule.x_module.ResourceTemplates
 """
+from __future__ import absolute_import
+
 import unittest
 
 from xmodule.x_module import ResourceTemplates
@@ -10,6 +12,7 @@ class ResourceTemplatesTests(unittest.TestCase):
     """
     Tests for xmodule.x_module.ResourceTemplates
     """
+
     def test_templates(self):
         expected = set([
             'latex_html.yaml',

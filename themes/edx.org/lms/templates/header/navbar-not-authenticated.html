@@ -1,0 +1,34 @@
+## mako
+
+<%page expression_filter="h"/>
+
+<%namespace name='static' file='../static_content.html'/>
+<%namespace file='../main.html' import="login_query"/>
+
+<%!
+from django.urls import reverse
+from django.utils.translation import ugettext as _
+from six import text_type
+%>
+
+<%
+  allows_login = not settings.FEATURES['DISABLE_LOGIN_BUTTON'] and not combined_login_and_register
+  can_discover_courses = settings.FEATURES.get('ENABLE_COURSE_DISCOVERY')
+  allow_public_account_creation = static.get_value('ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION'))
+%>
+<nav class="nav-links" aria-label='${_("Sign in")}'>
+  <div class="secondary">
+    <div>
+      % if allows_login:
+        % if allow_public_account_creation:
+          <div class="mobile-nav-item hidden-mobile nav-item">
+            <a class="register-btn btn" href="/register${login_query()}">${_("Register")}</a>
+          </div>
+        % endif
+          <div class="mobile-nav-item hidden-mobile nav-item">
+            <a class="sign-in-btn btn" href="/login${login_query()}">${_("Sign in")}</a>
+          </div>
+      % endif
+    </div>
+  </div>
+</nav>

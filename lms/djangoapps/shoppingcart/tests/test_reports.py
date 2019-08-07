@@ -1,21 +1,29 @@
 # -*- coding: utf-8 -*-
-
 """
 Tests for the Shopping Cart Models
 """
+from __future__ import absolute_import
+
 import datetime
-import pytz
 import StringIO
 from textwrap import dedent
 
+import pytz
 from django.conf import settings
+from mock import patch
+from six import text_type
 
 from course_modes.models import CourseMode
-from shoppingcart.models import (Order, CertificateItem, PaidCourseRegistration, PaidCourseRegistrationAnnotation,
-                                 CourseRegCodeItemAnnotation)
+from shoppingcart.models import (
+    CertificateItem,
+    CourseRegCodeItemAnnotation,
+    Order,
+    PaidCourseRegistration,
+    PaidCourseRegistrationAnnotation
+)
 from shoppingcart.views import initialize_report
-from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -26,9 +34,10 @@ class ReportTypeTests(ModuleStoreTestCase):
     """
     FIVE_MINS = datetime.timedelta(minutes=5)
 
-    def setUp(self):
+    @patch('student.models.CourseEnrollment.refund_cutoff_date')
+    def setUp(self, cutoff_date):
         super(ReportTypeTests, self).setUp()
-
+        cutoff_date.return_value = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=1)
         # Need to make a *lot* of users for this one
         self.first_verified_user = UserFactory.create(profile__name="John Doe")
         self.second_verified_user = UserFactory.create(profile__name="Jane Deer")
@@ -44,7 +53,7 @@ class ReportTypeTests(ModuleStoreTestCase):
         self.cost = 40
         self.course = CourseFactory.create(org='MITx', number='999', display_name=u'Robot Super Course')
         self.course_key = self.course.id
-        settings.COURSE_LISTINGS['default'] = [self.course_key.to_deprecated_string()]
+        settings.COURSE_LISTINGS['default'] = [text_type(self.course_key)]
         course_mode = CourseMode(course_id=self.course_key,
                                  mode_slug="honor",
                                  mode_display_name="honor cert",
@@ -99,7 +108,7 @@ class ReportTypeTests(ModuleStoreTestCase):
         second_refund.refund_requested_time = self.test_time
         second_refund.save()
 
-        self.CORRECT_REFUND_REPORT_CSV = dedent("""
+        self.CORRECT_REFUND_REPORT_CSV = dedent(b"""
             Order Number,Customer Name,Date of Original Transaction,Date of Refund,Amount of Refund,Service Fees (if any)
             3,King Bowsér,{time_str},{time_str},40.00,0.00
             4,Súsan Smith,{time_str},{time_str},40.00,0.00
@@ -196,7 +205,7 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
         cert.refund_requested_time = self.now
         cert.save()
 
-        self.CORRECT_CSV = dedent("""
+        self.CORRECT_CSV = dedent(b"""
             Purchase Time,Order ID,Status,Quantity,Unit Cost,Total Cost,Currency,Description,Comments
             {time_str},1,purchased,1,40.00,40.00,usd,Registration for Course: Robot Super Course,Ba\xc3\xbc\xe5\x8c\x85
             {time_str},1,purchased,1,40.00,40.00,usd,verified cert for course Robot Super Course,
@@ -232,16 +241,16 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
         """
         # delete the matching annotation
         self.annotation.delete()
-        self.assertEqual(u"", self.reg.csv_report_comments)
+        self.assertEqual("", self.reg.csv_report_comments)
 
     def test_paidcourseregistrationannotation_unicode(self):
         """
         Fill in gap in test coverage.  __unicode__ method of PaidCourseRegistrationAnnotation
         """
-        self.assertEqual(unicode(self.annotation), u'{} : {}'.format(self.course_key.to_deprecated_string(), self.TEST_ANNOTATION))
+        self.assertEqual(text_type(self.annotation), u'{} : {}'.format(text_type(self.course_key), self.TEST_ANNOTATION))
 
     def test_courseregcodeitemannotationannotation_unicode(self):
         """
         Fill in gap in test coverage.  __unicode__ method of CourseRegCodeItemAnnotation
         """
-        self.assertEqual(unicode(self.course_reg_code_annotation), u'{} : {}'.format(self.course_key.to_deprecated_string(), self.TEST_ANNOTATION))
+        self.assertEqual(text_type(self.course_reg_code_annotation), u'{} : {}'.format(text_type(self.course_key), self.TEST_ANNOTATION))

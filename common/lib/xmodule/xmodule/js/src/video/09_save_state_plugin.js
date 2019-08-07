@@ -1,6 +1,6 @@
 (function(define) {
     'use strict';
-    define('video/09_save_state_plugin.js', [], function() {
+    define('video/09_save_state_plugin.js', ['underscore', 'time.js'], function(_, Time) {
     /**
      * Save state module.
      * @exports video/09_save_state_plugin.js
@@ -15,8 +15,8 @@
                 return new SaveStatePlugin(state, i18n, options);
             }
 
-            _.bindAll(this, 'onSpeedChange', 'saveStateHandler', 'bindUnloadHandler', 'onUnload', 'onYoutubeAvailability',
-            'onLanguageChange', 'destroy');
+            _.bindAll(this, 'onSpeedChange', 'onAutoAdvanceChange', 'saveStateHandler', 'bindUnloadHandler', 'onUnload',
+            'onYoutubeAvailability', 'onLanguageChange', 'destroy');
             this.state = state;
             this.options = _.extend({events: []}, options);
             this.state.videoSaveStatePlugin = this;
@@ -37,11 +37,12 @@
 
             initialize: function() {
                 this.events = {
-                    'speedchange': this.onSpeedChange,
-                    'play': this.bindUnloadHandler,
+                    speedchange: this.onSpeedChange,
+                    autoadvancechange: this.onAutoAdvanceChange,
+                    play: this.bindUnloadHandler,
                     'pause destroy': this.saveStateHandler,
                     'language_menu:change': this.onLanguageChange,
-                    'youtube_availability': this.onYoutubeAvailability
+                    youtube_availability: this.onYoutubeAvailability
                 };
                 this.bindHandlers();
             },
@@ -71,6 +72,11 @@
                 this.state.storage.setItem('general_speed', newSpeed);
             },
 
+            onAutoAdvanceChange: function(event, enabled) {
+                this.saveState(true, {auto_advance: enabled});
+                this.state.storage.setItem('auto_advance', enabled);
+            },
+
             saveStateHandler: function() {
                 this.saveState(true);
             },
@@ -93,28 +99,30 @@
             },
 
             saveState: function(async, data) {
-                if (!($.isPlainObject(data))) {
-                    data = {
-                        saved_video_position: this.state.videoPlayer.currentTime
-                    };
-                }
+                if (this.state.config.saveStateEnabled) {
+                    if (!($.isPlainObject(data))) {
+                        data = {
+                            saved_video_position: this.state.videoPlayer.currentTime
+                        };
+                    }
 
-                if (data.speed) {
-                    this.state.storage.setItem('speed', data.speed, true);
-                }
+                    if (data.speed) {
+                        this.state.storage.setItem('speed', data.speed, true);
+                    }
 
-                if (_.has(data, 'saved_video_position')) {
-                    this.state.storage.setItem('savedVideoPosition', data.saved_video_position, true);
-                    data.saved_video_position = Time.formatFull(data.saved_video_position);
-                }
+                    if (_.has(data, 'saved_video_position')) {
+                        this.state.storage.setItem('savedVideoPosition', data.saved_video_position, true);
+                        data.saved_video_position = Time.formatFull(data.saved_video_position);
+                    }
 
-                $.ajax({
-                    url: this.state.config.saveStateUrl,
-                    type: 'POST',
-                    async: async ? true : false,
-                    dataType: 'json',
-                    data: data
-                });
+                    $.ajax({
+                        url: this.state.config.saveStateUrl,
+                        type: 'POST',
+                        async: !!async,
+                        dataType: 'json',
+                        data: data
+                    });
+                }
             }
         };
 

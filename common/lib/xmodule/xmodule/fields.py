@@ -1,12 +1,16 @@
-import time
+from __future__ import absolute_import
+
+import datetime
 import logging
 import re
+import time
 
-from xblock.fields import JSONField
-import datetime
 import dateutil.parser
-
+import six
 from pytz import UTC
+from six import text_type
+from xblock.fields import JSONField
+from xblock.scorable import Score
 
 log = logging.getLogger(__name__)
 
@@ -47,11 +51,11 @@ class Date(JSONField):
         """
         if field is None:
             return field
-        elif field is "":
+        elif field == "":
             return None
-        elif isinstance(field, basestring):
+        elif isinstance(field, six.string_types):
             return self._parse_date_wo_default_month_day(field)
-        elif isinstance(field, (int, long, float)):
+        elif isinstance(field, six.integer_types) or isinstance(field, float):
             return datetime.datetime.fromtimestamp(field / 1000, UTC)
         elif isinstance(field, time.struct_time):
             return datetime.datetime.fromtimestamp(time.mktime(field), UTC)
@@ -114,7 +118,7 @@ class Timedelta(JSONField):
             return
         parts = parts.groupdict()
         time_params = {}
-        for (name, param) in parts.iteritems():
+        for (name, param) in six.iteritems(parts):
             if param:
                 time_params[name] = int(param)
         return datetime.timedelta(**time_params)
@@ -175,7 +179,7 @@ class RelativeTime(JSONField):
         except ValueError as e:
             raise ValueError(
                 "Incorrect RelativeTime value {!r} was set in XML or serialized. "
-                "Original parse message is {}".format(value, e.message)
+                "Original parse message is {}".format(value, text_type(e))
             )
         return datetime.timedelta(
             hours=obj_time.tm_hour,
@@ -200,7 +204,7 @@ class RelativeTime(JSONField):
         if isinstance(value, float):
             return datetime.timedelta(seconds=value)
 
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             return self.isotime_to_timedelta(value)
 
         msg = "RelativeTime Field {0} has bad value '{1!r}'".format(self.name, value)
@@ -253,3 +257,48 @@ class RelativeTime(JSONField):
             return value
 
         return self.from_json(value)
+
+
+class ScoreField(JSONField):
+    """
+    Field for blocks that need to store a Score. XBlocks that implement
+    the ScorableXBlockMixin may need to store their score separately
+    from their problem state, specifically for use in staff override
+    of problem scores.
+    """
+    MUTABLE = False
+
+    def from_json(self, value):
+        if value is None:
+            return value
+        if isinstance(value, Score):
+            return value
+
+        if set(value) != {'raw_earned', 'raw_possible'}:
+            raise TypeError('Scores must contain only a raw earned and raw possible value. Got {}'.format(
+                set(value)
+            ))
+
+        raw_earned = value['raw_earned']
+        raw_possible = value['raw_possible']
+
+        if raw_possible < 0:
+            raise ValueError(
+                'Error deserializing field of type {0}: Expected a positive number for raw_possible, got {1}.'.format(
+                    self.display_name,
+                    raw_possible,
+                )
+            )
+
+        if not (0 <= raw_earned <= raw_possible):
+            raise ValueError(
+                'Error deserializing field of type {0}: Expected raw_earned between 0 and {1}, got {2}.'.format(
+                    self.display_name,
+                    raw_possible,
+                    raw_earned
+                )
+            )
+
+        return Score(raw_earned, raw_possible)
+
+    enforce_type = from_json

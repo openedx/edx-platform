@@ -1,28 +1,32 @@
 """
 Common utility functions useful throughout the contentstore
 """
+from __future__ import absolute_import, print_function
 
 import logging
 from datetime import datetime
-from pytz import UTC
 
+import six
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext as _
-from django_comment_common.models import assign_default_role
-from django_comment_common.utils import seed_permissions_roles
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.locator import LibraryLocator
+from pytz import UTC
+from six import text_type
 
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from openedx.core.djangoapps.django_comment_common.models import assign_default_role
+from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
+from student import auth
+from student.models import CourseEnrollment
+from student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from opaque_keys.edx.keys import UsageKey, CourseKey
-from student.roles import CourseInstructorRole, CourseStaffRole
-from student.models import CourseEnrollment
-from student import auth
-
+from xmodule.partitions.partitions_service import get_all_partitions_for_course
 
 log = logging.getLogger(__name__)
 
@@ -62,22 +66,38 @@ def remove_all_instructors(course_key):
     instructor_role.remove_users(*instructor_role.users_with_role())
 
 
-def delete_course_and_groups(course_key, user_id):
+def delete_course(course_key, user_id, keep_instructors=False):
     """
-    This deletes the courseware associated with a course_key as well as cleaning update_item
-    the various user table stuff (groups, permissions, etc.)
+    Delete course from module store and if specified remove user and
+    groups permissions from course.
+    """
+    _delete_course_from_modulestore(course_key, user_id)
+
+    if not keep_instructors:
+        _remove_instructors(course_key)
+
+
+def _delete_course_from_modulestore(course_key, user_id):
+    """
+    Delete course from MongoDB. Deleting course will fire a signal which will result into
+    deletion of the courseware associated with a course_key.
     """
     module_store = modulestore()
 
     with module_store.bulk_operations(course_key):
         module_store.delete_course(course_key, user_id)
 
-        print 'removing User permissions from course....'
-        # in the django layer, we need to remove all the user permissions groups associated with this course
-        try:
-            remove_all_instructors(course_key)
-        except Exception as err:
-            log.error("Error in deleting course groups for {0}: {1}".format(course_key, err))
+
+def _remove_instructors(course_key):
+    """
+    In the django layer, remove all the user/groups permissions associated with this course
+    """
+    print('removing User permissions from course....')
+
+    try:
+        remove_all_instructors(course_key)
+    except Exception as err:
+        log.error(u"Error in deleting course groups for {0}: {1}".format(course_key, err))
 
 
 def get_lms_link_for_item(location, preview=False):
@@ -111,12 +131,11 @@ def get_lms_link_for_item(location, preview=False):
 
     return u"//{lms_base}/courses/{course_key}/jump_to/{location}".format(
         lms_base=lms_base,
-        course_key=location.course_key.to_deprecated_string(),
-        location=location.to_deprecated_string(),
+        course_key=text_type(location.course_key),
+        location=text_type(location),
     )
 
 
-# pylint: disable=invalid-name
 def get_lms_link_for_certificate_web_view(user_id, course_key, mode):
     """
     Returns the url to the certificate web view.
@@ -132,7 +151,7 @@ def get_lms_link_for_certificate_web_view(user_id, course_key, mode):
     return u"//{certificate_web_base}/certificates/user/{user_id}/course/{course_id}?preview={mode}".format(
         certificate_web_base=lms_base,
         user_id=user_id,
-        course_id=unicode(course_key),
+        course_id=six.text_type(course_key),
         mode=mode
     )
 
@@ -162,24 +181,24 @@ def is_currently_visible_to_students(xblock):
     return True
 
 
-def has_children_visible_to_specific_content_groups(xblock):
+def has_children_visible_to_specific_partition_groups(xblock):
     """
-    Returns True if this xblock has children that are limited to specific content groups.
+    Returns True if this xblock has children that are limited to specific user partition groups.
     Note that this method is not recursive (it does not check grandchildren).
     """
     if not xblock.has_children:
         return False
 
     for child in xblock.get_children():
-        if is_visible_to_specific_content_groups(child):
+        if is_visible_to_specific_partition_groups(child):
             return True
 
     return False
 
 
-def is_visible_to_specific_content_groups(xblock):
+def is_visible_to_specific_partition_groups(xblock):
     """
-    Returns True if this xblock has visibility limited to specific content groups.
+    Returns True if this xblock has visibility limited to specific user partition groups.
     """
     if not xblock.group_access:
         return False
@@ -256,10 +275,10 @@ def reverse_url(handler_name, key_name=None, key_value=None, kwargs=None):
     Creates the URL for the given handler.
     The optional key_name and key_value are passed in as kwargs to the handler.
     """
-    kwargs_for_reverse = {key_name: unicode(key_value)} if key_name else None
+    kwargs_for_reverse = {key_name: six.text_type(key_value)} if key_name else None
     if kwargs:
         kwargs_for_reverse.update(kwargs)
-    return reverse('contentstore.views.' + handler_name, kwargs=kwargs_for_reverse)
+    return reverse(handler_name, kwargs=kwargs_for_reverse)
 
 
 def reverse_course_url(handler_name, course_key, kwargs=None):
@@ -281,6 +300,23 @@ def reverse_usage_url(handler_name, usage_key, kwargs=None):
     Creates the URL for handlers that use usage_keys as URL parameters.
     """
     return reverse_url(handler_name, 'usage_key_string', usage_key, kwargs)
+
+
+def get_split_group_display_name(xblock, course):
+    """
+    Returns group name if an xblock is found in user partition groups that are suitable for the split_test module.
+
+    Arguments:
+        xblock (XBlock): The courseware component.
+        course (XBlock): The course descriptor.
+
+    Returns:
+        group name (String): Group name of the matching group xblock.
+    """
+    for user_partition in get_user_partition_info(xblock, schemes=['random'], course=course):
+        for group in user_partition['groups']:
+            if u'Group ID {group_id}'.format(group_id=group['id']) == xblock.display_name_with_default:
+                return group['name']
 
 
 def get_user_partition_info(xblock, schemes=None, course=None):
@@ -347,7 +383,7 @@ def get_user_partition_info(xblock, schemes=None, course=None):
 
     if course is None:
         log.warning(
-            "Could not find course %s to retrieve user partition information",
+            u"Could not find course %s to retrieve user partition information",
             xblock.location.course_key
         )
         return []
@@ -356,20 +392,21 @@ def get_user_partition_info(xblock, schemes=None, course=None):
         schemes = set(schemes)
 
     partitions = []
-    for p in sorted(course.user_partitions, key=lambda p: p.name):
+    for p in sorted(get_all_partitions_for_course(course, active_only=True), key=lambda p: p.name):
 
         # Exclude disabled partitions, partitions with no groups defined
+        # The exception to this case is when there is a selected group within that partition, which means there is
+        # a deleted group
         # Also filter by scheme name if there's a filter defined.
-        if p.active and p.groups and (schemes is None or p.scheme.name in schemes):
+        selected_groups = set(xblock.group_access.get(p.id, []) or [])
+        if (p.groups or selected_groups) and (schemes is None or p.scheme.name in schemes):
 
             # First, add groups defined by the partition
             groups = []
             for g in p.groups:
-
                 # Falsey group access for a partition mean that all groups
                 # are selected.  In the UI, though, we don't show the particular
                 # groups selected, since there's a separate option for "all users".
-                selected_groups = set(xblock.group_access.get(p.id, []) or [])
                 groups.append({
                     "id": g.id,
                     "name": g.name,
@@ -383,7 +420,7 @@ def get_user_partition_info(xblock, schemes=None, course=None):
             for gid in missing_group_ids:
                 groups.append({
                     "id": gid,
-                    "name": _("Deleted group"),
+                    "name": _("Deleted Group"),
                     "selected": True,
                     "deleted": True,
                 })
@@ -391,7 +428,7 @@ def get_user_partition_info(xblock, schemes=None, course=None):
             # Put together the entire partition dictionary
             partitions.append({
                 "id": p.id,
-                "name": p.name,
+                "name": six.text_type(p.name),  # Convert into a string in case ugettext_lazy was used
                 "scheme": p.scheme.name,
                 "groups": groups,
             })
@@ -399,7 +436,7 @@ def get_user_partition_info(xblock, schemes=None, course=None):
     return partitions
 
 
-def get_visibility_partition_info(xblock):
+def get_visibility_partition_info(xblock, course=None):
     """
     Retrieve user partition information for the component visibility editor.
 
@@ -408,38 +445,76 @@ def get_visibility_partition_info(xblock):
     Arguments:
         xblock (XBlock): The component being edited.
 
+        course (XBlock): The course descriptor.  If provided, uses this to look up the user partitions
+            instead of loading the course.  This is useful if we're calling this function multiple
+            times for the same course want to minimize queries to the modulestore.
+
     Returns: dict
 
     """
-    user_partitions = get_user_partition_info(xblock, schemes=["verification", "cohort"])
-    cohort_partitions = []
-    verification_partitions = []
-    has_selected_groups = False
-    selected_verified_partition_id = None
+    selectable_partitions = []
+    # We wish to display enrollment partitions before cohort partitions.
+    enrollment_user_partitions = get_user_partition_info(xblock, schemes=["enrollment_track"], course=course)
 
-    # Pre-process the partitions to make it easier to display the UI
-    for p in user_partitions:
-        has_selected = any(g["selected"] for g in p["groups"])
-        has_selected_groups = has_selected_groups or has_selected
+    # For enrollment partitions, we only show them if there is a selected group or
+    # or if the number of groups > 1.
+    for partition in enrollment_user_partitions:
+        if len(partition["groups"]) > 1 or any(group["selected"] for group in partition["groups"]):
+            selectable_partitions.append(partition)
 
-        if p["scheme"] == "cohort":
-            cohort_partitions.append(p)
-        elif p["scheme"] == "verification":
-            verification_partitions.append(p)
-            if has_selected:
-                selected_verified_partition_id = p["id"]
+    course_key = xblock.scope_ids.usage_id.course_key
+    is_library = isinstance(course_key, LibraryLocator)
+    if not is_library and ContentTypeGatingConfig.current(course_key=course_key).studio_override_enabled:
+        selectable_partitions += get_user_partition_info(xblock, schemes=[CONTENT_TYPE_GATING_SCHEME], course=course)
+
+    # Now add the cohort user partitions.
+    selectable_partitions = selectable_partitions + get_user_partition_info(xblock, schemes=["cohort"], course=course)
+
+    # Find the first partition with a selected group. That will be the one initially enabled in the dialog
+    # (if the course has only been added in Studio, only one partition should have a selected group).
+    selected_partition_index = -1
+
+    # At the same time, build up all the selected groups as they are displayed in the dialog title.
+    selected_groups_label = ''
+
+    for index, partition in enumerate(selectable_partitions):
+        for group in partition["groups"]:
+            if group["selected"]:
+                if len(selected_groups_label) == 0:
+                    selected_groups_label = group['name']
+                else:
+                    # Translators: This is building up a list of groups. It is marked for translation because of the
+                    # comma, which is used as a separator between each group.
+                    selected_groups_label = _(u'{previous_groups}, {current_group}').format(
+                        previous_groups=selected_groups_label,
+                        current_group=group['name']
+                    )
+                if selected_partition_index == -1:
+                    selected_partition_index = index
 
     return {
-        "user_partitions": user_partitions,
-        "cohort_partitions": cohort_partitions,
-        "verification_partitions": verification_partitions,
-        "has_selected_groups": has_selected_groups,
-        "selected_verified_partition_id": selected_verified_partition_id,
+        "selectable_partitions": selectable_partitions,
+        "selected_partition_index": selected_partition_index,
+        "selected_groups_label": selected_groups_label,
     }
+
+
+def get_xblock_aside_instance(usage_key):
+    """
+    Returns: aside instance of a aside xblock
+    :param usage_key: Usage key of aside xblock
+    """
+    try:
+        descriptor = modulestore().get_item(usage_key.usage_key)
+        for aside in descriptor.runtime.get_asides(descriptor):
+            if aside.scope_ids.block_type == usage_key.aside_type:
+                return aside
+    except ItemNotFoundError:
+        log.warning(u'Unable to load item %s', usage_key.usage_key)
 
 
 def is_self_paced(course):
     """
     Returns True if course is self-paced, False otherwise.
     """
-    return course and course.self_paced and SelfPacedConfiguration.current().enabled
+    return course and course.self_paced

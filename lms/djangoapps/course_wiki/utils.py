@@ -2,9 +2,12 @@
 Utility functions for course_wiki.
 """
 
+from __future__ import absolute_import
+
 from django.core.exceptions import ObjectDoesNotExist
-from xmodule import modulestore
+
 import courseware
+from xmodule import modulestore
 
 
 def user_is_article_course_staff(user, article):

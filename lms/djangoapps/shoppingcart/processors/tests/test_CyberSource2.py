@@ -2,25 +2,27 @@
 """
 Tests for the newer CyberSource API implementation.
 """
-from mock import patch
-from django.test import TestCase
-from django.conf import settings
-import ddt
+from __future__ import absolute_import
 
-from student.tests.factories import UserFactory
+import ddt
+from django.conf import settings
+from django.test import TestCase
+from mock import patch
+
 from shoppingcart.models import Order, OrderItem
 from shoppingcart.processors.CyberSource2 import (
-    processor_hash,
-    process_postpay_callback,
-    render_purchase_form_html,
+    _get_processor_exception_html,
     get_signed_purchase_params,
-    _get_processor_exception_html
+    process_postpay_callback,
+    processor_hash,
+    render_purchase_form_html
 )
 from shoppingcart.processors.exceptions import (
-    CCProcessorSignatureException,
     CCProcessorDataException,
+    CCProcessorSignatureException,
     CCProcessorWrongAmountException
 )
+from student.tests.factories import UserFactory
 
 
 @ddt.ddt
@@ -79,7 +81,7 @@ class CyberSource2Test(TestCase):
         # Parameters determined by the order model
         self.assertEqual(params['amount'], '10.00')
         self.assertEqual(params['currency'], 'usd')
-        self.assertEqual(params['orderNumber'], 'OrderId: {order_id}'.format(order_id=self.order.id))
+        self.assertEqual(params['orderNumber'], u'OrderId: {order_id}'.format(order_id=self.order.id))
         self.assertEqual(params['reference_number'], self.order.id)
 
         # Parameters determined by the Django (test) settings
@@ -148,7 +150,7 @@ class CyberSource2Test(TestCase):
         # Expect that we processed the payment successfully
         self.assertTrue(
             result['success'],
-            msg="Payment was not successful: {error}".format(error=result.get('error_html'))
+            msg=u"Payment was not successful: {error}".format(error=result.get('error_html'))
         )
         self.assertEqual(result['error_html'], '')
 
@@ -231,7 +233,7 @@ class CyberSource2Test(TestCase):
         # Expect that we processed the payment successfully
         self.assertTrue(
             result['success'],
-            msg="Payment was not successful: {error}".format(error=result.get('error_html'))
+            msg=u"Payment was not successful: {error}".format(error=result.get('error_html'))
         )
         self.assertEqual(result['error_html'], '')
         self.assert_dump_recorded(result['order'])

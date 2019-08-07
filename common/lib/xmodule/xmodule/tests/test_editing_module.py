@@ -1,15 +1,17 @@
 """ Tests for editing descriptors"""
-import unittest
-import os
+from __future__ import absolute_import
+
 import logging
+import os
+import unittest
 
 from mock import Mock
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pkg_resources import resource_string
-from opaque_keys.edx.locations import Location
-from xmodule.editing_module import TabsEditingDescriptor
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
+from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.tests import get_test_descriptor_system
 
 log = logging.getLogger(__name__)
@@ -55,7 +57,9 @@ class TabsEditingDescriptorTestCase(unittest.TestCase):
         TabsEditingDescriptor.tabs = self.tabs
         self.descriptor = system.construct_xblock_from_class(
             TabsEditingDescriptor,
-            scope_ids=ScopeIds(None, None, None, Location('org', 'course', 'run', 'category', 'name', 'revision')),
+            scope_ids=ScopeIds(None, None, None,
+                               BlockUsageLocator(CourseLocator('org', 'course', 'run', branch='revision'),
+                                                 'category', 'name')),
             field_data=DictFieldData({}),
         )
 

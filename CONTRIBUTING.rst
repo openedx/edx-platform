@@ -6,7 +6,7 @@ Contributions to Open edX are very welcome, and strongly encouraged! We've
 put together `some documentation that describes our contribution process`_,
 but here's a step-by-step guide that should help you get started.
 
-.. _some documentation that describes our contribution process: http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/process/index.html
+.. _some documentation that describes our contribution process: https://edx.readthedocs.org/projects/edx-developer-guide/en/latest/process/index.html
 
 Step 0: Join the Conversation
 =============================
@@ -111,14 +111,6 @@ Alternatively, you're also free to physically mail the agreement to the street
 address on the agreement. Once we have your agreement in hand, we can begin
 reviewing and merging your work.
 
-You'll also need to add yourself to the `AUTHORS` file when you submit your
-first pull request.  You should add your full name as well as the email address
-associated with your GitHub account.  Please update `AUTHORS` in an individual
-commit, distinct from other changes in the pull request (it's OK for a pull
-request to contain multiple commits, including a commit to `AUTHORS`).
-Alternatively, you can open up a separate PR just to have your name added to
-the `AUTHORS` file, and link that PR to the PR with your changes.
-
 Step 2: Fork, Commit, and Pull Request
 ======================================
 GitHub has some great documentation on `how to fork a git repository`_. Once
@@ -138,7 +130,7 @@ requests must meet in order to be reviewed by a core committer. These requiremen
 include things like documentation and passing tests: see the
 `contributor documentation`_ page for the full list.
 
-.. _contributor documentation: http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/process/contributor.html
+.. _contributor documentation: https://edx.readthedocs.org/projects/edx-developer-guide/en/latest/process/contributor.html
 
 
 Areas of particular concern with their own detailed guidelines are:
@@ -150,10 +142,9 @@ Areas of particular concern with their own detailed guidelines are:
   around the world.
 
 
-.. _Accessibility: http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/conventions/accessibility.html
+.. _Accessibility: https://edx.readthedocs.org/projects/edx-developer-guide/en/latest/conventions/accessibility.html
 .. _website accessibility policy: https://www.edx.org/accessibility
-.. _Internationalization: http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/conventions/internationalization/index.html
-
+.. _Internationalization: https://edx.readthedocs.io/projects/edx-developer-guide/en/latest/internationalization/index.html
 
 Step 4: Approval by Community Manager and Product Owner
 =======================================================
@@ -225,4 +216,4 @@ Expectations You Have of Us
 3. Once we have determined through visual review that your code is not
    malicious, we will run a Jenkins build on your branch.
 
-.. _individual contributor agreement: http://open.edx.org/sites/default/files/wysiwyg/individual-contributor-agreement.pdf
+.. _individual contributor agreement: https://open.edx.org/wp-content/uploads/2019/01/individual-contributor-agreement.pdf

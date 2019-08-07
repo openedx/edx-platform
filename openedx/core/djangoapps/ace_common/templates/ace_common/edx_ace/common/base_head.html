@@ -1,0 +1,36 @@
+{% load i18n %}
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+{% get_current_language as LANGUAGE_CODE %}
+<title lang="{{ LANGUAGE_CODE|default:"en" }}">
+  {% block title %}
+  {% trans "edX Email" as tmsg %}{{ tmsg | force_escape }}
+  {% endblock %}
+</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<style type="text/css">
+    @media only screen and (min-device-width: 601px) {
+      .content {
+        width: 600px !important;
+      }
+    }
+
+    @-ms-viewport{
+      width: device-width;
+    }
+
+    /* Column Drop Layout Pattern CSS */
+    @media only screen and (max-width: 450px) {
+      td[class="col"] {
+        display: block;
+        width: 100%;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        float: left;
+        text-align: left !important;
+        padding-bottom: 20px;
+      }
+    }
+</style>

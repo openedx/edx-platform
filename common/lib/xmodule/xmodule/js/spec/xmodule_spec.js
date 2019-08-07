@@ -9,9 +9,9 @@
         });
 
         describe('implementation', function() {
-            var el,
+            var $el,
                 videoModule = {
-                    'module': 'video_module'
+                    module: 'video_module'
                 },
                 editCallback,
                 displayCallback,
@@ -19,7 +19,7 @@
                 removeVideo;
 
             beforeEach(function() {
-                el = $('<div />');
+                $el = $('<div />');
 
                 if (window.None) {
                     spyOn(window, 'None');
@@ -48,7 +48,7 @@
             });
 
             afterEach(function() {
-                el = null;
+                $el = null;
 
                 if (removeNone) {
                     window.None = undefined;
@@ -59,16 +59,16 @@
             });
 
             it('if element module is of type None, nothing happens', function() {
-                el.data('type', 'None');
+                $el.data('type', 'None');
 
-                expect(XBlockToXModuleShim(null, el)).toBeUndefined();
+                expect(XBlockToXModuleShim(null, $el)).toBeUndefined();
                 expect(window.None).not.toHaveBeenCalled();
             });
 
             it('if element module is of type Video, Video module constructor is called', function() {
-                el.data('type', 'Video');
+                $el.data('type', 'Video');
 
-                expect(XBlockToXModuleShim(null, el)).toEqual(videoModule);
+                expect(XBlockToXModuleShim(null, $el)).toEqual(videoModule);
                 expect(window.Video).toHaveBeenCalled();
 
                 expect('XModule.loaded.edit').not.toHaveBeenTriggeredOn(document);
@@ -76,28 +76,28 @@
             });
 
             it('if element has class "xmodule_edit"', function() {
-                el.data('type', 'Video')
+                $el.data('type', 'Video')
                     .addClass('xmodule_edit');
-                XBlockToXModuleShim(null, el);
+                XBlockToXModuleShim(null, $el);
                 expect('XModule.loaded.edit').toHaveBeenTriggeredOn($(document));
-                expect(editCallback).toHaveBeenCalledWith(jasmine.any($.Event), el, videoModule);
+                expect(editCallback).toHaveBeenCalledWith(jasmine.any($.Event), $el, videoModule);
                 expect('XModule.loaded.display').not.toHaveBeenTriggeredOn($(document));
             });
 
             it('if element has class "xmodule_display"', function() {
-                el.data('type', 'Video')
+                $el.data('type', 'Video')
                     .addClass('xmodule_display');
-                XBlockToXModuleShim(null, el);
+                XBlockToXModuleShim(null, $el);
                 expect('XModule.loaded.edit').not.toHaveBeenTriggeredOn($(document));
                 expect('XModule.loaded.display').toHaveBeenTriggeredOn($(document));
-                expect(displayCallback).toHaveBeenCalledWith(jasmine.any($.Event), el, videoModule);
+                expect(displayCallback).toHaveBeenCalledWith(jasmine.any($.Event), $el, videoModule);
             });
 
             it('if element has classes "xmodule_edit", and "xmodule_display"', function() {
-                el.data('type', 'Video')
+                $el.data('type', 'Video')
                     .addClass('xmodule_edit')
                     .addClass('xmodule_display');
-                XBlockToXModuleShim(null, el);
+                XBlockToXModuleShim(null, $el);
                 expect('XModule.loaded.edit').toHaveBeenTriggeredOn($(document));
                 expect('XModule.loaded.display').toHaveBeenTriggeredOn($(document));
             });
@@ -111,8 +111,8 @@
                     window.console = jasmine.createSpy('console.error');
                 }
 
-                el.data('type', 'UnknownModule');
-                expect(XBlockToXModuleShim(null, el)).toBeUndefined();
+                $el.data('type', 'UnknownModule');
+                expect(XBlockToXModuleShim(null, $el)).toBeUndefined();
 
                 expect(console.error).toHaveBeenCalledWith(
                     'Unable to load UnknownModule: window[moduleType] is not a constructor'
@@ -124,7 +124,7 @@
             it('element is of an unknown Module type, JavaScript throws if console.error() is not defined', function() {
                 var oldConsole = window.console,
                     testFunction = function() {
-                        return XBlockToXModuleShim(null, el);
+                        return XBlockToXModuleShim(null, $el);
                     };
 
 
@@ -132,7 +132,7 @@
                     window.console = undefined;
                 }
 
-                el.data('type', 'UnknownModule');
+                $el.data('type', 'UnknownModule');
                 expect(testFunction).toThrow();
 
                 window.console = oldConsole;

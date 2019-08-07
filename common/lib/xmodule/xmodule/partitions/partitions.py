@@ -1,11 +1,24 @@
 """Defines ``Group`` and ``UserPartition`` models for partitioning"""
 
+from __future__ import absolute_import
+
 from collections import namedtuple
+
 from stevedore.extension import ExtensionManager
 
 # We use ``id`` in this file as the IDs of our Groups and UserPartitions,
 # which Pylint disapproves of.
 # pylint: disable=redefined-builtin
+
+
+# UserPartition IDs must be unique. The Cohort and Random UserPartitions (when they are
+# created via Studio) choose an unused ID in the range of 100 (historical) to MAX_INT. Therefore the
+# dynamic UserPartitionIDs must be under 100, and they have to be hard-coded to ensure
+# they are always the same whenever the dynamic partition is added (since the UserPartition
+# ID is stored in the xblock group_access dict).
+ENROLLMENT_TRACK_PARTITION_ID = 50
+
+MINIMUM_STATIC_PARTITION_ID = 100
 
 
 class UserPartitionError(Exception):
@@ -25,6 +38,13 @@ class NoSuchUserPartitionError(UserPartitionError):
 class NoSuchUserPartitionGroupError(UserPartitionError):
     """
     Exception to be raised when looking up a UserPartition Group by its ID fails.
+    """
+    pass
+
+
+class ReadOnlyUserPartitionError(UserPartitionError):
+    """
+    Exception to be raised when attempting to modify a read only partition.
     """
     pass
 
@@ -127,7 +147,7 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         try:
             scheme = UserPartition.scheme_extensions[name].plugin
         except KeyError:
-            raise UserPartitionError("Unrecognized scheme {0}".format(name))
+            raise UserPartitionError("Unrecognized scheme '{0}'".format(name))
         scheme.name = name
         return scheme
 
@@ -188,15 +208,28 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         if not scheme:
             raise TypeError("UserPartition dict {0} has unrecognized scheme {1}".format(value, scheme_id))
 
-        return UserPartition(
-            value["id"],
-            value["name"],
-            value["description"],
-            groups,
-            scheme,
-            parameters,
-            active,
-        )
+        if getattr(scheme, 'read_only', False):
+            raise ReadOnlyUserPartitionError("UserPartition dict {0} uses scheme {1} which is read only".format(value, scheme_id))
+
+        if hasattr(scheme, "create_user_partition"):
+            return scheme.create_user_partition(
+                value["id"],
+                value["name"],
+                value["description"],
+                groups,
+                parameters,
+                active,
+            )
+        else:
+            return UserPartition(
+                value["id"],
+                value["name"],
+                value["description"],
+                groups,
+                scheme,
+                parameters,
+                active,
+            )
 
     def get_group(self, group_id):
         """
@@ -214,5 +247,37 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
                 return group
 
         raise NoSuchUserPartitionGroupError(
-            "could not find a Group with ID [{}] in UserPartition [{}]".format(group_id, self.id)
+            "Could not find a Group with ID [{group_id}] in UserPartition [{partition_id}].".format(
+                group_id=group_id, partition_id=self.id
+            )
         )
+
+    def access_denied_message(self, block_key, user, user_group, allowed_groups):
+        """
+        Return a message that should be displayed to the user when they are not allowed to access
+        content managed by this partition, or None if there is no applicable message.
+
+        Arguments:
+            block_key (:class:`.BlockUsageLocator`): The content being managed
+            user (:class:`.User`): The user who was denied access
+            user_group (:class:`.Group`): The current Group the user is in
+            allowed_groups (list of :class:`.Group`): The groups who are allowed to see the content
+
+        Returns: str
+        """
+        return None
+
+    def access_denied_fragment(self, block, user, user_group, allowed_groups):
+        """
+        Return an html fragment that should be displayed to the user when they are not allowed to access
+        content managed by this partition, or None if there is no applicable message.
+
+        Arguments:
+            block (:class:`.XBlock`): The content being managed
+            user (:class:`.User`): The user who was denied access
+            user_group (:class:`.Group`): The current Group the user is in
+            allowed_groups (list of :class:`.Group`): The groups who are allowed to see the content
+
+        Returns: :class:`.Fragment`
+        """
+        return None

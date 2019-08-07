@@ -81,12 +81,12 @@
             // in the POST parameter that shows up on the Django server.
             // TODO: add error handler.
             var ajax_url = '/instructor_task_status/';
-            var data = {'task_ids': task_ids};
+            var data = {task_ids: task_ids};
             $.post(ajax_url, data).done(this.update_progress);
         };
 
         return InstructorTaskProgress;
-    })();
+    }());
 }).call(this);
 
 // once the page is rendered, create the progress object

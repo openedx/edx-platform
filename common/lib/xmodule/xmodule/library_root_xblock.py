@@ -1,13 +1,15 @@
 """
 'library' XBlock (LibraryRoot)
 """
+from __future__ import absolute_import
+
 import logging
 
-from xmodule.studio_editable import StudioEditableModule
-
-from xblock.fields import Scope, String, List, Boolean
-from xblock.fragment import Fragment
+import six
+from web_fragments.fragment import Fragment
 from xblock.core import XBlock
+from xblock.fields import Boolean, List, Scope, String
+from xmodule.studio_editable import StudioEditableModule
 
 log = logging.getLogger(__name__)
 
@@ -25,7 +27,7 @@ class LibraryRoot(XBlock):
     resources_dir = None
 
     display_name = String(
-        help=_("Enter the name of the library as it should appear in Studio."),
+        help=_("The display name for this component."),
         default="Library",
         display_name=_("Library Display Name"),
         scope=Scope.settings
@@ -49,7 +51,7 @@ class LibraryRoot(XBlock):
         return u"Library: {}".format(self.display_name)
 
     def __str__(self):
-        return unicode(self).encode('utf-8')
+        return six.text_type(self).encode('utf-8')
 
     def author_view(self, context):
         """
@@ -80,6 +82,7 @@ class LibraryRoot(XBlock):
         children_to_show = self.children[item_start:item_end]  # pylint: disable=no-member
 
         force_render = context.get('force_render', None)
+        context['can_move'] = False
 
         for child_key in children_to_show:
             # Children must have a separate context from the library itself. Make a copy.
@@ -89,17 +92,17 @@ class LibraryRoot(XBlock):
             child = self.runtime.get_block(child_key)
             child_view_name = StudioEditableModule.get_preview_view_name(child)
 
-            if unicode(child.location) == force_render:
+            if six.text_type(child.location) == force_render:
                 child_context['show_preview'] = True
 
             if child_context['show_preview']:
                 rendered_child = self.runtime.render_child(child, child_view_name, child_context)
             else:
                 rendered_child = self.runtime.render_child_placeholder(child, child_view_name, child_context)
-            fragment.add_frag_resources(rendered_child)
+            fragment.add_fragment_resources(rendered_child)
 
             contents.append({
-                'id': unicode(child.location),
+                'id': six.text_type(child.location),
                 'content': rendered_child.content,
             })
 

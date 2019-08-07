@@ -3,9 +3,9 @@
         return Scroller;
 
         function Scroller(state) {
-            var parentEl, moveLeftEl, showEl, moveRightEl, showElLeftMargin;
+            var $parentEl, $moveLeftEl, $showEl, $moveRightEl, showElLeftMargin;
 
-            parentEl = $(
+            $parentEl = $(
             '<div ' +
                 'style=" ' +
                     'width: 665px; ' +
@@ -16,7 +16,7 @@
             '></div>'
         );
 
-            moveLeftEl = $(
+            $moveLeftEl = $(
             '<div ' +
                 'style=" ' +
                     'width: 40px; ' +
@@ -47,18 +47,18 @@
                 '></div>' +
             '</div>'
         );
-            moveLeftEl.appendTo(parentEl);
+            $moveLeftEl.appendTo($parentEl);
 
         // The below is necessary to prevent the browser thinking that we want
         // to perform a drag operation, or a highlight operation. If we don't
         // do this, the browser will then highlight with a gray shade the
         // element.
-            moveLeftEl.mousemove(function(event) { event.preventDefault(); });
-            moveLeftEl.mousedown(function(event) { event.preventDefault(); });
+            $moveLeftEl.mousemove(function(event) { event.preventDefault(); });
+            $moveLeftEl.mousedown(function(event) { event.preventDefault(); });
 
         // This event will be responsible for moving the scroller left.
         // Hidden draggables will be shown.
-            moveLeftEl.mouseup(function(event) {
+            $moveLeftEl.mouseup(function(event) {
                 event.preventDefault();
 
             // When there are no more hidden draggables, prevent from
@@ -77,7 +77,7 @@
                 });
             });
 
-            showEl = $(
+            $showEl = $(
             '<div ' +
                 'style=" ' +
                     'width: 585px; ' +
@@ -88,7 +88,7 @@
                 '" ' +
             '></div>'
         );
-            showEl.appendTo(parentEl);
+            $showEl.appendTo($parentEl);
 
             showElLeftMargin = 0;
 
@@ -106,13 +106,13 @@
                 '" ' +
             '></div>'
         );
-            state.sliderEl.appendTo(showEl);
+            state.sliderEl.appendTo($showEl);
 
             state.sliderEl.mousedown(function(event) {
                 event.preventDefault();
             });
 
-            moveRightEl = $(
+            $moveRightEl = $(
             '<div ' +
                 'style=" ' +
                     'width: 40px; ' +
@@ -143,18 +143,18 @@
                 '></div>' +
             '</div>'
         );
-            moveRightEl.appendTo(parentEl);
+            $moveRightEl.appendTo($parentEl);
 
         // The below is necessary to prevent the browser thinking that we want
         // to perform a drag operation, or a highlight operation. If we don't
         // do this, the browser will then highlight with a gray shade the
         // element.
-            moveRightEl.mousemove(function(event) { event.preventDefault(); });
-            moveRightEl.mousedown(function(event) { event.preventDefault(); });
+            $moveRightEl.mousemove(function(event) { event.preventDefault(); });
+            $moveRightEl.mousedown(function(event) { event.preventDefault(); });
 
         // This event will be responsible for moving the scroller right.
         // Hidden draggables will be shown.
-            moveRightEl.mouseup(function(event) {
+            $moveRightEl.mouseup(function(event) {
                 event.preventDefault();
 
             // When there are no more hidden draggables, prevent from
@@ -173,7 +173,7 @@
                 });
             });
 
-            parentEl.appendTo(state.containerEl);
+            $parentEl.appendTo(state.containerEl);
 
         // Make the function available throughout the application. We need to
         // call it in several places:
@@ -190,14 +190,14 @@
             return;
 
             function updateArrowOpacity() {
-                moveLeftEl.children('div').css('opacity', '1');
-                moveRightEl.children('div').css('opacity', '1');
+                $moveLeftEl.children('div').css('opacity', '1');
+                $moveRightEl.children('div').css('opacity', '1');
 
                 if (showElLeftMargin < -102 * (state.numDraggablesInSlider - 6)) {
-                    moveRightEl.children('div').css('opacity', '.4');
+                    $moveRightEl.children('div').css('opacity', '.4');
                 }
                 if (showElLeftMargin > -102) {
-                    moveLeftEl.children('div').css('opacity', '.4');
+                    $moveLeftEl.children('div').css('opacity', '.4');
                 }
             }
         } // End-of: function Scroller(state)

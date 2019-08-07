@@ -1,31 +1,34 @@
 """
 Declaration of CourseOverview model
 """
+from __future__ import absolute_import
+
 import json
 import logging
-from urlparse import urlparse, urlunparse
 
+import six
+from ccx_keys.locator import CCXLocator
+from config_models.models import ConfigurationModel
+from django.conf import settings
 from django.db import models, transaction
-from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField, FloatField, IntegerField
+from django.db.models.fields import BooleanField, DateTimeField, DecimalField, FloatField, IntegerField, TextField
 from django.db.utils import IntegrityError
 from django.template import defaultfilters
-from django.utils.translation import ugettext
-
-from ccx_keys.locator import CCXLocator
 from model_utils.models import TimeStampedModel
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
+from six import text_type  # pylint: disable=ungrouped-imports
+from six.moves.urllib.parse import urlparse, urlunparse  # pylint: disable=import-error
+from simple_history.models import HistoricalRecords
 
-from config_models.models import ConfigurationModel
-from lms.djangoapps import django_comment_client
+from lms.djangoapps.discussion import django_comment_client
+from openedx.core.djangoapps.catalog.models import CatalogIntegration
+from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.models.course_details import CourseDetails
-from pytz import utc
 from static_replace.models import AssetBaseUrlConfig
-from util.date_utils import strftime_localized
-from xmodule import course_metadata_utils, block_metadata_utils
-from xmodule.course_module import CourseDescriptor, DEFAULT_START_DATE
+from xmodule import block_metadata_utils, course_metadata_utils
+from xmodule.course_module import DEFAULT_START_DATE, CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, UsageKeyField
 
 log = logging.getLogger(__name__)
 
@@ -40,13 +43,15 @@ class CourseOverview(TimeStampedModel):
         user dashboard (enrolled courses)
         course catalog (courses to enroll in)
         course about (meta data about the course)
+
+    .. no_pii:
     """
 
     class Meta(object):
         app_label = 'course_overviews'
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 4
+    VERSION = 6
 
     # Cache entry versioning.
     version = IntegerField()
@@ -77,6 +82,7 @@ class CourseOverview(TimeStampedModel):
     has_any_active_web_certificate = BooleanField(default=False)
     cert_name_short = TextField()
     cert_name_long = TextField()
+    certificate_available_date = DateTimeField(default=None, null=True)
 
     # Grading
     lowest_passing_grade = DecimalField(max_digits=5, decimal_places=2, null=True)
@@ -100,11 +106,17 @@ class CourseOverview(TimeStampedModel):
     course_video_url = TextField(null=True)
     effort = TextField(null=True)
     self_paced = BooleanField(default=False)
+    marketing_url = TextField(null=True)
+    eligible_for_financial_aid = BooleanField(default=True)
+
+    language = TextField(null=True)
+
+    history = HistoricalRecords()
 
     @classmethod
-    def _create_from_course(cls, course):
+    def _create_or_update(cls, course):
         """
-        Creates a CourseOverview object from a CourseDescriptor.
+        Creates or updates a CourseOverview object from a CourseDescriptor.
 
         Does not touch the database, simply constructs and returns an overview
         from the given course.
@@ -113,12 +125,10 @@ class CourseOverview(TimeStampedModel):
             course (CourseDescriptor): any course descriptor object
 
         Returns:
-            CourseOverview: overview extracted from the given course
+            CourseOverview: created or updated overview extracted from the given course
         """
         from lms.djangoapps.certificates.api import get_active_web_certificate
         from openedx.core.lib.courses import course_image_url
-
-        log.info('Creating course overview for %s.', unicode(course.id))
 
         # Workaround for a problem discovered in https://openedx.atlassian.net/browse/TNL-2806.
         # If the course has a malformed grading policy such that
@@ -142,54 +152,66 @@ class CourseOverview(TimeStampedModel):
             end = ccx.due
             max_student_enrollments_allowed = ccx.max_student_enrollments_allowed
 
-        return cls(
-            version=cls.VERSION,
-            id=course.id,
-            _location=course.location,
-            org=course.location.org,
-            display_name=display_name,
-            display_number_with_default=course.display_number_with_default,
-            display_org_with_default=course.display_org_with_default,
+        course_overview = cls.objects.filter(id=course.id)
+        if course_overview.exists():
+            log.info(u'Updating course overview for %s.', six.text_type(course.id))
+            course_overview = course_overview.first()
+        else:
+            log.info(u'Creating course overview for %s.', six.text_type(course.id))
+            course_overview = cls()
 
-            start=start,
-            end=end,
-            advertised_start=course.advertised_start,
-            announcement=course.announcement,
+        course_overview.version = cls.VERSION
+        course_overview.id = course.id
+        course_overview._location = course.location
+        course_overview.org = course.location.org
+        course_overview.display_name = display_name
+        course_overview.display_number_with_default = course.display_number_with_default
+        course_overview.display_org_with_default = course.display_org_with_default
 
-            course_image_url=course_image_url(course),
-            social_sharing_url=course.social_sharing_url,
+        course_overview.start = start
+        course_overview.end = end
+        course_overview.advertised_start = course.advertised_start
+        course_overview.announcement = course.announcement
 
-            certificates_display_behavior=course.certificates_display_behavior,
-            certificates_show_before_end=course.certificates_show_before_end,
-            cert_html_view_enabled=course.cert_html_view_enabled,
-            has_any_active_web_certificate=(get_active_web_certificate(course) is not None),
-            cert_name_short=course.cert_name_short,
-            cert_name_long=course.cert_name_long,
-            lowest_passing_grade=lowest_passing_grade,
-            end_of_course_survey_url=course.end_of_course_survey_url,
+        course_overview.course_image_url = course_image_url(course)
+        course_overview.social_sharing_url = course.social_sharing_url
 
-            days_early_for_beta=course.days_early_for_beta,
-            mobile_available=course.mobile_available,
-            visible_to_staff_only=course.visible_to_staff_only,
-            _pre_requisite_courses_json=json.dumps(course.pre_requisite_courses),
+        course_overview.certificates_display_behavior = course.certificates_display_behavior
+        course_overview.certificates_show_before_end = course.certificates_show_before_end
+        course_overview.cert_html_view_enabled = course.cert_html_view_enabled
+        course_overview.has_any_active_web_certificate = (get_active_web_certificate(course) is not None)
+        course_overview.cert_name_short = course.cert_name_short
+        course_overview.cert_name_long = course.cert_name_long
+        course_overview.certificate_available_date = course.certificate_available_date
+        course_overview.lowest_passing_grade = lowest_passing_grade
+        course_overview.end_of_course_survey_url = course.end_of_course_survey_url
 
-            enrollment_start=course.enrollment_start,
-            enrollment_end=course.enrollment_end,
-            enrollment_domain=course.enrollment_domain,
-            invitation_only=course.invitation_only,
-            max_student_enrollments_allowed=max_student_enrollments_allowed,
+        course_overview.days_early_for_beta = course.days_early_for_beta
+        course_overview.mobile_available = course.mobile_available
+        course_overview.visible_to_staff_only = course.visible_to_staff_only
+        course_overview._pre_requisite_courses_json = json.dumps(course.pre_requisite_courses)
 
-            catalog_visibility=course.catalog_visibility,
-            short_description=CourseDetails.fetch_about_attribute(course.id, 'short_description'),
-            effort=CourseDetails.fetch_about_attribute(course.id, 'effort'),
-            course_video_url=CourseDetails.fetch_video_url(course.id),
-            self_paced=course.self_paced,
-        )
+        course_overview.enrollment_start = course.enrollment_start
+        course_overview.enrollment_end = course.enrollment_end
+        course_overview.enrollment_domain = course.enrollment_domain
+        course_overview.invitation_only = course.invitation_only
+        course_overview.max_student_enrollments_allowed = max_student_enrollments_allowed
+
+        course_overview.catalog_visibility = course.catalog_visibility
+        course_overview.short_description = CourseDetails.fetch_about_attribute(course.id, 'short_description')
+        course_overview.effort = CourseDetails.fetch_about_attribute(course.id, 'effort')
+        course_overview.course_video_url = CourseDetails.fetch_video_url(course.id)
+        course_overview.self_paced = course.self_paced
+
+        if not CatalogIntegration.is_enabled():
+            course_overview.language = course.language
+
+        return course_overview
 
     @classmethod
     def load_from_module_store(cls, course_id):
         """
-        Load a CourseDescriptor, create a new CourseOverview from it, cache the
+        Load a CourseDescriptor, create or update a CourseOverview from it, cache the
         overview, and return it.
 
         Arguments:
@@ -208,15 +230,19 @@ class CourseOverview(TimeStampedModel):
         with store.bulk_operations(course_id):
             course = store.get_course(course_id)
             if isinstance(course, CourseDescriptor):
-                course_overview = cls._create_from_course(course)
+                course_overview = cls._create_or_update(course)
                 try:
                     with transaction.atomic():
                         course_overview.save()
+                        # Remove and recreate all the course tabs
+                        CourseOverviewTab.objects.filter(course_overview=course_overview).delete()
                         CourseOverviewTab.objects.bulk_create([
                             CourseOverviewTab(tab_id=tab.tab_id, course_overview=course_overview)
                             for tab in course.tabs
                         ])
-                        CourseOverviewImageSet.create_for_course(course_overview, course)
+                        # Remove and recreate course images
+                        CourseOverviewImageSet.objects.filter(course_overview=course_overview).delete()
+                        CourseOverviewImageSet.create(course_overview, course)
 
                 except IntegrityError:
                     # There is a rare race condition that will occur if
@@ -228,12 +254,19 @@ class CourseOverview(TimeStampedModel):
                     # to save a duplicate.
                     # (see: https://openedx.atlassian.net/browse/TNL-2854).
                     pass
+                except Exception:
+                    log.exception(
+                        u"CourseOverview for course %s failed!",
+                        course_id,
+                    )
+                    raise
+
                 return course_overview
             elif course is not None:
                 raise IOError(
-                    "Error while loading course {} from the module store: {}",
-                    unicode(course_id),
-                    course.error_msg if isinstance(course, ErrorDescriptor) else unicode(course)
+                    u"Error while loading course {} from the module store: {}",
+                    six.text_type(course_id),
+                    course.error_msg if isinstance(course, ErrorDescriptor) else six.text_type(course)
                 )
             else:
                 raise cls.DoesNotExist()
@@ -273,9 +306,53 @@ class CourseOverview(TimeStampedModel):
         # they were never generated, or because they were flushed out after
         # a change to CourseOverviewImageConfig.
         if course_overview and not hasattr(course_overview, 'image_set'):
-            CourseOverviewImageSet.create_for_course(course_overview)
+            CourseOverviewImageSet.create(course_overview)
 
         return course_overview or cls.load_from_module_store(course_id)
+
+    @classmethod
+    def get_from_ids_if_exists(cls, course_ids):
+        """
+        Return a dict mapping course_ids to CourseOverviews, if they exist.
+
+        This method will *not* generate new CourseOverviews or delete outdated
+        ones. It exists only as a small optimization used when CourseOverviews
+        are known to exist, for common situations like the student dashboard.
+
+        Callers should assume that this list is incomplete and fall back to
+        get_from_id if they need to guarantee CourseOverview generation.
+        """
+        return {
+            overview.id: overview
+            for overview
+            in cls.objects.select_related('image_set').filter(
+                id__in=course_ids,
+                version__gte=cls.VERSION
+            )
+        }
+
+    @classmethod
+    def get_from_id_if_exists(cls, course_id):
+        """
+        Return a CourseOverview for the provided course_id if it exists.
+        Returns None if no CourseOverview exists with the provided course_id
+
+        This method will *not* generate new CourseOverviews or delete outdated
+        ones. It exists only as a small optimization used when CourseOverviews
+        are known to exist, for common situations like the student dashboard.
+
+        Callers should assume that this list is incomplete and fall back to
+        get_from_id if they need to guarantee CourseOverview generation.
+        """
+        try:
+            course_overview = cls.objects.select_related('image_set').get(
+                id=course_id,
+                version__gte=cls.VERSION
+            )
+        except cls.DoesNotExist:
+            course_overview = None
+
+        return course_overview
 
     def clean_id(self, padding_char='='):
         """
@@ -339,7 +416,15 @@ class CourseOverview(TimeStampedModel):
         migrate and test switching to display_name_with_default, which is no
         longer escaped.
         """
-        return block_metadata_utils.display_name_with_default_escaped(self)
+        # pylint: disable=line-too-long
+        return block_metadata_utils.display_name_with_default_escaped(self)  # xss-lint: disable=python-deprecated-display-name
+
+    @property
+    def dashboard_start_display(self):
+        """
+         Return start date to diplay on learner's dashboard, preferably `Course Advertised Start`
+        """
+        return self.advertised_start or self.start
 
     def has_started(self):
         """
@@ -353,26 +438,24 @@ class CourseOverview(TimeStampedModel):
         """
         return course_metadata_utils.has_course_ended(self.end)
 
+    def has_marketing_url(self):
+        """
+        Returns whether the course has marketing url.
+        """
+        return settings.FEATURES.get('ENABLE_MKTG_SITE') and bool(self.marketing_url)
+
+    def has_social_sharing_url(self):
+        """
+        Returns whether the course has social sharing url.
+        """
+        is_social_sharing_enabled = getattr(settings, 'SOCIAL_SHARING_SETTINGS', {}).get('CUSTOM_COURSE_URLS')
+        return is_social_sharing_enabled and bool(self.social_sharing_url)
+
     def starts_within(self, days):
         """
         Returns True if the course starts with-in given number of days otherwise returns False.
         """
         return course_metadata_utils.course_starts_within(self.start, days)
-
-    def start_datetime_text(self, format_string="SHORT_DATE", time_zone=utc):
-        """
-        Returns the desired text corresponding to the course's start date and
-        time in the specified time zone, or utc if no time zone given.
-        Prefers .advertised_start, then falls back to .start.
-        """
-        return course_metadata_utils.course_start_datetime_text(
-            self.start,
-            self.advertised_start,
-            format_string,
-            time_zone,
-            ugettext,
-            strftime_localized
-        )
 
     @property
     def start_date_is_still_default(self):
@@ -383,18 +466,6 @@ class CourseOverview(TimeStampedModel):
         return course_metadata_utils.course_start_date_is_default(
             self.start,
             self.advertised_start,
-        )
-
-    def end_datetime_text(self, format_string="SHORT_DATE", time_zone=utc):
-        """
-        Returns the end date or datetime for the course formatted as a string.
-
-        """
-        return course_metadata_utils.course_end_datetime_text(
-            self.end,
-            format_string,
-            time_zone,
-            strftime_localized
         )
 
     @property
@@ -441,7 +512,9 @@ class CourseOverview(TimeStampedModel):
         return course_metadata_utils.may_certify_for_course(
             self.certificates_display_behavior,
             self.certificates_show_before_end,
-            self.has_ended()
+            self.has_ended(),
+            self.certificate_available_date,
+            self.self_paced
         )
 
     @property
@@ -451,37 +524,54 @@ class CourseOverview(TimeStampedModel):
         """
         return json.loads(self._pre_requisite_courses_json)
 
-    @classmethod
-    def get_select_courses(cls, course_keys):
+    @pre_requisite_courses.setter
+    def pre_requisite_courses(self, value):
         """
-        Returns CourseOverview objects for the given course_keys.
+        Django requires there be a setter for this, but it is not
+        necessary for the way we currently use it. Due to the way
+        CourseOverviews are constructed raising errors here will
+        cause a lot of issues. These should not be mutable after
+        construction, so for now we just eat this.
         """
-        course_overviews = []
+        pass
 
-        log.info('Generating course overview for %d courses.', len(course_keys))
-        log.debug('Generating course overview(s) for the following courses: %s', course_keys)
+    @classmethod
+    def update_select_courses(cls, course_keys, force_update=False):
+        """
+        A side-effecting method that updates CourseOverview objects for
+        the given course_keys.
+
+        Arguments:
+            course_keys (list[CourseKey]): Identifies for which courses to
+                return CourseOverview objects.
+            force_update (boolean): Optional parameter that indicates
+                whether the requested CourseOverview objects should be
+                forcefully updated (i.e., re-synched with the modulestore).
+        """
+        log.info(u'Generating course overview for %d courses.', len(course_keys))
+        log.debug(u'Generating course overview(s) for the following courses: %s', course_keys)
+
+        action = CourseOverview.load_from_module_store if force_update else CourseOverview.get_from_id
 
         for course_key in course_keys:
             try:
-                course_overviews.append(CourseOverview.get_from_id(course_key))
+                action(course_key)
             except Exception as ex:  # pylint: disable=broad-except
                 log.exception(
-                    'An error occurred while generating course overview for %s: %s',
-                    unicode(course_key),
-                    ex.message,
+                    u'An error occurred while generating course overview for %s: %s',
+                    six.text_type(course_key),
+                    text_type(ex),
                 )
 
         log.info('Finished generating course overviews.')
 
-        return course_overviews
-
     @classmethod
-    def get_all_courses(cls, org=None, filter_=None):
+    def get_all_courses(cls, orgs=None, filter_=None):
         """
-        Returns all CourseOverview objects in the database.
+        Return a queryset containing all CourseOverview objects in the database.
 
         Arguments:
-            org (string): Optional parameter that allows case-insensitive
+            orgs (list[string]): Optional parameter that allows case-insensitive
                 filtering by organization.
             filter_ (dict): Optional parameter that allows custom filtering.
         """
@@ -490,11 +580,11 @@ class CourseOverview(TimeStampedModel):
         # created. For tests using CourseFactory, use emit_signals=True.
         course_overviews = CourseOverview.objects.all()
 
-        if org:
+        if orgs:
             # In rare cases, courses belonging to the same org may be accidentally assigned
             # an org code with a different casing (e.g., Harvardx as opposed to HarvardX).
-            # Case-insensitive exact matching allows us to deal with this kind of dirty data.
-            course_overviews = course_overviews.filter(org__iexact=org)
+            # Case-insensitive matching allows us to deal with this kind of dirty data.
+            course_overviews = course_overviews.filter(org__iregex=r'(' + '|'.join(orgs) + ')')
 
         if filter_:
             course_overviews = course_overviews.filter(**filter_)
@@ -506,10 +596,7 @@ class CourseOverview(TimeStampedModel):
         """
         Returns all course keys from course overviews.
         """
-        return [
-            CourseKey.from_string(course_overview['id'])
-            for course_overview in CourseOverview.objects.values('id')
-        ]
+        return CourseOverview.objects.values_list('id', flat=True)
 
     def is_discussion_tab_enabled(self):
         """
@@ -567,6 +654,15 @@ class CourseOverview(TimeStampedModel):
         """
         return 'self' if self.self_paced else 'instructor'
 
+    @property
+    def closest_released_language(self):
+        """
+        Returns the language code that most closely matches this course' language and is fully
+        supported by the LMS, or None if there are no fully supported languages that
+        match the target.
+        """
+        return get_closest_released_language(self.language) if self.language else None
+
     def apply_cdn_to_urls(self, image_urls):
         """
         Given a dict of resolutions -> urls, return a copy with CDN applied.
@@ -612,15 +708,17 @@ class CourseOverview(TimeStampedModel):
 
     def __unicode__(self):
         """Represent ourselves with the course key."""
-        return unicode(self.id)
+        return six.text_type(self.id)
 
 
 class CourseOverviewTab(models.Model):
     """
     Model for storing and caching tabs information of a course.
+
+    .. no_pii:
     """
     tab_id = models.CharField(max_length=50)
-    course_overview = models.ForeignKey(CourseOverview, db_index=True, related_name="tabs")
+    course_overview = models.ForeignKey(CourseOverview, db_index=True, related_name="tabs", on_delete=models.CASCADE)
 
 
 class CourseOverviewImageSet(TimeStampedModel):
@@ -690,17 +788,20 @@ class CourseOverviewImageSet(TimeStampedModel):
        process to do it, and it can happen in a follow-on PR if anyone is
        interested in extending this functionality.
 
+
+    .. no_pii:
     """
-    course_overview = models.OneToOneField(CourseOverview, db_index=True, related_name="image_set")
+    course_overview = models.OneToOneField(CourseOverview, db_index=True, related_name="image_set",
+                                           on_delete=models.CASCADE)
     small_url = models.TextField(blank=True, default="")
     large_url = models.TextField(blank=True, default="")
 
     @classmethod
-    def create_for_course(cls, course_overview, course=None):
+    def create(cls, course_overview, course=None):
         """
         Create thumbnail images for this CourseOverview.
 
-        This will save the CourseOverviewImageSet it creates before it returns.
+        This will save the CourseOverviewImageSet before it returns.
         """
         from openedx.core.lib.courses import create_course_image_thumbnail
 
@@ -716,7 +817,8 @@ class CourseOverviewImageSet(TimeStampedModel):
         if not course:
             course = modulestore().get_course(course_overview.id)
 
-        image_set = CourseOverviewImageSet(course_overview=course_overview)
+        image_set = cls(course_overview=course_overview)
+
         if course.course_image:
             # Try to create a thumbnails of the course image. If this fails for any
             # reason (weird format, non-standard URL, etc.), the URLs will default
@@ -727,7 +829,7 @@ class CourseOverviewImageSet(TimeStampedModel):
                 image_set.large_url = create_course_image_thumbnail(course, config.large)
             except Exception:  # pylint: disable=broad-except
                 log.exception(
-                    "Could not create thumbnail for course %s with image %s (small=%s), (large=%s)",
+                    u"Could not create thumbnail for course %s with image %s (small=%s), (large=%s)",
                     course.id,
                     course.course_image,
                     config.small,
@@ -769,6 +871,8 @@ class CourseOverviewImageConfig(ConfigurationModel):
     to take effect. You might want to do this if you're doing precise theming of
     your install of edx-platform... but really, you probably don't want to do this
     at all at the moment, given how new this is. :-P
+
+    .. no_pii:
     """
     # Small thumbnail, for things like the student dashboard
     small_width = models.IntegerField(default=375)

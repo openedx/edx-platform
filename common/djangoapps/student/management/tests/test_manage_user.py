@@ -1,13 +1,17 @@
 """
 Unit tests for user_management management commands.
 """
+from __future__ import absolute_import
+
 import itertools
 
 import ddt
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import Group, User
-from django.core.management import call_command, CommandError
+from django.core.management import CommandError, call_command
 from django.test import TestCase
+
+from openedx.core.djangoapps.user_api.accounts.utils import generate_password
 
 TEST_EMAIL = 'test@example.com'
 TEST_USERNAME = 'test-user'
@@ -55,7 +59,7 @@ class TestManageUserCommand(TestCase):
         """
         user = User.objects.create(username=TEST_USERNAME, email=TEST_EMAIL)
         self.assertEqual([(TEST_USERNAME, TEST_EMAIL)], [(u.username, u.email) for u in User.objects.all()])
-        user.set_password(User.objects.make_random_password())
+        user.set_password(generate_password())
         user.save()
 
         # Run once without passing --unusable-password and make sure the password is usable

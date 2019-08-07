@@ -1,36 +1,26 @@
+from __future__ import absolute_import
+
 import json
 import logging
-from smtplib import SMTPException
 import sys
 from functools import wraps
 
+import calc
+import crum
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.core.cache import caches
-from django.core.mail import send_mail
-from django.core.validators import ValidationError, validate_email
+from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseServerError
 from django.views.decorators.csrf import requires_csrf_token
 from django.views.defaults import server_error
-from django.http import (Http404, HttpResponse, HttpResponseNotAllowed,
-                         HttpResponseServerError, HttpResponseForbidden)
-import dogstats_wrapper as dog_stats_api
-import zendesk
-import calc
-
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from six.moves import map
 
-from opaque_keys.edx.keys import CourseKey
-
-from edxmako.shortcuts import render_to_response, render_to_string
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 import track.views
+from edxmako.shortcuts import render_to_response
 from student.roles import GlobalStaff
 
 log = logging.getLogger(__name__)
-
-DATADOG_FEEDBACK_METRIC = "lms_feedback_submissions"
-SUPPORT_BACKEND_ZENDESK = "support_ticket"
-SUPPORT_BACKEND_EMAIL = "email"
 
 
 def ensure_valid_course_key(view_func):
@@ -53,6 +43,26 @@ def ensure_valid_course_key(view_func):
     return inner
 
 
+def ensure_valid_usage_key(view_func):
+    """
+    This decorator should only be used with views which have argument usage_key_string.
+    If usage_key_string is not valid raise 404.
+    """
+    @wraps(view_func)
+    def inner(request, *args, **kwargs):  # pylint: disable=missing-docstring
+        usage_key = kwargs.get('usage_key_string')
+        if usage_key is not None:
+            try:
+                UsageKey.from_string(usage_key)
+            except InvalidKeyError:
+                raise Http404
+
+        response = view_func(request, *args, **kwargs)
+        return response
+
+    return inner
+
+
 def require_global_staff(func):
     """View decorator that requires that the user have global staff permissions. """
     @wraps(func)
@@ -66,6 +76,21 @@ def require_global_staff(func):
                 )
             )
     return login_required(wrapped)
+
+
+def fix_crum_request(func):
+    """
+    A decorator that ensures that the 'crum' package (a middleware that stores and fetches the current request in
+    thread-local storage) can correctly fetch the current request. Under certain conditions, the current request cannot
+    be fetched by crum (e.g.: when HTTP errors are raised in our views via 'raise Http404', et. al.). This decorator
+    manually sets the current request for crum if it cannot be fetched.
+    """
+    @wraps(func)
+    def wrapper(request, *args, **kwargs):
+        if not crum.get_current_request():
+            crum.set_current_request(request=request)
+        return func(request, *args, **kwargs)
+    return wrapper
 
 
 @requires_csrf_token
@@ -132,279 +157,11 @@ def calculate(request):
     try:
         result = calc.evaluator({}, {}, equation)
     except:
-        event = {'error': map(str, sys.exc_info()),
+        event = {'error': list(map(str, sys.exc_info())),
                  'equation': equation}
         track.views.server_track(request, 'error:calc', event, page='calc')
         return HttpResponse(json.dumps({'result': 'Invalid syntax'}))
     return HttpResponse(json.dumps({'result': str(result)}))
-
-
-class _ZendeskApi(object):
-
-    CACHE_PREFIX = 'ZENDESK_API_CACHE'
-    CACHE_TIMEOUT = 60 * 60
-
-    def __init__(self):
-        """
-        Instantiate the Zendesk API.
-
-        All of `ZENDESK_URL`, `ZENDESK_USER`, and `ZENDESK_API_KEY` must be set
-        in `django.conf.settings`.
-        """
-        self._zendesk_instance = zendesk.Zendesk(
-            settings.ZENDESK_URL,
-            settings.ZENDESK_USER,
-            settings.ZENDESK_API_KEY,
-            use_api_token=True,
-            api_version=2,
-            # As of 2012-05-08, Zendesk is using a CA that is not
-            # installed on our servers
-            client_args={"disable_ssl_certificate_validation": True}
-        )
-
-    def create_ticket(self, ticket):
-        """
-        Create the given `ticket` in Zendesk.
-
-        The ticket should have the format specified by the zendesk package.
-        """
-        ticket_url = self._zendesk_instance.create_ticket(data=ticket)
-        return zendesk.get_id_from_url(ticket_url)
-
-    def update_ticket(self, ticket_id, update):
-        """
-        Update the Zendesk ticket with id `ticket_id` using the given `update`.
-
-        The update should have the format specified by the zendesk package.
-        """
-        self._zendesk_instance.update_ticket(ticket_id=ticket_id, data=update)
-
-    def get_group(self, name):
-        """
-        Find the Zendesk group named `name`. Groups are cached for
-        CACHE_TIMEOUT seconds.
-
-        If a matching group exists, it is returned as a dictionary
-        with the format specifed by the zendesk package.
-
-        Otherwise, returns None.
-        """
-        cache = caches['default']
-        cache_key = '{prefix}_group_{name}'.format(prefix=self.CACHE_PREFIX, name=name)
-        cached = cache.get(cache_key)
-        if cached:
-            return cached
-        groups = self._zendesk_instance.list_groups()['groups']
-        for group in groups:
-            if group['name'] == name:
-                cache.set(cache_key, group, self.CACHE_TIMEOUT)
-                return group
-        return None
-
-
-def _record_feedback_in_zendesk(
-        realname,
-        email,
-        subject,
-        details,
-        tags,
-        additional_info,
-        group_name=None,
-        require_update=False,
-        support_email=None
-):
-    """
-    Create a new user-requested Zendesk ticket.
-
-    Once created, the ticket will be updated with a private comment containing
-    additional information from the browser and server, such as HTTP headers
-    and user state. Returns a boolean value indicating whether ticket creation
-    was successful, regardless of whether the private comment update succeeded.
-
-    If `group_name` is provided, attaches the ticket to the matching Zendesk group.
-
-    If `require_update` is provided, returns False when the update does not
-    succeed. This allows using the private comment to add necessary information
-    which the user will not see in followup emails from support.
-    """
-    zendesk_api = _ZendeskApi()
-
-    additional_info_string = (
-        u"Additional information:\n\n" +
-        u"\n".join(u"%s: %s" % (key, value) for (key, value) in additional_info.items() if value is not None)
-    )
-
-    # Tag all issues with LMS to distinguish channel in Zendesk; requested by student support team
-    zendesk_tags = list(tags.values()) + ["LMS"]
-
-    # Per edX support, we would like to be able to route white label feedback items
-    # via tagging
-    white_label_org = configuration_helpers.get_value('course_org_filter')
-    if white_label_org:
-        zendesk_tags = zendesk_tags + ["whitelabel_{org}".format(org=white_label_org)]
-
-    new_ticket = {
-        "ticket": {
-            "requester": {"name": realname, "email": email},
-            "subject": subject,
-            "comment": {"body": details},
-            "tags": zendesk_tags
-        }
-    }
-    group = None
-    if group_name is not None:
-        group = zendesk_api.get_group(group_name)
-        if group is not None:
-            new_ticket['ticket']['group_id'] = group['id']
-    if support_email is not None:
-        # If we do not include the `recipient` key here, Zendesk will default to using its default reply
-        # email address when support agents respond to tickets. By setting the `recipient` key here,
-        # we can ensure that WL site users are responded to via the correct Zendesk support email address.
-        new_ticket['ticket']['recipient'] = support_email
-    try:
-        ticket_id = zendesk_api.create_ticket(new_ticket)
-        if group_name is not None and group is None:
-            # Support uses Zendesk groups to track tickets. In case we
-            # haven't been able to correctly group this ticket, log its ID
-            # so it can be found later.
-            log.warning('Unable to find group named %s for Zendesk ticket with ID %s.', group_name, ticket_id)
-    except zendesk.ZendeskError:
-        log.exception("Error creating Zendesk ticket")
-        return False
-
-    # Additional information is provided as a private update so the information
-    # is not visible to the user.
-    ticket_update = {"ticket": {"comment": {"public": False, "body": additional_info_string}}}
-    try:
-        zendesk_api.update_ticket(ticket_id, ticket_update)
-    except zendesk.ZendeskError:
-        log.exception("Error updating Zendesk ticket with ID %s.", ticket_id)
-        # The update is not strictly necessary, so do not indicate
-        # failure to the user unless it has been requested with
-        # `require_update`.
-        if require_update:
-            return False
-    return True
-
-
-def _record_feedback_in_datadog(tags):
-    datadog_tags = [u"{k}:{v}".format(k=k, v=v) for k, v in tags.items()]
-    dog_stats_api.increment(DATADOG_FEEDBACK_METRIC, tags=datadog_tags)
-
-
-def get_feedback_form_context(request):
-    """
-    Extract the submitted form fields to be used as a context for
-    feedback submission.
-    """
-    context = {}
-
-    context["subject"] = request.POST["subject"]
-    context["details"] = request.POST["details"]
-    context["tags"] = dict(
-        [(tag, request.POST[tag]) for tag in ["issue_type", "course_id"] if tag in request.POST]
-    )
-
-    context["additional_info"] = {}
-
-    if request.user.is_authenticated():
-        context["realname"] = request.user.profile.name
-        context["email"] = request.user.email
-        context["additional_info"]["username"] = request.user.username
-    else:
-        context["realname"] = request.POST["name"]
-        context["email"] = request.POST["email"]
-
-    for header, pretty in [("HTTP_REFERER", "Page"), ("HTTP_USER_AGENT", "Browser"), ("REMOTE_ADDR", "Client IP"),
-                           ("SERVER_NAME", "Host")]:
-        context["additional_info"][pretty] = request.META.get(header)
-
-    context["support_email"] = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
-
-    return context
-
-
-def submit_feedback(request):
-    """
-    Create a Zendesk ticket or if not available, send an email with the
-    feedback form fields.
-
-    If feedback submission is not enabled, any request will raise `Http404`.
-    If any configuration parameter (`ZENDESK_URL`, `ZENDESK_USER`, or
-    `ZENDESK_API_KEY`) is missing, any request will raise an `Exception`.
-    The request must be a POST request specifying `subject` and `details`.
-    If the user is not authenticated, the request must also specify `name` and
-    `email`. If the user is authenticated, the `name` and `email` will be
-    populated from the user's information. If any required parameter is
-    missing, a 400 error will be returned indicating which field is missing and
-    providing an error message. If Zendesk ticket creation fails, 500 error
-    will be returned with no body; if ticket creation succeeds, an empty
-    successful response (200) will be returned.
-    """
-    if not settings.FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
-        raise Http404()
-    if request.method != "POST":
-        return HttpResponseNotAllowed(["POST"])
-
-    def build_error_response(status_code, field, err_msg):
-        return HttpResponse(json.dumps({"field": field, "error": err_msg}), status=status_code)
-
-    required_fields = ["subject", "details"]
-
-    if not request.user.is_authenticated():
-        required_fields += ["name", "email"]
-
-    required_field_errs = {
-        "subject": "Please provide a subject.",
-        "details": "Please provide details.",
-        "name": "Please provide your name.",
-        "email": "Please provide a valid e-mail.",
-    }
-    for field in required_fields:
-        if field not in request.POST or not request.POST[field]:
-            return build_error_response(400, field, required_field_errs[field])
-
-    if not request.user.is_authenticated():
-        try:
-            validate_email(request.POST["email"])
-        except ValidationError:
-            return build_error_response(400, "email", required_field_errs["email"])
-
-    success = False
-    context = get_feedback_form_context(request)
-    support_backend = configuration_helpers.get_value('CONTACT_FORM_SUBMISSION_BACKEND', SUPPORT_BACKEND_ZENDESK)
-
-    if support_backend == SUPPORT_BACKEND_EMAIL:
-        try:
-            send_mail(
-                subject=render_to_string('emails/contact_us_feedback_email_subject.txt', context),
-                message=render_to_string('emails/contact_us_feedback_email_body.txt', context),
-                from_email=context["support_email"],
-                recipient_list=[context["support_email"]],
-                fail_silently=False
-            )
-            success = True
-        except SMTPException:
-            log.exception('Error sending feedback to contact_us email address.')
-            success = False
-
-    else:
-        if not settings.ZENDESK_URL or not settings.ZENDESK_USER or not settings.ZENDESK_API_KEY:
-            raise Exception("Zendesk enabled but not configured")
-
-        success = _record_feedback_in_zendesk(
-            context["realname"],
-            context["email"],
-            context["subject"],
-            context["details"],
-            context["tags"],
-            context["additional_info"],
-            support_email=context["support_email"]
-        )
-
-    _record_feedback_in_datadog(context["tags"])
-
-    return HttpResponse(status=(200 if success else 500))
 
 
 def info(request):

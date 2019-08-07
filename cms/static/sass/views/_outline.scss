@@ -5,12 +5,12 @@
 // --------------------
 %outline-item-header {
   @include clearfix();
+
   line-height: 0;
 
   // CASE: is-editable
   // TODO: abstract out
   .is-editable {
-
     .incontext-editor-value, .incontext-editor-action-wrapper {
       vertical-align: top;
     }
@@ -21,7 +21,8 @@
 
     .incontext-editor-open-action {
       @include transition(opacity $tmg-f1 ease-in-out 0);
-      opacity: 0.0;
+
+      opacity: 0;
     }
 
     .incontext-editor-form {
@@ -33,6 +34,7 @@
     // TOOD: abstract this out into a Sass placeholder
     .incontext-editor-input {
       @include transition(box-shadow $tmg-f1 ease-in-out 0, color $tmg-f1 ease-in-out 0);
+
       width: 100%;
       background: none repeat scroll 0 0 $white;
       border: 0;
@@ -40,16 +42,16 @@
 
       // STATE: focus
       &:focus {
-        box-shadow: 0 0 2px 2px rgba($ui-action-primary-color-focus, 0.50) inset;
+        box-shadow: 0 0 2px 2px rgba($ui-action-primary-color-focus, 0.5) inset;
         color: $ui-action-primary-color-focus;
       }
     }
 
     // STATE: hover/focus
-    &:hover, &:focus {
-
+    &:hover,
+    &:focus {
       .incontext-editor-open-action {
-        opacity: 1.0;
+        opacity: 1;
       }
     }
   }
@@ -91,7 +93,6 @@
 
     // STATE: action will collapse all
     &.collapse-all {
-
       .expand-all {
         display: none;
       }
@@ -103,7 +104,6 @@
 
     // STATE: action will expand all
     &.expand-all {
-
       .collapse-all {
         display: none;
       }
@@ -121,6 +121,7 @@
   .new-section-name,
   .new-subsection-name-input {
     @extend %t-copy-base;
+
     display: inline-block;
     width: 515px;
     padding: ($baseline/4);
@@ -130,9 +131,11 @@
   .new-subsection-name-input {
     @extend %t-copy-sub1;
   }
+
   .new-section-name-save,
   .new-subsection-name-save {
     @include blue-button();
+
     margin: 0 5px;
     padding: 4px 20px 7px;
     color: $white;
@@ -141,6 +144,7 @@
   .new-section-name-cancel,
   .new-subsection-name-cancel {
     @include white-button();
+
     padding: 4px 20px 7px;
     color: $gray-l1;
   }
@@ -149,6 +153,7 @@
   .new-subsection-item,
   .new-unit-item {
     @extend %ui-btn-flat-outline;
+
     width: 100%;
     margin: 0 0 ($baseline/2) 0;
     border: 1px solid $gray-l3;
@@ -166,7 +171,6 @@
     margin-right: ($baseline*1.5);
   }
 
-
   // UI: general action list styles (section and subsection)
   // --------------------
   .expand-collapse {
@@ -179,44 +183,69 @@
     margin-bottom: $baseline;
 
     .status-release,
-    .status-pacing {
+    .status-highlights-enabled,
+    .status-studio-frontend {
       @extend %t-copy-base;
+
       display: inline-block;
       color: $color-copy-base;
+      margin-right: ($baseline/2);
 
       // STATE: hover
       &:hover {
         .status-actions {
-          opacity: 1.0;
+          opacity: 1;
         }
       }
     }
 
+    .status-highlights-enabled {
+      vertical-align: top;
+    }
+
     .status-release-label,
     .status-release-value,
-    .status-pacing-label,
-    .status-pacing-value,
+    .status-highlights-enabled-label,
+    .status-highlights-enabled-value,
+    .status-highlights-enabled-info,
     .status-actions {
       display: inline-block;
       vertical-align: middle;
       margin-bottom: 0;
     }
 
-    .status-release-label,
-    .status-pacing-label {
-      margin-right: ($baseline/4);
+    .status-release-value,
+    .status-highlights-enabled-value {
+      @extend %t-strong;
+
+      font-size: smaller;
     }
 
-    .status-release-value,
-    .status-pacing-value {
-      @extend %t-strong;
+    .status-highlights-enabled-info {
+      font-size: smaller;
+      margin-left: $baseline / 2;
+    }
+
+    .status-release-label,	
+    .status-highlights-enabled-label {	
+      margin-right: ($baseline/4);	
+    }
+
+    .status-highlights-enabled-value.button {
+      @extend %btn-primary-blue;
+      @extend %sizing;
+
+      padding: 5px 8px;
+      margin-top: 2px;
     }
 
     .status-actions {
       @extend %actions-list;
+
       @include transition(opacity $tmg-f1 ease-in-out 0);
+
       margin-left: ($baseline/4);
-      opacity: 0.0;
+      opacity: 0;
     }
   }
 
@@ -230,7 +259,6 @@
 
   // UI: complex version of the outline
   .outline-complex {
-
     .outline-content {
       margin-top: 0;
     }
@@ -274,7 +302,7 @@
 
       // STATE: drag and drop
       .drop-target-prepend .draggable-drop-indicator-initial {
-        opacity: 1.0;
+        opacity: 1;
       }
 
       // STATE: was dropped
@@ -300,6 +328,7 @@
 
       .section-header-details {
         @include float(left);
+
         width: flex-grid(6, 9);
 
         .icon, .wrapper-section-title {
@@ -317,10 +346,10 @@
         }
 
         .action-edit.action-inline {
-
           .icon {
             @include margin-right(0);
             @include transform(none);
+
             vertical-align: middle;
           }
         }
@@ -328,8 +357,10 @@
 
       .section-header-actions {
         @include float(right);
+
         width: flex-grid(3, 9);
         margin-top: -($baseline/4);
+
         @include text-align(right);
 
         .actions-list {
@@ -359,13 +390,13 @@
 
         .ui-toggle-expansion {
           @extend %t-icon3;
+
           color: $gray-l3;
         }
       }
 
       // STATE: is-collapsed
       &.is-collapsed {
-
         .section-content {
           @extend %outline-item-content-hidden;
         }
@@ -397,7 +428,8 @@
 
       .subsection-header-details {
         @include float(left);
-        width: flex-grid(6, 9);
+
+        width: flex-grid(5, 9);
 
         .icon, .wrapper-subsection-title {
           display: inline-block;
@@ -415,9 +447,9 @@
         }
 
         .action-edit.action-inline {
-
           .icon {
             @include transform(none);
+
             margin-right: 0;
             vertical-align: middle;
           }
@@ -426,14 +458,21 @@
 
       .subsection-header-actions {
         @include float(right);
-        width: flex-grid(3, 9);
+
+        width: flex-grid(4, 9);
         margin-top: -($baseline/4);
+
         @include text-align(right);
 
         .actions-list {
           @extend %actions-list;
           @extend %t-action2;
+
           margin-right: ($baseline/2);
+
+          .proctoring-configuration-button {
+            @extend %ui-btn-flat-outline;
+          }
         }
       }
 
@@ -458,13 +497,13 @@
 
         .ui-toggle-expansion {
           @extend %t-icon4;
+
           color: $gray-l3;
         }
       }
 
       // STATE: is-collapsed
       &.is-collapsed {
-
         .subsection-content {
           @extend %outline-item-content-hidden;
         }
@@ -479,6 +518,7 @@
 
     .outline-unit {
       @include transition(margin $tmg-f2 linear 0s); // needed for drag and drop transitions
+
       margin-left: $outline-indent-width;
 
       // header
@@ -488,14 +528,17 @@
 
       .unit-header-details {
         @include float(left);
+
         width: flex-grid(6, 9);
         margin-top: ($baseline/4);
       }
 
       .unit-header-actions {
         @include float(right);
+
         width: flex-grid(3, 9);
         margin-top: -($baseline/10);
+
         @include text-align(right);
 
         .actions-list {
@@ -511,12 +554,14 @@
 
       .button-new {
         @extend %ui-btn-flat-outline;
+
         padding: ($baseline/2) $baseline;
         display: block;
 
         .icon {
           display: inline-block;
           vertical-align: middle;
+
           @include margin-right($baseline/2);
         }
       }
@@ -539,7 +584,6 @@
   // UI: drag and drop: section
   // --------------------
   .outline-section {
-
     .ui-splint-indicator {
       height: ($baseline/10);
       margin-left: ($baseline/4);
@@ -558,7 +602,6 @@
 
   // UI: drag and drop: subsection
   .outline-subsection {
-
     .ui-splint-indicator {
       height: ($baseline/10);
       margin-left: ($baseline*1.25);
@@ -575,7 +618,6 @@
 
   // // UI: drag and drop: unit
   .outline-unit {
-
     .draggable-drop-indicator-before {
       top: -($baseline*0.75);
     }
@@ -591,14 +633,17 @@
 
     .draggable-drop-indicator {
       @extend %ui-depth3;
+
       @include transition(opacity $tmg-f2 linear 0s);
       @include size(100%, auto);
+
       position: absolute;
       border-top: 1px solid $blue-l1;
-      opacity: 0.0;
+      opacity: 0;
 
       .fa-caret-right {
         @extend %t-icon5;
+
         position: absolute;
         top: -12px;
         left: -($baseline/4);
@@ -615,14 +660,54 @@
     }
   }
 
+  // outline: highlight settings
+  .highlights-button {
+    cursor: pointer;
+    color: theme-color("primary");
+
+    // remove button styling
+    border: none;
+    background: none;
+    padding: 0;
+    font-weight: 600;
+  }
+
+  .number-highlights {
+    background: theme-color("primary");
+    border-radius: 50%;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    color: $white;
+    display: inline-block;
+    font-weight: bold;
+    line-height: 18px;
+    margin-right: 2px;
+    text-align: center;
+    width: 18px;
+  }
+
+  .highlights-section-modal {
+    .highlight-input-text {
+      width: 100%;
+      margin-bottom: ($baseline/4);
+      margin-top: ($baseline/4);
+    }
+
+    .highlight-input-label {
+      font-weight: 600;
+    }
+
+    .highlights-info {
+      font-size: smaller;
+    }
+  }
+
   // outline: edit item settings
   .wrapper-modal-window-bulkpublish-section,
   .wrapper-modal-window-bulkpublish-subsection,
   .wrapper-modal-window-bulkpublish-unit,
   .course-outline-modal {
-
     .list-fields {
-
       .field {
         display: inline-block;
         vertical-align: top;
@@ -637,7 +722,9 @@
 
         label {
           @extend %t-copy-sub1;
+
           @include transition(color $tmg-f3 ease-in-out 0s);
+
           margin: 0 0 ($baseline/4) 0;
           font-weight: 600;
 
@@ -649,7 +736,9 @@
 
         input, textarea {
           @extend %t-copy-base;
+
           @include transition(all $tmg-f2 ease-in-out 0s);
+
           height: 100%;
           width: 100%;
           padding: ($baseline/2);
@@ -676,7 +765,6 @@
 
       // CASE: select input
       .field-select {
-
         .label, .input {
           display: inline-block;
           vertical-align: middle;
@@ -693,7 +781,6 @@
     }
 
     .edit-settings-grading {
-
       .grading-type {
         margin-bottom: $baseline;
       }
@@ -704,11 +791,6 @@
   .bulkpublish-section-modal,
   .bulkpublish-subsection-modal,
   .bulkpublish-unit-modal {
-
-    .modal-introduction {
-      color: $gray-d2;
-    }
-
     .modal-section .outline-bulkpublish {
       max-height: ($baseline*20);
       overflow-y: auto;
@@ -727,6 +809,7 @@
 
     .outline-subsection .subsection-title {
       @extend %t-title8;
+
       margin-bottom: ($baseline/4);
       font-weight: 600;
       color: $gray-l2;
@@ -740,11 +823,13 @@
 
     .outline-unit .unit-title {
       @extend %t-title7;
+
       color: $color-heading-base;
     }
 
     .outline-unit .unit-status {
       @extend %t-copy-sub2;
+
       text-align: right;
     }
 

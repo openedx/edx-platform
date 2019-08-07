@@ -1,28 +1,28 @@
 """ Commerce API v1 view tests. """
-from datetime import datetime, timedelta
+from __future__ import absolute_import
+
 import itertools
 import json
+from datetime import datetime, timedelta
 
 import ddt
+import pytz
+import six
 from django.conf import settings
 from django.contrib.auth.models import Permission
-from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
-from edx_rest_api_client import exceptions
-from flaky import flaky
-from nose.plugins.attrib import attr
-import pytz
+from django.urls import reverse, reverse_lazy
 from rest_framework.utils.encoders import JSONEncoder
+
+from course_modes.models import CourseMode
+from lms.djangoapps.verify_student.models import VerificationDeadline
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from commerce.tests import TEST_API_URL, TEST_API_SIGNING_KEY
-from commerce.tests.mocks import mock_order_endpoint
-from commerce.tests.test_views import UserMixin
-from course_modes.models import CourseMode
-from student.tests.factories import UserFactory
-from lms.djangoapps.verify_student.models import VerificationDeadline
+from ....tests.mocks import mock_order_endpoint
+from ....tests.test_views import UserMixin
 
 PASSWORD = 'test'
 JSON_CONTENT_TYPE = 'application/json'
@@ -75,8 +75,8 @@ class CourseApiViewTestMixin(object):
         verification_deadline = verification_deadline or VerificationDeadline.deadline_for_course(course.id)
 
         return {
-            u'id': unicode(course.id),
-            u'name': unicode(course.display_name),
+            u'id': six.text_type(course.id),
+            u'name': six.text_type(course.display_name),
             u'verification_deadline': cls._serialize_datetime(verification_deadline),
             u'modes': [cls._serialize_course_mode(mode) for mode in modes]
         }
@@ -84,7 +84,7 @@ class CourseApiViewTestMixin(object):
 
 class CourseListViewTests(CourseApiViewTestMixin, ModuleStoreTestCase):
     """ Tests for CourseListView. """
-    path = reverse('commerce_api:v1:courses:list')
+    path = reverse_lazy('commerce_api:v1:courses:list')
 
     def test_authentication_required(self):
         """ Verify only authenticated users can access the view. """
@@ -104,14 +104,18 @@ class CourseListViewTests(CourseApiViewTestMixin, ModuleStoreTestCase):
         self.assertListEqual(actual, expected)
 
 
-@attr(shard=3)
 @ddt.ddt
 class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase):
     """ Tests for CourseRetrieveUpdateView. """
+    NOW = 'now'
+    DATES = {
+        NOW: datetime.now(),
+        None: None,
+    }
 
     def setUp(self):
         super(CourseRetrieveUpdateViewTests, self).setUp()
-        self.path = reverse('commerce_api:v1:courses:retrieve_update', args=[unicode(self.course.id)])
+        self.path = reverse('commerce_api:v1:courses:retrieve_update', args=[six.text_type(self.course.id)])
         self.user = UserFactory.create()
         self.client.login(username=self.user.username, password=PASSWORD)
 
@@ -127,8 +131,9 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
 
     @ddt.data('post', 'put')
     def test_authorization_required(self, method):
-        self.user.user_permissions.clear()
         """ Verify create/edit operations require appropriate permissions. """
+        self.user.user_permissions.clear()
+
         response = getattr(self.client, method)(self.path, content_type=JSON_CONTENT_TYPE)
         self.assertEqual(response.status_code, 403)
 
@@ -164,7 +169,6 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
 
         return response, expected
 
-    @flaky  # TODO This test will fail if one of the timestamps (in actual or expected) ends in .000
     def test_update(self):
         """ Verify the view supports updating a course. """
         # Sanity check: Ensure no verification deadline is set
@@ -236,6 +240,32 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         self.assertEqual(response.status_code, 200)
         self.assertIsNone(VerificationDeadline.deadline_for_course(self.course.id))
 
+    def test_update_verification_deadline_left_alone(self):
+        """
+        When the course's verification deadline is set and an update request doesn't
+        include it, we should take no action on it.
+        """
+        verification_deadline = datetime(year=1915, month=5, day=7, tzinfo=pytz.utc)
+        response, __ = self._get_update_response_and_expected_data(None, verification_deadline)
+        self.assertEqual(VerificationDeadline.deadline_for_course(self.course.id), verification_deadline)
+
+        verified_mode = CourseMode(
+            mode_slug=u'verified',
+            min_price=200,
+            currency=u'USD',
+            sku=u'ABC123',
+            bulk_sku=u'BULK-ABC123',
+            expiration_datetime=None
+        )
+        updated_data = self._serialize_course(self.course, [verified_mode], None)
+        # don't include the verification_deadline key in the PUT request
+        updated_data.pop('verification_deadline', None)
+
+        response = self.client.put(self.path, json.dumps(updated_data), content_type=JSON_CONTENT_TYPE)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(VerificationDeadline.deadline_for_course(self.course.id), verification_deadline)
+
     def test_remove_upgrade_deadline(self):
         """
         Verify that course mode upgrade deadlines can be removed through the API.
@@ -257,34 +287,55 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         self.assertIsNone(updated_verified_mode.expiration_datetime)
 
     def test_update_overwrite(self):
-        """ Verify that data submitted via PUT overwrites/deletes modes that are
-        not included in the body of the request. """
-        course_id = unicode(self.course.id)
-        expected_course_mode = CourseMode(
+        """
+        Verify that data submitted via PUT overwrites/deletes modes that are
+        not included in the body of the request, EXCEPT the Masters mode,
+        which it leaves alone.
+        """
+        existing_mode = self.course_mode
+        existing_masters_mode = CourseMode.objects.create(
+            course_id=self.course.id,
+            mode_slug=u'masters',
+            min_price=10000,
+            currency=u'USD',
+            sku=u'DEF456',
+            bulk_sku=u'BULK-DEF456'
+        )
+        new_mode = CourseMode(
+            course_id=self.course.id,
             mode_slug=u'credit',
             min_price=500,
             currency=u'USD',
             sku=u'ABC123',
             bulk_sku=u'BULK-ABC123'
         )
-        expected = self._serialize_course(self.course, [expected_course_mode])
-        path = reverse('commerce_api:v1:courses:retrieve_update', args=[course_id])
-        response = self.client.put(path, json.dumps(expected), content_type=JSON_CONTENT_TYPE)
-        self.assertEqual(response.status_code, 200)
-        actual = json.loads(response.content)
-        self.assertEqual(actual, expected)
 
-        # The existing CourseMode should have been removed.
-        self.assertFalse(CourseMode.objects.filter(id=self.course_mode.id).exists())
+        path = reverse('commerce_api:v1:courses:retrieve_update', args=[six.text_type(self.course.id)])
+        data = json.dumps(self._serialize_course(self.course, [new_mode]))
+        response = self.client.put(path, data, content_type=JSON_CONTENT_TYPE)
+        self.assertEqual(response.status_code, 200)
+
+        # Check modes list in response, disregarding its order.
+        expected_dict = self._serialize_course(self.course, [new_mode])
+        expected_items = expected_dict['modes']
+        actual_items = json.loads(response.content)['modes']
+        self.assertCountEqual(actual_items, expected_items)
+
+        # The existing non-Masters CourseMode should have been removed.
+        self.assertFalse(CourseMode.objects.filter(id=existing_mode.id).exists())
+
+        # The existing Masters course mode should remain.
+        self.assertTrue(CourseMode.objects.filter(id=existing_masters_mode.id).exists())
 
     @ddt.data(*itertools.product(
         ('honor', 'audit', 'verified', 'professional', 'no-id-professional'),
-        (datetime.now(), None),
+        (NOW, None),
     ))
     @ddt.unpack
-    def test_update_professional_expiration(self, mode_slug, expiration_datetime):
+    def test_update_professional_expiration(self, mode_slug, expiration_datetime_name):
         """ Verify that pushing a mode with a professional certificate and an expiration datetime
         will be rejected (this is not allowed). """
+        expiration_datetime = self.DATES[expiration_datetime_name]
         mode = self._serialize_course_mode(
             CourseMode(
                 mode_slug=mode_slug,
@@ -295,7 +346,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
                 expiration_datetime=expiration_datetime
             )
         )
-        course_id = unicode(self.course.id)
+        course_id = six.text_type(self.course.id)
         payload = {u'id': course_id, u'modes': [mode]}
         path = reverse('commerce_api:v1:courses:retrieve_update', args=[course_id])
 
@@ -323,7 +374,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
             )
         ]
         expected = self._serialize_course(course, expected_modes)
-        path = reverse('commerce_api:v1:courses:retrieve_update', args=[unicode(course.id)])
+        path = reverse('commerce_api:v1:courses:retrieve_update', args=[six.text_type(course.id)])
 
         response = self.client.put(path, json.dumps(expected), content_type=JSON_CONTENT_TYPE, **request_kwargs)
         self.assertEqual(response.status_code, 201)
@@ -369,13 +420,13 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         course_key = 'non/existing/key'
 
         course_dict = {
-            u'id': unicode(course_key),
-            u'name': unicode('Non Existing Course'),
+            u'id': six.text_type(course_key),
+            u'name': six.text_type('Non Existing Course'),
             u'verification_deadline': None,
             u'modes': [self._serialize_course_mode(mode) for mode in expected_modes]
         }
 
-        path = reverse('commerce_api:v1:courses:retrieve_update', args=[unicode(course_key)])
+        path = reverse('commerce_api:v1:courses:retrieve_update', args=[six.text_type(course_key)])
 
         response = self.client.put(path, json.dumps(course_dict), content_type=JSON_CONTENT_TYPE)
         self.assertEqual(response.status_code, 400)
@@ -390,14 +441,12 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         self.assertDictEqual(expected_dict, json.loads(response.content))
 
 
-@attr(shard=1)
-@override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
 class OrderViewTests(UserMixin, TestCase):
     """ Tests for the basket order view. """
     view_name = 'commerce_api:v1:orders:detail'
     ORDER_NUMBER = 'EDX-100001'
     MOCK_ORDER = {'number': ORDER_NUMBER}
-    path = reverse(view_name, kwargs={'number': ORDER_NUMBER})
+    path = reverse_lazy(view_name, kwargs={'number': ORDER_NUMBER})
 
     def setUp(self):
         super(OrderViewTests, self).setUp()
@@ -414,12 +463,12 @@ class OrderViewTests(UserMixin, TestCase):
 
     def test_order_not_found(self):
         """ If the order is not found, the view should return a 404. """
-        with mock_order_endpoint(order_number=self.ORDER_NUMBER, exception=exceptions.HttpNotFoundError):
+        with mock_order_endpoint(order_number=self.ORDER_NUMBER, status=404):
             response = self.client.get(self.path)
         self.assertEqual(response.status_code, 404)
 
     def test_login_required(self):
-        """ The view should return 403 if the user is not logged in. """
+        """ The view should return 401 if the user is not logged in. """
         self.client.logout()
         response = self.client.get(self.path)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)

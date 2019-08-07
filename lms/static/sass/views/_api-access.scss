@@ -1,20 +1,24 @@
 #api-access-wrapper {
-
   h1 {
     @extend %t-title4;
+
     margin-bottom: 0;
     padding: $baseline;
+
     @include text-align(left);
   }
 
   h2 {
     @extend %t-title5;
+
     margin: $baseline;
+
     @include text-align(left);
   }
 
   p {
     @extend %t-copy-sub1;
+
     margin: $baseline;
   }
 
@@ -47,10 +51,10 @@
 
   .api-form-container {
     @include float(left);
+
     width: 50%;
 
     .api-form {
-
       padding: 0 $baseline $baseline $baseline;
 
       p {
@@ -58,12 +62,14 @@
 
         .helptext {
           @extend %t-copy-sub1;
+
           display: block;
         }
       }
 
       label {
         @extend %t-copy-base;
+
         display: block;
         font-style: normal;
       }
@@ -74,6 +80,7 @@
 
       input, textarea {
         @extend %t-copy-base;
+
         font-family: 'Open Sans';
         font-style: normal;
         width: 300px;
@@ -81,11 +88,13 @@
         &[type=checkbox] {
           display: inline-block;
           width: initial;
+
           @include margin-right(0.5*$baseline);
         }
 
         &[type=submit] {
           @extend %t-copy-base;
+
           border-radius: 3px;
           border: none;
           background-color: $blue;
@@ -97,12 +106,12 @@
       }
 
       .errorlist {
-
         padding: 0;
         list-style-type: none;
 
         li {
           @extend %t-copy-base;
+
           margin: 0;
           color: $red;
         }
@@ -110,6 +119,7 @@
 
       #api-access-submit, .preview-query {
         @extend %t-copy-base;
+
         border-radius: 3px;
         border: none;
         background-color: $blue;
@@ -123,6 +133,7 @@
 
   .preview-results {
     @include float(right);
+
     width: 50%;
   }
 
@@ -136,6 +147,7 @@
 
     p {
       @extend %t-copy-base;
+
       margin: $baseline/2 0;
 
       .application-label {

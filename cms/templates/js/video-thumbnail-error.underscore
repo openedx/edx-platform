@@ -1,0 +1,4 @@
+<div class="thumbnail-error-wrapper thumbnail-error" data-video-id="<%- videoId %>">
+    <span class="icon fa fa-exclamation-triangle" aria-hidden="true"></span>
+    <span class="action-text"><%- errorText %></span>
+</div>

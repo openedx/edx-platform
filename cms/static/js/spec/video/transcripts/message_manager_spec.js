@@ -1,11 +1,11 @@
 define(
     [
-        'jquery', 'underscore',
+        'jquery', 'underscore', 'backbone',
         'js/views/video/transcripts/utils', 'js/views/video/transcripts/message_manager',
         'js/views/video/transcripts/file_uploader', 'sinon',
         'xmodule'
     ],
-function($, _, Utils, MessageManager, FileUploader, sinon) {
+function($, _, Backbone, Utils, MessageManager, FileUploader, sinon) {
     'use strict';
 
     describe('Transcripts.MessageManager', function() {
@@ -61,8 +61,7 @@ function($, _, Utils, MessageManager, FileUploader, sinon) {
             expect(fileUploader.initialize).toHaveBeenCalledWith({
                 el: view.$el,
                 messenger: view,
-                component_locator: view.component_locator,
-                videoListObject: view.options.parent
+                component_locator: view.component_locator
             });
         });
 
@@ -185,12 +184,14 @@ function($, _, Utils, MessageManager, FileUploader, sinon) {
             };
 
             it('Invoke without extraParamas', function(done) {
+                spyOn(Backbone, 'trigger');
+
                 sinonXhr.respondWith([
                     200,
                     {'Content-Type': 'application/json'},
                     JSON.stringify({
                         status: 'Success',
-                        subs: 'video_id'
+                        edx_video_id: 'video_id'
                     })
                 ]);
 
@@ -203,20 +204,22 @@ function($, _, Utils, MessageManager, FileUploader, sinon) {
                             void(0)
                         );
                         expect(view.showError).not.toHaveBeenCalled();
-                        expect(view.render.calls.mostRecent().args[0])
-                            .toEqual('found');
-                        expect(Utils.Storage.set).toHaveBeenCalled();
+                        expect(view.render.calls.mostRecent().args[0]).toEqual('found');
+                        expect(Backbone.trigger)
+                            .toHaveBeenCalledWith('transcripts:basicTabUpdateEdxVideoId', 'video_id');
                     })
                     .always(done);
             });
 
             it('Invoke with extraParamas', function(done) {
+                spyOn(Backbone, 'trigger');
+
                 sinonXhr.respondWith([
                     200,
                     {'Content-Type': 'application/json'},
                     JSON.stringify({
                         status: 'Success',
-                        subs: 'video_id'
+                        edx_video_id: 'video_id'
                     })
                 ]);
 
@@ -234,7 +237,8 @@ function($, _, Utils, MessageManager, FileUploader, sinon) {
                         );
                         expect(view.showError).not.toHaveBeenCalled();
                         expect(view.render.calls.mostRecent().args[0]).toEqual('found');
-                        expect(Utils.Storage.set).toHaveBeenCalled();
+                        expect(Backbone.trigger)
+                            .toHaveBeenCalledWith('transcripts:basicTabUpdateEdxVideoId', 'video_id');
                     })
                     .always(done);
             });

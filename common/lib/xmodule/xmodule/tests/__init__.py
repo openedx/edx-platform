@@ -7,6 +7,8 @@ Run like this:
 
 """
 
+from __future__ import absolute_import
+
 import inspect
 import json
 import os
@@ -14,24 +16,24 @@ import pprint
 import sys
 import traceback
 import unittest
-
 from contextlib import contextmanager, nested
 from functools import wraps
-from lazy import lazy
-from mock import Mock, patch
-from operator import attrgetter
-from path import Path as path
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+import six
+from django.test import TestCase
+from mock import Mock
+from opaque_keys.edx.keys import CourseKey
+from path import Path as path
+from six import text_type
 from xblock.field_data import DictFieldData
-from xblock.fields import ScopeIds, Scope, Reference, ReferenceList, ReferenceValueDict
+from xblock.fields import Reference, ReferenceList, ReferenceValueDict, ScopeIds
+
 from xmodule.assetstore import AssetMetadata
 from xmodule.error_module import ErrorDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES, ModuleStoreDraftAndPublished
-from xmodule.modulestore.inheritance import InheritanceMixin, own_metadata
-from xmodule.modulestore.mongo.draft import DraftModuleStore
+from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
+from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.xml import CourseLocationManager
 from xmodule.x_module import ModuleSystem, XModuleDescriptor, XModuleMixin
 
@@ -54,7 +56,7 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
 
     def handler_url(self, block, handler, suffix='', query='', thirdparty=False):
         return '{usage_id}/{handler}{suffix}?{query}'.format(
-            usage_id=unicode(block.scope_ids.usage_id),
+            usage_id=six.text_type(block.scope_ids.usage_id),
             handler=handler,
             suffix=suffix,
             query=query,
@@ -62,7 +64,7 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
 
     def local_resource_url(self, block, uri):
         return 'resource/{usage_id}/{uri}'.format(
-            usage_id=unicode(block.scope_ids.usage_id),
+            usage_id=six.text_type(block.scope_ids.usage_id),
             uri=uri,
         )
 
@@ -86,7 +88,7 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         return rt_repr
 
 
-def get_test_system(course_id=SlashSeparatedCourseKey('org', 'course', 'run')):
+def get_test_system(course_id=CourseKey.from_string('/'.join(['org', 'course', 'run']))):
     """
     Construct a test ModuleSystem instance.
 
@@ -178,9 +180,10 @@ def mock_render_template(*args, **kwargs):
 
 
 class ModelsTest(unittest.TestCase):
+
     def test_load_class(self):
-        vc = XModuleDescriptor.load_class('video')
-        vc_str = "<class 'xmodule.video_module.video_module.VideoDescriptor'>"
+        vc = XModuleDescriptor.load_class('sequential')
+        vc_str = "<class 'xmodule.seq_module.SequenceDescriptor'>"
         self.assertEqual(str(vc), vc_str)
 
 
@@ -218,7 +221,7 @@ def map_references(value, field, actual_course_key):
     if isinstance(field, ReferenceList):
         return [sub.map_into_course(actual_course_key) for sub in value]
     if isinstance(field, ReferenceValueDict):
-        return {key: ele.map_into_course(actual_course_key) for key, ele in value.iteritems()}
+        return {key: ele.map_into_course(actual_course_key) for key, ele in six.iteritems(value)}
     return value
 
 
@@ -257,7 +260,7 @@ class _BulkAssertionManager(object):
             raise BulkAssertionError(self._assertion_errors)
 
 
-class BulkAssertionTest(unittest.TestCase):
+class BulkAssertionTest(TestCase):
     """
     This context manager provides a _BulkAssertionManager to assert with,
     and then calls `raise_assertion_errors` at the end of the block to validate all
@@ -388,13 +391,13 @@ class LazyFormat(object):
         return self._message
 
     def __repr__(self):
-        return unicode(self)
+        return six.text_type(self)
 
     def __len__(self):
-        return len(unicode(self))
+        return len(six.text_type(self))
 
     def __getitem__(self, index):
-        return unicode(self)[index]
+        return six.text_type(self)[index]
 
 
 class CourseComparisonTest(BulkAssertionTest):
@@ -446,8 +449,8 @@ class CourseComparisonTest(BulkAssertionTest):
             expected = [extract_key(key) for key in expected]
             actual = [extract_key(key) for key in actual]
         elif isinstance(reference_field, ReferenceValueDict):
-            expected = {key: extract_key(val) for (key, val) in expected.iteritems()}
-            actual = {key: extract_key(val) for (key, val) in actual.iteritems()}
+            expected = {key: extract_key(val) for (key, val) in six.iteritems(expected)}
+            actual = {key: extract_key(val) for (key, val) in six.iteritems(actual)}
         self.assertEqual(
             expected,
             actual,
@@ -551,16 +554,16 @@ class CourseComparisonTest(BulkAssertionTest):
                 actual_item_location = actual_course_key.make_usage_key(expected_item.category, expected_item.location.block_id)
                 # split and old mongo use different names for the course root but we don't know which
                 # modulestore actual's come from here; so, assume old mongo and if that fails, assume split
-                if expected_item.location.category == 'course':
+                if expected_item.location.block_type == 'course':
                     actual_item_location = actual_item_location.replace(name=actual_item_location.run)
                 actual_item = actual_item_map.get(map_key(actual_item_location))
                 # must be split
-                if actual_item is None and expected_item.location.category == 'course':
+                if actual_item is None and expected_item.location.block_type == 'course':
                     actual_item_location = actual_item_location.replace(name='course')
                     actual_item = actual_item_map.get(map_key(actual_item_location))
 
                 # Formatting the message slows down tests of large courses significantly, so only do it if it would be used
-                self.assertIn(map_key(actual_item_location), actual_item_map.keys())
+                self.assertIn(map_key(actual_item_location), list(actual_item_map.keys()))
 
                 if actual_item is None:
                     continue
@@ -568,7 +571,7 @@ class CourseComparisonTest(BulkAssertionTest):
                 # compare fields
                 self.assertEqual(expected_item.fields, actual_item.fields)
 
-                for field_name, field in expected_item.fields.iteritems():
+                for field_name, field in six.iteritems(expected_item.fields):
                     if (expected_item.scope_ids.usage_id, field_name) in self.field_exclusions:
                         continue
 
@@ -613,8 +616,8 @@ class CourseComparisonTest(BulkAssertionTest):
 
         expected_filename = expected_asset.pop('filename')
         actual_filename = actual_asset.pop('filename')
-        self.assertEqual(expected_key.to_deprecated_string(), expected_filename)
-        self.assertEqual(actual_key.to_deprecated_string(), actual_filename)
+        self.assertEqual(text_type(expected_key), expected_filename)
+        self.assertEqual(text_type(actual_key), actual_filename)
         self.assertEqual(expected_asset, actual_asset)
 
     def _assertAssetsEqual(self, expected_course_key, expected_assets, actual_course_key, actual_assets):  # pylint: disable=invalid-name

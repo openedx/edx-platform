@@ -2,20 +2,26 @@
 some xmodules by conditions.
 """
 
+from __future__ import absolute_import
+
 import json
 import logging
+
+import six
 from lazy import lazy
 from lxml import etree
+from opaque_keys.edx.locator import BlockUsageLocator
 from pkg_resources import resource_string
+from six import text_type
+from web_fragments.fragment import Fragment
+from xblock.fields import ReferenceList, Scope, String
 
-from xmodule.x_module import XModule, STUDENT_VIEW
-from xmodule.seq_module import SequenceDescriptor
-from xmodule.studio_editable import StudioEditableModule, StudioEditableDescriptor
+from openedx.core.djangolib.markup import HTML, Text
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.seq_module import SequenceDescriptor
+from xmodule.studio_editable import StudioEditableDescriptor, StudioEditableModule
 from xmodule.validation import StudioValidation, StudioValidationMessage
-from xblock.fields import Scope, ReferenceList, String
-from xblock.fragment import Fragment
-
+from xmodule.x_module import STUDENT_VIEW, XModule
 
 log = logging.getLogger('edx.' + __name__)
 
@@ -27,7 +33,7 @@ class ConditionalFields(object):
     has_children = True
     display_name = String(
         display_name=_("Display Name"),
-        help=_("This name appears in the horizontal navigation at the top of the page."),
+        help=_("The display name for this component."),
         scope=Scope.settings,
         default=_('Conditional')
     )
@@ -113,10 +119,8 @@ class ConditionalModule(ConditionalFields, XModule, StudioEditableModule):
     """
 
     js = {
-        'coffee': [
-            resource_string(__name__, 'js/src/conditional/display.coffee'),
-        ],
         'js': [
+            resource_string(__name__, 'js/src/conditional/display.js'),
             resource_string(__name__, 'js/src/javascript_loader.js'),
             resource_string(__name__, 'js/src/collapsible.js'),
         ]
@@ -212,11 +216,11 @@ class ConditionalModule(ConditionalFields, XModule, StudioEditableModule):
                        'message': self.conditional_message}
             html = self.system.render_template('conditional_module.html',
                                                context)
-            return json.dumps({'html': [html], 'message': bool(self.conditional_message)})
+            return json.dumps({'fragments': [{'content': html}], 'message': bool(self.conditional_message)})
 
-        html = [child.render(STUDENT_VIEW).content for child in self.get_display_items()]
+        fragments = [child.render(STUDENT_VIEW).to_dict() for child in self.get_display_items()]
 
-        return json.dumps({'html': html})
+        return json.dumps({'fragments': fragments})
 
     def get_icon_class(self):
         new_class = 'other'
@@ -263,9 +267,13 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor, StudioEditabl
         # Convert sources xml_attribute to a ReferenceList field type so Location/Locator
         # substitution can be done.
         if not self.sources_list:
-            if 'sources' in self.xml_attributes and isinstance(self.xml_attributes['sources'], basestring):
+            if 'sources' in self.xml_attributes and isinstance(self.xml_attributes['sources'], six.string_types):
                 self.sources_list = [
-                    self.location.course_key.make_usage_key_from_deprecated_string(item)
+                    # TODO: it is not clear why we are replacing the run here (which actually is a no-op
+                    # for old-style course locators. However, this is the implementation of
+                    # CourseLocator.make_usage_key_from_deprecated_string, which was previously
+                    # being called in this location.
+                    BlockUsageLocator.from_string(item).replace(run=self.location.course_key.run)
                     for item in ConditionalDescriptor.parse_sources(self.xml_attributes)
                 ]
 
@@ -297,7 +305,7 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor, StudioEditabl
         children = []
         show_tag_list = []
         definition = {}
-        for conditional_attr in ConditionalModule.conditions_map.iterkeys():
+        for conditional_attr in six.iterkeys(ConditionalModule.conditions_map):
             conditional_value = xml_object.get(conditional_attr)
             if conditional_value is not None:
                 definition.update({
@@ -331,13 +339,13 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor, StudioEditabl
                 self.runtime.add_block_as_child_node(child, xml_object)
 
         if self.show_tag_list:
-            show_str = u'<{tag_name} sources="{sources}" />'.format(
-                tag_name='show', sources=';'.join(location.to_deprecated_string() for location in self.show_tag_list))
+            show_str = HTML(u'<show sources="{sources}" />').format(
+                sources=Text(';'.join(text_type(location) for location in self.show_tag_list)))
             xml_object.append(etree.fromstring(show_str))
 
         # Overwrite the original sources attribute with the value from sources_list, as
         # Locations may have been changed to Locators.
-        stringified_sources_list = map(lambda loc: loc.to_deprecated_string(), self.sources_list)
+        stringified_sources_list = [text_type(loc) for loc in self.sources_list]
         self.xml_attributes['sources'] = ';'.join(stringified_sources_list)
         self.xml_attributes[self.conditional_attr] = self.conditional_value
         self.xml_attributes['message'] = self.conditional_message

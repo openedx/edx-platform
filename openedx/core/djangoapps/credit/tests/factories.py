@@ -1,14 +1,23 @@
-# pylint:disable=missing-docstring,no-member
+# pylint:disable=missing-docstring
+from __future__ import absolute_import
+
 import datetime
 import json
-import uuid  # pylint:disable=unused-import
+import uuid
 
-from django.contrib.auth.models import User
 import factory
 from factory.fuzzy import FuzzyText
 import pytz
+from django.contrib.auth.models import User
 
-from openedx.core.djangoapps.credit.models import CreditProvider, CreditEligibility, CreditCourse, CreditRequest
+from openedx.core.djangoapps.credit.models import (
+    CreditCourse,
+    CreditEligibility,
+    CreditProvider,
+    CreditRequest,
+    CreditRequirement,
+    CreditRequirementStatus
+)
 from util.date_utils import to_timestamp
 
 
@@ -18,6 +27,21 @@ class CreditCourseFactory(factory.DjangoModelFactory):
 
     course_key = FuzzyText(prefix='fake.org/', suffix='/fake.run')
     enabled = True
+
+
+class CreditRequirementFactory(factory.DjangoModelFactory):
+    class Meta(object):
+        model = CreditRequirement
+
+    course = factory.SubFactory(CreditCourseFactory)
+
+
+class CreditRequirementStatusFactory(factory.DjangoModelFactory):
+    class Meta(object):
+        model = CreditRequirementStatus
+
+    requirement = factory.SubFactory(CreditRequirementFactory)
+    status = CreditRequirementStatus.REQUIREMENT_STATUS_CHOICES[0][0]
 
 
 class CreditProviderFactory(factory.DjangoModelFactory):
@@ -54,7 +78,6 @@ class CreditRequestFactory(factory.DjangoModelFactory):
             user = User.objects.get(username=obj.username)
             user_profile = user.profile
 
-            # pylint:disable=access-member-before-definition
             obj.parameters = json.dumps({
                 "request_uuid": obj.uuid,
                 "timestamp": to_timestamp(datetime.datetime.now(pytz.UTC)),

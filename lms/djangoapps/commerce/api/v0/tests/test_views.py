@@ -1,45 +1,49 @@
 """ Commerce API v0 view tests. """
-from datetime import datetime, timedelta
-import json
+from __future__ import absolute_import
+
 import itertools
+import json
+from datetime import datetime, timedelta
 from uuid import uuid4
-import httpretty
 
 import ddt
+import mock
+import pytz
+import six
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
-import mock
-from nose.plugins.attrib import attr
-import pytz
+from django.urls import reverse, reverse_lazy
+
+from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.embargo.test_utils import restrict_course
+from openedx.core.djangoapps.enrollments.api import get_enrollment
+from openedx.core.lib.django_test_client_utils import get_absolute_url
+from student.models import CourseEnrollment
+from student.tests.tests import EnrollmentEventTestMixin
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from commerce.constants import Messages
-from commerce.tests import TEST_BASKET_ID, TEST_ORDER_NUMBER, TEST_PAYMENT_DATA, TEST_API_URL, TEST_API_SIGNING_KEY
-from commerce.tests.mocks import mock_basket_order, mock_create_basket
-from commerce.tests.test_views import UserMixin
-from course_modes.models import CourseMode
-from edx_rest_api_client import exceptions
-from openedx.core.djangoapps.embargo.test_utils import restrict_course
-from enrollment.api import get_enrollment
-from openedx.core.lib.django_test_client_utils import get_absolute_url
-from student.models import CourseEnrollment
-from student.tests.factories import CourseModeFactory
-from student.tests.tests import EnrollmentEventTestMixin
-from xmodule.modulestore.django import modulestore
-from commerce.api.v0.views import SAILTHRU_CAMPAIGN_COOKIE
+from ....constants import Messages
+from ....tests.mocks import mock_basket_order
+from ....tests.test_views import UserMixin
+from ..views import SAILTHRU_CAMPAIGN_COOKIE
+
+UTM_COOKIE_NAME = 'edx.test.utm'
+UTM_COOKIE_CONTENTS = {
+    'utm_source': 'test-source'
+}
 
 
-@attr(shard=1)
 @ddt.ddt
-@override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
 class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase):
     """
-    Tests for the commerce orders view.
+    Tests for the commerce Baskets view.
     """
-    def _post_to_view(self, course_id=None, marketing_email_opt_in=False):
+
+    def _post_to_view(self, course_id=None, marketing_email_opt_in=False, include_utm_cookie=False):
         """
         POST to the view being tested.
 
@@ -49,34 +53,20 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         :return: Response
         """
         payload = {
-            "course_id": unicode(course_id or self.course.id)
+            "course_id": six.text_type(course_id or self.course.id)
         }
         if marketing_email_opt_in:
             payload["email_opt_in"] = True
 
         self.client.cookies[SAILTHRU_CAMPAIGN_COOKIE] = 'sailthru id'
+        if include_utm_cookie:
+            self.client.cookies[UTM_COOKIE_NAME] = json.dumps(UTM_COOKIE_CONTENTS)
         return self.client.post(self.url, payload)
 
     def assertResponseMessage(self, response, expected_msg):
         """ Asserts the detail field in the response's JSON body equals the expected message. """
         actual = json.loads(response.content)['detail']
         self.assertEqual(actual, expected_msg)
-
-    def assertResponsePaymentData(self, response):
-        """ Asserts correctness of a JSON body containing payment information. """
-        actual_response = json.loads(response.content)
-        self.assertEqual(actual_response, TEST_PAYMENT_DATA)
-
-    def assertValidEcommerceInternalRequestErrorResponse(self, response):
-        """ Asserts the response is a valid response sent when the E-Commerce API is unavailable. """
-        self.assertEqual(response.status_code, 500)
-        actual = json.loads(response.content)['detail']
-        self.assertIn('Call to E-Commerce API failed', actual)
-
-    def assertUserNotEnrolled(self):
-        """ Asserts that the user is NOT enrolled in the course, and that an enrollment event was NOT fired. """
-        self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course.id))
-        self.assert_no_events_were_emitted()
 
     def setUp(self):
         super(BasketsViewTests, self).setUp()
@@ -88,7 +78,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         # TODO Verify this is the best method to create CourseMode objects.
         # TODO Find/create constants for the modes.
         for mode in [CourseMode.HONOR, CourseMode.VERIFIED, CourseMode.AUDIT]:
-            sku_string = uuid4().hex.decode('ascii')
+            sku_string = six.text_type(uuid4().hex)
             CourseModeFactory.create(
                 course_id=self.course.id,
                 mode_slug=mode,
@@ -113,10 +103,10 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
 
     def test_login_required(self):
         """
-        The view should return HTTP 403 status if the user is not logged in.
+        The view should return HTTP 401 status if the user is not logged in.
         """
         self.client.logout()
-        self.assertEqual(403, self._post_to_view().status_code)
+        self.assertEqual(401, self._post_to_view().status_code)
 
     @ddt.data('delete', 'get', 'put')
     def test_post_required(self, method):
@@ -140,89 +130,38 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         self.assertEqual(406, self.client.post(self.url, {}).status_code)
         self.assertEqual(406, self.client.post(self.url, {'not_course_id': ''}).status_code)
 
-    def test_ecommerce_api_timeout(self):
+    @ddt.data(True, False)
+    def test_course_for_active_and_inactive_user(self, user_is_active):
         """
-        If the call to the E-Commerce API times out, the view should log an error and return an HTTP 503 status.
+        Test course enrollment for active and inactive user.
         """
-        with mock_create_basket(exception=exceptions.Timeout):
-            response = self._post_to_view()
-
-        self.assertValidEcommerceInternalRequestErrorResponse(response)
-        self.assertUserNotEnrolled()
-
-    def test_ecommerce_api_error(self):
-        """
-        If the E-Commerce API raises an error, the view should return an HTTP 503 status.
-        """
-        with mock_create_basket(exception=exceptions.SlumberBaseException):
-            response = self._post_to_view()
-
-        self.assertValidEcommerceInternalRequestErrorResponse(response)
-        self.assertUserNotEnrolled()
-
-    def _test_successful_ecommerce_api_call(self, is_completed=True):
-        """
-        Verifies that the view contacts the E-Commerce API with the correct data and headers.
-        """
-        with mock.patch('commerce.api.v0.views.audit_log') as mock_audit_log:
-            response = self._post_to_view()
-
-            # Verify that an audit message was logged
-            self.assertTrue(mock_audit_log.called)
+        # Set user's active flag
+        self.user.is_active = user_is_active
+        self.user.save()
+        response = self._post_to_view()
 
         # Validate the response content
-        if is_completed:
-            msg = Messages.ORDER_COMPLETED.format(order_number=TEST_ORDER_NUMBER)
-            self.assertResponseMessage(response, msg)
-        else:
-            self.assertResponsePaymentData(response)
-
-        # make sure ecommerce API call forwards Sailthru cookie
-        self.assertIn('{}=sailthru id'.format(SAILTHRU_CAMPAIGN_COOKIE), httpretty.last_request().headers['cookie'])
-
-    @ddt.data(True, False)
-    def test_course_with_honor_seat_sku(self, user_is_active):
-        """
-        If the course has a SKU, the view should get authorization from the E-Commerce API before enrolling
-        the user in the course. If authorization is approved, the user should be redirected to the user dashboard.
-        """
-
-        # Set user's active flag
-        self.user.is_active = user_is_active
-        self.user.save()  # pylint: disable=no-member
-
-        return_value = {'id': TEST_BASKET_ID, 'payment_data': None, 'order': {'number': TEST_ORDER_NUMBER}}
-        with mock_create_basket(response=return_value):
-            self._test_successful_ecommerce_api_call()
-
-    @ddt.data(True, False)
-    def test_course_with_paid_seat_sku(self, user_is_active):
-        """
-        If the course has a SKU, the view should return data that the client
-        will use to redirect the user to an external payment processor.
-        """
-        # Set user's active flag
-        self.user.is_active = user_is_active
-        self.user.save()  # pylint: disable=no-member
-
-        return_value = {'id': TEST_BASKET_ID, 'payment_data': TEST_PAYMENT_DATA, 'order': None}
-        with mock_create_basket(response=return_value):
-            self._test_successful_ecommerce_api_call(False)
+        self.assertEqual(response.status_code, 200)
+        msg = Messages.ENROLL_DIRECTLY.format(
+            course_id=self.course.id,
+            username=self.user.username
+        )
+        self.assertResponseMessage(response, msg)
 
     def _test_course_without_sku(self, enrollment_mode=CourseMode.DEFAULT_MODE_SLUG):
         """
-        Validates the view bypasses the E-Commerce API when the course has no CourseModes with SKUs.
+        Validates the view when course has no CourseModes with SKUs.
         """
-        # Place an order
-        with mock_create_basket(expect_called=False):
-            response = self._post_to_view()
+        response = self._post_to_view()
 
         # Validate the response content
         self.assertEqual(response.status_code, 200)
         msg = Messages.NO_SKU_ENROLLED.format(
             enrollment_mode=enrollment_mode,
             course_id=self.course.id,
-            username=self.user.username
+            course_name=self.course.display_name,
+            username=self.user.username,
+            announcement=self.course.announcement
         )
         self.assertResponseMessage(response, msg)
 
@@ -256,33 +195,15 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         # We should be enrolled in honor mode
         self._test_course_without_sku(enrollment_mode=CourseMode.HONOR)
 
-    @override_settings(ECOMMERCE_API_URL=None, ECOMMERCE_API_SIGNING_KEY=None)
-    def test_ecommerce_service_not_configured(self):
-        """
-        If the E-Commerce Service is not configured, the view should enroll the user.
-        """
-        with mock_create_basket(expect_called=False):
-            response = self._post_to_view()
-
-        # Validate the response
-        self.assertEqual(response.status_code, 200)
-        msg = Messages.NO_ECOM_API.format(username=self.user.username, course_id=self.course.id)
-        self.assertResponseMessage(response, msg)
-
-        # Ensure that the user is not enrolled and that no calls were made to the E-Commerce API
-        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
-
     def assertProfessionalModeBypassed(self):
         """ Verifies that the view returns HTTP 406 when a course with no honor or audit mode is encountered. """
 
         CourseMode.objects.filter(course_id=self.course.id).delete()
         mode = CourseMode.NO_ID_PROFESSIONAL_MODE
-        sku_string = uuid4().hex.decode('ascii')
+        sku_string = six.text_type(uuid4().hex)
         CourseModeFactory.create(course_id=self.course.id, mode_slug=mode, mode_display_name=mode,
                                  sku=sku_string, bulk_sku='BULK-{}'.format(sku_string))
-
-        with mock_create_basket(expect_called=False):
-            response = self._post_to_view()
+        response = self._post_to_view()
 
         # The view should return an error status code
         self.assertEqual(response.status_code, 406)
@@ -293,7 +214,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         """ Verifies that the view behaves appropriately when the course only has a professional mode. """
         self.assertProfessionalModeBypassed()
 
-    @override_settings(ECOMMERCE_API_URL=None, ECOMMERCE_API_SIGNING_KEY=None)
+    @override_settings(ECOMMERCE_API_URL=None)
     def test_professional_mode_only_and_ecommerce_service_not_configured(self):
         """
         Verifies that the view behaves appropriately when the course only has a professional mode and
@@ -331,12 +252,9 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         CourseEnrollment.enroll(self.user, self.course.id)
         CourseEnrollment.unenroll(self.user, self.course.id, True)
         self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course.id))
-        self.assertIsNotNone(get_enrollment(self.user.username, unicode(self.course.id)))
+        self.assertIsNotNone(get_enrollment(self.user.username, six.text_type(self.course.id)))
 
-        with mock_create_basket():
-            self._test_successful_ecommerce_api_call(False)
-
-    @mock.patch('commerce.api.v0.views.update_email_opt_in')
+    @mock.patch('lms.djangoapps.commerce.api.v0.views.update_email_opt_in')
     @ddt.data(*itertools.product((False, True), (False, True), (False, True)))
     @ddt.unpack
     def test_marketing_email_opt_in(self, is_opt_in, has_sku, is_exception, mock_update):
@@ -352,30 +270,24 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         if is_exception:
             mock_update.side_effect = Exception("boink")
 
-        return_value = {'id': TEST_BASKET_ID, 'payment_data': None, 'order': {'number': TEST_ORDER_NUMBER}}
-        with mock_create_basket(response=return_value, expect_called=has_sku):
-            response = self._post_to_view(marketing_email_opt_in=is_opt_in)
+        response = self._post_to_view(marketing_email_opt_in=is_opt_in)
         self.assertEqual(mock_update.called, is_opt_in)
         self.assertEqual(response.status_code, 200)
 
     def test_closed_course(self):
         """
-        Ensure that the view does not attempt to create a basket for closed
-        courses.
+        Verifies that the view returns HTTP 406 when a course is closed.
         """
         self.course.enrollment_end = datetime.now(pytz.UTC) - timedelta(days=1)
-        modulestore().update_item(self.course, self.user.id)  # pylint:disable=no-member
-        with mock_create_basket(expect_called=False):
-            self.assertEqual(self._post_to_view().status_code, 406)
+        modulestore().update_item(self.course, self.user.id)
+        self.assertEqual(self._post_to_view().status_code, 406)
 
 
-@attr(shard=1)
-@override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
 class BasketOrderViewTests(UserMixin, TestCase):
     """ Tests for the basket order view. """
     view_name = 'commerce_api:v0:baskets:retrieve_order'
     MOCK_ORDER = {'number': 1}
-    path = reverse(view_name, kwargs={'basket_id': 1})
+    path = reverse_lazy(view_name, kwargs={'basket_id': 1})
 
     def setUp(self):
         super(BasketOrderViewTests, self).setUp()
@@ -393,7 +305,7 @@ class BasketOrderViewTests(UserMixin, TestCase):
 
     def test_order_not_found(self):
         """ If the order is not found, the view should return a 404. """
-        with mock_basket_order(basket_id=1, exception=exceptions.HttpNotFoundError):
+        with mock_basket_order(basket_id=1, status=404):
             response = self.client.get(self.path)
         self.assertEqual(response.status_code, 404)
 

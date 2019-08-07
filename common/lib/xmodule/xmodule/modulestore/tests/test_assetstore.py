@@ -2,21 +2,30 @@
 Tests for assetstore using any of the modulestores for metadata. May extend to testing the storage options
 too.
 """
-from datetime import datetime, timedelta
-import ddt
-from nose.plugins.attrib import attr
-import pytz
-import unittest
+from __future__ import absolute_import
 
+import unittest
+from datetime import datetime, timedelta
+
+import ddt
+import pytz
+import six
+
+from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
+from six.moves import range, zip
+
+from openedx.core.lib.tests import attr
 from xmodule.assetstore import AssetMetadata
-from xmodule.modulestore import ModuleStoreEnum, SortedAssetList, IncorrectlySortedList
+from xmodule.modulestore import IncorrectlySortedList, ModuleStoreEnum, SortedAssetList
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.utils import (
-    MIXED_MODULESTORE_BOTH_SETUP, MODULESTORE_SETUPS,
-    XmlModulestoreBuilder, MixedModulestoreBuilder
+    MIXED_MODULESTORE_BOTH_SETUP,
+    MODULESTORE_SETUPS,
+    MixedModulestoreBuilder,
+    XmlModulestoreBuilder
 )
 
 
@@ -26,7 +35,11 @@ class AssetStoreTestData(object):
     """
     now = datetime.now(pytz.utc)
     user_id = 144
-    user_id_long = long(user_id)
+    if six.PY2:
+        user_id_long = long(user_id)
+    else:
+        user_id_long = int(user_id)
+
     user_email = "me@example.com"
 
     asset_fields = (
@@ -61,9 +74,10 @@ class TestSortedAssetList(unittest.TestCase):
     """
     Tests the SortedAssetList class.
     """
+
     def setUp(self):
         super(TestSortedAssetList, self).setUp()
-        asset_list = [dict(zip(AssetStoreTestData.asset_fields, asset)) for asset in AssetStoreTestData.all_asset_data]
+        asset_list = [dict(list(zip(AssetStoreTestData.asset_fields, asset))) for asset in AssetStoreTestData.all_asset_data]
         self.sorted_asset_list_by_filename = SortedAssetList(iterable=asset_list)
         self.sorted_asset_list_by_last_edit = SortedAssetList(iterable=asset_list, key=lambda x: x['edited_on'])
         self.course_key = CourseLocator('org', 'course', 'run')
@@ -84,10 +98,15 @@ class TestSortedAssetList(unittest.TestCase):
 
 @attr('mongo')
 @ddt.ddt
-class TestMongoAssetMetadataStorage(unittest.TestCase):
+class TestMongoAssetMetadataStorage(TestCase):
     """
     Tests for storing/querying course asset metadata.
     """
+    XML_MODULESTORE_MAP = {
+        'XML_MODULESTORE_BUILDER': XmlModulestoreBuilder(),
+        'MIXED_MODULESTORE_BUILDER': MixedModulestoreBuilder([('xml', XmlModulestoreBuilder())])
+    }
+
     def setUp(self):
         super(TestMongoAssetMetadataStorage, self).setUp()
         self.addTypeEqualityFunc(datetime, self._compare_datetimes)
@@ -143,7 +162,7 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
         Setup assets. Save in store if given
         """
         for i, asset in enumerate(AssetStoreTestData.all_asset_data):
-            asset_dict = dict(zip(AssetStoreTestData.asset_fields[1:], asset[1:]))
+            asset_dict = dict(list(zip(AssetStoreTestData.asset_fields[1:], asset[1:])))
             if i in (0, 1) and course1_key:
                 asset_key = course1_key.make_asset_key('asset', asset[0])
                 asset_md = AssetMetadata(asset_key, **asset_dict)
@@ -596,7 +615,7 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
             )
             # First, with paging across all sorts.
             for sort_test in expected_sorts_by_2:
-                for i in xrange(3):
+                for i in range(3):
                     asset_page = store.get_all_asset_metadata(
                         course2.id, 'asset', start=2 * i, maxresults=2, sort=sort_test[0]
                     )
@@ -635,11 +654,12 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
             )
             self.assertEquals(len(asset_page), 2)
 
-    @ddt.data(XmlModulestoreBuilder(), MixedModulestoreBuilder([('xml', XmlModulestoreBuilder())]))
-    def test_xml_not_yet_implemented(self, storebuilder):
+    @ddt.data('XML_MODULESTORE_BUILDER', 'MIXED_MODULESTORE_BUILDER')
+    def test_xml_not_yet_implemented(self, storebuilderName):
         """
         Test coverage which shows that for now xml read operations are not implemented
         """
+        storebuilder = self.XML_MODULESTORE_MAP[storebuilderName]
         with storebuilder.build(contentstore=None) as (__, store):
             course_key = store.make_course_key("org", "course", "run")
             asset_key = course_key.make_asset_key('asset', 'foo.jpg')

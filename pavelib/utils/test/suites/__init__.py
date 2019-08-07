@@ -1,9 +1,8 @@
 """
 TestSuite class and subclasses
 """
-from .suite import TestSuite
-from .nose_suite import NoseTestSuite, SystemTestSuite, LibTestSuite
+from .bokchoy_suite import BokChoyTestSuite
+from .js_suite import JestSnapshotTestSuite, JsTestSuite
+from .pytest_suite import LibTestSuite, PytestSuite, SystemTestSuite
 from .python_suite import PythonTestSuite
-from .js_suite import JsTestSuite
-from .acceptance_suite import AcceptanceTestSuite
-from .bokchoy_suite import BokChoyTestSuite, Pa11yCrawler
+from .suite import TestSuite

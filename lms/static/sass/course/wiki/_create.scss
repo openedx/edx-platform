@@ -5,7 +5,7 @@ form#wiki_revision {
 
   label {
     display: block;
-    margin-bottom: 7px ;
+    margin-bottom: 7px;
   }
 
   .CodeMirror-scroll {
@@ -15,13 +15,16 @@ form#wiki_revision {
 
   .CodeMirror {
     @extend textarea;
+
     @include box-sizing(border-box);
+
     font-family: monospace;
     margin-bottom: $baseline;
   }
 
   textarea {
     @include box-sizing(border-box);
+
     margin-bottom: $baseline;
     min-height: 450px;
     width: 100%;
@@ -53,13 +56,14 @@ form#wiki_revision {
   margin-top: lh();
   width: flex-grid(3, 9);
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     color: #333;
   }
 
   .markdown-example {
     background-color: #e3e3e3;
-    line-height: 1.0;
+    line-height: 1;
     margin: 5px 0 7px;
     padding: {
       top: 5px;
@@ -67,6 +71,7 @@ form#wiki_revision {
       bottom: 5px;
       left: 5px;
     }
+
     text-shadow: 0 1px 0 #fff;
   }
 }

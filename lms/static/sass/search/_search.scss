@@ -1,6 +1,6 @@
 .search-bar {
-
   @include box-sizing(border-box);
+
   position: relative;
 
   .search-field-wrapper {
@@ -9,7 +9,9 @@
 
   .search-field {
     @extend %t-weight2;
+
     @include box-sizing(border-box);
+
     top: 5px;
     width: 100%;
     border-radius: 4px;
@@ -21,16 +23,20 @@
   .search-button:hover,
   .cancel-button:hover {
     @extend %t-regular;
+
     @include box-sizing(border-box);
     @include right(0);
+
     display: block;
     position: absolute;
     top: 0;
     border: none;
     border-radius: 0;
+
     @include border-top-right-radius(3px);
     @include border-bottom-right-radius(3px);
-    background: $uxpl-blue-base;
+
+    background: theme-color("primary");
     padding: 0 10px;
     height: 35px;
     color: $white;
@@ -42,9 +48,9 @@
     &:hover,
     &:focus,
     &:active {
-        background: $uxpl-blue-hover-active;
-        box-shadow: none;
-        border: none;
+      background: $uxpl-blue-hover-active;
+      box-shadow: none;
+      border: none;
     }
   }
 
@@ -55,7 +61,6 @@
 }
 
 .search-results {
-
   display: none;
 
   .search-info {
@@ -65,6 +70,7 @@
 
     .search-count {
       @include float(right);
+
       color: $gray-l1;
     }
   }
@@ -75,7 +81,6 @@
   }
 
   .search-results-item {
-    @include padding-right(140px);
     position: relative;
     border-bottom: 1px solid $gray-l4;
     padding: $baseline ($baseline/2);
@@ -89,34 +94,41 @@
     .result-excerpt {
       margin-bottom: $baseline;
     }
+
     .result-type {
       @include right($baseline/2);
+
       position: absolute;
       bottom: $baseline;
       font-size: 14px;
       color: $gray-l1;
     }
+
     .result-course-name {
       @include margin-right(1em);
+
       font-size: 14px;
       color: $gray-l1;
     }
+
     .result-location {
       font-size: 14px;
       color: $gray-l1;
     }
+
     .result-link {
-      @include right($baseline/2);
-      position: absolute;
-      top: $baseline;
+      @include float(right);
+      @include padding-left($baseline/4);
+
       line-height: 1.6em;
-      text-transform: uppercase;
     }
+
     .search-results-ellipsis {
       @extend %t-copy-sub2;
-      color: $gray;
 
-      &:after {
+      color: theme-color("dark");
+
+      &::after {
         content: '\2026';
       }
     }
@@ -127,54 +139,53 @@
     border: 2px solid $link-color;
     padding: 1rem;
     border-radius: 3px;
-    color: $base-font-color;
-    text-transform: uppercase;
+    color: $body-color;
   }
-
 }
 
 .courseware-search-bar {
-   width: flex-grid(7);
+  width: flex-grid(7);
+
+  @extend %ui-print-excluded;
 }
 
+.dashboard-search-bar {
+  margin: 0 0 $baseline;
+  display: block;
 
-.dashboard-search-bar  {
-  @include float(right);
-  @include margin-left(flex-gutter());
-  margin-bottom: $baseline;
-  padding: 0;
-  width: flex-grid(3);
   label {
     @extend %t-regular;
-    font-family: $sans-serif;
-    color: $gray;
+
+    font-family: $font-family-sans-serif;
+    color: theme-color("dark");
     font-size: 13px;
     font-style: normal;
-    text-transform: uppercase;
   }
+
   .search-field {
     background: $white;
     box-shadow: 0 1px 0 0 $white, inset 0 0 3px 0 $shadow-l2;
-    font-family: $sans-serif;
+    font-family: $font-family-sans-serif;
     font-style: normal;
   }
 }
 
 .dashboard-search-results {
-  @include float(left);
-  margin: 0;
+  margin: 0 0 $baseline;
   padding: 0;
-  width: flex-grid(9);
-  min-height: 300px;
+
   .search-info {
     padding-bottom: lh(1.75);
+
     a {
       display: block;
-      margin-bottom: lh(.5);
+      margin-bottom: lh(0.5);
       font-size: 13px;
     }
+
     h2 {
       @extend %t-title5;
+
       @include float(left);
       @include clear(left);
     }

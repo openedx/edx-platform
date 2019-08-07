@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from __future__ import absolute_import
 from django.db import migrations, models
 import django.utils.timezone
 from django.conf import settings
 import model_utils.fields
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from opaque_keys.edx.django.models import CourseKeyField
 
 
 class Migration(migrations.Migration):
@@ -45,11 +46,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='surveyanswer',
             name='form',
-            field=models.ForeignKey(to='survey.SurveyForm'),
+            field=models.ForeignKey(to='survey.SurveyForm', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='surveyanswer',
             name='user',
-            field=models.ForeignKey(to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
         ),
     ]

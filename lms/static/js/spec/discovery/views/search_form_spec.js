@@ -46,5 +46,16 @@ define(['jquery', 'js/discovery/views/search_form'], function($, SearchForm) {
             this.form.showErrorMessage();
             expect($('#discovery-message')).not.toBeEmpty();
         });
+
+        it('shows default error message', function() {
+            this.form.showErrorMessage();
+            expect(this.form.$message).toContainHtml('There was an error, try searching again.');
+        });
+
+        it('shows remote error message', function() {
+            let remoteError = 'some-error-message';
+            this.form.showErrorMessage(remoteError);
+            expect(this.form.$message).toContainHtml(remoteError);
+        });
     });
 });

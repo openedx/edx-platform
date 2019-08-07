@@ -1,23 +1,26 @@
 """
 Course Outline page in Studio.
 """
+from __future__ import absolute_import
+
 import datetime
 
+from bok_choy.javascript import js_defined, wait_for_js
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise
-
 from selenium.webdriver import ActionChains
-from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import Select
+from six.moves import map, range
 
 from common.test.acceptance.pages.common.utils import click_css, confirm_prompt
-from common.test.acceptance.tests.helpers import disable_animations, enable_animations
-
-from common.test.acceptance.pages.studio.course_page import CoursePage
 from common.test.acceptance.pages.studio.container import ContainerPage
-from common.test.acceptance.pages.studio.utils import set_input_value_and_save, set_input_value
+from common.test.acceptance.pages.studio.course_page import CoursePage
+from common.test.acceptance.pages.studio.utils import set_input_value, set_input_value_and_save
+from common.test.acceptance.tests.helpers import disable_animations, enable_animations, select_option_by_text
 
 
+@js_defined('jQuery')
 class CourseOutlineItem(object):
     """
     A mixin class for any :class:`PageObject` shown in a course outline.
@@ -38,9 +41,9 @@ class CourseOutlineItem(object):
         # Check for the existence of a locator so that errors when navigating to the course outline page don't show up
         # as errors in the repr method instead.
         try:
-            return "{}(<browser>, {!r})".format(self.__class__.__name__, self.locator)  # pylint: disable=no-member
+            return u"{}(<browser>, {!r})".format(self.__class__.__name__, self.locator)
         except AttributeError:
-            return "{}(<browser>)".format(self.__class__.__name__)
+            return u"{}(<browser>)".format(self.__class__.__name__)
 
     def _bounded_selector(self, selector):
         """
@@ -50,7 +53,7 @@ class CourseOutlineItem(object):
         # This happens in the context of the CourseOutlinePage
         # pylint: disable=no-member
         if self.BODY_SELECTOR and hasattr(self, 'locator'):
-            return '{}[data-locator="{}"] {}'.format(
+            return u'{}[data-locator="{}"] {}'.format(
                 self.BODY_SELECTOR,
                 self.locator,
                 selector
@@ -87,6 +90,11 @@ class CourseOutlineItem(object):
     def has_staff_lock_warning(self):
         """ Returns True if the 'Contains staff only content' message is visible """
         return self.status_message == 'Contains staff only content' if self.has_status_message else False
+
+    @property
+    def has_restricted_warning(self):
+        """ Returns True if the 'Access to this unit is restricted to' message is visible """
+        return 'Access to this unit is restricted to' in self.status_message if self.has_status_message else False
 
     @property
     def is_staff_only(self):
@@ -128,6 +136,29 @@ class CourseOutlineItem(object):
         modal = self.edit()
         modal.is_explicitly_locked = is_locked
         modal.save()
+
+    def get_enrollment_select_options(self):
+        """
+        Gets the option names available for unit group access
+        """
+        modal = self.edit()
+        group_options = self.q(css='.group-select-title option').text
+        modal.cancel()
+        return group_options
+
+    def toggle_unit_access(self, partition_name, group_ids):
+        """
+        Toggles unit access to the groups in group_ids
+        """
+        if group_ids:
+            modal = self.edit()
+            groups_select = self.q(css='.group-select-title select')
+            select_option_by_text(groups_select, partition_name)
+
+            for group_id in group_ids:
+                checkbox = self.q(css=u'#content-group-{group_id}'.format(group_id=group_id))
+                checkbox.click()
+            modal.save()
 
     def in_editable_form(self):
         """
@@ -174,6 +205,7 @@ class CourseOutlineItem(object):
         element = self.q(css=self._bounded_selector(".status-grading-value"))  # pylint: disable=no-member
         return element.first.text[0] if element.present else None
 
+    @wait_for_js
     def publish(self):
         """
         Publish the unit.
@@ -261,19 +293,23 @@ class CourseOutlineContainer(CourseOutlineItem):
             self.wait_for_element_presence(
                 self._bounded_selector(self.ADD_BUTTON_SELECTOR), 'Toggle control is present'
             )
-            add_button = self.q(css=self._bounded_selector(self.ADD_BUTTON_SELECTOR)).first.results
+            css_element = self._bounded_selector(self.ADD_BUTTON_SELECTOR)
+            add_button = self.q(css=css_element).first.results  # pylint: disable=no-member
+            self.scroll_to_element(css_element)  # pylint: disable=no-member
             return add_button and add_button[0].is_displayed()
 
         currently_expanded = subsection_expanded()
 
         # Need to click slightly off-center in order for the click to be recognized.
-        ele = self.browser.find_element_by_css_selector(self._bounded_selector('.ui-toggle-expansion .fa'))
+        css_element = self._bounded_selector('.ui-toggle-expansion .fa')
+        self.scroll_to_element(css_element)  # pylint: disable=no-member
+        ele = self.browser.find_element_by_css_selector(css_element)  # pylint: disable=no-member
         ActionChains(self.browser).move_to_element_with_offset(ele, 8, 8).click().perform()  # pylint: disable=no-member
-        self.wait_for_element_presence(self._bounded_selector(self.ADD_BUTTON_SELECTOR), 'Subsection is expanded')
+        self.wait_for_element_presence(self._bounded_selector(self.ADD_BUTTON_SELECTOR), u'Subsection is expanded')
 
         EmptyPromise(
             lambda: subsection_expanded() != currently_expanded,
-            "Check that the container {} has been toggled".format(self.locator)
+            u"Check that the container {} has been toggled".format(self.locator)
         ).fulfill()
 
         enable_animations(self)
@@ -285,7 +321,9 @@ class CourseOutlineContainer(CourseOutlineItem):
         """
         Return whether this outline item is currently collapsed.
         """
-        return "is-collapsed" in self.q(css=self._bounded_selector('')).first.attrs("class")[0]  # pylint: disable=no-member
+        css_element = self._bounded_selector('')
+        self.scroll_to_element(css_element)  # pylint: disable=no-member
+        return "is-collapsed" in self.q(css=css_element).first.attrs("class")[0]  # pylint: disable=no-member
 
 
 class CourseOutlineChild(PageObject, CourseOutlineItem):
@@ -313,7 +351,7 @@ class CourseOutlineChild(PageObject, CourseOutlineItem):
         """
         Return `selector`, but limited to this particular `CourseOutlineChild` context
         """
-        return '{}[data-locator="{}"] {}'.format(
+        return u'{}[data-locator="{}"] {}'.format(
             self.BODY_SELECTOR,
             self.locator,
             selector
@@ -463,11 +501,18 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
             self.q(css='div.ui-loading.is-hidden').present
         ])
 
+    def click_course_status_section_start_date_link(self):
+        self.course_start_date_link.click()
+
+    def click_course_status_section_checklists_link(self):
+        self.course_checklists_link.click()
+
     def view_live(self):
         """
         Clicks the "View Live" link and switches to the new tab
         """
         click_css(self, '.view-live-button', require_notification=False)
+        self.wait_for_page()
         self.browser.switch_to_window(self.browser.window_handles[-1])
 
     def section(self, title):
@@ -486,7 +531,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         Find and click on first section name in course outline
         """
-        self.q(css='{} .section-name'.format(parent_css)).first.click()
+        self.q(css=u'{} .section-name'.format(parent_css)).first.click()
 
     def get_section_name(self, parent_css='', page_refresh=False):
         """
@@ -494,21 +539,21 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         if page_refresh:
             self.browser.refresh()
-        return self.q(css='{} .section-name'.format(parent_css)).text
+        return self.q(css=u'{} .section-name'.format(parent_css)).text
 
     def section_name_edit_form_present(self, parent_css=''):
         """
         Check that section name edit form present
         """
-        return self.q(css='{} .section-name input'.format(parent_css)).present
+        return self.q(css=u'{} .section-name input'.format(parent_css)).present
 
     def change_section_name(self, new_name, parent_css=''):
         """
         Change section name of first section present in course outline
         """
         self.click_section_name(parent_css)
-        self.q(css='{} .section-name input'.format(parent_css)).first.fill(new_name)
-        self.q(css='{} .section-name .save-button'.format(parent_css)).first.click()
+        self.q(css=u'{} .section-name input'.format(parent_css)).first.fill(new_name)
+        self.q(css=u'{} .section-name .save-button'.format(parent_css)).first.click()
         self.wait_for_ajax()
 
     def sections(self):
@@ -572,6 +617,13 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         self.q(css=".action-save").first.click()
         self.wait_for_ajax()
 
+    def select_visibility_tab(self):
+        """
+        Select the advanced settings tab
+        """
+        self.q(css=".settings-tab-button[data-tab='visibility']").first.click()
+        self.wait_for_element_presence('input[value=hide_after_due]', 'Visibility fields not present.')
+
     def select_advanced_tab(self, desired_item='special_exam'):
         """
         Select the advanced settings tab
@@ -581,8 +633,6 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
             self.wait_for_element_presence('input.no_special_exam', 'Special exam settings fields not present.')
         if desired_item == 'gated_content':
             self.wait_for_element_visibility('#is_prereq', 'Gating settings fields are present.')
-        if desired_item == 'hide_after_due_date':
-            self.wait_for_element_presence('input[value=hide_after_due]', 'Visibility fields not present.')
 
     def make_exam_proctored(self):
         """
@@ -598,6 +648,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         self.q(css="input.timed_exam").first.click()
         if hide_after_due:
+            self.select_visibility_tab()
             self.q(css='input[name=content-visibility][value=hide_after_due]').first.click()
         self.q(css=".action-save").first.click()
         self.wait_for_ajax()
@@ -678,12 +729,13 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         self.q(css=".action-save").first.click()
         self.wait_for_ajax()
 
-    def add_prerequisite_to_subsection(self, min_score):
+    def add_prerequisite_to_subsection(self, min_score, min_completion):
         """
         Adds a prerequisite to a subsection.
         """
         Select(self.q(css="#prereq")[0]).select_by_index(1)
         self.q(css="#prereq_min_score").fill(min_score)
+        self.q(css="#prereq_min_completion").fill(min_completion)
         self.q(css=".action-save").first.click()
         self.wait_for_ajax()
 
@@ -718,6 +770,20 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
 
         # The Prerequisites dropdown is visible
         return self.q(css="#prereq_min_score").visible
+
+    @property
+    def has_course_status_section(self):
+        # SFE and SFE-wrapper classes come from studio-frontend and
+        # wrap content provided by the studio-frontend package
+        return self.q(css='.course-status .SFE .SFE-wrapper').is_present()
+
+    @property
+    def course_start_date_link(self):
+        return self.q(css='.status-link').first
+
+    @property
+    def course_checklists_link(self):
+        return self.q(css='.status-link').nth(1)
 
     @property
     def bottom_add_section_button(self):
@@ -937,21 +1003,21 @@ class CourseOutlineModal(object):
         """
         Set `date` value to input pointed by `selector` and `property_name`.
         """
-        month, day, year = map(int, date.split('/'))
+        month, day, year = list(map(int, date.split('/')))
         self.click(input_selector)
         if getattr(self, property_name):
-            current_month, current_year = map(int, getattr(self, property_name).split('/')[1:])
+            current_month, current_year = list(map(int, getattr(self, property_name).split('/')[1:]))
         else:  # Use default timepicker values, which are current month and year.
             current_month, current_year = datetime.datetime.today().month, datetime.datetime.today().year
         date_diff = 12 * (year - current_year) + month - current_month
-        selector = "a.ui-datepicker-{}".format('next' if date_diff > 0 else 'prev')
-        for __ in xrange(abs(date_diff)):
+        selector = u"a.ui-datepicker-{}".format('next' if date_diff > 0 else 'prev')
+        for __ in range(abs(date_diff)):
             self.page.q(css=selector).click()
         self.page.q(css="a.ui-state-default").nth(day - 1).click()  # set day
         self.page.wait_for_element_invisibility("#ui-datepicker-div", "datepicker should be closed")
         EmptyPromise(
             lambda: getattr(self, property_name) == u'{m}/{d}/{y}'.format(m=month, d=day, y=year),
-            "{} is updated in modal.".format(property_name)
+            u"{} is updated in modal.".format(property_name)
         ).fulfill()
 
     def set_time(self, input_selector, time):
@@ -1054,7 +1120,7 @@ class CourseOutlineModal(object):
         if needed.
         """
         if not self.is_staff_lock_visible:
-            self.find_css(".settings-tab-button[data-tab=advanced]").click()
+            self.find_css(".settings-tab-button[data-tab=visibility]").click()
         EmptyPromise(
             lambda: self.is_staff_lock_visible,
             "Staff lock option is visible",
@@ -1075,7 +1141,7 @@ class CourseOutlineModal(object):
         """
         self.ensure_staff_lock_visible()
         if value != self.is_explicitly_locked:
-            self.find_css('label[for="staff_lock"]').click()
+            self.find_css('#staff_lock').click()
         EmptyPromise(lambda: value == self.is_explicitly_locked, "Explicit staff lock is updated").fulfill()
 
     def shows_staff_lock_warning(self):
@@ -1100,9 +1166,6 @@ class SubsectionOutlineModal(CourseOutlineModal):
     Subclass to handle a few special cases with subsection modals.
     """
 
-    def __init__(self, page):
-        super(SubsectionOutlineModal, self).__init__(page)
-
     @property
     def is_explicitly_locked(self):
         """
@@ -1119,7 +1182,7 @@ class SubsectionOutlineModal(CourseOutlineModal):
         return self.find_css('input[name=content-visibility]:checked').first.attrs('value')[0]
 
     @is_explicitly_locked.setter
-    def is_explicitly_locked(self, value):  # pylint: disable=arguments-differ
+    def is_explicitly_locked(self, value):
         """
         Override - sets visibility to staff_only if True, else 'visible'.
 

@@ -1,52 +1,49 @@
 """
 Unit tests for the Mongo modulestore
 """
-# pylint: disable=protected-access
-# pylint: disable=no-name-in-module
-# pylint: disable=bad-continuation
-from nose.tools import assert_equals, assert_raises, \
-    assert_not_equals, assert_false, assert_true, assert_greater, assert_is_instance, assert_is_none
-# pylint: enable=E0611
-from path import Path as path
-import pymongo
+
+from __future__ import absolute_import
+
 import logging
 import shutil
+from datetime import datetime
 from tempfile import mkdtemp
 from uuid import uuid4
-from datetime import datetime
-from pytz import UTC
-import unittest
+
+import pymongo
+import pytest
+import six
+
+# pylint: disable=no-name-in-module
+# pylint: disable=bad-continuation
+# pylint: disable=protected-access
+from django.test import TestCase
+# pylint: enable=E0611
 from mock import patch
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.locator import AssetLocator, BlockUsageLocator, CourseLocator, LibraryLocator
+from path import Path as path
+from pytz import UTC
 from xblock.core import XBlock
-
-from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
-from xblock.runtime import KeyValueStore
 from xblock.exceptions import InvalidScopeError
+from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope
+from xblock.runtime import KeyValueStore
 
-from xmodule.tests import DATA_DIR
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import Location
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.mongo import MongoKeyValueStore
-from xmodule.modulestore.draft import DraftModuleStore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
-from opaque_keys.edx.locator import LibraryLocator, CourseLocator
-from opaque_keys.edx.keys import UsageKey
-from xmodule.modulestore.xml_exporter import export_course_to_xml
-from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xlint
 from xmodule.contentstore.mongo import MongoContentStore
-
-from nose.tools import assert_in
 from xmodule.exceptions import NotFoundError
-from git.test.lib.asserts import assert_not_none
-from xmodule.x_module import XModuleMixin
-from xmodule.modulestore.mongo.base import as_draft
-from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
-from xmodule.modulestore.tests.utils import LocationMixin, mock_tab_from_json
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.draft import DraftModuleStore
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import InheritanceMixin
-
+from xmodule.modulestore.mongo import MongoKeyValueStore
+from xmodule.modulestore.mongo.base import as_draft
+from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
+from xmodule.modulestore.tests.utils import LocationMixin, mock_tab_from_json
+from xmodule.modulestore.xml_exporter import export_course_to_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xlint
+from xmodule.tests import DATA_DIR
+from xmodule.x_module import XModuleMixin
 
 log = logging.getLogger(__name__)
 
@@ -60,6 +57,13 @@ DEFAULT_CLASS = 'xmodule.raw_module.RawDescriptor'
 RENDER_TEMPLATE = lambda t_n, d, ctx=None, nsp='main': ''
 
 
+def assert_not_none(actual):
+    """
+    verify that item is None
+    """
+    assert actual is not None
+
+
 class ReferenceTestXBlock(XModuleMixin):
     """
     Test xblock type to test the reference field types
@@ -70,7 +74,7 @@ class ReferenceTestXBlock(XModuleMixin):
     reference_dict = ReferenceValueDict(scope=Scope.settings)
 
 
-class TestMongoModuleStoreBase(unittest.TestCase):
+class TestMongoModuleStoreBase(TestCase):
     '''
     Basic setup for all tests
     '''
@@ -78,7 +82,7 @@ class TestMongoModuleStoreBase(unittest.TestCase):
     courses = ['toy', 'simple', 'simple_with_draft', 'test_unicode']
 
     @classmethod
-    def setupClass(cls):
+    def setUpClass(cls):
         cls.connection = pymongo.MongoClient(
             host=HOST,
             port=PORT,
@@ -93,7 +97,7 @@ class TestMongoModuleStoreBase(unittest.TestCase):
         cls.content_store, cls.draft_store = cls.initdb()
 
     @classmethod
-    def teardownClass(cls):
+    def tearDownClass(cls):
         if cls.connection:
             cls.connection.drop_database(DB)
             cls.connection.close()
@@ -160,7 +164,7 @@ class TestMongoModuleStoreBase(unittest.TestCase):
                 static_content_store=content_store,
                 do_import_static=False,
                 verbose=True,
-                target_id=SlashSeparatedCourseKey('guestx', 'foo', 'bar')
+                target_id=CourseKey.from_string('guestx/foo/bar')
             )
 
         return content_store, draft_store
@@ -186,17 +190,17 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         pass
 
     @classmethod
-    def setupClass(cls):
-        super(TestMongoModuleStore, cls).setupClass()
+    def setUpClass(cls):
+        super(TestMongoModuleStore, cls).setUpClass()
 
     @classmethod
-    def teardownClass(cls):
-        super(TestMongoModuleStore, cls).teardownClass()
+    def tearDownClass(cls):
+        super(TestMongoModuleStore, cls).tearDownClass()
 
     def test_init(self):
         '''Make sure the db loads'''
         ids = list(self.connection[DB][COLLECTION].find({}, {'_id': True}))
-        assert_greater(len(ids), 12)
+        assert len(ids) > 12
 
     def test_mongo_modulestore_type(self):
         store = DraftModuleStore(
@@ -204,19 +208,19 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
             {'host': HOST, 'db': DB, 'port': PORT, 'collection': COLLECTION},
             FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS
         )
-        assert_equals(store.get_modulestore_type(''), ModuleStoreEnum.Type.mongo)
+        assert store.get_modulestore_type('') == ModuleStoreEnum.Type.mongo
 
     @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_get_courses(self, _from_json):
         '''Make sure the course objects loaded properly'''
         courses = self.draft_store.get_courses()
 
-        assert_equals(len(courses), 6)
+        assert len(courses) == 6
         course_ids = [course.id for course in courses]
 
         for course_key in [
 
-            SlashSeparatedCourseKey(*fields)
+            CourseKey.from_string('/'.join(fields))
             for fields in [
                 ['edX', 'simple', '2012_Fall'],
                 ['edX', 'simple_with_draft', '2012_Fall'],
@@ -226,15 +230,15 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
                 ['guestx', 'foo', 'bar'],
             ]
         ]:
-            assert_in(course_key, course_ids)
+            assert course_key in course_ids
             course = self.draft_store.get_course(course_key)
-            assert_not_none(course)
-            assert_true(self.draft_store.has_course(course_key))
-            mix_cased = SlashSeparatedCourseKey(
-                course_key.org.upper(), course_key.course.upper(), course_key.run.lower()
+            assert course is not None
+            assert self.draft_store.has_course(course_key)
+            mix_cased = CourseKey.from_string(
+                '/'.join([course_key.org.upper(), course_key.course.upper(), course_key.run.lower()])
             )
-            assert_false(self.draft_store.has_course(mix_cased))
-            assert_true(self.draft_store.has_course(mix_cased, ignore_case=True))
+            assert not self.draft_store.has_course(mix_cased)
+            assert self.draft_store.has_course(mix_cased, ignore_case=True)
 
     @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_get_org_courses(self, _from_json):
@@ -243,23 +247,23 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         """
 
         courses = self.draft_store.get_courses(org='guestx')
-        assert_equals(len(courses), 1)
+        assert len(courses) == 1
         course_ids = [course.id for course in courses]
 
         for course_key in [
-            SlashSeparatedCourseKey(*fields)
+            CourseKey.from_string('/'.join(fields))
             for fields in [
                 ['guestx', 'foo', 'bar']
             ]
         ]:
-            assert_in(course_key, course_ids)
+            assert course_key in course_ids
 
         courses = self.draft_store.get_courses(org='edX')
-        assert_equals(len(courses), 5)
+        assert len(courses) == 5
         course_ids = [course.id for course in courses]
 
         for course_key in [
-            SlashSeparatedCourseKey(*fields)
+            CourseKey.from_string('/'.join(fields))
             for fields in [
                 ['edX', 'simple', '2012_Fall'],
                 ['edX', 'simple_with_draft', '2012_Fall'],
@@ -268,7 +272,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
                 ['edX', 'toy', '2012_Fall'],
             ]
         ]:
-            assert_in(course_key, course_ids)
+            assert course_key in course_ids
 
     def test_no_such_course(self):
         """
@@ -276,20 +280,20 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         """
         for course_key in [
 
-            SlashSeparatedCourseKey(*fields)
+            CourseKey.from_string('/'.join(fields))
             for fields in [
                 ['edX', 'simple', 'no_such_course'], ['edX', 'no_such_course', '2012_Fall'],
                 ['NO_SUCH_COURSE', 'Test_iMport_courSe', '2012_Fall'],
             ]
         ]:
             course = self.draft_store.get_course(course_key)
-            assert_is_none(course)
-            assert_false(self.draft_store.has_course(course_key))
-            mix_cased = SlashSeparatedCourseKey(
-                course_key.org.lower(), course_key.course.upper(), course_key.run.upper()
+            assert course is None
+            assert not self.draft_store.has_course(course_key)
+            mix_cased = CourseKey.from_string(
+                '/'.join([course_key.org.lower(), course_key.course.upper(), course_key.run.upper()])
             )
-            assert_false(self.draft_store.has_course(mix_cased))
-            assert_false(self.draft_store.has_course(mix_cased, ignore_case=True))
+            assert not self.draft_store.has_course(mix_cased)
+            assert not self.draft_store.has_course(mix_cased, ignore_case=True)
 
     def test_get_mongo_course_with_split_course_key(self):
         """
@@ -316,63 +320,59 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         """
         lib_key = LibraryLocator("TestOrg", "TestLib")
         result = self.draft_store.has_course(lib_key)
-        assert_false(result)
+        assert not result
 
     def test_loads(self):
-        assert_not_none(
-            self.draft_store.get_item(Location('edX', 'toy', '2012_Fall', 'course', '2012_Fall'))
-        )
+        assert self.draft_store.get_item(BlockUsageLocator(CourseLocator('edX', 'toy', '2012_Fall', deprecated=True),
+                                                           'course', '2012_Fall', deprecated=True)) is not None
 
-        assert_not_none(
-            self.draft_store.get_item(Location('edX', 'simple', '2012_Fall', 'course', '2012_Fall')),
-        )
+        assert self.draft_store.get_item(BlockUsageLocator(CourseLocator('edX', 'simple', '2012_Fall', deprecated=True),
+                                                           'course', '2012_Fall', deprecated=True)) is not None
 
-        assert_not_none(
-            self.draft_store.get_item(Location('edX', 'toy', '2012_Fall', 'video', 'Welcome')),
-        )
+        assert self.draft_store.get_item(BlockUsageLocator(CourseLocator('edX', 'toy', '2012_Fall', deprecated=True),
+                                                           'video', 'Welcome', deprecated=True)) is not None
 
     def test_unicode_loads(self):
         """
         Test that getting items from the test_unicode course works
         """
-        assert_not_none(
-            self.draft_store.get_item(Location('edX', 'test_unicode', '2012_Fall', 'course', '2012_Fall')),
-        )
+        assert self.draft_store.get_item(
+            BlockUsageLocator(CourseLocator('edX', 'test_unicode', '2012_Fall', deprecated=True),
+                              'course', '2012_Fall', deprecated=True)) is not None
         # All items with ascii-only filenames should load properly.
-        assert_not_none(
-            self.draft_store.get_item(Location('edX', 'test_unicode', '2012_Fall', 'video', 'Welcome')),
-        )
-        assert_not_none(
-            self.draft_store.get_item(Location('edX', 'test_unicode', '2012_Fall', 'video', 'Welcome')),
-        )
-        assert_not_none(
-            self.draft_store.get_item(Location('edX', 'test_unicode', '2012_Fall', 'chapter', 'Overview')),
-        )
+        assert self.draft_store.get_item(
+            BlockUsageLocator(CourseLocator('edX', 'test_unicode', '2012_Fall', deprecated=True),
+                              'video', 'Welcome', deprecated=True)) is not None
+        assert self.draft_store.get_item(
+            BlockUsageLocator(CourseLocator('edX', 'test_unicode', '2012_Fall', deprecated=True),
+                              'video', 'Welcome', deprecated=True)) is not None
+        assert self.draft_store.get_item(
+            BlockUsageLocator(CourseLocator('edX', 'test_unicode', '2012_Fall', deprecated=True),
+                              'chapter', 'Overview', deprecated=True)) is not None
 
     def test_find_one(self):
-        assert_not_none(
-            self.draft_store._find_one(Location('edX', 'toy', '2012_Fall', 'course', '2012_Fall')),
-        )
+        assert self.draft_store._find_one(
+            BlockUsageLocator(CourseLocator('edX', 'toy', '2012_Fall', deprecated=True),
+                              'course', '2012_Fall', deprecated=True)) is not None
 
-        assert_not_none(
-            self.draft_store._find_one(Location('edX', 'simple', '2012_Fall', 'course', '2012_Fall')),
-        )
+        assert self.draft_store._find_one(
+            BlockUsageLocator(CourseLocator('edX', 'simple', '2012_Fall', deprecated=True),
+                              'course', '2012_Fall', deprecated=True)) is not None
 
-        assert_not_none(
-            self.draft_store._find_one(Location('edX', 'toy', '2012_Fall', 'video', 'Welcome')),
-        )
+        assert self.draft_store._find_one(BlockUsageLocator(CourseLocator('edX', 'toy', '2012_Fall', deprecated=True),
+                                          'video', 'Welcome', deprecated=True)) is not None
 
     def test_xlinter(self):
         '''
         Run through the xlinter, we know the 'toy' course has violations, but the
         number will continue to grow over time, so just check > 0
         '''
-        assert_not_equals(perform_xlint(DATA_DIR, ['toy']), 0)
+        assert perform_xlint(DATA_DIR, ['toy']) != 0
 
     def test_get_courses_has_no_templates(self):
         courses = self.draft_store.get_courses()
         for course in courses:
-            assert_false(
+            self.assertFalse(
                 course.location.org == 'edx' and course.location.course == 'templates',
                 '{0} is a template course'.format(course)
             )
@@ -381,65 +381,61 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         """
         Test getting, setting, and defaulting the locked attr and arbitrary attrs.
         """
-        location = Location('edX', 'toy', '2012_Fall', 'course', '2012_Fall')
+        location = BlockUsageLocator(CourseLocator('edX', 'toy', '2012_Fall', deprecated=True),
+                                     'course', '2012_Fall', deprecated=True)
         course_content, __ = self.content_store.get_all_content_for_course(location.course_key)
-        assert_true(len(course_content) > 0)
+        assert len(course_content) > 0
         filter_params = _build_requested_filter('Images')
         filtered_course_content, __ = self.content_store.get_all_content_for_course(
             location.course_key, filter_params=filter_params)
-        assert_true(len(filtered_course_content) < len(course_content))
+        assert len(filtered_course_content) < len(course_content)
         # a bit overkill, could just do for content[0]
         for content in course_content:
             assert not content.get('locked', False)
-            asset_key = AssetLocation._from_deprecated_son(content.get('content_son', content['_id']), location.run)
+            asset_key = AssetLocator._from_deprecated_son(content.get('content_son', content['_id']), location.run)
             assert not self.content_store.get_attr(asset_key, 'locked', False)
             attrs = self.content_store.get_attrs(asset_key)
-            assert_in('uploadDate', attrs)
+            assert 'uploadDate' in attrs
             assert not attrs.get('locked', False)
             self.content_store.set_attr(asset_key, 'locked', True)
             assert self.content_store.get_attr(asset_key, 'locked', False)
             attrs = self.content_store.get_attrs(asset_key)
-            assert_in('locked', attrs)
+            assert 'locked' in attrs
             assert attrs['locked'] is True
             self.content_store.set_attrs(asset_key, {'miscel': 99})
-            assert_equals(self.content_store.get_attr(asset_key, 'miscel'), 99)
+            assert self.content_store.get_attr(asset_key, 'miscel') == 99
 
-        asset_key = AssetLocation._from_deprecated_son(
+        asset_key = AssetLocator._from_deprecated_son(
             course_content[0].get('content_son', course_content[0]['_id']),
             location.run
         )
-        assert_raises(
-            AttributeError, self.content_store.set_attr, asset_key,
-            'md5', 'ff1532598830e3feac91c2449eaa60d6'
-        )
-        assert_raises(
-            AttributeError, self.content_store.set_attrs, asset_key,
-            {'foo': 9, 'md5': 'ff1532598830e3feac91c2449eaa60d6'}
-        )
-        assert_raises(
-            NotFoundError, self.content_store.get_attr,
-            Location('bogus', 'bogus', 'bogus', 'asset', 'bogus'),
-            'displayname'
-        )
-        assert_raises(
-            NotFoundError, self.content_store.set_attr,
-            Location('bogus', 'bogus', 'bogus', 'asset', 'bogus'),
-            'displayname', 'hello'
-        )
-        assert_raises(
-            NotFoundError, self.content_store.get_attrs,
-            Location('bogus', 'bogus', 'bogus', 'asset', 'bogus')
-        )
-        assert_raises(
-            NotFoundError, self.content_store.set_attrs,
-            Location('bogus', 'bogus', 'bogus', 'asset', 'bogus'),
-            {'displayname': 'hello'}
-        )
-        assert_raises(
-            NotFoundError, self.content_store.set_attrs,
-            Location('bogus', 'bogus', 'bogus', 'asset', None),
-            {'displayname': 'hello'}
-        )
+        with pytest.raises(AttributeError):
+            self.content_store.set_attr(asset_key, 'md5', 'ff1532598830e3feac91c2449eaa60d6')
+        with pytest.raises(AttributeError):
+            self.content_store.set_attrs(asset_key, {'foo': 9, 'md5': 'ff1532598830e3feac91c2449eaa60d6'})
+        with pytest.raises(NotFoundError):
+            self.content_store.get_attr(
+                BlockUsageLocator(CourseLocator('bogus', 'bogus', 'bogus'), 'asset', 'bogus'),
+                'displayname'
+            )
+        with pytest.raises(NotFoundError):
+            self.content_store.set_attr(
+                BlockUsageLocator(CourseLocator('bogus', 'bogus', 'bogus'), 'asset', 'bogus'),
+                'displayname', 'hello'
+            )
+        with pytest.raises(NotFoundError):
+            self.content_store.get_attrs(BlockUsageLocator(CourseLocator('bogus', 'bogus', 'bogus'), 'asset', 'bogus'))
+        with pytest.raises(NotFoundError):
+            self.content_store.set_attrs(
+                BlockUsageLocator(CourseLocator('bogus', 'bogus', 'bogus'), 'asset', 'bogus'),
+                {'displayname': 'hello'}
+            )
+        with pytest.raises(NotFoundError):
+            self.content_store.set_attrs(
+                BlockUsageLocator(CourseLocator('bogus', 'bogus', 'bogus', deprecated=True),
+                                  'asset', None, deprecated=True),
+                {'displayname': 'hello'}
+            )
 
     @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_get_courses_for_wiki(self, _from_json):
@@ -448,42 +444,42 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         """
         for course_number in self.courses:
             course_locations = self.draft_store.get_courses_for_wiki(course_number)
-            assert_equals(len(course_locations), 1)
-            assert_equals(SlashSeparatedCourseKey('edX', course_number, '2012_Fall'), course_locations[0])
+            assert len(course_locations) == 1
+            assert CourseKey.from_string('/'.join(['edX', course_number, '2012_Fall'])) == course_locations[0]
 
         course_locations = self.draft_store.get_courses_for_wiki('no_such_wiki')
-        assert_equals(len(course_locations), 0)
+        assert len(course_locations) == 0
 
         # set toy course to share the wiki with simple course
-        toy_course = self.draft_store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
+        toy_course = self.draft_store.get_course(CourseKey.from_string('edX/toy/2012_Fall'))
         toy_course.wiki_slug = 'simple'
         self.draft_store.update_item(toy_course, ModuleStoreEnum.UserID.test)
 
         # now toy_course should not be retrievable with old wiki_slug
         course_locations = self.draft_store.get_courses_for_wiki('toy')
-        assert_equals(len(course_locations), 0)
+        assert len(course_locations) == 0
 
         # but there should be two courses with wiki_slug 'simple'
         course_locations = self.draft_store.get_courses_for_wiki('simple')
-        assert_equals(len(course_locations), 2)
+        assert len(course_locations) == 2
         for course_number in ['toy', 'simple']:
-            assert_in(SlashSeparatedCourseKey('edX', course_number, '2012_Fall'), course_locations)
+            assert CourseKey.from_string('/'.join(['edX', course_number, '2012_Fall'])) in course_locations
 
         # configure simple course to use unique wiki_slug.
-        simple_course = self.draft_store.get_course(SlashSeparatedCourseKey('edX', 'simple', '2012_Fall'))
+        simple_course = self.draft_store.get_course(CourseKey.from_string('edX/simple/2012_Fall'))
         simple_course.wiki_slug = 'edX.simple.2012_Fall'
         self.draft_store.update_item(simple_course, ModuleStoreEnum.UserID.test)
         # it should be retrievable with its new wiki_slug
         course_locations = self.draft_store.get_courses_for_wiki('edX.simple.2012_Fall')
-        assert_equals(len(course_locations), 1)
-        assert_in(SlashSeparatedCourseKey('edX', 'simple', '2012_Fall'), course_locations)
+        assert len(course_locations) == 1
+        assert CourseKey.from_string('edX/simple/2012_Fall') in course_locations
 
     @XBlock.register_temp_plugin(ReferenceTestXBlock, 'ref_test')
     def test_reference_converters(self):
         """
         Test that references types get deserialized correctly
         """
-        course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        course_key = CourseKey.from_string('edX/toy/2012_Fall')
 
         def setup_test():
             course = self.draft_store.get_course(course_key)
@@ -520,20 +516,20 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         def check_xblock_fields():
             def check_children(xblock):
                 for child in xblock.children:
-                    assert_is_instance(child, UsageKey)
+                    assert isinstance(child, UsageKey)
 
             course = self.draft_store.get_course(course_key)
             check_children(course)
 
             refele = self.draft_store.get_item(self.refloc)
             check_children(refele)
-            assert_is_instance(refele.reference_link, UsageKey)
-            assert_greater(len(refele.reference_list), 0)
+            assert isinstance(refele.reference_link, UsageKey)
+            assert len(refele.reference_list) > 0
             for ref in refele.reference_list:
-                assert_is_instance(ref, UsageKey)
-            assert_greater(len(refele.reference_dict), 0)
-            for ref in refele.reference_dict.itervalues():
-                assert_is_instance(ref, UsageKey)
+                assert isinstance(ref, UsageKey)
+            assert len(refele.reference_dict) > 0
+            for ref in six.itervalues(refele.reference_dict):
+                assert isinstance(ref, UsageKey)
 
         def check_mongo_fields():
             def get_item(location):
@@ -541,29 +537,30 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
 
             def check_children(payload):
                 for child in payload['definition']['children']:
-                    assert_is_instance(child, basestring)
+                    assert isinstance(child, six.string_types)
 
             refele = get_item(self.refloc)
             check_children(refele)
-            assert_is_instance(refele['definition']['data']['reference_link'], basestring)
-            assert_greater(len(refele['definition']['data']['reference_list']), 0)
+            assert isinstance(refele['definition']['data']['reference_link'], six.string_types)
+            assert len(refele['definition']['data']['reference_list']) > 0
             for ref in refele['definition']['data']['reference_list']:
-                assert_is_instance(ref, basestring)
-            assert_greater(len(refele['metadata']['reference_dict']), 0)
-            for ref in refele['metadata']['reference_dict'].itervalues():
-                assert_is_instance(ref, basestring)
+                assert isinstance(ref, six.string_types)
+            assert len(refele['metadata']['reference_dict']) > 0
+            for ref in six.itervalues(refele['metadata']['reference_dict']):
+                assert isinstance(ref, six.string_types)
 
         setup_test()
         check_xblock_fields()
         check_mongo_fields()
 
+    @patch('xmodule.video_module.video_module.edxval_api', None)
     @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_export_course_image(self, _from_json):
         """
         Test to make sure that we have a course image in the contentstore,
         then export it to ensure it gets copied to both file locations.
         """
-        course_key = SlashSeparatedCourseKey('edX', 'simple', '2012_Fall')
+        course_key = CourseKey.from_string('edX/simple/2012_Fall')
         location = course_key.make_asset_key('asset', 'images_course_image.jpg')
 
         # This will raise if the course image is missing
@@ -571,34 +568,36 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
 
         root_dir = path(mkdtemp())
         self.addCleanup(shutil.rmtree, root_dir)
-        export_course_to_xml(self.draft_store, self.content_store, course_key, root_dir, 'test_export')
+        export_course_to_xml(self.draft_store, self.content_store, course_key, root_dir, u'test_export')
         self.assertTrue(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
         self.assertTrue(path(root_dir / 'test_export/static/images_course_image.jpg').isfile())
 
+    @patch('xmodule.video_module.video_module.edxval_api', None)
     @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_export_course_image_nondefault(self, _from_json):
         """
         Make sure that if a non-default image path is specified that we
         don't export it to the static default location
         """
-        course = self.draft_store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
-        assert_true(course.course_image, 'just_a_test.jpg')
+        course = self.draft_store.get_course(CourseKey.from_string('edX/toy/2012_Fall'))
+        assert course.course_image == 'just_a_test.jpg'
 
         root_dir = path(mkdtemp())
         self.addCleanup(shutil.rmtree, root_dir)
-        export_course_to_xml(self.draft_store, self.content_store, course.id, root_dir, 'test_export')
+        export_course_to_xml(self.draft_store, self.content_store, course.id, root_dir, u'test_export')
         self.assertTrue(path(root_dir / 'test_export/static/just_a_test.jpg').isfile())
         self.assertFalse(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
 
+    @patch('xmodule.video_module.video_module.edxval_api', None)
     def test_course_without_image(self):
         """
         Make sure we elegantly passover our code when there isn't a static
         image
         """
-        course = self.draft_store.get_course(SlashSeparatedCourseKey('edX', 'simple_with_draft', '2012_Fall'))
+        course = self.draft_store.get_course(CourseKey.from_string('edX/simple_with_draft/2012_Fall'))
         root_dir = path(mkdtemp())
         self.addCleanup(shutil.rmtree, root_dir)
-        export_course_to_xml(self.draft_store, self.content_store, course.id, root_dir, 'test_export')
+        export_course_to_xml(self.draft_store, self.content_store, course.id, root_dir, u'test_export')
         self.assertFalse(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
         self.assertFalse(path(root_dir / 'test_export/static/images_course_image.jpg').isfile())
 
@@ -619,15 +618,20 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         course = 'tree{}'.format(name)
         run = name
 
-        if not self.draft_store.has_course(SlashSeparatedCourseKey(org, course, run)):
+        if not self.draft_store.has_course(CourseKey.from_string('/'.join[org, course, run])):
             self.draft_store.create_course(org, course, run, user_id)
 
             locations = {
-                'grandparent': Location(org, course, run, 'chapter', 'grandparent'),
-                'parent_sibling': Location(org, course, run, 'sequential', 'parent_sibling'),
-                'parent': Location(org, course, run, 'sequential', 'parent'),
-                'child_sibling': Location(org, course, run, 'vertical', 'child_sibling'),
-                'child': Location(org, course, run, 'vertical', 'child'),
+                'grandparent': BlockUsageLocator(CourseLocator(org, course, run, deprecated=True),
+                                                 'chapter', 'grandparent', deprecated=True),
+                'parent_sibling': BlockUsageLocator(CourseLocator(org, course, run, deprecated=True),
+                                                    'sequential', 'parent_sibling', deprecated=True),
+                'parent': BlockUsageLocator(CourseLocator(org, course, run, deprecated=True),
+                                            'sequential', 'parent', deprecated=True),
+                'child_sibling': BlockUsageLocator(CourseLocator(org, course, run, deprecated=True),
+                                                   'vertical', 'child_sibling', deprecated=True),
+                'child': BlockUsageLocator(CourseLocator(org, course, run, deprecated=True),
+                                           'vertical', 'child', deprecated=True),
             }
 
             for key in locations:
@@ -657,7 +661,8 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         """
 
         # Insert the test block directly into the module store
-        location = Location('edX', 'migration', '2012_Fall', 'html', 'test_html')
+        location = BlockUsageLocator(CourseLocator('edX', 'migration', '2012_Fall', deprecated=True),
+                                     'html', 'test_html', deprecated=True)
         published_date = datetime(1970, 1, 1, tzinfo=UTC)
         published_by = 123
         self.draft_store._update_single_item(
@@ -701,8 +706,8 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
 
         # First child should have been moved to second position, and better child takes the lead
         course = self.draft_store.get_course(course.id)
-        self.assertEqual(unicode(course.children[1]), unicode(first_child.location))
-        self.assertEqual(unicode(course.children[0]), unicode(second_child.location))
+        self.assertEqual(six.text_type(course.children[1]), six.text_type(first_child.location))
+        self.assertEqual(six.text_type(course.children[0]), six.text_type(second_child.location))
 
         # Clean up the data so we don't break other tests which apparently expect a particular state
         self.draft_store.delete_course(course.id, self.dummy_user)
@@ -712,7 +717,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         course_key = CourseLocator(org="edX", course="101", run="2015")
         root_block_key = self.draft_store.make_course_usage_key(course_key)
         self.assertEqual(root_block_key.block_type, "course")
-        self.assertEqual(root_block_key.name, "2015")
+        self.assertEqual(root_block_key.block_id, "2015")
 
 
 class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):
@@ -728,12 +733,12 @@ class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):
         pass
 
     @classmethod
-    def setupClass(cls):
-        super(TestMongoModuleStoreWithNoAssetCollection, cls).setupClass()
+    def setUpClass(cls):
+        super(TestMongoModuleStoreWithNoAssetCollection, cls).setUpClass()
 
     @classmethod
-    def teardownClass(cls):
-        super(TestMongoModuleStoreWithNoAssetCollection, cls).teardownClass()
+    def tearDownClass(cls):
+        super(TestMongoModuleStoreWithNoAssetCollection, cls).tearDownClass()
 
     def test_no_asset_collection(self):
         courses = self.draft_store.get_courses()
@@ -747,7 +752,7 @@ class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):
         self.assertRaises(ItemNotFoundError, lambda: self.draft_store.get_all_asset_metadata(course_key, 'asset')[:1])
 
 
-class TestMongoKeyValueStore(unittest.TestCase):
+class TestMongoKeyValueStore(TestCase):
     """
     Tests for MongoKeyValueStore.
     """
@@ -755,32 +760,32 @@ class TestMongoKeyValueStore(unittest.TestCase):
     def setUp(self):
         super(TestMongoKeyValueStore, self).setUp()
         self.data = {'foo': 'foo_value'}
-        self.course_id = SlashSeparatedCourseKey('org', 'course', 'run')
+        self.course_id = CourseKey.from_string('org/course/run')
         self.parent = self.course_id.make_usage_key('parent', 'p')
         self.children = [self.course_id.make_usage_key('child', 'a'), self.course_id.make_usage_key('child', 'b')]
         self.metadata = {'meta': 'meta_val'}
         self.kvs = MongoKeyValueStore(self.data, self.parent, self.children, self.metadata)
 
     def test_read(self):
-        assert_equals(self.data['foo'], self.kvs.get(KeyValueStore.Key(Scope.content, None, None, 'foo')))
-        assert_equals(self.parent, self.kvs.get(KeyValueStore.Key(Scope.parent, None, None, 'parent')))
-        assert_equals(self.children, self.kvs.get(KeyValueStore.Key(Scope.children, None, None, 'children')))
-        assert_equals(self.metadata['meta'], self.kvs.get(KeyValueStore.Key(Scope.settings, None, None, 'meta')))
+        assert self.kvs.get(KeyValueStore.Key(Scope.content, None, None, 'foo')) == self.data['foo']
+        assert self.kvs.get(KeyValueStore.Key(Scope.parent, None, None, 'parent')) == self.parent
+        assert self.kvs.get(KeyValueStore.Key(Scope.children, None, None, 'children')) == self.children
+        assert self.kvs.get(KeyValueStore.Key(Scope.settings, None, None, 'meta')) == self.metadata['meta']
 
     def test_read_invalid_scope(self):
         for scope in (Scope.preferences, Scope.user_info, Scope.user_state):
             key = KeyValueStore.Key(scope, None, None, 'foo')
-            with assert_raises(InvalidScopeError):
+            with pytest.raises(InvalidScopeError):
                 self.kvs.get(key)
-            assert_false(self.kvs.has(key))
+            assert not self.kvs.has(key)
 
     def test_read_non_dict_data(self):
         self.kvs = MongoKeyValueStore('xml_data', self.parent, self.children, self.metadata)
-        assert_equals('xml_data', self.kvs.get(KeyValueStore.Key(Scope.content, None, None, 'data')))
+        assert self.kvs.get(KeyValueStore.Key(Scope.content, None, None, 'data')) == 'xml_data'
 
     def _check_write(self, key, value):
         self.kvs.set(key, value)
-        assert_equals(value, self.kvs.get(key))
+        assert self.kvs.get(key) == value
 
     def test_write(self):
         yield (self._check_write, KeyValueStore.Key(Scope.content, None, None, 'foo'), 'new_data')
@@ -794,19 +799,19 @@ class TestMongoKeyValueStore(unittest.TestCase):
 
     def test_write_invalid_scope(self):
         for scope in (Scope.preferences, Scope.user_info, Scope.user_state):
-            with assert_raises(InvalidScopeError):
+            with pytest.raises(InvalidScopeError):
                 self.kvs.set(KeyValueStore.Key(scope, None, None, 'foo'), 'new_value')
 
     def _check_delete_default(self, key, default_value):
         self.kvs.delete(key)
-        assert_equals(default_value, self.kvs.get(key))
+        assert self.kvs.get(key) == default_value
         assert self.kvs.has(key)
 
     def _check_delete_key_error(self, key):
         self.kvs.delete(key)
-        with assert_raises(KeyError):
+        with pytest.raises(KeyError):
             self.kvs.get(key)
-        assert_false(self.kvs.has(key))
+        assert not self.kvs.has(key)
 
     def test_delete(self):
         yield (self._check_delete_key_error, KeyValueStore.Key(Scope.content, None, None, 'foo'))
@@ -815,7 +820,7 @@ class TestMongoKeyValueStore(unittest.TestCase):
 
     def test_delete_invalid_scope(self):
         for scope in (Scope.preferences, Scope.user_info, Scope.user_state, Scope.parent):
-            with assert_raises(InvalidScopeError):
+            with pytest.raises(InvalidScopeError):
                 self.kvs.delete(KeyValueStore.Key(scope, None, None, 'foo'))
 
 
@@ -843,9 +848,11 @@ def _build_requested_filter(requested_filter):
         ],
     }
     requested_file_types = all_filters.get(requested_filter, None)
-    where = ["JSON.stringify(this.contentType).toUpperCase() == JSON.stringify('{}').toUpperCase()".format(
-        req_filter) for req_filter in requested_file_types]
     filter_params = {
-        "$where": ' || '.join(where),
+        '$or': [{
+            'contentType': {
+                '$in': requested_file_types,
+            },
+        }]
     }
     return filter_params

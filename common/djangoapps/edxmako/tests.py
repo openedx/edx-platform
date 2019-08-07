@@ -1,22 +1,20 @@
-from mock import patch, Mock
-import unittest
-import ddt
+from __future__ import absolute_import
 
-from request_cache.middleware import RequestCache
+import unittest
+
+import ddt
 from django.conf import settings
+from django.urls import reverse
 from django.http import HttpResponse
 from django.test import TestCase
-from django.test.utils import override_settings
 from django.test.client import RequestFactory
-from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
+from edx_django_utils.cache import RequestCache
+from mock import Mock, patch
+
+from edxmako import LOOKUP, add_lookup
 from edxmako.request_context import get_template_request_context
-from edxmako import add_lookup, LOOKUP
-from edxmako.shortcuts import (
-    marketing_link,
-    is_marketing_link_set,
-    is_any_marketing_link_set,
-    render_to_string,
-)
+from edxmako.shortcuts import is_any_marketing_link_set, is_marketing_link_set, marketing_link, render_to_string
 from student.tests.factories import UserFactory
 from util.testing import UrlResetMixin
 
@@ -93,7 +91,7 @@ class MakoRequestContextTest(TestCase):
         self.request.user = self.user
         self.response = Mock(spec=HttpResponse)
 
-        self.addCleanup(RequestCache.clear_request_cache)
+        self.addCleanup(RequestCache.clear_all_namespaces)
 
     def test_with_current_request(self):
         """
@@ -132,7 +130,7 @@ class MakoRequestContextTest(TestCase):
             self.assertIsNotNone(get_template_request_context())
         mock_get_current_request.assert_not_called()
 
-        RequestCache.clear_request_cache()
+        RequestCache.clear_all_namespaces()
 
         with patch('edxmako.request_context.get_current_request', return_value=None):
             # requestcontext should be None, because the cache isn't filled

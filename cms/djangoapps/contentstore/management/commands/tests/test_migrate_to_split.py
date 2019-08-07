@@ -1,32 +1,32 @@
 """
 Unittests for migrating a course to split mongo
 """
-import unittest
+from __future__ import absolute_import
 
 from django.core.management import CommandError, call_command
-from contentstore.management.commands.migrate_to_split import Command
+from django.test import TestCase
+
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
-class TestArgParsing(unittest.TestCase):
+class TestArgParsing(TestCase):
     """
     Tests for parsing arguments for the `migrate_to_split` management command
     """
     def setUp(self):
         super(TestArgParsing, self).setUp()
-        self.command = Command()
 
     def test_no_args(self):
         """
         Test the arg length error
         """
-        errstring = "migrate_to_split requires at least two arguments"
+        errstring = "Error: too few arguments"
         with self.assertRaisesRegexp(CommandError, errstring):
-            self.command.handle()
+            call_command("migrate_to_split")
 
     def test_invalid_location(self):
         """
@@ -34,7 +34,7 @@ class TestArgParsing(unittest.TestCase):
         """
         errstring = "Invalid location string"
         with self.assertRaisesRegexp(CommandError, errstring):
-            self.command.handle("foo", "bar")
+            call_command("migrate_to_split", "foo", "bar")
 
     def test_nonexistent_user_id(self):
         """
@@ -42,7 +42,7 @@ class TestArgParsing(unittest.TestCase):
         """
         errstring = "No user found identified by 99"
         with self.assertRaisesRegexp(CommandError, errstring):
-            self.command.handle("org/course/name", "99")
+            call_command("migrate_to_split", "org/course/name", "99")
 
     def test_nonexistent_user_email(self):
         """
@@ -50,10 +50,10 @@ class TestArgParsing(unittest.TestCase):
         """
         errstring = "No user found identified by fake@example.com"
         with self.assertRaisesRegexp(CommandError, errstring):
-            self.command.handle("org/course/name", "fake@example.com")
+            call_command("migrate_to_split", "org/course/name", "fake@example.com")
 
 
-# pylint: disable=no-member, protected-access
+# pylint: disable=protected-access
 class TestMigrateToSplit(ModuleStoreTestCase):
     """
     Unit tests for migrating a course from old mongo to split mongo
@@ -78,13 +78,6 @@ class TestMigrateToSplit(ModuleStoreTestCase):
             split_store.has_course(new_key),
             "Could not find course"
         )
-        # I put this in but realized that the migrator doesn't make the new course the
-        # default mapping in mixed modulestore. I left the test here so we can debate what it ought to do.
-#         self.assertEqual(
-#             ModuleStoreEnum.Type.split,
-#             modulestore()._get_modulestore_for_courselike(new_key).get_modulestore_type(),
-#             "Split is not the new default for the course"
-#         )
 
     def test_user_id(self):
         """
@@ -105,7 +98,9 @@ class TestMigrateToSplit(ModuleStoreTestCase):
             "migrate_to_split",
             str(self.course.id),
             str(self.user.id),
-            "org.dept", "name", "run",
+            org="org.dept",
+            course="name",
+            run="run",
         )
         split_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.split)
         locator = split_store.make_course_key("org.dept", "name", "run")

@@ -1,18 +1,23 @@
 """
 Test for user creation from sites with configuration overrides.
 """
-from django.test import TestCase
-from student.models import UserSignupSource
-import mock
+from __future__ import absolute_import
+
 import json
-from django.core.urlresolvers import reverse
+
+import mock
 from django.contrib.auth.models import User
+from django.test import TestCase
+from django.urls import reverse
+
+from student.models import UserSignupSource
 
 FAKE_SITE = {
     "SITE_NAME": "openedx.localhost",
     "university": "fakeuniversity",
     "course_org_filter": "fakeorg",
     "platform_name": "Fake University",
+    "PLATFORM_NAME": "Fake University",
     "email_from_address": "no-reply@fakeuniversity.com",
     "REGISTRATION_EXTRA_FIELDS": {
         "address1": "required",
@@ -59,14 +64,14 @@ class TestSite(TestCase):
             "honor_code": "true",
             "terms_of_service": "true",
         }
-        self.extended_params = dict(self.params.items() + {
+        self.extended_params = dict(list(self.params.items()) + list({
             "address1": "foo",
             "city": "foo",
             "state": "foo",
             "country": "foo",
             "company": "foo",
             "title": "foo"
-        }.items())
+        }.items()))
 
     @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_site_name)
     def test_user_signup_source(self):

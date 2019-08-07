@@ -1,9 +1,10 @@
 """ Tests for DiscussionXBLock"""
+from __future__ import print_function
+from __future__ import absolute_import
 from collections import namedtuple
 import ddt
 import itertools
 import mock
-from nose.plugins.attrib import attr
 import random
 import string
 from unittest import TestCase
@@ -14,9 +15,19 @@ from openedx.core.lib.xblock_builtin.xblock_discussion.xblock_discussion import 
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds, UNIQUE_ID, NO_CACHE_VALUE
 from xblock.runtime import Runtime
+from six.moves import range
+
+
+def attribute_pair_repr(self):
+    """
+    Custom string representation for the AttributePair namedtuple which is
+    consistent between test runs.
+    """
+    return u'<AttributePair name={}>'.format(self.name)
 
 
 AttributePair = namedtuple("AttributePair", ["name", "value"])
+AttributePair.__repr__ = attribute_pair_repr
 
 
 ID_ATTR_NAMES = ("discussion_id", "id",)
@@ -28,7 +39,7 @@ def _random_string():
     """
     Generates random string
     """
-    return ''.join(random.choice(string.lowercase, ) for _ in xrange(12))
+    return ''.join(random.choice(string.lowercase, ) for _ in range(12))
 
 
 def _make_attribute_test_cases():
@@ -44,7 +55,6 @@ def _make_attribute_test_cases():
         )
 
 
-@attr('shard2')
 @ddt.ddt
 class DiscussionXBlockImportExportTests(TestCase):
     """
@@ -78,7 +88,7 @@ class DiscussionXBlockImportExportTests(TestCase):
         """
         Test that xblock export XML format can be parsed preserving field values
         """
-        xblock_xml = """
+        xblock_xml = u"""
         <discussion
             url_name="82bb87a2d22240b1adac2dfcc1e7e5e4" xblock-family="xblock.v1"
             {id_attr}="{id_value}"
@@ -100,7 +110,7 @@ class DiscussionXBlockImportExportTests(TestCase):
             self.assertEqual(block.discussion_category, category_pair.value)
             self.assertEqual(block.discussion_target, target_pair.value)
         except AssertionError:
-            print xblock_xml
+            print(xblock_xml)
             raise
 
     @mock.patch(DISCUSSION_XBLOCK_LOCATION + ".load_definition_xml")
@@ -111,7 +121,7 @@ class DiscussionXBlockImportExportTests(TestCase):
         Test that legacy export XML format can be parsed preserving field values
         """
         xblock_xml = """<discussion url_name="82bb87a2d22240b1adac2dfcc1e7e5e4"/>"""
-        xblock_definition_xml = """
+        xblock_definition_xml = u"""
         <discussion
             {id_attr}="{id_value}"
             {category_attr}="{category_value}"
@@ -132,7 +142,7 @@ class DiscussionXBlockImportExportTests(TestCase):
             self.assertEqual(block.discussion_category, category_pair.value)
             self.assertEqual(block.discussion_target, target_pair.value)
         except AssertionError:
-            print xblock_xml, xblock_definition_xml
+            print(xblock_xml, xblock_definition_xml)
             raise
 
     def test_export_default_discussion_id(self):

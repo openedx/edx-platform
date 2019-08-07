@@ -2,18 +2,14 @@
 Some additional unit tests for Microsite logic. The LMS covers some of the Microsite testing, this adds
 some additional coverage
 """
+from __future__ import absolute_import
+
 import ddt
 from mock import patch
 
-from microsite_configuration.microsite import (
-    get_value_for_org,
-    get_backend,
-)
 from microsite_configuration.backends.base import BaseMicrositeBackend
-from microsite_configuration.tests.tests import (
-    DatabaseMicrositeTestCase,
-    MICROSITE_BACKENDS,
-)
+from microsite_configuration.microsite import get_backend, get_value_for_org
+from microsite_configuration.tests.tests import MICROSITE_BACKENDS, DatabaseMicrositeTestCase
 
 
 @ddt.ddt
@@ -21,9 +17,6 @@ class TestMicrosites(DatabaseMicrositeTestCase):
     """
     Run through some Microsite logic
     """
-
-    def setUp(self):
-        super(TestMicrosites, self).setUp()
 
     @ddt.data(*MICROSITE_BACKENDS)
     def test_get_value_for_org_when_microsite_has_no_org(self, site_backend):

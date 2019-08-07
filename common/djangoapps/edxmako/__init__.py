@@ -13,4 +13,14 @@
 #   limitations under the License.
 LOOKUP = {}
 
-from .paths import add_lookup, lookup_template, clear_lookups, save_lookups
+from .paths import add_lookup, clear_lookups, lookup_template, save_lookups
+
+
+class Engines(object):
+    """
+    Aliases for the available template engines.
+    Note that the preview engine is only configured for cms.
+    """
+    DJANGO = 'django'
+    MAKO = 'mako'
+    PREVIEW = 'preview'

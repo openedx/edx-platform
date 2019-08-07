@@ -1,14 +1,17 @@
 """
 Block Counts Transformer
 """
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
+from __future__ import absolute_import
+
+from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 
 
 class BlockCountsTransformer(BlockStructureTransformer):
     """
     Keep a count of descendant blocks of the requested types
     """
-    VERSION = 1
+    WRITE_VERSION = 1
+    READ_VERSION = 1
     BLOCK_COUNTS = 'block_counts'
 
     def __init__(self, block_types_to_count):

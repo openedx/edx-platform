@@ -1,18 +1,22 @@
 """Tests the course modules and their functions"""
-import ddt
+from __future__ import absolute_import, print_function
+
+import itertools
 import unittest
 from datetime import datetime, timedelta
 
-import itertools
+import ddt
+from dateutil import parser
+from django.conf import settings
+from django.test import override_settings
 from fs.memoryfs import MemoryFS
 from mock import Mock, patch
-from pytz import timezone, utc
-from xblock.runtime import KvsFieldData, DictKeyValueStore
+from opaque_keys.edx.keys import CourseKey
+from pytz import utc
+from xblock.runtime import DictKeyValueStore, KvsFieldData
 
 import xmodule.course_module
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-
 
 ORG = 'test_org'
 COURSE = 'test_course'
@@ -25,6 +29,7 @@ _NEXT_WEEK = _TODAY + timedelta(days=7)
 
 
 class CourseFieldsTestCase(unittest.TestCase):
+
     def test_default_start_date(self):
         self.assertEqual(
             xmodule.course_module.CourseFields.start.default,
@@ -38,7 +43,7 @@ class DummySystem(ImportSystem):
 
         xmlstore = XMLModuleStore("data_dir", source_dirs=[],
                                   load_error_modules=load_error_modules)
-        course_id = SlashSeparatedCourseKey(ORG, COURSE, 'test_run')
+        course_id = CourseKey.from_string('/'.join([ORG, COURSE, 'test_run']))
         course_dir = "test_dir"
         error_tracker = Mock()
 
@@ -142,6 +147,16 @@ class HasEndedMayCertifyTestCase(unittest.TestCase):
         self.assertFalse(self.future_noshow_certs.may_certify())
 
 
+class CourseSummaryHasEnded(unittest.TestCase):
+    """ Test for has_ended method when end date is missing timezone information. """
+
+    def test_course_end(self):
+        test_course = get_dummy_course("2012-01-01T12:00")
+        bad_end_date = parser.parse("2012-02-21 10:28:45")
+        summary = xmodule.course_module.CourseSummary(test_course.id, end=bad_end_date)
+        self.assertTrue(summary.has_ended())
+
+
 @ddt.ddt
 class IsNewCourseTestCase(unittest.TestCase):
     """Make sure the property is_new works on courses"""
@@ -196,7 +211,7 @@ class IsNewCourseTestCase(unittest.TestCase):
         for a, b, assertion in dates:
             a_score = get_dummy_course(start=a[0], announcement=a[1], advertised_start=a[2]).sorting_score
             b_score = get_dummy_course(start=b[0], announcement=b[1], advertised_start=b[2]).sorting_score
-            print "Comparing %s to %s" % (a, b)
+            print("Comparing %s to %s" % (a, b))
             assertion(a_score, b_score)
 
     start_advertised_settings = [
@@ -208,36 +223,6 @@ class IsNewCourseTestCase(unittest.TestCase):
         (xmodule.course_module.CourseFields.start.default, None, 'TBD', True, 'TBD'),
         (xmodule.course_module.CourseFields.start.default, 'January 2014', 'January 2014', False, 'January 2014'),
     ]
-
-    @patch('xmodule.course_metadata_utils.datetime.now')
-    def test_start_date_text(self, gmtime_mock):
-        gmtime_mock.return_value = NOW
-        for s in self.start_advertised_settings:
-            d = get_dummy_course(start=s[0], advertised_start=s[1])
-            print "Checking start=%s advertised=%s" % (s[0], s[1])
-            self.assertEqual(d.start_datetime_text(), s[2])
-
-    @patch('xmodule.course_metadata_utils.datetime.now')
-    def test_start_date_time_text(self, gmtime_mock):
-        gmtime_mock.return_value = NOW
-        for setting in self.start_advertised_settings:
-            course = get_dummy_course(start=setting[0], advertised_start=setting[1])
-            print "Checking start=%s advertised=%s" % (setting[0], setting[1])
-            self.assertEqual(course.start_datetime_text("DATE_TIME"), setting[4])
-
-    @ddt.data(("2015-11-01T08:59", 'Nov 01, 2015', u'Nov 01, 2015 at 01:59 PDT'),
-              ("2015-11-01T09:00", 'Nov 01, 2015', u'Nov 01, 2015 at 01:00 PST'))
-    @ddt.unpack
-    def test_start_date_time_zone(self, course_date, expected_short_date, expected_date_time):
-        """
-        Test that start datetime text correctly formats datetimes
-        for normal daylight hours and daylight savings hours
-        """
-        time_zone = timezone('America/Los_Angeles')
-
-        course = get_dummy_course(start=course_date, advertised_start=course_date)
-        self.assertEqual(course.start_datetime_text(time_zone=time_zone), expected_short_date)
-        self.assertEqual(course.start_datetime_text("DATE_TIME", time_zone), expected_date_time)
 
     def test_start_date_is_default(self):
         for s in self.start_advertised_settings:
@@ -276,38 +261,9 @@ class IsNewCourseTestCase(unittest.TestCase):
         descriptor = get_dummy_course(start='2012-12-31T12:00')
         assert descriptor.is_newish is True
 
-    def test_end_date_text(self):
-        # No end date set, returns empty string.
-        d = get_dummy_course('2012-12-02T12:00')
-        self.assertEqual('', d.end_datetime_text())
-
-        d = get_dummy_course('2012-12-02T12:00', end='2014-9-04T12:00')
-        self.assertEqual('Sep 04, 2014', d.end_datetime_text())
-
-    def test_end_date_time_text(self):
-        # No end date set, returns empty string.
-        course = get_dummy_course('2012-12-02T12:00')
-        self.assertEqual('', course.end_datetime_text("DATE_TIME"))
-
-        course = get_dummy_course('2012-12-02T12:00', end='2014-9-04T12:00')
-        self.assertEqual('Sep 04, 2014 at 12:00 UTC', course.end_datetime_text("DATE_TIME"))
-
-    @ddt.data(("2015-11-01T08:59", 'Nov 01, 2015', u'Nov 01, 2015 at 01:59 PDT'),
-              ("2015-11-01T09:00", 'Nov 01, 2015', u'Nov 01, 2015 at 01:00 PST'))
-    @ddt.unpack
-    def test_end_date_time_zone(self, course_date, expected_short_date, expected_date_time):
-        """
-        Test that end datetime text correctly formats datetimes
-        for normal daylight hours and daylight savings hours
-        """
-        time_zone = timezone('America/Los_Angeles')
-        course = get_dummy_course(course_date, end=course_date)
-
-        self.assertEqual(course.end_datetime_text(time_zone=time_zone), expected_short_date)
-        self.assertEqual(course.end_datetime_text("DATE_TIME", time_zone), expected_date_time)
-
 
 class DiscussionTopicsTestCase(unittest.TestCase):
+
     def test_default_discussion_topics(self):
         d = get_dummy_course('2012-12-02T12:00')
         self.assertEqual({'General': {'id': 'i4x-test_org-test_course-course-test'}}, d.discussion_topics)
@@ -334,7 +290,7 @@ class TeamsConfigurationTestCase(unittest.TestCase):
 
     def make_topic(self):
         """ Make a sample topic dictionary. """
-        next_num = self.count.next()
+        next_num = next(self.count)
         topic_id = "topic_id_{}".format(next_num)
         name = "Name {}".format(next_num)
         description = "Description {}".format(next_num)
@@ -396,6 +352,7 @@ class SelfPacedTestCase(unittest.TestCase):
 
 class BypassHomeTestCase(unittest.TestCase):
     """Tests for setting which allows course home to be bypassed."""
+
     def setUp(self):
         super(BypassHomeTestCase, self).setUp()
         self.course = get_dummy_course('2012-12-02T12:00')
@@ -419,7 +376,7 @@ class CourseDescriptorTestCase(unittest.TestCase):
         Initialize dummy testing course.
         """
         super(CourseDescriptorTestCase, self).setUp()
-        self.course = get_dummy_course(start=_TODAY)
+        self.course = get_dummy_course(start=_TODAY, end=_NEXT_WEEK)
 
     def test_clean_id(self):
         """
@@ -448,3 +405,80 @@ class CourseDescriptorTestCase(unittest.TestCase):
         Test CourseDescriptor.number.
         """
         self.assertEqual(self.course.number, COURSE)
+
+    def test_set_default_certificate_available_date(self):
+        """
+        The certificate_available_date field should default to two days
+        after the course end date.
+        """
+        expected_certificate_available_date = self.course.end + timedelta(days=2)
+        self.assertEqual(expected_certificate_available_date, self.course.certificate_available_date)
+
+
+class ProctoringProviderTestCase(unittest.TestCase):
+    """
+    Tests for ProctoringProvider, including the default value, validation, and inheritance behavior.
+    """
+
+    def setUp(self):
+        """
+        Initialize dummy testing course.
+        """
+        super(ProctoringProviderTestCase, self).setUp()
+        self.proctoring_provider = xmodule.course_module.ProctoringProvider()
+
+    def test_from_json_with_platform_default(self):
+        """
+        Test that a proctoring provider value equivalent to the platform
+        default will pass validation.
+        """
+        default_provider = settings.PROCTORING_BACKENDS.get('DEFAULT')
+
+        # we expect the validated value to be equivalent to the value passed in,
+        # since there are no validation errors or missing data
+        self.assertEqual(self.proctoring_provider.from_json(default_provider), default_provider)
+
+    def test_from_json_with_invalid_provider(self):
+        """
+        Test that an invalid provider (i.e. not one configured at the platform level)
+        throws a ValueError with the correct error message.
+        """
+        provider = 'invalid-provider'
+        proctoring_provider_whitelist = [u'mock', u'mock_proctoring_without_rules']
+
+        with self.assertRaises(ValueError) as context_manager:
+            self.proctoring_provider.from_json(provider)
+        self.assertEqual(
+            context_manager.exception.args[0],
+            ['The selected proctoring provider, {}, is not a valid provider. Please select from one of {}.'
+                .format(provider, proctoring_provider_whitelist)]
+        )
+
+    def test_from_json_adds_platform_default_for_missing_provider(self):
+        """
+        Test that a value with no provider will inherit the default provider
+        from the platform defaults.
+        """
+        default_provider = 'mock'
+
+        self.assertEqual(self.proctoring_provider.from_json(None), default_provider)
+
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'mock': {},
+            'mock_proctoring_without_rules': {}
+        }
+    )
+    def test_default_with_no_platform_default(self):
+        """
+        Test that, when the platform defaults are not set, the default is correct.
+        """
+        self. assertEqual(self.proctoring_provider.default, None)
+
+    @override_settings(PROCTORING_BACKENDS=None)
+    def test_default_with_no_platform_configuration(self):
+        """
+        Test that, when the platform default is not specified, the default is correct.
+        """
+        default = self.proctoring_provider.default
+        self.assertEqual(default, None)

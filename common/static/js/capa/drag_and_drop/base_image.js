@@ -3,9 +3,9 @@
         return BaseImage;
 
         function BaseImage(state) {
-            var baseImageElContainer;
+            var $baseImageElContainer;
 
-            baseImageElContainer = $(
+            $baseImageElContainer = $(
             '<div ' +
                 'class="base_image_container" ' +
                 'style=" ' +
@@ -23,13 +23,13 @@
 
             state.baseImageEl.attr('src', state.config.baseImage);
             state.baseImageEl.load(function() {
-                baseImageElContainer.css({
-                    'width': this.width,
-                    'height': this.height
+                $baseImageElContainer.css({
+                    width: this.width,
+                    height: this.height
                 });
 
-                state.baseImageEl.appendTo(baseImageElContainer);
-                baseImageElContainer.appendTo(state.containerEl);
+                state.baseImageEl.appendTo($baseImageElContainer);
+                $baseImageElContainer.appendTo(state.containerEl);
 
                 state.baseImageEl.mousedown(function(event) {
                     event.preventDefault();
@@ -39,12 +39,12 @@
             });
             state.baseImageEl.error(function() {
                 console.log('ERROR: Image "' + state.config.baseImage + '" was not found!');
-                baseImageElContainer.html(
+                $baseImageElContainer.html(
                 '<span style="color: red;">' +
                     'ERROR: Image "' + state.config.baseImage + '" was not found!' +
                 '</span>'
             );
-                baseImageElContainer.appendTo(state.containerEl);
+                $baseImageElContainer.appendTo(state.containerEl);
             });
         }
     }); // End-of: define([], function () {

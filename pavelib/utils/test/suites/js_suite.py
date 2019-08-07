@@ -2,12 +2,14 @@
 Javascript test tasks
 """
 
+from __future__ import absolute_import
+
 from paver import tasks
 
 from pavelib import assets
+from pavelib.utils.envs import Env
 from pavelib.utils.test import utils as test_utils
 from pavelib.utils.test.suites.suite import TestSuite
-from pavelib.utils.envs import Env
 
 __test__ = False  # do not collect
 
@@ -39,19 +41,18 @@ class JsTestSuite(TestSuite):
             test_utils.clean_dir(self.report_dir)
 
         assets.process_npm_assets()
-        assets.compile_coffeescript("`find lms cms common -type f -name \"*.coffee\"`")
 
     @property
     def _default_subsuites(self):
         """
         Returns all JS test suites
         """
-        return [JsTestSubSuite(test_id, **self.opts) for test_id in Env.JS_TEST_ID_KEYS]
+        return [JsTestSubSuite(test_id, **self.opts) for test_id in Env.JS_TEST_ID_KEYS if test_id != 'jest-snapshot']
 
 
 class JsTestSubSuite(TestSuite):
     """
-    Class for JS suites like cms, cms-squire, lms, lms-coffee, common,
+    Class for JS suites like cms, cms-squire, lms, common,
     common-requirejs and xmodule
     """
     def __init__(self, *args, **kwargs):
@@ -77,12 +78,15 @@ class JsTestSubSuite(TestSuite):
         Run the tests using karma runner.
         """
         cmd = [
-            "karma",
+            "nodejs",
+            "--max_old_space_size=4096",
+            "node_modules/.bin/karma",
             "start",
             self.test_conf_file,
             "--single-run={}".format('false' if self.mode == 'dev' else 'true'),
             "--capture-timeout=60000",
             "--junitreportpath={}".format(self.xunit_report),
+            "--browsers={}".format(Env.KARMA_BROWSER),
         ]
 
         if self.port:
@@ -95,3 +99,15 @@ class JsTestSubSuite(TestSuite):
             ])
 
         return cmd
+
+
+class JestSnapshotTestSuite(TestSuite):
+    """
+    A class for running Jest Snapshot tests.
+    """
+    @property
+    def cmd(self):
+        """
+        Run the tests using Jest.
+        """
+        return ["jest"]

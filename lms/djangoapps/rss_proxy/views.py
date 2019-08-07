@@ -1,13 +1,14 @@
 """
 Views for the rss_proxy djangoapp.
 """
-import requests
+from __future__ import absolute_import, print_function
 
+import requests
 from django.conf import settings
 from django.core.cache import cache
 from django.http import HttpResponse, HttpResponseNotFound
-from rss_proxy.models import WhitelistedRssUrl
 
+from rss_proxy.models import WhitelistedRssUrl
 
 CACHE_KEY_RSS = "rss_proxy.{url}"
 
@@ -23,8 +24,8 @@ def proxy(request):
         cache_key = CACHE_KEY_RSS.format(url=url)
         status_code = 200
         rss = cache.get(cache_key, '')
-        print cache_key
-        print 'Cached rss: %s' % rss
+        print(cache_key)
+        print(u'Cached rss: %s' % rss)
         if not rss:
             # Go get the RSS from the URL if it was not cached
             resp = requests.get(url)

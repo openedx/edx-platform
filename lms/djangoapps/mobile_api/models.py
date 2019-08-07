@@ -1,10 +1,13 @@
 """
 ConfigurationModel for the mobile_api djangoapp.
 """
-from django.db import models
-from mobile_api import utils
+from __future__ import absolute_import
+
 from config_models.models import ConfigurationModel
-from mobile_api.mobile_platform import PLATFORM_CLASSES
+from django.db import models
+
+from . import utils
+from .mobile_platform import PLATFORM_CLASSES
 
 
 class MobileApiConfig(ConfigurationModel):
@@ -13,11 +16,16 @@ class MobileApiConfig(ConfigurationModel):
 
     The order in which the comma-separated list of names of profiles are given
     is in priority order.
+
+    .. no_pii:
     """
     video_profiles = models.TextField(
         blank=True,
         help_text="A comma-separated list of names of profiles to include for videos returned from the mobile API."
     )
+
+    class Meta(object):
+        app_label = "mobile_api"
 
     @classmethod
     def get_video_profiles(cls):
@@ -30,6 +38,8 @@ class MobileApiConfig(ConfigurationModel):
 class AppVersionConfig(models.Model):
     """
     Configuration for mobile app versions available.
+
+    .. no_pii:
     """
     PLATFORM_CHOICES = tuple([
         (platform, platform)
@@ -50,6 +60,7 @@ class AppVersionConfig(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        app_label = "mobile_api"
         unique_together = ('platform', 'version',)
         ordering = ['-major_version', '-minor_version', '-patch_version']
 
@@ -76,3 +87,18 @@ class AppVersionConfig(models.Model):
         """ parses version into major, minor and patch versions before saving """
         self.major_version, self.minor_version, self.patch_version = utils.parsed_version(self.version)
         super(AppVersionConfig, self).save(*args, **kwargs)
+
+
+class IgnoreMobileAvailableFlagConfig(ConfigurationModel):  # pylint: disable=W5101
+    """
+    Configuration for the mobile_available flag. Default is false.
+
+    Enabling this configuration will cause the mobile_available flag check in
+    access.py._is_descriptor_mobile_available to ignore the mobile_available
+    flag.
+
+    .. no_pii:
+    """
+
+    class Meta(object):
+        app_label = "mobile_api"

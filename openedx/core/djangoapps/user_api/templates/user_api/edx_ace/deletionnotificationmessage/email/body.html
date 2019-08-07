@@ -1,0 +1,47 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+{% load i18n %}
+
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <p>
+                {% filter force_escape %}
+                {% blocktrans trimmed %}
+                    Hello {{full_name}},
+                {% endblocktrans %}
+                {% endfilter %}
+            </p>
+            <p>
+                {% filter force_escape %}
+                {% blocktrans trimmed %}
+                We received a deletion request for your account on {{platform_name}}. We're sorry to see you go!
+                {% endblocktrans %}
+                {% endfilter %}
+            </p>
+            <p>
+                {% filter force_escape %}
+                {% blocktrans trimmed %}
+                Your account will be deleted shortly. Account deletion, including removal from email lists, may take a few weeks to fully process through our system. If you want to opt-out of emails before then, please unsubscribe from the footer of any email.
+                {% endblocktrans %}
+                {% endfilter %}
+            </p>
+            <p>
+                {% filter force_escape %}
+                {% blocktrans trimmed %}
+                This is an informational email only. If you did not initiate this request, please contact {{contact_email}}.
+                {% endblocktrans %}
+                {% endfilter %}
+            </p>
+            <p>
+                {% filter force_escape %}
+                {% blocktrans trimmed %}
+                Best,
+                {{ platform_name }}
+                {% endblocktrans %}
+                {% endfilter %}
+            </p>
+        </td>
+    </tr>
+</table>
+{% endblock %}

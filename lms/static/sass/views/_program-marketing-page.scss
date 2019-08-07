@@ -1,0 +1,259 @@
+.content-wrapper {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#program-details-hero {
+  .program_title {
+    font-weight: bold;
+    margin-top: $baseline;
+  }
+
+  .main-banner {
+    color: $white;
+    margin-bottom: 1px;
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+
+    .authoring-org-logo {
+      background-color: $white;
+      height: 100px;
+    }
+
+    .logo-space {
+      height: 50px;
+    }
+
+    .btn {
+      font-size: 20px;
+      font-weight: $font-weight-bold;
+
+      .original-price {
+        text-decoration: line-through;
+        font-weight: $font-weight-normal;
+      }
+    }
+
+    .btn,
+    h1,
+    h2,
+    a {
+      margin-bottom: $baseline;
+    }
+
+    #program_video {
+      display: flex;
+      align-items: center;
+      height: 100%;
+
+      button {
+        background-color: transparent;
+        color: $white;
+      }
+
+      iframe {
+        width: 100%;
+        max-width: 400px;
+        height: 100%;
+        max-height: 200px;
+      }
+
+      @include media-breakpoint-down(md) {
+        iframe {
+          margin: 50px 0;
+        }
+      }
+    }
+  }
+
+  .quick-nav {
+    background-color: theme-color('light');
+
+    .nav-item {
+      font-size: 18px;
+      color: $white;
+    }
+  }
+}
+
+#program-details-page {
+  margin-top: $baseline;
+  font-size: $font-size-base;
+
+  .logo {
+    height: 100px;
+  }
+
+  .section_title {
+    margin-bottom: $baseline;
+    color: theme-color("dark");
+  }
+
+  .thick_rule {
+    height: 4px;
+    border: 0;
+    background-color: theme-color('primary');
+  }
+
+  .program-info {
+    .quote {
+      font-style: italic;
+    }
+
+    .section {
+      margin-bottom: $baseline;
+    }
+
+    .facts {
+      border: 1px solid theme-color('dark');
+
+      li {
+        margin: 0 $baseline;
+        padding: 15px 0;
+        border-bottom: 1px solid theme-color('light');
+
+        .label {
+          color: theme-color('dark');
+        }
+
+        .description {
+          .original-price {
+            text-decoration: line-through;
+          }
+
+          .green-highlight {
+            font-size: 18px;
+            color: theme-color('success');
+            font-weight: $font-weight-bold;
+          }
+        }
+
+        .label,
+        .description {
+          vertical-align: top;
+        }
+
+        &:last-child {
+          border-bottom: 0;
+        }
+      }
+    }
+  }
+
+  #courses {
+    h2 {
+      margin-bottom: $baseline;
+    }
+
+    .course {
+      margin: 50px 0;
+
+      .course-image {
+        img {
+          max-width: 100%;
+        }
+      }
+
+      .course-enroll {
+        margin-top: 50px;
+
+        div {
+          text-align: center;
+          font-weight: bold;
+        }
+
+        a {
+          font-size: 20px;
+        }
+      }
+
+      @include media-breakpoint-up(lg) {
+        .course-enroll {
+          margin-top: 0;
+        }
+      }
+    }
+  }
+
+  #instructors {
+    .instructor {
+      margin: $baseline 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      img {
+        display: block;
+        height: 100px;
+        width: 100px;
+        border-radius: 100px;
+        margin: auto;
+      }
+
+      .instructor-name {
+        font-weight: bold;
+      }
+
+      .instructor-org {
+        font-weight: bold;
+      }
+
+      .instructor-bio-toggle {
+        margin-top: 5px;
+      }
+
+      .hidden {
+        display: none;
+      }
+    }
+  }
+
+  .faqs {
+    margin-bottom: $baseline * 2;
+
+    .question {
+      font-weight: bold;
+      margin-top: $baseline;
+    }
+  }
+
+  a:focus,
+  a:active {
+    text-decoration: none;
+    outline: 0;
+  }
+
+  .modal-custom {
+    max-width: 500px;
+    max-height: 80%;
+    width: 90%;
+    top: 10%;
+    bottom: unset;
+    right: 0 !important;
+    left: 0 !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    background-color: #fff;
+    overflow: auto;
+
+    .modal-header {
+      padding-top: 0;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .instructor-bio {
+      padding: 10px 0;
+    }
+
+    .btn-close.modal_close {
+      text-align: right;
+
+      i {
+        font-size: 28px;
+        cursor: pointer;
+        padding: 5px;
+      }
+    }
+  }
+}

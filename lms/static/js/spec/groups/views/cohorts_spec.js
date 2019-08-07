@@ -1,35 +1,27 @@
+/* globals _ */
+
 define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-        'common/js/spec_helpers/template_helpers',
-        'js/groups/views/cohorts', 'js/groups/collections/cohort', 'js/groups/models/content_group',
-        'js/groups/models/course_cohort_settings', 'js/utils/animation', 'js/vendor/jquery.qubit',
-        'js/groups/views/course_cohort_settings_notification', 'js/groups/models/cohort_discussions',
-        'js/groups/views/cohort_discussions', 'js/groups/views/cohort_discussions_course_wide',
-        'js/groups/views/cohort_discussions_inline'
-        ],
+    'common/js/spec_helpers/template_helpers',
+    'js/groups/views/cohorts', 'js/groups/collections/cohort', 'js/groups/models/content_group',
+    'js/groups/models/course_cohort_settings', 'js/utils/animation', 'js/vendor/jquery.qubit',
+    'js/groups/views/course_cohort_settings_notification'
+],
     function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollection, ContentGroupModel,
-              CourseCohortSettingsModel, AnimationUtil, Qubit, CourseCohortSettingsNotificationView, DiscussionTopicsSettingsModel,
-              CohortDiscussionsView, CohortCourseWideDiscussionsView, CohortInlineDiscussionsView) {
+              CourseCohortSettingsModel, AnimationUtil, Qubit, CourseCohortSettingsNotificationView) {
         'use strict';
 
         describe('Cohorts View', function() {
-            var catLoversInitialCount = 123, dogLoversInitialCount = 456, unknownUserMessage,
-                createMockCohort, createMockCohorts, createMockContentGroups, createMockCohortSettingsJson,
-                createMockVerifiedTrackCohortsJson, flushVerifiedTrackCohortRequests, createCohortsView,
-                cohortsView, requests, respondToRefresh, verifyMessage, verifyNoMessage, verifyDetailedMessage,
-                verifyHeader, verifyVerifiedTrackMessage, verifyVerifiedTrackUIUpdates, expectCohortAddRequest,
-                getAddModal, selectContentGroup, clearContentGroup,
+            var catLoversInitialCount = 123,
+                dogLoversInitialCount = 456,
+                unknownUserMessage,
+                invalidEmailMessage, createMockCohort, createMockCohorts, createMockContentGroups,
+                createMockCohortSettingsJson, createMockVerifiedTrackCohortsJson, flushVerifiedTrackCohortRequests,
+                createCohortsView, cohortsView, requests, respondToRefresh, verifyMessage, verifyNoMessage,
+                verifyDetailedMessage, verifyHeader, verifyVerifiedTrackMessage, verifyVerifiedTrackUIUpdates,
+                expectCohortAddRequest, getAddModal, selectContentGroup, clearContentGroup,
                 saveFormAndExpectErrors, createMockCohortSettings, MOCK_COHORTED_USER_PARTITION_ID,
                 MOCK_UPLOAD_COHORTS_CSV_URL, MOCK_STUDIO_ADVANCED_SETTINGS_URL, MOCK_STUDIO_GROUP_CONFIGURATIONS_URL,
-                MOCK_VERIFIED_TRACK_COHORTING_URL, MOCK_MANUAL_ASSIGNMENT, MOCK_RANDOM_ASSIGNMENT,
-                createMockCohortDiscussionsJson, createMockCohortDiscussions, showAndAssertDiscussionTopics;
-
-            // Selectors
-            var discussionsToggle = '.toggle-cohort-management-discussions',
-                inlineDiscussionsFormCss = '.cohort-inline-discussions-form',
-                courseWideDiscussionsFormCss = '.cohort-course-wide-discussions-form',
-                courseWideDiscussionsSaveButtonCss = '.cohort-course-wide-discussions-form .action-save',
-                inlineDiscussionsSaveButtonCss = '.cohort-inline-discussions-form .action-save',
-                inlineDiscussionsForm, courseWideDiscussionsForm;
+                MOCK_VERIFIED_TRACK_COHORTING_URL, MOCK_MANUAL_ASSIGNMENT, MOCK_RANDOM_ASSIGNMENT;
 
             MOCK_MANUAL_ASSIGNMENT = 'manual';
             MOCK_RANDOM_ASSIGNMENT = 'random';
@@ -70,66 +62,16 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 ];
             };
 
-            createMockCohortSettingsJson = function(isCohorted, cohortedInlineDiscussions, cohortedCourseWideDiscussions, alwaysCohortInlineDiscussions) {
+            createMockCohortSettingsJson = function(isCohorted) {
                 return {
                     id: 0,
-                    is_cohorted: isCohorted || false,
-                    cohorted_inline_discussions: cohortedInlineDiscussions || [],
-                    cohorted_course_wide_discussions: cohortedCourseWideDiscussions || [],
-                    always_cohort_inline_discussions: alwaysCohortInlineDiscussions || true
+                    is_cohorted: isCohorted || false
                 };
             };
 
-            createMockCohortSettings = function(isCohorted, cohortedInlineDiscussions, cohortedCourseWideDiscussions, alwaysCohortInlineDiscussions) {
+            createMockCohortSettings = function(isCohorted) {
                 return new CourseCohortSettingsModel(
-                    createMockCohortSettingsJson(isCohorted, cohortedInlineDiscussions, cohortedCourseWideDiscussions, alwaysCohortInlineDiscussions)
-                );
-            };
-
-            createMockCohortDiscussionsJson = function(allCohorted) {
-                return {
-                    course_wide_discussions: {
-                        children: [['Topic_C_1', 'entry'], ['Topic_C_2', 'entry']],
-                        entries: {
-                            Topic_C_1: {
-                                sort_key: null,
-                                is_cohorted: true,
-                                id: 'Topic_C_1'
-                            },
-                            Topic_C_2: {
-                                sort_key: null,
-                                is_cohorted: false,
-                                id: 'Topic_C_2'
-                            }
-                        }
-                    },
-                    inline_discussions: {
-                        subcategories: {
-                            Topic_I_1: {
-                                subcategories: {},
-                                children: [['Inline_Discussion_1', 'entry'], ['Inline_Discussion_2', 'entry']],
-                                entries: {
-                                    Inline_Discussion_1: {
-                                        sort_key: null,
-                                        is_cohorted: true,
-                                        id: 'Inline_Discussion_1'
-                                    },
-                                    Inline_Discussion_2: {
-                                        sort_key: null,
-                                        is_cohorted: allCohorted || false,
-                                        id: 'Inline_Discussion_2'
-                                    }
-                                }
-                            }
-                        },
-                        children: [['Topic_I_1', 'subcategory']]
-                    }
-                };
-            };
-
-            createMockCohortDiscussions = function(allCohorted) {
-                return new DiscussionTopicsSettingsModel(
-                    createMockCohortDiscussionsJson(allCohorted)
+                    createMockCohortSettingsJson(isCohorted)
                 );
             };
 
@@ -139,14 +81,13 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                         enabled: true,
                         verified_cohort_name: 'Verified Track'
                     };
-                }
-                else {
+                } else {
                     return {enabled: false};
                 }
             };
 
             createCohortsView = function(test, options) {
-                var cohortsJson, cohorts, contentGroups, cohortSettings, cohortDiscussions;
+                var cohortsJson, cohorts, contentGroups, cohortSettings;
                 options = options || {};
                 cohortsJson = options.cohorts ? {cohorts: options.cohorts} : createMockCohorts();
                 cohorts = new CohortCollection(cohortsJson, {parse: true});
@@ -155,16 +96,12 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 cohortSettings.url = '/mock_service/cohorts/settings';
                 cohorts.url = '/mock_service/cohorts';
 
-                cohortDiscussions = options.cohortDiscussions || createMockCohortDiscussions();
-                cohortDiscussions.url = '/mock_service/cohorts/discussion/topics';
-
                 requests = AjaxHelpers.requests(test);
                 cohortsView = new CohortsView({
                     model: cohorts,
                     contentGroups: contentGroups,
                     cohortSettings: cohortSettings,
                     context: {
-                        discussionTopicsSettingsModel: cohortDiscussions,
                         uploadCohortsCsvUrl: MOCK_UPLOAD_COHORTS_CSV_URL,
                         studioAdvancedSettingsUrl: MOCK_STUDIO_ADVANCED_SETTINGS_URL,
                         studioGroupConfigurationsUrl: MOCK_STUDIO_GROUP_CONFIGURATIONS_URL,
@@ -232,8 +169,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 expect(cohortsView.$('div.message')).toHaveClass('message-' + expectedMessageType);
                 if (expectedAction) {
                     expect(cohortsView.$('.message-actions .action-primary').text().trim()).toBe(expectedAction);
-                }
-                else {
+                } else {
                     expect(cohortsView.$('.message-actions .action-primary').length).toBe(0);
                 }
                 if (!hasDetails) {
@@ -250,8 +186,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     expect($('.message').length).toBe(1);
                     expect($('.message-' + type).length).toBe(1);
                     expect($('.message-title').text()).toContain(expectedText);
-                }
-                else {
+                } else {
                     expect($('.message').length).toBe(0);
                 }
             };
@@ -314,42 +249,12 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 verifyDetailedMessage(expectedTitle, 'error', errors);
             };
 
-            showAndAssertDiscussionTopics = function(that) {
-                createCohortsView(that);
-
-                // Should see the control to toggle cohort discussions.
-                expect(cohortsView.$(discussionsToggle)).not.toHaveClass('is-hidden');
-                // But discussions form should not be visible until toggle is clicked.
-                expect(cohortsView.$(inlineDiscussionsFormCss).length).toBe(0);
-                expect(cohortsView.$(courseWideDiscussionsFormCss).length).toBe(0);
-
-                expect(cohortsView.$(discussionsToggle).text()).
-                    toContain('Specify whether discussion topics are divided by cohort');
-
-                cohortsView.$(discussionsToggle).click();
-                // After toggle is clicked, it should be hidden.
-                expect(cohortsView.$(discussionsToggle)).toHaveClass('is-hidden');
-
-                // Should see the course wide discussions form and its content
-                courseWideDiscussionsForm = cohortsView.$(courseWideDiscussionsFormCss);
-                expect(courseWideDiscussionsForm.length).toBe(1);
-
-                expect(courseWideDiscussionsForm.text()).
-                    toContain('Course-Wide Discussion Topics');
-                expect(courseWideDiscussionsForm.text()).
-                    toContain('Select the course-wide discussion topics that you want to divide by cohort.');
-
-                // Should see the inline discussions form and its content
-                inlineDiscussionsForm = cohortsView.$(inlineDiscussionsFormCss);
-                expect(inlineDiscussionsForm.length).toBe(1);
-                expect(inlineDiscussionsForm.text()).
-                    toContain('Content-Specific Discussion Topics');
-                expect(inlineDiscussionsForm.text()).
-                    toContain('Specify whether content-specific discussion topics are divided by cohort.');
+            unknownUserMessage = function(name) {
+                return 'Unknown username: ' + name;
             };
 
-            unknownUserMessage = function(name) {
-                return 'Unknown user: ' + name;
+            invalidEmailMessage = function(name) {
+                return 'Invalid email address: ' + name;
             };
 
             beforeEach(function() {
@@ -364,10 +269,6 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-group-header');
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/notification');
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-state');
-                TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-discussions-category');
-                TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-discussions-subcategory');
-                TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide');
-                TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-discussions-inline');
                 TemplateHelpers.installTemplate('templates/file-upload');
             });
 
@@ -380,9 +281,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 );
 
                 // If no cohorts have been created, can't upload a CSV file.
-                expect(cohortsView.$('.wrapper-cohort-supplemental')).toHaveClass('is-hidden');
-                // if no cohorts have been created, can't show the link to discussion topics.
-                expect(cohortsView.$('.cohort-discussions-nav')).toHaveClass('is-hidden');
+                expect(cohortsView.$('.wrapper-cohort-supplemental')).toHaveClass('hidden');
             });
 
             it('syncs data when membership tab is clicked', function() {
@@ -395,20 +294,21 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
             });
 
             it('can upload a CSV of cohort assignments if a cohort exists', function() {
-                var uploadCsvToggle, fileUploadForm, fileUploadFormCss = '#file-upload-form';
+                var uploadCsvToggle, fileUploadForm,
+                    fileUploadFormCss = '#file-upload-form';
 
                 createCohortsView(this);
 
                 // Should see the control to toggle CSV file upload.
-                expect(cohortsView.$('.wrapper-cohort-supplemental')).not.toHaveClass('is-hidden');
+                expect(cohortsView.$('.wrapper-cohort-supplemental')).not.toHaveClass('hidden');
                 // But upload form should not be visible until toggle is clicked.
                 expect(cohortsView.$(fileUploadFormCss).length).toBe(0);
                 uploadCsvToggle = cohortsView.$('.toggle-cohort-management-secondary');
                 expect(uploadCsvToggle.text()).
-                    toContain('Assign students to cohorts by uploading a CSV file');
+                    toContain('Assign learners to cohorts by uploading a CSV file');
                 uploadCsvToggle.click();
                 // After toggle is clicked, it should be hidden.
-                expect(uploadCsvToggle).toHaveClass('is-hidden');
+                expect(uploadCsvToggle).toHaveClass('hidden');
 
                 fileUploadForm = cohortsView.$(fileUploadFormCss);
                 expect(fileUploadForm.length).toBe(1);
@@ -420,10 +320,6 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 AjaxHelpers.respondWithJson(requests, {});
                 expect(cohortsView.$('.file-upload-form-result .message-confirmation .message-title').text().trim())
                     .toBe("Your file 'upload_file.txt' has been uploaded. Allow a few minutes for processing.");
-            });
-
-            it('can show discussion topics if cohort exists', function() {
-                showAndAssertDiscussionTopics(this);
             });
 
             describe('Cohort Selector', function() {
@@ -627,7 +523,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     cohortsView.$('.action-create').click();
                     expect(cohortsView.$('.cohort-management-settings-form').length).toBe(1);
                     expect(cohortsView.$('.cohort-management-nav')).toHaveClass('is-disabled');
-                    expect(cohortsView.$('.cohort-management-group')).toHaveClass('is-hidden');
+                    expect(cohortsView.$('.cohort-management-group')).toHaveClass('hidden');
                     cohortsView.$('.cohort-name').val(defaultCohortName);
                     cohortsView.$('.type-random').prop('checked', true).change();
                     selectContentGroup(contentGroupId, MOCK_COHORTED_USER_PARTITION_ID);
@@ -654,7 +550,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     );
                     verifyHeader(1, defaultCohortName, 0, MOCK_RANDOM_ASSIGNMENT);
                     expect(cohortsView.$('.cohort-management-nav')).not.toHaveClass('is-disabled');
-                    expect(cohortsView.$('.cohort-management-group')).not.toHaveClass('is-hidden');
+                    expect(cohortsView.$('.cohort-management-group')).not.toHaveClass('hidden');
                     expect(getAddModal().find('.cohort-management-settings-form').length).toBe(0);
                 });
 
@@ -800,7 +696,8 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 respondToAdd = function(result) {
                     AjaxHelpers.respondWithJson(
                         requests,
-                        _.extend({unknown: [], added: [], present: [], changed: [], success: true}, result)
+                        _.extend({unknown: [], added: [], present: [], changed: [],
+                            success: true, preassigned: [], invalid: []}, result)
                     );
                 };
 
@@ -819,27 +716,57 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     respondToAdd({added: ['student@sample.com']});
                     respondToRefresh(catLoversUpdatedCount, dogLoversInitialCount);
                     verifyHeader(1, 'Cat Lovers', catLoversUpdatedCount);
-                    verifyMessage('1 student has been added to this cohort', 'confirmation');
+                    verifyMessage('1 learner has been added to this cohort.', 'confirmation');
                     expect(getStudentInput().val()).toBe('');
                 });
 
-                it('shows an error when adding a student that does not exist', function() {
+                it('preassigns an email address if it is not associated with a user', function() {
                     createCohortsView(this, {selectCohort: 1});
                     addStudents('unknown@sample.com');
                     AjaxHelpers.expectRequest(
                         requests, 'POST', '/mock_service/cohorts/1/add', 'users=unknown%40sample.com'
                     );
-                    respondToAdd({unknown: ['unknown@sample.com']});
+                    respondToAdd({preassigned: ['unknown@sample.com']});
                     respondToRefresh(catLoversInitialCount, dogLoversInitialCount);
                     verifyHeader(1, 'Cat Lovers', catLoversInitialCount);
-                    verifyDetailedMessage('There was an error when trying to add students:', 'error',
-                        [unknownUserMessage('unknown@sample.com')]
-                    );
-                    expect(getStudentInput().val()).toBe('unknown@sample.com');
+                    verifyDetailedMessage('1 learner was pre-assigned for this cohort. ' +
+                        'This learner will automatically be added to the cohort when they enroll in the course.',
+                        'warning',
+                        ['unknown@sample.com']);
+                    expect(getStudentInput().val()).toBe('');
                 });
 
+                it('shows an error when adding an invalid email address', function() {
+                    createCohortsView(this, {selectCohort: 1});
+                    addStudents('unknown@');
+                    AjaxHelpers.expectRequest(
+                        requests, 'POST', '/mock_service/cohorts/1/add', 'users=unknown%40'
+                    );
+                    respondToAdd({invalid: ['unknown@']});
+                    respondToRefresh(catLoversInitialCount, dogLoversInitialCount);
+                    verifyHeader(1, 'Cat Lovers', catLoversInitialCount);
+                    verifyDetailedMessage('There was an error when trying to add learners:', 'error',
+                        [invalidEmailMessage('unknown@')]
+                    );
+                });
+
+                it('shows an error when adding an unknown user', function() {
+                    createCohortsView(this, {selectCohort: 1});
+                    addStudents('unknown');
+                    AjaxHelpers.expectRequest(
+                        requests, 'POST', '/mock_service/cohorts/1/add', 'users=unknown'
+                    );
+                    respondToAdd({unknown: ['unknown']});
+                    respondToRefresh(catLoversInitialCount, dogLoversInitialCount);
+                    verifyHeader(1, 'Cat Lovers', catLoversInitialCount);
+                    verifyDetailedMessage('There was an error when trying to add learners:', 'error',
+                        [unknownUserMessage('unknown')]
+                    );
+                });
+
+
                 it('shows a "view all" button when more than 5 students do not exist', function() {
-                    var sixUsers = 'unknown1@sample.com, unknown2@sample.com, unknown3@sample.com, unknown4@sample.com, unknown5@sample.com, unknown6@sample.com';
+                    var sixUsers = 'unknown1, unknown2, unknown3, unknown4, unknown5, unknown6';
                     createCohortsView(this, {selectCohort: 1});
 
                     addStudents(sixUsers);
@@ -848,30 +775,30 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                         'users=' + sixUsers.replace(/@/g, '%40').replace(/, /g, '%2C+')
                     );
                     respondToAdd({unknown: [
-                        'unknown1@sample.com',
-                        'unknown2@sample.com',
-                        'unknown3@sample.com',
-                        'unknown4@sample.com',
-                        'unknown5@sample.com',
-                        'unknown6@sample.com']
+                        'unknown1',
+                        'unknown2',
+                        'unknown3',
+                        'unknown4',
+                        'unknown5',
+                        'unknown6']
                     });
                     respondToRefresh(catLoversInitialCount + 6, dogLoversInitialCount);
-                    verifyDetailedMessage('There were 6 errors when trying to add students:', 'error',
+                    verifyDetailedMessage('6 learners could not be added to this cohort:', 'error',
                         [
-                            unknownUserMessage('unknown1@sample.com'), unknownUserMessage('unknown2@sample.com'),
-                            unknownUserMessage('unknown3@sample.com'), unknownUserMessage('unknown4@sample.com'),
-                            unknownUserMessage('unknown5@sample.com')
+                            unknownUserMessage('unknown1'), unknownUserMessage('unknown2'),
+                            unknownUserMessage('unknown3'), unknownUserMessage('unknown4'),
+                            unknownUserMessage('unknown5')
                         ],
                         'View all errors'
                     );
                     expect(getStudentInput().val()).toBe(sixUsers);
                     // Click "View all"
                     cohortsView.$('.action-expand').click();
-                    verifyDetailedMessage('There were 6 errors when trying to add students:', 'error',
+                    verifyDetailedMessage('6 learners could not be added to this cohort:', 'error',
                         [
-                            unknownUserMessage('unknown1@sample.com'), unknownUserMessage('unknown2@sample.com'),
-                            unknownUserMessage('unknown3@sample.com'), unknownUserMessage('unknown4@sample.com'),
-                            unknownUserMessage('unknown5@sample.com'), unknownUserMessage('unknown6@sample.com')
+                            unknownUserMessage('unknown1'), unknownUserMessage('unknown2'),
+                            unknownUserMessage('unknown3'), unknownUserMessage('unknown4'),
+                            unknownUserMessage('unknown5'), unknownUserMessage('unknown6')
                         ]
                     );
                 });
@@ -894,11 +821,11 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     });
                     respondToRefresh();
 
-                    verifyDetailedMessage('3 students have been added to this cohort', 'confirmation',
+                    verifyDetailedMessage('3 learners have been added to this cohort.', 'confirmation',
                         [
-                            '2 students were removed from cohort 2',
-                            '1 student was removed from cohort 3',
-                            '1 student was already in the cohort'
+                            '2 learners were moved from cohort 2',
+                            '1 learner was moved from cohort 3',
+                            '1 learner was already in the cohort'
                         ]
                     );
                     expect(getStudentInput().val()).toBe('');
@@ -908,7 +835,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     createCohortsView(this, {selectCohort: 1});
                     addStudents('student@sample.com');
                     AjaxHelpers.respondWithError(requests);
-                    verifyMessage('Error adding students.', 'error');
+                    verifyMessage('Error adding learners.', 'error');
                     expect(getStudentInput().val()).toBe('student@sample.com');
                 });
 
@@ -918,13 +845,13 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     // First verify that an error is shown
                     addStudents('student@sample.com');
                     AjaxHelpers.respondWithError(requests);
-                    verifyMessage('Error adding students.', 'error');
+                    verifyMessage('Error adding learners.', 'error');
 
                     // Now verify that the error is removed on a subsequent add
                     addStudents('student@sample.com');
                     respondToAdd({added: ['student@sample.com']});
                     respondToRefresh(catLoversInitialCount + 1, dogLoversInitialCount);
-                    verifyMessage('1 student has been added to this cohort', 'confirmation');
+                    verifyMessage('1 learner has been added to this cohort.', 'confirmation');
                 });
             });
 
@@ -988,7 +915,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     it('can clear selected content group', function() {
                         createCohortsView(this, {
                             cohorts: [
-                                {id: 1, name: 'Cat Lovers', group_id: 0, 'assignment_type': MOCK_MANUAL_ASSIGNMENT}
+                                {id: 1, name: 'Cat Lovers', group_id: 0, assignment_type: MOCK_MANUAL_ASSIGNMENT}
                             ],
                             selectCohort: 1
                         });
@@ -1002,7 +929,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                             requests, 'PATCH', '/mock_service/cohorts/1',
                             {
                                 name: 'Cat Lovers',
-                                'assignment_type': MOCK_MANUAL_ASSIGNMENT,
+                                assignment_type: MOCK_MANUAL_ASSIGNMENT,
                                 group_id: null,
                                 user_partition_id: null
                             }
@@ -1169,376 +1096,6 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                         cohortsView.$('.action-cancel').click();
                         expect(cohortsView.$('.tab-manage_students')).toHaveClass('is-selected');
                         expect(cohortsView.$('.tab-settings')).not.toHaveClass('is-selected');
-                    });
-                });
-            });
-
-            describe('Discussion Topics', function() {
-                var createCourseWideView, createInlineView,
-                    inlineView, courseWideView, assertCohortedTopics;
-
-                createCourseWideView = function(that) {
-                    createCohortsView(that);
-
-                    courseWideView = new CohortCourseWideDiscussionsView({
-                        el: cohortsView.$('.cohort-discussions-nav').removeClass('is-hidden'),
-                        model: cohortsView.context.discussionTopicsSettingsModel,
-                        cohortSettings: cohortsView.cohortSettings
-                    });
-                    courseWideView.render();
-                };
-
-                createInlineView = function(that, discussionTopicsSettingsModel) {
-                    createCohortsView(that);
-
-                    inlineView = new CohortInlineDiscussionsView({
-                        el: cohortsView.$('.cohort-discussions-nav').removeClass('is-hidden'),
-                        model: discussionTopicsSettingsModel || cohortsView.context.discussionTopicsSettingsModel,
-                        cohortSettings: cohortsView.cohortSettings
-                    });
-                    inlineView.render();
-                };
-
-                assertCohortedTopics = function(view, type) {
-                    expect(view.$('.check-discussion-subcategory-' + type).length).toBe(2);
-                    expect(view.$('.check-discussion-subcategory-' + type + ':checked').length).toBe(1);
-                };
-
-                it('renders the view properly', function() {
-                    showAndAssertDiscussionTopics(this);
-                });
-
-                describe('Course Wide', function() {
-                    it('shows the "Save" button as disabled initially', function() {
-                        createCourseWideView(this);
-                        expect(courseWideView.$(courseWideDiscussionsSaveButtonCss).prop('disabled')).toBeTruthy();
-                    });
-
-                    it('has one cohorted and one non-cohorted topic', function() {
-                        createCourseWideView(this);
-
-                        assertCohortedTopics(courseWideView, 'course-wide');
-
-                        expect(courseWideView.$('.cohorted-text').length).toBe(2);
-                        expect(courseWideView.$('.cohorted-text.hidden').length).toBe(1);
-                    });
-
-                    it('enables the "Save" button after changing checkbox', function() {
-                        createCourseWideView(this);
-
-                        // save button is disabled.
-                        expect(courseWideView.$(courseWideDiscussionsSaveButtonCss).prop('disabled')).toBeTruthy();
-
-                        $(courseWideView.$('.check-discussion-subcategory-course-wide')[0]).prop('checked', false).change();
-
-                        // save button is enabled.
-                        expect(courseWideView.$(courseWideDiscussionsSaveButtonCss).prop('disabled')).toBeFalsy();
-                    });
-
-                    it('saves the topic successfully', function() {
-                        createCourseWideView(this);
-
-                        $(courseWideView.$('.check-discussion-subcategory-course-wide')[1]).prop('checked', 'checked').change();
-                        expect(courseWideView.$(courseWideDiscussionsSaveButtonCss).prop('disabled')).toBeFalsy();
-
-                        // Save the updated settings
-                        courseWideView.$('.action-save').click();
-
-                        // fake requests for cohort settings with PATCH method.
-                        AjaxHelpers.expectJsonRequest(
-                            requests, 'PATCH', '/mock_service/cohorts/settings',
-                            {cohorted_course_wide_discussions: ['Topic_C_1', 'Topic_C_2']}
-                        );
-                        AjaxHelpers.respondWithJson(
-                            requests,
-                            {cohorted_course_wide_discussions: ['Topic_C_1', 'Topic_C_2']}
-                        );
-
-                        // fake request for discussion/topics with GET method.
-                        AjaxHelpers.expectJsonRequest(
-                            requests, 'GET', '/mock_service/cohorts/discussion/topics'
-                        );
-                        AjaxHelpers.respondWithJson(
-                            requests,
-                            createMockCohortDiscussions()
-                        );
-
-                        // verify the success message.
-                        expect(courseWideView.$(courseWideDiscussionsSaveButtonCss).prop('disabled')).toBeTruthy();
-                        verifyMessage('Your changes have been saved.', 'confirmation');
-                    });
-
-                    it('shows an appropriate message when subsequent "GET" returns HTTP500', function() {
-                        createCourseWideView(this);
-
-                        $(courseWideView.$('.check-discussion-subcategory-course-wide')[1]).prop('checked', 'checked').change();
-                        expect(courseWideView.$(courseWideDiscussionsSaveButtonCss).prop('disabled')).toBeFalsy();
-
-                        // Save the updated settings
-                        courseWideView.$('.action-save').click();
-
-                        // fake requests for cohort settings with PATCH method.
-                        AjaxHelpers.expectJsonRequest(
-                            requests, 'PATCH', '/mock_service/cohorts/settings',
-                            {cohorted_course_wide_discussions: ['Topic_C_1', 'Topic_C_2']}
-                        );
-                        AjaxHelpers.respondWithJson(
-                            requests,
-                            {cohorted_course_wide_discussions: ['Topic_C_1', 'Topic_C_2']}
-                        );
-
-                        // fake request for discussion/topics with GET method.
-                        AjaxHelpers.expectJsonRequest(
-                            requests, 'GET', '/mock_service/cohorts/discussion/topics'
-                        );
-                        AjaxHelpers.respondWithError(requests, 500);
-
-                        var expectedTitle = "We've encountered an error. Refresh your browser and then try again.";
-                        expect(courseWideView.$('.message-title').text().trim()).toBe(expectedTitle);
-                    });
-
-                    it('shows an appropriate error message for HTTP500', function() {
-                        createCourseWideView(this);
-
-                        $(courseWideView.$('.check-discussion-subcategory-course-wide')[1]).prop('checked', 'checked').change();
-                        courseWideView.$('.action-save').click();
-
-                        AjaxHelpers.respondWithError(requests, 500);
-                        var expectedTitle = "We've encountered an error. Refresh your browser and then try again.";
-                        expect(courseWideView.$('.message-title').text().trim()).toBe(expectedTitle);
-                    });
-                });
-
-                describe('Inline', function() {
-                    var enableSaveButton, mockGetRequest, verifySuccess, mockPatchRequest;
-
-                    enableSaveButton = function() {
-                        // enable the inline discussion topics.
-                        inlineView.$('.check-cohort-inline-discussions').prop('checked', 'checked').change();
-
-                        $(inlineView.$('.check-discussion-subcategory-inline')[0]).prop('checked', 'checked').change();
-
-                        expect(inlineView.$(inlineDiscussionsSaveButtonCss).prop('disabled')).toBeFalsy();
-                    };
-
-                    verifySuccess = function() {
-                        // verify the success message.
-                        expect(inlineView.$(inlineDiscussionsSaveButtonCss).prop('disabled')).toBeTruthy();
-                        verifyMessage('Your changes have been saved.', 'confirmation');
-                    };
-
-                    mockPatchRequest = function(cohortedInlineDiscussions) {
-                        AjaxHelpers.expectJsonRequest(
-                            requests, 'PATCH', '/mock_service/cohorts/settings',
-                            {
-                                cohorted_inline_discussions: cohortedInlineDiscussions,
-                                always_cohort_inline_discussions: false
-                            }
-                        );
-                        AjaxHelpers.respondWithJson(
-                            requests,
-                            {
-                                cohorted_inline_discussions: cohortedInlineDiscussions,
-                                always_cohort_inline_discussions: false
-                            }
-                        );
-                    };
-
-                    mockGetRequest = function(allCohorted) {
-                        // fake request for discussion/topics with GET method.
-                        AjaxHelpers.expectJsonRequest(
-                            requests, 'GET', '/mock_service/cohorts/discussion/topics'
-                        );
-                        AjaxHelpers.respondWithJson(
-                            requests,
-                            createMockCohortDiscussions(allCohorted)
-                        );
-                    };
-
-                    it('shows the "Save" button as disabled initially', function() {
-                        createInlineView(this);
-                        expect(inlineView.$(inlineDiscussionsSaveButtonCss).prop('disabled')).toBeTruthy();
-                    });
-
-                    it('shows always cohort radio button as selected', function() {
-                        createInlineView(this);
-                        inlineView.$('.check-all-inline-discussions').prop('checked', 'checked').change();
-
-                        // verify always cohort inline discussions is being selected.
-                        expect(inlineView.$('.check-all-inline-discussions').prop('checked')).toBeTruthy();
-
-                        // verify that inline topics are disabled
-                        expect(inlineView.$('.check-discussion-subcategory-inline').prop('disabled')).toBeTruthy();
-                        expect(inlineView.$('.check-discussion-category').prop('disabled')).toBeTruthy();
-
-                        // verify that cohort some topics are not being selected.
-                        expect(inlineView.$('.check-cohort-inline-discussions').prop('checked')).toBeFalsy();
-                    });
-
-                    it('shows cohort some topics radio button as selected', function() {
-                        createInlineView(this);
-                        inlineView.$('.check-cohort-inline-discussions').prop('checked', 'checked').change();
-
-                        // verify some cohort inline discussions radio is being selected.
-                        expect(inlineView.$('.check-cohort-inline-discussions').prop('checked')).toBeTruthy();
-
-                        // verify always cohort radio is not selected.
-                        expect(inlineView.$('.check-all-inline-discussions').prop('checked')).toBeFalsy();
-
-                        // verify that inline topics are enabled
-                        expect(inlineView.$('.check-discussion-subcategory-inline').prop('disabled')).toBeFalsy();
-                        expect(inlineView.$('.check-discussion-category').prop('disabled')).toBeFalsy();
-                    });
-
-                    it('has cohorted and non-cohorted topics', function() {
-                        createInlineView(this);
-                        enableSaveButton();
-                        assertCohortedTopics(inlineView, 'inline');
-                    });
-
-                    it('enables "Save" button after changing from always inline option', function() {
-                        createInlineView(this);
-                        enableSaveButton();
-                    });
-
-                    it('saves the topic', function() {
-                        createInlineView(this);
-                        enableSaveButton();
-
-                        // Save the updated settings
-                        inlineView.$('.action-save').click();
-
-                        mockPatchRequest(['Inline_Discussion_1']);
-                        mockGetRequest();
-
-                        verifySuccess();
-                    });
-
-                    it('selects the parent category when all children are selected', function() {
-                        createInlineView(this);
-                        enableSaveButton();
-
-                        // parent category should be indeterminate.
-                        expect(inlineView.$('.check-discussion-category:checked').length).toBe(0);
-                        expect(inlineView.$('.check-discussion-category:indeterminate').length).toBe(1);
-
-                        inlineView.$('.check-discussion-subcategory-inline').prop('checked', 'checked').change();
-                        // parent should be checked as we checked all children
-                        expect(inlineView.$('.check-discussion-category:checked').length).toBe(1);
-                    });
-
-                    it('selects/deselects all children when a parent category is selected/deselected', function() {
-                        createInlineView(this);
-                        enableSaveButton();
-
-                        expect(inlineView.$('.check-discussion-category:checked').length).toBe(0);
-
-                        inlineView.$('.check-discussion-category').prop('checked', 'checked').change();
-
-                        expect(inlineView.$('.check-discussion-category:checked').length).toBe(1);
-                        expect(inlineView.$('.check-discussion-subcategory-inline:checked').length).toBe(2);
-
-                        // un-check the parent, all children should be unchecd.
-                        inlineView.$('.check-discussion-category').prop('checked', false).change();
-                        expect(inlineView.$('.check-discussion-category:checked').length).toBe(0);
-                        expect(inlineView.$('.check-discussion-subcategory-inline:checked').length).toBe(0);
-                    });
-
-                    it('saves correctly when a subset of topics are selected within a category', function() {
-                        createInlineView(this);
-                        enableSaveButton();
-
-                        // parent category should be indeterminate.
-                        expect(inlineView.$('.check-discussion-category:checked').length).toBe(0);
-                        expect(inlineView.$('.check-discussion-category:indeterminate').length).toBe(1);
-
-                        // Save the updated settings
-                        inlineView.$('.action-save').click();
-
-                        mockPatchRequest(['Inline_Discussion_1']);
-                        mockGetRequest();
-
-                        verifySuccess();
-                        // parent category should be indeterminate.
-                        expect(inlineView.$('.check-discussion-category:indeterminate').length).toBe(1);
-                    });
-
-                    it('saves correctly when all child topics are selected within a category', function() {
-                        createInlineView(this);
-                        enableSaveButton();
-
-                        // parent category should be indeterminate.
-                        expect(inlineView.$('.check-discussion-category:checked').length).toBe(0);
-                        expect(inlineView.$('.check-discussion-category:indeterminate').length).toBe(1);
-
-                        inlineView.$('.check-discussion-subcategory-inline').prop('checked', 'checked').change();
-                        // Save the updated settings
-                        inlineView.$('.action-save').click();
-
-                        mockPatchRequest(['Inline_Discussion_1', 'Inline_Discussion_2']);
-                        mockGetRequest(true);
-
-                        verifySuccess();
-                        // parent category should be checked.
-                        expect(inlineView.$('.check-discussion-category:checked').length).toBe(1);
-                    });
-
-                    it('shows an appropriate message when no inline topics exist', function() {
-                        var topicsJson, discussionTopicsSettingsModel;
-
-                        topicsJson = {
-                            course_wide_discussions: {
-                                children: [['Topic_C_1', 'entry']],
-                                entries: {
-                                    Topic_C_1: {
-                                        sort_key: null,
-                                        is_cohorted: true,
-                                        id: 'Topic_C_1'
-                                    }
-                                }
-                            },
-                            inline_discussions: {
-                                subcategories: {},
-                                children: []
-                            }
-                        };
-                        discussionTopicsSettingsModel = new DiscussionTopicsSettingsModel(topicsJson);
-
-                        createInlineView(this, discussionTopicsSettingsModel);
-
-                        var expectedTitle = 'No content-specific discussion topics exist.';
-                        expect(inlineView.$('.no-topics').text().trim()).toBe(expectedTitle);
-                    });
-
-                    it('shows an appropriate message when subsequent "GET" returns HTTP500', function() {
-                        createInlineView(this);
-                        enableSaveButton();
-
-                        // Save the updated settings
-                        inlineView.$('.action-save').click();
-
-                        mockPatchRequest(['Inline_Discussion_1']);
-
-                        // fake request for discussion/topics with GET method.
-                        AjaxHelpers.expectJsonRequest(
-                            requests, 'GET', '/mock_service/cohorts/discussion/topics'
-                        );
-                        AjaxHelpers.respondWithError(requests, 500);
-
-                        var expectedTitle = "We've encountered an error. Refresh your browser and then try again.";
-                        expect(inlineView.$('.message-title').text().trim()).toBe(expectedTitle);
-                    });
-
-                    it('shows an appropriate error message for HTTP500', function() {
-                        createInlineView(this);
-                        enableSaveButton();
-
-                        $(inlineView.$('.check-discussion-subcategory-inline')[1]).prop('checked', 'checked').change();
-                        inlineView.$('.action-save').click();
-
-                        AjaxHelpers.respondWithError(requests, 500);
-                        var expectedTitle = "We've encountered an error. Refresh your browser and then try again.";
-                        expect(inlineView.$('.message-title').text().trim()).toBe(expectedTitle);
                     });
                 });
             });

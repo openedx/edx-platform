@@ -1,13 +1,15 @@
 """
 Use the 'Dummy' auth provider for generic integration tests of third_party_auth.
 """
+from __future__ import absolute_import
+
 import unittest
 from third_party_auth.tests import testutil
 
 from .base import IntegrationTestMixin
 
 
-@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, 'third_party_auth not enabled')
+@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
 class GenericIntegrationTest(IntegrationTestMixin, testutil.TestCase):
     """
     Basic integration tests of third_party_auth using Dummy provider

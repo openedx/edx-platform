@@ -1,15 +1,15 @@
 """Helpers for tests related to emitting events to the tracking logs."""
 
+from __future__ import absolute_import
+
 from datetime import datetime
 
 from django.test import TestCase
 from django.test.utils import override_settings
-from freezegun import freeze_time
-from pytz import UTC
-
 from eventtracking import tracker
 from eventtracking.django import DjangoTracker
-
+from freezegun import freeze_time
+from pytz import UTC
 
 FROZEN_TIME = datetime(2013, 10, 3, 8, 24, 55, tzinfo=UTC)
 IN_MEMORY_BACKEND_CONFIG = {
@@ -31,7 +31,6 @@ class InMemoryBackend(object):
         self.events.append(event)
 
 
-@freeze_time(FROZEN_TIME)
 @override_settings(
     EVENT_TRACKING_BACKENDS=IN_MEMORY_BACKEND_CONFIG
 )
@@ -46,6 +45,10 @@ class EventTrackingTestCase(TestCase):
     # Make this more robust to the addition of new events that the test doesn't care about.
 
     def setUp(self):
+        freezer = freeze_time(FROZEN_TIME)
+        freezer.start()
+        self.addCleanup(freezer.stop)
+
         super(EventTrackingTestCase, self).setUp()
 
         self.recreate_tracker()

@@ -109,13 +109,13 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     getDefaultNotes = function() {
         // Note that the server returns notes in reverse chronological order (newest first).
         return {
-            'count': 5,
-            'current_page': 1,
-            'num_pages': 1,
-            'start': 0,
-            'next': null,
-            'previous': null,
-            'results': [
+            count: 5,
+            current_page: 1,
+            num_pages: 1,
+            start: 0,
+            next: null,
+            previous: null,
+            results: [
                 {
                     chapter: getChapter('Second Chapter', 0, 1, [1, 'w_n', 0]),
                     section: getSection('Third Section', 0, ['w_n', 1, 0]),

@@ -1,0 +1,70 @@
+// Studio - bootstrap utilities - variables
+// ========================================
+
+// #Units:          Unit variables
+// #GRID:           Grid and layout variables
+// #COLORS:         Base, palette and theme color definitions + application
+// #TYPOGRAPHY:     Font definitions and scales
+// #ICONS:          Icon specific colors + other styling
+
+// ----------------------------
+// #UNITS
+// ----------------------------
+$baseline: 20px !default;
+
+// ----------------------------
+// #GRID
+// ----------------------------
+$studio-max-width: 1180px !default;
+
+// ----------------------------
+// #COLORS
+// ----------------------------
+
+$studio-gray: palette(grayscale, base) !default;
+$studio-background-color: palette(grayscale, x-back) !default;
+$studio-container-background-color: $white !default;
+$studio-border-color: palette(grayscale, back) !default;
+$studio-label-color: palette(grayscale, black) !default;
+$studio-active-color: palette(primary, base) !default;
+$studio-preview-menu-color: #c8c8c8 !default;
+$success-color-hover: palette(success, text) !default;
+
+$button-bg-hover-color: $white !default;
+
+$white-transparent: rgba(255, 255, 255, 0) !default;
+$white-opacity-40: rgba(255, 255, 255, 0.4) !default;
+$white-opacity-60: rgba(255, 255, 255, 0.6) !default;
+$white-opacity-70: rgba(255, 255, 255, 0.7) !default;
+$white-opacity-80: rgba(255, 255, 255, 0.8) !default;
+
+$black:     rgb(0, 0, 0) !default;
+$black-t0:  rgba($black, 0.125) !default;
+$black-t1:  rgba($black, 0.25) !default;
+$black-t2:  rgba($black, 0.5) !default;
+$black-t3:  rgba($black, 0.75) !default;
+
+$light-grey-transparent: rgba(200, 200, 200, 0) !default;
+$light-grey-solid: rgba(200, 200, 200, 1) !default;
+
+$header-bg: $white !default;
+$footer-bg: $white !default;
+
+// ----------------------------
+// #TYPOGRAPHY
+// ----------------------------
+$font-light: 300 !default;
+$font-regular: 400 !default;
+$font-semibold: 600 !default;
+$font-bold: 700 !default;
+
+// ----------------------------
+// #ICONS
+// ----------------------------
+// Icons
+$studio-dark-icon-color: $white !default;
+$studio-dark-icon-background-color: palette(grayscale, black) !default;
+
+$site-status-color: rgb(182, 37, 103) !default;
+
+$shadow-l1: rgba(0, 0, 0, 0.1) !default;

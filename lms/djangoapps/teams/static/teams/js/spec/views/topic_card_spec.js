@@ -1,16 +1,16 @@
 define(['jquery',
-        'underscore',
-        'teams/js/views/topic_card',
-        'teams/js/models/topic'],
+    'underscore',
+    'teams/js/views/topic_card',
+    'teams/js/models/topic'],
     function($, _, TopicCardView, Topic) {
         describe('Topic card view', function() {
             var createTopicCardView = function() {
                 return new TopicCardView({
                     model: new Topic({
-                        'id': 'renewables',
-                        'name': 'Renewable Energy',
-                        'description': 'Explore how changes in <ⓡⓔⓝⓔⓦⓐⓑⓛⓔ> ʎƃɹǝuǝ will affect our lives.',
-                        'team_count': 34
+                        id: 'renewables',
+                        name: 'Renewable Energy',
+                        description: 'Explore how changes in <ⓡⓔⓝⓔⓦⓐⓑⓛⓔ> ʎƃɹǝuǝ will affect our lives.',
+                        team_count: 34
                     })
                 });
             };

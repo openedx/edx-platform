@@ -1,0 +1,4 @@
+{% load i18n %}
+{% autoescape off %}
+{% blocktrans %}You have been removed from a beta test for {{ course_name }}{% endblocktrans %}
+{% endautoescape %}

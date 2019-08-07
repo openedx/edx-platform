@@ -1,19 +1,20 @@
+/* globals _ */
 (function() {
     'use strict';
     describe('Video Context Menu', function() {
         var state, openMenu, keyPressEvent, openSubmenuMouse, openSubmenuKeyboard, closeSubmenuMouse,
-            closeSubmenuKeyboard, menu, menuItems, menuSubmenuItem, submenu, submenuItems, overlay, playButton;
+            closeSubmenuKeyboard, menu, menuItems, menuSubmenuItem, submenu, submenuItems, overlay, $playButton;
 
         openMenu = function() {
-            var container = $('.video');
-            container.find('video').trigger('contextmenu');
-            menu = container.children('.contextmenu');
+            var $container = $('.video');
+            $container.find('video').trigger('contextmenu');
+            menu = $container.children('.contextmenu');
             menuItems = menu.children('.menu-item').not('.submenu-item');
             menuSubmenuItem = menu.children('.menu-item.submenu-item');
             submenu = menuSubmenuItem.children('.submenu');
             submenuItems = submenu.children('.menu-item');
-            overlay = container.children('.overlay');
-            playButton = $('.video_control.play');
+            overlay = $container.children('.overlay');
+            $playButton = $('.video_control.play');
         };
 
         keyPressEvent = function(key) {
@@ -106,14 +107,14 @@
                 menuItems.each(function() {
                     expect($(this)).toHaveAttrs({
                         'aria-selected': 'false',
-                        'role': 'menuitem'
+                        role: 'menuitem'
                     });
                 });
 
                 expect(menuSubmenuItem).toHaveAttrs({
                     'aria-expanded': 'false',
                     'aria-haspopup': 'true',
-                    'role': 'menuitem'
+                    role: 'menuitem'
                 });
 
                 // Submenu and its items.
@@ -191,14 +192,14 @@
 
             it('mouse left-clicking outside of the context menu will close it', function() {
                 // Left-click outside of open menu, for example on Play button
-                playButton.click();
+                $playButton.click();
                 expect(menu).not.toHaveClass('is-opened');
                 expect(overlay).not.toBeInDOM();
             });
 
             it('mouse right-clicking outside of video will close it', function() {
                 // Right-click outside of open menu for example on Play button
-                playButton.trigger('contextmenu');
+                $playButton.trigger('contextmenu');
                 expect(menu).not.toHaveClass('is-opened');
                 expect(overlay).not.toBeInDOM();
             });
@@ -429,4 +430,4 @@
             });
         });
     });
-})();
+}());

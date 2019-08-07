@@ -1,9 +1,11 @@
 """
 Tests for third_party_auth decorators.
 """
-import ddt
+from __future__ import absolute_import
+
 import unittest
 
+import ddt
 from django.conf import settings
 from django.http import HttpResponse
 from django.test import RequestFactory

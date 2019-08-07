@@ -2,8 +2,11 @@
 Helper functions to access and update the id and type
 used in event tracking.
 """
-from uuid import uuid4, UUID
-from request_cache import get_cache
+from __future__ import absolute_import
+
+from uuid import UUID, uuid4
+
+from openedx.core.lib.cache_utils import get_cache
 
 
 def get_event_transaction_id():

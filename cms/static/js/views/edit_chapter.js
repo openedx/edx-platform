@@ -1,7 +1,7 @@
 /* global course */
 
 define(['underscore', 'jquery', 'gettext', 'edx-ui-toolkit/js/utils/html-utils',
-        'js/views/baseview', 'js/models/uploads', 'js/views/uploads', 'text!templates/edit-chapter.underscore'],
+    'js/views/baseview', 'js/models/uploads', 'js/views/uploads', 'text!templates/edit-chapter.underscore'],
     function(_, $, gettext, HtmlUtils, BaseView, FileUploadModel, UploadDialogView, editChapterTemplate) {
         'use strict';
 
@@ -31,7 +31,7 @@ define(['underscore', 'jquery', 'gettext', 'edx-ui-toolkit/js/utils/html-utils',
                 'change .chapter-asset-path': 'changeAssetPath',
                 'click .action-close': 'removeChapter',
                 'click .action-upload': 'openUploadDialog',
-                'submit': 'uploadAsset'
+                submit: 'uploadAsset'
             },
             changeName: function(e) {
                 if (e && e.preventDefault) { e.preventDefault(); }

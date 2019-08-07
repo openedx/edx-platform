@@ -31,7 +31,7 @@ define(['js/dashboard/dropdown', 'jquery.simulate'],
         describe('edx.dashboard.dropdown.toggleCourseActionsDropdownMenu', function() {
             beforeEach(function() {
                 loadFixtures('js/fixtures/dashboard/dashboard.html');
-                window.edx.dashboard.dropdown.bindToggleButtons();
+                window.edx.dashboard.dropdown.bindToggleButtons('.action-more');
             });
 
             it('Clicking the .action-more button toggles the menu', function() {

@@ -1,8 +1,11 @@
 """
 Tests for Platform against Mobile App Request
 """
+from __future__ import absolute_import
+
 import ddt
 from django.test import TestCase
+
 from mobile_api.mobile_platform import MobilePlatform
 
 
@@ -11,8 +14,6 @@ class TestMobilePlatform(TestCase):
     """
     Tests for platform against mobile app request
     """
-    def setUp(self):
-        super(TestMobilePlatform, self).setUp()
 
     @ddt.data(
         ("edX/org.edx.mobile (0.1.5; OS Version 9.2 (Build 13C75))", "iOS", "0.1.5"),

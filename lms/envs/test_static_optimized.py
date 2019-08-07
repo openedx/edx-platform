@@ -11,6 +11,10 @@ from the same directory.
 """
 
 # Start with the common settings
+from __future__ import absolute_import
+
+from openedx.core.lib.derived import derive_settings
+
 from .common import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 # Use an in-memory database since this settings file is only used for updating assets
@@ -34,6 +38,11 @@ XQUEUE_INTERFACE = {
     "basic_auth": ('anant', 'agarwal'),
 }
 
+PROCTORING_BACKENDS = {
+    'DEFAULT': 'mock',
+    'mock': {},
+    'mock_proctoring_without_rules': {},
+}
 
 ######################### PIPELINE ####################################
 
@@ -53,8 +62,13 @@ LOG_DIR = (TEST_ROOT / "log").abspath()
 
 # Store the static files under test root so that they don't overwrite existing static assets
 STATIC_ROOT = (TEST_ROOT / "staticfiles" / "lms").abspath()
+WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = STATIC_ROOT / "webpack-stats.json"
 
 # Disable uglify when tests are running (used by build.js).
 # 1. Uglify is by far the slowest part of the build process
 # 2. Having full source code makes debugging tests easier for developers
 os.environ['REQUIRE_BUILD_PROFILE_OPTIMIZE'] = 'none'
+
+########################## Derive Any Derived Settings  #######################
+
+derive_settings(__name__)

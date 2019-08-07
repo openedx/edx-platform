@@ -1,7 +1,11 @@
 ''' useful functions for finding content and its position '''
+from __future__ import absolute_import
+
 from logging import getLogger
 
-from .exceptions import (ItemNotFoundError, NoPathToItem)
+from six.moves import range
+
+from .exceptions import ItemNotFoundError, NoPathToItem
 
 LOGGER = getLogger(__name__)
 
@@ -88,9 +92,9 @@ def path_to_location(modulestore, usage_key, full_path=False):
         n = len(path)
         course_id = path[0].course_key
         # pull out the location names
-        chapter = path[1].name if n > 1 else None
-        section = path[2].name if n > 2 else None
-        vertical = path[3].name if n > 3 else None
+        chapter = path[1].block_id if n > 1 else None
+        section = path[2].block_id if n > 2 else None
+        vertical = path[3].block_id if n > 3 else None
         # Figure out the position
         position = None
 

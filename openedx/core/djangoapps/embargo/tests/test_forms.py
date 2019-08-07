@@ -3,17 +3,19 @@
 Unit tests for embargo app admin forms.
 """
 
-from django.test import TestCase
+from __future__ import absolute_import
 
-from opaque_keys.edx.locator import CourseLocator
-
+import six
 # Explicitly import the cache from ConfigurationModel so we can reset it after each test
 from config_models.models import cache
-from ..models import IPFilter
-from ..forms import RestrictedCourseForm, IPFilterForm
+from django.test import TestCase
+from opaque_keys.edx.locator import CourseLocator
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+from ..forms import IPFilterForm, RestrictedCourseForm
+from ..models import IPFilter
 
 
 class RestrictedCourseFormTest(ModuleStoreTestCase):
@@ -22,7 +24,7 @@ class RestrictedCourseFormTest(ModuleStoreTestCase):
     def test_save_valid_data(self):
         course = CourseFactory.create()
         data = {
-            'course_key': unicode(course.id),
+            'course_key': six.text_type(course.id),
             'enroll_msg_key': 'default',
             'access_msg_key': 'default'
         }
@@ -68,31 +70,31 @@ class IPFilterFormTest(TestCase):
         # should be able to do both ipv4 and ipv6
         # spacing should not matter
         form_data = {
-            'whitelist': '127.0.0.1, 2003:dead:beef:4dad:23:46:bb:101, 1.1.0.1/32, 1.0.0.0/24',
-            'blacklist': '  18.244.1.5  ,  2002:c0a8:101::42, 18.36.22.1, 1.0.0.0/16'
+            'whitelist': u'127.0.0.1, 2003:dead:beef:4dad:23:46:bb:101, 1.1.0.1/32, 1.0.0.0/24',
+            'blacklist': u'  18.244.1.5  ,  2002:c0a8:101::42, 18.36.22.1, 1.0.0.0/16'
         }
         form = IPFilterForm(data=form_data)
         self.assertTrue(form.is_valid())
         form.save()
         whitelist = IPFilter.current().whitelist_ips
         blacklist = IPFilter.current().blacklist_ips
-        for addr in '127.0.0.1, 2003:dead:beef:4dad:23:46:bb:101'.split(','):
+        for addr in u'127.0.0.1, 2003:dead:beef:4dad:23:46:bb:101'.split(','):
             self.assertIn(addr.strip(), whitelist)
-        for addr in '18.244.1.5, 2002:c0a8:101::42, 18.36.22.1'.split(','):
+        for addr in u'18.244.1.5, 2002:c0a8:101::42, 18.36.22.1'.split(','):
             self.assertIn(addr.strip(), blacklist)
 
         # Network tests
         # ips not in whitelist network
-        for addr in ['1.1.0.2', '1.0.1.0']:
+        for addr in [u'1.1.0.2', u'1.0.1.0']:
             self.assertNotIn(addr.strip(), whitelist)
         # ips in whitelist network
-        for addr in ['1.1.0.1', '1.0.0.100']:
+        for addr in [u'1.1.0.1', u'1.0.0.100']:
             self.assertIn(addr.strip(), whitelist)
         # ips not in blacklist network
-        for addr in ['2.0.0.0', '1.1.0.0']:
+        for addr in [u'2.0.0.0', u'1.1.0.0']:
             self.assertNotIn(addr.strip(), blacklist)
         # ips in blacklist network
-        for addr in ['1.0.100.0', '1.0.0.10']:
+        for addr in [u'1.0.100.0', u'1.0.0.10']:
             self.assertIn(addr.strip(), blacklist)
 
         # Test clearing by adding an empty list is OK too
@@ -109,8 +111,8 @@ class IPFilterFormTest(TestCase):
     def test_add_invalid_ips(self):
         # test adding invalid ip addresses
         form_data = {
-            'whitelist': '.0.0.1, :dead:beef:::, 1.0.0.0/55',
-            'blacklist': '  18.244.*  ,  999999:c0a8:101::42, 1.0.0.0/'
+            'whitelist': u'.0.0.1, :dead:beef:::, 1.0.0.0/55',
+            'blacklist': u'  18.244.*  ,  999999:c0a8:101::42, 1.0.0.0/'
         }
         form = IPFilterForm(data=form_data)
         self.assertFalse(form.is_valid())

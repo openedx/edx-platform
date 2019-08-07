@@ -43,155 +43,158 @@ $bp-screen-md: 768px !default;
 // #UTILITIES
 // ----------------------------
 @mixin alert($shim-alert-color, $shim-alert-color-glow) {
-    border: 1px solid $shim-alert-color;
-    box-shadow: inset 0 0 0 4px $shim-alert-color-glow;
+  border: 1px solid $shim-alert-color;
+  box-shadow: inset 0 0 0 4px $shim-alert-color-glow;
 
-    .alert-icon {
-        color: $white;
-        background-color: $shim-alert-color;
-    }
+  .alert-icon {
+    color: $white;
+    background-color: $shim-alert-color;
+  }
 }
 
 @mixin alert-message($width) {
-    box-sizing: border-box;
+  box-sizing: border-box;
 
-    @media (min-width: $bp-screen-md) {
-        @include float(left);
-        width: $width;
-        padding: $spacing-vertical-small;
-        padding-top: 0;
-        padding-bottom: 0;
-    }
+  @media (min-width: $bp-screen-md) {
+    @include float(left);
 
-    :last-child {
-        // keeps the message compact
-        margin-bottom: 0;
-    }
+    width: $width;
+    padding: $spacing-vertical-small;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  :last-child {
+    // keeps the message compact
+    margin-bottom: 0;
+  }
 }
 
 // everything below here gets added specificity pattern-library-shim
 .pattern-library-shim {
-    // ----------------------------
-    // #GENERAL
-    // ----------------------------
-    &.alert {
-        background-color: $white;
-        border: 1px solid $palette-grey-accent;
+  // ----------------------------
+  // #GENERAL
+  // ----------------------------
+  &.alert {
+    background-color: $white;
+    border: 1px solid $palette-grey-accent;
+    padding: $spacing-vertical-small $spacing-horizontal-base;
+    box-shadow: inset 0 0 0 4px $palette-grey-back;
+    overflow: auto;
+
+    &.alert-slim {
+      padding: $spacing-vertical-x-small;
+
+      .alert-message {
         padding: $spacing-vertical-small $spacing-horizontal-base;
-        box-shadow: inset 0 0 0 4px $palette-grey-back;
-        overflow: auto;
+        font-size: $font-size-small;
 
-        &.alert-slim {
-            padding: $spacing-vertical-x-small;
-
-            .alert-message {
-                padding: $spacing-vertical-small $spacing-horizontal-base;
-                font-size: $font-size-small;
-
-                .copy {
-                    margin-bottom: 0;
-                }
-            }
+        .copy {
+          margin-bottom: 0;
         }
+      }
+    }
 
-        &.alert-tiny {
-            padding: $spacing-vertical-x-small;
+    &.alert-tiny {
+      padding: $spacing-vertical-x-small;
 
-            .alert-message {
-                padding: $spacing-vertical-x-small $spacing-horizontal-small;
-                font-size: $font-size-small;
+      .alert-message {
+        padding: $spacing-vertical-x-small $spacing-horizontal-small;
+        font-size: $font-size-small;
 
-                .copy {
-                    margin-bottom: 0;
+        .copy {
+          margin-bottom: 0;
 
-                    .icon {
-                        display: inline-block;
-                        margin-right: $baseline;
-                    }
-                }
-            }
+          .icon {
+            display: inline-block;
+            margin-right: $baseline;
+          }
         }
+      }
+    }
+  }
+
+  .alert-icon {
+    // hide icons on small screens
+    display: none;
+
+    @media (min-width: $bp-screen-md) {
+      @include float(left);
+
+      display: block;
+
+      // create a circle around the icon
+      border-radius: 50%;
+
+      // create room around the icon for the circle
+      padding: $spacing-vertical-x-small;
+    }
+  }
+
+  .alert-message-with-action {
+    // provide room for the action to be displayed next to the alert message
+    @include alert-message(70%);
+  }
+
+  .alert-message {
+    @include alert-message(90%);
+  }
+
+  .alert-title {
+    @extend %hd-5;
+    @extend %headings-emphasized;
+
+    @media (min-width: $bp-screen-md) {
+      // shift the section up to make the alert more compact
+      margin-top: - $spacing-vertical-x-small;
     }
 
-    .alert-icon {
-        // hide icons on small screens
-        display: none;
+  }
 
-        @media (min-width: $bp-screen-md) {
-            @include float(left);
-            display: block;
+  .alert-copy {
+    @extend %copy-base;
 
-            // create a circle around the icon
-            border-radius: 50%;
-
-            // create room around the icon for the circle
-            padding: $spacing-vertical-x-small;
-        }
+    @media (min-width: $bp-screen-md) {
+      // shift the message down to be in line with the icon
+      margin-top: $spacing-vertical-xx-small;
     }
+  }
 
-    .alert-message-with-action {
-        // provide room for the action to be displayed next to the alert message
-        @include alert-message(70%);
+  .alert-copy-with-title {
+    @extend %copy-base;
+  }
+
+  .alert-action {
+    width: 100%;
+
+    @media (min-width: $bp-screen-md) {
+      @include float(right);
+
+      width: inherit;
     }
+  }
 
-    .alert-message {
-        @include alert-message(90%);
-    }
+  // ----------------------------
+  // #INDIVIDUAL CASES
+  // ----------------------------
 
-    .alert-title {
-        @extend %hd-5;
-        @extend %headings-emphasized;
+  // information-based alert
+  &.alert-information {
+    @include alert($palette-brand-accent, $palette-brand-back);
+  }
 
-        @media (min-width: $bp-screen-md) {
-            // shift the section up to make the alert more compact
-            margin-top: - $spacing-vertical-x-small;
-        }
+  // warning-based alert
+  &.alert-warning {
+    @include alert($palette-warning-accent, $palette-warning-back);
+  }
 
-    }
+  // error-based alert
+  &.alert-error {
+    @include alert($palette-error-accent, $palette-error-back);
+  }
 
-    .alert-copy {
-        @extend %copy-base;
-
-        @media (min-width: $bp-screen-md) {
-            // shift the message down to be in line with the icon
-            margin-top: $spacing-vertical-xx-small;
-        }
-    }
-
-    .alert-copy-with-title {
-        @extend %copy-base;
-    }
-
-    .alert-action {
-        width: 100%;
-
-        @media (min-width: $bp-screen-md) {
-            @include float(right);
-            width: inherit;
-        }
-    }
-
-    // ----------------------------
-    // #INDIVIDUAL CASES
-    // ----------------------------
-
-    // information-based alert
-    &.alert-information {
-        @include alert($palette-brand-accent, $palette-brand-back);
-    }
-
-    // warning-based alert
-    &.alert-warning {
-        @include alert($palette-warning-accent, $palette-warning-back);
-    }
-
-    // error-based alert
-    &.alert-error {
-        @include alert($palette-error-accent, $palette-error-back);
-    }
-
-    // success-based alert
-    &.alert-success {
-        @include alert($palette-success-accent, $palette-success-back);
-    }
+  // success-based alert
+  &.alert-success {
+    @include alert($palette-success-accent, $palette-success-back);
+  }
 }

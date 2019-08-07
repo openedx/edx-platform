@@ -13,27 +13,29 @@ Main module which shows problems (of "capa" type).
 This is used by capa_module.
 """
 
-from collections import OrderedDict
-from copy import deepcopy
-from datetime import datetime
+from __future__ import absolute_import
+
 import logging
 import os.path
 import re
-
-from lxml import etree
-from pytz import UTC
+from collections import OrderedDict
+from copy import deepcopy
+from datetime import datetime
 from xml.sax.saxutils import unescape
 
-from capa.correctmap import CorrectMap
-import capa.inputtypes as inputtypes
-import capa.customrender as customrender
-import capa.responsetypes as responsetypes
-from capa.util import contextualize_text, convert_files_to_filenames
-import capa.xqueue_interface as xqueue_interface
-from capa.safe_exec import safe_exec
-from openedx.core.djangolib.markup import HTML
-from xmodule.stringify import stringify_children
+import six
+from lxml import etree
+from pytz import UTC
 
+import capa.customrender as customrender
+import capa.inputtypes as inputtypes
+import capa.responsetypes as responsetypes
+import capa.xqueue_interface as xqueue_interface
+from capa.correctmap import CorrectMap
+from capa.safe_exec import safe_exec
+from capa.util import contextualize_text, convert_files_to_filenames
+from openedx.core.djangolib.markup import HTML, Text
+from xmodule.stringify import stringify_children
 
 # extra things displayed after "show answers" is pressed
 solution_tags = ['solution']
@@ -129,7 +131,7 @@ class LoncapaProblem(object):
     Main class for capa Problems.
     """
     def __init__(self, problem_text, id, capa_system, capa_module,  # pylint: disable=redefined-builtin
-                 state=None, seed=None, minimal_init=False):
+                 state=None, seed=None, minimal_init=False, extract_tree=True):
         """
         Initializes capa Problem.
 
@@ -148,6 +150,8 @@ class LoncapaProblem(object):
                 - `done` (bool) indicates whether or not this problem is considered done
                 - `input_state` (dict) maps input_id to a dictionary that holds the state for that input
             seed (int): random number generator seed.
+            minimal_init (bool): whether to skip pre-processing student answers
+            extract_tree (bool): whether to parse the problem XML and store the HTML
 
         """
 
@@ -207,13 +211,14 @@ class LoncapaProblem(object):
 
             # Run response late_transforms last (see MultipleChoiceResponse)
             # Sort the responses to be in *_1 *_2 ... order.
-            responses = self.responders.values()
+            responses = list(self.responders.values())
             responses = sorted(responses, key=lambda resp: int(resp.id[resp.id.rindex('_') + 1:]))
             for response in responses:
                 if hasattr(response, 'late_transforms'):
                     response.late_transforms(self)
 
-            self.extracted_tree = self._extract_html(self.tree)
+            if extract_tree:
+                self.extracted_tree = self._extract_html(self.tree)
 
     def make_xml_compatible(self, tree):
         """
@@ -304,26 +309,25 @@ class LoncapaProblem(object):
             maxscore += responder.get_max_score()
         return maxscore
 
-    def get_score(self):
+    def calculate_score(self, correct_map=None):
         """
         Compute score for this problem.  The score is the number of points awarded.
         Returns a dictionary {'score': integer, from 0 to get_max_score(),
                               'total': get_max_score()}.
+
+        Takes an optional correctness map for use in the rescore workflow.
         """
+        if correct_map is None:
+            correct_map = self.correct_map
         correct = 0
-        for key in self.correct_map:
+        for key in correct_map:
             try:
-                correct += self.correct_map.get_npoints(key)
+                correct += correct_map.get_npoints(key)
             except Exception:
-                log.error('key=%s, correct_map = %s', key, self.correct_map)
+                log.error('key=%s, correct_map = %s', key, correct_map)
                 raise
 
-        if (not self.student_answers) or len(self.student_answers) == 0:
-            return {'score': 0,
-                    'total': self.get_max_score()}
-        else:
-            return {'score': correct,
-                    'total': self.get_max_score()}
+        return {'score': correct, 'total': self.get_max_score()}
 
     def update_score(self, score_msg, queuekey):
         """
@@ -397,7 +401,9 @@ class LoncapaProblem(object):
 
         # if answers include File objects, convert them to filenames.
         self.student_answers = convert_files_to_filenames(answers)
-        return self._grade_answers(answers)
+        new_cmap = self.get_grade_from_current_answers(answers)
+        self.correct_map = new_cmap
+        return self.correct_map
 
     def supports_rescoring(self):
         """
@@ -418,16 +424,10 @@ class LoncapaProblem(object):
         """
         return all('filesubmission' not in responder.allowed_inputfields for responder in self.responders.values())
 
-    def rescore_existing_answers(self):
+    def get_grade_from_current_answers(self, student_answers):
         """
-        Rescore student responses.  Called by capa_module.rescore_problem.
-        """
-        return self._grade_answers(None)
-
-    def _grade_answers(self, student_answers):
-        """
-        Internal grading call used for checking new 'student_answers' and also
-        rescoring existing student_answers.
+        Gets the grade for the currently-saved problem state, but does not save it
+        to the block.
 
         For new student_answers being graded, `student_answers` is a dict of all the
         entries from request.POST, but with the first part of each key removed
@@ -462,7 +462,6 @@ class LoncapaProblem(object):
                 results = responder.evaluate_answers(self.student_answers, oldcmap)
             newcmap.update(results)
 
-        self.correct_map = newcmap
         return newcmap
 
     def get_question_answers(self):
@@ -496,8 +495,147 @@ class LoncapaProblem(object):
         answer_ids = []
         for response in self.responders.keys():
             results = self.responder_answers[response]
-            answer_ids.append(results.keys())
+            answer_ids.append(list(results.keys()))
         return answer_ids
+
+    def find_correct_answer_text(self, answer_id):
+        """
+        Returns the correct answer(s) for the provided answer_id as a single string.
+
+        Arguments::
+            answer_id (str): a string like "98e6a8e915904d5389821a94e48babcf_13_1"
+
+        Returns:
+            str: A string containing the answer or multiple answers separated by commas.
+        """
+        xml_elements = self.tree.xpath('//*[@id="' + answer_id + '"]')
+        if not xml_elements:
+            return
+        xml_element = xml_elements[0]
+        answer_text = xml_element.xpath('@answer')
+        if answer_text:
+            return answer_id[0]
+        if xml_element.tag == 'optioninput':
+            return xml_element.xpath('@correct')[0]
+        return ', '.join(xml_element.xpath('*[@correct="true"]/text()'))
+
+    def find_question_label(self, answer_id):
+        """
+        Obtain the most relevant question text for a particular answer.
+
+        E.g. in a problem like "How much is 2+2?" "Two"/"Three"/"More than three",
+        this function returns the "How much is 2+2?" text.
+
+        It uses, in order:
+        - the question prompt, if the question has one
+        - the <p> or <label> element which precedes the choices (skipping descriptive elements)
+        - a text like "Question 5" if no other name could be found
+
+        Arguments::
+            answer_id: a string like "98e6a8e915904d5389821a94e48babcf_13_1"
+
+        Returns:
+            a string with the question text
+        """
+        _ = self.capa_system.i18n.ugettext
+        # Some questions define a prompt with this format:   >>This is a prompt<<
+        prompt = self.problem_data[answer_id].get('label')
+
+        if prompt:
+            question_text = prompt.striptags()
+        else:
+            # If no prompt, then we must look for something resembling a question ourselves
+            #
+            # We have a structure like:
+            #
+            # <p />
+            # <optionresponse id="a0effb954cca4759994f1ac9e9434bf4_2">
+            #   <optioninput id="a0effb954cca4759994f1ac9e9434bf4_3_1" />
+            # <optionresponse>
+            #
+            # Starting from  answer (the optioninput in this example) we go up and backwards
+            xml_elems = self.tree.xpath('//*[@id="' + answer_id + '"]')
+            assert len(xml_elems) == 1
+            xml_elem = xml_elems[0].getparent()
+
+            # Get the element that probably contains the question text
+            questiontext_elem = xml_elem.getprevious()
+
+            # Go backwards looking for a <p> or <label>, but skip <description> because it doesn't
+            # contain the question text.
+            #
+            # E.g if we have this:
+            #   <p /> <description /> <optionresponse /> <optionresponse />
+            #
+            # then from the first optionresponse we'll end with the <p>.
+            # If we start in the second optionresponse, we'll find another response in the way,
+            # stop early, and instead of a question we'll report "Question 2".
+            SKIP_ELEMS = ['description']
+            LABEL_ELEMS = ['p', 'label']
+            while questiontext_elem is not None and questiontext_elem.tag in SKIP_ELEMS:
+                questiontext_elem = questiontext_elem.getprevious()
+
+            if questiontext_elem is not None and questiontext_elem.tag in LABEL_ELEMS:
+                question_text = questiontext_elem.text
+            else:
+                # For instance 'd2e35c1d294b4ba0b3b1048615605d2a_2_1' contains 2,
+                # which is used in question number 1 (see example XML in comment above)
+                # There's no question 0 (question IDs start at 1, answer IDs at 2)
+                question_nr = int(answer_id.split('_')[-2]) - 1
+                question_text = _("Question {0}").format(question_nr)
+
+        return question_text
+
+    def find_answer_text(self, answer_id, current_answer):
+        """
+        Process a raw answer text to make it more meaningful.
+
+        E.g. in a choice problem like "How much is 2+2?" "Two"/"Three"/"More than three",
+        this function will transform "choice_1" (which is the internal response given by
+        many capa methods) to the human version, e.g. "More than three".
+
+        If the answers are multiple (e.g. because they're from a multiple choice problem),
+        this will join them with a comma.
+
+        If passed a normal string which is already the answer, it doesn't change it.
+
+        TODO merge with response_a11y_data?
+
+        Arguments:
+            answer_id: a string like "98e6a8e915904d5389821a94e48babcf_13_1"
+            current_answer: a data structure as found in `LoncapaProblem.student_answers`
+                which represents the best response we have until now
+
+        Returns:
+            a string with the human version of the response
+        """
+        if isinstance(current_answer, list):
+            # Multiple answers. This case happens e.g. in multiple choice problems
+            answer_text = ", ".join(
+                self.find_answer_text(answer_id, answer) for answer in current_answer
+            )
+
+        elif isinstance(current_answer, six.string_types) and current_answer.startswith('choice_'):
+            # Many problem (e.g. checkbox) report "choice_0" "choice_1" etc.
+            # Here we transform it
+            elems = self.tree.xpath('//*[@id="{answer_id}"]//*[@name="{choice_number}"]'.format(
+                answer_id=answer_id,
+                choice_number=current_answer
+            ))
+            assert len(elems) == 1
+            choicegroup = elems[0].getparent()
+            input_cls = inputtypes.registry.get_class_for_tag(choicegroup.tag)
+            choices_map = dict(input_cls.extract_choices(choicegroup, self.capa_system.i18n, text_only=True))
+            answer_text = choices_map[current_answer]
+
+        elif isinstance(current_answer, six.string_types):
+            # Already a string with the answer
+            answer_text = current_answer
+
+        else:
+            raise NotImplementedError()
+
+        return answer_text
 
     def do_targeted_feedback(self, tree):
         """
@@ -618,7 +756,7 @@ class LoncapaProblem(object):
         """
         includes = self.tree.findall('.//include')
         for inc in includes:
-            filename = inc.get('file')
+            filename = inc.get('file').decode('utf-8')
             if filename is not None:
                 try:
                     # open using LoncapaSystem OSFS filestore
@@ -749,7 +887,7 @@ class LoncapaProblem(object):
                 )
             except Exception as err:
                 log.exception("Error while execing script code: " + all_code)
-                msg = "Error while executing script code: %s" % str(err).replace('<', '&lt;')
+                msg = Text("Error while executing script code: %s" % str(err))
                 raise responsetypes.LoncapaProblemError(msg)
 
         # Store code source in context, along with the Python path needed to run it correctly.
@@ -768,7 +906,7 @@ class LoncapaProblem(object):
 
         Used by get_html.
         """
-        if not isinstance(problemtree.tag, basestring):
+        if not isinstance(problemtree.tag, six.string_types):
             # Comment and ProcessingInstruction nodes are not Elements,
             # and we're ok leaving those behind.
             # BTW: etree gives us no good way to distinguish these things
@@ -798,16 +936,21 @@ class LoncapaProblem(object):
             if problemid in self.correct_map:
                 pid = input_id
 
-                # If the the problem has not been saved since the last submit set the status to the
-                # current correctness value and set the message as expected. Otherwise we do not want to
-                # display correctness because the answer may have changed since the problem was graded.
-                if not self.has_saved_answers:
-                    status = self.correct_map.get_correctness(pid)
-                    msg = self.correct_map.get_msg(pid)
+                # If we're withholding correctness, don't show adaptive hints either.
+                # Note that regular, "demand" hints will be shown, if the course author has added them to the problem.
+                if not self.capa_module.correctness_available():
+                    status = 'submitted'
+                else:
+                    # If the the problem has not been saved since the last submit set the status to the
+                    # current correctness value and set the message as expected. Otherwise we do not want to
+                    # display correctness because the answer may have changed since the problem was graded.
+                    if not self.has_saved_answers:
+                        status = self.correct_map.get_correctness(pid)
+                        msg = self.correct_map.get_msg(pid)
 
-                hint = self.correct_map.get_hint(pid)
-                hintmode = self.correct_map.get_hintmode(pid)
-                answervariable = self.correct_map.get_property(pid, 'answervariable')
+                    hint = self.correct_map.get_hint(pid)
+                    hintmode = self.correct_map.get_hintmode(pid)
+                    answervariable = self.correct_map.get_property(pid, 'answervariable')
 
             value = ''
             if self.student_answers and problemid in self.student_answers:
@@ -979,7 +1122,7 @@ class LoncapaProblem(object):
             for inputfield in inputfields:
                 problem_data[inputfield.get('id')] = {
                     'group_label': group_label_tag_text,
-                    'label': inputfield.attrib.get('label', ''),
+                    'label': HTML(inputfield.attrib.get('label', '')),
                     'descriptions': {}
                 }
         else:

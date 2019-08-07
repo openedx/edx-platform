@@ -1,22 +1,24 @@
 """
 Test cases covering workflows and behaviors for the Randomize XModule
 """
+from __future__ import absolute_import
+
 import unittest
 from datetime import datetime, timedelta
 
-from django.utils.timezone import UTC
 from opaque_keys.edx.locator import BlockUsageLocator
+from pytz import UTC
 from xblock.fields import ScopeIds
+
 from xmodule.randomize_module import RandomizeModule
 
 from .test_course_module import DummySystem as DummyImportSystem
-
 
 ORG = 'test_org'
 COURSE = 'test_course'
 
 START = '2013-01-01T01:00:00'
-_TODAY = datetime.now(UTC())
+_TODAY = datetime.now(UTC)
 _LAST_WEEK = _TODAY - timedelta(days=7)
 _NEXT_WEEK = _TODAY + timedelta(days=7)
 

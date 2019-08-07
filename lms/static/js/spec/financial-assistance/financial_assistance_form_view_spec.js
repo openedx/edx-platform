@@ -18,9 +18,9 @@ define([
                         label: 'Course',
                         name: 'course',
                         options: [
-                                {'name': 'Verified with Audit', 'value': 'course-v1:HCFA+VA101+2015'},
-                                {'name': 'Something Else', 'value': 'course-v1:SomethingX+SE101+215'},
-                                {'name': 'Test Course', 'value': 'course-v1:TestX+T101+2015'}
+                                {name: 'Verified with Audit', value: 'course-v1:HCFA+VA101+2015'},
+                                {name: 'Something Else', value: 'course-v1:SomethingX+SE101+215'},
+                                {name: 'Test Course', value: 'course-v1:TestX+T101+2015'}
                         ],
                         placeholder: '',
                         required: true,
@@ -32,11 +32,11 @@ define([
                         label: 'Annual Income',
                         name: 'income',
                         options: [
-                                {'name': 'Less than $5,000', 'value': 'Less than $5,000'},
-                                {'name': '$5,000 - $10,000', 'value': '$5,000 - $10,000'},
-                                {'name': '$10,000 - $15,000', 'value': '$10,000 - $15,000'},
-                                {'name': '$15,000 - $20,000', 'value': '$15,000 - $20,000'},
-                                {'name': '$20,000 - $25,000', 'value': '$20,000 - $25,000'}
+                                {name: 'Less than $5,000', value: 'Less than $5,000'},
+                                {name: '$5,000 - $10,000', value: '$5,000 - $10,000'},
+                                {name: '$10,000 - $15,000', value: '$10,000 - $15,000'},
+                                {name: '$15,000 - $20,000', value: '$15,000 - $20,000'},
+                                {name: '$20,000 - $25,000', value: '$20,000 - $25,000'}
                         ],
                         placeholder: '',
                         required: true,
@@ -133,23 +133,23 @@ define([
 
         failedSubmission = function() {
             expect(view.$('.js-success-message').length).toEqual(0);
-            expect(view.$('.submission-error')).toHaveClass('hidden');
+            expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(0);
             validSubmission();
             view.model.trigger('error', {status: 500});
             expect(view.$('.js-success-message').length).toEqual(0);
-            expect(view.$('.submission-error')).not.toHaveClass('hidden');
+            expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(1);
         };
 
         invalidCountry = function() {
             expect(view.$('.js-success-message').length).toEqual(0);
-            expect(view.$('.submission-error')).not.toHaveClass('hidden');
+            expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(1);
             expect(view.$('#user-country-title')).toHaveClass('error');
             expect(view.$('.js-submit-form').prop('disabled')).toBeTruthy();
         };
 
         validCountry = function() {
             expect(view.$('.js-success-message').length).toEqual(0);
-            expect(view.$('.submission-error')).toHaveClass('hidden');
+            expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(0);
             expect(view.$('#user-country-title')).not.toHaveClass('error');
             expect(view.$('.js-submit-form').prop('disabled')).toBeFalsy();
         };
@@ -184,10 +184,10 @@ define([
         });
 
         it('should not submit the form if the front end validation fails', function() {
-            expect(view.$('.submission-error')).toHaveClass('hidden');
+            expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(0);
             view.$('.js-submit-form').click();
             expect(view.model.save).not.toHaveBeenCalled();
-            expect(view.$('.submission-error')).not.toHaveClass('hidden');
+            expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(1);
         });
 
         it('should submit the form data and additional data if validation passes', function() {

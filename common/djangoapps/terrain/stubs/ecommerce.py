@@ -2,8 +2,12 @@
 Stub implementation of ecommerce service for acceptance tests
 """
 
+from __future__ import absolute_import
+
 import re
-import urlparse
+
+import six.moves.urllib.parse  # pylint: disable=import-error
+
 from .http import StubHttpRequestHandler, StubHttpService
 
 
@@ -21,7 +25,7 @@ class StubEcommerceServiceHandler(StubHttpRequestHandler):  # pylint: disable=mi
         """
         Find the correct handler method given the path info from the HTTP request.
         """
-        path = urlparse.urlparse(self.path).path
+        path = six.moves.urllib.parse.urlparse(self.path).path
         for pattern in pattern_handlers:
             match = re.match(pattern, path)
             if match:
@@ -38,18 +42,14 @@ class StubEcommerceServiceHandler(StubHttpRequestHandler):  # pylint: disable=mi
                 {
                     'status': 'Complete',
                     'number': 'Edx-123',
-                    'total_excl_tax': '100.0',
+                    'total_excl_tax': '100.00',
                     'date_placed': '2016-04-21T23:14:23Z',
                     'lines': [
                         {
                             'title': 'Test Course',
+                            'line_price_excl_tax': '100.00',
                             'product': {
-                                'attribute_values': [
-                                    {
-                                        'name': 'certificate_type',
-                                        'value': 'verified'
-                                    }
-                                ]
+                                'product_class': 'Seat'
                             }
                         }
                     ],

@@ -6,25 +6,25 @@ define([
 
 
     var JSON_RESPONSE = {
-        'total': 365,
-        'results': [
+        total: 365,
+        results: [
             {
-                'data': {
-                    'modes': [
+                data: {
+                    modes: [
                         'honor'
                     ],
-                    'course': 'edX/DemoX/Demo_Course',
-                    'enrollment_start': '2015-04-21T00:00:00+00:00',
-                    'number': 'DemoX',
-                    'content': {
-                        'overview': ' About This Course Include your long course description here.',
-                        'display_name': 'edX Demonstration Course',
-                        'number': 'DemoX'
+                    course: 'edX/DemoX/Demo_Course',
+                    enrollment_start: '2015-04-21T00:00:00+00:00',
+                    number: 'DemoX',
+                    content: {
+                        overview: ' About This Course Include your long course description here.',
+                        display_name: 'edX Demonstration Course',
+                        number: 'DemoX'
                     },
-                    'start': '1970-01-01T05:00:00+00:00',
-                    'image_url': '/c4x/edX/DemoX/asset/images_course_image.jpg',
-                    'org': 'edX',
-                    'id': 'edX/DemoX/Demo_Course'
+                    start: '1970-01-01T05:00:00+00:00',
+                    image_url: '/c4x/edX/DemoX/asset/images_course_image.jpg',
+                    org: 'edX',
+                    id: 'edX/DemoX/Demo_Course'
                 }
             }
         ]
@@ -47,7 +47,7 @@ define([
             expect(this.view.$el.find('.course-name')).toContainHtml(data.org);
             expect(this.view.$el.find('.course-name')).toContainHtml(data.content.number);
             expect(this.view.$el.find('.course-name')).toContainHtml(data.content.display_name);
-            expect(this.view.$el.find('.course-date')).toContainHtml('Jan 01, 1970');
+            expect(this.view.$el.find('.course-date').text().trim()).toEqual('Starts: Jan 1, 1970');
         });
     });
 });

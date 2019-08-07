@@ -1,0 +1,136 @@
+<section id="membership" class="idash-section active-section" aria-labelledby="header-membership">
+  <h3 class="hd hd-3" id="header-membership">Membership</h3>
+
+  <div class="member-lists-management membership-section" aria-live="polite">
+    <h3 class="hd hd-3">Course Team Management</h3>
+
+    <div class="request-response-error"></div>
+
+    <div class="wrapper-member-select">
+      <label>Select a course team role:
+        <select id="member-lists-selector" class="member-lists-selector">
+          <option value="staff">Staff</option>
+          <option value="instructor">Admin</option>
+          <option value="beta">Beta Testers</option>
+          <option value="Administrator">Discussion Admins</option>
+          <option value="Moderator">Discussion Moderators</option>
+          <option value="Group Moderator">Group Community TA</option>
+          <option value="Community TA">Discussion Community TA</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="auth-list-container active" data-rolename="staff" data-display-name="Staff" data-info-text="
+          Course team members with the Staff role help you manage your course. Staff can enroll and unenroll learners, as well as modify their grades and access all course data. Staff also have access to your course in Studio and Insights. You can only give course team roles to enrolled users."
+         data-list-endpoint="/courses/course-v1:edx+ed202+2017_T3/instructor/api/list_course_role_members"
+         data-modify-endpoint="/courses/course-v1:edx+ed202+2017_T3/instructor/api/modify_access"
+         data-add-button-label="Add Staff">
+      <div class="member-list-widget">
+        <div class="header">
+          <div class="title"> Staff</div>
+        </div>
+        <div class="info">
+          Course team members with the Staff role help you manage your course. Staff can enroll and unenroll learners,
+          as well as modify their grades and access all course data. Staff also have access to your course in Studio and
+          Insights. You can only give course team roles to enrolled users.
+        </div>
+        <div class="member-list">
+          <table>
+            <thead>
+            <tr>
+              <th class="label" scope="column">Username</th>
+              <th class="label" scope="column">Email</th>
+              <th class="label" scope="column">Revoke access</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="bottom-bar">
+          <label>
+            <span class="label-text sr">Enter username or email</span>
+            <input type="text" name="add-field" class="add-field" placeholder="Enter username or email">
+          </label>
+          <input type="button" name="add" class="add" value="Add Staff">
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-list-container" data-rolename="Group Moderator" data-display-name="Group Community TA"
+         data-info-text="
+          Group Community TAs are members of the community who help course teams moderate discussions. Group Community TAs see only posts by learners in their assigned group. They can edit or delete posts, clear flags, close and re-open threads, and endorse responses, but only for posts by learners in their group."
+         data-list-endpoint="/courses/course-v1:edx+ed202+2017_T3/instructor/api/list_forum_members"
+         data-modify-endpoint="/courses/course-v1:edx+ed202+2017_T3/instructor/api/update_forum_role_membership"
+         data-add-button-label="Add Group Community TA">
+      <div class="member-list-widget">
+        <div class="header">
+          <div class="title"> Group Community TA</div>
+        </div>
+        <div class="info">
+          Group Community TAs are members of the community who help course teams moderate discussions. Group Community
+          TAs see only posts by learners in their assigned group. They can edit or delete posts, clear flags, close and
+          re-open threads, and endorse responses, but only for posts by learners in their group.
+        </div>
+        <div class="member-list">
+          <table>
+            <thead>
+            <tr>
+              <th class="label" scope="column">Username</th>
+              <th class="label" scope="column">Email</th>
+              <th class="label" scope="column">Group</th>
+              <th class="label" scope="column">Revoke access</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="bottom-bar">
+          <label>
+            <span class="label-text sr">Enter username or email</span>
+            <input type="text" name="add-field" class="add-field" placeholder="Enter username or email">
+          </label>
+          <input type="button" name="add" class="add" value="Add Group Community TA">
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-list-container" data-rolename="Community TA" data-display-name="Discussion Community TA"
+         data-info-text="
+          Community TAs are members of the community who help course teams moderate discussions. They can see posts by learners in their assigned cohort or enrollment track, and can edit or delete posts, clear flags, close or re-open threads, and endorse responses. Their posts are marked as 'Community TA'. Only enrolled users can be added as Community TAs."
+         data-list-endpoint="/courses/course-v1:edx+ed202+2017_T3/instructor/api/list_forum_members"
+         data-modify-endpoint="/courses/course-v1:edx+ed202+2017_T3/instructor/api/update_forum_role_membership"
+         data-add-button-label="Add Community TA">
+      <div class="member-list-widget">
+        <div class="header">
+          <div class="title"> Discussion Community TA</div>
+        </div>
+        <div class="info">
+          Community TAs are members of the community who help course teams moderate discussions. They can see posts by
+          learners in their assigned cohort or enrollment track, and can edit or delete posts, clear flags, close
+          or re-open threads, and endorse responses. Their posts are marked as 'Community TA'. Only enrolled users can
+          be added as Community TAs.
+        </div>
+        <div class="member-list">
+          <table>
+            <thead>
+            <tr>
+              <th class="label" scope="column">Username</th>
+              <th class="label" scope="column">Email</th>
+              <th class="label" scope="column">Revoke access</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="bottom-bar">
+          <label>
+            <span class="label-text sr">Enter username or email</span>
+            <input type="text" name="add-field" class="add-field" placeholder="Enter username or email">
+          </label>
+          <input type="button" name="add" class="add" value="Add Community TA">
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>

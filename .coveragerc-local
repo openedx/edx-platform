@@ -1,0 +1,50 @@
+# .coveragerc for edx-platform
+[run]
+data_file = reports/.coverage
+source =
+    cms
+    common/djangoapps
+    common/lib/capa
+    common/lib/xmodule
+    lms
+    openedx
+    pavelib
+    scripts
+
+omit =
+    cms/envs/*
+    cms/manage.py
+    cms/djangoapps/contentstore/views/dev.py
+    cms/djangoapps/*/migrations/*
+    cms/djangoapps/*/features/*
+    cms/lib/*/migrations/*
+    lms/debug/*
+    lms/envs/*
+    lms/djangoapps/*/migrations/*
+    lms/djangoapps/*/features/*
+    common/djangoapps/terrain/*
+    common/djangoapps/*/migrations/*
+    openedx/core/djangoapps/*/migrations/*
+    openedx/core/djangoapps/debug/*
+    openedx/features/*/migrations/*
+
+concurrency=multiprocessing
+parallel = true
+
+[report]
+ignore_errors = True
+
+exclude_lines =
+   pragma: no cover
+   raise NotImplementedError
+
+[html]
+title = edx-platform Python Test Coverage Report
+directory = reports/cover
+
+[xml]
+output = reports/coverage.xml
+
+[paths]
+source =
+    /edx/app/edxapp/edx-platform

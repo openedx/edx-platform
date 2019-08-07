@@ -1,31 +1,49 @@
 """
 Views for the course_mode module
 """
+from __future__ import absolute_import, unicode_literals
 
 import decimal
-import urllib
+import json
+import logging
 
+import six
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
+import waffle
 from babel.dates import format_datetime
 from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.utils.translation import get_language, to_locale, ugettext as _
+from django.utils.translation import get_language, to_locale
+from django.utils.translation import ugettext as _
 from django.views.generic.base import View
+from edx_django_utils.monitoring.utils import increment
 from ipware.ip import get_ip
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.django import modulestore
+from six import text_type
 
-from lms.djangoapps.commerce.utils import EcommerceService
 from course_modes.models import CourseMode
-from courseware.access import has_access
 from edxmako.shortcuts import render_to_response
+from lms.djangoapps.commerce.utils import EcommerceService
+from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
+from openedx.core.djangoapps.catalog.utils import get_currency_data
 from openedx.core.djangoapps.embargo import api as embargo_api
+from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+from openedx.features.course_experience.utils import get_first_purchase_offer_banner_fragment
+from openedx.features.discounts.applicability import discount_percentage
 from student.models import CourseEnrollment
 from util.db import outer_atomic
+from xmodule.modulestore.django import modulestore
+
+
+LOG = logging.getLogger(__name__)
 
 
 class ChooseModeView(View):
@@ -81,6 +99,13 @@ class ChooseModeView(View):
             return redirect(embargo_redirect)
 
         enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(request.user, course_key)
+
+        increment('track-selection.{}.{}'.format(enrollment_mode, 'active' if is_active else 'inactive'))
+        increment('track-selection.views')
+
+        if enrollment_mode is None:
+            LOG.info('Rendering track selection for unenrolled user, referred by %s', request.META.get('HTTP_REFERER'))
+
         modes = CourseMode.modes_for_course_dict(course_key)
         ecommerce_service = EcommerceService()
 
@@ -89,41 +114,43 @@ class ChooseModeView(View):
         has_enrolled_professional = (CourseMode.is_professional_slug(enrollment_mode) and is_active)
         if CourseMode.has_professional_mode(modes) and not has_enrolled_professional:
             purchase_workflow = request.GET.get("purchase_workflow", "single")
-            verify_url = reverse('verify_student_start_flow', kwargs={'course_id': unicode(course_key)})
+            verify_url = reverse('verify_student_start_flow', kwargs={'course_id': six.text_type(course_key)})
             redirect_url = "{url}?purchase_workflow={workflow}".format(url=verify_url, workflow=purchase_workflow)
             if ecommerce_service.is_enabled(request.user):
                 professional_mode = modes.get(CourseMode.NO_ID_PROFESSIONAL_MODE) or modes.get(CourseMode.PROFESSIONAL)
                 if purchase_workflow == "single" and professional_mode.sku:
-                    redirect_url = ecommerce_service.checkout_page_url(professional_mode.sku)
+                    redirect_url = ecommerce_service.get_checkout_page_url(professional_mode.sku)
                 if purchase_workflow == "bulk" and professional_mode.bulk_sku:
-                    redirect_url = ecommerce_service.checkout_page_url(professional_mode.bulk_sku)
+                    redirect_url = ecommerce_service.get_checkout_page_url(professional_mode.bulk_sku)
             return redirect(redirect_url)
 
+        course = modulestore().get_course(course_key)
+
         # If there isn't a verified mode available, then there's nothing
-        # to do on this page.  The user has almost certainly been auto-registered
-        # in the "honor" track by this point, so we send the user
-        # to the dashboard.
+        # to do on this page.  Send the user to the dashboard.
         if not CourseMode.has_verified_mode(modes):
             return redirect(reverse('dashboard'))
 
         # If a user has already paid, redirect them to the dashboard.
         if is_active and (enrollment_mode in CourseMode.VERIFIED_MODES + [CourseMode.NO_ID_PROFESSIONAL_MODE]):
+            # If the course has started redirect to course home instead
+            if course.has_started():
+                return redirect(reverse('openedx.course_experience.course_home', kwargs={'course_id': course_key}))
             return redirect(reverse('dashboard'))
 
         donation_for_course = request.session.get("donation_for_course", {})
-        chosen_price = donation_for_course.get(unicode(course_key), None)
+        chosen_price = donation_for_course.get(six.text_type(course_key), None)
 
-        course = modulestore().get_course(course_key)
         if CourseEnrollment.is_enrollment_closed(request.user, course):
             locale = to_locale(get_language())
             enrollment_end_date = format_datetime(course.enrollment_end, 'short', locale=locale)
-            params = urllib.urlencode({'course_closed': enrollment_end_date})
+            params = six.moves.urllib.parse.urlencode({'course_closed': enrollment_end_date})
             return redirect('{0}?{1}'.format(reverse('dashboard'), params))
 
         # When a credit mode is available, students will be given the option
         # to upgrade from a verified mode to a credit mode at the end of the course.
         # This allows students who have completed photo verification to be eligible
-        # for univerity credit.
+        # for university credit.
         # Since credit isn't one of the selectable options on the track selection page,
         # we need to check *all* available course modes in order to determine whether
         # a credit mode is available.  If so, then we show slightly different messaging
@@ -132,22 +159,44 @@ class ChooseModeView(View):
             CourseMode.is_credit_mode(mode) for mode
             in CourseMode.modes_for_course(course_key, only_selectable=False)
         )
+        course_id = text_type(course_key)
 
         context = {
             "course_modes_choose_url": reverse(
                 "course_modes_choose",
-                kwargs={'course_id': course_key.to_deprecated_string()}
+                kwargs={'course_id': course_id}
             ),
             "modes": modes,
             "has_credit_upsell": has_credit_upsell,
-            "course_name": course.display_name_with_default_escaped,
+            "course_name": course.display_name_with_default,
             "course_org": course.display_org_with_default,
             "course_num": course.display_number_with_default,
             "chosen_price": chosen_price,
             "error": error,
             "responsive": True,
             "nav_hidden": True,
+            "content_gating_enabled": ContentTypeGatingConfig.enabled_for_enrollment(
+                user=request.user,
+                course_key=course_key
+            ),
+            "course_duration_limit_enabled": CourseDurationLimitConfig.enabled_for_enrollment(
+                user=request.user,
+                course_key=course_key
+            ),
         }
+        context.update(
+            get_experiment_user_metadata_context(
+                course,
+                request.user,
+            )
+        )
+
+        title_content = _("Congratulations!  You are now enrolled in {course_name}").format(
+            course_name=course.display_name_with_default
+        )
+
+        context["title_content"] = title_content
+
         if "verified" in modes:
             verified_mode = modes["verified"]
             context["suggested_prices"] = [
@@ -155,10 +204,21 @@ class ChooseModeView(View):
                 for x in verified_mode.suggested_prices.split(",")
                 if x.strip()
             ]
+            price_before_discount = verified_mode.min_price
+
             context["currency"] = verified_mode.currency.upper()
-            context["min_price"] = verified_mode.min_price
+            context["min_price"] = price_before_discount
             context["verified_name"] = verified_mode.name
             context["verified_description"] = verified_mode.description
+
+            offer_banner_fragment = get_first_purchase_offer_banner_fragment(
+                request.user, course
+            )
+            if offer_banner_fragment:
+                context['offer_banner_fragment'] = offer_banner_fragment
+                discounted_price = "{:0.2f}".format(price_before_discount * ((100.0 - discount_percentage()) / 100))
+                context["min_price"] = discounted_price
+                context["price_before_discount"] = price_before_discount
 
             if verified_mode.sku:
                 context["use_ecommerce_payment_flow"] = ecommerce_service.is_enabled(request.user)
@@ -166,6 +226,14 @@ class ChooseModeView(View):
                 context["sku"] = verified_mode.sku
                 context["bulk_sku"] = verified_mode.bulk_sku
 
+        context['currency_data'] = []
+        if waffle.switch_is_active('local_currency'):
+            if 'edx-price-l10n' not in request.COOKIES:
+                currency_data = get_currency_data()
+                try:
+                    context['currency_data'] = json.dumps(currency_data)
+                except TypeError:
+                    pass
         return render_to_response("course_modes/choose.html", context)
 
     @method_decorator(transaction.non_atomic_requests)
@@ -185,13 +253,13 @@ class ChooseModeView(View):
             below the minimum, otherwise redirects to the verification flow.
 
         """
-        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_key = CourseKey.from_string(course_id)
         user = request.user
 
         # This is a bit redundant with logic in student.views.change_enrollment,
         # but I don't really have the time to refactor it more nicely and test.
         course = modulestore().get_course(course_key)
-        if not has_access(user, 'enroll', course):
+        if not user.has_perm(ENROLL_IN_COURSE, course):
             error_msg = _("Enrollment is closed")
             return self.get(request, course_id, error=error_msg)
 
@@ -202,13 +270,22 @@ class ChooseModeView(View):
             return HttpResponseBadRequest(_("Enrollment mode not supported"))
 
         if requested_mode == 'audit':
-            # The user will have already been enrolled in the audit mode at this
-            # point, so we just redirect them to the dashboard, thereby avoiding
-            # hitting the database a second time attempting to enroll them.
+            # If the learner has arrived at this screen via the traditional enrollment workflow,
+            # then they should already be enrolled in an audit mode for the course, assuming one has
+            # been configured.  However, alternative enrollment workflows have been introduced into the
+            # system, such as third-party discovery.  These workflows result in learners arriving
+            # directly at this screen, and they will not necessarily be pre-enrolled in the audit mode.
+            CourseEnrollment.enroll(request.user, course_key, CourseMode.AUDIT)
+            # If the course has started redirect to course home instead
+            if course.has_started():
+                return redirect(reverse('openedx.course_experience.course_home', kwargs={'course_id': course_key}))
             return redirect(reverse('dashboard'))
 
         if requested_mode == 'honor':
             CourseEnrollment.enroll(user, course_key, mode=requested_mode)
+            # If the course has started redirect to course home instead
+            if course.has_started():
+                return redirect(reverse('openedx.course_experience.course_home', kwargs={'course_id': course_key}))
             return redirect(reverse('dashboard'))
 
         mode_info = allowed_modes[requested_mode]
@@ -230,13 +307,13 @@ class ChooseModeView(View):
                 return self.get(request, course_id, error=error_msg)
 
             donation_for_course = request.session.get("donation_for_course", {})
-            donation_for_course[unicode(course_key)] = amount_value
+            donation_for_course[six.text_type(course_key)] = amount_value
             request.session["donation_for_course"] = donation_for_course
 
             return redirect(
                 reverse(
                     'verify_student_start_flow',
-                    kwargs={'course_id': unicode(course_key)}
+                    kwargs={'course_id': six.text_type(course_key)}
                 )
             )
 
@@ -272,6 +349,7 @@ def create_mode(request, course_id):
         `min_price` (int): The minimum price a user must pay to enroll in the new course mode
         `suggested_prices` (str): Comma-separated prices to suggest to the user.
         `currency` (str): The currency in which to list prices.
+        `sku` (str): The product SKU value.
 
     By default, this endpoint will create an 'honor' mode for the given course with display name
     'Honor Code', a minimum price of 0, no suggested prices, and using USD as the currency.
@@ -289,10 +367,11 @@ def create_mode(request, course_id):
         'min_price': 0,
         'suggested_prices': u'',
         'currency': u'usd',
+        'sku': None,
     }
 
     # Try pulling querystring parameters out of the request
-    for parameter, default in PARAMETERS.iteritems():
+    for parameter, default in six.iteritems(PARAMETERS):
         PARAMETERS[parameter] = request.GET.get(parameter, default)
 
     # Attempt to create the new mode for the given course

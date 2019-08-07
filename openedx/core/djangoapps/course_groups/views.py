@@ -2,30 +2,43 @@
 Views related to course groups functionality.
 """
 
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_POST
-from django.contrib.auth.models import User
-from django.core.paginator import Paginator, EmptyPage
-from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponseBadRequest
-from django.views.decorators.http import require_http_methods
-from util.json_request import expect_json, JsonResponse
-from django.db import transaction
-from django.contrib.auth.decorators import login_required
-from django.utils.translation import ugettext
+from __future__ import absolute_import
 
 import logging
 import re
 
+import six
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.core.paginator import EmptyPage, Paginator
+from django.http import Http404, HttpResponseBadRequest
+from django.urls import reverse
+from django.utils.translation import ugettext
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_http_methods, require_POST
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from edx_rest_framework_extensions.paginators import NamespacedPageNumberPagination
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from courseware.courses import get_course_with_access
-from edxmako.shortcuts import render_to_response
+from rest_framework import permissions, status
+from rest_framework.generics import GenericAPIView
+from rest_framework.response import Response
+from rest_framework.serializers import Serializer
 
-from . import cohorts
-from lms.djangoapps.django_comment_client.utils import get_discussion_category_map, get_discussion_categories_ids
-from lms.djangoapps.django_comment_client.constants import TYPE_ENTRY
-from .models import CourseUserGroup, CourseUserGroupPartitionGroup, CohortMembership
+from courseware.courses import get_course, get_course_with_access
+from edxmako.shortcuts import render_to_response
+from openedx.core.djangoapps.course_groups.models import CohortMembership
+from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
+from student.auth import has_course_author_access
+from util.json_request import JsonResponse, expect_json
+
+from . import api, cohorts
+from .models import CourseUserGroup, CourseUserGroupPartitionGroup
+from .serializers import CohortUsersAPISerializer
+
+MAX_PAGE_SIZE = 100
 
 log = logging.getLogger(__name__)
 
@@ -64,21 +77,24 @@ def unlink_cohort_partition_group(cohort):
 
 
 # pylint: disable=invalid-name
-def _get_course_cohort_settings_representation(course, course_cohort_settings):
+def _get_course_cohort_settings_representation(cohort_id, is_cohorted):
     """
     Returns a JSON representation of a course cohort settings.
     """
-    cohorted_course_wide_discussions, cohorted_inline_discussions = get_cohorted_discussions(
-        course, course_cohort_settings
-    )
-
     return {
-        'id': course_cohort_settings.id,
-        'is_cohorted': course_cohort_settings.is_cohorted,
-        'cohorted_inline_discussions': cohorted_inline_discussions,
-        'cohorted_course_wide_discussions': cohorted_course_wide_discussions,
-        'always_cohort_inline_discussions': course_cohort_settings.always_cohort_inline_discussions,
+        'id': cohort_id,
+        'is_cohorted': is_cohorted,
     }
+
+
+def _cohort_settings(course_key):
+    """
+    Fetch a course current cohort settings.
+    """
+    return _get_course_cohort_settings_representation(
+        cohorts.get_course_cohort_id(course_key),
+        cohorts.is_course_cohorted(course_key)
+    )
 
 
 def _get_cohort_representation(cohort, course):
@@ -90,30 +106,12 @@ def _get_cohort_representation(cohort, course):
     return {
         'name': cohort.name,
         'id': cohort.id,
-        'user_count': cohort.users.count(),
+        'user_count': cohort.users.filter(courseenrollment__course_id=course.location.course_key,
+                                          courseenrollment__is_active=1).count(),
         'assignment_type': assignment_type,
         'user_partition_id': partition_id,
         'group_id': group_id,
     }
-
-
-def get_cohorted_discussions(course, course_settings):
-    """
-    Returns the course-wide and inline cohorted discussion ids separately.
-    """
-    cohorted_course_wide_discussions = []
-    cohorted_inline_discussions = []
-
-    course_wide_discussions = [topic['id'] for __, topic in course.discussion_topics.items()]
-    all_discussions = get_discussion_categories_ids(course, None, include_all=True)
-
-    for cohorted_discussion_id in course_settings.cohorted_discussions:
-        if cohorted_discussion_id in course_wide_discussions:
-            cohorted_course_wide_discussions.append(cohorted_discussion_id)
-        elif cohorted_discussion_id in all_discussions:
-            cohorted_inline_discussions.append(cohorted_discussion_id)
-
-    return cohorted_course_wide_discussions, cohorted_inline_discussions
 
 
 @require_http_methods(("GET", "PATCH"))
@@ -130,45 +128,24 @@ def course_cohort_settings_handler(request, course_key_string):
         Updates the cohort settings for the course. Returns the JSON representation of updated settings.
     """
     course_key = CourseKey.from_string(course_key_string)
-    course = get_course_with_access(request.user, 'staff', course_key)
-    cohort_settings = cohorts.get_course_cohort_settings(course_key)
+    # Although this course data is not used this method will return 404 is user is not staff
+    get_course_with_access(request.user, 'staff', course_key)
 
     if request.method == 'PATCH':
-        cohorted_course_wide_discussions, cohorted_inline_discussions = get_cohorted_discussions(
-            course, cohort_settings
-        )
+        if 'is_cohorted' not in request.json:
+            return JsonResponse({"error": u"Bad Request"}, 400)
 
-        settings_to_change = {}
-
-        if 'is_cohorted' in request.json:
-            settings_to_change['is_cohorted'] = request.json.get('is_cohorted')
-
-        if 'cohorted_course_wide_discussions' in request.json or 'cohorted_inline_discussions' in request.json:
-            cohorted_course_wide_discussions = request.json.get(
-                'cohorted_course_wide_discussions', cohorted_course_wide_discussions
-            )
-            cohorted_inline_discussions = request.json.get(
-                'cohorted_inline_discussions', cohorted_inline_discussions
-            )
-            settings_to_change['cohorted_discussions'] = cohorted_course_wide_discussions + cohorted_inline_discussions
-
-        if 'always_cohort_inline_discussions' in request.json:
-            settings_to_change['always_cohort_inline_discussions'] = request.json.get(
-                'always_cohort_inline_discussions'
-            )
-
-        if not settings_to_change:
-            return JsonResponse({"error": unicode("Bad Request")}, 400)
-
+        is_cohorted = request.json.get('is_cohorted')
         try:
-            cohort_settings = cohorts.set_course_cohort_settings(
-                course_key, **settings_to_change
-            )
+            cohorts.set_course_cohorted(course_key, is_cohorted)
         except ValueError as err:
             # Note: error message not translated because it is not exposed to the user (UI prevents this state).
-            return JsonResponse({"error": unicode(err)}, 400)
+            return JsonResponse({"error": six.text_type(err)}, 400)
 
-    return JsonResponse(_get_course_cohort_settings_representation(course, cohort_settings))
+    return JsonResponse(_get_course_cohort_settings_representation(
+        cohorts.get_course_cohort_id(course_key),
+        cohorts.is_course_cohorted(course_key)
+    ))
 
 
 @require_http_methods(("GET", "PUT", "POST", "PATCH"))
@@ -191,8 +168,12 @@ def cohort_handler(request, course_key_string, cohort_id=None):
         If no cohort ID is specified, creates a new cohort and returns the JSON representation of the updated
         cohort.
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
-    course = get_course_with_access(request.user, 'staff', course_key)
+    course_key = CourseKey.from_string(course_key_string)
+    if not has_course_author_access(request.user, course_key):
+        raise Http404('The requesting user does not have course author permissions.')
+
+    course = get_course(course_key)
+
     if request.method == 'GET':
         if not cohort_id:
             all_cohorts = [
@@ -218,18 +199,18 @@ def cohort_handler(request, course_key_string, cohort_id=None):
             if name != cohort.name:
                 if cohorts.is_cohort_exists(course_key, name):
                     err_msg = ugettext("A cohort with the same name already exists.")
-                    return JsonResponse({"error": unicode(err_msg)}, 400)
+                    return JsonResponse({"error": six.text_type(err_msg)}, 400)
                 cohort.name = name
                 cohort.save()
             try:
                 cohorts.set_assignment_type(cohort, assignment_type)
             except ValueError as err:
-                return JsonResponse({"error": unicode(err)}, 400)
+                return JsonResponse({"error": six.text_type(err)}, 400)
         else:
             try:
                 cohort = cohorts.add_cohort(course_key, name, assignment_type)
             except ValueError as err:
-                return JsonResponse({"error": unicode(err)}, 400)
+                return JsonResponse({"error": six.text_type(err)}, 400)
 
         group_id = request.json.get('group_id')
         if group_id is not None:
@@ -267,7 +248,7 @@ def users_in_cohort(request, course_key_string, cohort_id):
     }
     """
     # this is a string when we get it here
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
+    course_key = CourseKey.from_string(course_key_string)
 
     get_course_with_access(request.user, 'staff', course_key)
 
@@ -292,7 +273,7 @@ def users_in_cohort(request, course_key_string, cohort_id):
 
     user_info = [{'username': u.username,
                   'email': u.email,
-                  'name': '{0} {1}'.format(u.first_name, u.last_name)}
+                  'name': u'{0} {1}'.format(u.first_name, u.last_name)}
                  for u in users]
 
     return json_http_response({'success': True,
@@ -301,7 +282,6 @@ def users_in_cohort(request, course_key_string, cohort_id):
                                'users': user_info})
 
 
-@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @require_POST
 def add_users_to_cohort(request, course_key_string, cohort_id):
@@ -317,18 +297,20 @@ def add_users_to_cohort(request, course_key_string, cohort_id):
                   'email': ...,
                   'previous_cohort': ...}, ...],
      'present': [str1, str2, ...],    # already there
-     'unknown': [str1, str2, ...]}
+     'unknown': [str1, str2, ...],
+     'preassigned': [str1, str2, ...],
+     'invalid': [str1, str2, ...]}
 
      Raises Http404 if the cohort cannot be found for the given course.
     """
     # this is a string when we get it here
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
+    course_key = CourseKey.from_string(course_key_string)
     get_course_with_access(request.user, 'staff', course_key)
 
     try:
         cohort = cohorts.get_cohort_by_id(course_key, cohort_id)
     except CourseUserGroup.DoesNotExist:
-        raise Http404("Cohort (ID {cohort_id}) not found for {course_key_string}".format(
+        raise Http404(u"Cohort (ID {cohort_id}) not found for {course_key_string}".format(
             cohort_id=cohort_id,
             course_key_string=course_key_string
         ))
@@ -338,31 +320,41 @@ def add_users_to_cohort(request, course_key_string, cohort_id):
     changed = []
     present = []
     unknown = []
+    preassigned = []
+    invalid = []
     for username_or_email in split_by_comma_and_whitespace(users):
         if not username_or_email:
             continue
 
         try:
-            (user, previous_cohort) = cohorts.add_user_to_cohort(cohort, username_or_email)
-            info = {
-                'username': user.username,
-                'email': user.email,
-            }
-            if previous_cohort:
-                info['previous_cohort'] = previous_cohort
+            # A user object is only returned by add_user_to_cohort if the user already exists.
+            (user, previous_cohort, preassignedCohort) = cohorts.add_user_to_cohort(cohort, username_or_email)
+
+            if preassignedCohort:
+                preassigned.append(username_or_email)
+            elif previous_cohort:
+                info = {'email': user.email,
+                        'previous_cohort': previous_cohort,
+                        'username': user.username}
                 changed.append(info)
             else:
+                info = {'username': user.username,
+                        'email': user.email}
                 added.append(info)
-        except ValueError:
-            present.append(username_or_email)
         except User.DoesNotExist:
             unknown.append(username_or_email)
+        except ValidationError:
+            invalid.append(username_or_email)
+        except ValueError:
+            present.append(username_or_email)
 
     return json_http_response({'success': True,
                                'added': added,
                                'changed': changed,
                                'present': present,
-                               'unknown': unknown})
+                               'unknown': unknown,
+                               'preassigned': preassigned,
+                               'invalid': invalid})
 
 
 @ensure_csrf_cookie
@@ -378,27 +370,18 @@ def remove_user_from_cohort(request, course_key_string, cohort_id):
      'msg': error_msg}
     """
     # this is a string when we get it here
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
+    course_key = CourseKey.from_string(course_key_string)
     get_course_with_access(request.user, 'staff', course_key)
 
     username = request.POST.get('username')
     if username is None:
-        return json_http_response({'success': False,
-                                   'msg': 'No username specified'})
+        return json_http_response({'success': False, 'msg': 'No username specified'})
 
     try:
-        user = User.objects.get(username=username)
+        api.remove_user_from_cohort(course_key, username)
     except User.DoesNotExist:
         log.debug('no user')
-        return json_http_response({'success': False,
-                                   'msg': "No user '{0}'".format(username)})
-
-    try:
-        membership = CohortMembership.objects.get(user=user, course_id=course_key)
-        membership.delete()
-
-    except CohortMembership.DoesNotExist:
-        pass
+        return json_http_response({'success': False, 'msg': u"No user '{0}'".format(username)})
 
     return json_http_response({'success': True})
 
@@ -408,90 +391,381 @@ def debug_cohort_mgmt(request, course_key_string):
     Debugging view for dev.
     """
     # this is a string when we get it here
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
+    course_key = CourseKey.from_string(course_key_string)
     # add staff check to make sure it's safe if it's accidentally deployed.
     get_course_with_access(request.user, 'staff', course_key)
 
     context = {'cohorts_url': reverse(
         'cohorts',
-        kwargs={'course_key': course_key.to_deprecated_string()}
+        kwargs={'course_key': six.text_type(course_key)}
     )}
     return render_to_response('/course_groups/debug.html', context)
 
 
-@expect_json
-@login_required
-def cohort_discussion_topics(request, course_key_string):
+def _get_course_with_access(request, course_key_string, action='staff'):
     """
-    The handler for cohort discussion categories requests.
-    This will raise 404 if user is not staff.
-
-    Returns the JSON representation of discussion topics w.r.t categories for the course.
-
-    Example:
-        >>> example = {
-        >>>               "course_wide_discussions": {
-        >>>                   "entries": {
-        >>>                       "General": {
-        >>>                           "sort_key": "General",
-        >>>                           "is_cohorted": True,
-        >>>                           "id": "i4x-edx-eiorguegnru-course-foobarbaz"
-        >>>                       }
-        >>>                   }
-        >>>                   "children": ["General", "entry"]
-        >>>               },
-        >>>               "inline_discussions" : {
-        >>>                   "subcategories": {
-        >>>                       "Getting Started": {
-        >>>                           "subcategories": {},
-        >>>                           "children": [
-        >>>                               ["Working with Videos", "entry"],
-        >>>                               ["Videos on edX", "entry"]
-        >>>                           ],
-        >>>                           "entries": {
-        >>>                               "Working with Videos": {
-        >>>                                   "sort_key": None,
-        >>>                                   "is_cohorted": False,
-        >>>                                   "id": "d9f970a42067413cbb633f81cfb12604"
-        >>>                               },
-        >>>                               "Videos on edX": {
-        >>>                                   "sort_key": None,
-        >>>                                   "is_cohorted": False,
-        >>>                                   "id": "98d8feb5971041a085512ae22b398613"
-        >>>                               }
-        >>>                           }
-        >>>                       },
-        >>>                       "children": ["Getting Started", "subcategory"]
-        >>>                   },
-        >>>               }
-        >>>          }
+    Fetching a course with expected permission level
     """
     course_key = CourseKey.from_string(course_key_string)
-    course = get_course_with_access(request.user, 'staff', course_key)
+    return course_key, get_course_with_access(request.user, action, course_key)
 
-    discussion_topics = {}
-    discussion_category_map = get_discussion_category_map(
-        course, request.user, cohorted_if_in_list=True, exclude_unstarted=False
+
+def _get_cohort_response(cohort, course):
+    """
+    Helper method that returns APIView Response of a cohort representation
+    """
+    return Response(_get_cohort_representation(cohort, course), status=status.HTTP_200_OK)
+
+
+def _get_cohort_settings_response(course_key):
+    """
+    Helper method to return a serialized response for the cohort settings.
+    """
+    return Response(_cohort_settings(course_key))
+
+
+class APIPermissions(GenericAPIView):
+    """
+    Helper class defining the authentication and permission class for the subclass views.
+    """
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
     )
+    permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
+    serializer_class = Serializer
 
-    # We extract the data for the course wide discussions from the category map.
-    course_wide_entries = discussion_category_map.pop('entries')
 
-    course_wide_children = []
-    inline_children = []
+class CohortSettings(DeveloperErrorViewMixin, APIPermissions):
+    """
+    **Use Cases**
 
-    for name, c_type in discussion_category_map['children']:
-        if name in course_wide_entries and c_type == TYPE_ENTRY:
-            course_wide_children.append([name, c_type])
+        Get the cohort setting for a course.
+        Set the cohort setting for a course.
+
+    **Example Requests**:
+
+        GET /api/cohorts/v1/settings/{course_id}
+        PUT /api/cohorts/v1/settings/{course_id}
+
+    **Response Values**
+
+        * is_cohorted: current status of the cohort setting
+    """
+
+    def get(self, request, course_key_string):
+        """
+        Endpoint to fetch the course cohort settings.
+        """
+        course_key, _ = _get_course_with_access(request, course_key_string)
+        return _get_cohort_settings_response(course_key)
+
+    def put(self, request, course_key_string):
+        """
+        Endpoint to set the course cohort settings.
+        """
+        course_key, _ = _get_course_with_access(request, course_key_string)
+
+        if 'is_cohorted' not in request.data:
+            raise self.api_error(status.HTTP_400_BAD_REQUEST,
+                                 'Missing field "is_cohorted".')
+        try:
+            cohorts.set_course_cohorted(course_key, request.data.get('is_cohorted'))
+        except ValueError as err:
+            raise self.api_error(status.HTTP_400_BAD_REQUEST, err)
+        return _get_cohort_settings_response(course_key)
+
+
+class CohortHandler(DeveloperErrorViewMixin, APIPermissions):
+    """
+    **Use Cases**
+
+        Get the current cohorts in a course.
+        Create a new cohort in a course.
+        Modify a cohort in a course.
+
+    **Example Requests**:
+
+        GET /api/cohorts/v1/courses/{course_id}/cohorts
+        POST /api/cohorts/v1/courses/{course_id}/cohorts
+        GET /api/cohorts/v1/courses/{course_id}/cohorts/{cohort_id}
+        PATCH /api/cohorts/v1/courses/{course_id}/cohorts/{cohort_id}
+
+    **Response Values**
+
+        * cohorts: List of cohorts.
+        * cohort: A cohort representation:
+            * name: The string identifier for a cohort.
+            * id: The integer identifier for a cohort.
+            * user_count: The number of students in the cohort.
+            * assignment_type: The string representing the assignment type.
+            * user_partition_id: The integer identified of the UserPartition.
+            * group_id: The integer identified of the specific group in the partition.
+    """
+    def get(self, request, course_key_string, cohort_id=None):
+        """
+        Endpoint to get either one or all cohorts.
+        """
+        course_key, course = _get_course_with_access(request, course_key_string)
+        if not cohort_id:
+            all_cohorts = cohorts.get_course_cohorts(course)
+            paginator = NamespacedPageNumberPagination()
+            paginator.max_page_size = MAX_PAGE_SIZE
+            page = paginator.paginate_queryset(all_cohorts, request)
+            response = [_get_cohort_representation(c, course) for c in page]
+            return Response(response, status=status.HTTP_200_OK)
         else:
-            inline_children.append([name, c_type])
+            cohort = cohorts.get_cohort_by_id(course_key, cohort_id)
+            return _get_cohort_response(cohort, course)
 
-    discussion_topics['course_wide_discussions'] = {
-        'entries': course_wide_entries,
-        'children': course_wide_children
+    def post(self, request, course_key_string, cohort_id=None):
+        """
+        Endpoint to create a new cohort, must not include cohort_id.
+        """
+        if cohort_id is not None:
+            raise self.api_error(status.HTTP_405_METHOD_NOT_ALLOWED,
+                                 'Please use the parent endpoint.',
+                                 'wrong-endpoint')
+        course_key, course = _get_course_with_access(request, course_key_string)
+        name = request.data.get('name')
+        if not name:
+            raise self.api_error(status.HTTP_400_BAD_REQUEST,
+                                 '"name" must be specified to create cohort.',
+                                 'missing-cohort-name')
+        assignment_type = request.data.get('assignment_type')
+        if not assignment_type:
+            raise self.api_error(status.HTTP_400_BAD_REQUEST,
+                                 '"assignment_type" must be specified to create cohort.',
+                                 'missing-assignment-type')
+        return _get_cohort_response(
+            cohorts.add_cohort(course_key, name, assignment_type), course)
+
+    def patch(self, request, course_key_string, cohort_id=None):
+        """
+        Endpoint to update a cohort name and/or assignment type.
+        """
+        if cohort_id is None:
+            raise self.api_error(status.HTTP_405_METHOD_NOT_ALLOWED,
+                                 'Request method requires cohort_id in path',
+                                 'missing-cohort-id')
+        name = request.data.get('name')
+        assignment_type = request.data.get('assignment_type')
+        if not any((name, assignment_type)):
+            raise self.api_error(status.HTTP_400_BAD_REQUEST,
+                                 'Request must include name and/or assignment type.',
+                                 'missing-fields')
+        course_key, _ = _get_course_with_access(request, course_key_string)
+        cohort = cohorts.get_cohort_by_id(course_key, cohort_id)
+        if name is not None and name != cohort.name:
+            if cohorts.is_cohort_exists(course_key, name):
+                raise self.api_error(status.HTTP_400_BAD_REQUEST,
+                                     'A cohort with the same name already exists.',
+                                     'cohort-name-exists')
+            cohort.name = name
+            cohort.save()
+        if assignment_type is not None:
+            try:
+                cohorts.set_assignment_type(cohort, assignment_type)
+            except ValueError as e:
+                raise self.api_error(status.HTTP_400_BAD_REQUEST, str(e), 'last-random-cohort')
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CohortUsers(DeveloperErrorViewMixin, APIPermissions):
+    """
+    **Use Cases**
+        List users in a cohort
+        Removes an user from a cohort.
+        Add a user to a specific cohort.
+
+    **Example Requests**
+
+        GET /api/cohorts/v1/courses/{course_id}/cohorts/{cohort_id}/users
+        DELETE /api/cohorts/v1/courses/{course_id}/cohorts/{cohort_id}/users/{username}
+        POST /api/cohorts/v1/courses/{course_id}/cohorts/{cohort_id}/users/{username}
+        POST /api/cohorts/v1/courses/{course_id}/cohorts/{cohort_id}/users
+
+    **GET list of users in a cohort request parameters**
+
+        * course_id (required): The course id of the course the cohort belongs to.
+        * cohort_id (required): The cohort id of the cohort to list the users in.
+        * page_size: A query string parameter with the number of results to return per page.
+          Optional. Default: 10. Maximum: 100.
+        * page: A query string parameter with the page number to retrieve. Optional. Default: 1.
+
+    ** POST add a user to a cohort request parameters**
+
+        * course_id (required): The course id of the course the cohort belongs to.
+        * cohort_id (required): The cohort id of the cohort to list the users in.
+        * users (required): A body JSON parameter with a list of usernames/email addresses of users
+          to be added to the cohort.
+
+    ** DELETE remove a user from a cohort request parameters**
+
+        * course_id (required): The course id of the course the cohort belongs to.
+        * cohort_id (required): The cohort id of the cohort to list the users in.
+        * username (required): The username of the user to be removed from the given cohort.
+
+    **GET Response Values**
+
+        Returns a HTTP 404 Not Found response status code when:
+            * The course corresponding to the corresponding course id could not be found.
+            * The requesting user does not have staff access to the course.
+            * The cohort corresponding to the given cohort id could not be found.
+        Returns a HTTP 200 OK response status code to indicate success.
+
+        * count: Number of users enrolled in the given cohort.
+        * num_pages: Total number of pages of results.
+        * current_page: Current page number.
+        * start: The list index of the first item in the response.
+        * previous: The URL of the previous page of results or null if it is the first page.
+        * next: The URL of the next page of results or null if it is the last page.
+        * results: A list of users in the cohort.
+            * username: Username of the user.
+            * email: Email address of the user.
+            * name: Full name of the user.
+
+    **POST Response Values**
+
+        Returns a HTTP 404 Not Found response status code when:
+            * The course corresponding to the corresponding course id could not be found.
+            * The requesting user does not have staff access to the course.
+            * The cohort corresponding to the given cohort id could not be found.
+        Returns a HTTP 200 OK response status code to indicate success.
+
+        * success: Boolean indicating if the operation was successful.
+        * added: Usernames/emails of the users that have been added to the cohort.
+        * changed: Usernames/emails of the users that have been moved to the cohort.
+        * present: Usernames/emails of the users already present in the cohort.
+        * unknown: Usernames/emails of the users with an unknown cohort.
+        * preassigned: Usernames/emails of unenrolled users that have been preassigned to the cohort.
+        * invalid: Invalid emails submitted.
+
+    Adding multiple users to a cohort, send a request to:
+    POST /api/cohorts/v1/courses/{course_id}/cohorts/{cohort_id}/users
+
+    With a payload such as:
+    {
+        "users": [username1, username2, username3...]
     }
 
-    discussion_category_map['children'] = inline_children
-    discussion_topics['inline_discussions'] = discussion_category_map
+    **DELETE Response Values**
 
-    return JsonResponse(discussion_topics)
+        Returns a HTTP 404 Not Found response status code when:
+            * The course corresponding to the corresponding course id could not be found.
+            * The requesting user does not have staff access to the course.
+            * The cohort corresponding to the given cohort id could not be found.
+            * The user corresponding to the given username could not be found.
+        Returns a HTTP 204 No Content response status code to indicate success.
+    """
+    serializer_class = CohortUsersAPISerializer
+
+    def _get_course_and_cohort(self, request, course_key_string, cohort_id):
+        """
+        Return the course and cohort for the given course_key_string and cohort_id.
+        """
+        course_key, _ = _get_course_with_access(request, course_key_string)
+
+        try:
+            cohort = cohorts.get_cohort_by_id(course_key, cohort_id)
+        except CourseUserGroup.DoesNotExist:
+            msg = u'Cohort (ID {cohort_id}) not found for {course_key_string}'.format(
+                cohort_id=cohort_id,
+                course_key_string=course_key_string
+            )
+            raise self.api_error(status.HTTP_404_NOT_FOUND, msg, 'cohort-not-found')
+        return course_key, cohort
+
+    def get(self, request, course_key_string, cohort_id, username=None):  # pylint: disable=unused-argument
+        """
+        Lists the users in a specific cohort.
+        """
+
+        _, cohort = self._get_course_and_cohort(request, course_key_string, cohort_id)
+        queryset = cohort.users.all()
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response(self.get_serializer(queryset, many=True).data)
+
+    def delete(self, request, course_key_string, cohort_id, username=None):
+
+        """
+        Removes and user from a specific cohort.
+
+        Note: It's better to use the post method to move users between cohorts.
+        """
+        if username is None:
+            raise self.api_error(status.HTTP_405_METHOD_NOT_ALLOWED,
+                                 'Missing username in path',
+                                 'missing-username')
+        course_key, cohort = self._get_course_and_cohort(request, course_key_string, cohort_id)
+
+        try:
+            api.remove_user_from_cohort(course_key, username, cohort.id)
+        except User.DoesNotExist:
+            raise self.api_error(status.HTTP_404_NOT_FOUND, 'User does not exist.', 'user-not-found')
+        except CohortMembership.DoesNotExist:  # pylint: disable=duplicate-except
+            raise self.api_error(
+                status.HTTP_400_BAD_REQUEST,
+                'User not assigned to the given cohort.',
+                'user-not-in-cohort'
+            )
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def post(self, request, course_key_string, cohort_id, username=None):
+        """
+        Add given users to the cohort.
+        """
+        _, cohort = self._get_course_and_cohort(request, course_key_string, cohort_id)
+        users = request.data.get('users')
+        if not users:
+            if username is not None:
+                users = [username]
+            else:
+                raise self.api_error(status.HTTP_400_BAD_REQUEST, 'Missing users key in payload', 'missing-users')
+
+        added, changed, present, unknown, preassigned, invalid = [], [], [], [], [], []
+        for username_or_email in users:
+            if not username_or_email:
+                continue
+
+            try:
+                # A user object is only returned by add_user_to_cohort if the user already exists.
+                (user, previous_cohort, preassignedCohort) = cohorts.add_user_to_cohort(cohort, username_or_email)
+
+                if preassignedCohort:
+                    preassigned.append(username_or_email)
+                elif previous_cohort:
+                    info = {
+                        'email': user.email,
+                        'previous_cohort': previous_cohort,
+                        'username': user.username
+                    }
+                    changed.append(info)
+                else:
+                    info = {
+                        'username': user.username,
+                        'email': user.email
+                    }
+                    added.append(info)
+            except User.DoesNotExist:
+                unknown.append(username_or_email)
+            except ValidationError:
+                invalid.append(username_or_email)
+            except ValueError:
+                present.append(username_or_email)
+
+        return Response({
+            'success': True,
+            'added': added,
+            'changed': changed,
+            'present': present,
+            'unknown': unknown,
+            'preassigned': preassigned,
+            'invalid': invalid
+        })

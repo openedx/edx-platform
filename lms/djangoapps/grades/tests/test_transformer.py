@@ -2,22 +2,26 @@
 Test the behavior of the GradesTransformer
 """
 
-import datetime
-import pytz
-import random
+from __future__ import absolute_import
 
-import ddt
+import datetime
+import random
 from copy import deepcopy
 
+import ddt
+import pytz
+import six
+from six.moves import range
+
+from lms.djangoapps.course_blocks.api import get_course_blocks
+from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase
+from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls
 
-from lms.djangoapps.course_blocks.api import get_course_blocks
-from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase
-from openedx.core.djangoapps.content.block_structure.api import get_cache
 from ..transformer import GradesTransformer
 
 
@@ -28,6 +32,8 @@ class GradesTransformerTestCase(CourseStructureTestCase):
     """
 
     TRANSFORMER_CLASS_TO_TEST = GradesTransformer
+
+    ENABLED_SIGNALS = ['course_published']
 
     problem_metadata = {
         u'graded': True,
@@ -90,7 +96,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         """
         self.assertGreater(len(expectations), 0)
         # Append our custom message to the default assertEqual error message
-        self.longMessage = True  # pylint: disable=invalid-name
+        self.longMessage = True
         for field in expectations:
             self.assertEqual(
                 expectations[field],
@@ -212,7 +218,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         }
         blocks = self.build_complicated_hypothetical_course()
         block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
-        for block_ref, expected_subsections in expected_subsections.iteritems():
+        for block_ref, expected_subsections in six.iteritems(expected_subsections):
             actual_subsections = block_structure.get_transformer_block_field(
                 blocks[block_ref].location,
                 self.TRANSFORMER_CLASS_TO_TEST,
@@ -390,6 +396,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         )
 
 
+@ddt.ddt
 class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModuleStoreTestCase):
     """
     Test mongo usage in GradesTransformer.
@@ -403,7 +410,12 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
         self.student = UserFactory.create(is_staff=False, username=u'test_student', password=password)
         self.client.login(username=self.student.username, password=password)
 
-    def test_modulestore_performance(self):
+    @ddt.data(
+        (ModuleStoreEnum.Type.split, 3),
+        (ModuleStoreEnum.Type.mongo, 2),
+    )
+    @ddt.unpack
+    def test_modulestore_performance(self, store_type, expected_mongo_queries):
         """
         Test that a constant number of mongo calls are made regardless of how
         many grade-related blocks are in the course.
@@ -419,7 +431,7 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
                 u'#children': [],
             },
         ]
-        for problem_number in xrange(random.randrange(10, 20)):
+        for problem_number in range(random.randrange(10, 20)):
             course[0][u'#children'].append(
                 {
                     u'metadata': {
@@ -437,7 +449,8 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
                         </problem>'''.format(number=problem_number),
                 }
             )
-        blocks = self.build_course(course)
-        get_cache().clear()
-        with check_mongo_calls(2):
+        with self.store.default_store(store_type):
+            blocks = self.build_course(course)
+        clear_course_from_cache(blocks[u'course'].id)
+        with check_mongo_calls(expected_mongo_queries):
             get_course_blocks(self.student, blocks[u'course'].location, self.transformers)

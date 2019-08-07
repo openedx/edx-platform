@@ -1,17 +1,24 @@
 """
 django admin pages for certificates models
 """
-from django.contrib import admin
-from django import forms
+from __future__ import absolute_import
+
+from operator import itemgetter
+
 from config_models.admin import ConfigurationModelAdmin
-from util.organizations_helpers import get_organizations
-from certificates.models import (
+from django import forms
+from django.conf import settings
+from django.contrib import admin
+
+from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
+    CertificateGenerationCourseSetting,
     CertificateHtmlViewConfiguration,
     CertificateTemplate,
     CertificateTemplateAsset,
-    GeneratedCertificate,
+    GeneratedCertificate
 )
+from util.organizations_helpers import get_organizations
 
 
 class CertificateTemplateForm(forms.ModelForm):
@@ -26,6 +33,12 @@ class CertificateTemplateForm(forms.ModelForm):
         self.fields['organization_id'] = forms.TypedChoiceField(
             choices=org_choices, required=False, coerce=int, empty_value=None
         )
+        languages = list(settings.CERTIFICATE_TEMPLATE_LANGUAGES.items())
+        lang_choices = sorted(languages, key=itemgetter(1))
+        lang_choices.insert(0, (None, 'All Languages'))
+        self.fields['language'] = forms.ChoiceField(
+            choices=lang_choices, required=False
+        )
 
     class Meta(object):
         model = CertificateTemplate
@@ -36,7 +49,7 @@ class CertificateTemplateAdmin(admin.ModelAdmin):
     """
     Django admin customizations for CertificateTemplate model
     """
-    list_display = ('name', 'description', 'organization_id', 'course_key', 'mode', 'is_active')
+    list_display = ('name', 'description', 'organization_id', 'course_key', 'mode', 'language', 'is_active')
     form = CertificateTemplateForm
 
 
@@ -58,7 +71,17 @@ class GeneratedCertificateAdmin(admin.ModelAdmin):
     list_display = ('id', 'course_id', 'mode', 'user')
 
 
+class CertificateGenerationCourseSettingAdmin(admin.ModelAdmin):
+    """
+    Django admin customizations for CertificateGenerationCourseSetting model
+    """
+    list_display = ('course_key', 'self_generation_enabled', 'language_specific_templates_enabled')
+    search_fields = ('course_key',)
+    show_full_result_count = False
+
+
 admin.site.register(CertificateGenerationConfiguration)
+admin.site.register(CertificateGenerationCourseSetting, CertificateGenerationCourseSettingAdmin)
 admin.site.register(CertificateHtmlViewConfiguration, ConfigurationModelAdmin)
 admin.site.register(CertificateTemplate, CertificateTemplateAdmin)
 admin.site.register(CertificateTemplateAsset, CertificateTemplateAssetAdmin)

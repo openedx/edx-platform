@@ -3,6 +3,7 @@
 <%namespace name='static' file='static_content.html'/>
 <%!
     from django.utils.translation import ugettext as _
+    from django.utils.translation import pgettext
     from courseware.courses import get_course_about_section
 %>
 
@@ -30,7 +31,7 @@
                             <input type="hidden" name="csrfmiddlewaretoken" value="${ csrftoken }"/>
                             <div class="main-cta">
                                 <button class="register" name="enroll" type="submit"
-                                        value="${_('Enroll')}">${_('Enroll')}<span
+                                        value="${pgettext('self','Enroll')}">${pgettext('self','Enroll')}<span
                                         class="sr">${course.display_name_with_default}</span></button>
                                 <button class="register" name="dont_enroll" type="submit"
                                         value="${_('Don\'t enroll')}">${_('Don\'t enroll')}<span

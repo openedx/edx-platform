@@ -1,22 +1,27 @@
 """
 Unit tests for the container page.
 """
-import re
-import datetime
-from pytz import UTC
-from mock import patch, Mock
+from __future__ import absolute_import
 
+import datetime
+import re
+
+import six
 from django.http import Http404
 from django.test.client import RequestFactory
 from django.utils import http
+from mock import Mock, patch
+from pytz import UTC
 
 import contentstore.views.component as views
+from contentstore.tests.test_libraries import LibraryTestCase
 from contentstore.views.tests.utils import StudioPageTestCase
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
-class ContainerPageTestCase(StudioPageTestCase):
+class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
     """
     Unit tests for the container page.
     """
@@ -54,16 +59,16 @@ class ContainerPageTestCase(StudioPageTestCase):
         self._test_html_content(
             self.child_container,
             expected_section_tag=(
-                '<section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" '
-                'data-locator="{0}" data-course-key="{0.course_key}">'.format(self.child_container.location)
+                u'<section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" '
+                u'data-locator="{0}" data-course-key="{0.course_key}">'.format(self.child_container.location)
             ),
             expected_breadcrumbs=(
-                r'<a href="/course/{course}{section_parameters}" class="{classes}">\s*Week 1\s*</a>\s*'
-                r'<a href="/course/{course}{subsection_parameters}" class="{classes}">\s*Lesson 1\s*</a>\s*'
-                r'<a href="/container/{unit}" class="{classes}">\s*Unit\s*</a>'
+                ur'<a href="/course/{course}{section_parameters}" class="{classes}">\s*Week 1\s*</a>\s*'
+                ur'<a href="/course/{course}{subsection_parameters}" class="{classes}">\s*Lesson 1\s*</a>\s*'
+                ur'<a href="/container/{unit}" class="{classes}">\s*Unit\s*</a>'
             ).format(
-                course=re.escape(unicode(self.course.id)),
-                unit=re.escape(unicode(self.vertical.location)),
+                course=re.escape(six.text_type(self.course.id)),
+                unit=re.escape(six.text_type(self.vertical.location)),
                 classes='navigation-item navigation-link navigation-parent',
                 section_parameters=re.escape(u'?show={}'.format(http.urlquote(self.chapter.location))),
                 subsection_parameters=re.escape(u'?show={}'.format(http.urlquote(self.sequential.location))),
@@ -82,19 +87,19 @@ class ContainerPageTestCase(StudioPageTestCase):
             self._test_html_content(
                 xblock,
                 expected_section_tag=(
-                    '<section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" '
-                    'data-locator="{0}" data-course-key="{0.course_key}">'.format(draft_container.location)
+                    u'<section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" '
+                    u'data-locator="{0}" data-course-key="{0.course_key}">'.format(draft_container.location)
                 ),
                 expected_breadcrumbs=(
-                    r'<a href="/course/{course}{section_parameters}" class="{classes}">\s*Week 1\s*</a>\s*'
-                    r'<a href="/course/{course}{subsection_parameters}" class="{classes}">\s*Lesson 1\s*</a>\s*'
-                    r'<a href="/container/{unit}" class="{classes}">\s*Unit\s*</a>\s*'
-                    r'<a href="/container/{split_test}" class="{classes}">\s*Split Test\s*</a>'
+                    ur'<a href="/course/{course}{section_parameters}" class="{classes}">\s*Week 1\s*</a>\s*'
+                    ur'<a href="/course/{course}{subsection_parameters}" class="{classes}">\s*Lesson 1\s*</a>\s*'
+                    ur'<a href="/container/{unit}" class="{classes}">\s*Unit\s*</a>\s*'
+                    ur'<a href="/container/{split_test}" class="{classes}">\s*Split Test\s*</a>'
                 ).format(
-                    course=re.escape(unicode(self.course.id)),
-                    unit=re.escape(unicode(self.vertical.location)),
-                    split_test=re.escape(unicode(self.child_container.location)),
-                    classes='navigation-item navigation-link navigation-parent',
+                    course=re.escape(six.text_type(self.course.id)),
+                    unit=re.escape(six.text_type(self.vertical.location)),
+                    split_test=re.escape(six.text_type(self.child_container.location)),
+                    classes=u'navigation-item navigation-link navigation-parent',
                     section_parameters=re.escape(u'?show={}'.format(http.urlquote(self.chapter.location))),
                     subsection_parameters=re.escape(u'?show={}'.format(http.urlquote(self.sequential.location))),
                 ),
@@ -127,6 +132,44 @@ class ContainerPageTestCase(StudioPageTestCase):
         self.validate_preview_html(published_unit, self.container_view)
         self.validate_preview_html(published_child_container, self.container_view)
         self.validate_preview_html(published_child_vertical, self.reorderable_child_view)
+
+    def test_library_page_preview_html(self):
+        """
+        Verify that a library xblock's container (library page) preview returns the expected HTML.
+        """
+        # Add some content to library.
+        self._add_simple_content_block()
+        self.validate_preview_html(self.library, self.container_view, can_reorder=False, can_move=False)
+
+    def test_library_content_preview_html(self):
+        """
+        Verify that a library content block container page preview returns the expected HTML.
+        """
+        # Library content block is only supported in split courses.
+        with modulestore().default_store(ModuleStoreEnum.Type.split):
+            course = CourseFactory.create()
+
+        # Add some content to library
+        self._add_simple_content_block()
+
+        # Create a library content block
+        lc_block = self._add_library_content_block(course, self.lib_key)
+        self.assertEqual(len(lc_block.children), 0)
+
+        # Refresh children to be reflected in lc_block
+        lc_block = self._refresh_children(lc_block)
+        self.assertEqual(len(lc_block.children), 1)
+
+        self.validate_preview_html(
+            lc_block,
+            self.container_view,
+            can_add=False,
+            can_reorder=False,
+            can_move=False,
+            can_edit=True,
+            can_duplicate=False,
+            can_delete=False
+        )
 
     def test_draft_container_preview_html(self):
         """
@@ -171,6 +214,7 @@ class ContainerPageTestCase(StudioPageTestCase):
         """
         request = RequestFactory().get('foo')
         request.user = self.user
+        request.LANGUAGE_CODE = 'en'
 
         # Check for invalid 'usage_key_strings'
         self.assertRaises(
@@ -182,6 +226,6 @@ class ContainerPageTestCase(StudioPageTestCase):
         # Check 200 response if 'usage_key_string' is correct
         response = views.container_handler(
             request=request,
-            usage_key_string=unicode(self.vertical.location)
+            usage_key_string=six.text_type(self.vertical.location)
         )
         self.assertEqual(response.status_code, 200)

@@ -1,25 +1,30 @@
 """
 Tests for ErrorModule and NonStaffErrorModule
 """
+from __future__ import absolute_import
+
 import unittest
-from xmodule.tests import get_test_system
-from xmodule.error_module import ErrorDescriptor, ErrorModule, NonStaffErrorDescriptor
-from xmodule.modulestore.xml import CourseLocationManager
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
-from xmodule.x_module import XModuleDescriptor, XModule, STUDENT_VIEW
+
 from mock import MagicMock, Mock, patch
-from xblock.runtime import Runtime, IdReader
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
+from xblock.runtime import IdReader, Runtime
 from xblock.test.tools import unabc
+
+from xmodule.error_module import ErrorDescriptor, ErrorModule, NonStaffErrorDescriptor
+from xmodule.modulestore.xml import CourseLocationManager
+from xmodule.tests import get_test_system
+from xmodule.x_module import STUDENT_VIEW, XModule, XModuleDescriptor
 
 
 class SetupTestErrorModules(unittest.TestCase):
     """Common setUp for use in ErrorModule tests."""
+
     def setUp(self):
         super(SetupTestErrorModules, self).setUp()
         self.system = get_test_system()
-        self.course_id = SlashSeparatedCourseKey('org', 'course', 'run')
+        self.course_id = CourseLocator('org', 'course', 'run')
         self.location = self.course_id.make_usage_key('foo', 'bar')
         self.valid_xml = u"<problem>ABC \N{SNOWMAN}</problem>"
         self.error_msg = "Error"
@@ -29,6 +34,7 @@ class TestErrorModule(SetupTestErrorModules):
     """
     Tests for ErrorModule and ErrorDescriptor
     """
+
     def test_error_module_xml_rendering(self):
         descriptor = ErrorDescriptor.from_xml(
             self.valid_xml,
@@ -62,6 +68,7 @@ class TestNonStaffErrorModule(SetupTestErrorModules):
     """
     Tests for NonStaffErrorModule and NonStaffErrorDescriptor
     """
+
     def test_non_staff_error_module_create(self):
         descriptor = NonStaffErrorDescriptor.from_xml(
             self.valid_xml,
@@ -121,6 +128,7 @@ class TestErrorModuleConstruction(unittest.TestCase):
     """
     Test that error module construction happens correctly
     """
+
     def setUp(self):
         # pylint: disable=abstract-class-instantiated
         super(TestErrorModuleConstruction, self).setUp()
@@ -128,7 +136,8 @@ class TestErrorModuleConstruction(unittest.TestCase):
         self.descriptor = BrokenDescriptor(
             TestRuntime(Mock(spec=IdReader), field_data),
             field_data,
-            ScopeIds(None, None, None, Location('org', 'course', 'run', 'broken', 'name', None))
+            ScopeIds(None, None, None,
+                     BlockUsageLocator(CourseLocator('org', 'course', 'run'), 'broken', 'name'))
         )
         self.descriptor.xmodule_runtime = TestRuntime(Mock(spec=IdReader), field_data)
         self.descriptor.xmodule_runtime.error_descriptor_class = ErrorDescriptor

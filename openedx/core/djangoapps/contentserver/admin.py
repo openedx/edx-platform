@@ -2,9 +2,12 @@
 Django admin page for CourseAssetCacheTtlConfig, which allows you to configure the TTL
 that gets used when sending cachability headers back with request course assets.
 """
-from django.contrib import admin
+from __future__ import absolute_import
+
 from config_models.admin import ConfigurationModelAdmin
-from .models import CourseAssetCacheTtlConfig, CdnUserAgentsConfig
+from django.contrib import admin
+
+from .models import CdnUserAgentsConfig, CourseAssetCacheTtlConfig
 
 
 class CourseAssetCacheTtlConfigAdmin(ConfigurationModelAdmin):

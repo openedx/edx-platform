@@ -1,17 +1,18 @@
 """
 Provides a UserPartition driver for cohorts.
 """
+from __future__ import absolute_import
+
 import logging
 
-from courseware.masquerade import (  # pylint: disable=import-error
+from courseware.masquerade import (
     get_course_masquerade,
-    get_masquerading_group_info,
-    is_masquerading_as_specific_student,
+    get_masquerading_user_group,
+    is_masquerading_as_specific_student
 )
 from xmodule.partitions.partitions import NoSuchUserPartitionGroupError
 
 from .cohorts import get_cohort, get_group_info_for_cohort
-
 
 log = logging.getLogger(__name__)
 
@@ -23,9 +24,8 @@ class CohortPartitionScheme(object):
     Groups.
     """
 
-    # pylint: disable=unused-argument
     @classmethod
-    def get_group_for_user(cls, course_key, user, user_partition, track_function=None, use_cached=True):
+    def get_group_for_user(cls, course_key, user, user_partition, use_cached=True):
         """
         Returns the Group from the specified user partition to which the user
         is assigned, via their cohort membership and any mappings from cohorts
@@ -45,14 +45,7 @@ class CohortPartitionScheme(object):
         # user is masquerading as a generic student in a specific group, then
         # return that group.
         if get_course_masquerade(user, course_key) and not is_masquerading_as_specific_student(user, course_key):
-            group_id, user_partition_id = get_masquerading_group_info(user, course_key)
-            if user_partition_id == user_partition.id and group_id is not None:
-                try:
-                    return user_partition.get_group(group_id)
-                except NoSuchUserPartitionGroupError:
-                    return None
-            # The user is masquerading as a generic student. We can't show any particular group.
-            return None
+            return get_masquerading_user_group(course_key, user, user_partition)
 
         cohort = get_cohort(user, course_key, use_cached=use_cached)
         if cohort is None:
@@ -69,7 +62,7 @@ class CohortPartitionScheme(object):
             # one it means the mapping is invalid.  the previous state of the
             # partition configuration may have been modified.
             log.warn(
-                "partition mismatch in CohortPartitionScheme: %r",
+                u"partition mismatch in CohortPartitionScheme: %r",
                 {
                     "requested_partition_id": user_partition.id,
                     "found_partition_id": partition_id,
@@ -87,7 +80,7 @@ class CohortPartitionScheme(object):
             # it means the mapping is invalid.  the previous state of the
             # partition configuration may have been modified.
             log.warn(
-                "group not found in CohortPartitionScheme: %r",
+                u"group not found in CohortPartitionScheme: %r",
                 {
                     "requested_partition_id": user_partition.id,
                     "requested_group_id": group_id,

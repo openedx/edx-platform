@@ -2,23 +2,49 @@
 <%! from django.utils.translation import ugettext as _ %>
 %if section_data['access']['staff'] or section_data['access']['instructor']:
 <div class="action-type-container">
-    %if section_data['is_small_course']:
+    %if section_data.get('writable_gradebook_url') or section_data.get('is_small_course'):
         <br><br>
         <h4 class="hd hd-4">${_("View gradebook for enrolled learners")}</h4>
         <br>
+    %if section_data.get('writable_gradebook_url'):
+        <span name="gradebook-link"><a href="${ section_data['writable_gradebook_url'] }" class="gradebook-link"> ${_("View Gradebook")} </a></span>
+    %elif section_data.get('is_small_course'):
         <label for="gradebook-link">${_("Note: This feature is available only to courses with a small number of enrolled learners.")}</label>
         <br><br>
         <span name="gradebook-link"><a href="${ section_data['spoc_gradebook_url'] }" class="gradebook-link"> ${_("View Gradebook")} </a></span>
+    %endif
         <br><br>
         <hr>
     %endif
 </div>
 
-<div class="student-specific-container action-type-container">
+<div class="student-enrollment-status-container action-type-container">
+    <h4 class="hd hd-4">${_("View a specific learner's enrollment status")}</h4>
+    <div class="request-response-error"></div>
+    <label for="student-select-enrollment-status">
+        ${_("Learner's {platform_name} email address or username *").format(platform_name=settings.PLATFORM_NAME)}
+    </label>
+    <br>
+    <input type="text" name="student-select-enrollment-status" placeholder="${_('Learner email address or username')}" >
+
+    <blockquote class="student-enrollment-status"></blockquote>
+
+    <br><br>
+    <div class="enrollment-status-link-wrapper">
+        <span name="enrollment-status-link">
+            <a href="" class="enrollment-status-link" data-endpoint="${ section_data['get_student_enrollment_status_url'] }">
+                ${_("View Enrollment Status")}
+            </a>
+        </span>
+    </div>
+    <hr>
+</div>
+
+<div class="student-progress-container action-type-container">
     <h4 class="hd hd-4">${_("View a specific learner's grades and progress")}</h4>
     <div class="request-response-error"></div>
     <label for="student-select-progress">
-        ${_("Learner's {platform_name} email address or username *").format(platform_name=settings.PLATFORM_NAME)}
+        ${_("Learner's {platform_name} email address or username").format(platform_name=settings.PLATFORM_NAME)}
     </label>
     <br>
     <input type="text" name="student-select-progress" placeholder="${_('Learner email address or username')}" >
@@ -37,7 +63,7 @@
     <h4 class="hd hd-4">${_("Adjust a learner's grade for a specific problem")}</h4>
     <div class="request-response-error"></div>
     <label for="student-select-grade">
-        ${_("Learner's {platform_name} email address or username *").format(platform_name=settings.PLATFORM_NAME)}
+        ${_("Learner's {platform_name} email address or username").format(platform_name=settings.PLATFORM_NAME)}
     </label>
     <br>
     <input type="text" name="student-select-grade" placeholder="${_('Learner email address or username')}">
@@ -45,7 +71,7 @@
     <br><br>
 
     <label for="problem-select-single">
-        ${_("Location of problem in course *")}<br>
+        ${_("Location of problem in course")}<br>
         <span class="location-example">${_("Example")}: block-v1:edX+DemoX+2015+type@problem+block@618c5933b8b544e4a4cc103d3e508378</span>
     </label>
     <br>
@@ -66,6 +92,23 @@
         <span name="rescore-actions-single">
             <input type="button" name="rescore-problem-single" value="${_('Rescore Learner\'s Submission')}" data-endpoint="${ section_data['rescore_problem_url'] }">
             <input type="button" name="rescore-problem-if-higher-single" value="${_('Rescore Only If Score Improves')}" data-endpoint="${ section_data['rescore_problem_url'] }">
+        </span>
+    %endif
+
+    <br><br>
+
+    %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+        <h5 class="hd hd-5">${_("Score Override")}</h5>
+        <label for="override-problem-score-single">${_("For the specified problem, override the learner's score.")}</label>
+        <br><br>
+        <label for="score-select-single">
+            ${_("New score for problem, out of the total points available for the problem")}<br>
+        </label>
+        <br>
+        <input type="text" name="score-select-single" placeholder="${_('Score')}">
+        <br><br>
+        <span name="override-actions-single">
+            <input type="button" name="override-problem-score-single" value="${_('Override Learner\'s Score')}" data-endpoint="${ section_data['override_problem_score_url'] }">
         </span>
     %endif
 
@@ -94,7 +137,7 @@
     <div class="request-response-error"></div>
 
     <label for="entrance-exam-student-select-grade">
-        ${_("Learner's {platform_name} email address or username *").format(platform_name=settings.PLATFORM_NAME)}
+        ${_("Learner's {platform_name} email address or username").format(platform_name=settings.PLATFORM_NAME)}
     </label>
     <br>
     <input type="text" name="entrance-exam-student-select-grade" placeholder="${_('Learner email address or username')}">
@@ -156,7 +199,7 @@
     <div class="request-response-error"></div>
 
     <label for="problem-select-all">
-        ${_("Location of problem in course *")}<br>
+        ${_("Location of problem in course")}<br>
         <span class="location-example">${_("Example")}: block-v1:edX+DemoX+2015+type@problem+block@618c5933b8b544e4a4cc103d3e508378</span>
     </label>
     <br>
@@ -186,6 +229,7 @@
     <hr>
 </div>
 %endif
+%endif
 
 %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
 <div class="running-tasks-container action-type-container">
@@ -197,6 +241,4 @@
     </div>
     <div class="no-pending-tasks-message"></div>
 </div>
-%endif
-
 %endif

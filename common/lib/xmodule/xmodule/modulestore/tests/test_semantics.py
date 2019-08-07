@@ -2,24 +2,24 @@
 Tests of modulestore semantics: How do the interfaces methods of ModuleStore relate to each other?
 """
 
-import ddt
+from __future__ import absolute_import
+
 import itertools
 from collections import namedtuple
-from xmodule.course_module import CourseSummary
-from mock import patch
 
-from xmodule.modulestore.tests.utils import (
-    PureModulestoreTestCase, MongoModulestoreBuilder,
-    SPLIT_MODULESTORE_SETUP
-)
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
+import ddt
+from mock import patch
 from xblock.core import XBlock, XBlockAside
 from xblock.fields import Scope, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.tools import TestRuntime
+
+from xmodule.course_module import CourseSummary
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.utils import SPLIT_MODULESTORE_SETUP, MongoModulestoreBuilder, PureModulestoreTestCase
 
 DETACHED_BLOCK_TYPES = dict(XBlock.load_tagged_classes('detached'))
 
@@ -211,7 +211,7 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
         """
         def verify_course_summery_fields(course_summary):
             """ Verify that every `course_summary` object has all the required fields """
-            expected_fields = CourseSummary.course_info_fields + ['id', 'location']
+            expected_fields = CourseSummary.course_info_fields + ['id', 'location', 'has_ended']
             return all([hasattr(course_summary, field) for field in expected_fields])
 
         self.assertTrue(all(verify_course_summery_fields(course_summary) for course_summary in course_summaries))

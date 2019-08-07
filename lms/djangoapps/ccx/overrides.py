@@ -2,19 +2,18 @@
 API related to providing field overrides for individual students.  This is used
 by the individual custom courses feature.
 """
+from __future__ import absolute_import
+
 import json
 import logging
 
+from ccx_keys.locator import CCXBlockUsageLocator, CCXLocator
 from django.db import transaction
-
-import request_cache
-
-from courseware.field_overrides import FieldOverrideProvider
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
 
 from lms.djangoapps.ccx.models import CcxFieldOverride, CustomCourseForEdX
-
+from lms.djangoapps.courseware.field_overrides import FieldOverrideProvider
+from openedx.core.lib.cache_utils import get_cache
 
 log = logging.getLogger(__name__)
 
@@ -41,7 +40,7 @@ class CustomCoursesForEdxOverrideProvider(FieldOverrideProvider):
         elif hasattr(block, 'location'):
             course_key = block.location.course_key
         else:
-            msg = "Unable to get course id when calculating ccx overide for block type %r"
+            msg = u"Unable to get course id when calculating ccx overide for block type %r"
             log.error(msg, type(block))
         if course_key is not None:
             ccx = get_current_ccx(course_key)
@@ -70,7 +69,7 @@ def get_current_ccx(course_key):
     if not isinstance(course_key, CCXLocator):
         return None
 
-    ccx_cache = request_cache.get_cache('ccx')
+    ccx_cache = get_cache('ccx')
     if course_key not in ccx_cache:
         ccx_cache[course_key] = CustomCourseForEdX.objects.get(pk=course_key.ccx)
 
@@ -123,7 +122,7 @@ def _get_overrides_for_ccx(ccx):
     Returns a dictionary mapping field name to overriden value for any
     overrides set on this block for this CCX.
     """
-    overrides_cache = request_cache.get_cache('ccx-overrides')
+    overrides_cache = get_cache('ccx-overrides')
 
     if ccx not in overrides_cache:
         overrides = {}
@@ -198,7 +197,7 @@ def clear_override_for_ccx(ccx, block, name):
         pass
 
 
-def clear_ccx_field_info_from_ccx_map(ccx, block, name):  # pylint: disable=invalid-name
+def clear_ccx_field_info_from_ccx_map(ccx, block, name):
     """
     Remove field information from ccx overrides mapping dictionary
     """
@@ -216,7 +215,7 @@ def bulk_delete_ccx_override_fields(ccx, ids):
     """
     Bulk delete for CcxFieldOverride model
     """
-    ids = filter(None, ids)
+    ids = [ccx_id for ccx_id in ids if ccx_id]
     ids = list(set(ids))
     if ids:
         CcxFieldOverride.objects.filter(ccx=ccx, id__in=ids).delete()

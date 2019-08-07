@@ -1,0 +1,149 @@
+<%page expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+%>
+<div class="reasons_survey">
+  <div class="slide1 hidden">
+    <h3>${_("We're sorry to see you go! Read the following statements and rate your level of agreement.")}</h3><br>
+   
+    <h4>${_('Price is too high for me')}</h4>
+    <div>
+      <input type="radio" name="priceEntitlementUnenrollment" id="priceEntitlementUnenrollment1" value="1">
+      <label for="priceEntitlementUnenrollment1">1 (Strongly disagree)</label>
+    </div>  
+    <div class="form-check form-check-inline">
+      <input type="radio" name="priceEntitlementUnenrollment" id="priceEntitlementUnenrollment2" value="2">
+      <label for="priceEntitlementUnenrollment2">2</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input type="radio" name="priceEntitlementUnenrollment" id="priceEntitlementUnenrollment3" value="3" >
+      <label for="priceEntitlementUnenrollment3">3</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input type="radio" name="priceEntitlementUnenrollment" id="priceEntitlementUnenrollment4" value="4" >
+      <label for="priceEntitlementUnenrollment4">4</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input type="radio" name="priceEntitlementUnenrollment" id="priceEntitlementUnenrollment5" value="5" >
+      <label for="priceEntitlementUnenrollment5">5 (Strongly agree)</label>
+    </div>
+    <br>
+
+    <h4>${_("I was not satisfied with my experience taking the courses")}</h4>
+    <div>
+      <input type="radio" name="dissastisfiedEntitlementUnenrollment" id="dissastisfiedEntitlementUnenrollment1" value="1">
+      <label for="dissastisfiedEntitlementUnenrollment1">1 (Strongly disagree)</label>
+    </div>  
+    <div class="form-check form-check-inline">
+      <input type="radio" name="dissastisfiedEntitlementUnenrollment" id="dissastisfiedEntitlementUnenrollment2" value="2">
+      <label for="dissastisfiedEntitlementUnenrollment2">2</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input type="radio" name="dissastisfiedEntitlementUnenrollment" id="dissastisfiedEntitlementUnenrollment3" value="3" >
+      <label for="dissastisfiedEntitlementUnenrollment3">3</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input type="radio" name="dissastisfiedEntitlementUnenrollment" id="dissastisfiedEntitlementUnenrollment4" value="4" >
+      <label for="dissastisfiedEntitlementUnenrollment4">4</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input type="radio" name="dissastisfiedEntitlementUnenrollment" id="dissastisfiedEntitlementUnenrollment5" value="5" >
+      <label for="dissastisfiedEntitlementUnenrollment5">5 (Strongly agree)</label>
+    </div>
+    <br>
+
+    <h4>${_("Content of the courses was too difficult")}</h4>
+    <div>
+        <input type="radio" name="difficultEntitlementUnenrollment" id="difficultEntitlementUnenrollment1" value="1">
+        <label for="dissastisfiedEntitlementUnenrollment1">1 (Strongly disagree)</label>
+    </div>  
+    <div class="form-check form-check-inline">
+      <input type="radio" name="difficultEntitlementUnenrollment" id="difficultEntitlementUnenrollment2" value="2">
+      <label for="difficultEntitlementUnenrollment2">2</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input type="radio" name="difficultEntitlementUnenrollment" id="difficultEntitlementUnenrollment3" value="3" >
+      <label for="difficultEntitlementUnenrollment3">3</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input type="radio" name="difficultEntitlementUnenrollment" id="difficultEntitlementUnenrollment4" value="4" >
+      <label for="difficultEntitlementUnenrollment4">4</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input type="radio" name="difficultEntitlementUnenrollment" id="difficultEntitlementUnenrollment5" value="5" >
+      <label for="difficultEntitlementUnenrollment5">5 (Strongly agree)</label>
+    </div>
+    <br>
+
+    <h4>${_("I did not have enough time to complete the courses")}</h4>
+    <div>
+      <input type="radio" name="timeEntitlementUnenrollment" id="timeEntitlementUnenrollment1" value="1">
+      <label for="timeEntitlementUnenrollment1">1 (Strongly disagree)</label>
+    </div>  
+    <div class="form-check form-check-inline">
+      <input type="radio" name="timeEntitlementUnenrollment" id="timeEntitlementUnenrollment2" value="2">
+      <label for="timeEntitlementUnenrollment2">2</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input type="radio" name="timeEntitlementUnenrollment" id="timeEntitlementUnenrollment3" value="3" >
+      <label for="timeEntitlementUnenrollment3">3</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input type="radio" name="timeEntitlementUnenrollment" id="timeEntitlementUnenrollment4" value="4" >
+      <label for="timeEntitlementUnenrollment4">4</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input type="radio" name="timeEntitlementUnenrollment" id="timeEntitlementUnenrollment5" value="5" >
+      <label for="timeEntitlementUnenrollment5">5 (Strongly agree)</label>
+    </div>
+    <br>
+
+    <h4>${_("The content was not available when I wanted to start")}</h4>
+    <div>
+      <input type="radio" name="unavailableEntitlementUnenrollment" id="unavailableEntitlementUnenrollment1" value="1">
+      <label for="unavailableEntitlementUnenrollment1">1 (Strongly disagree)</label>
+    </div>  
+    <div class="form-check form-check-inline">
+      <input type="radio" name="unavailableEntitlementUnenrollment" id="unavailableEntitlementUnenrollment2" value="2">
+      <label for="unavailableEntitlementUnenrollment2">2</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input type="radio" name="unavailableEntitlementUnenrollment" id="unavailableEntitlementUnenrollment3" value="3" >
+      <label for="unavailableEntitlementUnenrollment3">3</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input type="radio" name="unavailableEntitlementUnenrollment" id="unavailableEntitlementUnenrollment4" value="4" >
+      <label for="unavailableEntitlementUnenrollment4">4</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input type="radio" name="unavailableEntitlementUnenrollment" id="unavailableEntitlementUnenrollment5" value="5" >
+      <label for="unavailableEntitlementUnenrollment5">5 (Strongly agree)</label>
+    </div>
+    <br>
+
+    <h4>${_("Can we contact you via email for follow up?")}</h4>
+    <div>
+      <input type="radio" name="emailEntitlementUnenrollment" id="unavailableEntitlementUnenrollment1" value="yes">
+      <label for="emailEntitlementUnenrollment1">Yes</label>
+    </div>  
+    <div class="form-check form-check-inline">
+      <input type="radio" name="emailEntitlementUnenrollment" id="unavailableEntitlementUnenrollment2" value="no">
+      <label for="emailEntitlementUnenrollment0">No</label>
+    </div>
+    <br>
+    <button class="submit-reasons">${_('Submit')}</button>
+  </div>
+  <div class="slide2 hidden">
+    ${_('Thank you for sharing your reasons for unenrolling.')}<br>
+    ${_('You are unenrolled from')} <span class="survey_course_name"></span>.
+
+    <div>
+      <a href="/dashboard" class="btn button survey_button return_to_dashboard">
+        ${_('Return To Dashboard')}
+      </a>
+      <a href="/courses" class="btn button survey_button browse_courses">
+        ${_('Browse Courses')}
+      </a>
+    </div>
+  </div>
+</div>

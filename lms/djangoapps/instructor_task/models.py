@@ -12,20 +12,28 @@ file and check it in at the same time as your model changes. To do that,
 ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 """
-from uuid import uuid4
-import csv
-import json
-import hashlib
-import os.path
+from __future__ import absolute_import
 
+import codecs
+import csv
+import hashlib
+import json
+import logging
+import os.path
+from uuid import uuid4
+
+import six
+from boto.exception import BotoServerError
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.db import models, transaction
+from opaque_keys.edx.django.models import CourseKeyField
+from six import text_type
 
 from openedx.core.storage import get_storage
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
+logger = logging.getLogger(__name__)
 
 # define custom states used by InstructorTask
 QUEUING = 'QUEUING'
@@ -53,6 +61,8 @@ class InstructorTask(models.Model):
     `requester` stores id of user who submitted the task
     `created` stores date that entry was first created
     `updated` stores date that entry was last modified
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "instructor_task"
@@ -60,11 +70,11 @@ class InstructorTask(models.Model):
     task_type = models.CharField(max_length=50, db_index=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
     task_key = models.CharField(max_length=255, db_index=True)
-    task_input = models.CharField(max_length=255)
+    task_input = models.TextField()
     task_id = models.CharField(max_length=255, db_index=True)  # max_length from celery_taskmeta
     task_state = models.CharField(max_length=50, null=True, db_index=True)  # max_length from celery_taskmeta
     task_output = models.CharField(max_length=1024, null=True)
-    requester = models.ForeignKey(User, db_index=True)
+    requester = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True, null=True)
     updated = models.DateTimeField(auto_now=True)
     subtasks = models.TextField(blank=True)  # JSON dictionary
@@ -80,7 +90,7 @@ class InstructorTask(models.Model):
         },)
 
     def __unicode__(self):
-        return unicode(repr(self))
+        return six.text_type(repr(self))
 
     @classmethod
     def create(cls, course_id, task_type, task_key, task_input, requester):
@@ -89,14 +99,7 @@ class InstructorTask(models.Model):
         """
         # create the task_id here, and pass it into celery:
         task_id = str(uuid4())
-
         json_task_input = json.dumps(task_input)
-
-        # check length of task_input, and return an exception if it's too long:
-        if len(json_task_input) > 255:
-            fmt = 'Task input longer than 255: "{input}" for "{task}" of "{course}"'
-            msg = fmt.format(input=json_task_input, task=task_type, course=course_id)
-            raise ValueError(msg)
 
         # create the task, then save it:
         instructor_task = cls(
@@ -130,7 +133,7 @@ class InstructorTask(models.Model):
         # will fit in the column.  In the meantime, just return an exception.
         json_output = json.dumps(returned_result)
         if len(json_output) > 1023:
-            raise ValueError("Length of task output is too long: {0}".format(json_output))
+            raise ValueError(u"Length of task output is too long: {0}".format(json_output))
         return json_output
 
     @staticmethod
@@ -145,7 +148,7 @@ class InstructorTask(models.Model):
         Truncation is indicated by adding "..." to the end of the value.
         """
         tag = '...'
-        task_progress = {'exception': type(exception).__name__, 'message': unicode(exception.message)}
+        task_progress = {'exception': type(exception).__name__, 'message': text_type(exception)}
         if traceback_string is not None:
             # truncate any traceback that goes into the InstructorTask model:
             task_progress['traceback'] = traceback_string
@@ -219,7 +222,7 @@ class ReportStore(object):
         compatibility.
         """
         for row in rows:
-            yield [unicode(item).encode('utf-8') for item in row]
+            yield [six.text_type(item).encode('utf-8') for item in row]
 
 
 class DjangoStorageReportStore(ReportStore):
@@ -266,6 +269,8 @@ class DjangoStorageReportStore(ReportStore):
         strings), write the rows to the storage backend in csv format.
         """
         output_buffer = ContentFile('')
+        # Adding unicode signature (BOM) for MS Excel 2013 compatibility
+        output_buffer.write(codecs.BOM_UTF8)
         csvwriter = csv.writer(output_buffer)
         csvwriter.writerows(self._get_utf8_encoded_rows(rows))
         output_buffer.seek(0)
@@ -284,6 +289,14 @@ class DjangoStorageReportStore(ReportStore):
             # Django's FileSystemStorage fails with an OSError if the course
             # dir does not exist; other storage types return an empty list.
             return []
+        except BotoServerError as ex:
+            logger.error(
+                u'Fetching files failed for course: %s, status: %s, reason: %s',
+                course_id,
+                ex.status,
+                ex.reason
+            )
+            return []
         files = [(filename, os.path.join(course_dir, filename)) for filename in filenames]
         files.sort(key=lambda f: self.storage.modified_time(f[1]), reverse=True)
         return [
@@ -295,5 +308,5 @@ class DjangoStorageReportStore(ReportStore):
         """
         Return the full path to a given file for a given course.
         """
-        hashed_course_id = hashlib.sha1(course_id.to_deprecated_string()).hexdigest()
+        hashed_course_id = hashlib.sha1(text_type(course_id)).hexdigest()
         return os.path.join(hashed_course_id, filename)

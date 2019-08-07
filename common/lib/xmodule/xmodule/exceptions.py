@@ -45,9 +45,6 @@ class HeartbeatFailure(Exception):
     Raised when heartbeat fails.
     """
 
-    def __unicode__(self, *args, **kwargs):
-        return self.message
-
     def __init__(self, msg, service):
         """
         In addition to a msg, provide the name of the service.

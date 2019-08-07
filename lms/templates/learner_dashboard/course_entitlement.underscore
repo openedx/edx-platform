@@ -1,0 +1,39 @@
+<div id="change-session-<%- entitlementUUID %>" class="message is-shown">
+    <div class="action-header">
+        <% if (availableSessions.length === 0) { %>
+            <%- gettext('More sessions coming soon.') %>
+        <% } else { %>
+            <% if (currentSessionId) { %>
+                <%- gettext('Change to a different session or leave the current session.')%>
+            <% } else { %>
+                <%- gettext('To access the course, select a session.')%>
+            <% } %>
+        <% } %>
+    </div>
+    <% if (availableSessions.length !== 0) { %>
+        <div class="action-controls">
+            <select class="session-select" aria-label="<%- StringUtils.interpolate( gettext('Session Selection Dropdown for {courseName}'), { courseName: courseName }) %>">
+                <% _.each(availableSessions, function(session) { %>
+                    <option data-session_id="<%- session.session_id || session.key %>" <% if ((session.session_id || session.key) === currentSessionId) { %> selected<% } %> >
+                        <% if ((session.session_id || session.key) === currentSessionId) { %>
+                            <%- StringUtils.interpolate( gettext('{sessionDates} - Currently Selected'), {sessionDates: session.session_dates}) %>
+                        <% } else if (session.enrollment_end){ %>
+                            <%- StringUtils.interpolate( gettext('{sessionDates} (Open until {enrollmentEnd})'), {sessionDates: session.session_dates, enrollmentEnd: session.enrollment_end}) %>
+                        <% } else { %>
+                            <%- session.session_dates %>
+                        <% } %>
+                    </option>
+                <% }) %>
+                <option disabled><%- gettext('More sessions coming soon') %></option>
+                <% if (currentSessionId){%> <option><%- gettext('Leave the current session and decide later')%></option><% } %>
+            </select>
+            <button class="enroll-btn-initial">
+                <% if (currentSessionId) { %>
+                    <%- gettext('Change Session') %>
+                <% } else { %>
+                    <%- gettext('Select Session') %>
+                <% } %>
+            </button>
+        </div>
+    <% } %>
+</div>

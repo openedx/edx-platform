@@ -8,6 +8,8 @@ Core methods
 
 """
 
+from __future__ import absolute_import
+
 from django.core.cache import cache
 from django.db import DEFAULT_DB_ALIAS
 
@@ -63,7 +65,7 @@ def get_instance(model, instance_or_pk, timeout=None, using=None):
     instance = model._default_manager.using(using).get(pk=primary_key)  # pylint: disable=protected-access
 
     data = {}
-    for field in instance._meta.fields:  # pylint: disable=protected-access
+    for field in instance._meta.fields:
         # Harmless to save, but saves space in the dictionary - we already know
         # the primary key when we lookup
         if field.primary_key:
@@ -96,7 +98,6 @@ def instance_key(model, instance_or_pk):
     """
     Returns the cache key for this (model, instance) pair.
     """
-    # pylint: disable=protected-access
     return '%s.%s:%d' % (
         model._meta.app_label,
         model._meta.model_name,

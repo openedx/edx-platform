@@ -1,22 +1,21 @@
+from __future__ import absolute_import
+
 import datetime
 import json
 
 import pytz
-
+import six
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import redirect
-
 from django.views.decorators.csrf import ensure_csrf_cookie
-
-from edxmako.shortcuts import render_to_response
+from eventtracking import tracker as eventtracker
 from ipware.ip import get_ip
 
-from track import tracker
-from track import contexts
-from track import shim
+from edxmako.shortcuts import render_to_response
+from track import contexts, shim, tracker
 from track.models import TrackingLog
-from eventtracking import tracker as eventtracker
 
 
 def log_event(event):
@@ -50,6 +49,22 @@ def _get_request_value(request, value_name, default=''):
     return default
 
 
+def _add_user_id_for_username(data):
+    """
+    If data contains a username, adds the corresponding user_id to the data.
+
+    In certain use cases, the caller may have the username and not the
+    user_id. This enables us to standardize on user_id in event data,
+    even when the caller only has access to the username.
+    """
+    if data and ('username' in data) and ('user_id' not in data):
+        try:
+            user = User.objects.get(username=data.get('username'))
+            data['user_id'] = user.id
+        except User.DoesNotExist:
+            pass
+
+
 def user_track(request):
     """
     Log when POST call to "event" URL is made by a user.
@@ -65,9 +80,10 @@ def user_track(request):
     data = _get_request_value(request, 'event', {})
     page = _get_request_value(request, 'page')
 
-    if isinstance(data, basestring) and len(data) > 0:
+    if isinstance(data, six.string_types) and len(data) > 0:
         try:
             data = json.loads(data)
+            _add_user_id_for_username(data)
         except ValueError:
             pass
 
@@ -107,7 +123,7 @@ def server_track(request, event_type, event, page=None):
         "event": event,
         "agent": _get_request_header(request, 'HTTP_USER_AGENT').decode('latin1'),
         "page": page,
-        "time": datetime.datetime.utcnow(),
+        "time": datetime.datetime.utcnow().replace(tzinfo=pytz.utc),
         "host": _get_request_header(request, 'SERVER_NAME'),
         "context": eventtracker.get_tracker().resolve_context(),
     }
@@ -155,7 +171,7 @@ def task_track(request_info, task_info, event_type, event, page=None):
             "event": full_event,
             "agent": request_info.get('agent', 'unknown'),
             "page": page,
-            "time": datetime.datetime.utcnow(),
+            "time": datetime.datetime.utcnow().replace(tzinfo=pytz.utc),
             "host": request_info.get('host', 'unknown'),
             "context": eventtracker.get_tracker().resolve_context(),
         }

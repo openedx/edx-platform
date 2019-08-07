@@ -1,0 +1,19 @@
+// ------------------------------------
+// Studio support for legacy Sass partials
+//
+// The intention is that this makes it
+// easier to reuse existing partials
+// that were not built with Bootstrap
+// in mind.
+// ------------------------------------
+
+@import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
+
+@mixin font-size($sizeValue: 16) {
+  font-size: ($sizeValue/10) + rem;
+}
+
+// Support .sr as a synonym for .sr-only
+.sr {
+  @extend .sr-only;
+}

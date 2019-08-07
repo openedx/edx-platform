@@ -1,6 +1,8 @@
 """
 Mixins for TestCase classes that need to account for multiple sites
 """
+from __future__ import absolute_import
+
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 
 
@@ -16,7 +18,9 @@ class SiteMixin(object):
             site=self.site,
             values={
                 "SITE_NAME": self.site.domain,
-                "course_org_filter": "fakeX",
+                "course_email_from_addr": "fake@example.com",
+                "course_email_template_name": "fake_email_template",
+                "course_org_filter": "fakeX"
             }
         )
 
@@ -55,6 +59,7 @@ class SiteMixin(object):
             values=site_configuration_values
         )
         self.use_site(site)
+        return site
 
     def use_site(self, site):
         """

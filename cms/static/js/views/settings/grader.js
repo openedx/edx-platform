@@ -1,9 +1,9 @@
 define(['js/views/validation',
-        'gettext',
-        'edx-ui-toolkit/js/utils/string-utils',
-        'edx-ui-toolkit/js/utils/html-utils',
-        'underscore',
-        'jquery'],
+    'gettext',
+    'edx-ui-toolkit/js/utils/string-utils',
+    'edx-ui-toolkit/js/utils/html-utils',
+    'underscore',
+    'jquery'],
     function(ValidatingView, gettext, StringUtils, HtmlUtils, _, $) {
         var GraderView = ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseGrader
@@ -28,11 +28,11 @@ define(['js/views/validation',
                 return this;
             },
             fieldToSelectorMap: {
-                'type': 'course-grading-assignment-name',
-                'short_label': 'course-grading-assignment-shortname',
-                'min_count': 'course-grading-assignment-totalassignments',
-                'drop_count': 'course-grading-assignment-droppable',
-                'weight': 'course-grading-assignment-gradeweight'
+                type: 'course-grading-assignment-name',
+                short_label: 'course-grading-assignment-shortname',
+                min_count: 'course-grading-assignment-totalassignments',
+                drop_count: 'course-grading-assignment-droppable',
+                weight: 'course-grading-assignment-gradeweight'
             },
             updateModel: function(event) {
         // HACK to fix model sometimes losing its pointer to the collection [I think I fixed this but leaving

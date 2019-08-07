@@ -2,24 +2,26 @@
 Acceptance tests for Studio related to course reruns.
 """
 
+from __future__ import absolute_import
+
 import random
+
 from bok_choy.promise import EmptyPromise
-from nose.tools import assert_in
 
-from common.test.acceptance.pages.studio.index import DashboardPage
-from common.test.acceptance.pages.studio.course_rerun import CourseRerunPage
-from common.test.acceptance.pages.studio.overview import CourseOutlinePage
-from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.studio.course_rerun import CourseRerunPage
+from common.test.acceptance.pages.studio.index import DashboardPage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage
 
-from base_studio_test import StudioCourseTest
+from .base_studio_test import StudioCourseTest
 
 
 class CourseRerunTest(StudioCourseTest):
     """
     Feature: Courses can be rerun
     """
-
+    shard = 21
     __test__ = True
 
     SECTION_NAME = 'Rerun Section'
@@ -70,6 +72,7 @@ class CourseRerunTest(StudioCourseTest):
         updated_course_info = course_info[0] + "+" + course_info[1] + "+" + course_info[2]
 
         self.dashboard_page.visit()
+        self.dashboard_page.scroll_to_course(course_info[1])
         self.dashboard_page.create_rerun(updated_course_info)
 
         rerun_page = CourseRerunPage(self.browser, *course_info)
@@ -84,7 +87,7 @@ class CourseRerunTest(StudioCourseTest):
 
         EmptyPromise(finished_processing, "Rerun finished processing", try_interval=5, timeout=60).fulfill()
 
-        assert_in(course_run, self.dashboard_page.course_runs)
+        assert course_run in self.dashboard_page.course_runs
         self.dashboard_page.click_course_run(course_run)
 
         outline_page = CourseOutlinePage(self.browser, *course_info)

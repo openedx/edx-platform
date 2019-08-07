@@ -3,7 +3,7 @@
 <%namespace name='static' file='/static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from openedx.core.djangolib.js_utils import (
     dump_js_escaped_json, js_escaped_string
 )
@@ -112,34 +112,12 @@ from openedx.core.djangolib.js_utils import (
 
   function setup_management_form() {
 
-    $(".member-lists-management form").on("submit", function (event) {
-      var target, action;
-      target = $(event.target);
-      if (target.serialize().indexOf('student-action') < 0) {
-        action = $('<input />', {
-          type: 'hidden',
-          name: 'student-action',
-          value: 'add'
-        });
-        target.append(action);
-      }
-    });
-
-    $(".member-lists-management form .add, .member-lists-management form .revoke").on("click", function(event) {
+    $(".member-lists-management-ccx form .revoke").on("click", function(event) {
         var target, form, action, studentId, selectedStudent;
         event.preventDefault();
         target = $(event.target);
         form = target.parents('form').first();
-        if (target.hasClass('add')) {
-          // adding a new student, add the student-action input and submit
-          action = $('<input />', {
-            type: 'hidden',
-            name: 'student-action',
-            // this is untenable, tied to a translated value.  Fix it.
-            value: 'add'
-          });
-          form.append(action).submit();
-        } else if (target.hasClass('revoke')) {
+        if (target.hasClass('revoke')) {
           // revoking access for a student, get set form values and submit
           // get the email address of the student, since they might not be 'enrolled' yet.
           selectedStudent = target.parent('td').siblings().last().text();

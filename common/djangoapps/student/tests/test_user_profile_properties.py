@@ -1,12 +1,15 @@
 """Unit tests for custom UserProfile properties."""
 
-import datetime
-import ddt
+from __future__ import absolute_import
 
+import datetime
+
+import ddt
+from django.core.cache import cache
+
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.models import UserProfile
 from student.tests.factories import UserFactory
-from django.core.cache import cache
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 
 @ddt.ddt

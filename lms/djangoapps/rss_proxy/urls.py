@@ -1,9 +1,13 @@
 """
 URLs for the rss_proxy djangoapp.
 """
+from __future__ import absolute_import
+
 from django.conf.urls import url
 
+from rss_proxy.views import proxy
 
+app_name = 'rss_proxy'
 urlpatterns = [
-    url(r"^$", "rss_proxy.views.proxy", name="proxy"),
+    url(r'^$', proxy, name='proxy'),
 ]

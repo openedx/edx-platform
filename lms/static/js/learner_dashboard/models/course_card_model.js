@@ -1,105 +1,282 @@
+/* globals gettext */
+
+import Backbone from 'backbone';
+
+import DateUtils from 'edx-ui-toolkit/js/utils/date-utils';
+import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
+
 /**
  * Model for Course Programs.
  */
-(function(define) {
-    'use strict';
-    define([
-        'backbone'
-    ],
-        function(Backbone) {
-            return Backbone.Model.extend({
-                initialize: function(data) {
-                    if (data) {
-                        this.context = data;
-                        this.setActiveRunMode(this.getRunMode(data.run_modes));
-                    }
-                },
+class CourseCardModel extends Backbone.Model {
+  initialize(data) {
+    if (data) {
+      this.context = data;
+      this.setActiveCourseRun(this.getCourseRun(data), data.user_preferences);
+    }
+  }
 
-                getUnselectedRunMode: function(runModes) {
-                    if (runModes && runModes.length > 0) {
-                        return {
-                            course_image_url: runModes[0].course_image_url,
-                            marketing_url: runModes[0].marketing_url,
-                            is_enrollment_open: runModes[0].is_enrollment_open
-                        };
-                    }
+  getCourseRun(course) {
+    const enrolledCourseRun = course.course_runs.find(run => run.is_enrolled);
+    const openEnrollmentCourseRuns = this.getEnrollableCourseRuns();
+    let desiredCourseRun;
 
-                    return {};
-                },
+    // If the learner has an existing, unexpired enrollment,
+    // use it to populate the model.
+    if (enrolledCourseRun && !course.expired) {
+      desiredCourseRun = enrolledCourseRun;
+    } else if (openEnrollmentCourseRuns.length > 0) {
+      if (openEnrollmentCourseRuns.length === 1) {
+        desiredCourseRun = openEnrollmentCourseRuns[0];
+      } else {
+        desiredCourseRun = CourseCardModel.getUnselectedCourseRun(openEnrollmentCourseRuns);
+      }
+    } else {
+      desiredCourseRun = CourseCardModel.getUnselectedCourseRun(course.course_runs);
+    }
 
-                getRunMode: function(runModes) {
-                    var enrolled_mode = _.findWhere(runModes, {is_enrolled: true}),
-                        openEnrollmentRunModes = this.getEnrollableRunModes(),
-                        desiredRunMode;
-                // We populate our model by looking at the run modes.
-                    if (enrolled_mode) {
-                    // If the learner is already enrolled in a run mode, return that one.
-                        desiredRunMode = enrolled_mode;
-                    } else if (openEnrollmentRunModes.length > 0) {
-                        if (openEnrollmentRunModes.length === 1) {
-                            desiredRunMode = openEnrollmentRunModes[0];
-                        } else {
-                            desiredRunMode = this.getUnselectedRunMode(openEnrollmentRunModes);
-                        }
-                    } else {
-                        desiredRunMode = this.getUnselectedRunMode(runModes);
-                    }
+    return desiredCourseRun;
+  }
 
-                    return desiredRunMode;
-                },
+  getCourseRunWithHighestGrade(grades) {
+    const allEnrolledCourseRuns = this.context.course_runs.filter(run => run.is_enrolled);
+    if (allEnrolledCourseRuns.length <= 1) {
+      return null;
+    }
 
-                getEnrollableRunModes: function() {
-                    return _.where(this.context.run_modes, {
-                        is_enrollment_open: true,
-                        is_enrolled: false,
-                        is_course_ended: false
-                    });
-                },
+    allEnrolledCourseRuns.sort((a, b) => (grades[a.key] || 0) - (grades[b.key] || 0));
+    return allEnrolledCourseRuns[allEnrolledCourseRuns.length - 1];
+  }
 
-                getUpcomingRunModes: function() {
-                    return _.where(this.context.run_modes, {
-                        is_enrollment_open: false,
-                        is_enrolled: false,
-                        is_course_ended: false
-                    });
-                },
+  updateCourseRunWithHighestGrade(grades) {
+    const courseRunWithHighestGrade = this.getCourseRunWithHighestGrade(grades);
+    if (courseRunWithHighestGrade) {
+      this.setActiveCourseRun(courseRunWithHighestGrade, this.context.user_preferences);
+    }
+  }
 
-                setActiveRunMode: function(runMode) {
-                    if (runMode) {
-                        this.set({
-                            certificate_url: runMode.certificate_url,
-                            course_image_url: runMode.course_image_url || '',
-                            course_key: runMode.course_key,
-                            course_url: runMode.course_url || '',
-                            display_name: this.context.display_name,
-                            end_date: runMode.end_date,
-                            enrollable_run_modes: this.getEnrollableRunModes(),
-                            is_course_ended: runMode.is_course_ended,
-                            is_enrolled: runMode.is_enrolled,
-                            is_enrollment_open: runMode.is_enrollment_open,
-                            key: this.context.key,
-                            marketing_url: runMode.marketing_url,
-                            mode_slug: runMode.mode_slug,
-                            run_key: runMode.run_key,
-                            start_date: runMode.start_date,
-                            upcoming_run_modes: this.getUpcomingRunModes(),
-                            upgrade_url: runMode.upgrade_url
-                        });
-                    }
-                },
+  isEnrolledInSession() {
+    // Returns true if the user is currently enrolled in a session of the course
+    return this.context.course_runs.find(run => run.is_enrolled) !== undefined;
+  }
 
-                setUnselected: function() {
-                // Called to reset the model back to the unselected state.
-                    var unselectedMode = this.getUnselectedRunMode(this.get('enrollable_run_modes'));
-                    this.setActiveRunMode(unselectedMode);
-                },
+  static getUnselectedCourseRun(courseRuns) {
+    const unselectedRun = {};
 
-                updateRun: function(runKey) {
-                    var selectedRun = _.findWhere(this.get('run_modes'), {run_key: runKey});
-                    if (selectedRun) {
-                        this.setActiveRunMode(selectedRun);
-                    }
-                }
-            });
+    if (courseRuns && courseRuns.length > 0) {
+      const courseRun = courseRuns[0];
+
+      $.extend(unselectedRun, {
+        marketing_url: courseRun.marketing_url,
+        is_enrollment_open: courseRun.is_enrollment_open,
+        key: courseRun.key || '',
+        is_mobile_only: courseRun.is_mobile_only || false,
+      });
+    }
+
+    return unselectedRun;
+  }
+
+  getEnrollableCourseRuns() {
+    const rawCourseRuns = this.context.course_runs.filter(run => (
+      run.is_enrollment_open &&
+      !run.is_enrolled &&
+      !run.is_course_ended &&
+      run.status === 'published'
+    ));
+
+    // Deep copy to avoid mutating this.context.
+    const enrollableCourseRuns = $.extend(true, [], rawCourseRuns);
+
+    // These are raw course runs from the server. The start
+    // dates are ISO-8601 formatted strings that need to be
+    // prepped for display.
+    enrollableCourseRuns.forEach((courseRun) => {
+      Object.assign(courseRun, {
+        start_date: CourseCardModel.formatDate(courseRun.start),
+        end_date: CourseCardModel.formatDate(courseRun.end),
+        // This is used to render the date when selecting a course run to enroll in
+        dateString: this.formatDateString(courseRun),
+      });
+    });
+
+    return enrollableCourseRuns;
+  }
+
+  getUpcomingCourseRuns() {
+    return this.context.course_runs.filter(run => (
+      !run.is_enrollment_open &&
+      !run.is_enrolled &&
+      !run.is_course_ended &&
+      run.status === 'published'
+    ));
+  }
+
+  static formatDate(date, userPreferences) {
+    let userTimezone = '';
+    let userLanguage = '';
+    if (userPreferences !== undefined) {
+      userTimezone = userPreferences.time_zone;
+      userLanguage = userPreferences['pref-lang'];
+    }
+    const context = {
+      datetime: date,
+      timezone: userTimezone,
+      language: userLanguage,
+      format: DateUtils.dateFormatEnum.shortDate,
+    };
+    return DateUtils.localize(context);
+  }
+
+  static getCertificatePriceString(run) {
+    if ('seats' in run && run.seats.length) {
+      // eslint-disable-next-line consistent-return
+      const upgradeableSeats = run.seats.filter((seat) => {
+        const upgradeableSeatTypes = ['verified', 'professional', 'no-id-professional', 'credit'];
+        return upgradeableSeatTypes.indexOf(seat.type) >= 0;
+      });
+      if (upgradeableSeats.length > 0) {
+        const upgradeableSeat = upgradeableSeats[0];
+        if (upgradeableSeat) {
+          const currency = upgradeableSeat.currency;
+          if (currency === 'USD') {
+            return `$${upgradeableSeat.price}`;
+          }
+          return `${upgradeableSeat.price} ${currency}`;
+        }
+      }
+    }
+    return null;
+  }
+
+  formatDateString(run) {
+    const pacingType = run.pacing_type;
+    let dateString;
+    let start = CourseCardModel.valueIsDefined(run.start_date) ?
+      run.advertised_start || run.start_date :
+      this.get('start_date');
+    if (start === undefined) {
+      start = CourseCardModel.valueIsDefined(run.start) ?
+        run.advertised_start || CourseCardModel.formatDate(run.start) : undefined;
+    }
+    let end = CourseCardModel.valueIsDefined(run.end_date) ? run.end_date : this.get('end_date');
+    if (end === undefined) {
+      end = CourseCardModel.valueIsDefined(run.end) ?
+        CourseCardModel.formatDate(run.end) : undefined;
+    }
+    const now = new Date();
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+
+    if (pacingType === 'self_paced') {
+      if (start) {
+        dateString = startDate > now ?
+          StringUtils.interpolate(gettext('(Self-paced) Starts {start}'), { start }) :
+          StringUtils.interpolate(gettext('(Self-paced) Started {start}'), { start });
+      } else if (end && endDate > now) {
+        dateString = StringUtils.interpolate(gettext('(Self-paced) Ends {end}'), { end });
+      } else if (end && endDate < now) {
+        dateString = StringUtils.interpolate(gettext('(Self-paced) Ended {end}'), { end });
+      }
+    } else if (start && end) {
+      dateString = `${start} - ${end}`;
+    } else if (start) {
+      dateString = startDate > now ?
+                                StringUtils.interpolate(gettext('Starts {start}'), { start }) :
+                                StringUtils.interpolate(gettext('Started {start}'), { start });
+    } else if (end) {
+      dateString = StringUtils.interpolate(gettext('Ends {end}'), { end });
+    }
+    return dateString;
+  }
+
+  static valueIsDefined(val) {
+    return !([undefined, 'None', null].indexOf(val) >= 0);
+  }
+
+  setActiveCourseRun(courseRun, userPreferences) {
+    let startDateString;
+    let courseTitleLink = '';
+    const isEnrolled = this.isEnrolledInSession() && courseRun.key;
+    if (courseRun) {
+      if (CourseCardModel.valueIsDefined(courseRun.advertised_start)) {
+        startDateString = courseRun.advertised_start;
+      } else {
+        startDateString = CourseCardModel.formatDate(courseRun.start, userPreferences);
+      }
+      if (isEnrolled && courseRun.course_url) {
+        courseTitleLink = courseRun.course_url;
+      } else if (!isEnrolled && courseRun.marketing_url) {
+        courseTitleLink = CourseCardModel.updateMarketingUrl(courseRun);
+      }
+      this.set({
+        certificate_url: courseRun.certificate_url,
+        course_run_key: courseRun.key || '',
+        course_url: courseRun.course_url || '',
+        title: this.context.title,
+        end_date: CourseCardModel.formatDate(courseRun.end, userPreferences),
+        enrollable_course_runs: this.getEnrollableCourseRuns(),
+        is_course_ended: courseRun.is_course_ended,
+        is_enrolled: isEnrolled,
+        is_enrollment_open: courseRun.is_enrollment_open,
+        course_key: this.context.key,
+        user_entitlement: this.context.user_entitlement,
+        is_unfulfilled_entitlement: this.context.user_entitlement && !isEnrolled,
+        marketing_url: courseRun.marketing_url,
+        mode_slug: courseRun.type,
+        start_date: startDateString,
+        upcoming_course_runs: this.getUpcomingCourseRuns(),
+        upgrade_url: courseRun.upgrade_url,
+        price: CourseCardModel.getCertificatePriceString(courseRun),
+        course_title_link: courseTitleLink,
+        is_mobile_only: courseRun.is_mobile_only || false,
+      });
+
+      // This is used to render the date for completed and in progress courses
+      this.set({ dateString: this.formatDateString(courseRun) });
+    }
+  }
+
+  setUnselected() {
+    // Called to reset the model back to the unselected state.
+    const unselectedCourseRun = CourseCardModel.getUnselectedCourseRun(this.get('enrollable_course_runs'));
+    this.setActiveCourseRun(unselectedCourseRun);
+  }
+
+  updateCourseRun(courseRunKey) {
+    const selectedCourseRun = this.get('course_runs').find(run => run.key === courseRunKey);
+    if (selectedCourseRun) {
+      // Update the current context to set the course run to the enrolled state
+      this.context.course_runs.forEach((run) => {
+        Object.assign(run, {
+          is_enrolled: run.is_enrolled || run.key === selectedCourseRun.key,
         });
-}).call(this, define || RequireJS.define);
+      });
+      this.setActiveCourseRun(selectedCourseRun);
+    }
+  }
+
+  // update marketing url for deep linking if is_mobile_only true
+  static updateMarketingUrl(courseRun) {
+    if (courseRun.is_mobile_only === true) {
+      const marketingUrl = courseRun.marketing_url;
+      let href = marketingUrl;
+
+      if (marketingUrl.indexOf('course_info?path_id') < 0) {
+        const start = marketingUrl.indexOf('course/');
+        let path;
+
+        if (start > -1) {
+          path = marketingUrl.substr(start);
+        }
+
+        href = `edxapp://course_info?path_id=${path}`;
+      }
+
+      return href;
+    }
+    return courseRun.marketing_url;
+  }
+}
+
+export default CourseCardModel;

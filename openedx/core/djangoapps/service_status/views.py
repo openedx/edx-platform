@@ -2,16 +2,14 @@
 Django Views for service status app
 """
 
+from __future__ import absolute_import
+
 import json
 import time
 
-from django.http import HttpResponse
-
-from dogapi import dog_stats_api
-
-from djcelery import celery
 from celery.exceptions import TimeoutError
-
+from django.http import HttpResponse
+from djcelery import celery
 from openedx.core.djangoapps.service_status.tasks import delayed_ping
 
 
@@ -22,7 +20,6 @@ def index(_):
     return HttpResponse()
 
 
-@dog_stats_api.timed('status.service.celery.status')
 def celery_status(_):
     """
     A view that returns Celery stats
@@ -32,7 +29,6 @@ def celery_status(_):
                         content_type="application/json")
 
 
-@dog_stats_api.timed('status.service.celery.ping')
 def celery_ping(_):
     """
     A Simple view that checks if Celery can process a simple task

@@ -3,6 +3,8 @@
 """
 Course Header Menu Tests.
 """
+from __future__ import absolute_import
+
 from django.conf import settings
 from django.test.utils import override_settings
 
@@ -31,6 +33,8 @@ class TestHeaderMenu(CourseTestCase, UrlResetMixin):
         Tests course header menu should not have `Certificates` menu item
         if course has not web/HTML certificates enabled.
         """
+        self.course.cert_html_view_enabled = False
+        self.save_course()
         outline_url = reverse_course_url('course_handler', self.course.id)
         resp = self.client.get(outline_url, HTTP_ACCEPT='text/html')
         self.assertEqual(resp.status_code, 200)
@@ -41,8 +45,6 @@ class TestHeaderMenu(CourseTestCase, UrlResetMixin):
         Tests course header menu should have `Certificates` menu item
         if course has web/HTML certificates enabled.
         """
-        self.course.cert_html_view_enabled = True
-        self.save_course()
         outline_url = reverse_course_url('course_handler', self.course.id)
         resp = self.client.get(outline_url, HTTP_ACCEPT='text/html')
         self.assertEqual(resp.status_code, 200)

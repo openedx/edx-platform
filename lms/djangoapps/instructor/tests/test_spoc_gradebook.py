@@ -2,19 +2,22 @@
 Tests of the instructor dashboard spoc gradebook
 """
 
-from django.core.urlresolvers import reverse
-from nose.plugins.attrib import attr
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from student.tests.factories import UserFactory, CourseEnrollmentFactory, AdminFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from __future__ import absolute_import
+
+from django.urls import reverse
+from six import text_type
+from six.moves import range
+
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.tests.factories import StudentModuleFactory
-
+from lms.djangoapps.grades.api import task_compute_all_grades_for_course
+from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 USER_COUNT = 11
 
 
-@attr(shard=1)
 class TestGradebook(SharedModuleStoreTestCase):
     """
     Test functionality of the spoc gradebook. Sets up a course with assignments and
@@ -51,7 +54,7 @@ class TestGradebook(SharedModuleStoreTestCase):
                     data=StringResponseXMLFactory().build_xml(answer='foo'),
                     metadata={'rerandomize': 'always'}
                 )
-                for __ in xrange(USER_COUNT - 1)
+                for __ in range(USER_COUNT - 1)
             ]
 
     def setUp(self):
@@ -59,7 +62,7 @@ class TestGradebook(SharedModuleStoreTestCase):
 
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password='test')
-        self.users = [UserFactory.create() for _ in xrange(USER_COUNT)]
+        self.users = [UserFactory.create() for _ in range(USER_COUNT)]
 
         for user in self.users:
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
@@ -73,16 +76,16 @@ class TestGradebook(SharedModuleStoreTestCase):
                     course_id=self.course.id,
                     module_state_key=item.location
                 )
+        task_compute_all_grades_for_course.apply_async(kwargs={'course_key': text_type(self.course.id)})
 
         self.response = self.client.get(reverse(
             'spoc_gradebook',
-            args=(self.course.id.to_deprecated_string(),)
+            args=(text_type(self.course.id),)
         ))
 
         self.assertEquals(self.response.status_code, 200)
 
 
-@attr(shard=1)
 class TestDefaultGradingPolicy(TestGradebook):
     """
     Tests that the grading policy is properly applied for all users in the course
@@ -90,7 +93,7 @@ class TestDefaultGradingPolicy(TestGradebook):
     """
     def test_all_users_listed(self):
         for user in self.users:
-            self.assertIn(user.username, unicode(self.response.content, 'utf-8'))
+            self.assertIn(user.username, text_type(self.response.content, 'utf-8'))
 
     def test_default_policy(self):
         # Default >= 50% passes, so Users 5-10 should be passing for Homework 1 [6]
@@ -108,7 +111,6 @@ class TestDefaultGradingPolicy(TestGradebook):
         self.assertEquals(293, self.response.content.count('grade_None'))
 
 
-@attr(shard=1)
 class TestLetterCutoffPolicy(TestGradebook):
     """
     Tests advanced grading policy (with letter grade cutoffs). Includes tests of
@@ -134,10 +136,10 @@ class TestLetterCutoffPolicy(TestGradebook):
 
     def test_styles(self):
 
-        self.assertIn("grade_A {color:green;}", self.response.content)
-        self.assertIn("grade_B {color:Chocolate;}", self.response.content)
-        self.assertIn("grade_C {color:DarkSlateGray;}", self.response.content)
-        self.assertIn("grade_D {color:DarkSlateGray;}", self.response.content)
+        self.assertIn(u"grade_A {color:green;}", self.response.content.decode(self.response.charset))
+        self.assertIn(u"grade_B {color:Chocolate;}", self.response.content.decode(self.response.charset))
+        self.assertIn(u"grade_C {color:DarkSlateGray;}", self.response.content.decode(self.response.charset))
+        self.assertIn(u"grade_D {color:DarkSlateGray;}", self.response.content.decode(self.response.charset))
 
     def test_assigned_grades(self):
         # Users 9-10 have >= 90% on Homeworks [2]

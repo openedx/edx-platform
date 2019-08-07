@@ -2,12 +2,12 @@
     'use strict';
 
     define(['backbone',
-            'underscore',
-            'gettext',
-            'js/views/fields',
-            'teams/js/models/team',
-            'common/js/components/utils/view_utils',
-            'text!teams/templates/edit-team.underscore'],
+        'underscore',
+        'gettext',
+        'js/views/fields',
+        'teams/js/models/team',
+        'common/js/components/utils/view_utils',
+        'text!teams/templates/edit-team.underscore'],
         function(Backbone, _, gettext, FieldViews, TeamModel, ViewUtils, editTeamTemplate) {
             return Backbone.View.extend({
 

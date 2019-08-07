@@ -1,16 +1,14 @@
 """
 Django admin page for microsite models
 """
-from django.contrib import admin
-from django import forms
+from __future__ import absolute_import
 
-from .models import (
-    Microsite,
-    MicrositeHistory,
-    MicrositeOrganizationMapping,
-    MicrositeTemplate
-)
+from django import forms
+from django.contrib import admin
+
 from util.organizations_helpers import get_organizations
+
+from .models import Microsite, MicrositeHistory, MicrositeOrganizationMapping, MicrositeTemplate
 
 
 class MicrositeAdmin(admin.ModelAdmin):

@@ -1,14 +1,18 @@
 """
 Utility functions for capa.
 """
-import bleach
+from __future__ import absolute_import
+
+import re
+from cmath import isinf, isnan
 from decimal import Decimal
 
+import bleach
 from calc import evaluator
-from cmath import isinf, isnan
-import re
 from lxml import etree
+
 from openedx.core.djangolib.markup import HTML
+
 #-----------------------------------------------------------------------------
 #
 # Utility functions used in CAPA responsetypes
@@ -168,10 +172,6 @@ def sanitize_html(html_code):
     Used to sanitize XQueue responses from Matlab.
     """
     attributes = bleach.ALLOWED_ATTRIBUTES.copy()
-    # Yuck! but bleach does not offer the option of passing in allowed_protocols,
-    # and matlab uses data urls for images
-    if u'data' not in bleach.BleachSanitizer.allowed_protocols:
-        bleach.BleachSanitizer.allowed_protocols.append(u'data')
     attributes.update({
         '*': ['class', 'style', 'id'],
         'audio': ['controls', 'autobuffer', 'autoplay', 'src'],
@@ -179,6 +179,7 @@ def sanitize_html(html_code):
     })
     output = bleach.clean(
         html_code,
+        protocols=bleach.ALLOWED_PROTOCOLS + ['data'],
         tags=bleach.ALLOWED_TAGS + ['div', 'p', 'audio', 'pre', 'img', 'span'],
         styles=['white-space'],
         attributes=attributes
@@ -194,6 +195,7 @@ def get_inner_html_from_xpath(xpath_node):
     # returns string from xpath node
     html = etree.tostring(xpath_node).strip()
     # strips outer tag from html string
+    # xss-lint: disable=python-interpolate-html
     inner_html = re.sub('(?ms)<%s[^>]*>(.*)</%s>' % (xpath_node.tag, xpath_node.tag), '\\1', html)
     return inner_html.strip()
 

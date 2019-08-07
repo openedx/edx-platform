@@ -1,38 +1,46 @@
 """Tests for the certificates panel of the instructor dash. """
-import contextlib
-import ddt
-import mock
-import json
-import pytz
+from __future__ import absolute_import
 
+import contextlib
+import io
+import json
 from datetime import datetime, timedelta
 
-from nose.plugins.attrib import attr
-from django.core.urlresolvers import reverse
-from django.core.exceptions import ObjectDoesNotExist
-from django.test.utils import override_settings
+import ddt
+import mock
+import pytz
+import six
+from config_models.models import cache
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test.utils import override_settings
+from django.urls import reverse
 
-from course_modes.models import CourseMode
 from capa.xqueue_interface import XQueueInterface
+from course_modes.models import CourseMode
+from courseware.tests.factories import GlobalStaffFactory, InstructorFactory, UserFactory
+from lms.djangoapps.certificates import api as certs_api
+from lms.djangoapps.certificates.models import (
+    CertificateGenerationConfiguration,
+    CertificateInvalidation,
+    CertificateStatuses,
+    CertificateWhitelist,
+    GeneratedCertificate
+)
+from lms.djangoapps.certificates.tests.factories import (
+    CertificateInvalidationFactory,
+    CertificateWhitelistFactory,
+    GeneratedCertificateFactory
+)
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
+from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from config_models.models import cache
-from courseware.tests.factories import GlobalStaffFactory, InstructorFactory, UserFactory
-from certificates.tests.factories import GeneratedCertificateFactory, CertificateWhitelistFactory, \
-    CertificateInvalidationFactory
-from certificates.models import CertificateGenerationConfiguration, CertificateStatuses, CertificateWhitelist, \
-    GeneratedCertificate, CertificateInvalidation
-from certificates import api as certs_api
-from student.models import CourseEnrollment
-from django.core.files.uploadedfile import SimpleUploadedFile
-import io
 
 
-@attr(shard=1)
 @ddt.ddt
 class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
     """Tests for the certificate panel of the instructor dash. """
@@ -46,7 +54,7 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
         cls.course = CourseFactory.create()
         cls.url = reverse(
             'instructor_dashboard',
-            kwargs={'course_id': unicode(cls.course.id)}
+            kwargs={'course_id': six.text_type(cls.course.id)}
         )
 
     def setUp(self):
@@ -124,7 +132,7 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
         """
         self.course.cert_html_view_enabled = True
         self.course.save()
-        self.store.update_item(self.course, self.global_staff.id)  # pylint: disable=no-member
+        self.store.update_item(self.course, self.global_staff.id)
         self.client.login(username=self.global_staff.username, password="test")
         response = self.client.get(self.url)
         self.assertContains(response, 'Enable Student-Generated Certificates')
@@ -140,7 +148,7 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
         """
         self.course.cert_html_view_enabled = True
         self.course.save()
-        self.store.update_item(self.course, self.global_staff.id)  # pylint: disable=no-member
+        self.store.update_item(self.course, self.global_staff.id)
         self.client.login(username=self.global_staff.username, password="test")
         response = self.client.get(self.url)
         self.assertContains(response, 'Enable Student-Generated Certificates')
@@ -179,7 +187,7 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
         response = self.client.get(self.url)
 
         if expected_status == 'started':
-            expected = 'Generating example {name} certificate'.format(name=cert_name)
+            expected = u'Generating example {name} certificate'.format(name=cert_name)
             self.assertContains(response, expected)
         elif expected_status == 'error':
             expected = self.ERROR_REASON
@@ -188,7 +196,7 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
             expected = self.DOWNLOAD_URL
             self.assertContains(response, expected)
         else:
-            self.fail("Invalid certificate status: {status}".format(status=expected_status))
+            self.fail(u"Invalid certificate status: {status}".format(status=expected_status))
 
     def _assert_enable_certs_button_is_disabled(self):
         """Check that the "enable student-generated certificates" button is disabled. """
@@ -206,7 +214,6 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
         self.assertContains(response, expected_html)
 
 
-@attr(shard=1)
 @override_settings(CERT_QUEUE='certificates')
 @ddt.ddt
 class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
@@ -245,7 +252,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         self.client.login(username=self.global_staff.username, password='test')
         url = reverse(
             'generate_example_certificates',
-            kwargs={'course_id': unicode(self.course.id)}
+            kwargs={'course_id': six.text_type(self.course.id)}
         )
         response = self.client.post(url)
 
@@ -263,7 +270,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         self.client.login(username=self.global_staff.username, password='test')
         url = reverse(
             'enable_certificate_generation',
-            kwargs={'course_id': unicode(self.course.id)}
+            kwargs={'course_id': six.text_type(self.course.id)}
         )
         params = {'certificates-enabled': 'true' if is_enabled else 'false'}
         response = self.client.post(url, data=params)
@@ -279,7 +286,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         """Check that the response redirects to the certificates section. """
         expected_redirect = reverse(
             'instructor_dashboard',
-            kwargs={'course_id': unicode(self.course.id)}
+            kwargs={'course_id': six.text_type(self.course.id)}
         )
         expected_redirect += '#view-certificates'
         self.assertRedirects(response, expected_redirect)
@@ -293,7 +300,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         self.client.login(username=user.username, password='test')
         url = reverse(
             'start_certificate_generation',
-            kwargs={'course_id': unicode(self.course.id)}
+            kwargs={'course_id': six.text_type(self.course.id)}
         )
 
         response = self.client.post(url)
@@ -311,7 +318,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         self.client.login(username=self.global_staff.username, password='test')
         url = reverse(
             'start_certificate_generation',
-            kwargs={'course_id': unicode(self.course.id)}
+            kwargs={'course_id': six.text_type(self.course.id)}
         )
 
         response = self.client.post(url)
@@ -336,7 +343,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
 
         # Login the client and access the url with 'certificate_statuses'
         self.client.login(username=self.global_staff.username, password='test')
-        url = reverse('start_certificate_regeneration', kwargs={'course_id': unicode(self.course.id)})
+        url = reverse('start_certificate_regeneration', kwargs={'course_id': six.text_type(self.course.id)})
         response = self.client.post(url, data={'certificate_statuses': [CertificateStatuses.downloadable]})
 
         # Assert 200 status code in response
@@ -391,10 +398,9 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
 
             # Create and assert user's ID verification record.
             SoftwareSecurePhotoVerificationFactory.create(user=self.user, status=id_verification_status)
-            actual_verification_status = SoftwareSecurePhotoVerification.verification_status_for_user(
+            actual_verification_status = IDVerificationService.verification_status_for_user(
                 self.user,
-                self.course.id,
-                enrollment.mode,
+                enrollment.mode
             )
             self.assertEquals(actual_verification_status, verification_output)
 
@@ -402,7 +408,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
             self.client.login(username=self.global_staff.username, password='test')
             url = reverse(
                 'start_certificate_regeneration',
-                kwargs={'course_id': unicode(self.course.id)}
+                kwargs={'course_id': six.text_type(self.course.id)}
             )
 
             with mock.patch.object(XQueueInterface, 'send_to_queue') as mock_send:
@@ -450,7 +456,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
 
         # Login the client and access the url without 'certificate_statuses'
         self.client.login(username=self.global_staff.username, password='test')
-        url = reverse('start_certificate_regeneration', kwargs={'course_id': unicode(self.course.id)})
+        url = reverse('start_certificate_regeneration', kwargs={'course_id': six.text_type(self.course.id)})
         response = self.client.post(url)
 
         # Assert 400 status code in response
@@ -464,7 +470,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         )
 
         # Access the url passing 'certificate_statuses' that are not present in db
-        url = reverse('start_certificate_regeneration', kwargs={'course_id': unicode(self.course.id)})
+        url = reverse('start_certificate_regeneration', kwargs={'course_id': six.text_type(self.course.id)})
         response = self.client.post(url, data={'certificate_statuses': [CertificateStatuses.generating]})
 
         # Assert 400 status code in response
@@ -475,7 +481,6 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         self.assertEqual(res_json['message'], u'Please select certificate statuses from the list only.')
 
 
-@attr(shard=1)
 @override_settings(CERT_QUEUE='certificates')
 @ddt.ddt
 class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
@@ -493,7 +498,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         self.user2 = UserFactory()
         CourseEnrollment.enroll(self.user, self.course.id)
         CourseEnrollment.enroll(self.user2, self.course.id)
-        self.url = reverse('certificate_exception_view', kwargs={'course_id': unicode(self.course.id)})
+        self.url = reverse('certificate_exception_view', kwargs={'course_id': six.text_type(self.course.id)})
 
         certificate_white_list_item = CertificateWhitelistFactory.create(
             user=self.user2,
@@ -505,7 +510,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
             notes="Test Notes for Test Certificate Exception",
             user_email='',
             user_id='',
-            user_name=unicode(self.user.username)
+            user_name=six.text_type(self.user.username)
         )
 
         self.certificate_exception_in_db = dict(
@@ -538,7 +543,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         # Assert Certificate Exception Updated data
         self.assertEqual(certificate_exception['user_email'], self.user.email)
         self.assertEqual(certificate_exception['user_name'], self.user.username)
-        self.assertEqual(certificate_exception['user_id'], self.user.id)  # pylint: disable=no-member
+        self.assertEqual(certificate_exception['user_id'], self.user.id)
 
     def test_certificate_exception_invalid_username_error(self):
         """
@@ -633,12 +638,12 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         # Assert Certificate Exception Updated data
         self.assertEqual(certificate_exception['user_email'], self.user.email)
         self.assertEqual(certificate_exception['user_name'], self.user.username)
-        self.assertEqual(certificate_exception['user_id'], self.user.id)  # pylint: disable=no-member
+        self.assertEqual(certificate_exception['user_id'], self.user.id)
 
         course2 = CourseFactory.create()
         url_course2 = reverse(
             'certificate_exception_view',
-            kwargs={'course_id': unicode(course2.id)}
+            kwargs={'course_id': six.text_type(course2.id)}
         )
 
         # add certificate exception for same user in a different course
@@ -654,7 +659,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         # Assert Certificate Exception Updated data
         self.assertEqual(certificate_exception['user_email'], self.user.email)
         self.assertEqual(certificate_exception['user_name'], self.user.username)
-        self.assertEqual(certificate_exception['user_id'], self.user.id)  # pylint: disable=no-member
+        self.assertEqual(certificate_exception['user_id'], self.user.id)
 
     def test_certificate_exception_user_not_enrolled_error(self):
         """
@@ -679,7 +684,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         # Assert Error Message
         self.assertEqual(
             res_json['message'],
-            "{user} is not enrolled in this course. Please check your spelling and retry.".format(
+            u"{user} is not enrolled in this course. Please check your spelling and retry.".format(
                 user=self.certificate_exception['user_name']
             )
         )
@@ -762,7 +767,6 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         )
 
 
-@attr(shard=1)
 @override_settings(CERT_QUEUE='certificates')
 @ddt.ddt
 class GenerateCertificatesInstructorApiTest(SharedModuleStoreTestCase):
@@ -803,7 +807,7 @@ class GenerateCertificatesInstructorApiTest(SharedModuleStoreTestCase):
         """
         url = reverse(
             'generate_certificate_exceptions',
-            kwargs={'course_id': unicode(self.course.id), 'generate_for': 'all'}
+            kwargs={'course_id': six.text_type(self.course.id), 'generate_for': 'all'}
         )
 
         response = self.client.post(
@@ -830,7 +834,7 @@ class GenerateCertificatesInstructorApiTest(SharedModuleStoreTestCase):
         """
         url = reverse(
             'generate_certificate_exceptions',
-            kwargs={'course_id': unicode(self.course.id), 'generate_for': 'new'}
+            kwargs={'course_id': six.text_type(self.course.id), 'generate_for': 'new'}
         )
 
         response = self.client.post(
@@ -858,7 +862,7 @@ class GenerateCertificatesInstructorApiTest(SharedModuleStoreTestCase):
         """
         url = reverse(
             'generate_certificate_exceptions',
-            kwargs={'course_id': unicode(self.course.id), 'generate_for': ''}
+            kwargs={'course_id': six.text_type(self.course.id), 'generate_for': ''}
         )
 
         response = self.client.post(
@@ -880,7 +884,6 @@ class GenerateCertificatesInstructorApiTest(SharedModuleStoreTestCase):
         )
 
 
-@attr(shard=1)
 @ddt.ddt
 class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTestCase):
     """
@@ -1038,7 +1041,6 @@ class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTest
         return data
 
 
-@attr(shard=1)
 @ddt.ddt
 class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
     """

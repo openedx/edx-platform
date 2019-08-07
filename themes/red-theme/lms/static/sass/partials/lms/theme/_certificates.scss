@@ -1,0 +1,35 @@
+// Certificate overrides for the red theme
+
+.certificate-card {
+  &.mode-audit {
+    border-color: $audit-mode-color;
+
+    .card-logo {
+      background-image: url('#{$static-path}/images/certificates/red-certificate.png');
+    }
+  }
+
+  &.mode-honor {
+    border-color: $honor-mode-color;
+
+    .card-logo {
+      background-image: url('#{$static-path}/images/certificates/red-certificate.png');
+    }
+  }
+
+  &.mode-verified {
+    border-color: $verified-mode-color;
+
+    .card-logo {
+      background-image: url('#{$static-path}/images/certificates/red-certificate.png');
+    }
+  }
+
+  &.mode-professional {
+    border-color: $professional-certificate-color;
+
+    .card-logo {
+      background-image: url('#{$static-path}/images/certificates/red-certificate.png');
+    }
+  }
+}

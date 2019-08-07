@@ -86,45 +86,47 @@ define([
 
             it('should match server model to client model', function() {
                 var serverModelSpec = {
-                        'id': 10,
-                        'name': 'My Group Configuration',
-                        'description': 'Some description',
-                        'version': 2,
-                        'scheme': 'random',
-                        'groups': [
+                        id: 10,
+                        name: 'My Group Configuration',
+                        description: 'Some description',
+                        version: 2,
+                        scheme: 'random',
+                        groups: [
                             {
-                                'version': 1,
-                                'name': 'Group 1',
-                                'usage': []
+                                version: 1,
+                                name: 'Group 1',
+                                usage: []
                             }, {
-                                'version': 1,
-                                'name': 'Group 2',
-                                'usage': []
-                            }
-                        ]
-                    },
-                    clientModelSpec = {
-                        'id': 10,
-                        'name': 'My Group Configuration',
-                        'description': 'Some description',
-                        'scheme': 'random',
-                        'showGroups': false,
-                        'editing': false,
-                        'version': 2,
-                        'groups': [
-                            {
-                                'version': 1,
-                                'order': 0,
-                                'name': 'Group 1',
-                                'usage': []
-                            }, {
-                                'version': 1,
-                                'order': 1,
-                                'name': 'Group 2',
-                                'usage': []
+                                version: 1,
+                                name: 'Group 2',
+                                usage: []
                             }
                         ],
-                        'usage': []
+                        read_only: true
+                    },
+                    clientModelSpec = {
+                        id: 10,
+                        name: 'My Group Configuration',
+                        description: 'Some description',
+                        scheme: 'random',
+                        showGroups: false,
+                        editing: false,
+                        version: 2,
+                        groups: [
+                            {
+                                version: 1,
+                                order: 0,
+                                name: 'Group 1',
+                                usage: []
+                            }, {
+                                version: 1,
+                                order: 1,
+                                name: 'Group 2',
+                                usage: []
+                            }
+                        ],
+                        usage: [],
+                        read_only: true
                     },
                     model = new GroupConfigurationModel(
                         serverModelSpec, {parse: true}

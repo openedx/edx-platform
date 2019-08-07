@@ -1,12 +1,13 @@
 ## mako
 <%page expression_filter="h"/>
 <%!
-  from django.core.urlresolvers import reverse
+  from django.urls import reverse
   from django.utils.translation import ugettext as _
 %>
 
 %if urlpath is not Undefined and urlpath:
-<header>
+<header class="breadcrumbs-header">
+  <h2 class="sr">${_("Course Wiki")}</h2>
   <ul class="breadcrumb pull-left" class="">
     <%
       # The create button links to the highest ancestor we have edit priveleges to

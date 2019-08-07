@@ -69,8 +69,8 @@
                 var data;
                 annotations = _.reject(annotations, this.isNew);
                 data = {
-                    'notes': _.map(annotations, function(annotation) {
-                        return {'note_id': annotation.id};
+                    notes: _.map(annotations, function(annotation) {
+                        return {note_id: annotation.id};
                     })
                 };
                 if (data.notes.length) {
@@ -120,9 +120,9 @@
                 var truncated = [];
                 return _.extend(
                     {
-                        'note_id': annotation.id,
-                        'component_usage_id': annotation.usage_id,
-                        'truncated': truncated
+                        note_id: annotation.id,
+                        component_usage_id: annotation.usage_id,
+                        truncated: truncated
                     },
                 this.getText('note_text', annotation.text, truncated),
                 this.getText('highlighted_content', annotation.quote, truncated),
@@ -145,7 +145,11 @@
             },
 
             getTextArray: function(fieldName, textArray, truncated) {
-                var info = {}, limit = this.options.stringLimit, totalLength = 0, returnArray = [], i;
+                var info = {},
+                    limit = this.options.stringLimit,
+                    totalLength = 0,
+                    returnArray = [],
+                    i;
 
                 if (_.isNumber(limit) && _.isArray(textArray)) {
                     for (i = 0; i < textArray.length; i++) {
@@ -156,8 +160,7 @@
                         totalLength += textArray[i].length;
                         returnArray[i] = textArray[i];
                     }
-                }
-                else {
+                } else {
                     returnArray = textArray;
                 }
 

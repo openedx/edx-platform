@@ -2,26 +2,25 @@
 Test data created by CourseSerializer and CourseDetailSerializer
 """
 
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
+
 from datetime import datetime
 
 import ddt
-from nose.plugins.attrib import attr
-from openedx.core.djangoapps.models.course_details import CourseDetails
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from rest_framework.test import APIRequestFactory
 from rest_framework.request import Request
-
+from rest_framework.test import APIRequestFactory
 from xblock.core import XBlock
+
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.models.course_details import CourseDetails
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls
 
-from ..serializers import CourseSerializer, CourseDetailSerializer
+from ..serializers import CourseDetailSerializer, CourseSerializer
 from .mixins import CourseApiFactoryMixin
 
 
-@attr(shard=3)
 @ddt.ddt
 class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
     """
@@ -30,6 +29,8 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
     expected_mongo_calls = 0
     maxDiff = 5000  # long enough to show mismatched dicts, in case of error
     serializer_class = CourseSerializer
+
+    ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
         super(TestCourseSerializer, self).setUp()
@@ -64,11 +65,12 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
             'end': u'2015-09-19T18:00:00Z',
             'enrollment_start': u'2015-06-15T00:00:00Z',
             'enrollment_end': u'2015-07-15T00:00:00Z',
-            'blocks_url': u'http://testserver/api/courses/v1/blocks/?course_id=edX%2Ftoy%2F2012_Fall',
+            'blocks_url': u'http://testserver/api/courses/v2/blocks/?course_id=edX%2Ftoy%2F2012_Fall',
             'effort': u'6 hours',
             'pacing': 'instructor',
-            'mobile_available': False,
+            'mobile_available': True,
             'hidden': False,
+            'invitation_only': False,
 
             # 'course_id' is a deprecated field, please use 'id' instead.
             'course_id': u'edX/toy/2012_Fall',
@@ -93,7 +95,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
 
     def test_basic(self):
         course = self.create_course()
-        CourseDetails.update_about_video(course, 'test_youtube_id', self.staff_user.id)  # pylint: disable=no-member
+        CourseDetails.update_about_video(course, 'test_youtube_id', self.staff_user.id)
         with check_mongo_calls(self.expected_mongo_calls):
             result = self._get_result(course)
         self.assertDictEqual(result, self.expected_data)
@@ -136,7 +138,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
         self.assertEqual(result['pacing'], expected_pacing)
 
 
-class TestCourseDetailSerializer(TestCourseSerializer):  # pylint: disable=test-inherits-tests
+class TestCourseDetailSerializer(TestCourseSerializer):
     """
     Test CourseDetailSerializer by rerunning all the tests
     in TestCourseSerializer, but with the

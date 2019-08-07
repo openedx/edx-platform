@@ -11,9 +11,10 @@
 // * +Layout - Certificates
 // ====================
 .view-certificates {
-
-  .content-primary, .content-supplementary {
+  .content-primary,
+  .content-supplementary {
     @include box-sizing(border-box);
+
     float: left;
   }
 
@@ -24,6 +25,7 @@
     .notice-moduledisabled {
       @extend %ui-well;
       @extend %t-copy-base;
+
       background-color: $white;
       padding: ($baseline*1.5) $baseline;
       text-align: center;
@@ -34,7 +36,6 @@
     }
 
     .wrapper-certificates {
-
       .title {
         @extend %t-title4;
         @extend %t-strong;
@@ -46,6 +47,7 @@
 
       .instructions {
         @extend %t-copy-sub1;
+
         margin-bottom: $baseline;
       }
     }
@@ -56,6 +58,7 @@
 
     .actual-course-title {
       @extend %t-strong;
+
       margin-bottom: $baseline;
     }
   }
@@ -64,11 +67,13 @@
     width: flex-grid(3, 12);
   }
 
-  .certificate-info-section{
-      overflow: auto;
+  .certificate-info-section {
+    overflow: auto;
 
-    .course-title-section, .course-number-section{
+    .course-title-section,
+    .course-number-section {
       min-width: 47%;
+
       @include margin-right(2%);
     }
   }
@@ -77,14 +82,14 @@
 // * +Main - Collection
 // ====================
 .view-certificates {
-
   .wrapper-collection {
     @extend %ui-window;
+
     position: relative;
     outline: none;
 
     &:hover .collection .actions {
-      opacity: 1.0;
+      opacity: 1;
     }
 
     .collection-details {
@@ -111,6 +116,7 @@
 
         li {
           @include box-sizing(border-box);
+
           display: table-cell;
           margin-right: 1%;
           padding: ($baseline/4) 0;
@@ -124,6 +130,7 @@
 
       .item {
         @extend %t-copy-lead1;
+
         padding: ($baseline/7) 0 ($baseline/4);
         border-top: 1px solid $gray-l4;
         white-space: nowrap;
@@ -144,13 +151,13 @@
     }
 
     .collection-details {
-
       .actions {
-        @include transition(opacity .15s .25s ease-in-out);
+        @include transition(opacity 0.15s 0.25s ease-in-out);
+
         position: absolute;
         top: $baseline;
         right: $baseline;
-        opacity: 0.0;
+        opacity: 0;
 
         .action {
           display: inline-block;
@@ -179,6 +186,7 @@
 
     .collection-references {
       @extend %t-copy-sub1;
+
       box-shadow: 0 2px 2px 0 $shadow inset;
       padding: $baseline ($baseline*1.5) $baseline ($baseline*2.5);
       color: $gray-l1;
@@ -208,6 +216,7 @@
 
     .collection-edit {
       @include box-sizing(border-box);
+
       border-radius: 2px;
       width: 100%;
       background: $white;
@@ -226,6 +235,7 @@
 
       .action-add-signatory {
         @extend %ui-btn-flat-outline;
+
         display: block;
         width: 100%;
         margin-top: ($baseline*0.75);
@@ -234,12 +244,15 @@
 
       .disableClick {
         @extend %ui-disabled;
+
         color: $gray-l1;
       }
 
       .tip {
         @extend %t-copy-sub2;
+
         @include transition(color, 0.15s, ease-in-out);
+
         display: block;
         margin-top: ($baseline/2);
         color: $gray-d1;
@@ -252,6 +265,7 @@
 
       .collection-fields {
         @extend %cont-no-list;
+
         margin-bottom: $baseline;
       }
 
@@ -263,18 +277,19 @@
         }
 
         &.required {
-
           label {
             @extend %t-strong;
           }
 
-          label:after {
+          label::after {
             margin-left: ($baseline/4);
             content: "*";
           }
         }
 
-        label, input, textarea {
+        label,
+        input,
+        textarea {
           display: block;
         }
 
@@ -284,7 +299,9 @@
 
         label {
           @extend %t-copy-sub1;
+
           @include transition(color, 0.15s, ease-in-out);
+
           margin: 0 0 ($baseline/4) 0;
 
           &.is-focused {
@@ -293,8 +310,10 @@
         }
 
         //this section is borrowed from _account.scss - we should clean up and unify later
-        input, textarea {
+        input,
+        textarea {
           @extend %t-copy-base;
+
           height: 100%;
           width: 100%;
           padding: ($baseline/2);
@@ -308,19 +327,19 @@
           }
 
           ::-webkit-input-placeholder {
-             color: $gray-l4;
+            color: $gray-l4;
           }
 
           :-moz-placeholder {
-             color: $gray-l3;
+            color: $gray-l3;
           }
 
           ::-moz-placeholder {
-             color: $gray-l3;
+            color: $gray-l3;
           }
 
           :-ms-input-placeholder {
-             color: $gray-l3;
+            color: $gray-l3;
           }
 
           &:focus {
@@ -331,30 +350,31 @@
         }
 
         &.error {
-            label {
-              color: $red;
-            }
+          label {
+            color: $red;
+          }
 
-            input {
-              border-color: $red;
-            }
+          input {
+            border-color: $red;
+          }
         }
       }
 
       label.required {
         @extend %t-strong;
 
-        &:after {
+        &::after {
           margin-left: ($baseline/4);
           content: "*";
         }
       }
 
       .field.add-collection-name {
-
         label {
           width: 50%;
+
           @extend %t-title5;
+
           display: inline-block;
           vertical-align: bottom;
         }
@@ -368,6 +388,7 @@
 
           .certificate-value {
             @extend %t-strong;
+
             white-space: nowrap;
             margin-left: ($baseline*0.5);
           }
@@ -390,11 +411,13 @@
 
         .action-primary {
           @extend %btn-primary-blue;
+
           padding: ($baseline/4) $baseline;
         }
 
         .action-secondary {
           @extend %btn-secondary-gray;
+
           padding: ($baseline/4) $baseline;
         }
 
@@ -406,16 +429,18 @@
             color: $gray-l3;
           }
         }
+
         &.custom-signatory-action {
           position: relative;
           top: 0;
           left: 0;
-          opacity: 1.0;
+          opacity: 1;
         }
       }
 
       .copy {
         @extend %t-copy-sub2;
+
         margin: ($baseline) 0 ($baseline/2) 0;
         color: $gray;
 
@@ -429,6 +454,7 @@
       @extend %ui-btn-flat-outline;
       @extend %t-action2;
       @extend %t-strong;
+
       display: block;
       width: 100%;
       margin: ($baseline*1.5) 0 0 0;
@@ -439,6 +465,7 @@
   // add/new collection
   .action-add {
     @extend %ui-btn-flat-outline;
+
     display: block;
     width: 100%;
     margin-top: ($baseline*0.75);
@@ -451,9 +478,11 @@
     .icon {
       display: inline-block;
       vertical-align: middle;
+
       @include margin-right($baseline/2);
     }
   }
+
   .action-add-hidden {
     visibility: hidden;
   }
@@ -467,18 +496,17 @@
 }
 
 .view-certificates .certificates {
-
-  .certificate-details, .certificate-edit {
-
+  .certificate-details,
+  .certificate-edit {
     .title {
       @extend %t-title4;
       @extend %t-strong;
+
       margin-bottom: ($baseline/2);
     }
   }
 
   .certificate-edit {
-
     .add-collection-name label {
       padding-right: 5%;
       overflow: hidden;
@@ -488,6 +516,7 @@
 
     .field-group {
       @include clearfix();
+
       margin: 0 0 ($baseline/2) 0;
       padding: ($baseline/4) 0 0 0;
 
@@ -518,7 +547,9 @@
 
       .action-close {
         @include transition(color $tmg-f2 ease-in-out);
+
         @extend %t-action1;
+
         display: inline-block;
         border: 0;
         padding: 0;
@@ -538,13 +569,15 @@
 // ====================
 // TO-DO: refactor to use collection styling where possible.
 .view-certificates .certificates {
-
-  .signatory-details, .signatory-edit {
+  .signatory-details,
+  .signatory-edit {
     @extend %ui-window;
+
     border-color: $gray-l4;
 
     .signatory-panel-header {
       @extend %t-strong;
+
       background-color: $gray-l5;
       padding: ($baseline/2) ($baseline*0.75);
       border-bottom: 1px solid $gray-l5;
@@ -569,7 +602,8 @@
     }
 
     .signatory-panel-edit {
-      float:right;
+      @include float(right);
+
       padding: 8px;
       position: inherit;
     }
@@ -578,14 +612,18 @@
   .signatory-edit {
 
     // TO-DO: remove icon styling, use save / cancel pattern for Studio
-    .signatory-panel-close, .signatory-panel-save, .signatory-panel-delete {
-      float:right;
-      padding:10px;
+    .signatory-panel-close,
+    .signatory-panel-save,
+    .signatory-panel-delete {
+      float: right;
+      padding: $baseline/2;
     }
 
     .tip {
       @extend %t-copy-sub2;
+
       @include transition(color, 0.15s, ease-in-out);
+
       display: block;
       margin-top: ($baseline/4);
       color: $gray-d1;
@@ -599,18 +637,19 @@
       }
 
       &.required {
-
         label {
           @extend %t-strong;
         }
 
-        label:after {
+        label::after {
           margin-left: ($baseline/4);
           content: "*";
         }
       }
 
-      label, input, textarea {
+      label,
+      input,
+      textarea {
         display: block;
       }
 
@@ -620,7 +659,9 @@
 
       label {
         @extend %t-copy-sub1;
+
         @include transition(color, 0.15s, ease-in-out);
+
         margin: 0 0 ($baseline/4) 0;
 
         &.is-focused {
@@ -629,8 +670,10 @@
       }
 
       //TO-DO: this section is borrowed from _account.scss - we should clean up and unify later
-      input, textarea {
+      input,
+      textarea {
         @extend %t-copy-base;
+
         height: 100%;
         width: 100%;
         padding: ($baseline/2);
@@ -644,19 +687,19 @@
         }
 
         ::-webkit-input-placeholder {
-           color: $gray-l4;
+          color: $gray-l4;
         }
 
         :-moz-placeholder {
-           color: $gray-l3;
+          color: $gray-l3;
         }
 
         ::-moz-placeholder {
-           color: $gray-l3;
+          color: $gray-l3;
         }
 
         :-ms-input-placeholder {
-           color: $gray-l3;
+          color: $gray-l3;
         }
 
         &:focus {
@@ -667,32 +710,35 @@
       }
 
       &.error {
-          label {
-            color: $red;
-          }
+        label {
+          color: $red;
+        }
 
-          input {
-            border-color: $red;
-          }
+        input {
+          border-color: $red;
+        }
 
-          .message-error{
-            color: $red;
-          }
+        .message-error {
+          color: $red;
+        }
       }
+
       .signature-upload-wrapper {
         @include clearfix();
-        width: flex-grid(12,12);
+
+        width: flex-grid(12, 12);
 
         .signature-upload-input-wrapper {
           float: left;
-          width: flex-grid(7,12);
+          width: flex-grid(7, 12);
           margin-right: flex-gutter();
         }
 
         .action-upload-signature {
           @extend %ui-btn-flat-outline;
+
           float: right;
-          width: flex-grid(4,12);
+          width: flex-grid(4, 12);
           margin-top: ($baseline/4);
           padding: ($baseline/2) $baseline;
         }

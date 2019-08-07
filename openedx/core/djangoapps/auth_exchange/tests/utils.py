@@ -2,8 +2,15 @@
 Test utilities for OAuth access token exchange
 """
 
-from social.apps.django_app.default.models import UserSocialAuth
+from __future__ import absolute_import
+
+from django.conf import settings
+from social_django.models import Partial, UserSocialAuth
+
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixin
+
+TPA_FEATURES_KEY = 'ENABLE_THIRD_PARTY_AUTH'
+TPA_FEATURE_ENABLED = TPA_FEATURES_KEY in settings.FEATURES
 
 
 class AccessTokenExchangeTestMixin(ThirdPartyOAuthTestMixin):
@@ -13,7 +20,7 @@ class AccessTokenExchangeTestMixin(ThirdPartyOAuthTestMixin):
     * _assert_error(data, expected_error, expected_error_description)
     * _assert_success(data, expected_scopes)
     """
-    def setUp(self):  # pylint: disable=arguments-differ
+    def setUp(self):
         super(AccessTokenExchangeTestMixin, self).setUp()
 
         # Initialize to minimal data
@@ -55,7 +62,7 @@ class AccessTokenExchangeTestMixin(ThirdPartyOAuthTestMixin):
         for field in ["access_token", "client_id"]:
             data = dict(self.data)
             del data[field]
-            self._assert_error(data, "invalid_request", "{} is required".format(field))
+            self._assert_error(data, "invalid_request", u"{} is required".format(field))
 
     def test_invalid_client(self):
         self.data["client_id"] = "nonexistent_client"
@@ -71,12 +78,12 @@ class AccessTokenExchangeTestMixin(ThirdPartyOAuthTestMixin):
         self._assert_error(
             self.data,
             "invalid_client",
-            "{}_confidential is not a public client".format(self.client_id),
+            u"{}_confidential is not a public client".format(self.client_id),
         )
 
     def test_inactive_user(self):
         self.user.is_active = False
-        self.user.save()  # pylint: disable=no-member
+        self.user.save()
         self._setup_provider_response(success=True)
         self._assert_success(self.data, expected_scopes=[])
 
@@ -86,17 +93,20 @@ class AccessTokenExchangeTestMixin(ThirdPartyOAuthTestMixin):
 
     def test_no_linked_user(self):
         UserSocialAuth.objects.all().delete()
+        Partial.objects.all().delete()
         self._setup_provider_response(success=True)
         self._assert_error(self.data, "invalid_grant", "access_token is not valid")
 
     def test_user_automatically_linked_by_email(self):
         UserSocialAuth.objects.all().delete()
+        Partial.objects.all().delete()
         self._setup_provider_response(success=True, email=self.user.email)
         self._assert_success(self.data, expected_scopes=[])
 
     def test_inactive_user_not_automatically_linked(self):
         UserSocialAuth.objects.all().delete()
+        Partial.objects.all().delete()
         self._setup_provider_response(success=True, email=self.user.email)
         self.user.is_active = False
-        self.user.save()  # pylint: disable=no-member
+        self.user.save()
         self._assert_error(self.data, "invalid_grant", "access_token is not valid")

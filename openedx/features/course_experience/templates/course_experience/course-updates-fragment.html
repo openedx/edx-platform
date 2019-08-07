@@ -1,0 +1,56 @@
+## mako
+
+<%page expression_filter="h"/>
+<%namespace name='static' file='../static_content.html'/>
+
+<%!
+from django.utils.translation import ugettext as _
+
+from openedx.core.djangolib.markup import HTML
+from openedx.features.course_experience import course_home_page_title
+%>
+
+<%block name="content">
+<div class="course-updates page-content-container" id="course-container">
+    <header class="page-header has-secondary">
+        ## Breadcrumb navigation
+        <div class="page-header-main">
+            <nav aria-label="${_('Updates')}" class="sr-is-focusable" tabindex="-1">
+                <div class="has-breadcrumbs">
+                    <div class="breadcrumbs">
+                        <span class="nav-item">
+                            <a href="${course_url}">${course_home_page_title(course)}</a>
+                        </span>
+                        <span class="icon fa fa-angle-right" aria-hidden="true"></span>
+                        <span class="nav-item">${_('Updates')}</span>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+    <div class="page-content">
+        % if plain_html_updates:
+            ${HTML(plain_html_updates)}
+        % else:
+            <div class="all-updates">
+                % if updates:
+                    % for index, update in enumerate(updates):
+                        <article class="updates-article">
+                            % if not update.get("is_error"):
+                                <div class="date">${update.get("date")}</div>
+                            % endif
+                            <div class="article-content">
+                                ${HTML(update.get("content"))}
+                            </div>
+                        </article>
+                    % endfor
+                % else:
+                    <div class="well depth-0 message-area">
+                        ${_("This course does not have any updates.")}
+                    </div>
+                % endif
+            </div>
+        % endif
+    </div>
+</div>
+</%block>

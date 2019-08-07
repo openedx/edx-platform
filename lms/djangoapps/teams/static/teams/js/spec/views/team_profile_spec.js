@@ -59,7 +59,8 @@ define([
                 requests,
                 'GET',
                 interpolate(
-                    '/courses/%(courseID)s/discussion/forum/%(topicID)s/inline?page=1&ajax=1',
+                    '/courses/%(courseID)s/discussion/forum/%(topicID)s/inline' +
+                    '?page=1&sort_key=activity&sort_order=desc&ajax=1',
                     {
                         courseID: TeamSpecHelpers.testCourseID,
                         topicID: TeamSpecHelpers.testTeamDiscussionID

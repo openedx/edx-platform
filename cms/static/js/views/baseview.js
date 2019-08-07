@@ -1,5 +1,5 @@
 define(['jquery', 'underscore', 'backbone', 'gettext', 'js/utils/handle_iframe_binding', 'js/utils/templates',
-        'common/js/components/utils/view_utils'],
+    'common/js/components/utils/view_utils'],
     function($, _, Backbone, gettext, IframeUtils, TemplateUtils, ViewUtils) {
         /*
          This view is extended from backbone to provide useful functionality for all Studio views.
@@ -32,6 +32,15 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/utils/handle_iframe_b
                 if (this.options) {
                     options = _.extend({}, _.result(this, 'options'), options);
                 }
+
+                // trunc is not available in IE, and it provides polyfill for it.
+                // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/trunc
+                if (!Math.trunc) {
+                    Math.trunc = function(v) {
+                        v = +v;  // eslint-disable-line no-param-reassign
+                        return (v - v % 1) || (!isFinite(v) || v === 0 ? v : v < 0 ? -0 : 0);
+                    };
+                }
                 this.options = options;
 
                 var _this = this;
@@ -58,12 +67,12 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/utils/handle_iframe_b
             },
 
             toggleExpandCollapse: function(event) {
-                var target = $(event.target);
+                var $target = $(event.target);
                 // Don't propagate the event as it is possible that two views will both contain
                 // this element, e.g. clicking on the element of a child view container in a parent.
                 event.stopPropagation();
                 event.preventDefault();
-                ViewUtils.toggleExpandCollapse(target, this.options.collapsedClass);
+                ViewUtils.toggleExpandCollapse($target, this.options.collapsedClass);
             },
 
             /**

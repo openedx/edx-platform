@@ -4,6 +4,7 @@
   h1 {
     margin-bottom: $baseline;
     padding: ($baseline/2);
+
     @extend %success-message-colors;
   }
 

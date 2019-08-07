@@ -1,30 +1,41 @@
 """
 Test for the registration code status information.
 """
-from course_modes.models import CourseMode
-from courseware.tests.factories import InstructorFactory
-from xmodule.modulestore.tests.factories import CourseFactory
+from __future__ import absolute_import
+
+import json
+
+import six
+from django.test.utils import override_settings
+from django.urls import reverse
 from django.utils.translation import ugettext as _
+from six import text_type
+from six.moves import range
+
+from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
+from courseware.tests.factories import InstructorFactory
 from shoppingcart.models import (
-    Invoice, CourseRegistrationCodeInvoiceItem, CourseRegistrationCode,
-    CourseRegCodeItem, Order, RegistrationCodeRedemption
+    CourseRegCodeItem,
+    CourseRegistrationCode,
+    CourseRegistrationCodeInvoiceItem,
+    Invoice,
+    Order,
+    RegistrationCodeRedemption
 )
 from student.models import CourseEnrollment
 from student.roles import CourseSalesAdminRole
-from nose.plugins.attrib import attr
-import json
-from student.tests.factories import UserFactory, CourseModeFactory
-from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
 @override_settings(REGISTRATION_CODE_LENGTH=8)
 class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
     """
     Test registration code status.
     """
+
     @classmethod
     def setUpClass(cls):
         super(TestCourseRegistrationCodeStatus, cls).setUpClass()
@@ -50,13 +61,13 @@ class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
             course_id=self.course.id
         )
         self.lookup_code_url = reverse('look_up_registration_code',
-                                       kwargs={'course_id': unicode(self.course.id)})
+                                       kwargs={'course_id': text_type(self.course.id)})
 
         self.registration_code_detail_url = reverse('registration_code_details',
-                                                    kwargs={'course_id': unicode(self.course.id)})
+                                                    kwargs={'course_id': text_type(self.course.id)})
 
         url = reverse('generate_registration_codes',
-                      kwargs={'course_id': self.course.id.to_deprecated_string()})
+                      kwargs={'course_id': text_type(self.course.id)})
 
         data = {
             'total_registration_codes': 12,
@@ -93,7 +104,7 @@ class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
         response = self.client.get(self.lookup_code_url, data)
         self.assertEqual(response.status_code, 400)
         json_dict = json.loads(response.content)
-        message = _('The enrollment code ({code}) was not found for the {course_name} course.').format(
+        message = _(u'The enrollment code ({code}) was not found for the {course_name} course.').format(
             course_name=self.course.display_name, code=data['registration_code']
         )
         self.assertEqual(message, json_dict['message'])
@@ -113,7 +124,7 @@ class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
         for i in range(2):
             CourseRegistrationCode.objects.create(
                 code='reg_code{}'.format(i),
-                course_id=unicode(self.course.id),
+                course_id=six.text_type(self.course.id),
                 created_by=self.instructor,
                 invoice=self.sale_invoice,
                 invoice_item=self.invoice_item,
@@ -231,7 +242,7 @@ class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 400)
 
         json_dict = json.loads(response.content)
-        message = _('The enrollment code ({code}) was not found for the {course_name} course.').format(
+        message = _(u'The enrollment code ({code}) was not found for the {course_name} course.').format(
             course_name=self.course.display_name, code=data['registration_code']
         )
         self.assertEqual(message, json_dict['message'])
@@ -244,7 +255,7 @@ class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
         for i in range(2):
             CourseRegistrationCode.objects.create(
                 code='reg_code{}'.format(i),
-                course_id=self.course.id.to_deprecated_string(),
+                course_id=text_type(self.course.id),
                 created_by=self.instructor,
                 invoice=self.sale_invoice,
                 invoice_item=self.invoice_item,
@@ -275,7 +286,7 @@ class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
         for i in range(2):
             CourseRegistrationCode.objects.create(
                 code='reg_code{}'.format(i),
-                course_id=self.course.id.to_deprecated_string(),
+                course_id=text_type(self.course.id),
                 created_by=self.instructor,
                 invoice=self.sale_invoice,
                 invoice_item=self.invoice_item,
@@ -291,5 +302,5 @@ class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 400)
 
         json_dict = json.loads(response.content)
-        message = _('The redemption does not exist against enrollment code ({code}).').format(code=reg_code.code)
+        message = _(u'The redemption does not exist against enrollment code ({code}).').format(code=reg_code.code)
         self.assertEqual(message, json_dict['message'])

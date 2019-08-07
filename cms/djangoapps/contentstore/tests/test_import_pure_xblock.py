@@ -2,15 +2,17 @@
 Integration tests for importing courses containing pure XBlocks.
 """
 
+from __future__ import absolute_import
+
+from django.conf import settings
 from xblock.core import XBlock
 from xblock.fields import String
 
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.xml_importer import import_course_from_xml
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.mongo.draft import as_draft
-from django.conf import settings
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.xml_importer import import_course_from_xml
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -31,6 +33,7 @@ class StubXBlock(XBlock):
 
 
 class XBlockImportTest(ModuleStoreTestCase):
+    """Test class to verify xblock import operations"""
 
     @XBlock.register_temp_plugin(StubXBlock)
     def test_import_public(self):

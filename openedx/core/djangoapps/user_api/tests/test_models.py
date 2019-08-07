@@ -1,17 +1,19 @@
 """
 Test UserPreferenceModel and UserPreference events
 """
+from __future__ import absolute_import
+
 from django.db import IntegrityError
 from django.test import TestCase
 
 from student.tests.factories import UserFactory
 from student.tests.tests import UserSettingsEventTestMixin
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..tests.factories import UserPreferenceFactory, UserCourseTagFactory, UserOrgTagFactory
-from ..models import UserPreference
+from ..models import UserOrgTag, UserPreference
 from ..preferences.api import set_user_preference
+from ..tests.factories import UserCourseTagFactory, UserOrgTagFactory, UserPreferenceFactory
 
 
 class UserPreferenceModelTest(ModuleStoreTestCase):
@@ -33,7 +35,7 @@ class UserPreferenceModelTest(ModuleStoreTestCase):
         user = UserFactory.create()
         self._create_and_assert(user=user, key="testkey0", value="")
         self._create_and_assert(user=user, key="testkey1", value="This is some English text!")
-        self._create_and_assert(user=user, key="testkey2", value="{'some': 'json'}")
+        self._create_and_assert(user=user, key="testkey2", value='{"some": "json"}')
         self._create_and_assert(
             user=user,
             key="testkey3",
@@ -76,6 +78,30 @@ class UserPreferenceModelTest(ModuleStoreTestCase):
         tag.save()
         self.assertEquals(tag.value, "barfoo")
         self.assertNotEqual(original_modified, tag.modified)
+
+    def test_retire_user_org_tags_by_user_value(self):
+        """Create org specific user tags and confirm all properties are set """
+        user = UserFactory.create()
+        course = CourseFactory.create()
+        UserOrgTagFactory.create(user=user, org=course.id.org, key="testkey", value="foobar")
+        UserOrgTagFactory.create(user=user, org=course.id.org + "x", key="testkey", value="foobar")
+        self.assertEqual(len(UserOrgTag.objects.filter(user_id=user.id)), 2)
+        # Delete the tags by user value. Ensure the rows no longer exist.
+        UserOrgTag.delete_by_user_value(user.id, "user_id")
+
+        self.assertEqual(len(UserOrgTag.objects.filter(user_id=user.id)), 0)
+
+    def test_retire_user_org_tags_only_deletes_user(self):
+        """Create org specific user tags and confirm all properties are set """
+        user = UserFactory.create()
+        other_user = UserFactory.create()
+        course = CourseFactory.create()
+        UserOrgTagFactory.create(user=user, org=course.id.org, key="testkey", value="foobar")
+        UserOrgTagFactory.create(user=other_user, org=course.id.org, key="testkey", value="foobar")
+        # Delete the tags by user value. Ensure the other user's row is still present.
+        UserOrgTag.delete_by_user_value(user.id, "user_id")
+
+        self.assertEqual(len(UserOrgTag.objects.filter(user_id=other_user.id)), 1)
 
     def test_get_value(self):
         """Verifies the behavior of get_value."""

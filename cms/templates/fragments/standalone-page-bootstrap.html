@@ -1,0 +1,13 @@
+## mako
+
+<%page expression_filter="h"/>
+
+## Override the default styles_version to use Bootstrap
+<%! main_css = "css/bootstrap/studio-main.css" %>
+
+<%inherit file="../base.html" />
+<%block name="title">${page_title if page_title else ''}</%block>
+
+<%block name="content">
+  <%include file="/fragments/standalone-page-fragment.html" args="fragment=fragment"/>
+</%block>

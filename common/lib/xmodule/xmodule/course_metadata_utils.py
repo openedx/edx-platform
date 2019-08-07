@@ -5,17 +5,55 @@ This is a place to put simple functions that operate on course metadata. It
 allows us to share code between the CourseDescriptor and CourseOverview
 classes, which both need these type of functions.
 """
+from __future__ import absolute_import
+
 from base64 import b32encode
 from datetime import datetime, timedelta
-import dateutil.parser
 from math import exp
 
-from openedx.core.lib.time_zone_utils import get_time_zone_abbr
+import dateutil.parser
+import six
 from pytz import utc
 
-from .fields import Date
-
 DEFAULT_START_DATE = datetime(2030, 1, 1, tzinfo=utc)
+
+"""
+Default grading policy for a course run.
+"""
+DEFAULT_GRADING_POLICY = {
+    "GRADER": [
+        {
+            "type": "Homework",
+            "short_label": "HW",
+            "min_count": 12,
+            "drop_count": 2,
+            "weight": 0.15,
+        },
+        {
+            "type": "Lab",
+            "min_count": 12,
+            "drop_count": 2,
+            "weight": 0.15,
+        },
+        {
+            "type": "Midterm Exam",
+            "short_label": "Midterm",
+            "min_count": 1,
+            "drop_count": 0,
+            "weight": 0.3,
+        },
+        {
+            "type": "Final Exam",
+            "short_label": "Final",
+            "min_count": 1,
+            "drop_count": 0,
+            "weight": 0.4,
+        }
+    ],
+    "GRADE_CUTOFFS": {
+        "Pass": 0.5,
+    },
+}
 
 
 def clean_course_key(course_key, padding_char):
@@ -29,7 +67,7 @@ def clean_course_key(course_key, padding_char):
             string. The standard value for this is '='.
     """
     return "course_{}".format(
-        b32encode(unicode(course_key)).replace('=', padding_char)
+        b32encode(six.text_type(course_key)).replace('=', padding_char)
     )
 
 
@@ -96,87 +134,16 @@ def course_start_date_is_default(start, advertised_start):
     return advertised_start is None and start == DEFAULT_START_DATE
 
 
-def _datetime_to_string(date_time, format_string, time_zone, strftime_localized):
-    """
-    Formats the given datetime with the given function and format string.
-
-    Adds time zone abbreviation to the resulting string if the format is DATE_TIME or TIME.
-
-    Arguments:
-        date_time (datetime): the datetime to be formatted
-        format_string (str): the date format type, as passed to strftime
-        time_zone (pytz time zone): the time zone to convert to
-        strftime_localized ((datetime, str) -> str): a nm localized string
-            formatting function
-    """
-    result = strftime_localized(date_time.astimezone(time_zone), format_string)
-    abbr = get_time_zone_abbr(time_zone, date_time)
-    return (
-        result + ' ' + abbr if format_string in ['DATE_TIME', 'TIME', 'DAY_AND_TIME']
-        else result
-    )
-
-
-def course_start_datetime_text(start_date, advertised_start, format_string, time_zone, ugettext, strftime_localized):
-    """
-    Calculates text to be shown to user regarding a course's start
-    datetime in specified time zone.
-
-    Prefers .advertised_start, then falls back to .start.
-
-    Arguments:
-        start_date (datetime): the course's start datetime
-        advertised_start (str): the course's advertised start date
-        format_string (str): the date format type, as passed to strftime
-        time_zone (pytz time zone): the time zone to convert to
-        ugettext ((str) -> str): a text localization function
-        strftime_localized ((datetime, str) -> str): a localized string
-            formatting function
-    """
-    if advertised_start is not None:
-        # TODO: This will return an empty string if advertised_start == ""... consider changing this behavior?
-        try:
-            # from_json either returns a Date, returns None, or raises a ValueError
-            parsed_advertised_start = Date().from_json(advertised_start)
-            if parsed_advertised_start is not None:
-                # In the Django implementation of strftime_localized, if
-                # the year is <1900, _datetime_to_string will raise a ValueError.
-                return _datetime_to_string(parsed_advertised_start, format_string, time_zone, strftime_localized)
-        except ValueError:
-            pass
-        return advertised_start.title()
-    elif start_date != DEFAULT_START_DATE:
-        return _datetime_to_string(start_date, format_string, time_zone, strftime_localized)
-    else:
-        _ = ugettext
-        # Translators: TBD stands for 'To Be Determined' and is used when a course
-        # does not yet have an announced start date.
-        return _('TBD')
-
-
-def course_end_datetime_text(end_date, format_string, time_zone, strftime_localized):
-    """
-    Returns a formatted string for a course's end date or datetime.
-
-    If end_date is None, an empty string will be returned.
-
-    Arguments:
-        end_date (datetime): the end datetime of a course
-        format_string (str): the date format type, as passed to strftime
-        time_zone (pytz time zone): the time zone to convert to
-        strftime_localized ((datetime, str) -> str): a localized string
-            formatting function
-    """
-    return (
-        _datetime_to_string(end_date, format_string, time_zone, strftime_localized) if end_date is not None
-        else ''
-    )
-
-
-def may_certify_for_course(certificates_display_behavior, certificates_show_before_end, has_ended):
+def may_certify_for_course(
+        certificates_display_behavior,
+        certificates_show_before_end,
+        has_ended,
+        certificate_available_date,
+        self_paced
+):
     """
     Returns whether it is acceptable to show the student a certificate download
-    link for a course.
+    link for a course, based on provided attributes of the course.
 
     Arguments:
         certificates_display_behavior (str): string describing the course's
@@ -185,12 +152,20 @@ def may_certify_for_course(certificates_display_behavior, certificates_show_befo
         certificates_show_before_end (bool): whether user can download the
             course's certificates before the course has ended.
         has_ended (bool): Whether the course has ended.
+        certificate_available_date (datetime): the date the certificate is available on for the course.
+        self_paced (bool): Whether the course is self-paced.
     """
     show_early = (
         certificates_display_behavior in ('early_with_info', 'early_no_info')
         or certificates_show_before_end
     )
-    return show_early or has_ended
+    past_available_date = (
+        certificate_available_date
+        and certificate_available_date < datetime.now(utc)
+    )
+    ended_without_available_date = (certificate_available_date is None) and has_ended
+
+    return any((self_paced, show_early, past_available_date, ended_without_available_date))
 
 
 def sorting_score(start, advertised_start, announcement):

@@ -1,6 +1,8 @@
 """ CCX API v0 Paginators. """
 
-from openedx.core.lib.api.paginators import DefaultPagination
+from __future__ import absolute_import
+
+from edx_rest_framework_extensions.paginators import DefaultPagination
 
 
 class CCXAPIPagination(DefaultPagination):

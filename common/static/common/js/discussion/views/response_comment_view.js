@@ -45,7 +45,8 @@
                 return this.$el.find(selector);
             };
 
-            ResponseCommentView.prototype.initialize = function() {
+            ResponseCommentView.prototype.initialize = function(options) {
+                this.startHeader = options.startHeader;
                 return ResponseCommentView.__super__.initialize.call(this);
             };
 
@@ -84,7 +85,8 @@
                         this.showView = null;
                     }
                     this.editView = new ResponseCommentEditView({
-                        model: this.model
+                        model: this.model,
+                        startHeader: this.startHeader
                     });
                     this.editView.bind('comment:update', this.update);
                     this.editView.bind('comment:cancel_edit', this.cancelEdit);
@@ -154,6 +156,6 @@
             };
 
             return ResponseCommentView;
-        })(DiscussionContentView);
+        }(DiscussionContentView));
     }
 }).call(window);

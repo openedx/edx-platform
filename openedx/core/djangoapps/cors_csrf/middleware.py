@@ -42,13 +42,16 @@ CSRF cookie.
 
 """
 
+from __future__ import absolute_import
+
 import logging
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured, MiddlewareNotUsed
 from django.middleware.csrf import CsrfViewMiddleware
-from django.core.exceptions import MiddlewareNotUsed, ImproperlyConfigured
 
 from .helpers import is_cross_domain_request_allowed, skip_cross_domain_referer_check
+
 
 log = logging.getLogger(__name__)
 
@@ -138,7 +141,7 @@ class CsrfCrossDomainCookieMiddleware(object):
                 secure=True
             )
             log.debug(
-                "Set cross-domain CSRF cookie '%s' for domain '%s'",
+                u"Set cross-domain CSRF cookie '%s' for domain '%s'",
                 settings.CROSS_DOMAIN_CSRF_COOKIE_NAME,
                 settings.CROSS_DOMAIN_CSRF_COOKIE_DOMAIN
             )

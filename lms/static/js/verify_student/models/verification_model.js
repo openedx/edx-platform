@@ -81,4 +81,4 @@
              });
          }
      });
- })(jQuery, Backbone);
+ }(jQuery, Backbone));

@@ -1,8 +1,43 @@
 .forum-search {
-    @include margin-left($baseline);
-    display: inline-block;
+  display: flex;
+  margin-top: $baseline;
+  position: relative;
 
-    .search-input {
-        width: input-width(short);
+  .search-input {
+    width: input-width(short);
+  }
+
+  .search-button {
+    margin-left: 0;
+  }
+
+  @include media-breakpoint-up(sm) {
+    @include margin-left($baseline);
+
+    margin-top: 0;
+  }
+
+  > label {
+    position: absolute;
+    display: block;
+    color: #495057;
+    transition: all .1s ease-in-out;
+    padding-left: 10px;
+    padding-top: 10px;
+
+  }
+
+  input::placeholder {
+    color: transparent;
+  }
+
+  input:not(:placeholder-shown) {
+    & ~ label {
+      padding-top: .15rem;
+      font-size: 10px;
     }
+
+  }
 }
+
+

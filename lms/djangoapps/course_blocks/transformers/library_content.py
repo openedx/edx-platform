@@ -1,12 +1,23 @@
 """
 Content Library Transformer.
 """
+from __future__ import absolute_import
+
 import json
+
+import six
+from eventtracking import tracker
+
 from courseware.models import StudentModule
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer, FilteringTransformerMixin
+from openedx.core.djangoapps.content.block_structure.transformer import (
+    BlockStructureTransformer,
+    FilteringTransformerMixin
+)
+from track import contexts
 from xmodule.library_content_module import LibraryContentModule
 from xmodule.modulestore.django import modulestore
-from eventtracking import tracker
+
+from ..utils import get_student_module_as_dict
 
 
 class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransformer):
@@ -15,9 +26,10 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
     blocks within a library_content module to which a user should not
     have access.
 
-    Staff users are *not* exempted from library content pathways.
+    Staff users are not to be exempted from library content pathways.
     """
-    VERSION = 1
+    WRITE_VERSION = 1
+    READ_VERSION = 1
 
     @classmethod
     def name(cls):
@@ -43,9 +55,9 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
             """ Basic information about the given block """
             orig_key, orig_version = store.get_block_original_usage(usage_key)
             return {
-                "usage_key": unicode(usage_key),
-                "original_usage_key": unicode(orig_key) if orig_key else None,
-                "original_usage_version": unicode(orig_version) if orig_version else None,
+                "usage_key": six.text_type(usage_key),
+                "original_usage_key": six.text_type(orig_key) if orig_key else None,
+                "original_usage_version": six.text_type(orig_version) if orig_version else None,
             }
 
         # For each block check if block is library_content.
@@ -73,23 +85,41 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
                 max_count = block_structure.get_xblock_field(block_key, 'max_count')
 
                 # Retrieve "selected" json from LMS MySQL database.
-                module = self._get_student_module(usage_info.user, usage_info.course_key, block_key)
-                if module:
-                    state_dict = json.loads(module.state)
+                state_dict = get_student_module_as_dict(usage_info.user, usage_info.course_key, block_key)
+                for selected_block in state_dict.get('selected', []):
                     # Add all selected entries for this user for this
                     # library module to the selected list.
-                    for state in state_dict['selected']:
-                        usage_key = usage_info.course_key.make_usage_key(state[0], state[1])
-                        if usage_key in library_children:
-                            selected.append((state[0], state[1]))
+                    block_type, block_id = selected_block
+                    usage_key = usage_info.course_key.make_usage_key(block_type, block_id)
+                    if usage_key in library_children:
+                        selected.append(selected_block)
 
-                # update selected
+                # Update selected
                 previous_count = len(selected)
                 block_keys = LibraryContentModule.make_selection(selected, library_children, max_count, mode)
                 selected = block_keys['selected']
 
+                # Save back any changes
+                if any(block_keys[changed] for changed in ('invalid', 'overlimit', 'added')):
+                    state_dict['selected'] = list(selected)
+                    StudentModule.save_state(
+                        student=usage_info.user,
+                        course_id=usage_info.course_key,
+                        module_state_key=block_key,
+                        defaults={
+                            'state': json.dumps(state_dict),
+                        },
+                    )
+
                 # publish events for analytics
-                self._publish_events(block_structure, block_key, previous_count, max_count, block_keys)
+                self._publish_events(
+                    block_structure,
+                    block_key,
+                    previous_count,
+                    max_count,
+                    block_keys,
+                    usage_info.user.id,
+                )
                 all_selected_children.update(usage_info.course_key.make_usage_key(s[0], s[1]) for s in selected)
 
         def check_child_removal(block_key):
@@ -107,31 +137,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
 
         return [block_structure.create_removal_filter(check_child_removal)]
 
-    @classmethod
-    def _get_student_module(cls, user, course_key, block_key):
-        """
-        Get the student module for the given user for the given block.
-
-        Arguments:
-            user (User)
-            course_key (CourseLocator)
-            block_key (BlockUsageLocator)
-
-        Returns:
-            StudentModule if exists, or None.
-        """
-        try:
-            return StudentModule.objects.get(
-                student=user,
-                course_id=course_key,
-                module_state_key=block_key,
-                state__contains='"selected": [['
-            )
-        except StudentModule.DoesNotExist:
-            return None
-
-    @classmethod
-    def _publish_events(cls, block_structure, location, previous_count, max_count, block_keys):
+    def _publish_events(self, block_structure, location, previous_count, max_count, block_keys, user_id):
         """
         Helper method to publish events for analytics purposes
         """
@@ -153,13 +159,18 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
             Helper function to publish an event for analytics purposes
             """
             event_data = {
-                "location": unicode(location),
+                "location": six.text_type(location),
                 "previous_count": previous_count,
                 "result": result,
-                "max_count": max_count
+                "max_count": max_count,
             }
             event_data.update(kwargs)
-            tracker.emit("edx.librarycontentblock.content.{}".format(event_name), event_data)
+            context = contexts.course_context_from_course_id(location.course_key)
+            if user_id:
+                context['user_id'] = user_id
+            full_event_name = "edx.librarycontentblock.content.{}".format(event_name)
+            with tracker.get_tracker().context(full_event_name, context):
+                tracker.emit(full_event_name, event_data)
 
         LibraryContentModule.publish_selected_children_events(
             block_keys,

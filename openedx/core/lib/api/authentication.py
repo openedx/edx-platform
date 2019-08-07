@@ -1,16 +1,13 @@
 """ Common Authentication Handlers used across projects. """
 
+from __future__ import absolute_import
 import logging
 
 import django.utils.timezone
-from rest_framework.authentication import SessionAuthentication
-from rest_framework import exceptions as drf_exceptions
-from rest_framework_oauth.authentication import OAuth2Authentication
-
-from provider.oauth2 import models as dop_models
 from oauth2_provider import models as dot_models
-
-from openedx.core.lib.api.exceptions import AuthenticationFailed
+from provider.oauth2 import models as dop_models
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework_oauth.authentication import OAuth2Authentication
 
 
 OAUTH2_TOKEN_ERROR = u'token_error'
@@ -21,53 +18,6 @@ OAUTH2_TOKEN_ERROR_NOT_PROVIDED = u'token_not_provided'
 
 
 log = logging.getLogger(__name__)
-
-
-class SessionAuthenticationAllowInactiveUser(SessionAuthentication):
-    """Ensure that the user is logged in, but do not require the account to be active.
-
-    We use this in the special case that a user has created an account,
-    but has not yet activated it.  We still want to allow the user to
-    enroll in courses, so we remove the usual restriction
-    on session authentication that requires an active account.
-
-    You should use this authentication class ONLY for end-points that
-    it's safe for an un-activated user to access.  For example,
-    we can allow a user to update his/her own enrollments without
-    activating an account.
-
-    """
-    def authenticate(self, request):
-        """Authenticate the user, requiring a logged-in account and CSRF.
-
-        This is exactly the same as the `SessionAuthentication` implementation,
-        with the `user.is_active` check removed.
-
-        Args:
-            request (HttpRequest)
-
-        Returns:
-            Tuple of `(user, token)`
-
-        Raises:
-            PermissionDenied: The CSRF token check failed.
-
-        """
-        # Get the underlying HttpRequest object
-        request = request._request  # pylint: disable=protected-access
-        user = getattr(request, 'user', None)
-
-        # Unauthenticated, CSRF validation not required
-        # This is where regular `SessionAuthentication` checks that the user is active.
-        # We have removed that check in this implementation.
-        # But we added a check to prevent anonymous users since we require a logged-in account.
-        if not user or user.is_anonymous():
-            return None
-
-        self.enforce_csrf(request)
-
-        # CSRF passed with authenticated user
-        return (user, None)
 
 
 class OAuth2AuthenticationAllowInactiveUser(OAuth2Authentication):
@@ -91,27 +41,25 @@ class OAuth2AuthenticationAllowInactiveUser(OAuth2Authentication):
         succeeds, raises an AuthenticationFailed (HTTP 401) if authentication
         fails or None if the user did not try to authenticate using an access
         token.
-
-        Overrides base class implementation to return edX-style error
-        responses.
         """
 
         try:
             return super(OAuth2AuthenticationAllowInactiveUser, self).authenticate(*args, **kwargs)
-        except AuthenticationFailed:
-            # AuthenticationFailed is a subclass of drf_exceptions.AuthenticationFailed,
-            # but we don't want to post-process the exception detail for our own class.
-            raise
-        except drf_exceptions.AuthenticationFailed as exc:
-            if 'No credentials provided' in exc.detail:
-                error_code = OAUTH2_TOKEN_ERROR_NOT_PROVIDED
-            elif 'Token string should not contain spaces' in exc.detail:
-                error_code = OAUTH2_TOKEN_ERROR_MALFORMED
+        except AuthenticationFailed as exc:
+            if isinstance(exc.detail, dict):
+                developer_message = exc.detail['developer_message']
+                error_code = exc.detail['error_code']
             else:
-                error_code = OAUTH2_TOKEN_ERROR
+                developer_message = exc.detail
+                if 'No credentials provided' in developer_message:
+                    error_code = OAUTH2_TOKEN_ERROR_NOT_PROVIDED
+                elif 'Token string should not contain spaces' in developer_message:
+                    error_code = OAUTH2_TOKEN_ERROR_MALFORMED
+                else:
+                    error_code = OAUTH2_TOKEN_ERROR
             raise AuthenticationFailed({
                 u'error_code': error_code,
-                u'developer_message': exc.detail
+                u'developer_message': developer_message
             })
 
     def authenticate_credentials(self, request, access_token):

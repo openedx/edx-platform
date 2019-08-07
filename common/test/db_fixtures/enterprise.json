@@ -1,0 +1,33 @@
+[
+  {
+    "pk": 2,
+    "model": "auth.user",
+    "fields": {
+      "date_joined": "2015-06-12 11:02:13.007790+00:00",
+      "username": "enterprise_worker",
+      "first_name": "enterprise",
+      "last_name": "worker",
+      "email":"enterprise_worker@example.com",
+      "password": "enterpriseworker",
+      "is_staff": false,
+      "is_active": true
+    }
+  },
+  {
+    "pk": 2,
+    "model": "student.userprofile",
+    "fields": {
+      "user": 2,
+      "name": "enterprise worker",
+      "courseware": "course.xml"
+    }
+  },
+  {
+    "pk": 2,
+    "model": "student.registration",
+    "fields": {
+      "user": 2,
+      "activation_key": "52bfac10384d49219385dcd4cc17177h"
+    }
+  }
+]

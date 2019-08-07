@@ -2,59 +2,67 @@
 Instructor Dashboard Views
 """
 
-import logging
+from __future__ import absolute_import
+
 import datetime
+import logging
+import uuid
+
+import pytz
+import six
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.http import Http404, HttpResponseServerError
+from django.urls import reverse
+from django.utils.html import escape
+from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_noop
+from django.views.decorators.cache import cache_control
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_POST
+from edx_when.api import is_enabled_for_course
+from mock import patch
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-import uuid
-import pytz
-
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
-from django.utils.translation import ugettext as _, ugettext_noop
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.cache import cache_control
-from edxmako.shortcuts import render_to_response
-from django.core.urlresolvers import reverse
-from django.utils.html import escape
-from django.http import Http404, HttpResponseServerError
-from django.conf import settings
-from util.json_request import JsonResponse
-from mock import patch
-
-from openedx.core.lib.xblock_utils import wrap_xblock
-from openedx.core.lib.url_utils import quote_slashes
-from xmodule.html_module import HtmlDescriptor
-from xmodule.modulestore.django import modulestore
-from xmodule.tabs import CourseTab
+from six import text_type
+from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
+
+from bulk_email.api import is_bulk_email_feature_enabled
+from class_dashboard.dashboard_data import get_array_section_has_problem, get_section_display_name
+from course_modes.models import CourseMode, CourseModesArchive
 from courseware.access import has_access
 from courseware.courses import get_course_by_id, get_studio_url
-from django_comment_client.utils import has_forum_access
-from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
-from openedx.core.djangoapps.course_groups.cohorts import get_course_cohorts, is_course_cohorted, DEFAULT_COHORT_NAME
-from student.models import CourseEnrollment
-from shoppingcart.models import Coupon, PaidCourseRegistration, CourseRegCodeItem
-from course_modes.models import CourseMode, CourseModesArchive
-from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
-from certificates.models import (
+from edxmako.shortcuts import render_to_response
+from lms.djangoapps.certificates import api as certs_api
+from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
-    CertificateWhitelist,
-    GeneratedCertificate,
-    CertificateStatuses,
     CertificateGenerationHistory,
     CertificateInvalidation,
+    CertificateStatuses,
+    CertificateWhitelist,
+    GeneratedCertificate
 )
-from certificates import api as certs_api
-from bulk_email.models import BulkEmailFlag
-
-from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
-from .tools import get_units_with_due_date, title_or_url
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from lms.djangoapps.courseware.module_render import get_module_by_usage_id
+from lms.djangoapps.discussion.django_comment_client.utils import available_division_schemes, has_forum_access
+from lms.djangoapps.grades.api import is_writable_gradebook_enabled
+from openedx.core.djangoapps.course_groups.cohorts import DEFAULT_COHORT_NAME, get_course_cohorts, is_course_cohorted
+from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, CourseDiscussionSettings
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-
+from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.lib.url_utils import quote_slashes
+from openedx.core.lib.xblock_utils import wrap_xblock
+from shoppingcart.models import Coupon, CourseRegCodeItem, PaidCourseRegistration
+from student.models import CourseEnrollment
+from student.roles import CourseFinanceAdminRole, CourseInstructorRole, CourseSalesAdminRole, CourseStaffRole
+from util.json_request import JsonResponse
+from xmodule.html_module import HtmlBlock
+from xmodule.modulestore.django import modulestore
+from xmodule.tabs import CourseTab
+
+from .tools import get_units_with_due_date, title_or_url
 
 log = logging.getLogger(__name__)
 
@@ -121,8 +129,9 @@ def instructor_dashboard_2(request, course_id):
 
     sections = [
         _section_course_info(course, access),
-        _section_membership(course, access, is_white_label),
+        _section_membership(course, access),
         _section_cohort_management(course, access),
+        _section_discussions_management(course, access),
         _section_student_admin(course, access),
         _section_data_download(course, access),
     ]
@@ -130,11 +139,11 @@ def instructor_dashboard_2(request, course_id):
     analytics_dashboard_message = None
     if show_analytics_dashboard_message(course_key):
         # Construct a URL to the external analytics dashboard
-        analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
-        link_start = HTML("<a href=\"{}\" target=\"_blank\">").format(analytics_dashboard_url)
+        analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, six.text_type(course_key))
+        link_start = HTML(u"<a href=\"{}\" target=\"_blank\">").format(analytics_dashboard_url)
         analytics_dashboard_message = _(
-            "To gain insights into student enrollment and participation {link_start}"
-            "visit {analytics_dashboard_name}, our new course analytics product{link_end}."
+            u"To gain insights into student enrollment and participation {link_start}"
+            u"visit {analytics_dashboard_name}, our new course analytics product{link_end}."
         )
         analytics_dashboard_message = Text(analytics_dashboard_message).format(
             link_start=link_start, link_end=HTML("</a>"), analytics_dashboard_name=settings.ANALYTICS_DASHBOARD_NAME)
@@ -151,14 +160,14 @@ def instructor_dashboard_2(request, course_id):
         log.error(
             u"Course %s has %s course modes with payment options. Course must only have "
             u"one paid course mode to enable eCommerce options.",
-            unicode(course_key), len(paid_modes)
+            six.text_type(course_key), len(paid_modes)
         )
 
-    if settings.FEATURES.get('INDIVIDUAL_DUE_DATES') and access['instructor']:
+    if access['instructor'] and is_enabled_for_course(course_key):
         sections.insert(3, _section_extensions(course))
 
     # Gate access to course email by feature flag & by course-specific authorization
-    if BulkEmailFlag.feature_enabled(course_key):
+    if is_bulk_email_feature_enabled(course_key):
         sections.append(_section_send_email(course, access))
 
     # Gate access to Metrics tab by featue flag and staff authorization
@@ -172,13 +181,15 @@ def instructor_dashboard_2(request, course_id):
     # Gate access to Special Exam tab depending if either timed exams or proctored exams
     # are enabled in the course
 
-    # NOTE: For now, if we only have procotred exams enabled, then only platform Staff
-    # (user.is_staff) will be able to view the special exams tab. This may
-    # change in the future
-    can_see_special_exams = (
-        ((course.enable_proctored_exams and request.user.is_staff) or course.enable_timed_exams) and
-        settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False)
-    )
+    user_has_access = any([
+        request.user.is_staff,
+        CourseStaffRole(course_key).has_user(request.user),
+        CourseInstructorRole(course_key).has_user(request.user)
+    ])
+    course_has_special_exams = course.enable_proctored_exams or course.enable_timed_exams
+    can_see_special_exams = course_has_special_exams and user_has_access and settings.FEATURES.get(
+        'ENABLE_SPECIAL_EXAMS', False)
+
     if can_see_special_exams:
         sections.append(_section_special_exams(course, access))
 
@@ -190,25 +201,35 @@ def instructor_dashboard_2(request, course_id):
     if certs_enabled and access['admin']:
         sections.append(_section_certificates(course))
 
+    openassessment_blocks = modulestore().get_items(
+        course_key, qualifiers={'category': 'openassessment'}
+    )
+    # filter out orphaned openassessment blocks
+    openassessment_blocks = [
+        block for block in openassessment_blocks if block.parent is not None
+    ]
+    if len(openassessment_blocks) > 0:
+        sections.append(_section_open_response_assessment(request, course, openassessment_blocks, access))
+
     disable_buttons = not _is_small_course(course_key)
 
     certificate_white_list = CertificateWhitelist.get_certificate_white_list(course_key)
-    generate_certificate_exceptions_url = reverse(  # pylint: disable=invalid-name
+    generate_certificate_exceptions_url = reverse(
         'generate_certificate_exceptions',
-        kwargs={'course_id': unicode(course_key), 'generate_for': ''}
+        kwargs={'course_id': six.text_type(course_key), 'generate_for': ''}
     )
-    generate_bulk_certificate_exceptions_url = reverse(  # pylint: disable=invalid-name
+    generate_bulk_certificate_exceptions_url = reverse(
         'generate_bulk_certificate_exceptions',
-        kwargs={'course_id': unicode(course_key)}
+        kwargs={'course_id': six.text_type(course_key)}
     )
     certificate_exception_view_url = reverse(
         'certificate_exception_view',
-        kwargs={'course_id': unicode(course_key)}
+        kwargs={'course_id': six.text_type(course_key)}
     )
 
-    certificate_invalidation_view_url = reverse(  # pylint: disable=invalid-name
+    certificate_invalidation_view_url = reverse(
         'certificate_invalidation_view',
-        kwargs={'course_id': unicode(course_key)}
+        kwargs={'course_id': six.text_type(course_key)}
     )
 
     certificate_invalidations = CertificateInvalidation.get_certificate_invalidations(course_key)
@@ -257,48 +278,74 @@ def _section_e_commerce(course, access, paid_mode, coupons_enabled, reports_enab
         'section_key': 'e-commerce',
         'section_display_name': _('E-Commerce'),
         'access': access,
-        'course_id': unicode(course_key),
+        'course_id': six.text_type(course_key),
         'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
-        'ajax_remove_coupon_url': reverse('remove_coupon', kwargs={'course_id': unicode(course_key)}),
-        'ajax_get_coupon_info': reverse('get_coupon_info', kwargs={'course_id': unicode(course_key)}),
-        'get_user_invoice_preference_url': reverse('get_user_invoice_preference', kwargs={'course_id': unicode(course_key)}),
-        'sale_validation_url': reverse('sale_validation', kwargs={'course_id': unicode(course_key)}),
-        'ajax_update_coupon': reverse('update_coupon', kwargs={'course_id': unicode(course_key)}),
-        'ajax_add_coupon': reverse('add_coupon', kwargs={'course_id': unicode(course_key)}),
-        'get_sale_records_url': reverse('get_sale_records', kwargs={'course_id': unicode(course_key)}),
-        'get_sale_order_records_url': reverse('get_sale_order_records', kwargs={'course_id': unicode(course_key)}),
-        'instructor_url': reverse('instructor_dashboard', kwargs={'course_id': unicode(course_key)}),
-        'get_registration_code_csv_url': reverse('get_registration_codes', kwargs={'course_id': unicode(course_key)}),
-        'generate_registration_code_csv_url': reverse('generate_registration_codes', kwargs={'course_id': unicode(course_key)}),
-        'active_registration_code_csv_url': reverse('active_registration_codes', kwargs={'course_id': unicode(course_key)}),
-        'spent_registration_code_csv_url': reverse('spent_registration_codes', kwargs={'course_id': unicode(course_key)}),
-        'set_course_mode_url': reverse('set_course_mode_price', kwargs={'course_id': unicode(course_key)}),
-        'download_coupon_codes_url': reverse('get_coupon_codes', kwargs={'course_id': unicode(course_key)}),
-        'enrollment_report_url': reverse('get_enrollment_report', kwargs={'course_id': unicode(course_key)}),
-        'exec_summary_report_url': reverse('get_exec_summary_report', kwargs={'course_id': unicode(course_key)}),
-        'list_financial_report_downloads_url': reverse('list_financial_report_downloads',
-                                                       kwargs={'course_id': unicode(course_key)}),
-        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': unicode(course_key)}),
-        'look_up_registration_code': reverse('look_up_registration_code', kwargs={'course_id': unicode(course_key)}),
+        'ajax_remove_coupon_url': reverse('remove_coupon', kwargs={'course_id': six.text_type(course_key)}),
+        'ajax_get_coupon_info': reverse('get_coupon_info', kwargs={'course_id': six.text_type(course_key)}),
+        'get_user_invoice_preference_url': reverse(
+            'get_user_invoice_preference',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
+        'sale_validation_url': reverse('sale_validation', kwargs={'course_id': six.text_type(course_key)}),
+        'ajax_update_coupon': reverse('update_coupon', kwargs={'course_id': six.text_type(course_key)}),
+        'ajax_add_coupon': reverse('add_coupon', kwargs={'course_id': six.text_type(course_key)}),
+        'get_sale_records_url': reverse('get_sale_records', kwargs={'course_id': six.text_type(course_key)}),
+        'get_sale_order_records_url': reverse(
+            'get_sale_order_records',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
+        'instructor_url': reverse('instructor_dashboard', kwargs={'course_id': six.text_type(course_key)}),
+        'get_registration_code_csv_url': reverse(
+            'get_registration_codes',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
+        'generate_registration_code_csv_url': reverse(
+            'generate_registration_codes',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
+        'active_registration_code_csv_url': reverse(
+            'active_registration_codes',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
+        'spent_registration_code_csv_url': reverse(
+            'spent_registration_codes',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
+        'set_course_mode_url': reverse('set_course_mode_price', kwargs={'course_id': six.text_type(course_key)}),
+        'download_coupon_codes_url': reverse('get_coupon_codes', kwargs={'course_id': six.text_type(course_key)}),
+        'enrollment_report_url': reverse('get_enrollment_report', kwargs={'course_id': six.text_type(course_key)}),
+        'exec_summary_report_url': reverse('get_exec_summary_report', kwargs={'course_id': six.text_type(course_key)}),
+        'list_financial_report_downloads_url': reverse(
+            'list_financial_report_downloads',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
+        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': six.text_type(course_key)}),
+        'look_up_registration_code': reverse(
+            'look_up_registration_code',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
         'coupons': coupons,
         'sales_admin': access['sales_admin'],
         'coupons_enabled': coupons_enabled,
         'reports_enabled': reports_enabled,
         'course_price': course_price,
-        'total_amount': total_amount
+        'total_amount': total_amount,
+        'is_ecommerce_course': is_ecommerce_course(course_key)
     }
     return section_data
 
 
 def _section_special_exams(course, access):
     """ Provide data for the corresponding dashboard section """
-    course_key = course.id
+    course_key = six.text_type(course.id)
+    from edx_proctoring.api import is_backend_dashboard_available
 
     section_data = {
         'section_key': 'special_exams',
         'section_display_name': _('Special Exams'),
         'access': access,
-        'course_id': unicode(course_key)
+        'course_id': course_key,
+        'show_dashboard': is_backend_dashboard_available(course_key),
     }
     return section_data
 
@@ -318,7 +365,7 @@ def _section_certificates(course):
 
     """
     example_cert_status = None
-    html_cert_enabled = certs_api.has_html_certificates_enabled(course.id, course)
+    html_cert_enabled = certs_api.has_html_certificates_enabled(course)
     if html_cert_enabled:
         can_enable_for_course = True
     else:
@@ -397,12 +444,12 @@ def set_course_mode_price(request, course_id):
             status=400)  # status code 400: Bad Request
 
     currency = request.POST['currency']
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
 
     course_honor_mode = CourseMode.objects.filter(mode_slug='honor', course_id=course_key)
     if not course_honor_mode:
         return JsonResponse(
-            {'message': _("CourseMode with the mode slug({mode_slug}) DoesNotExist").format(mode_slug='honor')},
+            {'message': _(u"CourseMode with the mode slug({mode_slug}) DoesNotExist").format(mode_slug='honor')},
             status=400)  # status code 400: Bad Request
 
     CourseModesArchive.objects.create(
@@ -426,13 +473,15 @@ def _section_course_info(course, access):
         'section_display_name': _('Course Info'),
         'access': access,
         'course_id': course_key,
-        'course_display_name': course.display_name,
+        'course_display_name': course.display_name_with_default,
+        'course_org': course.display_org_with_default,
+        'course_number': course.display_number_with_default,
         'has_started': course.has_started(),
         'has_ended': course.has_ended(),
         'start_date': course.start,
         'end_date': course.end,
         'num_sections': len(course.children),
-        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': unicode(course_key)}),
+        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': six.text_type(course_key)}),
     }
 
     if settings.FEATURES.get('DISPLAY_ANALYTICS_ENROLLMENTS'):
@@ -442,15 +491,20 @@ def _section_course_info(course, access):
         #  dashboard_link is already made safe in _get_dashboard_link
         dashboard_link = _get_dashboard_link(course_key)
         #  so we can use Text() here so it's not double-escaped and rendering HTML on the front-end
-        message = Text(_("Enrollment data is now available in {dashboard_link}.")).format(dashboard_link=dashboard_link)
+        message = Text(
+            _(u"Enrollment data is now available in {dashboard_link}.")
+        ).format(dashboard_link=dashboard_link)
         section_data['enrollment_message'] = message
 
     if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'):
-        section_data['detailed_gitlogs_url'] = reverse('gitlogs_detail', kwargs={'course_id': unicode(course_key)})
+        section_data['detailed_gitlogs_url'] = reverse(
+            'gitlogs_detail',
+            kwargs={'course_id': six.text_type(course_key)}
+        )
 
     try:
-        sorted_cutoffs = sorted(course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True)
-        advance = lambda memo, (letter, score): "{}: {}, ".format(letter, score) + memo
+        sorted_cutoffs = sorted(list(course.grade_cutoffs.items()), key=lambda i: i[1], reverse=True)
+        advance = lambda memo, (letter, score): u"{}: {}, ".format(letter, score) + memo
         section_data['grade_cutoffs'] = reduce(advance, sorted_cutoffs, "")[:-2]
     except Exception:  # pylint: disable=broad-except
         section_data['grade_cutoffs'] = "Not Available"
@@ -463,24 +517,39 @@ def _section_course_info(course, access):
     return section_data
 
 
-def _section_membership(course, access, is_white_label):
+def _section_membership(course, access):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
     ccx_enabled = settings.FEATURES.get('CUSTOM_COURSES_EDX', False) and course.enable_ccx
+    enrollment_role_choices = configuration_helpers.get_value('MANUAL_ENROLLMENT_ROLE_CHOICES',
+                                                              settings.MANUAL_ENROLLMENT_ROLE_CHOICES)
+
     section_data = {
         'section_key': 'membership',
         'section_display_name': _('Membership'),
         'access': access,
         'ccx_is_enabled': ccx_enabled,
-        'is_white_label': is_white_label,
-        'enroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': unicode(course_key)}),
-        'unenroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': unicode(course_key)}),
-        'upload_student_csv_button_url': reverse('register_and_enroll_students', kwargs={'course_id': unicode(course_key)}),
-        'modify_beta_testers_button_url': reverse('bulk_beta_modify_access', kwargs={'course_id': unicode(course_key)}),
-        'list_course_role_members_url': reverse('list_course_role_members', kwargs={'course_id': unicode(course_key)}),
-        'modify_access_url': reverse('modify_access', kwargs={'course_id': unicode(course_key)}),
-        'list_forum_members_url': reverse('list_forum_members', kwargs={'course_id': unicode(course_key)}),
-        'update_forum_role_membership_url': reverse('update_forum_role_membership', kwargs={'course_id': unicode(course_key)}),
+        'enroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': six.text_type(course_key)}),
+        'unenroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': six.text_type(course_key)}),
+        'upload_student_csv_button_url': reverse(
+            'register_and_enroll_students',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
+        'modify_beta_testers_button_url': reverse(
+            'bulk_beta_modify_access',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
+        'list_course_role_members_url': reverse(
+            'list_course_role_members',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
+        'modify_access_url': reverse('modify_access', kwargs={'course_id': six.text_type(course_key)}),
+        'list_forum_members_url': reverse('list_forum_members', kwargs={'course_id': six.text_type(course_key)}),
+        'update_forum_role_membership_url': reverse(
+            'update_forum_role_membership',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
+        'enrollment_role_choices': enrollment_role_choices
     }
     return section_data
 
@@ -496,13 +565,30 @@ def _section_cohort_management(course, access):
         'ccx_is_enabled': ccx_enabled,
         'course_cohort_settings_url': reverse(
             'course_cohort_settings',
-            kwargs={'course_key_string': unicode(course_key)}
+            kwargs={'course_key_string': six.text_type(course_key)}
         ),
-        'cohorts_url': reverse('cohorts', kwargs={'course_key_string': unicode(course_key)}),
-        'upload_cohorts_csv_url': reverse('add_users_to_cohorts', kwargs={'course_id': unicode(course_key)}),
-        'discussion_topics_url': reverse('cohort_discussion_topics', kwargs={'course_key_string': unicode(course_key)}),
+        'cohorts_url': reverse('cohorts', kwargs={'course_key_string': six.text_type(course_key)}),
+        'upload_cohorts_csv_url': reverse('add_users_to_cohorts', kwargs={'course_id': six.text_type(course_key)}),
         'verified_track_cohorting_url': reverse(
-            'verified_track_cohorting', kwargs={'course_key_string': unicode(course_key)}
+            'verified_track_cohorting', kwargs={'course_key_string': six.text_type(course_key)}
+        ),
+    }
+    return section_data
+
+
+def _section_discussions_management(course, access):
+    """ Provide data for the corresponding discussion management section """
+    course_key = course.id
+    enrollment_track_schemes = available_division_schemes(course_key)
+    section_data = {
+        'section_key': 'discussions_management',
+        'section_display_name': _('Discussions'),
+        'is_hidden': (not is_course_cohorted(course_key) and
+                      CourseDiscussionSettings.ENROLLMENT_TRACK not in enrollment_track_schemes),
+        'discussion_topics_url': reverse('discussion_topics', kwargs={'course_key_string': six.text_type(course_key)}),
+        'course_discussion_settings': reverse(
+            'course_discussions_settings',
+            kwargs={'course_key_string': six.text_type(course_key)}
         ),
     }
     return section_data
@@ -528,24 +614,42 @@ def _section_student_admin(course, access):
         'section_display_name': _('Student Admin'),
         'access': access,
         'is_small_course': is_small_course,
-        'get_student_progress_url_url': reverse('get_student_progress_url', kwargs={'course_id': unicode(course_key)}),
-        'enrollment_url': reverse('students_update_enrollment', kwargs={'course_id': unicode(course_key)}),
-        'reset_student_attempts_url': reverse('reset_student_attempts', kwargs={'course_id': unicode(course_key)}),
+        'get_student_enrollment_status_url': reverse(
+            'get_student_enrollment_status',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
+        'get_student_progress_url_url': reverse(
+            'get_student_progress_url',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
+        'enrollment_url': reverse('students_update_enrollment', kwargs={'course_id': six.text_type(course_key)}),
+        'reset_student_attempts_url': reverse(
+            'reset_student_attempts',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
         'reset_student_attempts_for_entrance_exam_url': reverse(
             'reset_student_attempts_for_entrance_exam',
-            kwargs={'course_id': unicode(course_key)},
+            kwargs={'course_id': six.text_type(course_key)},
         ),
-        'rescore_problem_url': reverse('rescore_problem', kwargs={'course_id': unicode(course_key)}),
-        'rescore_entrance_exam_url': reverse('rescore_entrance_exam', kwargs={'course_id': unicode(course_key)}),
+        'rescore_problem_url': reverse('rescore_problem', kwargs={'course_id': six.text_type(course_key)}),
+        'override_problem_score_url': reverse(
+            'override_problem_score',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
+        'rescore_entrance_exam_url': reverse('rescore_entrance_exam', kwargs={'course_id': six.text_type(course_key)}),
         'student_can_skip_entrance_exam_url': reverse(
             'mark_student_can_skip_entrance_exam',
-            kwargs={'course_id': unicode(course_key)},
+            kwargs={'course_id': six.text_type(course_key)},
         ),
-        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': unicode(course_key)}),
-        'list_entrace_exam_instructor_tasks_url': reverse('list_entrance_exam_instructor_tasks',
-                                                          kwargs={'course_id': unicode(course_key)}),
-        'spoc_gradebook_url': reverse('spoc_gradebook', kwargs={'course_id': unicode(course_key)}),
+        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': six.text_type(course_key)}),
+        'list_entrace_exam_instructor_tasks_url': reverse(
+            'list_entrance_exam_instructor_tasks',
+            kwargs={'course_id': six.text_type(course_key)}
+        ),
+        'spoc_gradebook_url': reverse('spoc_gradebook', kwargs={'course_id': six.text_type(course_key)}),
     }
+    if is_writable_gradebook_enabled(course_key) and settings.WRITABLE_GRADEBOOK_URL:
+        section_data['writable_gradebook_url'] = urljoin(settings.WRITABLE_GRADEBOOK_URL, '/' + text_type(course_key))
     return section_data
 
 
@@ -554,12 +658,15 @@ def _section_extensions(course):
     section_data = {
         'section_key': 'extensions',
         'section_display_name': _('Extensions'),
-        'units_with_due_dates': [(title_or_url(unit), unicode(unit.location))
+        'units_with_due_dates': [(title_or_url(unit), six.text_type(unit.location))
                                  for unit in get_units_with_due_date(course)],
-        'change_due_date_url': reverse('change_due_date', kwargs={'course_id': unicode(course.id)}),
-        'reset_due_date_url': reverse('reset_due_date', kwargs={'course_id': unicode(course.id)}),
-        'show_unit_extensions_url': reverse('show_unit_extensions', kwargs={'course_id': unicode(course.id)}),
-        'show_student_extensions_url': reverse('show_student_extensions', kwargs={'course_id': unicode(course.id)}),
+        'change_due_date_url': reverse('change_due_date', kwargs={'course_id': six.text_type(course.id)}),
+        'reset_due_date_url': reverse('reset_due_date', kwargs={'course_id': six.text_type(course.id)}),
+        'show_unit_extensions_url': reverse('show_unit_extensions', kwargs={'course_id': six.text_type(course.id)}),
+        'show_student_extensions_url': reverse(
+            'show_student_extensions',
+            kwargs={'course_id': six.text_type(course.id)}
+        ),
     }
     return section_data
 
@@ -578,24 +685,28 @@ def _section_data_download(course, access):
         'section_display_name': _('Data Download'),
         'access': access,
         'show_generate_proctored_exam_report_button': show_proctored_report_button,
-        'get_problem_responses_url': reverse('get_problem_responses', kwargs={'course_id': unicode(course_key)}),
-        'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': unicode(course_key)}),
-        'get_students_features_url': reverse('get_students_features', kwargs={'course_id': unicode(course_key)}),
+        'get_problem_responses_url': reverse('get_problem_responses', kwargs={'course_id': six.text_type(course_key)}),
+        'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': six.text_type(course_key)}),
+        'get_students_features_url': reverse('get_students_features', kwargs={'course_id': six.text_type(course_key)}),
         'get_issued_certificates_url': reverse(
-            'get_issued_certificates', kwargs={'course_id': unicode(course_key)}
+            'get_issued_certificates', kwargs={'course_id': six.text_type(course_key)}
         ),
         'get_students_who_may_enroll_url': reverse(
-            'get_students_who_may_enroll', kwargs={'course_id': unicode(course_key)}
+            'get_students_who_may_enroll', kwargs={'course_id': six.text_type(course_key)}
         ),
-        'get_anon_ids_url': reverse('get_anon_ids', kwargs={'course_id': unicode(course_key)}),
-        'list_proctored_results_url': reverse('get_proctored_exam_results', kwargs={'course_id': unicode(course_key)}),
-        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': unicode(course_key)}),
-        'list_report_downloads_url': reverse('list_report_downloads', kwargs={'course_id': unicode(course_key)}),
-        'calculate_grades_csv_url': reverse('calculate_grades_csv', kwargs={'course_id': unicode(course_key)}),
-        'problem_grade_report_url': reverse('problem_grade_report', kwargs={'course_id': unicode(course_key)}),
+        'get_anon_ids_url': reverse('get_anon_ids', kwargs={'course_id': six.text_type(course_key)}),
+        'list_proctored_results_url': reverse(
+            'get_proctored_exam_results', kwargs={'course_id': six.text_type(course_key)}
+        ),
+        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': six.text_type(course_key)}),
+        'list_report_downloads_url': reverse('list_report_downloads', kwargs={'course_id': six.text_type(course_key)}),
+        'calculate_grades_csv_url': reverse('calculate_grades_csv', kwargs={'course_id': six.text_type(course_key)}),
+        'problem_grade_report_url': reverse('problem_grade_report', kwargs={'course_id': six.text_type(course_key)}),
         'course_has_survey': True if course.course_survey_name else False,
-        'course_survey_results_url': reverse('get_course_survey_results', kwargs={'course_id': unicode(course_key)}),
-        'export_ora2_data_url': reverse('export_ora2_data', kwargs={'course_id': unicode(course_key)}),
+        'course_survey_results_url': reverse(
+            'get_course_survey_results', kwargs={'course_id': six.text_type(course_key)}
+        ),
+        'export_ora2_data_url': reverse('export_ora2_data', kwargs={'course_id': six.text_type(course_key)}),
     }
     return section_data
 
@@ -603,7 +714,7 @@ def _section_data_download(course, access):
 def null_applicable_aside_types(block):  # pylint: disable=unused-argument
     """
     get_aside method for monkey-patching into applicable_aside_types
-    while rendering an HtmlDescriptor for email text editing. This returns
+    while rendering an HtmlBlock for email text editing. This returns
     an empty list.
     """
     return []
@@ -615,8 +726,8 @@ def _section_send_email(course, access):
 
     # Monkey-patch applicable_aside_types to return no asides for the duration of this render
     with patch.object(course.runtime, 'applicable_aside_types', null_applicable_aside_types):
-        # This HtmlDescriptor is only being used to generate a nice text editor.
-        html_module = HtmlDescriptor(
+        # This HtmlBlock is only being used to generate a nice text editor.
+        html_module = HtmlBlock(
             course.system,
             DictFieldData({'data': ''}),
             ScopeIds(None, None, None, course_key.make_usage_key('html', 'fake'))
@@ -624,8 +735,8 @@ def _section_send_email(course, access):
         fragment = course.system.render(html_module, 'studio_view')
     fragment = wrap_xblock(
         'LmsRuntime', html_module, 'studio_view', fragment, None,
-        extra_data={"course-id": unicode(course_key)},
-        usage_id_serializer=lambda usage_id: quote_slashes(unicode(usage_id)),
+        extra_data={"course-id": six.text_type(course_key)},
+        usage_id_serializer=lambda usage_id: quote_slashes(six.text_type(usage_id)),
         # Generate a new request_token here at random, because this module isn't connected to any other
         # xblock rendering.
         request_token=uuid.uuid1().get_hex()
@@ -633,23 +744,27 @@ def _section_send_email(course, access):
     cohorts = []
     if is_course_cohorted(course_key):
         cohorts = get_course_cohorts(course)
+    course_modes = []
+    if not VerifiedTrackCohortedCourse.is_verified_track_cohort_enabled(course_key):
+        course_modes = CourseMode.modes_for_course(course_key, include_expired=True, only_selectable=False)
     email_editor = fragment.content
     section_data = {
         'section_key': 'send_email',
         'section_display_name': _('Email'),
         'access': access,
-        'send_email': reverse('send_email', kwargs={'course_id': unicode(course_key)}),
+        'send_email': reverse('send_email', kwargs={'course_id': six.text_type(course_key)}),
         'editor': email_editor,
         'cohorts': cohorts,
+        'course_modes': course_modes,
         'default_cohort_name': DEFAULT_COHORT_NAME,
         'list_instructor_tasks_url': reverse(
-            'list_instructor_tasks', kwargs={'course_id': unicode(course_key)}
+            'list_instructor_tasks', kwargs={'course_id': six.text_type(course_key)}
         ),
         'email_background_tasks_url': reverse(
-            'list_background_email_tasks', kwargs={'course_id': unicode(course_key)}
+            'list_background_email_tasks', kwargs={'course_id': six.text_type(course_key)}
         ),
         'email_content_history_url': reverse(
-            'list_email_content', kwargs={'course_id': unicode(course_key)}
+            'list_email_content', kwargs={'course_id': six.text_type(course_key)}
         ),
     }
     return section_data
@@ -657,7 +772,7 @@ def _section_send_email(course, access):
 
 def _get_dashboard_link(course_key):
     """ Construct a URL to the external analytics dashboard """
-    analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
+    analytics_dashboard_url = u'{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, six.text_type(course_key))
     link = HTML(u"<a href=\"{0}\" target=\"_blank\">{1}</a>").format(
         analytics_dashboard_url, settings.ANALYTICS_DASHBOARD_NAME
     )
@@ -670,7 +785,7 @@ def _section_analytics(course, access):
         'section_key': 'instructor_analytics',
         'section_display_name': _('Analytics'),
         'access': access,
-        'course_id': unicode(course.id),
+        'course_id': six.text_type(course.id),
     }
     return section_data
 
@@ -682,7 +797,7 @@ def _section_metrics(course, access):
         'section_key': 'metrics',
         'section_display_name': _('Metrics'),
         'access': access,
-        'course_id': unicode(course_key),
+        'course_id': six.text_type(course_key),
         'sub_section_display_name': get_section_display_name(course_key),
         'section_has_problem': get_array_section_has_problem(course_key),
         'get_students_opened_subsection_url': reverse('get_students_opened_subsection'),
@@ -690,3 +805,54 @@ def _section_metrics(course, access):
         'post_metrics_data_csv_url': reverse('post_metrics_data_csv'),
     }
     return section_data
+
+
+def _section_open_response_assessment(request, course, openassessment_blocks, access):
+    """Provide data for the corresponding dashboard section """
+    course_key = course.id
+
+    ora_items = []
+    parents = {}
+
+    for block in openassessment_blocks:
+        block_parent_id = six.text_type(block.parent)
+        result_item_id = six.text_type(block.location)
+        if block_parent_id not in parents:
+            parents[block_parent_id] = modulestore().get_item(block.parent)
+
+        ora_items.append({
+            'id': result_item_id,
+            'name': block.display_name,
+            'parent_id': block_parent_id,
+            'parent_name': parents[block_parent_id].display_name,
+            'staff_assessment': 'staff-assessment' in block.assessment_steps,
+            'url_base': reverse('xblock_view', args=[course.id, block.location, 'student_view']),
+            'url_grade_available_responses': reverse('xblock_view', args=[course.id, block.location,
+                                                                          'grade_available_responses_view']),
+        })
+
+    openassessment_block = openassessment_blocks[0]
+    block, __ = get_module_by_usage_id(
+        request, six.text_type(course_key), six.text_type(openassessment_block.location),
+        disable_staff_debug_info=True, course=course
+    )
+    section_data = {
+        'fragment': block.render('ora_blocks_listing_view', context={
+            'ora_items': ora_items,
+            'ora_item_view_enabled': settings.FEATURES.get('ENABLE_XBLOCK_VIEW_ENDPOINT', False)
+        }),
+        'section_key': 'open_response_assessment',
+        'section_display_name': _('Open Responses'),
+        'access': access,
+        'course_id': six.text_type(course_key),
+    }
+    return section_data
+
+
+def is_ecommerce_course(course_key):
+    """
+    Checks if the given course is an e-commerce course or not, by checking its SKU value from
+    CourseMode records for the course
+    """
+    sku_count = len([mode.sku for mode in CourseMode.modes_for_course(course_key) if mode.sku])
+    return sku_count > 0

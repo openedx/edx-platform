@@ -1,21 +1,19 @@
 """
 Run acceptance tests that use the bok-choy framework
-http://bok-choy.readthedocs.org/en/latest/
+https://bok-choy.readthedocs.org/en/latest/
 """
-from paver.easy import task, needs, cmdopts, sh
-from pavelib.utils.test.suites.bokchoy_suite import BokChoyTestSuite, Pa11yCrawler
-from pavelib.utils.test.bokchoy_options import (
-    BOKCHOY_OPTS,
-    PA11Y_HTML,
-    PA11Y_COURSE_KEY,
-    PA11Y_FETCH_COURSE,
-)
-from pavelib.utils.envs import Env
-from pavelib.utils.test.utils import check_firefox_version
-from pavelib.utils.passthrough_opts import PassthroughTask
-from pavelib.utils.timer import timed
-from optparse import make_option
+from __future__ import absolute_import, print_function
+
 import os
+
+from paver.easy import cmdopts, needs, sh, task, call_task
+
+from pavelib.utils.envs import Env
+from pavelib.utils.passthrough_opts import PassthroughTask
+from pavelib.utils.test.bokchoy_options import BOKCHOY_OPTS
+from pavelib.utils.test.suites.bokchoy_suite import BokChoyTestSuite
+from pavelib.utils.test.utils import check_firefox_version
+from pavelib.utils.timer import timed
 
 try:
     from pygments.console import colorize
@@ -48,9 +46,15 @@ def test_bokchoy(options, passthrough_options):
     # firefox as the default here.
     using_firefox = (os.environ.get('SELENIUM_BROWSER', 'firefox') == 'firefox')
     validate_firefox = getattr(options, 'validate_firefox_version', using_firefox)
+    options.test_bokchoy.coveragerc = options.get('coveragerc', None)
 
     if validate_firefox:
         check_firefox_version()
+
+    if hasattr(options.test_bokchoy, 'with_wtw'):
+        call_task('fetch_coverage_test_selection_data', options={
+            'compare_branch': options.test_bokchoy.with_wtw
+        })
 
     run_bokchoy(options.test_bokchoy, passthrough_options)
 
@@ -78,8 +82,8 @@ def test_a11y(options, passthrough_options):
     # Modify the options object directly, so that any subsequently called tasks
     # that share with this task get the modified options
     options.test_a11y.report_dir = Env.BOK_CHOY_A11Y_REPORT_DIR
-    options.test_a11y.coveragerc = Env.BOK_CHOY_A11Y_COVERAGERC
     options.test_a11y.extra_args = options.get('extra_args', '') + ' -a "a11y" '
+    options.test_a11y.coveragerc = options.get('coveragerc', None)
     run_bokchoy(options.test_a11y, passthrough_options)
 
 
@@ -98,39 +102,6 @@ def perf_report_bokchoy(options, passthrough_options):
     run_bokchoy(options.perf_report_bokchoy, passthrough_options)
 
 
-@needs('pavelib.prereqs.install_prereqs', 'get_test_course')
-@cmdopts(
-    BOKCHOY_OPTS + [PA11Y_HTML, PA11Y_COURSE_KEY, PA11Y_FETCH_COURSE],
-    share_with=['get_test_course', 'prepare_bokchoy_run', 'load_courses']
-)
-@PassthroughTask
-@timed
-def pa11ycrawler(options, passthrough_options):
-    """
-    Runs pa11ycrawler against the demo-test-course to generates accessibility
-    reports. (See https://github.com/edx/demo-test-course)
-
-    Note: Like the bok-choy tests, this can be used with the `serversonly`
-    flag to get an environment running. The setup for this is the same as
-    for bok-choy tests, only test course is imported as well.
-    """
-    # Modify the options object directly, so that any subsequently called tasks
-    # that share with this task get the modified options
-    options.pa11ycrawler.report_dir = Env.PA11YCRAWLER_REPORT_DIR
-    options.pa11ycrawler.coveragerc = Env.PA11YCRAWLER_COVERAGERC
-    options.pa11ycrawler.should_fetch_course = getattr(
-        options,
-        'should_fetch_course',
-        not options.get('fasttest')
-    )
-    options.pa11ycrawler.course_key = getattr(options, 'course-key', "course-v1:edX+Test101+course")
-    test_suite = Pa11yCrawler('pa11ycrawler', passthrough_options=passthrough_options, **options.pa11ycrawler)
-    test_suite.run()
-
-    if getattr(options, 'with_html', False):
-        test_suite.generate_html_reports()
-
-
 def run_bokchoy(options, passthrough_options):
     """
     Runs BokChoyTestSuite with the given options.
@@ -138,11 +109,11 @@ def run_bokchoy(options, passthrough_options):
     test_suite = BokChoyTestSuite('bok-choy', passthrough_options=passthrough_options, **options)
     msg = colorize(
         'green',
-        'Running tests using {default_store} modulestore.'.format(
+        u'Running tests using {default_store} modulestore.'.format(
             default_store=test_suite.default_store,
         )
     )
-    print msg
+    print(msg)
     test_suite.run()
 
 
@@ -153,16 +124,16 @@ def parse_coverage(report_dir, coveragerc):
     report_dir.makedirs_p()
 
     msg = colorize('green', "Combining coverage reports")
-    print msg
+    print(msg)
 
-    sh("coverage combine --rcfile={}".format(coveragerc))
+    sh(u"coverage combine --rcfile={}".format(coveragerc))
 
     msg = colorize('green', "Generating coverage reports")
-    print msg
+    print(msg)
 
-    sh("coverage html --rcfile={}".format(coveragerc))
-    sh("coverage xml --rcfile={}".format(coveragerc))
-    sh("coverage report --rcfile={}".format(coveragerc))
+    sh(u"coverage html --rcfile={}".format(coveragerc))
+    sh(u"coverage xml --rcfile={}".format(coveragerc))
+    sh(u"coverage report --rcfile={}".format(coveragerc))
 
 
 @task
@@ -190,16 +161,4 @@ def a11y_coverage():
     parse_coverage(
         Env.BOK_CHOY_A11Y_REPORT_DIR,
         Env.BOK_CHOY_A11Y_COVERAGERC
-    )
-
-
-@task
-@timed
-def pa11ycrawler_coverage():
-    """
-    Generate coverage reports for bok-choy tests
-    """
-    parse_coverage(
-        Env.PA11YCRAWLER_REPORT_DIR,
-        Env.PA11YCRAWLER_COVERAGERC
     )

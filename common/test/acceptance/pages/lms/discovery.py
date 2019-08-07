@@ -2,8 +2,11 @@
 Course discovery page.
 """
 
-from common.test.acceptance.pages.lms import BASE_URL
+from __future__ import absolute_import
+
 from bok_choy.page_object import PageObject
+
+from common.test.acceptance.pages.lms import BASE_URL
 
 
 class CourseDiscoveryPage(PageObject):
@@ -30,7 +33,7 @@ class CourseDiscoveryPage(PageObject):
         """
         Return search result items.
         """
-        return self.q(css=".courses-listing-item")
+        return self.q(css=".courses-list .courses-listing-item")
 
     @property
     def clear_button(self):
@@ -53,3 +56,12 @@ class CourseDiscoveryPage(PageObject):
         """
         self.clear_button.click()
         self.wait_for_ajax()
+
+    def click_course(self, course_id):
+        """
+        Click on the course
+
+        Args:
+            course_id(string): ID of the course which is to be clicked
+        """
+        self.q(css='.courses-listing-item a').filter(lambda el: course_id in el.get_attribute('href')).click()

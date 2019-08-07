@@ -21,7 +21,3 @@ $static-path: '../..';
 @import "views/response";
 @import 'utilities/developer';
 @import 'utilities/shame';
-
-// Styles for WYSIWYG Markdown editor
-@import "../course/discussion/form-wmd-toolbar";
-@import "../course/discussion/form";

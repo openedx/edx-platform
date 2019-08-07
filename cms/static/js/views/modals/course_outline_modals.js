@@ -13,19 +13,22 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
     $, Backbone, _, gettext, BaseView, BaseModal, date, XBlockViewUtils, DateUtils, HtmlUtils, StringUtils
 ) {
     'use strict';
-    var CourseOutlineXBlockModal, SettingsXBlockModal, PublishXBlockModal, AbstractEditor, BaseDateEditor,
-        ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, AbstractVisibilityEditor, StaffLockEditor,
-        ContentVisibilityEditor, VerificationAccessEditor, TimedExaminationPreferenceEditor, AccessEditor;
+    var CourseOutlineXBlockModal, SettingsXBlockModal, PublishXBlockModal, HighlightsXBlockModal,
+        AbstractEditor, BaseDateEditor,
+        ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, AbstractVisibilityEditor,
+        StaffLockEditor, UnitAccessEditor, ContentVisibilityEditor, TimedExaminationPreferenceEditor,
+        AccessEditor, ShowCorrectnessEditor, HighlightsEditor, HighlightsEnableXBlockModal, HighlightsEnableEditor;
 
     CourseOutlineXBlockModal = BaseModal.extend({
         events: _.extend({}, BaseModal.prototype.events, {
-            'click .action-save': 'save'
+            'click .action-save': 'save',
+            keydown: 'keyHandler'
         }),
 
         options: $.extend({}, BaseModal.prototype.options, {
             modalName: 'course-outline',
             modalType: 'edit-settings',
-            addSaveButton: true,
+            addPrimaryActionButton: true,
             modalSize: 'med',
             viewSpecificClasses: 'confirm',
             editors: []
@@ -67,8 +70,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         save: function(event) {
+            var requestData;
+
             event.preventDefault();
-            var requestData = this.getRequestData();
+            requestData = this.getRequestData();
             if (!_.isEqual(requestData, {metadata: {}})) {
                 XBlockViewUtils.updateXBlockFields(this.model, requestData, {
                     success: this.options.onSave
@@ -100,6 +105,12 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             });
 
             return $.extend.apply(this, [true, {}].concat(requestData));
+        },
+
+        keyHandler: function(event) {
+            if (event.which === 27) {  // escape key
+                this.hide();
+            }
         }
     });
 
@@ -112,23 +123,12 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             );
         },
 
-        getIntroductionMessage: function() {
-            var message = '';
-            var tabs = this.options.tabs;
-            if (!tabs || tabs.length < 2) {
-                message = StringUtils.interpolate(
-                    gettext('Change the settings for {display_name}'),
-                    {display_name: this.model.get('display_name')}
-                );
-            }
-            return message;
-        },
-
         initializeEditors: function() {
+            var tabsTemplate;
             var tabs = this.options.tabs;
             if (tabs && tabs.length > 0) {
                 if (tabs.length > 1) {
-                    var tabsTemplate = this.loadTemplate('settings-modal-tabs');
+                    tabsTemplate = this.loadTemplate('settings-modal-tabs');
                     HtmlUtils.setHtml(this.$('.modal-section'), HtmlUtils.HTML(tabsTemplate({tabs: tabs})));
                     _.each(this.options.tabs, function(tab) {
                         this.options.editors.push.apply(
@@ -217,6 +217,85 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         }
     });
 
+    HighlightsXBlockModal = CourseOutlineXBlockModal.extend({
+
+        events: _.extend({}, CourseOutlineXBlockModal.prototype.events, {
+            'click .action-save': 'callAnalytics',
+            'click .action-cancel': 'callAnalytics'
+        }),
+
+        initialize: function() {
+            CourseOutlineXBlockModal.prototype.initialize.call(this);
+            if (this.options.xblockType) {
+                this.options.modalName = 'highlights-' + this.options.xblockType;
+            }
+        },
+
+        getTitle: function() {
+            return StringUtils.interpolate(
+                gettext('Highlights for {display_name}'),
+                {display_name: this.model.get('display_name')}
+            );
+        },
+
+        getIntroductionMessage: function() {
+            return '';
+        },
+
+        callAnalytics: function(event) {
+            event.preventDefault();
+            window.analytics.track('edx.bi.highlights.' + event.target.innerText.toLowerCase());
+            if (event.target.className.indexOf('save') !== -1) {
+                this.save(event);
+            } else {
+                this.hide();
+            }
+        },
+
+        addActionButtons: function() {
+            this.addActionButton('save', gettext('Save'), true);
+            this.addActionButton('cancel', gettext('Cancel'));
+        }
+    });
+
+    HighlightsEnableXBlockModal = CourseOutlineXBlockModal.extend({
+
+        events: _.extend({}, CourseOutlineXBlockModal.prototype.events, {
+            'click .action-save': 'callAnalytics',
+            'click .action-cancel': 'callAnalytics'
+        }),
+
+        initialize: function() {
+            CourseOutlineXBlockModal.prototype.initialize.call(this);
+            if (this.options.xblockType) {
+                this.options.modalName = 'highlights-enable-' + this.options.xblockType;
+            }
+        },
+
+        getTitle: function() {
+            return gettext('Enable Weekly Highlight Emails');
+        },
+
+        getIntroductionMessage: function() {
+            return '';
+        },
+
+        callAnalytics: function(event) {
+            event.preventDefault();
+            window.analytics.track('edx.bi.highlights_enable.' + event.target.innerText.toLowerCase());
+            if (event.target.className.indexOf('save') !== -1) {
+                this.save(event);
+            } else {
+                this.hide();
+            }
+        },
+
+        addActionButtons: function() {
+            this.addActionButton('save', gettext('Enable'), true);
+            this.addActionButton('cancel', gettext('Not yet'));
+        }
+    });
+
     AbstractEditor = BaseView.extend({
         tagName: 'section',
         templateName: null,
@@ -258,10 +337,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
         afterRender: function() {
             AbstractEditor.prototype.afterRender.call(this);
-            this.$('input.date').datepicker({'dateFormat': 'm/d/yy'});
+            this.$('input.date').datepicker({dateFormat: 'm/d/yy'});
             this.$('input.time').timepicker({
-                'timeFormat': 'H:i',
-                'forceRoundTime': false
+                timeFormat: 'H:i',
+                forceRoundTime: false
             });
             if (this.model.get(this.fieldName)) {
                 DateUtils.setDate(
@@ -289,7 +368,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         getRequestData: function() {
             return {
                 metadata: {
-                    'due': this.getValue()
+                    due: this.getValue()
                 }
             };
         }
@@ -324,7 +403,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             }
             return {
                 metadata: {
-                    'start': newReleaseDate
+                    start: newReleaseDate
                 }
             };
         }
@@ -335,9 +414,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         className: 'edit-settings-timed-examination',
         events: {
             'change input.no_special_exam': 'notTimedExam',
-            'change input.timed_exam': 'setTimedExam',
-            'change input.practice_exam': 'setPracticeExam',
+            'change input.timed_exam': 'setSpecialExamWithoutRules',
+            'change input.practice_exam': 'setSpecialExamWithoutRules',
             'change input.proctored_exam': 'setProctoredExam',
+            'change input.onboarding_exam': 'setSpecialExamWithoutRules',
             'focusout .field-time-limit input': 'timeLimitFocusout'
         },
         notTimedExam: function(event) {
@@ -353,16 +433,11 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             }
             if (showRulesField) {
                 this.$('.field-exam-review-rules').show();
-            }
-            else {
+            } else {
                 this.$('.field-exam-review-rules').hide();
             }
         },
-        setTimedExam: function(event) {
-            event.preventDefault();
-            this.selectSpecialExam(false);
-        },
-        setPracticeExam: function(event) {
+        setSpecialExamWithoutRules: function(event) {
             event.preventDefault();
             this.selectSpecialExam(false);
         },
@@ -371,8 +446,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             this.selectSpecialExam(true);
         },
         timeLimitFocusout: function(event) {
+            var selectedTimeLimit;
+
             event.preventDefault();
-            var selectedTimeLimit = $(event.currentTarget).val();
+            selectedTimeLimit = $(event.currentTarget).val();
             if (!this.isValidTimeLimit(selectedTimeLimit)) {
                 $(event.currentTarget).val('00:30');
             }
@@ -380,31 +457,33 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         afterRender: function() {
             AbstractEditor.prototype.afterRender.call(this);
             this.$('input.time').timepicker({
-                'timeFormat': 'H:i',
-                'minTime': '00:30',
-                'maxTime': '24:00',
-                'forceRoundTime': false
+                timeFormat: 'H:i',
+                minTime: '00:30',
+                maxTime: '24:00',
+                forceRoundTime: false
             });
 
             this.setExamType(this.model.get('is_time_limited'), this.model.get('is_proctored_exam'),
-                            this.model.get('is_practice_exam'));
+                            this.model.get('is_practice_exam'), this.model.get('is_onboarding_exam'));
             this.setExamTime(this.model.get('default_time_limit_minutes'));
 
             this.setReviewRules(this.model.get('exam_review_rules'));
         },
-        setExamType: function(is_time_limited, is_proctored_exam, is_practice_exam) {
+        setExamType: function(isTimeLimited, isProctoredExam, isPracticeExam, isOnboardingExam) {
             this.$('.field-time-limit').hide();
             this.$('.field-exam-review-rules').hide();
 
-            if (!is_time_limited) {
+            if (!isTimeLimited) {
                 this.$('input.no_special_exam').prop('checked', true);
                 return;
             }
 
             this.$('.field-time-limit').show();
 
-            if (this.options.enable_proctored_exams && is_proctored_exam) {
-                if (is_practice_exam) {
+            if (this.options.enable_proctored_exams && isProctoredExam) {
+                if (isOnboardingExam) {
+                    this.$('input.onboarding_exam').prop('checked', true);
+                } else if (isPracticeExam) {
                     this.$('input.practice_exam').prop('checked', true);
                 } else {
                     this.$('input.proctored_exam').prop('checked', true);
@@ -424,9 +503,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         setReviewRules: function(value) {
             this.$('.field-exam-review-rules textarea').val(value);
         },
-        isValidTimeLimit: function(time_limit) {
+        isValidTimeLimit: function(timeLimit) {
             var pattern = new RegExp('^\\d{1,2}:[0-5][0-9]$');
-            return pattern.test(time_limit) && time_limit !== '00:00';
+            return pattern.test(timeLimit) && timeLimit !== '00:00';
         },
         getExamTimeLimit: function() {
             return this.$('.field-time-limit input').val();
@@ -438,48 +517,32 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             actualMinutesStr = '00'.substring(0, 2 - actualMinutesStr.length) + actualMinutesStr;
             return hoursStr + ':' + actualMinutesStr;
         },
-        convertTimeLimitToMinutes: function(time_limit) {
-            var time = time_limit.split(':');
-            var total_time = (parseInt(time[0]) * 60) + parseInt(time[1]);
-            return total_time;
+        convertTimeLimitToMinutes: function(timeLimit) {
+            var time = timeLimit.split(':');
+            var totalTime = (parseInt(time[0], 10) * 60) + parseInt(time[1], 10);
+            return totalTime;
         },
         getRequestData: function() {
-            var is_time_limited;
-            var is_practice_exam;
-            var is_proctored_exam;
-            var time_limit = this.getExamTimeLimit();
-            var exam_review_rules = this.$('.field-exam-review-rules textarea').val();
-
-            if (this.$('input.no_special_exam').is(':checked')) {
-                is_time_limited = false;
-                is_practice_exam = false;
-                is_proctored_exam = false;
-            } else if (this.$('input.timed_exam').is(':checked')) {
-                is_time_limited = true;
-                is_practice_exam = false;
-                is_proctored_exam = false;
-            } else if (this.$('input.proctored_exam').is(':checked')) {
-                is_time_limited = true;
-                is_practice_exam = false;
-                is_proctored_exam = true;
-            } else if (this.$('input.practice_exam').is(':checked')) {
-                is_time_limited = true;
-                is_practice_exam = true;
-                is_proctored_exam = true;
-            }
+            var isNoSpecialExamChecked = this.$('input.no_special_exam').is(':checked');
+            var isProctoredExamChecked = this.$('input.proctored_exam').is(':checked');
+            var isPracticeExamChecked = this.$('input.practice_exam').is(':checked');
+            var isOnboardingExamChecked = this.$('input.onboarding_exam').is(':checked');
+            var timeLimit = this.getExamTimeLimit();
+            var examReviewRules = this.$('.field-exam-review-rules textarea').val();
 
             return {
                 metadata: {
-                    'is_practice_exam': is_practice_exam,
-                    'is_time_limited': is_time_limited,
-                    'exam_review_rules': exam_review_rules,
+                    is_practice_exam: isPracticeExamChecked,
+                    is_time_limited: !isNoSpecialExamChecked,
+                    exam_review_rules: examReviewRules,
                     // We have to use the legacy field name
                     // as the Ajax handler directly populates
                     // the xBlocks fields. We will have to
                     // update this call site when we migrate
                     // seq_module.py to use 'is_proctored_exam'
-                    'is_proctored_enabled': is_proctored_exam,
-                    'default_time_limit_minutes': this.convertTimeLimitToMinutes(time_limit)
+                    is_proctored_enabled: isProctoredExamChecked || isPracticeExamChecked || isOnboardingExamChecked,
+                    default_time_limit_minutes: this.convertTimeLimitToMinutes(timeLimit),
+                    is_onboarding_exam: isOnboardingExamChecked
                 }
             };
         }
@@ -490,50 +553,70 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         className: 'edit-settings-access',
         events: {
             'change #prereq': 'handlePrereqSelect',
-            'keyup #prereq_min_score': 'validateMinScore'
+            'keyup #prereq_min_completion': 'validateScoreAndCompletion',
+            'keyup #prereq_min_score': 'validateScoreAndCompletion'
         },
         afterRender: function() {
+            var prereq, prereqMinScore, prereqMinCompletion;
+
             AbstractEditor.prototype.afterRender.call(this);
-            var prereq = this.model.get('prereq') || '';
-            var prereq_min_score = this.model.get('prereq_min_score') || '';
+            prereq = this.model.get('prereq') || '';
+            prereqMinScore = this.model.get('prereq_min_score') || '100';
+            prereqMinCompletion = this.model.get('prereq_min_completion') || '100';
             this.$('#is_prereq').prop('checked', this.model.get('is_prereq'));
             this.$('#prereq option[value="' + prereq + '"]').prop('selected', true);
-            this.$('#prereq_min_score').val(prereq_min_score);
+            this.$('#prereq_min_score').val(prereqMinScore);
             this.$('#prereq_min_score_input').toggle(prereq.length > 0);
+            this.$('#prereq_min_completion').val(prereqMinCompletion);
+            this.$('#prereq_min_completion_input').toggle(prereq.length > 0);
         },
         handlePrereqSelect: function() {
             var showPrereqInput = this.$('#prereq option:selected').val().length > 0;
             this.$('#prereq_min_score_input').toggle(showPrereqInput);
+            this.$('#prereq_min_completion_input').toggle(showPrereqInput);
         },
-        validateMinScore: function() {
+        isValidPercentage: function(val) {
+            var intVal = parseInt(val, 10);
+            return (typeof val !== 'undefined' && val !== '' && intVal >= 0 && intVal <= 100 && String(intVal) === val);
+        },
+        validateScoreAndCompletion: function() {
+            var invalidInput = false;
             var minScore = this.$('#prereq_min_score').val().trim();
-            var minScoreInt = parseInt(minScore);
-            // minScore needs to be an integer between 0 and 100
-            if (
-                minScore &&
-                (
-                    typeof(minScoreInt) === 'undefined' ||
-                    String(minScoreInt) !== minScore ||
-                    minScoreInt < 0 ||
-                    minScoreInt > 100
-                )
-            ) {
+            var minCompletion = this.$('#prereq_min_completion').val().trim();
+
+            if (minScore === '' || !this.isValidPercentage(minScore)) {
+                invalidInput = true;
                 this.$('#prereq_min_score_error').show();
-                BaseModal.prototype.disableActionButton.call(this.parent, 'save');
             } else {
                 this.$('#prereq_min_score_error').hide();
+            }
+            if (minCompletion === '' || !this.isValidPercentage(minCompletion)) {
+                invalidInput = true;
+                this.$('#prereq_min_completion_error').show();
+            } else {
+                this.$('#prereq_min_completion_error').hide();
+            }
+            if (invalidInput) {
+                BaseModal.prototype.disableActionButton.call(this.parent, 'save');
+            } else {
                 BaseModal.prototype.enableActionButton.call(this.parent, 'save');
             }
         },
         getRequestData: function() {
             var minScore = this.$('#prereq_min_score').val();
+            var minCompletion = this.$('#prereq_min_completion').val();
             if (minScore) {
                 minScore = minScore.trim();
             }
+            if (minCompletion) {
+                minCompletion = minCompletion.trim();
+            }
+
             return {
                 isPrereq: this.$('#is_prereq').is(':checked'),
                 prereqUsageKey: this.$('#prereq option:selected').val(),
-                prereqMinScore: minScore
+                prereqMinScore: minScore,
+                prereqMinCompletion: minCompletion
             };
         }
     });
@@ -557,7 +640,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
         getRequestData: function() {
             return {
-                'graderType': this.getValue()
+                graderType: this.getValue()
             };
         },
 
@@ -579,6 +662,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
     });
 
     AbstractVisibilityEditor = AbstractEditor.extend({
+
         afterRender: function() {
             AbstractEditor.prototype.afterRender.call(this);
         },
@@ -633,6 +717,96 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         }
     });
 
+    UnitAccessEditor = AbstractVisibilityEditor.extend({
+        templateName: 'unit-access-editor',
+        className: 'edit-unit-access',
+        events: {
+            'change .user-partition-select': function() {
+                this.hideCheckboxDivs();
+                this.showSelectedDiv(this.getSelectedEnrollmentTrackId());
+            }
+        },
+
+        afterRender: function() {
+            var groupAccess,
+                keys;
+            AbstractVisibilityEditor.prototype.afterRender.call(this);
+            this.hideCheckboxDivs();
+            if (this.model.attributes.group_access) {
+                groupAccess = this.model.attributes.group_access;
+                keys = Object.keys(groupAccess);
+                if (keys.length === 1) { // should be only one partition key
+                    if (groupAccess.hasOwnProperty(keys[0]) && groupAccess[keys[0]].length > 0) {
+                        // Select the option that has group access, provided there is a specific group within the scheme
+                        this.$('.user-partition-select option[value=' + keys[0] + ']').prop('selected', true);
+                        this.showSelectedDiv(keys[0]);
+                        // Change default option to 'All Learners and Staff' if unit is currently restricted
+                        this.$('#partition-select option:first').text(gettext('All Learners and Staff'));
+                    }
+                }
+            }
+        },
+
+        getSelectedEnrollmentTrackId: function() {
+            return parseInt(this.$('.user-partition-select').val(), 10);
+        },
+
+        getCheckboxDivs: function() {
+            return $('.user-partition-group-checkboxes').children('div');
+        },
+
+        getSelectedCheckboxesByDivId: function(contentGroupId) {
+            var $checkboxes = $('#' + contentGroupId + '-checkboxes input:checked'),
+                selectedCheckboxValues = [],
+                i;
+            for (i = 0; i < $checkboxes.length; i++) {
+                selectedCheckboxValues.push(parseInt($($checkboxes[i]).val(), 10));
+            }
+            return selectedCheckboxValues;
+        },
+
+        showSelectedDiv: function(contentGroupId) {
+            $('#' + contentGroupId + '-checkboxes').show();
+        },
+
+        hideCheckboxDivs: function() {
+            this.getCheckboxDivs().hide();
+        },
+
+        hasChanges: function() {
+            // compare the group access object retrieved vs the current selection
+            return (JSON.stringify(this.model.get('group_access')) !== JSON.stringify(this.getGroupAccessData()));
+        },
+
+        getGroupAccessData: function() {
+            var userPartitionId = this.getSelectedEnrollmentTrackId(),
+                groupAccess = {};
+            if (userPartitionId !== -1 && !isNaN(userPartitionId)) {
+                groupAccess[userPartitionId] = this.getSelectedCheckboxesByDivId(userPartitionId);
+                return groupAccess;
+            } else {
+                return {};
+            }
+        },
+
+        getRequestData: function() {
+            var metadata = {},
+                groupAccessData = this.getGroupAccessData();
+
+            if (this.hasChanges()) {
+                if (groupAccessData) {
+                    metadata.group_access = groupAccessData;
+                }
+                return {
+                    publish: 'republish',
+                    metadata: metadata
+                };
+            } else {
+                return {};
+            }
+        }
+    });
+
     ContentVisibilityEditor = AbstractVisibilityEditor.extend({
         templateName: 'content-visibility-editor',
         className: 'edit-content-visibility',
@@ -669,9 +843,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         toggleUnlockWarning: function() {
+            var display;
             var warning = this.$('.staff-lock .tip-warning');
             if (warning) {
-                var display;
                 if (this.currentVisibility() !== 'staff_only') {
                     display = 'block';
                 } else {
@@ -684,13 +858,14 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         getRequestData: function() {
+            var metadata;
+
             if (this.hasChanges()) {
-                var metadata = {};
+                metadata = {};
                 if (this.currentVisibility() === 'staff_only') {
                     metadata.visible_to_staff_only = true;
                     metadata.hide_after_due = null;
-                }
-                else if (this.currentVisibility() === 'hide_after_due') {
+                } else if (this.currentVisibility() === 'hide_after_due') {
                     metadata.visible_to_staff_only = null;
                     metadata.hide_after_due = true;
                 } else {
@@ -702,8 +877,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                     publish: 'republish',
                     metadata: metadata
                 };
-            }
-            else {
+            } else {
                 return {};
             }
         },
@@ -712,111 +886,135 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             return $.extend(
                 {},
                 AbstractVisibilityEditor.prototype.getContext.call(this),
-                {hide_after_due: this.modelVisibility() === 'hide_after_due'}
+                {
+                    hide_after_due: this.modelVisibility() === 'hide_after_due',
+                    self_paced: course.get('self_paced') === true
+                }
             );
         }
     });
 
-    VerificationAccessEditor = AbstractEditor.extend({
-        templateName: 'verification-access-editor',
-        className: 'edit-verification-access',
+    ShowCorrectnessEditor = AbstractEditor.extend({
+        templateName: 'show-correctness-editor',
+        className: 'edit-show-correctness',
 
-        // This constant MUST match the group ID
-        // defined by VerificationPartitionScheme on the backend!
-        ALLOW_GROUP_ID: 1,
-
-        getSelectedPartition: function() {
-            var hasRestrictions = $('#verification-access-checkbox').is(':checked'),
-                selectedPartitionID = null;
-
-            if (hasRestrictions) {
-                selectedPartitionID = $('#verification-partition-select').val();
-            }
-
-            return parseInt(selectedPartitionID, 10);
+        afterRender: function() {
+            AbstractEditor.prototype.afterRender.call(this);
+            this.setValue(this.model.get('show_correctness') || 'always');
         },
 
-        getGroupAccess: function() {
-            var groupAccess = _.clone(this.model.get('group_access')) || [],
-                userPartitions = this.model.get('user_partitions') || [],
-                selectedPartition = this.getSelectedPartition(),
-                that = this;
+        setValue: function(value) {
+            this.$('input[name=show-correctness][value=' + value + ']').prop('checked', true);
+        },
 
-            // We display a simplified UI to course authors.
-            // On the backend, each verification checkpoint is associated
-            // with a user partition that has two groups.  For example,
-            // if two checkpoints were defined, they might look like:
-            //
-            // Midterm A: |-- ALLOW --|-- DENY --|
-            // Midterm B: |-- ALLOW --|-- DENY --|
-            //
-            // To make life easier for course authors, we display
-            // *one* option for each checkpoint:
-            //
-            // [X] Must complete verification checkpoint
-            //     Dropdown:
-            //        * Midterm A
-            //        * Midterm B
-            //
-            // This is where we map the simplified UI to
-            // the underlying user partition.  If the user checked
-            // the box, that means there *is* a restriction,
-            // so only the "ALLOW" group for the selected partition has access.
-            // Otherwise, all groups in the partition have access.
-            //
-            _.each(userPartitions, function(partition) {
-                if (partition.scheme === 'verification') {
-                    if (selectedPartition === partition.id) {
-                        groupAccess[partition.id] = [that.ALLOW_GROUP_ID];
-                    } else {
-                        delete groupAccess[partition.id];
-                    }
-                }
-            });
+        currentValue: function() {
+            return this.$('input[name=show-correctness]:checked').val();
+        },
 
-            return groupAccess;
+        hasChanges: function() {
+            return this.model.get('show_correctness') !== this.currentValue();
         },
 
         getRequestData: function() {
-            var groupAccess = this.getGroupAccess(),
-                hasChanges = !_.isEqual(groupAccess, this.model.get('group_access'));
-
-            return hasChanges ? {
-                publish: 'republish',
-                metadata: {
-                    group_access: groupAccess
-                }
-            } : {};
+            if (this.hasChanges()) {
+                return {
+                    publish: 'republish',
+                    metadata: {
+                        show_correctness: this.currentValue()
+                    }
+                };
+            } else {
+                return {};
+            }
         },
-
         getContext: function() {
-            var partitions = this.model.get('user_partitions'),
-                hasRestrictions = false,
-                verificationPartitions = [],
-                isSelected = false;
+            return $.extend(
+                {},
+                AbstractEditor.prototype.getContext.call(this),
+                {
+                    self_paced: course.get('self_paced') === true
+                }
+            );
+        }
+    });
 
-            // Display a simplified version of verified partition schemes.
-            // Although there are two groups defined (ALLOW and DENY),
-            // we show only the ALLOW group.
-            // To avoid searching all the groups, we're assuming that the editor
-            // either sets the ALLOW group or doesn't set any groups (implicitly allow all).
-            _.each(partitions, function(item) {
-                if (item.scheme === 'verification') {
-                    isSelected = _.any(_.pluck(item.groups, 'selected'));
-                    hasRestrictions = hasRestrictions || isSelected;
+    HighlightsEditor = AbstractEditor.extend({
+        templateName: 'highlights-editor',
+        className: 'edit-show-highlights',
 
-                    verificationPartitions.push({
-                        'id': item.id,
-                        'name': item.name,
-                        'selected': isSelected
-                    });
+        currentValue: function() {
+            var highlights = [];
+            $('.highlight-input-text').each(function() {
+                var value = $(this).val();
+                if (value !== '' && value !== null) {
+                    highlights.push(value);
                 }
             });
+            return highlights;
+        },
 
-            return {
-                'hasVerificationRestrictions': hasRestrictions,
-                'verificationPartitions': verificationPartitions
-            };
+        hasChanges: function() {
+            return this.model.get('highlights') !== this.currentValue();
+        },
+
+        getRequestData: function() {
+            if (this.hasChanges()) {
+                return {
+                    publish: 'republish',
+                    metadata: {
+                        highlights: this.currentValue()
+                    }
+                };
+            } else {
+                return {};
+            }
+        },
+        getContext: function() {
+            return $.extend(
+                {},
+                AbstractEditor.prototype.getContext.call(this),
+                {
+                    highlights: this.model.get('highlights'),
+                    highlights_preview_only: this.model.get('highlights_preview_only'),
+                    highlights_doc_url: this.model.get('highlights_doc_url')
+                }
+            );
+        }
+    });
+
+    HighlightsEnableEditor = AbstractEditor.extend({
+        templateName: 'highlights-enable-editor',
+        className: 'edit-enable-highlights',
+
+        currentValue: function() {
+            return true;
+        },
+
+        hasChanges: function() {
+            return this.model.get('highlights_enabled_for_messaging') !== this.currentValue();
+        },
+
+        getRequestData: function() {
+            if (this.hasChanges()) {
+                return {
+                    publish: 'republish',
+                    metadata: {
+                        highlights_enabled_for_messaging: this.currentValue()
+                    }
+                };
+            } else {
+                return {};
+            }
+        },
+        getContext: function() {
+            return $.extend(
+                {},
+                AbstractEditor.prototype.getContext.call(this),
+                {
+                    highlights_enabled: this.model.get('highlights_enabled_for_messaging'),
+                    highlights_doc_url: this.model.get('highlights_doc_url')
+                }
+            );
         }
     });
 
@@ -826,18 +1024,25 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 return this.getEditModal(xblockInfo, options);
             } else if (type === 'publish') {
                 return this.getPublishModal(xblockInfo, options);
+            } else if (type === 'highlights') {
+                return this.getHighlightsModal(xblockInfo, options);
+            } else if (type === 'highlights_enable') {
+                return this.getHighlightsEnableModal(xblockInfo, options);
+            } else {
+                return null;
             }
         },
 
         getEditModal: function(xblockInfo, options) {
             var tabs = [];
             var editors = [];
+            var advancedTab = {
+                name: 'advanced',
+                displayName: gettext('Advanced'),
+                editors: []
+            };
             if (xblockInfo.isVertical()) {
-                editors = [StaffLockEditor];
-
-                if (xblockInfo.hasVerifiedCheckpoints()) {
-                    editors.push(VerificationAccessEditor);
-                }
+                editors = [StaffLockEditor, UnitAccessEditor];
             } else {
                 tabs = [
                     {
@@ -846,8 +1051,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                         editors: []
                     },
                     {
-                        name: 'advanced',
-                        displayName: gettext('Advanced'),
+                        name: 'visibility',
+                        displayName: gettext('Visibility'),
                         editors: []
                     }
                 ];
@@ -856,14 +1061,19 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                     tabs[1].editors = [StaffLockEditor];
                 } else if (xblockInfo.isSequential()) {
                     tabs[0].editors = [ReleaseDateEditor, GradingEditor, DueDateEditor];
-                    tabs[1].editors = [ContentVisibilityEditor];
+                    tabs[1].editors = [ContentVisibilityEditor, ShowCorrectnessEditor];
 
                     if (options.enable_proctored_exams || options.enable_timed_exams) {
-                        tabs[1].editors.push(TimedExaminationPreferenceEditor);
+                        advancedTab.editors.push(TimedExaminationPreferenceEditor);
                     }
 
                     if (typeof(xblockInfo.get('is_prereq')) !== 'undefined') {
-                        tabs[1].editors.push(AccessEditor);
+                        advancedTab.editors.push(AccessEditor);
+                    }
+
+                    // Show the Advanced tab iff it has editors to display
+                    if (advancedTab.editors.length > 0) {
+                        tabs.push(advancedTab);
                     }
                 }
             }
@@ -886,6 +1096,20 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         getPublishModal: function(xblockInfo, options) {
             return new PublishXBlockModal($.extend({
                 editors: [PublishEditor],
+                model: xblockInfo
+            }, options));
+        },
+
+        getHighlightsModal: function(xblockInfo, options) {
+            return new HighlightsXBlockModal($.extend({
+                editors: [HighlightsEditor],
+                model: xblockInfo
+            }, options));
+        },
+
+        getHighlightsEnableModal: function(xblockInfo, options) {
+            return new HighlightsEnableXBlockModal($.extend({
+                editors: [HighlightsEnableEditor],
                 model: xblockInfo
             }, options));
         }

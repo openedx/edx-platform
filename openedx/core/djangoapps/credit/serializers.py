@@ -1,15 +1,17 @@
 """ Credit API Serializers """
 
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
+
 import datetime
 import logging
 
-from django.conf import settings
 import pytz
+import six
+from django.conf import settings
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
 
-from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider, CreditEligibility, CreditRequest
+from openedx.core.djangoapps.credit.models import CreditCourse, CreditEligibility, CreditProvider, CreditRequest
 from openedx.core.djangoapps.credit.signature import get_shared_secret_key, signature
 from openedx.core.lib.api.serializers import CourseKeyField
 from util.date_utils import from_timestamp
@@ -46,7 +48,7 @@ class CreditEligibilitySerializer(serializers.ModelSerializer):
 
     def get_course_key(self, obj):
         """ Returns the course key associated with the course. """
-        return unicode(obj.course.course_key)
+        return six.text_type(obj.course.course_key)
 
     class Meta(object):
         model = CreditEligibility

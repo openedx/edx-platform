@@ -1,19 +1,23 @@
 """
 Template for PDF Receipt/Invoice Generation
 """
-from PIL import Image
+from __future__ import absolute_import
+
 import logging
-from reportlab.lib import colors
+
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from reportlab.pdfgen.canvas import Canvas
+from PIL import Image
+from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
-from reportlab.lib.units import mm
 from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import mm
+from reportlab.pdfgen.canvas import Canvas
 from reportlab.platypus import Paragraph
 from reportlab.platypus.tables import Table, TableStyle
-from xmodule.modulestore.django import ModuleI18nService
+
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from xmodule.modulestore.django import ModuleI18nService
 
 log = logging.getLogger("PDF Generation")
 
@@ -62,7 +66,7 @@ class NumberedCanvas(Canvas):
         self.drawRightString(
             200 * mm,
             12 * mm,
-            _("Page {page_number} of {page_count}").format(page_number=self._pageNumber, page_count=page_count)
+            _(u"Page {page_number} of {page_count}").format(page_number=self._pageNumber, page_count=page_count)
         )
 
 
@@ -178,8 +182,8 @@ class PDFInvoice(object):
         """
         try:
             img = Image.open(img_path)
-        except IOError, ex:
-            log.exception('Pdf unable to open the image file: %s', str(ex))
+        except IOError as ex:
+            log.exception(u'Pdf unable to open the image file: %s', str(ex))
             img = None
 
         return img
@@ -379,7 +383,7 @@ class PDFInvoice(object):
         if self.is_invoice:
             # only print TaxID if we are generating an Invoice
             totals_data.append(
-                ['', '{tax_label}:  {tax_id}'.format(tax_label=self.tax_label, tax_id=self.tax_id)]
+                ['', u'{tax_label}:  {tax_id}'.format(tax_label=self.tax_label, tax_id=self.tax_id)]
             )
 
         heights = 8 * mm

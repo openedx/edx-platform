@@ -55,8 +55,8 @@
              */
             renderCourses: function(data) {
                 this.$('.preview-results').html(_.template(catalogResultsTpl)({
-                    'courses': data.results,
-                    'catalogApiUrl': this.catalogApiUrl
+                    courses: data.results,
+                    catalogApiUrl: this.catalogApiUrl
                 }));
             }
         });

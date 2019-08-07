@@ -1,10 +1,14 @@
 """
 Tests for Mobile API Configuration Models
 """
+from __future__ import absolute_import
+
 from datetime import datetime
+
 import ddt
 from django.test import TestCase
 from pytz import UTC
+
 from mobile_api.models import AppVersionConfig, MobileApiConfig
 
 
@@ -13,8 +17,6 @@ class TestAppVersionConfigModel(TestCase):
     """
     Tests for app version configuration model
     """
-    def setUp(self):
-        super(TestAppVersionConfigModel, self).setUp()
 
     def set_app_version_config(self):
         """ Creates configuration data for platform versions """
@@ -22,19 +24,19 @@ class TestAppVersionConfigModel(TestCase):
         AppVersionConfig(
             platform="ios",
             version="2.2.2",
-            expire_at=datetime(2014, 01, 01, tzinfo=UTC),
+            expire_at=datetime(2014, 1, 1, tzinfo=UTC),
             enabled=True
         ).save()
         AppVersionConfig(
             platform="ios",
             version="4.1.1",
-            expire_at=datetime(5000, 01, 01, tzinfo=UTC),
+            expire_at=datetime(5000, 1, 1, tzinfo=UTC),
             enabled=False
         ).save()
         AppVersionConfig(
             platform="ios",
             version="4.4.4",
-            expire_at=datetime(9000, 01, 01, tzinfo=UTC),
+            expire_at=datetime(9000, 1, 1, tzinfo=UTC),
             enabled=True
         ).save()
         AppVersionConfig(platform="ios", version="6.6.6", expire_at=None, enabled=True).save()
@@ -44,13 +46,13 @@ class TestAppVersionConfigModel(TestCase):
         AppVersionConfig(
             platform="android",
             version="2.2.2",
-            expire_at=datetime(2014, 01, 01, tzinfo=UTC),
+            expire_at=datetime(2014, 1, 1, tzinfo=UTC),
             enabled=True
         ).save()
         AppVersionConfig(
             platform="android",
             version="4.4.4",
-            expire_at=datetime(9000, 01, 01, tzinfo=UTC),
+            expire_at=datetime(9000, 1, 1, tzinfo=UTC),
             enabled=True
         ).save()
         AppVersionConfig(platform="android", version="8.8.8", expire_at=None, enabled=True).save()

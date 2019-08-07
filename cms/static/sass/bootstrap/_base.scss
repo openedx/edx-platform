@@ -1,0 +1,15 @@
+// Open edX: Studio base styles
+// ============================
+//
+// Note: these styles replicate the Studio styles directly
+// rather than benefiting from any Bootstrap classes. Ideally
+// the code base should be rebuilt using Bootstrap and then
+// these styles will no longer be necessary.
+
+.is-hidden {
+  display: none;
+}
+
+.sr {
+  @include sr-only();
+}

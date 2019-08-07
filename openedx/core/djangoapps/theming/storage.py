@@ -2,24 +2,29 @@
 Comprehensive Theming support for Django's collectstatic functionality.
 See https://docs.djangoproject.com/en/1.8/ref/contrib/staticfiles/
 """
-import posixpath
-import os.path
-from django.conf import settings
-from django.utils._os import safe_join
-from django.contrib.staticfiles.storage import StaticFilesStorage, CachedFilesMixin
-from django.contrib.staticfiles.finders import find
-from django.utils.six.moves.urllib.parse import (  # pylint: disable=no-name-in-module, import-error
-    unquote, urlsplit,
-)
+from __future__ import absolute_import
 
+import os.path
+import posixpath
+import re
+
+from django.conf import settings
+from django.contrib.staticfiles.finders import find
+from django.contrib.staticfiles.storage import CachedFilesMixin, StaticFilesStorage
+from django.utils._os import safe_join
+from django.utils.six.moves.urllib.parse import (  # pylint: disable=no-name-in-module, import-error
+    unquote,
+    urldefrag,
+    urlsplit
+)
 from pipeline.storage import PipelineMixin
 
 from openedx.core.djangoapps.theming.helpers import (
-    get_theme_base_dir,
-    get_project_root_name,
     get_current_theme,
+    get_project_root_name,
+    get_theme_base_dir,
     get_themes,
-    is_comprehensive_theming_enabled,
+    is_comprehensive_theming_enabled
 )
 
 
@@ -111,10 +116,10 @@ class ThemeCachedFilesMixin(CachedFilesMixin):
     """
     Comprehensive theme aware CachedFilesMixin.
     Main purpose of subclassing CachedFilesMixin is to override the following methods.
-    1 - url
+    1 - _url
     2 - url_converter
 
-    url:
+    _url:
         This method takes asset name as argument and is responsible for adding hash to the name to support caching.
         This method is called during both collectstatic command and live server run.
 
@@ -138,13 +143,16 @@ class ThemeCachedFilesMixin(CachedFilesMixin):
         want it to return absolute url (e.g. url("/static/images/logo.790c9a5340cb.png")) so that it works properly
         with themes.
 
-        The overridden method here simply comments out the two lines that convert absolute url to relative url,
+        The overridden method here simply comments out the line that convert absolute url to relative url,
         hence absolute urls are used instead of relative urls.
     """
 
-    def url(self, name, force=False):
+    def _processed_asset_name(self, name):
         """
-        Returns themed url for the given asset.
+        Returns either a themed or unthemed version of the given asset name,
+        depending on several factors.
+
+        See the class docstring for more info.
         """
         theme = get_current_theme()
         if theme and theme.theme_dir_name not in name:
@@ -162,62 +170,79 @@ class ThemeCachedFilesMixin(CachedFilesMixin):
             if theme in [theme.theme_dir_name for theme in get_themes()]:
                 asset_name = "/".join(name.split("/")[1:])
 
-        return super(ThemeCachedFilesMixin, self).url(asset_name, force)
+        return asset_name
 
-    def url_converter(self, name, template=None):
+    def _url(self, hashed_name_func, name, force=False, hashed_files=None):
+        """
+        This override method swaps out `name` with a processed version.
+
+        See the class docstring for more info.
+        """
+        processed_asset_name = self._processed_asset_name(name)
+        return super(ThemeCachedFilesMixin, self)._url(hashed_name_func, processed_asset_name, force, hashed_files)
+
+    def url_converter(self, name, hashed_files, template=None):
         """
         This is an override of url_converter from CachedFilesMixin.
-        It just comments out two lines at the end of the method.
-
-        The purpose of this override is to make converter method return absolute urls instead of relative urls.
-        This behavior is necessary for theme overrides, as we get 404 on assets with relative urls on a themed site.
+        It changes one line near the end of the method (see the NOTE) in order
+        to return absolute urls instead of relative urls.  This behavior is
+        necessary for theme overrides, as we get 404 on assets with relative
+        urls on a themed site.
         """
         if template is None:
             template = self.default_template
 
         def converter(matchobj):
             """
-            Converts the matched URL depending on the parent level (`..`)
-            and returns the normalized and hashed URL using the url method
-            of the storage.
+            Convert the matched URL to a normalized and hashed URL.
+            This requires figuring out which files the matched URL resolves
+            to and calling the url() method of the storage.
             """
             matched, url = matchobj.groups()
-            # Completely ignore http(s) prefixed URLs,
-            # fragments and data-uri URLs
-            if url.startswith(('#', 'http:', 'https:', 'data:', '//')):
+
+            # Ignore absolute/protocol-relative and data-uri URLs.
+            if re.match(r'^[a-z]+:', url):
                 return matched
-            name_parts = name.split(os.sep)
-            # Using posix normpath here to remove duplicates
-            url = posixpath.normpath(url)
-            url_parts = url.split('/')
-            parent_level, sub_level = url.count('..'), url.count('/')
-            if url.startswith('/'):
-                sub_level -= 1
-                url_parts = url_parts[1:]
-            if parent_level or not url.startswith('/'):
-                start, end = parent_level + 1, parent_level
+
+            # Ignore absolute URLs that don't point to a static file (dynamic
+            # CSS / JS?). Note that STATIC_URL cannot be empty.
+            if url.startswith('/') and not url.startswith(settings.STATIC_URL):
+                return matched
+
+            # Strip off the fragment so a path-like fragment won't interfere.
+            url_path, fragment = urldefrag(url)
+
+            if url_path.startswith('/'):
+                # Otherwise the condition above would have returned prematurely.
+                assert url_path.startswith(settings.STATIC_URL)
+                target_name = url_path[len(settings.STATIC_URL):]
             else:
-                if sub_level:
-                    if sub_level == 1:
-                        parent_level -= 1
-                    start, end = parent_level, 1
-                else:
-                    start, end = 1, sub_level - 1
-            joined_result = '/'.join(name_parts[:-start] + url_parts[end:])
-            hashed_url = self.url(unquote(joined_result), force=True)
+                # We're using the posixpath module to mix paths and URLs conveniently.
+                source_name = name if os.sep == '/' else name.replace(os.sep, '/')
+                target_name = posixpath.join(posixpath.dirname(source_name), url_path)
+
+            # Determine the hashed name of the target file with the storage backend.
+            hashed_url = self._url(
+                self._stored_name, unquote(target_name),
+                force=True, hashed_files=hashed_files,
+            )
 
             # NOTE:
-            # following two lines are commented out so that absolute urls are used instead of relative urls
-            # to make themed assets work correctly.
+            # The line below was commented out so that absolute urls are used instead of relative urls to make themed
+            # assets work correctly.
             #
-            # The lines are commented and not removed to make future django upgrade easier and
-            # show exactly what is changed in this method override
+            # The line is commented and not removed to make future django upgrade easier and show exactly what is
+            # changed in this method override
             #
-            # file_name = hashed_url.split('/')[-1:]
-            # relative_url = '/'.join(url.split('/')[:-1] + file_name)
+            #transformed_url = '/'.join(url_path.split('/')[:-1] + hashed_url.split('/')[-1:])
+            transformed_url = hashed_url  # This line was added.
+
+            # Restore the fragment that was stripped off earlier.
+            if fragment:
+                transformed_url += ('?#' if '?#' in url else '#') + fragment
 
             # Return the hashed version to the file
-            return template % unquote(hashed_url)
+            return template % unquote(transformed_url)
 
         return converter
 
@@ -252,23 +277,15 @@ class ThemePipelineMixin(PipelineMixin):
         themes = get_themes()
 
         for theme in themes:
-            css_packages = self.get_themed_packages(theme.theme_dir_name, settings.PIPELINE_CSS)
-            js_packages = self.get_themed_packages(theme.theme_dir_name, settings.PIPELINE_JS)
+            css_packages = self.get_themed_packages(theme.theme_dir_name, settings.PIPELINE['STYLESHEETS'])
 
             from pipeline.packager import Packager
-            packager = Packager(storage=self, css_packages=css_packages, js_packages=js_packages)
+            packager = Packager(storage=self, css_packages=css_packages)
             for package_name in packager.packages['css']:
                 package = packager.package_for('css', package_name)
                 output_file = package.output_filename
                 if self.packing:
                     packager.pack_stylesheets(package)
-                paths[output_file] = (self, output_file)
-                yield output_file, output_file, True
-            for package_name in packager.packages['js']:
-                package = packager.package_for('js', package_name)
-                output_file = package.output_filename
-                if self.packing:
-                    packager.pack_javascripts(package)
                 paths[output_file] = (self, output_file)
                 yield output_file, output_file, True
 

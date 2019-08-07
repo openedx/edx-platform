@@ -1,20 +1,22 @@
 """
 Views related to course tabs
 """
-from student.auth import has_course_author_access
-from util.json_request import expect_json, JsonResponse
+from __future__ import absolute_import
 
-from django.http import HttpResponseNotFound
+import six
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseNotFound
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from edxmako.shortcuts import render_to_response
-from xmodule.modulestore.django import modulestore
+from student.auth import has_course_author_access
+from util.json_request import JsonResponse, expect_json
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.tabs import CourseTabList, CourseTab, InvalidTabsException, StaticTab
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from xmodule.modulestore.django import modulestore
+from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException, StaticTab
 
 from ..utils import get_lms_link_for_item
 
@@ -61,7 +63,8 @@ def tabs_handler(request, course_key_string):
         # present in the same order they are displayed in LMS
 
         tabs_to_render = []
-        for tab in CourseTabList.iterate_displayable(course_item, inline_collections=False):
+        for tab in CourseTabList.iterate_displayable(course_item, user=request.user, inline_collections=False,
+                                                     include_hidden=True):
             if isinstance(tab, StaticTab):
                 # static tab needs its locator information to render itself as an xmodule
                 static_tab_loc = course_key.make_usage_key('static_tab', tab.url_slug)
@@ -97,7 +100,7 @@ def reorder_tabs_handler(course_item, request):
         tab = get_tab_by_tab_id_locator(old_tab_list, tab_id_locator)
         if tab is None:
             return JsonResponse(
-                {"error": "Tab with id_locator '{0}' does not exist.".format(tab_id_locator)}, status=400
+                {"error": u"Tab with id_locator '{0}' does not exist.".format(tab_id_locator)}, status=400
             )
         new_tab_list.append(tab)
 
@@ -109,9 +112,9 @@ def reorder_tabs_handler(course_item, request):
     # validate the tabs to make sure everything is Ok (e.g., did the client try to reorder unmovable tabs?)
     try:
         CourseTabList.validate_tabs(new_tab_list)
-    except InvalidTabsException, exception:
+    except InvalidTabsException as exception:
         return JsonResponse(
-            {"error": "New list of tabs is not valid: {0}.".format(str(exception))}, status=400
+            {"error": u"New list of tabs is not valid: {0}.".format(str(exception))}, status=400
         )
 
     # persist the new order of the tabs
@@ -133,7 +136,7 @@ def edit_tab_handler(course_item, request):
     tab = get_tab_by_tab_id_locator(course_item.tabs, tab_id_locator)
     if tab is None:
         return JsonResponse(
-            {"error": "Tab with id_locator '{0}' does not exist.".format(tab_id_locator)}, status=400
+            {"error": u"Tab with id_locator '{0}' does not exist.".format(tab_id_locator)}, status=400
         )
 
     if 'is_hidden' in request.json:
@@ -141,7 +144,7 @@ def edit_tab_handler(course_item, request):
         tab.is_hidden = request.json['is_hidden']
         modulestore().update_item(course_item, request.user.id)
     else:
-        raise NotImplementedError('Unsupported request to edit tab: {0}'.format(request.json))
+        raise NotImplementedError(u'Unsupported request to edit tab: {0}'.format(request.json))
 
     return JsonResponse()
 
@@ -197,7 +200,7 @@ def primitive_delete(course, num):
 def primitive_insert(course, num, tab_type, name):
     "Inserts a new tab at the given number (0 based)."
     validate_args(num, tab_type)
-    new_tab = CourseTab.from_json({u'type': unicode(tab_type), u'name': unicode(name)})
+    new_tab = CourseTab.from_json({u'type': six.text_type(tab_type), u'name': six.text_type(name)})
     tabs = course.tabs
     tabs.insert(num, new_tab)
     modulestore().update_item(course, ModuleStoreEnum.UserID.primitive_command)

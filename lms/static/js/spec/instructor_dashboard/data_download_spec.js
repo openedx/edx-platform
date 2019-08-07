@@ -1,8 +1,8 @@
 /* global define */
 define(['jquery',
-        'js/instructor_dashboard/data_download',
-        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-        'slick.grid'],
+    'js/instructor_dashboard/data_download',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'slick.grid'],
     function($, DataDownload, AjaxHelpers) {
         'use strict';
         describe('edx.instructor_dashboard.data_download.DataDownload_Certificate', function() {
@@ -19,9 +19,9 @@ define(['jquery',
                 // Spy on AJAX requests
                 var requests = AjaxHelpers.requests(this);
                 var data = {
-                    'certificates': [{'course_id': 'xyz_test', 'mode': 'honor'}],
-                    'queried_features': ['course_id', 'mode'],
-                    'feature_names': {'course_id': 'Course ID', 'mode': ' Mode'}
+                    certificates: [{course_id: 'xyz_test', mode: 'honor'}],
+                    queried_features: ['course_id', 'mode'],
+                    feature_names: {course_id: 'Course ID', mode: ' Mode'}
                 };
 
                 data_download_certificate.$list_issued_certificate_table_btn.click();

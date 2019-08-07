@@ -1,6 +1,6 @@
 define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/spec_helpers/view_helpers',
-        'js/views/course_rerun', 'js/views/utils/create_course_utils', 'common/js/components/utils/view_utils',
-        'jquery.simulate'],
+    'js/views/course_rerun', 'js/views/utils/create_course_utils', 'common/js/components/utils/view_utils',
+    'jquery.simulate'],
     function($, AjaxHelpers, ViewHelpers, CourseRerunUtils, CreateCourseUtilsFactory, ViewUtils) {
         describe('Create course rerun page', function() {
             var selectors = {
@@ -108,34 +108,34 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                 });
 
                 it('shows an error message when non URL characters are entered', function() {
-                    var input = $(selectors.org);
-                    expect(input.parent()).not.toHaveClass(classes.error);
-                    type(input, '%');
-                    expect(input.parent()).toHaveClass(classes.error);
+                    var $input = $(selectors.org);
+                    expect($input.parent()).not.toHaveClass(classes.error);
+                    type($input, '%');
+                    expect($input.parent()).toHaveClass(classes.error);
                 });
 
                 it('does not show an error message when tabbing into a field', function() {
-                    var input = $(selectors.number);
-                    input.val('');
-                    expect(input.parent()).not.toHaveClass(classes.error);
-                    input.simulate('keyup', {keyCode: $.simulate.keyCode.TAB});
-                    expect(input.parent()).not.toHaveClass(classes.error);
+                    var $input = $(selectors.number);
+                    $input.val('');
+                    expect($input.parent()).not.toHaveClass(classes.error);
+                    $input.simulate('keyup', {keyCode: $.simulate.keyCode.TAB});
+                    expect($input.parent()).not.toHaveClass(classes.error);
                 });
 
                 it('shows an error message when a required field is empty', function() {
-                    var input = $(selectors.org);
-                    input.val('');
-                    expect(input.parent()).not.toHaveClass(classes.error);
-                    input.simulate('keyup', {keyCode: $.simulate.keyCode.ENTER});
-                    expect(input.parent()).toHaveClass(classes.error);
+                    var $input = $(selectors.org);
+                    $input.val('');
+                    expect($input.parent()).not.toHaveClass(classes.error);
+                    $input.simulate('keyup', {keyCode: $.simulate.keyCode.ENTER});
+                    expect($input.parent()).toHaveClass(classes.error);
                 });
 
                 it('shows an error message when spaces are entered and unicode is allowed', function() {
-                    var input = $(selectors.org);
+                    var $input = $(selectors.org);
                     $(selectors.allowUnicode).val('True');
-                    expect(input.parent()).not.toHaveClass(classes.error);
-                    type(input, ' ');
-                    expect(input.parent()).toHaveClass(classes.error);
+                    expect($input.parent()).not.toHaveClass(classes.error);
+                    type($input, ' ');
+                    expect($input.parent()).toHaveClass(classes.error);
                 });
 
                 it('shows an error message when total length exceeds 65 characters', function() {
@@ -148,10 +148,10 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
 
                 describe('Name field', function() {
                     it('does not show an error message when non URL characters are entered', function() {
-                        var input = $(selectors.name);
-                        expect(input.parent()).not.toHaveClass(classes.error);
-                        type(input, '%');
-                        expect(input.parent()).not.toHaveClass(classes.error);
+                        var $input = $(selectors.name);
+                        expect($input.parent()).not.toHaveClass(classes.error);
+                        type($input, '%');
+                        expect($input.parent()).not.toHaveClass(classes.error);
                     });
                 });
             });

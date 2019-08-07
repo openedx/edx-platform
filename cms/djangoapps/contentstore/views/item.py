@@ -8,50 +8,68 @@ from datetime import datetime
 from functools import partial
 from uuid import uuid4
 
-import dogstats_wrapper as dog_stats_api
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseBadRequest, HttpResponse, Http404
+from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryUsageLocator
 from pytz import UTC
+from six import text_type
+from web_fragments.fragment import Fragment
+from xblock.core import XBlock
 from xblock.fields import Scope
-from xblock.fragment import Fragment
-from xblock_django.user_service import DjangoXBlockUserService
 
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
 from contentstore.utils import (
-    find_release_date_source, find_staff_lock_source, is_currently_visible_to_students,
-    ancestor_has_staff_lock, has_children_visible_to_specific_content_groups,
+    ancestor_has_staff_lock,
+    find_release_date_source,
+    find_staff_lock_source,
+    get_split_group_display_name,
     get_user_partition_info,
+    get_visibility_partition_info,
+    has_children_visible_to_specific_partition_groups,
+    is_currently_visible_to_students,
+    is_self_paced
 )
-from contentstore.views.helpers import is_unit, xblock_studio_url, xblock_primary_child_category, \
-    xblock_type_display_name, get_parent_xblock, create_xblock, usage_key_with_run
+from contentstore.views.helpers import (
+    create_xblock,
+    get_parent_xblock,
+    is_unit,
+    usage_key_with_run,
+    xblock_primary_child_category,
+    xblock_studio_url,
+    xblock_type_display_name
+)
 from contentstore.views.preview import get_preview_fragment
-from contentstore.utils import is_self_paced
-
-from openedx.core.lib.gating import api as gating_api
 from edxmako.shortcuts import render_to_string
+from help_tokens.core import HelpUrlExpert
 from models.settings.course_grading import CourseGradingModel
-from openedx.core.lib.xblock_utils import wrap_xblock, request_token
+from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
+from openedx.core.djangoapps.waffle_utils import WaffleSwitch
+from openedx.core.lib.gating import api as gating_api
+from openedx.core.lib.xblock_utils import request_token, wrap_xblock, wrap_xblock_aside
 from static_replace import replace_static_urls
-from student.auth import has_studio_write_access, has_studio_read_access
+from student.auth import has_studio_read_access, has_studio_write_access
 from util.date_utils import get_default_time_display
-from util.json_request import expect_json, JsonResponse
+from util.json_request import JsonResponse, expect_json
 from util.milestones_helpers import is_entrance_exams_enabled
+from xblock_config.models import CourseEditLTIFieldsEnabledFlag
+from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.course_module import DEFAULT_START_DATE
-from xmodule.modulestore import ModuleStoreEnum, EdxJSONEncoder
+from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
-from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
+from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
+from xmodule.services import ConfigurationService, SettingsService
 from xmodule.tabs import CourseTabList
-from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW, STUDENT_VIEW, DEPRECATION_VSCOMPAT_EVENT
-
+from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW
+from edx_proctoring.api import get_exam_configuration_dashboard_url, does_backend_support_onboarding
+from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
 
 __all__ = [
     'orphan_handler', 'xblock_handler', 'xblock_view_handler', 'xblock_outline_handler', 'xblock_container_handler'
@@ -66,9 +84,12 @@ NEVER = lambda x: False
 ALWAYS = lambda x: True
 
 
+highlights_setting = WaffleSwitch(u'dynamic_pacing', u'studio_course_update')
+
+
 def hash_resource(resource):
     """
-    Hash a :class:`xblock.fragment.FragmentResource`.
+    Hash a :class:`web_fragments.fragment.FragmentResource`.
     """
     md5 = hashlib.md5()
     md5.update(repr(resource))
@@ -98,6 +119,7 @@ def xblock_handler(request, usage_key_string):
     GET
         json: returns representation of the xblock (locator id, data, and metadata).
               if ?fields=graderType, it returns the graderType for the unit instead of the above.
+              if ?fields=ancestorInfo, it returns ancestor info of the xblock.
         html: returns HTML for rendering the xblock (which includes both the "preview" view and the "editor" view)
     PUT or POST or PATCH
         json: if xblock locator is specified, update the xblock instance. The json payload can contain
@@ -114,7 +136,9 @@ def xblock_handler(request, usage_key_string):
                 :isPrereq: Set this xblock as a prerequisite which can be used to limit access to other xblocks
                 :prereqUsageKey: Use the xblock identified by this usage key to limit access to this xblock
                 :prereqMinScore: The minimum score that needs to be achieved on the prerequisite xblock
-                        identifed by prereqUsageKey
+                        identifed by prereqUsageKey. Ranging from 0 to 100.
+                :prereqMinCompletion: The minimum completion percentage that needs to be achieved on the
+                        prerequisite xblock identifed by prereqUsageKey. Ranging from 0 to 100.
                 :publish: can be:
                   'make_public': publish the content
                   'republish': publish this item *only* if it was previously published
@@ -126,8 +150,11 @@ def xblock_handler(request, usage_key_string):
               if usage_key_string is not specified, create a new xblock instance, either by duplicating
               an existing xblock, or creating an entirely new one. The json playload can contain
               these fields:
-                :parent_locator: parent for new xblock, required for both duplicate and create new instance
+                :parent_locator: parent for new xblock, required for duplicate, move and create new instance
                 :duplicate_source_locator: if present, use this as the source for creating a duplicate copy
+                :move_source_locator: if present, use this as the source item for moving
+                :target_index: if present, use this as the target index for moving an item to a particular index
+                    otherwise target_index is calculated. It is sent back in the response.
                 :category: type of xblock, required if duplicate_source_locator is not present.
                 :display_name: name for new xblock, optional
                 :boilerplate: template name for populating fields, optional and only used
@@ -149,6 +176,10 @@ def xblock_handler(request, usage_key_string):
                 if 'graderType' in fields:
                     # right now can't combine output of this w/ output of _get_module_info, but worthy goal
                     return JsonResponse(CourseGradingModel.get_section_grader_type(usage_key))
+                elif 'ancestorInfo' in fields:
+                    xblock = _get_xblock(usage_key, request.user)
+                    ancestor_info = _create_xblock_ancestor_info(xblock, is_concise=True)
+                    return JsonResponse(ancestor_info)
                 # TODO: pass fields to _get_module_info and only return those
                 with modulestore().bulk_operations(usage_key.course_key):
                     response = _get_module_info(_get_xblock(usage_key, request.user))
@@ -171,6 +202,7 @@ def xblock_handler(request, usage_key_string):
                 is_prereq=request.json.get('isPrereq'),
                 prereq_usage_key=request.json.get('prereqUsageKey'),
                 prereq_min_score=request.json.get('prereqMinScore'),
+                prereq_min_completion=request.json.get('prereqMinCompletion'),
                 publish=request.json.get('publish'),
                 fields=request.json.get('fields'),
             )
@@ -193,14 +225,26 @@ def xblock_handler(request, usage_key_string):
                 request.user,
                 request.json.get('display_name'),
             )
-
-            return JsonResponse({"locator": unicode(dest_usage_key), "courseKey": unicode(dest_usage_key.course_key)})
+            return JsonResponse({'locator': unicode(dest_usage_key), 'courseKey': unicode(dest_usage_key.course_key)})
         else:
             return _create_item(request)
+    elif request.method == 'PATCH':
+        if 'move_source_locator' in request.json:
+            move_source_usage_key = usage_key_with_run(request.json.get('move_source_locator'))
+            target_parent_usage_key = usage_key_with_run(request.json.get('parent_locator'))
+            target_index = request.json.get('target_index')
+            if (
+                    not has_studio_write_access(request.user, target_parent_usage_key.course_key) or
+                    not has_studio_read_access(request.user, target_parent_usage_key.course_key)
+            ):
+                raise PermissionDenied()
+            return _move_item(move_source_usage_key, target_parent_usage_key, request.user, target_index)
+
+        return JsonResponse({'error': 'Patch request did not recognise any parameters to handle.'}, status=400)
     else:
         return HttpResponseBadRequest(
-            "Only instance creation is supported without a usage key.",
-            content_type="text/plain"
+            'Only instance creation is supported without a usage key.',
+            content_type='text/plain'
         )
 
 
@@ -244,6 +288,10 @@ class StudioEditModuleRuntime(object):
                 return DjangoXBlockUserService(self._user)
             if service_name == "studio_user_permissions":
                 return StudioPermissionsService(self._user)
+            if service_name == "settings":
+                return SettingsService()
+            if service_name == "lti-configuration":
+                return ConfigurationService(CourseEditLTIFieldsEnabledFlag)
         return None
 
 
@@ -279,6 +327,14 @@ def xblock_view_handler(request, usage_key_string, view_name):
             request_token=request_token(request),
         ))
 
+        xblock.runtime.wrappers_asides.append(partial(
+            wrap_xblock_aside,
+            'StudioRuntime',
+            usage_id_serializer=unicode,
+            request_token=request_token(request),
+            extra_classes=['wrapper-comp-plugins']
+        ))
+
         if view_name in (STUDIO_VIEW, VISIBILITY_VIEW):
             if view_name == STUDIO_VIEW and xblock.xmodule_runtime is None:
                 xblock.xmodule_runtime = StudioEditModuleRuntime(request.user)
@@ -289,7 +345,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
             # dungeon and surface as uneditable, unsaveable, and undeletable
             # component-goblins.
             except Exception as exc:                          # pylint: disable=broad-except
-                log.debug("Unable to render %s for %r", view_name, xblock, exc_info=True)
+                log.debug(u"Unable to render %s for %r", view_name, xblock, exc_info=True)
                 fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
 
         elif view_name in PREVIEW_VIEWS + container_views:
@@ -313,8 +369,8 @@ def xblock_view_handler(request, usage_key_string, view_name):
                     }
             except ValueError:
                 return HttpResponse(
-                    content="Couldn't parse paging parameters: enable_paging: "
-                            "{0}, page_number: {1}, page_size: {2}".format(
+                    content=u"Couldn't parse paging parameters: enable_paging: "
+                            u"{0}, page_number: {1}, page_size: {2}".format(
                                 request.GET.get('enable_paging', 'false'),
                                 request.GET.get('page_number', 0),
                                 request.GET.get('page_size', 0)
@@ -436,7 +492,7 @@ def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
 
 def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, nullout=None,
                  grader_type=None, is_prereq=None, prereq_usage_key=None, prereq_min_score=None,
-                 publish=None, fields=None):
+                 prereq_min_completion=None, publish=None, fields=None):
     """
     Saves xblock w/ its fields. Has special processing for grader_type, publish, and nullout and Nones in metadata.
     nullout means to truly set the field to None whereas nones in metadata mean to unset them (so they revert
@@ -531,18 +587,19 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
                             value = field.from_json(value)
                         except ValueError as verr:
                             reason = _("Invalid data")
-                            if verr.message:
-                                reason = _("Invalid data ({details})").format(details=verr.message)
+                            if text_type(verr):
+                                reason = _(u"Invalid data ({details})").format(details=text_type(verr))
                             return JsonResponse({"error": reason}, 400)
 
                         field.write_to(xblock, value)
 
+        validate_and_update_xblock_due_date(xblock)
         # update the xblock and call any xblock callbacks
         xblock = _update_with_callback(xblock, user, old_metadata, old_content)
 
         # for static tabs, their containing course also records their display name
         course = store.get_course(xblock.location.course_key)
-        if xblock.location.category == 'static_tab':
+        if xblock.location.block_type == 'static_tab':
             # find the course's reference to this tab and update the name.
             static_tab = CourseTabList.get_tab_by_slug(course.tabs, xblock.location.name)
             # only update if changed
@@ -577,7 +634,11 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
 
             if prereq_usage_key is not None:
                 gating_api.set_required_content(
-                    xblock.location.course_key, xblock.location, prereq_usage_key, prereq_min_score
+                    xblock.location.course_key,
+                    xblock.location,
+                    prereq_usage_key,
+                    prereq_min_score,
+                    prereq_min_completion
                 )
 
         # If publish is set to 'republish' and this item is not in direct only categories and has previously been
@@ -619,7 +680,7 @@ def _create_item(request):
         # Only these categories are supported at this time.
         if category not in ['html', 'problem', 'video']:
             return HttpResponseBadRequest(
-                "Category '%s' not supported for Libraries" % category, content_type='text/plain'
+                u"Category '%s' not supported for Libraries" % category, content_type='text/plain'
             )
 
     created_block = create_xblock(
@@ -631,8 +692,139 @@ def _create_item(request):
     )
 
     return JsonResponse(
-        {"locator": unicode(created_block.location), "courseKey": unicode(created_block.location.course_key)}
+        {'locator': unicode(created_block.location), 'courseKey': unicode(created_block.location.course_key)}
     )
+
+
+def _get_source_index(source_usage_key, source_parent):
+    """
+    Get source index position of the XBlock.
+
+    Arguments:
+        source_usage_key (BlockUsageLocator): Locator of source item.
+        source_parent (XBlock): A parent of the source XBlock.
+
+    Returns:
+        source_index (int): Index position of the xblock in a parent.
+    """
+    try:
+        source_index = source_parent.children.index(source_usage_key)
+        return source_index
+    except ValueError:
+        return None
+
+
+def is_source_item_in_target_parents(source_item, target_parent):
+    """
+    Returns True if source item is found in target parents otherwise False.
+
+    Arguments:
+        source_item (XBlock): Source Xblock.
+        target_parent (XBlock): Target XBlock.
+    """
+    target_ancestors = _create_xblock_ancestor_info(target_parent, is_concise=True)['ancestors']
+    for target_ancestor in target_ancestors:
+        if unicode(source_item.location) == target_ancestor['id']:
+            return True
+    return False
+
+
+def _move_item(source_usage_key, target_parent_usage_key, user, target_index=None):
+    """
+    Move an existing xblock as a child of the supplied target_parent_usage_key.
+
+    Arguments:
+        source_usage_key (BlockUsageLocator): Locator of source item.
+        target_parent_usage_key (BlockUsageLocator): Locator of target parent.
+        target_index (int): If provided, insert source item at provided index location in target_parent_usage_key item.
+
+    Returns:
+        JsonResponse: Information regarding move operation. It may contains error info if an invalid move operation
+            is performed.
+    """
+    # Get the list of all parentable component type XBlocks.
+    parent_component_types = list(
+        set(name for name, class_ in XBlock.load_classes() if getattr(class_, 'has_children', False)) -
+        set(DIRECT_ONLY_CATEGORIES)
+    )
+
+    store = modulestore()
+    with store.bulk_operations(source_usage_key.course_key):
+        source_item = store.get_item(source_usage_key)
+        source_parent = source_item.get_parent()
+        target_parent = store.get_item(target_parent_usage_key)
+        source_type = source_item.category
+        target_parent_type = target_parent.category
+        error = None
+
+        # Store actual/initial index of the source item. This would be sent back with response,
+        # so that with Undo operation, it would easier to move back item to it's original/old index.
+        source_index = _get_source_index(source_usage_key, source_parent)
+
+        valid_move_type = {
+            'sequential': 'vertical',
+            'chapter': 'sequential',
+        }
+
+        if (valid_move_type.get(target_parent_type, '') != source_type and
+                target_parent_type not in parent_component_types):
+            error = _(u'You can not move {source_type} into {target_parent_type}.').format(
+                source_type=source_type,
+                target_parent_type=target_parent_type,
+            )
+        elif source_parent.location == target_parent.location or source_item.location in target_parent.children:
+            error = _('Item is already present in target location.')
+        elif source_item.location == target_parent.location:
+            error = _('You can not move an item into itself.')
+        elif is_source_item_in_target_parents(source_item, target_parent):
+            error = _('You can not move an item into it\'s child.')
+        elif target_parent_type == 'split_test':
+            error = _('You can not move an item directly into content experiment.')
+        elif source_index is None:
+            error = _(u'{source_usage_key} not found in {parent_usage_key}.').format(
+                source_usage_key=unicode(source_usage_key),
+                parent_usage_key=unicode(source_parent.location)
+            )
+        else:
+            try:
+                target_index = int(target_index) if target_index is not None else None
+                if len(target_parent.children) < target_index:
+                    error = _(u'You can not move {source_usage_key} at an invalid index ({target_index}).').format(
+                        source_usage_key=unicode(source_usage_key),
+                        target_index=target_index
+                    )
+            except ValueError:
+                error = _(u'You must provide target_index ({target_index}) as an integer.').format(
+                    target_index=target_index
+                )
+        if error:
+            return JsonResponse({'error': error}, status=400)
+
+        # When target_index is provided, insert xblock at target_index position, otherwise insert at the end.
+        insert_at = target_index if target_index is not None else len(target_parent.children)
+
+        store.update_item_parent(
+            item_location=source_item.location,
+            new_parent_location=target_parent.location,
+            old_parent_location=source_parent.location,
+            insert_at=insert_at,
+            user_id=user.id
+        )
+
+        log.info(
+            u'MOVE: %s moved from %s to %s at %d index',
+            unicode(source_usage_key),
+            unicode(source_parent.location),
+            unicode(target_parent_usage_key),
+            insert_at
+        )
+
+        context = {
+            'move_source_locator': unicode(source_usage_key),
+            'parent_locator': unicode(target_parent_usage_key),
+            'source_index': target_index if target_index is not None else source_index
+        }
+        return JsonResponse(context)
 
 
 def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_name=None, is_child=False):
@@ -661,9 +853,9 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
             duplicate_metadata['display_name'] = display_name
         else:
             if source_item.display_name is None:
-                duplicate_metadata['display_name'] = _("Duplicate of {0}").format(source_item.category)
+                duplicate_metadata['display_name'] = _(u"Duplicate of {0}").format(source_item.category)
             else:
-                duplicate_metadata['display_name'] = _("Duplicate of '{0}'").format(source_item.display_name)
+                duplicate_metadata['display_name'] = _(u"Duplicate of '{0}'").format(source_item.display_name)
 
         asides_to_create = []
         for aside in source_item.runtime.get_asides(source_item):
@@ -742,19 +934,10 @@ def _delete_item(usage_key, user):
         # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
         # if we add one then we need to also add it to the policy information (i.e. metadata)
         # we should remove this once we can break this reference from the course to static tabs
-        if usage_key.category == 'static_tab':
-
-            dog_stats_api.increment(
-                DEPRECATION_VSCOMPAT_EVENT,
-                tags=(
-                    "location:_delete_item_static_tab",
-                    u"course:{}".format(unicode(usage_key.course_key)),
-                )
-            )
-
+        if usage_key.block_type == 'static_tab':
             course = store.get_course(usage_key.course_key)
             existing_tabs = course.tabs or []
-            course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != usage_key.name]
+            course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != usage_key.block_id]
             store.update_item(course, user.id)
 
         store.delete_item(usage_key, user.id)
@@ -814,7 +997,7 @@ def _get_xblock(usage_key, user):
         try:
             return store.get_item(usage_key, depth=None)
         except ItemNotFoundError:
-            if usage_key.category in CREATE_IF_NOT_FOUND:
+            if usage_key.block_type in CREATE_IF_NOT_FOUND:
                 # Create a new one for certain categories only. Used for course info handouts.
                 return store.create_item(user.id, usage_key.course_key, usage_key.block_type, block_id=usage_key.block_id)
             else:
@@ -849,6 +1032,7 @@ def _get_module_info(xblock, rewrite_static_links=True, include_ancestor_info=Fa
         )
         if include_publishing_info:
             add_container_page_publishing_info(xblock, xblock_info)
+
         return xblock_info
 
 
@@ -869,17 +1053,18 @@ def _get_gating_info(course, xblock):
         if not hasattr(course, 'gating_prerequisites'):
             # Cache gating prerequisites on course module so that we are not
             # hitting the database for every xblock in the course
-            setattr(course, 'gating_prerequisites', gating_api.get_prerequisites(course.id))  # pylint: disable=literal-used-as-attribute
+            setattr(course, 'gating_prerequisites', gating_api.get_prerequisites(course.id))
         info["is_prereq"] = gating_api.is_prerequisite(course.id, xblock.location)
         info["prereqs"] = [
             p for p in course.gating_prerequisites if unicode(xblock.location) not in p['namespace']
         ]
-        prereq, prereq_min_score = gating_api.get_required_content(
+        prereq, prereq_min_score, prereq_min_completion = gating_api.get_required_content(
             course.id,
             xblock.location
         )
         info["prereq"] = prereq
         info["prereq_min_score"] = prereq_min_score
+        info["prereq_min_completion"] = prereq_min_completion
         if prereq:
             info["visibility_state"] = VisibilityState.gated
     return info
@@ -887,7 +1072,7 @@ def _get_gating_info(course, xblock):
 
 def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=False, include_child_info=False,
                        course_outline=False, include_children_predicate=NEVER, parent_xblock=None, graders=None,
-                       user=None, course=None):
+                       user=None, course=None, is_concise=False):
     """
     Creates the information needed for client-side XBlockInfo.
 
@@ -897,6 +1082,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     There are three optional boolean parameters:
       include_ancestor_info - if true, ancestor info is added to the response
       include_child_info - if true, direct child info is included in the response
+      is_concise - if true, returns the concise version of xblock info, default is false.
       course_outline - if true, the xblock is being rendered on behalf of the course outline.
         There are certain expensive computations that do not need to be included in this case.
 
@@ -933,20 +1119,22 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
             graders,
             include_children_predicate=include_children_predicate,
             user=user,
-            course=course
+            course=course,
+            is_concise=is_concise
         )
     else:
         child_info = None
 
     release_date = _get_release_date(xblock, user)
 
-    if xblock.category != 'course':
+    if xblock.category != 'course' and not is_concise:
         visibility_state = _compute_visibility_state(
             xblock, child_info, is_xblock_unit and has_changes, is_self_paced(course)
         )
     else:
         visibility_state = None
     published = modulestore().has_published_version(xblock) if not is_library_block else None
+    published_on = get_default_time_display(xblock.published_on) if published and xblock.published_on else None
 
     # defining the default value 'True' for delete, duplicate, drag and add new child actions
     # in xblock_actions for each xblock.
@@ -963,93 +1151,144 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         # Translators: The {pct_sign} here represents the percent sign, i.e., '%'
         # in many languages. This is used to avoid Transifex's misinterpreting of
         # '% o'. The percent sign is also translatable as a standalone string.
-        explanatory_message = _('Students must score {score}{pct_sign} or higher to access course materials.').format(
+        explanatory_message = _(u'Students must score {score}{pct_sign} or higher to access course materials.').format(
             score=int(parent_xblock.entrance_exam_minimum_score_pct * 100),
             # Translators: This is the percent sign. It will be used to represent
             # a percent value out of 100, e.g. "58%" means "58/100".
             pct_sign=_('%'))
 
     xblock_info = {
-        "id": unicode(xblock.location),
-        "display_name": xblock.display_name_with_default,
-        "category": xblock.category,
-        "edited_on": get_default_time_display(xblock.subtree_edited_on) if xblock.subtree_edited_on else None,
-        "published": published,
-        "published_on": get_default_time_display(xblock.published_on) if published and xblock.published_on else None,
-        "studio_url": xblock_studio_url(xblock, parent_xblock),
-        "released_to_students": datetime.now(UTC) > xblock.start,
-        "release_date": release_date,
-        "visibility_state": visibility_state,
-        "has_explicit_staff_lock": xblock.fields['visible_to_staff_only'].is_set_on(xblock),
-        "start": xblock.fields['start'].to_json(xblock.start),
-        "graded": xblock.graded,
-        "due_date": get_default_time_display(xblock.due),
-        "due": xblock.fields['due'].to_json(xblock.due),
-        "format": xblock.format,
-        "course_graders": [grader.get('type') for grader in graders],
-        "has_changes": has_changes,
-        "actions": xblock_actions,
-        "explanatory_message": explanatory_message,
-        "group_access": xblock.group_access,
-        "user_partitions": get_user_partition_info(xblock, course=course),
+        'id': unicode(xblock.location),
+        'display_name': xblock.display_name_with_default,
+        'category': xblock.category,
+        'has_children': xblock.has_children
     }
-
-    if xblock.category == 'sequential':
+    if is_concise:
+        if child_info and len(child_info.get('children', [])) > 0:
+            xblock_info['child_info'] = child_info
+        # Groups are labelled with their internal ids, rather than with the group name. Replace id with display name.
+        group_display_name = get_split_group_display_name(xblock, course)
+        xblock_info['display_name'] = group_display_name if group_display_name else xblock_info['display_name']
+    else:
+        user_partitions = get_user_partition_info(xblock, course=course)
         xblock_info.update({
-            "hide_after_due": xblock.hide_after_due,
+            'edited_on': get_default_time_display(xblock.subtree_edited_on) if xblock.subtree_edited_on else None,
+            'published': published,
+            'published_on': published_on,
+            'studio_url': xblock_studio_url(xblock, parent_xblock),
+            'released_to_students': datetime.now(UTC) > xblock.start,
+            'release_date': release_date,
+            'visibility_state': visibility_state,
+            'has_explicit_staff_lock': xblock.fields['visible_to_staff_only'].is_set_on(xblock),
+            'start': xblock.fields['start'].to_json(xblock.start),
+            'graded': xblock.graded,
+            'due_date': get_default_time_display(xblock.due),
+            'due': xblock.fields['due'].to_json(xblock.due),
+            'format': xblock.format,
+            'course_graders': [grader.get('type') for grader in graders],
+            'has_changes': has_changes,
+            'actions': xblock_actions,
+            'explanatory_message': explanatory_message,
+            'group_access': xblock.group_access,
+            'user_partitions': user_partitions,
+            'show_correctness': xblock.show_correctness,
         })
 
-    # update xblock_info with special exam information if the feature flag is enabled
-    if settings.FEATURES.get('ENABLE_SPECIAL_EXAMS'):
-        if xblock.category == 'course':
+        if xblock.category == 'sequential':
             xblock_info.update({
-                "enable_proctored_exams": xblock.enable_proctored_exams,
-                "create_zendesk_tickets": xblock.create_zendesk_tickets,
-                "enable_timed_exams": xblock.enable_timed_exams
+                'hide_after_due': xblock.hide_after_due,
             })
-        elif xblock.category == 'sequential':
+        elif xblock.category in ('chapter', 'course'):
+            if xblock.category == 'chapter':
+                xblock_info.update({
+                    'highlights': xblock.highlights,
+                })
+            elif xblock.category == 'course':
+                xblock_info.update({
+                    'highlights_enabled_for_messaging': course.highlights_enabled_for_messaging,
+                })
             xblock_info.update({
-                "is_proctored_exam": xblock.is_proctored_exam,
-                "is_practice_exam": xblock.is_practice_exam,
-                "is_time_limited": xblock.is_time_limited,
-                "exam_review_rules": xblock.exam_review_rules,
-                "default_time_limit_minutes": xblock.default_time_limit_minutes,
+                'highlights_enabled': highlights_setting.is_enabled(),
+                'highlights_preview_only': not COURSE_UPDATE_WAFFLE_FLAG.is_enabled(course.id),
+                'highlights_doc_url': HelpUrlExpert.the_one().url_for_token('content_highlights'),
             })
 
-    # Update with gating info
-    xblock_info.update(_get_gating_info(course, xblock))
+        # update xblock_info with special exam information if the feature flag is enabled
+        if settings.FEATURES.get('ENABLE_SPECIAL_EXAMS'):
+            if xblock.category == 'course':
+                xblock_info.update({
+                    'enable_proctored_exams': xblock.enable_proctored_exams,
+                    'create_zendesk_tickets': xblock.create_zendesk_tickets,
+                    'enable_timed_exams': xblock.enable_timed_exams,
+                })
+            elif xblock.category == 'sequential':
+                rules_url = settings.PROCTORING_SETTINGS.get('LINK_URLS', {}).get('online_proctoring_rules', "")
+                supports_onboarding = does_backend_support_onboarding(course.proctoring_provider)
 
-    if xblock.category == 'sequential':
-        # Entrance exam subsection should be hidden. in_entrance_exam is
-        # inherited metadata, all children will have it.
-        if getattr(xblock, "in_entrance_exam", False):
-            xblock_info["is_header_visible"] = False
+                proctoring_exam_configuration_link = None
+                if xblock.is_proctored_exam:
+                    proctoring_exam_configuration_link = get_exam_configuration_dashboard_url(
+                        course.id, xblock_info['id'])
 
-    if data is not None:
-        xblock_info["data"] = data
-    if metadata is not None:
-        xblock_info["metadata"] = metadata
-    if include_ancestor_info:
-        xblock_info['ancestor_info'] = _create_xblock_ancestor_info(xblock, course_outline)
-    if child_info:
-        xblock_info['child_info'] = child_info
-    if visibility_state == VisibilityState.staff_only:
-        xblock_info["ancestor_has_staff_lock"] = ancestor_has_staff_lock(xblock, parent_xblock)
-    else:
-        xblock_info["ancestor_has_staff_lock"] = False
+                if course.proctoring_provider == 'proctortrack':
+                    show_review_rules = SHOW_REVIEW_RULES_FLAG.is_enabled(xblock.location.course_key)
+                else:
+                    show_review_rules = True
 
-    if course_outline:
-        if xblock_info["has_explicit_staff_lock"]:
-            xblock_info["staff_only_message"] = True
-        elif child_info and child_info["children"]:
-            xblock_info["staff_only_message"] = all([child["staff_only_message"] for child in child_info["children"]])
+                xblock_info.update({
+                    'is_proctored_exam': xblock.is_proctored_exam,
+                    'online_proctoring_rules': rules_url,
+                    'is_practice_exam': xblock.is_practice_exam,
+                    'is_onboarding_exam': xblock.is_onboarding_exam,
+                    'is_time_limited': xblock.is_time_limited,
+                    'exam_review_rules': xblock.exam_review_rules,
+                    'default_time_limit_minutes': xblock.default_time_limit_minutes,
+                    'proctoring_exam_configuration_link': proctoring_exam_configuration_link,
+                    'supports_onboarding': supports_onboarding,
+                    'show_review_rules': show_review_rules
+                })
+
+        # Update with gating info
+        xblock_info.update(_get_gating_info(course, xblock))
+
+        if xblock.category == 'sequential':
+            # Entrance exam subsection should be hidden. in_entrance_exam is
+            # inherited metadata, all children will have it.
+            if getattr(xblock, 'in_entrance_exam', False):
+                xblock_info['is_header_visible'] = False
+
+        if data is not None:
+            xblock_info['data'] = data
+        if metadata is not None:
+            xblock_info['metadata'] = metadata
+        if include_ancestor_info:
+            xblock_info['ancestor_info'] = _create_xblock_ancestor_info(xblock, course_outline, include_child_info=True)
+        if child_info:
+            xblock_info['child_info'] = child_info
+        if visibility_state == VisibilityState.staff_only:
+            xblock_info['ancestor_has_staff_lock'] = ancestor_has_staff_lock(xblock, parent_xblock)
         else:
-            xblock_info["staff_only_message"] = False
+            xblock_info['ancestor_has_staff_lock'] = False
+
+        if course_outline:
+            if xblock_info['has_explicit_staff_lock']:
+                xblock_info['staff_only_message'] = True
+            elif child_info and child_info['children']:
+                xblock_info['staff_only_message'] = all(
+                    [child['staff_only_message'] for child in child_info['children']]
+                )
+            else:
+                xblock_info['staff_only_message'] = False
+
+            xblock_info['has_partition_group_components'] = has_children_visible_to_specific_partition_groups(
+                xblock
+            )
+        xblock_info['user_partition_info'] = get_visibility_partition_info(xblock, course=course)
 
     return xblock_info
 
 
-def add_container_page_publishing_info(xblock, xblock_info):  # pylint: disable=invalid-name
+def add_container_page_publishing_info(xblock, xblock_info):
     """
     Adds information about the xblock's publish state to the supplied
     xblock_info for the container page.
@@ -1074,7 +1313,7 @@ def add_container_page_publishing_info(xblock, xblock_info):  # pylint: disable=
     xblock_info["edited_by"] = safe_get_username(xblock.subtree_edited_by)
     xblock_info["published_by"] = safe_get_username(xblock.published_by)
     xblock_info["currently_visible_to_students"] = is_currently_visible_to_students(xblock)
-    xblock_info["has_content_group_components"] = has_children_visible_to_specific_content_groups(xblock)
+    xblock_info["has_partition_group_components"] = has_children_visible_to_specific_partition_groups(xblock)
     if xblock_info["release_date"]:
         xblock_info["release_date_from"] = _get_release_date_from(xblock)
     if xblock_info["visibility_state"] == VisibilityState.staff_only:
@@ -1155,14 +1394,14 @@ def _compute_visibility_state(xblock, child_info, is_unit_with_changes, is_cours
         return VisibilityState.ready
 
 
-def _create_xblock_ancestor_info(xblock, course_outline):
+def _create_xblock_ancestor_info(xblock, course_outline=False, include_child_info=False, is_concise=False):
     """
     Returns information about the ancestors of an xblock. Note that the direct parent will also return
     information about all of its children.
     """
     ancestors = []
 
-    def collect_ancestor_info(ancestor, include_child_info=False):
+    def collect_ancestor_info(ancestor, include_child_info=False, is_concise=False):
         """
         Collect xblock info regarding the specified xblock and its ancestors.
         """
@@ -1172,16 +1411,18 @@ def _create_xblock_ancestor_info(xblock, course_outline):
                 ancestor,
                 include_child_info=include_child_info,
                 course_outline=course_outline,
-                include_children_predicate=direct_children_only
+                include_children_predicate=direct_children_only,
+                is_concise=is_concise
             ))
-            collect_ancestor_info(get_parent_xblock(ancestor))
-    collect_ancestor_info(get_parent_xblock(xblock), include_child_info=True)
+            collect_ancestor_info(get_parent_xblock(ancestor), is_concise=is_concise)
+    collect_ancestor_info(get_parent_xblock(xblock), include_child_info=include_child_info, is_concise=is_concise)
     return {
         'ancestors': ancestors
     }
 
 
-def _create_xblock_child_info(xblock, course_outline, graders, include_children_predicate=NEVER, user=None, course=None):  # pylint: disable=line-too-long
+def _create_xblock_child_info(xblock, course_outline, graders, include_children_predicate=NEVER, user=None,
+                              course=None, is_concise=False):
     """
     Returns information about the children of an xblock, as well as about the primary category
     of xblock expected as children.
@@ -1202,6 +1443,7 @@ def _create_xblock_child_info(xblock, course_outline, graders, include_children_
                 graders=graders,
                 user=user,
                 course=course,
+                is_concise=is_concise
             ) for child in xblock.get_children()
         ]
     return child_info
@@ -1228,6 +1470,14 @@ def _get_release_date(xblock, user=None):
     return get_default_time_display(xblock.start) if xblock.start != DEFAULT_START_DATE else None
 
 
+def validate_and_update_xblock_due_date(xblock):
+    """
+    Validates the due date for the xblock, and set to None if pre-1900 due date provided
+    """
+    if xblock.due and xblock.due.year < 1900:
+        xblock.due = None
+
+
 def _get_release_date_from(xblock):
     """
     Returns a string representation of the section or subsection that sets the xblock's release date
@@ -1247,6 +1497,6 @@ def _xblock_type_and_display_name(xblock):
     """
     Returns a string representation of the xblock's type and display name
     """
-    return _('{section_or_subsection} "{display_name}"').format(
+    return _(u'{section_or_subsection} "{display_name}"').format(
         section_or_subsection=xblock_type_display_name(xblock),
         display_name=xblock.display_name_with_default)

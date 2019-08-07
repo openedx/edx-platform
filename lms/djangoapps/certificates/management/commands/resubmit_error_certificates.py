@@ -16,33 +16,36 @@ Example usage:
     $ ./manage.py lms resubmit_error_certificates -c edX/DemoX/Fall_2015 -c edX/DemoX/Spring_2016
 
 """
-import logging
-from optparse import make_option
-from django.core.management.base import BaseCommand, CommandError
+from __future__ import absolute_import
 
-from xmodule.modulestore.django import modulestore
+import logging
+from textwrap import dedent
+
+from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from certificates import api as certs_api
-from certificates.models import GeneratedCertificate, CertificateStatuses
+from six import text_type
 
+from lms.djangoapps.certificates import api as certs_api
+from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
+from xmodule.modulestore.django import modulestore
 
 LOGGER = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
     """Resubmit certificates with error status. """
+    help = dedent(__doc__).strip()
 
-    option_list = BaseCommand.option_list + (
-        make_option(
+    def add_arguments(self, parser):
+        parser.add_argument(
             '-c', '--course',
             metavar='COURSE_KEY',
             dest='course_key_list',
             action='append',
             default=[],
             help='Only re-submit certificates for these courses.'
-        ),
-    )
+        )
 
     def handle(self, *args, **options):
         """Resubmit certificates with status 'error'.
@@ -58,12 +61,12 @@ class Command(BaseCommand):
 
         """
         only_course_keys = []
-        for course_key_str in options.get('course_key_list', []):
+        for course_key_str in options['course_key_list']:
             try:
                 only_course_keys.append(CourseKey.from_string(course_key_str))
             except InvalidKeyError:
                 raise CommandError(
-                    '"{course_key_str}" is not a valid course key.'.format(
+                    u'"{course_key_str}" is not a valid course key.'.format(
                         course_key_str=course_key_str
                     )
                 )
@@ -73,7 +76,7 @@ class Command(BaseCommand):
                 (
                     u'Starting to re-submit certificates with status "error" '
                     u'in these courses: %s'
-                ), ", ".join([unicode(key) for key in only_course_keys])
+                ), ", ".join([text_type(key) for key in only_course_keys])
             )
         else:
             LOGGER.info(u'Starting to re-submit certificates with status "error".')
@@ -109,7 +112,7 @@ class Command(BaseCommand):
                     ), course_key, user.id
                 )
 
-        LOGGER.info("Finished resubmitting %s certificate tasks", resubmit_count)
+        LOGGER.info(u"Finished resubmitting %s certificate tasks", resubmit_count)
 
     def _load_course_with_cache(self, course_key, course_cache):
         """Retrieve the course, then cache it to avoid Mongo queries. """

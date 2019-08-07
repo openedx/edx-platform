@@ -65,7 +65,6 @@ from lms.djangoapps.verify_student.views import PayAndVerifyView
       data-platform-name='${platform_name}'
       data-course-key='${course_key}'
       data-course-name='${course.display_name}'
-      data-course-start-date='${course.start_datetime_text()}'
       data-courseware-url='${courseware_url}'
       data-course-mode-name='${course_mode.name}'
       data-course-mode-slug='${course_mode.slug}'
@@ -124,6 +123,3 @@ from lms.djangoapps.verify_student.views import PayAndVerifyView
   </section>
 </div>
 </%block>
-<%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
-    DateUtilFactory.transform(iterationKey=".localized-datetime");
-</%static:require_module_async>

@@ -1,12 +1,14 @@
 """
 Tests for the lms_result_processor
 """
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from __future__ import absolute_import
+
+import six
 
 from courseware.tests.factories import UserFactory
-
 from lms.lib.courseware_search.lms_result_processor import LmsSearchResultProcessor
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class LmsSearchResultProcessorTestCase(ModuleStoreTestCase):
@@ -61,8 +63,6 @@ class LmsSearchResultProcessorTestCase(ModuleStoreTestCase):
         )
 
     def setUp(self):
-        # from nose.tools import set_trace
-        # set_trace()
         super(LmsSearchResultProcessorTestCase, self).setUp()
         self.build_course()
 
@@ -75,15 +75,18 @@ class LmsSearchResultProcessorTestCase(ModuleStoreTestCase):
 
         srp = LmsSearchResultProcessor(
             {
-                "course": unicode(self.course.id),
-                "id": unicode(self.html.scope_ids.usage_id),
+                "course": six.text_type(self.course.id),
+                "id": six.text_type(self.html.scope_ids.usage_id),
                 "content": {"text": "This is the html text"}
             },
             "test"
         )
 
         self.assertEqual(
-            srp.url, "/courses/{}/jump_to/{}".format(unicode(self.course.id), unicode(self.html.scope_ids.usage_id)))
+            srp.url, "/courses/{}/jump_to/{}".format(
+                six.text_type(self.course.id),
+                six.text_type(self.html.scope_ids.usage_id))
+        )
 
     def test_should_remove(self):
         """
@@ -91,8 +94,8 @@ class LmsSearchResultProcessorTestCase(ModuleStoreTestCase):
         """
         srp = LmsSearchResultProcessor(
             {
-                "course": unicode(self.course.id),
-                "id": unicode(self.html.scope_ids.usage_id),
+                "course": six.text_type(self.course.id),
+                "id": six.text_type(self.html.scope_ids.usage_id),
                 "content": {"text": "This is html test text"}
             },
             "test"

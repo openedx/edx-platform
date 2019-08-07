@@ -5,8 +5,9 @@
   import hashlib
   import copy
   import json
+  from six import text_type
   from xmodule.modulestore import EdxJSONEncoder
-  hlskey = hashlib.md5(module.location.to_deprecated_string().encode('utf-8')).hexdigest()
+  hlskey = hashlib.md5(text_type(module.location).encode('utf-8')).hexdigest()
 %>
 
 ## js templates
@@ -36,4 +37,4 @@
     <%include file="source-edit.html" />
 % endif
 
-<div class="wrapper-comp-settings metadata_edit" id="settings-tab" data-metadata='${json.dumps(metadata_field_copy, cls=EdxJSONEncoder) | h}'/>
+<div class="wrapper-comp-settings metadata_edit" id="settings-tab" data-metadata='${json.dumps(metadata_field_copy, cls=EdxJSONEncoder) | h}'></div>

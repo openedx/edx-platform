@@ -4,9 +4,17 @@
 (function(define, require) {
     'use strict';
 
+    /* RequireJS */
     define(['jquery', 'underscore', 'gettext', 'common/js/components/views/feedback_notification',
-            'common/js/components/views/feedback_prompt'],
+        'common/js/components/views/feedback_prompt'],
         function($, _, gettext, NotificationView, PromptView) {
+    /* End RequireJS */
+    /* Webpack
+    define(['jquery', 'underscore', 'gettext', 'common/js/components/views/feedback_notification',
+        'common/js/components/views/feedback_prompt', 'scriptjs'],
+        function($, _, gettext, NotificationView, PromptView, $script) {
+    /* End Webpack */
+
             var toggleExpandCollapse, showLoadingIndicator, hideLoadingIndicator, confirmThenRunOperation,
                 runOperationShowingMessage, withDisabledElement, disableElementWhileRunning,
                 getScrollOffset, setScrollOffset, setScrollTop, redirect, reload, hasChangedAttributes,
@@ -21,11 +29,9 @@
              */
             toggleExpandCollapse = function(target, collapsedClass) {
                 // Support the old 'collapsed' option until fully switched over to is-collapsed
-                if (!collapsedClass) {
-                    collapsedClass = 'collapsed';
-                }
+                var collapsed = collapsedClass || 'collapsed';
                 target.closest('.expand-collapse').toggleClass('expand collapse');
-                target.closest('.is-collapsible, .window').toggleClass(collapsedClass);
+                target.closest('.is-collapsible, .window').toggleClass(collapsed);
                 target.closest('.is-collapsible').children('article').slideToggle();
             };
 
@@ -189,7 +195,8 @@
              * @returns {boolean} Returns true if attribute changes are found.
              */
             hasChangedAttributes = function(model, attributes) {
-                var i, changedAttributes = model.changedAttributes();
+                var i,
+                    changedAttributes = model.changedAttributes();
                 if (!changedAttributes) {
                     return false;
                 }
@@ -221,8 +228,7 @@
                     if (/\s/g.test(item)) {
                         return gettext('Please do not use any spaces in this field.');
                     }
-                }
-                else {
+                } else {
                     if (item !== encodeURIComponent(item) || item.match(/[!'()*]/)) {
                         return gettext('Please do not use any spaces or special characters in this field.');
                     }
@@ -231,20 +237,20 @@
             };
 
             // Ensure that sum length of key field values <= ${MAX_SUM_KEY_LENGTH} chars.
-            validateTotalKeyLength = function(key_field_selectors) {
+            validateTotalKeyLength = function(keyFieldSelectors) {
                 var totalLength = _.reduce(
-                    key_field_selectors,
+                    keyFieldSelectors,
                     function(sum, ele) { return sum + $(ele).val().length; },
                     0
                 );
                 return totalLength <= MAX_SUM_KEY_LENGTH;
             };
 
-            checkTotalKeyLengthViolations = function(selectors, classes, key_field_selectors, message_tpl) {
-                if (!validateTotalKeyLength(key_field_selectors)) {
+            checkTotalKeyLengthViolations = function(selectors, classes, keyFieldSelectors, messageTpl) {
+                if (!validateTotalKeyLength(keyFieldSelectors)) {
                     $(selectors.errorWrapper).addClass(classes.shown).removeClass(classes.hiding);
                     $(selectors.errorMessage).html(
-                        '<p>' + _.template(message_tpl)({limit: MAX_SUM_KEY_LENGTH}) + '</p>'
+                        '<p>' + _.template(messageTpl)({limit: MAX_SUM_KEY_LENGTH}) + '</p>'
                     );
                     $(selectors.save).addClass(classes.disabled);
                 } else {
@@ -259,6 +265,7 @@
              */
             loadJavaScript = function(url) {
                 var deferred = $.Deferred();
+                /* RequireJS */
                 require([url],
                     function() {
                         deferred.resolve();
@@ -266,29 +273,35 @@
                     function() {
                         deferred.reject();
                     });
+                /* End RequireJS */
+                /* Webpack
+                $script(url, url, function () {
+                    deferred.resolve();
+                });
+                /* End Webpack */
                 return deferred.promise();
             };
 
             return {
-                'toggleExpandCollapse': toggleExpandCollapse,
-                'showLoadingIndicator': showLoadingIndicator,
-                'hideLoadingIndicator': hideLoadingIndicator,
-                'confirmThenRunOperation': confirmThenRunOperation,
-                'runOperationShowingMessage': runOperationShowingMessage,
-                'withDisabledElement': withDisabledElement,
-                'disableElementWhileRunning': disableElementWhileRunning,
-                'deleteNotificationHandler': deleteNotificationHandler,
-                'setScrollTop': setScrollTop,
-                'getScrollOffset': getScrollOffset,
-                'setScrollOffset': setScrollOffset,
-                'redirect': redirect,
-                'reload': reload,
-                'hasChangedAttributes': hasChangedAttributes,
-                'validateRequiredField': validateRequiredField,
-                'validateURLItemEncoding': validateURLItemEncoding,
-                'validateTotalKeyLength': validateTotalKeyLength,
-                'checkTotalKeyLengthViolations': checkTotalKeyLengthViolations,
-                'loadJavaScript': loadJavaScript
+                toggleExpandCollapse: toggleExpandCollapse,
+                showLoadingIndicator: showLoadingIndicator,
+                hideLoadingIndicator: hideLoadingIndicator,
+                confirmThenRunOperation: confirmThenRunOperation,
+                runOperationShowingMessage: runOperationShowingMessage,
+                withDisabledElement: withDisabledElement,
+                disableElementWhileRunning: disableElementWhileRunning,
+                deleteNotificationHandler: deleteNotificationHandler,
+                setScrollTop: setScrollTop,
+                getScrollOffset: getScrollOffset,
+                setScrollOffset: setScrollOffset,
+                redirect: redirect,
+                reload: reload,
+                hasChangedAttributes: hasChangedAttributes,
+                validateRequiredField: validateRequiredField,
+                validateURLItemEncoding: validateURLItemEncoding,
+                validateTotalKeyLength: validateTotalKeyLength,
+                checkTotalKeyLengthViolations: checkTotalKeyLengthViolations,
+                loadJavaScript: loadJavaScript
             };
         });
 }).call(this, define || RequireJS.define, require || RequireJS.require);

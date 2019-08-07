@@ -14,9 +14,11 @@ they are pushed to production. To make sure that themed assets are collected
 and served by the system (in addition to core assets), we need to extend this
 interface, as well.
 
-.. _Django-Pipeline: http://django-pipeline.readthedocs.org/
+.. _Django-Pipeline: https://django-pipeline.readthedocs.org/
 .. _Django-Require: https://github.com/etianen/django-require
 """
+from __future__ import absolute_import
+
 import os
 from collections import OrderedDict
 

@@ -2,8 +2,11 @@
 Provide accessors to these models via the Django Admin pages
 """
 
+from __future__ import absolute_import
+
 from django import forms
 from django.contrib import admin
+
 from survey.models import SurveyForm
 
 

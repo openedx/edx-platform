@@ -1,4 +1,6 @@
 """
 Package declaration for content assertions test helper module
 """
-import core
+from __future__ import absolute_import
+
+from . import core

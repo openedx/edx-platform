@@ -8,6 +8,7 @@ define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js
                 language: '',
                 start_date: null,	// maps to 'start'
                 end_date: null,		// maps to 'end'
+                certificate_available_date: null,
                 enrollment_start: null,
                 enrollment_end: null,
                 syllabus: null,
@@ -30,7 +31,8 @@ define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js
                 entrance_exam_enabled: '',
                 entrance_exam_minimum_score_pct: '50',
                 learning_info: [],
-                instructor_info: {}
+                instructor_info: {},
+                self_paced: null
             },
 
             validate: function(newattrs) {
@@ -38,8 +40,9 @@ define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js
         // A bit funny in that the video key validation is asynchronous; so, it won't stop the validation.
                 var errors = {};
                 newattrs = DateUtils.convertDateStringsToObjects(
-            newattrs, ['start_date', 'end_date', 'enrollment_start', 'enrollment_end']
-        );
+                    newattrs,
+                    ['start_date', 'end_date', 'certificate_available_date', 'enrollment_start', 'enrollment_end']
+                );
 
                 if (newattrs.start_date === null) {
                     errors.start_date = gettext('The course must have an assigned start date.');
@@ -56,6 +59,12 @@ define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js
                 }
                 if (newattrs.end_date && newattrs.enrollment_end && newattrs.end_date < newattrs.enrollment_end) {
                     errors.enrollment_end = gettext('The enrollment end date cannot be after the course end date.');
+                }
+                if (this.showCertificateAvailableDate && newattrs.end_date && newattrs.certificate_available_date &&
+                    newattrs.certificate_available_date < newattrs.end_date) {
+                    errors.certificate_available_date = gettext(
+                        'The certificate available date must be later than the course end date.'
+                    );
                 }
                 if (newattrs.intro_video && newattrs.intro_video !== this.get('intro_video')) {
                     if (this._videokey_illegal_chars.exec(newattrs.intro_video)) {
@@ -81,7 +90,7 @@ define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js
             set_videosource: function(newsource) {
         // newsource either is <video youtube="speed:key, *"/> or just the "speed:key, *" string
         // returns the videosource for the preview which iss the key whose speed is closest to 1
-                if (_.isEmpty(newsource) && !_.isEmpty(this.get('intro_video'))) this.set({'intro_video': null}, {validate: true});
+                if (_.isEmpty(newsource) && !_.isEmpty(this.get('intro_video'))) this.set({intro_video: null}, {validate: true});
         // TODO remove all whitespace w/in string
                 else {
                     if (this.get('intro_video') !== newsource) this.set('intro_video', newsource, {validate: true});

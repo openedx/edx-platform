@@ -1,24 +1,28 @@
 """ Commerce views. """
+from __future__ import absolute_import
+
 import logging
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
+from django.http import HttpResponseBadRequest
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
-
-from commerce.models import CommerceConfiguration
-from edxmako.shortcuts import render_to_response
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
-from shoppingcart.processors.CyberSource2 import is_user_payment_error
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from django.views.decorators.http import require_http_methods
 from opaque_keys.edx.locator import CourseLocator
+
+from course_modes.models import CourseMode
+from edxmako.shortcuts import render_to_response
+from lms.djangoapps.verify_student.services import IDVerificationService
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
+from openedx.core.djangolib.markup import HTML
+from shoppingcart.processors.CyberSource2 import is_user_payment_error
 from student.models import CourseEnrollment
 from util.json_request import JsonResponse
-from django.views.decorators.http import require_http_methods
-from course_modes.models import CourseMode
-from django.http import HttpResponseBadRequest
+
+from .models import CommerceConfiguration
 
 log = logging.getLogger(__name__)
 
@@ -53,7 +57,7 @@ def checkout_receipt(request):
     page_title = _('Receipt')
     is_payment_complete = True
     payment_support_email = configuration_helpers.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)
-    payment_support_link = '<a href=\"mailto:{email}\">{email}</a>'.format(email=payment_support_email)
+    payment_support_link = HTML(u'<a href=\"mailto:{email}\">{email}</a>').format(email=payment_support_email)
 
     is_cybersource = all(k in request.POST for k in ('signed_field_names', 'decision', 'reason_code'))
     if is_cybersource and request.POST['decision'] != 'ACCEPT':
@@ -71,13 +75,13 @@ def checkout_receipt(request):
         else:
             error_summary = _("A system error occurred while processing your payment. You have not been charged.")
             error_text = _("Please wait a few minutes and then try again.")
-        for_help_text = _("For help, contact {payment_support_link}.").format(payment_support_link=payment_support_link)
+        for_help_text = _(u"For help, contact {payment_support_link}.").format(payment_support_link=payment_support_link)
     else:
         # if anything goes wrong rendering the receipt, it indicates a problem fetching order data.
         error_summary = _("An error occurred while creating your receipt.")
         error_text = None  # nothing particularly helpful to say if this happens.
         for_help_text = _(
-            "If your course does not appear on your dashboard, contact {payment_support_link}."
+            u"If your course does not appear on your dashboard, contact {payment_support_link}."
         ).format(payment_support_link=payment_support_link)
 
     commerce_configuration = CommerceConfiguration.current()
@@ -91,7 +95,7 @@ def checkout_receipt(request):
         'page_title': page_title,
         'is_payment_complete': is_payment_complete,
         'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
-        'verified': SoftwareSecurePhotoVerification.verification_valid_or_pending(request.user).exists(),
+        'verified': IDVerificationService.user_has_valid_or_pending(request.user),
         'error_summary': error_summary,
         'error_text': error_text,
         'for_help_text': for_help_text,

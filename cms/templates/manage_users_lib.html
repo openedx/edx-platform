@@ -1,7 +1,7 @@
 <%inherit file="base.html" />
 <%!
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from openedx.core.djangolib.js_utils import (
     dump_js_escaped_json, js_escaped_string
@@ -112,7 +112,7 @@ from openedx.core.djangolib.js_utils import (
       ManageLibraryUsersFactory(
         "${context_library.display_name_with_default | h}",
         ${users | n, dump_js_escaped_json},
-        "${reverse('contentstore.views.course_team_handler', kwargs={'course_key_string': library_key, 'email': '@@EMAIL@@'}) | n, js_escaped_string}",
+        "${reverse('course_team_handler', kwargs={'course_key_string': library_key, 'email': '@@EMAIL@@'}) | n, js_escaped_string}",
         ${request.user.id | n, dump_js_escaped_json},
         ${allow_actions | n, dump_js_escaped_json}
       );

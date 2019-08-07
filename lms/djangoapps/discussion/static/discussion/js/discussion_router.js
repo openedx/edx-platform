@@ -18,11 +18,16 @@
                 initialize: function(options) {
                     Backbone.Router.prototype.initialize.call(this);
                     _.bindAll(this, 'allThreads', 'showThread');
-                    this.courseId = options.courseId;
+                    this.rootUrl = options.rootUrl;
                     this.discussion = options.discussion;
-                    this.course_settings = options.courseSettings;
+                    this.courseSettings = options.courseSettings;
                     this.discussionBoardView = options.discussionBoardView;
                     this.newPostView = options.newPostView;
+                    if (options.startHeader !== undefined) {
+                        this.startHeader = options.startHeader;
+                    } else {
+                        this.startHeader = 2; // Start the header levels at H<startHeader>
+                    }
                 },
 
                 start: function() {
@@ -50,7 +55,7 @@
 
                     Backbone.history.start({
                         pushState: true,
-                        root: '/courses/' + this.courseId + '/discussion/forum/'
+                        root: this.rootUrl
                     });
                 },
 
@@ -59,7 +64,6 @@
                 },
 
                 allThreads: function() {
-                    this.discussionBoardView.updateSidebar();
                     return this.discussionBoardView.goHome();
                 },
 
@@ -95,12 +99,11 @@
                         el: $('.forum-content'),
                         model: this.thread,
                         mode: 'tab',
-                        course_settings: this.course_settings
+                        startHeader: this.startHeader,
+                        courseSettings: this.courseSettings,
+                        is_commentable_divided: this.discussion.is_commentable_divided
                     });
                     this.main.render();
-                    this.main.on('thread:responses:rendered', function() {
-                        return self.discussionBoardView.updateSidebar();
-                    });
                     return this.thread.on('thread:thread_type_updated', this.showMain);
                 },
 

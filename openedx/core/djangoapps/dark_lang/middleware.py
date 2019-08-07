@@ -7,15 +7,15 @@ Language setting page.
 This middleware must be placed before the LocaleMiddleware, but after
 the SessionMiddleware.
 """
+from __future__ import absolute_import
+
 from django.conf import settings
-from django.utils.translation.trans_real import parse_accept_lang_header
 from django.utils.translation import LANGUAGE_SESSION_KEY
+from django.utils.translation.trans_real import parse_accept_lang_header
 
 from openedx.core.djangoapps.dark_lang import DARK_LANGUAGE_KEY
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
-from openedx.core.djangoapps.user_api.preferences.api import (
-    get_user_preference
-)
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 
 # If django 1.7 or higher is used, the right-side can be updated with new-style codes.
 CHINESE_LANGUAGE_CODE_MAP = {
@@ -71,6 +71,16 @@ class DarkLangMiddleware(object):
             language_options.append(settings.LANGUAGE_CODE)
         return language_options
 
+    @property
+    def beta_langs(self):
+        """
+        Current list of released languages
+        """
+        language_options = DarkLangConfig.current().beta_languages_list
+        if settings.LANGUAGE_CODE not in language_options:
+            language_options.append(settings.LANGUAGE_CODE)
+        return language_options
+
     def process_request(self, request):
         """
         Prevent user from requesting un-released languages except by using the preview-lang query string.
@@ -84,11 +94,18 @@ class DarkLangMiddleware(object):
     def _fuzzy_match(self, lang_code):
         """Returns a fuzzy match for lang_code"""
         match = None
-        if lang_code in self.released_langs:
+        dark_lang_config = DarkLangConfig.current()
+
+        if dark_lang_config.enable_beta_languages:
+            langs = self.released_langs + self.beta_langs
+        else:
+            langs = self.released_langs
+
+        if lang_code in langs:
             match = lang_code
         else:
             lang_prefix = lang_code.partition('-')[0]
-            for released_lang in self.released_langs:
+            for released_lang in langs:
                 released_prefix = released_lang.partition('-')[0]
                 if lang_prefix == released_prefix:
                     match = released_lang
@@ -118,7 +135,7 @@ class DarkLangMiddleware(object):
         """
         Check the user's dark language setting in the session and apply it
         """
-        auth_user = request.user.is_authenticated()
+        auth_user = request.user.is_authenticated
         preview_lang = None
         if auth_user:
             # Get the request user's dark lang preference

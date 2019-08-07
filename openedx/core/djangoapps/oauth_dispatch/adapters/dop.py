@@ -2,8 +2,10 @@
 Adapter to isolate django-oauth2-provider dependencies
 """
 
-from provider.oauth2 import models
+from __future__ import absolute_import
+
 from provider import constants, scope
+from provider.oauth2 import models
 
 
 class DOPAdapter(object):
@@ -57,14 +59,32 @@ class DOPAdapter(object):
         """
         return models.AccessToken.objects.get(token=token_string)
 
-    def normalize_scopes(self, scopes):
+    def create_access_token_for_test(self, token_string, client, user, expires):
         """
-        Given a list of scopes, return a space-separated list of those scopes.
+        Returns a new AccessToken object created from the given arguments.
+        This method is currently used only by tests.
         """
-        return ' '.join(scopes)
+        return models.AccessToken.objects.create(
+            token=token_string,
+            client=client,
+            user=user,
+            expires=expires,
+        )
 
     def get_token_scope_names(self, token):
         """
         Given an access token object, return its scopes.
         """
         return scope.to_names(token.scope)
+
+    def is_client_restricted(self, client):  # pylint: disable=unused-argument
+        """
+        Returns true if the client is set up as a RestrictedApplication.
+        """
+        return False
+
+    def get_authorization_filters(self, client):  # pylint: disable=unused-argument
+        """
+        Get the authorization filters for the given client application.
+        """
+        return []

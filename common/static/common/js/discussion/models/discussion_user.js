@@ -44,6 +44,6 @@
             };
 
             return DiscussionUser;
-        })(Backbone.Model);
+        }(Backbone.Model));
     }
 }).call(this);

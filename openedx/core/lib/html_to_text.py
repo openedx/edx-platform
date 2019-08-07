@@ -1,6 +1,7 @@
 """Provides a function to convert html to plaintext."""
+from __future__ import absolute_import
 import logging
-from subprocess import Popen, PIPE
+from subprocess import PIPE, Popen
 
 log = logging.getLogger(__name__)
 

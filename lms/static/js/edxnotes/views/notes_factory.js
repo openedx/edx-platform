@@ -79,19 +79,19 @@
      * @return {Object} An instance of Annotator.js.
      **/
         getAnnotator = function(element, params) {
-            var el = $(element),
-                options = getOptions(el, params),
+            var $el = $(element),
+                options = getOptions($el, params),
                 logger = NotesLogger.getLogger(element.id, params.debug),
                 annotator;
 
-            annotator = el.annotator(options).data('annotator');
+            annotator = $el.annotator(options).data('annotator');
             setupPlugins(annotator, plugins, options);
             NotesCollector.storeNotesRequestData(
                 {annotator: annotator, params: params},
                 $('.edx-notes-wrapper').length
             );
             annotator.logger = logger;
-            logger.log({'element': element, 'options': options});
+            logger.log({element: element, options: options});
             return annotator;
         };
 

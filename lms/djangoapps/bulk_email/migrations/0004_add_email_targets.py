@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 from django.db import migrations, models
 
@@ -27,8 +27,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='CohortTarget',
             fields=[
-                ('target_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='bulk_email.Target')),
-                ('cohort', models.ForeignKey(to='course_groups.CourseUserGroup')),
+                ('target_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='bulk_email.Target', on_delete=models.CASCADE)),
+                ('cohort', models.ForeignKey(to='course_groups.CourseUserGroup', on_delete=models.CASCADE)),
             ],
             bases=('bulk_email.target',),
         ),

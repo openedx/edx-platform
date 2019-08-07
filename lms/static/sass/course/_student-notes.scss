@@ -26,7 +26,9 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
 
 %notes-tab-control {
   @include transition(none);
+
   @extend %shame-link-base;
+
   display: inline-block;
   vertical-align: middle;
   border-bottom: ($baseline/5) solid $transparent;
@@ -38,11 +40,14 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
   // --------------------
   .wrapper-student-notes {
     @include clearfix();
+
     padding-bottom: $baseline;
 
     .student-notes {
       @include clearfix();
+
       @extend .content; // needed extend carried over from course handouts UI, but should be cleaned up
+
       width: 100%;
     }
   }
@@ -51,23 +56,27 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
   // --------------------
   .title-search-container {
     @include clearfix();
+
     margin-bottom: $baseline;
 
     .wrapper-title {
       @include float(left);
-      width: flex-grid(7,12);
+
+      width: flex-grid(7, 12);
 
       .page-title {
         @extend %t-title4;
         @extend %t-weight1;
+
         margin-bottom: 0;
 
         .page-subtitle {
           @extend %t-title7;
           @extend %t-weight2;
+
           display: block;
           margin-top: ($baseline/4);
-          color: $gray-l1;
+          color: $lightest-base-font-color;
           letter-spacing: 0;
         }
       }
@@ -75,19 +84,25 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
 
     .wrapper-notes-search {
       @include float(right);
-      width: flex-grid(5,12);
+
+      width: flex-grid(5, 12);
+
       @include text-align(right);
     }
 
-    .search-notes-input, .search-notes-submit {
+    .search-notes-input,
+    .search-notes-submit {
       display: inline-block;
       vertical-align: middle;
     }
 
     .search-notes-input {
       @extend %t-demi-strong;
+
       position: relative;
+
       @include right(-6px); // manually positioning input right next to submit
+
       width: 55%;
       padding: ($baseline/2) ($baseline*0.75);
       color: $gray-d3;
@@ -96,6 +111,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
     .search-notes-submit {
       @extend %btn-inherited-primary;
       @extend %t-action2;
+
       padding: 8px $baseline 9px $baseline; // manually syncing up height with search input
     }
   }
@@ -108,9 +124,11 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
     padding-top: ($baseline*1.5);
 
     // course structure labels
-    .course-title, .tags-title {
+    .course-title,
+    .tags-title {
       @extend %t-title6;
       @extend %t-weight4;
+
       margin: 0 0 ($baseline/2) 0;
       color: $gray-d3;
     }
@@ -118,6 +136,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
     .course-subtitle {
       @extend %t-title7;
       @extend %t-weight4;
+
       margin: 0 0 ($baseline/4) 0;
       border-bottom: $divider-visual-tertiary;
       padding-bottom: ($baseline/2);
@@ -132,10 +151,12 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
     // individual note
     .note {
       @include clearfix();
+
       margin: ($baseline*1.5) 0;
 
       .wrapper-note-excerpts {
         @include transition(box-shadow $tmg-avg ease-in-out 0, border-color $tmg-avg ease-in-out 0);
+
         display: inline-block;
         width: flex-grid(9, 12);
         border: 1px solid $gray-l5;
@@ -144,6 +165,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
         // note - highlighted content
         .note-excerpt {
           @include transition(background-color $tmg-avg ease-in-out 0);
+
           padding: $baseline;
           background: $student-notes-highlight-color;
 
@@ -158,30 +180,36 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
           @extend %t-copy-sub1;
           @extend %t-weight2;
           @extend %shame-link-text;
+
           display: inline;
+
           @include margin-left($baseline/4);
+
           border: 0;
           background: transparent;
           padding: 0;
-          
+
           &:active {
-              background: transparent;
-              box-shadow: none;
+            background: transparent;
+            box-shadow: none;
           }
         }
 
         // note - comment made on highlighted content
         .note-comments {
           @extend %ui-no-list;
+
           border-top: ($baseline/5) solid $student-notes-highlight-color-focus;
 
           .note-comment {
             @include transition(color $tmg-avg ease-in-out 0);
+
             padding: ($baseline*0.75) $baseline;
             color: $gray;
 
             .note-comment-title {
               @extend %t-title8;
+
               letter-spacing: ($baseline/20);
               margin: 0 0 ($baseline/4) 0;
               color: $gray-l2;
@@ -192,6 +220,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
             .note-comment-ol {
               @extend %t-copy-sub1;
               @extend %t-weight2;
+
               padding: 0;
               margin: 0;
               background: transparent;
@@ -218,6 +247,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
       // note reference
       .reference {
         @extend %t-copy-sub1;
+
         display: inline-block;
         width: flex-grid(3, 12);
         vertical-align: top;
@@ -229,8 +259,8 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
           .reference-title {
             @extend %t-title8;
             @extend %t-weight3;
+
             margin-top: ($baseline/2);
-            text-transform: uppercase;
             letter-spacing: ($baseline/20);
             color: $gray-l2;
 
@@ -242,6 +272,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
 
           .reference-meta {
             @extend %t-weight2;
+
             color: $m-gray-d2;
           }
 
@@ -254,26 +285,26 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
             }
           }
           // Put commas between tags.
-          span.reference-meta.reference-tags:after {
+          span.reference-meta.reference-tags::after {
             content: ",";
             color: $m-gray-d2;
           }
 
           // But not after the last tag.
-          span.reference-meta.reference-tags:last-child:after {
-              content: "";
+          span.reference-meta.reference-tags:last-child::after {
+            content: "";
           }
 
           // needed for poor base LMS styling scope
           a.reference-meta {
-             @extend %shame-link-text;
+            @extend %shame-link-text;
           }
         }
       }
 
       // STATE: hover/focus
-      &:hover, &:focus {
-
+      &:hover,
+      &:focus {
         .wrapper-note-excerpts {
           box-shadow: 0 2px 0 1px $shadow-l2;
           border-color: $gray-l4;
@@ -294,9 +325,11 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
   // +tabbed views
   // --------------------
   .wrapper-tabs {
-
-    .tab-panel, .inline-error, .ui-loading {
+    .tab-panel,
+    .inline-error,
+    .ui-loading {
       @extend %no-outline;
+
       border-top: $divider-visual-primary;
 
       .listing-tools {
@@ -321,26 +354,33 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
 
     .tab-list {
       @include clearfix();
+
       position: relative;
       top: ($baseline/5);
 
-      .tabs-label, .tabs {
+      .tabs-label,
+      .tabs {
         display: inline-block;
         vertical-align: middle;
       }
 
       .tabs-label {
         @extend %hd-lv5;
+
         margin-bottom: 0;
         padding: ($baseline*0.75) 0;
+
         @include padding-right($baseline);
-        color: $gray-l2;
+
+        color: $lightest-base-font-color;
         font-weight: $font-semibold !important; // needed for poor base LMS styling scope
       }
 
       .tabs {
         @include clearfix();
+
         @extend %ui-no-list;
+
         position: relative;
         bottom: -($baseline/4);
       }
@@ -351,6 +391,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
 
         .tab-label {
           @extend %notes-tab-control;
+
           padding: ($baseline/2) ($baseline*0.75);
           text-align: center;
 
@@ -361,7 +402,6 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
 
         // STATE: active/current tab being viewed
         &.is-active {
-
           .tab-label {
             border-bottom-color: $gray-d3;
             color: $gray-d3;
@@ -376,8 +416,11 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
         // CASE: tab-label can be closed
         .action-close {
           @extend %notes-tab-control;
+
           position: relative;
+
           @include left(-($baseline*0.75));
+
           padding: ($baseline/2);
         }
       }
@@ -390,6 +433,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
   #no-results-panel {
     p {
       @extend %t-copy-lead1;
+
       margin: ($baseline*1.5) 0;
     }
   }
@@ -406,10 +450,15 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
     background: $gray-l5;
     border-top: ($baseline/4) solid $active-color;
     padding: ($baseline*1.5);
+
+    a {
+      color: $blue-d1;
+    }
   }
 
   .placeholder-title {
     @extend %hd-lv3;
+
     margin-bottom: $baseline;
     text-transform: none; // reset needed for poor h2 element styling
     letter-spacing: 0; // reset needed for poor h2 element styling
@@ -423,6 +472,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
 
       li {
         @extend %wipe-last-child;
+
         display: block;
         margin-bottom: ($baseline/2);
       }

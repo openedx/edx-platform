@@ -1,25 +1,25 @@
-from django.core.exceptions import PermissionDenied
-from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_http_methods
-from django.utils.translation import ugettext as _
-from django.views.decorators.http import require_POST
-from django.views.decorators.csrf import ensure_csrf_cookie
-from edxmako.shortcuts import render_to_response
+"""Views for users"""
 
-from xmodule.modulestore.django import modulestore
+from __future__ import absolute_import
+
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseNotFound
+from django.utils.translation import ugettext as _
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_http_methods, require_POST
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
-from util.json_request import JsonResponse, expect_json
-from student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
+
 from course_creators.views import user_requested_access
-
-from student.auth import STUDIO_EDIT_ROLES, STUDIO_VIEW_USERS, get_user_permissions
-
-from student.models import CourseEnrollment
-from django.http import HttpResponseNotFound
+from edxmako.shortcuts import render_to_response
 from student import auth
-
+from student.auth import STUDIO_EDIT_ROLES, STUDIO_VIEW_USERS, get_user_permissions
+from student.models import CourseEnrollment
+from student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
+from util.json_request import JsonResponse, expect_json
+from xmodule.modulestore.django import modulestore
 
 __all__ = ['request_course_creator', 'course_team_handler']
 
@@ -45,7 +45,8 @@ def course_team_handler(request, course_key_string=None, email=None):
         html: return html page for managing course team
         json: return json representation of a particular course team member (email is required).
     POST or PUT
-        json: modify the permissions for a particular course team member (email is required, as well as role in the payload).
+        json: modify the permissions for a particular course team member (email is required, as well as role in the
+         payload).
     DELETE:
         json: remove a particular course team member from the course team (email is required).
     """
@@ -115,9 +116,9 @@ def _course_team_user(request, course_key, email):
 
     try:
         user = User.objects.get(email=email)
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         msg = {
-            "error": _("Could not find user by email address '{email}'.").format(email=email),
+            "error": _(u"Could not find user by email address '{email}'.").format(email=email),
         }
         return JsonResponse(msg, 404)
 
@@ -161,7 +162,7 @@ def _course_team_user(request, course_key, email):
     # can't modify an inactive user but can remove it
     if not (user.is_active or new_role is None):
         msg = {
-            "error": _('User {email} has registered but has not yet activated his/her account.').format(email=email),
+            "error": _(u'User {email} has registered but has not yet activated his/her account.').format(email=email),
         }
         return JsonResponse(msg, 400)
 

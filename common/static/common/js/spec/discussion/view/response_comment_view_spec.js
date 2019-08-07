@@ -82,7 +82,7 @@
             it('does not delete a comment if the permission is false', function() {
                 this.comment.updateInfo({
                     ability: {
-                        'can_delete': false
+                        can_delete: false
                     }
                 });
                 spyOn(window, 'confirm');

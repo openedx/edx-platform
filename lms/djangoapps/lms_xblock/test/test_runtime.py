@@ -2,24 +2,24 @@
 Tests of the LMS XBlock Runtime and associated utilities
 """
 
+from __future__ import absolute_import
+
+from ddt import data, ddt
 from django.conf import settings
-from ddt import ddt, data
 from django.test import TestCase
 from mock import Mock, patch
-from urlparse import urlparse
-
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import BlockUsageLocator, CourseLocator, SlashSeparatedCourseKey
+from opaque_keys.edx.locations import BlockUsageLocator, CourseLocator
+from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
+from xblock.exceptions import NoSuchServiceError
+from xblock.fields import ScopeIds
 
 from badges.tests.factories import BadgeClassFactory
 from badges.tests.test_models import get_image
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
-from xblock.fields import ScopeIds
+from student.tests.factories import UserFactory
 from xmodule.modulestore.django import ModuleI18nService
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xblock.exceptions import NoSuchServiceError
-
-from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
@@ -57,7 +57,7 @@ class TestHandlerUrl(TestCase):
     def setUp(self):
         super(TestHandlerUrl, self).setUp()
         self.block = BlockMock(name='block', scope_ids=ScopeIds(None, None, None, 'dummy'))
-        self.course_key = SlashSeparatedCourseKey("org", "course", "run")
+        self.course_key = CourseLocator("org", "course", "run")
         self.runtime = LmsModuleSystem(
             static_url='/static',
             track_function=Mock(),
@@ -121,7 +121,7 @@ class TestUserServiceAPI(TestCase):
 
     def setUp(self):
         super(TestUserServiceAPI, self).setUp()
-        self.course_id = SlashSeparatedCourseKey("org", "course", "run")
+        self.course_id = CourseLocator("org", "course", "run")
         self.user = UserFactory.create()
 
         def mock_get_real_user(_anon_id):

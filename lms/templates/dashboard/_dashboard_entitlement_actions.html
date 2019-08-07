@@ -1,0 +1,61 @@
+<%page args="course_overview, entitlement, dashboard_index, can_refund_entitlement, show_email_settings" expression_filter="h"/>
+
+<%!
+from django.utils.translation import ugettext as _
+from django.urls import reverse
+%>
+
+<%
+dropdown_id = "entitlement-actions-dropdown-{}".format(dashboard_index)
+dropdown_btn_id = "entitlement-actions-dropdown-btn-{}".format(dashboard_index)
+%>
+
+<div class="entitlement-actions-wrapper">
+  ## id, data-dropdown-selector, and data-dropdown-button-selector must be defined for compatibility with
+  ## lms/static/js/dashboard/dropdown.js
+  <button id="${dropdown_btn_id}"
+          class="entitlement-action entitlement-action-more js-entitlement-action-more"
+          type="button"
+          aria-haspopup="true"
+          aria-expanded="false"
+          aria-controls="${dropdown_id}"
+          data-dropdown-selector="#${dropdown_id}"
+          data-dropdown-button-selector="#${dropdown_btn_id}">
+    <span class="sr">${_('Course options for {courseName}').format(courseName=course_overview.display_name_with_default)}</span>
+    <span class="fa fa-cog" aria-hidden="true"></span>
+  </button>
+
+  <div id="${dropdown_id}" class="entitlement-actions-dropdown" tabindex="-1">
+    <ul class="entitlement-actions-dropdown-list" aria-label="${_('Available Actions')}" role="menu">
+      % if can_refund_entitlement:
+        <li class="entitlement-actions-item" role="menuitem">
+          ## href, id, rel, and data-model-close-button-selector must be defined for compatibility with lms/static/js/leanModal.js
+          ## data-dropdown-selector and data-dropdown-button-selector must be defined for compatibility with lms/static/js/dashboard/dropdown.js
+          ## class="js-entitlement-action-unenroll" must be set for compatibility with lms/static/js/learner_dashboard/views/entitlement_unenrollment_view.js
+          <a href="#entitlement-unenrollment-modal" id="entitlement-action-unenroll-${dashboard_index}" class="entitlement-action js-entitlement-action-unenroll" rel="leanModal"
+            data-modal-close-button-selector=".js-entitlement-unenrollment-modal .js-entitlement-unenrollment-modal-close-btn"
+            data-dropdown-selector="#${dropdown_id}"
+            data-dropdown-button-selector="#${dropdown_btn_id}"
+            data-course-name="${course_overview.display_name_with_default}"
+            data-course-number="${course_overview.number}"
+            data-entitlement-api-endpoint="${reverse('entitlements_api:v1:enrollments', args=[unicode(entitlement.uuid)]) + '?is_refund=true'}">
+            ${_('Unenroll')}
+          </a>
+        </li>
+      % endif
+      % if show_email_settings:
+        <li class="actions-item" id="actions-item-email-settings-${dashboard_index}" role="menuitem">
+          ## href and rel must be defined for compatibility with lms/static/js/leanModal.js
+          ## data-dropdown-selector and data-dropdown-button-selector must be defined for compatibility with lms/static/js/dashboard/dropdown.js
+          <a href="#email-settings-modal" class="entitlement-action action-email-settings" rel="leanModal"
+            data-dropdown-selector="#${dropdown_id}"
+            data-dropdown-button-selector="#${dropdown_btn_id}"
+            data-course-id="${course_overview.id}"
+            data-course-number="${course_overview.number}"
+            data-dashboard-index="${dashboard_index}"
+            data-optout="${unicode(course_overview.id) in course_optouts}">${_('Email Settings')}</a>
+        </li>
+      % endif
+      </ul>
+  </div>
+</div>

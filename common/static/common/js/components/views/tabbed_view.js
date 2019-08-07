@@ -84,14 +84,14 @@
                 var self = this;
                 this.$el.html(this.template);
                 _.each(this.tabs, function(tabInfo, index) {
-                    var tabEl = $(_.template(tabTemplate)({
+                    var $tabEl = $(_.template(tabTemplate)({
                             index: index,
                             title: tabInfo.title,
                             url: tabInfo.url,
                             tabPanelId: getTabPanelId(tabInfo.url)
                         })),
                         tabContainerEl = this.$('.tabs');
-                    self.$('.page-content-nav').append(tabEl);
+                    self.$('.page-content-nav').append($tabEl);
 
                     // Render and append the current tab panel
                     tabContainerEl.append(tabInfo.view.render().$el);
@@ -119,7 +119,7 @@
                     .attr({
                         'aria-expanded': 'false',
                         'aria-selected': 'false',
-                        'tabindex': '-1'
+                        tabindex: '-1'
                     });
 
                 this.$('.tabpanel[aria-hidden="false"]')
@@ -138,7 +138,7 @@
                     .attr({
                         'aria-expanded': 'true',
                         'aria-selected': 'true',
-                        'tabindex': '0'
+                        tabindex: '0'
                     });
 
                 view.$el
@@ -187,22 +187,22 @@
 
             keydownHandler: function(event) {
                 var key = event.which,
-                    focused = $(event.currentTarget),
-                    index = $(focused).parent().find('.tab').index(focused),
-                    total = $(focused).parent().find('.tab').size() - 1,
-                    $tab = $(focused).data('index');
+                    $focused = $(event.currentTarget),
+                    index = $($focused).parent().find('.tab').index($focused),
+                    total = $($focused).parent().find('.tab').size() - 1,
+                    $tab = $($focused).data('index');
 
                 switch (key) {
                 case Constants.keyCodes.left:
                 case Constants.keyCodes.up:
                     event.preventDefault();
-                    this.previousTab(focused, index);
+                    this.previousTab($focused, index);
                     break;
 
                 case Constants.keyCodes.right:
                 case Constants.keyCodes.down:
                     event.preventDefault();
-                    this.nextTab(focused, index, total);
+                    this.nextTab($focused, index, total);
                     break;
 
                 case Constants.keyCodes.enter:
@@ -229,7 +229,7 @@
                     tab = this.tabs[tabNameOrIndex];
                     $element = this.$('button[data-index=' + tabNameOrIndex + ']');
                 }
-                return {'tab': tab, 'element': $element};
+                return {tab: tab, element: $element};
             }
         });
         return TabbedView;

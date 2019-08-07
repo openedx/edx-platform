@@ -1,30 +1,18 @@
 """Ensure we can parse events sent to us from the Segment webhook integration"""
+from __future__ import absolute_import
 
-from datetime import datetime
 import json
 
-from ddt import ddt, data, unpack
-from mock import sentinel
-from nose.plugins.attrib import attr
-
+from dateutil import parser
+from ddt import data, ddt, unpack
 from django.contrib.auth.models import User
-from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from mock import sentinel
 
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 from track.middleware import TrackMiddleware
-from track.tests import EventTrackingTestCase
 from track.views import segmentio
-
-
-SECRET = 'anything'
-ENDPOINT = '/segmentio/test/event'
-USER_ID = 10
-
-MOBILE_SHIM_PROCESSOR = [
-    {'ENGINE': 'track.shim.LegacyFieldMappingProcessor'},
-    {'ENGINE': 'track.shim.PrefixedEventProcessor'},
-]
+from track.views.tests.base import SEGMENTIO_TEST_ENDPOINT, SEGMENTIO_TEST_USER_ID, SegmentIOTrackingTestCaseBase
 
 
 def expect_failure_with_message(message):
@@ -37,26 +25,19 @@ def expect_failure_with_message(message):
     return test_decorator
 
 
-@attr(shard=3)
 @ddt
-@override_settings(
-    TRACKING_SEGMENTIO_WEBHOOK_SECRET=SECRET,
-    TRACKING_IGNORE_URL_PATTERNS=[ENDPOINT],
-    TRACKING_SEGMENTIO_ALLOWED_TYPES=['track'],
-    TRACKING_SEGMENTIO_DISALLOWED_SUBSTRING_NAMES=['.bi.'],
-    TRACKING_SEGMENTIO_SOURCE_MAP={'test-app': 'mobile'},
-    EVENT_TRACKING_PROCESSORS=MOBILE_SHIM_PROCESSOR,
-)
-class SegmentIOTrackingTestCase(EventTrackingTestCase):
-    """Test processing of Segment events"""
+class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
+    """
+    Test processing of Segment events.
+    """
 
     def setUp(self):
         super(SegmentIOTrackingTestCase, self).setUp()
-        self.maxDiff = None  # pylint: disable=invalid-name
-        self.request_factory = RequestFactory()
+
+        User.objects.create(pk=SEGMENTIO_TEST_USER_ID, username=str(sentinel.username))
 
     def test_get_request(self):
-        request = self.request_factory.get(ENDPOINT)
+        request = self.request_factory.get(SEGMENTIO_TEST_ENDPOINT)
         response = segmentio.segmentio_event(request)
         self.assertEquals(response.status_code, 405)
         self.assert_no_events_emitted()
@@ -65,13 +46,13 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
         TRACKING_SEGMENTIO_WEBHOOK_SECRET=None
     )
     def test_no_secret_config(self):
-        request = self.request_factory.post(ENDPOINT)
+        request = self.request_factory.post(SEGMENTIO_TEST_ENDPOINT)
         response = segmentio.segmentio_event(request)
         self.assertEquals(response.status_code, 401)
         self.assert_no_events_emitted()
 
     def test_no_secret_provided(self):
-        request = self.request_factory.post(ENDPOINT)
+        request = self.request_factory.post(SEGMENTIO_TEST_ENDPOINT)
         response = segmentio.segmentio_event(request)
         self.assertEquals(response.status_code, 401)
         self.assert_no_events_emitted()
@@ -82,82 +63,10 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
         self.assertEquals(response.status_code, 401)
         self.assert_no_events_emitted()
 
-    def create_request(self, key=None, **kwargs):
-        """Create a fake request that emulates a request from the Segment servers to ours"""
-        if key is None:
-            key = SECRET
-
-        request = self.request_factory.post(ENDPOINT + "?key=" + key, **kwargs)
-        if 'data' in kwargs:
-            request.json = json.loads(kwargs['data'])
-
-        return request
-
     @data('identify', 'Group', 'Alias', 'Page', 'identify', 'screen')
     def test_segmentio_ignore_actions(self, action):
         self.post_segmentio_event(action=action)
         self.assert_no_events_emitted()
-
-    @data('edx.bi.some_name', 'EDX.BI.CAPITAL_NAME')
-    def test_segmentio_ignore_names(self, name):
-        self.post_segmentio_event(name=name)
-        self.assert_no_events_emitted()
-
-    def post_segmentio_event(self, **kwargs):
-        """Post a fake Segment event to the view that processes it"""
-        request = self.create_request(
-            data=self.create_segmentio_event_json(**kwargs),
-            content_type='application/json'
-        )
-        segmentio.track_segmentio_event(request)
-
-    def create_segmentio_event(self, **kwargs):
-        """Populate a fake Segment event with data of interest"""
-        action = kwargs.get('action', 'Track')
-        sample_event = {
-            "userId": kwargs.get('user_id', USER_ID),
-            "event": "Did something",
-            "properties": {
-                'name': kwargs.get('name', str(sentinel.name)),
-                'data': kwargs.get('data', {}),
-                'context': {
-                    'course_id': kwargs.get('course_id') or '',
-                    'app_name': 'edx.mobile.android',
-                }
-            },
-            "channel": 'server',
-            "context": {
-                "library": {
-                    "name": kwargs.get('library_name', 'test-app'),
-                    "version": "unknown"
-                },
-                "app": {
-                    "version": "1.0.1",
-                },
-                'userAgent': str(sentinel.user_agent),
-            },
-            "receivedAt": "2014-08-27T16:33:39.100Z",
-            "timestamp": "2014-08-27T16:33:39.215Z",
-            "type": action.lower(),
-            "projectId": "u0j33yjkr8",
-            "messageId": "qy52hwp4",
-            "version": 2,
-            "integrations": {},
-            "options": {
-                "library": "unknown",
-                "providers": {}
-            },
-            "action": action
-        }
-
-        if 'context' in kwargs:
-            sample_event['properties']['context'].update(kwargs['context'])
-
-        return sample_event
-
-    def create_segmentio_event_json(self, **kwargs):
-        """Return a json string containing a fake Segment event"""
-        return json.dumps(self.create_segmentio_event(**kwargs))
 
     def test_segmentio_ignore_unknown_libraries(self):
         self.post_segmentio_event(library_name='foo')
@@ -179,7 +88,6 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
             data=self.create_segmentio_event_json(data={'foo': 'bar'}, course_id=course_id),
             content_type='application/json'
         )
-        User.objects.create(pk=USER_ID, username=str(sentinel.username))
 
         middleware.process_request(request)
         # The middleware normally emits an event, make sure it doesn't in this case.
@@ -200,17 +108,17 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
                 'event': {'foo': 'bar'},
                 'agent': str(sentinel.user_agent),
                 'page': None,
-                'time': datetime.strptime("2014-08-27T16:33:39.215Z", "%Y-%m-%dT%H:%M:%S.%fZ"),
+                'time': parser.parse("2014-08-27T16:33:39.215Z"),
                 'host': 'testserver',
                 'context': {
                     'application': {
                         'name': 'edx.mobile.android',
                         'version': '1.0.1',
                     },
-                    'user_id': USER_ID,
+                    'user_id': SEGMENTIO_TEST_USER_ID,
                     'course_id': course_id,
                     'org_id': u'foo',
-                    'path': ENDPOINT,
+                    'path': SEGMENTIO_TEST_ENDPOINT,
                     'client': {
                         'library': {
                             'name': 'test-app',
@@ -220,7 +128,7 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
                             'version': '1.0.1',
                         },
                     },
-                    'received_at': datetime.strptime("2014-08-27T16:33:39.100Z", "%Y-%m-%dT%H:%M:%S.%fZ"),
+                    'received_at': parser.parse("2014-08-27T16:33:39.100Z"),
                 },
             }
         finally:
@@ -233,7 +141,6 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
             data=self.create_segmentio_event_json(course_id='invalid'),
             content_type='application/json'
         )
-        User.objects.create(pk=USER_ID, username=str(sentinel.username))
         segmentio.track_segmentio_event(request)
         self.assert_events_emitted()
 
@@ -245,7 +152,6 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
             data=json.dumps(sample_event_raw),
             content_type='application/json'
         )
-        User.objects.create(pk=USER_ID, username=str(sentinel.username))
 
         segmentio.track_segmentio_event(request)
 
@@ -257,7 +163,6 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
             data=json.dumps(sample_event_raw),
             content_type='application/json'
         )
-        User.objects.create(pk=USER_ID, username=str(sentinel.username))
 
         segmentio.track_segmentio_event(request)
 
@@ -268,7 +173,6 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
             data=json.dumps(sample_event_raw),
             content_type='application/json'
         )
-        User.objects.create(pk=USER_ID, username=str(sentinel.username))
 
         segmentio.track_segmentio_event(request)
 
@@ -279,7 +183,6 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
             data=json.dumps(sample_event_raw),
             content_type='application/json'
         )
-        User.objects.create(pk=USER_ID, username=str(sentinel.username))
 
         segmentio.track_segmentio_event(request)
 
@@ -294,8 +197,24 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
         return event
 
     def test_string_user_id(self):
-        User.objects.create(pk=USER_ID, username=str(sentinel.username))
-        self.post_segmentio_event(user_id=str(USER_ID))
+        self.post_segmentio_event(user_id=str(SEGMENTIO_TEST_USER_ID))
+        self.assert_events_emitted()
+
+    @data(
+        '2018-12-11T07:27:28.015900357Z',
+        '2014-08-27T16:33:39.100Z',
+        '2014-08-27T16:33:39.215Z'
+    )
+    def test_timestamp_success(self, timestamp):
+        sample_event_raw = self.create_segmentio_event()
+        sample_event_raw['receivedAt'] = timestamp
+        sample_event_raw['timestamp'] = timestamp
+        request = self.create_request(
+            data=json.dumps(sample_event_raw),
+            content_type='application/json'
+        )
+        response = segmentio.segmentio_event(request)
+        self.assertEquals(response.status_code, 200)
         self.assert_events_emitted()
 
     def test_hiding_failure(self):
@@ -304,7 +223,6 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
             data=json.dumps(sample_event_raw),
             content_type='application/json'
         )
-        User.objects.create(pk=USER_ID, username=str(sentinel.username))
 
         response = segmentio.segmentio_event(request)
         self.assertEquals(response.status_code, 200)
@@ -350,7 +268,6 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
                 }),
             content_type='application/json'
         )
-        User.objects.create(pk=USER_ID, username=str(sentinel.username))
 
         middleware.process_request(request)
         try:
@@ -368,13 +285,13 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
                 'name': name,
                 'agent': str(sentinel.user_agent),
                 'page': 'https://testserver/courses/foo/bar/baz/courseware/Week_1/Activity',
-                'time': datetime.strptime("2014-08-27T16:33:39.215Z", "%Y-%m-%dT%H:%M:%S.%fZ"),
+                'time': parser.parse("2014-08-27T16:33:39.215Z"),
                 'host': 'testserver',
                 'context': {
-                    'user_id': USER_ID,
+                    'user_id': SEGMENTIO_TEST_USER_ID,
                     'course_id': course_id,
                     'org_id': 'foo',
-                    'path': ENDPOINT,
+                    'path': SEGMENTIO_TEST_ENDPOINT,
                     'client': {
                         'library': {
                             'name': 'test-app',
@@ -389,7 +306,7 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
                         'version': '29',
                         'component': 'videoplayer'
                     },
-                    'received_at': datetime.strptime("2014-08-27T16:33:39.100Z", "%Y-%m-%dT%H:%M:%S.%fZ"),
+                    'received_at': parser.parse("2014-08-27T16:33:39.100Z"),
                 },
                 'event': {
                     'currentTime': 132.134456,
@@ -484,7 +401,6 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
             ),
             content_type='application/json'
         )
-        User.objects.create(pk=USER_ID, username=str(sentinel.username))
 
         middleware.process_request(request)
         try:
@@ -502,13 +418,13 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
                 'name': expected_name,
                 'agent': str(sentinel.user_agent),
                 'page': 'https://testserver/courses/foo/bar/baz/courseware/Week_1/Activity',
-                'time': datetime.strptime("2014-08-27T16:33:39.215Z", "%Y-%m-%dT%H:%M:%S.%fZ"),
+                'time': parser.parse("2014-08-27T16:33:39.215Z"),
                 'host': 'testserver',
                 'context': {
-                    'user_id': USER_ID,
+                    'user_id': SEGMENTIO_TEST_USER_ID,
                     'course_id': course_id,
                     'org_id': 'foo',
-                    'path': ENDPOINT,
+                    'path': SEGMENTIO_TEST_ENDPOINT,
                     'client': {
                         'library': {
                             'name': 'test-app',
@@ -523,7 +439,7 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
                         'version': version,
                         'component': 'videoplayer'
                     },
-                    'received_at': datetime.strptime("2014-08-27T16:33:39.100Z", "%Y-%m-%dT%H:%M:%S.%fZ"),
+                    'received_at': parser.parse("2014-08-27T16:33:39.100Z"),
                 },
                 'event': {
                     "code": "mobile",

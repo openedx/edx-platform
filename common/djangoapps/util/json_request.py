@@ -1,6 +1,9 @@
-from functools import wraps
-import json
+from __future__ import absolute_import
+
 import decimal
+import json
+from functools import wraps
+
 from django.core.serializers import serialize
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models.query import QuerySet

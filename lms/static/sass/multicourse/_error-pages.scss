@@ -1,11 +1,15 @@
 section.outside-app {
   @extend .container;
+
   @include text-align(left);
+
   padding: ($baseline*4) 0;
 
   h1 {
     @extend h2;
+
     margin-bottom: ($baseline*2);
+    text-align: center;
   }
 
   p, ul, form {

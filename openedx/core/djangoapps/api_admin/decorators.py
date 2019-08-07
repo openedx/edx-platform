@@ -1,11 +1,13 @@
 """Decorators for API access management."""
+from __future__ import absolute_import
+
 from functools import wraps
 
-from django.core.urlresolvers import reverse
 from django.http import HttpResponseNotFound
 from django.shortcuts import redirect
+from django.urls import reverse
 
-from openedx.core.djangoapps.api_admin.models import ApiAccessRequest, ApiAccessConfig
+from openedx.core.djangoapps.api_admin.models import ApiAccessConfig, ApiAccessRequest
 
 
 def api_access_enabled_or_404(view_func):

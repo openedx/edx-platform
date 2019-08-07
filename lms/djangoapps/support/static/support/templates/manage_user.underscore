@@ -1,0 +1,46 @@
+<div class="manage-user-search">
+    <form class="manage-user-form">
+        <label class="sr" for="manage-user-query-input"><%- gettext('Search') %></label>
+        <input
+            id="manage-user-query-input"
+            type="text"
+            name="query"
+            value="<%- user %>"
+            placeholder="<%- gettext('Username') %>">
+        </input>
+        <input type="submit" value="<%- gettext('Search') %>" class="btn-disable-on-submit"></input>
+    </form>
+</div>
+
+<% if (user_profile.get('username') !== undefined) { %>
+<div class="manage-user-results">
+  <table id="manage-user-table" class="manage-user-table display compact nowrap">
+    <thead>
+      <tr>
+        <th><%- gettext('Username') %></th>
+        <th><%- gettext('Email') %></th>
+        <th><%- gettext('Date Joined') %></th>
+        <th><%- gettext('Password Status') %></th>
+        <th><%- gettext('Action') %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><% print(user_profile.get('username')) %></td>
+        <td><% print(user_profile.get('email')) %></td>
+        <td><% print(user_profile.get('date_joined')) %></td>
+        <td><% print(user_profile.get('status')) %></td>
+        <td>
+          <button class="disable-account-btn">
+            <%- gettext('Toggle Account Password (Usable/Unusable)') %>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+   </table>
+</div>
+<% } %>
+
+<% if (user_profile.get('response')) {%>
+    <span><% print(user_profile.get('response')) %></span>
+<% } %>

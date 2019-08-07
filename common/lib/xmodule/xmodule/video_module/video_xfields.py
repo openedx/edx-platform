@@ -1,9 +1,12 @@
 """
 XFields for video module.
 """
+from __future__ import absolute_import
+
 import datetime
 
-from xblock.fields import Scope, String, Float, Boolean, List, Dict, DateTime
+from xblock.fields import Boolean, DateTime, Dict, Float, List, Scope, String
+
 from xmodule.fields import RelativeTime
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
@@ -12,9 +15,9 @@ _ = lambda text: text
 
 
 class VideoFields(object):
-    """Fields for `VideoModule` and `VideoDescriptor`."""
+    """Fields for `VideoBlock`."""
     display_name = String(
-        help=_("The name students see. This name appears in the course ribbon and as a header for the video."),
+        help=_("The display name for this component."),
         display_name=_("Component Display Name"),
         default="Video",
         scope=Scope.settings
@@ -73,14 +76,6 @@ class VideoFields(object):
     )
     #front-end code of video player checks logical validity of (start_time, end_time) pair.
 
-    # `source` is deprecated field and should not be used in future.
-    # `download_video` is used instead.
-    source = String(
-        help=_("The external URL to download the video."),
-        display_name=_("Download Video"),
-        scope=Scope.settings,
-        default=""
-    )
     download_video = Boolean(
         help=_("Allow students to download versions of this video in different formats if they cannot use the edX video player or do not have access to YouTube. You must add at least one non-YouTube URL in the Video File URLs field."),  # pylint: disable=line-too-long
         display_name=_("Video Download Allowed"),
@@ -104,6 +99,8 @@ class VideoFields(object):
         scope=Scope.settings,
         default=False
     )
+    # `sub` is deprecated field and should not be used in future. Now, transcripts are primarily handled in VAL and
+    # backward compatibility for the video modules already using this field has been ensured.
     sub = String(
         help=_("The default transcript for the video, from the Default Timed Transcript field on the Basic tab. This transcript should be in English. You don't have to change this setting."),  # pylint: disable=line-too-long
         display_name=_("Default Timed Transcript"),
@@ -147,6 +144,15 @@ class VideoFields(object):
         help=_("The default speed for the video."),
         scope=Scope.preferences,
         default=1.0
+    )
+    auto_advance = Boolean(
+        help=_("Specify whether to advance automatically to the next unit when the video ends."),
+        scope=Scope.preferences,
+        # The default is True because this field only has an effect when auto-advance controls are enabled
+        # (globally enabled through feature flag and locally enabled through course setting); in that case
+        # it's good to start auto-advancing and let the student disable it, instead of the other way around
+        # (requiring the user to enable it). When auto-advance controls are hidden, this field won't be used.
+        default=True,
     )
     youtube_is_available = Boolean(
         help=_("Specify whether YouTube is available for the user."),

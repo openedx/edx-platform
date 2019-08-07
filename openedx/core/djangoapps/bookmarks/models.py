@@ -1,19 +1,21 @@
 """
 Models for Bookmarks.
 """
+from __future__ import absolute_import
+
 import logging
 
+import six
 from django.contrib.auth.models import User
 from django.db import models
-
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
-
+from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from opaque_keys.edx.keys import UsageKey
+
 from xmodule.modulestore import search
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, LocationKeyField
 
 from . import PathItem
 
@@ -24,7 +26,7 @@ def prepare_path_for_serialization(path):
     """
     Return the data from a list of PathItems ready for serialization to json.
     """
-    return [(unicode(path_item.usage_key), path_item.display_name) for path_item in path]
+    return [(six.text_type(path_item.usage_key), path_item.display_name) for path_item in path]
 
 
 def parse_path_data(path_data):
@@ -42,13 +44,15 @@ def parse_path_data(path_data):
 class Bookmark(TimeStampedModel):
     """
     Bookmarks model.
+
+    .. no_pii:
     """
-    user = models.ForeignKey(User, db_index=True)
+    user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     course_key = CourseKeyField(max_length=255, db_index=True)
-    usage_key = LocationKeyField(max_length=255, db_index=True)
+    usage_key = UsageKeyField(max_length=255, db_index=True)
     _path = JSONField(db_column='path', help_text='Path in course tree to the block')
 
-    xblock_cache = models.ForeignKey('bookmarks.XBlockCache')
+    xblock_cache = models.ForeignKey('bookmarks.XBlockCache', on_delete=models.CASCADE)
 
     class Meta(object):
         """
@@ -90,6 +94,9 @@ class Bookmark(TimeStampedModel):
 
         user = data.pop('user')
 
+        # Sometimes this ends up in data, but newer versions of Django will fail on having unknown keys in defaults
+        data.pop('display_name', None)
+
         bookmark, created = cls.objects.get_or_create(usage_key=usage_key, user=user, defaults=data)
         return bookmark, created
 
@@ -98,7 +105,7 @@ class Bookmark(TimeStampedModel):
         """
         Return the resource id: {username,usage_id}.
         """
-        return u"{0},{1}".format(self.user.username, self.usage_key)  # pylint: disable=no-member
+        return u"{0},{1}".format(self.user.username, self.usage_key)
 
     @property
     def display_name(self):
@@ -172,7 +179,7 @@ class Bookmark(TimeStampedModel):
 
             path_data = []
             for ancestor_usage_key in path:
-                if ancestor_usage_key != usage_key and ancestor_usage_key.block_type != 'course':  # pylint: disable=no-member
+                if ancestor_usage_key != usage_key and ancestor_usage_key.block_type != 'course':
                     try:
                         block = modulestore().get_item(ancestor_usage_key)
                     except ItemNotFoundError:
@@ -187,10 +194,12 @@ class Bookmark(TimeStampedModel):
 class XBlockCache(TimeStampedModel):
     """
     XBlockCache model to store info about xblocks.
+
+    .. no_pii:
     """
 
     course_key = CourseKeyField(max_length=255, db_index=True)
-    usage_key = LocationKeyField(max_length=255, db_index=True, unique=True)
+    usage_key = UsageKeyField(max_length=255, db_index=True, unique=True)
 
     display_name = models.CharField(max_length=255, default='')
     _paths = JSONField(
@@ -198,7 +207,7 @@ class XBlockCache(TimeStampedModel):
     )
 
     def __unicode__(self):
-        return unicode(self.usage_key)
+        return six.text_type(self.usage_key)
 
     @property
     def paths(self):

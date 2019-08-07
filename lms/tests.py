@@ -1,15 +1,17 @@
 """Tests for the lms module itself."""
 
+from __future__ import absolute_import
+
+import logging
 import mimetypes
-from mock import patch
 
+from django.conf import settings
 from django.test import TestCase
-from django.core.urlresolvers import reverse
 
-from edxmako import add_lookup, LOOKUP
-from lms import startup
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from edxmako import LOOKUP, add_lookup
+from microsite_configuration import microsite
+
+log = logging.getLogger(__name__)
 
 
 class LmsModuleTests(TestCase):
@@ -22,6 +24,14 @@ class LmsModuleTests(TestCase):
         for extension in extensions:
             mimetype, _ = mimetypes.guess_type('test.' + extension)
             self.assertIsNotNone(mimetype)
+
+    def test_api_docs(self):
+        """
+        Tests that requests to the `/api-docs/` endpoint do not raise an exception.
+        """
+        assert settings.FEATURES['ENABLE_API_DOCS']
+        response = self.client.get('/api-docs/')
+        self.assertEqual(200, response.status_code)
 
 
 class TemplateLookupTests(TestCase):
@@ -37,23 +47,6 @@ class TemplateLookupTests(TestCase):
         self.assertEqual(len([directory for directory in directories if 'external_module' in directory]), 1)
 
         # This should not clear the directories list
-        startup.enable_microsites()
+        microsite.enable_microsites(log)
         directories = LOOKUP['main'].directories
         self.assertEqual(len([directory for directory in directories if 'external_module' in directory]), 1)
-
-
-@patch.dict('django.conf.settings.FEATURES', {'ENABLE_FEEDBACK_SUBMISSION': True})
-class HelpModalTests(ModuleStoreTestCase):
-    """Tests for the help modal"""
-    def setUp(self):
-        super(HelpModalTests, self).setUp()
-        self.course = CourseFactory.create()
-
-    def test_simple_test(self):
-        """
-        Simple test to make sure that you don't get a 500 error when the modal
-        is enabled.
-        """
-        url = reverse('info', args=[self.course.id.to_deprecated_string()])
-        resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 200)

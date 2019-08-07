@@ -2,29 +2,39 @@
 """
 LibraryContent: The XBlock used to include blocks from a library in a course.
 """
-import json
-from lxml import etree
-from copy import copy
-from capa.responsetypes import registry
-from gettext import ngettext
-from lazy import lazy
+from __future__ import absolute_import
 
-from .mako_module import MakoModuleDescriptor
-from opaque_keys.edx.locator import LibraryLocator
+import json
+import logging
 import random
+from copy import copy
+from gettext import ngettext
+
+from pkg_resources import resource_string
+
+import six
+from capa.responsetypes import registry
+from lazy import lazy
+from lxml import etree
+from opaque_keys.edx.locator import LibraryLocator
+from six import text_type
+from six.moves import zip
+from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlock
-from xblock.fields import Scope, String, List, Integer, Boolean
-from xblock.fragment import Fragment
-from xmodule.validation import StudioValidationMessage, StudioValidation
-from xmodule.x_module import XModule, STUDENT_VIEW
-from xmodule.studio_editable import StudioEditableModule, StudioEditableDescriptor
+from xblock.fields import Integer, List, Scope, String
+from xmodule.studio_editable import StudioEditableDescriptor, StudioEditableModule
+from xmodule.validation import StudioValidation, StudioValidationMessage
+from xmodule.x_module import STUDENT_VIEW, XModule
+
+from .mako_module import MakoModuleDescriptor
 from .xml_module import XmlDescriptor
-from pkg_resources import resource_string
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
+
+logger = logging.getLogger(__name__)
 
 ANY_CAPA_TYPE_VALUE = 'any'
 
@@ -60,7 +70,7 @@ class LibraryContentFields(object):
     # to locate input elements - keep synchronized
     display_name = String(
         display_name=_("Display Name"),
-        help=_("Display name for this module"),
+        help=_("The display name for this component."),
         default="Randomized Content Block",
         scope=Scope.settings,
     )
@@ -146,10 +156,13 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             'overlimit' (set) of dropped (block_type, block_id) tuples that were previously selected
             'added' (set) of newly added (block_type, block_id) tuples
         """
+        rand = random.Random()
+
         selected = set(tuple(k) for k in selected)  # set of (block_type, block_id) tuples assigned to this student
 
         # Determine which of our children we will show:
         valid_block_keys = set([(c.block_type, c.block_id) for c in children])
+
         # Remove any selected blocks that are no longer valid:
         invalid_block_keys = (selected - valid_block_keys)
         if invalid_block_keys:
@@ -157,8 +170,10 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
 
         # If max_count has been decreased, we may have to drop some previously selected blocks:
         overlimit_block_keys = set()
-        while len(selected) > max_count:
-            overlimit_block_keys.add(selected.pop())
+        if len(selected) > max_count:
+            num_to_remove = len(selected) - max_count
+            overlimit_block_keys = set(rand.sample(selected, num_to_remove))
+            selected -= overlimit_block_keys
 
         # Do we have enough blocks now?
         num_to_add = max_count - len(selected)
@@ -169,7 +184,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             pool = valid_block_keys - selected
             if mode == "random":
                 num_to_add = min(len(pool), num_to_add)
-                added_block_keys = set(random.sample(pool, num_to_add))
+                added_block_keys = set(rand.sample(pool, num_to_add))
                 # We now have the correct n random children to show for this user.
             else:
                 raise NotImplementedError("Unsupported mode.")
@@ -187,7 +202,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         Helper method to publish an event for analytics purposes
         """
         event_data = {
-            "location": unicode(self.location),
+            "location": six.text_type(self.location),
             "result": result,
             "previous_count": getattr(self, "_last_event_result_count", len(self.selected)),
             "max_count": self.max_count,
@@ -291,7 +306,10 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         current user.
         """
         for block_type, block_id in self.selected_children():
-            yield self.runtime.get_block(self.location.course_key.make_usage_key(block_type, block_id))
+            child = self.runtime.get_block(self.location.course_key.make_usage_key(block_type, block_id))
+            if child is None:
+                logger.info("Child not found for %s %s", str(block_type), str(block_id))
+            yield child
 
     def student_view(self, context):
         fragment = Fragment()
@@ -301,9 +319,9 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         for child in self._get_selected_child_blocks():
             for displayable in child.displayable_items():
                 rendered_child = displayable.render(STUDENT_VIEW, child_context)
-                fragment.add_frag_resources(rendered_child)
+                fragment.add_fragment_resources(rendered_child)
                 contents.append({
-                    'id': displayable.location.to_deprecated_string(),
+                    'id': text_type(displayable.location),
                     'content': rendered_child.content,
                 })
 
@@ -311,6 +329,8 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             'items': contents,
             'xblock_context': context,
             'show_bookmark_button': False,
+            'watched_completable_blocks': set(),
+            'completion_delay_ms': None,
         }))
         return fragment
 
@@ -338,6 +358,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
                     'display_name': self.display_name or self.url_name,
                 }))
                 context['can_edit_visibility'] = False
+                context['can_move'] = False
                 self.render_children(context, fragment, can_reorder=False, can_add=False)
         # else: When shown on a unit page, don't show any sort of preview -
         # just the status of this block in the validation area.
@@ -366,7 +387,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
 
     module_class = LibraryContentModule
     mako_template = 'widgets/metadata-edit.html'
-    js = {'coffee': [resource_string(__name__, 'js/src/vertical/edit.coffee')]}
+    js = {'js': [resource_string(__name__, 'js/src/vertical/edit.js')]}
     js_module_name = "VerticalDescriptor"
 
     show_in_read_only_mode = True
@@ -425,7 +446,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         """
         Copy any overrides the user has made on blocks in this library.
         """
-        for field in source.fields.itervalues():
+        for field in six.itervalues(source.fields):
             if field.scope == Scope.settings and field.is_set_on(source):
                 setattr(dest, field.name, field.read_from(source))
         if source.has_children:
@@ -462,7 +483,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         """
         latest_version = lib_tools.get_library_version(library_key)
         if latest_version is not None:
-            if version is None or version != unicode(latest_version):
+            if version is None or version != six.text_type(latest_version):
                 validation.set_summary(
                     StudioValidationMessage(
                         StudioValidationMessage.WARNING,
@@ -572,13 +593,13 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         all_libraries = [
             (key, name) for key, name in lib_tools.list_available_libraries()
-            if user_perms.can_read(key) or self.source_library_id == unicode(key)
+            if user_perms.can_read(key) or self.source_library_id == six.text_type(key)
         ]
         all_libraries.sort(key=lambda entry: entry[1])  # Sort by name
         if self.source_library_id and self.source_library_key not in [entry[0] for entry in all_libraries]:
             all_libraries.append((self.source_library_id, _(u"Invalid Library")))
         all_libraries = [(u"", _("No Library Selected"))] + all_libraries
-        values = [{"display_name": name, "value": unicode(key)} for key, name in all_libraries]
+        values = [{"display_name": name, "value": six.text_type(key)} for key, name in all_libraries]
         return values
 
     def editor_saved(self, user, old_metadata, old_content):
@@ -621,7 +642,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         ]
         definition = {
             attr_name: json.loads(attr_value)
-            for attr_name, attr_value in xml_object.attrib
+            for attr_name, attr_value in xml_object.attrib.items()
         }
         return definition, children
 
@@ -631,9 +652,45 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         for child in self.get_children():
             self.runtime.add_block_as_child_node(child, xml_object)
         # Set node attributes based on our fields.
-        for field_name, field in self.fields.iteritems():
+        for field_name, field in six.iteritems(self.fields):  # pylint: disable=no-member
             if field_name in ('children', 'parent', 'content'):
                 continue
             if field.is_set_on(self):
-                xml_object.set(field_name, unicode(field.read_from(self)))
+                xml_object.set(field_name, six.text_type(field.read_from(self)))
         return xml_object
+
+
+class LibrarySummary(object):
+    """
+    A library summary object which contains the fields required for library listing on studio.
+    """
+
+    def __init__(self, library_locator, display_name):
+        """
+        Initialize LibrarySummary
+
+        Arguments:
+        library_locator (LibraryLocator):  LibraryLocator object of the library.
+
+        display_name (unicode): display name of the library.
+        """
+        self.display_name = display_name if display_name else _(u"Empty")
+
+        self.id = library_locator  # pylint: disable=invalid-name
+        self.location = library_locator.make_usage_key('library', 'library')
+
+    @property
+    def display_org_with_default(self):
+        """
+        Org display names are not implemented. This just provides API compatibility with CourseDescriptor.
+        Always returns the raw 'org' field from the key.
+        """
+        return self.location.library_key.org
+
+    @property
+    def display_number_with_default(self):
+        """
+        Display numbers are not implemented. This just provides API compatibility with CourseDescriptor.
+        Always returns the raw 'library' field from the key.
+        """
+        return self.location.library_key.library

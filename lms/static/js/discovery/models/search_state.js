@@ -72,10 +72,12 @@
             reset: function() {
                 this.discovery.reset();
                 this.page = 0;
+                this.errorMessage = '';
             },
 
             onError: function(collection, response, options) {
                 if (response.statusText !== 'abort') {
+                    this.errorMessage = response.responseJSON.error;
                     this.trigger('error');
                 }
             },
@@ -94,8 +96,7 @@
                         });
                         this.searchTerm = '';
                         this.terms = {};
-                    }
-                    else {
+                    } else {
                         _.each(this.terms, function(term, facet) {
                             if (facet !== 'search_query') {
                                 var option = this.discovery.facetOptions.findWhere({
@@ -109,8 +110,7 @@
                         }, this);
                         this.trigger('search', this.searchTerm, total);
                     }
-                }
-                else {
+                } else {
                     this.page = options.data.page_index;
                     this.trigger('next');
                 }
@@ -123,8 +123,7 @@
 
                 if (this.cached) {
                     deferred.resolveWith(this, [this.cached]);
-                }
-                else {
+                } else {
                     this.cached = new CourseDiscovery();
                     this.cached.fetch({
                         type: 'POST',
@@ -143,4 +142,4 @@
 
         });
     });
-})(define || RequireJS.define);
+}(define || RequireJS.define));

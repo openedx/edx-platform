@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
-from django.db import migrations, models
 import django.utils.timezone
-from django.conf import settings
 import model_utils.fields
+from django.conf import settings
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -23,8 +23,8 @@ class Migration(migrations.Migration):
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
                 ('notes', models.TextField(default=None, null=True)),
                 ('active', models.BooleanField(default=True)),
-                ('generated_certificate', models.ForeignKey(to='certificates.GeneratedCertificate')),
-                ('invalidated_by', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('generated_certificate', models.ForeignKey(to='certificates.GeneratedCertificate', on_delete=models.CASCADE)),
+                ('invalidated_by', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
     ]

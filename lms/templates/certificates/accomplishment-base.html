@@ -1,5 +1,6 @@
+<%page expression_filter="h"/>
 <%namespace name='static' file='/static_content.html'/>
-<%! from django.utils.translation import ugettext as _ %>
+<%! from django.utils.translation import ugettext as _%>
 
 <%
 # set doc language direction
@@ -9,7 +10,7 @@ course_mode_class = course_mode if course_mode else ''
 %>
 
 <!DOCTYPE html>
-<html class="no-js" lang="en">
+<html class="no-js" lang="${LANGUAGE_CODE}">
 <head dir="${dir_rtl}">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">

@@ -1,10 +1,13 @@
 """
 Tests of edX Studio runtime functionality
 """
-from urlparse import urlparse
+from __future__ import absolute_import
+
+from unittest import TestCase
 
 from mock import Mock
-from unittest import TestCase
+from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
+
 from cms.lib.xblock.runtime import handler_url
 
 

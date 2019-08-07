@@ -1,5 +1,5 @@
 define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'URI', 'js/views/assets',
-         'js/collections/asset', 'common/js/spec_helpers/view_helpers'],
+    'js/collections/asset', 'common/js/spec_helpers/view_helpers'],
     function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
         describe('Assets', function() {
             var assetsView, mockEmptyAssetsResponse, mockAssetUploadResponse, mockFileUpload,
@@ -57,34 +57,34 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'URI', 'j
                 end: 2,
                 assets: [
                     {
-                        'display_name': 'test.jpg',
-                        'url': '/c4x/A/CS102/asset/test.jpg',
-                        'date_added': 'Nov 07, 2014 at 17:47 UTC',
-                        'id': '/c4x/A/CS102/asset/test.jpg',
-                        'portable_url': '/static/test.jpg',
-                        'thumbnail': '/c4x/A/CS102/thumbnail/test.jpg',
-                        'locked': false,
-                        'external_url': 'localhost:8000/c4x/A/CS102/asset/test.jpg'
+                        display_name: 'test.jpg',
+                        url: '/c4x/A/CS102/asset/test.jpg',
+                        date_added: 'Nov 07, 2014 at 17:47 UTC',
+                        id: '/c4x/A/CS102/asset/test.jpg',
+                        portable_url: '/static/test.jpg',
+                        thumbnail: '/c4x/A/CS102/thumbnail/test.jpg',
+                        locked: false,
+                        external_url: 'localhost:8000/c4x/A/CS102/asset/test.jpg'
                     },
                     {
-                        'display_name': 'test.pdf',
-                        'url': '/c4x/A/CS102/asset/test.pdf',
-                        'date_added': 'Oct 20, 2014 at 11:00 UTC',
-                        'id': '/c4x/A/CS102/asset/test.pdf',
-                        'portable_url': '/static/test.pdf',
-                        'thumbnail': null,
-                        'locked': false,
-                        'external_url': 'localhost:8000/c4x/A/CS102/asset/test.pdf'
+                        display_name: 'test.pdf',
+                        url: '/c4x/A/CS102/asset/test.pdf',
+                        date_added: 'Oct 20, 2014 at 11:00 UTC',
+                        id: '/c4x/A/CS102/asset/test.pdf',
+                        portable_url: '/static/test.pdf',
+                        thumbnail: null,
+                        locked: false,
+                        external_url: 'localhost:8000/c4x/A/CS102/asset/test.pdf'
                     },
                     {
-                        'display_name': 'test.odt',
-                        'url': '/c4x/A/CS102/asset/test.odt',
-                        'date_added': 'Oct 20, 2014 at 11:00 UTC',
-                        'id': '/c4x/A/CS102/asset/test.odt',
-                        'portable_url': '/static/test.odt',
-                        'thumbnail': null,
-                        'locked': false,
-                        'external_url': 'localhost:8000/c4x/A/CS102/asset/test.odt'
+                        display_name: 'test.odt',
+                        url: '/c4x/A/CS102/asset/test.odt',
+                        date_added: 'Oct 20, 2014 at 11:00 UTC',
+                        id: '/c4x/A/CS102/asset/test.odt',
+                        portable_url: '/static/test.odt',
+                        thumbnail: null,
+                        locked: false,
+                        external_url: 'localhost:8000/c4x/A/CS102/asset/test.odt'
                     }
                 ],
                 pageSize: 2,
@@ -98,14 +98,14 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'URI', 'j
                 end: 1,
                 assets: [
                     {
-                        'display_name': 'test.jpg',
-                        'url': '/c4x/A/CS102/asset/test.jpg',
-                        'date_added': 'Nov 07, 2014 at 17:47 UTC',
-                        'id': '/c4x/A/CS102/asset/test.jpg',
-                        'portable_url': '/static/test.jpg',
-                        'thumbnail': '/c4x/A/CS102/thumbnail/test.jpg',
-                        'locked': false,
-                        'external_url': 'localhost:8000/c4x/A/CS102/asset/test.jpg'
+                        display_name: 'test.jpg',
+                        url: '/c4x/A/CS102/asset/test.jpg',
+                        date_added: 'Nov 07, 2014 at 17:47 UTC',
+                        id: '/c4x/A/CS102/asset/test.jpg',
+                        portable_url: '/static/test.jpg',
+                        thumbnail: '/c4x/A/CS102/thumbnail/test.jpg',
+                        locked: false,
+                        external_url: 'localhost:8000/c4x/A/CS102/asset/test.jpg'
                     }
                 ],
                 pageSize: 1,
@@ -133,7 +133,7 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'URI', 'j
             };
 
             var event = {};
-            event.target = {'value': 'dummy.jpg'};
+            event.target = {value: 'dummy.jpg'};
 
             describe('AssetsView', function() {
                 var setup;
@@ -366,43 +366,44 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'URI', 'j
                             end: 1,
                             assets: [
                                 {
-                                    'display_name': 'test.jpg',
-                                    'url': '/c4x/A/CS102/asset/test.jpg',
-                                    'date_added': 'Nov 07, 2014 at 17:47 UTC',
-                                    'id': '/c4x/A/CS102/asset/test.jpg',
-                                    'portable_url': '/static/test.jpg',
-                                    'thumbnail': '/c4x/A/CS102/thumbnail/test.jpg',
-                                    'locked': false,
-                                    'external_url': 'localhost:8000/c4x/A/CS102/asset/test.jpg'
+                                    display_name: 'test.jpg',
+                                    url: '/c4x/A/CS102/asset/test.jpg',
+                                    date_added: 'Nov 07, 2014 at 17:47 UTC',
+                                    id: '/c4x/A/CS102/asset/test.jpg',
+                                    portable_url: '/static/test.jpg',
+                                    thumbnail: '/c4x/A/CS102/thumbnail/test.jpg',
+                                    locked: false,
+                                    external_url: 'localhost:8000/c4x/A/CS102/asset/test.jpg'
                                 },
                                 {
-                                    'display_name': 'test.pdf',
-                                    'url': '/c4x/A/CS102/asset/test.pdf',
-                                    'date_added': 'Oct 20, 2014 at 11:00 UTC',
-                                    'id': '/c4x/A/CS102/asset/test.pdf',
-                                    'portable_url': '/static/test.pdf',
-                                    'thumbnail': null,
-                                    'locked': false,
-                                    'external_url': 'localhost:8000/c4x/A/CS102/asset/test.pdf'
+                                    display_name: 'test.pdf',
+                                    url: '/c4x/A/CS102/asset/test.pdf',
+                                    date_added: 'Oct 20, 2014 at 11:00 UTC',
+                                    id: '/c4x/A/CS102/asset/test.pdf',
+                                    portable_url: '/static/test.pdf',
+                                    thumbnail: null,
+                                    locked: false,
+                                    external_url: 'localhost:8000/c4x/A/CS102/asset/test.pdf'
                                 }
                             ],
                             pageSize: 2,
                             totalCount: 3,
                             start: 0,
                             page: 0
-                        }, secondPageAssets = {
+                        },
+                        secondPageAssets = {
                             sort: 'uploadDate',
                             end: 2,
                             assets: [
                                 {
-                                    'display_name': 'test.odt',
-                                    'url': '/c4x/A/CS102/asset/test.odt',
-                                    'date_added': 'Oct 20, 2014 at 11:00 UTC',
-                                    'id': '/c4x/A/CS102/asset/test.odt',
-                                    'portable_url': '/static/test.odt',
-                                    'thumbnail': null,
-                                    'locked': false,
-                                    'external_url': 'localhost:8000/c4x/A/CS102/asset/test.odt'
+                                    display_name: 'test.odt',
+                                    url: '/c4x/A/CS102/asset/test.odt',
+                                    date_added: 'Oct 20, 2014 at 11:00 UTC',
+                                    id: '/c4x/A/CS102/asset/test.odt',
+                                    portable_url: '/static/test.odt',
+                                    thumbnail: null,
+                                    locked: false,
+                                    external_url: 'localhost:8000/c4x/A/CS102/asset/test.odt'
                                 }
                             ],
                             pageSize: 2,

@@ -1,30 +1,43 @@
 """
 Tests for the Certificate REST APIs.
 """
-from datetime import datetime, timedelta
+from __future__ import absolute_import
 
-from django.core.urlresolvers import reverse
-from oauth2_provider import models as dot_models
+from itertools import product
+
+import ddt
+import six
+from django.urls import reverse
+from django.utils import timezone
+from freezegun import freeze_time
+from mock import patch
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from certificates.models import CertificateStatuses
-from certificates.tests.factories import GeneratedCertificateFactory
 from course_modes.models import CourseMode
+from lms.djangoapps.certificates.apis.v0.views import CertificatesDetailView, CertificatesListView
+from lms.djangoapps.certificates.models import CertificateStatuses
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.core.djangoapps.oauth_dispatch.toggles import ENFORCE_JWT_SCOPES
+from openedx.core.djangoapps.user_api.tests.factories import UserPreferenceFactory
+from openedx.core.djangoapps.user_authn.tests.utils import JWT_AUTH_TYPES, AuthAndScopesTestMixin, AuthType
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-USER_PASSWORD = 'test'
 
-
-class CertificatesRestApiTest(SharedModuleStoreTestCase, APITestCase):
+@ddt.ddt
+class CertificatesDetailRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestCase, APITestCase):
     """
     Test for the Certificates REST APIs
     """
+    now = timezone.now()
+    default_scopes = CertificatesDetailView.required_scopes
+
     @classmethod
     def setUpClass(cls):
-        super(CertificatesRestApiTest, cls).setUpClass()
+        super(CertificatesDetailRestApiTest, cls).setUpClass()
         cls.course = CourseFactory.create(
             org='edx',
             number='verified',
@@ -32,11 +45,11 @@ class CertificatesRestApiTest(SharedModuleStoreTestCase, APITestCase):
         )
 
     def setUp(self):
-        super(CertificatesRestApiTest, self).setUp()
+        freezer = freeze_time(self.now)
+        freezer.start()
+        self.addCleanup(freezer.stop)
 
-        self.student = UserFactory.create(password=USER_PASSWORD)
-        self.student_no_cert = UserFactory.create(password=USER_PASSWORD)
-        self.staff_user = UserFactory.create(password=USER_PASSWORD, is_staff=True)
+        super(CertificatesDetailRestApiTest, self).setUp()
 
         GeneratedCertificateFactory.create(
             user=self.student,
@@ -49,27 +62,8 @@ class CertificatesRestApiTest(SharedModuleStoreTestCase, APITestCase):
 
         self.namespaced_url = 'certificates_api:v0:certificates:detail'
 
-        # create a configuration for django-oauth-toolkit (DOT)
-        dot_app_user = UserFactory.create(password=USER_PASSWORD)
-        dot_app = dot_models.Application.objects.create(
-            name='test app',
-            user=dot_app_user,
-            client_type='confidential',
-            authorization_grant_type='authorization-code',
-            redirect_uris='http://localhost:8079/complete/edxorg/'
-        )
-        self.dot_access_token = dot_models.AccessToken.objects.create(
-            user=self.student,
-            application=dot_app,
-            expires=datetime.utcnow() + timedelta(weeks=1),
-            scope='read write',
-            token='16MGyP3OaQYHmpT1lK7Q6MMNAZsjwF'
-        )
-
     def get_url(self, username):
-        """
-        Helper function to create the url for certificates
-        """
+        """ This method is required by AuthAndScopesTestMixin. """
         return reverse(
             self.namespaced_url,
             kwargs={
@@ -78,106 +72,259 @@ class CertificatesRestApiTest(SharedModuleStoreTestCase, APITestCase):
             }
         )
 
-    def assert_oauth_status(self, access_token, expected_status):
-        """
-        Helper method for requests with OAUTH token
-        """
-        self.client.logout()
-        auth_header = "Bearer {0}".format(access_token)
-        response = self.client.get(self.get_url(self.student.username), HTTP_AUTHORIZATION=auth_header)
-        self.assertEqual(response.status_code, expected_status)
-
-    def test_permissions(self):
-        """
-        Test that only the owner of the certificate can access the url
-        """
-        # anonymous user
-        resp = self.client.get(self.get_url(self.student.username))
-        self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
-
-        # another student
-        self.client.login(username=self.student_no_cert.username, password=USER_PASSWORD)
-        resp = self.client.get(self.get_url(self.student.username))
-        # gets 404 instead of 403 for security reasons
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(resp.data, {u'detail': u'Not found.'})  # pylint: disable=no-member
-        self.client.logout()
-
-        # same student of the certificate
-        self.client.login(username=self.student.username, password=USER_PASSWORD)
-        resp = self.client.get(self.get_url(self.student.username))
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.client.logout()
-
-        # staff user
-        self.client.login(username=self.staff_user.username, password=USER_PASSWORD)
-        resp = self.client.get(self.get_url(self.student.username))
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-
-    def test_inactive_user_access(self):
-        """
-        Verify inactive users - those who have not verified their email addresses -
-        are allowed to access the endpoint.
-        """
-        self.client.login(username=self.student.username, password=USER_PASSWORD)
-
-        self.student.is_active = False
-        self.student.save()
-
-        resp = self.client.get(self.get_url(self.student.username))
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-
-    def test_dot_valid_accesstoken(self):
-        """
-        Verify access with a valid Django Oauth Toolkit access token.
-        """
-        self.assert_oauth_status(self.dot_access_token, status.HTTP_200_OK)
-
-    def test_dot_invalid_accesstoken(self):
-        """
-        Verify the endpoint is inaccessible for authorization
-        attempts made with an invalid OAuth access token.
-        """
-        self.assert_oauth_status("fooooooooooToken", status.HTTP_401_UNAUTHORIZED)
-
-    def test_dot_expired_accesstoken(self):
-        """
-        Verify the endpoint is inaccessible for authorization
-        attempts made with an expired OAuth access token.
-        """
-        # set the expiration date in the past
-        self.dot_access_token.expires = datetime.utcnow() - timedelta(weeks=1)
-        self.dot_access_token.save()
-        self.assert_oauth_status(self.dot_access_token, status.HTTP_401_UNAUTHORIZED)
-
-    def test_no_certificate_for_user(self):
-        """
-        Test for case with no certificate available
-        """
-        self.client.login(username=self.student_no_cert.username, password=USER_PASSWORD)
-        resp = self.client.get(self.get_url(self.student_no_cert.username))
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertIn('error_code', resp.data)  # pylint: disable=no-member
+    def assert_success_response_for_student(self, response):
+        """ This method is required by AuthAndScopesTestMixin. """
         self.assertEqual(
-            resp.data['error_code'],  # pylint: disable=no-member
-            'no_certificate_for_user'
-        )
-
-    def test_certificate_for_user(self):
-        """
-        Tests case user that pulls her own certificate
-        """
-        self.client.login(username=self.student.username, password=USER_PASSWORD)
-        resp = self.client.get(self.get_url(self.student.username))
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(
-            resp.data,  # pylint: disable=no-member
+            response.data,
             {
                 'username': self.student.username,
                 'status': CertificateStatuses.downloadable,
+                'is_passing': True,
                 'grade': '0.88',
                 'download_url': 'www.google.com',
                 'certificate_type': CourseMode.VERIFIED,
-                'course_id': unicode(self.course.id),
+                'course_id': six.text_type(self.course.id),
+                'created_date': self.now,
             }
         )
+
+    def test_no_certificate(self):
+        student_no_cert = UserFactory.create(password=self.user_password)
+        resp = self.get_response(
+            AuthType.session,
+            requesting_user=student_no_cert,
+            requested_user=student_no_cert,
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn('error_code', resp.data)
+        self.assertEqual(
+            resp.data['error_code'],
+            'no_certificate_for_user',
+        )
+
+
+@ddt.ddt
+class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestCase, APITestCase):
+    """
+    Test for the Certificates REST APIs
+    """
+    now = timezone.now()
+    default_scopes = CertificatesListView.required_scopes
+
+    @classmethod
+    def setUpClass(cls):
+        super(CertificatesListRestApiTest, cls).setUpClass()
+        cls.course = CourseFactory.create(
+            org='edx',
+            number='verified',
+            display_name='Verified Course',
+            self_paced=True,
+        )
+        cls.course_overview = CourseOverviewFactory.create(
+            id=cls.course.id,
+            display_org_with_default='edx',
+            display_name='Verified Course',
+            cert_html_view_enabled=True,
+            self_paced=True,
+        )
+
+    def setUp(self):
+        freezer = freeze_time(self.now)
+        freezer.start()
+        self.addCleanup(freezer.stop)
+
+        super(CertificatesListRestApiTest, self).setUp()
+
+        GeneratedCertificateFactory.create(
+            user=self.student,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable,
+            mode='verified',
+            download_url='www.google.com',
+            grade="0.88",
+        )
+
+        self.namespaced_url = 'certificates_api:v0:certificates:list'
+
+    def get_url(self, username):
+        """ This method is required by AuthAndScopesTestMixin. """
+        return reverse(
+            self.namespaced_url,
+            kwargs={
+                'username': username
+            }
+        )
+
+    def assert_success_response_for_student(self, response):
+        """ This method is required by AuthAndScopesTestMixin. """
+        self.assertEqual(
+            response.data,
+            [{
+                'username': self.student.username,
+                'course_id': six.text_type(self.course.id),
+                'course_display_name': self.course.display_name,
+                'course_organization': self.course.org,
+                'certificate_type': CourseMode.VERIFIED,
+                'created_date': self.now,
+                'modified_date': self.now,
+                'status': CertificateStatuses.downloadable,
+                'is_passing': True,
+                'download_url': 'www.google.com',
+                'grade': '0.88',
+            }]
+        )
+
+    @patch('edx_rest_framework_extensions.permissions.log')
+    @ddt.data(*product(list(AuthType), (True, False)))
+    @ddt.unpack
+    def test_another_user(self, auth_type, scopes_enforced, mock_log):
+        """
+        Returns 200 with empty list for OAuth, Session, and JWT auth.
+        Returns 200 for jwt_restricted and user:me filter unset.
+        """
+        with ENFORCE_JWT_SCOPES.override(active=scopes_enforced):
+            resp = self.get_response(auth_type, requesting_user=self.other_student)
+
+            self.assertEqual(resp.status_code, status.HTTP_200_OK)
+            self.assertEqual(len(resp.data), 0)
+
+    @ddt.data(*product(list(AuthType), (True, False)))
+    @ddt.unpack
+    def test_another_user_with_certs_shared_public(self, auth_type, scopes_enforced):
+        """
+        Returns 200 with cert list for OAuth, Session, and JWT auth.
+        Returns 200 for jwt_restricted and user:me filter unset.
+        """
+        self.student.profile.year_of_birth = 1977
+        self.student.profile.save()
+        UserPreferenceFactory.build(
+            user=self.student,
+            key='account_privacy',
+            value='all_users',
+        ).save()
+
+        with ENFORCE_JWT_SCOPES.override(active=scopes_enforced):
+            resp = self.get_response(auth_type, requesting_user=self.other_student)
+
+            self.assertEqual(resp.status_code, status.HTTP_200_OK)
+            self.assertEqual(len(resp.data), 1)
+
+    @ddt.data(*product(list(AuthType), (True, False)))
+    @ddt.unpack
+    def test_another_user_with_certs_shared_custom(self, auth_type, scopes_enforced):
+        """
+        Returns 200 with cert list for OAuth, Session, and JWT auth.
+        Returns 200 for jwt_restricted and user:me filter unset.
+        """
+        self.student.profile.year_of_birth = 1977
+        self.student.profile.save()
+        UserPreferenceFactory.build(
+            user=self.student,
+            key='account_privacy',
+            value='custom',
+        ).save()
+        UserPreferenceFactory.build(
+            user=self.student,
+            key='visibility.course_certificates',
+            value='all_users',
+        ).save()
+
+        with ENFORCE_JWT_SCOPES.override(active=scopes_enforced):
+            resp = self.get_response(auth_type, requesting_user=self.other_student)
+
+            self.assertEqual(resp.status_code, status.HTTP_200_OK)
+            self.assertEqual(len(resp.data), 1)
+
+    @patch('edx_rest_framework_extensions.permissions.log')
+    @ddt.data(*product(JWT_AUTH_TYPES, (True, False)))
+    @ddt.unpack
+    def test_jwt_on_behalf_of_other_user(self, auth_type, scopes_enforced, mock_log):
+        """ Returns 403 when scopes are enforced with JwtHasUserFilterForRequestedUser. """
+        with ENFORCE_JWT_SCOPES.override(active=scopes_enforced):
+            jwt_token = self._create_jwt_token(self.other_student, auth_type, include_me_filter=True)
+            resp = self.get_response(AuthType.jwt, token=jwt_token)
+
+            if scopes_enforced and auth_type == AuthType.jwt_restricted:
+                self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+                self._assert_in_log("JwtHasUserFilterForRequestedUser", mock_log.warning)
+            else:
+                self.assertEqual(resp.status_code, status.HTTP_200_OK)
+                self.assertEqual(len(resp.data), 0)
+
+    @patch('edx_rest_framework_extensions.permissions.log')
+    @ddt.data(*product(JWT_AUTH_TYPES, (True, False)))
+    @ddt.unpack
+    def test_jwt_no_filter(self, auth_type, scopes_enforced, mock_log):
+        self.assertTrue(True)  # pylint: disable=redundant-unittest-assert
+
+    def test_no_certificate(self):
+        student_no_cert = UserFactory.create(password=self.user_password)
+        resp = self.get_response(
+            AuthType.session,
+            requesting_user=student_no_cert,
+            requested_user=student_no_cert,
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.data, [])
+
+    def test_query_counts(self):
+        # Test student with no certificates
+        student_no_cert = UserFactory.create(password=self.user_password)
+        with self.assertNumQueries(22):
+            resp = self.get_response(
+                AuthType.jwt,
+                requesting_user=student_no_cert,
+                requested_user=student_no_cert,
+            )
+            self.assertEqual(resp.status_code, status.HTTP_200_OK)
+            self.assertEqual(len(resp.data), 0)
+
+        # Test student with 1 certificate
+        with self.assertNumQueries(17):
+            resp = self.get_response(
+                AuthType.jwt,
+                requesting_user=self.student,
+                requested_user=self.student,
+            )
+            self.assertEqual(resp.status_code, status.HTTP_200_OK)
+            self.assertEqual(len(resp.data), 1)
+
+        # Test student with 2 certificates
+        student_2_certs = UserFactory.create(password=self.user_password)
+        course = CourseFactory.create(
+            org='edx',
+            number='test',
+            display_name='Test Course',
+            self_paced=True,
+        )
+        CourseOverviewFactory.create(
+            id=course.id,
+            display_org_with_default='edx',
+            display_name='Test Course',
+            cert_html_view_enabled=True,
+            self_paced=True,
+        )
+        GeneratedCertificateFactory.create(
+            user=student_2_certs,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable,
+            mode='verified',
+            download_url='www.google.com',
+            grade="0.88",
+        )
+        GeneratedCertificateFactory.create(
+            user=student_2_certs,
+            course_id=course.id,
+            status=CertificateStatuses.downloadable,
+            mode='verified',
+            download_url='www.google.com',
+            grade="0.88",
+        )
+        with self.assertNumQueries(17):
+            resp = self.get_response(
+                AuthType.jwt,
+                requesting_user=student_2_certs,
+                requested_user=student_2_certs,
+            )
+            self.assertEqual(resp.status_code, status.HTTP_200_OK)
+            self.assertEqual(len(resp.data), 2)

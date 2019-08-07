@@ -1,9 +1,10 @@
 """Map new event context values to old top-level field values. Ensures events can be parsed by legacy parsers."""
 
+from __future__ import absolute_import
+
 import json
 
 from .transformers import EventTransformerRegistry
-
 
 CONTEXT_FIELDS_TO_INCLUDE = [
     'username',

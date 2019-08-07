@@ -18,7 +18,7 @@
          el: '#webcam',
 
          backends: {
-             'html5': {
+             html5: {
                  name: 'html5',
 
                  initialize: function(obj) {
@@ -50,11 +50,16 @@
                  },
 
                  snapshot: function() {
-                     var video;
+                     var video, canvas, aspectRatio;
 
                      if (this.stream) {
                          video = this.getVideo();
-                         this.getCanvas().getContext('2d').drawImage(video, 0, 0);
+                         canvas = this.getCanvas();
+                         // keep canvas aspect ratio same as video while drawing image.
+                         aspectRatio = canvas.width / video.videoWidth;
+                         canvas.width = video.videoWidth * aspectRatio;
+                         canvas.height = video.videoHeight * aspectRatio;
+                         canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
                          video.pause();
                          return true;
                      }
@@ -84,7 +89,7 @@
                  getUserMediaCallback: function(stream) {
                      var video = this.getVideo();
                      this.stream = stream;
-                     video.src = this.URL.createObjectURL(stream);
+                     video.srcObject = stream;
                      video.play();
                      this.trigger('webcam-loaded');
                  },
@@ -106,7 +111,7 @@
                  }
              },
 
-             'flash': {
+             flash: {
 
                  name: 'flash',
 
@@ -149,20 +154,6 @@
 
                  getImageData: function() {
                      return this.imageData;
-                 },
-
-                 flashObjectTag: function() {
-                     return (
-                        '<object type="application/x-shockwave-flash" ' +
-                            'id="flash_video" ' +
-                            'name="flash_video" ' +
-                            'data="/static/js/verify_student/CameraCapture.swf" ' +
-                            'width="500" ' +
-                            'height="375">' +
-                         '<param name="quality" value="high">' +
-                         '<param name="allowscriptaccess" value="sameDomain">' +
-                         '</object>'
-                    );
                  },
 
                  getFlashObject: function() {
@@ -242,10 +233,10 @@
              this.setSubmitButtonEnabled(false);
 
             // Load the template for the webcam into the DOM
-             renderedHtml = _.template($(this.template).html())(
+             renderedHtml = edx.HtmlUtils.template($(this.template).html())(
                 {backendName: this.backend.name}
             );
-             $(this.el).html(renderedHtml);
+             edx.HtmlUtils.setHtml($(this.el), renderedHtml);
 
              $resetBtn = this.$el.find('#webcam_reset_button');
              $captureBtn = this.$el.find('#webcam_capture_button');
@@ -348,7 +339,7 @@
 
          isMobileDevice: function() {
             // Check whether user is using mobile device or not
-             return (navigator.userAgent.match(/(Android|iPad|iPhone|iPod)/g) ? true : false);
+             return (!!navigator.userAgent.match(/(Android|iPad|iPhone|iPod)/g));
          }
      });
 
@@ -395,4 +386,4 @@
         // allow users to take a photo with the camera.
          return new edx.verify_student.ImageInputView(obj);
      };
- })(jQuery, _, Backbone, gettext);
+ }(jQuery, _, Backbone, gettext));

@@ -1,18 +1,23 @@
 """
 E-commerce Tab Instructor Dashboard Query Registration Code Status.
 """
-from django.core.urlresolvers import reverse
-from django.views.decorators.http import require_GET, require_POST
-from lms.djangoapps.instructor.enrollment import get_email_params, send_mail_to_student
+from __future__ import absolute_import
+
+import logging
+
+import six
+from django.urls import reverse
 from django.utils.translation import ugettext as _
+from django.views.decorators.cache import cache_control
+from django.views.decorators.http import require_GET, require_POST
+from opaque_keys.edx.locator import CourseKey
+
 from courseware.courses import get_course_by_id
+from lms.djangoapps.instructor.enrollment import get_email_params, send_mail_to_student
 from lms.djangoapps.instructor.views.api import require_level
+from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption
 from student.models import CourseEnrollment
 from util.json_request import JsonResponse
-from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from django.views.decorators.cache import cache_control
-import logging
 
 log = logging.getLogger(__name__)
 
@@ -25,7 +30,7 @@ def look_up_registration_code(request, course_id):
     Look for the registration_code in the database.
     and check if it is still valid, allowed to redeem or not.
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     code = request.GET.get('registration_code')
     course = get_course_by_id(course_key, depth=0)
     try:
@@ -35,14 +40,14 @@ def look_up_registration_code(request, course_id):
             'is_registration_code_exists': False,
             'is_registration_code_valid': False,
             'is_registration_code_redeemed': False,
-            'message': _('The enrollment code ({code}) was not found for the {course_name} course.').format(
+            'message': _(u'The enrollment code ({code}) was not found for the {course_name} course.').format(
                 code=code, course_name=course.display_name
             )
         }, status=400)  # status code 200: OK by default
 
     reg_code_already_redeemed = RegistrationCodeRedemption.is_registration_code_redeemed(code)
 
-    registration_code_detail_url = reverse('registration_code_details', kwargs={'course_id': unicode(course_id)})
+    registration_code_detail_url = reverse('registration_code_details', kwargs={'course_id': six.text_type(course_id)})
 
     return JsonResponse({
         'is_registration_code_exists': True,
@@ -63,7 +68,7 @@ def registration_code_details(request, course_id):
         3) Unredeem.
 
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     code = request.POST.get('registration_code')
     action_type = request.POST.get('action_type')
     course = get_course_by_id(course_key, depth=0)
@@ -76,7 +81,7 @@ def registration_code_details(request, course_id):
         registration_code = CourseRegistrationCode.objects.get(code=code)
     except CourseRegistrationCode.DoesNotExist:
         return JsonResponse({
-            'message': _('The enrollment code ({code}) was not found for the {course_name} course.').format(
+            'message': _(u'The enrollment code ({code}) was not found for the {course_name} course.').format(
                 code=code, course_name=course.display_name
             )}, status=400)
 
@@ -95,7 +100,7 @@ def registration_code_details(request, course_id):
         code_redemption = RegistrationCodeRedemption.get_registration_code_redemption(code, course_key)
         if code_redemption is None:
             return JsonResponse({
-                'message': _('The redemption does not exist against enrollment code ({code}).').format(
+                'message': _(u'The redemption does not exist against enrollment code ({code}).').format(
                     code=code)}, status=400)
 
         delete_redemption_entry(request, code_redemption, course_key)
@@ -116,11 +121,11 @@ def delete_redemption_entry(request, code_redemption, course_key):
 
     course = get_course_by_id(course_key, depth=0)
     email_params = get_email_params(course, True, secure=request.is_secure())
-    email_params['message'] = 'enrolled_unenroll'
+    email_params['message_type'] = 'enrolled_unenroll'
     email_params['email_address'] = email_address
     email_params['full_name'] = full_name
     send_mail_to_student(email_address, email_params)
 
     # remove the redemption entry from the database.
-    log.info('deleting redemption entry (%s) from the database.', code_redemption.id)
+    log.info(u'deleting redemption entry (%s) from the database.', code_redemption.id)
     code_redemption.delete()

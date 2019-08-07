@@ -1,15 +1,18 @@
 """
 Tests for Course Blocks forms
 """
+from __future__ import absolute_import
+
 import ddt
+import six
+from six.moves.urllib.parse import urlencode  # pylint: disable=import-error
 from django.http import Http404, QueryDict
-from urllib import urlencode
+from opaque_keys.edx.locator import CourseLocator
 from rest_framework.exceptions import PermissionDenied
 
-from opaque_keys.edx.locator import CourseLocator
 from openedx.core.djangoapps.util.test_forms import FormTestMixin
 from student.models import CourseEnrollment
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -21,6 +24,7 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
     """
     Tests for BlockListGetForm
     """
+
     FORM_CLASS = BlockListGetForm
 
     @classmethod
@@ -44,7 +48,7 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
         self.form_data = QueryDict(
             urlencode({
                 'username': self.student.username,
-                'usage_key': unicode(usage_key),
+                'usage_key': six.text_type(usage_key),
             }),
             mutable=True,
         )

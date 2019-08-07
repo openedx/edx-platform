@@ -1,52 +1,53 @@
 """
 This test file will test registration, login, activation, and session activity timeouts
 """
-import time
-import mock
-import unittest
-from ddt import ddt, data, unpack
+from __future__ import absolute_import, print_function
 
-from django.test import TestCase
-from django.test.utils import override_settings
-from django.core.cache import cache
+import datetime
+import time
+
+import mock
+import pytest
+from contentstore.tests.test_course_settings import CourseTestCase
+from contentstore.tests.utils import AjaxEnabledTestClient, parse_json, registration, user
+from ddt import data, ddt, unpack
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
-
-from contentstore.models import PushNotificationConfig
-from contentstore.tests.utils import parse_json, user, registration, AjaxEnabledTestClient
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from contentstore.tests.test_course_settings import CourseTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-import datetime
-from pytz import UTC
-
+from django.core.cache import cache
+from django.test import TestCase
+from django.test.utils import override_settings
+from django.urls import reverse
 from freezegun import freeze_time
+from pytz import UTC
+from six.moves import range
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class ContentStoreTestCase(ModuleStoreTestCase):
+    """Test class to verify user account operations"""
+
     def _login(self, email, password):
         """
         Login.  View should always return 200.  The success/fail is in the
         returned json
         """
         resp = self.client.post(
-            reverse('login_post'),
+            reverse('user_api_login_session'),
             {'email': email, 'password': password}
         )
-        self.assertEqual(resp.status_code, 200)
         return resp
 
     def login(self, email, password):
         """Login, check that it worked."""
         resp = self._login(email, password)
-        data = parse_json(resp)
-        self.assertTrue(data['success'])
+        self.assertEqual(resp.status_code, 200)
         return resp
 
     def _create_account(self, username, email, password):
         """Try to create an account.  No error checking"""
-        resp = self.client.post('/create_account', {
+        registration_url = reverse('user_api_registration')
+        resp = self.client.post(registration_url, {
             'username': username,
             'email': email,
             'password': password,
@@ -62,8 +63,8 @@ class ContentStoreTestCase(ModuleStoreTestCase):
         """Create the account and check that it worked"""
         resp = self._create_account(username, email, password)
         self.assertEqual(resp.status_code, 200)
-        data = parse_json(resp)
-        self.assertEqual(data['success'], True)
+        json_data = parse_json(resp)
+        self.assertEqual(json_data['success'], True)
 
         # Check both that the user is created, and inactive
         self.assertFalse(user(email).is_active)
@@ -84,6 +85,36 @@ class ContentStoreTestCase(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         # Now make sure that the user is now actually activated
         self.assertTrue(user(email).is_active)
+
+
+@pytest.mark.django_db
+def test_create_account_email_already_exists(django_db_use_migrations):
+    """
+    This is tricky. Django's user model doesn't have a constraint on
+    unique email addresses, but we *add* that constraint during the
+    migration process:
+    see common/djangoapps/student/migrations/0004_add_email_index.py
+
+    The behavior we *want* is for this account creation request
+    to fail, due to this uniqueness constraint, but the request will
+    succeed if the migrations have not run.
+
+    django_db_use_migration is a pytest fixture that tells us if
+    migrations have been run. Since pytest fixtures don't play nice
+    with TestCase objects this is a function and doesn't get to use
+    assertRaises.
+    """
+    if django_db_use_migrations:
+        email = 'a@b.com'
+        pw = 'xyz'
+        username = 'testuser'
+        User.objects.create_user(username, email, pw)
+
+        # Hack to use the _create_account shortcut
+        case = ContentStoreTestCase()
+        resp = case._create_account("abcdef", email, "password")  # pylint: disable=protected-access
+
+        assert resp.status_code == 400, 'Migrations are run, but creating an account with duplicate email succeeded!'
 
 
 class AuthTestCase(ContentStoreTestCase):
@@ -114,15 +145,14 @@ class AuthTestCase(ContentStoreTestCase):
             reverse('signup'),
         )
         for page in pages:
-            print "Checking '{0}'".format(page)
+            print(u"Checking '{0}'".format(page))
             self.check_page_get(page, 200)
 
     def test_create_account_errors(self):
         # No post data -- should fail
-        resp = self.client.post('/create_account', {})
+        registration_url = reverse('user_api_registration')
+        resp = self.client.post(registration_url, {})
         self.assertEqual(resp.status_code, 400)
-        data = parse_json(resp)
-        self.assertEqual(data['success'], False)
 
     def test_create_account(self):
         self.create_account(self.username, self.email, self.pw)
@@ -132,7 +162,7 @@ class AuthTestCase(ContentStoreTestCase):
         User.objects.create_user(self.username, self.email, self.pw)
         resp = self._create_account(self.username, "abc@def.com", "password")
         # we have a constraint on unique usernames, so this should fail
-        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(resp.status_code, 409)
 
     def test_create_account_pw_already_exists(self):
         User.objects.create_user(self.username, self.email, self.pw)
@@ -140,27 +170,11 @@ class AuthTestCase(ContentStoreTestCase):
         # we can have two users with the same password, so this should succeed
         self.assertEqual(resp.status_code, 200)
 
-    @unittest.skipUnless(settings.SOUTH_TESTS_MIGRATE, "South migrations required")
-    def test_create_account_email_already_exists(self):
-        User.objects.create_user(self.username, self.email, self.pw)
-        resp = self._create_account("abcdef", self.email, "password")
-        # This is tricky. Django's user model doesn't have a constraint on
-        # unique email addresses, but we *add* that constraint during the
-        # migration process:
-        # see common/djangoapps/student/migrations/0004_add_email_index.py
-        #
-        # The behavior we *want* is for this account creation request
-        # to fail, due to this uniqueness constraint, but the request will
-        # succeed if the migrations have not run.
-        self.assertEqual(resp.status_code, 400)
-
     def test_login(self):
         self.create_account(self.username, self.email, self.pw)
 
         # Not activated yet.  Login should fail.
-        resp = self._login(self.email, self.pw)
-        data = parse_json(resp)
-        self.assertFalse(data['success'])
+        self._login(self.email, self.pw)
 
         self.activate_user(self.email)
 
@@ -170,14 +184,12 @@ class AuthTestCase(ContentStoreTestCase):
     def test_login_ratelimited(self):
         # try logging in 30 times, the default limit in the number of failed
         # login attempts in one 5 minute period before the rate gets limited
-        for i in xrange(30):
+        for i in range(30):
             resp = self._login(self.email, 'wrong_password{0}'.format(i))
-            self.assertEqual(resp.status_code, 200)
+            self.assertEqual(resp.status_code, 403)
         resp = self._login(self.email, 'wrong_password')
-        self.assertEqual(resp.status_code, 200)
-        data = parse_json(resp)
-        self.assertFalse(data['success'])
-        self.assertIn('Too many failed login attempts.', data['value'])
+        self.assertEqual(resp.status_code, 403)
+        self.assertIn('Too many failed login attempts.', resp.content)
 
     @override_settings(MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED=3)
     @override_settings(MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS=2)
@@ -189,25 +201,21 @@ class AuthTestCase(ContentStoreTestCase):
             self.create_account(self.username, self.email, self.pw)
             self.activate_user(self.email)
 
-            for i in xrange(3):
+            for i in range(3):
                 resp = self._login(self.email, 'wrong_password{0}'.format(i))
-                self.assertEqual(resp.status_code, 200)
-                data = parse_json(resp)
-                self.assertFalse(data['success'])
+                self.assertEqual(resp.status_code, 403)
                 self.assertIn(
                     'Email or password is incorrect.',
-                    data['value']
+                    resp.content
                 )
 
             # now the account should be locked
 
             resp = self._login(self.email, 'wrong_password')
-            self.assertEqual(resp.status_code, 200)
-            data = parse_json(resp)
-            self.assertFalse(data['success'])
+            self.assertEqual(resp.status_code, 403)
             self.assertIn(
-                'This account has been temporarily locked due to excessive login failures. Try again later.',
-                data['value']
+                'This account has been temporarily locked due to excessive login failures.',
+                resp.content
             )
 
             with freeze_time('2100-01-01'):
@@ -215,9 +223,11 @@ class AuthTestCase(ContentStoreTestCase):
 
             # make sure the failed attempt counter gets reset on successful login
             resp = self._login(self.email, 'wrong_password')
-            self.assertEqual(resp.status_code, 200)
-            data = parse_json(resp)
-            self.assertFalse(data['success'])
+            self.assertEqual(resp.status_code, 403)
+            self.assertIn(
+                'Email or password is incorrect.',
+                resp.content
+            )
 
             # account should not be locked out after just one attempt
             self.login(self.email, self.pw)
@@ -257,17 +267,17 @@ class AuthTestCase(ContentStoreTestCase):
         self.client = AjaxEnabledTestClient()
 
         # Not logged in.  Should redirect to login.
-        print 'Not logged in'
+        print('Not logged in')
         for page in auth_pages:
-            print "Checking '{0}'".format(page)
+            print(u"Checking '{0}'".format(page))
             self.check_page_get(page, expected=302)
 
         # Logged in should work.
         self.login(self.email, self.pw)
 
-        print 'Logged in'
+        print('Logged in')
         for page in simple_auth_pages:
-            print "Checking '{0}'".format(page)
+            print(u"Checking '{0}'".format(page))
             self.check_page_get(page, expected=200)
 
     def test_index_auth(self):
@@ -300,14 +310,50 @@ class AuthTestCase(ContentStoreTestCase):
         resp = self.client.get_html(course_url)
 
         # re-request, and we should get a redirect to login page
-        self.assertRedirects(resp, settings.LOGIN_REDIRECT_URL + '?next=/home/')
+        self.assertRedirects(resp, settings.LOGIN_URL + '?next=/home/')
+
+    @mock.patch.dict(settings.FEATURES, {"ALLOW_PUBLIC_ACCOUNT_CREATION": False})
+    def test_signup_button_index_page(self):
+        """
+        Navigate to the home page and check the Sign Up button is hidden when ALLOW_PUBLIC_ACCOUNT_CREATION flag
+        is turned off
+        """
+        response = self.client.get(reverse('homepage'))
+        self.assertNotIn('<a class="action action-signup" href="/signup">Sign Up</a>', response.content)
+
+    @mock.patch.dict(settings.FEATURES, {"ALLOW_PUBLIC_ACCOUNT_CREATION": False})
+    def test_signup_button_login_page(self):
+        """
+        Navigate to the login page and check the Sign Up button is hidden when ALLOW_PUBLIC_ACCOUNT_CREATION flag
+        is turned off
+        """
+        response = self.client.get(reverse('login'))
+        self.assertNotIn('<a class="action action-signup" href="/signup">Sign Up</a>', response.content)
+
+    @mock.patch.dict(settings.FEATURES, {"ALLOW_PUBLIC_ACCOUNT_CREATION": False})
+    def test_signup_link_login_page(self):
+        """
+        Navigate to the login page and check the Sign Up link is hidden when ALLOW_PUBLIC_ACCOUNT_CREATION flag
+        is turned off
+        """
+        response = self.client.get(reverse('login'))
+        self.assertNotIn('<a href="/signup" class="action action-signin">Don&#39;t have a Studio Account? Sign up!</a>',
+                         response.content)
 
 
 class ForumTestCase(CourseTestCase):
+    """Tests class to verify course to forum operations"""
+
     def setUp(self):
         """ Creates the test course. """
         super(ForumTestCase, self).setUp()
         self.course = CourseFactory.create(org='testX', number='727', display_name='Forum Course')
+
+    def set_blackout_dates(self, blackout_dates):
+        """Helper method to set blackout dates in course."""
+        self.course.discussion_blackouts = [
+            [start_date.isoformat(), end_date.isoformat()] for start_date, end_date in blackout_dates
+        ]
 
     def test_blackouts(self):
         now = datetime.datetime.now(UTC)
@@ -315,13 +361,27 @@ class ForumTestCase(CourseTestCase):
             (now - datetime.timedelta(days=14), now - datetime.timedelta(days=11)),
             (now + datetime.timedelta(days=24), now + datetime.timedelta(days=30))
         ]
-        self.course.discussion_blackouts = [(t.isoformat(), t2.isoformat()) for t, t2 in times1]
+        self.set_blackout_dates(times1)
         self.assertTrue(self.course.forum_posts_allowed)
         times2 = [
             (now - datetime.timedelta(days=14), now + datetime.timedelta(days=2)),
             (now + datetime.timedelta(days=24), now + datetime.timedelta(days=30))
         ]
-        self.course.discussion_blackouts = [(t.isoformat(), t2.isoformat()) for t, t2 in times2]
+        self.set_blackout_dates(times2)
+        self.assertFalse(self.course.forum_posts_allowed)
+
+        # Single date set for allowed forum posts.
+        self.course.discussion_blackouts = [
+            now + datetime.timedelta(days=24),
+            now + datetime.timedelta(days=30)
+        ]
+        self.assertTrue(self.course.forum_posts_allowed)
+
+        # Single date set for restricted forum posts.
+        self.course.discussion_blackouts = [
+            now - datetime.timedelta(days=24),
+            now + datetime.timedelta(days=30)
+        ]
         self.assertFalse(self.course.forum_posts_allowed)
 
         # test if user gives empty blackout date it should return true for forum_posts_allowed
@@ -331,6 +391,8 @@ class ForumTestCase(CourseTestCase):
 
 @ddt
 class CourseKeyVerificationTestCase(CourseTestCase):
+    """Test class to verify course decorator operations"""
+
     def setUp(self):
         """
         Create test course.
@@ -354,15 +416,3 @@ class CourseKeyVerificationTestCase(CourseTestCase):
         )
         resp = self.client.get_html(url)
         self.assertEqual(resp.status_code, status_code)
-
-
-class PushNotificationConfigTestCase(TestCase):
-    """
-    Tests PushNotificationConfig.
-    """
-    def test_notifications_defaults(self):
-        self.assertFalse(PushNotificationConfig.is_enabled())
-
-    def test_notifications_enabled(self):
-        PushNotificationConfig(enabled=True).save()
-        self.assertTrue(PushNotificationConfig.is_enabled())

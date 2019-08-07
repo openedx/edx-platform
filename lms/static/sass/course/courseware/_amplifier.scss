@@ -1,6 +1,7 @@
 // JM MOSFET AMPLIFIER
 section.tool-wrapper {
   @extend .clearfix;
+
   background: #073642;
   border-bottom: 1px solid darken(#002b36, 10%);
   border-top: 1px solid darken(#002b36, 10%);
@@ -11,7 +12,9 @@ section.tool-wrapper {
 
   div#graph-container {
     background: none;
+
     @include box-sizing(border-box);
+
     display: table-cell;
     padding: lh();
     vertical-align: top;
@@ -60,11 +63,11 @@ section.tool-wrapper {
         a {
           border: none;
           color: #839496;
-          font: bold 12px $body-font-family;
+          font: bold 12px $font-family-sans-serif;
           letter-spacing: 1px;
-          text-transform: uppercase;
 
-          &:hover, &:focus {
+          &:hover,
+          &:focus {
             color: #eee8d5;
           }
         }
@@ -74,19 +77,22 @@ section.tool-wrapper {
 
   div#controlls-container {
     @extend .clearfix;
+
     background: darken(#073642, 2%);
     border-right: 1px solid darken(#002b36, 6%);
     box-shadow: 1px 0 0 lighten(#002b36, 6%), inset 0 0 0 4px darken(#094959, 6%);
+
     @include box-sizing(border-box);
+
     display: table-cell;
     padding: lh();
     vertical-align: top;
     width: flex-grid(4.5, 9);
 
     div.graph-controls {
-
       div.music-wrapper {
         @extend .clearfix;
+
         border-bottom: 1px solid darken(#073642, 10%);
         box-shadow: 0 1px 0 lighten(#073642, 2%);
         margin-bottom: lh();
@@ -94,10 +100,12 @@ section.tool-wrapper {
 
         input#playButton {
           border-color: darken(#002b36, 6%);
-          @include button(simple, lighten( #586e75, 5% ));
+
+          @include button(simple, lighten(#586e75, 5%));
+
           display: block;
           float: right;
-          font: bold 14px $body-font-family;
+          font: bold 14px $font-family-sans-serif;
           margin-top: 19px;
 
           &:active {
@@ -106,7 +114,8 @@ section.tool-wrapper {
 
           &[value="Stop"] {
             @include button(simple, darken(#268bd2, 30%));
-            font: bold 14px $body-font-family;
+
+            font: bold 14px $font-family-sans-serif;
 
             &:active {
               box-shadow: none;
@@ -117,9 +126,12 @@ section.tool-wrapper {
 
       div.inputs-wrapper {
         @extend .clearfix;
+
         border-bottom: 1px solid darken(#073642, 10%);
         box-shadow: 0 1px 0 lighten(#073642, 2%);
+
         @include clearfix();
+
         margin-bottom: lh();
         margin-bottom: lh();
         padding: 0 0 lh();
@@ -192,13 +204,14 @@ section.tool-wrapper {
     div.schematic-sliders {
       div.top-sliders {
         @extend .clearfix;
+
         border-bottom: 1px solid darken(#073642, 10%);
         box-shadow: 0 1px 0 lighten(#073642, 2%);
         margin-bottom: lh();
         padding: 0 0 lh();
 
         select#musicTypeSelect {
-          font: 16px $body-font-family;
+          font: 16px $font-family-sans-serif;
           display: inline-block;
           margin-bottom: 0;
         }
@@ -231,13 +244,13 @@ section.tool-wrapper {
         }
 
         .ui-slider-handle {
-          background: lighten( #586e75, 5% ) url('#{$static-path}/images/amplifier-slider-handle.png') center no-repeat;
+          background: lighten(#586e75, 5%) url('#{$static-path}/images/amplifier-slider-handle.png') center no-repeat;
           border: 1px solid darken(#002b36, 8%);
-          box-shadow: inset 0 1px 0 lighten( #586e75, 20% );
-          margin-top: -.3em;
+          box-shadow: inset 0 1px 0 lighten(#586e75, 20%);
+          margin-top: -0.3em;
 
           &:hover, &:active, &:focus {
-            background-color: lighten( #586e75, 10% );
+            background-color: lighten(#586e75, 10%);
           }
         }
       }

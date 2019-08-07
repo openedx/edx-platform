@@ -18,7 +18,7 @@
         // grab the input id from the input
         input_id = $(this).data('input-id');
 
-        Problem.inputAjax(url, input_id, 'preview_chemcalc', {'formula': this.value}, create_handler(preview_div));
+        Problem.inputAjax(url, input_id, 'preview_chemcalc', {formula: this.value}, create_handler(preview_div));
     };
 
     inputs = $('.chemicalequationinput input');

@@ -1,20 +1,22 @@
 """
 Test for split test XModule
 """
-from django.core.urlresolvers import reverse
+from __future__ import absolute_import
+
+import six
+from django.urls import reverse
 from mock import MagicMock
-from nose.plugins.attrib import attr
+from six import text_type
 
-from courseware.module_render import get_module_for_descriptor
 from courseware.model_data import FieldDataCache
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.partitions.partitions import Group, UserPartition
+from courseware.module_render import get_module_for_descriptor
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.partitions.partitions import Group, UserPartition
 
 
-@attr(shard=1)
 class SplitTestBase(SharedModuleStoreTestCase):
     """
     Sets up a basic course and user for split test testing.
@@ -73,7 +75,7 @@ class SplitTestBase(SharedModuleStoreTestCase):
         return ItemFactory.create(
             parent_location=parent.location,
             category="video",
-            display_name="Group {} Sees This Video".format(group),
+            display_name=u"Group {} Sees This Video".format(group),
         )
 
     def _problem(self, parent, group):
@@ -84,7 +86,7 @@ class SplitTestBase(SharedModuleStoreTestCase):
         return ItemFactory.create(
             parent_location=parent.location,
             category="problem",
-            display_name="Group {} Sees This Problem".format(group),
+            display_name=u"Group {} Sees This Problem".format(group),
             data="<h1>No Problem Defined Yet!</h1>",
         )
 
@@ -96,8 +98,8 @@ class SplitTestBase(SharedModuleStoreTestCase):
         return ItemFactory.create(
             parent_location=parent.location,
             category="html",
-            display_name="Group {} Sees This HTML".format(group),
-            data="Some HTML for group {}".format(group),
+            display_name=u"Group {} Sees This HTML".format(group),
+            data=u"Some HTML for group {}".format(group),
         )
 
     def test_split_test_0(self):
@@ -118,24 +120,27 @@ class SplitTestBase(SharedModuleStoreTestCase):
 
         resp = self.client.get(reverse(
             'courseware_section',
-            kwargs={'course_id': self.course.id.to_deprecated_string(),
+            kwargs={'course_id': text_type(self.course.id),
                     'chapter': self.chapter.url_name,
                     'section': self.sequential.url_name}
         ))
         content = resp.content
 
         # Assert we see the proper icon in the top display
-        self.assertIn('<button class="{} inactive nav-item"'.format(self.ICON_CLASSES[user_tag]), content)
+        self.assertIn(
+            u'<button class="{} inactive nav-item tab"'.format(self.ICON_CLASSES[user_tag]),
+            content.decode(resp.charset)
+        )
         # And proper tooltips
         for tooltip in self.TOOLTIPS[user_tag]:
             self.assertIn(tooltip, content)
 
         unicode_content = content.decode("utf-8")
         for key in self.included_usage_keys[user_tag]:
-            self.assertIn(unicode(key), unicode_content)
+            self.assertIn(six.text_type(key), unicode_content)
 
         for key in self.excluded_usage_keys[user_tag]:
-            self.assertNotIn(unicode(key), unicode_content)
+            self.assertNotIn(six.text_type(key), unicode_content)
 
         # Assert that we can see the data from the appropriate test condition
         for visible in self.VISIBLE_CONTENT[user_tag]:
@@ -167,7 +172,6 @@ class TestSplitTestVert(SplitTestBase):
 
     def setUp(self):
         # We define problem compenents that we need but don't explicitly call elsewhere.
-        # pylint: disable=unused-variable
         super(TestSplitTestVert, self).setUp()
 
         c0_url = self.course.id.make_usage_key("vertical", "split_test_cond0")
@@ -177,7 +181,7 @@ class TestSplitTestVert(SplitTestBase):
             parent_location=self.sequential.location,
             category="split_test",
             display_name="Split test",
-            user_partition_id='0',
+            user_partition_id=0,
             group_id_to_child={"0": c0_url, "1": c1_url},
         )
 
@@ -236,7 +240,6 @@ class TestVertSplitTestVert(SplitTestBase):
 
     def setUp(self):
         # We define problem compenents that we need but don't explicitly call elsewhere.
-        # pylint: disable=unused-variable
         super(TestVertSplitTestVert, self).setUp()
 
         vert1 = ItemFactory.create(
@@ -251,7 +254,7 @@ class TestVertSplitTestVert(SplitTestBase):
             parent_location=vert1.location,
             category="split_test",
             display_name="Split test",
-            user_partition_id='0',
+            user_partition_id=0,
             group_id_to_child={"0": c0_url, "1": c1_url},
         )
 
@@ -284,11 +287,11 @@ class TestVertSplitTestVert(SplitTestBase):
         ]
 
 
-@attr(shard=1)
 class SplitTestPosition(SharedModuleStoreTestCase):
     """
     Check that we can change positions in a course with partitions defined
     """
+
     @classmethod
     def setUpClass(cls):
         super(SplitTestPosition, cls).setUpClass()

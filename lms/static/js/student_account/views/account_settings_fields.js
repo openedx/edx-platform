@@ -25,8 +25,7 @@
         field_order_history_template,
         StringUtils,
         HtmlUtils
-    )
-    {
+    ) {
         var AccountSettingsFieldViews = {
             ReadonlyFieldView: FieldViews.ReadonlyFieldView.extend({
                 fieldTemplate: field_readonly_account_template
@@ -44,16 +43,33 @@
                         this.indicators.success,
                         StringUtils.interpolate(
                             gettext('We\'ve sent a confirmation message to {new_email_address}. Click the link in the message to update your email address.'),  // eslint-disable-line max-len
-                            {'new_email_address': this.fieldValue()}
+                            {new_email_address: this.fieldValue()}
                         )
                     );
                 }
             }),
             LanguagePreferenceFieldView: FieldViews.DropdownFieldView.extend({
                 fieldTemplate: field_dropdown_account_template,
+
+                initialize: function(options) {
+                    this._super(options);   // eslint-disable-line no-underscore-dangle
+                    this.listenTo(this.model, 'revertValue', this.revertValue);
+                },
+
+                revertValue: function(event) {
+                    var attributes = {},
+                        oldPrefLang = $(event.target).data('old-lang-code');
+
+                    if (oldPrefLang) {
+                        attributes['pref-lang'] = oldPrefLang;
+                        this.saveAttributes(attributes);
+                    }
+                },
+
                 saveSucceeded: function() {
                     var data = {
-                        'language': this.modelValue()
+                        language: this.modelValue(),
+                        next: window.location.href
                     };
 
                     var view = this;
@@ -151,6 +167,7 @@
                 },
                 linkClicked: function(event) {
                     event.preventDefault();
+                    this.toggleDisableButton(true);
                     this.resetPassword(event);
                 },
                 resetPassword: function() {
@@ -169,8 +186,15 @@
                         error: function(xhr) {
                             view.showErrorMessage(xhr);
                             view.setMessageTimeout();
+                            view.toggleDisableButton(false);
                         }
                     });
+                },
+                toggleDisableButton: function(disabled) {
+                    var button = this.$('#u-field-link-' + this.options.valueAttribute);
+                    if (button) {
+                        button.prop('disabled', disabled);
+                    }
                 },
                 setMessageTimeout: function() {
                     var view = this;
@@ -181,9 +205,19 @@
                 successMessage: function() {
                     return HtmlUtils.joinHtml(
                         this.indicators.success,
-                        StringUtils.interpolate(
-                            gettext('We\'ve sent a message to {email_address}. Click the link in the message to reset your password.'),  // eslint-disable-line max-len
-                            {'email_address': this.model.get(this.options.emailAttribute)}
+                        HtmlUtils.interpolateHtml(
+                            gettext('We\'ve sent a message to {email}. Click the link in the message to reset your password. Didn\'t receive the message? Contact {anchorStart}technical support{anchorEnd}.'),  // eslint-disable-line max-len
+                            {
+                                email: this.model.get(this.options.emailAttribute),
+                                anchorStart: HtmlUtils.HTML(
+                                    StringUtils.interpolate(
+                                        '<a href="{passwordResetSupportUrl}">', {
+                                            passwordResetSupportUrl: this.options.passwordResetSupportUrl
+                                        }
+                                    )
+                                ),
+                                anchorEnd: HtmlUtils.HTML('</a>')
+                            }
                         )
                     );
                 }
@@ -199,9 +233,98 @@
                     }
                 },
                 saveValue: function() {
+                    var attributes = {},
+                        value = '';
                     if (this.persistChanges === true) {
-                        var attributes = {},
-                            value = this.fieldValue() ? [{'code': this.fieldValue()}] : [];
+                        value = this.fieldValue() ? [{code: this.fieldValue()}] : [];
+                        attributes[this.options.valueAttribute] = value;
+                        this.saveAttributes(attributes);
+                    }
+                }
+            }),
+            SocialLinkTextFieldView: FieldViews.TextFieldView.extend({
+                render: function() {
+                    HtmlUtils.setHtml(this.$el, HtmlUtils.template(field_text_account_template)({
+                        id: this.options.valueAttribute + '_' + this.options.platform,
+                        title: this.options.title,
+                        value: this.modelValue(),
+                        message: this.options.helpMessage,
+                        placeholder: this.options.placeholder || ''
+                    }));
+                    this.delegateEvents();
+                    return this;
+                },
+
+                modelValue: function() {
+                    var socialLinks = this.model.get(this.options.valueAttribute);
+                    for (var i = 0; i < socialLinks.length; i++) { // eslint-disable-line vars-on-top
+                        if (socialLinks[i].platform === this.options.platform) {
+                            return socialLinks[i].social_link;
+                        }
+                    }
+                    return null;
+                },
+                saveValue: function() {
+                    var attributes, value;
+                    if (this.persistChanges === true) {
+                        attributes = {};
+                        value = this.fieldValue() != null ? [{platform: this.options.platform,
+                            social_link: this.fieldValue()}] : [];
+                        attributes[this.options.valueAttribute] = value;
+                        this.saveAttributes(attributes);
+                    }
+                }
+            }),
+            ExtendedFieldTextFieldView: FieldViews.TextFieldView.extend({
+                render: function() {
+                    HtmlUtils.setHtml(this.$el, HtmlUtils.template(field_text_account_template)({
+                        id: this.options.valueAttribute + '_' + this.options.field_name,
+                        title: this.options.title,
+                        value: this.modelValue(),
+                        message: this.options.helpMessage,
+                        placeholder: this.options.placeholder || ''
+                    }));
+                    this.delegateEvents();
+                    return this;
+                },
+
+                modelValue: function() {
+                    var extendedProfileFields = this.model.get(this.options.valueAttribute);
+                    for (var i = 0; i < extendedProfileFields.length; i++) { // eslint-disable-line vars-on-top
+                        if (extendedProfileFields[i].field_name === this.options.fieldName) {
+                            return extendedProfileFields[i].field_value;
+                        }
+                    }
+                    return null;
+                },
+                saveValue: function() {
+                    var attributes, value;
+                    if (this.persistChanges === true) {
+                        attributes = {};
+                        value = this.fieldValue() != null ? [{field_name: this.options.fieldName,
+                            field_value: this.fieldValue()}] : [];
+                        attributes[this.options.valueAttribute] = value;
+                        this.saveAttributes(attributes);
+                    }
+                }
+            }),
+            ExtendedFieldListFieldView: FieldViews.DropdownFieldView.extend({
+                fieldTemplate: field_dropdown_account_template,
+                modelValue: function() {
+                    var extendedProfileFields = this.model.get(this.options.valueAttribute);
+                    for (var i = 0; i < extendedProfileFields.length; i++) { // eslint-disable-line vars-on-top
+                        if (extendedProfileFields[i].field_name === this.options.fieldName) {
+                            return extendedProfileFields[i].field_value;
+                        }
+                    }
+                    return null;
+                },
+                saveValue: function() {
+                    var attributes = {},
+                        value;
+                    if (this.persistChanges === true) {
+                        value = this.fieldValue() ? [{field_name: this.options.fieldName,
+                            field_value: this.fieldValue()}] : [];
                         attributes[this.options.valueAttribute] = value;
                         this.saveAttributes(attributes);
                     }
@@ -317,12 +440,12 @@
 
                 render: function() {
                     HtmlUtils.setHtml(this.$el, this.template({
-                        title: this.options.title,
                         totalPrice: this.options.totalPrice,
                         orderId: this.options.orderId,
                         orderDate: this.options.orderDate,
                         receiptUrl: this.options.receiptUrl,
-                        valueAttribute: this.options.valueAttribute
+                        valueAttribute: this.options.valueAttribute,
+                        lines: this.options.lines
                     }));
                     this.delegateEvents();
                     return this;

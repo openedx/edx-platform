@@ -9,7 +9,7 @@
  *  - adding units will automatically redirect to the unit page rather than showing them inline
  */
 define(['jquery', 'underscore', 'js/views/xblock_outline', 'common/js/components/utils/view_utils', 'js/views/utils/xblock_utils',
-        'js/models/xblock_outline_info', 'js/views/modals/course_outline_modals', 'js/utils/drag_and_drop'],
+    'js/models/xblock_outline_info', 'js/views/modals/course_outline_modals', 'js/utils/drag_and_drop'],
     function(
         $, _, XBlockOutlineView, ViewUtils, XBlockViewUtils,
         XBlockOutlineInfo, CourseOutlineModalsFactory, ContentDragger
@@ -69,8 +69,7 @@ define(['jquery', 'underscore', 'js/views/xblock_outline', 'common/js/components
                 var locator = this.model.get('id');
                 if (isCollapsed) {
                     this.expandedLocators.remove(locator);
-                }
-                else {
+                } else {
                     this.expandedLocators.add(locator);
                 }
                 this.refresh();
@@ -158,22 +157,23 @@ define(['jquery', 'underscore', 'js/views/xblock_outline', 'common/js/components
             },
 
             editXBlock: function() {
-                var enable_proctored_exams = false;
-                var enable_timed_exams = false;
+                var modal;
+                var enableProctoredExams = false;
+                var enableTimedExams = false;
                 if (this.model.get('category') === 'sequential') {
                     if (this.parentView.parentView.model.has('enable_proctored_exams')) {
-                        enable_proctored_exams = this.parentView.parentView.model.get('enable_proctored_exams');
+                        enableProctoredExams = this.parentView.parentView.model.get('enable_proctored_exams');
                     }
                     if (this.parentView.parentView.model.has('enable_timed_exams')) {
-                        enable_timed_exams = this.parentView.parentView.model.get('enable_timed_exams');
+                        enableTimedExams = this.parentView.parentView.model.get('enable_timed_exams');
                     }
                 }
 
-                var modal = CourseOutlineModalsFactory.getModal('edit', this.model, {
+                modal = CourseOutlineModalsFactory.getModal('edit', this.model, {
                     onSave: this.refresh.bind(this),
                     parentInfo: this.parentInfo,
-                    enable_proctored_exams: enable_proctored_exams,
-                    enable_timed_exams: enable_timed_exams,
+                    enable_proctored_exams: enableProctoredExams,
+                    enable_timed_exams: enableTimedExams,
                     xblockType: XBlockViewUtils.getXBlockType(
                         this.model.get('category'), this.parentView.model, true
                     )
@@ -197,6 +197,20 @@ define(['jquery', 'underscore', 'js/views/xblock_outline', 'common/js/components
                 }
             },
 
+            highlightsXBlock: function() {
+                var modal = CourseOutlineModalsFactory.getModal('highlights', this.model, {
+                    onSave: this.refresh.bind(this),
+                    xblockType: XBlockViewUtils.getXBlockType(
+                        this.model.get('category'), this.parentView.model, true
+                    )
+                });
+
+                if (modal) {
+                    window.analytics.track('edx.bi.highlights.modal_open');
+                    modal.show();
+                }
+            },
+
             addButtonActions: function(element) {
                 XBlockOutlineView.prototype.addButtonActions.apply(this, arguments);
                 element.find('.configure-button').click(function(event) {
@@ -206,6 +220,12 @@ define(['jquery', 'underscore', 'js/views/xblock_outline', 'common/js/components
                 element.find('.publish-button').click(function(event) {
                     event.preventDefault();
                     this.publishXBlock();
+                }.bind(this));
+                element.find('.highlights-button').on('click keydown', function(event) {
+                    if (event.type === 'click' || event.which === 13 || event.which === 32) {
+                        event.preventDefault();
+                        this.highlightsXBlock();
+                    }
                 }.bind(this));
             },
 
@@ -219,8 +239,7 @@ define(['jquery', 'underscore', 'js/views/xblock_outline', 'common/js/components
                         refresh: this.refreshWithCollapsedState.bind(this),
                         ensureChildrenRendered: this.ensureChildrenRendered.bind(this)
                     });
-                }
-                else if ($(element).hasClass('outline-subsection')) {
+                } else if ($(element).hasClass('outline-subsection')) {
                     ContentDragger.makeDraggable(element, {
                         type: '.outline-subsection',
                         handleClass: '.subsection-drag-handle',
@@ -229,8 +248,7 @@ define(['jquery', 'underscore', 'js/views/xblock_outline', 'common/js/components
                         refresh: this.refreshWithCollapsedState.bind(this),
                         ensureChildrenRendered: this.ensureChildrenRendered.bind(this)
                     });
-                }
-                else if ($(element).hasClass('outline-unit')) {
+                } else if ($(element).hasClass('outline-unit')) {
                     ContentDragger.makeDraggable(element, {
                         type: '.outline-unit',
                         handleClass: '.unit-drag-handle',

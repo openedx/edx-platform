@@ -3,8 +3,10 @@ LTI user management functionality. This module reconciles the two identities
 that an individual has in the campus LMS platform and on edX.
 """
 
-import string
+from __future__ import absolute_import
+
 import random
+import string
 import uuid
 
 from django.conf import settings
@@ -12,6 +14,8 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError, transaction
+from six.moves import range
+
 from lti_provider.models import LtiUser
 from student.models import UserProfile
 
@@ -34,7 +38,7 @@ def authenticate_lti_user(request, lti_user_id, lti_consumer):
         # This is the first time that the user has been here. Create an account.
         lti_user = create_lti_user(lti_user_id, lti_consumer)
 
-    if not (request.user.is_authenticated() and
+    if not (request.user.is_authenticated and
             request.user == lti_user.edx_user):
         # The user is not authenticated, or is logged in as somebody else.
         # Switch them to the LTI user

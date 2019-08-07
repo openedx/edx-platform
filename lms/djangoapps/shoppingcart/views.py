@@ -1,57 +1,84 @@
-import logging
+"""This module contains views related to shopping cart"""
+
+from __future__ import absolute_import
+
 import datetime
 import decimal
+import json
+import logging
+
 import pytz
-from ipware.ip import get_ip
-from django.db.models import Q
-from django.conf import settings
-from django.contrib.auth.models import Group
-from django.shortcuts import redirect
-from django.http import (
-    HttpResponse, HttpResponseRedirect, HttpResponseNotFound,
-    HttpResponseBadRequest, HttpResponseForbidden, Http404
-)
-from django.utils.translation import ugettext as _
-from course_modes.models import CourseMode
-from util.json_request import JsonResponse
-from django.views.decorators.http import require_POST, require_http_methods
-from django.core.urlresolvers import reverse
-from django.views.decorators.csrf import csrf_exempt
-from util.bad_request_rate_limiter import BadRequestRateLimiter
-from util.date_utils import get_default_time_display
-from django.contrib.auth.decorators import login_required
-from edxmako.shortcuts import render_to_response
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from opaque_keys.edx.locator import CourseLocator
-from opaque_keys import InvalidKeyError
-from courseware.courses import get_course_by_id
+import six
 from config_models.decorators import require_config
-from shoppingcart.reports import RefundReport, ItemizedPurchaseReport, UniversityRevenueShareReport, CertificateStatusReport
-from student.models import CourseEnrollment, EnrollmentClosedError, CourseFullError, \
-    AlreadyEnrolledError
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import Group
+from django.db.models import Q
+from django.http import (
+    Http404,
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+    HttpResponseNotFound,
+    HttpResponseRedirect
+)
+from django.shortcuts import redirect
+from django.urls import reverse
+from django.utils.translation import ugettext as _
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods, require_POST
+from ipware.ip import get_ip
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import CourseLocator
+
+from course_modes.models import CourseMode
+from courseware.courses import get_course_by_id
+from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.embargo import api as embargo_api
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from shoppingcart.reports import (
+    CertificateStatusReport,
+    ItemizedPurchaseReport,
+    RefundReport,
+    UniversityRevenueShareReport
+)
+from student.models import AlreadyEnrolledError, CourseEnrollment, CourseFullError, EnrollmentClosedError
+from util.date_utils import get_default_time_display
+from util.json_request import JsonResponse
+from util.request_rate_limiter import BadRequestRateLimiter
+
+from .decorators import enforce_shopping_cart_enabled
 from .exceptions import (
-    ItemAlreadyInCartException, AlreadyEnrolledInCourseException,
-    CourseDoesNotExistException, ReportTypeDoesNotExistException,
-    MultipleCouponsNotAllowedException, InvalidCartItem,
-    ItemNotFoundInCartException, RedemptionCodeError
+    AlreadyEnrolledInCourseException,
+    CourseDoesNotExistException,
+    InvalidCartItem,
+    ItemAlreadyInCartException,
+    ItemNotFoundInCartException,
+    MultipleCouponsNotAllowedException,
+    RedemptionCodeError,
+    ReportTypeDoesNotExistException
 )
 from .models import (
-    Order, OrderTypes,
-    PaidCourseRegistration, OrderItem, Coupon,
-    CertificateItem, CouponRedemption, CourseRegistrationCode,
-    RegistrationCodeRedemption, CourseRegCodeItem,
-    Donation, DonationConfiguration
+    CertificateItem,
+    Coupon,
+    CouponRedemption,
+    CourseRegCodeItem,
+    CourseRegistrationCode,
+    Donation,
+    DonationConfiguration,
+    Order,
+    OrderItem,
+    OrderTypes,
+    PaidCourseRegistration,
+    RegistrationCodeRedemption
 )
 from .processors import (
-    process_postpay_callback, render_purchase_form_html,
-    get_signed_purchase_params, get_purchase_endpoint
+    get_purchase_endpoint,
+    get_signed_purchase_params,
+    process_postpay_callback,
+    render_purchase_form_html
 )
-
-import json
-from .decorators import enforce_shopping_cart_enabled
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-
 
 log = logging.getLogger("shoppingcart")
 AUDIT_LOG = logging.getLogger("audit")
@@ -83,22 +110,22 @@ def add_course_to_cart(request, course_id):
     heavy lifting (logging, error checking, etc)
     """
 
-    assert isinstance(course_id, basestring)
-    if not request.user.is_authenticated():
+    assert isinstance(course_id, six.string_types)
+    if not request.user.is_authenticated:
         log.info(u"Anon user trying to add course %s to cart", course_id)
         return HttpResponseForbidden(_('You must be logged-in to add to a shopping cart'))
     cart = Order.get_cart_for_user(request.user)
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     # All logging from here handled by the model
     try:
         paid_course_item = PaidCourseRegistration.add_to_order(cart, course_key)
     except CourseDoesNotExistException:
         return HttpResponseNotFound(_('The course you requested does not exist.'))
     except ItemAlreadyInCartException:
-        return HttpResponseBadRequest(_('The course {course_id} is already in your cart.').format(course_id=course_id))
+        return HttpResponseBadRequest(_(u'The course {course_id} is already in your cart.').format(course_id=course_id))
     except AlreadyEnrolledInCourseException:
         return HttpResponseBadRequest(
-            _('You are already registered in course {course_id}.').format(course_id=course_id))
+            _(u'You are already registered in course {course_id}.').format(course_id=course_id))
     else:
         # in case a coupon redemption code has been applied, new items should also get a discount if applicable.
         order = paid_course_item.order
@@ -228,7 +255,9 @@ def remove_item(request):
             item_id
         )
     else:
-        item = items[0]
+        # Reload the item directly to prevent select_subclasses() hackery from interfering with
+        # deletion of all objects in the model inheritance hierarchy
+        item = items[0].__class__.objects.get(id=item_id)
         if item.user == request.user:
             Order.remove_cart_item_from_order(item, request.user)
             item.order.update_order_type()
@@ -269,7 +298,7 @@ def use_code(request):
         try:
             course_reg = CourseRegistrationCode.objects.get(code=code)
         except CourseRegistrationCode.DoesNotExist:
-            return HttpResponseNotFound(_("Discount does not exist against code '{code}'.").format(code=code))
+            return HttpResponseNotFound(_(u"Discount does not exist against code '{code}'.").format(code=code))
 
         return use_registration_code(course_reg, request.user)
 
@@ -294,8 +323,8 @@ def get_reg_code_validity(registration_code, request, limiter):
         reg_code_already_redeemed = RegistrationCodeRedemption.is_registration_code_redeemed(registration_code)
     if not reg_code_is_valid:
         # tick the rate limiter counter
-        AUDIT_LOG.info("Redemption of a invalid RegistrationCode %s", registration_code)
-        limiter.tick_bad_request_counter(request)
+        AUDIT_LOG.info(u"Redemption of a invalid RegistrationCode %s", registration_code)
+        limiter.tick_request_counter(request)
         raise Http404()
 
     return reg_code_is_valid, reg_code_already_redeemed, course_registration
@@ -373,6 +402,9 @@ def register_code_redemption(request, registration_code):
             else:
                 for cart_item in cart_items:
                     if isinstance(cart_item, PaidCourseRegistration) or isinstance(cart_item, CourseRegCodeItem):
+                        # Reload the item directly to prevent select_subclasses() hackery from interfering with
+                        # deletion of all objects in the model inheritance hierarchy
+                        cart_item = cart_item.__class__.objects.get(id=cart_item.id)
                         cart_item.delete()
 
             #now redeem the reg code.
@@ -438,7 +470,7 @@ def use_registration_code(course_reg, user):
     if not course_reg.is_valid:
         log.warning(u"The enrollment code (%s) is no longer valid.", course_reg.code)
         return HttpResponseBadRequest(
-            _("This enrollment code ({enrollment_code}) is no longer valid.").format(
+            _(u"This enrollment code ({enrollment_code}) is no longer valid.").format(
                 enrollment_code=course_reg.code
             )
         )
@@ -446,7 +478,7 @@ def use_registration_code(course_reg, user):
     if RegistrationCodeRedemption.is_registration_code_redeemed(course_reg.code):
         log.warning(u"This enrollment code ({%s}) has already been used.", course_reg.code)
         return HttpResponseBadRequest(
-            _("This enrollment code ({enrollment_code}) is not valid.").format(
+            _(u"This enrollment code ({enrollment_code}) is not valid.").format(
                 enrollment_code=course_reg.code
             )
         )
@@ -456,7 +488,7 @@ def use_registration_code(course_reg, user):
     except ItemNotFoundInCartException:
         log.warning(u"Course item does not exist against registration code '%s'", course_reg.code)
         return HttpResponseNotFound(
-            _("Code '{registration_code}' is not valid for any course in the shopping cart.").format(
+            _(u"Code '{registration_code}' is not valid for any course in the shopping cart.").format(
                 registration_code=course_reg.code
             )
         )
@@ -494,7 +526,7 @@ def use_coupon_code(coupons, user):
 
     if not is_redemption_applied:
         log.warning(u"Discount does not exist against code '%s'.", coupons[0].code)
-        return HttpResponseNotFound(_("Discount does not exist against code '{code}'.").format(code=coupons[0].code))
+        return HttpResponseNotFound(_(u"Discount does not exist against code '{code}'.").format(code=coupons[0].code))
 
     return HttpResponse(
         json.dumps({'response': 'success', 'coupon_code_applied': True}),
@@ -503,6 +535,7 @@ def use_coupon_code(coupons, user):
 
 
 @require_config(DonationConfiguration)
+@csrf_exempt
 @require_POST
 @login_required
 def donate(request):
@@ -577,7 +610,7 @@ def donate(request):
             amount,
             course_id
         )
-        return HttpResponseBadRequest(unicode(ex))
+        return HttpResponseBadRequest(six.text_type(ex))
 
     # Start the purchase.
     # This will "lock" the purchase so the user can't change
@@ -593,7 +626,7 @@ def donate(request):
 
     # Add extra to make it easier to track transactions
     extra_data = [
-        unicode(course_id) if course_id else "",
+        six.text_type(course_id) if course_id else "",
         "donation_course" if course_id else "donation_general"
     ]
 
@@ -641,7 +674,7 @@ def _get_verify_flow_redirect(order):
         course_id = cert_items[0].course_id
         url = reverse(
             'verify_student_payment_confirmation',
-            kwargs={'course_id': unicode(course_id)}
+            kwargs={'course_id': six.text_type(course_id)}
         )
         # Add a query string param for the order ID
         # This allows the view to query for the receipt information later.
@@ -849,7 +882,7 @@ def _show_receipt_json(order):
                 'unit_cost': item.unit_cost,
                 'line_cost': item.line_cost,
                 'line_desc': item.line_desc,
-                'course_key': unicode(item.course_id)
+                'course_key': six.text_type(item.course_id)
             }
             for item in OrderItem.objects.filter(order=order).select_subclasses()
         ]
@@ -922,7 +955,7 @@ def _show_receipt_html(request, order):
         'currency': settings.PAID_COURSE_REGISTRATION_CURRENCY[0],
         'total_registration_codes': total_registration_codes,
         'reg_code_info_list': reg_code_info_list,
-        'order_purchase_date': order.purchase_time.strftime("%B %d, %Y"),
+        'order_purchase_date': order.purchase_time.strftime(u"%B %d, %Y"),
     }
 
     # We want to have the ability to override the default receipt page when
@@ -994,8 +1027,8 @@ def csv_report(request):
         items = report.rows()
 
         response = HttpResponse(content_type='text/csv')
-        filename = "purchases_report_{}.csv".format(datetime.datetime.now(pytz.UTC).strftime("%Y-%m-%d-%H-%M-%S"))
-        response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+        filename = u"purchases_report_{}.csv".format(datetime.datetime.now(pytz.UTC).strftime(u"%Y-%m-%d-%H-%M-%S"))
+        response['Content-Disposition'] = u'attachment; filename="{}"'.format(filename)
         report.write_csv(response)
         return response
 

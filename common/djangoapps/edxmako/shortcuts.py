@@ -12,18 +12,21 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+from __future__ import absolute_import
+
 import logging
-from urlparse import urljoin
+import six
+from six.moves.urllib.parse import urljoin
 
-from django.http import HttpResponse
-from django.template import Context
-
-from edxmako import lookup_template
-from edxmako.request_context import get_template_request_context
 from django.conf import settings
-from django.core.urlresolvers import reverse
-from openedx.core.djangoapps.theming.helpers import get_template_path, is_request_in_themed_site
+from django.urls import reverse
+from django.http import HttpResponse
+from django.template import engines
+
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
+
+from . import Engines
 
 log = logging.getLogger(__name__)
 
@@ -52,6 +55,12 @@ def marketing_link(name):
         # special case for when we only want the root marketing URL
         if name == 'ROOT':
             return marketing_urls.get('ROOT')
+        # special case for new enterprise marketing url with custom tracking query params
+        if name == 'ENTERPRISE':
+            enterprise_url = marketing_urls.get(name)
+            # if url is not relative, then return it without joining to root
+            if not enterprise_url.startswith('/'):
+                return enterprise_url
         # Using urljoin here allows us to enable a marketing site and set
         # a site ROOT, but still specify absolute URLs for other marketing
         # URLs in the MKTG_URLS setting
@@ -113,8 +122,8 @@ def marketing_link_context_processor(request):
         [
             ("MKTG_URL_" + k, marketing_link(k))
             for k in (
-                settings.MKTG_URL_LINK_MAP.viewkeys() |
-                marketing_urls.viewkeys()
+                six.viewkeys(settings.MKTG_URL_LINK_MAP) |
+                six.viewkeys(marketing_urls)
             )
         ]
     )
@@ -131,7 +140,7 @@ def footer_context_processor(request):  # pylint: disable=unused-argument
     )
 
 
-def render_to_string(template_name, dictionary, context=None, namespace='main', request=None):
+def render_to_string(template_name, dictionary, namespace='main', request=None):
     """
     Render a Mako template to as a string.
 
@@ -147,52 +156,23 @@ def render_to_string(template_name, dictionary, context=None, namespace='main', 
             from the template paths specified in configuration.
         dictionary: A dictionary of variables to insert into the template during
             rendering.
-        context: A :class:`~django.template.Context` with values to make
-            available to the template.
         namespace: The Mako namespace to find the named template in.
         request: The request to use to construct the RequestContext for rendering
             this template. If not supplied, the current request will be used.
     """
-
-    template_name = get_template_path(template_name)
-
-    context_instance = Context(dictionary)
-    # add dictionary to context_instance
-    context_instance.update(dictionary or {})
-    # collapse context_instance to a single dictionary for mako
-    context_dictionary = {}
-    context_instance['settings'] = settings
-    context_instance['EDX_ROOT_URL'] = settings.EDX_ROOT_URL
-    context_instance['marketing_link'] = marketing_link
-    context_instance['is_any_marketing_link_set'] = is_any_marketing_link_set
-    context_instance['is_marketing_link_set'] = is_marketing_link_set
-
-    # In various testing contexts, there might not be a current request context.
-    request_context = get_template_request_context(request)
-    if request_context:
-        for item in request_context:
-            context_dictionary.update(item)
-    for item in context_instance:
-        context_dictionary.update(item)
-    if context:
-        context_dictionary.update(context)
-
-    # "Fix" CSRF token by evaluating the lazy object
-    KEY_CSRF_TOKENS = ('csrf_token', 'csrf')
-    for key in KEY_CSRF_TOKENS:
-        if key in context_dictionary:
-            context_dictionary[key] = unicode(context_dictionary[key])
-
-    # fetch and render template
-    template = lookup_template(namespace, template_name)
-    return template.render_unicode(**context_dictionary)
+    if namespace == 'lms.main':
+        engine = engines[Engines.PREVIEW]
+    else:
+        engine = engines[Engines.MAKO]
+    template = engine.get_template(template_name)
+    return template.render(dictionary, request)
 
 
-def render_to_response(template_name, dictionary=None, context_instance=None, namespace='main', request=None, **kwargs):
+def render_to_response(template_name, dictionary=None, namespace='main', request=None, **kwargs):
     """
     Returns a HttpResponse whose content is filled with the result of calling
     lookup.get_template(args[0]).render with the passed arguments.
     """
 
     dictionary = dictionary or {}
-    return HttpResponse(render_to_string(template_name, dictionary, context_instance, namespace, request), **kwargs)
+    return HttpResponse(render_to_string(template_name, dictionary, namespace, request), **kwargs)

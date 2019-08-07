@@ -19,11 +19,14 @@
                 mailing_address: '',
                 year_of_birth: null,
                 bio: null,
+                social_links: [],
                 language_proficiencies: [],
                 requires_parental_consent: true,
                 profile_image: null,
                 accomplishments_shared: false,
-                default_public_account_fields: []
+                default_public_account_fields: [],
+                extended_profile: [],
+                secondary_email: ''
             },
 
             parse: function(response) {

@@ -15,7 +15,7 @@ def url_name_for_block(block):
         block (XModuleMixin|CourseOverview|BlockStructureBlockData):
             Block that is being accessed
     """
-    return block.location.name
+    return block.location.block_id
 
 
 def display_name_with_default(block):

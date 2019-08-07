@@ -2,17 +2,21 @@
 """
 Tests for BlockNavigationTransformer.
 """
-import ddt
+from __future__ import absolute_import
+
 from unittest import TestCase
+
+import ddt
+import six
 
 from lms.djangoapps.course_api.blocks.transformers.block_depth import BlockDepthTransformer
 from lms.djangoapps.course_api.blocks.transformers.navigation import BlockNavigationTransformer
-from openedx.core.lib.block_structure.tests.helpers import ChildrenMapTestMixin
-from openedx.core.lib.block_structure.block_structure import BlockStructureModulestoreData
-from openedx.core.lib.block_structure.factory import BlockStructureFactory
+from openedx.core.djangoapps.content.block_structure.block_structure import BlockStructureModulestoreData
+from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
+from openedx.core.djangoapps.content.block_structure.tests.helpers import ChildrenMapTestMixin
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import SampleCourseFactory
-from xmodule.modulestore import ModuleStoreEnum
 
 
 @ddt.ddt
@@ -53,7 +57,7 @@ class BlockNavigationTransformerTestCase(TestCase, ChildrenMapTestMixin):
 
         for block_key, expected_nav in enumerate(expected_nav_map):
             self.assertSetEqual(
-                set(unicode(block) for block in expected_nav),
+                set(six.text_type(block) for block in expected_nav),
                 set(
                     block_structure.get_transformer_block_field(
                         block_key,
@@ -110,7 +114,7 @@ class BlockNavigationTransformerCourseTestCase(ModuleStoreTestCase):
                 course_key.make_usage_key('vertical', 'vertical_y1a'),
                 course_key.make_usage_key('problem', 'problem_y1a_1'),
         ]:
-            self.assertIn(unicode(block_key), course_descendants)
+            self.assertIn(six.text_type(block_key), course_descendants)
 
         # chapter_x and its descendants should not be included
         for block_key in [
@@ -119,4 +123,4 @@ class BlockNavigationTransformerCourseTestCase(ModuleStoreTestCase):
                 course_key.make_usage_key('vertical', 'vertical_x1a'),
                 course_key.make_usage_key('problem', 'problem_x1a_1'),
         ]:
-            self.assertNotIn(unicode(block_key), course_descendants)
+            self.assertNotIn(six.text_type(block_key), course_descendants)

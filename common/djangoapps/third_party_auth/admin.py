@@ -2,23 +2,29 @@
 """
 Admin site configuration for third party authentication
 """
+from __future__ import absolute_import
+
+from config_models.admin import KeyedConfigurationModelAdmin
 from django import forms
-
 from django.contrib import admin
+from django.db import DatabaseError, transaction
+from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 
-from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
+from openedx.core.djangolib.markup import HTML
+from third_party_auth.provider import Registry
+
 from .models import (
-    OAuth2ProviderConfig,
-    SAMLProviderConfig,
-    SAMLConfiguration,
-    SAMLProviderData,
-    LTIProviderConfig,
-    ProviderApiPermissions,
     _PSA_OAUTH2_BACKENDS,
-    _PSA_SAML_BACKENDS
+    _PSA_SAML_BACKENDS,
+    LTIProviderConfig,
+    OAuth2ProviderConfig,
+    ProviderApiPermissions,
+    SAMLConfiguration,
+    SAMLProviderConfig,
+    SAMLProviderData
 )
 from .tasks import fetch_saml_metadata
-from third_party_auth.provider import Registry
 
 
 class OAuth2ProviderConfigForm(forms.ModelForm):
@@ -33,7 +39,7 @@ class OAuth2ProviderConfigAdmin(KeyedConfigurationModelAdmin):
     def get_list_display(self, request):
         """ Don't show every single field in the admin change list """
         return (
-            'name', 'enabled', 'site', 'backend_name', 'secondary', 'skip_registration_form',
+            'name', 'enabled', 'slug', 'site', 'backend_name', 'secondary', 'skip_registration_form',
             'skip_email_verification', 'change_date', 'changed_by', 'edit_link',
         )
 
@@ -49,12 +55,59 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
     """ Django Admin class for SAMLProviderConfig """
     form = SAMLProviderConfigForm
 
+    def get_queryset(self, request):
+        """
+        Filter the queryset to exclude the archived records.
+        """
+        queryset = super(SAMLProviderConfigAdmin, self).get_queryset(request).exclude(archived=True)
+        return queryset
+
+    def archive_provider_configuration(self, request, queryset):
+        """
+        Archived the selected provider configurations.
+        """
+        with transaction.atomic():
+            for obj in queryset:
+                self.model.objects.filter(pk=obj.pk).update(archived=True, enabled=False)
+        self.message_user(request, _("Deleted the selected configuration(s)."))
+
     def get_list_display(self, request):
         """ Don't show every single field in the admin change list """
         return (
-            'name', 'enabled', 'site', 'backend_name', 'entity_id', 'metadata_source',
-            'has_data', 'mode', 'change_date', 'changed_by', 'edit_link',
+            'name_with_update_link', 'enabled', 'site', 'entity_id', 'metadata_source',
+            'has_data', 'mode', 'saml_configuration', 'change_date', 'changed_by',
         )
+
+    list_display_links = None
+
+    def get_actions(self, request):
+        """
+        Get the actions.
+        """
+        actions = super(SAMLProviderConfigAdmin, self).get_actions(request)
+        action_delete = {
+            'archive_provider_configuration': (
+                SAMLProviderConfigAdmin.archive_provider_configuration,
+                'archive_provider_configuration',
+                _('Delete the selected configuration')
+            )
+        }
+        actions.update(action_delete)
+        return actions
+
+    def name_with_update_link(self, instance):
+        """
+        Record name with link for the change view.
+        """
+        if not instance.is_active:
+            return instance.name
+
+        update_url = reverse('admin:{}_{}_add'.format(self.model._meta.app_label, self.model._meta.model_name))
+        update_url += '?source={}'.format(instance.pk)
+        return HTML(u'<a href="{}">{}</a>').format(update_url, instance.name)
+
+    name_with_update_link.allow_tags = True
+    name_with_update_link.short_description = u'Name'
 
     def has_data(self, inst):
         """ Do we have cached metadata for this SAML provider? """
@@ -91,7 +144,7 @@ class SAMLConfigurationAdmin(KeyedConfigurationModelAdmin):
     def get_list_display(self, request):
         """ Shorten the public/private keys in the change view """
         return (
-            'site', 'change_date', 'changed_by', 'enabled', 'entity_id',
+            'site', 'slug', 'change_date', 'changed_by', 'enabled', 'entity_id',
             'org_info_str', 'key_summary', 'edit_link',
         )
 
@@ -100,10 +153,10 @@ class SAMLConfigurationAdmin(KeyedConfigurationModelAdmin):
         public_key = inst.get_setting('SP_PUBLIC_CERT')
         private_key = inst.get_setting('SP_PRIVATE_KEY')
         if not public_key or not private_key:
-            return u'<em>Key pair incomplete/missing</em>'
+            return HTML(u'<em>Key pair incomplete/missing</em>')
         pub1, pub2 = public_key[0:10], public_key[-10:]
         priv1, priv2 = private_key[0:10], private_key[-10:]
-        return u'Public: {}…{}<br>Private: {}…{}'.format(pub1, pub2, priv1, priv2)
+        return HTML(u'Public: {}…{}<br>Private: {}…{}').format(pub1, pub2, priv1, priv2)
     key_summary.allow_tags = True
 
 admin.site.register(SAMLConfiguration, SAMLConfigurationAdmin)
@@ -116,8 +169,9 @@ class SAMLProviderDataAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         if obj:  # editing an existing object
-            return self.model._meta.get_all_field_names()  # pylint: disable=protected-access
+            return [field.name for field in self.model._meta.get_fields()]
         return self.readonly_fields
+
 
 admin.site.register(SAMLProviderData, SAMLProviderDataAdmin)
 
@@ -158,7 +212,7 @@ class ApiPermissionsAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ApiPermissionsAdminForm, self).__init__(*args, **kwargs)
         self.fields['provider_id'].choices = (
-            (provider.provider_id, "{} ({})".format(provider.name, provider.provider_id))
+            (provider.provider_id, u"{} ({})".format(provider.name, provider.provider_id))
             for provider in Registry.enabled()
         )
 

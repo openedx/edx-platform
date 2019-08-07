@@ -17,6 +17,7 @@
                 formType: 'password-reset',
 
                 requiredStr: '',
+                optionalStr: '',
 
                 submitButton: '.js-reset',
 
@@ -24,15 +25,6 @@
                     this.element.show($(this.el));
                     this.element.show($(this.el).parent());
                     this.listenTo(this.model, 'sync', this.saveSuccess);
-                },
-
-                toggleErrorMsg: function(show) {
-                    if (show) {
-                        this.setErrors();
-                        this.toggleDisableButton(false);
-                    } else {
-                        this.element.hide(this.$errors);
-                    }
                 },
 
                 saveSuccess: function() {

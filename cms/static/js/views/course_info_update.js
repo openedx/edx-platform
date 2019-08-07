@@ -1,12 +1,12 @@
 define(['codemirror',
-        'js/utils/modal',
-        'js/utils/date_utils',
-        'edx-ui-toolkit/js/utils/html-utils',
-        'js/views/course_info_helper',
-        'js/views/validation',
-        'js/models/course_update',
-        'common/js/components/views/feedback_prompt',
-        'common/js/components/views/feedback_notification'],
+    'js/utils/modal',
+    'js/utils/date_utils',
+    'edx-ui-toolkit/js/utils/html-utils',
+    'js/views/course_info_helper',
+    'js/views/validation',
+    'js/models/course_update',
+    'common/js/components/views/feedback_prompt',
+    'common/js/components/views/feedback_notification'],
     function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, ValidatingView, CourseUpdateModel,
              PromptView, NotificationView) {
         'use strict';
@@ -39,10 +39,9 @@ define(['codemirror',
                         try {
                             CourseInfoHelper.changeContentToPreview(
                                 update, 'content', self.options.base_asset_url);
-                            // push notification is always disabled for existing updates
                             HtmlUtils.append(
                                 updateList,
-                                HtmlUtils.HTML(self.template({updateModel: update, push_notification_enabled: false}))
+                                HtmlUtils.HTML(self.template({updateModel: update}))
                             );
                             DateUtils.setupDatePicker('date', self, index);
                             update.isValid();
@@ -132,8 +131,7 @@ define(['codemirror',
 
                 var $newForm = $(
                 this.template({
-                    updateModel: newModel,
-                    push_notification_enabled: this.options.push_notification_enabled
+                    updateModel: newModel
                 })
                 );
 
@@ -164,8 +162,7 @@ define(['codemirror',
                 targetModel.set({
                 // translate short-form date (for input) into long form date (for display)
                     date: $.datepicker.formatDate('MM d, yy', new Date(this.dateEntry(event).val())),
-                    content: this.$codeMirror.getValue(),
-                    push_notification_selected: this.push_notification_selected(event)
+                    content: this.$codeMirror.getValue()
                 });
             // push change to display, hide the editor, submit the change
                 var saving = new NotificationView.Mini({
@@ -184,9 +181,8 @@ define(['codemirror',
                 this.closeEditor(false);
 
                 analytics.track('Saved Course Update', {
-                    'course': course_location_analytics,
-                    'date': this.dateEntry(event).val(),
-                    'push_notification_selected': this.push_notification_selected(event)
+                    course: course_location_analytics,
+                    date: this.dateEntry(event).val()
                 });
             },
 
@@ -214,8 +210,7 @@ define(['codemirror',
             // translate long-form date (for viewing) into short-form date (for input)
                 if (targetModel.get('date') && targetModel.isValid()) {
                     $(this.dateEntry(event)).val($.datepicker.formatDate('mm/dd/yy', new Date(targetModel.get('date'))));
-                }
-                else {
+                } else {
                     $(this.dateEntry(event)).val('MM/DD/YY');
                 }
                 this.$codeMirror = CourseInfoHelper.editWithCodeMirror(
@@ -245,8 +240,8 @@ define(['codemirror',
                             text: gettext('OK'),
                             click: function() {
                                 analytics.track('Deleted Course Update', {
-                                    'course': course_location_analytics,
-                                    'date': self.dateEntry(event).val()
+                                    course: course_location_analytics,
+                                    date: self.dateEntry(event).val()
                                 });
                                 self.modelDom(event).remove();
                                 var deleting = new NotificationView.Mini({
@@ -304,12 +299,6 @@ define(['codemirror',
                     }
                     this.$currentPost.find('form').hide();
                     this.$currentPost.find('.CodeMirror').remove();
-
-                // hide the push notification checkbox for subsequent edits to the Post
-                    var push_notification_ele = this.$currentPost.find('.new-update-push-notification');
-                    if (push_notification_ele) {
-                        push_notification_ele.hide();
-                    }
                 }
 
                 ModalUtils.hideModalCover(this.$modalCover);
@@ -337,17 +326,6 @@ define(['codemirror',
                 var li = $(event.currentTarget).closest('li');
                 if (li) {
                     return $(li).find('.date').first();
-                }
-            },
-
-            push_notification_selected: function(event) {
-                var push_notification_checkbox;
-                var li = $(event.currentTarget).closest('li');
-                if (li) {
-                    push_notification_checkbox = li.find('.new-update-push-notification .toggle-checkbox');
-                    if (push_notification_checkbox) {
-                        return push_notification_checkbox.is(':checked');
-                    }
                 }
             }
         });

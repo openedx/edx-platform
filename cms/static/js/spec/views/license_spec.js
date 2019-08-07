@@ -51,7 +51,7 @@ define(['js/views/license', 'js/models/license', 'common/js/spec_helpers/templat
                          var ccBtn = this.view.$('li[data-license=creative-commons] button');
                          ccBtn.click();
                          expect(this.model.get('options')).toEqual(
-                {'ver': '4.0', 'BY': true, 'NC': true, 'ND': true, 'SA': false}
+                {ver: '4.0', BY: true, NC: true, ND: true, SA: false}
             );
                          var arrBtn = this.view.$('li[data-license=all-rights-reserved] button');
                          arrBtn.click();
@@ -59,7 +59,7 @@ define(['js/views/license', 'js/models/license', 'common/js/spec_helpers/templat
                      });
 
                      it('renders license options', function() {
-                         this.model.set({'type': 'creative-commons'});
+                         this.model.set({type: 'creative-commons'});
                          expect(this.view.$('ul.license-options li[data-option=BY]'))
                 .toContainText('Attribution');
                          expect(this.view.$('ul.license-options li[data-option=NC]'))
@@ -74,19 +74,19 @@ define(['js/views/license', 'js/models/license', 'common/js/spec_helpers/templat
                      it('toggles boolean options on click', function() {
                          this.view.$('li[data-license=creative-commons] button').click();
                          expect(this.model.get('options')).toEqual(
-                {'ver': '4.0', 'BY': true, 'NC': true, 'ND': true, 'SA': false}
+                {ver: '4.0', BY: true, NC: true, ND: true, SA: false}
             );
             // toggle NC option
                          this.view.$('li[data-option=NC]').click();
                          expect(this.model.get('options')).toEqual(
-                {'ver': '4.0', 'BY': true, 'NC': false, 'ND': true, 'SA': false}
+                {ver: '4.0', BY: true, NC: false, ND: true, SA: false}
             );
                      });
 
                      it("doesn't toggle disabled options", function() {
                          this.view.$('li[data-license=creative-commons] button').click();
                          expect(this.model.get('options')).toEqual(
-                {'ver': '4.0', 'BY': true, 'NC': true, 'ND': true, 'SA': false}
+                {ver: '4.0', BY: true, NC: true, ND: true, SA: false}
             );
                          var BY = this.view.$('li[data-option=BY]');
                          expect(BY).toHaveClass('is-disabled');
@@ -94,14 +94,14 @@ define(['js/views/license', 'js/models/license', 'common/js/spec_helpers/templat
                          BY.click();
             // no change
                          expect(this.model.get('options')).toEqual(
-                {'ver': '4.0', 'BY': true, 'NC': true, 'ND': true, 'SA': false}
+                {ver: '4.0', BY: true, NC: true, ND: true, SA: false}
             );
                      });
 
                      it("doesn't allow simultaneous conflicting options", function() {
                          this.view.$('li[data-license=creative-commons] button').click();
                          expect(this.model.get('options')).toEqual(
-                {'ver': '4.0', 'BY': true, 'NC': true, 'ND': true, 'SA': false}
+                {ver: '4.0', BY: true, NC: true, ND: true, SA: false}
             );
             // SA and ND conflict
                          var SA = this.view.$('li[data-option=SA]');
@@ -109,14 +109,14 @@ define(['js/views/license', 'js/models/license', 'common/js/spec_helpers/templat
                          SA.click();
             // ND should no longer be selected
                          expect(this.model.get('options')).toEqual(
-                {'ver': '4.0', 'BY': true, 'NC': true, 'ND': false, 'SA': true}
+                {ver: '4.0', BY: true, NC: true, ND: false, SA: true}
             );
 
             // try to turn on ND option
                          ND = this.view.$('li[data-option=ND]');
                          ND.click();
                          expect(this.model.get('options')).toEqual(
-                {'ver': '4.0', 'BY': true, 'NC': true, 'ND': true, 'SA': false}
+                {ver: '4.0', BY: true, NC: true, ND: true, SA: false}
             );
                      });
 

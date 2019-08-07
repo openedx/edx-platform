@@ -23,7 +23,7 @@ data: |
                 click the "Show Answer" button.
             </p>
             <p>
-                For more information, see <a href="http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/custom_python.html" target="_blank">
+                For more information, see <a href="https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/custom_python.html" target="_blank">
                 Write-Your-Own-Grader Problem</a> in <i>Building and Running an edX Course</i>.
             </p>
             <p>

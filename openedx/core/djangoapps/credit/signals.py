@@ -2,14 +2,15 @@
 This file contains receivers of course publication signals.
 """
 
+from __future__ import absolute_import
+
 import logging
 
+import six
 from django.dispatch import receiver
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
-from xmodule.modulestore.django import SignalHandler
 
-from openedx.core.djangoapps.credit.verification_access import update_verification_partitions
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_CHANGED
 
 log = logging.getLogger(__name__)
@@ -29,27 +30,8 @@ def on_course_publish(course_key):
     from openedx.core.djangoapps.credit import api, tasks
 
     if api.is_credit_course(course_key):
-        tasks.update_credit_course_requirements.delay(unicode(course_key))
+        tasks.update_credit_course_requirements.delay(six.text_type(course_key))
         log.info(u'Added task to update credit requirements for course "%s" to the task queue', course_key)
-
-
-@receiver(SignalHandler.pre_publish)
-def on_pre_publish(sender, course_key, **kwargs):  # pylint: disable=unused-argument
-    """
-    Create user partitions for verification checkpoints.
-
-    This is a pre-publish step since we need to write to the course descriptor.
-    """
-    from openedx.core.djangoapps.credit import api
-    if api.is_credit_course(course_key):
-        # For now, we are tagging content with in-course-reverification access groups
-        # only in credit courses on publish.  In the long run, this is not where we want to put this.
-        # This really should be a transformation on the course structure performed as a pre-processing
-        # step by the LMS, and the transformation should be owned by the verify_student app.
-        # Since none of that infrastructure currently exists, we're doing it this way instead.
-        log.info(u"Starting to update in-course reverification access rules")
-        update_verification_partitions(course_key)
-        log.info(u"Finished updating in-course reverification access rules")
 
 
 @receiver(COURSE_GRADE_CHANGED)
@@ -68,9 +50,9 @@ def listen_for_grade_calculation(sender, user, course_grade, course_key, deadlin
 
     """
     # This needs to be imported here to avoid a circular dependency
-    # that can cause syncdb to fail.
+    # that can cause migrations to fail.
     from openedx.core.djangoapps.credit import api
-    course_id = CourseKey.from_string(unicode(course_key))
+    course_id = CourseKey.from_string(six.text_type(course_key))
     is_credit = api.is_credit_course(course_id)
     if is_credit:
         requirements = api.get_credit_requirements(course_id, namespace='grade')

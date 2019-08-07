@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Tests for the wrapping layer that provides the XBlock API using XModule/Descriptor
 functionality
@@ -5,55 +6,59 @@ functionality
 # For tests, ignore access to protected members
 # pylint: disable=protected-access
 
-import webob
+from __future__ import absolute_import
+
+from unittest.case import SkipTest, TestCase
+
 import ddt
+import webob
 from factory import (
     BUILD_STRATEGY,
     Factory,
-    lazy_attribute,
     LazyAttributeSequence,
-    post_generation,
     SubFactory,
-    use_strategy,
+    lazy_attribute,
+    post_generation,
+    use_strategy
 )
 from fs.memoryfs import MemoryFS
 from lxml import etree
 from mock import Mock
-from unittest.case import SkipTest, TestCase
-
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from six.moves import range
+from xblock.core import XBlock
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
-from xblock.core import XBlock
 
-from opaque_keys.edx.locations import Location
-
-from xmodule.x_module import ModuleSystem, XModule, XModuleDescriptor, DescriptorSystem, STUDENT_VIEW, STUDIO_VIEW
 from xmodule.annotatable_module import AnnotatableDescriptor
-from xmodule.capa_module import CapaDescriptor
-from xmodule.course_module import CourseDescriptor
-from xmodule.html_module import HtmlDescriptor
-from xmodule.poll_module import PollDescriptor
-from xmodule.word_cloud_module import WordCloudDescriptor
-#from xmodule.video_module import VideoDescriptor
-from xmodule.seq_module import SequenceDescriptor
 from xmodule.conditional_module import ConditionalDescriptor
+from xmodule.course_module import CourseDescriptor
+from xmodule.html_module import HtmlBlock
+from xmodule.poll_module import PollDescriptor
 from xmodule.randomize_module import RandomizeDescriptor
-from xmodule.vertical_block import VerticalBlock
-from xmodule.wrapper_module import WrapperBlock
+from xmodule.seq_module import SequenceDescriptor
 from xmodule.tests import get_test_descriptor_system, get_test_system
-
+from xmodule.vertical_block import VerticalBlock
+from xmodule.word_cloud_module import WordCloudDescriptor
+from xmodule.wrapper_module import WrapperBlock
+from xmodule.x_module import (
+    PUBLIC_VIEW,
+    STUDENT_VIEW,
+    STUDIO_VIEW,
+    DescriptorSystem,
+    ModuleSystem,
+    XModule,
+    XModuleDescriptor
+)
 
 # A dictionary that maps specific XModuleDescriptor classes without children
 # to a list of sample field values to test with.
 # TODO: Add more types of sample data
 LEAF_XMODULES = {
     AnnotatableDescriptor: [{}],
-    CapaDescriptor: [{}],
-    HtmlDescriptor: [{}],
+    HtmlBlock: [{}],
     PollDescriptor: [{'display_name': 'Poll Display Name'}],
     WordCloudDescriptor: [{}],
-    # This is being excluded because it has dependencies on django
-    #VideoDescriptor,
 }
 
 
@@ -63,8 +68,8 @@ LEAF_XMODULES = {
 CONTAINER_XMODULES = {
     ConditionalDescriptor: [{}],
     CourseDescriptor: [{}],
-    RandomizeDescriptor: [{}],
-    SequenceDescriptor: [{}],
+    RandomizeDescriptor: [{'display_name': 'Test String Display'}],
+    SequenceDescriptor: [{'display_name': u'Test Unicode हिंदी Display'}],
     VerticalBlock: [{}],
     WrapperBlock: [{}],
 }
@@ -80,7 +85,8 @@ def flatten(class_dict):
     Flatten a dict from cls -> [fields, ...] and yields values of the form (cls, fields)
     for each entry in the dictionary value.
     """
-    for cls, fields_list in class_dict.items():
+    for cls in sorted(class_dict, key=lambda err: err.__name__):
+        fields_list = class_dict[cls]
         for fields in fields_list:
             yield (cls, fields)
 
@@ -130,7 +136,7 @@ class ContainerModuleRuntimeFactory(ModuleSystemFactory):
         """
         # pylint: disable=no-member
         if depth == 0:
-            self.get_module.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlDescriptor)
+            self.get_module.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlBlock)
         else:
             self.get_module.side_effect = lambda x: ContainerModuleFactory(
                 descriptor_cls=VerticalBlock,
@@ -158,7 +164,7 @@ class ContainerDescriptorRuntimeFactory(DescriptorSystemFactory):
         """
         # pylint: disable=no-member
         if depth == 0:
-            self.load_item.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlDescriptor)
+            self.load_item.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlBlock)
         else:
             self.load_item.side_effect = lambda x: ContainerModuleFactory(
                 descriptor_cls=VerticalBlock,
@@ -188,7 +194,7 @@ class LeafDescriptorFactory(Factory):
 
     @lazy_attribute
     def location(self):
-        return Location('org', 'course', 'run', 'category', self.url_name, None)
+        return BlockUsageLocator(CourseLocator('org', 'course', 'run'), 'category', self.url_name)
 
     @lazy_attribute
     def block_type(self):
@@ -241,7 +247,7 @@ class ContainerDescriptorFactory(LeafDescriptorFactory):
     Factory to generate XModuleDescriptors that are containers.
     """
     runtime = SubFactory(ContainerDescriptorRuntimeFactory)
-    children = range(3)
+    children = list(range(3))
 
 
 class ContainerModuleFactory(LeafModuleFactory):
@@ -321,6 +327,7 @@ class TestStudentView(XBlockWrapperTestMixin, TestCase):
     """
     This tests that student_view and XModule.get_html produce the same results.
     """
+
     def skip_if_invalid(self, descriptor_cls):
         pure_xblock_class = issubclass(descriptor_cls, XBlock) and not issubclass(descriptor_cls, XModuleDescriptor)
         if pure_xblock_class:
@@ -344,6 +351,7 @@ class TestStudioView(XBlockWrapperTestMixin, TestCase):
     """
     This tests that studio_view and XModuleDescriptor.get_html produce the same results
     """
+
     def skip_if_invalid(self, descriptor_cls):
         if descriptor_cls in NOT_STUDIO_EDITABLE:
             raise SkipTest(descriptor_cls.__name__ + " is not editable in studio")
@@ -363,6 +371,7 @@ class TestStudioView(XBlockWrapperTestMixin, TestCase):
         self.assertEqual(html, rendered_content)
 
 
+@ddt.ddt
 class TestXModuleHandler(TestCase):
     """
     Tests that the xmodule_handler function correctly wraps handle_ajax
@@ -387,11 +396,27 @@ class TestXModuleHandler(TestCase):
         self.assertIsInstance(response, webob.Response)
         self.assertEqual(response.body, '{}')
 
+    @ddt.data(
+        u'{"test_key": "test_value"}',
+        '{"test_key": "test_value"}',
+    )
+    def test_xmodule_handler_with_data(self, response_data):
+        """
+        Tests that xmodule_handler function correctly wraps handle_ajax when handle_ajax response is either
+        str or unicode.
+        """
+
+        self.module.handle_ajax = Mock(return_value=response_data)
+        response = self.module.xmodule_handler(self.request)
+        self.assertIsInstance(response, webob.Response)
+        self.assertEqual(response.body, '{"test_key": "test_value"}')
+
 
 class TestXmlExport(XBlockWrapperTestMixin, TestCase):
     """
     This tests that XModuleDescriptor.export_course_to_xml and add_xml_to_node produce the same results.
     """
+
     def skip_if_invalid(self, descriptor_cls):
         if descriptor_cls.add_xml_to_node != XModuleDescriptor.add_xml_to_node:
             raise SkipTest(descriptor_cls.__name__ + " implements add_xml_to_node")
@@ -408,3 +433,33 @@ class TestXmlExport(XBlockWrapperTestMixin, TestCase):
 
         self.assertEquals(list(xmodule_api_fs.walk()), list(xblock_api_fs.walk()))
         self.assertEquals(etree.tostring(xmodule_node), etree.tostring(xblock_node))
+
+
+class TestPublicView(XBlockWrapperTestMixin, TestCase):
+    """
+    This tests that default public_view shows the correct message.
+    """
+
+    def skip_if_invalid(self, descriptor_cls):
+        pure_xblock_class = issubclass(descriptor_cls, XBlock) and not issubclass(descriptor_cls, XModuleDescriptor)
+        if pure_xblock_class:
+            public_view = descriptor_cls.public_view
+        else:
+            public_view = descriptor_cls.module_class.public_view
+        if public_view != XModule.public_view:
+            raise SkipTest(descriptor_cls.__name__ + " implements public_view")
+
+    def check_property(self, descriptor):
+        """
+        Assert that public_view contains correct message.
+        """
+        if descriptor.display_name:
+            self.assertIn(
+                descriptor.display_name,
+                descriptor.render(PUBLIC_VIEW).content
+            )
+        else:
+            self.assertIn(
+                "This content is only accessible",
+                descriptor.render(PUBLIC_VIEW).content
+            )

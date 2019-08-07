@@ -2,51 +2,65 @@
 """
 Tests for course access
 """
+from __future__ import absolute_import
+
+import datetime
 import itertools
 
 import ddt
-from django.conf import settings
-from django.test.utils import override_settings
-from django.core.urlresolvers import reverse
-from django.test.client import RequestFactory
 import mock
-from nose.plugins.attrib import attr
+import pytz
+import six
+from crum import set_current_request
+from django.conf import settings
+from django.test.client import RequestFactory
+from django.test.utils import override_settings
+from django.urls import reverse
+from opaque_keys.edx.keys import CourseKey
+from six import text_type
+from six.moves import range
 
 from courseware.courses import (
+    course_open_for_self_enrollment,
     get_cms_block_link,
     get_cms_course_link,
-    get_courses,
     get_course_about_section,
     get_course_by_id,
+    get_course_chapter_ids,
     get_course_info_section,
     get_course_overview_with_access,
     get_course_with_access,
+    get_courses,
+    get_current_child
 )
-from courseware.module_render import get_module_for_descriptor
 from courseware.model_data import FieldDataCache
+from courseware.module_render import get_module_for_descriptor
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.courses import course_image_url
 from student.tests.factories import UserFactory
-from xmodule.modulestore.django import _get_modulestore_branch_setting, modulestore
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.xml_importer import import_course_from_xml
+from xmodule.modulestore.django import _get_modulestore_branch_setting, modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import (
-    CourseFactory, ItemFactory, check_mongo_calls
-)
-from xmodule.tests.xml import factories as xml
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.tests.xml import XModuleXmlImportTest
-
+from xmodule.tests.xml import factories as xml
 
 CMS_BASE_TEST = 'testcms'
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
-@attr(shard=1)
 @ddt.ddt
 class CoursesTest(ModuleStoreTestCase):
     """Test methods related to fetching courses."""
+    ENABLED_SIGNALS = ['course_published']
+    GET_COURSE_WITH_ACCESS = 'get_course_with_access'
+    GET_COURSE_OVERVIEW_WITH_ACCESS = 'get_course_overview_with_access'
+    COURSE_ACCESS_FUNCS = {
+        GET_COURSE_WITH_ACCESS: get_course_with_access,
+        GET_COURSE_OVERVIEW_WITH_ACCESS: get_course_overview_with_access,
+    }
 
     @override_settings(CMS_BASE=CMS_BASE_TEST)
     def test_get_cms_course_block_link(self):
@@ -57,28 +71,30 @@ class CoursesTest(ModuleStoreTestCase):
             org='org', number='num', display_name='name'
         )
 
-        cms_url = u"//{}/course/{}".format(CMS_BASE_TEST, unicode(self.course.id))
+        cms_url = u"//{}/course/{}".format(CMS_BASE_TEST, six.text_type(self.course.id))
         self.assertEqual(cms_url, get_cms_course_link(self.course))
-        cms_url = u"//{}/course/{}".format(CMS_BASE_TEST, unicode(self.course.location))
+        cms_url = u"//{}/course/{}".format(CMS_BASE_TEST, six.text_type(self.course.location))
         self.assertEqual(cms_url, get_cms_block_link(self.course, 'course'))
 
-    @ddt.data(get_course_with_access, get_course_overview_with_access)
-    def test_get_course_func_with_access_error(self, course_access_func):
+    @ddt.data(GET_COURSE_WITH_ACCESS, GET_COURSE_OVERVIEW_WITH_ACCESS)
+    def test_get_course_func_with_access_error(self, course_access_func_name):
+        course_access_func = self.COURSE_ACCESS_FUNCS[course_access_func_name]
         user = UserFactory.create()
         course = CourseFactory.create(visible_to_staff_only=True)
 
         with self.assertRaises(CoursewareAccessException) as error:
             course_access_func(user, 'load', course.id)
-        self.assertEqual(error.exception.message, "Course not found.")
+        self.assertEqual(text_type(error.exception), "Course not found.")
         self.assertEqual(error.exception.access_response.error_code, "not_visible_to_user")
         self.assertFalse(error.exception.access_response.has_access)
 
     @ddt.data(
-        (get_course_with_access, 1),
-        (get_course_overview_with_access, 0),
+        (GET_COURSE_WITH_ACCESS, 1),
+        (GET_COURSE_OVERVIEW_WITH_ACCESS, 0),
     )
     @ddt.unpack
-    def test_get_course_func_with_access(self, course_access_func, num_mongo_calls):
+    def test_get_course_func_with_access(self, course_access_func_name, num_mongo_calls):
+        course_access_func = self.COURSE_ACCESS_FUNCS[course_access_func_name]
         user = UserFactory.create()
         course = CourseFactory.create(emit_signals=True)
         with check_mongo_calls(num_mongo_calls):
@@ -127,7 +143,7 @@ class CoursesTest(ModuleStoreTestCase):
 
             # Request filtering for an org distinct from the designated org.
             no_courses = get_courses(user, org=primary)
-            self.assertEqual(no_courses, [])
+            self.assertEqual(list(no_courses), [])
 
             # Request filtering for an org matching the designated org.
             site_courses = get_courses(user, org=alternate)
@@ -140,8 +156,9 @@ class CoursesTest(ModuleStoreTestCase):
         Verify that filtering performs as expected.
         """
         user = UserFactory.create()
-        non_mobile_course = CourseFactory.create(emit_signals=True)
-        mobile_course = CourseFactory.create(mobile_available=True, emit_signals=True)
+        mobile_course = CourseFactory.create(emit_signals=True)
+        non_mobile_course =\
+            CourseFactory.create(mobile_available=False, emit_signals=True)
 
         test_cases = (
             (None, {non_mobile_course.id, mobile_course.id}),
@@ -156,11 +173,27 @@ class CoursesTest(ModuleStoreTestCase):
                     get_courses(user, filter_=filter_)
                 },
                 expected_courses,
-                "testing get_courses with filter_={}".format(filter_),
+                u"testing get_courses with filter_={}".format(filter_),
             )
 
+    def test_get_current_child(self):
+        mock_xmodule = mock.MagicMock()
+        self.assertIsNone(get_current_child(mock_xmodule))
 
-@attr(shard=1)
+        mock_xmodule.position = -1
+        mock_xmodule.get_display_items.return_value = ['one', 'two', 'three']
+        self.assertEqual(get_current_child(mock_xmodule), 'one')
+
+        mock_xmodule.position = 2
+        self.assertEqual(get_current_child(mock_xmodule), 'two')
+        self.assertEqual(get_current_child(mock_xmodule, requested_child='first'), 'one')
+        self.assertEqual(get_current_child(mock_xmodule, requested_child='last'), 'three')
+
+        mock_xmodule.position = 3
+        mock_xmodule.get_display_items.return_value = []
+        self.assertIsNone(get_current_child(mock_xmodule))
+
+
 class ModuleStoreBranchSettingTest(ModuleStoreTestCase):
     """Test methods related to the modulestore branch setting."""
     @mock.patch(
@@ -186,7 +219,6 @@ class ModuleStoreBranchSettingTest(ModuleStoreTestCase):
         self.assertEqual(_get_modulestore_branch_setting(), 'fake_default_branch')
 
 
-@attr(shard=1)
 @override_settings(CMS_BASE=CMS_BASE_TEST)
 class MongoCourseImageTestCase(ModuleStoreTestCase):
     """Tests for course image URLs when using a mongo modulestore."""
@@ -242,7 +274,6 @@ class MongoCourseImageTestCase(ModuleStoreTestCase):
         )
 
 
-@attr(shard=1)
 class XmlCourseImageTestCase(XModuleXmlImportTest):
     """Tests for course image URLs when using an xml modulestore."""
 
@@ -260,7 +291,6 @@ class XmlCourseImageTestCase(XModuleXmlImportTest):
         self.assertEquals(course_image_url(course), u'/static/xml_test_course/before after.jpg')
 
 
-@attr(shard=1)
 class CoursesRenderTest(ModuleStoreTestCase):
     """Test methods related to rendering courses content."""
 
@@ -276,6 +306,7 @@ class CoursesRenderTest(ModuleStoreTestCase):
         course_items = import_course_from_xml(store, self.user.id, TEST_DATA_DIR, ['toy'])
         course_key = course_items[0].id
         self.course = get_course_by_id(course_key)
+        self.addCleanup(set_current_request, None)
         self.request = get_mock_request(UserFactory.create())
 
     def test_get_course_info_section_render(self):
@@ -306,7 +337,52 @@ class CoursesRenderTest(ModuleStoreTestCase):
             self.assertIn("this module is temporarily unavailable", course_about)
 
 
-@attr(shard=1)
+class CourseEnrollmentOpenTests(ModuleStoreTestCase):
+    def setUp(self):
+        super(CourseEnrollmentOpenTests, self).setUp()
+        self.now = datetime.datetime.now().replace(tzinfo=pytz.UTC)
+
+    def test_course_enrollment_open(self):
+        start = self.now - datetime.timedelta(days=1)
+        end = self.now + datetime.timedelta(days=1)
+        course = CourseFactory(enrollment_start=start, enrollment_end=end)
+        self.assertTrue(course_open_for_self_enrollment(course.id))
+
+    def test_course_enrollment_closed_future(self):
+        start = self.now + datetime.timedelta(days=1)
+        end = self.now + datetime.timedelta(days=2)
+        course = CourseFactory(enrollment_start=start, enrollment_end=end)
+        self.assertFalse(course_open_for_self_enrollment(course.id))
+
+    def test_course_enrollment_closed_past(self):
+        start = self.now - datetime.timedelta(days=2)
+        end = self.now - datetime.timedelta(days=1)
+        course = CourseFactory(enrollment_start=start, enrollment_end=end)
+        self.assertFalse(course_open_for_self_enrollment(course.id))
+
+    def test_course_enrollment_dates_missing(self):
+        course = CourseFactory()
+        self.assertTrue(course_open_for_self_enrollment(course.id))
+
+    def test_course_enrollment_dates_missing_start(self):
+        end = self.now + datetime.timedelta(days=1)
+        course = CourseFactory(enrollment_end=end)
+        self.assertTrue(course_open_for_self_enrollment(course.id))
+
+        end = self.now - datetime.timedelta(days=1)
+        course = CourseFactory(enrollment_end=end)
+        self.assertFalse(course_open_for_self_enrollment(course.id))
+
+    def test_course_enrollment_dates_missing_end(self):
+        start = self.now - datetime.timedelta(days=1)
+        course = CourseFactory(enrollment_start=start)
+        self.assertTrue(course_open_for_self_enrollment(course.id))
+
+        start = self.now + datetime.timedelta(days=1)
+        course = CourseFactory(enrollment_start=start)
+        self.assertFalse(course_open_for_self_enrollment(course.id))
+
+
 @ddt.ddt
 class CourseInstantiationTests(ModuleStoreTestCase):
     """
@@ -317,7 +393,7 @@ class CourseInstantiationTests(ModuleStoreTestCase):
 
         self.factory = RequestFactory()
 
-    @ddt.data(*itertools.product(xrange(5), [ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split], [None, 0, 5]))
+    @ddt.data(*itertools.product(range(5), [ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split], [None, 0, 5]))
     @ddt.unpack
     def test_repeated_course_module_instantiation(self, loops, default_store, course_depth):
 
@@ -328,12 +404,12 @@ class CourseInstantiationTests(ModuleStoreTestCase):
             __ = ItemFactory(parent=section, category='problem')
 
         fake_request = self.factory.get(
-            reverse('progress', kwargs={'course_id': unicode(course.id)})
+            reverse('progress', kwargs={'course_id': six.text_type(course.id)})
         )
 
         course = modulestore().get_course(course.id, depth=course_depth)
 
-        for _ in xrange(loops):
+        for _ in range(loops):
             field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
                 course.id, self.user, course, depth=course_depth
             )
@@ -349,3 +425,32 @@ class CourseInstantiationTests(ModuleStoreTestCase):
                 for section in chapter.get_children():
                     for item in section.get_children():
                         self.assertTrue(item.graded)
+
+
+class TestGetCourseChapters(ModuleStoreTestCase):
+    """
+    Tests for the `get_course_chapter_ids` function.
+    """
+
+    def test_get_non_existant_course(self):
+        """
+        Test non-existant course returns empty list.
+        """
+        self.assertEqual(get_course_chapter_ids(None), [])
+        # build a fake key
+        fake_course_key = CourseKey.from_string('course-v1:FakeOrg+CN1+CR-FALLNEVER1')
+        self.assertEqual(get_course_chapter_ids(fake_course_key), [])
+
+    def test_get_chapters(self):
+        """
+        Test get_course_chapter_ids returns expected result.
+        """
+        course = CourseFactory()
+        ItemFactory(parent=course, category='chapter')
+        ItemFactory(parent=course, category='chapter')
+        course_chapter_ids = get_course_chapter_ids(course.location.course_key)
+        self.assertEqual(len(course_chapter_ids), 2)
+        self.assertEqual(
+            course_chapter_ids,
+            [six.text_type(child) for child in course.children]
+        )

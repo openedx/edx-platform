@@ -36,21 +36,27 @@
             NewPostView.prototype.initialize = function(options) {
                 var _ref;
                 this.mode = options.mode || 'inline';
+                this.startHeader = options.startHeader;
                 if ((_ref = this.mode) !== 'tab' && _ref !== 'inline') {
                     throw new Error('invalid mode: ' + this.mode);
                 }
                 this.course_settings = options.course_settings;
-                this.is_commentable_cohorted = options.is_commentable_cohorted;
+                this.is_commentable_divided = options.is_commentable_divided;
+                this.user_group_id = options.user_group_id;
                 this.topicId = options.topicId;
+                this.discussionBoardView = options.discussionBoardView;
             };
 
             NewPostView.prototype.render = function() {
-                var context, threadTypeTemplate;
+                var context,
+                    threadTypeTemplate;
                 context = _.clone(this.course_settings.attributes);
                 _.extend(context, {
-                    cohort_options: this.getCohortOptions(),
-                    is_commentable_cohorted: this.is_commentable_cohorted,
+                    group_options: this.getGroupOptions(),
+                    is_commentable_divided: this.is_commentable_divided,
+                    is_discussion_division_enabled: this.course_settings.get('is_discussion_division_enabled'),
                     mode: this.mode,
+                    startHeader: this.startHeader,
                     form_id: this.mode + (this.topicId ? '-' + this.topicId : '')
                 });
                 this.$el.html(_.template($('#new-post-template').html())(context));
@@ -64,10 +70,17 @@
                 if (this.isTabMode()) {
                     this.topicView = new DiscussionTopicMenuView({
                         topicId: this.topicId,
-                        course_settings: this.course_settings
+                        course_settings: this.course_settings,
+                        group_name: this.getGroupName()
                     });
                     this.topicView.on('thread:topic_change', this.toggleGroupDropdown);
+                    if (this.course_settings.get('is_discussion_division_enabled')) {
+                        this.topicView.on('thread:topic_change', this.updateVisibilityMessage);
+                    }
                     this.addField(this.topicView.render());
+                } else {
+                    this.group_name = this.getGroupName();
+                    this.updateVisibilityMessage(null, this.is_commentable_divided);
                 }
                 return DiscussionUtil.makeWmdEditor(this.$el, $.proxy(this.$, this), 'js-post-body');
             };
@@ -80,20 +93,40 @@
                 return this.mode === 'tab';
             };
 
-            NewPostView.prototype.getCohortOptions = function() {
-                var userCohortId;
-                if (this.course_settings.get('is_cohorted') && DiscussionUtil.isPrivilegedUser()) {
-                    userCohortId = $('#discussion-container').data('user-cohort-id');
-                    return _.map(this.course_settings.get('cohorts'), function(cohort) {
+            NewPostView.prototype.getGroupOptions = function() {
+                var userGroupId;
+                if (this.course_settings.get('is_discussion_division_enabled') && DiscussionUtil.isPrivilegedUser()) {
+                    userGroupId = $('#discussion-container').data('user-group-id');
+                    return _.map(this.course_settings.get('groups'), function(group) {
                         return {
-                            value: cohort.id,
-                            text: cohort.name,
-                            selected: cohort.id === userCohortId
+                            value: group.id,
+                            text: group.name,
+                            selected: group.id === userGroupId
                         };
                     });
                 } else {
                     return null;
                 }
+            };
+
+            NewPostView.prototype.getGroupName = function() {
+                var userGroupId;
+                var group;
+                var groupName = null;
+                if (this.course_settings.get('is_discussion_division_enabled')) {
+                    userGroupId = $('#discussion-container').data('user-group-id');
+                    if (!userGroupId) {
+                        userGroupId = this.user_group_id;
+                    }
+                    group = this.course_settings.get('groups').find(function(courseSettingsGroup) {
+                        return courseSettingsGroup.id === String(userGroupId);
+                    });
+                    if (group) {
+                        groupName = group.name;
+                    }
+                }
+
+                return groupName;
             };
 
             NewPostView.prototype.events = {
@@ -102,19 +135,35 @@
                 },
                 'submit .forum-new-post-form': 'createPost',
                 'change .post-option-input': 'postOptionChange',
+                'change .js-group-select': 'groupOptionChange',
                 'click .cancel': 'cancel',
                 'click  .add-post-cancel': 'cancel',
-                'reset .forum-new-post-form': 'updateStyles'
+                'reset .forum-new-post-form': 'updateStyles',
+                'keydown .wmd-button': function(event) {
+                    return DiscussionUtil.handleKeypressInToolbar(event);
+                }
             };
 
             NewPostView.prototype.toggleGroupDropdown = function($target) {
-                if ($target.data('cohorted')) {
+                if ($target.data('divided')) {
                     $('.js-group-select').prop('disabled', false);
+                    $('.js-group-select').val('').prop('selected', true);
                     return $('.group-selector-wrapper').removeClass('disabled');
                 } else {
                     $('.js-group-select').val('').prop('disabled', true);
                     return $('.group-selector-wrapper').addClass('disabled');
                 }
+            };
+
+            NewPostView.prototype.updateVisibilityMessage = function($target, forceDivided) {
+                var $visEl = $('#wrapper-visibility-message');
+                var visTemplate = edx.HtmlUtils.template($('#new-post-visibility-template').html());
+                var groupName = null;
+                if (($target && $target.data('divided')) || forceDivided) {
+                    groupName = this.group_name;
+                }
+
+                edx.HtmlUtils.setHtml($visEl, visTemplate({group_name: groupName}));
             };
 
             NewPostView.prototype.postOptionChange = function(event) {
@@ -132,13 +181,13 @@
                 var anonymous, anonymousToPeers, body, follow, group, threadType, title, topicId, url,
                     self = this;
                 event.preventDefault();
-                threadType = this.$('.post-type-input:checked').val();
+                threadType = this.$('.input-radio:checked').val();
                 title = this.$('.js-post-title').val();
                 body = this.$('.js-post-body').find('.wmd-input').val();
                 group = this.$('.js-group-select option:selected').attr('value');
-                anonymous = false || this.$('.js-anon').is(':checked');
-                anonymousToPeers = false || this.$('.js-anon-peers').is(':checked');
-                follow = false || this.$('.js-follow').is(':checked');
+                anonymous = false || this.$('input[name=anonymous]').is(':checked');
+                anonymousToPeers = false || this.$('input[name=anonymous_to_peers]').is(':checked');
+                follow = false || this.$('input[name=follow]').is(':checked');
                 topicId = this.isTabMode() ? this.topicView.getCurrentTopicId() : this.topicId;
                 url = DiscussionUtil.urlFor('create_thread', topicId);
                 return DiscussionUtil.safeAjax({
@@ -158,8 +207,17 @@
                     },
                     error: DiscussionUtil.formErrorHandler(this.$('.post-errors')),
                     success: function(response) {
-                        var thread;
+                        var thread, discussionBreadcrumbsModel;
                         thread = new Thread(response.content);
+                        // Update the breadcrumbs and discussion Id(s) related to current topic
+                        if (self.discussionBoardView) {
+                            discussionBreadcrumbsModel = self.discussionBoardView.breadcrumbs.model;
+                            if (discussionBreadcrumbsModel.get('contents').length) {
+                                discussionBreadcrumbsModel.set('contents', self.topicView.topicText.split('/'));
+                            }
+                            self.discussionBoardView.discussionThreadListView.discussionIds =
+                                self.topicView.currentTopicId;
+                        }
                         self.$el.addClass('is-hidden');
                         self.resetForm();
                         self.trigger('newPost:createPost');
@@ -186,11 +244,13 @@
             };
 
             NewPostView.prototype.resetForm = function() {
+                var $general;
                 this.$('.forum-new-post-form')[0].reset();
                 DiscussionUtil.clearFormErrors(this.$('.post-errors'));
-                this.$('.wmd-preview p').html('');
+                this.$('.wmd-preview').html('');
                 if (this.isTabMode()) {
-                    this.topicView.setTopic(this.$('button.topic-title').first());
+                    $general = this.$('.post-topic option:contains(General)');
+                    this.topicView.setTopic($general || this.$('button.topic-title').first());
                 }
             };
 
@@ -199,7 +259,15 @@
                 return setTimeout(function() { return self.$('.post-option-input').trigger('change'); }, 1);
             };
 
+            NewPostView.prototype.groupOptionChange = function(event) {
+                var $target = $(event.target),
+                    data = $target.data();
+                this.group_name = this.$('.js-group-select option:selected').text();
+                data.divided = true;
+                this.updateVisibilityMessage($target);
+            };
+
             return NewPostView;
-        })(Backbone.View);
+        }(Backbone.View));
     }
 }).call(window);

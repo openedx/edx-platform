@@ -1,0 +1,8 @@
+{% autoescape off %}
+{% load i18n %}
+{% if course_ids|length > 1 %}
+{% blocktrans %}Keep learning on {{ platform_name }}{% endblocktrans %}
+{% else %}
+{% blocktrans %}Keep learning in {{course_name}}{% endblocktrans %}
+{% endif %}
+{% endautoescape %}

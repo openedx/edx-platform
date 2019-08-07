@@ -38,8 +38,11 @@ graded status as'status'
 # makes sense, but a bunch of problems have markup that assumes block.  Bigger TODO: figure out a
 # general css and layout strategy for capa, document it, then implement it.
 
+from __future__ import absolute_import
+
 import json
 import logging
+import re
 import shlex  # for splitting quoted strings
 import sys
 import time
@@ -48,15 +51,17 @@ from datetime import datetime
 import bleach
 import html5lib
 import pyparsing
-import re
+import six
 from calc.preview import latex_preview
-from chem import chemcalc
 from lxml import etree
-from openedx.core.djangolib.markup import HTML, Text
+from six import text_type
 
-import xqueue_interface
-from xmodule.stringify import stringify_children
 from capa.xqueue_interface import XQUEUE_TIMEOUT
+from chem import chemcalc
+from openedx.core.djangolib.markup import HTML, Text
+from xmodule.stringify import stringify_children
+
+from . import xqueue_interface
 from .registry import TagRegistry
 from .util import sanitize_html
 
@@ -80,7 +85,7 @@ class Status(object):
     }
     __slots__ = ('classname', '_status', 'display_name', 'display_tooltip')
 
-    def __init__(self, status, gettext_func=unicode):
+    def __init__(self, status, gettext_func=six.text_type):
         self.classname = self.css_classes.get(status, status)
         _ = gettext_func
         names = {
@@ -90,6 +95,7 @@ class Status(object):
             'incomplete': _('incomplete'),
             'unanswered': _('unanswered'),
             'unsubmitted': _('unanswered'),
+            'submitted': _('submitted'),
             'queued': _('processing'),
         }
         tooltips = {
@@ -104,7 +110,7 @@ class Status(object):
                 ['incomplete', 'unanswered', 'unsubmitted'], _('Not yet answered.')
             )
         )
-        self.display_name = names.get(status, unicode(status))
+        self.display_name = names.get(status, six.text_type(status))
         self.display_tooltip = tooltips.get(status, u'')
         self._status = status or ''
 
@@ -197,7 +203,7 @@ class InputTypeBase(object):
                                     (what the student entered last time)
                       * 'id' -- the id of this input, typically
                                 "{problem-location}_{response-num}_{input-num}"
-                      * 'status' (answered, unanswered, unsubmitted)
+                      * 'status' (submitted, unanswered, unsubmitted)
                       * 'input_state' -- dictionary containing any inputtype-specific state
                                         that has been preserved
                       * 'feedback' (dictionary containing keys for hints, errors, or other
@@ -249,8 +255,8 @@ class InputTypeBase(object):
         except Exception as err:
             # Something went wrong: add xml to message, but keep the traceback
             msg = u"Error in xml '{x}': {err} ".format(
-                x=etree.tostring(xml), err=err.message)
-            raise Exception, msg, sys.exc_info()[2]
+                x=etree.tostring(xml), err=text_type(err))
+            six.reraise(Exception, msg, sys.exc_info()[2])
 
     @classmethod
     def get_attributes(cls):
@@ -328,17 +334,24 @@ class InputTypeBase(object):
         }
 
         # Generate the list of ids to be used with the aria-describedby field.
+        descriptions = list()
+
+        # If there is trailing text, add the id as the first element to the list before adding the status id
+        if 'trailing_text' in self.loaded_attributes and self.loaded_attributes['trailing_text']:
+            trailing_text_id = 'trailing_text_' + self.input_id
+            descriptions.append(trailing_text_id)
+
         # Every list should contain the status id
         status_id = 'status_' + self.input_id
-        descriptions = list([status_id])
-        descriptions.extend(self.response_data.get('descriptions', {}).keys())
+        descriptions.append(status_id)
+        descriptions.extend(list(self.response_data.get('descriptions', {}).keys()))
         description_ids = ' '.join(descriptions)
         context.update(
             {'describedby_html': HTML('aria-describedby="{}"').format(description_ids)}
         )
 
         context.update(
-            (a, v) for (a, v) in self.loaded_attributes.iteritems() if a in self.to_render
+            (a, v) for (a, v) in six.iteritems(self.loaded_attributes) if a in self.to_render
         )
         context.update(self._extra_context())
         if self.answervariable:
@@ -508,12 +521,14 @@ class ChoiceGroup(InputTypeBase):
                 'name_array_suffix': self.suffix}
 
     @staticmethod
-    def extract_choices(element, i18n):
+    def extract_choices(element, i18n, text_only=False):
         """
         Extracts choices for a few input types, such as ChoiceGroup, RadioGroup and
         CheckboxGroup.
 
         returns list of (choice_name, choice_text) tuples
+
+        By default it will return any XML tag in the choice (e.g. <choicehint>) unless text_only=True is passed.
 
         TODO: allow order of choices to be randomized, following lon-capa spec.  Use
         "location" attribute, ie random, top, bottom.
@@ -524,7 +539,11 @@ class ChoiceGroup(InputTypeBase):
 
         for choice in element:
             if choice.tag == 'choice':
-                choices.append((choice.get("name"), stringify_children(choice)))
+                if not text_only:
+                    text = stringify_children(choice)
+                else:
+                    text = choice.text
+                choices.append((choice.get("name"), text))
             else:
                 if choice.tag != 'compoundhint':
                     msg = Text('[capa.inputtypes.extract_choices] {error_message}').format(
@@ -538,7 +557,7 @@ class ChoiceGroup(InputTypeBase):
         return choices
 
     def get_user_visible_answer(self, internal_answer):
-        if isinstance(internal_answer, basestring):
+        if isinstance(internal_answer, six.string_types):
             return self._choices_map[internal_answer]
 
         return [self._choices_map[i] for i in internal_answer]
@@ -673,7 +692,7 @@ class TextLine(InputTypeBase):
                 'class_name': self.loaded_attributes['preprocessorClassName'],
                 'script_src': self.loaded_attributes['preprocessorSrc'],
             }
-            if None in self.preprocessor.values():
+            if None in list(self.preprocessor.values()):
                 self.preprocessor = None
 
     def _extra_context(self):
@@ -1578,7 +1597,7 @@ class AnnotationInput(InputTypeBase):
             d = {}
 
         comment_value = d.get('comment', '')
-        if not isinstance(comment_value, basestring):
+        if not isinstance(comment_value, six.string_types):
             comment_value = ''
 
         options_value = d.get('options', [])
@@ -1774,6 +1793,7 @@ class ChoiceTextGroup(InputTypeBase):
                 msg = Text("[capa.inputtypes.extract_choices] {0}").format(
                     # Translators: a "tag" is an XML element, such as "<b>" in HTML
                     Text(_("Expected a {expected_tag} tag; got {given_tag} instead")).format(
+                        # xss-lint: disable=python-wrap-html
                         expected_tag="<choice>",
                         given_tag=choice.tag,
                     )

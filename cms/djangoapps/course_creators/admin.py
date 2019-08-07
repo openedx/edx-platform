@@ -2,17 +2,19 @@
 django admin page for the course creators table
 """
 
-from course_creators.models import CourseCreator, update_creator_state, send_user_notification, send_admin_notification
-from course_creators.views import update_course_creator_group
-
-from ratelimitbackend import admin
-from django.conf import settings
-from django.dispatch import receiver
-from edxmako.shortcuts import render_to_string
-from django.core.mail import send_mail
-from smtplib import SMTPException
+from __future__ import absolute_import
 
 import logging
+from smtplib import SMTPException
+
+from django.conf import settings
+from django.contrib import admin
+from django.core.mail import send_mail
+from django.dispatch import receiver
+
+from course_creators.models import CourseCreator, send_admin_notification, send_user_notification, update_creator_state
+from course_creators.views import update_course_creator_group
+from edxmako.shortcuts import render_to_string
 
 log = logging.getLogger("studio.coursecreatoradmin")
 
@@ -108,7 +110,7 @@ def send_user_notification_callback(sender, **kwargs):
     try:
         user.email_user(subject, message, studio_request_email)
     except:
-        log.warning("Unable to send course creator status e-mail to %s", user.email)
+        log.warning(u"Unable to send course creator status e-mail to %s", user.email)
 
 
 @receiver(send_admin_notification, sender=CourseCreator)
@@ -134,4 +136,4 @@ def send_admin_notification_callback(sender, **kwargs):
             fail_silently=False
         )
     except SMTPException:
-        log.warning("Failure sending 'pending state' e-mail for %s to %s", user.email, studio_request_email)
+        log.warning(u"Failure sending 'pending state' e-mail for %s to %s", user.email, studio_request_email)

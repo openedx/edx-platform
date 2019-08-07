@@ -2,7 +2,10 @@
 Tests for string_utils.py
 """
 
+from __future__ import absolute_import
+
 from django.test import TestCase
+
 from util.string_utils import str_to_bool
 
 

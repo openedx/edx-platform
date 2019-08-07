@@ -5,19 +5,19 @@ but these are specific to the new storage model with multiple
 backend tables.
 """
 
+from __future__ import absolute_import
+
 import json
-from mock import patch
-from django.test import TestCase
-from django.conf import settings
 from unittest import skipUnless
-from nose.plugins.attrib import attr
 
-from courseware.models import BaseStudentModuleHistory, StudentModuleHistory, StudentModule
+from django.conf import settings
+from django.test import TestCase
+from mock import patch
 
-from courseware.tests.factories import StudentModuleFactory, location, course_id
+from courseware.models import BaseStudentModuleHistory, StudentModule, StudentModuleHistory
+from courseware.tests.factories import StudentModuleFactory, course_id, location
 
 
-@attr(shard=1)
 @skipUnless(settings.FEATURES["ENABLE_CSMH_EXTENDED"], "CSMH Extended needs to be enabled")
 class TestStudentModuleHistoryBackends(TestCase):
     """ Tests of data in CSMH and CSMHE """

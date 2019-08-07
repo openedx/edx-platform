@@ -1,25 +1,26 @@
 """
-Test grading event across apps.
+Test grading events across apps.
 """
-# pylint: disable=protected-access
+
+from __future__ import absolute_import
+
+import six
+from crum import set_current_request
+from mock import call as mock_call
+from mock import patch
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from lms.djangoapps.instructor.enrollment import reset_student_attempts
 from lms.djangoapps.instructor_task.api import submit_rescore_problem_for_student
-from mock import patch
 from openedx.core.djangolib.testing.utils import get_mock_request
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-
-from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-STATE_DELETED_TYPE = 'edx.grades.problem.state_deleted'
-RESCORE_TYPE = 'edx.grades.problem.rescored'
-SUBMITTED_TYPE = 'edx.grades.problem.submitted'
+from ... import events
 
 
 class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTestCase):
@@ -27,10 +28,13 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
     Tests integration between the eventing in various layers
     of the grading infrastructure.
     """
+    ENABLED_SIGNALS = ['course_published']
+
     @classmethod
-    def setUpClass(cls):
-        super(GradesEventIntegrationTest, cls).setUpClass()
-        cls.store = modulestore()
+    def reset_course(cls):
+        """
+        Sets up the course anew.
+        """
         with cls.store.default_store(ModuleStoreEnum.Type.split):
             cls.course = CourseFactory.create()
             cls.chapter = ItemFactory.create(
@@ -64,7 +68,9 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
             )
 
     def setUp(self):
+        self.reset_course()
         super(GradesEventIntegrationTest, self).setUp()
+        self.addCleanup(set_current_request, None)
         self.request = get_mock_request(UserFactory())
         self.student = self.request.user
         self.client.login(username=self.student.username, password="test")
@@ -72,160 +78,141 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
         self.instructor = UserFactory.create(is_staff=True, username=u'test_instructor', password=u'test')
         self.refresh_course()
 
-    @patch('lms.djangoapps.instructor.enrollment.tracker')
-    @patch('lms.djangoapps.grades.signals.handlers.tracker')
-    @patch('lms.djangoapps.grades.models.tracker')
-    def test_delete_student_state_events(self, models_tracker, handlers_tracker, enrollment_tracker):
-        # submit answer
+    @patch('lms.djangoapps.grades.events.tracker')
+    def test_submit_answer(self, events_tracker):
+        self.submit_question_answer('p1', {'2_1': 'choice_choice_2'})
+        course = self.store.get_course(self.course.id, depth=0)
+
+        event_transaction_id = events_tracker.emit.mock_calls[0][1][1]['event_transaction_id']
+        events_tracker.emit.assert_has_calls(
+            [
+                mock_call(
+                    events.PROBLEM_SUBMITTED_EVENT_TYPE,
+                    {
+                        'user_id': six.text_type(self.student.id),
+                        'event_transaction_id': event_transaction_id,
+                        'event_transaction_type': events.PROBLEM_SUBMITTED_EVENT_TYPE,
+                        'course_id': six.text_type(self.course.id),
+                        'problem_id': six.text_type(self.problem.location),
+                        'weighted_earned': 2.0,
+                        'weighted_possible': 2.0,
+                    },
+                ),
+                mock_call(
+                    events.COURSE_GRADE_CALCULATED,
+                    {
+                        'course_version': six.text_type(course.course_version),
+                        'percent_grade': 0.02,
+                        'grading_policy_hash': u'ChVp0lHGQGCevD0t4njna/C44zQ=',
+                        'user_id': six.text_type(self.student.id),
+                        'letter_grade': u'',
+                        'event_transaction_id': event_transaction_id,
+                        'event_transaction_type': events.PROBLEM_SUBMITTED_EVENT_TYPE,
+                        'course_id': six.text_type(self.course.id),
+                        'course_edited_timestamp': six.text_type(course.subtree_edited_on),
+                    }
+                ),
+            ],
+            any_order=True,
+        )
+
+    def test_delete_student_state(self):
         self.submit_question_answer('p1', {'2_1': 'choice_choice_2'})
 
-        # check logging to make sure id's are tracked correctly across events
-        event_transaction_id = handlers_tracker.method_calls[0][1][1]['event_transaction_id']
-        for call in models_tracker.method_calls:
-            self.assertEqual(event_transaction_id, call[1][1]['event_transaction_id'])
-            self.assertEqual(unicode(SUBMITTED_TYPE), call[1][1]['event_transaction_type'])
-
-        handlers_tracker.emit.assert_called_with(
-            unicode(SUBMITTED_TYPE),
-            {
-                'user_id': unicode(self.student.id),
-                'event_transaction_id': event_transaction_id,
-                'event_transaction_type': unicode(SUBMITTED_TYPE),
-                'course_id': unicode(self.course.id),
-                'problem_id': unicode(self.problem.location),
-                'weighted_earned': 2.0,
-                'weighted_possible': 2.0,
-            }
-        )
-
+        with patch('lms.djangoapps.instructor.enrollment.tracker') as enrollment_tracker:
+            with patch('lms.djangoapps.grades.events.tracker') as events_tracker:
+                reset_student_attempts(
+                    self.course.id, self.student, self.problem.location, self.instructor, delete_module=True,
+                )
         course = self.store.get_course(self.course.id, depth=0)
-        models_tracker.emit.assert_called_with(
-            u'edx.grades.course.grade_calculated',
-            {
-                'course_version': unicode(course.course_version),
-                'percent_grade': 0.02,
-                'grading_policy_hash': u'ChVp0lHGQGCevD0t4njna/C44zQ=',
-                'user_id': unicode(self.student.id),
-                'letter_grade': u'',
-                'event_transaction_id': event_transaction_id,
-                'event_transaction_type': unicode(SUBMITTED_TYPE),
-                'course_id': unicode(self.course.id),
-                'course_edited_timestamp': unicode(course.subtree_edited_on),
-            }
-        )
-        models_tracker.reset_mock()
-        handlers_tracker.reset_mock()
 
-        # delete state
-        reset_student_attempts(self.course.id, self.student, self.problem.location, self.instructor, delete_module=True)
-
-        # check logging to make sure id's are tracked correctly across events
         event_transaction_id = enrollment_tracker.method_calls[0][1][1]['event_transaction_id']
-
-        # make sure the id is propagated throughout the event flow
-        for call in models_tracker.method_calls:
-            self.assertEqual(event_transaction_id, call[1][1]['event_transaction_id'])
-            self.assertEqual(unicode(STATE_DELETED_TYPE), call[1][1]['event_transaction_type'])
-
-        # ensure we do not log a problem submitted event when state is deleted
-        handlers_tracker.assert_not_called()
         enrollment_tracker.emit.assert_called_with(
-            unicode(STATE_DELETED_TYPE),
+            events.STATE_DELETED_EVENT_TYPE,
             {
-                'user_id': unicode(self.student.id),
-                'course_id': unicode(self.course.id),
-                'problem_id': unicode(self.problem.location),
-                'instructor_id': unicode(self.instructor.id),
+                'user_id': six.text_type(self.student.id),
+                'course_id': six.text_type(self.course.id),
+                'problem_id': six.text_type(self.problem.location),
+                'instructor_id': six.text_type(self.instructor.id),
                 'event_transaction_id': event_transaction_id,
-                'event_transaction_type': unicode(STATE_DELETED_TYPE),
+                'event_transaction_type': events.STATE_DELETED_EVENT_TYPE,
             }
         )
 
-        course = modulestore().get_course(self.course.id, depth=0)
-        models_tracker.emit.assert_called_with(
-            u'edx.grades.course.grade_calculated',
+        events_tracker.emit.assert_called_with(
+            events.COURSE_GRADE_CALCULATED,
             {
                 'percent_grade': 0.0,
                 'grading_policy_hash': u'ChVp0lHGQGCevD0t4njna/C44zQ=',
-                'user_id': unicode(self.student.id),
+                'user_id': six.text_type(self.student.id),
                 'letter_grade': u'',
                 'event_transaction_id': event_transaction_id,
-                'event_transaction_type': unicode(STATE_DELETED_TYPE),
-                'course_id': unicode(self.course.id),
-                'course_edited_timestamp': unicode(course.subtree_edited_on),
-                'course_version': unicode(course.course_version),
+                'event_transaction_type': events.STATE_DELETED_EVENT_TYPE,
+                'course_id': six.text_type(self.course.id),
+                'course_edited_timestamp': six.text_type(course.subtree_edited_on),
+                'course_version': six.text_type(course.course_version),
             }
         )
-        enrollment_tracker.reset_mock()
-        models_tracker.reset_mock()
-        handlers_tracker.reset_mock()
 
-    @patch('lms.djangoapps.instructor_task.tasks_helper.tracker')
-    @patch('lms.djangoapps.grades.signals.handlers.tracker')
-    @patch('lms.djangoapps.grades.models.tracker')
-    def test_rescoring_events(self, models_tracker, handlers_tracker, instructor_task_tracker):
-        # submit answer
+    def test_rescoring_events(self):
         self.submit_question_answer('p1', {'2_1': 'choice_choice_3'})
-        models_tracker.reset_mock()
-        handlers_tracker.reset_mock()
-
         new_problem_xml = MultipleChoiceResponseXMLFactory().build_xml(
             question_text='The correct answer is Choice 3',
             choices=[False, False, False, True],
             choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
         )
-        module_store = modulestore()
-        with module_store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
             self.problem.data = new_problem_xml
-            module_store.update_item(self.problem, self.instructor.id)
-            module_store.publish(self.problem.location, self.instructor.id)
+            self.store.update_item(self.problem, self.instructor.id)
+        self.store.publish(self.problem.location, self.instructor.id)
 
-        submit_rescore_problem_for_student(
-            request=get_mock_request(self.instructor),
-            usage_key=self.problem.location,
-            student=self.student,
-            only_if_higher=False
+        with patch('lms.djangoapps.grades.events.tracker') as events_tracker:
+            submit_rescore_problem_for_student(
+                request=get_mock_request(self.instructor),
+                usage_key=self.problem.location,
+                student=self.student,
+                only_if_higher=False
+            )
+        course = self.store.get_course(self.course.id, depth=0)
+
+        # make sure the tracker's context is updated with course info
+        for args in events_tracker.get_tracker().context.call_args_list:
+            self.assertEqual(
+                args[0][1],
+                {'course_id': six.text_type(self.course.id), 'org_id': six.text_type(self.course.org)}
+            )
+
+        event_transaction_id = events_tracker.emit.mock_calls[0][1][1]['event_transaction_id']
+        events_tracker.emit.assert_has_calls(
+            [
+                mock_call(
+                    events.GRADES_RESCORE_EVENT_TYPE,
+                    {
+                        'course_id': six.text_type(self.course.id),
+                        'user_id': six.text_type(self.student.id),
+                        'problem_id': six.text_type(self.problem.location),
+                        'new_weighted_earned': 2,
+                        'new_weighted_possible': 2,
+                        'only_if_higher': False,
+                        'instructor_id': six.text_type(self.instructor.id),
+                        'event_transaction_id': event_transaction_id,
+                        'event_transaction_type': events.GRADES_RESCORE_EVENT_TYPE,
+                    },
+                ),
+                mock_call(
+                    events.COURSE_GRADE_CALCULATED,
+                    {
+                        'course_version': six.text_type(course.course_version),
+                        'percent_grade': 0.02,
+                        'grading_policy_hash': u'ChVp0lHGQGCevD0t4njna/C44zQ=',
+                        'user_id': six.text_type(self.student.id),
+                        'letter_grade': u'',
+                        'event_transaction_id': event_transaction_id,
+                        'event_transaction_type': events.GRADES_RESCORE_EVENT_TYPE,
+                        'course_id': six.text_type(self.course.id),
+                        'course_edited_timestamp': six.text_type(course.subtree_edited_on),
+                    },
+                ),
+            ],
+            any_order=True,
         )
-        # check logging to make sure id's are tracked correctly across
-        # events
-        event_transaction_id = instructor_task_tracker.method_calls[0][1][1]['event_transaction_id']
-
-        # make sure the id is propagated throughout the event flow
-        for call in models_tracker.method_calls:
-            self.assertEqual(event_transaction_id, call[1][1]['event_transaction_id'])
-            self.assertEqual(unicode(RESCORE_TYPE), call[1][1]['event_transaction_type'])
-
-        handlers_tracker.assert_not_called()
-
-        instructor_task_tracker.emit.assert_called_with(
-            unicode(RESCORE_TYPE),
-            {
-                'course_id': unicode(self.course.id),
-                'user_id': unicode(self.student.id),
-                'problem_id': unicode(self.problem.location),
-                'new_weighted_earned': 2,
-                'new_weighted_possible': 2,
-                'only_if_higher': False,
-                'instructor_id': unicode(self.instructor.id),
-                'event_transaction_id': event_transaction_id,
-                'event_transaction_type': unicode(RESCORE_TYPE),
-            }
-        )
-        course = modulestore().get_course(self.course.id, depth=0)
-        models_tracker.emit.assert_called_with(
-            u'edx.grades.course.grade_calculated',
-            {
-                'course_version': unicode(course.course_version),
-                'percent_grade': 0.02,
-                'grading_policy_hash': u'ChVp0lHGQGCevD0t4njna/C44zQ=',
-                'user_id': unicode(self.student.id),
-                'letter_grade': u'',
-                'event_transaction_id': event_transaction_id,
-                'event_transaction_type': unicode(RESCORE_TYPE),
-                'course_id': unicode(self.course.id),
-                'course_edited_timestamp': unicode(course.subtree_edited_on),
-            }
-        )
-        instructor_task_tracker.reset_mock()
-        models_tracker.reset_mock()
-        handlers_tracker.reset_mock()

@@ -1,12 +1,14 @@
 """Module progress tests"""
 
-import unittest
-from mock import Mock
+from __future__ import absolute_import
 
+import unittest
+
+from mock import Mock
 from xblock.field_data import DictFieldData
 
-from xmodule.progress import Progress
 from xmodule import x_module
+from xmodule.progress import Progress
 
 from . import get_test_system
 
@@ -117,6 +119,7 @@ class ProgressTest(unittest.TestCase):
 class ModuleProgressTest(unittest.TestCase):
     ''' Test that get_progress() does the right thing for the different modules
     '''
+
     def test_xmodule_default(self):
         '''Make sure default get_progress exists, returns None'''
         xmod = x_module.XModule(Mock(), get_test_system(), DictFieldData({'location': 'a://b/c/d/e'}), Mock())

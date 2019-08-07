@@ -11,24 +11,26 @@ Provides sympy representation.
 # Author: I. Chuang <ichuang@mit.edu>
 #
 
-import os
-import string
-import re
+from __future__ import absolute_import
 import logging
 import operator
-import requests
+import os
+import re
+import string
+import unicodedata
+#import subprocess
+from copy import deepcopy
+from xml.sax.saxutils import unescape
+
 import sympy
-from sympy.printing.latex import LatexPrinter
-from sympy.printing.str import StrPrinter
+from lxml import etree
 from sympy import latex, sympify
 from sympy.physics.quantum.qubit import Qubit
 from sympy.physics.quantum.state import Ket
-
-from xml.sax.saxutils import unescape
-import unicodedata
-from lxml import etree
-#import subprocess
-from copy import deepcopy
+from sympy.printing.latex import LatexPrinter
+from sympy.printing.str import StrPrinter
+import six
+from functools import reduce
 
 log = logging.getLogger(__name__)
 
@@ -207,7 +209,7 @@ class formula(object):
         for k in xml:
             tag = gettag(k)
             if tag == 'mi' or tag == 'ci':
-                usym = unicode(k.text)
+                usym = six.text_type(k.text)
                 try:
                     udata = unicodedata.name(usym)
                 except Exception:  # pylint: disable=broad-except
@@ -233,7 +235,7 @@ class formula(object):
         it, if possible...
         """
 
-        if isinstance(xml, (str, unicode)):
+        if isinstance(xml, (str, six.text_type)):
             xml = etree.fromstring(xml)		# TODO: wrap in try
 
         xml = self.fix_greek_in_mathml(xml)	 # convert greek utf letters to greek spelled out in ascii
@@ -428,10 +430,7 @@ class formula(object):
             return "<html>Error! Cannot process pmathml</html>"
         pmathml = etree.tostring(xml, pretty_print=True)
         self.the_pmathml = pmathml  # pylint: disable=attribute-defined-outside-init
-
-        # convert to cmathml
-        self.the_cmathml = self.GetContentMathML(self.asciimath, pmathml)
-        return self.the_cmathml
+        return self.the_pmathml
 
     cmathml = property(get_content_mathml, None, None, 'content MathML representation')
 
@@ -455,7 +454,7 @@ class formula(object):
                 try:
                     cmml = self.cmathml
                     xml = etree.fromstring(str(cmml))
-                except Exception, err:
+                except Exception as err:
                     if 'conversion from Presentation MathML to Content MathML was not successful' in cmml:
                         msg = "Illegal math expression"
                     else:
@@ -542,7 +541,7 @@ class formula(object):
                 args = [self.make_sympy(expr) for expr in xml[1:]]
                 try:
                     res = op(*args)
-                except Exception, err:
+                except Exception as err:
                     self.args = args  # pylint: disable=attribute-defined-outside-init
                     self.op = op      # pylint: disable=attribute-defined-outside-init, invalid-name
                     raise Exception('[formula] error=%s failed to apply %s to args=%s' % (err, opstr, args))
@@ -572,7 +571,7 @@ class formula(object):
                 usym = parse_presentation_symbol(xml[0])
                 sym = sympy.Symbol(str(usym))
             else:
-                usym = unicode(xml.text)
+                usym = six.text_type(xml.text)
                 if 'hat' in usym:
                     sym = my_sympify(usym)
                 else:
@@ -586,35 +585,3 @@ class formula(object):
             raise Exception('[formula] unknown tag %s' % tag)
 
     sympy = property(make_sympy, None, None, 'sympy representation')
-
-    def GetContentMathML(self, asciimath, mathml):  # pylint: disable=invalid-name
-        """
-        Handle requests to snuggletex API to convert the Ascii math to MathML
-        """
-        url = 'https://math-xserver.mitx.mit.edu/snuggletex-webapp-1.2.2/ASCIIMathMLUpConversionDemo'
-
-        payload = {
-            'asciiMathInput': asciimath,
-            'asciiMathML': mathml,
-        }
-        headers = {
-            'User-Agent': "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13"
-        }
-        request = requests.post(url, data=payload, headers=headers, verify=False)
-        request.encoding = 'utf-8'
-        ret = request.text
-
-        mode = 0
-        cmathml = []
-        for k in ret.split('\n'):
-            if 'conversion to Content MathML' in k:
-                mode = 1
-                continue
-            if mode == 1:
-                if '<h3>Maxima Input Form</h3>' in k:
-                    mode = 0
-                    continue
-                cmathml.append(k)
-        cmathml = '\n'.join(cmathml[2:])
-        cmathml = '<math xmlns="http://www.w3.org/1998/Math/MathML">\n' + unescape(cmathml) + '\n</math>'
-        return cmathml

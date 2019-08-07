@@ -1,23 +1,21 @@
 """
 This test tests that i18n extraction (`paver i18n_extract -v`) works properly.
 """
-from datetime import datetime, timedelta
+from __future__ import absolute_import
+
 import os
 import random
 import re
-import sys
 import string
 import subprocess
+import sys
+from datetime import datetime, timedelta
 from unittest import TestCase
 
-from mock import patch
+from i18n import config, dummy, extract, generate
 from polib import pofile
 from pytz import UTC
-
-from i18n import extract
-from i18n import generate
-from i18n import dummy
-from i18n.config import CONFIGURATION
+from six.moves import range
 
 
 class TestGenerate(TestCase):
@@ -57,6 +55,8 @@ class TestGenerate(TestCase):
     def setUp(self):
         super(TestGenerate, self).setUp()
 
+        self.configuration = config.Configuration()
+
         # Subtract 1 second to help comparisons with file-modify time succeed,
         # since os.path.getmtime() is not millisecond-accurate
         self.start_time = datetime.now(UTC) - timedelta(seconds=1)
@@ -65,13 +65,11 @@ class TestGenerate(TestCase):
         """
         Tests merge script on English source files.
         """
-        filename = os.path.join(CONFIGURATION.source_messages_dir, random_name())
-        generate.merge(CONFIGURATION.source_locale, target=filename)
+        filename = os.path.join(self.configuration.source_messages_dir, random_name())
+        generate.merge(self.configuration, self.configuration.source_locale, target=filename)
         self.assertTrue(os.path.exists(filename))
         os.remove(filename)
 
-    # Patch dummy_locales to not have esperanto present
-    @patch.object(CONFIGURATION, 'dummy_locales', ['fake2'])
     def test_main(self):
         """
         Runs generate.main() which should merge source files,
@@ -80,17 +78,20 @@ class TestGenerate(TestCase):
         .mo files should exist, and be recently created (modified
         after start of test suite)
         """
+        # Change dummy_locales to not have Esperanto present.
+        self.configuration.dummy_locales = ['fake2']
+
         generate.main(verbosity=0, strict=False)
-        for locale in CONFIGURATION.translated_locales:
+        for locale in self.configuration.translated_locales:
             for filename in ('django', 'djangojs'):
                 mofile = filename + '.mo'
-                path = os.path.join(CONFIGURATION.get_messages_dir(locale), mofile)
+                path = os.path.join(self.configuration.get_messages_dir(locale), mofile)
                 exists = os.path.exists(path)
-                self.assertTrue(exists, msg='Missing file in locale %s: %s' % (locale, mofile))
+                self.assertTrue(exists, msg=u'Missing file in locale %s: %s' % (locale, mofile))
                 self.assertGreaterEqual(
                     datetime.fromtimestamp(os.path.getmtime(path), UTC),
                     self.start_time,
-                    msg='File not recently modified: %s' % path
+                    msg=u'File not recently modified: %s' % path
                 )
             # Segmenting means that the merge headers don't work they way they
             # used to, so don't make this check for now. I'm not sure if we'll
@@ -108,14 +109,14 @@ class TestGenerate(TestCase):
         # #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 
         """
-        path = os.path.join(CONFIGURATION.get_messages_dir(locale), 'django.po')
+        path = os.path.join(self.configuration.get_messages_dir(locale), 'django.po')
         pof = pofile(path)
         pattern = re.compile('^#-#-#-#-#', re.M)
         match = pattern.findall(pof.header)
         self.assertEqual(
             len(match),
             3,
-            msg="Found %s (should be 3) merge comments in the header for %s" % (len(match), path)
+            msg=u"Found %s (should be 3) merge comments in the header for %s" % (len(match), path)
         )
 
 

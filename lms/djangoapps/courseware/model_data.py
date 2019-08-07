@@ -21,30 +21,28 @@ UserInfoCache: A cache for Scope.user_info
 DjangoOrmFieldCache: A base-class for single-row-per-field caches.
 """
 
+from __future__ import absolute_import
+
 import json
-from abc import abstractmethod, ABCMeta
-from collections import defaultdict, namedtuple
-from .models import (
-    StudentModule,
-    XModuleUserStateSummaryField,
-    XModuleStudentPrefsField,
-    XModuleStudentInfoField
-)
 import logging
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.block_types import BlockTypeKeyV1
-from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
+from abc import ABCMeta, abstractmethod
+from collections import defaultdict, namedtuple
+
+import six
 from contracts import contract, new_contract
-
-from django.db import DatabaseError
-
-from xblock.runtime import KeyValueStore
-from xblock.exceptions import KeyValueMultiSaveError, InvalidScopeError
-from xblock.fields import Scope, UserScope
-from xmodule.modulestore.django import modulestore
+from django.db import DatabaseError, IntegrityError, transaction
+from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
+from opaque_keys.edx.block_types import BlockTypeKeyV1
+from opaque_keys.edx.keys import CourseKey
 from xblock.core import XBlockAside
-from courseware.user_state_client import DjangoXBlockUserStateClient
+from xblock.exceptions import InvalidScopeError, KeyValueMultiSaveError
+from xblock.fields import Scope, UserScope
+from xblock.runtime import KeyValueStore
 
+from courseware.user_state_client import DjangoXBlockUserStateClient
+from xmodule.modulestore.django import modulestore
+
+from .models import StudentModule, XModuleStudentInfoField, XModuleStudentPrefsField, XModuleUserStateSummaryField
 
 log = logging.getLogger(__name__)
 
@@ -157,12 +155,11 @@ new_contract("DjangoKeyValueStore", DjangoKeyValueStore)
 new_contract("DjangoKeyValueStore_Key", DjangoKeyValueStore.Key)
 
 
-class DjangoOrmFieldCache(object):
+class DjangoOrmFieldCache(six.with_metaclass(ABCMeta, object)):
     """
     Baseclass for Scope-specific field cache objects that are based on
     single-row-per-field Django ORM objects.
     """
-    __metaclass__ = ABCMeta
 
     def __init__(self):
         self._cache = {}
@@ -240,7 +237,7 @@ class DjangoOrmFieldCache(object):
                     field_object.save(force_update=True)
 
             except DatabaseError:
-                log.exception("Saving field %r failed", kvs_key.field_name)
+                log.exception(u"Saving field %r failed", kvs_key.field_name)
                 raise KeyValueMultiSaveError(saved_fields)
 
             finally:
@@ -424,7 +421,7 @@ class UserStateCache(object):
                 pending_updates
             )
         except DatabaseError:
-            log.exception("Saving user state failed for %s", self.user.username)
+            log.exception(u"Saving user state failed for %s", self.user.username)
             raise KeyValueMultiSaveError([])
         finally:
             self._cache.update(pending_updates)
@@ -547,7 +544,7 @@ class UserStateSummaryCache(DjangoOrmFieldCache):
         Arguments:
             field_object: A Django model instance that stores the data for fields in this cache
         """
-        return (field_object.usage_id.map_into_course(self.course_id), field_object.field_name)
+        return field_object.usage_id.map_into_course(self.course_id), field_object.field_name
 
     def _cache_key_for_kvs_key(self, key):
         """
@@ -556,7 +553,7 @@ class UserStateSummaryCache(DjangoOrmFieldCache):
         Arguments:
             key (:class:`~DjangoKeyValueStore.Key`): The key representing the cached field
         """
-        return (key.block_scope_id, key.field_name)
+        return key.block_scope_id, key.field_name
 
 
 class PreferencesCache(DjangoOrmFieldCache):
@@ -610,7 +607,7 @@ class PreferencesCache(DjangoOrmFieldCache):
         Arguments:
             field_object: A Django model instance that stores the data for fields in this cache
         """
-        return (field_object.module_type, field_object.field_name)
+        return field_object.module_type, field_object.field_name
 
     def _cache_key_for_kvs_key(self, key):
         """
@@ -619,7 +616,7 @@ class PreferencesCache(DjangoOrmFieldCache):
         Arguments:
             key (:class:`~DjangoKeyValueStore.Key`): The key representing the cached field
         """
-        return (BlockTypeKeyV1(key.block_family, key.block_scope_id), key.field_name)
+        return BlockTypeKeyV1(key.block_family, key.block_scope_id), key.field_name
 
 
 class UserInfoCache(DjangoOrmFieldCache):
@@ -687,7 +684,7 @@ class FieldDataCache(object):
     A cache of django model objects needed to supply the data
     for a module and its descendants
     """
-    def __init__(self, descriptors, course_id, user, select_for_update=False, asides=None):
+    def __init__(self, descriptors, course_id, user, asides=None, read_only=False):
         """
         Find any courseware.models objects that are needed by any descriptor
         in descriptors. Attempts to minimize the number of queries to the database.
@@ -698,8 +695,8 @@ class FieldDataCache(object):
         descriptors: A list of XModuleDescriptors.
         course_id: The id of the current course
         user: The user for which to cache data
-        select_for_update: Ignored
         asides: The list of aside types to load, or None to prefetch no asides.
+        read_only: We should not perform writes (they become a no-op).
         """
         if asides is None:
             self.asides = []
@@ -709,6 +706,7 @@ class FieldDataCache(object):
         assert isinstance(course_id, CourseKey)
         self.course_id = course_id
         self.user = user
+        self.read_only = read_only
 
         self.cache = {
             Scope.user_state: UserStateCache(
@@ -732,7 +730,7 @@ class FieldDataCache(object):
         """
         Add all `descriptors` to this FieldDataCache.
         """
-        if self.user.is_authenticated():
+        if self.user.is_authenticated:
             self.scorable_locations.update(desc.location for desc in descriptors if desc.has_score)
             for scope, fields in self._fields_to_cache(descriptors).items():
                 if scope not in self.cache:
@@ -783,7 +781,7 @@ class FieldDataCache(object):
     @classmethod
     def cache_for_descriptor_descendents(cls, course_id, user, descriptor, depth=None,
                                          descriptor_filter=lambda descriptor: True,
-                                         select_for_update=False, asides=None):
+                                         asides=None, read_only=False):
         """
         course_id: the course in the context of which we want StudentModules.
         user: the django user for whom to load modules.
@@ -792,9 +790,8 @@ class FieldDataCache(object):
             the supplied descriptor. If depth is None, load all descendant StudentModules
         descriptor_filter is a function that accepts a descriptor and return whether the field data
             should be cached
-        select_for_update: Ignored
         """
-        cache = FieldDataCache([], course_id, user, select_for_update, asides=asides)
+        cache = FieldDataCache([], course_id, user, asides=asides, read_only=read_only)
         cache.add_descriptor_descendents(descriptor, depth, descriptor_filter)
         return cache
 
@@ -820,7 +817,7 @@ class FieldDataCache(object):
         Raises: KeyError if key isn't found in the cache
         """
 
-        if key.scope.user == UserScope.ONE and not self.user.is_anonymous():
+        if key.scope.user == UserScope.ONE and not self.user.is_anonymous:
             # If we're getting user data, we expect that the key matches the
             # user we were constructed for.
             assert key.user_id == self.user.id
@@ -840,12 +837,14 @@ class FieldDataCache(object):
             kv_dict (dict): dict mapping from `DjangoKeyValueStore.Key`s to field values
         Raises: DatabaseError if any fields fail to save
         """
+        if self.read_only:
+            return
 
         saved_fields = []
         by_scope = defaultdict(dict)
-        for key, value in kv_dict.iteritems():
+        for key, value in six.iteritems(kv_dict):
 
-            if key.scope.user == UserScope.ONE and not self.user.is_anonymous():
+            if key.scope.user == UserScope.ONE and not self.user.is_anonymous:
                 # If we're getting user data, we expect that the key matches the
                 # user we were constructed for.
                 assert key.user_id == self.user.id
@@ -855,14 +854,14 @@ class FieldDataCache(object):
 
             by_scope[key.scope][key] = value
 
-        for scope, set_many_data in by_scope.iteritems():
+        for scope, set_many_data in six.iteritems(by_scope):
             try:
                 self.cache[scope].set_many(set_many_data)
                 # If save is successful on these fields, add it to
                 # the list of successful saves
                 saved_fields.extend(key.field_name for key in set_many_data)
             except KeyValueMultiSaveError as exc:
-                log.exception('Error saving fields %r', [key.field_name for key in set_many_data])
+                log.exception(u'Error saving fields %r', [key.field_name for key in set_many_data])
                 raise KeyValueMultiSaveError(saved_fields + exc.saved_field_names)
 
     @contract(key=DjangoKeyValueStore.Key)
@@ -875,8 +874,10 @@ class FieldDataCache(object):
 
         Raises: KeyError if key isn't found in the cache
         """
+        if self.read_only:
+            return
 
-        if key.scope.user == UserScope.ONE and not self.user.is_anonymous():
+        if key.scope.user == UserScope.ONE and not self.user.is_anonymous:
             # If we're getting user data, we expect that the key matches the
             # user we were constructed for.
             assert key.user_id == self.user.id
@@ -897,7 +898,7 @@ class FieldDataCache(object):
         Returns: bool
         """
 
-        if key.scope.user == UserScope.ONE and not self.user.is_anonymous():
+        if key.scope.user == UserScope.ONE and not self.user.is_anonymous:
             # If we're getting user data, we expect that the key matches the
             # user we were constructed for.
             assert key.user_id == self.user.id
@@ -917,7 +918,7 @@ class FieldDataCache(object):
 
         Returns: datetime if there was a modified date, or None otherwise
         """
-        if key.scope.user == UserScope.ONE and not self.user.is_anonymous():
+        if key.scope.user == UserScope.ONE and not self.user.is_anonymous:
             # If we're getting user data, we expect that the key matches the
             # user we were constructed for.
             assert key.user_id == self.user.id
@@ -938,7 +939,7 @@ class ScoresClient(object):
     Eventually, this should read and write scores, but at the moment it only
     handles the read side of things.
     """
-    Score = namedtuple('Score', 'correct total')
+    Score = namedtuple('Score', 'correct total created')
 
     def __init__(self, course_key, user_id):
         self.course_key = course_key
@@ -961,9 +962,9 @@ class ScoresClient(object):
         # attached to them (since old mongo identifiers don't include runs).
         # So we have to add that info back in before we put it into our lookup.
         self._locations_to_scores.update({
-            UsageKey.from_string(location).map_into_course(self.course_key): self.Score(correct, total)
-            for location, correct, total
-            in scores_qset.values_list('module_state_key', 'grade', 'max_grade')
+            location.map_into_course(self.course_key): self.Score(correct, total, created)
+            for location, correct, total, created
+            in scores_qset.values_list('module_state_key', 'grade', 'max_grade', 'created')
         })
         self._has_fetched = True
 
@@ -977,7 +978,7 @@ class ScoresClient(object):
         """
         if not self._has_fetched:
             raise ValueError(
-                "Tried to fetch location {} from ScoresClient before fetch_scores() has run."
+                u"Tried to fetch location {} from ScoresClient before fetch_scores() has run."
                 .format(location)
             )
         return self._locations_to_scores.get(location.replace(version=None, branch=None))
@@ -995,15 +996,26 @@ def set_score(user_id, usage_key, score, max_score):
     """
     Set the score and max_score for the specified user and xblock usage.
     """
-    student_module, created = StudentModule.objects.get_or_create(
-        student_id=user_id,
-        module_state_key=usage_key,
-        course_id=usage_key.course_key,
-        defaults={
-            'grade': score,
-            'max_grade': max_score,
-        }
-    )
+    created = False
+    kwargs = {"student_id": user_id, "module_state_key": usage_key, "course_id": usage_key.course_key}
+    try:
+        with transaction.atomic():
+            student_module, created = StudentModule.objects.get_or_create(
+                defaults={
+                    'grade': score,
+                    'max_grade': max_score,
+                },
+                **kwargs
+            )
+    except IntegrityError:
+        # log information for duplicate entry and get the record as above command failed.
+        log.exception(
+            u'set_score: IntegrityError for student %s - course_id %s - usage_key %s having '
+            u'score %d and max_score %d',
+            str(user_id), usage_key.course_key, usage_key, score, max_score
+        )
+        student_module = StudentModule.objects.get(**kwargs)
+
     if not created:
         student_module.grade = score
         student_module.max_grade = max_score

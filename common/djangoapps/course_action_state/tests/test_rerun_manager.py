@@ -2,10 +2,14 @@
 Tests specific to the CourseRerunState Model and Manager.
 """
 
+from __future__ import absolute_import
+
 from django.test import TestCase
 from opaque_keys.edx.locations import CourseLocator
-from course_action_state.models import CourseRerunState
+from six import text_type
+
 from course_action_state.managers import CourseRerunUIStateManager
+from course_action_state.models import CourseRerunState
 from student.tests.factories import UserFactory
 
 
@@ -102,7 +106,7 @@ class TestCourseRerunStateManager(TestCase):
         )
         self.expected_rerun_state.pop('message')
         rerun = self.verify_rerun_state()
-        self.assertIn(exception.message, rerun.message)
+        self.assertIn(text_type(exception), rerun.message)
 
         # dismiss ui and verify
         self.dismiss_ui_and_verify(rerun)

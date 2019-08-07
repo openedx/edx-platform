@@ -191,8 +191,8 @@ function($, _, Squire) {
 
             options = this.uploadSpies.constructor.calls.mostRecent().args[0];
             options.onSuccess({
-                'asset': {
-                    'url': 'http://example.org/test_3'
+                asset: {
+                    url: 'http://example.org/test_3'
                 }
             });
 

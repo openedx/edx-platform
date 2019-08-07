@@ -2,7 +2,10 @@
 Tools for creating edxnotes content fixture data.
 """
 
+from __future__ import absolute_import
+
 import json
+
 import factory
 import requests
 
@@ -56,7 +59,7 @@ class EdxNotesFixture(object):
 
         if not response.ok:
             raise EdxNotesFixtureError(
-                "Could not create notes {0}.  Status was {1}".format(
+                u"Could not create notes {0}.  Status was {1}".format(
                     json.dumps(self.notes), response.status_code
                 )
             )
@@ -72,7 +75,7 @@ class EdxNotesFixture(object):
 
         if not response.ok:
             raise EdxNotesFixtureError(
-                "Could not cleanup EdxNotes service {0}.  Status was {1}".format(
+                u"Could not cleanup EdxNotes service {0}.  Status was {1}".format(
                     json.dumps(self.notes), response.status_code
                 )
             )

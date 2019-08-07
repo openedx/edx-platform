@@ -1,8 +1,9 @@
+<%page expression_filter="h"/>
 <%inherit file="base.html" />
 <%def name="online_help_token()">
-<% 
+<%
 if library:
-    return "import_library" 
+    return "import_library"
 else:
     return "import_course"
 %>
@@ -13,6 +14,7 @@ else:
   from openedx.core.djangolib.js_utils import (
       dump_js_escaped_json, js_escaped_string
   )
+  from openedx.core.djangolib.markup import HTML, Text
 %>
 <%block name="title">
 %if library:
@@ -44,11 +46,11 @@ else:
       <div class="introduction">
         ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
         %if library:
-            <p>${_("Be sure you want to import a library before continuing. The contents of the imported library will replace the contents of the existing library. {em_start}You cannot undo a library import{em_end}. Before you proceed, we recommend that you export the current library, so that you have a backup copy of it.").format(em_start='<strong>', em_end="</strong>")}</p>
+            <p>${Text(_("Be sure you want to import a library before continuing. The contents of the imported library will replace the contents of the existing library. {em_start}You cannot undo a library import{em_end}. Before you proceed, we recommend that you export the current library, so that you have a backup copy of it.")).format(em_start=HTML('<strong>'), em_end=HTML("</strong>"))}</p>
             <p>${_("The library that you import must be in a .tar.gz file (that is, a .tar file compressed with GNU Zip). This .tar.gz file must contain a library.xml file. It may also contain other files.")}</p>
             <p>${_("The import process has five stages. During the first two stages, you must stay on this page. You can leave this page after the Unpacking stage has completed. We recommend, however, that you don't make important changes to your library until the import operation has completed.")}</p>
         %else:
-            <p>${_("Be sure you want to import a course before continuing. The contents of the imported course will replace the contents of the existing course. {em_start}You cannot undo a course import{em_end}. Before you proceed, we recommend that you export the current course, so that you have a backup copy of it.").format(em_start='<strong>', em_end="</strong>")}</p>
+            <p>${Text(_("Be sure you want to import a course before continuing. The contents of the imported course will replace the contents of the existing course. {em_start}You cannot undo a course import{em_end}. Before you proceed, we recommend that you export the current course, so that you have a backup copy of it.")).format(em_start=HTML('<strong>'), em_end=HTML("</strong>"))}</p>
             <p>${_("The course that you import must be in a .tar.gz file (that is, a .tar file compressed with GNU Zip). This .tar.gz file must contain a course.xml file. It may also contain other files.")}</p>
             <p>${_("The import process has five stages. During the first two stages, you must stay on this page. You can leave this page after the Unpacking stage has completed. We recommend, however, that you don't make important changes to your course until the import operation has completed.")}</p>
         %endif
@@ -118,7 +120,7 @@ else:
             <li class="item-progresspoint item-progresspoint-unpack is-started">
               <span class="deco status-visual">
                 <span class="icon fa fa-cog" aria-hidden="true"></span>
-                <span class="icon fa fa-warning" aria-hidden="true"v></span>
+                <span class="icon fa fa-warning" aria-hidden="true"></span>
               </span>
 
               <div class="status-detail">
@@ -212,7 +214,7 @@ else:
       </div>
       <div class="bit external-help">
           <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about importing a library")}</a>
-      </div>      
+      </div>
     </aside>
   %else:
     <aside class="content-supplementary" role="complementary">
@@ -223,7 +225,19 @@ else:
 
       <div class="bit">
         <h3 class="title-3">${_("What content is imported?")}</h3>
-        <p>${_("Only the course content and structure (including sections, subsections, and units) are imported. Other data, including student data, grading information, discussion forum data, course settings, and course team information, remains the same as it was in the existing course.")}</p>
+        <p>${_("The following content is imported.")}</p>
+        <ul>
+          <li>${_("Course content and structure")}</li>
+          <li>${_("Course dates")}</li>
+          <li>${_("Grading policy")}</li>
+          <li>${_("Any group configurations")}</li>
+          <li>${_("Settings on the Advanced Settings page, including MATLAB API keys and LTI passports")}</li>
+        </ul>
+        <p>${_("The following content is not imported.")}</p>
+        <ul>
+          <li>${_("Learner-specific content, such as learner grades and discussion forum data")}</li>
+          <li>${_("The course team")}</li>
+        </ul>
       </div>
 
       <div class="bit">
@@ -232,18 +246,13 @@ else:
       </div>
       <div class="bit external-help">
           <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about importing a course")}</a>
-      </div>      
+      </div>
     </aside>
   %endif
   </section>
 </div>
+<%static:webpack entry="Import">
+  Import('${import_status_url | n, js_escaped_string}', ${library | n, dump_js_escaped_json});
+</%static:webpack>
 </%block>
 
-<%block name="requirejs">
-  require(["js/factories/import"], function(ImportFactory) {
-      ImportFactory(
-          "${import_status_url | n, js_escaped_string}",
-          ${library | n, dump_js_escaped_json}
-      );
-  });
-</%block>

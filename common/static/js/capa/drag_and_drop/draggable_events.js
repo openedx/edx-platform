@@ -1,7 +1,7 @@
 (function(requirejs, require, define) {
     define([], function() {
         return {
-            'attachMouseEventsTo': function(element) {
+            attachMouseEventsTo: function(element) {
                 var self;
 
                 self = this;
@@ -17,7 +17,7 @@
                 });
             },
 
-            'mouseDown': function(event) {
+            mouseDown: function(event) {
                 if (this.mousePressed === false) {
             // So that the browser does not perform a default drag.
             // If we don't do this, each drag operation will
@@ -47,19 +47,19 @@
 
                         if (this.iconImgEl !== null) {
                             this.iconImgEl.css({
-                                'width': this.iconWidth,
-                                'height': this.iconHeight
+                                width: this.iconWidth,
+                                height: this.iconHeight
                             });
                         }
                         this.iconEl.css({
                             'background-color': this.iconElBGColor,
                             'padding-left': this.iconElPadding,
                             'padding-right': this.iconElPadding,
-                            'border': this.iconElBorder,
-                            'width': this.iconWidth,
-                            'height': this.iconHeight,
-                            'left': event.pageX - this.state.baseImageEl.offset().left - this.iconWidth * 0.5 - this.iconElLeftOffset,
-                            'top': event.pageY - this.state.baseImageEl.offset().top - this.iconHeight * 0.5
+                            border: this.iconElBorder,
+                            width: this.iconWidth,
+                            height: this.iconHeight,
+                            left: event.pageX - this.state.baseImageEl.offset().left - this.iconWidth * 0.5 - this.iconElLeftOffset,
+                            top: event.pageY - this.state.baseImageEl.offset().top - this.iconHeight * 0.5
                         });
                         this.iconEl.appendTo(this.state.baseImageEl.parent());
 
@@ -71,9 +71,9 @@
                                 'background-color': this.state.config.labelBgColor,
                                 'padding-left': 8,
                                 'padding-right': 8,
-                                'border': '1px solid black',
-                                'left': event.pageX - this.state.baseImageEl.offset().left - this.labelWidth * 0.5 - 9, // Account for padding, border.
-                                'top': event.pageY - this.state.baseImageEl.offset().top + this.iconHeight * 0.5 + 5
+                                border: '1px solid black',
+                                left: event.pageX - this.state.baseImageEl.offset().left - this.labelWidth * 0.5 - 9, // Account for padding, border.
+                                top: event.pageY - this.state.baseImageEl.offset().top + this.iconHeight * 0.5 + 5
                             });
                             this.labelEl.appendTo(this.state.baseImageEl.parent());
                         }
@@ -100,7 +100,7 @@
                 }
             },
 
-            'mouseUp': function() {
+            mouseUp: function() {
                 if (this.mousePressed === true) {
                     this.state.currentMovingDraggable = null;
                     this.iconEl.attr('aria-grabbed', 'false');
@@ -115,7 +115,7 @@
                 }
             },
 
-            'mouseMove': function(event) {
+            mouseMove: function(event) {
                 if (this.mousePressed === true) {
             // Because we have also attached a 'mousemove' event to the
             // 'document' (that will do the same thing), let's tell the
@@ -126,14 +126,14 @@
                     event.stopPropagation();
 
                     this.iconEl.css({
-                        'left': event.pageX - this.state.baseImageEl.offset().left - this.iconWidth * 0.5 - this.iconElLeftOffset,
-                        'top': event.pageY - this.state.baseImageEl.offset().top - this.iconHeight * 0.5
+                        left: event.pageX - this.state.baseImageEl.offset().left - this.iconWidth * 0.5 - this.iconElLeftOffset,
+                        top: event.pageY - this.state.baseImageEl.offset().top - this.iconHeight * 0.5
                     });
 
                     if (this.labelEl !== null) {
                         this.labelEl.css({
-                            'left': event.pageX - this.state.baseImageEl.offset().left - this.labelWidth * 0.5 - 9, // Acoount for padding, border.
-                            'top': event.pageY - this.state.baseImageEl.offset().top + this.iconHeight * 0.5 + 5
+                            left: event.pageX - this.state.baseImageEl.offset().left - this.labelWidth * 0.5 - 9, // Acoount for padding, border.
+                            top: event.pageY - this.state.baseImageEl.offset().top + this.iconHeight * 0.5 + 5
                         });
                     }
                 }

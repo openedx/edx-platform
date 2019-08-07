@@ -1,17 +1,17 @@
 """
 Test that inherited fields work correctly when parsing XML
 """
-from nose.tools import assert_equals, assert_in  # pylint: disable=no-name-in-module
+from __future__ import absolute_import
 
 from xmodule.tests.xml import XModuleXmlImportTest
-from xmodule.tests.xml.factories import CourseFactory, SequenceFactory, ProblemFactory, XmlImportFactory
+from xmodule.tests.xml.factories import CourseFactory, ProblemFactory, SequenceFactory, XmlImportFactory
 
 
 class TestInheritedFieldParsing(XModuleXmlImportTest):
     """
     Test that inherited fields work correctly when parsing XML
-
     """
+
     def test_null_string(self):
         # Test that the string inherited fields are passed through 'deserialize_field',
         # which converts the string "null" to the python value None
@@ -20,13 +20,13 @@ class TestInheritedFieldParsing(XModuleXmlImportTest):
         ProblemFactory.build(parent=sequence)
 
         course = self.process_xml(root)
-        assert_equals(None, course.days_early_for_beta)
+        assert course.days_early_for_beta is None
 
         sequence = course.get_children()[0]
-        assert_equals(None, sequence.days_early_for_beta)
+        assert sequence.days_early_for_beta is None
 
         problem = sequence.get_children()[0]
-        assert_equals(None, problem.days_early_for_beta)
+        assert problem.days_early_for_beta is None
 
     def test_video_attr(self):
         """
@@ -44,4 +44,4 @@ class TestInheritedFieldParsing(XModuleXmlImportTest):
             }
         )
         video_block = self.process_xml(video)
-        assert_in('garbage', video_block.xml_attributes)
+        assert 'garbage' in video_block.xml_attributes

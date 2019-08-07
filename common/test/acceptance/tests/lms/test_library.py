@@ -2,26 +2,29 @@
 """
 End-to-end tests for LibraryContent block in LMS
 """
-import ddt
+from __future__ import absolute_import
+
 import textwrap
 
-from nose.plugins.attrib import attr
-from common.test.acceptance.tests.helpers import UniqueCourseTest, TestWithSearchIndexMixin
-from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
-from common.test.acceptance.pages.studio.overview import CourseOutlinePage
-from common.test.acceptance.pages.studio.library import StudioLibraryContentEditor, StudioLibraryContainerXBlockWrapper
-from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.library import LibraryContentXBlockWrapper
-from common.test.acceptance.pages.common.logout import LogoutPage
+import ddt
+import six
+
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.fixtures.library import LibraryFixture
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.common.logout import LogoutPage
+from common.test.acceptance.pages.lms.course_home import CourseHomePage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.library import LibraryContentXBlockWrapper
+from common.test.acceptance.pages.studio.library import StudioLibraryContainerXBlockWrapper, StudioLibraryContentEditor
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
+from common.test.acceptance.tests.helpers import TestWithSearchIndexMixin, UniqueCourseTest
 
 SECTION_NAME = 'Test Section'
 SUBSECTION_NAME = 'Test Subsection'
 UNIT_NAME = 'Test Unit'
 
 
-@attr(shard=7)
 class LibraryContentTestBase(UniqueCourseTest):
     """ Base class for library content block tests """
     USERNAME = "STUDENT_TESTER"
@@ -29,6 +32,7 @@ class LibraryContentTestBase(UniqueCourseTest):
 
     STAFF_USERNAME = "STAFF_TESTER"
     STAFF_EMAIL = "staff101@example.com"
+    shard = 10
 
     def populate_library_fixture(self, library_fixture):
         """
@@ -44,14 +48,14 @@ class LibraryContentTestBase(UniqueCourseTest):
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
 
-        self.course_outline = CourseOutlinePage(
+        self.studio_course_outline = StudioCourseOutlinePage(
             self.browser,
             self.course_info['org'],
             self.course_info['number'],
             self.course_info['run']
         )
 
-        self.library_fixture = LibraryFixture('test_org', self.unique_id, 'Test Library {}'.format(self.unique_id))
+        self.library_fixture = LibraryFixture('test_org', self.unique_id, u'Test Library {}'.format(self.unique_id))
         self.populate_library_fixture(self.library_fixture)
 
         self.library_fixture.install()
@@ -65,7 +69,7 @@ class LibraryContentTestBase(UniqueCourseTest):
         )
 
         library_content_metadata = {
-            'source_library_id': unicode(self.library_key),
+            'source_library_id': six.text_type(self.library_key),
             'mode': 'random',
             'max_count': 1,
         }
@@ -98,8 +102,7 @@ class LibraryContentTestBase(UniqueCourseTest):
         editor.save()
         self._go_to_unit_page(change_login=False)
         unit_page.wait_for_page()
-        unit_page.publish_action.click()
-        unit_page.wait_for_ajax()
+        unit_page.publish()
         self.assertIn("Published and Live", unit_page.publish_title)
 
     @property
@@ -116,9 +119,9 @@ class LibraryContentTestBase(UniqueCourseTest):
         if change_login:
             LogoutPage(self.browser).visit()
             self._auto_auth(self.STAFF_USERNAME, self.STAFF_EMAIL, True)
-        self.course_outline.visit()
+        self.studio_course_outline.visit()
 
-        subsection = self.course_outline.section(SECTION_NAME).subsection(SUBSECTION_NAME)
+        subsection = self.studio_course_outline.section(SECTION_NAME).subsection(SUBSECTION_NAME)
         return subsection.expand_subsection().unit(UNIT_NAME).go_to()
 
     def _goto_library_block_page(self, block_id=None):
@@ -128,7 +131,9 @@ class LibraryContentTestBase(UniqueCourseTest):
         self.courseware_page.visit()
         paragraphs = self.courseware_page.q(css='.course-content p').results
         if not paragraphs:
-            self.courseware_page.q(css='.menu-item a').results[0].click()
+            course_home_page = CourseHomePage(self.browser, self.course_id)
+            course_home_page.visit()
+            course_home_page.outline.go_to_section_by_index(0, 0)
         block_id = block_id if block_id is not None else self.lib_block.locator
         #pylint: disable=attribute-defined-outside-init
         self.library_content_page = LibraryContentXBlockWrapper(self.browser, block_id)
@@ -143,11 +148,12 @@ class LibraryContentTestBase(UniqueCourseTest):
 
 
 @ddt.ddt
-@attr(shard=7)
 class LibraryContentTest(LibraryContentTestBase):
     """
     Test courseware.
     """
+    shard = 10
+
     def populate_library_fixture(self, library_fixture):
         """
         Populates library fixture with XBlock Fixtures
@@ -196,11 +202,12 @@ class LibraryContentTest(LibraryContentTestBase):
 
 
 @ddt.ddt
-@attr(shard=7)
 class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase, TestWithSearchIndexMixin):
     """
     Test Library Content block in LMS
     """
+    shard = 10
+
     def setUp(self):
         """ SetUp method """
         self._create_search_index()
@@ -213,11 +220,11 @@ class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase, TestWithSearc
     def _get_problem_choice_group_text(self, name, items):
         """ Generates Choice Group CAPA problem XML """
         items_text = "\n".join([
-            "<choice correct='{correct}'>{item}</choice>".format(correct=correct, item=item)
+            u"<choice correct='{correct}'>{item}</choice>".format(correct=correct, item=item)
             for item, correct in items
         ])
 
-        return textwrap.dedent("""
+        return textwrap.dedent(u"""
         <problem>
             <p>{name}</p>
             <multiplechoiceresponse>
@@ -229,7 +236,7 @@ class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase, TestWithSearc
         """ Generates Select Option CAPA problem XML """
         items_text = ",".join(["'{0}'".format(item) for item in items])
 
-        return textwrap.dedent("""
+        return textwrap.dedent(u"""
         <problem>
             <p>{name}</p>
             <optionresponse>

@@ -1,13 +1,14 @@
 """
 Tests third_party_auth admin views
 """
+from __future__ import absolute_import
+
 import unittest
 
-from django.conf import settings
 from django.contrib.admin.sites import AdminSite
-from django.core.urlresolvers import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import models
+from django.urls import reverse
 
 from student.tests.factories import UserFactory
 from third_party_auth.admin import OAuth2ProviderConfigAdmin
@@ -16,7 +17,7 @@ from third_party_auth.tests import testutil
 
 
 # This is necessary because cms does not implement third party auth
-@unittest.skipUnless(settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'), 'third party auth not enabled')
+@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
 class Oauth2ProviderConfigAdminTest(testutil.TestCase):
     """
     Tests for oauth2 provider config admin
@@ -59,13 +60,16 @@ class Oauth2ProviderConfigAdminTest(testutil.TestCase):
 
         # Edit the provider via the admin edit link
         admin = OAuth2ProviderConfigAdmin(provider1, AdminSite())
-        # pylint: disable=protected-access
         update_url = reverse('admin:{}_{}_add'.format(admin.model._meta.app_label, admin.model._meta.model_name))
         update_url += "?source={}".format(provider1.pk)
 
         # Remove the icon_image from the POST data, to simulate unchanged icon_image
         post_data = models.model_to_dict(provider1)
         del post_data['icon_image']
+        # Remove max_session_length and organization. A default null value must be POSTed
+        # back as an absent value, rather than as a "null-like" included value.
+        del post_data['max_session_length']
+        del post_data['organization']
 
         # Change the name, to verify POST
         post_data['name'] = 'Another name'

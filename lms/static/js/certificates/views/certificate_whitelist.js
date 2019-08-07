@@ -35,8 +35,7 @@
                     this.$el.html(template({certificates: this.collection.models}));
                     if (!this.active_certificate || this.collection.isEmpty()) {
                         this.$('#generate-exception-certificates').attr('disabled', 'disabled');
-                    }
-                    else {
+                    } else {
                         this.$('#generate-exception-certificates').removeAttr('disabled');
                     }
                 },
@@ -64,8 +63,7 @@
                                 data: JSON.stringify(model.attributes)
                             }
                         );
-                    }
-                    else {
+                    } else {
                         this.escapeAndShowMessage(
                             gettext('Could not find Certificate Exception in white list. Please refresh the page and try again')  // eslint-disable-line max-len
                         );
@@ -96,8 +94,7 @@
                         try {
                             var response = JSON.parse(xhr.responseText);
                             caller_object.escapeAndShowMessage(response.message);
-                        }
-                        catch (exception) {
+                        } catch (exception) {
                             caller_object.escapeAndShowMessage(
                                 gettext('Server Error, Please refresh the page and try again.')
                             );

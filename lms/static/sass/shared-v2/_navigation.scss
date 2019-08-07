@@ -2,22 +2,32 @@
 
 // skip navigation
 .nav-skip {
-    font-size: font-size(small);
-    display: inline-block;
-    position: absolute;
-    left: 0;
-    top: -($baseline*30);
-    overflow: hidden;
-    background: $white;
-    border-bottom: 1px solid $lms-border-color;
-    padding: ($baseline*0.75) ($baseline/2);
+  font-size: font-size(small);
+  display: inline-block;
+  position: absolute;
+  left: 0;
+  top: -($baseline*30);
+  overflow: hidden;
+  background: $white;
+  border-bottom: 1px solid $border-color;
+  padding: ($baseline*0.75) ($baseline/2);
 
-    &:focus,
-    &:active {
-        position: relative;
-        top: auto;
-        width: auto;
-        height: auto;
-        margin: 0;
-    }
+  &:focus,
+  &:active {
+    @include left(50%);
+    @include margin-left(-6.5em)
+      margin-top: 0;
+
+    padding: 10px 0.5em;
+    text-align: center;
+    position: absolute;
+    width: 12em;
+    z-index: 1050;
+    top: 0;
+    background-color: $black !important;
+    opacity: 0.8;
+    color: $white !important;
+    text-decoration: none;
+    outline: none;
+  }
 }

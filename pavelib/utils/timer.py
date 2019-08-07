@@ -2,13 +2,16 @@
 Tools for timing paver tasks
 """
 
-from datetime import datetime
+from __future__ import absolute_import
+
 import json
 import logging
 import os
-from os.path import dirname, exists
 import sys
 import traceback
+from datetime import datetime
+from os.path import dirname, exists
+
 import wrapt
 
 LOGGER = logging.getLogger(__file__)
@@ -36,7 +39,7 @@ def timed(wrapped, instance, args, kwargs):  # pylint: disable=unused-argument
     exception_info = {}
     try:
         return wrapped(*args, **kwargs)
-    except Exception as exc:  # pylint: disable=broad-except
+    except Exception as exc:
         exception_info = {
             'exception': "".join(traceback.format_exception_only(type(exc), exc)).strip()
         }

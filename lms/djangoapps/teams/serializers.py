@@ -1,17 +1,19 @@
 """Defines serializers used by the Team API."""
+from __future__ import absolute_import
+
 from copy import deepcopy
+
+import six
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Count
-from django.conf import settings
-
 from django_countries import countries
 from rest_framework import serializers
 
-from openedx.core.lib.api.serializers import CollapsedReferenceSerializer
-from openedx.core.lib.api.fields import ExpandableField
-from openedx.core.djangoapps.user_api.accounts.serializers import UserReadOnlySerializer
-
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
+from openedx.core.djangoapps.user_api.accounts.serializers import UserReadOnlySerializer
+from openedx.core.lib.api.fields import ExpandableField
+from openedx.core.lib.api.serializers import CollapsedReferenceSerializer
 
 
 class CountryField(serializers.Field):
@@ -19,13 +21,13 @@ class CountryField(serializers.Field):
     Field to serialize a country code.
     """
 
-    COUNTRY_CODES = dict(countries).keys()
+    COUNTRY_CODES = list(dict(countries).keys())
 
     def to_representation(self, obj):
         """
         Represent the country as a 2-character unicode identifier.
         """
-        return unicode(obj)
+        return six.text_type(obj)
 
     def to_internal_value(self, data):
         """
@@ -48,7 +50,7 @@ class UserMembershipSerializer(serializers.ModelSerializer):
     Used for listing team members.
     """
     profile_configuration = deepcopy(settings.ACCOUNT_VISIBILITY_CONFIGURATION)
-    profile_configuration['shareable_fields'].append('url')
+    profile_configuration['bulk_shareable_fields'].append('url')
     profile_configuration['public_fields'].append('url')
 
     user = ExpandableField(
@@ -135,7 +137,7 @@ class CourseTeamSerializerWithoutMembership(CourseTeamSerializer):
 class MembershipSerializer(serializers.ModelSerializer):
     """Serializes CourseTeamMemberships with information about both teams and users."""
     profile_configuration = deepcopy(settings.ACCOUNT_VISIBILITY_CONFIGURATION)
-    profile_configuration['shareable_fields'].append('url')
+    profile_configuration['bulk_shareable_fields'].append('url')
     profile_configuration['public_fields'].append('url')
 
     user = ExpandableField(

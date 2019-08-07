@@ -17,6 +17,7 @@
 %bubble {
   @include transform(rotate(45deg));
   @include left(12px);
+
   position: absolute;
   bottom: -($baseline/2);
   display: block;
@@ -45,7 +46,7 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
 }
 
 %notes-reset-font {
-  font-family: $f-sans-serif !important;
+  font-family: $font-family-sans-serif !important;
   font-style: normal !important;
   font-weight: $font-regular !important;
 }
@@ -66,17 +67,19 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
 // +toggling notes
 // --------------------
 .edx-notes-visibility {
-
   .edx-notes-visibility-error {
     @extend %t-copy-sub2;
     @extend %text-truncated;
+
     position: relative;
     bottom: -($baseline/20); // needed to sync up with current rogue/more complex calc utility alignment
     max-width: ($baseline*15);
     display: none;
     vertical-align: bottom;
+
     @include margin-right(-($baseline/4));
     @include border-right(($baseline/4) solid $error-color);
+
     padding: ($baseline/2) $baseline;
     background: $black-t3;
     text-align: center;
@@ -85,7 +88,6 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
 
   // STATE: has error
   &.has-error {
-
     .edx-notes-visibility-error {
       display: inline-block;
     }
@@ -100,6 +102,7 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
 .annotator-notice {
   @extend %t-weight4;
   @extend %t-copy-sub1;
+
   padding: ($baseline/4) $baseline;
   background: $black-t3;
 }
@@ -109,6 +112,7 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
 .annotator-notice {
   @extend %t-weight4;
   @extend %t-copy-sub1;
+
   padding: ($baseline/2) $baseline;
   background: $gray-d4;
 }
@@ -140,7 +144,7 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
     margin: 0 !important;
 
     .annotator-widget {
-      &:after {
+      &::after {
         @extend %bubble;
       }
     }
@@ -148,8 +152,9 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
 
   .annotator-editor {
     .annotator-widget {
-      &:after {
+      &::after {
         @extend %bubble;
+
         background: $gray-l5;
       }
     }
@@ -169,23 +174,30 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
 
     button {
       @extend %notes-bubble;
+
       position: relative;
       display: block;
 
-      &:after {
+      &::after {
         @extend %notes-reset-icon;
         @extend %shame-link-base;
+
         @include font-size(30);
+
         position: absolute;
         top: 35%;
+
         @include left(15%);
+
         content: "\f14b";
       }
 
       // using annotatorJS triangle styling for adder
-      &:before {
+      &::before {
         @extend %bubble;
+
         @include left(10px);
+
         background: whitesmoke;
       }
     }
@@ -193,30 +205,32 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
 
   // editing
   .annotator-editor {
-
     .annotator-controls {
       @include text-align(left);
       @include clearfix();
+
       @extend %ui-depth1;
+
       position: relative;
       padding: 8px;
       border: none !important;
       border-radius: 0 !important;
       background: $gray-l5 !important;
-      font-family: $f-sans-serif !important;
+      font-family: $font-family-sans-serif !important;
 
       // actions
       .annotator-save, .annotator-cancel {
         @extend %notes-reset-background;
+
         padding: ($baseline/4) ($baseline/2) !important;
         border: none;
         box-shadow: none;
-        font-family: $f-sans-serif !important;
+        font-family: $font-family-sans-serif !important;
         font-size: 14px !important;
         text-shadow: none !important;
 
         // removing vendor icons
-        &:after {
+        &::after {
           display: none !important;
         }
       }
@@ -231,10 +245,10 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
     }
 
     .annotator-item {
-
       textarea {
         @extend %notes-reset-font;
         @extend %t-demi-strong;
+
         padding: ($baseline/5) !important;
         font-size: 14px !important;
         line-height: 22px !important;
@@ -268,6 +282,7 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
       // STATE: disabled
       &:disabled, &.is-disabled {
         @extend %ui-disabled;
+
         opacity: 0.5;
         cursor: not-allowed;
       }
@@ -286,7 +301,6 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
 
   // content
   .annotator-viewer {
-
     .annotator-widget.annotator-listing {
       outline: none;
     }
@@ -294,6 +308,7 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
     // poorly scoped selector for content of a note's comment
     div:first-of-type {
       @extend %notes-reset-font;
+
       padding: ($baseline/4) !important;
       font-size: 14px !important;
       line-height: 22px !important;
@@ -305,7 +320,9 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
       opacity: 1;
       // RTL support
       @include right(0);
+
       top: 0;
+
       @include float(right);
       @include padding-left($baseline/4);
 
@@ -314,10 +331,11 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
         display: inline-block;
         vertical-align: middle;
 
-        &:before {
+        &::before {
           @extend %notes-reset-icon;
           @extend %shame-link-base;
           @extend %t-icon4;
+
           position: absolute;
         }
       }
@@ -325,9 +343,11 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
       .annotator-edit {
         @include margin-right($baseline/2);
 
-        &:before {
+        &::before {
           top: 0;
+
           @include left(0);
+
           content: "\f040"; // .fa-pencil
         }
       }
@@ -335,18 +355,21 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
       .annotator-delete {
         @include margin-right($baseline/3);
 
-        &:before {
+        &::before {
           top: -($baseline/20);
+
           @include left(0);
+
           content: "\f1f8"; // .fa-trash
         }
       }
 
       .annotator-close {
-
-        &:before {
+        &::before {
           top: -($baseline/20);
+
           @include left(0);
+
           content: "\f00d"; // .fa-close
         }
       }
@@ -357,7 +380,8 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
 // --------------------
 .edx-notes-wrapper .annotator-wrapper.annotator-wrapper .annotator-outer.annotator-viewer .annotator-controls button {
   @extend %notes-reset-background;
-  opacity: 1.0;
+
+  opacity: 1;
 }
 
 .edx-notes-wrapper .annotator-wrapper .annotator-editor.annotator-outer button.annotator-save {

@@ -2,6 +2,8 @@
 Tests for the CORS CSRF middleware
 """
 
+from __future__ import absolute_import
+
 from mock import patch, Mock
 import ddt
 
@@ -263,7 +265,7 @@ class TestCsrfCrossDomainCookieMiddleware(TestCase):
             self.assertIn(self.COOKIE_NAME, response.cookies)
             cookie_header = str(response.cookies[self.COOKIE_NAME])
 
-            expected = 'Set-Cookie: {name}={value}; Domain={domain};'.format(
+            expected = b'Set-Cookie: {name}={value}; Domain={domain};'.format(
                 name=self.COOKIE_NAME,
                 value=self.COOKIE_VALUE,
                 domain=self.COOKIE_DOMAIN

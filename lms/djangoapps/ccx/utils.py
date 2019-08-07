@@ -3,42 +3,32 @@ CCX Enrollment operations for use by Coach APIs.
 
 Does not include any access control, be sure to check access before calling.
 """
+from __future__ import absolute_import
+
 import datetime
 import logging
-import pytz
 from contextlib import contextmanager
-
-from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext as _
-from django.core.validators import validate_email
-from django.core.urlresolvers import reverse
 from smtplib import SMTPException
 
-from courseware.courses import get_course_by_id
-from lms.djangoapps.instructor.enrollment import (
-    enroll_email,
-    get_email_params,
-    unenroll_email,
-)
-from lms.djangoapps.instructor.access import (
-    allow_access,
-    list_with_level,
-    revoke_access,
-)
-from lms.djangoapps.instructor.views.tools import get_student_from_identifier
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.content.course_structures.models import CourseStructure
-from student.models import CourseEnrollment, CourseEnrollmentException
-from student.roles import (
-    CourseCcxCoachRole,
-    CourseInstructorRole,
-    CourseStaffRole
-)
+import pytz
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
+from django.urls import reverse
+from django.utils.translation import ugettext as _
+from six.moves import map
 
-from lms.djangoapps.ccx.overrides import get_override_for_ccx
+from courseware.courses import get_course_by_id
 from lms.djangoapps.ccx.custom_exception import CCXUserValidationException
 from lms.djangoapps.ccx.models import CustomCourseForEdX
+from lms.djangoapps.ccx.overrides import get_override_for_ccx
+from lms.djangoapps.instructor.access import allow_access, list_with_level, revoke_access
+from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params, unenroll_email
+from lms.djangoapps.instructor.views.api import _split_input_list
+from lms.djangoapps.instructor.views.tools import get_student_from_identifier
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from student.models import CourseEnrollment, CourseEnrollmentException
+from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
 
 log = logging.getLogger("edx.ccx")
 
@@ -73,7 +63,7 @@ def get_ccx_from_ccx_locator(course_id):
         ccx = CustomCourseForEdX.objects.filter(id=ccx_id)
     if not ccx:
         log.warning(
-            "CCX does not exist for course with id %s",
+            u"CCX does not exist for course with id %s",
             course_id
         )
         return None
@@ -98,15 +88,36 @@ def get_date(ccx, node, date_type=None, parent_node=None):
 
     if date is not None:
         # Setting override date [start or due]
-        date = date.strftime('%Y-%m-%d %H:%M')
+        date = date.strftime(u'%Y-%m-%d %H:%M')
     elif not parent_node and master_date is not None:
         # Setting date from master course
-        date = master_date.strftime('%Y-%m-%d %H:%M')
+        date = master_date.strftime(u'%Y-%m-%d %H:%M')
     elif parent_node is not None:
         # Set parent date (vertical has same dates as subsections)
         date = get_date(ccx, node=parent_node, date_type=date_type)
 
     return date
+
+
+def get_enrollment_action_and_identifiers(request):
+    """
+    Extracts action type and student identifiers from the request
+    on Enrollment tab of CCX Dashboard.
+    """
+    action, identifiers = None, None
+    student_action = request.POST.get('student-action', None)
+    batch_action = request.POST.get('enrollment-button', None)
+
+    if student_action:
+        action = student_action
+        student_id = request.POST.get('student-id', '')
+        identifiers = [student_id]
+    elif batch_action:
+        action = batch_action
+        identifiers_raw = request.POST.get('student-ids')
+        identifiers = _split_input_list(identifiers_raw)
+
+    return action, identifiers
 
 
 def validate_date(year, month, day, hour, minute):
@@ -134,8 +145,8 @@ def parse_date(datestring):
     """
     if datestring:
         date, time = datestring.split(' ')
-        year, month, day = map(int, date.split('-'))
-        hour, minute = map(int, time.split(':'))
+        year, month, day = list(map(int, date.split('-')))
+        hour, minute = list(map(int, time.split(':')))
         if validate_date(year, month, day, hour, minute):
             return datetime.datetime(
                 year, month, day, hour, minute, tzinfo=pytz.UTC)
@@ -215,22 +226,16 @@ def get_valid_student_with_email(identifier):
     try:
         validate_email(email)
     except ValidationError:
-        raise CCXUserValidationException('Could not find a user with name or email "{0}" '.format(identifier))
+        raise CCXUserValidationException(u'Could not find a user with name or email "{0}" '.format(identifier))
     return email, user
 
 
 def ccx_students_enrolling_center(action, identifiers, email_students, course_key, email_params, coach):
     """
-    Function to enroll/add or unenroll/revoke students.
-
-    This function exists for backwards compatibility: in CCX there are
-    two different views to manage students that used to implement
-    a different logic. Now the logic has been reconciled at the point that
-    this function can be used by both.
-    The two different views can be merged after some UI refactoring.
+    Function to enroll or unenroll/revoke students.
 
     Arguments:
-        action (str): type of action to perform (add, Enroll, revoke, Unenroll)
+        action (str): type of action to perform (Enroll, Unenroll/revoke)
         identifiers (list): list of students username/email
         email_students (bool): Flag to send an email to students
         course_key (CCXLocator): a CCX course key
@@ -242,7 +247,7 @@ def ccx_students_enrolling_center(action, identifiers, email_students, course_ke
     """
     errors = []
 
-    if action == 'Enroll' or action == 'add':
+    if action == 'Enroll':
         ccx_course_overview = CourseOverview.get_from_id(course_key)
         course_locator = course_key.to_course_locator()
         staff = CourseStaffRole(course_locator).users_with_role()
@@ -255,14 +260,14 @@ def ccx_students_enrolling_center(action, identifiers, email_students, course_ke
                 if student:
                     must_enroll = student in staff or student in admins or student == coach
             except CCXUserValidationException as exp:
-                log.info("%s", exp)
-                errors.append("{0}".format(exp))
+                log.info(u"%s", exp)
+                errors.append(u"{0}".format(exp))
                 continue
 
             if CourseEnrollment.objects.is_course_full(ccx_course_overview) and not must_enroll:
-                error = _('The course is full: the limit is {max_student_enrollments_allowed}').format(
+                error = _(u'The course is full: the limit is {max_student_enrollments_allowed}').format(
                     max_student_enrollments_allowed=ccx_course_overview.max_student_enrollments_allowed)
-                log.info("%s", error)
+                log.info(u"%s", error)
                 errors.append(error)
                 break
             enroll_email(course_key, email, auto_enroll=True, email_students=email_students, email_params=email_params)
@@ -271,17 +276,11 @@ def ccx_students_enrolling_center(action, identifiers, email_students, course_ke
             try:
                 email, __ = get_valid_student_with_email(identifier)
             except CCXUserValidationException as exp:
-                log.info("%s", exp)
-                errors.append("{0}".format(exp))
+                log.info(u"%s", exp)
+                errors.append(u"{0}".format(exp))
                 continue
             unenroll_email(course_key, email, email_students=email_students, email_params=email_params)
     return errors
-
-
-def prep_course_for_grading(course, request):
-    """Set up course module for overrides to function properly"""
-    course._field_data_cache = {}  # pylint: disable=protected-access
-    course.set_grading_policy(course.grading_policy)
 
 
 @contextmanager
@@ -323,32 +322,6 @@ def is_email(identifier):
     return True
 
 
-def get_course_chapters(course_key):
-    """
-    Extracts the chapters from a course structure.
-    If the course does not exist returns None.
-    If the structure does not contain 1st level children,
-    it returns an empty list.
-
-    Args:
-        course_key (CourseLocator): the course key
-    Returns:
-        list (string): a list of string representing the chapters modules
-            of the course
-    """
-    if course_key is None:
-        return
-    try:
-        course_obj = CourseStructure.objects.get(course_id=course_key)
-    except CourseStructure.DoesNotExist:
-        return
-    course_struct = course_obj.structure
-    try:
-        return course_struct['blocks'][course_struct['root']].get('children', [])
-    except KeyError:
-        return []
-
-
 def add_master_course_staff_to_ccx(master_course, ccx_key, display_name, send_email=True):
     """
     Add staff and instructor roles on ccx to all the staff and instructors members of master course.
@@ -384,7 +357,7 @@ def add_master_course_staff_to_ccx(master_course, ccx_key, display_name, send_em
                     allow_access(course_ccx, staff, 'staff')
                 except CourseEnrollmentException:
                     log.warning(
-                        "Unable to enroll staff %s to course with id %s",
+                        u"Unable to enroll staff %s to course with id %s",
                         staff.email,
                         ccx_key
                     )
@@ -409,7 +382,7 @@ def add_master_course_staff_to_ccx(master_course, ccx_key, display_name, send_em
                     allow_access(course_ccx, instructor, 'instructor')
                 except CourseEnrollmentException:
                     log.warning(
-                        "Unable to enroll instructor %s to course with id %s",
+                        u"Unable to enroll instructor %s to course with id %s",
                         instructor.email,
                         ccx_key
                     )

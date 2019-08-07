@@ -15,7 +15,7 @@ class StudentModuleHistoryExtendedRouter(object):
         Return True if ``model`` is courseware.StudentModuleHistoryExtended.
         """
         return (
-            model._meta.app_label == 'coursewarehistoryextended' and  # pylint: disable=protected-access
+            model._meta.app_label == 'coursewarehistoryextended' and
             model.__name__ == 'StudentModuleHistoryExtended'
         )
 
@@ -45,13 +45,15 @@ class StudentModuleHistoryExtendedRouter(object):
             return False
         return None
 
-    def allow_migrate(self, db, model):  # pylint: disable=unused-argument
+    def allow_migrate(self, db, app_label, model_name=None, **hints):  # pylint: disable=unused-argument
         """
         Only sync StudentModuleHistoryExtended to StudentModuleHistoryExtendedRouter.DATABASE_Name
         """
-        if self._is_csmh(model):
-            return db == self.DATABASE_NAME
-        elif db == self.DATABASE_NAME:
+        if model_name is not None:
+            model = hints.get('model')
+            if model is not None and self._is_csmh(model):
+                return db == self.DATABASE_NAME
+        if db == self.DATABASE_NAME:
             return False
 
         return None

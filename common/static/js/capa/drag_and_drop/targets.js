@@ -1,9 +1,9 @@
 (function(requirejs, require, define) {
     define([], function() {
         return {
-            'initializeBaseTargets': initializeBaseTargets,
-            'initializeTargetField': initializeTargetField,
-            'destroyTargetField': destroyTargetField
+            initializeBaseTargets: initializeBaseTargets,
+            initializeTargetField: initializeTargetField,
+            destroyTargetField: destroyTargetField
         };
 
         function initializeBaseTargets(state) {
@@ -68,14 +68,14 @@
         }
 
         function processTarget(state, obj, fromTargetField, draggableObj) {
-            var targetEl, borderCss, numTextEl, targetObj;
+            var $targetEl, borderCss, $numTextEl, targetObj;
 
             borderCss = '';
             if (state.config.targetOutline === true) {
                 borderCss = 'border: 1px dashed gray; ';
             }
 
-            targetEl = $(
+            $targetEl = $(
             '<div ' +
                 'style=" ' +
                     'display: block; ' +
@@ -89,17 +89,17 @@
             'aria-dropeffect=""></div>'
         );
             if (fromTargetField === true) {
-                targetEl.appendTo(draggableObj.iconEl);
+                $targetEl.appendTo(draggableObj.iconEl);
             } else {
-                targetEl.appendTo(state.baseImageEl.parent());
+                $targetEl.appendTo(state.baseImageEl.parent());
             }
 
-            targetEl.mousedown(function(event) {
+            $targetEl.mousedown(function(event) {
                 event.preventDefault();
             });
 
             if (state.config.onePerTarget === false) {
-                numTextEl = $(
+                $numTextEl = $(
                 '<div ' +
                     'style=" ' +
                         'display: block; ' +
@@ -118,37 +118,37 @@
                 '>0</div>'
             );
             } else {
-                numTextEl = null;
+                $numTextEl = null;
             }
 
             targetObj = {
-                'uniqueId': state.getUniqueId(),
+                uniqueId: state.getUniqueId(),
 
-                'id': obj.id,
+                id: obj.id,
 
-                'x': obj.x,
-                'y': obj.y,
+                x: obj.x,
+                y: obj.y,
 
-                'w': obj.w,
-                'h': obj.h,
+                w: obj.w,
+                h: obj.h,
 
-                'el': targetEl,
-                'offset': targetEl.position(),
+                el: $targetEl,
+                offset: $targetEl.position(),
 
-                'draggableList': [],
+                draggableList: [],
 
-                'state': state,
+                state: state,
 
-                'targetEl': targetEl,
+                targetEl: $targetEl,
 
-                'numTextEl': numTextEl,
-                'updateNumTextEl': updateNumTextEl,
+                numTextEl: $numTextEl,
+                updateNumTextEl: updateNumTextEl,
 
-                'removeDraggable': removeDraggable,
-                'addDraggable': addDraggable,
+                removeDraggable: removeDraggable,
+                addDraggable: addDraggable,
 
-                'type': 'base',
-                'draggableObj': null
+                type: 'base',
+                draggableObj: null
             };
 
             if (fromTargetField === true) {
@@ -161,11 +161,11 @@
             }
 
             if (state.config.onePerTarget === false) {
-                numTextEl.appendTo(state.baseImageEl.parent());
-                numTextEl.mousedown(function(event) {
+                $numTextEl.appendTo(state.baseImageEl.parent());
+                $numTextEl.mousedown(function(event) {
                     event.preventDefault();
                 });
-                numTextEl.mouseup(function() {
+                $numTextEl.mouseup(function() {
                     cycleDraggableOrder.call(targetObj);
                 });
             }

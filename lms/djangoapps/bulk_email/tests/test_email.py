@@ -2,28 +2,35 @@
 """
 Unit tests for sending course email
 """
+from __future__ import absolute_import
+
 import json
-from markupsafe import escape
-from mock import patch, Mock
-from nose.plugins.attrib import attr
 import os
 from unittest import skipIf
 
+import ddt
+import six
+from six.moves import range
 from django.conf import settings
 from django.core import mail
 from django.core.mail.message import forbid_multi_line_headers
-from django.core.urlresolvers import reverse
 from django.core.management import call_command
 from django.test.utils import override_settings
+from django.urls import reverse
+from django.utils.translation import get_language
+from markupsafe import escape
+from mock import Mock, patch
 
-from bulk_email.models import Optout, BulkEmailFlag
-from bulk_email.tasks import _get_source_address, _get_course_email_context
-from openedx.core.djangoapps.course_groups.models import CourseCohort
-from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
-from courseware.tests.factories import StaffFactory, InstructorFactory
+from bulk_email.models import BulkEmailFlag, Optout
+from bulk_email.tasks import _get_course_email_context, _get_source_address
+from course_modes.models import CourseMode
+from courseware.tests.factories import InstructorFactory, StaffFactory
 from lms.djangoapps.instructor_task.subtasks import update_subtask_status
-from student.roles import CourseStaffRole
+from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
+from openedx.core.djangoapps.course_groups.models import CourseCohort
+from openedx.core.djangoapps.enrollments.api import update_enrollment
 from student.models import CourseEnrollment
+from student.roles import CourseStaffRole
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -64,7 +71,7 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
         self.instructor = InstructorFactory(course_key=self.course.id)
 
         self.staff = [
-            StaffFactory(course_key=self.course.id) for __ in xrange(STAFF_COUNT)
+            StaffFactory(course_key=self.course.id) for __ in range(STAFF_COUNT)
         ]
 
     def create_students(self):
@@ -72,7 +79,7 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
         Creates users and enrolls them in self.course. Assigns these users to
         self.students.
         """
-        self.students = [UserFactory() for _ in xrange(STUDENT_COUNT)]
+        self.students = [UserFactory() for _ in range(STUDENT_COUNT)]
         for student in self.students:
             CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
 
@@ -87,12 +94,12 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
         Goes to the instructor dashboard to verify that the email section is
         there.
         """
-        url = reverse('instructor_dashboard', kwargs={'course_id': unicode(self.course.id)})
+        url = reverse('instructor_dashboard', kwargs={'course_id': six.text_type(self.course.id)})
         # Response loads the whole instructor dashboard, so no need to explicitly
         # navigate to a particular email section
         response = self.client.get(url)
         email_section = '<div class="vert-left send-email" id="section-send-email">'
-        # If this fails, it is likely because BulkEmailFlag.is_enabled() is set to False
+        # If this fails, it is likely because bulk_email.api.is_bulk_email_feature_enabled is set to False
         self.assertIn(email_section, response.content)
 
     @classmethod
@@ -118,10 +125,10 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
         # Pulling up the instructor dash email view here allows us to test sending emails in tests
         self.goto_instructor_dash_email_view()
         self.send_mail_url = reverse(
-            'send_email', kwargs={'course_id': unicode(self.course.id)}
+            'send_email', kwargs={'course_id': six.text_type(self.course.id)}
         )
         self.success_content = {
-            'course_id': unicode(self.course.id),
+            'course_id': six.text_type(self.course.id),
             'success': True,
         }
 
@@ -130,7 +137,97 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
         BulkEmailFlag.objects.all().delete()
 
 
-@attr(shard=1)
+class SendEmailWithMockedUgettextMixin(object):
+    """
+    Mock uggetext for EmailSendFromDashboardTestCase.
+    """
+    def send_email(self):
+        """
+        Sends a dummy email to check the `from_addr` translation.
+        """
+        test_email = {
+            'action': 'send',
+            'send_to': '["myself"]',
+            'subject': 'test subject for myself',
+            'message': 'test message for myself'
+        }
+
+        def mock_ugettext(text):
+            """
+            Mocks ugettext to return the lang code with the original string.
+
+            e.g.
+
+            >>> mock_ugettext('Hello') == '@AR Hello@'
+            """
+            return u'@{lang} {text}@'.format(
+                lang=get_language().upper(),
+                text=text,
+            )
+
+        with patch('bulk_email.tasks._', side_effect=mock_ugettext):
+            self.client.post(self.send_mail_url, test_email)
+
+        return mail.outbox[0]
+
+
+@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
+@ddt.ddt
+class LocalizedFromAddressPlatformLangTestCase(SendEmailWithMockedUgettextMixin, EmailSendFromDashboardTestCase):
+    """
+    Tests to ensure that the bulk email has the "From" address localized according to LANGUAGE_CODE.
+    """
+    @override_settings(LANGUAGE_CODE='en')
+    def test_english_platform(self):
+        """
+        Ensures that the source-code language (English) works well.
+        """
+        self.assertIsNone(self.course.language)  # Sanity check
+        message = self.send_email()
+        self.assertRegexpMatches(message.from_email, '.*Course Staff.*')
+
+    @override_settings(LANGUAGE_CODE='eo')
+    def test_esperanto_platform(self):
+        """
+        Tests the fake Esperanto language to ensure proper gettext calls.
+        """
+        self.assertIsNone(self.course.language)  # Sanity check
+        message = self.send_email()
+        self.assertRegexpMatches(message.from_email, '@EO .* Course Staff@')
+
+
+@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
+@ddt.ddt
+class LocalizedFromAddressCourseLangTestCase(SendEmailWithMockedUgettextMixin, EmailSendFromDashboardTestCase):
+    """
+    Test if the bulk email "From" address uses the course.language if present instead of LANGUAGE_CODE.
+
+    This is similiar to LocalizedFromAddressTestCase but creating a different test case to allow
+    changing the class-wide course object.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Creates a different course.
+        """
+        super(LocalizedFromAddressCourseLangTestCase, cls).setUpClass()
+        course_title = u"ẗëṡẗ ｲэ"
+        cls.course = CourseFactory.create(
+            display_name=course_title,
+            language='ar',
+            default_store=ModuleStoreEnum.Type.split
+        )
+
+    @override_settings(LANGUAGE_CODE='eo')
+    def test_esperanto_platform_arabic_course(self):
+        """
+        The course language should override the platform's.
+        """
+        message = self.send_email()
+        self.assertRegexpMatches(message.from_email, '@AR .* Course Staff@')
+
+
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase):
     """
@@ -238,6 +335,64 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
 
         self.assertEquals(len(mail.outbox), len(self.students) - 1)
         self.assertNotIn(self.students[-1].email, [e.to[0] for e in mail.outbox])
+
+    def test_send_to_track(self):
+        """
+        Make sure email sent to a registration track goes there.
+        """
+        CourseMode.objects.create(mode_slug='test', course_id=self.course.id)
+        for student in self.students:
+            update_enrollment(student, six.text_type(self.course.id), 'test')
+        test_email = {
+            'action': 'Send email',
+            'send_to': '["track:test"]',
+            'subject': 'test subject for test track',
+            'message': 'test message for test track',
+        }
+        response = self.client.post(self.send_mail_url, test_email)
+        self.assertEquals(json.loads(response.content), self.success_content)
+
+        self.assertItemsEqual(
+            [e.to[0] for e in mail.outbox],
+            [s.email for s in self.students]
+        )
+
+    def test_send_to_track_other_enrollments(self):
+        """
+        Failing test for EDUCATOR-217: verifies that emails are only sent to
+        users in a specific track if they're in that track in the course the
+        email is being sent from.
+        """
+        # Create a mode and designate an enrolled user to be placed in that mode
+        CourseMode.objects.create(mode_slug='test_mode', course_id=self.course.id)
+        test_mode_student = self.students[0]
+        update_enrollment(test_mode_student, six.text_type(self.course.id), 'test_mode')
+
+        # Take another user already enrolled in the course, then enroll them in
+        # another course but in that same test mode
+        test_mode_student_other_course = self.students[1]
+        other_course = CourseFactory.create()
+        CourseMode.objects.create(mode_slug='test_mode', course_id=other_course.id)
+        CourseEnrollmentFactory.create(
+            user=test_mode_student_other_course,
+            course_id=other_course.id
+        )
+        update_enrollment(test_mode_student_other_course, six.text_type(other_course.id), 'test_mode')
+
+        # Send the emails...
+        test_email = {
+            'action': 'Send email',
+            'send_to': '["track:test_mode"]',
+            'subject': 'test subject for test_mode track',
+            'message': 'test message for test_mode track',
+        }
+        response = self.client.post(self.send_mail_url, test_email)
+        self.assertEquals(json.loads(response.content), self.success_content)
+
+        # Only the the student in the test mode in the course the email was
+        # sent from should receive an email
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to[0], test_mode_student.email)
 
     def test_send_to_all(self):
         """
@@ -371,7 +526,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         instructor = InstructorFactory(course_key=course.id)
 
         unexpected_from_addr = _get_source_address(
-            course.id, course.display_name, truncate=False
+            course.id, course.display_name, course_language=None, truncate=False
         )
         __, encoded_unexpected_from_addr = forbid_multi_line_headers(
             "from", unexpected_from_addr, 'utf-8'
@@ -386,7 +541,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         self.assertEqual(len(unexpected_from_addr), 137)
 
         self.login_as_user(instructor)
-        send_mail_url = reverse('send_email', kwargs={'course_id': unicode(course.id)})
+        send_mail_url = reverse('send_email', kwargs={'course_id': six.text_type(course.id)})
         response = self.client.post(send_mail_url, test_email)
         self.assertTrue(json.loads(response.content)['success'])
 
@@ -412,7 +567,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         mock_factory = MockCourseEmailResult()
         email_mock.side_effect = mock_factory.get_mock_update_subtask_status()
         added_users = []
-        for _ in xrange(LARGE_NUM_EMAILS):
+        for _ in range(LARGE_NUM_EMAILS):
             user = UserFactory()
             added_users.append(user)
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
@@ -443,7 +598,6 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         self.assertItemsEqual(outbox_contents, should_send_contents)
 
 
-@attr(shard=1)
 @skipIf(os.environ.get("TRAVIS") == 'true', "Skip this test in Travis CI.")
 class TestEmailSendFromDashboard(EmailSendFromDashboardTestCase):
     """

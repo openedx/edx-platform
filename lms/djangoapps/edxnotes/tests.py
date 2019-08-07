@@ -1,38 +1,43 @@
 """
 Tests for the EdxNotes app.
 """
-from contextlib import contextmanager
-import ddt
-import json
-import jwt
-from mock import patch, MagicMock
-from nose.plugins.attrib import attr
-from unittest import skipUnless
-from datetime import datetime
-import urlparse
+from __future__ import absolute_import
 
+import json
+from contextlib import contextmanager
+from datetime import datetime
+from unittest import skipUnless
+
+import ddt
+import jwt
+from six import text_type
+from six.moves.urllib.parse import urlparse, parse_qs  # pylint: disable=import-error
+from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
+from django.core.exceptions import ImproperlyConfigured
+from django.test.client import RequestFactory
+from django.test.utils import override_settings
+from django.urls import reverse
+from mock import MagicMock, patch
+from oauth2_provider.models import Application
+
+from courseware.model_data import FieldDataCache
+from courseware.module_render import get_module_for_descriptor
+from courseware.tabs import get_course_tab_list
 from edxmako.shortcuts import render_to_string
 from edxnotes import helpers
 from edxnotes.decorators import edxnotes
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from edxnotes.plugins import EdxNotesTab
-from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.core.exceptions import ImproperlyConfigured
-from django.test.client import RequestFactory
-from django.test.utils import override_settings
-from edx_oauth2_provider.tests.factories import ClientFactory
-from provider.oauth2.models import Client
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
+from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
+from student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.tabs import CourseTab
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module_for_descriptor
-from courseware.tabs import get_course_tab_list
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
-
 
 FEATURES = settings.FEATURES.copy()
 
@@ -72,11 +77,11 @@ class TestProblem(object):
 
     The purpose of this class is to imitate any problem.
     """
-    def __init__(self, course):
+    def __init__(self, course, user=None):
         self.system = MagicMock(is_author_mode=False)
         self.scope_ids = MagicMock(usage_id="test_usage_id")
-        self.user = UserFactory.create(username="Joe", email="joe@example.com", password="edx")
-        self.runtime = MagicMock(course_id=course.id, get_real_user=lambda anon_id: self.user)
+        user = user or UserFactory()
+        self.runtime = MagicMock(course_id=course.id, get_real_user=lambda __: user)
         self.descriptor = MagicMock()
         self.descriptor.runtime.modulestore.get_course.return_value = course
 
@@ -87,7 +92,6 @@ class TestProblem(object):
         return "original_get_html"
 
 
-@attr(shard=3)
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
 class EdxNotesDecoratorTest(ModuleStoreTestCase):
     """
@@ -97,36 +101,41 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
     def setUp(self):
         super(EdxNotesDecoratorTest, self).setUp()
 
-        ClientFactory(name="edx-notes")
+        ApplicationFactory(name="edx-notes")
         # Using old mongo because of locator comparison issues (see longer
         # note below in EdxNotesHelpersTest setUp.
-        self.course = CourseFactory.create(edxnotes=True, default_store=ModuleStoreEnum.Type.mongo)
-        self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
-        self.client.login(username=self.user.username, password="edx")
-        self.problem = TestProblem(self.course)
+        self.course = CourseFactory(edxnotes=True, default_store=ModuleStoreEnum.Type.mongo)
+        self.user = UserFactory()
+        self.client.login(username=self.user.username, password=UserFactory._DEFAULT_PASSWORD)
+        self.problem = TestProblem(self.course, self.user)
 
     @patch.dict("django.conf.settings.FEATURES", {'ENABLE_EDXNOTES': True})
-    @patch("edxnotes.decorators.get_public_endpoint", autospec=True)
-    @patch("edxnotes.decorators.get_token_url", autospec=True)
-    @patch("edxnotes.decorators.get_edxnotes_id_token", autospec=True)
-    @patch("edxnotes.decorators.generate_uid", autospec=True)
+    @patch("edxnotes.helpers.get_public_endpoint", autospec=True)
+    @patch("edxnotes.helpers.get_token_url", autospec=True)
+    @patch("edxnotes.helpers.get_edxnotes_id_token", autospec=True)
+    @patch("edxnotes.helpers.generate_uid", autospec=True)
     def test_edxnotes_enabled(self, mock_generate_uid, mock_get_id_token, mock_get_token_url, mock_get_endpoint):
         """
         Tests if get_html is wrapped when feature flag is on and edxnotes are
         enabled for the course.
         """
+        course = CourseFactory(edxnotes=True)
+        enrollment = CourseEnrollmentFactory(course_id=course.id)
+        user = enrollment.user
+        problem = TestProblem(course, user)
+
         mock_generate_uid.return_value = "uid"
         mock_get_id_token.return_value = "token"
         mock_get_token_url.return_value = "/tokenUrl"
         mock_get_endpoint.return_value = "/endpoint"
-        enable_edxnotes_for_the_course(self.course, self.user.id)
+        enable_edxnotes_for_the_course(course, user.id)
         expected_context = {
             "content": "original_get_html",
             "uid": "uid",
             "edxnotes_visibility": "true",
             "params": {
-                "usageId": u"test_usage_id",
-                "courseId": unicode(self.course.id).encode("utf-8"),
+                "usageId": "test_usage_id",
+                "courseId": course.id,
                 "token": "token",
                 "tokenUrl": "/tokenUrl",
                 "endpoint": "/endpoint",
@@ -135,7 +144,7 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
             },
         }
         self.assertEqual(
-            self.problem.get_html(),
+            problem.get_html(),
             render_to_string("edxnotes_wrapper.html", expected_context),
         )
 
@@ -170,8 +179,14 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
         enable_edxnotes_for_the_course(self.course, self.user.id)
         self.assertEqual("original_get_html", self.problem.get_html())
 
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
+    def test_anonymous_user(self):
+        user = AnonymousUser()
+        problem = TestProblem(self.course, user)
+        enable_edxnotes_for_the_course(self.course, None)
+        assert problem.get_html() == "original_get_html"
 
-@attr(shard=3)
+
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
 @ddt.ddt
 class EdxNotesHelpersTest(ModuleStoreTestCase):
@@ -189,7 +204,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         # comparison values do not. This needs further investigation in order to enable these tests
         # with the split modulestore.
         with self.store.default_store(ModuleStoreEnum.Type.mongo):
-            ClientFactory(name="edx-notes")
+            ApplicationFactory(name="edx-notes")
             self.course = CourseFactory.create()
             self.chapter = ItemFactory.create(category="chapter", parent_location=self.course.location)
             self.chapter_2 = ItemFactory.create(category="chapter", parent_location=self.course.location)
@@ -217,8 +232,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             self.child_vertical = self.store.get_item(self.child_vertical.location)
             self.child_html_module = self.store.get_item(self.child_html_module.location)
 
-            self.user = UserFactory.create(username="Joe", email="joe@example.com", password="edx")
-            self.client.login(username=self.user.username, password="edx")
+            self.user = UserFactory()
+            self.client.login(username=self.user.username, password=UserFactory._DEFAULT_PASSWORD)
 
         self.request = RequestFactory().request()
         self.request.user = self.user
@@ -238,29 +253,17 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         Tests that edxnotes are disabled when Harvard Annotation Tool is enabled.
         """
-        self.course.advanced_modules = ["foo", "imageannotation", "boo"]
-        self.assertFalse(helpers.is_feature_enabled(self.course))
+        self.course.advanced_modules = ['imageannotation', 'textannotation', 'videoannotation']
+        assert not helpers.is_feature_enabled(self.course, self.user)
 
-        self.course.advanced_modules = ["foo", "boo", "videoannotation"]
-        self.assertFalse(helpers.is_feature_enabled(self.course))
-
-        self.course.advanced_modules = ["textannotation", "foo", "boo"]
-        self.assertFalse(helpers.is_feature_enabled(self.course))
-
-        self.course.advanced_modules = ["textannotation", "videoannotation", "imageannotation"]
-        self.assertFalse(helpers.is_feature_enabled(self.course))
-
-    @ddt.unpack
-    @ddt.data(
-        {'_edxnotes': True},
-        {'_edxnotes': False}
-    )
-    def test_is_feature_enabled(self, _edxnotes):
+    @ddt.data(True, False)
+    def test_is_feature_enabled(self, enabled):
         """
         Tests that is_feature_enabled shows correct behavior.
         """
-        self.course.edxnotes = _edxnotes
-        self.assertEqual(helpers.is_feature_enabled(self.course), _edxnotes)
+        course = CourseFactory(edxnotes=enabled)
+        enrollment = CourseEnrollmentFactory(course_id=course.id)
+        assert helpers.is_feature_enabled(course, enrollment.user) == enabled
 
     @ddt.data(
         helpers.get_public_endpoint,
@@ -318,13 +321,13 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     {
                         u"quote": u"quote text",
                         u"text": u"text",
-                        u"usage_id": unicode(self.html_module_1.location),
+                        u"usage_id": text_type(self.html_module_1.location),
                         u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000).isoformat(),
                     },
                     {
                         u"quote": u"quote text",
                         u"text": u"text",
-                        u"usage_id": unicode(self.html_module_2.location),
+                        u"usage_id": text_type(self.html_module_2.location),
                         u"updated": datetime(2014, 11, 19, 8, 6, 16, 00000).isoformat(),
                     }
                 ]
@@ -344,48 +347,48 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                         u"quote": u"quote text",
                         u"text": u"text",
                         u"chapter": {
-                            u"display_name": self.chapter.display_name_with_default_escaped,
+                            u"display_name": self.chapter.display_name_with_default,
                             u"index": 0,
-                            u"location": unicode(self.chapter.location),
-                            u"children": [unicode(self.sequential.location)]
+                            u"location": text_type(self.chapter.location),
+                            u"children": [text_type(self.sequential.location)]
                         },
                         u"section": {
-                            u"display_name": self.sequential.display_name_with_default_escaped,
-                            u"location": unicode(self.sequential.location),
+                            u"display_name": self.sequential.display_name_with_default,
+                            u"location": text_type(self.sequential.location),
                             u"children": [
-                                unicode(self.vertical.location), unicode(self.vertical_with_container.location)
+                                text_type(self.vertical.location), text_type(self.vertical_with_container.location)
                             ]
                         },
                         u"unit": {
                             u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
-                            u"display_name": self.vertical.display_name_with_default_escaped,
-                            u"location": unicode(self.vertical.location),
+                            u"display_name": self.vertical.display_name_with_default,
+                            u"location": text_type(self.vertical.location),
                         },
-                        u"usage_id": unicode(self.html_module_2.location),
+                        u"usage_id": text_type(self.html_module_2.location),
                         u"updated": "Nov 19, 2014 at 08:06 UTC",
                     },
                     {
                         u"quote": u"quote text",
                         u"text": u"text",
                         u"chapter": {
-                            u"display_name": self.chapter.display_name_with_default_escaped,
+                            u"display_name": self.chapter.display_name_with_default,
                             u"index": 0,
-                            u"location": unicode(self.chapter.location),
-                            u"children": [unicode(self.sequential.location)]
+                            u"location": text_type(self.chapter.location),
+                            u"children": [text_type(self.sequential.location)]
                         },
                         u"section": {
-                            u"display_name": self.sequential.display_name_with_default_escaped,
-                            u"location": unicode(self.sequential.location),
+                            u"display_name": self.sequential.display_name_with_default,
+                            u"location": text_type(self.sequential.location),
                             u"children": [
-                                unicode(self.vertical.location),
-                                unicode(self.vertical_with_container.location)]
+                                text_type(self.vertical.location),
+                                text_type(self.vertical_with_container.location)]
                         },
                         u"unit": {
                             u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
-                            u"display_name": self.vertical.display_name_with_default_escaped,
-                            u"location": unicode(self.vertical.location),
+                            u"display_name": self.vertical.display_name_with_default,
+                            u"location": text_type(self.vertical.location),
                         },
-                        u"usage_id": unicode(self.html_module_1.location),
+                        u"usage_id": text_type(self.html_module_1.location),
                         u"updated": "Nov 19, 2014 at 08:05 UTC",
                     },
                 ]
@@ -425,13 +428,13 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                 {
                     u"quote": u"quote text",
                     u"text": u"text",
-                    u"usage_id": unicode(self.html_module_1.location),
+                    u"usage_id": text_type(self.html_module_1.location),
                     u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000).isoformat(),
                 },
                 {
                     u"quote": u"quote text",
                     u"text": u"text",
-                    u"usage_id": unicode(self.html_module_2.location),
+                    u"usage_id": text_type(self.html_module_2.location),
                     u"updated": datetime(2014, 11, 19, 8, 6, 16, 00000).isoformat(),
                 }
             ]
@@ -450,48 +453,48 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                         u"quote": u"quote text",
                         u"text": u"text",
                         u"chapter": {
-                            u"display_name": self.chapter.display_name_with_default_escaped,
+                            u"display_name": self.chapter.display_name_with_default,
                             u"index": 0,
-                            u"location": unicode(self.chapter.location),
-                            u"children": [unicode(self.sequential.location)]
+                            u"location": text_type(self.chapter.location),
+                            u"children": [text_type(self.sequential.location)]
                         },
                         u"section": {
-                            u"display_name": self.sequential.display_name_with_default_escaped,
-                            u"location": unicode(self.sequential.location),
+                            u"display_name": self.sequential.display_name_with_default,
+                            u"location": text_type(self.sequential.location),
                             u"children": [
-                                unicode(self.vertical.location),
-                                unicode(self.vertical_with_container.location)]
+                                text_type(self.vertical.location),
+                                text_type(self.vertical_with_container.location)]
                         },
                         u"unit": {
                             u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
-                            u"display_name": self.vertical.display_name_with_default_escaped,
-                            u"location": unicode(self.vertical.location),
+                            u"display_name": self.vertical.display_name_with_default,
+                            u"location": text_type(self.vertical.location),
                         },
-                        u"usage_id": unicode(self.html_module_2.location),
+                        u"usage_id": text_type(self.html_module_2.location),
                         u"updated": "Nov 19, 2014 at 08:06 UTC",
                     },
                     {
                         u"quote": u"quote text",
                         u"text": u"text",
                         u"chapter": {
-                            u"display_name": self.chapter.display_name_with_default_escaped,
+                            u"display_name": self.chapter.display_name_with_default,
                             u"index": 0,
-                            u"location": unicode(self.chapter.location),
-                            u"children": [unicode(self.sequential.location)]
+                            u"location": text_type(self.chapter.location),
+                            u"children": [text_type(self.sequential.location)]
                         },
                         u"section": {
-                            u"display_name": self.sequential.display_name_with_default_escaped,
-                            u"location": unicode(self.sequential.location),
+                            u"display_name": self.sequential.display_name_with_default,
+                            u"location": text_type(self.sequential.location),
                             u"children": [
-                                unicode(self.vertical.location),
-                                unicode(self.vertical_with_container.location)]
+                                text_type(self.vertical.location),
+                                text_type(self.vertical_with_container.location)]
                         },
                         u"unit": {
                             u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
-                            u"display_name": self.vertical.display_name_with_default_escaped,
-                            u"location": unicode(self.vertical.location),
+                            u"display_name": self.vertical.display_name_with_default,
+                            u"location": text_type(self.vertical.location),
                         },
-                        u"usage_id": unicode(self.html_module_1.location),
+                        u"usage_id": text_type(self.html_module_1.location),
                         u"updated": "Nov 19, 2014 at 08:05 UTC",
                     },
                 ]
@@ -526,6 +529,29 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             helpers.get_notes(self.request, self.course)
         )
 
+    @override_settings(EDXNOTES_PUBLIC_API="http://example.com")
+    @override_settings(EDXNOTES_INTERNAL_API="http://example.com")
+    @patch("edxnotes.helpers.anonymous_id_for_user", autospec=True)
+    @patch("edxnotes.helpers.get_edxnotes_id_token", autospec=True)
+    @patch("edxnotes.helpers.requests.post")
+    def test_delete_all_notes_for_user(self, mock_post, mock_get_id_token, mock_anonymous_id_for_user):
+        """
+        Test GDPR data deletion for Notes user_id
+        """
+        mock_anonymous_id_for_user.return_value = "anonymous_id"
+        mock_get_id_token.return_value = "test_token"
+        helpers.delete_all_notes_for_user(self.user)
+        mock_post.assert_called_with(
+            url='http://example.com/retire_annotations/',
+            headers={
+                'x-annotator-auth-token': 'test_token'
+            },
+            data={
+                'user': 'anonymous_id'
+            },
+            timeout=(settings.EDXNOTES_CONNECT_TIMEOUT, settings.EDXNOTES_READ_TIMEOUT)
+        )
+
     def test_preprocess_collection_no_item(self):
         """
         Tests the result if appropriate module is not found.
@@ -534,13 +560,13 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             {
                 u"quote": u"quote text",
                 u"text": u"text",
-                u"usage_id": unicode(self.html_module_1.location),
+                u"usage_id": text_type(self.html_module_1.location),
                 u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000).isoformat()
             },
             {
                 u"quote": u"quote text",
                 u"text": u"text",
-                u"usage_id": unicode(self.course.id.make_usage_key("html", "test_item")),
+                u"usage_id": text_type(self.course.id.make_usage_key("html", "test_item")),
                 u"updated": datetime(2014, 11, 19, 8, 6, 16, 00000).isoformat()
             },
         ]
@@ -550,22 +576,22 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                 u"quote": u"quote text",
                 u"text": u"text",
                 u"chapter": {
-                    u"display_name": self.chapter.display_name_with_default_escaped,
+                    u"display_name": self.chapter.display_name_with_default,
                     u"index": 0,
-                    u"location": unicode(self.chapter.location),
-                    u"children": [unicode(self.sequential.location)]
+                    u"location": text_type(self.chapter.location),
+                    u"children": [text_type(self.sequential.location)]
                 },
                 u"section": {
-                    u"display_name": self.sequential.display_name_with_default_escaped,
-                    u"location": unicode(self.sequential.location),
-                    u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)]
+                    u"display_name": self.sequential.display_name_with_default,
+                    u"location": text_type(self.sequential.location),
+                    u"children": [text_type(self.vertical.location), text_type(self.vertical_with_container.location)]
                 },
                 u"unit": {
                     u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
-                    u"display_name": self.vertical.display_name_with_default_escaped,
-                    u"location": unicode(self.vertical.location),
+                    u"display_name": self.vertical.display_name_with_default,
+                    u"location": text_type(self.vertical.location),
                 },
-                u"usage_id": unicode(self.html_module_1.location),
+                u"usage_id": text_type(self.html_module_1.location),
                 u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000),
             }],
             helpers.preprocess_collection(self.user, self.course, initial_collection)
@@ -579,13 +605,13 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             {
                 u"quote": u"quote text",
                 u"text": u"text",
-                u"usage_id": unicode(self.html_module_1.location),
+                u"usage_id": text_type(self.html_module_1.location),
                 u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000).isoformat(),
             },
             {
                 u"quote": u"quote text",
                 u"text": u"text",
-                u"usage_id": unicode(self.html_module_2.location),
+                u"usage_id": text_type(self.html_module_2.location),
                 u"updated": datetime(2014, 11, 19, 8, 6, 16, 00000).isoformat(),
             },
         ]
@@ -596,22 +622,22 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                 u"quote": u"quote text",
                 u"text": u"text",
                 u"chapter": {
-                    u"display_name": self.chapter.display_name_with_default_escaped,
+                    u"display_name": self.chapter.display_name_with_default,
                     u"index": 0,
-                    u"location": unicode(self.chapter.location),
-                    u"children": [unicode(self.sequential.location)]
+                    u"location": text_type(self.chapter.location),
+                    u"children": [text_type(self.sequential.location)]
                 },
                 u"section": {
-                    u"display_name": self.sequential.display_name_with_default_escaped,
-                    u"location": unicode(self.sequential.location),
-                    u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)]
+                    u"display_name": self.sequential.display_name_with_default,
+                    u"location": text_type(self.sequential.location),
+                    u"children": [text_type(self.vertical.location), text_type(self.vertical_with_container.location)]
                 },
                 u"unit": {
                     u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
-                    u"display_name": self.vertical.display_name_with_default_escaped,
-                    u"location": unicode(self.vertical.location),
+                    u"display_name": self.vertical.display_name_with_default,
+                    u"location": text_type(self.vertical.location),
                 },
-                u"usage_id": unicode(self.html_module_1.location),
+                u"usage_id": text_type(self.html_module_1.location),
                 u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000),
             }],
             helpers.preprocess_collection(self.user, self.course, initial_collection)
@@ -630,7 +656,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         initial_collection = [{
             u"quote": u"quote text",
             u"text": u"text",
-            u"usage_id": unicode(self.html_module_1.location),
+            u"usage_id": text_type(self.html_module_1.location),
             u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000).isoformat(),
         }]
 
@@ -647,14 +673,14 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             {
                 u"quote": u"quote text1",
                 u"text": u"text1",
-                u"usage_id": unicode(self.html_module_1.location),
-                u"updated": datetime(2016, 01, 26, 8, 5, 16, 00000).isoformat(),
+                u"usage_id": text_type(self.html_module_1.location),
+                u"updated": datetime(2016, 1, 26, 8, 5, 16, 00000).isoformat(),
             },
             {
                 u"quote": u"quote text2",
                 u"text": u"text2",
-                u"usage_id": unicode(self.html_module_2.location),
-                u"updated": datetime(2016, 01, 26, 9, 6, 17, 00000).isoformat(),
+                u"usage_id": text_type(self.html_module_2.location),
+                u"updated": datetime(2016, 1, 26, 9, 6, 17, 00000).isoformat(),
             },
         ]
 
@@ -666,45 +692,30 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     'chapter': {},
                     "unit": {
                         u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
-                        u"display_name": self.vertical.display_name_with_default_escaped,
-                        u"location": unicode(self.vertical.location),
+                        u"display_name": self.vertical.display_name_with_default,
+                        u"location": text_type(self.vertical.location),
                     },
                     u'text': u'text1',
                     u'quote': u'quote text1',
-                    u'usage_id': unicode(self.html_module_1.location),
-                    u'updated': datetime(2016, 01, 26, 8, 5, 16)
+                    u'usage_id': text_type(self.html_module_1.location),
+                    u'updated': datetime(2016, 1, 26, 8, 5, 16)
                 },
                 {
                     'section': {},
                     'chapter': {},
                     "unit": {
                         u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
-                        u"display_name": self.vertical.display_name_with_default_escaped,
-                        u"location": unicode(self.vertical.location),
+                        u"display_name": self.vertical.display_name_with_default,
+                        u"location": text_type(self.vertical.location),
                     },
                     u'text': u'text2',
                     u'quote': u'quote text2',
-                    u'usage_id': unicode(self.html_module_2.location),
-                    u'updated': datetime(2016, 01, 26, 9, 6, 17)
+                    u'usage_id': text_type(self.html_module_2.location),
+                    u'updated': datetime(2016, 1, 26, 9, 6, 17)
                 }
             ],
             helpers.preprocess_collection(self.user, self.course, initial_collection)
         )
-
-    def test_get_parent_unit(self):
-        """
-        Tests `get_parent_unit` method for the successful result.
-        """
-        parent = helpers.get_parent_unit(self.html_module_1)
-        self.assertEqual(parent.location, self.vertical.location)
-
-        parent = helpers.get_parent_unit(self.child_html_module)
-        self.assertEqual(parent.location, self.vertical_with_container.location)
-
-        self.assertIsNone(helpers.get_parent_unit(None))
-        self.assertIsNone(helpers.get_parent_unit(self.course))
-        self.assertIsNone(helpers.get_parent_unit(self.chapter))
-        self.assertIsNone(helpers.get_parent_unit(self.sequential))
 
     def test_get_module_context_sequential(self):
         """
@@ -712,9 +723,9 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         self.assertDictEqual(
             {
-                u"display_name": self.sequential.display_name_with_default_escaped,
-                u"location": unicode(self.sequential.location),
-                u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)],
+                u"display_name": self.sequential.display_name_with_default,
+                u"location": text_type(self.sequential.location),
+                u"children": [text_type(self.vertical.location), text_type(self.vertical_with_container.location)],
             },
             helpers.get_module_context(self.course, self.sequential)
         )
@@ -725,8 +736,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         self.assertDictEqual(
             {
-                u"display_name": self.html_module_1.display_name_with_default_escaped,
-                u"location": unicode(self.html_module_1.location),
+                u"display_name": self.html_module_1.display_name_with_default,
+                u"location": text_type(self.html_module_1.location),
             },
             helpers.get_module_context(self.course, self.html_module_1)
         )
@@ -737,18 +748,18 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         self.assertDictEqual(
             {
-                u"display_name": self.chapter.display_name_with_default_escaped,
+                u"display_name": self.chapter.display_name_with_default,
                 u"index": 0,
-                u"location": unicode(self.chapter.location),
-                u"children": [unicode(self.sequential.location)],
+                u"location": text_type(self.chapter.location),
+                u"children": [text_type(self.sequential.location)],
             },
             helpers.get_module_context(self.course, self.chapter)
         )
         self.assertDictEqual(
             {
-                u"display_name": self.chapter_2.display_name_with_default_escaped,
+                u"display_name": self.chapter_2.display_name_with_default,
                 u"index": 1,
-                u"location": unicode(self.chapter_2.location),
+                u"location": text_type(self.chapter_2.location),
                 u"children": [],
             },
             helpers.get_module_context(self.course, self.chapter_2)
@@ -780,7 +791,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             },
             params={
                 "user": "anonymous_id",
-                "course_id": unicode(self.course.id),
+                "course_id": text_type(self.course.id),
                 "text": "text",
                 "highlight": True,
                 'page': 1,
@@ -810,7 +821,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             },
             params={
                 "user": "anonymous_id",
-                "course_id": unicode(self.course.id),
+                "course_id": text_type(self.course.id),
                 'page': helpers.DEFAULT_PAGE,
                 'page_size': helpers.DEFAULT_PAGE_SIZE,
             },
@@ -835,7 +846,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
 
         mock_chapter = MagicMock()
         mock_chapter.url_name = 'chapter_url_name'
-        mock_chapter.display_name_with_default_escaped = 'Test Chapter Display Name'
+        mock_chapter.display_name_with_default = 'Test Chapter Display Name'
 
         mock_course_module.get_display_items.return_value = [mock_chapter]
 
@@ -865,7 +876,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
 
         mock_section = MagicMock()
         mock_section.url_name = 'section_url_name'
-        mock_section.display_name_with_default_escaped = 'Test Section Display Name'
+        mock_section.display_name_with_default = 'Test Section Display Name'
 
         mock_chapter.get_display_items.return_value = [mock_section]
         mock_section.get_display_items.return_value = [MagicMock()]
@@ -880,8 +891,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         Tests `get_index` method returns unit url.
         """
         children = self.sequential.children
-        self.assertEqual(0, helpers.get_index(unicode(self.vertical.location), children))
-        self.assertEqual(1, helpers.get_index(unicode(self.vertical_with_container.location), children))
+        self.assertEqual(0, helpers.get_index(text_type(self.vertical.location), children))
+        self.assertEqual(1, helpers.get_index(text_type(self.vertical_with_container.location), children))
 
     @ddt.unpack
     @ddt.data(
@@ -902,12 +913,11 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         Verify that `construct_url` works correctly.
         """
         # make absolute url
-        # pylint: disable=no-member
         if self.request.is_secure():
             host = 'https://' + self.request.get_host()
         else:
             host = 'http://' + self.request.get_host()
-        notes_url = host + reverse("notes", args=[unicode(self.course.id)])
+        notes_url = host + reverse("notes", args=[text_type(self.course.id)])
 
         def verify_url(constructed, expected):
             """
@@ -927,8 +937,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                 allowed_params = ('page', 'page_size', 'text')
 
                 # extract query params from constructed url
-                parsed = urlparse.urlparse(constructed)
-                params = urlparse.parse_qs(parsed.query)
+                parsed = urlparse(constructed)
+                params = parse_qs(parsed.query)
 
                 # verify that constructed url has only correct params and params have correct values
                 for param, value in params.items():
@@ -944,7 +954,6 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         verify_url(previous_url, previous_api_url)
 
 
-@attr(shard=3)
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
 @ddt.ddt
 class EdxNotesViewsTest(ModuleStoreTestCase):
@@ -952,16 +961,16 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
     Tests for EdxNotes views.
     """
     def setUp(self):
-        ClientFactory(name="edx-notes")
+        ApplicationFactory(name="edx-notes")
         super(EdxNotesViewsTest, self).setUp()
-        self.course = CourseFactory.create(edxnotes=True)
-        self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
-        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
-        self.client.login(username=self.user.username, password="edx")
-        self.notes_page_url = reverse("edxnotes", args=[unicode(self.course.id)])
-        self.notes_url = reverse("notes", args=[unicode(self.course.id)])
-        self.get_token_url = reverse("get_token", args=[unicode(self.course.id)])
-        self.visibility_url = reverse("edxnotes_visibility", args=[unicode(self.course.id)])
+        self.course = CourseFactory(edxnotes=True)
+        self.user = UserFactory()
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
+        self.client.login(username=self.user.username, password=UserFactory._DEFAULT_PASSWORD)
+        self.notes_page_url = reverse("edxnotes", args=[text_type(self.course.id)])
+        self.notes_url = reverse("notes", args=[text_type(self.course.id)])
+        self.get_token_url = reverse("get_token", args=[text_type(self.course.id)])
+        self.visibility_url = reverse("edxnotes_visibility", args=[text_type(self.course.id)])
 
     def _get_course_module(self):
         """
@@ -1079,7 +1088,7 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         """
         response = self.client.get(self.get_token_url)
         self.assertEqual(response.status_code, 200)
-        client = Client.objects.get(name='edx-notes')
+        client = Application.objects.get(name='edx-notes')
         jwt.decode(response.content, client.client_secret, audience=client.client_id)
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
@@ -1140,7 +1149,119 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 400)
 
 
-@attr(shard=3)
+class EdxNotesRetireAPITest(ModuleStoreTestCase):
+    """
+    Tests for EdxNotes retirement API.
+    """
+    def setUp(self):
+        ApplicationFactory(name="edx-notes")
+        super(EdxNotesRetireAPITest, self).setUp()
+
+        # setup relevant states
+        RetirementState.objects.create(state_name='PENDING', state_execution_order=1)
+        self.retire_notes_state = RetirementState.objects.create(state_name='RETIRING_NOTES', state_execution_order=11)
+        self.something_complete_state = RetirementState.objects.create(
+            state_name='SOMETHING_COMPLETE',
+            state_execution_order=22,
+        )
+
+        # setup retired user with retirement status
+        self.retired_user = UserFactory()
+        self.retirement = UserRetirementStatus.create_retirement(self.retired_user)
+        self.retirement.current_state = self.retire_notes_state
+        self.retirement.save()
+
+        # setup another normal user which should not be allowed to retire any notes
+        self.normal_user = UserFactory()
+
+        # setup superuser for making API calls
+        self.superuser = SuperuserFactory()
+
+        self.retire_user_url = reverse("edxnotes_retire_user")
+
+    def _build_jwt_headers(self, user):
+        """
+        Helper function for creating headers for the JWT authentication.
+        """
+        token = create_jwt_for_user(user)
+        headers = {'HTTP_AUTHORIZATION': 'JWT ' + token}
+        return headers
+
+    @patch("edxnotes.helpers.requests.post", autospec=True)
+    def test_retire_user_success(self, mock_post):
+        """
+        Tests that 204 response is received on success.
+        """
+        mock_post.return_value.content = ''
+        mock_post.return_value.status_code = 204
+        headers = self._build_jwt_headers(self.superuser)
+        response = self.client.post(
+            self.retire_user_url,
+            data=json.dumps({'username': self.retired_user.username}),
+            content_type='application/json',
+            **headers
+        )
+        self.assertEqual(response.status_code, 204)
+
+    def test_retire_user_normal_user_not_allowed(self):
+        """
+        Tests that 403 response is received when the requester is not allowed to call the retirement endpoint.
+        """
+        headers = self._build_jwt_headers(self.normal_user)
+        response = self.client.post(
+            self.retire_user_url,
+            data=json.dumps({'username': self.retired_user.username}),
+            content_type='application/json',
+            **headers
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_retire_user_status_not_found(self):
+        """
+        Tests that 404 response is received if the retirement user status is not found.
+        """
+        headers = self._build_jwt_headers(self.superuser)
+        response = self.client.post(
+            self.retire_user_url,
+            data=json.dumps({'username': 'username_does_not_exist'}),
+            content_type='application/json',
+            **headers
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_retire_user_wrong_state(self):
+        """
+        Tests that 405 response is received if the retirement user status is currently in a state which cannot be acted
+        on.
+        """
+        # Set state to the _COMPLETE version of an arbitrary "SOMETHING" state.
+        self.retirement.current_state = self.something_complete_state
+        self.retirement.save()
+        headers = self._build_jwt_headers(self.superuser)
+        response = self.client.post(
+            self.retire_user_url,
+            data=json.dumps({'username': self.retired_user.username}),
+            content_type='application/json',
+            **headers
+        )
+        self.assertEqual(response.status_code, 405)
+
+    @patch("edxnotes.helpers.delete_all_notes_for_user", autospec=True)
+    def test_retire_user_downstream_unavailable(self, mock_delete_all_notes_for_user):
+        """
+        Tests that 500 response is received if the downstream (i.e. the EdxNotes IDA) is unavailable.
+        """
+        mock_delete_all_notes_for_user.side_effect = EdxNotesServiceUnavailable
+        headers = self._build_jwt_headers(self.superuser)
+        response = self.client.post(
+            self.retire_user_url,
+            data=json.dumps({'username': self.retired_user.username}),
+            content_type='application/json',
+            **headers
+        )
+        self.assertEqual(response.status_code, 500)
+
+
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
 @ddt.ddt
 class EdxNotesPluginTest(ModuleStoreTestCase):
@@ -1151,38 +1272,18 @@ class EdxNotesPluginTest(ModuleStoreTestCase):
     def setUp(self):
         super(EdxNotesPluginTest, self).setUp()
         self.course = CourseFactory.create(edxnotes=True)
-        self.user = UserFactory.create(username="ma", email="ma@ma.info", password="edx")
+        self.user = UserFactory()
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
 
-    def test_edxnotes_tab_with_unauthorized_user(self):
-        """
-        Verify EdxNotesTab visibility when user is unauthroized.
-        """
-        user = UserFactory.create(username="ma1", email="ma1@ma1.info", password="edx")
-        self.assertFalse(EdxNotesTab.is_enabled(self.course, user=user))
+    def test_edxnotes_tab_with_unenrolled_user(self):
+        user = UserFactory()
+        assert not EdxNotesTab.is_enabled(self.course, user=user)
 
-    @ddt.unpack
-    @ddt.data(
-        {'enable_edxnotes': False},
-        {'enable_edxnotes': True}
-    )
-    def test_edxnotes_tab_with_feature_flag(self, enable_edxnotes):
+    @ddt.data(True, False)
+    def test_edxnotes_tab_with_feature_flag(self, enabled):
         """
         Verify EdxNotesTab visibility when ENABLE_EDXNOTES feature flag is enabled/disabled.
         """
-        FEATURES['ENABLE_EDXNOTES'] = enable_edxnotes
+        FEATURES['ENABLE_EDXNOTES'] = enabled
         with override_settings(FEATURES=FEATURES):
-            self.assertEqual(EdxNotesTab.is_enabled(self.course), enable_edxnotes)
-
-    @ddt.unpack
-    @ddt.data(
-        {'harvard_notes_enabled': False},
-        {'harvard_notes_enabled': True}
-    )
-    def test_edxnotes_tab_with_harvard_notes(self, harvard_notes_enabled):
-        """
-        Verify EdxNotesTab visibility when harvard notes feature is enabled/disabled.
-        """
-        with patch("edxnotes.plugins.is_harvard_notes_enabled") as mock_harvard_notes_enabled:
-            mock_harvard_notes_enabled.return_value = harvard_notes_enabled
-            self.assertEqual(EdxNotesTab.is_enabled(self.course), not harvard_notes_enabled)
+            assert EdxNotesTab.is_enabled(self.course, self.user) == enabled

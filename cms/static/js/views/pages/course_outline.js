@@ -1,10 +1,14 @@
 /**
  * This page is used to show the user an outline of the course.
  */
-define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'js/views/utils/xblock_utils',
-        'js/views/course_outline', 'common/js/components/utils/view_utils', 'common/js/components/views/feedback_alert',
-        'common/js/components/views/feedback_notification'],
-    function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils, AlertView, NoteView) {
+define([
+    'jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'js/views/utils/xblock_utils',
+    'js/views/course_outline', 'common/js/components/utils/view_utils', 'common/js/components/views/feedback_alert',
+    'common/js/components/views/feedback_notification', 'js/views/course_highlights_enable'],
+    function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils, AlertView, NoteView,
+             CourseHighlightsEnableView
+    ) {
+        'use strict';
         var expandedLocators, CourseOutlinePage;
 
         CourseOutlinePage = BasePage.extend({
@@ -13,6 +17,18 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'js/views
             events: {
                 'click .button-toggle-expand-collapse': 'toggleExpandCollapse'
             },
+
+            /**
+             * keep a running timeout counter of 5,000 milliseconds
+             * for finding an element; see afterRender and scrollToElement function
+             */
+            findElementPollingTimeout: 5000,
+
+            /**
+             * used as the delay parameter to setTimeout in scrollToElement
+             * function for polling for an element
+             */
+            pollingDelay: 100,
 
             options: {
                 collapsedClass: 'is-collapsed'
@@ -36,11 +52,11 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'js/views
 
             setCollapseExpandVisibility: function() {
                 var has_content = this.hasContent(),
-                    collapseExpandButton = $('.button-toggle-expand-collapse');
+                    $collapseExpandButton = $('.button-toggle-expand-collapse');
                 if (has_content) {
-                    collapseExpandButton.removeClass('is-hidden');
+                    $collapseExpandButton.removeClass('is-hidden');
                 } else {
-                    collapseExpandButton.addClass('is-hidden');
+                    $collapseExpandButton.addClass('is-hidden');
                 }
             },
 
@@ -65,6 +81,15 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'js/views
                     this.expandedLocators.addAll(this.initialState.expanded_locators);
                 }
 
+                /* globals course */
+                if (this.model.get('highlights_enabled') && course.get('self_paced')) {
+                    this.highlightsEnableView = new CourseHighlightsEnableView({
+                        el: this.$('.status-highlights-enabled'),
+                        model: this.model
+                    });
+                    this.highlightsEnableView.render();
+                }
+
                 this.outlineView = new CourseOutlineView({
                     el: this.$('.outline'),
                     model: this.model,
@@ -77,6 +102,32 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'js/views
                 return $.Deferred().resolve().promise();
             },
 
+            afterRender: function() {
+                this.scrollToElement();
+            },
+
+            /**
+             * recursively poll for element specified by the URL fragment
+             * at 100 millisecond intervals until element is found or
+             * Polling is reached
+             */
+            scrollToElement: function () {
+                this.findElementPollingTimeout -= this.pollingDelay;
+
+                const elementID = window.location.hash.replace("#", "");
+
+                if (this.findElementPollingTimeout > 0) {
+                    if (elementID) {
+                        const element = document.getElementById(elementID);
+                        if (element) {
+                            element.scrollIntoView();
+                        } else {
+                            setTimeout(this.scrollToElement, this.pollingDelay);
+                        }
+                    }
+                }
+            },
+
             hasContent: function() {
                 return this.model.hasChildren();
             },
@@ -87,19 +138,18 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'js/views
                 event.preventDefault();
                 toggleButton.toggleClass('collapse-all expand-all');
                 this.$('.list-sections > li').each(function(index, domElement) {
-                    var element = $(domElement);
+                    var $element = $(domElement);
                     if (collapse) {
-                        element.addClass('is-collapsed');
+                        $element.addClass('is-collapsed');
                     } else {
-                        element.removeClass('is-collapsed');
+                        $element.removeClass('is-collapsed');
                     }
                 });
                 if (this.model.get('child_info')) {
                     _.each(this.model.get('child_info').children, function(childXBlockInfo) {
                         if (collapse) {
                             this.expandedLocators.remove(childXBlockInfo.get('id'));
-                        }
-                        else {
+                        } else {
                             this.expandedLocators.add(childXBlockInfo.get('id'));
                         }
                     }, this);
@@ -109,12 +159,12 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'js/views
             handleReIndexEvent: function(event) {
                 var self = this;
                 event.preventDefault();
-                var target = $(event.currentTarget);
-                target.css('cursor', 'wait');
-                this.startReIndex(target.attr('href'))
+                var $target = $(event.currentTarget);
+                $target.css('cursor', 'wait');
+                this.startReIndex($target.attr('href'))
                     .done(function(data) { self.onIndexSuccess(data); })
                     .fail(function(data) { self.onIndexError(data); })
-                    .always(function() { target.css('cursor', 'pointer'); });
+                    .always(function() { $target.css('cursor', 'pointer'); });
             },
 
             startReIndex: function(reindex_url) {

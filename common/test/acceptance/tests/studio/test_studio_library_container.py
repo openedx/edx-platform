@@ -1,28 +1,31 @@
 """
 Acceptance tests for Library Content in LMS
 """
-import ddt
-from nose.plugins.attrib import attr
+from __future__ import absolute_import
+
 import textwrap
 
-from common.test.acceptance.tests.studio.base_studio_test import StudioLibraryTest
-from common.test.acceptance.fixtures.course import CourseFixture
-from common.test.acceptance.tests.helpers import UniqueCourseTest, TestWithSearchIndexMixin
-from common.test.acceptance.pages.studio.library import StudioLibraryContentEditor, StudioLibraryContainerXBlockWrapper
+import ddt
+import six
+
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.pages.studio.library import StudioLibraryContainerXBlockWrapper, StudioLibraryContentEditor
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage
-from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.tests.helpers import TestWithSearchIndexMixin, UniqueCourseTest
+from common.test.acceptance.tests.studio.base_studio_test import StudioLibraryTest
 
 SECTION_NAME = 'Test Section'
 SUBSECTION_NAME = 'Test Subsection'
 UNIT_NAME = 'Test Unit'
 
 
-@attr(shard=5)
 @ddt.ddt
 class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest, TestWithSearchIndexMixin):
     """
     Test Library Content block in LMS
     """
+    shard = 17
+
     def setUp(self):
         """
         Install library with some content and a course using fixtures
@@ -62,7 +65,7 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest, TestWithSe
     def populate_course_fixture(self, course_fixture):
         """ Install a course with sections/problems, tabs, updates, and handouts """
         library_content_metadata = {
-            'source_library_id': unicode(self.library_key),
+            'source_library_id': six.text_type(self.library_key),
             'mode': 'random',
             'max_count': 1,
         }
@@ -218,8 +221,8 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest, TestWithSe
         And I set Problem Type selector so "Any"
         Then I can see that "No matching content" warning is shown
         """
-        expected_tpl = "The specified library is configured to fetch {count} problems, " \
-                       "but there are only {actual} matching problems."
+        expected_tpl = u"The specified library is configured to fetch {count} problems, " \
+                       u"but there are only {actual} matching problems."
 
         library_container = self._get_library_xblock_wrapper(self.unit_page.xblocks[1])
 

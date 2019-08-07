@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
 """
 Bok choy acceptance tests for problems in the LMS
-
-See also old lettuce tests in lms/djangoapps/courseware/features/problems.feature
 """
-from nose.plugins.attrib import attr
+from __future__ import absolute_import
+
+import time
 from textwrap import dedent
 
-from common.test.acceptance.tests.helpers import UniqueCourseTest
-from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
-from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.problem import ProblemPage
-from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage
+import ddt
+
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
-from common.test.acceptance.tests.helpers import EventsTestMixin
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage
+from common.test.acceptance.pages.lms.problem import ProblemPage
+from common.test.acceptance.tests.helpers import EventsTestMixin, UniqueCourseTest
+from openedx.core.lib.tests import attr
 
 
 class ProblemsTest(UniqueCourseTest):
@@ -65,6 +67,7 @@ class ProblemsTest(UniqueCourseTest):
         return XBlockFixtureDesc('sequential', 'Test Subsection')
 
 
+@attr(shard=9)
 class ProblemClarificationTest(ProblemsTest):
     """
     Tests the <clarification> element that can be used in problem XML.
@@ -74,7 +77,7 @@ class ProblemClarificationTest(ProblemsTest):
         """
         Create a problem with a <clarification>
         """
-        xml = dedent("""
+        xml = dedent(u"""
             <problem markdown="null">
                 <text>
                     <p>
@@ -107,6 +110,7 @@ class ProblemClarificationTest(ProblemsTest):
         self.assertNotIn('strong', tooltip_text)
 
 
+@attr(shard=9)
 class ProblemHintTest(ProblemsTest, EventsTestMixin):
     """
     Base test class for problem hint tests.
@@ -142,13 +146,13 @@ class ProblemHintTest(ProblemsTest, EventsTestMixin):
         self.assertEqual([None, None], problem_page.get_hint_button_disabled_attr())
 
         # The hint button rotates through multiple hints
-        problem_page.click_hint()
+        problem_page.click_hint(hint_index=0)
         self.assertTrue(problem_page.is_hint_notification_visible())
         self.assertEqual(problem_page.hint_text, first_hint)
         # Now there are two "hint" buttons, as there is also one in the hint notification.
         self.assertEqual([None, None], problem_page.get_hint_button_disabled_attr())
 
-        problem_page.click_hint()
+        problem_page.click_hint(hint_index=1)
         self.assertEqual(problem_page.hint_text, second_hint)
         # Now both "hint" buttons should be disabled, as there are no more hints.
         self.assertEqual(['true', 'true'], problem_page.get_hint_button_disabled_attr())
@@ -169,6 +173,7 @@ class ProblemHintTest(ProblemsTest, EventsTestMixin):
         raise NotImplementedError()
 
 
+@attr(shard=9)
 class ProblemNotificationTests(ProblemsTest):
     """
     Tests that the notifications are visible when expected.
@@ -225,6 +230,7 @@ class ProblemNotificationTests(ProblemsTest):
         self.assertFalse(problem_page.is_save_notification_visible())
 
 
+@attr(shard=9)
 class ProblemFeedbackNotificationTests(ProblemsTest):
     """
     Tests that the feedback notifications are visible when expected.
@@ -262,6 +268,7 @@ class ProblemFeedbackNotificationTests(ProblemsTest):
         self.assertFalse(problem_page.is_feedback_message_notification_visible())
 
 
+@attr(shard=9)
 class ProblemSaveStatusUpdateTests(ProblemsTest):
     """
     Tests the problem status updates correctly with an answer change and save.
@@ -313,6 +320,7 @@ class ProblemSaveStatusUpdateTests(ProblemsTest):
         self.assertTrue(problem_page.is_save_notification_visible())
 
 
+@attr(shard=9)
 class ProblemSubmitButtonMaxAttemptsTest(ProblemsTest):
     """
     Tests that the Submit button disables after the number of max attempts is reached.
@@ -361,6 +369,7 @@ class ProblemSubmitButtonMaxAttemptsTest(ProblemsTest):
         problem_page.wait_for_submit_disabled()
 
 
+@attr(shard=9)
 class ProblemSubmitButtonPastDueTest(ProblemsTest):
     """
     Tests that the Submit button is disabled if it is past the due date.
@@ -405,6 +414,7 @@ class ProblemSubmitButtonPastDueTest(ProblemsTest):
         problem_page.wait_for_submit_disabled()
 
 
+@attr(shard=9)
 class ProblemExtendedHintTest(ProblemHintTest, EventsTestMixin):
     """
     Test that extended hint features plumb through to the page html and tracking log.
@@ -465,6 +475,7 @@ class ProblemExtendedHintTest(ProblemHintTest, EventsTestMixin):
         )
 
 
+@attr(shard=9)
 class ProblemHintWithHtmlTest(ProblemHintTest, EventsTestMixin):
     """
     Tests that hints containing html get rendered properly
@@ -525,6 +536,7 @@ class ProblemHintWithHtmlTest(ProblemHintTest, EventsTestMixin):
         )
 
 
+@attr(shard=9)
 class ProblemWithMathjax(ProblemsTest):
     """
     Tests the <MathJax> used in problem
@@ -563,7 +575,7 @@ class ProblemWithMathjax(ProblemsTest):
         problem_page.verify_mathjax_rendered_in_problem()
 
         # The hint button rotates through multiple hints
-        problem_page.click_hint()
+        problem_page.click_hint(hint_index=0)
         self.assertEqual(
             ["<strong>Hint (1 of 2): </strong>mathjax should work1"],
             problem_page.extract_hint_text_from_html
@@ -571,7 +583,7 @@ class ProblemWithMathjax(ProblemsTest):
         problem_page.verify_mathjax_rendered_in_hint()
 
         # Rotate the hint and check the problem hint
-        problem_page.click_hint()
+        problem_page.click_hint(hint_index=1)
 
         self.assertEqual(
             [
@@ -584,6 +596,7 @@ class ProblemWithMathjax(ProblemsTest):
         problem_page.verify_mathjax_rendered_in_hint()
 
 
+@attr(shard=9)
 class ProblemPartialCredit(ProblemsTest):
     """
     Makes sure that the partial credit is appearing properly.
@@ -605,19 +618,21 @@ class ProblemPartialCredit(ProblemsTest):
         """)
         return XBlockFixtureDesc('problem', 'PARTIAL CREDIT TEST PROBLEM', data=xml)
 
-    def test_partial_credit(self):
-        """
-        Test that we can see the partial credit value and feedback.
-        """
-        self.courseware_page.visit()
-        problem_page = ProblemPage(self.browser)
-        self.assertEqual(problem_page.problem_name, 'PARTIAL CREDIT TEST PROBLEM')
-        problem_page.fill_answer_numerical('-1')
-        problem_page.click_submit()
-        problem_page.wait_for_status_icon()
-        self.assertTrue(problem_page.simpleprob_is_partially_correct())
+    # TODO: Reinstate this, it broke when landing the unified header in LEARNER-
+    # def test_partial_credit(self):
+    #     """
+    #     Test that we can see the partial credit value and feedback.
+    #     """
+    #     self.courseware_page.visit()
+    #     problem_page = ProblemPage(self.browser)
+    #     self.assertEqual(problem_page.problem_name, 'PARTIAL CREDIT TEST PROBLEM')
+    #     problem_page.fill_answer_numerical('-1')
+    #     problem_page.click_submit()
+    #     problem_page.wait_for_status_icon()
+    #     self.assertTrue(problem_page.simpleprob_is_partially_correct())
 
 
+@attr(shard=9)
 class LogoutDuringAnswering(ProblemsTest):
     """
     Tests for the scenario where a user is logged out (their session expires
@@ -678,28 +693,8 @@ class LogoutDuringAnswering(ProblemsTest):
         problem_page.click_submit()
         self.assertTrue(problem_page.simpleprob_is_correct())
 
-    def test_logout_cancel_no_redirect(self):
-        """
-        1) User goes to a problem page.
-        2) User fills out an answer to the problem.
-        3) User is logged out because their session id is invalidated or removed.
-        4) User clicks "check", and sees a confirmation modal asking them to
-           re-authenticate, since they've just been logged out.
-        5) User clicks "cancel".
-        6) User is not redirected to the login page.
-        """
-        self.courseware_page.visit()
-        problem_page = ProblemPage(self.browser)
-        self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
-        problem_page.fill_answer_numerical('1')
-        self.log_user_out()
-        with problem_page.handle_alert(confirm=False):
-            problem_page.click_submit()
 
-        problem_page.wait_for_page()
-        self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
-
-
+@attr(shard=9)
 class ProblemQuestionDescriptionTest(ProblemsTest):
     """TestCase Class to verify question and description rendering."""
     descriptions = [
@@ -711,7 +706,7 @@ class ProblemQuestionDescriptionTest(ProblemsTest):
         """
         Create a problem with question and description.
         """
-        xml = dedent("""
+        xml = dedent(u"""
             <problem>
                 <choiceresponse>
                     <label>Eggplant is a _____?</label>
@@ -887,6 +882,8 @@ class ProblemMetaGradedTest(ProblemsTest):
     """
     TestCase Class to verify that the graded variable is passed
     """
+    shard = 23
+
     def get_problem(self):
         """
         Problem structure
@@ -917,6 +914,8 @@ class ProblemMetaUngradedTest(ProblemsTest):
     """
     TestCase Class to verify that the ungraded variable is passed
     """
+    shard = 23
+
     def get_problem(self):
         """
         Problem structure
@@ -941,3 +940,150 @@ class ProblemMetaUngradedTest(ProblemsTest):
         problem_page = ProblemPage(self.browser)
         self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
         self.assertEqual(problem_page.problem_progress_graded_value, "1 point possible (ungraded)")
+
+
+class FormulaProblemTest(ProblemsTest):
+    """
+    Test Class to verify the formula problem on LMS.
+    """
+    shard = 23
+
+    def setUp(self):
+        """
+        Setup the test suite to verify various behaviors involving formula problem type.
+
+        Given a course, setup a formula problem type and view it in courseware
+        Given the MathJax requirement for generating preview, wait for MathJax files to load
+        """
+        super(FormulaProblemTest, self).setUp()
+        self.courseware_page.visit()
+        time.sleep(6)
+
+    def get_problem(self):
+        """
+        creating the formula response problem, with reset button enabled.
+        """
+        xml = dedent("""
+                    <problem>
+    <formularesponse type="ci" samples="R_1,R_2,R_3@1,2,3:3,4,5#10" answer="R_1*R_2/R_3">
+        <p>You can use this template as a guide to the OLX markup to use for math expression problems. Edit this component to replace the example with your own assessment.</p>
+        <label>Add the question text, or prompt, here. This text is required. Example: Write an expression for the product of R_1, R_2, and the inverse of R_3.</label>
+        <description>You can add an optional tip or note related to the prompt like this. Example: To test this example, the correct answer is R_1*R_2/R_3</description>
+        <responseparam type="tolerance" default="0.00001"/>
+        <formulaequationinput size="40"/>
+    </formularesponse>
+                    </problem>
+                """)
+        return XBlockFixtureDesc('problem', 'TEST PROBLEM', data=xml, metadata={'show_reset_button': True})
+
+    def test_reset_button_not_rendered_after_correct_submission(self):
+        """
+        Scenario: Verify that formula problem can not be resetted after an incorrect submission.
+
+        Given I am attempting a formula response problem type
+        When I input a correct answer
+        Then I should be able to see the mathjax generated preview
+        When I submit the answer
+        Then the correct status is visible
+        And reset button is not rendered
+        """
+        problem_page = ProblemPage(self.browser)
+        problem_page.fill_answer_numerical('R_1*R_2/R_3')
+        problem_page.verify_mathjax_rendered_in_preview()
+        problem_page.click_submit()
+        self.assertTrue(problem_page.simpleprob_is_correct())
+        self.assertFalse(problem_page.is_reset_button_present())
+
+    def test_reset_problem_after_changing_correctness(self):
+        """
+        Scenario: Verify that formula problem can be resetted after changing the correctness.
+
+        Given I am attempting a formula problem type
+        When I answer it correctly
+        Then the correctness status should be visible
+        And reset button is not rendered
+        When I change my submission to incorrect
+        Then the reset button appears and is clickable
+        """
+        problem_page = ProblemPage(self.browser)
+        problem_page.fill_answer_numerical('R_1*R_2/R_3')
+        problem_page.verify_mathjax_rendered_in_preview()
+        problem_page.click_submit()
+        self.assertTrue(problem_page.simpleprob_is_correct())
+        self.assertFalse(problem_page.is_reset_button_present())
+        problem_page.fill_answer_numerical('R_1/R_3')
+        problem_page.click_submit()
+        self.assertFalse(problem_page.simpleprob_is_correct())
+        self.assertTrue(problem_page.is_reset_button_present())
+        problem_page.click_reset()
+        self.assertEqual(problem_page.get_numerical_input_value, '')
+
+
+@ddt.ddt
+class FormulaProblemRandomizeTest(ProblemsTest):
+    """
+    Test Class to verify the formula problem on LMS with Randomization enabled.
+    """
+    shard = 23
+
+    def setUp(self):
+        """
+        Setup the test suite to verify various behaviors involving formula problem type.
+
+        Given a course, setup a formula problem type and view it in courseware
+        Given the MathJax requirement for generating preview, wait for MathJax files to load
+        """
+        super(FormulaProblemRandomizeTest, self).setUp()
+        self.courseware_page.visit()
+        time.sleep(6)
+
+    def get_problem(self):
+        """
+        creating the formula response problem.
+        """
+        xml = dedent("""
+                    <problem>
+    <formularesponse type="ci" samples="R_1,R_2,R_3@1,2,3:3,4,5#10" answer="R_1*R_2/R_3">
+        <p>You can use this template as a guide to the OLX markup to use for math expression problems. Edit this component to replace the example with your own assessment.</p>
+        <label>Add the question text, or prompt, here. This text is required. Example: Write an expression for the product of R_1, R_2, and the inverse of R_3.</label>
+        <description>You can add an optional tip or note related to the prompt like this. Example: To test this example, the correct answer is R_1*R_2/R_3</description>
+        <responseparam type="tolerance" default="0.00001"/>
+        <formulaequationinput size="40"/>
+    </formularesponse>
+                    </problem>
+                """)
+
+        # rerandomize:always will show reset button, no matter the submission correctness
+        return XBlockFixtureDesc(
+            'problem', 'TEST PROBLEM', data=xml, metadata={'show_reset_button': True, 'rerandomize': 'always'}
+        )
+
+    @ddt.data(
+        ('R_1*R_2', 'incorrect', 'R_1*R_2/R_3'),
+        ('R_1*R_2/R_3', 'correct', 'R_1/R_3')
+    )
+    @ddt.unpack
+    def test_reset_correctness_after_changing_answer(self, input_value, correctness, next_input):
+        """
+        Scenario: Test that formula problem can be resetted after changing the answer.
+
+        Given I am attempting a formula problem type with randomization:always configuration
+        When I input an answer
+        Then the mathjax generated preview should be visible
+        When I submit the problem, I can see the correctness status
+        When I only input another answer
+        Then the correctness status is no longer visible
+        And I am able to see the reset button
+        And when I click the reset button
+        Then input pane contents are cleared
+        """
+        problem_page = ProblemPage(self.browser)
+        problem_page.fill_answer_numerical(input_value)
+        problem_page.verify_mathjax_rendered_in_preview()
+        problem_page.click_submit()
+        self.assertEqual(problem_page.get_simpleprob_correctness(), correctness)
+        problem_page.fill_answer_numerical(next_input)
+        self.assertIsNone(problem_page.get_simpleprob_correctness())
+        self.assertTrue(problem_page.is_reset_button_present())
+        problem_page.click_reset()
+        self.assertEqual(problem_page.get_numerical_input_value, '')

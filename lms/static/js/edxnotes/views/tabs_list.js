@@ -10,8 +10,8 @@
             initialize: function(options) {
                 this.options = options;
                 this.listenTo(this.collection, {
-                    'add': this.createTab,
-                    'destroy': function(model, collection) {
+                    add: this.createTab,
+                    destroy: function(model, collection) {
                         if (model.isActive() && collection.length) {
                             collection.at(0).activate();
                         }

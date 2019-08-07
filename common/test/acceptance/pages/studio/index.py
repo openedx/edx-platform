@@ -1,8 +1,11 @@
 """
 Studio Index, home and dashboard pages. These are the starting pages for users.
 """
+from __future__ import absolute_import
+
 from bok_choy.page_object import PageObject
 from selenium.webdriver import ActionChains
+from selenium.webdriver.common.keys import Keys
 
 from common.test.acceptance.pages.studio import BASE_URL
 from common.test.acceptance.pages.studio.login import LoginPage
@@ -82,6 +85,13 @@ class DashboardPage(PageObject, HelpMixin):
         # Clicking on course with run will trigger an ajax event
         self.wait_for_ajax()
 
+    def scroll_to_course(self, course_key):
+        """
+        Scroll down to the course element
+        """
+        element = '[data-course-key*="{}"]'.format(course_key)
+        self.scroll_to_element(element)
+
     def has_new_library_button(self):
         """
         (bool) is the "New Library" button present?
@@ -106,7 +116,7 @@ class DashboardPage(PageObject, HelpMixin):
         Fill out the form to create a new library.
         Must have called click_new_library() first.
         """
-        field = lambda fn: self.q(css='.wrapper-create-library #new-library-{}'.format(fn))
+        field = lambda fn: self.q(css=u'.wrapper-create-library #new-library-{}'.format(fn))
         field('name').fill(display_name)
         field('org').fill(org)
         field('number').fill(number)
@@ -150,7 +160,7 @@ class DashboardPage(PageObject, HelpMixin):
         """
         Fill out the form to create a new course.
         """
-        field = lambda fn: self.q(css='.wrapper-create-course #new-course-{}'.format(fn))
+        field = lambda fn: self.q(css=u'.wrapper-create-course #new-course-{}'.format(fn))
         field('name').fill(display_name)
         field('org').fill(org)
         field('number').fill(number)
@@ -205,14 +215,14 @@ class DashboardPage(PageObject, HelpMixin):
         )
         self.q(css='.ui-autocomplete .ui-menu-item a').filter(lambda el: el.text == item_text)[0].click()
 
-    def list_courses(self):
+    def list_courses(self, archived=False):
         """
-        List all the courses found on the page's list of libraries.
+        List all the courses found on the page's list of courses.
         """
         # Workaround Selenium/Firefox bug: `.text` property is broken on invisible elements
-        course_tab_link = self.q(css='#course-index-tabs .courses-tab a')
-        if course_tab_link:
-            course_tab_link.click()
+        tab_selector = u'#course-index-tabs .{} a'.format('archived-courses-tab' if archived else 'courses-tab')
+        self.wait_for_element_presence(tab_selector, "Courses Tab")
+        self.q(css=tab_selector).click()
         div2info = lambda element: {
             'name': element.find_element_by_css_selector('.course-title').text,
             'org': element.find_element_by_css_selector('.course-org .value').text,
@@ -220,13 +230,14 @@ class DashboardPage(PageObject, HelpMixin):
             'run': element.find_element_by_css_selector('.course-run .value').text,
             'url': element.find_element_by_css_selector('a.course-link').get_attribute('href'),
         }
-        return self.q(css='.courses li.course-item').map(div2info).results
+        course_list_selector = u'.{} li.course-item'.format('archived-courses' if archived else 'courses')
+        return self.q(css=course_list_selector).map(div2info).results
 
-    def has_course(self, org, number, run):
+    def has_course(self, org, number, run, archived=False):
         """
         Returns `True` if course for given org, number and run exists on the page otherwise `False`
         """
-        for course in self.list_courses():
+        for course in self.list_courses(archived):
             if course['org'] == org and course['number'] == number and course['run'] == run:
                 return True
         return False
@@ -236,13 +247,16 @@ class DashboardPage(PageObject, HelpMixin):
         Click the tab to display the available libraries, and return detail of them.
         """
         # Workaround Selenium/Firefox bug: `.text` property is broken on invisible elements
-        self.q(css='#course-index-tabs .libraries-tab a').click()
+        library_tab_css = '#course-index-tabs .libraries-tab'
+        self.wait_for_element_presence(library_tab_css, "Libraries tab")
+        self.q(css=library_tab_css).click()
         if self.q(css='.list-notices.libraries-tab').present:
             # No libraries are available.
-            self.wait_for_element_visibility('.libraries-tab .new-library-button', "Switch to library tab")
+            self.wait_for_element_presence('.libraries-tab .new-library-button', "new library tab")
             return []
         div2info = lambda element: {
             'name': element.find_element_by_css_selector('.course-title').text,
+            'link_element': element.find_element_by_css_selector('.course-title'),
             'org': element.find_element_by_css_selector('.course-org .value').text,
             'number': element.find_element_by_css_selector('.course-num .value').text,
             'url': element.find_element_by_css_selector('a.library-link').get_attribute('href'),
@@ -259,6 +273,14 @@ class DashboardPage(PageObject, HelpMixin):
                 return True
         return False
 
+    def click_library(self, name):
+        """
+        Click on the library with the given name.
+        """
+        for lib in self.list_libraries():
+            if lib['name'] == name:
+                lib['link_element'].click()
+
     @property
     def language_selector(self):
         """
@@ -270,6 +292,27 @@ class DashboardPage(PageObject, HelpMixin):
         )
         return self.q(css='#settings-language-value')
 
+    @property
+    def course_creation_error_message(self):
+        """
+        Returns the course creation error
+        """
+        self.wait_for_element_visibility(
+            '#course_creation_error>p',
+            'Length error is present'
+        )
+        return self.q(css='#course_creation_error>p').text[0]
+
+    def is_create_button_disabled(self):
+        """
+        Returns: True if Create button is disbaled
+        """
+        self.wait_for_element_presence(
+            '.action.action-primary.new-course-save.is-disabled',
+            "Create button is disabled"
+        )
+        return True
+
 
 class HomePage(DashboardPage):
     """
@@ -278,55 +321,69 @@ class HomePage(DashboardPage):
     url = BASE_URL + "/home/"
 
 
-class DashboardPageWithPrograms(DashboardPage):
+class AccessibilityPage(IndexPage):
     """
-    Extends DashboardPage for bok choy testing programs-related behavior.
+    Home page for Studio when logged in.
     """
+    url = BASE_URL + "/accessibility"
 
-    def is_programs_tab_present(self):
+    def is_browser_on_page(self):
         """
-        Determine if the programs tab appears on the studio home page.
+        Is the page header visible?
         """
-        return self.q(css='#course-index-tabs .programs-tab a').present
+        return self.q(css='#root h2').visible
 
-    def _click_programs_tab(self):
+    def header_text_on_page(self):
         """
-        DRY helper.
+        Check that the page header has the right text.
         """
-        self.q(css='#course-index-tabs .programs-tab a').click()
-        self.wait_for_element_visibility("div.programs-tab.active", "Switch to programs tab")
+        return 'Individualized Accessibility Process for Course Creators' in self.q(css='#root h2').text
 
-    def is_new_program_button_present(self):
+    def fill_form(self, email, name, message):
         """
-        Determine if the "new program" button is visible in the top "nav
-        actions" section of the page.
+        Fill the accessibility feedback form out.
         """
-        return self.q(css='.nav-actions a.new-program-button').present
+        email_input = self.q(css='#root input#email')
+        name_input = self.q(css='#root input#fullName')
+        message_input = self.q(css='#root textarea#message')
 
-    def is_empty_list_create_button_present(self):
-        """
-        Determine if the "create your first program" button is visible under
-        the programs tab (when the program list result is empty).
-        """
-        self._click_programs_tab()
-        return self.q(css='div.programs-tab.active a.new-program-button').present
+        email_input.fill(email)
+        name_input.fill(name)
+        message_input.fill(message)
 
-    def get_program_list(self):
-        """
-        Fetch the content of the program list under the programs tab (assuming
-        it is nonempty).
-        """
-        self._click_programs_tab()
-        div2info = lambda element: (
-            element.find_element_by_css_selector('.course-title').text,  # name
-            element.find_element_by_css_selector('.course-org .value').text,  # org key
-        )
-        return self.q(css='div.programs-tab li.course-item').map(div2info).results
+        # Tab off the message textarea to trigger any error messages
+        message_input[0].send_keys(Keys.TAB)
 
-    def click_new_program_button(self):
+    def submit_form(self):
         """
-        Click on the new program button.
+        Click the submit button on the accessibiltiy feedback form.
         """
-        self.q(css='.button.new-button.new-program-button').click()
-        self.wait_for_ajax()
-        self.wait_for_element_visibility(".account-username", "New program page is open")
+        button = self.q(css='#root section button')[0]
+        button.click()
+        self.wait_for_element_visibility('#root div.alert-dialog', 'Form submission alert is visible')
+
+    def leave_field_blank(self, field_id, field_type='input'):
+        """
+        To simulate leaving a field blank, click on the field, then press TAB to move off focus off the field.
+        """
+        field = self.q(css=u'#root {}#{}'.format(field_type, field_id))[0]
+        field.click()
+        field.send_keys(Keys.TAB)
+
+    def alert_has_text(self, text=''):
+        """
+        Check that the alert dialog contains the specified text.
+        """
+        return text in self.q(css='#root div.alert-dialog').text
+
+    def error_message_is_shown_with_text(self, field_id, text=''):
+        """
+        Check that at least one error message is shown and at least one contains the specified text.
+        """
+        selector = u'#root div#error-{}'.format(field_id)
+        self.wait_for_element_visibility(selector, 'An error message is visible')
+        error_messages = self.q(css=selector)
+        for message in error_messages:
+            if text in message.text:
+                return True
+        return False

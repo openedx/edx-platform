@@ -1,13 +1,49 @@
 """
 Helper functions for loading environment settings.
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+
+import io
+import json
 import os
 import sys
-import json
+from time import sleep
+
+import memcache
+import six
 from lazy import lazy
 from path import Path as path
-import memcache
+from paver.easy import BuildFailure, sh
+from six.moves import configparser
+
+from pavelib.utils.cmd import django_cmd
+
+
+def repo_root():
+    """
+    Get the root of the git repository (edx-platform).
+
+    This sometimes fails on Docker Devstack, so it's been broken
+    down with some additional error handling.  It usually starts
+    working within 30 seconds or so; for more details, see
+    https://openedx.atlassian.net/browse/PLAT-1629 and
+    https://github.com/docker/for-mac/issues/1509
+    """
+    file_path = path(__file__)
+    attempt = 1
+    while True:
+        try:
+            absolute_path = file_path.abspath()
+            break
+        except OSError:
+            print(u'Attempt {}/180 to get an absolute path failed'.format(attempt))
+            if attempt < 180:
+                attempt += 1
+                sleep(1)
+            else:
+                print('Unable to determine the absolute path of the edx-platform repo, aborting')
+                raise
+    return absolute_path.parent.parent.parent
 
 
 class Env(object):
@@ -16,11 +52,12 @@ class Env(object):
     """
 
     # Root of the git repository (edx-platform)
-    REPO_ROOT = path(__file__).abspath().parent.parent.parent
+    REPO_ROOT = repo_root()
 
     # Reports Directory
     REPORT_DIR = REPO_ROOT / 'reports'
     METRICS_DIR = REPORT_DIR / 'metrics'
+    QUALITY_DIR = REPORT_DIR / 'quality_junitxml'
 
     # Generic log dir
     GEN_LOG_DIR = REPO_ROOT / "test_root" / "log"
@@ -40,9 +77,6 @@ class Env(object):
         "lib" / "custom_a11y_rules.js"
     )
 
-    PA11YCRAWLER_REPORT_DIR = REPORT_DIR / "pa11ycrawler"
-    PA11YCRAWLER_COVERAGERC = BOK_CHOY_DIR / ".pa11ycrawlercoveragerc"
-
     # If set, put reports for run in "unique" directories.
     # The main purpose of this is to ensure that the reports can be 'slurped'
     # in the main jenkins flow job without overwriting the reports from other
@@ -52,21 +86,31 @@ class Env(object):
         BOK_CHOY_REPORT_DIR = BOK_CHOY_REPORT_DIR / shard_str
         BOK_CHOY_LOG_DIR = BOK_CHOY_LOG_DIR / shard_str
 
-    # For the time being, stubs are used by both the bok-choy and lettuce acceptance tests
-    # For this reason, the stubs package is currently located in the Django app called "terrain"
-    # where other lettuce configuration is stored.
+    # The stubs package is currently located in the Django app called "terrain"
+    # from when they were used by both the bok-choy and lettuce (deprecated) acceptance tests
     BOK_CHOY_STUB_DIR = REPO_ROOT / "common" / "djangoapps" / "terrain"
 
     # Directory that videos are served from
     VIDEO_SOURCE_DIR = REPO_ROOT / "test_root" / "data" / "video"
 
+    PRINT_SETTINGS_LOG_FILE = BOK_CHOY_LOG_DIR / "print_settings.log"
+
+    # Detect if in a Docker container, and if so which one
+    SERVER_HOST = os.environ.get('BOK_CHOY_HOSTNAME', '0.0.0.0')
+    USING_DOCKER = SERVER_HOST != '0.0.0.0'
+    SETTINGS = 'bok_choy_docker' if USING_DOCKER else 'bok_choy'
+    DEVSTACK_SETTINGS = 'devstack_docker' if USING_DOCKER else 'devstack'
+    TEST_SETTINGS = 'test'
+
     BOK_CHOY_SERVERS = {
         'lms': {
-            'port': 8003,
+            'host': SERVER_HOST,
+            'port': os.environ.get('BOK_CHOY_LMS_PORT', '8003'),
             'log': BOK_CHOY_LOG_DIR / "bok_choy_lms.log"
         },
         'cms': {
-            'port': 8031,
+            'host': SERVER_HOST,
+            'port': os.environ.get('BOK_CHOY_CMS_PORT', '8031'),
             'log': BOK_CHOY_LOG_DIR / "bok_choy_studio.log"
         }
     }
@@ -111,23 +155,32 @@ class Env(object):
             'log': BOK_CHOY_LOG_DIR / "bok_choy_ecommerce.log",
         },
 
-        'programs': {
-            'port': 8090,
-            'log': BOK_CHOY_LOG_DIR / "bok_choy_programs.log",
-        },
-
         'catalog': {
             'port': 8091,
             'log': BOK_CHOY_LOG_DIR / "bok_choy_catalog.log",
         },
+
+        'lti': {
+            'port': 8765,
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_lti.log",
+        },
     }
 
     # Mongo databases that will be dropped before/after the tests run
+    MONGO_HOST = 'edx.devstack.mongo' if USING_DOCKER else 'localhost'
     BOK_CHOY_MONGO_DATABASE = "test"
-    BOK_CHOY_CACHE = memcache.Client(['0.0.0.0:11211'], debug=0)
+    BOK_CHOY_CACHE_HOST = 'edx.devstack.memcached' if USING_DOCKER else '0.0.0.0'
+    BOK_CHOY_CACHE = memcache.Client(['{}:11211'.format(BOK_CHOY_CACHE_HOST)], debug=0)
 
     # Test Ids Directory
     TEST_DIR = REPO_ROOT / ".testids"
+
+    # Configured browser to use for the js test suites
+    SELENIUM_BROWSER = os.environ.get('SELENIUM_BROWSER', 'firefox')
+    if USING_DOCKER:
+        KARMA_BROWSER = 'ChromeDocker' if SELENIUM_BROWSER == 'chrome' else 'FirefoxDocker'
+    else:
+        KARMA_BROWSER = 'FirefoxNoUpdates'
 
     # Files used to run each of the js test suites
     # TODO:  Store this as a dict. Order seems to matter for some
@@ -135,9 +188,10 @@ class Env(object):
     KARMA_CONFIG_FILES = [
         REPO_ROOT / 'cms/static/karma_cms.conf.js',
         REPO_ROOT / 'cms/static/karma_cms_squire.conf.js',
+        REPO_ROOT / 'cms/static/karma_cms_webpack.conf.js',
         REPO_ROOT / 'lms/static/karma_lms.conf.js',
-        REPO_ROOT / 'lms/static/karma_lms_coffee.conf.js',
         REPO_ROOT / 'common/lib/xmodule/xmodule/js/karma_xmodule.conf.js',
+        REPO_ROOT / 'common/lib/xmodule/xmodule/js/karma_xmodule_webpack.conf.js',
         REPO_ROOT / 'common/static/karma_common.conf.js',
         REPO_ROOT / 'common/static/karma_common_requirejs.conf.js',
     ]
@@ -145,21 +199,26 @@ class Env(object):
     JS_TEST_ID_KEYS = [
         'cms',
         'cms-squire',
+        'cms-webpack',
         'lms',
-        'lms-coffee',
         'xmodule',
+        'xmodule-webpack',
         'common',
-        'common-requirejs'
+        'common-requirejs',
+        'jest-snapshot'
     ]
 
     JS_REPORT_DIR = REPORT_DIR / 'javascript'
 
-    # Directories used for common/lib/ tests
+    # Directories used for common/lib/tests
+    IGNORED_TEST_DIRS = ('__pycache__', '.cache')
     LIB_TEST_DIRS = []
     for item in (REPO_ROOT / "common/lib").listdir():
-        if (REPO_ROOT / 'common/lib' / item).isdir():
+        dir_name = (REPO_ROOT / 'common/lib' / item)
+        if dir_name.isdir() and not dir_name.endswith(IGNORED_TEST_DIRS):
             LIB_TEST_DIRS.append(path("common/lib") / item.basename())
     LIB_TEST_DIRS.append(path("pavelib/paver_tests"))
+    LIB_TEST_DIRS.append(path("scripts/xsslint/tests"))
 
     # Directory for i18n test reports
     I18N_REPORT_DIR = REPORT_DIR / 'i18n'
@@ -175,6 +234,55 @@ class Env(object):
             SERVICE_VARIANT = 'cms'
         else:
             SERVICE_VARIANT = 'lms'
+
+    @classmethod
+    def get_django_setting(cls, django_setting, system, settings=None):
+        """
+        Interrogate Django environment for specific settings values
+        :param django_setting: the django setting to get
+        :param system: the django app to use when asking for the setting (lms | cms)
+        :param settings: the settings file to use when asking for the value
+        :return: unicode value of the django setting
+        """
+        if not settings:
+            settings = os.environ.get("EDX_PLATFORM_SETTINGS", "aws")
+        log_dir = os.path.dirname(cls.PRINT_SETTINGS_LOG_FILE)
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+        try:
+            value = sh(
+                django_cmd(
+                    system,
+                    settings,
+                    u"print_setting {django_setting} 2>{log_file}".format(
+                        django_setting=django_setting,
+                        log_file=cls.PRINT_SETTINGS_LOG_FILE
+                    )
+                ),
+                capture=True
+            )
+            return six.text_type(value).strip()
+        except BuildFailure:
+            print(u"Unable to print the value of the {} setting:".format(django_setting))
+            with io.open(cls.PRINT_SETTINGS_LOG_FILE, 'r') as f:
+                print(f.read())
+            sys.exit(1)
+
+    @classmethod
+    def covered_modules(cls):
+        """
+        List the source modules listed in .coveragerc for which coverage
+        will be measured.
+        """
+        coveragerc = configparser.RawConfigParser()
+        coveragerc.read(cls.PYTHON_COVERAGERC)
+        modules = coveragerc.get('run', 'source')
+        result = []
+        for module in modules.split('\n'):
+            module = module.strip()
+            if module:
+                result.append(module)
+        return result
 
     @lazy
     def env_tokens(self):
@@ -195,8 +303,8 @@ class Env(object):
             env_path = env_path.parent.parent / env_path.basename()
         if not env_path.isfile():
             print(
-                "Warning: could not find environment JSON file "
-                "at '{path}'".format(path=env_path),
+                u"Warning: could not find environment JSON file "
+                "at '{path}'".format(path=env_path),  # pylint: disable=unicode-format-string
                 file=sys.stderr,
             )
             return dict()
@@ -208,8 +316,8 @@ class Env(object):
 
         except ValueError:
             print(
-                "Error: Could not parse JSON "
-                "in {path}".format(path=env_path),
+                u"Error: Could not parse JSON "
+                "in {path}".format(path=env_path),  # pylint: disable=unicode-format-string
                 file=sys.stderr,
             )
             sys.exit(1)
@@ -220,3 +328,15 @@ class Env(object):
         Return a dictionary of feature flags configured by the environment.
         """
         return self.env_tokens.get('FEATURES', dict())
+
+    @classmethod
+    def rsync_dirs(cls):
+        """
+        List the directories that should be synced during pytest-xdist
+        execution.  Needs to include all modules for which coverage is
+        measured, not just the tests being run.
+        """
+        result = set()
+        for module in cls.covered_modules():
+            result.add(module.split('/')[0])
+        return result

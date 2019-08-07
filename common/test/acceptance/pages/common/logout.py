@@ -1,7 +1,10 @@
 """
 Logout Page.
 """
+from __future__ import absolute_import
+
 from bok_choy.page_object import PageObject
+
 from common.test.acceptance.pages.common import BASE_URL
 
 
@@ -13,4 +16,4 @@ class LogoutPage(PageObject):
     url = BASE_URL + "/logout"
 
     def is_browser_on_page(self):
-        return self.q(css='.btn-login').present
+        return self.q(css='.sign-in-btn').present

@@ -1,59 +1,70 @@
 """
 Unit tests for the Mixed Modulestore, with DDT for the various stores (Split, Draft, XML)
 """
-from collections import namedtuple
-import datetime
-import logging
-import ddt
-import itertools
-import mimetypes
-from uuid import uuid4
-from contextlib import contextmanager
-from mock import patch, Mock, call
+from __future__ import absolute_import
 
+import datetime
+import itertools
+import logging
+import mimetypes
+from collections import namedtuple
+from contextlib import contextmanager
+from shutil import rmtree
+from tempfile import mkdtemp
+from uuid import uuid4
+
+import ddt
+import pymongo
+import pytest
+import six
 # Mixed modulestore depends on django, so we'll manually configure some django settings
 # before importing the module
 # TODO remove this import and the configuration -- xmodule should not depend on django!
 from django.conf import settings
-# This import breaks this test file when run separately. Needs to be fixed! (PLAT-449)
-from nose.plugins.attrib import attr
-from nose import SkipTest
-import pymongo
+from mock import Mock, call, patch
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryLocator
 from pytz import UTC
-from shutil import rmtree
-from tempfile import mkdtemp
-
-from xmodule.x_module import XModuleMixin
-from xmodule.modulestore.edit_info import EditInfoMixin
-from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore.tests.utils import MongoContentstoreBuilder
-from xmodule.contentstore.content import StaticContent
-from xmodule.modulestore.xml_importer import import_course_from_xml
-from xmodule.modulestore.xml_exporter import export_course_to_xml
-from xmodule.modulestore.tests.test_asides import AsideTestType
+from six.moves import range
+from web_fragments.fragment import Fragment
 from xblock.core import XBlockAside
-from xblock.fields import Scope, String, ScopeIds
-from xblock.fragment import Fragment
+from xblock.fields import Scope, ScopeIds, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.tools import TestRuntime
+
+from openedx.core.lib.tests import attr
+from xmodule.contentstore.content import StaticContent
+from xmodule.exceptions import InvalidVersionError
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES, UnsupportedRevisionError
+from xmodule.modulestore.edit_info import EditInfoMixin
+from xmodule.modulestore.exceptions import (
+    DuplicateCourseError,
+    ItemNotFoundError,
+    NoPathToItem,
+    ReferentialIntegrityError
+)
+from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore.mixed import MixedModuleStore
+from xmodule.modulestore.search import navigation_index, path_to_location
+from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
+from xmodule.modulestore.tests.factories import check_exact_number_of_calls, check_mongo_calls, mongo_uses_error_check
+from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
+from xmodule.modulestore.tests.test_asides import AsideTestType
+from xmodule.modulestore.tests.utils import (
+    LocationMixin,
+    MongoContentstoreBuilder,
+    create_modulestore_instance,
+    mock_tab_from_json
+)
+from xmodule.modulestore.xml_exporter import export_course_to_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml
+from xmodule.tests import DATA_DIR, CourseComparisonTest
+from xmodule.x_module import XModuleMixin
 
 if not settings.configured:
     settings.configure()
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryLocator
-from xmodule.exceptions import InvalidVersionError
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, DIRECT_ONLY_CATEGORIES
-from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError, NoPathToItem
-from xmodule.modulestore.mixed import MixedModuleStore
-from xmodule.modulestore.search import path_to_location, navigation_index
-from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
-from xmodule.modulestore.tests.factories import check_mongo_calls, check_exact_number_of_calls, \
-    mongo_uses_error_check
-from xmodule.modulestore.tests.utils import create_modulestore_instance, LocationMixin, mock_tab_from_json
-from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
-from xmodule.tests import DATA_DIR, CourseComparisonTest
 
 log = logging.getLogger(__name__)
 
@@ -110,7 +121,7 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest):
         AssertEqual replacement for CourseLocator
         """
         if loc1.for_branch(None) != loc2.for_branch(None):
-            self.fail(self._formatMessage(msg, u"{} != {}".format(unicode(loc1), unicode(loc2))))
+            self.fail(self._formatMessage(msg, u"{} != {}".format(six.text_type(loc1), six.text_type(loc2))))
 
     def setUp(self):
         """
@@ -323,7 +334,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         )
         # try an unknown mapping, it should be the 'default' store
         self.assertEqual(self.store.get_modulestore_type(
-            SlashSeparatedCourseKey('foo', 'bar', '2012_Fall')), default_ms
+            CourseKey.from_string('foo/bar/2012_Fall')), default_ms
         )
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
@@ -418,7 +429,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #    wildcard query, 6! load pertinent items for inheritance calls, load parents, course root fetch (why)
     # Split:
     #    active_versions (with regex), structure, and spurious active_versions refetch
-    @ddt.data((ModuleStoreEnum.Type.mongo, 14, 0), (ModuleStoreEnum.Type.split, 3, 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 14, 0), (ModuleStoreEnum.Type.split, 4, 0))
     @ddt.unpack
     def test_get_items(self, default_ms, max_find, max_send):
         self.initdb(default_ms)
@@ -1043,7 +1054,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #   1) wildcard split search,
     #   2-4) active_versions, structure, definition (s/b lazy; so, unnecessary)
     #   5) wildcard draft mongo which has none
-    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0), (ModuleStoreEnum.Type.split, 5, 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0), (ModuleStoreEnum.Type.split, 6, 0))
     @ddt.unpack
     def test_get_courses(self, default_ms, max_find, max_send):
         self.initdb(default_ms)
@@ -1142,6 +1153,378 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
                 parent_location,
                 self.store.get_parent_location(child_location, revision=revision)
             )
+
+    def verify_item_parent(self, item_location, expected_parent_location, old_parent_location, is_reverted=False):
+        """
+        Verifies that item is placed under expected parent.
+
+        Arguments:
+            item_location (BlockUsageLocator)    : Locator of item.
+            expected_parent_location (BlockUsageLocator)  : Expected parent block locator.
+            old_parent_location (BlockUsageLocator)  : Old parent block locator.
+            is_reverted (Boolean)   : A flag to notify that item was reverted.
+        """
+        with self.store.bulk_operations(self.course.id):
+            source_item = self.store.get_item(item_location)
+            old_parent = self.store.get_item(old_parent_location)
+            expected_parent = self.store.get_item(expected_parent_location)
+
+            self.assertEqual(expected_parent_location, source_item.get_parent().location)
+
+            # If an item is reverted, it means it's actual parent was the one that is the current parent now
+            # i.e expected_parent_location otherwise old_parent_location.
+            published_parent_location = expected_parent_location if is_reverted else old_parent_location
+
+            # Check parent locations wrt branches
+            with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+                self.assertEqual(expected_parent_location, self.store.get_item(item_location).get_parent().location)
+            with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
+                self.assertEqual(published_parent_location, self.store.get_item(item_location).get_parent().location)
+
+            # Make location specific to published branch for verify_get_parent_locations_results call.
+            published_parent_location = published_parent_location.for_branch(ModuleStoreEnum.BranchName.published)
+
+            # Verify expected item parent locations
+            self.verify_get_parent_locations_results([
+                (item_location, expected_parent_location, None),
+                (item_location, expected_parent_location, ModuleStoreEnum.RevisionOption.draft_preferred),
+                (item_location, published_parent_location, ModuleStoreEnum.RevisionOption.published_only),
+            ])
+
+            # Also verify item.parent has correct parent location set.
+            self.assertEqual(source_item.parent, expected_parent_location)
+            self.assertEqual(source_item.parent, self.store.get_parent_location(item_location))
+
+            # Item should be present in new parent's children list but not in old parent's children list.
+            self.assertIn(item_location, expected_parent.children)
+            self.assertNotIn(item_location, old_parent.children)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_update_item_parent(self, store_type):
+        """
+        Test that when we move an item from old to new parent, the item should be present in new parent.
+        """
+        self.initdb(store_type)
+        self._create_block_hierarchy()
+
+        # Publish the course.
+        self.course = self.store.publish(self.course.location, self.user_id)
+
+        # Move child problem_x1a_1 to vertical_y1a.
+        item_location = self.problem_x1a_1
+        new_parent_location = self.vertical_y1a
+        old_parent_location = self.vertical_x1a
+        updated_item_location = self.store.update_item_parent(
+            item_location, new_parent_location, old_parent_location, self.user_id
+        )
+        self.assertEqual(updated_item_location, item_location)
+
+        self.verify_item_parent(
+            item_location=item_location,
+            expected_parent_location=new_parent_location,
+            old_parent_location=old_parent_location
+        )
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_move_revert(self, store_type):
+        """
+        Test that when we move an item to new parent and then discard the original parent, the item should be present
+        back in original parent.
+        """
+        self.initdb(store_type)
+        self._create_block_hierarchy()
+
+        # Publish the course
+        self.course = self.store.publish(self.course.location, self.user_id)
+
+        # Move child problem_x1a_1 to vertical_y1a.
+        item_location = self.problem_x1a_1
+        new_parent_location = self.vertical_y1a
+        old_parent_location = self.vertical_x1a
+        updated_item_location = self.store.update_item_parent(
+            item_location, new_parent_location, old_parent_location, self.user_id
+        )
+        self.assertEqual(updated_item_location, item_location)
+
+        self.verify_item_parent(
+            item_location=item_location,
+            expected_parent_location=new_parent_location,
+            old_parent_location=old_parent_location
+        )
+
+        # Now discard changes in old_parent_location i.e original parent.
+        self.store.revert_to_published(old_parent_location, self.user_id)
+
+        self.verify_item_parent(
+            item_location=item_location,
+            expected_parent_location=old_parent_location,
+            old_parent_location=new_parent_location,
+            is_reverted=True
+        )
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_move_delete_revert(self, store_type):
+        """
+        Test that when we move an item and delete it and then discard changes for original parent, item should be
+        present back in original parent.
+        """
+        self.initdb(store_type)
+        self._create_block_hierarchy()
+
+        # Publish the course
+        self.course = self.store.publish(self.course.location, self.user_id)
+
+        # Move child problem_x1a_1 to vertical_y1a.
+        item_location = self.problem_x1a_1
+        new_parent_location = self.vertical_y1a
+        old_parent_location = self.vertical_x1a
+        updated_item_location = self.store.update_item_parent(
+            item_location, new_parent_location, old_parent_location, self.user_id
+        )
+        self.assertEqual(updated_item_location, item_location)
+
+        self.verify_item_parent(
+            item_location=item_location,
+            expected_parent_location=new_parent_location,
+            old_parent_location=old_parent_location
+        )
+
+        # Now delete the item.
+        self.store.delete_item(item_location, self.user_id)
+
+        # Now discard changes in old_parent_location i.e original parent.
+        self.store.revert_to_published(old_parent_location, self.user_id)
+
+        self.verify_item_parent(
+            item_location=item_location,
+            expected_parent_location=old_parent_location,
+            old_parent_location=new_parent_location,
+            is_reverted=True
+        )
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_move_revert_move(self, store_type):
+        """
+        Test that when we move an item to new parent and discard changes for the old parent, then the item should be
+        present in the old parent and then moving an item from old parent to new parent should place that item under
+        new parent.
+        """
+        self.initdb(store_type)
+        self._create_block_hierarchy()
+
+        # Publish the course
+        self.course = self.store.publish(self.course.location, self.user_id)
+
+        # Move child problem_x1a_1 to vertical_y1a.
+        item_location = self.problem_x1a_1
+        new_parent_location = self.vertical_y1a
+        old_parent_location = self.vertical_x1a
+        updated_item_location = self.store.update_item_parent(
+            item_location, new_parent_location, old_parent_location, self.user_id
+        )
+        self.assertEqual(updated_item_location, item_location)
+
+        self.verify_item_parent(
+            item_location=item_location,
+            expected_parent_location=new_parent_location,
+            old_parent_location=old_parent_location
+        )
+
+        # Now discard changes in old_parent_location i.e original parent.
+        self.store.revert_to_published(old_parent_location, self.user_id)
+
+        self.verify_item_parent(
+            item_location=item_location,
+            expected_parent_location=old_parent_location,
+            old_parent_location=new_parent_location,
+            is_reverted=True
+        )
+
+        # Again try to move from x1 to y1
+        updated_item_location = self.store.update_item_parent(
+            item_location, new_parent_location, old_parent_location, self.user_id
+        )
+        self.assertEqual(updated_item_location, item_location)
+
+        self.verify_item_parent(
+            item_location=item_location,
+            expected_parent_location=new_parent_location,
+            old_parent_location=old_parent_location
+        )
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_move_edited_revert(self, store_type):
+        """
+        Test that when we move an edited item from old parent to new parent and then discard changes in old parent,
+        item should be placed under original parent with initial state.
+        """
+        self.initdb(store_type)
+        self._create_block_hierarchy()
+
+        # Publish the course.
+        self.course = self.store.publish(self.course.location, self.user_id)
+
+        # Move child problem_x1a_1 to vertical_y1a.
+        item_location = self.problem_x1a_1
+        new_parent_location = self.vertical_y1a
+        old_parent_location = self.vertical_x1a
+
+        problem = self.store.get_item(self.problem_x1a_1)
+        orig_display_name = problem.display_name
+
+        # Change display name of problem and update just it.
+        problem.display_name = 'updated'
+        self.store.update_item(problem, self.user_id)
+
+        updated_problem = self.store.get_item(self.problem_x1a_1)
+        self.assertEqual(updated_problem.display_name, 'updated')
+
+        # Now, move from x1 to y1.
+        updated_item_location = self.store.update_item_parent(
+            item_location, new_parent_location, old_parent_location, self.user_id
+        )
+        self.assertEqual(updated_item_location, item_location)
+
+        self.verify_item_parent(
+            item_location=item_location,
+            expected_parent_location=new_parent_location,
+            old_parent_location=old_parent_location
+        )
+
+        # Now discard changes in old_parent_location i.e original parent.
+        self.store.revert_to_published(old_parent_location, self.user_id)
+
+        # Check that problem has the original name back.
+        reverted_problem = self.store.get_item(self.problem_x1a_1)
+        self.assertEqual(orig_display_name, reverted_problem.display_name)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_move_1_moved_1_unchanged(self, store_type):
+        """
+        Test that when we move an item from an old parent which have multiple items then only moved item's parent
+        is changed while other items are still present inside old parent.
+        """
+        self.initdb(store_type)
+        self._create_block_hierarchy()
+
+        # Create some children in vertical_x1a
+        problem_item2 = self.store.create_child(self.user_id, self.vertical_x1a, 'problem', 'Problem_Item2')
+
+        # Publish the course.
+        self.course = self.store.publish(self.course.location, self.user_id)
+
+        item_location = self.problem_x1a_1
+        new_parent_location = self.vertical_y1a
+        old_parent_location = self.vertical_x1a
+
+        # Move problem_x1a_1 from x1 to y1.
+        updated_item_location = self.store.update_item_parent(
+            item_location, new_parent_location, old_parent_location, self.user_id
+        )
+        self.assertEqual(updated_item_location, item_location)
+
+        self.verify_item_parent(
+            item_location=item_location,
+            expected_parent_location=new_parent_location,
+            old_parent_location=old_parent_location
+        )
+
+        # Check that problem_item2 is still present in vertical_x1a
+        problem_item2 = self.store.get_item(problem_item2.location)
+        self.assertEqual(problem_item2.parent, self.vertical_x1a)
+        self.assertIn(problem_item2.location, problem_item2.get_parent().children)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_move_1_moved_1_edited(self, store_type):
+        """
+        Test that when we move an item inside an old parent having multiple items, we edit one item and move
+        other item from old to new parent, then discard changes in old parent would discard the changes of the
+        edited item and move back the moved item to old location.
+        """
+        self.initdb(store_type)
+        self._create_block_hierarchy()
+
+        # Create some children in vertical_x1a
+        problem_item2 = self.store.create_child(self.user_id, self.vertical_x1a, 'problem', 'Problem_Item2')
+        orig_display_name = problem_item2.display_name
+
+        # Publish the course.
+        self.course = self.store.publish(self.course.location, self.user_id)
+
+        # Edit problem_item2.
+        problem_item2.display_name = 'updated'
+        self.store.update_item(problem_item2, self.user_id)
+
+        updated_problem2 = self.store.get_item(problem_item2.location)
+        self.assertEqual(updated_problem2.display_name, 'updated')
+
+        item_location = self.problem_x1a_1
+        new_parent_location = self.vertical_y1a
+        old_parent_location = self.vertical_x1a
+
+        # Move problem_x1a_1 from x1 to y1.
+        updated_item_location = self.store.update_item_parent(
+            item_location, new_parent_location, old_parent_location, self.user_id
+        )
+        self.assertEqual(updated_item_location, item_location)
+
+        self.verify_item_parent(
+            item_location=item_location,
+            expected_parent_location=new_parent_location,
+            old_parent_location=old_parent_location
+        )
+
+        # Now discard changes in old_parent_location i.e original parent.
+        self.store.revert_to_published(old_parent_location, self.user_id)
+
+        # Check that problem_item2 has the original name back.
+        reverted_problem2 = self.store.get_item(problem_item2.location)
+        self.assertEqual(orig_display_name, reverted_problem2.display_name)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_move_1_moved_1_deleted(self, store_type):
+        """
+        Test that when we move an item inside an old parent having multiple items, we delete one item and move
+        other item from old to new parent, then discard changes in old parent would undo delete the deleted
+        item and move back the moved item to old location.
+        """
+        self.initdb(store_type)
+        self._create_block_hierarchy()
+
+        # Create some children in vertical_x1a
+        problem_item2 = self.store.create_child(self.user_id, self.vertical_x1a, 'problem', 'Problem_Item2')
+        orig_display_name = problem_item2.display_name
+
+        # Publish the course.
+        self.course = self.store.publish(self.course.location, self.user_id)
+
+        # Now delete other problem problem_item2.
+        self.store.delete_item(problem_item2.location, self.user_id)
+
+        # Move child problem_x1a_1 to vertical_y1a.
+        item_location = self.problem_x1a_1
+        new_parent_location = self.vertical_y1a
+        old_parent_location = self.vertical_x1a
+
+        # Move problem_x1a_1 from x1 to y1.
+        updated_item_location = self.store.update_item_parent(
+            item_location, new_parent_location, old_parent_location, self.user_id
+        )
+        self.assertEqual(updated_item_location, item_location)
+
+        self.verify_item_parent(
+            item_location=item_location,
+            expected_parent_location=new_parent_location,
+            old_parent_location=old_parent_location
+        )
+
+        # Now discard changes in old_parent_location i.e original parent.
+        self.store.revert_to_published(old_parent_location, self.user_id)
+
+        # Check that problem_item2 is also back in vertical_x1a
+        problem_item2 = self.store.get_item(problem_item2.location)
+        self.assertEqual(problem_item2.parent, self.vertical_x1a)
+        self.assertIn(problem_item2.location, problem_item2.get_parent().children)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_get_parent_locations_moved_child(self, default_ms):
@@ -1243,7 +1626,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         # add another parent (unit) "vertical_x1b" for problem "problem_x1a_1"
         mongo_store.collection.update(
             self.vertical_x1b.to_deprecated_son('_id.'),
-            {'$push': {'definition.children': unicode(self.problem_x1a_1)}}
+            {'$push': {'definition.children': six.text_type(self.problem_x1a_1)}}
         )
 
         # convert first parent (unit) "vertical_x1a" of problem "problem_x1a_1" to draft
@@ -1493,11 +1876,11 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         # add orphan vertical and sequential as another parents of problem "problem_x1a_1"
         mongo_store.collection.update(
             orphan_sequential.to_deprecated_son('_id.'),
-            {'$push': {'definition.children': unicode(self.problem_x1a_1)}}
+            {'$push': {'definition.children': six.text_type(self.problem_x1a_1)}}
         )
         mongo_store.collection.update(
             orphan_vertical.to_deprecated_son('_id.'),
-            {'$push': {'definition.children': unicode(self.problem_x1a_1)}}
+            {'$push': {'definition.children': six.text_type(self.problem_x1a_1)}}
         )
         # test that "get_parent_location" method of published branch still returns the correct non-orphan parent for
         # problem "problem_x1a_1" since the two other parents are orphans
@@ -1508,7 +1891,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         # now add valid published vertical as another parent of problem
         mongo_store.collection.update(
             self.sequential_x1.to_deprecated_son('_id.'),
-            {'$push': {'definition.children': unicode(self.problem_x1a_1)}}
+            {'$push': {'definition.children': six.text_type(self.problem_x1a_1)}}
         )
         # now check that "get_parent_location" method of published branch raises "ReferentialIntegrityError" for
         # problem "problem_x1a_1" since it has now 2 valid published parents
@@ -2907,7 +3290,7 @@ class TestPublishOverExportImport(CommonMixedModuleStoreSetup):
         Check that asides could be imported from XML and the modulestores handle asides crud
         """
         if default_store == ModuleStoreEnum.Type.mongo:
-            raise SkipTest("asides not supported in old mongo")
+            pytest.skip("asides not supported in old mongo")
         with MongoContentstoreBuilder().build() as contentstore:
             self.store = MixedModuleStore(
                 contentstore=contentstore,
@@ -2982,7 +3365,7 @@ class TestPublishOverExportImport(CommonMixedModuleStoreSetup):
            lambda self, block: ['test_aside'])
     def test_export_course_with_asides(self, default_store):
         if default_store == ModuleStoreEnum.Type.mongo:
-            raise SkipTest("asides not supported in old mongo")
+            pytest.skip("asides not supported in old mongo")
         with MongoContentstoreBuilder().build() as contentstore:
             self.store = MixedModuleStore(
                 contentstore=contentstore,
@@ -3069,7 +3452,7 @@ class TestPublishOverExportImport(CommonMixedModuleStoreSetup):
            lambda self, block: ['test_aside'])
     def test_export_course_after_creating_new_items_with_asides(self, default_store):  # pylint: disable=too-many-statements
         if default_store == ModuleStoreEnum.Type.mongo:
-            raise SkipTest("asides not supported in old mongo")
+            pytest.skip("asides not supported in old mongo")
         with MongoContentstoreBuilder().build() as contentstore:
             self.store = MixedModuleStore(
                 contentstore=contentstore,
@@ -3206,7 +3589,7 @@ class TestAsidesWithMixedModuleStore(CommonMixedModuleStoreSetup):
         Tests that connected asides could be stored, received and updated along with connected course items
         """
         if default_store == ModuleStoreEnum.Type.mongo:
-            raise SkipTest("asides not supported in old mongo")
+            pytest.skip("asides not supported in old mongo")
 
         self.initdb(default_store)
 
@@ -3270,7 +3653,7 @@ class TestAsidesWithMixedModuleStore(CommonMixedModuleStoreSetup):
         Tests that connected asides will be cloned together with the parent courses
         """
         if default_store == ModuleStoreEnum.Type.mongo:
-            raise SkipTest("asides not supported in old mongo")
+            pytest.skip("asides not supported in old mongo")
 
         with MongoContentstoreBuilder().build() as contentstore:
             # initialize the mixed modulestore
@@ -3318,7 +3701,7 @@ class TestAsidesWithMixedModuleStore(CommonMixedModuleStoreSetup):
         Tests that connected asides will be removed together with the connected items
         """
         if default_store == ModuleStoreEnum.Type.mongo:
-            raise SkipTest("asides not supported in old mongo")
+            pytest.skip("asides not supported in old mongo")
 
         self.initdb(default_store)
 
@@ -3368,7 +3751,7 @@ class TestAsidesWithMixedModuleStore(CommonMixedModuleStoreSetup):
         Tests that public/unpublish doesn't affect connected stored asides
         """
         if default_store == ModuleStoreEnum.Type.mongo:
-            raise SkipTest("asides not supported in old mongo")
+            pytest.skip("asides not supported in old mongo")
 
         self.initdb(default_store)
 
@@ -3395,13 +3778,17 @@ class TestAsidesWithMixedModuleStore(CommonMixedModuleStoreSetup):
         _check_asides(item)
 
         # Private -> Public
-        self.store.publish(item_location, self.user_id)
+        published_block = self.store.publish(item_location, self.user_id)
+        _check_asides(published_block)
+
         item = self.store.get_item(item_location)
         self.assertTrue(self.store.has_published_version(item))
         _check_asides(item)
 
         # Public -> Private
-        self.store.unpublish(item_location, self.user_id)
+        unpublished_block = self.store.unpublish(item_location, self.user_id)
+        _check_asides(unpublished_block)
+
         item = self.store.get_item(item_location)
         self.assertFalse(self.store.has_published_version(item))
         _check_asides(item)

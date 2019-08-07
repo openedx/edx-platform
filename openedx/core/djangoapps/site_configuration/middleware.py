@@ -1,8 +1,10 @@
 """
 This file contains Django middleware related to the site_configuration app.
 """
+from __future__ import absolute_import
 
 from django.conf import settings
+
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 

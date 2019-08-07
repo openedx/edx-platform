@@ -1,15 +1,19 @@
 """ Mixins for setting up particular course structures (such as split tests or cohorted content) """
+from __future__ import absolute_import
 
 from datetime import datetime
+
 from pytz import UTC
 
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
+from openedx.core.djangoapps.django_comment_common.models import Role
+from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.partitions.partitions import UserPartition, Group
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.partitions.partitions import Group, UserPartition
 
 
 class ContentGroupTestCase(ModuleStoreTestCase):
@@ -50,17 +54,27 @@ class ContentGroupTestCase(ModuleStoreTestCase):
             discussion_topics={}
         )
 
+        seed_permissions_roles(self.course.id)
+
         self.staff_user = UserFactory.create(is_staff=True)
         self.alpha_user = UserFactory.create()
         self.beta_user = UserFactory.create()
         self.non_cohorted_user = UserFactory.create()
-        for user in [self.staff_user, self.alpha_user, self.beta_user, self.non_cohorted_user]:
+        self.community_ta = UserFactory.create(username="community_ta")
+        self.community_ta.roles.add(Role.objects.get(name="Community TA", course_id=self.course.id))
+        for user in [
+            self.staff_user,
+            self.alpha_user,
+            self.beta_user,
+            self.non_cohorted_user,
+            self.community_ta
+        ]:
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
 
         alpha_cohort = CohortFactory(
             course_id=self.course.id,
             name='Cohort Alpha',
-            users=[self.alpha_user]
+            users=[self.alpha_user, self.community_ta, self.staff_user]
         )
         beta_cohort = CohortFactory(
             course_id=self.course.id,

@@ -1,18 +1,20 @@
 """Handle events that were forwarded from the Segment webhook integration"""
 
-import datetime
+from __future__ import absolute_import
+
 import json
 import logging
 
+from dateutil import parser
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
-
+from django.views.decorators.http import require_POST
 from eventtracking import tracker
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+
 from util.json_request import expect_json
 
 log = logging.getLogger(__name__)
@@ -26,6 +28,10 @@ ERROR_MISSING_DATA = 'The data field must be specified in the properties diction
 ERROR_MISSING_NAME = 'The name field must be specified in the properties dictionary'
 ERROR_MISSING_TIMESTAMP = 'Required timestamp field not found'
 ERROR_MISSING_RECEIVED_AT = 'Required receivedAt field not found'
+
+
+FORUM_THREAD_VIEWED_EVENT_LABEL = 'Forum: View Thread'
+BI_SCREEN_VIEWED_EVENT_NAME = u'edx.bi.app.navigation.screen'
 
 
 @require_POST
@@ -141,11 +147,8 @@ def track_segmentio_event(request):  # pylint: disable=too-many-statements
     if not segment_event_type or (segment_event_type.lower() not in allowed_types):
         return
 
-    if 'name' not in segment_properties:
-        raise EventValidationError(ERROR_MISSING_NAME)
-
     # Ignore event names that are unsupported
-    segment_event_name = segment_properties['name']
+    segment_event_name = _get_segmentio_event_name(segment_properties)
     disallowed_substring_names = [
         a.lower() for a in getattr(settings, 'TRACKING_SEGMENTIO_DISALLOWED_SUBSTRING_NAMES', [])
     ]
@@ -220,10 +223,49 @@ def track_segmentio_event(request):  # pylint: disable=too-many-statements
 
     context['ip'] = segment_properties.get('context', {}).get('ip', '')
 
+    # For Business Intelligence events: Add label to context
+    if 'label' in segment_properties:
+        context['label'] = segment_properties['label']
+
+    # For Android-sourced Business Intelligence events: add course ID to context
+    if 'course_id' in segment_properties:
+        context['course_id'] = segment_properties['course_id']
+
     with tracker.get_tracker().context('edx.segmentio', context):
         tracker.emit(segment_event_name, segment_properties.get('data', {}))
 
 
+def _get_segmentio_event_name(event_properties):
+    """
+    Get the name of a SegmentIO event.
+
+    Args:
+        event_properties: dict
+            The properties of the event, which should contain the event's
+            name or, in the case of an old Android screen event, its screen
+            label.
+
+    Returns: str
+        The name (or effective name) of the event.
+
+    Note:
+        In older versions of the Android app, screen-view tracking events
+        did not have a name. So, in order to capture forum-thread-viewed events
+        from those old-versioned apps, we have to accept the event based on
+        its screen label. We return an event name that matches screen-view
+        events in the iOS app and newer versions of the Android app.
+
+    Raises:
+        EventValidationError if name is missing
+    """
+    if 'name' in event_properties:
+        return event_properties['name']
+    elif event_properties.get('label') == FORUM_THREAD_VIEWED_EVENT_LABEL:
+        return BI_SCREEN_VIEWED_EVENT_NAME
+    else:
+        raise EventValidationError(ERROR_MISSING_NAME)
+
+
 def parse_iso8601_timestamp(timestamp):
     """Parse a particular type of ISO8601 formatted timestamp"""
-    return datetime.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ")
+    return parser.parse(timestamp)

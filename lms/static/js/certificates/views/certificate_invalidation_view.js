@@ -48,8 +48,7 @@
                     if (this.collection.findWhere({user: user})) {
                         message = gettext('Certificate of <%= user %> has already been invalidated. Please check your spelling and retry.');  // eslint-disable-line max-len
                         this.escapeAndShowMessage(_.template(message)({user: user}));
-                    }
-                    else if (certificate_invalidation.isValid()) {
+                    } else if (certificate_invalidation.isValid()) {
                         var self = this;
                         certificate_invalidation.save(null, {
                             wait: true,
@@ -64,16 +63,14 @@
                                 try {
                                     var response_data = JSON.parse(response.responseText);
                                     self.escapeAndShowMessage(response_data.message);
-                                }
-                                catch (exception) {
+                                } catch (exception) {
                                     self.escapeAndShowMessage(
                                         gettext('Server Error, Please refresh the page and try again.')
                                     );
                                 }
                             }
                         });
-                    }
-                    else {
+                    } else {
                         this.escapeAndShowMessage(certificate_invalidation.validationError);
                     }
                 },
@@ -94,8 +91,7 @@
                                 try {
                                     var response_data = JSON.parse(response.responseText);
                                     self.escapeAndShowMessage(response_data.message);
-                                }
-                                catch (exception) {
+                                } catch (exception) {
                                     self.escapeAndShowMessage(
                                         gettext('Server Error, Please refresh the page and try again.')
                                     );
@@ -104,8 +100,7 @@
                             wait: true,
                             data: JSON.stringify(model.attributes)
                         });
-                    }
-                    else {
+                    } else {
                         self.escapeAndShowMessage(
                             gettext('Could not find Certificate Invalidation in the list. Please refresh the page and try again')  // eslint-disable-line max-len
                         );

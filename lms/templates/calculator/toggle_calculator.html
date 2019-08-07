@@ -2,7 +2,7 @@
 
 <%!
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from openedx.core.djangolib.markup import HTML, Text
 %>
 
@@ -25,9 +25,9 @@ from openedx.core.djangolib.markup import HTML, Text
                             <p>
                                 <span class="bold">
                                     ${Text(_("For detailed information, see {math_link_start}Entering Mathematical and Scientific Expressions{math_link_end} in the {guide_link_start}edX Guide for Students{guide_link_end}.")).format(
-                                        math_link_start=HTML('<a href="http://edx.readthedocs.io/projects/edx-guide-for-students/en/latest/completing_assignments/SFD_mathformatting.html#math-formatting">'),
+                                        math_link_start=HTML('<a href="https://edx.readthedocs.io/projects/edx-guide-for-students/en/latest/completing_assignments/SFD_mathformatting.html#math-formatting">'),
                                         math_link_end=HTML('</a>'),
-                                        guide_link_start=HTML('<a href="http://edx-guide-for-students.readthedocs.io/en/latest/index.html">'),
+                                        guide_link_start=HTML('<a href="https://edx-guide-for-students.readthedocs.io/en/latest/index.html">'),
                                         guide_link_end=HTML('</a>'),
                                     )}
                                 </span>

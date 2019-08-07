@@ -1,7 +1,8 @@
 """
 Run and manage servers for local development.
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+
 import argparse
 import sys
 
@@ -9,12 +10,12 @@ from paver.easy import call_task, cmdopts, consume_args, needs, sh, task
 
 from .assets import collect_assets
 from .utils.cmd import django_cmd
-from .utils.process import run_process, run_multi_processes
+from .utils.envs import Env
+from .utils.process import run_multi_processes, run_process
 from .utils.timer import timed
 
-
 DEFAULT_PORT = {"lms": 8000, "studio": 8001}
-DEFAULT_SETTINGS = 'devstack'
+DEFAULT_SETTINGS = Env.DEVSTACK_SETTINGS
 OPTIMIZED_SETTINGS = "devstack_optimized"
 OPTIMIZED_ASSETS_SETTINGS = "test_static_optimized"
 
@@ -157,7 +158,7 @@ def celery(options):
     """
     Runs Celery workers.
     """
-    settings = getattr(options, 'settings', 'dev_with_worker')
+    settings = getattr(options, 'settings', 'devstack_with_worker')
     run_process(django_cmd('lms', settings, 'celery', 'worker', '--beat', '--loglevel=INFO', '--pythonpath=.'))
 
 
@@ -187,7 +188,7 @@ def run_all_servers(options):
     """
     settings = getattr(options, 'settings', DEFAULT_SETTINGS)
     asset_settings = getattr(options, 'asset_settings', settings)
-    worker_settings = getattr(options, 'worker_settings', 'dev_with_worker')
+    worker_settings = getattr(options, 'worker_settings', 'devstack_with_worker')
     fast = getattr(options, 'fast', False)
     optimized = getattr(options, 'optimized', False)
 
@@ -254,7 +255,7 @@ def update_db(options):
     fake = "--fake-initial" if getattr(options, 'fake_initial', False) else ""
     for system in ('lms', 'cms'):
         # pylint: disable=line-too-long
-        sh("NO_EDXAPP_SUDO=1 EDX_PLATFORM_SETTINGS_OVERRIDE={settings} /edx/bin/edxapp-migrate-{system} --traceback --pythonpath=. {fake}".format(
+        sh(u"NO_EDXAPP_SUDO=1 EDX_PLATFORM_SETTINGS_OVERRIDE={settings} /edx/bin/edxapp-migrate-{system} --traceback --pythonpath=. {fake}".format(
             settings=settings,
             system=system,
             fake=fake))
@@ -277,9 +278,9 @@ def check_settings(args):
     settings = args.settings[0]
 
     try:
-        import_cmd = "echo 'import {system}.envs.{settings}'".format(system=system, settings=settings)
+        import_cmd = u"echo 'import {system}.envs.{settings}'".format(system=system, settings=settings)
         django_shell_cmd = django_cmd(system, settings, 'shell', '--plain', '--pythonpath=.')
-        sh("{import_cmd} | {shell_cmd}".format(import_cmd=import_cmd, shell_cmd=django_shell_cmd))
+        sh(u"{import_cmd} | {shell_cmd}".format(import_cmd=import_cmd, shell_cmd=django_shell_cmd))
 
     except:  # pylint: disable=bare-except
         print("Failed to import settings", file=sys.stderr)

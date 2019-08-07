@@ -20,7 +20,7 @@
     }
 
     li {
-      color: $base-font-color;
+      color: $body-color;
       font: normal 1em/1.6em $serif;
       margin: 0;
 
@@ -36,7 +36,9 @@
     > article {
       border: 1px solid rgb(220,220,220);
       border-radius: 10px;
+
       @include box-sizing(border-box);
+
       box-shadow: 0 2px 16px 0 $shadow-l1;
       margin: 0 auto;
       padding: 80px 80px 40px;
@@ -44,15 +46,17 @@
 
       .footer {
         hr {
-          margin: 80px 0px 40px;
+          margin: 80px 0 40px;
         }
       }
     }
 
     figure {
       display: block;
+
       @include float(right);
-      @include margin(20px, 0px, 60px, 20px);
+      @include margin(20px, 0, 60px, 20px);
+
       width: 300px;
 
       img {
@@ -62,6 +66,7 @@
       figcaption {
         font: normal 0.8em/1em $serif;
         padding: ($baseline/4);
+
         a {
           font: normal 1em $serif;
         }
@@ -80,7 +85,7 @@
       margin-top: $baseline;
 
       p + p {
-       margin-top: 0;
+        margin-top: 0;
       }
     }
 
@@ -98,18 +103,22 @@
 
       .fb-like {
         margin-top: 8px;
+
         @include margin-left($baseline/2);
         @include float(left);
       }
 
       p {
         @include float(left);
+
         margin-top: 8px;
+
         @include margin-right($baseline/2);
       }
 
       a {
         display: block;
+
         @include float(left);
       }
     }

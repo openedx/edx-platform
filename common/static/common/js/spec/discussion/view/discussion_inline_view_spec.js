@@ -34,7 +34,34 @@
             spyOn(DiscussionThreadShowView.prototype, 'convertMath');
         });
 
-        createTestView = function() {
+        createTestView = function(test) {
+            var courseSettings = DiscussionSpecHelper.createTestCourseSettings({
+                groups: [
+                    {
+                        id: 1,
+                        name: 'Cohort1'
+                    }, {
+                        id: 2,
+                        name: 'Cohort2'
+                    }
+                ]
+            });
+            setNextAjaxResult(test, {
+                user_info: DiscussionSpecHelper.getTestUserInfo(),
+                roles: DiscussionSpecHelper.getTestRoleInfo(),
+                course_settings: courseSettings.attributes,
+                discussion_data: DiscussionViewSpecHelper.makeThreadWithProps({
+                    commentable_id: 'test-topic',
+                    title: TEST_THREAD_TITLE
+                }),
+                page: 1,
+                num_pages: 1,
+                content: {
+                    endorsed_responses: [],
+                    non_endorsed_responses: [],
+                    children: []
+                }
+            });
             var testView = new DiscussionInlineView({
                 el: $('.discussion-module')
             });
@@ -43,10 +70,21 @@
         };
 
         showDiscussion = function(test, testView) {
+            var courseSettings = DiscussionSpecHelper.createTestCourseSettings({
+                groups: [
+                    {
+                        id: 1,
+                        name: 'Cohort1'
+                    }, {
+                        id: 2,
+                        name: 'Cohort2'
+                    }
+                ]
+            });
             setNextAjaxResult(test, {
                 user_info: DiscussionSpecHelper.getTestUserInfo(),
                 roles: DiscussionSpecHelper.getTestRoleInfo(),
-                course_settings: DiscussionSpecHelper.createTestCourseSettings().attributes,
+                course_settings: courseSettings.attributes,
                 discussion_data: DiscussionViewSpecHelper.makeThreadWithProps({
                     commentable_id: 'test-topic',
                     title: TEST_THREAD_TITLE
@@ -72,12 +110,24 @@
         };
 
         describe('inline discussion', function() {
-            it('is shown after "Show Discussion" is clicked', function() {
+            it('is shown by default', function() {
                 var testView = createTestView(this),
                     showButton = testView.$('.discussion-show');
+
+                // Verify that the discussion is shown without clicking anything
+                expect(showButton).toHaveClass('shown');
+                expect(showButton.text().trim()).toEqual('Hide Discussion');
+                expect(testView.$('.inline-discussion:visible')).not.toHaveClass('is-hidden');
+            });
+            it('is shown after "Show Discussion" is clicked while discussions are hidden', function() {
+                var testView = createTestView(this),
+                    showButton = testView.$('.discussion-show');
+
+                // hide the discussion; discussions are loaded by default
+                testView.$('.discussion-show').click();
                 showDiscussion(this, testView);
 
-                // Verify that the discussion is now shown
+                // Verify that the discussion is now shown again
                 expect(showButton).toHaveClass('shown');
                 expect(showButton.text().trim()).toEqual('Hide Discussion');
                 expect(testView.$('.inline-discussion:visible')).not.toHaveClass('is-hidden');
@@ -86,9 +136,8 @@
             it('is hidden after "Hide Discussion" is clicked', function() {
                 var testView = createTestView(this),
                     showButton = testView.$('.discussion-show');
-                showDiscussion(this, testView);
 
-                // Hide the discussion by clicking the toggle button again
+                // Hide the discussion by clicking the toggle button
                 testView.$('.discussion-show').click();
 
                 // Verify that the discussion is now hidden

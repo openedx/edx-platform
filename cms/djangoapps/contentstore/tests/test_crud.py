@@ -1,12 +1,16 @@
+"""Tests for CRUD Operations"""
+
+from __future__ import absolute_import
+
 from xmodule import templates
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
+from xmodule.capa_module import ProblemBlock
 from xmodule.course_module import CourseDescriptor
-from xmodule.seq_module import SequenceDescriptor
-from xmodule.capa_module import CapaDescriptor
-from xmodule.html_module import HtmlDescriptor
+from xmodule.html_module import HtmlBlock
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import DuplicateCourseError
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.seq_module import SequenceDescriptor
 
 
 class TemplateTests(ModuleStoreTestCase):
@@ -40,10 +44,10 @@ class TemplateTests(ModuleStoreTestCase):
 
     def test_get_some_templates(self):
         self.assertEqual(len(SequenceDescriptor.templates()), 0)
-        self.assertGreater(len(HtmlDescriptor.templates()), 0)
+        self.assertGreater(len(HtmlBlock.templates()), 0)
         self.assertIsNone(SequenceDescriptor.get_template('doesntexist.yaml'))
-        self.assertIsNone(HtmlDescriptor.get_template('doesntexist.yaml'))
-        self.assertIsNotNone(HtmlDescriptor.get_template('announcement.yaml'))
+        self.assertIsNone(HtmlBlock.get_template('doesntexist.yaml'))
+        self.assertIsNotNone(HtmlBlock.get_template('announcement.yaml'))
 
     def test_factories(self):
         test_course = CourseFactory.create(
@@ -102,7 +106,7 @@ class TemplateTests(ModuleStoreTestCase):
             test_course.system, test_course.id, 'problem', fields={'data': test_def_content},
             parent_xblock=test_chapter
         )
-        self.assertIsInstance(test_problem, CapaDescriptor)
+        self.assertIsInstance(test_problem, ProblemBlock)
         self.assertEqual(test_problem.data, test_def_content)
         self.assertIn(test_problem, test_chapter.get_children())
         test_problem.display_name = 'test problem'

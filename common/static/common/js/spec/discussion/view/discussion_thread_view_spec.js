@@ -1,5 +1,5 @@
 /* global
-    Discussion, DiscussionThreadShowView, DiscussionViewSpecHelper, DiscussionSpecHelper, DiscussionThreadView,
+    _, Discussion, DiscussionThreadShowView, DiscussionViewSpecHelper, DiscussionSpecHelper, DiscussionThreadView,
     DiscussionUtil, Thread, DiscussionContentView, ThreadResponseShowView
 */
 (function() {
@@ -27,6 +27,7 @@
             $.ajax.calls.reset();
             return jasmine.clock().uninstall();
         });
+
         renderWithContent = function(view, content) {
             $.ajax.and.callFake(function(params) {
                 params.success(createAjaxResponseJson(content, false), 'success');
@@ -45,11 +46,11 @@
                 children: count > 0 ? (function() {
                     var _i, _results;
                     _results = [];
-                    for (index = _i = 1; 1 <= count ? _i <= count : _i >= count; index = 1 <= count ? ++_i : --_i) {
+                    for (index = _i = 1; count >= 1 ? _i <= count : _i >= count; index = count >= 1 ? ++_i : --_i) {
                         _results.push(createTestResponseJson(index));
                     }
                     return _results;
-                })() : []
+                }()) : []
             }, options));
         };
         createTestResponseJson = function(index) {
@@ -182,6 +183,7 @@
                     el: $('#fixture-element'),
                     course_settings: DiscussionSpecHelper.createTestCourseSettings()
                 });
+                spyOn($.fn, 'focus');
             });
             describe('responses', function() {
                 it('can post a first response', function() {
@@ -189,8 +191,9 @@
                     postResponse(this.view, 1);
                     expect(this.view.$('.forum-response').length).toBe(1);
                     expect(this.view.$('.post-actions-list').find('.action-edit').parent('.is-hidden').length).toBe(1);
-                    return expect(this.view.$('.response-actions-list').find('.action-edit')
+                    expect(this.view.$('.response-actions-list').find('.action-edit')
                         .parent().not('.is-hidden').length).toBe(1);
+                    expect(document.activeElement === this.view.$('.forum-response')[0]);
                 });
                 it('can post a second response', function() {
                     renderWithTestResponses(this.view, 1);
@@ -201,8 +204,9 @@
                     postResponse(this.view, 2);
                     expect(this.view.$('.forum-response').length).toBe(2);
                     expect(this.view.$('.post-actions-list').find('.action-edit').parent('.is-hidden').length).toBe(1);
-                    return expect(this.view.$('.response-actions-list').find('.action-edit').parent()
+                    expect(this.view.$('.response-actions-list').find('.action-edit').parent()
                         .not('.is-hidden').length).toBe(2);
+                    expect(document.activeElement === this.view.$('.forum-response')[0]);
                 });
             });
             describe('response count and pagination', function() {
@@ -301,14 +305,14 @@
                 );
             };
             _.each({
-                'no': 0,
-                'one': 1,
-                'many': 5
+                no: 0,
+                one: 1,
+                many: 5
             }, function(numEndorsed, endorsedDesc) {
                 return _.each({
-                    'no': 0,
-                    'one': 1,
-                    'many': 5
+                    no: 0,
+                    one: 1,
+                    many: 5
                 }, function(numNonEndorsed, nonEndorsedDesc) {
                     it(
                         'renders correctly with ' + endorsedDesc + ' marked answer(s) and ' + nonEndorsedDesc +

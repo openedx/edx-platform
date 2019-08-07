@@ -2,14 +2,16 @@
 Tests for the Sending activation email celery tasks
 """
 
-import mock
+from __future__ import absolute_import
 
-from django.test import TestCase
-from django.conf import settings
-from student.tasks import send_activation_email
+import mock
 from boto.exception import NoAuthHandlerFound
+from django.conf import settings
+from django.test import TestCase
+from six.moves import range
 
 from lms.djangoapps.courseware.tests.factories import UserFactory
+from student.tasks import send_activation_email
 
 
 class SendActivationEmailTestCase(TestCase):

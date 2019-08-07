@@ -1,0 +1,54 @@
+## mako
+
+<%page expression_filter="h"/>
+
+<%namespace name='static' file='/static_content.html'/>
+
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import js_escaped_string
+%>
+
+<%block name="headextra">
+<script type="text/javascript">
+    (function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-latest.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode banner closeBanner creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setBranchViewData setIdentity track validateCode".split(" "), 0);
+    branch.init('${static.get_value("BRANCH_IO_KEY", settings.BRANCH_IO_KEY) | n, js_escaped_string}');
+    function sendSMS(form) {
+        var phone = form.phone.value;
+        var linkData = {
+            tags: [],
+            channel: 'Website',
+            feature: 'TextMeTheApp',
+            data: {}
+        };
+        var options = {};
+        var callback = function(err, result) {
+            if (err) {
+                alert(gettext("Sorry, something went wrong."));
+            }
+            else {
+                alert(gettext("SMS sent!"));
+            }
+        };
+        branch.sendSMS(phone, linkData, options, callback);
+        form.phone.value = "";
+    }
+</script>
+</%block>
+
+<section class="text-me-fragment">
+    <h2>${_("Get the {platform_name} Mobile App!").format(platform_name=static.get_platform_name())}</h2>
+    <h3>${_("We'll send you a one time SMS with a link to download the app.")}</h3>
+    <form onsubmit="sendSMS(this); return false;">
+        <div class="form-field">
+            <label class="label">${_("Mobile phone number")}</label>
+            <input id="phone" name="phone" type="tel" placeholder="+1 (123) 123-1234" />
+        </div>
+        <div class="form-field">
+            <button class="action action-primary" type="submit">
+                <span class="fa fa-send"></span>
+                <span class="action-text">${_("Send me a text with the link")}</span>
+            </button>
+        </div>
+    </form>
+</section>

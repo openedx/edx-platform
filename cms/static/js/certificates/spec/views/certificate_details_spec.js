@@ -131,8 +131,8 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
             it('should parse a JSON object collection into a Backbone model collection', function() {
                 var course_title = 'Test certificate course title override 2';
                 var CERTIFICATE_JSON_OBJECT = [{
-                    'course_title': course_title,
-                    'signatories': '[]'
+                    course_title: course_title,
+                    signatories: '[]'
                 }];
                 this.collection.parse(CERTIFICATE_JSON_OBJECT);
                 var model = this.collection.at(1);

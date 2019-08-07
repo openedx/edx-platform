@@ -1,0 +1,25 @@
+## mako
+
+<%page expression_filter="h"/>
+
+<%namespace name='static' file='../static_content.html'/>
+<%!
+from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
+)
+%>
+
+<div class="program-list-wrapper grid-container">
+    <div class="program-cards-container col"></div>
+    <div class="sidebar col col-last"></div>
+</div>
+
+<%block name="js_extra">
+<%static:webpack entry="ProgramListFactory">
+ProgramListFactory({
+    marketingUrl: '${marketing_url | n, js_escaped_string}',
+    programsData: ${programs | n, dump_js_escaped_json},
+    userProgress: ${progress | n, dump_js_escaped_json}
+});
+</%static:webpack>
+</%block>

@@ -19,8 +19,7 @@ var edx = edx || {};
             if (event.currentTarget.checked) {
                 this.show(this.$('#coupon_expiration_date'));
                 this.$el.find('#coupon_expiration_date').focus();
-            }
-            else {
+            } else {
                 this.hide(this.$('#coupon_expiration_date'));
             }
         },
@@ -49,15 +48,15 @@ var edx = edx || {};
                 dataType: 'json',
                 url: url,
                 success: function(data) {
-                    $('#enrollment-report-request-response').text(data['status']);
+                    $('#enrollment-report-request-response').text(data.status);
                     return $('#enrollment-report-request-response').css({
-                        'display': 'block'
+                        display: 'block'
                     });
                 },
                 error: function(std_ajax_err) {
                     $('#enrollment-report-request-response-error').text(gettext('There was a problem creating the report. Select "Create Executive Summary" to try again.'));
                     return $('#enrollment-report-request-response-error').css({
-                        'display': 'block'
+                        display: 'block'
                     });
                 }
             });
@@ -69,15 +68,15 @@ var edx = edx || {};
                 dataType: 'json',
                 url: url,
                 success: function(data) {
-                    $('#exec-summary-report-request-response').text(data['status']);
+                    $('#exec-summary-report-request-response').text(data.status);
                     return $('#exec-summary-report-request-response').css({
-                        'display': 'block'
+                        display: 'block'
                     });
                 },
                 error: function(std_ajax_err) {
                     $('#exec-summary-report-request-response-error').text(gettext('There was a problem creating the report. Select "Create Executive Summary" to try again.'));
                     return $('#exec-summary-report-request-response-error').css({
-                        'display': 'block'
+                        display: 'block'
                     });
                 }
             });
@@ -96,7 +95,7 @@ var edx = edx || {};
             $.ajax({
                 type: 'GET',
                 data: {
-                    'registration_code': lookup_registration_code
+                    registration_code: lookup_registration_code
                 },
                 url: url,
                 success: function(data) {
@@ -109,37 +108,35 @@ var edx = edx || {};
                         $registration_code_status_form_error.hide();
                         $registration_code_status_form_error.show();
                         $registration_code_status_form_error.text(gettext(data.message));
-                    }
-                    else {
+                    } else {
                         var actions_links = '';
                         var actions = [];
                         if (is_registration_code_valid == true) {
                             actions.push(
                                 {
-                                    'action_url': data.registration_code_detail_url,
-                                    'action_name': gettext('Cancel enrollment code'),
-                                    'registration_code': lookup_registration_code,
-                                    'action_type': 'invalidate_registration_code'
+                                    action_url: data.registration_code_detail_url,
+                                    action_name: gettext('Cancel enrollment code'),
+                                    registration_code: lookup_registration_code,
+                                    action_type: 'invalidate_registration_code'
                                 }
                             );
-                        }
-                        else {
+                        } else {
                             actions.push(
                                 {
-                                    'action_url': data.registration_code_detail_url,
-                                    'action_name': gettext('Restore enrollment code'),
-                                    'registration_code': lookup_registration_code,
-                                    'action_type': 'validate_registration_code'
+                                    action_url: data.registration_code_detail_url,
+                                    action_name: gettext('Restore enrollment code'),
+                                    registration_code: lookup_registration_code,
+                                    action_type: 'validate_registration_code'
                                 }
                             );
                         }
                         if (is_registration_code_redeemed == true) {
                             actions.push(
                                 {
-                                    'action_url': data.registration_code_detail_url,
-                                    'action_name': gettext('Mark enrollment code as unused'),
-                                    'registration_code': lookup_registration_code,
-                                    'action_type': 'unredeem_registration_code'
+                                    action_url: data.registration_code_detail_url,
+                                    action_name: gettext('Mark enrollment code as unused'),
+                                    registration_code: lookup_registration_code,
+                                    action_type: 'unredeem_registration_code'
                                 }
                             );
                         }
@@ -181,8 +178,8 @@ var edx = edx || {};
             $.ajax({
                 type: 'POST',
                 data: {
-                    'registration_code': registration_code,
-                    'action_type': action_type
+                    registration_code: registration_code,
+                    action_type: action_type
                 },
                 url: url,
                 success: function(data) {
@@ -204,4 +201,4 @@ var edx = edx || {};
             });
         });
     });
-})(Backbone, $, _, gettext);
+}(Backbone, $, _, gettext));

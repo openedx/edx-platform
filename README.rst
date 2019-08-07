@@ -11,13 +11,13 @@ install edX:
    to contribute or make changes to the edX source code.
 -  `edX Full Stack`_: Using Vagrant/Virtualbox this will setup all edX
    services on a single server in a production like configuration.
--  `edX Ubuntu 12.04 64-bit Installation`_: This will install edX on an
-   existing Ubuntu 12.04 server.
+-  `edX Ubuntu 16.04 64-bit Installation`_: This will install edX on an
+   existing Ubuntu 16.04 server.
 
 .. _configuration repo: https://github.com/edx/configuration
-.. _edX Developer Stack: https://openedx.atlassian.net/wiki/display/OpenOPS/Running+Devstack
+.. _edX Developer Stack: https://github.com/edx/devstack
 .. _edX Full Stack: https://openedx.atlassian.net/wiki/display/OpenOPS/Running+Fullstack
-.. _edX Ubuntu 12.04 64-bit Installation: https://openedx.atlassian.net/wiki/display/OpenOPS/Native+Open+edX+Ubuntu+12.04+64+bit+Installation
+.. _edX Ubuntu 16.04 64-bit Installation: https://openedx.atlassian.net/wiki/display/OpenOPS/Native+Open+edX+Ubuntu+16.04+64+bit+Installation
 
 
 License
@@ -29,43 +29,22 @@ unless otherwise noted. Please see the `LICENSE`_ file for details.
 .. _LICENSE: https://github.com/edx/edx-platform/blob/master/LICENSE
 
 
-The Open edX Portal
----------------------
+More about Open edX
+-------------------
 
-See the `Open edX Portal`_ to learn more about Open edX. You can find
+See the `Open edX site`_ to learn more about Open edX. You can find
 information about the edX roadmap, as well as about hosting, extending, and
 contributing to Open edX. In addition, the Open edX Portal provides product
 announcements, the Open edX blog, and other rich community resources.
 
-To comment on blog posts or the edX roadmap, you must create an account and log
-in. If you do not have an account, follow these steps.
-
-#. Visit `open.edx.org/user/register`_.
-#. Fill in your personal details.
-#. Select **Create New Account**. You are then logged in to the `Open edX
-   Portal`_.
-
-.. _Open edX Portal: https://open.edx.org
-.. _open.edx.org/user/register: https://open.edx.org/user/register
+.. _Open edX site: https://open.edx.org
 
 Documentation
 -------------
 
-Documentation is managed in the `edx-documentation`_ repository. Documentation
-is built using `Sphinx`_: you can `view the built documentation on
-ReadTheDocs`_.
+Documentation details can be found in the `docs index.rst`_.
 
-You can also check out `Confluence`_, our wiki system. Once you sign up for
-an account, you'll be able to create new pages and edit existing pages, just
-like in any other wiki system. You only need one account for both Confluence
-and `JIRA`_, our issue tracker.
-
-.. _Sphinx: http://sphinx-doc.org/
-.. _view the built documentation on ReadTheDocs: http://docs.edx.org/
-.. _edx-documentation: https://github.com/edx/edx-documentation
-.. _Confluence: http://openedx.atlassian.net/wiki/
-.. _JIRA: https://openedx.atlassian.net/
-
+.. _docs index.rst: docs/index.rst
 
 Getting Help
 ------------
@@ -102,7 +81,7 @@ Issue Tracker
 or request a new feature, please make a free account on our JIRA and
 create a new issue! If you’re filing a bug, we’d appreciate it if you
 would follow `our guidelines for filing high-quality, actionable bug
-reports`_. Thanks!
+reports`_. Thanks!! 
 
 .. _We use JIRA for our issue tracker: https://openedx.atlassian.net/
 .. _our guidelines for filing high-quality, actionable bug reports: https://openedx.atlassian.net/wiki/display/SUST/How+to+File+a+Quality+Bug+Report
@@ -124,5 +103,5 @@ Reporting Security Issues
 Please do not report security issues in public. Please email
 security@edx.org.
 
-.. _individual contributor agreement: http://open.edx.org/sites/default/files/wysiwyg/individual-contributor-agreement.pdf
+.. _individual contributor agreement: https://open.edx.org/wp-content/uploads/2019/01/individual-contributor-agreement.pdf
 .. _CONTRIBUTING: https://github.com/edx/edx-platform/blob/master/CONTRIBUTING.rst

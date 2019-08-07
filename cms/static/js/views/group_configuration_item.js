@@ -27,8 +27,8 @@ define([
 
         attributes: function() {
             return {
-                'id': this.model.get('id'),
-                'tabindex': -1
+                id: this.model.get('id'),
+                tabindex: -1
             };
         },
 

@@ -1,15 +1,31 @@
+"""
+Tests for bulk operations in Split Modulestore.
+"""
+# pylint: disable=protected-access
+from __future__ import absolute_import
+
 import copy
-import ddt
 import unittest
+
+import ddt
 from bson.objectid import ObjectId
 from mock import MagicMock, Mock, call
-from xmodule.modulestore.split_mongo.split import SplitBulkWriteMixin
-from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection
-
 from opaque_keys.edx.locator import CourseLocator
+from six.moves import range
+
+from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection
+from xmodule.modulestore.split_mongo.split import SplitBulkWriteMixin
+
+VERSION_GUID_DICT = {
+    'SAMPLE_VERSION_GUID': 'deadbeef1234' * 2,
+    'SAMPLE_UNICODE_VERSION_GUID': u'deadbeef1234' * 2,
+    'BSON_OBJECTID': ObjectId()
+}
+SAMPLE_GUIDS_LIST = ['SAMPLE_VERSION_GUID', 'SAMPLE_UNICODE_VERSION_GUID', 'BSON_OBJECTID']
 
 
 class TestBulkWriteMixin(unittest.TestCase):
+
     def setUp(self):
         super(TestBulkWriteMixin, self).setUp()
         self.bulk = SplitBulkWriteMixin()
@@ -50,10 +66,12 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
     """
     Tests of the bulk write mixin when bulk operations aren't active.
     """
-    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, ObjectId())
-    def test_no_bulk_read_structure(self, version_guid):
+
+    @ddt.data(*SAMPLE_GUIDS_LIST)
+    def test_no_bulk_read_structure(self, version_guid_name):
         # Reading a structure when no bulk operation is active should just call
         # through to the db_connection
+        version_guid = VERSION_GUID_DICT[version_guid_name]
         result = self.bulk.get_structure(self.course_key, version_guid)
         self.assertConnCalls(
             call.get_structure(self.course_key.as_object_id(version_guid), self.course_key)
@@ -69,10 +87,11 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.assertConnCalls(call.insert_structure(self.structure, self.course_key))
         self.clear_cache.assert_called_once_with(self.structure['_id'])
 
-    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, ObjectId())
-    def test_no_bulk_read_definition(self, version_guid):
+    @ddt.data(*SAMPLE_GUIDS_LIST)
+    def test_no_bulk_read_definition(self, version_guid_name):
         # Reading a definition when no bulk operation is active should just call
         # through to the db_connection
+        version_guid = VERSION_GUID_DICT[version_guid_name]
         result = self.bulk.get_definition(self.course_key, version_guid)
         self.assertConnCalls(
             call.get_definition(
@@ -292,13 +311,20 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
     """
     Tests of BulkWriteMixin methods for finding many structures or indexes
     """
+
     def test_no_bulk_find_matching_course_indexes(self):
         branch = Mock(name='branch')
         search_targets = MagicMock(name='search_targets')
         org_targets = None
         self.conn.find_matching_course_indexes.return_value = [Mock(name='result')]
         result = self.bulk.find_matching_course_indexes(branch, search_targets)
-        self.assertConnCalls(call.find_matching_course_indexes(branch, search_targets, org_targets))
+        self.assertConnCalls(call.find_matching_course_indexes(
+            branch,
+            search_targets,
+            org_targets,
+            course_keys=None
+        )
+        )
         self.assertEqual(result, self.conn.find_matching_course_indexes.return_value)
         self.assertCacheNotCleared()
 
@@ -444,6 +470,17 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
             else:
                 self.assertNotIn(db_definition(_id), results)
 
+    def test_get_definitions_doesnt_update_db(self):
+        test_ids = [1, 2]
+        db_definition = lambda _id: {'db': 'definition', '_id': _id}
+
+        db_definitions = [db_definition(_id) for _id in test_ids]
+        self.conn.get_definitions.return_value = db_definitions
+        self.bulk._begin_bulk_operation(self.course_key)
+        self.bulk.get_definitions(self.course_key, test_ids)
+        self.bulk._end_bulk_operation(self.course_key)
+        self.assertFalse(self.conn.insert_definition.called)
+
     def test_no_bulk_find_structures_derived_from(self):
         ids = [Mock(name='id')]
         self.conn.find_structures_derived_from.return_value = [MagicMock(name='result')]
@@ -551,42 +588,47 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
     """
     Tests of the bulk write mixin when bulk write operations are open
     """
+
     def setUp(self):
         super(TestBulkWriteMixinOpen, self).setUp()
         self.bulk._begin_bulk_operation(self.course_key)
 
-    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, ObjectId())
-    def test_read_structure_without_write_from_db(self, version_guid):
+    @ddt.data(*SAMPLE_GUIDS_LIST)
+    def test_read_structure_without_write_from_db(self, version_guid_name):
         # Reading a structure before it's been written (while in bulk operation mode)
         # returns the structure from the database
+        version_guid = VERSION_GUID_DICT[version_guid_name]
         result = self.bulk.get_structure(self.course_key, version_guid)
         self.assertEquals(self.conn.get_structure.call_count, 1)
         self.assertEqual(result, self.conn.get_structure.return_value)
         self.assertCacheNotCleared()
 
-    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, ObjectId())
-    def test_read_structure_without_write_only_reads_once(self, version_guid):
+    @ddt.data(*SAMPLE_GUIDS_LIST)
+    def test_read_structure_without_write_only_reads_once(self, version_guid_name):
         # Reading the same structure multiple times shouldn't hit the database
         # more than once
-        for _ in xrange(2):
+        version_guid = VERSION_GUID_DICT[version_guid_name]
+        for _ in range(2):
             result = self.bulk.get_structure(self.course_key, version_guid)
             self.assertEquals(self.conn.get_structure.call_count, 1)
             self.assertEqual(result, self.conn.get_structure.return_value)
             self.assertCacheNotCleared()
 
-    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, ObjectId())
-    def test_read_structure_after_write_no_db(self, version_guid):
+    @ddt.data(*SAMPLE_GUIDS_LIST)
+    def test_read_structure_after_write_no_db(self, version_guid_name):
         # Reading a structure that's already been written shouldn't hit the db at all
+        version_guid = VERSION_GUID_DICT[version_guid_name]
         self.structure['_id'] = version_guid
         self.bulk.update_structure(self.course_key, self.structure)
         result = self.bulk.get_structure(self.course_key, version_guid)
         self.assertEquals(self.conn.get_structure.call_count, 0)
         self.assertEqual(result, self.structure)
 
-    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, ObjectId())
-    def test_read_structure_after_write_after_read(self, version_guid):
+    @ddt.data(*SAMPLE_GUIDS_LIST)
+    def test_read_structure_after_write_after_read(self, version_guid_name):
         # Reading a structure that's been updated after being pulled from the db should
         # still get the updated value
+        version_guid = VERSION_GUID_DICT[version_guid_name]
         self.structure['_id'] = version_guid
         self.bulk.get_structure(self.course_key, version_guid)
         self.bulk.update_structure(self.course_key, self.structure)
@@ -594,38 +636,42 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
         self.assertEquals(self.conn.get_structure.call_count, 1)
         self.assertEqual(result, self.structure)
 
-    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, ObjectId())
-    def test_read_definition_without_write_from_db(self, version_guid):
+    @ddt.data(*SAMPLE_GUIDS_LIST)
+    def test_read_definition_without_write_from_db(self, version_guid_name):
         # Reading a definition before it's been written (while in bulk operation mode)
         # returns the definition from the database
+        version_guid = VERSION_GUID_DICT[version_guid_name]
         result = self.bulk.get_definition(self.course_key, version_guid)
         self.assertEquals(self.conn.get_definition.call_count, 1)
         self.assertEqual(result, self.conn.get_definition.return_value)
         self.assertCacheNotCleared()
 
-    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, ObjectId())
-    def test_read_definition_without_write_only_reads_once(self, version_guid):
+    @ddt.data(*SAMPLE_GUIDS_LIST)
+    def test_read_definition_without_write_only_reads_once(self, version_guid_name):
         # Reading the same definition multiple times shouldn't hit the database
         # more than once
-        for _ in xrange(2):
+        version_guid = VERSION_GUID_DICT[version_guid_name]
+        for _ in range(2):
             result = self.bulk.get_definition(self.course_key, version_guid)
             self.assertEquals(self.conn.get_definition.call_count, 1)
             self.assertEqual(result, self.conn.get_definition.return_value)
             self.assertCacheNotCleared()
 
-    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, ObjectId())
-    def test_read_definition_after_write_no_db(self, version_guid):
+    @ddt.data(*SAMPLE_GUIDS_LIST)
+    def test_read_definition_after_write_no_db(self, version_guid_name):
         # Reading a definition that's already been written shouldn't hit the db at all
+        version_guid = VERSION_GUID_DICT[version_guid_name]
         self.definition['_id'] = version_guid
         self.bulk.update_definition(self.course_key, self.definition)
         result = self.bulk.get_definition(self.course_key, version_guid)
         self.assertEquals(self.conn.get_definition.call_count, 0)
         self.assertEqual(result, self.definition)
 
-    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, ObjectId())
-    def test_read_definition_after_write_after_read(self, version_guid):
+    @ddt.data(*SAMPLE_GUIDS_LIST)
+    def test_read_definition_after_write_after_read(self, version_guid_name):
         # Reading a definition that's been updated after being pulled from the db should
         # still get the updated value
+        version_guid = VERSION_GUID_DICT[version_guid_name]
         self.definition['_id'] = version_guid
         self.bulk.get_definition(self.course_key, version_guid)
         self.bulk.update_definition(self.course_key, self.definition)
@@ -644,7 +690,7 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
     def test_read_index_without_write_only_reads_once(self, ignore_case):
         # Reading the index multiple times should only result in one read from
         # the database
-        for _ in xrange(2):
+        for _ in range(2):
             result = self.bulk.get_course_index(self.course_key, ignore_case=ignore_case)
             self.assertEquals(self.conn.get_course_index.call_count, 1)
             self.assertEquals(self.conn.get_course_index.return_value, result)

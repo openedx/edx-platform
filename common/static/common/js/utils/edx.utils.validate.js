@@ -21,7 +21,7 @@
                 var _fn = {
                     validate: {
 
-                        template: _.template('<li><%= content %></li>'),
+                        template: _.template('<li><%- content %></li>'),
 
                         msg: {
                             email: gettext("The email address you've provided isn't formatted correctly."),
@@ -103,12 +103,12 @@
                         },
 
                         email: {
-                        // This is the same regex used to validate email addresses in Django 1.4
+                        // This is the same regex used to validate email addresses in Django 1.11
                             regex: new RegExp(
                             [
                                 '(^[-!#$%&\'*+/=?^_`{}|~0-9A-Z]+(\\.[-!#$%&\'*+/=?^_`{}|~0-9A-Z]+)*',
-                                '|^"([\\001-\\010\\013\\014\\016-\\037!#-\\[\\]-\\177]|\\\\[\\001-\\011\\013\\014\\016-\\177])*"',
-                                ')@((?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\\.)+[A-Z]{2,6}\\.?$)',
+                                '|^"([\\001-\\010\\013\\014\\016-\\037!#-\\[\\]-\\177]|\\\\[\\001-\\011\\013\\014\\016-\\177])*"', // eslint-disable-line max-len
+                                ')@((?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\\.)+)(?:[A-Z0-9-]{2,63})',
                                 '|\\[(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)){3}\\]$'
                             ].join(''), 'i'
                         ),
@@ -124,7 +124,7 @@
 
                         getLabel: function(id) {
                         // Extract the field label, remove the asterisk (if it appears) and any extra whitespace
-                            return $('label[for=' + id + ']').text().split('*')[0].trim();
+                            return $('label[for=' + id + '] > span.label-text').text().split('*')[0].trim();
                         },
 
                         getMessage: function($el, tests) {
@@ -132,16 +132,21 @@
                                 label,
                                 context,
                                 content,
-                                customMsg;
+                                customMsg,
+                                liveValidationMsg;
 
                             _.each(tests, function(value, key) {
                                 if (!value) {
                                     label = _fn.validate.getLabel($el.attr('id'));
                                     customMsg = $el.data('errormsg-' + key) || false;
+                                    liveValidationMsg =
+                                        $('#' + $el.attr('id') + '-validation-error-msg').text() || false;
 
                                 // If the field has a custom error msg attached, use it
                                     if (customMsg) {
                                         content = customMsg;
+                                    } else if (liveValidationMsg) {
+                                        content = liveValidationMsg;
                                     } else {
                                         context = {field: label};
 
@@ -154,7 +159,9 @@
                                         content = _.sprintf(_fn.validate.msg[key], context);
                                     }
 
-                                    txt.push(_fn.validate.template({content: content}));
+                                    txt.push(_fn.validate.template({
+                                        content: content
+                                    }));
                                 }
                             });
 
@@ -173,7 +180,7 @@
                 return {
                     validate: _fn.validate.field
                 };
-            })();
+            }());
 
             return utils;
         });

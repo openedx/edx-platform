@@ -1,16 +1,19 @@
 """Ensure videos emit proper events"""
 
+from __future__ import absolute_import
+
 import datetime
 import json
-from nose.plugins.attrib import attr
-import ddt
+from unittest import skip
 
+import ddt
+import six
+from opaque_keys.edx.keys import CourseKey, UsageKey
+
+from common.test.acceptance.pages.lms.video.video import _parse_time_str
 from common.test.acceptance.tests.helpers import EventsTestMixin
 from common.test.acceptance.tests.video.test_video_module import VideoBaseTest
-from common.test.acceptance.pages.lms.video.video import _parse_time_str
-
 from openedx.core.lib.tests.assertions.events import assert_event_matches, assert_events_equal
-from opaque_keys.edx.keys import UsageKey, CourseKey
 
 
 class VideoEventsTestMixin(EventsTestMixin, VideoBaseTest):
@@ -46,10 +49,10 @@ class VideoEventsTestMixin(EventsTestMixin, VideoBaseTest):
 
     def assert_field_type(self, event_dict, field, field_type):
         """Assert that a particular `field` in the `event_dict` has a particular type"""
-        self.assertIn(field, event_dict, '{0} not found in the root of the event'.format(field))
+        self.assertIn(field, event_dict, u'{0} not found in the root of the event'.format(field))
         self.assertTrue(
             isinstance(event_dict[field], field_type),
-            'Expected "{key}" to be a "{field_type}", but it has the value "{value}" of type "{t}"'.format(
+            u'Expected "{key}" to be a "{field_type}", but it has the value "{value}" of type "{t}"'.format(
                 key=field,
                 value=event_dict[field],
                 t=type(event_dict[field]),
@@ -60,6 +63,7 @@ class VideoEventsTestMixin(EventsTestMixin, VideoBaseTest):
 
 class VideoEventsTest(VideoEventsTestMixin):
     """ Test video player event emission """
+    shard = 21
 
     def test_video_control_events(self):
         """
@@ -121,8 +125,8 @@ class VideoEventsTest(VideoEventsTestMixin):
             'session'
         )
         for field in dynamic_string_fields:
-            self.assert_field_type(load_video_event, field, basestring)
-            self.assertIn(field, load_video_event, '{0} not found in the root of the event'.format(field))
+            self.assert_field_type(load_video_event, field, six.string_types)
+            self.assertIn(field, load_video_event, u'{0} not found in the root of the event'.format(field))
             del load_video_event[field]
 
         # A weak assertion for the timestamp as well
@@ -134,7 +138,7 @@ class VideoEventsTest(VideoEventsTestMixin):
         course_key = CourseKey.from_string(self.course_id)
         static_fields_pattern = {
             'context': {
-                'course_id': unicode(course_key),
+                'course_id': six.text_type(course_key),
                 'org_id': course_key.org,
                 'path': '/event',
                 'user_id': self.user_info['user_id']
@@ -149,10 +153,50 @@ class VideoEventsTest(VideoEventsTestMixin):
         assert_events_equal(static_fields_pattern, load_video_event)
 
 
-@attr(shard=8)
+class VideoHLSEventsTest(VideoEventsTestMixin):
+    """
+    Test video player event emission for HLS video
+    """
+    shard = 16
+
+    def test_event_data_for_hls(self):
+        """
+        Scenario: Video component with HLS video emits events correctly
+
+        Given the course has a Video component with Youtube, HTML5 and HLS sources available.
+        And I play the video
+        And the video starts playing
+        And I watch 3 seconds of it
+        When I pause and seek the video
+        And I play the video to the end
+        Then I verify that all expected events are triggered
+        And triggered events have correct data
+        """
+        video_events = ('load_video', 'play_video', 'pause_video', 'seek_video')
+
+        def is_video_event(event):
+            """
+            Filter out anything other than the video events of interest
+            """
+            return event['event_type'] in video_events
+
+        captured_events = []
+        with self.capture_events(is_video_event, captured_events=captured_events):
+            self.metadata = self.metadata_for_mode('hls')
+            self.navigate_to_video()
+            self.video.click_player_button('play')
+            self.video.wait_for_position('0:03')
+            self.video.click_player_button('pause')
+            self.video.seek('0:08')
+
+        expected_events = [{'name': event, 'event': {'code': 'hls'}} for event in video_events]
+        self.assert_events_match(expected_events, captured_events)
+
+
 @ddt.ddt
 class VideoBumperEventsTest(VideoEventsTestMixin):
     """ Test bumper video event emission """
+    shard = 19
 
     # helper methods
     def watch_video_and_skip(self):
@@ -191,6 +235,7 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
         }
         self.course_fixture.add_advanced_settings(additional_data)
 
+    @skip("student: 5/2/18: flaky test")
     @ddt.data(
         ('edx.video.bumper.skipped', watch_video_and_skip),
         ('edx.video.bumper.dismissed', watch_video_and_dismiss),
@@ -317,8 +362,8 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
             'session'
         )
         for field in dynamic_string_fields:
-            self.assert_field_type(load_video_event, field, basestring)
-            self.assertIn(field, load_video_event, '{0} not found in the root of the event'.format(field))
+            self.assert_field_type(load_video_event, field, six.string_types)
+            self.assertIn(field, load_video_event, u'{0} not found in the root of the event'.format(field))
             del load_video_event[field]
 
         # A weak assertion for the timestamp as well
@@ -330,7 +375,7 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
         course_key = CourseKey.from_string(self.course_id)
         static_fields_pattern = {
             'context': {
-                'course_id': unicode(course_key),
+                'course_id': six.text_type(course_key),
                 'org_id': course_key.org,
                 'path': '/event',
                 'user_id': self.user_info['user_id']

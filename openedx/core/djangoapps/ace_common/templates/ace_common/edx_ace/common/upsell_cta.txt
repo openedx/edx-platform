@@ -1,0 +1,10 @@
+{% load i18n %}
+{% load ace %}
+{% if show_upsell %}
+{% blocktrans trimmed %}
+    Don't miss the opportunity to highlight your new knowledge and skills by earning a verified
+    certificate. Upgrade by {{ user_schedule_upgrade_deadline_time }}.
+{% endblocktrans %}
+
+{% trans "Upgrade Now" %} <{% with_link_tracking upsell_link %}>
+{% endif %}

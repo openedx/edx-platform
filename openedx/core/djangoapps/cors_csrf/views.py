@@ -1,13 +1,16 @@
 """Views for enabling cross-domain requests. """
-import logging
+from __future__ import absolute_import
+
 import json
+import logging
+
 from django.conf import settings
-from django.views.decorators.cache import cache_page
 from django.http import HttpResponseNotFound
+from django.views.decorators.cache import cache_page
+
 from edxmako.shortcuts import render_to_response
 
 from .models import XDomainProxyConfiguration
-
 
 log = logging.getLogger(__name__)
 

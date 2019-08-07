@@ -1,26 +1,31 @@
 """
 Support tool for changing course enrollments.
 """
+from __future__ import absolute_import
+
+import six
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponseBadRequest
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.generic import View
-from rest_framework.generics import GenericAPIView
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from rest_framework.generics import GenericAPIView
+from six import text_type
 
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
-from enrollment.api import get_enrollments, update_enrollment
-from enrollment.errors import CourseModeNotFoundError
-from enrollment.serializers import ModeSerializer
 from lms.djangoapps.support.decorators import require_support_permission
 from lms.djangoapps.support.serializers import ManualEnrollmentSerializer
 from lms.djangoapps.verify_student.models import VerificationDeadline
-from student.models import CourseEnrollment, ManualEnrollmentAudit, ENROLLED_TO_ENROLLED
+from openedx.core.djangoapps.credit.email_utils import get_credit_provider_attribute_values
+from openedx.core.djangoapps.enrollments.api import get_enrollments, update_enrollment
+from openedx.core.djangoapps.enrollments.errors import CourseModeNotFoundError
+from openedx.core.djangoapps.enrollments.serializers import ModeSerializer
+from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAttribute, ManualEnrollmentAudit
 from util.json_request import JsonResponse
 
 
@@ -45,6 +50,10 @@ class EnrollmentSupportListView(GenericAPIView):
     Allows viewing and changing learner enrollments by support
     staff.
     """
+    # TODO: ARCH-91
+    # This view is excluded from Swagger doc generation because it
+    # does not specify a serializer class.
+    exclude_from_schema = True
 
     @method_decorator(require_support_permission)
     def get(self, request, username_or_email):
@@ -57,7 +66,7 @@ class EnrollmentSupportListView(GenericAPIView):
         except User.DoesNotExist:
             return JsonResponse([])
 
-        enrollments = get_enrollments(user.username)
+        enrollments = get_enrollments(user.username, include_inactive=True)
         for enrollment in enrollments:
             # Folds the course_details field up into the main JSON object.
             enrollment.update(**enrollment.pop('course_details'))
@@ -86,17 +95,15 @@ class EnrollmentSupportListView(GenericAPIView):
                     username=user.username,
                     old_mode=old_mode
                 ))
-            if new_mode == CourseMode.CREDIT_MODE:
-                return HttpResponseBadRequest(u'Enrollment cannot be changed to credit mode.')
         except KeyError as err:
-            return HttpResponseBadRequest(u'The field {} is required.'.format(err.message))
+            return HttpResponseBadRequest(u'The field {} is required.'.format(text_type(err)))
         except InvalidKeyError:
             return HttpResponseBadRequest(u'Could not parse course key.')
         except (CourseEnrollment.DoesNotExist, User.DoesNotExist):
             return HttpResponseBadRequest(
                 u'Could not find enrollment for user {username} in course {course}.'.format(
                     username=username_or_email,
-                    course=unicode(course_key)
+                    course=six.text_type(course_key)
                 )
             )
         try:
@@ -111,9 +118,19 @@ class EnrollmentSupportListView(GenericAPIView):
                     reason=reason,
                     enrollment=enrollment
                 )
+                if new_mode == CourseMode.CREDIT_MODE:
+                    provider_ids = get_credit_provider_attribute_values(course_key, 'id')
+                    credit_provider_attr = {
+                        'namespace': 'credit',
+                        'name': 'provider_id',
+                        'value': provider_ids[0],
+                    }
+                    CourseEnrollmentAttribute.add_enrollment_attr(
+                        enrollment=enrollment, data_list=[credit_provider_attr]
+                    )
                 return JsonResponse(ManualEnrollmentSerializer(instance=manual_enrollment).data)
         except CourseModeNotFoundError as err:
-            return HttpResponseBadRequest(err.message)
+            return HttpResponseBadRequest(text_type(err))
 
     @staticmethod
     def include_verified_mode_info(enrollment_data, course_key):
@@ -170,7 +187,8 @@ class EnrollmentSupportListView(GenericAPIView):
         """
         course_modes = CourseMode.modes_for_course(
             course_key,
-            include_expired=True
+            include_expired=True,
+            exclude_credit=False
         )
         return [
             ModeSerializer(mode).data

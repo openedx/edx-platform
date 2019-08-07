@@ -1,0 +1,170 @@
+.verification-sock {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  max-width: map-get($container-max-widths, xl);
+  margin: $baseline auto 0;
+  -webkit-transition: all 0.4s ease-out;
+  -moz-transition: all 0.4s ease-out;
+  -o-transition: all 0.4s ease-out;
+  -ms-transition: all 0.4s ease-out;
+  transition: all 0.4s ease-out;
+
+  .action-toggle-verification-sock {
+    @include left(50%);
+    @include margin-left(-1 * $baseline * 15/2);
+
+    position: absolute;
+    top: (-1 * $baseline);
+    width: ($baseline * 15);
+    color: theme-color("inverse");
+    background-color: theme-color("success");
+    border-color: theme-color("success");
+    background-image: none;
+    box-shadow: none;
+    -webkit-transition: background-color 0.5s;
+    transition: background-color 0.5s;
+    cursor: pointer;
+
+    &.active,
+    &:focus,
+    &:hover {
+      color: theme-color("success");
+      background-color: theme-color("inverse");
+      border-color: theme-color("success");
+      background-image: none;
+      box-shadow: none;
+    }
+  }
+
+  .verification-main-panel {
+    display: none;
+    overflow: hidden;
+    border-top: 1px solid $border-color;
+    padding: ($baseline * 5/2) ($baseline * 2);
+    -webkit-transition: height ease-out;
+    transition: height ease-out;
+
+    .verification-desc-panel {
+      color: $black-t3;
+      position: relative;
+
+      h2 {
+        font-size: 1.5rem;
+        font-weight: $font-weight-bold;
+      }
+
+      h3 {
+        font-size: 1.25rem;
+      }
+
+      @media (max-width: 960px) {
+        .mini-cert {
+          display: none;
+          border: 1px solid $black-t0;
+        }
+      }
+
+      .mini-cert {
+        @include right($baseline);
+
+        position: absolute;
+        top: $baseline;
+        width: ($baseline * 13);
+      }
+
+      .learner-story-container {
+        display: flex;
+        max-width: 630px;
+
+        .student-image {
+          margin: ($baseline / 4) $baseline 0 0;
+          height: ($baseline * 5/2);
+          width: ($baseline * 5/2);
+        }
+
+        .story-quote > .author {
+          display: block;
+          margin-top: ($baseline / 4);
+          font-weight: 600;
+        }
+
+        &:not(:first-child) {
+          margin-top: ($baseline * 2);
+        }
+      }
+
+      .action-upgrade-certificate {
+        position: absolute;
+        right: $baseline;
+        background-color: theme-color("success");
+        border-color: theme-color("success");
+        color: theme-color("inverse");
+        background-image: none;
+        box-shadow: none;
+        cursor: pointer;
+
+        &:hover {
+          background-color: theme-color("inverse");
+          color: theme-color("success");
+        }
+
+        @media (max-width: 960px) {
+          & {
+            position: relative;
+            margin-top: ($baseline * 2);
+          }
+        }
+
+        @media (min-width: 960px) {
+          &.stuck-top {
+            bottom: auto;
+            top: $baseline * (52 / 5);
+          }
+
+          &.stuck-bottom {
+            top: auto;
+            bottom: $baseline * (-1 * 3/2);
+          }
+
+          &.attached {
+            @include right($baseline);
+
+            position: fixed;
+            bottom: $baseline;
+            top: auto;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Overrides for the courseware page.
+.view-courseware {
+  .verification-sock {
+    margin-top: 0;
+    border-top: none;
+    border-bottom: none;
+
+    .action-toggle-verification-sock {
+      top: (-1 * $baseline * 5/4);
+
+      &:not(.active) {
+        color: theme-color("inverse");
+        background-color: theme-color("success");
+        box-shadow: none;
+        border: 1px solid theme-color("success");
+
+        &:hover {
+          background-color: $success-color-hover;
+        }
+      }
+    }
+
+    .verification-main-panel {
+      border-top: 0;
+      border-bottom: 1px solid $border-color;
+    }
+  }
+}

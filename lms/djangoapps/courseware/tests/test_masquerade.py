@@ -1,34 +1,38 @@
+# -*- coding: utf-8 -*-
 """
 Unit tests for masquerade.
 """
+from __future__ import absolute_import
+
 import json
 import pickle
-from mock import patch
-from nose.plugins.attrib import attr
 from datetime import datetime
 
-from django.core.urlresolvers import reverse
-from django.test import TestCase, RequestFactory
-from django.utils.timezone import UTC
+import ddt
+import six
+from django.conf import settings
+from django.test import TestCase
+from django.urls import reverse
+from mock import patch
+from pytz import UTC
+from xblock.runtime import DictKeyValueStore
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
-from courseware.masquerade import (
-    CourseMasquerade,
-    MasqueradingKeyValueStore,
-    handle_ajax,
-    setup_masquerade,
-    get_masquerading_group_info
-)
+from courseware.masquerade import CourseMasquerade, MasqueradingKeyValueStore, get_masquerading_user_group
 from courseware.tests.factories import StaffFactory
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_group_member
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
+from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
-from xblock.runtime import DictKeyValueStore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 
 
 class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -38,7 +42,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     @classmethod
     def setUpClass(cls):
         super(MasqueradeTestCase, cls).setUpClass()
-        cls.course = CourseFactory.create(number='masquerade-test', metadata={'start': datetime.now(UTC())})
+        cls.course = CourseFactory.create(number='masquerade-test', metadata={'start': datetime.now(UTC)})
         cls.info_page = ItemFactory.create(
             category="course_info", parent_location=cls.course.location,
             data="OOGIE BLOOGIE", display_name="updates"
@@ -88,9 +92,9 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': unicode(self.course.id),
-                'chapter': self.chapter.location.name,
-                'section': self.sequential.location.name,
+                'course_id': six.text_type(self.course.id),
+                'chapter': self.chapter.location.block_id,
+                'section': self.sequential.location.block_id,
             }
         )
         return self.client.get(url)
@@ -102,20 +106,22 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse(
             'info',
             kwargs={
-                'course_id': unicode(self.course.id),
+                'course_id': six.text_type(self.course.id),
             }
         )
         return self.client.get(url)
 
-    def _create_mock_json_request(self, user, data, method='POST', session=None):
+    def get_progress_page(self):
         """
-        Returns a mock JSON request for the specified user
+        Returns the server response for progress page.
         """
-        factory = RequestFactory()
-        request = factory.generic(method, '/', content_type='application/json', data=json.dumps(data))
-        request.user = user
-        request.session = session or {}
-        return request
+        url = reverse(
+            'progress',
+            kwargs={
+                'course_id': six.text_type(self.course.id),
+            }
+        )
+        return self.client.get(url)
 
     def verify_staff_debug_present(self, staff_debug_expected):
         """
@@ -132,8 +138,8 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         problem_url = reverse(
             'xblock_handler',
             kwargs={
-                'course_id': unicode(self.course.id),
-                'usage_id': unicode(self.problem.location),
+                'course_id': six.text_type(self.course.id),
+                'usage_id': six.text_type(self.problem.location),
                 'handler': 'xmodule_handler',
                 'suffix': 'problem_get'
             }
@@ -148,22 +154,20 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertIn(self.problem_display_name, problem_html)
         self.assertEqual(show_answer_expected, "Show Answer" in problem_html)
 
-    def verify_real_user_profile_link(self):
+    def ensure_masquerade_as_group_member(self, partition_id, group_id):
         """
-        Verifies that the 'Profile' link in the navigation dropdown is pointing
-        to the real user.
+        Installs a masquerade for the test_user and test course, to enable the
+        user to masquerade as belonging to the specific partition/group combination.
+        Also verifies that the call to install the masquerade was successful.
+
+        Arguments:
+            partition_id (int): the integer partition id, referring to partitions already
+               configured in the course.
+            group_id (int); the integer group id, within the specified partition.
         """
-        content = self.get_courseware_page().content
-        self.assertIn(
-            '<a href="/u/{}" role="menuitem" class="action dropdown-menuitem">Profile</a>'.format(
-                self.test_user.username
-            ),
-            content,
-            "Profile link should point to real user",
-        )
+        self.assertEqual(200, masquerade_as_group_member(self.test_user, self.course, partition_id, group_id))
 
 
-@attr(shard=1)
 class NormalStudentVisibilityTest(MasqueradeTestCase):
     """
     Verify the course displays as expected for a "normal" student (to ensure test setup is correct).
@@ -206,7 +210,7 @@ class StaffMasqueradeTestCase(MasqueradeTestCase):
         masquerade_url = reverse(
             'masquerade_update',
             kwargs={
-                'course_key_string': unicode(self.course.id),
+                'course_key_string': six.text_type(self.course.id),
             }
         )
         response = self.client.post(
@@ -218,7 +222,6 @@ class StaffMasqueradeTestCase(MasqueradeTestCase):
         return response
 
 
-@attr(shard=1)
 class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):
     """
     Check for staff being able to masquerade as student.
@@ -256,7 +259,7 @@ class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):
         self.verify_show_answer_present(True)
 
 
-@attr(shard=1)
+@ddt.ddt
 class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmissionTestMixin):
     """
     Check for staff being able to masquerade as a specific student.
@@ -296,6 +299,23 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         progress = '%s/%s' % (str(json_data['current_score']), str(json_data['total_possible']))
         return progress
 
+    def assertExpectedLanguageInPreference(self, user, expected_language_code):
+        """
+        This method is a custom assertion verifies that a given user has expected
+        language code in the preference and in cookies.
+
+        Arguments:
+            user: User model instance
+            expected_language_code: string indicating a language code
+        """
+        self.assertEqual(
+            get_user_preference(user, LANGUAGE_KEY), expected_language_code
+        )
+        self.assertEqual(
+            self.client.cookies[settings.LANGUAGE_COOKIE].value, expected_language_code
+        )
+
+    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_masquerade_as_specific_user_on_self_paced(self):
         """
@@ -320,16 +340,23 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         content = response.content
         self.assertIn("OOGIE BLOOGIE", content)
 
+    @ddt.data(
+        'john',  # Non-unicode username
+        u'fôô@bar',  # Unicode username with @, which is what the ENABLE_UNICODE_USERNAME feature allows
+    )
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    def test_masquerade_as_specific_student(self):
+    def test_masquerade_as_specific_student(self, username):
         """
         Test masquerading as a specific user.
 
         We answer the problem in our test course as the student and as staff user, and we use the
         progress as a proxy to determine who's state we currently see.
         """
+        student = UserFactory.create(username=username)
+        CourseEnrollment.enroll(student, self.course.id)
+        self.logout()
+        self.login(student.email, 'test')
         # Answer correctly as the student, and check progress.
-        self.login_student()
         self.submit_answer('Correct', 'Correct')
         self.assertEqual(self.get_progress_detail(), u'2/2')
 
@@ -338,11 +365,8 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         self.assertEqual(self.get_progress_detail(), u'0/2')
 
         # Masquerade as the student, and check we can see the student state.
-        self.update_masquerade(role='student', user_name=self.student_user.username)
+        self.update_masquerade(role='student', user_name=student.username)
         self.assertEqual(self.get_progress_detail(), u'2/2')
-
-        # Verify that the user dropdown links have not changed
-        self.verify_real_user_profile_link()
 
         # Temporarily override the student state.
         self.submit_answer('Correct', 'Incorrect')
@@ -357,9 +381,36 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         self.assertEqual(self.get_progress_detail(), u'0/2')
 
         # Verify the student state did not change.
-        self.login_student()
+        self.logout()
+        self.login(student.email, 'test')
         self.assertEqual(self.get_progress_detail(), u'2/2')
 
+    def test_masquerading_with_language_preference(self):
+        """
+        Tests that masquerading as a specific user for the course does not update preference language
+        for the staff.
+
+        Login as a staff user and set user's language preference to english and visit the courseware page.
+        Set masquerade to view same page as a specific student having different language preference and
+        revisit the courseware page.
+        """
+        english_language_code = 'en'
+        set_user_preference(self.test_user, preference_key=LANGUAGE_KEY, preference_value=english_language_code)
+        self.login_staff()
+
+        # Reload the page and check we have expected language preference in system and in cookies.
+        self.get_courseware_page()
+        self.assertExpectedLanguageInPreference(self.test_user, english_language_code)
+
+        # Set student language preference and set masquerade to view same page the student.
+        set_user_preference(self.student_user, preference_key=LANGUAGE_KEY, preference_value='es-419')
+        self.update_masquerade(role='student', user_name=self.student_user.username)
+
+        # Reload the page and check we have expected language preference in system and in cookies.
+        self.get_courseware_page()
+        self.assertExpectedLanguageInPreference(self.test_user, english_language_code)
+
+    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_masquerade_as_specific_student_course_info(self):
         """
@@ -378,8 +429,31 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         content = self.get_course_info_page().content
         self.assertIn("OOGIE BLOOGIE", content)
 
+    def test_masquerade_as_specific_student_progress(self):
+        """
+        Test masquerading as a specific user for progress page.
+        """
+        # Give the student some correct answers, check their progress page
+        self.login_student()
+        self.submit_answer('Correct', 'Correct')
+        student_progress = self.get_progress_page().content
+        self.assertNotIn("1 of 2 possible points", student_progress)
+        self.assertIn("2 of 2 possible points", student_progress)
 
-@attr(shard=1)
+        # Staff answers are slightly different
+        self.login_staff()
+        self.submit_answer('Incorrect', 'Correct')
+        staff_progress = self.get_progress_page().content
+        self.assertNotIn("2 of 2 possible points", staff_progress)
+        self.assertIn("1 of 2 possible points", staff_progress)
+
+        # Should now see the student's scores
+        self.update_masquerade(role='student', user_name=self.student_user.username)
+        masquerade_progress = self.get_progress_page().content
+        self.assertNotIn("1 of 2 possible points", masquerade_progress)
+        self.assertIn("2 of 2 possible points", masquerade_progress)
+
+
 class TestGetMasqueradingGroupId(StaffMasqueradeTestCase):
     """
     Check for staff being able to masquerade as belonging to a group.
@@ -395,28 +469,20 @@ class TestGetMasqueradingGroupId(StaffMasqueradeTestCase):
         modulestore().update_item(self.course, self.test_user.id)
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    def test_group_masquerade(self):
+    def test_get_masquerade_group(self):
         """
-        Tests that a staff member can masquerade as being in a particular group.
+        Tests that a staff member can masquerade as being in a group in a user partition
         """
-        # Verify that there is no masquerading group initially
-        group_id, user_partition_id = get_masquerading_group_info(self.test_user, self.course.id)
-        self.assertIsNone(group_id)
-        self.assertIsNone(user_partition_id)
+        # Verify there is no masquerading group initially
+        group = get_masquerading_user_group(self.course.id, self.test_user, self.user_partition)
+        self.assertIsNone(group)
 
         # Install a masquerading group
-        request = self._create_mock_json_request(
-            self.test_user,
-            data={"role": "student", "user_partition_id": 0, "group_id": 1}
-        )
-        response = handle_ajax(request, unicode(self.course.id))
-        self.assertEquals(response.status_code, 200)
-        setup_masquerade(request, self.course.id, True)
+        self.ensure_masquerade_as_group_member(0, 1)
 
         # Verify that the masquerading group is returned
-        group_id, user_partition_id = get_masquerading_group_info(self.test_user, self.course.id)
-        self.assertEqual(group_id, 1)
-        self.assertEqual(user_partition_id, 0)
+        group = get_masquerading_user_group(self.course.id, self.test_user, self.user_partition)
+        self.assertEqual(group.id, 1)
 
 
 class ReadOnlyKeyValueStore(DictKeyValueStore):

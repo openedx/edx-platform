@@ -33,7 +33,8 @@
             this.storeValue(value_el, current_value);
         },
         onClickTag: function(e) {
-            var target_el = e.target, target_value, target_index;
+            var target_el = e.target,
+                target_value, target_index;
             var value_el, current_value;
 
             value_el = this.findValueEl(e.target);

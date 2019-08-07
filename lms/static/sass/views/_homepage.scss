@@ -10,6 +10,7 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
   .courses {
     @include row();
     @include float(left);
+
     width:100%;
 
     .courses-listing {
@@ -24,6 +25,7 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
     .course {
       @include box-sizing(border-box);
       @include transition(all $tmg-f3 linear 0s);
+
       position: relative;
       border-bottom: 3px solid $action-primary-bg;
       box-shadow: 0 1px 10px 0 $black-t0, inset 0 0 0 1px $white-t3;
@@ -35,9 +37,11 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
         overflow: hidden;
 
         // places the shadow on top of the course image while hovering over the course card
-        &:before {
+        &::before {
           @include left(0);
+
           @extend %ui-depth1;
+
           position: absolute;
           top: 0;
           opacity: 0;
@@ -55,15 +59,17 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
         .learn-more {
           @include left($learn-more-horizontal-position);
           @include box-sizing(border-box);
+
           @extend %ui-depth2;
+
           position: absolute;
           top: ($baseline*2.75);
           padding: 0 $baseline;
           width: ($baseline*10);
           height: ($baseline*2.5);
-          border-color: $uxpl-blue-base;
+          border-color: theme-color("primary");
           border-radius: 3px;
-          background: $uxpl-blue-base;
+          background: theme-color("primary");
           color: $white;
           line-height: ($baseline*2.5);
           text-align: center;
@@ -74,14 +80,15 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
 
       .course-info {
         height: $course-info-height;
-        font-family: $sans-serif;
+        font-family: $font-family-sans-serif;
 
         h2 {
-          font-family: $sans-serif;
+          font-family: $font-family-sans-serif;
         }
 
         .course-organization, .course-code, .course-date {
           @extend %t-icon6;
+
           color: $gray-d2;
         }
 
@@ -92,17 +99,21 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
 
         .course-organization {
           @include line-height(11);
+
           padding: ($baseline/2) ($baseline*0.75) ($baseline/10) ($baseline*0.75);
         }
 
         .course-code {
           @include line-height(16);
+
           padding: 0 ($baseline*0.75);
         }
 
         .course-title {
           @include line-height(16);
+
           @extend %t-icon4;
+
           margin: ($baseline*0.25) 0 ($baseline*1.75) 0;
           padding: 0 ($baseline*0.75);
           height: $course-title-height;
@@ -111,6 +122,7 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
 
         .course-date {
           @include line-height(14);
+
           padding: ($baseline/10) ($baseline*0.75);
         }
       }
@@ -119,13 +131,15 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
       &:hover,
       &:focus {
         .cover-image {
-          &:before {
+          &::before {
             @include transition(opacity $tmg-f2 ease-out $tmg-f2);
+
             opacity: 0.6;
           }
 
           .learn-more {
             @include transition(opacity $tmg-f2 ease-out $tmg-f2);
+
             opacity: 1;
           }
         }
@@ -135,6 +149,7 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
 
   .courses-more {
     @include margin-right(0);
+
     text-align: center;
 
     @include media($large-min-width) {
@@ -145,7 +160,7 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
     .courses-more-cta {
       font-weight: $font-semibold;
 
-      &:after {
+      &::after {
         content: " ›";
       }
     }
@@ -154,8 +169,8 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
 
 /* Set homepage specific media queries */
 .home .courses-container .courses .courses-listing .courses-listing-item {
-
   @include rtl() { $layout-direction: "RTL"; }
+
   @include fill-parent();
 
   @include media($bp-medium) {

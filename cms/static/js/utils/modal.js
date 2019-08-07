@@ -59,8 +59,7 @@ define(['jquery'], function($) {
         $modalCover.unbind('click');
         if (clickHandler) {
             $modalCover.bind('click', clickHandler);
-        }
-        else {
+        } else {
             $modalCover.bind('click', hideModal);
         }
         return $modalCover;

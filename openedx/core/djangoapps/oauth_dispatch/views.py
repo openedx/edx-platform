@@ -3,18 +3,23 @@ Views that dispatch processing of OAuth requests to django-oauth2-provider or
 django-oauth-toolkit as appropriate.
 """
 
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import json
 
+from django.conf import settings
 from django.views.generic import View
+from edx_django_utils import monitoring as monitoring_utils
 from edx_oauth2_provider import views as dop_views  # django-oauth2-provider views
-from oauth2_provider import models as dot_models, views as dot_views  # django-oauth-toolkit
+from oauth2_provider import models as dot_models  # django-oauth-toolkit
+from oauth2_provider import views as dot_views
+from ratelimit import ALL
+from ratelimit.mixins import RatelimitMixin
 
 from openedx.core.djangoapps.auth_exchange import views as auth_exchange_views
-from openedx.core.lib.token_utils import JwtBuilder
-
-from . import adapters
+from openedx.core.djangoapps.oauth_dispatch import adapters
+from openedx.core.djangoapps.oauth_dispatch.dot_overrides import views as dot_overrides_views
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_from_token
 
 
 class _DispatchingView(View):
@@ -23,7 +28,6 @@ class _DispatchingView(View):
     behavior routes based on client_id, but this can be overridden by redefining
     `select_backend()` if particular views need different behavior.
     """
-    # pylint: disable=no-member
 
     dot_adapter = adapters.DOTAdapter()
     dop_adapter = adapters.DOPAdapter()
@@ -32,9 +36,14 @@ class _DispatchingView(View):
         """
         Returns the appropriate adapter based on the OAuth client linked to the request.
         """
-        if dot_models.Application.objects.filter(client_id=self._get_client_id(request)).exists():
+        client_id = self._get_client_id(request)
+        monitoring_utils.set_custom_metric('oauth_client_id', client_id)
+
+        if dot_models.Application.objects.filter(client_id=client_id).exists():
+            monitoring_utils.set_custom_metric('oauth_adapter', 'dot')
             return self.dot_adapter
         else:
+            monitoring_utils.set_custom_metric('oauth_adapter', 'dop')
             return self.dop_adapter
 
     def dispatch(self, request, *args, **kwargs):
@@ -76,39 +85,38 @@ class _DispatchingView(View):
             return request.POST.get('client_id')
 
 
-class AccessTokenView(_DispatchingView):
+class AccessTokenView(RatelimitMixin, _DispatchingView):
     """
     Handle access token requests.
     """
     dot_view = dot_views.TokenView
     dop_view = dop_views.AccessTokenView
+    ratelimit_key = 'openedx.core.djangoapps.util.ratelimit.real_ip'
+    ratelimit_rate = settings.RATELIMIT_RATE
+    ratelimit_block = True
+    ratelimit_method = ALL
 
     def dispatch(self, request, *args, **kwargs):
         response = super(AccessTokenView, self).dispatch(request, *args, **kwargs)
 
-        if response.status_code == 200 and request.POST.get('token_type', '').lower() == 'jwt':
-            expires_in, scopes, user = self._decompose_access_token_response(request, response)
+        token_type = request.POST.get('token_type', 'no_token_type_supplied').lower()
+        monitoring_utils.set_custom_metric('oauth_token_type', token_type)
+        monitoring_utils.set_custom_metric('oauth_grant_type', request.POST.get('grant_type', ''))
 
-            content = {
-                'access_token': JwtBuilder(user).build_token(scopes, expires_in),
-                'expires_in': expires_in,
-                'token_type': 'JWT',
-                'scope': ' '.join(scopes),
-            }
-            response.content = json.dumps(content)
+        if response.status_code == 200 and token_type == 'jwt':
+            response.content = self._build_jwt_response_from_access_token_response(request, response)
 
         return response
 
-    def _decompose_access_token_response(self, request, response):
-        """ Decomposes the access token in the request to an expiration date, scopes, and User. """
-        content = json.loads(response.content)
-        access_token = content['access_token']
-        scope = content['scope']
-        access_token_obj = self.get_adapter(request).get_access_token(access_token)
-        user = access_token_obj.user
-        scopes = scope.split(' ')
-        expires_in = content['expires_in']
-        return expires_in, scopes, user
+    def _build_jwt_response_from_access_token_response(self, request, response):
+        """ Builds the content of the response, including the JWT token. """
+        token_dict = json.loads(response.content)
+        jwt = create_jwt_from_token(token_dict, self.get_adapter(request))
+        token_dict.update({
+            'access_token': jwt,
+            'token_type': 'JWT',
+        })
+        return json.dumps(token_dict)
 
 
 class AuthorizationView(_DispatchingView):
@@ -116,7 +124,7 @@ class AuthorizationView(_DispatchingView):
     Part of the authorization flow.
     """
     dop_view = dop_views.Capture
-    dot_view = dot_views.AuthorizationView
+    dot_view = dot_overrides_views.EdxOAuth2AuthorizationView
 
 
 class AccessTokenExchangeView(_DispatchingView):

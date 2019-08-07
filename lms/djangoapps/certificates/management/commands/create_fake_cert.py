@@ -9,47 +9,60 @@ Example usage:
     $ ./manage.py lms create_fake_cert test_user edX/DemoX/Demo_Course --mode honor --grade 0.89
 
 """
-import logging
-from django.core.management.base import BaseCommand, CommandError
-from django.contrib.auth.models import User
-from optparse import make_option
-from opaque_keys.edx.keys import CourseKey
-from certificates.models import GeneratedCertificate, CertificateStatuses
+from __future__ import absolute_import
 
+import logging
+from textwrap import dedent
+
+from django.contrib.auth.models import User
+from django.core.management.base import BaseCommand
+from opaque_keys.edx.keys import CourseKey
+from six import text_type
+
+from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 
 LOGGER = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
     """Create a fake certificate for a user in a course. """
+    help = dedent(__doc__).strip()
 
-    USAGE = u'Usage: create_fake_cert <USERNAME> <COURSE_KEY> --mode <MODE> --status <STATUS> --grade <GRADE>'
+    def add_arguments(self, parser):
+        parser.add_argument(
+            'username',
+            metavar='USERNAME',
+            help='Username of the user to create the fake cert for'
+        )
+        parser.add_argument(
+            'course_key',
+            metavar='COURSE_KEY',
+            help='Course key of the course to grant the cert for'
+        )
 
-    option_list = BaseCommand.option_list + (
-        make_option(
+        parser.add_argument(
             '-m', '--mode',
             metavar='CERT_MODE',
             dest='cert_mode',
             default='honor',
             help='The course mode of the certificate (e.g. "honor", "verified", or "professional")'
-        ),
+        )
 
-        make_option(
+        parser.add_argument(
             '-s', '--status',
             metavar='CERT_STATUS',
             dest='status',
             default=CertificateStatuses.downloadable,
             help='The status of the certificate'
-        ),
+        )
 
-        make_option(
+        parser.add_argument(
             '-g', '--grade',
             metavar='CERT_GRADE',
             dest='grade',
             default='',
-            help='The grade for the course, as a decimal (e.g. "0.89" for 89%)'
-        ),
-    )
+            help='The grade for the course, as a decimal (e.g. "0.89" for 89 percent)'
+        )
 
     def handle(self, *args, **options):
         """Create a fake certificate for a user.
@@ -67,11 +80,8 @@ class Command(BaseCommand):
             CommandError
 
         """
-        if len(args) < 2:
-            raise CommandError(self.USAGE)
-
-        user = User.objects.get(username=args[0])
-        course_key = CourseKey.from_string(args[1])
+        user = User.objects.get(username=options['username'])
+        course_key = CourseKey.from_string(options['course_key'])
         cert_mode = options.get('cert_mode', 'honor')
         status = options.get('status', CertificateStatuses.downloadable)
         grade = options.get('grade', '')
@@ -96,7 +106,7 @@ class Command(BaseCommand):
                 u"Created certificate for user %s in course %s "
                 u"with mode %s, status %s, "
                 u"and grade %s",
-                user.id, unicode(course_key),
+                user.id, text_type(course_key),
                 cert_mode, status, grade
             )
 
@@ -105,6 +115,6 @@ class Command(BaseCommand):
                 u"Updated certificate for user %s in course %s "
                 u"with mode %s, status %s, "
                 u"and grade %s",
-                user.id, unicode(course_key),
+                user.id, text_type(course_key),
                 cert_mode, status, grade
             )

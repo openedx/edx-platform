@@ -4,6 +4,8 @@
         var template = [
             '<button class="control add-fullscreen" aria-disabled="false" title="',
             gettext('Fill browser'),
+            '" aria-label="',
+            gettext('Fill browser'),
             '">',
             '<span class="icon fa fa-arrows-alt" aria-hidden="true"></span>',
             '</button>'
@@ -50,8 +52,8 @@
             $(document).off('keyup', this.videoFullScreen.exitHandler);
             this.videoFullScreen.fullScreenEl.remove();
             this.el.off({
-                'fullscreen': this.videoFullScreen.onFullscreenChange,
-                'destroy': this.videoFullScreen.destroy
+                fullscreen: this.videoFullScreen.onFullscreenChange,
+                destroy: this.videoFullScreen.destroy
             });
             if (this.isFullScreen) {
                 this.videoFullScreen.exit();
@@ -78,8 +80,8 @@
         function _bindHandlers(state) {
             state.videoFullScreen.fullScreenEl.on('click', state.videoFullScreen.toggleHandler);
             state.el.on({
-                'fullscreen': state.videoFullScreen.onFullscreenChange,
-                'destroy': state.videoFullScreen.destroy
+                fullscreen: state.videoFullScreen.onFullscreenChange,
+                destroy: state.videoFullScreen.destroy
             });
             $(document).on('keyup', state.videoFullScreen.exitHandler);
         }
@@ -134,7 +136,7 @@
             fullScreenClassNameEl.removeClass('video-fullscreen');
             $(window).scrollTop(this.scrollPos);
             this.videoFullScreen.fullScreenEl
-            .attr('title', gettext('Fill browser'))
+            .attr({title: gettext('Fill browser'), 'aria-label': gettext('Fill browser')})
             .find('.icon')
                 .removeClass('fa-compress')
                 .addClass('fa-arrows-alt');
@@ -142,8 +144,8 @@
             this.el.trigger('fullscreen', [this.isFullScreen]);
 
             $(closedCaptionsEl).css({
-                'top': '70%',
-                'left': '5%'
+                top: '70%',
+                left: '5%'
             });
         }
 
@@ -156,7 +158,7 @@
             this.videoFullScreen.fullScreenState = this.isFullScreen = true;
             fullScreenClassNameEl.addClass('video-fullscreen');
             this.videoFullScreen.fullScreenEl
-            .attr('title', gettext('Exit full browser'))
+            .attr({title: gettext('Exit full browser'), 'aria-label': gettext('Exit full browser')})
             .find('.icon')
                 .removeClass('fa-arrows-alt')
                 .addClass('fa-compress');
@@ -164,8 +166,8 @@
             this.el.trigger('fullscreen', [this.isFullScreen]);
 
             $(closedCaptionsEl).css({
-                'top': '70%',
-                'left': '5%'
+                top: '70%',
+                left: '5%'
             });
         }
 

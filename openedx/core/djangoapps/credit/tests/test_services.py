@@ -2,28 +2,27 @@
 Tests for the Credit xBlock service
 """
 
-import ddt
-from nose.plugins.attrib import attr
-from course_modes.models import CourseMode
+from __future__ import absolute_import
 
+import ddt
+import six
+
+from course_modes.models import CourseMode
+from openedx.core.djangoapps.credit.api.eligibility import set_credit_requirements
+from openedx.core.djangoapps.credit.models import CreditCourse
+from openedx.core.djangoapps.credit.services import CreditService
+from student.models import CourseEnrollment, UserProfile
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from openedx.core.djangoapps.credit.services import CreditService
-from openedx.core.djangoapps.credit.models import CreditCourse
-from openedx.core.djangoapps.credit.api.eligibility import set_credit_requirements
 
-from student.models import CourseEnrollment, UserProfile
-
-
-@attr(shard=2)
 @ddt.ddt
 class CreditServiceTests(ModuleStoreTestCase):
     """
     Tests for the Credit xBlock service
     """
 
-    def setUp(self, **kwargs):
+    def setUp(self):
         super(CreditServiceTests, self).setUp()
 
         self.service = CreditService()
@@ -385,12 +384,12 @@ class CreditServiceTests(ModuleStoreTestCase):
         # mark the grade as satisfied
         self.service.set_credit_requirement_status(
             self.user.id,
-            unicode(self.course.id),
+            six.text_type(self.course.id),
             'grade',
             'grade'
         )
 
-        credit_state = self.service.get_credit_state(self.user.id, unicode(self.course.id))
+        credit_state = self.service.get_credit_state(self.user.id, six.text_type(self.course.id))
 
         self.assertIsNotNone(credit_state)
         self.assertEqual(credit_state['enrollment_mode'], 'verified')

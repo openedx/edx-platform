@@ -2,20 +2,25 @@
 Tests for DOT Adapter
 """
 
+from __future__ import absolute_import
+
+import unittest
 from datetime import timedelta
 
 import ddt
+import six
 from django.conf import settings
 from django.test import TestCase
 from django.utils.timezone import now
 from oauth2_provider import models
-import unittest
 
 from student.tests.factories import UserFactory
 
-from ..adapters import DOTAdapter
-from .constants import DUMMY_REDIRECT_URL, DUMMY_REDIRECT_URL2
-from ..models import RestrictedApplication
+# oauth_dispatch is not in CMS' INSTALLED_APPS so these imports will error during test collection
+if settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"):
+    from ..adapters import DOTAdapter
+    from .constants import DUMMY_REDIRECT_URL, DUMMY_REDIRECT_URL2
+    from ..models import RestrictedApplication
 
 
 @ddt.ddt
@@ -24,11 +29,9 @@ class DOTAdapterTestCase(TestCase):
     """
     Test class for DOTAdapter.
     """
-
-    adapter = DOTAdapter()
-
     def setUp(self):
         super(DOTAdapterTestCase, self).setUp()
+        self.adapter = DOTAdapter()
         self.user = UserFactory()
         self.public_client = self.adapter.create_public_client(
             name='public app',
@@ -54,7 +57,7 @@ class DOTAdapterTestCase(TestCase):
         """
         Make sure unicode representation of RestrictedApplication is correct
         """
-        self.assertEqual(unicode(self.restricted_app), u"<RestrictedApplication '{name}'>".format(
+        self.assertEqual(six.text_type(self.restricted_app), u"<RestrictedApplication '{name}'>".format(
             name=self.restricted_client.name
         ))
 
@@ -93,9 +96,9 @@ class DOTAdapterTestCase(TestCase):
         self.assertEqual(self.adapter.get_client_for_token(token), self.public_client)
 
     def test_get_access_token(self):
-        token = models.AccessToken.objects.create(
-            token='token-id',
-            application=self.public_client,
+        token = self.adapter.create_access_token_for_test(
+            'token-id',
+            client=self.public_client,
             user=self.user,
             expires=now() + timedelta(days=30),
         )
@@ -106,9 +109,9 @@ class DOTAdapterTestCase(TestCase):
         Make sure when generating an access_token for a restricted client
         that the token is immediately expired
         """
-        models.AccessToken.objects.create(
-            token='expired-token-id',
-            application=self.restricted_client,
+        self.adapter.create_access_token_for_test(
+            'expired-token-id',
+            client=self.restricted_client,
             user=self.user,
             expires=now() + timedelta(days=30),
         )

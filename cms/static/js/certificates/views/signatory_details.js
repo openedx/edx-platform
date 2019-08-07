@@ -76,10 +76,10 @@ function($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Signa
                             actionableModel.setOriginalAttributes();
                             dfd.resolve();
                             self.closeSignatoryEditView();
-                        }.bind(this)
+                        }
                     });
                     return dfd;
-                }.bind(this));
+                });
         },
 
         closeSignatoryEditView: function(event) {

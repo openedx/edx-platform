@@ -5,17 +5,20 @@
         <%- gettext("Download available encodings (.csv)") %>
       </a>
     </div>
-    <table class="assets-table">
-        <thead>
-            <tr>
-                <th><%- gettext("Name") %></th>
-                <th><%- gettext("Duration") %></th>
-                <th><%- gettext("Date Added") %></th>
-                <th><%- gettext("Video ID") %></th>
-                <th><%- gettext("Status") %></th>
-                <th><%- gettext("Action") %></th>
-            </tr>
-        </thead>
-        <tbody class="js-table-body"></tbody>
-    </table>
+    <div class="assets-table video-table">
+        <div class="js-table-head">
+            <div class="video-row">
+                <% if (videoImageUploadEnabled) { %>
+                <div class="video-head-col video-col thumbnail-col"><%- gettext("Thumbnail") %></div>
+                <% } %>
+                <div class="video-head-col video-col name-col"><%- gettext("Name") %></div>
+                <div class="video-head-col video-col date-col"><%- gettext("Date Added") %></div>
+                <div class="video-head-col video-col video-id-col"><%- gettext("Video ID") %></div>
+                <div class="video-head-col video-col transcripts-col"><%- gettext("Transcripts") %></div>
+                <div class="video-head-col video-col status-col"><%- gettext("Video Status") %></div>
+                <div class="video-head-col video-col actions-col"><%- gettext("Action") %></div>
+            </div>
+        </div>
+        <div class="js-table-body"></div>
+    </div>
 </div>

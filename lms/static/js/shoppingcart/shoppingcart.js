@@ -85,8 +85,7 @@ var edx = edx || {};
             responseFromServer: function(data) {
                 if (data.is_course_enrollment_closed == true) {
                     location.href = '/shoppingcart';
-                }
-                else {
+                } else {
                     this.submitPaymentForm(this.$paymentForm);
                 }
             },
@@ -121,14 +120,14 @@ var edx = edx || {};
             // before going to make payment
             // if exists then trigger click event of the apply code button
             var code = $('div.code-input input#input_code').val();
-            if (typeof(code) != 'undefined' && code != '') {
+            if (typeof(code) !== 'undefined' && code != '') {
                 $('div.code-input #submit-code').trigger('click');
                 return false;
             }
-            var container = $('.confirm-enrollment.cart-view form');
+            var $container = $('.confirm-enrollment.cart-view form');
             var view = new edx.shoppingcart.showcart.CartView({
-                el: container
+                el: $container
             }).submit(event);
         });
     });
-})(jQuery);
+}(jQuery));

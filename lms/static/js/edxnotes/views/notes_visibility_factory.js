@@ -78,7 +78,7 @@
                     type: 'PUT',
                     url: this.visibilityUrl,
                     dataType: 'json',
-                    data: JSON.stringify({'visibility': this.visibility}),
+                    data: JSON.stringify({visibility: this.visibility}),
                     success: this.onSuccess,
                     error: this.onError
                 });

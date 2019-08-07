@@ -1,21 +1,20 @@
 """
 Bok-Choy PageObject class for learner profile page.
 """
-from bok_choy.query import BrowserQuery
+from __future__ import absolute_import
 
-from common.test.acceptance.pages.lms import BASE_URL
 from bok_choy.page_object import PageObject
-from common.test.acceptance.pages.lms.fields import FieldsMixin
 from bok_choy.promise import EmptyPromise
-from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
+from bok_choy.query import BrowserQuery
 from selenium.webdriver import ActionChains
 
+from common.test.acceptance.pages.lms import BASE_URL
+from common.test.acceptance.pages.lms.fields import FieldsMixin
+from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
+from common.test.acceptance.tests.helpers import select_option_by_value
 
-PROFILE_VISIBILITY_SELECTOR = '#u-field-select-account_privacy option[value="{}"]'
-FIELD_ICONS = {
-    'country': 'fa-map-marker',
-    'language_proficiencies': 'fa-comment',
-}
+PROFILE_VISIBILITY_SELECTOR = u'#u-field-select-account_privacy option[value="{}"]'
+PROFILE_VISIBILITY_INPUT = '#u-field-select-account_privacy'
 
 
 class Badge(PageObject):
@@ -56,8 +55,8 @@ class Badge(PageObject):
         """
         Execute javascript to bring the popup(.badges-model) inside the window.
         """
-        script_to_execute = ("var popup = document.querySelectorAll('.badges-modal')[0];;"
-                             "popup.style.left = '20%';")
+        script_to_execute = (u"var popup = document.querySelectorAll('.badges-modal')[0];;"
+                             u"popup.style.left = '20%';")
         self.browser.execute_script(script_to_execute)
 
     def close_modal(self):
@@ -146,8 +145,10 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         self.wait_for_element_visibility('select#u-field-select-account_privacy', 'Privacy dropdown is visible')
 
         if privacy != self.privacy:
-            self.q(css=PROFILE_VISIBILITY_SELECTOR.format(privacy)).first.click()
-            EmptyPromise(lambda: privacy == self.privacy, 'Privacy is set to {}'.format(privacy)).fulfill()
+            query = self.q(css=PROFILE_VISIBILITY_INPUT)
+            select_option_by_value(query, privacy)
+            EmptyPromise(lambda: privacy == self.privacy, u'Privacy is set to {}'.format(privacy)).fulfill()
+            self.q(css='.btn-change-privacy').first.click()
             self.wait_for_ajax()
 
             if privacy == 'all_users':
@@ -211,18 +212,6 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         """
         self.wait_for_ajax()
         return self.q(css='#u-field-select-account_privacy').visible
-
-    def field_icon_present(self, field_id):
-        """
-        Check if an icon is present for a field. Only dropdown fields have icons.
-
-        Arguments:
-            field_id (str): field id
-
-        Returns:
-            True/False
-        """
-        return self.icon_for_field(field_id, FIELD_ICONS[field_id])
 
     def wait_for_public_fields(self):
         """
@@ -294,10 +283,6 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         self.browser.execute_script('$(".upload-button-input").css("opacity",1);')
 
         self.wait_for_element_visibility('.upload-button-input', "upload button is visible")
-
-        self.browser.execute_script('$(".upload-submit").show();')
-
-        self.q(css='.upload-submit').first.click()
         self.q(css='.upload-button-input').results[0].send_keys(file_path)
         self.wait_for_ajax()
 

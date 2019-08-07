@@ -2,7 +2,7 @@ function sendLog(name, data, event_type) {
     var message = data || {};
     message.chapter = PDF_URL || '';
     message.name = 'textbook.pdf.' + name;
-    Logger.log(event_type ? event_type : message.name, message);
+    Logger.log(event_type || message.name, message);
 }
 
 // this event is loaded after the others to accurately represent the order of events:
@@ -19,9 +19,9 @@ $(function() {
         if (old_page !== page || first_page) {
             first_page = false;
             if ((event.timeStamp - scroll.timeStamp) < 50) {
-                sendLog('page.scrolled', {'page': page, 'direction': scroll.direction});
+                sendLog('page.scrolled', {page: page, direction: scroll.direction});
             }
-            sendLog('page.loaded', {'type': 'gotopage', 'old': old_page, 'new': page}, 'book');
+            sendLog('page.loaded', {type: 'gotopage', old: old_page, new: page}, 'book');
             scroll.timeStamp = 0;
         }
     });
@@ -33,44 +33,44 @@ $(function() {
 });
 
 $('#viewThumbnail,#sidebarToggle').on('click', function() {
-    sendLog('thumbnails.toggled', {'page': PDFViewerApplication.page});
+    sendLog('thumbnails.toggled', {page: PDFViewerApplication.page});
 });
 
 $('#thumbnailView a').live('click', function() {
-    sendLog('thumbnail.navigated', {'page': $('#thumbnailView a').index(this) + 1, 'thumbnail_title': $(this).attr('title')});
+    sendLog('thumbnail.navigated', {page: $('#thumbnailView a').index(this) + 1, thumbnail_title: $(this).attr('title')});
 });
 
 $('#viewOutline').on('click', function() {
-    sendLog('outline.toggled', {'page': PDFViewerApplication.page});
+    sendLog('outline.toggled', {page: PDFViewerApplication.page});
 });
 
 $('#previous').on('click', function() {
-    sendLog('page.navigatednext', {'type': 'prevpage', 'new': PDFViewerApplication.page - 1}, 'book');
+    sendLog('page.navigatednext', {type: 'prevpage', new: PDFViewerApplication.page - 1}, 'book');
 });
 
 $('#next').on('click', function() {
-    sendLog('page.navigatednext', {'type': 'nextpage', 'new': PDFViewerApplication.page + 1}, 'book');
+    sendLog('page.navigatednext', {type: 'nextpage', new: PDFViewerApplication.page + 1}, 'book');
 });
 
 $('#zoomIn,#zoomOut').on('click', function() {
-    sendLog('zoom.buttons.changed', {'direction': $(this).attr('id') == 'zoomIn' ? 'in' : 'out', 'page': PDFViewerApplication.page});
+    sendLog('zoom.buttons.changed', {direction: $(this).attr('id') == 'zoomIn' ? 'in' : 'out', page: PDFViewerApplication.page});
 });
 
 $('#pageNumber').on('change', function() {
-    sendLog('page.navigated', {'page': $(this).val()});
+    sendLog('page.navigated', {page: $(this).val()});
 });
 
 var old_amount = 1;
 $(window).bind('scalechange', function(event) {
     var amount = event.originalEvent.scale;
     if (amount !== old_amount) {
-        sendLog('display.scaled', {'amount': amount, 'page': PDFViewerApplication.page});
+        sendLog('display.scaled', {amount: amount, page: PDFViewerApplication.page});
         old_amount = amount;
     }
 });
 
 $('#scaleSelect').on('change', function() {
-    sendLog('zoom.menu.changed', {'amount': $('#scaleSelect').val(), 'page': PDFViewerApplication.page});
+    sendLog('zoom.menu.changed', {amount: $('#scaleSelect').val(), page: PDFViewerApplication.page});
 });
 
 var search_event = null;

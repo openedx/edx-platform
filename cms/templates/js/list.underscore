@@ -10,7 +10,7 @@
     </div>
 <% } else { %>
     <div class="list-items"></div>
-    <% if (!isEditing) { %>
+    <% if (!isEditing && !restrictEditing) { %>
         <button class="action action-add <% if(!canCreateNewItem) {%> action-add-hidden <% }%>" >
             <span class="icon fa fa-plus" aria-hidden="true"></span>
             <%- interpolate(

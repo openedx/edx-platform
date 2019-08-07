@@ -7,20 +7,23 @@ of the submit_problem method of a capa module when the "delay between quiz
 submissions" setting is set to different values
 """
 
-import unittest
-import textwrap
+from __future__ import absolute_import
+
 import datetime
+import textwrap
+import unittest
 
 from mock import Mock
-
-import xmodule
-from xmodule.capa_module import CapaModule
-from opaque_keys.edx.locations import Location
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from pytz import UTC
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
+from xblock.scorable import Score
+
+import xmodule
+from xmodule.capa_module import ProblemBlock
 
 from . import get_test_system
-from pytz import UTC
 
 
 class CapaFactoryWithDelay(object):
@@ -84,7 +87,8 @@ class CapaFactoryWithDelay(object):
         """
         Optional parameters here are cut down to what we actually use vs. the regular CapaFactory.
         """
-        location = Location("edX", "capa_test", "run", "problem", "SampleProblem{0}".format(cls.next_num()))
+        location = BlockUsageLocator(CourseLocator('edX', 'capa_test', 'run', deprecated=True),
+                                     'problem', 'SampleProblem{0}'.format(cls.next_num()), deprecated=True)
         field_data = {'data': cls.sample_problem_xml}
 
         if max_attempts is not None:
@@ -94,7 +98,6 @@ class CapaFactoryWithDelay(object):
         if submission_wait_seconds is not None:
             field_data['submission_wait_seconds'] = submission_wait_seconds
 
-        descriptor = Mock(weight="1")
         if attempts is not None:
             # converting to int here because I keep putting "0" and "1" in the tests
             # since everything else is a string.
@@ -102,8 +105,7 @@ class CapaFactoryWithDelay(object):
 
         system = get_test_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
-        module = CapaModule(
-            descriptor,
+        module = ProblemBlock(
             system,
             DictFieldData(field_data),
             ScopeIds(None, None, location, location),
@@ -111,9 +113,9 @@ class CapaFactoryWithDelay(object):
 
         if correct:
             # Could set the internal state formally, but here we just jam in the score.
-            module.get_score = lambda: {'score': 1, 'total': 1}
+            module.score = Score(raw_earned=1, raw_possible=1)
         else:
-            module.get_score = lambda: {'score': 0, 'total': 1}
+            module.score = Score(raw_earned=0, raw_possible=1)
 
         return module
 

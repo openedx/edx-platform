@@ -1,27 +1,32 @@
 """
 Tests for student enrollment.
 """
-import ddt
-import unittest
-from mock import patch
-from nose.plugins.attrib import attr
+from __future__ import absolute_import
 
+import unittest
+
+import ddt
+import six
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
+from mock import patch
+
 from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.embargo.test_utils import restrict_course
+from student.models import (
+    SCORE_RECALCULATION_DELAY_ON_ENROLLMENT_UPDATE,
+    CourseEnrollment,
+    CourseFullError,
+    EnrollmentClosedError
+)
+from student.roles import CourseInstructorRole, CourseStaffRole
+from student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
+from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from util.testing import UrlResetMixin
-from openedx.core.djangoapps.embargo.test_utils import restrict_course
-from student.tests.factories import UserFactory, CourseModeFactory
-from student.models import CourseEnrollment, CourseFullError
-from student.roles import (
-    CourseInstructorRole,
-    CourseStaffRole,
-)
 
 
-@attr(shard=3)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
@@ -49,7 +54,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
         self.course_limited.max_student_enrollments_allowed = 1
         self.store.update_item(self.course_limited, self.user.id)
         self.urls = [
-            reverse('course_modes_choose', kwargs={'course_id': unicode(self.course.id)})
+            reverse('course_modes_choose', kwargs={'course_id': six.text_type(self.course.id)})
         ]
 
     @ddt.data(
@@ -92,7 +97,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
         # (otherwise, use an empty string, which the JavaScript client
         # interprets as a redirect to the dashboard)
         full_url = (
-            reverse(next_url, kwargs={'course_id': unicode(self.course.id)})
+            reverse(next_url, kwargs={'course_id': six.text_type(self.course.id)})
             if next_url else next_url
         )
 
@@ -270,7 +275,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
 
         """
         if course_id is None:
-            course_id = unicode(self.course.id)
+            course_id = six.text_type(self.course.id)
 
         params = {
             'enrollment_action': action,
@@ -281,3 +286,94 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
             params['email_opt_in'] = email_opt_in
 
         return self.client.post(reverse('change_enrollment'), params)
+
+    def test_cea_enrolls_only_one_user(self):
+        """
+        Tests that a CourseEnrollmentAllowed can be used by just one user.
+        If the user changes e-mail and then a second user tries to enroll with the same accepted e-mail,
+        the second enrollment should fail.
+        However, the original user can reuse the CEA many times.
+        """
+
+        cea = CourseEnrollmentAllowedFactory(
+            email='allowed@edx.org',
+            course_id=self.course.id,
+            auto_enroll=False,
+        )
+        # Still unlinked
+        self.assertIsNone(cea.user)
+
+        user1 = UserFactory.create(username="tester1", email="tester1@e.com", password="test")
+        user2 = UserFactory.create(username="tester2", email="tester2@e.com", password="test")
+
+        self.assertFalse(
+            CourseEnrollment.objects.filter(course_id=self.course.id, user=user1).exists()
+        )
+
+        user1.email = 'allowed@edx.org'
+        user1.save()
+
+        CourseEnrollment.enroll(user1, self.course.id, check_access=True)
+
+        self.assertTrue(
+            CourseEnrollment.objects.filter(course_id=self.course.id, user=user1).exists()
+        )
+
+        # The CEA is now linked
+        cea.refresh_from_db()
+        self.assertEqual(cea.user, user1)
+
+        # user2 wants to enroll too, (ab)using the same allowed e-mail, but cannot
+        user1.email = 'my_other_email@edx.org'
+        user1.save()
+        user2.email = 'allowed@edx.org'
+        user2.save()
+        with self.assertRaises(EnrollmentClosedError):
+            CourseEnrollment.enroll(user2, self.course.id, check_access=True)
+
+        # CEA still linked to user1. Also after unenrolling
+        cea.refresh_from_db()
+        self.assertEqual(cea.user, user1)
+
+        CourseEnrollment.unenroll(user1, self.course.id)
+
+        cea.refresh_from_db()
+        self.assertEqual(cea.user, user1)
+
+        # Enroll user1 again. Because it's the original owner of the CEA, the enrollment is allowed
+        CourseEnrollment.enroll(user1, self.course.id, check_access=True)
+
+        # Still same
+        cea.refresh_from_db()
+        self.assertEqual(cea.user, user1)
+
+    def test_score_recalculation_on_enrollment_update(self):
+        """
+        Test that an update in enrollment cause score recalculation.
+        Note:
+        Score recalculation task must be called with a delay of SCORE_RECALCULATION_DELAY_ON_ENROLLMENT_UPDATE
+        """
+        course_modes = ['verified', 'audit']
+
+        for mode_slug in course_modes:
+            CourseModeFactory.create(
+                course_id=self.course.id,
+                mode_slug=mode_slug,
+                mode_display_name=mode_slug,
+            )
+        CourseEnrollment.enroll(self.user, self.course.id, mode="audit")
+
+        local_task_args = dict(
+            user_id=self.user.id,
+            course_key=str(self.course.id)
+        )
+
+        with patch(
+            'lms.djangoapps.grades.tasks.recalculate_course_and_subsection_grades_for_user.apply_async',
+            return_value=None
+        ) as mock_task_apply:
+            CourseEnrollment.enroll(self.user, self.course.id, mode="verified")
+            mock_task_apply.assert_called_once_with(
+                countdown=SCORE_RECALCULATION_DELAY_ON_ENROLLMENT_UPDATE,
+                kwargs=local_task_args
+            )

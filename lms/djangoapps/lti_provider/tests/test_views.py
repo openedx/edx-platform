@@ -2,18 +2,19 @@
 Tests for the LTI provider views
 """
 
-from django.core.urlresolvers import reverse
+from __future__ import absolute_import
+
+import six
 from django.test import TestCase
 from django.test.client import RequestFactory
-from mock import patch, MagicMock
-from nose.plugins.attrib import attr
+from django.urls import reverse
+from mock import MagicMock, patch
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 from courseware.testutils import RenderXBlockTestMixin
-from lti_provider import views, models
-from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
+from lti_provider import models, views
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
 
 LTI_DEFAULT_PARAMS = {
     'roles': u'Instructor,urn:lti:instrole:ims/lis/Administrator',
@@ -28,6 +29,8 @@ LTI_DEFAULT_PARAMS = {
 }
 
 LTI_OPTIONAL_PARAMS = {
+    'context_title': u'context title',
+    'context_label': u'context label',
     'lis_result_sourcedid': u'result sourcedid',
     'lis_outcome_service_url': u'outcome service URL',
     'tool_consumer_instance_guid': u'consumer instance guid'
@@ -42,18 +45,21 @@ COURSE_PARAMS = {
 }
 
 
-ALL_PARAMS = dict(LTI_DEFAULT_PARAMS.items() + COURSE_PARAMS.items())
+ALL_PARAMS = dict(list(LTI_DEFAULT_PARAMS.items()) + list(COURSE_PARAMS.items()))
 
 
-def build_launch_request(authenticated=True):
+def build_launch_request(extra_post_data=None, param_to_delete=None):
     """
     Helper method to create a new request object for the LTI launch.
     """
-    request = RequestFactory().post('/')
+    if extra_post_data is None:
+        extra_post_data = {}
+    post_data = dict(list(LTI_DEFAULT_PARAMS.items()) + list(extra_post_data.items()))
+    if param_to_delete:
+        del post_data[param_to_delete]
+    request = RequestFactory().post('/', data=post_data)
     request.user = UserFactory.create()
-    request.user.is_authenticated = MagicMock(return_value=authenticated)
     request.session = {}
-    request.POST.update(LTI_DEFAULT_PARAMS)
     return request
 
 
@@ -89,8 +95,23 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         Verifies that the LTI launch succeeds when passed a valid request.
         """
         request = build_launch_request()
-        views.lti_launch(request, unicode(COURSE_KEY), unicode(USAGE_KEY))
+        views.lti_launch(request, six.text_type(COURSE_KEY), six.text_type(USAGE_KEY))
         render.assert_called_with(request, USAGE_KEY)
+
+    @patch('lti_provider.views.render_courseware')
+    @patch('lti_provider.views.store_outcome_parameters')
+    @patch('lti_provider.views.authenticate_lti_user')
+    def test_valid_launch_with_optional_params(self, _authenticate, store_params, _render):
+        """
+        Verifies that the LTI launch succeeds when passed a valid request.
+        """
+        request = build_launch_request(extra_post_data=LTI_OPTIONAL_PARAMS)
+        views.lti_launch(request, six.text_type(COURSE_KEY), six.text_type(USAGE_KEY))
+        store_params.assert_called_with(
+            dict(list(ALL_PARAMS.items()) + list(LTI_OPTIONAL_PARAMS.items())),
+            request.user,
+            self.consumer
+        )
 
     @patch('lti_provider.views.render_courseware')
     @patch('lti_provider.views.store_outcome_parameters')
@@ -102,8 +123,8 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         request = build_launch_request()
         views.lti_launch(
             request,
-            unicode(COURSE_PARAMS['course_key']),
-            unicode(COURSE_PARAMS['usage_key'])
+            six.text_type(COURSE_PARAMS['course_key']),
+            six.text_type(COURSE_PARAMS['usage_key'])
         )
         store_params.assert_called_with(ALL_PARAMS, request.user, self.consumer)
 
@@ -111,8 +132,7 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         """
         Helper method to remove a parameter from the LTI launch and call the view
         """
-        request = build_launch_request()
-        del request.POST[missing_param]
+        request = build_launch_request(param_to_delete=missing_param)
         return views.lti_launch(request, None, None)
 
     def test_launch_with_missing_parameters(self):
@@ -153,8 +173,7 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
     def test_lti_consumer_record_supplemented_with_guid(self, _render):
         self.mock_verify.return_value = False
 
-        request = build_launch_request()
-        request.POST.update(LTI_OPTIONAL_PARAMS)
+        request = build_launch_request(LTI_OPTIONAL_PARAMS)
         with self.assertNumQueries(3):
             views.lti_launch(request, None, None)
         consumer = models.LtiConsumer.objects.get(
@@ -163,22 +182,23 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         self.assertEqual(consumer.instance_guid, u'consumer instance guid')
 
 
-@attr(shard=3)
 class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCase):
     """
     Tests for the rendering returned by lti_launch view.
     This class overrides the get_response method, which is used by
     the tests defined in RenderXBlockTestMixin.
     """
-    def get_response(self, url_encoded_params=None):
+    SUCCESS_ENROLLED_STAFF_MONGO_COUNT = 9
+
+    def get_response(self, usage_key, url_encoded_params=None):
         """
         Overridable method to get the response from the endpoint that is being tested.
         """
         lti_launch_url = reverse(
             'lti_provider_launch',
             kwargs={
-                'course_id': unicode(self.course.id),
-                'usage_id': unicode(self.html_block.location)
+                'course_id': six.text_type(self.course.id),
+                'usage_id': six.text_type(usage_key)
             }
         )
         if url_encoded_params:
@@ -206,3 +226,21 @@ class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCa
         self.setup_course()
         self.setup_user(admin=False, enroll=True, login=False)
         self.verify_response()
+
+    def get_success_enrolled_staff_mongo_count(self):
+        """
+        Override because mongo queries are higher for this
+        particular test. This has not been investigated exhaustively
+        as mongo is no longer used much, and removing user_partitions
+        from inheritance fixes the problem.
+
+        # The 9 mongoDB calls include calls for
+        # Old Mongo:
+        #   (1) fill_in_run
+        #   (2) get_course in get_course_with_access
+        #   (3) get_item for HTML block in get_module_by_usage_id
+        #   (4) get_parent when loading HTML block
+        #   (5)-(8) calls related to the inherited user_partitions field.
+        #   (9) edx_notes descriptor call to get_course
+        """
+        return 9

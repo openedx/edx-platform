@@ -3,17 +3,19 @@ Test lti_provider management commands.
 """
 
 
+from __future__ import absolute_import
+
+import six
 from django.test import TestCase
 from mock import patch
-from opaque_keys.edx.keys import UsageKey, CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
+from lti_provider.management.commands import resend_lti_scores
+from lti_provider.models import GradedAssignment, LtiConsumer, OutcomeService
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.utils import TEST_DATA_DIR
 from xmodule.modulestore.xml_importer import import_course_from_xml
-
-from lti_provider.management.commands import resend_lti_scores
-from lti_provider.models import GradedAssignment, LtiConsumer, OutcomeService
 
 
 class CommandArgsTestCase(TestCase):
@@ -34,7 +36,7 @@ class CommandArgsTestCase(TestCase):
         self.assertEqual(len(args.course_keys), 2)
         key = args.course_keys[0]
         self.assertIsInstance(key, CourseKey)
-        self.assertEqual(unicode(key), 'course-v1:edX+test_course+2525_fall')
+        self.assertEqual(six.text_type(key), 'course-v1:edX+test_course+2525_fall')
 
     def test_no_course_keys(self):
         parser = self._get_arg_parser()

@@ -3,15 +3,22 @@ Simple utility functions for computing access.
 It allows us to share code between access.py and block transformers.
 """
 
-from datetime import datetime, timedelta
-from django.conf import settings
-from django.utils.timezone import UTC
-from logging import getLogger
-from student.roles import CourseBetaTesterRole
-from courseware.masquerade import is_masquerading_as_student
-from courseware.access_response import AccessResponse, StartDateError
-from xmodule.util.django import get_current_request_hostname
+from __future__ import absolute_import
 
+from datetime import datetime, timedelta
+from logging import getLogger
+
+from django.conf import settings
+from django.utils.translation import ugettext as _
+from pytz import UTC
+
+from courseware.access_response import AccessResponse, StartDateError
+from courseware.masquerade import get_course_masquerade, is_masquerading_as_student
+from openedx.core.djangoapps.util.user_messages import PageLevelMessages
+from openedx.core.djangolib.markup import HTML
+from openedx.features.course_experience import COURSE_PRE_START_ACCESS_FLAG
+from student.roles import CourseBetaTesterRole
+from xmodule.util.xmodule_django import get_current_request_hostname
 
 DEBUG_ACCESS = False
 log = getLogger(__name__)
@@ -42,7 +49,7 @@ def adjust_start_date(user, days_early_for_beta, start, course_key):
         return start
 
     if CourseBetaTesterRole(course_key).has_user(user):
-        debug("Adjust start time: user in beta role for %s", course_key)
+        debug(u"Adjust start time: user in beta role for %s", course_key)
         delta = timedelta(days_early_for_beta)
         effective = start - delta
         return effective
@@ -50,27 +57,32 @@ def adjust_start_date(user, days_early_for_beta, start, course_key):
     return start
 
 
-def check_start_date(user, days_early_for_beta, start, course_key):
+def check_start_date(user, days_early_for_beta, start, course_key, display_error_to_user=True):
     """
     Verifies whether the given user is allowed access given the
     start date and the Beta offset for the given course.
+
+    Arguments:
+        display_error_to_user: If True, display this error to users in the UI.
 
     Returns:
         AccessResponse: Either ACCESS_GRANTED or StartDateError.
     """
     start_dates_disabled = settings.FEATURES['DISABLE_START_DATES']
-    if start_dates_disabled and not is_masquerading_as_student(user, course_key):
+    masquerading_as_student = is_masquerading_as_student(user, course_key)
+
+    if start_dates_disabled and not masquerading_as_student:
         return ACCESS_GRANTED
     else:
-        now = datetime.now(UTC())
-        if start is None or in_preview_mode():
+        now = datetime.now(UTC)
+        if start is None or in_preview_mode() or get_course_masquerade(user, course_key):
             return ACCESS_GRANTED
 
         effective_start = adjust_start_date(user, days_early_for_beta, start, course_key)
         if now > effective_start:
             return ACCESS_GRANTED
 
-        return StartDateError(start)
+        return StartDateError(start, display_error_to_user=display_error_to_user)
 
 
 def in_preview_mode():
@@ -80,3 +92,15 @@ def in_preview_mode():
     hostname = get_current_request_hostname()
     preview_lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE', None)
     return bool(preview_lms_base and hostname and hostname.split(':')[0] == preview_lms_base.split(':')[0])
+
+
+def check_course_open_for_learner(user, course):
+    """
+    Check if the course is open for learners based on the start date.
+
+    Returns:
+        AccessResponse: Either ACCESS_GRANTED or StartDateError.
+    """
+    if COURSE_PRE_START_ACCESS_FLAG.is_enabled():
+        return ACCESS_GRANTED
+    return check_start_date(user, course.days_early_for_beta, course.start, course.id)

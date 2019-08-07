@@ -7,36 +7,65 @@ from __future__ import absolute_import
 
 import logging
 
-from contentstore.views.item import create_xblock_info
-from contentstore.utils import reverse_library_url, add_instructor
-from django.http import HttpResponseNotAllowed, Http404
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.conf import settings
+from django.http import Http404, HttpResponseForbidden, HttpResponseNotAllowed
 from django.utils.translation import ugettext as _
-from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import ensure_csrf_cookie
-from edxmako.shortcuts import render_to_response
+from django.views.decorators.http import require_http_methods
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator
-from xmodule.modulestore.exceptions import DuplicateCourseError
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from .user import user_with_role
+from six import text_type
 
-from .component import get_component_templates, CONTAINER_TEMPLATES
+from contentstore.utils import add_instructor, reverse_library_url
+from contentstore.views.item import create_xblock_info
+from course_creators.views import get_course_creator_status
+from edxmako.shortcuts import render_to_response
 from student.auth import (
-    STUDIO_VIEW_USERS, STUDIO_EDIT_ROLES, get_user_permissions, has_studio_read_access, has_studio_write_access
+    STUDIO_EDIT_ROLES,
+    STUDIO_VIEW_USERS,
+    get_user_permissions,
+    has_studio_read_access,
+    has_studio_write_access
 )
 from student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
-from util.json_request import expect_json, JsonResponse, JsonResponseBadRequest
+from util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import DuplicateCourseError
+
+from .component import CONTAINER_TEMPLATES, get_component_templates
+from .user import user_with_role
 
 __all__ = ['library_handler', 'manage_library_users']
 
 log = logging.getLogger(__name__)
 
 LIBRARIES_ENABLED = settings.FEATURES.get('ENABLE_CONTENT_LIBRARIES', False)
+
+
+def get_library_creator_status(user):
+    """
+    Helper method for returning the library creation status for a particular user,
+    taking into account the value LIBRARIES_ENABLED.
+    """
+
+    if not LIBRARIES_ENABLED:
+        return False
+    elif user.is_staff:
+        return True
+    elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
+        return get_course_creator_status(user) == 'granted'
+    else:
+        # EDUCATOR-1924: DISABLE_LIBRARY_CREATION overrides DISABLE_COURSE_CREATION, if present.
+        disable_library_creation = settings.FEATURES.get('DISABLE_LIBRARY_CREATION', None)
+        disable_course_creation = settings.FEATURES.get('DISABLE_COURSE_CREATION', False)
+        if disable_library_creation is not None:
+            return not disable_library_creation
+        else:
+            return not disable_course_creation
 
 
 @login_required
@@ -50,17 +79,20 @@ def library_handler(request, library_key_string=None):
         log.exception("Attempted to use the content library API when the libraries feature is disabled.")
         raise Http404  # Should never happen because we test the feature in urls.py also
 
-    if library_key_string is not None and request.method == 'POST':
-        return HttpResponseNotAllowed(("POST",))
-
     if request.method == 'POST':
+        if not get_library_creator_status(request.user):
+            return HttpResponseForbidden()
+
+        if library_key_string is not None:
+            return HttpResponseNotAllowed(("POST",))
+
         return _create_library(request)
 
-    # request method is get, since only GET and POST are allowed by @require_http_methods(('GET', 'POST'))
-    if library_key_string:
-        return _display_library(library_key_string, request)
+    else:
+        if library_key_string:
+            return _display_library(library_key_string, request)
 
-    return _list_libraries(request)
+        return _list_libraries(request)
 
 
 def _display_library(library_key_string, request):
@@ -133,12 +165,12 @@ def _create_library(request):
     except KeyError as error:
         log.exception("Unable to create library - missing required JSON key.")
         return JsonResponseBadRequest({
-            "ErrMsg": _("Unable to create library - missing required field '{field}'").format(field=error.message)
+            "ErrMsg": _(u"Unable to create library - missing required field '{field}'").format(field=text_type(error))
         })
     except InvalidKeyError as error:
         log.exception("Unable to create library - invalid key.")
         return JsonResponseBadRequest({
-            "ErrMsg": _("Unable to create library '{name}'.\n\n{err}").format(name=display_name, err=error.message)
+            "ErrMsg": _(u"Unable to create library '{name}'.\n\n{err}").format(name=display_name, err=text_type(error))
         })
     except DuplicateCourseError:
         log.exception("Unable to create library - one already exists with the same key.")
@@ -177,7 +209,7 @@ def library_blocks_view(library, user, response_format):
         return JsonResponse({
             "display_name": library.display_name,
             "library_id": unicode(library.location.library_key),
-            "version": unicode(library.runtime.course_entry.course_key.version),
+            "version": unicode(library.runtime.course_entry.course_key.version_guid),
             "previous_version": unicode(prev_version) if prev_version else None,
             "blocks": [unicode(x) for x in children],
         })

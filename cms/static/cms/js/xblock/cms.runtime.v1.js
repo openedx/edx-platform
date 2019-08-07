@@ -1,5 +1,5 @@
 define(['jquery', 'backbone', 'xblock/runtime.v1', 'URI', 'gettext', 'js/utils/modal',
-        'common/js/components/views/feedback_notification'],
+    'common/js/components/views/feedback_notification'],
     function($, Backbone, XBlock, URI, gettext, ModalUtils, NotificationView) {
         'use strict';
 
@@ -149,7 +149,7 @@ define(['jquery', 'backbone', 'xblock/runtime.v1', 'URI', 'gettext', 'js/utils/m
             };
 
             return v1;
-        })(XBlock.Runtime.v1);
+        }(XBlock.Runtime.v1));
 
         PreviewRuntime.v1 = (function(_super) {
             __extends(v1, _super);
@@ -161,7 +161,7 @@ define(['jquery', 'backbone', 'xblock/runtime.v1', 'URI', 'gettext', 'js/utils/m
             v1.prototype.handlerPrefix = '/preview/xblock';
 
             return v1;
-        })(BaseRuntime.v1);
+        }(BaseRuntime.v1));
 
         StudioRuntime.v1 = (function(_super) {
             __extends(v1, _super);
@@ -173,7 +173,7 @@ define(['jquery', 'backbone', 'xblock/runtime.v1', 'URI', 'gettext', 'js/utils/m
             v1.prototype.handlerPrefix = '/xblock';
 
             return v1;
-        })(BaseRuntime.v1);
+        }(BaseRuntime.v1));
 
         // Install the runtime's into the global namespace
         window.BaseRuntime = BaseRuntime;

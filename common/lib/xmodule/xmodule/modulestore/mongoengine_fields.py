@@ -1,10 +1,14 @@
 """
 Custom field types for mongoengine
 """
+from __future__ import absolute_import
+
 import mongoengine
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
-from types import NoneType
+import six
+
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.locations import Location
+from six import text_type
 
 
 class CourseKeyField(mongoengine.StringField):
@@ -19,10 +23,10 @@ class CourseKeyField(mongoengine.StringField):
         """
         For now saves the course key in the deprecated form
         """
-        assert isinstance(course_key, (NoneType, CourseKey))
+        assert isinstance(course_key, (type(None), CourseKey))
         if course_key:
             # don't call super as base.BaseField.to_mongo calls to_python() for some odd reason
-            return course_key.to_deprecated_string()
+            return text_type(course_key)
         else:
             return None
 
@@ -32,18 +36,18 @@ class CourseKeyField(mongoengine.StringField):
         """
         # calling super b/c it decodes utf (and doesn't have circularity of from_python)
         course_key = super(CourseKeyField, self).to_python(course_key)
-        assert isinstance(course_key, (NoneType, basestring, CourseKey))
+        assert isinstance(course_key, (type(None), six.string_types, CourseKey))
         if course_key == '':
             return None
-        if isinstance(course_key, basestring):
-            return SlashSeparatedCourseKey.from_deprecated_string(course_key)
+        if isinstance(course_key, six.string_types):
+            return CourseKey.from_string(course_key)
         else:
             return course_key
 
     def validate(self, value):
-        assert isinstance(value, (NoneType, basestring, CourseKey))
+        assert isinstance(value, (type(None), six.string_types, CourseKey))
         if isinstance(value, CourseKey):
-            return super(CourseKeyField, self).validate(value.to_deprecated_string())
+            return super(CourseKeyField, self).validate(text_type(value))
         else:
             return super(CourseKeyField, self).validate(value)
 
@@ -59,28 +63,28 @@ class UsageKeyField(mongoengine.StringField):
         """
         For now saves the usage key in the deprecated location i4x/c4x form
         """
-        assert isinstance(location, (NoneType, UsageKey))
+        assert isinstance(location, (type(None), UsageKey))
         if location is None:
             return None
-        return super(UsageKeyField, self).to_mongo(location.to_deprecated_string())
+        return super(UsageKeyField, self).to_mongo(text_type(location))
 
     def to_python(self, location):
         """
         Deserialize to a UsageKey instance: for now it's a location missing the run
         """
-        assert isinstance(location, (NoneType, basestring, UsageKey))
+        assert isinstance(location, (type(None), six.string_types, UsageKey))
         if location == '':
             return None
-        if isinstance(location, basestring):
+        if isinstance(location, six.string_types):
             location = super(UsageKeyField, self).to_python(location)
-            return Location.from_deprecated_string(location)
+            return Location.from_string(location)
         else:
             return location
 
     def validate(self, value):
-        assert isinstance(value, (NoneType, basestring, UsageKey))
+        assert isinstance(value, (type(None), six.string_types, UsageKey))
         if isinstance(value, UsageKey):
-            return super(UsageKeyField, self).validate(value.to_deprecated_string())
+            return super(UsageKeyField, self).validate(text_type(value))
         else:
             return super(UsageKeyField, self).validate(value)
 

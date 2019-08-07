@@ -3,18 +3,19 @@
     define([
         'gettext', 'jquery', 'underscore', 'backbone',
         'edx-ui-toolkit/js/utils/html-utils',
+        'edx-ui-toolkit/js/utils/date-utils',
         'text!templates/fields/field_readonly.underscore',
         'text!templates/fields/field_dropdown.underscore',
         'text!templates/fields/field_link.underscore',
         'text!templates/fields/field_text.underscore',
         'text!templates/fields/field_textarea.underscore',
         'backbone-super'
-    ], function(gettext, $, _, Backbone, HtmlUtils,
-                 field_readonly_template,
-                 field_dropdown_template,
-                 field_link_template,
-                 field_text_template,
-                 field_textarea_template
+    ], function(gettext, $, _, Backbone, HtmlUtils, DateUtils,
+                 fieldReadOnlyTemplate,
+                 fieldDropDownTemplate,
+                 fieldLinkTemplate,
+                 fieldTextTemplate,
+                 fieldTextAreaTemplate
     ) {
         var messageRevertDelay = 6000;
         var FieldViews = {};
@@ -30,32 +31,32 @@
             tagName: 'div',
 
             indicators: {
-                'canEdit': HtmlUtils.joinHtml(
+                canEdit: HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<span class="icon fa fa-pencil message-can-edit" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
                     gettext('Editable'),
                     HtmlUtils.HTML('</span>')
                 ),
-                'error': HtmlUtils.joinHtml(
+                error: HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<span class="fa fa-exclamation-triangle message-error" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
                     gettext('Error'),
                     HtmlUtils.HTML('</span>')
                 ),
-                'validationError': HtmlUtils.joinHtml(
+                validationError: HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<span class="fa fa-exclamation-triangle message-validation-error" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
                     gettext('Validation Error'),
                     HtmlUtils.HTML('</span>')
                 ),
-                'inProgress': HtmlUtils.joinHtml(
+                inProgress: HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<span class="fa fa-spinner fa-pulse message-in-progress" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
                     gettext('In Progress'),
                     HtmlUtils.HTML('</span>')
                 ),
-                'success': HtmlUtils.joinHtml(
+                success: HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<span class="fa fa-check message-success" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
                     gettext('Success'),
                     HtmlUtils.HTML('</span>')
                 ),
-                'plus': HtmlUtils.joinHtml(
+                plus: HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<span class="fa fa-plus placeholder" aria-hidden="true"></span><span class="sr">'),
                     gettext('Placeholder'),
                     HtmlUtils.HTML('</span>')
@@ -63,11 +64,11 @@
             },
 
             messages: {
-                'canEdit': '',
-                'error': gettext('An error occurred. Please try again.'),
-                'validationError': '',
-                'inProgress': gettext('Saving'),
-                'success': gettext('Your changes have been saved.')
+                canEdit: '',
+                error: gettext('An error occurred. Please try again.'),
+                validationError: '',
+                inProgress: gettext('Saving'),
+                success: gettext('Your changes have been saved.')
             },
 
             constructor: function(options) {
@@ -142,6 +143,9 @@
                 this.showNotificationMessage(successMessage);
 
                 if (this.options.refreshPageOnSave) {
+                    if ("focusNextID" in this.options) {
+                        $.cookie('focus_id', this.options.focusNextID );
+                    }
                     location.reload(true);
                 }
 
@@ -284,7 +288,7 @@
 
             fieldType: 'readonly',
 
-            fieldTemplate: field_readonly_template,
+            fieldTemplate: fieldReadOnlyTemplate,
 
             initialize: function(options) {
                 this._super(options);
@@ -313,11 +317,43 @@
             }
         });
 
+        FieldViews.DateFieldView = FieldViews.ReadonlyFieldView.extend({
+
+            fieldType: 'date',
+
+            timezoneFormattedDate: function() {
+                var context;
+                context = {
+                    datetime: new Date(this.modelValue()),
+                    language: this.options.userLanguage,
+                    timezone: this.options.userTimezone,
+                    format: this.options.dateFormat
+                };
+                return DateUtils.localize(context);
+            },
+
+            render: function() {
+                HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.fieldTemplate)({
+                    id: this.options.valueAttribute,
+                    title: this.options.title,
+                    screenReaderTitle: this.options.screenReaderTitle || this.options.title,
+                    value: this.timezoneFormattedDate(),
+                    message: this.helpMessage
+                }));
+                this.delegateEvents();
+                return this;
+            },
+
+            updateValueInField: function() {
+                this.$('.u-field-value ').text(this.timezoneFormattedDate());
+            }
+        });
+
         FieldViews.TextFieldView = FieldViews.EditableFieldView.extend({
 
             fieldType: 'text',
 
-            fieldTemplate: field_text_template,
+            fieldTemplate: fieldTextTemplate,
 
             events: {
                 'change input': 'saveValue'
@@ -334,7 +370,8 @@
                     id: this.options.valueAttribute,
                     title: this.options.title,
                     value: this.modelValue(),
-                    message: this.helpMessage
+                    message: this.helpMessage,
+                    placeholder: this.options.placeholder || ''
                 }));
                 this.delegateEvents();
                 return this;
@@ -360,11 +397,10 @@
 
             fieldType: 'dropdown',
 
-            fieldTemplate: field_dropdown_template,
+            fieldTemplate: fieldDropDownTemplate,
 
             events: {
-                'click': 'startEditing',
-                'change select': 'finishEditing',
+                click: 'startEditing',
                 'focusout select': 'finishEditing'
             },
 
@@ -425,8 +461,7 @@
                 var value;
                 if (this.editable === 'never') {
                     value = this.modelValueIsSet() ? this.modelValue() : null;
-                }
-                else {
+                } else {
                     value = this.$('.u-field-value select').val();
                 }
                 return value === '' ? null : value;
@@ -450,7 +485,6 @@
                 if (this.modelValueIsSet() === false) {
                     value = this.options.placeholderValue || '';
                 }
-                this.$('.u-field-value').attr('aria-label', this.options.title);
                 this.$('.u-field-value-readonly').text(value);
 
                 if (this.mode === 'display') {
@@ -461,6 +495,7 @@
             saveValue: function() {
                 var attributes = {};
                 attributes[this.options.valueAttribute] = this.fieldValue();
+                $.cookie('old-pref-lang', this.modelValue());
                 this.saveAttributes(attributes);
             },
 
@@ -498,10 +533,10 @@
 
             createGroupOptions: function() {
                 return !(_.isUndefined(this.options.groupOptions)) ? this.options.groupOptions :
-                    [{
-                        groupTitle: null,
-                        selectOptions: this.options.options
-                    }];
+                [{
+                    groupTitle: null,
+                    selectOptions: this.options.options
+                }];
             }
         });
 
@@ -509,22 +544,23 @@
 
             fieldType: 'textarea',
 
-            fieldTemplate: field_textarea_template,
+            fieldTemplate: fieldTextAreaTemplate,
 
             events: {
                 'keydown .wrapper-u-field': 'startEditing',
                 'click .wrapper-u-field': 'startEditing',
                 'click .u-field-placeholder': 'startEditing',
                 'focusout textarea': 'finishEditing',
-                'change textarea': 'adjustTextareaHeight',
-                'keyup textarea': 'adjustTextareaHeight',
+                'change textarea': 'manageTextareaContentChange',
+                'keyup textarea': 'manageTextareaContentChange',
                 'keydown textarea': 'onKeyDown',
-                'paste textarea': 'adjustTextareaHeight',
-                'cut textarea': 'adjustTextareaHeight'
+                'paste textarea': 'manageTextareaContentChange',
+                'cut textarea': 'manageTextareaContentChange'
             },
 
             initialize: function(options) {
-                _.bindAll(this, 'render', 'onKeyDown', 'adjustTextareaHeight', 'fieldValue', 'saveValue', 'updateView');
+                _.bindAll(this, 'render', 'onKeyDown', 'adjustTextareaHeight', 'manageTextareaContentChange',
+                    'fieldValue', 'saveValue', 'updateView');
                 this._super(options);
                 this.listenTo(this.model, 'change:' + this.options.valueAttribute, this.updateView);
             },
@@ -542,7 +578,8 @@
                     value: value,
                     message: this.helpMessage,
                     messagePosition: this.options.messagePosition || 'footer',
-                    placeholderValue: this.options.placeholderValue
+                    placeholderValue: this.options.placeholderValue,
+                    maxCharacters: this.options.maxCharacters || ''
                 }));
                 this.delegateEvents();
                 this.title((this.modelValue() || this.mode === 'edit') ?
@@ -563,10 +600,43 @@
                 }
             },
 
+            updateCharCount: function() {
+                var curCharCount;
+                var remainingCharCount;
+                var $charCount = $('.u-field-footer .current-char-count');
+                // Update character count for textarea
+                if (this.options.maxCharacters) {
+                    curCharCount = $('#u-field-textarea-' + this.options.valueAttribute).val().length;
+                    remainingCharCount = this.options.maxCharacters - curCharCount;
+                    if (remainingCharCount < 20) {
+                        $charCount.attr({
+                            'aria-live': 'assertive',
+                            'aria-atomic': true
+                        });
+                    }
+                    else if (remainingCharCount < 60) {
+                        $charCount.attr('aria-atomic', 'false');
+                    }
+                    else if (remainingCharCount < 70) {
+                        $charCount.attr({
+                            'aria-live': 'polite',
+                            'aria-atomic': true
+                        });
+                    }
+                    $charCount.text(curCharCount);
+
+                }
+            },
+
             adjustTextareaHeight: function() {
                 if (this.persistChanges === false) { return; }
                 var textarea = this.$('textarea');
                 textarea.css('height', 'auto').css('height', textarea.prop('scrollHeight') + 10);
+            },
+
+            manageTextareaContentChange: function() {
+                this.updateCharCount();
+                this.adjustTextareaHeight();
             },
 
             modelValue: function() {
@@ -577,8 +647,7 @@
             fieldValue: function() {
                 if (this.mode === 'edit') {
                     return this.$('.u-field-value textarea').val();
-                }
-                else {
+                } else {
                     return this.$('.u-field-value .u-field-value-readonly').text();
                 }
             },
@@ -618,7 +687,7 @@
 
             fieldType: 'link',
 
-            fieldTemplate: field_link_template,
+            fieldTemplate: fieldLinkTemplate,
 
             events: {
                 'click a': 'linkClicked'

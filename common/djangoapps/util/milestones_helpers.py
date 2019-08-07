@@ -2,19 +2,21 @@
 """
 Utility library for working with the edx-milestones app
 """
+from __future__ import absolute_import
+
+import six
 from django.conf import settings
 from django.utils.translation import ugettext as _
-
+from milestones import api as milestones_api
+from milestones.exceptions import InvalidMilestoneRelationshipTypeException, InvalidUserException
+from milestones.models import MilestoneRelationshipType
+from milestones.services import MilestonesService
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from milestones import api as milestones_api
-from milestones.exceptions import InvalidMilestoneRelationshipTypeException
-from milestones.models import MilestoneRelationshipType
-from milestones.services import MilestonesService
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.lib.cache_utils import get_cache
 from xmodule.modulestore.django import modulestore
-import request_cache
 
 NAMESPACE_CHOICES = {
     'ENTRANCE_EXAM': 'entrance_exams'
@@ -55,12 +57,12 @@ def add_prerequisite_course(course_key, prerequisite_course_key):
     if not is_prerequisite_courses_enabled():
         return None
     milestone_name = _('Course {course_id} requires {prerequisite_course_id}').format(
-        course_id=unicode(course_key),
-        prerequisite_course_id=unicode(prerequisite_course_key)
+        course_id=six.text_type(course_key),
+        prerequisite_course_id=six.text_type(prerequisite_course_key)
     )
     milestone = milestones_api.add_milestone({
         'name': milestone_name,
-        'namespace': unicode(prerequisite_course_key),
+        'namespace': six.text_type(prerequisite_course_key),
         'description': _('System defined milestone'),
     })
     # add requirement course milestone
@@ -207,28 +209,39 @@ def remove_course_milestones(course_key, user, relationship):
         milestones_api.remove_user_milestone({'id': user.id}, milestone)
 
 
-def get_required_content(course, user):
+def get_required_content(course_key, user):
     """
     Queries milestones subsystem to see if the specified course is gated on one or more milestones,
     and if those milestones can be fulfilled via completion of a particular course content module
     """
     required_content = []
     if settings.FEATURES.get('MILESTONES_APP'):
-        # Get all of the outstanding milestones for this course, for this user
-        try:
-            milestone_paths = get_course_milestones_fulfillment_paths(
-                unicode(course.id),
-                serialize_user(user)
-            )
-        except InvalidMilestoneRelationshipTypeException:
-            return required_content
+        course_run_id = six.text_type(course_key)
 
-        # For each outstanding milestone, see if this content is one of its fulfillment paths
-        for path_key in milestone_paths:
-            milestone_path = milestone_paths[path_key]
-            if milestone_path.get('content') and len(milestone_path['content']):
-                for content in milestone_path['content']:
-                    required_content.append(content)
+        if user.is_authenticated:
+            # Get all of the outstanding milestones for this course, for this user
+            try:
+
+                milestone_paths = get_course_milestones_fulfillment_paths(
+                    course_run_id,
+                    serialize_user(user)
+                )
+            except InvalidMilestoneRelationshipTypeException:
+                return required_content
+
+            # For each outstanding milestone, see if this content is one of its fulfillment paths
+            for path_key in milestone_paths:
+                milestone_path = milestone_paths[path_key]
+                if milestone_path.get('content') and len(milestone_path['content']):
+                    for content in milestone_path['content']:
+                        required_content.append(content)
+        else:
+            if get_course_milestones(course_run_id):
+                # NOTE (CCB): The initial version of anonymous courseware access is very simple. We avoid accidentally
+                # exposing locked content by simply avoiding anonymous access altogether for courses runs with
+                # milestones.
+                raise InvalidUserException('Anonymous access is not allowed for course runs with milestones set.')
+
     return required_content
 
 
@@ -266,9 +279,9 @@ def generate_milestone_namespace(namespace, course_key=None):
     """
     Returns a specifically-formatted namespace string for the specified type
     """
-    if namespace in NAMESPACE_CHOICES.values():
+    if namespace in list(NAMESPACE_CHOICES.values()):
         if namespace == 'entrance_exams':
-            return '{}.{}'.format(unicode(course_key), NAMESPACE_CHOICES['ENTRANCE_EXAM'])
+            return '{}.{}'.format(six.text_type(course_key), NAMESPACE_CHOICES['ENTRANCE_EXAM'])
 
 
 def serialize_user(user):
@@ -334,11 +347,14 @@ def add_course_content_milestone(course_id, content_id, relationship, milestone)
     return milestones_api.add_course_content_milestone(course_id, content_id, relationship, milestone)
 
 
-def get_course_content_milestones(course_id, content_id, relationship, user_id=None):
+def get_course_content_milestones(course_id, content_id=None, relationship='requires', user_id=None):
     """
     Client API operation adapter/wrapper
     Uses the request cache to store all of a user's
     milestones
+
+    Returns all content blocks in a course if content_id is None, otherwise it just returns that
+    specific content block.
     """
     if not settings.FEATURES.get('MILESTONES_APP'):
         return []
@@ -346,7 +362,7 @@ def get_course_content_milestones(course_id, content_id, relationship, user_id=N
     if user_id is None:
         return milestones_api.get_course_content_milestones(course_id, content_id, relationship)
 
-    request_cache_dict = request_cache.get_cache(REQUEST_CACHE_NAME)
+    request_cache_dict = get_cache(REQUEST_CACHE_NAME)
     if user_id not in request_cache_dict:
         request_cache_dict[user_id] = {}
 
@@ -357,7 +373,10 @@ def get_course_content_milestones(course_id, content_id, relationship, user_id=N
             user={"id": user_id}
         )
 
-    return [m for m in request_cache_dict[user_id][relationship] if m['content_id'] == unicode(content_id)]
+    if content_id is None:
+        return request_cache_dict[user_id][relationship]
+
+    return [m for m in request_cache_dict[user_id][relationship] if m['content_id'] == six.text_type(content_id)]
 
 
 def remove_course_content_user_milestones(course_key, content_key, user, relationship):
@@ -385,9 +404,12 @@ def any_unfulfilled_milestones(course_id, user_id):
     """ Returns a boolean if user has any unfulfilled milestones """
     if not settings.FEATURES.get('MILESTONES_APP'):
         return False
-    return bool(
-        get_course_milestones_fulfillment_paths(course_id, {"id": user_id})
-    )
+
+    fulfillment_paths = milestones_api.get_course_milestones_fulfillment_paths(course_id, {'id': user_id})
+
+    # Returns True if any of the milestones is unfulfilled. False if
+    # values is empty or all values are.
+    return any(fulfillment_paths.values())
 
 
 def get_course_milestones_fulfillment_paths(course_id, user_id):

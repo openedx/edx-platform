@@ -3,16 +3,18 @@
 Unit tests for bulk-email-related forms.
 """
 
-from nose.plugins.attrib import attr
+from __future__ import absolute_import
 
-from bulk_email.models import CourseEmailTemplate, BulkEmailFlag
+from opaque_keys.edx.locator import CourseLocator
+from six import text_type
+
+from bulk_email.api import is_bulk_email_feature_enabled
 from bulk_email.forms import CourseAuthorizationAdminForm, CourseEmailTemplateForm
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from bulk_email.models import BulkEmailFlag, CourseEmailTemplate
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
 class CourseAuthorizationFormTest(ModuleStoreTestCase):
     """Test the CourseAuthorizationAdminForm form for Mongo-backed courses."""
 
@@ -28,30 +30,30 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
 
     def test_authorize_mongo_course(self):
         # Initially course shouldn't be authorized
-        self.assertFalse(BulkEmailFlag.feature_enabled(self.course.id))
+        self.assertFalse(is_bulk_email_feature_enabled(self.course.id))
         # Test authorizing the course, which should totally work
-        form_data = {'course_id': self.course.id.to_deprecated_string(), 'email_enabled': True}
+        form_data = {'course_id': text_type(self.course.id), 'email_enabled': True}
         form = CourseAuthorizationAdminForm(data=form_data)
         # Validation should work
         self.assertTrue(form.is_valid())
         form.save()
         # Check that this course is authorized
-        self.assertTrue(BulkEmailFlag.feature_enabled(self.course.id))
+        self.assertTrue(is_bulk_email_feature_enabled(self.course.id))
 
     def test_repeat_course(self):
         # Initially course shouldn't be authorized
-        self.assertFalse(BulkEmailFlag.feature_enabled(self.course.id))
+        self.assertFalse(is_bulk_email_feature_enabled(self.course.id))
         # Test authorizing the course, which should totally work
-        form_data = {'course_id': self.course.id.to_deprecated_string(), 'email_enabled': True}
+        form_data = {'course_id': text_type(self.course.id), 'email_enabled': True}
         form = CourseAuthorizationAdminForm(data=form_data)
         # Validation should work
         self.assertTrue(form.is_valid())
         form.save()
         # Check that this course is authorized
-        self.assertTrue(BulkEmailFlag.feature_enabled(self.course.id))
+        self.assertTrue(is_bulk_email_feature_enabled(self.course.id))
 
         # Now make a new course authorization with the same course id that tries to turn email off
-        form_data = {'course_id': self.course.id.to_deprecated_string(), 'email_enabled': False}
+        form_data = {'course_id': text_type(self.course.id), 'email_enabled': False}
         form = CourseAuthorizationAdminForm(data=form_data)
         # Validation should not work because course_id field is unique
         self.assertFalse(form.is_valid())
@@ -66,20 +68,19 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
             form.save()
 
         # Course should still be authorized (invalid attempt had no effect)
-        self.assertTrue(BulkEmailFlag.feature_enabled(self.course.id))
+        self.assertTrue(is_bulk_email_feature_enabled(self.course.id))
 
     def test_form_typo(self):
         # Munge course id
-        bad_id = SlashSeparatedCourseKey(u'Broken{}'.format(self.course.id.org), 'hello', self.course.id.run + '_typo')
+        bad_id = CourseLocator(u'Broken{}'.format(self.course.id.org), 'hello', self.course.id.run + '_typo')
 
-        form_data = {'course_id': bad_id.to_deprecated_string(), 'email_enabled': True}
+        form_data = {'course_id': text_type(bad_id), 'email_enabled': True}
         form = CourseAuthorizationAdminForm(data=form_data)
         # Validation shouldn't work
         self.assertFalse(form.is_valid())
 
-        msg = u'COURSE NOT FOUND'
-        msg += u' --- Entered course id was: "{0}". '.format(bad_id.to_deprecated_string())
-        msg += 'Please recheck that you have supplied a valid course id.'
+        msg = u'Course not found.'
+        msg += u' Entered course id was: "{0}".'.format(text_type(bad_id))
         self.assertEquals(msg, form._errors['course_id'][0])  # pylint: disable=protected-access
 
         with self.assertRaisesRegexp(
@@ -95,8 +96,7 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         self.assertFalse(form.is_valid())
 
         msg = u'Course id invalid.'
-        msg += u' --- Entered course id was: "asd::**!@#$%^&*())//foobar!!". '
-        msg += 'Please recheck that you have supplied a valid course id.'
+        msg += u' Entered course id was: "asd::**!@#$%^&*())//foobar!!".'
         self.assertEquals(msg, form._errors['course_id'][0])  # pylint: disable=protected-access
 
         with self.assertRaisesRegexp(
@@ -113,8 +113,7 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         self.assertFalse(form.is_valid())
 
         error_msg = form._errors['course_id'][0]  # pylint: disable=protected-access
-        self.assertIn(u'--- Entered course id was: "{0}". '.format(self.course.id.run), error_msg)
-        self.assertIn(u'Please recheck that you have supplied a valid course id.', error_msg)
+        self.assertIn(u'Entered course id was: "{0}".'.format(self.course.id.run), error_msg)
 
         with self.assertRaisesRegexp(
             ValueError,

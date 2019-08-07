@@ -2,9 +2,9 @@
 <%namespace name='static' file='/static_content.html'/>
 <%!
  from django.utils.translation import ugettext as _
- from django.core.urlresolvers import reverse
+ from django.urls import reverse
  %>
-<%page args="tab_list, active_page, default_tab, tab_image" />
+<%page args="tab_list, active_page, default_tab, tab_image" expression_filter="h" />
 
 <%
 def url_class(is_active):
@@ -18,8 +18,8 @@ def url_class(is_active):
     tab_class = url_class(tab_is_active)
   %>
   <li>
-  <a href="${tab.link_func(course, reverse) | h}" class="${tab_class}">
-  Test Site Tab: ${_(tab.name) | h}
+  <a href="${tab.link_func(course, reverse)}" class="${tab_class}">
+  Test Site Tab: ${_(tab.name)}
   % if tab_is_active:
       <span class="sr">, current location</span>
   %endif

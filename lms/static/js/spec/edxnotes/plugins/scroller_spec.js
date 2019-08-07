@@ -33,9 +33,9 @@ define([
                 spyOn(annotator, 'onHighlightMouseover').and.callThrough();
                 spyOn(annotator, 'startViewerHideTimer').and.callThrough();
                 return $('<span></span>', {
-                    'class': 'annotator-hl',
-                    'tabindex': -1,
-                    'text': 'some content'
+                    class: 'annotator-hl',
+                    tabindex: -1,
+                    text: 'some content'
                 }).appendTo(annotator.element);
             });
 

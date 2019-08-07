@@ -1,29 +1,28 @@
 """
 Tests for branding page
 """
+from __future__ import absolute_import
 
 import datetime
 
+import six
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.http import HttpResponseRedirect
-from django.test.utils import override_settings
 from django.test.client import RequestFactory
-
+from django.test.utils import override_settings
+from django.urls import reverse
+from milestones.tests.utils import MilestonesTestCaseMixin
+from mock import Mock, patch
 from pytz import UTC
-from mock import patch, Mock
-from nose.plugins.attrib import attr
-from edxmako.shortcuts import render_to_response
 
 from branding.views import index
+from courseware.tests.helpers import LoginEnrollmentTestCase
+from edxmako.shortcuts import render_to_response
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from util.milestones_helpers import set_prerequisite_courses
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
-from django.core.urlresolvers import reverse
-from courseware.tests.helpers import LoginEnrollmentTestCase
-
-from util.milestones_helpers import set_prerequisite_courses
-from milestones.tests.utils import MilestonesTestCaseMixin
 
 FEATURES_WITH_STARTDATE = settings.FEATURES.copy()
 FEATURES_WITH_STARTDATE['DISABLE_START_DATES'] = False
@@ -40,7 +39,6 @@ def mock_render_to_response(*args, **kwargs):
 RENDER_MOCK = Mock(side_effect=mock_render_to_response)
 
 
-@attr(shard=1)
 class AnonymousIndexPageTest(ModuleStoreTestCase):
     """
     Tests that anonymous users can access the '/' page,  Need courses with start date
@@ -75,22 +73,22 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
 
+    @override_settings(X_FRAME_OPTIONS='ALLOW')
     def test_allow_x_frame_options(self):
         """
         Check the x-frame-option response header
         """
 
-        # check to see that the default setting is to ALLOW iframing
+        # check to see that the override value is honored
         resp = self.client.get('/')
         self.assertEquals(resp['X-Frame-Options'], 'ALLOW')
 
-    @override_settings(X_FRAME_OPTIONS='DENY')
     def test_deny_x_frame_options(self):
         """
         Check the x-frame-option response header
         """
 
-        # check to see that the override value is honored
+        # check to see that the default setting is to DENY iframing
         resp = self.client.get('/')
         self.assertEquals(resp['X-Frame-Options'], 'DENY')
 
@@ -112,12 +110,13 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
         self.assertEqual(response._headers.get("location")[1], "/login")  # pylint: disable=protected-access
 
 
-@attr(shard=1)
 class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase, MilestonesTestCaseMixin):
     """
     Test to simulate and verify fix for disappearing courses in
     course catalog when using pre-requisite courses
     """
+    ENABLED_SIGNALS = ['course_published']
+
     @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True})
     def test_course_with_prereq(self):
         """
@@ -131,7 +130,7 @@ class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase, Mi
             emit_signals=True,
         )
 
-        pre_requisite_courses = [unicode(pre_requisite_course.id)]
+        pre_requisite_courses = [six.text_type(pre_requisite_course.id)]
 
         # for this failure to occur, the enrollment window needs to be in the past
         course = CourseFactory.create(
@@ -156,11 +155,12 @@ class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase, Mi
         self.assertIn('course that has pre requisite', resp.content)
 
 
-@attr(shard=1)
 class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
     """
     Test for Index page course cards sorting
     """
+    ENABLED_SIGNALS = ['course_published']
+
     def setUp(self):
         super(IndexPageCourseCardsSortingTests, self).setUp()
         self.starting_later = CourseFactory.create(
@@ -191,7 +191,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         )
         self.factory = RequestFactory()
 
-    @patch('student.views.render_to_response', RENDER_MOCK)
+    @patch('student.views.management.render_to_response', RENDER_MOCK)
     @patch('courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
     def test_course_discovery_off(self):
@@ -205,7 +205,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertNotIn('Search for a course', response.content)
 
         # check the /courses view
-        response = self.client.get(reverse('branding.views.courses'))
+        response = self.client.get(reverse('courses'))
         self.assertEqual(response.status_code, 200)
 
         # assert that the course discovery UI is not present
@@ -215,7 +215,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         # make sure we have the special css class on the section
         self.assertIn('<div class="courses no-course-discovery"', response.content)
 
-    @patch('student.views.render_to_response', RENDER_MOCK)
+    @patch('student.views.management.render_to_response', RENDER_MOCK)
     @patch('courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': True})
     def test_course_discovery_on(self):
@@ -229,7 +229,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertIn('Search for a course', response.content)
 
         # check the /courses view
-        response = self.client.get(reverse('branding.views.courses'))
+        response = self.client.get(reverse('courses'))
         self.assertEqual(response.status_code, 200)
 
         # assert that the course discovery UI is present
@@ -237,7 +237,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertIn('<aside aria-label="Refine Your Search" class="search-facets phone-menu">', response.content)
         self.assertIn('<div class="courses"', response.content)
 
-    @patch('student.views.render_to_response', RENDER_MOCK)
+    @patch('student.views.management.render_to_response', RENDER_MOCK)
     @patch('courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
     def test_course_cards_sorted_by_default_sorting(self):
@@ -252,7 +252,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
 
         # check the /courses view
-        response = self.client.get(reverse('branding.views.courses'))
+        response = self.client.get(reverse('courses'))
         self.assertEqual(response.status_code, 200)
         ((template, context), _) = RENDER_MOCK.call_args  # pylint: disable=unpacking-non-sequence
         self.assertEqual(template, 'courseware/courses.html')
@@ -262,7 +262,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertEqual(context['courses'][1].id, self.starting_later.id)
         self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
 
-    @patch('student.views.render_to_response', RENDER_MOCK)
+    @patch('student.views.management.render_to_response', RENDER_MOCK)
     @patch('courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_SORTING_BY_START_DATE': False})
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
@@ -278,7 +278,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
 
         # check the /courses view as well
-        response = self.client.get(reverse('branding.views.courses'))
+        response = self.client.get(reverse('courses'))
         self.assertEqual(response.status_code, 200)
         ((template, context), _) = RENDER_MOCK.call_args  # pylint: disable=unpacking-non-sequence
         self.assertEqual(template, 'courseware/courses.html')
@@ -287,3 +287,19 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertEqual(context['courses'][0].id, self.starting_later.id)
         self.assertEqual(context['courses'][1].id, self.starting_earlier.id)
         self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
+
+
+class IndexPageProgramsTests(SiteMixin, ModuleStoreTestCase):
+    """
+    Tests for Programs List in Marketing Pages.
+    """
+    def test_get_programs_with_type_called(self):
+        views = [
+            (reverse('root'), 'student.views.get_programs_with_type'),
+            (reverse('courses'), 'courseware.views.views.get_programs_with_type'),
+        ]
+        for url, dotted_path in views:
+            with patch(dotted_path) as mock_get_programs_with_type:
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, 200)
+                mock_get_programs_with_type.assert_called_once()

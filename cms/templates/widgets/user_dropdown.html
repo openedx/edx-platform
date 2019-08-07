@@ -2,7 +2,7 @@
 <%namespace name='static' file='../static_content.html'/>
 <%!
   from django.conf import settings
-  from django.core.urlresolvers import reverse
+  from django.urls import reverse
   from django.utils.translation import ugettext as _
   from student.roles import GlobalStaff
 %>
@@ -39,7 +39,6 @@
     </span>
     <span class="icon fa fa-caret-down ui-toggle-dd" aria-hidden="true"></span>
   </h3>
-
   <div class="wrapper wrapper-nav-sub">
     <div class="nav-sub">
       <ul>
@@ -52,7 +51,7 @@
         </li>
         % endif
         <li class="nav-item nav-account-signout">
-          <a class="action action-signout" href="${reverse('logout')}">${_("Sign Out")}</a>
+          <a class="action action-signout" href="${settings.FRONTEND_LOGOUT_URL}">${_("Sign Out")}</a>
         </li>
       </ul>
     </div>

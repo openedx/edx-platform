@@ -1,28 +1,36 @@
 """
 Custom routers used by both lms and cms when routing tasks to worker queues.
 
-For more, see http://celery.readthedocs.io/en/latest/userguide/routing.html#routers
+For more, see https://celery.readthedocs.io/en/latest/userguide/routing.html#routers
 """
-from abc import ABCMeta, abstractproperty
-from django.conf import settings
+from __future__ import absolute_import
 import logging
+from abc import ABCMeta, abstractproperty
+
+from django.conf import settings
+import six
 
 log = logging.getLogger(__name__)
 
 
-class AlternateEnvironmentRouter(object):
+class AlternateEnvironmentRouter(six.with_metaclass(ABCMeta, object)):
     """
     A custom Router class for use in routing celery tasks to non-default queues.
     """
-    # this is an abstract base class, implementations must provide alternate_env_tasks
-    __metaclass__ = ABCMeta
 
     @abstractproperty
     def alternate_env_tasks(self):
         """
-        Defines the task -> alternate worker environment queue to be used when routing.
+        Defines the task -> alternate worker environment to be used when routing.
 
         Subclasses must override this property with their own specific mappings.
+        """
+        return {}
+
+    @property
+    def explicit_queues(self):
+        """
+        Defines the task -> alternate worker queue to be used when routing.
         """
         return {}
 
@@ -32,16 +40,13 @@ class AlternateEnvironmentRouter(object):
 
         If None is returned from this method, default routing logic is used.
         """
+        if task in self.explicit_queues:
+            return self.explicit_queues[task]
+
         alternate_env = self.alternate_env_tasks.get(task, None)
-        if 'update_course_in_cache' in task:
-            log.info("TNL-5408: task={task}, args={args}, alternate_env={alt_env}, queues={queues}".format(
-                task=task,
-                args=args,
-                alt_env=alternate_env,
-                queues=getattr(settings, 'CELERY_QUEUES', []).keys()
-            ))
         if alternate_env:
             return self.ensure_queue_env(alternate_env)
+
         return None
 
     def ensure_queue_env(self, desired_env):

@@ -13,11 +13,14 @@ To disable rate limiting:
 Note: You should NEVER disable rate limiting in production.
 
 """
-from functools import wraps
-import logging
-from rest_framework.views import APIView
-from util.models import RateLimitConfiguration
+from __future__ import absolute_import
 
+import logging
+from functools import wraps
+
+from rest_framework.views import APIView
+
+from util.models import RateLimitConfiguration
 
 LOGGER = logging.getLogger(__name__)
 

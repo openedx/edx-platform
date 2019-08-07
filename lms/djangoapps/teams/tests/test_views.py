@@ -1,37 +1,39 @@
 # -*- coding: utf-8 -*-
 """Tests for the teams API at the HTTP request level."""
+from __future__ import absolute_import
+
 import json
+import unittest
 from datetime import datetime
 
+import ddt
 import pytz
 from dateutil import parser
-import ddt
-from elasticsearch.exceptions import ConnectionError
-from mock import patch
-from search.search_engine_base import SearchEngine
-from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.db.models.signals import post_save
+from django.urls import reverse
 from django.utils import translation
-from nose.plugins.attrib import attr
-import unittest
-from rest_framework.test import APITestCase, APIClient
+from elasticsearch.exceptions import ConnectionError
+from mock import patch
+from rest_framework.test import APIClient, APITestCase
+from search.search_engine_base import SearchEngine
+from six.moves import range
+
+from common.test.utils import skip_signal
+from courseware.tests.factories import StaffFactory
+from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
+from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
+from student.models import CourseEnrollment
+from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from util.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from courseware.tests.factories import StaffFactory
-from common.test.utils import skip_signal
-from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
-from student.models import CourseEnrollment
-from util.testing import EventTestMixin
-from .factories import CourseTeamFactory, LAST_ACTIVITY_AT
 from ..models import CourseTeamMembership
-from ..search_indexes import CourseTeamIndexer, CourseTeam, course_team_post_save_callback
-from django_comment_common.models import Role, FORUM_ROLE_COMMUNITY_TA
-from django_comment_common.utils import seed_permissions_roles
+from ..search_indexes import CourseTeam, CourseTeamIndexer, course_team_post_save_callback
+from .factories import LAST_ACTIVITY_AT, CourseTeamFactory
 
 
-@attr(shard=1)
 class TestDashboard(SharedModuleStoreTestCase):
     """Tests for the Teams dashboard."""
     test_password = "test"
@@ -46,9 +48,9 @@ class TestDashboard(SharedModuleStoreTestCase):
                 "max_team_size": 10,
                 "topics": [
                     {
-                        "name": "Topic {}".format(topic_id),
+                        "name": u"Topic {}".format(topic_id),
                         "id": topic_id,
-                        "description": "Description for topic {}".format(topic_id)
+                        "description": u"Description for topic {}".format(topic_id)
                     }
                     for topic_id in range(cls.NUM_TOPICS)
                 ]
@@ -178,19 +180,17 @@ class TestDashboard(SharedModuleStoreTestCase):
         # Check that initially list of user teams in course one is empty
         course_one_teams_url = reverse('teams_dashboard', args=[self.course.id])
         response = self.client.get(course_one_teams_url)
-        self.assertIn('"teams": {"count": 0', response.content)
-
+        self.assertIn('"teams": {"count": 0', response.content)  # pylint: disable=unicode-format-string
         # Add user to a course one team
         course_one_team.add_user(self.user)
 
         # Check that list of user teams in course one is not empty, it is one now
         response = self.client.get(course_one_teams_url)
-        self.assertIn('"teams": {"count": 1', response.content)
-
+        self.assertIn('"teams": {"count": 1', response.content)  # pylint: disable=unicode-format-string
         # Check that list of user teams in course two is still empty
         course_two_teams_url = reverse('teams_dashboard', args=[course_two.id])
         response = self.client.get(course_two_teams_url)
-        self.assertIn('"teams": {"count": 0', response.content)
+        self.assertIn('"teams": {"count": 0', response.content)  # pylint: disable=unicode-format-string
 
 
 class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
@@ -200,6 +200,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
+        # pylint: disable=super-method-not-called
         with super(TeamAPITestCase, cls).setUpClassAndTestData():
             teams_configuration_1 = {
                 'topics':
@@ -207,7 +208,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                     {
                         'id': 'topic_{}'.format(i),
                         'name': name,
-                        'description': 'Description for topic {}.'.format(i)
+                        'description': u'Description for topic {}.'.format(i)
                     } for i, name in enumerate([u'Sólar power', 'Wind Power', 'Nuclear Power', 'Coal Power'])
                 ]
             }
@@ -405,10 +406,10 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         self.assertEqual(
             expected_status,
             response.status_code,
-            msg="Expected status {expected} but got {actual}: {content}".format(
+            msg=u"Expected status {expected} but got {actual}: {content}".format(
                 expected=expected_status,
                 actual=response.status_code,
-                content=response.content,
+                content=response.content.decode(response.charset),
             )
         )
 

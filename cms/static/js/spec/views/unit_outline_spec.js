@@ -1,6 +1,6 @@
 define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/spec_helpers/template_helpers',
-        'common/js/spec_helpers/view_helpers', 'common/js/components/utils/view_utils', 'js/models/course',
-        'js/views/unit_outline', 'js/models/xblock_info'],
+    'common/js/spec_helpers/view_helpers', 'common/js/components/utils/view_utils', 'js/models/course',
+    'js/views/unit_outline', 'js/models/xblock_info'],
     function($, AjaxHelpers, TemplateHelpers, ViewHelpers, ViewUtils,
               Course, UnitOutlineView, XBlockInfo) {
         'use strict';

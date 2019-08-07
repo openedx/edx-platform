@@ -1,0 +1,36 @@
+// LMS common build
+
+// Theme-specific variables
+@import 'lms/theme/variables';
+
+// Core Bootstrap functions, variables and mixins
+@import 'bootstrap/variables';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/box-shadow';
+@import 'bootstrap/scss/mixins/breakpoints';
+@import 'bootstrap/scss/mixins/grid';
+@import 'bootstrap/scss/mixins/reset-text';
+
+// Bootstrap components
+@import 'bootstrap/scss/popover';
+
+// LMS-specific variables
+@import '../variables';
+
+// Legacy variables
+//
+// Note: these should be replaced by Bootstrap theme variables
+@import 'lms/theme/variables-v1';
+
+// Base
+@import 'base/reset';
+@import 'base/mixins';
+
+// Pattern Library shims
+@import 'edx-pattern-library-shims/base/variables';
+@import 'edx-pattern-library-shims/breadcrumbs';
+@import 'edx-pattern-library-shims/buttons';
+
+// Cookie Policy Banner
+@import '@edx/cookie-policy-banner/build/_cookie-policy-banner.scss';

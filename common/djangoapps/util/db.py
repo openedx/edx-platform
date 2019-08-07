@@ -1,15 +1,17 @@
 """
 Utility functions related to databases.
 """
+from __future__ import absolute_import
+
+import random
 # TransactionManagementError used below actually *does* derive from the standard "Exception" class.
 # pylint: disable=nonstandard-exception
 from contextlib import contextmanager
 from functools import wraps
-import random
 
 from django.db import DEFAULT_DB_ALIAS, DatabaseError, Error, transaction
-import request_cache
 
+from openedx.core.lib.cache_utils import get_cache
 
 OUTER_ATOMIC_CACHE_NAME = 'db.outer_atomic'
 
@@ -160,13 +162,15 @@ def enable_named_outer_atomic(*names):
     if len(names) == 0:
         raise ValueError("At least one name must be specified.")
 
-    cache = request_cache.get_cache(OUTER_ATOMIC_CACHE_NAME)
+    cache = get_cache(OUTER_ATOMIC_CACHE_NAME)
 
     for name in names:
         cache[name] = True
-    yield
-    for name in names:
-        del cache[name]
+    try:
+        yield
+    finally:
+        for name in names:
+            del cache[name]
 
 
 class OuterAtomic(transaction.Atomic):
@@ -187,7 +191,7 @@ class OuterAtomic(transaction.Atomic):
 
         connection = transaction.get_connection(self.using)
 
-        cache = request_cache.get_cache(OUTER_ATOMIC_CACHE_NAME)
+        cache = get_cache(OUTER_ATOMIC_CACHE_NAME)
 
         # By default it is enabled.
         enable = True
@@ -289,4 +293,4 @@ class NoOpMigrationModules(object):
         return True
 
     def __getitem__(self, item):
-        return "notmigrations"
+        return None

@@ -1,12 +1,16 @@
 """
 Tests for Version Based App Upgrade Middleware
 """
+from __future__ import absolute_import
+
 from datetime import datetime
+
 import ddt
+import mock
 from django.core.cache import caches
 from django.http import HttpRequest, HttpResponse
-import mock
 from pytz import UTC
+
 from mobile_api.middleware import AppVersionUpgrade
 from mobile_api.models import AppVersionConfig
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
@@ -31,13 +35,13 @@ class TestAppVersionUpgradeMiddleware(CacheIsolationTestCase):
         AppVersionConfig(
             platform="iOS",
             version="2.2.2",
-            expire_at=datetime(2014, 01, 01, tzinfo=UTC),
+            expire_at=datetime(2014, 1, 1, tzinfo=UTC),
             enabled=True
         ).save()
         AppVersionConfig(
             platform="iOS",
             version="4.4.4",
-            expire_at=datetime(9000, 01, 01, tzinfo=UTC),
+            expire_at=datetime(9000, 1, 1, tzinfo=UTC),
             enabled=True
         ).save()
         AppVersionConfig(platform="iOS", version="6.6.6", expire_at=None, enabled=True).save()
@@ -46,13 +50,13 @@ class TestAppVersionUpgradeMiddleware(CacheIsolationTestCase):
         AppVersionConfig(
             platform="Android",
             version="2.2.2",
-            expire_at=datetime(2014, 01, 01, tzinfo=UTC),
+            expire_at=datetime(2014, 1, 1, tzinfo=UTC),
             enabled=True
         ).save()
         AppVersionConfig(
             platform="Android",
             version="4.4.4",
-            expire_at=datetime(5000, 01, 01, tzinfo=UTC),
+            expire_at=datetime(5000, 1, 1, tzinfo=UTC),
             enabled=True
         ).save()
         AppVersionConfig(platform="Android", version="8.8.8", expire_at=None, enabled=True).save()

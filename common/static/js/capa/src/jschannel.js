@@ -247,15 +247,14 @@ var Channel = (function() {
             if ((s_boundChans['*'] && s_boundChans['*'][scope])) {
                 exists = hasWin(s_boundChans['*'][scope]);
             }
-            if (!exists && s_boundChans[origin] && s_boundChans[origin][scope])
-            {
+            if (!exists && s_boundChans[origin] && s_boundChans[origin][scope]) {
                 exists = hasWin(s_boundChans[origin][scope]);
             }
         }
         if (exists) throw "A channel is already bound to the same window which overlaps with origin '" + origin + "' and has scope '" + scope + "'";
 
-        if (typeof s_boundChans[origin] != 'object') s_boundChans[origin] = { };
-        if (typeof s_boundChans[origin][scope] != 'object') s_boundChans[origin][scope] = [];
+        if (typeof s_boundChans[origin] !== 'object') s_boundChans[origin] = { };
+        if (typeof s_boundChans[origin][scope] !== 'object') s_boundChans[origin][scope] = [];
         s_boundChans[origin][scope].push({win: win, handler: handler});
     }
 
@@ -345,7 +344,7 @@ var Channel = (function() {
             }
         }
         // otherwise it must have an id (or be poorly formed
-        else if (typeof i != 'undefined') {
+        else if (typeof i !== 'undefined') {
             if (s_transIds[i]) s_transIds[i](o, meth, m);
         }
     };
@@ -403,7 +402,7 @@ var Channel = (function() {
             }
 
             /* basic argument validation */
-            if (typeof cfg != 'object') throw ('Channel build invoked without a proper object argument');
+            if (typeof cfg !== 'object') throw ('Channel build invoked without a proper object argument');
 
             if (!cfg.window || !cfg.window.postMessage) throw ('Channel.build() called without a valid window argument');
 
@@ -418,7 +417,7 @@ var Channel = (function() {
                 var oMatch;
                 if (cfg.origin === '*') validOrigin = true;
                 // allow valid domains under http and https.  Also, trim paths off otherwise valid origins.
-                else if (null !== (oMatch = cfg.origin.match(/^https?:\/\/(?:[-a-zA-Z0-9_\.])+(?::\d+)?/))) {
+                else if ((oMatch = cfg.origin.match(/^https?:\/\/(?:[-a-zA-Z0-9_\.])+(?::\d+)?/)) !== null) {
                     cfg.origin = oMatch[0].toLowerCase();
                     validOrigin = true;
                 }
@@ -438,7 +437,7 @@ var Channel = (function() {
                 var alpha = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
                 for (var i = 0; i < 5; i++) text += alpha.charAt(Math.floor(Math.random() * alpha.length));
                 return text;
-            })();
+            }());
 
             // registrations: mapping method names to call objects
             var regTbl = { };
@@ -549,7 +548,7 @@ var Channel = (function() {
                                         return function(params) {
                                             return trans.invoke(cbName, params);
                                         };
-                                    })();
+                                    }());
                                 }
                             }
                             var resp = regTbl[method](trans, m.params);
@@ -583,8 +582,7 @@ var Channel = (function() {
                                     message = JSON.stringify(e);
                                     /* On MSIE8, this can result in 'out of memory', which
                                      * leaves message undefined. */
-                                    if (typeof(message) == 'undefined')
-                                        message = e.toString();
+                                    if (typeof(message) === 'undefined') { message = e.toString(); }
                                 } catch (e2) {
                                     message = e.toString();
                                 }
@@ -594,8 +592,7 @@ var Channel = (function() {
                         }
                     }
                 } else if (m.id && m.callback) {
-                    if (!outTbl[m.id] || !outTbl[m.id].callbacks || !outTbl[m.id].callbacks[m.callback])
-                    {
+                    if (!outTbl[m.id] || !outTbl[m.id].callbacks || !outTbl[m.id].callbacks[m.callback]) {
                         debug('ignoring invalid callback, id:' + m.id + ' (' + m.callback + ')');
                     } else {
                         // XXX: what if client code raises an exception here?
@@ -744,7 +741,7 @@ var Channel = (function() {
                       // XXX: This function returns a timeout ID, but we don't do anything with it.
                       // We might want to keep track of it so we can cancel it using clearTimeout()
                       // when the transaction completes.
-                        setTransactionTimeout(s_curTranId, m.timeout, scopeMethod(m.method));
+                        { setTransactionTimeout(s_curTranId, m.timeout, scopeMethod(m.method)); }
 
                     // insert into the transaction table
                     outTbl[s_curTranId] = {callbacks: callbacks, error: m.error, success: m.success};
@@ -785,4 +782,4 @@ var Channel = (function() {
             return obj;
         }
     };
-})();
+}());

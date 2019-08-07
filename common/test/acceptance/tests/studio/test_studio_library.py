@@ -1,19 +1,21 @@
 """
 Acceptance tests for Content Libraries in Studio
 """
-from ddt import ddt, data
-from nose.plugins.attrib import attr
-from flaky import flaky
+from __future__ import absolute_import
 
-from common.test.acceptance.tests.studio.base_studio_test import StudioLibraryTest
+from ddt import data, ddt
+from six.moves import range
+
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
-from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
-from common.test.acceptance.pages.studio.utils import add_component
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio.library import LibraryEditPage
 from common.test.acceptance.pages.studio.users import LibraryUsersPage
+from common.test.acceptance.pages.studio.utils import add_component
+from common.test.acceptance.tests.studio.base_studio_test import StudioLibraryTest
+from openedx.core.lib.tests import attr
 
 
-@attr(shard=2)
+@attr(shard=15)
 @ddt
 class LibraryEditPageTest(StudioLibraryTest):
     """
@@ -185,7 +187,7 @@ class LibraryEditPageTest(StudioLibraryTest):
         self.assertIn("Checkboxes", problem_block.name)
 
 
-@attr(shard=2)
+@attr(shard=15)
 @ddt
 class LibraryNavigationTest(StudioLibraryTest):
     """
@@ -205,7 +207,7 @@ class LibraryNavigationTest(StudioLibraryTest):
         Create four pages worth of XBlocks, and offset by one so each is named
         after the number they should be in line by the user's perception.
         """
-        self.blocks = [XBlockFixtureDesc('html', str(i)) for i in xrange(1, 41)]
+        self.blocks = [XBlockFixtureDesc('html', str(i)) for i in range(1, 41)]
         library_fixture.add_children(*self.blocks)
 
     def test_arbitrary_page_selection(self):
@@ -501,6 +503,7 @@ class LibraryNavigationTest(StudioLibraryTest):
         self.assertFalse(target_block.is_placeholder())
 
 
+@attr(shard=21)
 class LibraryUsersPageTest(StudioLibraryTest):
     """
     Test the functionality of the library "Instructor Access" page.
@@ -654,6 +657,10 @@ class StudioLibraryA11yTest(StudioLibraryTest):
         lib_page.a11y_audit.config.set_rules({
             "ignore": [
                 'link-href',  # TODO: AC-590
+                'duplicate-id-aria',  # TODO: AC-940
+                'heading-order',  # TODO: AC-933
+                'landmark-complementary-is-top-level',  # TODO: AC-939
+                'region'  # TODO: AC-932
             ],
         })
 

@@ -1,6 +1,8 @@
 """
 Provide tests for git_add_course management command.
 """
+from __future__ import absolute_import
+
 import logging
 import os
 import shutil
@@ -8,28 +10,26 @@ import StringIO
 import subprocess
 import unittest
 from uuid import uuid4
-from nose.plugins.attrib import attr
 
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test.utils import override_settings
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 import dashboard.git_import as git_import
 from dashboard.git_import import (
     GitImportError,
-    GitImportErrorNoDir,
-    GitImportErrorUrlBad,
-    GitImportErrorCannotPull,
     GitImportErrorBadRepo,
+    GitImportErrorCannotPull,
+    GitImportErrorNoDir,
     GitImportErrorRemoteBranchMissing,
+    GitImportErrorUrlBad
 )
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
-
+from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
 
 TEST_MONGODB_LOG = {
     'host': MONGO_HOST,
@@ -39,11 +39,7 @@ TEST_MONGODB_LOG = {
     'db': 'test_xlog',
 }
 
-FEATURES_WITH_SSL_AUTH = settings.FEATURES.copy()
-FEATURES_WITH_SSL_AUTH['AUTH_USE_CERTIFICATES'] = True
 
-
-@attr(shard=3)
 @override_settings(
     MONGODB_LOG=TEST_MONGODB_LOG,
     GIT_REPO_DIR=settings.TEST_ROOT / "course_repos_{}".format(uuid4().hex)
@@ -54,11 +50,10 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
     """
     Tests the git_add_course management command for proper functions.
     """
-
-    TEST_REPO = 'https://github.com/mitocw/edx4edx_lite.git'
+    TEST_REPO = 'https://github.com/edx/edx4edx_lite.git'
     TEST_COURSE = 'MITx/edx4edx/edx4edx'
     TEST_BRANCH = 'testing_do_not_delete'
-    TEST_BRANCH_COURSE = SlashSeparatedCourseKey('MITx', 'edx4edx_branch', 'edx4edx')
+    TEST_BRANCH_COURSE = CourseKey.from_string('MITx/edx4edx_branch/edx4edx')
 
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
@@ -85,7 +80,7 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
             'blah', 'blah', 'blah', 'blah')
         # Not a valid path.
         self.assertCommandFailureRegexp(
-            'Path {0} doesn\'t exist, please create it,'.format(self.git_repo_dir),
+            u'Path {0} doesn\'t exist, please create it,'.format(self.git_repo_dir),
             'blah')
         # Test successful import from command
         if not os.path.isdir(self.git_repo_dir):
@@ -184,7 +179,7 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
                             repo_dir / 'edx4edx_lite',
                             'master')
         self.assertIsNone(def_ms.get_course(self.TEST_BRANCH_COURSE))
-        self.assertIsNotNone(def_ms.get_course(SlashSeparatedCourseKey.from_deprecated_string(self.TEST_COURSE)))
+        self.assertIsNotNone(def_ms.get_course(CourseKey.from_string(self.TEST_COURSE)))
 
     def test_branch_exceptions(self):
         """

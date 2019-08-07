@@ -12,7 +12,8 @@ var FaceBook = (function() {
                 });
             };
             (function(d, s, id) {
-                var js, fjs = d.getElementsByTagName(s)[0];
+                var js,
+                    fjs = d.getElementsByTagName(s)[0];
                 if (d.getElementById(id)) { return; }
                 js = d.createElement(s); js.id = id;
                 js.src = '//connect.facebook.net/en_US/sdk.js';
@@ -22,10 +23,10 @@ var FaceBook = (function() {
         share: function(feed_data) {
             FB.ui({
                 method: 'feed',
-                name: feed_data['share_text'],
-                link: feed_data['share_link'],
-                picture: feed_data['picture_link'],
-                description: feed_data['description']
+                name: feed_data.share_text,
+                link: feed_data.share_link,
+                picture: feed_data.picture_link,
+                description: feed_data.description
             });
         }
     };

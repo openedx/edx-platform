@@ -33,9 +33,12 @@
                     'Community TA': []
                 });
 
+                if (options.roles === undefined) {
+                    options.roles = {};
+                }
                 DiscussionUtil.loadRoles(options.roles);
                 window.$$course_id = options.courseId;
-                window.courseName = options.course_name;
+                window.courseName = options.courseName;
                 DiscussionUtil.setUser(user);
                 window.user = user;
                 Content.loadContentInfos(contentInfo);

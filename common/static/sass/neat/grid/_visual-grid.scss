@@ -11,7 +11,9 @@
   body:before {
     content: '';
     display: inline-block;
+
     @include grid-column-gradient(gradient-stops($grid-columns));
+
     height: 100%;
     left: 0;
     margin: 0 auto;

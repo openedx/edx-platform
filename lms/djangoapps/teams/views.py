@@ -1,54 +1,57 @@
 """HTTP endpoints for the Teams API."""
 
+from __future__ import absolute_import
+
 import logging
 
-from django.shortcuts import get_object_or_404, render_to_response
-from django.http import Http404
+import six
 from django.conf import settings
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.http import Http404
+from django.shortcuts import get_object_or_404, render_to_response
+from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_noop
+from django_countries import countries
+from edx_rest_framework_extensions.paginators import DefaultPagination, paginate_search_results
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from rest_framework import permissions, status
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
-from rest_framework.authentication import SessionAuthentication
 from rest_framework_oauth.authentication import OAuth2Authentication
-from rest_framework import status
-from rest_framework import permissions
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from django.contrib.auth.models import User
-from django_countries import countries
-from django.utils.translation import ugettext as _
-from django.utils.translation import ugettext_noop
+
+from courseware.courses import get_course_with_access, has_access
+from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
+from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.permissions import IsStaffOrReadOnly
 from openedx.core.lib.api.view_utils import (
+    ExpandableFieldViewMixin,
     RetrievePatchAPIView,
     add_serializer_errors,
-    build_api_error,
-    ExpandableFieldViewMixin
+    build_api_error
 )
-from openedx.core.lib.api.paginators import paginate_search_results, DefaultPagination
-from xmodule.modulestore.django import modulestore
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
-
-from courseware.courses import get_course_with_access, has_access
-from student.models import CourseEnrollment, CourseAccessRole
+from student.models import CourseAccessRole, CourseEnrollment
 from student.roles import CourseStaffRole
-from django_comment_client.utils import has_discussion_privileges
 from util.model_utils import truncate_fields
+from xmodule.modulestore.django import modulestore
+
 from . import is_feature_enabled
-from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
+from .errors import AlreadyOnTeamInCourse, ElasticSearchConnectionError, NotEnrolledInCourseForTeam
+from .search_indexes import CourseTeamIndexer
 from .serializers import (
-    CourseTeamSerializer,
-    CourseTeamCreationSerializer,
-    TopicSerializer,
     BulkTeamCountTopicSerializer,
+    CourseTeamCreationSerializer,
+    CourseTeamSerializer,
     MembershipSerializer,
+    TopicSerializer,
     add_team_count
 )
-from .search_indexes import CourseTeamIndexer
-from .errors import AlreadyOnTeamInCourse, ElasticSearchConnectionError, NotEnrolledInCourseForTeam
 from .utils import emit_team_event
 
 TEAM_MEMBERSHIPS_PER_PAGE = 2
@@ -66,7 +69,10 @@ def team_post_save_callback(sender, instance, **kwargs):  # pylint: disable=unus
     if not kwargs['created']:
         for field in changed_fields:
             if field not in instance.FIELD_BLACKLIST:
-                truncated_fields = truncate_fields(unicode(changed_fields[field]), unicode(getattr(instance, field)))
+                truncated_fields = truncate_fields(
+                    six.text_type(changed_fields[field]),
+                    six.text_type(getattr(instance, field))
+                )
                 truncated_fields['team_id'] = instance.team_id
                 truncated_fields['field'] = field
 
@@ -160,7 +166,7 @@ class TeamsDashboardView(GenericAPIView):
             "team_memberships_url": reverse('team_membership_list', request=request),
             "my_teams_url": reverse('teams_list', request=request),
             "team_membership_detail_url": reverse('team_membership_detail', args=['team_id', user.username]),
-            "languages": [[lang[0], _(lang[1])] for lang in settings.ALL_LANGUAGES],  # pylint: disable=translation-of-non-string
+            "languages": [[lang[0], _(lang[1])] for lang in settings.ALL_LANGUAGES],
             "countries": list(countries),
             "disable_courseware_js": True,
             "teams_base_url": reverse('teams_dashboard', request=request, kwargs={'course_id': course_id}),
@@ -372,7 +378,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 result_filter.update({'course_id': course_key})
             except InvalidKeyError:
                 error = build_api_error(
-                    ugettext_noop("The supplied course id {course_id} is not valid."),
+                    ugettext_noop(u"The supplied course id {course_id} is not valid."),
                     course_id=course_id_string,
                 )
                 return Response(error, status=status.HTTP_400_BAD_REQUEST)
@@ -399,7 +405,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         if topic_id is not None:
             if topic_id not in [topic['id'] for topic in course_module.teams_configuration['topics']]:
                 error = build_api_error(
-                    ugettext_noop('The supplied topic id {topic_id} is not valid'),
+                    ugettext_noop(u'The supplied topic id {topic_id} is not valid'),
                     topic_id=topic_id
                 )
                 return Response(error, status=status.HTTP_400_BAD_REQUEST)
@@ -448,7 +454,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 queryset = queryset.order_by('-last_activity_at', 'team_size')
             else:
                 return Response({
-                    'developer_message': "unsupported order_by value {ordering}".format(ordering=order_by_input),
+                    'developer_message': u"unsupported order_by value {ordering}".format(ordering=order_by_input),
                     # Translators: 'ordering' is a string describing a way
                     # of ordering a list. For example, {ordering} may be
                     # 'name', indicating that the user wants to sort the
@@ -477,7 +483,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 return Response(status=status.HTTP_404_NOT_FOUND)
         except InvalidKeyError:
             field_errors['course_id'] = build_api_error(
-                ugettext_noop('The supplied course_id {course_id} is not valid.'),
+                ugettext_noop(u'The supplied course_id {course_id} is not valid.'),
                 course_id=course_id
             )
             return Response({
@@ -499,7 +505,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         data = request.data.copy()
-        data['course_id'] = course_key
+        data['course_id'] = six.text_type(course_key)
 
         serializer = CourseTeamCreationSerializer(data=data)
         add_serializer_errors(serializer, data, field_errors)
@@ -673,7 +679,7 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
 
         # Note: also deletes all team memberships associated with this team
         team.delete()
-        log.info('user %d deleted team %s', request.user.id, team_id)
+        log.info(u'user %d deleted team %s', request.user.id, team_id)
         emit_team_event('edx.team.deleted', team.course_id, {
             'team_id': team_id,
         })
@@ -755,7 +761,7 @@ class TopicListView(GenericAPIView):
             return Response({
                 'field_errors': {
                     'course_id': build_api_error(
-                        ugettext_noop("The supplied course id {course_id} is not valid."),
+                        ugettext_noop(u"The supplied course id {course_id} is not valid."),
                         course_id=course_id_string
                     )
                 }
@@ -777,7 +783,7 @@ class TopicListView(GenericAPIView):
         ordering = request.query_params.get('order_by', 'name')
         if ordering not in ['name', 'team_count']:
             return Response({
-                'developer_message': "unsupported order_by value {ordering}".format(ordering=ordering),
+                'developer_message': u"unsupported order_by value {ordering}".format(ordering=ordering),
                 # Translators: 'ordering' is a string describing a way
                 # of ordering a list. For example, {ordering} may be
                 # 'name', indicating that the user wants to sort the
@@ -1055,7 +1061,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
                     CourseAccessRole.objects.filter(user=request.user, role='staff').values_list('course_id', flat=True)
                 )
                 accessible_course_ids = [item for sublist in (enrolled_courses, staff_courses) for item in sublist]
-                if requested_course_id is not None and requested_course_id not in accessible_course_ids:
+                if requested_course_id is not None and requested_course_key not in accessible_course_ids:
                     return Response(status=status.HTTP_400_BAD_REQUEST)
 
         if not specified_username_or_team:
@@ -1068,7 +1074,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         if requested_course_key is not None:
             course_keys = [requested_course_key]
         elif accessible_course_ids is not None:
-            course_keys = [CourseKey.from_string(course_string) for course_string in accessible_course_ids]
+            course_keys = accessible_course_ids
 
         queryset = CourseTeamMembership.get_memberships(username, course_keys, team_id)
         page = self.paginate_queryset(queryset)
@@ -1125,7 +1131,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         except AlreadyOnTeamInCourse:
             return Response(
                 build_api_error(
-                    ugettext_noop("The user {username} is already a member of a team in this course."),
+                    ugettext_noop(u"The user {username} is already a member of a team in this course."),
                     username=username
                 ),
                 status=status.HTTP_400_BAD_REQUEST
@@ -1133,7 +1139,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         except NotEnrolledInCourseForTeam:
             return Response(
                 build_api_error(
-                    ugettext_noop("The user {username} is not enrolled in the course associated with this team."),
+                    ugettext_noop(u"The user {username} is not enrolled in the course associated with this team."),
                     username=username
                 ),
                 status=status.HTTP_400_BAD_REQUEST

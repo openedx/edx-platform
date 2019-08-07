@@ -1,0 +1,25 @@
+<div class="member-list-widget">
+    <div class="header">
+        <div class="title"><%- title %></div>
+    </div>
+    <div class="info"><%- info %></div>
+    <div class="member-list">
+        <table>
+            <thead>
+            <tr>
+                <% _.each(labels, function(label) { %>
+                <th class="label" scope="column"><%- label %></th>
+                <% }); %>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <div class="bottom-bar">
+        <label>
+            <span class="label-text sr"><%- add_placeholder %></span>
+            <input type="text" name="add-field" class="add-field" placeholder="<%- add_placeholder %>">
+        </label>
+        <input type="button" name="add" class="add" value="<%- add_btn_label %>">
+    </div>
+</div>

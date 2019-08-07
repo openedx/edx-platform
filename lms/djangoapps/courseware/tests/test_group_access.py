@@ -3,17 +3,17 @@ This module defines tests for courseware.access that are specific to group
 access control rules.
 """
 
-import ddt
-from nose.plugins.attrib import attr
-from stevedore.extension import Extension, ExtensionManager
+from __future__ import absolute_import
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.partitions.partitions import Group, UserPartition, USER_PARTITION_SCHEME_NAMESPACE
-from xmodule.modulestore.django import modulestore
+import ddt
+from stevedore.extension import Extension, ExtensionManager
 
 import courseware.access as access
 from courseware.tests.factories import StaffFactory, UserFactory
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.partitions.partitions import USER_PARTITION_SCHEME_NAMESPACE, Group, UserPartition
 
 
 class MemoryUserPartitionScheme(object):
@@ -31,7 +31,7 @@ class MemoryUserPartitionScheme(object):
         """
         self.current_group.setdefault(user.id, {})[user_partition.id] = group
 
-    def get_group_for_user(self, course_id, user, user_partition, track_function=None):  # pylint: disable=unused-argument
+    def get_group_for_user(self, course_id, user, user_partition):  # pylint: disable=unused-argument
         """
         Fetch the group to which this user is linked in this partition, or None.
         """
@@ -45,19 +45,19 @@ def resolve_attrs(test_method):
     replaces them with the resolved values of those attributes in the method
     call.
     """
-    def _wrapper(self, *args):  # pylint: disable=missing-docstring
+    def _wrapper(self, *args):
         new_args = [getattr(self, arg) for arg in args]
         return test_method(self, *new_args)
     return _wrapper
 
 
-@attr(shard=2)
 @ddt.ddt
 class GroupAccessTestCase(ModuleStoreTestCase):
     """
     Tests to ensure that has_access() correctly enforces the visibility
     restrictions specified in the `group_access` field of XBlocks.
     """
+
     def set_user_group(self, user, partition, group):
         """
         Internal DRY / shorthand.
@@ -406,31 +406,3 @@ class GroupAccessTestCase(ModuleStoreTestCase):
         self.check_access(self.blue_dog, block_accessed, False)
         self.check_access(self.gray_worm, block_accessed, False)
         self.ensure_staff_access(block_accessed)
-
-    def test_group_access_short_circuits(self):
-        """
-        Test that the group_access check short-circuits if there are no user_partitions defined
-        except user_partitions in use by the split_test module.
-        """
-        # Initially, "red_cat" user can't view the vertical.
-        self.set_group_access(self.chapter_location, {self.animal_partition.id: [self.dog_group.id]})
-        self.check_access(self.red_cat, self.vertical_location, False)
-
-        # Change the vertical's user_partitions value to the empty list. Now red_cat can view the vertical.
-        self.set_user_partitions(self.vertical_location, [])
-        self.check_access(self.red_cat, self.vertical_location, True)
-
-        # Change the vertical's user_partitions value to include only "split_test" partitions.
-        split_test_partition = UserPartition(
-            199,
-            'split_test partition',
-            'nothing to look at here',
-            [Group(2, 'random group')],
-            scheme=UserPartition.get_scheme("random"),
-        )
-        self.set_user_partitions(self.vertical_location, [split_test_partition])
-        self.check_access(self.red_cat, self.vertical_location, True)
-
-        # Finally, add back in a cohort user_partition
-        self.set_user_partitions(self.vertical_location, [split_test_partition, self.animal_partition])
-        self.check_access(self.red_cat, self.vertical_location, False)

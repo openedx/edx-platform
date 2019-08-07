@@ -1,14 +1,17 @@
 """
 Student View Transformer
 """
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
+from __future__ import absolute_import
+
+from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 
 
 class StudentViewTransformer(BlockStructureTransformer):
     """
     Only show information that is appropriate for a learner
     """
-    VERSION = 1
+    WRITE_VERSION = 1
+    READ_VERSION = 1
     STUDENT_VIEW_DATA = 'student_view_data'
     STUDENT_VIEW_MULTI_DEVICE = 'student_view_multi_device'
 
@@ -46,9 +49,7 @@ class StudentViewTransformer(BlockStructureTransformer):
             # problem where your particular XModule explodes here (and don't
             # have the time to convert it to an XBlock), please try refactoring
             # so that you declare your student_view() method in a common
-            # ancestor class of both your Descriptor and Module classes. As an
-            # example, I changed the name of HtmlFields to HtmlBlock and moved
-            # student_view() from HtmlModuleMixin to HtmlBlock.
+            # ancestor class of both your Descriptor and Module classes.
             student_view = getattr(block.__class__, 'student_view', None)
             supports_multi_device = block.has_support(student_view, 'multi_device')
 

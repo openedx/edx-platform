@@ -86,7 +86,7 @@ function(BaseView, _, gettext, str, StringUtils, HtmlUtils) {
                         Translators: 'count' is number of units that the group
                         configuration is used in.
                     */
-                    'Used in {count} unit', 'Used in {count} units',
+                    'Used in {count} location', 'Used in {count} locations',
                     count
                 ),
                     {count: count}

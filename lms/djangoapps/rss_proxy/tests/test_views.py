@@ -1,9 +1,12 @@
 """
 Tests for the rss_proxy views
 """
+from __future__ import absolute_import, print_function
+
 from django.test import TestCase
-from django.core.urlresolvers import reverse
-from mock import patch, Mock
+from django.urls import reverse
+from mock import Mock, patch
+
 from rss_proxy.models import WhitelistedRssUrl
 
 
@@ -54,9 +57,9 @@ class RssProxyViewTests(TestCase):
         """
         mock_requests_get.return_value = Mock(status_code=404)
         resp = self.client.get('%s?url=%s' % (reverse('rss_proxy:proxy'), self.whitelisted_url2))
-        print resp.status_code
-        print resp.content
-        print resp['Content-Type']
+        print(resp.status_code)
+        print(resp.content)
+        print(resp['Content-Type'])
         self.assertEqual(resp.status_code, 404)
         self.assertEqual(resp['Content-Type'], 'application/xml')
         self.assertEqual(resp.content, '')

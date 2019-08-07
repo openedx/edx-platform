@@ -1,17 +1,18 @@
 <%page expression_filter="h"/>
 <%!
 from django.utils.translation import ugettext as _
+from django.utils.translation import pgettext
 from openedx.core.djangolib.markup import HTML, Text
 %>
 
-<h2 class="hd hd-2">${_("Batch Enrollment")}</h2>
-<div class="batch-enrollment" style="float:left;width:50%">
-  <form method="POST" action="ccx_invite">
+<h2 class="hd hd-2">${_("Enrollment")}</h2>
+<div class="batch-enrollment-ccx">
+  <form method="POST" action="ccx-manage-students">
   <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
   <label for="student-ids" class="sr">${_("Email Addresses/Usernames")}</label>
   <p id="label_student_ids" class="text-helper">
-      ${_("Enter email addresses and/or usernames separated by new lines or commas.")}
-      ${_("You will not get notification for emails that bounce, so please double-check spelling.")}
+      ${_("Enter one or more email addresses or usernames separated by new lines or commas.")}
+      ${_("Make sure you enter the information carefully. You will not receive notification for invalid usernames or email addresses.")}
   </p>
   <textarea rows="6" name="student-ids" id="student-ids" aria-describedby="label_student_ids" placeholder="${_("Email Addresses/Usernames")}" spellcheck="false"></textarea>
 
@@ -53,7 +54,7 @@ from openedx.core.djangolib.markup import HTML, Text
   </div>
 
   <div>
-    <input type="submit" name="enrollment-button" class="enrollment-button" value="${_("Enroll")}">
+    <input type="submit" name="enrollment-button" class="enrollment-button" value="${pgettext('someone','Enroll')}">
     <input type="submit" name="enrollment-button" class="enrollment-button" value="${_("Unenroll")}">
   </div>
   <div class="request-response"></div>
@@ -61,8 +62,8 @@ from openedx.core.djangolib.markup import HTML, Text
   </form>
 </div>
 
-<div class="member-lists-management" style="float:left;width:50%">
-  <form method="POST" action="ccx_manage_student" class="ccx-manage-student-form">
+<div class="member-lists-management-ccx">
+  <form method="POST" action="ccx-manage-students" class="ccx-manage-student-form">
   <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
   <div class="auth-list-container active">
     <div class="member-list-widget">
@@ -79,9 +80,9 @@ from openedx.core.djangolib.markup import HTML, Text
         <table>
           <thead>
             <tr>
-              <th class="label" scope="col">Username</th>
-              <th class="label" scope="col">Email</th>
-              <th class="label" scope="col">Revoke access</th>
+              <th class="label" scope="col">${_("Username")}</th>
+              <th class="label" scope="col">${_("Email")}</th>
+              <th class="label" scope="col">${_("Revoke access")}</th>
             </tr>
           </thead>
           <tbody>
@@ -94,45 +95,6 @@ from openedx.core.djangolib.markup import HTML, Text
             %endfor
           </tbody>
         </table>
-      </div>
-      <div class="bottom-bar">
-        <label for="student-id" class="sr">${_("Enter username or email")}</label>
-        <input name="student-id" id="student-id" class="add-field" placeholder="${_("Enter username or email")}" type="text">
-        <input name="student-action" class="add" value="Add Student" type="button">
-        <div class="enroll-option">
-            <input type="checkbox" name="auto-enroll" id="auto-enroll" value="Auto-Enroll" checked="yes" aria-describedby="auto-enroll-helper" disabled>
-            <label style="display:inline" for="auto-enroll">${_("Auto Enroll")}</label>
-            <div class="hint auto-enroll-hint">
-              <span class="hint-caret"></span>
-              <p class="text-helper" id="auto-enroll-helper">
-                ${Text(_("If this option is {em_start}checked{em_end}, users who have not yet registered for {platform_name} will be automatically enrolled.")).format(
-                    em_start=HTML('<em>'),
-                    em_end=HTML('</em>'),
-                    platform_name=settings.PLATFORM_NAME,
-                )}
-                ${Text(_("If this option is left {em_start}unchecked{em_end}, users who have not yet registered for {platform_name} will not be enrolled, but will be allowed to enroll once they make an account.")).format(
-                    em_start=HTML('<em>'),
-                    em_end=HTML('</em>'),
-                    platform_name=settings.PLATFORM_NAME,
-                )}
-                <br /><br />
-                ${_("Checking this box has no effect if 'Revoke' is clicked.")}
-              </p>
-            </div>
-        </div>
-        <div class="enroll-option ccx-notify-user">
-            <input type="checkbox" name="email-students" id="email-students" value="Notify-students-by-email" checked="yes" aria-describedby="email-students-helper">
-            <label style="display:inline" for="email-students">${_("Notify users by email")}</label>
-            <div class="hint email-students-hint">
-              <span class="hint-caret"></span>
-              <p class="text-helper" id="email-students-helper">
-                ${Text(_("If this option is {em_start}checked{em_end}, users will receive an email notification.")).format(
-                    em_start=HTML('<em>'),
-                    em_end=HTML('</em>'),
-                )}
-              </p>
-            </div>
-        </div>
       </div>
     </div>
   </div>

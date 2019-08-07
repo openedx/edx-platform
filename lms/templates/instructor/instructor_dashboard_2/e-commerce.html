@@ -14,7 +14,8 @@ import pytz
 <div class="ecommerce-wrapper">
    <div class="error-msgs" id="error-msg"></div>
    <div id = "accordion">
-      <div class="wrap">
+      %if not section_data['is_ecommerce_course']:
+       <div class="wrap">
          <h3 class="hd hd-3">${_('Enrollment Codes')}</h3>
          <div>
             %if section_data['sales_admin']:
@@ -53,6 +54,7 @@ import pytz
            <a id="registration_code_generation_link-trigger" href="#registration_code_generation_modal" rel="leanModal"></a>
          </div>
       </div>
+      %endif
       <!-- end wrap -->
       %if section_data['coupons_enabled']:
       <div class="wrap">
@@ -145,7 +147,7 @@ import pytz
         </div>
       </div><!-- end wrap -->
       %endif
-      %if section_data['coupons_enabled']:
+      %if section_data['coupons_enabled'] and not section_data['is_ecommerce_course']:
       <div class="wrap">
          <h3 class="hd hd-3">${_("Coupon Code List")}</h3>
          <div>

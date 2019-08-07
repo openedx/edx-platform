@@ -1,25 +1,28 @@
 """
 Tests for instructor_task/models.py.
 """
+from __future__ import absolute_import
+
 import copy
-from cStringIO import StringIO
 import time
+from cStringIO import StringIO
 
 import boto
 from django.conf import settings
-from django.test import SimpleTestCase, override_settings, TestCase
+from django.test import SimpleTestCase, TestCase, override_settings
 from mock import patch
+from opaque_keys.edx.locator import CourseLocator
 
 from common.test.utils import MockS3Mixin
 from lms.djangoapps.instructor_task.models import ReportStore
 from lms.djangoapps.instructor_task.tests.test_base import TestReportMixin
-from opaque_keys.edx.locator import CourseLocator
 
 
 class ReportStoreTestMixin(object):
     """
     Mixin for report store tests.
     """
+
     def setUp(self):
         super(ReportStoreTestMixin, self).setUp()
         self.course_id = CourseLocator(org="testx", course="coursex", run="runx")
@@ -119,6 +122,7 @@ class TestS3ReportStorage(MockS3Mixin, TestCase):
     Test the S3ReportStorage to make sure that configuration overrides from settings.FINANCIAL_REPORTS
     are used instead of default ones.
     """
+
     def test_financial_report_overrides(self):
         """
         Test that CUSTOM_DOMAIN from FINANCIAL_REPORTS is used to construct file url. instead of domain defined via

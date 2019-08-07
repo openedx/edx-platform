@@ -1,34 +1,34 @@
 # -*- coding: utf-8 -*-
 """Tests for the email opt-in list management command. """
-import os.path
-import tempfile
-import shutil
+from __future__ import absolute_import
+
 import csv
+import os.path
+import shutil
+import tempfile
 from collections import defaultdict
-from nose.plugins.attrib import attr
-from unittest import skipUnless
 
 import ddt
-from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.management import call_command
 from django.core.management.base import CommandError
+from six import text_type
+from six.moves import range
 
+from openedx.core.djangoapps.user_api.management.commands import email_opt_in_list
+from openedx.core.djangoapps.user_api.models import UserOrgTag
+from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
+from openedx.core.djangolib.testing.utils import skip_unless_lms
+from student.models import CourseEnrollment
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from student.models import CourseEnrollment
-
-from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
-from openedx.core.djangoapps.user_api.models import UserOrgTag
-from openedx.core.djangoapps.user_api.management.commands import email_opt_in_list
 
 
-@attr(shard=2)
 @ddt.ddt
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class EmailOptInListTest(ModuleStoreTestCase):
     """Tests for the email opt-in list management command. """
-
     USER_USERNAME = "test_user"
     USER_FIRST_NAME = u"Ṫëṡẗ"
     USER_LAST_NAME = u"Űśéŕ"
@@ -37,6 +37,8 @@ class EmailOptInListTest(ModuleStoreTestCase):
 
     OUTPUT_FILE_NAME = "test_org_email_opt_in.csv"
     OUTPUT_FIELD_NAMES = [
+        "user_id",
+        "username",
         "email",
         "full_name",
         "course_id",
@@ -201,6 +203,20 @@ class EmailOptInListTest(ModuleStoreTestCase):
         only_courses = [self.courses[0].id, self.courses[1].id]
         self._run_command(self.TEST_ORG, only_courses=only_courses)
 
+    def test_specify_chunk_size(self):
+        # Create several courses in the same org
+        self._create_courses_and_enrollments(
+            (self.TEST_ORG, True),
+            (self.TEST_ORG, True),
+            (self.TEST_ORG, True),
+        )
+
+        # Execute the command, but exclude the second course from the list
+        output = self._run_command(self.TEST_ORG, chunk_size=2)
+        course_ids = [row['course_id'].strip().decode('utf-8') for row in output]
+        for course in self.courses:
+            assert text_type(course.id) in course_ids
+
     # Choose numbers before and after the query interval boundary
     @ddt.data(2, 3, 4, 5, 6, 7, 8, 9)
     def test_many_users(self, num_users):
@@ -245,18 +261,20 @@ class EmailOptInListTest(ModuleStoreTestCase):
     @ddt.data(0, 1)
     def test_not_enough_args(self, num_args):
         args = ["dummy"] * num_args
-        expected_msg_regex = "^Usage: <OUTPUT_FILENAME> <ORG_ALIASES> --courses=COURSE_ID_LIST$"
+        expected_msg_regex = (
+            "^Error: too few arguments$"
+        )
         with self.assertRaisesRegexp(CommandError, expected_msg_regex):
-            email_opt_in_list.Command().handle(*args)
+            call_command('email_opt_in_list', *args)
 
     def test_file_already_exists(self):
         temp_file = tempfile.NamedTemporaryFile(delete=True)
 
-        def _cleanup():  # pylint: disable=missing-docstring
+        def _cleanup():
             temp_file.close()
 
         with self.assertRaisesRegexp(CommandError, "^File already exists"):
-            email_opt_in_list.Command().handle(temp_file.name, self.TEST_ORG)
+            call_command('email_opt_in_list', temp_file.name, self.TEST_ORG)
 
     def test_no_user_profile(self):
         """
@@ -331,7 +349,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
         pref = UserOrgTag.objects.filter(user=user).order_by("-modified")
         return pref[0].modified.isoformat(' ') if len(pref) > 0 else self.DEFAULT_DATETIME_STR
 
-    def _run_command(self, org, other_names=None, only_courses=None, query_interval=None):
+    def _run_command(self, org, other_names=None, only_courses=None, query_interval=None, chunk_size=None):
         """Execute the management command to generate the email opt-in list.
 
         Arguments:
@@ -341,6 +359,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
             other_names (list): List of other aliases for the org.
             only_courses (list): If provided, include only these course IDs in the report.
             query_interval (int): If provided, override the default query interval.
+            chunk_size (int): If provided, overrides the default number of chunks for query iteration.
 
         Returns:
             list: The rows of the generated CSV report.  Each item is a dictionary.
@@ -358,7 +377,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
         output_path = os.path.join(temp_dir_path, self.OUTPUT_FILE_NAME)
         org_list = [org] + other_names
         if only_courses is not None:
-            only_courses = ",".join(unicode(course_id) for course_id in only_courses)
+            only_courses = ",".join(text_type(course_id) for course_id in only_courses)
 
         command = email_opt_in_list.Command()
 
@@ -367,7 +386,10 @@ class EmailOptInListTest(ModuleStoreTestCase):
             command.QUERY_INTERVAL = query_interval
 
         # Execute the command
-        command.handle(output_path, *org_list, courses=only_courses)
+        kwargs = {'courses': only_courses}
+        if chunk_size:
+            kwargs['email_optin_chunk_size'] = chunk_size
+        call_command('email_opt_in_list', output_path, *org_list, **kwargs)
 
         # Retrieve the output from the file
         try:
@@ -375,7 +397,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
                 reader = csv.DictReader(output_file, fieldnames=self.OUTPUT_FIELD_NAMES)
                 rows = [row for row in reader]
         except IOError:
-            self.fail("Could not find or open output file at '{path}'".format(path=output_path))
+            self.fail(u"Could not find or open output file at '{path}'".format(path=output_path))
 
         # Return the output as a list of dictionaries
         return rows
@@ -401,6 +423,8 @@ class EmailOptInListTest(ModuleStoreTestCase):
 
         # Check the header row
         self.assertEqual({
+            "user_id": "user_id",
+            "username": "username",
             "email": "email",
             "full_name": "full_name",
             "course_id": "course_id",
@@ -411,14 +435,16 @@ class EmailOptInListTest(ModuleStoreTestCase):
         # Check data rows
         for user, course_id, opt_in_pref in args:
             self.assertIn({
+                "user_id": str(user.id),
+                "username": user.username.encode('utf-8'),
                 "email": user.email.encode('utf-8'),
                 "full_name": (
                     user.profile.name.encode('utf-8')
                     if hasattr(user, 'profile')
                     else ''
                 ),
-                "course_id": unicode(course_id).encode('utf-8'),
-                "is_opted_in_for_email": unicode(opt_in_pref),
+                "course_id": text_type(course_id).encode('utf-8'),
+                "is_opted_in_for_email": text_type(opt_in_pref),
                 "preference_set_datetime": (
                     self._latest_pref_set_datetime(self.user)
                     if kwargs.get("expect_pref_datetime", True)

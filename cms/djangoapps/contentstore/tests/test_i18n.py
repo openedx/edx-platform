@@ -1,17 +1,22 @@
+# -*- coding: utf-8 -*-
 """
 Tests for validate Internationalization and Module i18n service.
 """
-import mock
+from __future__ import absolute_import
+
 import gettext
 from unittest import skip
+
+import mock
 from django.contrib.auth.models import User
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from contentstore.tests.utils import AjaxEnabledTestClient
-from xmodule.modulestore.django import ModuleI18nService
 from django.utils import translation
 from django.utils.translation import get_language
-from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
+
+from contentstore.tests.utils import AjaxEnabledTestClient
 from contentstore.views.preview import _preview_module_system
+from xmodule.modulestore.django import ModuleI18nService
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class FakeTranslations(ModuleI18nService):
@@ -205,7 +210,7 @@ class InternationalizationTest(ModuleStoreTestCase):
 
         resp = self.client.get_html('/home/')
         self.assertContains(resp,
-                            '<h1 class="page-header">Studio Home</h1>',
+                            u'<h1 class="page-header">𝓢𝓽𝓾𝓭𝓲𝓸 Home</h1>',
                             status_code=200,
                             html=True)
 
@@ -221,7 +226,7 @@ class InternationalizationTest(ModuleStoreTestCase):
         )
 
         self.assertContains(resp,
-                            '<h1 class="page-header">Studio Home</h1>',
+                            u'<h1 class="page-header">𝓢𝓽𝓾𝓭𝓲𝓸 Home</h1>',
                             status_code=200,
                             html=True)
 

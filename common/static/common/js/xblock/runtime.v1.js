@@ -1,14 +1,14 @@
 (function() {
     'use strict';
 
-    XBlock.Runtime.v1 = (function() {
+    this.XBlock.Runtime.v1 = (function() {
         function v1() {
-            var _this = this;
+            var block = this;
             this.childMap = function() {
-                return v1.prototype.childMap.apply(_this, arguments);
+                return v1.prototype.childMap.apply(block, arguments);
             };
             this.children = function() {
-                return v1.prototype.children.apply(_this, arguments);
+                return v1.prototype.children.apply(block, arguments);
             };
         }
 
@@ -17,14 +17,15 @@
         };
 
         v1.prototype.childMap = function(block, childName) {
-            var child, _i, _len, _ref;
-            _ref = this.children(block);
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                child = _ref[_i];
+            var child, idx, len, ref;
+            ref = this.children(block);
+            for (idx = 0, len = ref.length; idx < len; idx++) {
+                child = ref[idx];
                 if (child.name === childName) {
                     return child;
                 }
             }
+            return null;
         };
 
         /**
@@ -43,5 +44,5 @@
         };
 
         return v1;
-    })();
+    }());
 }).call(this);

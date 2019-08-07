@@ -1,6 +1,9 @@
 """
 Tests for the organizations helpers library, which is the integration point for the edx-organizations API
 """
+from __future__ import absolute_import
+
+import six
 from mock import patch
 
 from util import organizations_helpers
@@ -42,7 +45,7 @@ class OrganizationsHelpersTestCase(ModuleStoreTestCase):
         self.assertEqual(len(response), 0)
 
     def test_get_course_organizations_returns_none_when_app_disabled(self):
-        response = organizations_helpers.get_course_organizations(unicode(self.course.id))
+        response = organizations_helpers.get_course_organizations(six.text_type(self.course.id))
         self.assertEqual(len(response), 0)
 
     def test_add_organization_returns_none_when_app_disabled(self):

@@ -22,7 +22,7 @@
     % for option in options:
         <li>
             % if has_options_value:
-                % if all([c == status.classname for c in option['choice'], status]):
+                % if all(c == status.classname for c in (option['choice'], status)):
                 <span class="tag-status ${status.classname}" aria-describedby="input_${id}_comment">
                     <%include file="status_span.html" args="status=status"/>
                 </span>

@@ -33,6 +33,16 @@ class AccountUserAlreadyExists(AccountRequestError):
     pass
 
 
+class AccountUsernameAlreadyExists(AccountRequestError):
+    """User with the same username already exists. """
+    pass
+
+
+class AccountEmailAlreadyExists(AccountRequestError):
+    """User with the same email already exists. """
+    pass
+
+
 class AccountUsernameInvalid(AccountRequestError):
     """The requested username is not in a valid format. """
     pass
@@ -45,6 +55,21 @@ class AccountEmailInvalid(AccountRequestError):
 
 class AccountPasswordInvalid(AccountRequestError):
     """The requested password is not in a valid format. """
+    pass
+
+
+class AccountCountryInvalid(AccountRequestError):
+    """The requested country does not exist. """
+    pass
+
+
+class AccountDataBadLength(AccountRequestError):
+    """The requested account data is either too short or too long. """
+    pass
+
+
+class AccountDataBadType(AccountRequestError):
+    """The requested account data is of the wrong type. """
     pass
 
 
@@ -83,6 +108,7 @@ class PreferenceValidationError(PreferenceRequestError):
     """
     def __init__(self, preference_errors):
         self.preference_errors = preference_errors
+        super(PreferenceValidationError, self).__init__(preference_errors)
 
 
 class PreferenceUpdateError(PreferenceRequestError):
@@ -93,6 +119,7 @@ class PreferenceUpdateError(PreferenceRequestError):
     def __init__(self, developer_message, user_message=None):
         self.developer_message = developer_message
         self.user_message = user_message
+        super(PreferenceUpdateError, self).__init__(developer_message)
 
 
 class CountryCodeError(ValueError):

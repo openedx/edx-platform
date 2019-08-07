@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%! from django.utils.translation import ugettext as _ %>
 <%inherit file="../main.html" />
 
@@ -13,7 +14,7 @@
             ${_("To resolve the problem, your partner manager should verify that the following information is correct.")}
         </p>
         <ul>
-            <li>${_("The institution&#39;s logo.")}</li>
+            <li>${_("The institution's logo.")}</li>
             <li>${_("The institution that is linked to the course.")}</li>
             <li>${_("The course information in the Course Administration tool.")}</li>
         </ul>

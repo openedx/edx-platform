@@ -28,14 +28,14 @@
 
 // +Font Sizing - Mixin
 // ====================
-@mixin font-size($sizeValue: 16){
+@mixin font-size($sizeValue: 16) {
   font-size: $sizeValue + px;
   font-size: ($sizeValue/10) + rem;
 }
 
 // +Line Height - Mixin
 // ====================
-@mixin line-height($fontSize: auto){
+@mixin line-height($fontSize: auto) {
   line-height: ($fontSize*1.48) + px;
   line-height: (($fontSize/10)*1.48) + rem;
 }
@@ -59,11 +59,13 @@
   :-moz-placeholder {
     color: $color;
   }
+
   ::-webkit-input-placeholder {
     color: $color;
   }
+
   :-ms-input-placeholder {
-     color: $color;
+    color: $color;
   }
 }
 
@@ -113,18 +115,21 @@
 %ui-wrapper {
   @include clearfix();
   @include box-sizing(border-box);
+
   width: 100%;
 }
 
 // layout placeholders
-.ui-col-wide  {
+.ui-col-wide {
   width: flex-grid(9, 12);
+
   @include margin-right(flex-gutter());
   @include float(left);
 }
 
-.ui-col-narrow  {
+.ui-col-narrow {
   width: flex-grid(3, 12);
+
   @include float(left);
 }
 
@@ -132,6 +137,7 @@
 // ====================
 %ui-window {
   @include clearfix();
+
   border-radius: ($baseline/10);
   box-shadow: 0 1px 1px $shadow-l2;
   margin-bottom: $baseline;
@@ -139,7 +145,8 @@
   background: $white;
 
   // STATE: hover/active
-  &:hover, &:active {
+  &:hover,
+  &:active {
     box-shadow: 0 1px 1px $shadow;
   }
 }
@@ -172,7 +179,6 @@
 // ====================
 // extends - UI - utility - first child clearing
 %wipe-first-child {
-
   &:first-child {
     margin-top: 0;
     border-top: none;
@@ -182,7 +188,6 @@
 
 // extends - UI - utility - last child clearing
 %wipe-last-child {
-
   &:last-child {
     margin-bottom: 0;
     border-bottom: none;
@@ -195,14 +200,13 @@
 %ui-btn {
   @include box-sizing(border-box);
   @include transition(color $tmg-f2 ease-in-out 0s, border-color $tmg-f2 ease-in-out 0s, background $tmg-f2 ease-in-out 0s, box-shadow $tmg-f2 ease-in-out 0s);
+
   display: inline-block;
   cursor: pointer;
 
-  &:hover, &:active {
-
-  }
-
-  &.disabled, &[disabled], &.is-disabled {
+  &.disabled,
+  &[disabled],
+  &.is-disabled {
     cursor: default;
     pointer-events: none;
     border: 1px solid $gray-l3;
@@ -231,21 +235,27 @@
   @extend %ui-btn;
   @extend %ui-btn-pill;
   @extend %t-strong;
-  padding:($baseline/2) $baseline;
+
+  padding: ($baseline/2) $baseline;
   border-width: 1px;
   border-style: solid;
   box-shadow: none;
   line-height: 1.5em;
   text-align: center;
 
-  &:hover, &:active, &:focus {
+  &:hover,
+  &:active,
+  &:focus {
     box-shadow: 0 2px 1px $shadow;
   }
 
-  &.current, &.active {
+  &.current,
+  &.active {
     box-shadow: inset 1px 1px 2px $shadow-d1;
 
-    &:hover, &:active, &:focus {
+    &:hover,
+    &:active,
+    &:focus {
       box-shadow: inset 1px 1px 1px $shadow-d1;
     }
   }
@@ -255,45 +265,52 @@
 %ui-btn-secondary {
   @extend %ui-btn;
   @extend %ui-btn-pill;
+
   border-width: 1px;
   border-style: solid;
-  padding:($baseline/2) $baseline;
+  padding: ($baseline/2) $baseline;
   background: transparent;
   line-height: 1.5em;
   text-align: center;
 }
 
 %ui-btn-flat-outline {
-  @include transition(all .15s);
+  @include transition(all 0.15s);
+
   @extend %t-strong;
   @extend %t-action4;
+
   text-align: center;
   border-radius: ($baseline/4);
-  border: 1px solid $uxpl-blue-base;
+  border: 1px solid theme-color("primary");
   padding: 1px ($baseline/2) 2px ($baseline/2);
-  background-color: $white;
-  color: $uxpl-blue-base;
+  background-color: theme-color("inverse");
+  color: theme-color("primary");
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     border: 1px solid $uxpl-blue-hover-active;
     background-color: $uxpl-blue-hover-active;
-    color: $white;
+    color: theme-color("inverse");
   }
 
   &.is-disabled,
-  &[disabled="disabled"]{
-   border: 1px solid $gray-l2;
-   background-color: $gray-l4;
-   color: $gray-l2;
-   pointer-events: none;
+  &[disabled="disabled"] {
+    border: 1px solid $gray-l2;
+    background-color: $gray-l4;
+    color: $gray-l2;
+    pointer-events: none;
   }
 }
 
 // button with no button shell until hover for understated actions
 %ui-btn-non {
-  @include transition(all .15s);
+  @include transition(all 0.15s);
+
   @extend %ui-btn-pill;
+
   @include transition(all $tmg-f2 linear 0s);
+
   display: inline-block;
   vertical-align: middle;
   border: none;
@@ -301,7 +318,8 @@
   background: none;
   color: $gray-l1;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     background-color: $gray-l1;
     color: $white;
   }
@@ -311,9 +329,10 @@
 %ui-btn-non-blue {
   @extend %ui-btn-non;
 
-  &:hover, &:focus {
-    background-color: $uxpl-blue-base;
-    color: $white;
+  &:hover,
+  &:focus {
+    background-color: theme-color("primary");
+    color: theme-color("inverse");
   }
 }
 
@@ -326,6 +345,7 @@
 
 %no-content {
   @extend %ui-well;
+
   padding: ($baseline*2);
   background-color: $gray-l4;
   text-align: center;
@@ -335,6 +355,7 @@
   .action {
     @extend %btn-primary-green;
     @extend %t-action3;
+
     margin-left: $baseline;
 
     .icon {
@@ -345,15 +366,18 @@
 
 .ui-loading {
   @include animation(fadeIn $tmg-f2 linear 1);
+
   @extend %ui-well;
   @extend %t-copy-base;
-  opacity: .6;
+
+  opacity: 0.6;
   background-color: $white;
   padding: ($baseline*1.5) $baseline;
   text-align: center;
 
   .spin {
     @extend %anim-rotateCW;
+
     display: inline-block;
   }
 
@@ -393,18 +417,18 @@
 // +Content - Screenreader Text - Extend
 // ====================
 %cont-text-sr {
-    // clip has been deprecated but is still supported
-    clip: rect(1px 1px 1px 1px);
-    clip: rect(1px, 1px, 1px, 1px);
-    position: absolute;
-    margin: -1px;
-    height: 1px;
-    width: 1px;
-    border: 0;
-    padding: 0;
-    overflow: hidden;
-    // ensure there are spaces in sr text
-    word-wrap: normal;
+  // clip has been deprecated but is still supported
+  clip: rect(1px 1px 1px 1px);
+  clip: rect(1px, 1px, 1px, 1px);
+  position: absolute;
+  margin: -1px;
+  height: 1px;
+  width: 1px;
+  border: 0;
+  padding: 0;
+  overflow: hidden;
+  // ensure there are spaces in sr text
+  word-wrap: normal;
 }
 
 // +Content - Text Wrap - Extend
@@ -417,6 +441,7 @@
 // ====================
 %cont-truncated {
   @include box-sizing(border-box);
+
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -446,8 +471,8 @@
   .icon-image {
     width: auto;
     height: auto;
-    max-height: 1.4em;
-    max-width: 1.4em;
+    max-height: 2em;
+    max-width: 2em;
     margin-top: -2px;
   }
 }

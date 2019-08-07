@@ -9,11 +9,18 @@ Configuration values:
 If no grade response is configured, a default response will be returned.
 """
 
-from .http import StubHttpRequestHandler, StubHttpService, require_params
-import json
+from __future__ import absolute_import
+
 import copy
-from requests import post
+import json
 from threading import Timer
+
+import six
+from requests import post
+
+from openedx.core.djangolib.markup import HTML
+
+from .http import StubHttpRequestHandler, StubHttpService, require_params
 
 
 class StubXQueueHandler(StubHttpRequestHandler):
@@ -145,7 +152,7 @@ class StubXQueueHandler(StubHttpRequestHandler):
 
         # Wrap the message in <div> tags to ensure that it is valid XML
         if isinstance(grade_response, dict) and 'msg' in grade_response:
-            grade_response['msg'] = "<div>{0}</div>".format(grade_response['msg'])
+            grade_response['msg'] = HTML("<div>{0}</div>").format(grade_response['msg'])
 
         data = {
             'xqueue_header': json.dumps(xqueue_header),
@@ -214,8 +221,8 @@ class StubXQueueService(StubHttpService):
         Every configuration key is a queue name,
         except for 'default' and 'register_submission_url' which have special meaning
         """
-        return {
+        return list({
             key: value
-            for key, value in self.config.iteritems()
+            for key, value in six.iteritems(self.config)
             if key not in self.NON_QUEUE_CONFIG_KEYS
-        }.items()
+        }.items())

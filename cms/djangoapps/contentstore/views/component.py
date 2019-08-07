@@ -2,35 +2,30 @@ from __future__ import absolute_import
 
 import logging
 
-from django.http import HttpResponseBadRequest, Http404
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_GET
-from django.core.exceptions import PermissionDenied
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.http import Http404, HttpResponseBadRequest
+from django.utils.translation import ugettext as _
+from django.views.decorators.http import require_GET
 from opaque_keys import InvalidKeyError
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from edxmako.shortcuts import render_to_response
-
-from xmodule.modulestore.django import modulestore
-
+from opaque_keys.edx.keys import UsageKey
 from xblock.core import XBlock
-from xblock.django.request import webob_to_django_response, django_to_webob_request
+from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xblock.exceptions import NoSuchHandlerError
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
 
-from contentstore.utils import get_lms_link_for_item
+from contentstore.utils import get_lms_link_for_item, reverse_course_url
 from contentstore.views.helpers import get_parent_xblock, is_unit, xblock_type_display_name
-from contentstore.views.item import create_xblock_info, add_container_page_publishing_info, StudioEditModuleRuntime
-
-from opaque_keys.edx.keys import UsageKey
-
+from contentstore.views.item import StudioEditModuleRuntime, add_container_page_publishing_info, create_xblock_info
+from edxmako.shortcuts import render_to_response
+from openedx.core.lib.xblock_utils import is_xblock_aside, get_aside_from_xblock
 from student.auth import has_course_author_access
-from django.utils.translation import ugettext as _
-
-from xblock_django.api import disabled_xblocks, authorable_xblocks
+from xblock_django.api import authorable_xblocks, disabled_xblocks
 from xblock_django.models import XBlockStudioConfigurationFlag
-
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 __all__ = [
     'container_handler',
@@ -51,8 +46,8 @@ CONTAINER_TEMPLATES = [
     "editor-mode-button", "upload-dialog",
     "add-xblock-component", "add-xblock-component-button", "add-xblock-component-menu",
     "add-xblock-component-support-legend", "add-xblock-component-support-level", "add-xblock-component-menu-problem",
-    "xblock-string-field-editor", "publish-xblock", "publish-history",
-    "unit-outline", "container-message", "license-selector",
+    "xblock-string-field-editor", "xblock-access-editor", "publish-xblock", "publish-history",
+    "unit-outline", "container-message", "container-access", "license-selector",
 ]
 
 
@@ -155,6 +150,7 @@ def container_handler(request, usage_key_string):
                 index += 1
 
             return render_to_response('container.html', {
+                'language_code': request.LANGUAGE_CODE,
                 'context_course': course,  # Needed only for display of menus at top of page.
                 'action': action,
                 'xblock': xblock,
@@ -164,6 +160,7 @@ def container_handler(request, usage_key_string):
                 'subsection': subsection,
                 'section': section,
                 'new_unit_category': 'vertical',
+                'outline_url': '{url}?format=concise'.format(url=reverse_course_url('course_handler', course.id)),
                 'ancestor_xblocks': ancestor_xblocks,
                 'component_templates': component_templates,
                 'xblock_info': xblock_info,
@@ -237,7 +234,7 @@ def get_component_templates(courselike, library=False):
         return {
             "show_legend": XBlockStudioConfigurationFlag.is_enabled(),
             "allow_unsupported_xblocks": allow_unsupported,
-            "documentation_label": _("{platform_name} Support Levels:").format(platform_name=settings.PLATFORM_NAME)
+            "documentation_label": _(u"{platform_name} Support Levels:").format(platform_name=settings.PLATFORM_NAME)
         }
 
     component_display_names = {
@@ -297,7 +294,7 @@ def get_component_templates(courselike, library=False):
 
                         templates_for_category.append(
                             create_template_dict(
-                                _(template['metadata'].get('display_name')),    # pylint: disable=translation-of-non-string
+                                _(template['metadata'].get('display_name')),
                                 category,
                                 support_level_with_template,
                                 template_id,
@@ -306,8 +303,9 @@ def get_component_templates(courselike, library=False):
                             )
                         )
 
-        # Add any advanced problem types. Note that these are different xblocks being stored as Advanced Problems.
-        if category == 'problem':
+        # Add any advanced problem types. Note that these are different xblocks being stored as Advanced Problems,
+        # currently not supported in libraries .
+        if category == 'problem' and not library:
             disabled_block_names = [block.name for block in disabled_xblocks()]
             advanced_problem_types = [advanced_problem_type for advanced_problem_type in ADVANCED_PROBLEM_TYPES
                                       if advanced_problem_type['component'] not in disabled_block_names]
@@ -325,7 +323,7 @@ def get_component_templates(courselike, library=False):
                     try:
                         component_display_name = xblock_type_display_name(component)
                     except PluginMissingError:
-                        log.warning('Unable to load xblock type %s to read display_name', component, exc_info=True)
+                        log.warning(u'Unable to load xblock type %s to read display_name', component, exc_info=True)
                     else:
                         templates_for_category.append(
                             create_template_dict(
@@ -383,12 +381,12 @@ def get_component_templates(courselike, library=False):
                     # prevents any authors from trying to instantiate the
                     # non-existent component type by not showing it in the menu
                     log.warning(
-                        "Advanced component %s does not exist. It will not be added to the Studio new component menu.",
+                        u"Advanced component %s does not exist. It will not be added to the Studio new component menu.",
                         category
                     )
     else:
         log.error(
-            "Improper format for course advanced keys! %s",
+            u"Improper format for course advanced keys! %s",
             course_advanced_keys
         )
     if len(advanced_component_templates['templates']) > 0:
@@ -443,23 +441,29 @@ def component_handler(request, usage_key_string, handler, suffix=''):
         :class:`django.http.HttpResponse`: The response from the handler, converted to a
             django response
     """
-
     usage_key = UsageKey.from_string(usage_key_string)
 
-    descriptor = modulestore().get_item(usage_key)
-    descriptor.xmodule_runtime = StudioEditModuleRuntime(request.user)
     # Let the module handle the AJAX
     req = django_to_webob_request(request)
 
     try:
-        resp = descriptor.handle(handler, req, suffix)
-
+        if is_xblock_aside(usage_key):
+            # Get the descriptor for the block being wrapped by the aside (not the aside itself)
+            descriptor = modulestore().get_item(usage_key.usage_key)
+            handler_descriptor = get_aside_from_xblock(descriptor, usage_key.aside_type)
+            asides = [handler_descriptor]
+        else:
+            descriptor = modulestore().get_item(usage_key)
+            handler_descriptor = descriptor
+            asides = []
+        handler_descriptor.xmodule_runtime = StudioEditModuleRuntime(request.user)
+        resp = handler_descriptor.handle(handler, req, suffix)
     except NoSuchHandlerError:
-        log.info("XBlock %s attempted to access missing handler %r", descriptor, handler, exc_info=True)
+        log.info(u"XBlock %s attempted to access missing handler %r", handler_descriptor, handler, exc_info=True)
         raise Http404
 
     # unintentional update to handle any side effects of handle call
     # could potentially be updating actual course data or simply caching its values
-    modulestore().update_item(descriptor, request.user.id)
+    modulestore().update_item(descriptor, request.user.id, asides=asides)
 
     return webob_to_django_response(resp)

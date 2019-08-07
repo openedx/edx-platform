@@ -3,6 +3,7 @@
 
 .wrapper-sock {
   @include clearfix();
+
   position: relative;
   margin: ($baseline*2) 0 0 0;
   border-top: 1px solid $gray-l4;
@@ -10,6 +11,7 @@
 
   .wrapper-inner {
     @include linear-gradient($gray-d3 0%, $gray-d3 98%, $black 100%);
+
     display: none;
     width: 100% !important;
     border-bottom: 1px solid $white;
@@ -19,6 +21,7 @@
   // sock - actions
   .list-cta {
     @extend %ui-depth1;
+
     position: absolute;
     top: -($baseline*0.75);
     width: 100%;
@@ -27,6 +30,7 @@
 
     .cta-show-sock {
       @extend %ui-btn-pill;
+
       background: $uxpl-grayscale-x-back;
       font-size: font-size(x-small);
       padding: ($baseline/2) $baseline;
@@ -47,6 +51,7 @@
   .sock {
     @include clearfix();
     @include span(12);
+
     max-width: $fg-max-width;
     min-width: $fg-min-width;
     margin: 0 auto;
@@ -73,6 +78,7 @@
         .action-item {
           @include float(left);
           @include margin-right($baseline/2);
+
           margin-bottom: ($baseline/2);
 
           &:last-child {
@@ -84,6 +90,7 @@
 
             .icon {
               vertical-align: middle;
+
               @include margin-right($baseline/4);
             }
           }
@@ -104,10 +111,11 @@
     .support {
       @include float(left);
       @include span(8);
+
       margin-right: flex-gutter();
 
       .action-item {
-        width: flexgrid(4,8);
+        width: flexgrid(4, 8);
       }
     }
 
@@ -115,8 +123,9 @@
     .feedback {
       @include float(left);
       @include span(4);
+
       .action-item {
-        width: flexgrid(4,4);
+        width: flexgrid(4, 4);
       }
     }
   }

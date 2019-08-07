@@ -3,23 +3,30 @@ An implementation of :class:`XBlockUserStateClient`, which stores XBlock Scope.u
 data in a Django ORM model.
 """
 
+from __future__ import absolute_import
+
 import itertools
+import logging
 from operator import attrgetter
 from time import time
-import logging
+
+import six
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.core.paginator import Paginator
+from django.db import transaction
+from django.db.utils import IntegrityError
+from edx_django_utils import monitoring as monitoring_utils
+from edx_user_state_client.interface import XBlockUserState, XBlockUserStateClient
+from xblock.fields import Scope
+
+from courseware.models import BaseStudentModuleHistory, StudentModule
+
 try:
     import simplejson as json
 except ImportError:
     import json
 
-import newrelic_custom_metrics
-import dogstats_wrapper as dog_stats_api
-from django.contrib.auth.models import User
-from django.db import transaction
-from django.db.utils import IntegrityError
-from xblock.fields import Scope
-from courseware.models import StudentModule, BaseStudentModuleHistory
-from edx_user_state_client.interface import XBlockUserStateClient, XBlockUserState
 
 log = logging.getLogger(__name__)
 
@@ -100,27 +107,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                 usage_key = student_module.module_state_key.map_into_course(student_module.course_id)
                 yield (student_module, usage_key)
 
-    def _ddog_increment(self, evt_time, evt_name):
-        """
-        DataDog increment method.
-        """
-        dog_stats_api.increment(
-            'DjangoXBlockUserStateClient.{}'.format(evt_name),
-            timestamp=evt_time,
-            sample_rate=self.API_DATADOG_SAMPLE_RATE,
-        )
-
-    def _ddog_histogram(self, evt_time, evt_name, value):
-        """
-        DataDog histogram method.
-        """
-        dog_stats_api.histogram(
-            'DjangoXBlockUserStateClient.{}'.format(evt_name),
-            value,
-            timestamp=evt_time,
-            sample_rate=self.API_DATADOG_SAMPLE_RATE,
-        )
-
     def _nr_metric_name(self, function_name, stat_name, block_type=None):
         """
         Return a metric name (string) representing the provided descriptors.
@@ -136,7 +122,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         """
         Accumulate arbitrary NR stats (not specific to block types).
         """
-        newrelic_custom_metrics.accumulate(
+        monitoring_utils.accumulate(
             self._nr_metric_name(function_name, stat_name),
             value
         )
@@ -151,11 +137,11 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         """
         Accumulate NR stats related to block types.
         """
-        newrelic_custom_metrics.accumulate(
+        monitoring_utils.accumulate(
             self._nr_metric_name(function_name, stat_name),
             value,
         )
-        newrelic_custom_metrics.accumulate(
+        monitoring_utils.accumulate(
             self._nr_metric_name(function_name, stat_name, block_type=block_type),
             value,
         )
@@ -181,7 +167,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             field_state is a dict mapping field names to values.
         """
         if scope != Scope.user_state:
-            raise ValueError("Only Scope.user_state is supported, not {}".format(scope))
+            raise ValueError(u"Only Scope.user_state is supported, not {}".format(scope))
 
         total_block_count = 0
         evt_time = time()
@@ -190,21 +176,15 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         self._nr_stat_increment('get_many', 'calls')
 
         # keep track of blocks requested
-        self._ddog_histogram(evt_time, 'get_many.blks_requested', len(block_keys))
         self._nr_stat_accumulate('get_many', 'blocks_requested', len(block_keys))
 
         modules = self._get_student_modules(username, block_keys)
         for module, usage_key in modules:
             if module.state is None:
-                self._ddog_increment(evt_time, 'get_many.empty_state')
                 continue
 
             state = json.loads(module.state)
             state_length = len(module.state)
-
-            # record this metric before the check for empty state, so that we
-            # have some visibility into empty blocks.
-            self._ddog_histogram(evt_time, 'get_many.block_size', state_length)
 
             # If the state is the empty dict, then it has been deleted, and so
             # conformant UserStateClients should treat it as if it doesn't exist.
@@ -228,9 +208,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         # The rest of this method exists only to report metrics.
         finish_time = time()
         duration = (finish_time - evt_time) * 1000  # milliseconds
-
-        self._ddog_histogram(evt_time, 'get_many.blks_out', total_block_count)
-        self._ddog_histogram(evt_time, 'get_many.response_time', duration)
         self._nr_stat_accumulate('get_many', 'duration', duration)
 
     def set_many(self, username, block_keys_to_state, scope=Scope.user_state):
@@ -260,7 +237,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         else:
             user = User.objects.get(username=username)
 
-        if user.is_anonymous():
+        if user.is_anonymous:
             # Anonymous users cannot be persisted to the database, so let's just use
             # what we have.
             return
@@ -268,15 +245,25 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         evt_time = time()
 
         for usage_key, state in block_keys_to_state.items():
-            student_module, created = StudentModule.objects.get_or_create(
-                student=user,
-                course_id=usage_key.course_key,
-                module_state_key=usage_key,
-                defaults={
-                    'state': json.dumps(state),
-                    'module_type': usage_key.block_type,
-                },
-            )
+            try:
+                student_module, created = StudentModule.objects.get_or_create(
+                    student=user,
+                    course_id=usage_key.course_key,
+                    module_state_key=usage_key,
+                    defaults={
+                        'state': json.dumps(state),
+                        'module_type': usage_key.block_type,
+                    },
+                )
+            except IntegrityError:
+                # PLAT-1109 - Until we switch to read committed, we cannot rely
+                # on get_or_create to be able to see rows created in another
+                # process. This seems to happen frequently, and ignoring it is the
+                # best course of action for now
+                log.warning(u"set_many: IntegrityError for student {} - course_id {} - usage key {}".format(
+                    user, repr(six.text_type(usage_key.course_key)), usage_key
+                ))
+                return
 
             num_fields_before = num_fields_after = num_new_fields_set = len(state)
             num_fields_updated = 0
@@ -296,11 +283,11 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                 except IntegrityError:
                     # The UPDATE above failed. Log information - but ignore the error.
                     # See https://openedx.atlassian.net/browse/TNL-5365
-                    log.warning("set_many: IntegrityError for student {} - course_id {} - usage key {}".format(
-                        user, repr(unicode(usage_key.course_key)), usage_key
+                    log.warning(u"set_many: IntegrityError for student {} - course_id {} - usage key {}".format(
+                        user, repr(six.text_type(usage_key.course_key)), usage_key
                     ))
-                    log.warning("set_many: All {} block keys: {}".format(
-                        len(block_keys_to_state), block_keys_to_state.keys()
+                    log.warning(u"set_many: All {} block keys: {}".format(
+                        len(block_keys_to_state), list(block_keys_to_state.keys())
                     ))
 
             # DataDog and New Relic reporting
@@ -310,28 +297,19 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
 
             # Record whether a state row has been created or updated.
             if created:
-                self._ddog_increment(evt_time, 'set_many.state_created')
                 self._nr_block_stat_increment('set_many', usage_key.block_type, 'blocks_created')
             else:
-                self._ddog_increment(evt_time, 'set_many.state_updated')
                 self._nr_block_stat_increment('set_many', usage_key.block_type, 'blocks_updated')
-
-            # Event to record number of fields sent in to set/set_many.
-            self._ddog_histogram(evt_time, 'set_many.fields_in', len(state))
 
             # Event to record number of new fields set in set/set_many.
             num_new_fields_set = num_fields_after - num_fields_before
-            self._ddog_histogram(evt_time, 'set_many.fields_set', num_new_fields_set)
 
             # Event to record number of existing fields updated in set/set_many.
             num_fields_updated = max(0, len(state) - num_new_fields_set)
-            self._ddog_histogram(evt_time, 'set_many.fields_updated', num_fields_updated)
 
         # Events for the entire set_many call.
         finish_time = time()
         duration = (finish_time - evt_time) * 1000  # milliseconds
-        self._ddog_histogram(evt_time, 'set_many.blks_updated', len(block_keys_to_state))
-        self._ddog_histogram(evt_time, 'set_many.response_time', duration)
         self._nr_stat_accumulate('set_many', 'duration', duration)
 
     def delete_many(self, username, block_keys, scope=Scope.user_state, fields=None):
@@ -348,13 +326,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             raise ValueError("Only Scope.user_state is supported")
 
         evt_time = time()
-        if fields is None:
-            self._ddog_increment(evt_time, 'delete_many.empty_state')
-        else:
-            self._ddog_histogram(evt_time, 'delete_many.field_count', len(fields))
-
-        self._ddog_histogram(evt_time, 'delete_many.block_count', len(block_keys))
-
         student_modules = self._get_student_modules(username, block_keys)
         for student_module, _ in student_modules:
             if fields is None:
@@ -372,7 +343,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
 
         # Event for the entire delete_many call.
         finish_time = time()
-        self._ddog_histogram(evt_time, 'delete_many.response_time', (finish_time - evt_time) * 1000)
 
     def get_history(self, username, block_key, scope=Scope.user_state):
         """
@@ -426,22 +396,69 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
 
             yield XBlockUserState(username, block_key, state, history_entry.created, scope)
 
-    def iter_all_for_block(self, block_key, scope=Scope.user_state, batch_size=None):
+    def iter_all_for_block(self, block_key, scope=Scope.user_state):
         """
-        You get no ordering guarantees. Fetching will happen in batch_size
-        increments. If you're using this method, you should be running in an
-        async task.
-        """
-        if scope != Scope.user_state:
-            raise ValueError("Only Scope.user_state is supported")
-        raise NotImplementedError()
+        Return an iterator over the data stored in the block (e.g. a problem block).
 
-    def iter_all_for_course(self, course_key, block_type=None, scope=Scope.user_state, batch_size=None):
-        """
-        You get no ordering guarantees. Fetching will happen in batch_size
-        increments. If you're using this method, you should be running in an
+        You get no ordering guarantees.If you're using this method, you should be running in an
         async task.
+
+        Arguments:
+            block_key: an XBlock's locator (e.g. :class:`~BlockUsageLocator`)
+            scope (Scope): must be `Scope.user_state`
+
+        Returns:
+            an iterator over all data. Each invocation returns the next :class:`~XBlockUserState`
+                object, which includes the block's contents.
         """
         if scope != Scope.user_state:
             raise ValueError("Only Scope.user_state is supported")
-        raise NotImplementedError()
+
+        results = StudentModule.objects.order_by('id').filter(module_state_key=block_key)
+        p = Paginator(results, settings.USER_STATE_BATCH_SIZE)
+
+        for page_number in p.page_range:
+            page = p.page(page_number)
+
+            for sm in page.object_list:
+                state = json.loads(sm.state)
+
+                if state == {}:
+                    continue
+
+                yield XBlockUserState(sm.student.username, sm.module_state_key, state, sm.modified, scope)
+
+    def iter_all_for_course(self, course_key, block_type=None, scope=Scope.user_state):
+        """
+        Return an iterator over all data stored in a course's blocks.
+
+        You get no ordering guarantees. If you're using this method, you should be running in an
+        async task.
+
+        Arguments:
+            course_key: a course locator
+            scope (Scope): must be `Scope.user_state`
+
+        Returns:
+            an iterator over all data. Each invocation returns the next :class:`~XBlockUserState`
+                object, which includes the block's contents.
+        """
+        if scope != Scope.user_state:
+            raise ValueError("Only Scope.user_state is supported")
+
+        results = StudentModule.objects.order_by('id').filter(course_id=course_key)
+        if block_type:
+            results = results.filter(module_type=block_type)
+
+        p = Paginator(results, settings.USER_STATE_BATCH_SIZE)
+
+        for page_number in p.page_range:
+            page = p.page(page_number)
+
+            for sm in page.object_list:
+                state = json.loads(sm.state)
+
+                if state == {}:
+                    continue
+
+                yield XBlockUserState(sm.student.username, sm.module_state_key, state, sm.modified, scope)

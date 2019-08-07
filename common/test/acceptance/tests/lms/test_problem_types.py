@@ -1,15 +1,18 @@
 """
 Bok choy acceptance and a11y tests for problem types in the LMS
-
-See also lettuce tests in lms/djangoapps/courseware/features/problems.feature
 """
+from __future__ import absolute_import
+
 import random
 import textwrap
-
 from abc import ABCMeta, abstractmethod
-from nose import SkipTest
-from nose.plugins.attrib import attr
+
+import ddt
+import pytest
+import six
+from bok_choy.promise import BrokenPromise
 from selenium.webdriver import ActionChains
+from six.moves import range
 
 from capa.tests.response_xml_factory import (
     AnnotationResponseXMLFactory,
@@ -24,14 +27,13 @@ from capa.tests.response_xml_factory import (
     NumericalResponseXMLFactory,
     OptionResponseXMLFactory,
     StringResponseXMLFactory,
-    SymbolicResponseXMLFactory,
+    SymbolicResponseXMLFactory
 )
-
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.lms.problem import ProblemPage
-from common.test.acceptance.tests.helpers import select_option_by_text
-from common.test.acceptance.tests.helpers import EventsTestMixin
+from common.test.acceptance.tests.helpers import EventsTestMixin, select_option_by_text
 from common.test.acceptance.tests.lms.test_lms_problems import ProblemsTest
+from openedx.core.lib.tests import attr
 
 
 class ProblemTypeTestBaseMeta(ABCMeta):
@@ -51,7 +53,7 @@ class ProblemTypeTestBaseMeta(ABCMeta):
         ]
 
         for required_attr in required_attrs:
-            msg = ('{} is a required attribute for {}').format(
+            msg = (u'{} is a required attribute for {}').format(
                 required_attr, str(cls)
             )
 
@@ -64,7 +66,7 @@ class ProblemTypeTestBaseMeta(ABCMeta):
         return obj
 
 
-class ProblemTypeTestBase(ProblemsTest, EventsTestMixin):
+class ProblemTypeTestBase(six.with_metaclass(ProblemTypeTestBaseMeta, ProblemsTest, EventsTestMixin)):
     """
     Base class for testing assesment problem types in bok choy.
 
@@ -80,16 +82,18 @@ class ProblemTypeTestBase(ProblemsTest, EventsTestMixin):
     Additionally, the default values for factory_kwargs and status_indicators
     may need to be overridden for some problem types.
     """
-    __metaclass__ = ProblemTypeTestBaseMeta
 
     problem_name = None
     problem_type = None
+    problem_points = 1
     factory = None
     factory_kwargs = {}
     status_indicators = {
         'correct': ['span.correct'],
         'incorrect': ['span.incorrect'],
         'unanswered': ['span.unanswered'],
+        'submitted': ['span.submitted'],
+        'unsubmitted': ['.unsubmitted']
     }
 
     def setUp(self):
@@ -99,6 +103,10 @@ class ProblemTypeTestBase(ProblemsTest, EventsTestMixin):
         super(ProblemTypeTestBase, self).setUp()
         self.courseware_page.visit()
         self.problem_page = ProblemPage(self.browser)
+
+    def get_sequential(self):
+        """ Allow any class in the inheritance chain to customize subsection metadata."""
+        return XBlockFixtureDesc('sequential', 'Test Subsection', metadata=getattr(self, 'sequential_metadata', {}))
 
     def get_problem(self):
         """
@@ -117,11 +125,28 @@ class ProblemTypeTestBase(ProblemsTest, EventsTestMixin):
         Waits for the expected status indicator.
 
         Args:
-            status: one of ("correct", "incorrect", "unanswered)
+            status: one of ("correct", "incorrect", "unanswered", "submitted")
         """
-        msg = "Wait for status to be {}".format(status)
+        msg = u"Wait for status to be {}".format(status)
         selector = ', '.join(self.status_indicators[status])
         self.problem_page.wait_for_element_visibility(selector, msg)
+
+    def problem_status(self, status):
+        """
+        Returns the status of problem
+        Args:
+            status(string): status of the problem which is to be checked
+
+        Returns:
+            True: If provided status is present on the page
+            False: If provided status is not present on the page
+        """
+        selector = ', '.join(self.status_indicators[status])
+        try:
+            self.problem_page.wait_for_element_visibility(selector, 'Status not present', timeout=10)
+            return True
+        except BrokenPromise:
+            return False
 
     @abstractmethod
     def answer_problem(self, correctness):
@@ -149,12 +174,14 @@ class ProblemTypeA11yTestMixin(object):
 
         # Set the scope to the problem container
         self.problem_page.a11y_audit.config.set_scope(
-            include=['div#seq_content'])
+            include=['div#seq_content']
+        )
 
         # Run the accessibility audit.
         self.problem_page.a11y_audit.check_for_accessibility_errors()
 
 
+@ddt.ddt
 class ProblemTypeTestMixin(ProblemTypeA11yTestMixin):
     """
     Test cases shared amongst problem types.
@@ -162,7 +189,7 @@ class ProblemTypeTestMixin(ProblemTypeA11yTestMixin):
     can_submit_blank = False
     can_update_save_notification = True
 
-    @attr(shard=7)
+    @attr(shard=11)
     def test_answer_correctly(self):
         """
         Scenario: I can answer a problem correctly
@@ -207,7 +234,7 @@ class ProblemTypeTestMixin(ProblemTypeA11yTestMixin):
         for event in expected_events:
             self.wait_for_events(event_filter=event, number_of_matches=1)
 
-    @attr(shard=7)
+    @attr(shard=11)
     def test_answer_incorrectly(self):
         """
         Scenario: I can answer a problem incorrectly
@@ -228,7 +255,7 @@ class ProblemTypeTestMixin(ProblemTypeA11yTestMixin):
         self.wait_for_status('incorrect')
         self.problem_page.wait_incorrect_notification()
 
-    @attr(shard=7)
+    @attr(shard=11)
     def test_submit_blank_answer(self):
         """
         Scenario: I can submit a blank answer
@@ -238,7 +265,7 @@ class ProblemTypeTestMixin(ProblemTypeA11yTestMixin):
         And The "<ProblemType>" problem displays a "blank" answer
         """
         if not self.can_submit_blank:
-            raise SkipTest("Test incompatible with the current problem type")
+            pytest.skip("Test incompatible with the current problem type")
 
         self.problem_page.wait_for(
             lambda: self.problem_page.problem_name == self.problem_name,
@@ -250,7 +277,7 @@ class ProblemTypeTestMixin(ProblemTypeA11yTestMixin):
         self.problem_page.click_submit()
         self.wait_for_status('incorrect')
 
-    @attr(shard=7)
+    @attr(shard=11)
     def test_cant_submit_blank_answer(self):
         """
         Scenario: I can't submit a blank answer
@@ -258,7 +285,7 @@ class ProblemTypeTestMixin(ProblemTypeA11yTestMixin):
         Then I can't submit a problem
         """
         if self.can_submit_blank:
-            raise SkipTest("Test incompatible with the current problem type")
+            pytest.skip("Test incompatible with the current problem type")
 
         self.problem_page.wait_for(
             lambda: self.problem_page.problem_name == self.problem_name,
@@ -266,7 +293,7 @@ class ProblemTypeTestMixin(ProblemTypeA11yTestMixin):
         )
         self.assertTrue(self.problem_page.is_submit_disabled())
 
-    @attr(shard=7)
+    @attr(shard=12)
     def test_can_show_answer(self):
         """
         Scenario: Verifies that show answer button is working as expected.
@@ -278,9 +305,9 @@ class ProblemTypeTestMixin(ProblemTypeA11yTestMixin):
         And I should see the problem title is focused
         """
         self.problem_page.click_show()
-        self.problem_page.wait_for_focus_on_problem_meta()
+        self.problem_page.wait_for_show_answer_notification()
 
-    @attr(shard=7)
+    @attr(shard=12)
     def test_save_reaction(self):
         """
         Scenario: Verify that the save button performs as expected with problem types
@@ -314,32 +341,7 @@ class ProblemTypeTestMixin(ProblemTypeA11yTestMixin):
             self.answer_problem(correctness='incorrect')
             self.assertFalse(self.problem_page.is_save_notification_visible())
 
-    @attr(shard=7)
-    def test_reset_clears_answer_and_focus(self):
-        """
-        Scenario: Reset will clear answers and focus on problem meta
-        If I select an answer
-        and then reset the problem
-        There should be no answer selected
-        And the focus should shift appropriately
-        """
-        self.problem_page.wait_for(
-            lambda: self.problem_page.problem_name == self.problem_name,
-            "Make sure the correct problem is on the page"
-        )
-        self.wait_for_status('unanswered')
-        # Set an answer
-        self.answer_problem(correctness='correct')
-        self.problem_page.click_submit()
-        self.wait_for_status('correct')
-        # clear the answers
-        self.problem_page.click_reset()
-        # Focus should change to meta
-        self.problem_page.wait_for_focus_on_problem_meta()
-        # Answer should be reset
-        self.wait_for_status('unanswered')
-
-    @attr(shard=7)
+    @attr(shard=12)
     def test_reset_shows_errors(self):
         """
         Scenario: Reset will show server errors
@@ -357,7 +359,7 @@ class ProblemTypeTestMixin(ProblemTypeA11yTestMixin):
         self.problem_page.click_reset()
         self.problem_page.wait_for_gentle_alert_notification()
 
-    @attr(shard=7)
+    @attr(shard=12)
     def test_partially_complete_notifications(self):
         """
         Scenario: If a partially correct problem is submitted the correct notification is shown
@@ -367,7 +369,7 @@ class ProblemTypeTestMixin(ProblemTypeA11yTestMixin):
 
         # Not all problems have partially correct solutions configured
         if not self.partially_correct:
-            raise SkipTest("Test incompatible with the current problem type")
+            pytest.skip("Test incompatible with the current problem type")
 
         self.problem_page.wait_for(
             lambda: self.problem_page.problem_name == self.problem_name,
@@ -380,13 +382,183 @@ class ProblemTypeTestMixin(ProblemTypeA11yTestMixin):
         self.problem_page.click_submit()
         self.problem_page.wait_partial_notification()
 
+    @ddt.data('correct', 'incorrect')
+    def test_reset_problem(self, correctness):
+        """
+        Scenario: I can reset a problem
 
-class AnnotationProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
+        Given I am viewing a problem with randomization: always and with reset button: on
+        And I answer a problem as <correctness>
+        When I reset the problem
+        Then my answer is marked "unanswered"
+        And The problem displays a "blank" answer
+        """
+        self.answer_problem(correctness)
+        self.problem_page.click_submit()
+        self.problem_page.click_reset()
+        self.assertTrue(self.problem_status('unanswered'))
+
+
+@ddt.ddt
+class ChangingAnswerOfProblemTestMixin(object):
     """
-    TestCase Class for Annotation Problem Type
+    Test the effect of changing the answers of problem
+    """
+
+    @ddt.data(['correct', '1/1 point (ungraded)'], ['incorrect', '0/1 point (ungraded)'])
+    @ddt.unpack
+    def test_checkbox_score_after_answer_and_reset(self, correctness, score):
+        """
+        Scenario: I can see my score on problem when I answer it and after I reset it
+
+        Given I am viewing problem
+        When I answer problem with <correctness>
+        Then I should see a <score>
+        When I reset the problem
+        Then I should see a score of points possible: 0/1 point (ungraded)
+        """
+        self.answer_problem(correctness)
+        self.problem_page.click_submit()
+        self.assertEqual(self.problem_page.problem_progress_graded_value, score)
+        self.problem_page.click_reset()
+        self.assertEqual(self.problem_page.problem_progress_graded_value, '0/1 point (ungraded)')
+
+    @ddt.data(['correct', 'incorrect'], ['incorrect', 'correct'])
+    @ddt.unpack
+    def test_reset_correctness_after_changing_answer(self, initial_correctness, other_correctness):
+        """
+        Scenario: I can reset the correctness of a problem after changing my answer
+
+        Given I am viewing problem
+        Then my problem's answer is marked "unanswered"
+        When I answer and submit the problem with <initial correctness>
+        Then my problem's answer is marked with <initial correctness>
+        And I input an answer as <other correctness>
+        Then my problem's answer is marked "unanswered"
+        """
+        self.assertTrue(self.problem_status('unanswered'))
+        self.answer_problem(initial_correctness)
+        self.problem_page.click_submit()
+
+        self.assertTrue(self.problem_status(initial_correctness))
+
+        self.answer_problem(other_correctness)
+        self.assertTrue(self.problem_status('unanswered'))
+
+
+@ddt.ddt
+class NonRandomizedProblemTypeTestMixin(ProblemTypeA11yTestMixin):
+    """
+    Test the effect of 'randomization: never'
+    """
+    can_submit_blank = False
+    can_update_save_notification = True
+
+    def test_non_randomized_problem_correctly(self):
+        """
+        Scenario: The reset button doesn't show up
+
+        Given I am viewing a problem with "randomization": never and with "reset button": on
+        And I answer problem problem problem correctly
+        Then The "Reset" button does not appear
+        """
+        self.answer_problem("correct")
+        self.problem_page.click_submit()
+        self.assertFalse(self.problem_page.is_reset_button_present())
+
+    def test_non_randomized_problem_incorrectly(self):
+        """
+        Scenario: I can reset a non-randomized problem that I answered incorrectly
+
+        Given I am viewing problem with "randomization": never and with "reset button": on
+        And I answer problem incorrectly
+        When I reset the problem
+        Then my problem answer is marked "unanswered"
+        And the problem problem displays a "blank" answer
+        """
+        self.answer_problem("incorrect")
+        self.problem_page.click_submit()
+        self.problem_page.click_reset()
+        self.assertTrue(self.problem_status('unanswered'))
+
+
+@ddt.ddt
+class ProblemNeverShowCorrectnessMixin(object):
+    """
+    Tests the effect of adding `show_correctness: never` to the sequence metadata
+    for subclasses of ProblemTypeTestMixin.
+    """
+    sequential_metadata = {'show_correctness': 'never'}
+
+    @attr(shard=7)
+    @ddt.data('correct', 'incorrect', 'partially-correct')
+    def test_answer_says_submitted(self, correctness):
+        """
+        Scenario: I can answer a problem <Correctness>ly
+        Given External graders respond "<Correctness>"
+        And I am viewing a "<ProblemType>" problem
+        in a subsection with show_correctness set to "never"
+        Then I should see a score of "N point(s) possible (ungraded, results hidden)"
+        When I answer a "<ProblemType>" problem "<Correctness>ly"
+        And the "<ProblemType>" problem displays only a "submitted" notification.
+        And I should see a score of "N point(s) possible (ungraded, results hidden)"
+        And a "problem_check" server event is emitted
+        And a "problem_check" browser event is emitted
+        """
+
+        # Not all problems have partially correct solutions configured
+        if correctness == 'partially-correct' and not self.partially_correct:
+            pytest.skip("Test incompatible with the current problem type")
+
+        # Problem progress text depends on points possible
+        possible = 'possible (ungraded, results hidden)'
+        if self.problem_points == 1:
+            problem_progress = u'1 point {}'.format(possible)
+        else:
+            problem_progress = u'{} points {}'.format(self.problem_points, possible)
+
+        # Make sure we're looking at the right problem
+        self.problem_page.wait_for(
+            lambda: self.problem_page.problem_name == self.problem_name,
+            "Make sure the correct problem is on the page"
+        )
+
+        # Learner can see that score will be hidden prior to submitting answer
+        self.assertEqual(self.problem_page.problem_progress_graded_value, problem_progress)
+
+        # Answer the problem correctly
+        self.answer_problem(correctness=correctness)
+        self.problem_page.click_submit()
+        self.wait_for_status('submitted')
+        self.problem_page.wait_submitted_notification()
+
+        # Score is still hidden after submitting answer
+        self.assertEqual(self.problem_page.problem_progress_graded_value, problem_progress)
+
+        # Check for corresponding tracking event
+        expected_events = [
+            {
+                'event_source': 'server',
+                'event_type': 'problem_check',
+                'username': self.username,
+            }, {
+                'event_source': 'browser',
+                'event_type': 'problem_check',
+                'username': self.username,
+            },
+        ]
+
+        for event in expected_events:
+            self.wait_for_events(event_filter=event, number_of_matches=1)
+
+
+class AnnotationProblemTypeBase(ProblemTypeTestBase):
+    """
+    ProblemTypeTestBase specialization for Annotation Problem Type
     """
     problem_name = 'ANNOTATION TEST PROBLEM'
     problem_type = 'annotationresponse'
+    problem_points = 2
 
     factory = AnnotationResponseXMLFactory()
     partially_correct = True
@@ -411,17 +583,19 @@ class AnnotationProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'incorrect': ['span.incorrect'],
         'partially-correct': ['span.partially-correct'],
         'unanswered': ['span.unanswered'],
+        'submitted': ['span.submitted'],
     }
 
     def setUp(self, *args, **kwargs):
         """
-        Additional setup for AnnotationProblemTypeTest
+        Additional setup for AnnotationProblemTypeBase
         """
-        super(AnnotationProblemTypeTest, self).setUp(*args, **kwargs)
+        super(AnnotationProblemTypeBase, self).setUp(*args, **kwargs)
 
         self.problem_page.a11y_audit.config.set_rules({
             "ignore": [
                 'label',  # TODO: AC-491
+                'label-title-only',  # TODO: AC-493
             ]
         })
 
@@ -443,9 +617,24 @@ class AnnotationProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         ).nth(choice).click()
 
 
-class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
+class AnnotationProblemTypeTest(AnnotationProblemTypeBase, ProblemTypeTestMixin):
     """
-    TestCase Class for Checkbox Problem Type
+    Standard tests for the Annotation Problem Type
+    """
+    shard = 24
+    pass
+
+
+class AnnotationProblemTypeNeverShowCorrectnessTest(AnnotationProblemTypeBase, ProblemNeverShowCorrectnessMixin):
+    """
+    Ensure that correctness can be withheld for Annotation Problem Type problems.
+    """
+    pass
+
+
+class CheckboxProblemTypeBase(ProblemTypeTestBase):
+    """
+    ProblemTypeTestBase specialization Checkbox Problem Type
     """
     problem_name = 'CHECKBOX TEST PROBLEM'
     problem_type = 'checkbox'
@@ -462,12 +651,6 @@ class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'explanation_text': 'This is explanation text'
     }
 
-    def setUp(self, *args, **kwargs):
-        """
-        Additional setup for CheckboxProblemTypeTest
-        """
-        super(CheckboxProblemTypeTest, self).setUp(*args, **kwargs)
-
     def answer_problem(self, correctness):
         """
         Answer checkbox problem.
@@ -481,7 +664,14 @@ class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
             self.problem_page.click_choice("choice_1")
             self.problem_page.click_choice("choice_3")
 
-    @attr(shard=7)
+
+@ddt.ddt
+class CheckboxProblemTypeTest(CheckboxProblemTypeBase, ProblemTypeTestMixin, ChangingAnswerOfProblemTestMixin):
+    """
+    Standard tests for the Checkbox Problem Type
+    """
+    shard = 24
+
     def test_can_show_answer(self):
         """
         Scenario: Verifies that show answer button is working as expected.
@@ -495,12 +685,38 @@ class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         self.problem_page.click_show()
         self.assertTrue(self.problem_page.is_solution_tag_present())
         self.assertTrue(self.problem_page.is_correct_choice_highlighted(correct_choices=[1, 3]))
-        self.problem_page.wait_for_focus_on_problem_meta()
+        self.problem_page.wait_for_show_answer_notification()
 
 
-class MultipleChoiceProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
+class CheckboxProblemTypeTestNonRandomized(CheckboxProblemTypeBase, NonRandomizedProblemTypeTestMixin):
     """
-    TestCase Class for Multiple Choice Problem Type
+    Tests for the non-randomized checkbox problem
+    """
+
+    def get_problem(self):
+        """
+        Creates a {problem_type} problem
+        """
+        # Generate the problem XML using capa.tests.response_xml_factory
+        return XBlockFixtureDesc(
+            'problem',
+            self.problem_name,
+            data=self.factory.build_xml(**self.factory_kwargs),
+            metadata={'rerandomize': 'never', 'show_reset_button': True}
+        )
+
+
+class CheckboxProblemTypeNeverShowCorrectnessTest(CheckboxProblemTypeBase, ProblemNeverShowCorrectnessMixin):
+    """
+    Ensure that correctness can be withheld for Checkbox Problem Type problems.
+    """
+    pass
+
+
+@ddt.ddt
+class MultipleChoiceProblemTypeBase(ProblemTypeTestBase):
+    """
+    ProblemTypeTestBase specialization Multiple Choice Problem Type
     """
     problem_name = 'MULTIPLE CHOICE TEST PROBLEM'
     problem_type = 'multiple choice'
@@ -518,13 +734,25 @@ class MultipleChoiceProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'correct': ['label.choicegroup_correct'],
         'incorrect': ['label.choicegroup_incorrect', 'span.incorrect'],
         'unanswered': ['span.unanswered'],
+        'submitted': ['label.choicegroup_submitted', 'span.submitted'],
     }
 
-    def setUp(self, *args, **kwargs):
+    def problem_status(self, status):
         """
-        Additional setup for MultipleChoiceProblemTypeTest
+        Returns the status of problem
+        Args:
+            status(string): status of the problem which is to be checked
+
+        Returns:
+            True: If provided status is present on the page
+            False: If provided status is not present on the page
         """
-        super(MultipleChoiceProblemTypeTest, self).setUp(*args, **kwargs)
+        selector = ', '.join(self.status_indicators[status])
+        try:
+            self.problem_page.wait_for_element_visibility(selector, 'Status not present', timeout=10)
+            return True
+        except BrokenPromise:
+            return False
 
     def answer_problem(self, correctness):
         """
@@ -536,9 +764,239 @@ class MultipleChoiceProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
             self.problem_page.click_choice("choice_choice_2")
 
 
-class RadioProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
+@ddt.ddt
+class MultipleChoiceProblemTypeTest(MultipleChoiceProblemTypeBase, ProblemTypeTestMixin):
     """
-    TestCase Class for Radio Problem Type
+    Standard tests for the Multiple Choice Problem Type
+    """
+    shard = 24
+
+    def test_can_show_answer(self):
+        """
+        Scenario: Verifies that show answer button is working as expected.
+
+        Given that I am on courseware page
+        And I can see a CAPA problem with show answer button
+        When I click "Show Answer" button
+        The correct answer is displayed with a single correctness indicator.
+        """
+        # Click the correct answer, but don't submit yet. No correctness shows.
+        self.answer_problem('correct')
+        self.assertFalse(self.problem_page.is_correct_choice_highlighted(correct_choices=[3]))
+
+        # After submit, the answer should be marked as correct.
+        self.problem_page.click_submit()
+        self.assertTrue(self.problem_page.is_correct_choice_highlighted(correct_choices=[3]))
+
+        # Switch to an incorrect answer. This will hide the correctness indicator.
+        self.answer_problem('incorrect')
+        self.assertFalse(self.problem_page.is_correct_choice_highlighted(correct_choices=[3]))
+
+        # Now click Show Answer. A single correctness indicator should be shown.
+        self.problem_page.click_show()
+        self.assertTrue(self.problem_page.is_correct_choice_highlighted(correct_choices=[3]))
+
+        # Finally, make sure that clicking Show Answer moved focus to the correct place.
+        self.problem_page.wait_for_show_answer_notification()
+
+
+@ddt.ddt
+class MultipleChoiceProblemResetCorrectnessAfterChangingAnswerTest(MultipleChoiceProblemTypeBase):
+    """
+    Tests for Multiple choice problem with changing answers
+    """
+    shard = 24
+
+    @ddt.data(['correct', '1/1 point (ungraded)'], ['incorrect', '0/1 point (ungraded)'])
+    @ddt.unpack
+    def test_mcq_score_after_answer_and_reset(self, correctness, score):
+        """
+        Scenario: I can see my score on a multiple choice problem when I answer it and after I reset it
+
+        Given I am viewing a multiple choice problem
+        When I answer a multiple choice problem <correctness>
+        Then I should see a <score>
+        When I reset the problem
+        Then I should see a score of points possible: 0/1 point (ungraded)
+        """
+        self.answer_problem(correctness)
+        self.problem_page.click_submit()
+        self.assertEqual(self.problem_page.problem_progress_graded_value, score)
+        self.problem_page.click_reset()
+        self.assertEqual(self.problem_page.problem_progress_graded_value, '0/1 point (ungraded)')
+
+    @ddt.data(['correct', 'incorrect'], ['incorrect', 'correct'])
+    @ddt.unpack
+    def test_reset_correctness_after_changing_answer(self, initial_correctness, other_correctness):
+        """
+        Scenario: I can reset the correctness of a multiple choice problem after changing my answer
+
+        Given I am viewing a multiple choice problem
+        When I answer a multiple choice problem <initial_correctness>
+        Then my multiple choice answer is marked <initial_correctness>
+        And I reset the problem
+        Then my multiple choice answer is NOT marked <initial_correctness>
+        And my multiple choice answer is NOT marked <other_correctness>
+        """
+        self.assertTrue(self.problem_status("unanswered"))
+        self.answer_problem(initial_correctness)
+        self.problem_page.click_submit()
+
+        self.assertTrue(self.problem_status(initial_correctness))
+        self.problem_page.click_reset()
+
+        self.assertFalse(self.problem_status(initial_correctness))
+        self.assertFalse(self.problem_status(other_correctness))
+
+
+@ddt.ddt
+class MultipleChoiceProblemTypeTestNonRandomized(MultipleChoiceProblemTypeBase, NonRandomizedProblemTypeTestMixin):
+    """
+    Tests for non-randomized multiple choice problem
+    """
+    shard = 24
+
+    def get_problem(self):
+        """
+        Creates a {problem_type} problem
+        """
+        # Generate the problem XML using capa.tests.response_xml_factory
+        return XBlockFixtureDesc(
+            'problem',
+            self.problem_name,
+            data=self.factory.build_xml(**self.factory_kwargs),
+            metadata={'rerandomize': 'never', 'show_reset_button': True, 'max_attempts': 3}
+        )
+
+    def test_non_randomized_multiple_choice_with_multiple_attempts(self):
+        """
+        Scenario: I can answer a problem with multiple attempts correctly but cannot reset because randomization is off
+
+        Given I am viewing a randomization "never" "multiple choice" problem with "3" attempts with reset
+        Then I should see "You have used 0 of 3 attempts" somewhere in the page
+        When I answer a "multiple choice" problem "correctly"
+        Then The "Reset" button does not appear
+        """
+        self.assertEqual(
+            self.problem_page.submission_feedback,
+            "You have used 0 of 3 attempts",
+            "All 3 attempts are not available"
+        )
+
+        self.answer_problem("correct")
+        self.problem_page.click_submit()
+        self.assertFalse(self.problem_page.is_reset_button_present())
+
+
+class MultipleChoiceProblemTypeTestOneAttempt(MultipleChoiceProblemTypeBase):
+    """
+    Test Multiple choice problem with single attempt
+    """
+
+    def get_problem(self):
+        """
+        Creates a {problem_type} problem
+        """
+        # Generate the problem XML using capa.tests.response_xml_factory
+        return XBlockFixtureDesc(
+            'problem',
+            self.problem_name,
+            data=self.factory.build_xml(**self.factory_kwargs),
+            metadata={'rerandomize': 'never', 'show_reset_button': True, 'max_attempts': 1}
+        )
+
+    def test_answer_with_one_attempt_correctly(self):
+        """
+        Scenario: I can answer a problem with one attempt correctly and can not reset
+
+        Given I am viewing a "multiple choice" problem with "1" attempt
+        When I answer a "multiple choice" problem "correctly"
+        Then The "Reset" button does not appear
+        """
+        self.answer_problem("correct")
+        self.problem_page.click_submit()
+        self.assertFalse(self.problem_page.is_reset_button_present())
+
+
+class MultipleChoiceProblemTypeTestMultipleAttempt(MultipleChoiceProblemTypeBase):
+    """
+    Test Multiple choice problem with multiple attempts
+    """
+
+    def get_problem(self):
+        """
+        Creates a {problem_type} problem
+        """
+        # Generate the problem XML using capa.tests.response_xml_factory
+        return XBlockFixtureDesc(
+            'problem',
+            self.problem_name,
+            data=self.factory.build_xml(**self.factory_kwargs),
+            metadata={'rerandomize': 'always', 'show_reset_button': True, 'max_attempts': 3}
+        )
+
+    def test_answer_with_multiple_attempt_correctly(self):
+        """
+        Scenario: I can answer a problem with multiple attempts correctly and still reset the problem
+
+        Given I am viewing a "multiple choice" problem with "3" attempts
+        Then I should see "You have used 0 of 3 attempts" somewhere in the page
+        When I answer a "multiple choice" problem "correctly"
+        Then The "Reset" button does appear
+        """
+        self.assertEqual(
+            self.problem_page.submission_feedback,
+            "You have used 0 of 3 attempts",
+            "All 3 attempts are not available"
+        )
+        self.answer_problem("correct")
+        self.problem_page.click_submit()
+        self.assertTrue(self.problem_page.is_reset_button_present())
+
+    def test_learner_can_see_attempts_left(self):
+        """
+        Scenario: I can view how many attempts I have left on a problem
+
+        Given I am viewing a "multiple choice" problem with "3" attempts
+        Then I should see "You have used 0 of 3 attempts" somewhere in the page
+        When I answer a "multiple choice" problem "incorrectly"
+        And I reset the problem
+        Then I should see "You have used 1 of 3 attempts" somewhere in the page
+        When I answer a "multiple choice" problem "incorrectly"
+        And I reset the problem
+        Then I should see "You have used 2 of 3 attempts" somewhere in the page
+        And The "Submit" button does appear
+        When I answer a "multiple choice" problem "correctly"
+        Then The "Reset" button does not appear
+        """
+        for attempts_used in range(3):
+            self.assertEqual(
+                self.problem_page.submission_feedback,
+                u"You have used {} of 3 attempts".format(str(attempts_used)),
+                "All 3 attempts are not available"
+            )
+            if attempts_used == 2:
+                self.assertTrue(self.problem_page.is_submit_disabled())
+                self.answer_problem("correct")
+                self.problem_page.click_submit()
+                self.assertFalse(self.problem_page.is_reset_button_present())
+            else:
+                self.answer_problem("incorrect")
+                self.problem_page.click_submit()
+                self.problem_page.click_reset()
+
+
+class MultipleChoiceProblemTypeNeverShowCorrectnessTest(MultipleChoiceProblemTypeBase,
+                                                        ProblemNeverShowCorrectnessMixin):
+    """
+    Ensure that correctness can be withheld for Multiple Choice Problem Type problems.
+    """
+    pass
+
+
+class RadioProblemTypeBase(ProblemTypeTestBase):
+    """
+    ProblemTypeTestBase specialization for Radio Problem Type
     """
     problem_name = 'RADIO TEST PROBLEM'
     problem_type = 'radio'
@@ -557,13 +1015,25 @@ class RadioProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'correct': ['label.choicegroup_correct'],
         'incorrect': ['label.choicegroup_incorrect', 'span.incorrect'],
         'unanswered': ['span.unanswered'],
+        'submitted': ['label.choicegroup_submitted', 'span.submitted'],
     }
 
-    def setUp(self, *args, **kwargs):
+    def problem_status(self, status):
         """
-        Additional setup for RadioProblemTypeTest
+        Returns the status of problem
+        Args:
+            status(string): status of the problem which is to be checked
+
+        Returns:
+            True: If provided status is present on the page
+            False: If provided status is not present on the page
         """
-        super(RadioProblemTypeTest, self).setUp(*args, **kwargs)
+        selector = ', '.join(self.status_indicators[status])
+        try:
+            self.problem_page.wait_for_element_visibility(selector, 'Status not present', timeout=10)
+            return True
+        except BrokenPromise:
+            return False
 
     def answer_problem(self, correctness):
         """
@@ -575,9 +1045,93 @@ class RadioProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
             self.problem_page.click_choice("choice_1")
 
 
-class DropDownProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
+@ddt.ddt
+class RadioProblemTypeTest(RadioProblemTypeBase, ProblemTypeTestMixin):
     """
-    TestCase Class for Drop Down Problem Type
+    Standard tests for the Multiple Radio Problem Type
+    """
+    shard = 24
+    pass
+
+
+@ddt.ddt
+class RadioProblemResetCorrectnessAfterChangingAnswerTest(RadioProblemTypeBase):
+    """
+    Tests for Radio problem with changing answers
+    """
+    shard = 24
+
+    @ddt.data(['correct', '1/1 point (ungraded)'], ['incorrect', '0/1 point (ungraded)'])
+    @ddt.unpack
+    def test_radio_score_after_answer_and_reset(self, correctness, score):
+        """
+        Scenario: I can see my score on a radio problem when I answer it and after I reset it
+
+        Given I am viewing a radio problem
+        When I answer a radio problem <correctness>
+        Then I should see a <score>
+        When I reset the problem
+        Then I should see a score of points possible: 0/1 point (ungraded)
+        """
+        self.answer_problem(correctness)
+        self.problem_page.click_submit()
+        self.assertEqual(self.problem_page.problem_progress_graded_value, score)
+        self.problem_page.click_reset()
+        self.assertEqual(self.problem_page.problem_progress_graded_value, '0/1 point (ungraded)')
+
+    @ddt.data(['correct', 'incorrect'], ['incorrect', 'correct'])
+    @ddt.unpack
+    def test_reset_correctness_after_changing_answer(self, initial_correctness, other_correctness):
+        """
+        Scenario: I can reset the correctness of a radio problem after changing my answer
+
+        Given I am viewing a radio problem
+        When I answer a radio problem with <initial_correctness>
+        Then my radio answer is marked <initial_correctness>
+        And I reset the problem
+        Then my radio problem's answer is NOT marked <initial_correctness>
+        And my radio problem's answer is NOT marked <other_correctness>
+        """
+        self.assertTrue(self.problem_status("unanswered"))
+        self.answer_problem(initial_correctness)
+        self.problem_page.click_submit()
+
+        self.assertTrue(self.problem_status(initial_correctness))
+        self.problem_page.click_reset()
+
+        self.assertFalse(self.problem_status(initial_correctness))
+        self.assertFalse(self.problem_status(other_correctness))
+
+
+class RadioProblemTypeTestNonRandomized(RadioProblemTypeBase, NonRandomizedProblemTypeTestMixin):
+    """
+    Tests for non-randomized radio problem
+    """
+    shard = 24
+
+    def get_problem(self):
+        """
+        Creates a {problem_type} problem
+        """
+        # Generate the problem XML using capa.tests.response_xml_factory
+        return XBlockFixtureDesc(
+            'problem',
+            self.problem_name,
+            data=self.factory.build_xml(**self.factory_kwargs),
+            metadata={'rerandomize': 'never', 'show_reset_button': True}
+        )
+
+
+class RadioProblemTypeNeverShowCorrectnessTest(RadioProblemTypeBase, ProblemNeverShowCorrectnessMixin):
+    """
+    Ensure that correctness can be withheld for Radio Problem Type problems.
+    """
+    pass
+
+
+class DropDownProblemTypeBase(ProblemTypeTestBase):
+    """
+    ProblemTypeTestBase specialization for Drop Down Problem Type
     """
     problem_name = 'DROP DOWN TEST PROBLEM'
     problem_type = 'drop down'
@@ -592,12 +1146,6 @@ class DropDownProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'correct_option': 'Option 2'
     }
 
-    def setUp(self, *args, **kwargs):
-        """
-        Additional setup for DropDownProblemTypeTest
-        """
-        super(DropDownProblemTypeTest, self).setUp(*args, **kwargs)
-
     def answer_problem(self, correctness):
         """
         Answer drop down problem.
@@ -608,9 +1156,45 @@ class DropDownProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         select_option_by_text(selector_element, answer)
 
 
-class StringProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
+@ddt.ddt
+class DropdownProblemTypeTest(DropDownProblemTypeBase, ProblemTypeTestMixin, ChangingAnswerOfProblemTestMixin):
     """
-    TestCase Class for String Problem Type
+    Standard tests for the Dropdown Problem Type
+    """
+    shard = 24
+    pass
+
+
+@ddt.ddt
+class DropDownProblemTypeTestNonRandomized(DropDownProblemTypeBase, NonRandomizedProblemTypeTestMixin):
+    """
+    Tests for non-randomized Dropdown problem
+    """
+    shard = 24
+
+    def get_problem(self):
+        """
+        Creates a {problem_type} problem
+        """
+        # Generate the problem XML using capa.tests.response_xml_factory
+        return XBlockFixtureDesc(
+            'problem',
+            self.problem_name,
+            data=self.factory.build_xml(**self.factory_kwargs),
+            metadata={'rerandomize': 'never', 'show_reset_button': True}
+        )
+
+
+class DropDownProblemTypeNeverShowCorrectnessTest(DropDownProblemTypeBase, ProblemNeverShowCorrectnessMixin):
+    """
+    Ensure that correctness can be withheld for Drop Down Problem Type problems.
+    """
+    pass
+
+
+class StringProblemTypeBase(ProblemTypeTestBase):
+    """
+    ProblemTypeTestBase specialization for String Problem Type
     """
     problem_name = 'STRING TEST PROBLEM'
     problem_type = 'string'
@@ -629,13 +1213,25 @@ class StringProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'correct': ['div.correct'],
         'incorrect': ['div.incorrect'],
         'unanswered': ['div.unanswered', 'div.unsubmitted'],
+        'submitted': ['span.submitted'],
     }
 
-    def setUp(self, *args, **kwargs):
+    def problem_status(self, status):
         """
-        Additional setup for StringProblemTypeTest
+        Returns the status of problem
+        Args:
+            status(string): status of the problem which is to be checked
+
+        Returns:
+            True: If provided status is present on the page
+            False: If provided status is not present on the page
         """
-        super(StringProblemTypeTest, self).setUp(*args, **kwargs)
+        selector = ', '.join(self.status_indicators[status])
+        try:
+            self.problem_page.wait_for_element_visibility(selector, 'Status not present', timeout=10)
+            return True
+        except BrokenPromise:
+            return False
 
     def answer_problem(self, correctness):
         """
@@ -645,9 +1241,24 @@ class StringProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         self.problem_page.fill_answer(textvalue)
 
 
-class NumericalProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
+class StringProblemTypeTest(StringProblemTypeBase, ProblemTypeTestMixin):
     """
-    TestCase Class for Numerical Problem Type
+    Standard tests for the String Problem Type
+    """
+    shard = 24
+    pass
+
+
+class StringProblemTypeNeverShowCorrectnessTest(StringProblemTypeBase, ProblemNeverShowCorrectnessMixin):
+    """
+    Ensure that correctness can be withheld for String Problem Type problems.
+    """
+    pass
+
+
+class NumericalProblemTypeBase(ProblemTypeTestBase):
+    """
+    ProblemTypeTestBase specialization for Numerical Problem Type
     """
     problem_name = 'NUMERICAL TEST PROBLEM'
     problem_type = 'numerical'
@@ -666,13 +1277,26 @@ class NumericalProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'correct': ['div.correct'],
         'incorrect': ['div.incorrect'],
         'unanswered': ['div.unanswered', 'div.unsubmitted'],
+        'submitted': ['div.submitted'],
+        'unsubmitted': ['div.unsubmitted']
     }
 
-    def setUp(self, *args, **kwargs):
+    def problem_status(self, status):
         """
-        Additional setup for NumericalProblemTypeTest
+        Returns the status of problem
+        Args:
+            status(string): status of the problem which is to be checked
+
+        Returns:
+            True: If provided status is present on the page
+            False: If provided status is not present on the page
         """
-        super(NumericalProblemTypeTest, self).setUp(*args, **kwargs)
+        selector = ', '.join(self.status_indicators[status])
+        try:
+            self.problem_page.wait_for_element_visibility(selector, 'Status not present', timeout=10)
+            return True
+        except BrokenPromise:
+            return False
 
     def answer_problem(self, correctness):
         """
@@ -686,6 +1310,14 @@ class NumericalProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         else:
             textvalue = str(random.randint(-2, 2))
         self.problem_page.fill_answer(textvalue)
+
+
+@ddt.ddt
+class NumericalProblemTypeTest(NumericalProblemTypeBase, ProblemTypeTestMixin, ChangingAnswerOfProblemTestMixin):
+    """
+    Standard tests for the Numerical Problem Type
+    """
+    shard = 12
 
     def test_error_input_gentle_alert(self):
         """
@@ -712,9 +1344,66 @@ class NumericalProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         self.problem_page.wait_for_focus_on_problem_meta()
 
 
-class FormulaProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
+@ddt.ddt
+class NumericalProblemTypeTestNonRandomized(NumericalProblemTypeBase, NonRandomizedProblemTypeTestMixin):
     """
-    TestCase Class for Formula Problem Type
+    Tests for non-randomized Numerical problem
+    """
+    shard = 12
+
+    def get_problem(self):
+        """
+        Creates a {problem_type} problem
+        """
+        # Generate the problem XML using capa.tests.response_xml_factory
+        return XBlockFixtureDesc(
+            'problem',
+            self.problem_name,
+            data=self.factory.build_xml(**self.factory_kwargs),
+            metadata={'rerandomize': 'never', 'show_reset_button': True}
+        )
+
+
+class NumericalProblemTypeTestViewAnswer(NumericalProblemTypeBase):
+    """
+    Test learner can view Numerical problem's answer
+    """
+
+    def get_problem(self):
+        """
+        Creates a {problem_type} problem
+        """
+        # Generate the problem XML using capa.tests.response_xml_factory
+        return XBlockFixtureDesc(
+            'problem',
+            self.problem_name,
+            data=self.factory.build_xml(**self.factory_kwargs),
+            metadata={'showanswer': 'always'}
+        )
+
+    def test_learner_can_view_answer(self):
+        """
+        Scenario: I can view the answer if the problem has it:
+
+        Given I am viewing a "numerical" that shows the answer "always"
+        When I press the button with the label "Show Answer"
+        And I should see "4.14159" somewhere in the page
+        """
+        self.problem_page.click_show()
+        self.assertEqual(self.problem_page.answer, '4.14159')
+
+
+class NumericalProblemTypeNeverShowCorrectnessTest(NumericalProblemTypeBase, ProblemNeverShowCorrectnessMixin):
+    """
+    Ensure that correctness can be withheld for Numerical Problem Type problems.
+    """
+    pass
+
+
+@ddt.ddt
+class FormulaProblemTypeBase(ProblemTypeTestBase):
+    """
+    ProblemTypeTestBase specialization for Formula Problem Type
     """
     problem_name = 'FORMULA TEST PROBLEM'
     problem_type = 'formula'
@@ -735,13 +1424,25 @@ class FormulaProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'correct': ['div.correct'],
         'incorrect': ['div.incorrect'],
         'unanswered': ['div.unanswered', 'div.unsubmitted'],
+        'submitted': ['div.submitted'],
     }
 
-    def setUp(self, *args, **kwargs):
+    def problem_status(self, status):
         """
-        Additional setup for FormulaProblemTypeTest
+        Returns the status of problem
+        Args:
+            status(string): status of the problem which is to be checked
+
+        Returns:
+            True: If provided status is present on the page
+            False: If provided status is not present on the page
         """
-        super(FormulaProblemTypeTest, self).setUp(*args, **kwargs)
+        selector = ', '.join(self.status_indicators[status])
+        try:
+            self.problem_page.wait_for_element_visibility(selector, 'Status not present', timeout=10)
+            return True
+        except BrokenPromise:
+            return False
 
     def answer_problem(self, correctness):
         """
@@ -751,12 +1452,49 @@ class FormulaProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         self.problem_page.fill_answer(textvalue)
 
 
-class ScriptProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
+@ddt.ddt
+class FormulaProblemTypeTest(FormulaProblemTypeBase, ProblemTypeTestMixin, ChangingAnswerOfProblemTestMixin):
     """
-    TestCase Class for Script Problem Type
+    Standard tests for the Formula Problem Type
+    """
+    shard = 24
+    pass
+
+
+class FormulaProblemTypeTestNonRandomized(FormulaProblemTypeBase, NonRandomizedProblemTypeTestMixin):
+    """
+    Tests for non-randomized Formula problem
+    """
+    shard = 24
+
+    def get_problem(self):
+        """
+        Creates a {problem_type} problem
+        """
+        # Generate the problem XML using capa.tests.response_xml_factory
+        return XBlockFixtureDesc(
+            'problem',
+            self.problem_name,
+            data=self.factory.build_xml(**self.factory_kwargs),
+            metadata={'rerandomize': 'never', 'show_reset_button': True}
+        )
+
+
+class FormulaProblemTypeNeverShowCorrectnessTest(FormulaProblemTypeBase, ProblemNeverShowCorrectnessMixin):
+    """
+    Ensure that correctness can be withheld for Formula Problem Type problems.
+    """
+    pass
+
+
+@ddt.ddt
+class ScriptProblemTypeBase(ProblemTypeTestBase):
+    """
+    ProblemTypeTestBase specialization for Script Problem Type
     """
     problem_name = 'SCRIPT TEST PROBLEM'
     problem_type = 'script'
+    problem_points = 2
     partially_correct = False
 
     factory = CustomResponseXMLFactory()
@@ -782,13 +1520,24 @@ class ScriptProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'correct': ['div.correct'],
         'incorrect': ['div.incorrect'],
         'unanswered': ['div.unanswered', 'div.unsubmitted'],
+        'submitted': ['div.submitted'],
     }
 
-    def setUp(self, *args, **kwargs):
+    def problem_status(self, status):
         """
-        Additional setup for ScriptProblemTypeTest
+        Returns the status of problem
+        Args:
+            status(string): status of the problem which is to be checked
+
+        Returns:
+            True: If provided status is present on the page
         """
-        super(ScriptProblemTypeTest, self).setUp(*args, **kwargs)
+        selector = ', '.join(self.status_indicators[status])
+        try:
+            self.problem_page.wait_for_element_visibility(selector, 'Status is present', timeout=10)
+            return True
+        except BrokenPromise:
+            return False
 
     def answer_problem(self, correctness):
         """
@@ -805,6 +1554,88 @@ class ScriptProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
 
         self.problem_page.fill_answer(first_addend, input_num=0)
         self.problem_page.fill_answer(second_addend, input_num=1)
+
+
+@ddt.ddt
+class ScriptProblemTypeTest(ScriptProblemTypeBase, ProblemTypeTestMixin):
+    """
+    Standard tests for the Script Problem Type
+    """
+    shard = 24
+    pass
+
+
+@ddt.ddt
+class ScriptProblemResetAfterAnswerTest(ScriptProblemTypeBase):
+    """
+    Test Script problem by resetting answers
+    """
+    shard = 24
+
+    @ddt.data(['correct', 'incorrect'], ['incorrect', 'correct'])
+    @ddt.unpack
+    def test_reset_correctness_after_changing_answer(self, initial_correctness, other_correctness):
+        """
+        Scenario: I can reset the correctness of a problem after changing my answer
+
+        Given I am viewing a script problem
+        Then my script problem's answer is marked "unanswered"
+        When I answer a script problem initial correctness
+        And I input an answer on a script problem other correctness
+        Then my script problem answer is marked "unanswered"
+        """
+        self.assertTrue(self.problem_status('unanswered'))
+        self.answer_problem(initial_correctness)
+        self.problem_page.click_submit()
+
+        self.assertTrue(self.problem_status(initial_correctness))
+
+        self.answer_problem(other_correctness)
+        self.assertTrue(self.problem_status('unanswered'))
+
+    @ddt.data(['correct', '2/2 points (ungraded)'], ['incorrect', '0/2 points (ungraded)'])
+    @ddt.unpack
+    def test_script_score_after_answer_and_reset(self, correctness, score):
+        """
+        Scenario: I can see my score on a script problem when I answer it and after I reset it
+
+        Given I am viewing a script problem
+        When I answer a script problem correct/incorrect
+        Then I should see a score
+        When I reset the problem
+        Then I should see a score of points possible: 0/2 points (ungraded)
+        """
+        self.answer_problem(correctness)
+        self.problem_page.click_submit()
+        self.assertEqual(self.problem_page.problem_progress_graded_value, score)
+        self.problem_page.click_reset()
+        self.assertEqual(self.problem_page.problem_progress_graded_value, '0/2 points (ungraded)')
+
+
+class ScriptProblemTypeTestNonRandomized(ScriptProblemTypeBase, NonRandomizedProblemTypeTestMixin):
+    """
+    Tests for non-randomized Script problem
+    """
+    shard = 24
+
+    def get_problem(self):
+        """
+        Creates a {problem_type} problem
+        """
+        # Generate the problem XML using capa.tests.response_xml_factory
+        return XBlockFixtureDesc(
+            'problem',
+            self.problem_name,
+            data=self.factory.build_xml(**self.factory_kwargs),
+            metadata={'rerandomize': 'never', 'show_reset_button': True}
+        )
+
+
+class ScriptProblemTypeNeverShowCorrectnessTest(ScriptProblemTypeBase, ProblemNeverShowCorrectnessMixin):
+    """
+    Ensure that correctness can be withheld for Script Problem Type problems.
+    """
+    pass
 
 
 class JSInputTypeTest(ProblemTypeTestBase, ProblemTypeA11yTestMixin):
@@ -830,9 +1661,9 @@ class JSInputTypeTest(ProblemTypeTestBase, ProblemTypeA11yTestMixin):
         raise NotImplementedError()
 
 
-class CodeProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
+class CodeProblemTypeBase(ProblemTypeTestBase):
     """
-    TestCase Class for Code Problem Type
+    ProblemTypeTestBase specialization for Code Problem Type
     """
     problem_name = 'CODE TEST PROBLEM'
     problem_type = 'code'
@@ -850,6 +1681,7 @@ class CodeProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'correct': ['.grader-status .correct ~ .debug'],
         'incorrect': ['.grader-status .incorrect ~ .debug'],
         'unanswered': ['.grader-status .unanswered ~ .debug'],
+        'submitted': ['.grader-status .submitted ~ .debug'],
     }
 
     def answer_problem(self, correctness):
@@ -865,6 +1697,13 @@ class CodeProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         # For this reason, we submit the initial code in the response
         # (configured in the problem XML above)
         pass
+
+
+class CodeProblemTypeTest(CodeProblemTypeBase, ProblemTypeTestMixin):
+    """
+    Standard tests for the Code Problem Type
+    """
+    shard = 12
 
     def test_answer_incorrectly(self):
         """
@@ -895,7 +1734,14 @@ class CodeProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         pass
 
 
-class ChoiceTextProbelmTypeTestBase(ProblemTypeTestBase):
+class CodeProblemTypeNeverShowCorrectnessTest(CodeProblemTypeBase, ProblemNeverShowCorrectnessMixin):
+    """
+    Ensure that correctness can be withheld for Code Problem Type problems.
+    """
+    pass
+
+
+class ChoiceTextProblemTypeTestBase(ProblemTypeTestBase):
     """
     Base class for "Choice + Text" Problem Types.
     (e.g. RadioText, CheckboxText)
@@ -909,7 +1755,7 @@ class ChoiceTextProbelmTypeTestBase(ProblemTypeTestBase):
         Selects the nth (where n == input_num) choice of the problem.
         """
         self.problem_page.q(
-            css='div.problem input.ctinput[type="{}"]'.format(self.choice_type)
+            css=u'div.problem input.ctinput[type="{}"]'.format(self.choice_type)
         ).nth(input_num).click()
 
     def _fill_input_text(self, value, input_num):
@@ -932,9 +1778,9 @@ class ChoiceTextProbelmTypeTestBase(ProblemTypeTestBase):
         self._fill_input_text(input_value, choice)
 
 
-class RadioTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTestMixin):
+class RadioTextProblemTypeBase(ChoiceTextProblemTypeTestBase):
     """
-    TestCase Class for Radio Text Problem Type
+    ProblemTypeTestBase specialization for Radio Text Problem Type
     """
     problem_name = 'RADIO TEXT TEST PROBLEM'
     problem_type = 'radio_text'
@@ -957,13 +1803,31 @@ class RadioTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTestMix
         'correct': ['section.choicetextgroup_correct'],
         'incorrect': ['section.choicetextgroup_incorrect', 'span.incorrect'],
         'unanswered': ['span.unanswered'],
+        'submitted': ['section.choicetextgroup_submitted', 'span.submitted'],
     }
+
+    def problem_status(self, status):
+        """
+        Returns the status of problem
+        Args:
+            status(string): status of the problem which is to be checked
+
+        Returns:
+            True: If provided status is present on the page
+            False: If provided status is not present on the page
+        """
+        selector = ', '.join(self.status_indicators[status])
+        try:
+            self.problem_page.wait_for_element_visibility(selector, 'Status not present', timeout=10)
+            return True
+        except BrokenPromise:
+            return False
 
     def setUp(self, *args, **kwargs):
         """
-        Additional setup for RadioTextProblemTypeTest
+        Additional setup for RadioTextProblemTypeBase
         """
-        super(RadioTextProblemTypeTest, self).setUp(*args, **kwargs)
+        super(RadioTextProblemTypeBase, self).setUp(*args, **kwargs)
 
         self.problem_page.a11y_audit.config.set_rules({
             "ignore": [
@@ -974,9 +1838,93 @@ class RadioTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTestMix
         })
 
 
-class CheckboxTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTestMixin):
+@ddt.ddt
+class RadioTextProblemTypeTest(RadioTextProblemTypeBase, ProblemTypeTestMixin):
     """
-    TestCase Class for Checkbox Text Problem Type
+    Standard tests for the Radio Text Problem Type
+    """
+    shard = 24
+    pass
+
+
+@ddt.ddt
+class RadioTextProblemResetCorrectnessAfterChangingAnswerTest(RadioTextProblemTypeBase):
+    """
+    Tests for Radio Text problem with changing answers
+    """
+    shard = 24
+
+    @ddt.data(['correct', '1/1 point (ungraded)'], ['incorrect', '0/1 point (ungraded)'])
+    @ddt.unpack
+    def test_mcq_score_after_answer_and_reset(self, correctness, score):
+        """
+        Scenario: I can see my score on a radio text problem when I answer it and after I reset it
+
+        Given I am viewing a radio text problem
+        When I answer a radio text problem correct/incorrect
+        Then I should see a score
+        When I reset the problem
+        Then I should see a score of points possible: (1/1 point (ungraded) -- 0/1 point (ungraded)
+        """
+        self.answer_problem(correctness)
+        self.problem_page.click_submit()
+        self.assertEqual(self.problem_page.problem_progress_graded_value, score)
+        self.problem_page.click_reset()
+        self.assertEqual(self.problem_page.problem_progress_graded_value, '0/1 point (ungraded)')
+
+    @ddt.data(['correct', 'incorrect'], ['incorrect', 'correct'])
+    @ddt.unpack
+    def test_reset_correctness_after_changing_answer(self, initial_correctness, other_correctness):
+        """
+        Scenario: I can reset the correctness of a multiple choice problem after changing my answer
+
+        Given I am viewing a radio text problem
+        When I answer a radio text problem InitialCorrectness
+        Then my radio text answer is marked InitialCorrectness
+        And I reset the problem
+        Then my answer is NOT marked InitialCorrectness
+        And my answer is NOT marked OtherCorrectness
+        """
+        self.assertTrue(self.problem_status("unanswered"))
+        self.answer_problem(initial_correctness)
+        self.problem_page.click_submit()
+
+        self.assertTrue(self.problem_status(initial_correctness))
+        self.problem_page.click_reset()
+
+        self.assertFalse(self.problem_status(initial_correctness))
+        self.assertFalse(self.problem_status(other_correctness))
+
+
+class RadioTextProblemTypeTestNonRandomized(RadioTextProblemTypeBase, NonRandomizedProblemTypeTestMixin):
+    """
+    Tests for non-randomized Radio text problem
+    """
+    shard = 24
+
+    def get_problem(self):
+        """
+        Creates a {problem_type} problem
+        """
+        # Generate the problem XML using capa.tests.response_xml_factory
+        return XBlockFixtureDesc(
+            'problem',
+            self.problem_name,
+            data=self.factory.build_xml(**self.factory_kwargs),
+            metadata={'rerandomize': 'never', 'show_reset_button': True}
+        )
+
+
+class RadioTextProblemTypeNeverShowCorrectnessTest(RadioTextProblemTypeBase, ProblemNeverShowCorrectnessMixin):
+    """
+    Ensure that correctness can be withheld for Radio + Text Problem Type problems.
+    """
+    pass
+
+
+class CheckboxTextProblemTypeBase(ChoiceTextProblemTypeTestBase):
+    """
+    ProblemTypeTestBase specialization for Checkbox Text Problem Type
     """
     problem_name = 'CHECKBOX TEXT TEST PROBLEM'
     problem_type = 'checkbox_text'
@@ -996,9 +1944,9 @@ class CheckboxTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTest
 
     def setUp(self, *args, **kwargs):
         """
-        Additional setup for CheckboxTextProblemTypeTest
+        Additional setup for CheckboxTextProblemTypeBase
         """
-        super(CheckboxTextProblemTypeTest, self).setUp(*args, **kwargs)
+        super(CheckboxTextProblemTypeBase, self).setUp(*args, **kwargs)
 
         self.problem_page.a11y_audit.config.set_rules({
             "ignore": [
@@ -1009,9 +1957,41 @@ class CheckboxTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTest
         })
 
 
-class ImageProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
+class CheckboxTextProblemTypeTest(CheckboxTextProblemTypeBase, ProblemTypeTestMixin):
     """
-    TestCase Class for Image Problem Type
+    Standard tests for the Checkbox Text Problem Type
+    """
+    pass
+
+
+class CheckboxTextProblemTypeTestNonRandomized(CheckboxTextProblemTypeBase, NonRandomizedProblemTypeTestMixin):
+    """
+    Tests for non-randomized Checkbox problem
+    """
+
+    def get_problem(self):
+        """
+        Creates a {problem_type} problem
+        """
+        # Generate the problem XML using capa.tests.response_xml_factory
+        return XBlockFixtureDesc(
+            'problem',
+            self.problem_name,
+            data=self.factory.build_xml(**self.factory_kwargs),
+            metadata={'rerandomize': 'never', 'show_reset_button': True}
+        )
+
+
+class CheckboxTextProblemTypeNeverShowCorrectnessTest(CheckboxTextProblemTypeBase, ProblemNeverShowCorrectnessMixin):
+    """
+    Ensure that correctness can be withheld for Checkbox + Text Problem Type problems.
+    """
+    pass
+
+
+class ImageProblemTypeBase(ProblemTypeTestBase):
+    """
+    ProblemTypeTestBase specialization for Image Problem Type
     """
     problem_name = 'IMAGE TEST PROBLEM'
     problem_type = 'image'
@@ -1042,9 +2022,49 @@ class ImageProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         chain.perform()
 
 
-class SymbolicProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
+@ddt.ddt
+class ImageProblemTypeTest(ImageProblemTypeBase, ProblemTypeTestMixin):
     """
-    TestCase Class for Symbolic Problem Type
+    Standard tests for the Image Problem Type
+    """
+    def test_image_problem_score_with_blank_answer(self):
+        """
+        Scenario: I can see my score on a problem to which I submit a blank answer
+        Given I am viewing aN image problem
+        When I submit a problem
+        Then I should see a score of Points Possible: 0/1 point (ungraded)
+        """
+        self.problem_page.click_submit()
+        self.assertEqual(self.problem_page.problem_progress_graded_value, '0/1 point (ungraded)')
+
+
+class ImageProblemTypeTestNonRandomized(ImageProblemTypeBase, NonRandomizedProblemTypeTestMixin):
+    """
+    Tests for non-randomized Image problem
+    """
+    def get_problem(self):
+        """
+        Creates a {problem_type} problem
+        """
+        # Generate the problem XML using capa.tests.response_xml_factory
+        return XBlockFixtureDesc(
+            'problem',
+            self.problem_name,
+            data=self.factory.build_xml(**self.factory_kwargs),
+            metadata={'rerandomize': 'never', 'show_reset_button': True}
+        )
+
+
+class ImageProblemTypeNeverShowCorrectnessTest(ImageProblemTypeBase, ProblemNeverShowCorrectnessMixin):
+    """
+    Ensure that correctness can be withheld for Image Problem Type problems.
+    """
+    pass
+
+
+class SymbolicProblemTypeBase(ProblemTypeTestBase):
+    """
+    ProblemTypeTestBase specialization  for Symbolic Problem Type
     """
     problem_name = 'SYMBOLIC TEST PROBLEM'
     problem_type = 'symbolicresponse'
@@ -1061,6 +2081,7 @@ class SymbolicProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'correct': ['div.capa_inputtype div.correct'],
         'incorrect': ['div.capa_inputtype div.incorrect'],
         'unanswered': ['div.capa_inputtype div.unanswered'],
+        'submitted': ['div.capa_inputtype div.submitted'],
     }
 
     def answer_problem(self, correctness):
@@ -1069,3 +2090,17 @@ class SymbolicProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         """
         choice = "2*x+3*y" if correctness == 'correct' else "3*a+4*b"
         self.problem_page.fill_answer(choice)
+
+
+class SymbolicProblemTypeTest(SymbolicProblemTypeBase, ProblemTypeTestMixin):
+    """
+    Standard tests for the Symbolic Problem Type
+    """
+    pass
+
+
+class SymbolicProblemTypeNeverShowCorrectnessTest(SymbolicProblemTypeBase, ProblemNeverShowCorrectnessMixin):
+    """
+    Ensure that correctness can be withheld for Symbolic Problem Type problems.
+    """
+    pass

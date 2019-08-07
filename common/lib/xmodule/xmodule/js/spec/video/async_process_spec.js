@@ -78,4 +78,4 @@ function(AsyncProcess) {
         });
     });
 });
-}(RequireJS.require));
+}(require));

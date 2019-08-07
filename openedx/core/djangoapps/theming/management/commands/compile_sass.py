@@ -2,14 +2,14 @@
 Management command for compiling sass.
 """
 
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
+import six
 from django.core.management import BaseCommand, CommandError
-
 from paver.easy import call_task
 
+from openedx.core.djangoapps.theming.helpers import get_theme_base_dirs, get_themes, is_comprehensive_theming_enabled
 from pavelib.assets import ALL_SYSTEMS
-from openedx.core.djangoapps.theming.helpers import get_themes, get_theme_base_dirs, is_comprehensive_theming_enabled
 
 
 class Command(BaseCommand):
@@ -18,6 +18,9 @@ class Command(BaseCommand):
     """
 
     help = 'Compile and collect themed assets...'
+
+    # NOTE (CCB): This allows us to compile static assets in Docker containers without database access.
+    requires_system_checks = False
 
     def add_arguments(self, parser):
         """
@@ -89,7 +92,7 @@ class Command(BaseCommand):
         if theme_dirs:
             available_themes = {}
             for theme_dir in theme_dirs:
-                available_themes.update({t.theme_dir_name: t for t in get_themes(theme_dir)})
+                available_themes.update({t.theme_dir_name: t for t in get_themes([theme_dir])})
         else:
             theme_dirs = get_theme_base_dirs()
             available_themes = {t.theme_dir_name: t for t in get_themes()}
@@ -100,7 +103,7 @@ class Command(BaseCommand):
                 raise CommandError("Invalid themes value, It must either be 'all' or 'no' or list of themes.")
         # Raise error if any of the given theme name is invalid
         # (theme name would be invalid if it does not exist in themes directory)
-        elif (not set(given_themes).issubset(available_themes.keys())) and is_comprehensive_theming_enabled():
+        elif (not set(given_themes).issubset(list(available_themes.keys()))) and is_comprehensive_theming_enabled():
             raise CommandError(
                 "Given themes '{themes}' do not exist inside any of the theme directories '{theme_dirs}'".format(
                     themes=", ".join(set(given_themes) - set(available_themes.keys())),
@@ -109,7 +112,7 @@ class Command(BaseCommand):
             )
 
         if "all" in given_themes:
-            themes = list(available_themes.itervalues())
+            themes = list(six.itervalues(available_themes))
         elif "no" in given_themes:
             themes = []
         else:
@@ -128,7 +131,7 @@ class Command(BaseCommand):
         if options.get("themes", None) and not is_comprehensive_theming_enabled():
             # log a warning message to let the user know that asset compilation for themes is skipped
             self.stdout.write(
-                self.style.WARNING(  # pylint: disable=no-member
+                self.style.WARNING(
                     "Skipping theme asset compilation: enable theming to process themed assets"
                 ),
             )

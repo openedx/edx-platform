@@ -91,7 +91,8 @@ define([
         });
 
         it('can use timers', function() {
-            var logger = getLogger('id', 1), logs, log;
+            var logger = getLogger('id', 1),
+                logs, log;
 
             spyOn(performance, 'now').and.returnValue(1);
             spyOn(Date, 'now').and.returnValue(1);

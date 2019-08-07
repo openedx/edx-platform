@@ -1,14 +1,18 @@
 """
 Functionality for problem scores.
 """
+from __future__ import absolute_import
+
 from logging import getLogger
 
-from openedx.core.lib.cache_utils import memoized
+import six
+from numpy import around
 from xblock.core import XBlock
-from xmodule.block_metadata_utils import display_name_with_default_escaped
-from xmodule.graders import ProblemScore
-from .transformer import GradesTransformer
 
+from openedx.core.lib.cache_utils import process_cached
+from xmodule.graders import ProblemScore
+
+from .transformer import GradesTransformer
 
 log = getLogger(__name__)
 
@@ -102,7 +106,7 @@ def get_score(submissions_scores, csm_scores, persisted_block, block):
 
     # Priority order for retrieving the scores:
     # submissions API -> CSM -> grades persisted block -> latest block content
-    raw_earned, raw_possible, weighted_earned, weighted_possible, attempted = (
+    raw_earned, raw_possible, weighted_earned, weighted_possible, first_attempted = (
         _get_score_from_submissions(submissions_scores, block) or
         _get_score_from_csm(csm_scores, block, weight) or
         _get_score_from_persisted_or_latest_block(persisted_block, block, weight)
@@ -122,7 +126,7 @@ def get_score(submissions_scores, csm_scores, persisted_block, block):
             weighted_possible,
             weight,
             graded,
-            attempted=attempted,
+            first_attempted=first_attempted,
         )
 
 
@@ -143,17 +147,29 @@ def weighted_score(raw_earned, raw_possible, weight):
         return float(raw_earned) * weight / raw_possible, float(weight)
 
 
+def compute_percent(earned, possible):
+    """
+     Returns the percentage of the given earned and possible values.
+     """
+    if possible > 0:
+        # Rounds to two decimal places.
+        return around(earned / possible, decimals=2)
+    else:
+        return 0.0
+
+
 def _get_score_from_submissions(submissions_scores, block):
     """
     Returns the score values from the submissions API if found.
     """
     if submissions_scores:
-        submission_value = submissions_scores.get(unicode(block.location))
+        submission_value = submissions_scores.get(six.text_type(block.location))
         if submission_value:
-            attempted = True
-            weighted_earned, weighted_possible = submission_value
+            first_attempted = submission_value['created_at']
+            weighted_earned = submission_value['points_earned']
+            weighted_possible = submission_value['points_possible']
             assert weighted_earned >= 0.0 and weighted_possible > 0.0  # per contract from submissions API
-            return (None, None) + (weighted_earned, weighted_possible) + (attempted,)
+            return (None, None) + (weighted_earned, weighted_possible) + (first_attempted,)
 
 
 def _get_score_from_csm(csm_scores, block, weight):
@@ -176,13 +192,14 @@ def _get_score_from_csm(csm_scores, block, weight):
     has_valid_score = score and score.total is not None
     if has_valid_score:
         if score.correct is not None:
-            attempted = True
+            first_attempted = score.created
             raw_earned = score.correct
         else:
-            attempted = False
+            first_attempted = None
             raw_earned = 0.0
+
         raw_possible = score.total
-        return (raw_earned, raw_possible) + weighted_score(raw_earned, raw_possible, weight) + (attempted,)
+        return (raw_earned, raw_possible) + weighted_score(raw_earned, raw_possible, weight) + (first_attempted,)
 
 
 def _get_score_from_persisted_or_latest_block(persisted_block, block, weight):
@@ -193,7 +210,7 @@ def _get_score_from_persisted_or_latest_block(persisted_block, block, weight):
     the latest block content.
     """
     raw_earned = 0.0
-    attempted = False
+    first_attempted = None
 
     if persisted_block:
         raw_possible = persisted_block.raw_possible
@@ -206,7 +223,7 @@ def _get_score_from_persisted_or_latest_block(persisted_block, block, weight):
     else:
         weighted_scores = weighted_score(raw_earned, raw_possible, weight)
 
-    return (raw_earned, raw_possible) + weighted_scores + (attempted,)
+    return (raw_earned, raw_possible) + weighted_scores + (first_attempted,)
 
 
 def _get_weight_from_block(persisted_block, block):
@@ -248,7 +265,7 @@ def _get_explicit_graded(block):
     return True if field_value is None else field_value
 
 
-@memoized
+@process_cached
 def _block_types_possibly_scored():
     """
     Returns the block types that could have a score.

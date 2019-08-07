@@ -1,20 +1,22 @@
 """
 Tests for the course completion helper functions.
 """
+from __future__ import absolute_import
+
 from datetime import datetime
 
-from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
 from badges.events import course_complete
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class CourseCompleteTestCase(ModuleStoreTestCase):
     """
     Tests for the course completion helper functions.
     """
-    def setUp(self, **kwargs):
+
+    def setUp(self):
         super(CourseCompleteTestCase, self).setUp()
         # Need key to be deterministic to test slugs.
         self.course = CourseFactory.create(

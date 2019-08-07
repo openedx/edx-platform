@@ -1,35 +1,43 @@
 """
 Tests for Studio Course Settings.
 """
-import datetime
-import ddt
-import json
+from __future__ import absolute_import
+
 import copy
-import mock
-from mock import Mock, patch
+import datetime
+import json
 import unittest
 
+import ddt
+import mock
+import six
+from crum import set_current_request
 from django.conf import settings
-from django.utils.timezone import UTC
+from django.test import RequestFactory
 from django.test.utils import override_settings
+from milestones.models import MilestoneRelationshipType
+from milestones.tests.utils import MilestonesTestCaseMixin
+from mock import Mock, patch
+from pytz import UTC
 
+from contentstore.config.waffle import ENABLE_PROCTORING_PROVIDER_OVERRIDES
 from contentstore.utils import reverse_course_url, reverse_usage_url
-from models.settings.course_grading import CourseGradingModel
+from models.settings.course_grading import GRADING_POLICY_CHANGED_EVENT_TYPE, CourseGradingModel, hash_grading_policy
 from models.settings.course_metadata import CourseMetadata
 from models.settings.encoder import CourseSettingsEncoder
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.models.course_details import CourseDetails
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
+from util import milestones_helpers
 from xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.tabs import InvalidTabsException
-from milestones.tests.utils import MilestonesTestCaseMixin
 
-from .utils import CourseTestCase, AjaxEnabledTestClient
+from .utils import AjaxEnabledTestClient, CourseTestCase
 
 
 def get_url(course_id, handler_name='settings_handler'):
@@ -40,6 +48,7 @@ class CourseSettingsEncoderTest(CourseTestCase):
     """
     Tests for CourseSettingsEncoder.
     """
+
     def test_encoder(self):
         details = CourseDetails.fetch(self.course.id)
         jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
@@ -59,7 +68,7 @@ class CourseSettingsEncoderTest(CourseTestCase):
         doesn't work for these dates.
         """
         details = CourseDetails.fetch(self.course.id)
-        pre_1900 = datetime.datetime(1564, 4, 23, 1, 1, 1, tzinfo=UTC())
+        pre_1900 = datetime.datetime(1564, 4, 23, 1, 1, 1, tzinfo=UTC)
         details.enrollment_start = pre_1900
         dumped_jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
         loaded_jsondetails = json.loads(dumped_jsondetails)
@@ -72,7 +81,7 @@ class CourseSettingsEncoderTest(CourseTestCase):
         details = {
             'number': 1,
             'string': 'string',
-            'datetime': datetime.datetime.now(UTC())
+            'datetime': datetime.datetime.now(UTC)
         }
         jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
         jsondetails = json.loads(jsondetails)
@@ -86,8 +95,6 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
     """
     Tests for modifying content on the first course settings page (course dates, overview, etc.).
     """
-    def setUp(self):
-        super(CourseDetailsViewTest, self).setUp()
 
     def alter_field(self, url, details, field, val):
         """
@@ -103,6 +110,9 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         resp = self.client.ajax_post(url, payload)
         self.compare_details_with_encoding(json.loads(resp.content), details.__dict__, field + str(val))
 
+        MilestoneRelationshipType.objects.get_or_create(name='requires')
+        MilestoneRelationshipType.objects.get_or_create(name='fulfills')
+
     @staticmethod
     def convert_datetime_to_iso(datetime_obj):
         """
@@ -111,7 +121,6 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         return Date().to_json(datetime_obj)
 
     def test_update_and_fetch(self):
-        SelfPacedConfiguration(enabled=True).save()
         details = CourseDetails.fetch(self.course.id)
 
         # resp s/b json from here on
@@ -119,14 +128,14 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         resp = self.client.get_json(url)
         self.compare_details_with_encoding(json.loads(resp.content), details.__dict__, "virgin get")
 
-        utc = UTC()
-        self.alter_field(url, details, 'start_date', datetime.datetime(2012, 11, 12, 1, 30, tzinfo=utc))
-        self.alter_field(url, details, 'start_date', datetime.datetime(2012, 11, 1, 13, 30, tzinfo=utc))
-        self.alter_field(url, details, 'end_date', datetime.datetime(2013, 2, 12, 1, 30, tzinfo=utc))
-        self.alter_field(url, details, 'enrollment_start', datetime.datetime(2012, 10, 12, 1, 30, tzinfo=utc))
+        self.alter_field(url, details, 'start_date', datetime.datetime(2012, 11, 12, 1, 30, tzinfo=UTC))
+        self.alter_field(url, details, 'start_date', datetime.datetime(2012, 11, 1, 13, 30, tzinfo=UTC))
+        self.alter_field(url, details, 'end_date', datetime.datetime(2013, 2, 12, 1, 30, tzinfo=UTC))
+        self.alter_field(url, details, 'enrollment_start', datetime.datetime(2012, 10, 12, 1, 30, tzinfo=UTC))
 
-        self.alter_field(url, details, 'enrollment_end', datetime.datetime(2012, 11, 15, 1, 30, tzinfo=utc))
+        self.alter_field(url, details, 'enrollment_end', datetime.datetime(2012, 11, 15, 1, 30, tzinfo=UTC))
         self.alter_field(url, details, 'short_description', "Short Description")
+        self.alter_field(url, details, 'about_sidebar_html', "About Sidebar HTML")
         self.alter_field(url, details, 'overview', "Overview")
         self.alter_field(url, details, 'intro_video', "intro_video")
         self.alter_field(url, details, 'effort', "effort")
@@ -145,6 +154,9 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         self.assertEqual(
             details['short_description'], encoded['short_description'], context + " short_description not =="
         )
+        self.assertEqual(
+            details['about_sidebar_html'], encoded['about_sidebar_html'], context + " about_sidebar_html not =="
+        )
         self.assertEqual(details['overview'], encoded['overview'], context + " overviews not ==")
         self.assertEqual(details['intro_video'], encoded.get('intro_video', None), context + " intro_video not ==")
         self.assertEqual(details['effort'], encoded['effort'], context + " efforts not ==")
@@ -161,7 +173,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
                 dt1 = date.from_json(encoded[field])
                 dt2 = details[field]
 
-                self.assertEqual(dt1, dt2, msg="{} != {} at {}".format(dt1, dt2, context))
+                self.assertEqual(dt1, dt2, msg=u"{} != {} at {}".format(dt1, dt2, context))
             else:
                 self.fail(field + " missing from encoded but in details at " + context)
         elif field in encoded and encoded[field] is not None:
@@ -175,6 +187,9 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
     def test_pre_requisite_course_update_and_fetch(self):
+        self.assertFalse(milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id),
+                         msg='The initial empty state should be: no prerequisite courses')
+
         url = get_url(self.course.id)
         resp = self.client.get_json(url)
         course_detail_json = json.loads(resp.content)
@@ -184,7 +199,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         # update pre requisite courses with a new course keys
         pre_requisite_course = CourseFactory.create(org='edX', course='900', run='test_run')
         pre_requisite_course2 = CourseFactory.create(org='edX', course='902', run='test_run')
-        pre_requisite_course_keys = [unicode(pre_requisite_course.id), unicode(pre_requisite_course2.id)]
+        pre_requisite_course_keys = [six.text_type(pre_requisite_course.id), six.text_type(pre_requisite_course2.id)]
         course_detail_json['pre_requisite_courses'] = pre_requisite_course_keys
         self.client.ajax_post(url, course_detail_json)
 
@@ -193,12 +208,18 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         course_detail_json = json.loads(resp.content)
         self.assertEqual(pre_requisite_course_keys, course_detail_json['pre_requisite_courses'])
 
+        self.assertTrue(milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id),
+                        msg='Should have prerequisite courses')
+
         # remove pre requisite course
         course_detail_json['pre_requisite_courses'] = []
         self.client.ajax_post(url, course_detail_json)
         resp = self.client.get_json(url)
         course_detail_json = json.loads(resp.content)
         self.assertEqual([], course_detail_json['pre_requisite_courses'])
+
+        self.assertFalse(milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id),
+                         msg='Should not have prerequisite courses anymore')
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
     def test_invalid_pre_requisite_course(self):
@@ -208,7 +229,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
 
         # update pre requisite courses one valid and one invalid key
         pre_requisite_course = CourseFactory.create(org='edX', course='900', run='test_run')
-        pre_requisite_course_keys = [unicode(pre_requisite_course.id), 'invalid_key']
+        pre_requisite_course_keys = [six.text_type(pre_requisite_course.id), 'invalid_key']
         course_detail_json['pre_requisite_courses'] = pre_requisite_course_keys
         response = self.client.ajax_post(url, course_detail_json)
         self.assertEqual(400, response.status_code)
@@ -254,11 +275,11 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             self.assertContains(response, "Course End Date")
             self.assertContains(response, "Enrollment Start Date")
             self.assertContains(response, "Enrollment End Date")
-            self.assertContains(response, "not the dates shown on your course summary page")
 
             self.assertContains(response, "Introducing Your Course")
             self.assertContains(response, "Course Card Image")
             self.assertContains(response, "Course Short Description")
+            self.assertNotContains(response, "Course About Sidebar HTML")
             self.assertNotContains(response, "Course Title")
             self.assertNotContains(response, "Course Subtitle")
             self.assertNotContains(response, "Course Duration")
@@ -271,6 +292,14 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
 
     @unittest.skipUnless(settings.FEATURES.get('ENTRANCE_EXAMS', False), True)
     def test_entrance_exam_created_updated_and_deleted_successfully(self):
+        """
+        This tests both of the entrance exam settings and the `any_unfulfilled_milestones` helper.
+
+        Splitting the test requires significant refactoring `settings_handler()` view.
+        """
+        self.assertFalse(milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id),
+                         msg='The initial empty state should be: no entrance exam')
+
         settings_details_url = get_url(self.course.id)
         data = {
             'entrance_exam_enabled': 'true',
@@ -279,7 +308,9 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             'short_description': 'empty',
             'overview': '',
             'effort': '',
-            'intro_video': ''
+            'intro_video': '',
+            'start_date': '2012-01-01',
+            'end_date': '2012-12-31',
         }
         response = self.client.post(settings_details_url, data=json.dumps(data), content_type='application/json',
                                     HTTP_ACCEPT='application/json')
@@ -302,6 +333,9 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         self.assertTrue(course.entrance_exam_enabled)
         self.assertEquals(course.entrance_exam_minimum_score_pct, .80)
 
+        self.assertTrue(milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id),
+                        msg='The entrance exam should be required.')
+
         # Delete the entrance exam
         data['entrance_exam_enabled'] = "false"
         response = self.client.post(
@@ -314,6 +348,9 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         self.assertEquals(response.status_code, 200)
         self.assertFalse(course.entrance_exam_enabled)
         self.assertEquals(course.entrance_exam_minimum_score_pct, None)
+
+        self.assertFalse(milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id),
+                         msg='The entrance exam should not be required anymore')
 
     @unittest.skipUnless(settings.FEATURES.get('ENTRANCE_EXAMS', False), True)
     def test_entrance_exam_store_default_min_score(self):
@@ -328,7 +365,9 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             'short_description': 'empty',
             'overview': '',
             'effort': '',
-            'intro_video': ''
+            'intro_video': '',
+            'start_date': '2012-01-01',
+            'end_date': '2012-12-31',
         }
         response = self.client.post(
             settings_details_url,
@@ -351,7 +390,9 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             'short_description': 'empty',
             'overview': '',
             'effort': '',
-            'intro_video': ''
+            'intro_video': '',
+            'start_date': '2012-01-01',
+            'end_date': '2012-12-31',
         }
 
         response = self.client.post(
@@ -386,7 +427,6 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             self.assertContains(response, "Course End Date")
             self.assertContains(response, "Enrollment Start Date")
             self.assertContains(response, "Enrollment End Date")
-            self.assertNotContains(response, "not the dates shown on your course summary page")
 
             self.assertContains(response, "Introducing Your Course")
             self.assertContains(response, "Course Card Image")
@@ -395,6 +435,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             self.assertContains(response, "Course Duration")
             self.assertContains(response, "Course Description")
             self.assertContains(response, "Course Short Description")
+            self.assertNotContains(response, "Course About Sidebar HTML")
             self.assertContains(response, "Course Overview")
             self.assertContains(response, "Course Introduction Video")
             self.assertContains(response, "Requirements")
@@ -407,6 +448,7 @@ class CourseGradingTest(CourseTestCase):
     """
     Tests for the course settings grading page.
     """
+
     def test_initial_grader(self):
         test_grader = CourseGradingModel(self.course)
         self.assertIsNotNone(test_grader.graders)
@@ -421,18 +463,21 @@ class CourseGradingTest(CourseTestCase):
             subgrader = CourseGradingModel.fetch_grader(self.course.id, i)
             self.assertDictEqual(grader, subgrader, str(i) + "th graders not equal")
 
+    @mock.patch('track.event_transaction_utils.uuid4')
+    @mock.patch('models.settings.course_grading.tracker')
+    @mock.patch('contentstore.signals.signals.GRADING_POLICY_CHANGED.send')
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_update_from_json(self, store):
+    def test_update_from_json(self, store, send_signal, tracker, uuid):
+        uuid.return_value = "mockUUID"
         self.course = CourseFactory.create(default_store=store)
-
         test_grader = CourseGradingModel.fetch(self.course.id)
         altered_grader = CourseGradingModel.update_from_json(self.course.id, test_grader.__dict__, self.user)
         self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "Noop update")
-
+        grading_policy_1 = self._grading_policy_hash_for_course()
         test_grader.graders[0]['weight'] = test_grader.graders[0].get('weight') * 2
         altered_grader = CourseGradingModel.update_from_json(self.course.id, test_grader.__dict__, self.user)
         self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "Weight[0] * 2")
-
+        grading_policy_2 = self._grading_policy_hash_for_course()
         # test for bug LMS-11485
         with modulestore().bulk_operations(self.course.id):
             new_grader = test_grader.graders[0].copy()
@@ -444,49 +489,127 @@ class CourseGradingTest(CourseTestCase):
             CourseGradingModel.update_from_json(self.course.id, test_grader.__dict__, self.user)
             altered_grader = CourseGradingModel.fetch(self.course.id)
             self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__)
-
+        grading_policy_3 = self._grading_policy_hash_for_course()
         test_grader.grade_cutoffs['D'] = 0.3
         altered_grader = CourseGradingModel.update_from_json(self.course.id, test_grader.__dict__, self.user)
         self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "cutoff add D")
-
+        grading_policy_4 = self._grading_policy_hash_for_course()
         test_grader.grace_period = {'hours': 4, 'minutes': 5, 'seconds': 0}
         altered_grader = CourseGradingModel.update_from_json(self.course.id, test_grader.__dict__, self.user)
         self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "4 hour grace period")
 
-    def test_update_grader_from_json(self):
+        # one for each of the calls to update_from_json()
+        send_signal.assert_has_calls([
+            # pylint: disable=line-too-long
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_1),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_2),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_3),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_4),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_4),
+            # pylint: enable=line-too-long
+        ])
+
+        # one for each of the calls to update_from_json(); the last update doesn't actually change the parts of the
+        # policy that get hashed
+        tracker.emit.assert_has_calls([
+            mock.call(
+                GRADING_POLICY_CHANGED_EVENT_TYPE,
+                {
+                    'course_id': six.text_type(self.course.id),
+                    'event_transaction_type': 'edx.grades.grading_policy_changed',
+                    'grading_policy_hash': policy_hash,
+                    'user_id': six.text_type(self.user.id),
+                    'event_transaction_id': 'mockUUID',
+                }
+            ) for policy_hash in (
+                grading_policy_1, grading_policy_2, grading_policy_3, grading_policy_4, grading_policy_4
+            )
+        ])
+
+    @mock.patch('track.event_transaction_utils.uuid4')
+    @mock.patch('models.settings.course_grading.tracker')
+    @mock.patch('contentstore.signals.signals.GRADING_POLICY_CHANGED.send')
+    def test_update_grader_from_json(self, send_signal, tracker, uuid):
+        uuid.return_value = 'mockUUID'
         test_grader = CourseGradingModel.fetch(self.course.id)
         altered_grader = CourseGradingModel.update_grader_from_json(
             self.course.id, test_grader.graders[1], self.user
         )
         self.assertDictEqual(test_grader.graders[1], altered_grader, "Noop update")
+        grading_policy_1 = self._grading_policy_hash_for_course()
 
         test_grader.graders[1]['min_count'] = test_grader.graders[1].get('min_count') + 2
         altered_grader = CourseGradingModel.update_grader_from_json(
             self.course.id, test_grader.graders[1], self.user)
         self.assertDictEqual(test_grader.graders[1], altered_grader, "min_count[1] + 2")
+        grading_policy_2 = self._grading_policy_hash_for_course()
 
         test_grader.graders[1]['drop_count'] = test_grader.graders[1].get('drop_count') + 1
         altered_grader = CourseGradingModel.update_grader_from_json(
             self.course.id, test_grader.graders[1], self.user)
         self.assertDictEqual(test_grader.graders[1], altered_grader, "drop_count[1] + 2")
+        grading_policy_3 = self._grading_policy_hash_for_course()
 
-    def test_update_cutoffs_from_json(self):
+        # one for each of the calls to update_grader_from_json()
+        send_signal.assert_has_calls([
+            # pylint: disable=line-too-long
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_1),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_2),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_3),
+            # pylint: enable=line-too-long
+        ])
+
+        # one for each of the calls to update_grader_from_json()
+        tracker.emit.assert_has_calls([
+            mock.call(
+                GRADING_POLICY_CHANGED_EVENT_TYPE,
+                {
+                    'course_id': six.text_type(self.course.id),
+                    'event_transaction_type': 'edx.grades.grading_policy_changed',
+                    'grading_policy_hash': policy_hash,
+                    'user_id': six.text_type(self.user.id),
+                    'event_transaction_id': 'mockUUID',
+                }
+            ) for policy_hash in {grading_policy_1, grading_policy_2, grading_policy_3}
+        ])
+
+    @mock.patch('track.event_transaction_utils.uuid4')
+    @mock.patch('models.settings.course_grading.tracker')
+    def test_update_cutoffs_from_json(self, tracker, uuid):
+        uuid.return_value = 'mockUUID'
         test_grader = CourseGradingModel.fetch(self.course.id)
         CourseGradingModel.update_cutoffs_from_json(self.course.id, test_grader.grade_cutoffs, self.user)
         # Unlike other tests, need to actually perform a db fetch for this test since update_cutoffs_from_json
         #  simply returns the cutoffs you send into it, rather than returning the db contents.
         altered_grader = CourseGradingModel.fetch(self.course.id)
         self.assertDictEqual(test_grader.grade_cutoffs, altered_grader.grade_cutoffs, "Noop update")
+        grading_policy_1 = self._grading_policy_hash_for_course()
 
         test_grader.grade_cutoffs['D'] = 0.3
         CourseGradingModel.update_cutoffs_from_json(self.course.id, test_grader.grade_cutoffs, self.user)
         altered_grader = CourseGradingModel.fetch(self.course.id)
         self.assertDictEqual(test_grader.grade_cutoffs, altered_grader.grade_cutoffs, "cutoff add D")
+        grading_policy_2 = self._grading_policy_hash_for_course()
 
         test_grader.grade_cutoffs['Pass'] = 0.75
         CourseGradingModel.update_cutoffs_from_json(self.course.id, test_grader.grade_cutoffs, self.user)
         altered_grader = CourseGradingModel.fetch(self.course.id)
         self.assertDictEqual(test_grader.grade_cutoffs, altered_grader.grade_cutoffs, "cutoff change 'Pass'")
+        grading_policy_3 = self._grading_policy_hash_for_course()
+
+        # one for each of the calls to update_cutoffs_from_json()
+        tracker.emit.assert_has_calls([
+            mock.call(
+                GRADING_POLICY_CHANGED_EVENT_TYPE,
+                {
+                    'course_id': six.text_type(self.course.id),
+                    'event_transaction_type': 'edx.grades.grading_policy_changed',
+                    'grading_policy_hash': policy_hash,
+                    'user_id': six.text_type(self.user.id),
+                    'event_transaction_id': 'mockUUID',
+                }
+            ) for policy_hash in (grading_policy_1, grading_policy_2, grading_policy_3)
+        ])
 
     def test_delete_grace_period(self):
         test_grader = CourseGradingModel.fetch(self.course.id)
@@ -511,7 +634,11 @@ class CourseGradingTest(CourseTestCase):
         # Once deleted, the grace period should simply be None
         self.assertEqual(None, altered_grader.grace_period, "Delete grace period")
 
-    def test_update_section_grader_type(self):
+    @mock.patch('track.event_transaction_utils.uuid4')
+    @mock.patch('models.settings.course_grading.tracker')
+    @mock.patch('contentstore.signals.signals.GRADING_POLICY_CHANGED.send')
+    def test_update_section_grader_type(self, send_signal, tracker, uuid):
+        uuid.return_value = 'mockUUID'
         # Get the descriptor and the section_grader_type and assert they are the default values
         descriptor = modulestore().get_item(self.course.location)
         section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
@@ -524,6 +651,7 @@ class CourseGradingTest(CourseTestCase):
         CourseGradingModel.update_section_grader_type(self.course, 'Homework', self.user)
         descriptor = modulestore().get_item(self.course.location)
         section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
+        grading_policy_1 = self._grading_policy_hash_for_course()
 
         self.assertEqual('Homework', section_grader_type['graderType'])
         self.assertEqual('Homework', descriptor.format)
@@ -533,34 +661,65 @@ class CourseGradingTest(CourseTestCase):
         CourseGradingModel.update_section_grader_type(self.course, 'notgraded', self.user)
         descriptor = modulestore().get_item(self.course.location)
         section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
+        grading_policy_2 = self._grading_policy_hash_for_course()
 
         self.assertEqual('notgraded', section_grader_type['graderType'])
         self.assertEqual(None, descriptor.format)
         self.assertEqual(False, descriptor.graded)
 
+        # one for each call to update_section_grader_type()
+        send_signal.assert_has_calls([
+            # pylint: disable=line-too-long
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_1),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_2),
+            # pylint: enable=line-too-long
+        ])
+
+        tracker.emit.assert_has_calls([
+            mock.call(
+                GRADING_POLICY_CHANGED_EVENT_TYPE,
+                {
+                    'course_id': six.text_type(self.course.id),
+                    'event_transaction_type': 'edx.grades.grading_policy_changed',
+                    'grading_policy_hash': policy_hash,
+                    'user_id': six.text_type(self.user.id),
+                    'event_transaction_id': 'mockUUID',
+                }
+            ) for policy_hash in (grading_policy_1, grading_policy_2)
+        ])
+
+    def _model_from_url(self, url_base):
+        response = self.client.get_json(url_base)
+        return json.loads(response.content)
+
     def test_get_set_grader_types_ajax(self):
         """
-        Test configuring the graders via ajax calls
+        Test creating and fetching the graders via ajax calls.
         """
         grader_type_url_base = get_url(self.course.id, 'grading_handler')
-        # test get whole
-        response = self.client.get_json(grader_type_url_base)
-        whole_model = json.loads(response.content)
+        whole_model = self._model_from_url(grader_type_url_base)
+
         self.assertIn('graders', whole_model)
         self.assertIn('grade_cutoffs', whole_model)
         self.assertIn('grace_period', whole_model)
+
         # test post/update whole
         whole_model['grace_period'] = {'hours': 1, 'minutes': 30, 'seconds': 0}
         response = self.client.ajax_post(grader_type_url_base, whole_model)
         self.assertEqual(200, response.status_code)
-        response = self.client.get_json(grader_type_url_base)
-        whole_model = json.loads(response.content)
+        whole_model = self._model_from_url(grader_type_url_base)
         self.assertEqual(whole_model['grace_period'], {'hours': 1, 'minutes': 30, 'seconds': 0})
+
         # test get one grader
         self.assertGreater(len(whole_model['graders']), 1)  # ensure test will make sense
-        response = self.client.get_json(grader_type_url_base + '/1')
-        grader_sample = json.loads(response.content)
+        grader_sample = self._model_from_url(grader_type_url_base + '/1')
         self.assertEqual(grader_sample, whole_model['graders'][1])
+
+    @mock.patch('contentstore.signals.signals.GRADING_POLICY_CHANGED.send')
+    def test_add_delete_grader(self, send_signal):
+        grader_type_url_base = get_url(self.course.id, 'grading_handler')
+        original_model = self._model_from_url(grader_type_url_base)
+
         # test add grader
         new_grader = {
             "type": "Extra Credit",
@@ -569,22 +728,33 @@ class CourseGradingTest(CourseTestCase):
             "short_label": None,
             "weight": 15,
         }
+
         response = self.client.ajax_post(
-            '{}/{}'.format(grader_type_url_base, len(whole_model['graders'])),
+            '{}/{}'.format(grader_type_url_base, len(original_model['graders'])),
             new_grader
         )
+        grading_policy_hash1 = self._grading_policy_hash_for_course()
         self.assertEqual(200, response.status_code)
         grader_sample = json.loads(response.content)
-        new_grader['id'] = len(whole_model['graders'])
+        new_grader['id'] = len(original_model['graders'])
         self.assertEqual(new_grader, grader_sample)
-        # test delete grader
+
+        # test deleting the original grader
         response = self.client.delete(grader_type_url_base + '/1', HTTP_ACCEPT="application/json")
+        grading_policy_hash2 = self._grading_policy_hash_for_course()
         self.assertEqual(204, response.status_code)
-        response = self.client.get_json(grader_type_url_base)
-        updated_model = json.loads(response.content)
+        updated_model = self._model_from_url(grader_type_url_base)
         new_grader['id'] -= 1  # one fewer and the id mutates
         self.assertIn(new_grader, updated_model['graders'])
-        self.assertNotIn(whole_model['graders'][1], updated_model['graders'])
+        self.assertNotIn(original_model['graders'][1], updated_model['graders'])
+        send_signal.assert_has_calls([
+            # once for the POST
+            # pylint: disable=line-too-long
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_hash1),
+            # once for the DELETE
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_hash2),
+            # pylint: enable=line-too-long
+        ])
 
     def setup_test_set_get_section_grader_ajax(self):
         """
@@ -612,18 +782,28 @@ class CourseGradingTest(CourseTestCase):
         response = self.client.get_json(grade_type_url + '?fields=graderType')
         self.assertEqual(json.loads(response.content).get('graderType'), u'notgraded')
 
+    def _grading_policy_hash_for_course(self):
+        return hash_grading_policy(modulestore().get_course(self.course.id).grading_policy)
+
 
 @ddt.ddt
 class CourseMetadataEditingTest(CourseTestCase):
     """
     Tests for CourseMetadata.
     """
+
     def setUp(self):
-        CourseTestCase.setUp(self)
+        super(CourseMetadataEditingTest, self).setUp()
         self.fullcourse = CourseFactory.create()
         self.course_setting_url = get_url(self.course.id, 'advanced_settings_handler')
         self.fullcourse_setting_url = get_url(self.fullcourse.id, 'advanced_settings_handler')
         self.notes_tab = {"type": "notes", "name": "My Notes"}
+
+        self.request = RequestFactory().request()
+        self.user = UserFactory()
+        self.request.user = self.user
+        set_current_request(self.request)
+        self.addCleanup(set_current_request, None)
 
     def test_fetch_initial_fields(self):
         test_model = CourseMetadata.fetch(self.course)
@@ -786,6 +966,22 @@ class CourseMetadataEditingTest(CourseTestCase):
         )
         self.assertNotIn('edxnotes', test_model)
 
+    @patch.dict(settings.FEATURES, {'ENABLE_OTHER_COURSE_SETTINGS': True})
+    def test_othercoursesettings_present(self):
+        """
+        If feature flag ENABLE_OTHER_COURSE_SETTINGS is on, show the setting in Advanced Settings.
+        """
+        test_model = CourseMetadata.fetch(self.fullcourse)
+        self.assertIn('other_course_settings', test_model)
+
+    @patch.dict(settings.FEATURES, {'ENABLE_OTHER_COURSE_SETTINGS': False})
+    def test_othercoursesettings_not_present(self):
+        """
+        If feature flag ENABLE_OTHER_COURSE_SETTINGS is off, don't show the setting at all in Advanced Settings.
+        """
+        test_model = CourseMetadata.fetch(self.fullcourse)
+        self.assertNotIn('other_course_settings', test_model)
+
     def test_allow_unsupported_xblocks(self):
         """
         allow_unsupported_xblocks is only shown in Advanced Settings if
@@ -839,7 +1035,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         fresh = modulestore().get_course(self.course.id)
         test_model = CourseMetadata.fetch(fresh)
 
-        self.assertNotEqual(test_model['advertised_start']['value'], 1, 'advertised_start should not be updated to a wrong value')
+        self.assertNotEqual(test_model['advertised_start']['value'], 1, 'advertised_start should not be updated to a wrong value')  # pylint: disable=line-too-long
         self.assertNotEqual(test_model['days_early_for_beta']['value'], "supposed to be an integer",
                             'days_early_for beta should not be updated to a wrong value')
 
@@ -986,7 +1182,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertEqual(tab_list, course.tabs)
 
     @patch.dict(settings.FEATURES, {'ENABLE_EDXNOTES': True})
-    @patch('xmodule.util.django.get_current_request')
+    @patch('xmodule.util.xmodule_django.get_current_request')
     def test_post_settings_with_staff_not_enrolled(self, mock_request):
         """
         Tests that we can post advance settings when course staff is not enrolled.
@@ -1002,11 +1198,199 @@ class CourseMetadataEditingTest(CourseTestCase):
         })
         self.assertEqual(response.status_code, 200)
 
+    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
+    def test_proctoring_provider_present_when_waffle_flag_enabled(self):
+        """
+        Tests that proctoring provider field is not filtered out when the waffle flag is enabled.
+        """
+        test_model = CourseMetadata.fetch(self.fullcourse)
+        self.assertIn('proctoring_provider', test_model)
+
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'test_proctoring_provider',
+            'test_proctoring_provider': {}
+        }
+    )
+    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
+    def test_validate_update_does_not_filter_out_proctoring_provider_when_waffle_flag_enabled(self):
+        """
+        Tests that proctoring provider field is returned by validate_and_update_from_json method when
+        waffle flag is enabled.
+        """
+        field_name = "proctoring_provider"
+
+        _, _, test_model = CourseMetadata.validate_and_update_from_json(
+            self.course,
+            {
+                field_name: {"value": 'test_proctoring_provider'},
+            },
+            user=self.user
+        )
+        self.assertIn(field_name, test_model)
+
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'test_proctoring_provider',
+            'test_proctoring_provider': {}
+        }
+    )
+    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
+    def test_update_from_json_does_not_filter_out_proctoring_provider_when_waffle_flag_enabled(self):
+        """
+        Tests that proctoring provider field is returned by update_from_json method when
+        waffle flag is enabled.
+        """
+        field_name = "proctoring_provider"
+        test_model = CourseMetadata.update_from_json(
+            self.course,
+            {
+                field_name: {"value": 'test_proctoring_provider'},
+            },
+            user=self.user
+        )
+        self.assertIn(field_name, test_model)
+
+    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, False)
+    def test_proctoring_provider_not_present_when_waffle_flag_not_enabled(self):
+        """
+        Tests that proctoring provider field is filtered out when the waffle flag is not enabled.
+        """
+        test_model = CourseMetadata.fetch(self.fullcourse)
+        self.assertNotIn('proctoring_provider', test_model)
+
+    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, False)
+    def test_validate_update_does_filter_out_proctoring_provider_when_waffle_flag_not_enabled(self):
+        """
+        Tests that proctoring provider field is not returned by validate_and_update_from_json method when
+        waffle flag is not enabled.
+        """
+        field_name = "proctoring_provider"
+
+        _, _, test_model = CourseMetadata.validate_and_update_from_json(
+            self.course,
+            {
+                field_name: {"value": 'test_proctoring_provider'},
+            },
+            user=self.user
+        )
+        self.assertNotIn(field_name, test_model)
+
+    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, False)
+    def test_update_from_json_does_filter_out_proctoring_provider_when_waffle_flag_not_enabled(self):
+        """
+        Tests that proctoring provider field is not returned by update_from_json method when
+        waffle flag is not enabled.
+        """
+        field_name = "proctoring_provider"
+
+        test_model = CourseMetadata.update_from_json(
+            self.course,
+            {
+                field_name: {"value": 'test_proctoring_provider'},
+            },
+            user=self.user
+        )
+        self.assertNotIn(field_name, test_model)
+
+    def test_create_zendesk_tickets_present_for_edx_staff(self):
+        """
+        Tests that create zendesk tickets field is not filtered out when the user is an edX staff member.
+        """
+        self._set_request_user_to_staff()
+
+        test_model = CourseMetadata.fetch(self.fullcourse)
+        self.assertIn('create_zendesk_tickets', test_model)
+
+    def test_validate_update_does_not_filter_out_create_zendesk_tickets_for_edx_staff(self):
+        """
+        Tests that create zendesk tickets field is returned by validate_and_update_from_json method when
+        the user is an edX staff member.
+        """
+        self._set_request_user_to_staff()
+
+        field_name = "create_zendesk_tickets"
+
+        _, _, test_model = CourseMetadata.validate_and_update_from_json(
+            self.course,
+            {
+                field_name: {"value": True},
+            },
+            user=self.user
+        )
+        self.assertIn(field_name, test_model)
+
+    def test_update_from_json_does_not_filter_out_create_zendesk_tickets_for_edx_staff(self):
+        """
+        Tests that create zendesk tickets field is returned by update_from_json method when
+        the user is an edX staff member.
+        """
+        self._set_request_user_to_staff()
+
+        field_name = "create_zendesk_tickets"
+
+        test_model = CourseMetadata.update_from_json(
+            self.course,
+            {
+                field_name: {"value": True},
+            },
+            user=self.user
+        )
+        self.assertIn(field_name, test_model)
+
+    def test_create_zendesk_tickets_not_present_for_course_staff(self):
+        """
+        Tests that create zendesk tickets field is filtered out when the user is not an edX staff member.
+        """
+        test_model = CourseMetadata.fetch(self.fullcourse)
+        self.assertNotIn('create_zendesk_tickets', test_model)
+
+    def test_validate_update_does_filter_out_create_zendesk_tickets_for_course_staff(self):
+        """
+        Tests that create zendesk tickets field is not returned by validate_and_update_from_json method when
+        the user is not an edX staff member.
+        """
+        field_name = "create_zendesk_tickets"
+
+        _, _, test_model = CourseMetadata.validate_and_update_from_json(
+            self.course,
+            {
+                field_name: {"value": True},
+            },
+            user=self.user
+        )
+        self.assertNotIn(field_name, test_model)
+
+    def test_update_from_json_does_filter_out_create_zendesk_tickets_for_course_staff(self):
+        """
+        Tests that create zendesk tickets field is not returned by update_from_json method when
+        the user is not an edX staff member.
+        """
+        field_name = "create_zendesk_tickets"
+
+        test_model = CourseMetadata.update_from_json(
+            self.course,
+            {
+                field_name: {"value": True},
+            },
+            user=self.user
+        )
+        self.assertNotIn(field_name, test_model)
+
+    def _set_request_user_to_staff(self):
+        """
+        Update the current request's user to be an edX staff member.
+        """
+        self.user.is_staff = True
+        self.request.user = self.user
+        set_current_request(self.request)
+
 
 class CourseGraderUpdatesTest(CourseTestCase):
     """
     Test getting, deleting, adding, & updating graders
     """
+
     def setUp(self):
         """Compute the url to use in tests"""
         super(CourseGraderUpdatesTest, self).setUp()
@@ -1072,6 +1456,7 @@ class CourseEnrollmentEndFieldTest(CourseTestCase):
     Base class to test the enrollment end fields in the course settings details view in Studio
     when using marketing site flag and global vs non-global staff to access the page.
     """
+
     NOT_EDITABLE_HELPER_MESSAGE = "Contact your edX partner manager to update these settings."
     NOT_EDITABLE_DATE_WRAPPER = "<div class=\"field date is-not-editable\" id=\"field-enrollment-end-date\">"
     NOT_EDITABLE_TIME_WRAPPER = "<div class=\"field time is-not-editable\" id=\"field-enrollment-end-time\">"
@@ -1103,13 +1488,17 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
     ]
 
     def setUp(self):
-        """ Initialize course used to test enrollment fields. """
+        """
+        Initialize course used to test enrollment fields.
+        """
         super(CourseEnrollmentEndFieldTest, self).setUp()
         self.course = CourseFactory.create(org='edX', number='dummy', display_name='Marketing Site Course')
-        self.course_details_url = reverse_course_url('settings_handler', unicode(self.course.id))
+        self.course_details_url = reverse_course_url('settings_handler', six.text_type(self.course.id))
 
     def _get_course_details_response(self, global_staff):
-        """ Return the course details page as either global or non-global staff"""
+        """
+        Return the course details page as either global or non-global staff
+        """
         user = UserFactory(is_staff=global_staff)
         CourseInstructorRole(self.course.id).add_users(user)
 
@@ -1118,7 +1507,8 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
         return self.client.get_html(self.course_details_url)
 
     def _verify_editable(self, response):
-        """ Verify that the response has expected editable fields.
+        """
+        Verify that the response has expected editable fields.
 
         Assert that all editable field content exists and no
         uneditable field content exists for enrollment end fields.
@@ -1131,7 +1521,8 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
             self.assertContains(response, element)
 
     def _verify_not_editable(self, response):
-        """ Verify that the response has expected non-editable fields.
+        """
+        Verify that the response has expected non-editable fields.
 
         Assert that all uneditable field content exists and no
         editable field content exists for enrollment end fields.
@@ -1145,7 +1536,8 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_MKTG_SITE': False})
     def test_course_details_with_disabled_setting_global_staff(self):
-        """ Test that user enrollment end date is editable in response.
+        """
+        Test that user enrollment end date is editable in response.
 
         Feature flag 'ENABLE_MKTG_SITE' is not enabled.
         User is global staff.
@@ -1154,7 +1546,8 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_MKTG_SITE': False})
     def test_course_details_with_disabled_setting_non_global_staff(self):
-        """ Test that user enrollment end date is editable in response.
+        """
+        Test that user enrollment end date is editable in response.
 
         Feature flag 'ENABLE_MKTG_SITE' is not enabled.
         User is non-global staff.
@@ -1164,7 +1557,8 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_MKTG_SITE': True})
     @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
     def test_course_details_with_enabled_setting_global_staff(self):
-        """ Test that user enrollment end date is editable in response.
+        """
+        Test that user enrollment end date is editable in response.
 
         Feature flag 'ENABLE_MKTG_SITE' is enabled.
         User is global staff.
@@ -1174,7 +1568,8 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_MKTG_SITE': True})
     @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
     def test_course_details_with_enabled_setting_non_global_staff(self):
-        """ Test that user enrollment end date is not editable in response.
+        """
+        Test that user enrollment end date is not editable in response.
 
         Feature flag 'ENABLE_MKTG_SITE' is enabled.
         User is non-global staff.

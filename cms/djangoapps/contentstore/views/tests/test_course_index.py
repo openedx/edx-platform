@@ -1,41 +1,51 @@
 """
 Unit tests for getting the list of courses and the course outline.
 """
-import ddt
-import json
-import lxml
+from __future__ import absolute_import
+
 import datetime
+import json
+
+import ddt
+import lxml
 import mock
 import pytz
-
+import six
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.test.utils import override_settings
 from django.utils.translation import ugettext as _
-
-from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url, reverse_library_url, add_instructor, reverse_usage_url
-from contentstore.views.course import (
-    course_outline_initial_state, reindex_course_and_check_access, _deprecated_blocks_info
-)
-from contentstore.views.item import create_xblock_info, VisibilityState
-from course_action_state.managers import CourseRerunUIStateManager
-from course_action_state.models import CourseRerunState
+from edx_django_utils.monitoring.middleware import _DEFAULT_NAMESPACE as DJANGO_UTILS_NAMESPACE
 from opaque_keys.edx.locator import CourseLocator
 from search.api import perform_search
+
+from contentstore.config.waffle import WAFFLE_NAMESPACE as STUDIO_WAFFLE_NAMESPACE
+from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
+from contentstore.tests.utils import CourseTestCase
+from contentstore.utils import add_instructor, reverse_course_url, reverse_usage_url
+from contentstore.views.course import WAFFLE_NAMESPACE as COURSE_WAFFLE_NAMESPACE
+from contentstore.views.course import (
+    _deprecated_blocks_info,
+    course_outline_initial_state,
+    reindex_course_and_check_access
+)
+from contentstore.views.item import VisibilityState, create_xblock_info
+from course_action_state.managers import CourseRerunUIStateManager
+from course_action_state.models import CourseRerunState
+from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from student.auth import has_course_author_access
+from student.roles import CourseStaffRole, GlobalStaff, LibraryUserRole
 from student.tests.factories import UserFactory
-from util.date_utils import get_default_time_display
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls
 
 
 class TestCourseIndex(CourseTestCase):
     """
     Unit tests for getting the list of courses and the course outline.
     """
+
     def setUp(self):
         """
         Add a course with odd characters in the fields
@@ -48,55 +58,49 @@ class TestCourseIndex(CourseTestCase):
             display_name='dotted.course.name-2',
         )
 
-    def check_index_and_outline(self, authed_client):
+    def check_courses_on_index(self, authed_client):
         """
-        Test getting the list of courses and then pulling up their outlines
+        Test that the React course listing is present.
         """
         index_url = '/home/'
         index_response = authed_client.get(index_url, {}, HTTP_ACCEPT='text/html')
         parsed_html = lxml.html.fromstring(index_response.content)
-        course_link_eles = parsed_html.find_class('course-link')
-        self.assertGreaterEqual(len(course_link_eles), 2)
-        for link in course_link_eles:
-            self.assertRegexpMatches(
-                link.get("href"),
-                'course/{}'.format(settings.COURSE_KEY_PATTERN)
-            )
-            # now test that url
-            outline_response = authed_client.get(link.get("href"), {}, HTTP_ACCEPT='text/html')
-            # ensure it has the expected 2 self referential links
-            outline_parsed = lxml.html.fromstring(outline_response.content)
-            outline_link = outline_parsed.find_class('course-link')[0]
-            self.assertEqual(outline_link.get("href"), link.get("href"))
-            course_menu_link = outline_parsed.find_class('nav-course-courseware-outline')[0]
-            self.assertEqual(course_menu_link.find("a").get("href"), link.get("href"))
+        courses_tab = parsed_html.find_class('react-course-listing')
+        self.assertEqual(len(courses_tab), 1)
 
-    def test_libraries_on_course_index(self):
+    def test_libraries_on_index(self):
         """
-        Test getting the list of libraries from the course listing page
+        Test that the library tab is present.
         """
+        def _assert_library_tab_present(response):
+            """
+            Asserts there's a library tab.
+            """
+            parsed_html = lxml.html.fromstring(response.content)
+            library_tab = parsed_html.find_class('react-library-listing')
+            self.assertEqual(len(library_tab), 1)
+
         # Add a library:
         lib1 = LibraryFactory.create()
 
         index_url = '/home/'
         index_response = self.client.get(index_url, {}, HTTP_ACCEPT='text/html')
-        parsed_html = lxml.html.fromstring(index_response.content)
-        library_link_elements = parsed_html.find_class('library-link')
-        self.assertEqual(len(library_link_elements), 1)
-        link = library_link_elements[0]
-        self.assertEqual(
-            link.get("href"),
-            reverse_library_url('library_handler', lib1.location.library_key),
-        )
-        # now test that url
-        outline_response = self.client.get(link.get("href"), {}, HTTP_ACCEPT='text/html')
-        self.assertEqual(outline_response.status_code, 200)
+        _assert_library_tab_present(index_response)
+
+        # Make sure libraries are visible to non-staff users too
+        self.client.logout()
+        non_staff_user, non_staff_userpassword = self.create_non_staff_user()
+        lib2 = LibraryFactory.create(user_id=non_staff_user.id)
+        LibraryUserRole(lib2.location.library_key).add_users(non_staff_user)
+        self.client.login(username=non_staff_user.username, password=non_staff_userpassword)
+        index_response = self.client.get(index_url, {}, HTTP_ACCEPT='text/html')
+        _assert_library_tab_present(index_response)
 
     def test_is_staff_access(self):
         """
         Test that people with is_staff see the courses and can navigate into them
         """
-        self.check_index_and_outline(self.client)
+        self.check_courses_on_index(self.client)
 
     def test_negative_conditions(self):
         """
@@ -124,7 +128,7 @@ class TestCourseIndex(CourseTestCase):
             )
 
         # test access
-        self.check_index_and_outline(course_staff_client)
+        self.check_courses_on_index(course_staff_client)
 
     def test_json_responses(self):
         outline_url = reverse_course_url('course_handler', self.course.id)
@@ -142,7 +146,7 @@ class TestCourseIndex(CourseTestCase):
 
         # First spot check some values in the root response
         self.assertEqual(json_response['category'], 'course')
-        self.assertEqual(json_response['id'], unicode(self.course.location))
+        self.assertEqual(json_response['id'], six.text_type(self.course.location))
         self.assertEqual(json_response['display_name'], self.course.display_name)
         self.assertTrue(json_response['published'])
         self.assertIsNone(json_response['visibility_state'])
@@ -152,7 +156,7 @@ class TestCourseIndex(CourseTestCase):
         self.assertGreater(len(children), 0)
         first_child_response = children[0]
         self.assertEqual(first_child_response['category'], 'chapter')
-        self.assertEqual(first_child_response['id'], unicode(chapter.location))
+        self.assertEqual(first_child_response['id'], six.text_type(chapter.location))
         self.assertEqual(first_child_response['display_name'], 'Week 1')
         self.assertTrue(json_response['published'])
         self.assertEqual(first_child_response['visibility_state'], VisibilityState.unscheduled)
@@ -311,10 +315,125 @@ class TestCourseIndex(CourseTestCase):
 
 
 @ddt.ddt
+class TestCourseIndexArchived(CourseTestCase):
+    """
+    Unit tests for testing the course index list when there are archived courses.
+    """
+    NOW = datetime.datetime.now(pytz.utc)
+    DAY = datetime.timedelta(days=1)
+    YESTERDAY = NOW - DAY
+    TOMORROW = NOW + DAY
+
+    ORG = 'MyOrg'
+
+    ENABLE_SEPARATE_ARCHIVED_COURSES = settings.FEATURES.copy()
+    ENABLE_SEPARATE_ARCHIVED_COURSES['ENABLE_SEPARATE_ARCHIVED_COURSES'] = True
+    DISABLE_SEPARATE_ARCHIVED_COURSES = settings.FEATURES.copy()
+    DISABLE_SEPARATE_ARCHIVED_COURSES['ENABLE_SEPARATE_ARCHIVED_COURSES'] = False
+
+    def setUp(self):
+        """
+        Add courses with the end date set to various values
+        """
+        super(TestCourseIndexArchived, self).setUp()
+
+        # Base course has no end date (so is active)
+        self.course.end = None
+        self.course.display_name = 'Active Course 1'
+        self.ORG = self.course.location.org
+        self.save_course()
+
+        # Active course has end date set to tomorrow
+        self.active_course = CourseFactory.create(
+            display_name='Active Course 2',
+            org=self.ORG,
+            end=self.TOMORROW,
+        )
+
+        # Archived course has end date set to yesterday
+        self.archived_course = CourseFactory.create(
+            display_name='Archived Course',
+            org=self.ORG,
+            end=self.YESTERDAY,
+        )
+
+        # Base user has global staff access
+        self.assertTrue(GlobalStaff().has_user(self.user))
+
+        # Staff user just has course staff access
+        self.staff, self.staff_password = self.create_non_staff_user()
+        for course in (self.course, self.active_course, self.archived_course):
+            CourseStaffRole(course.id).add_users(self.staff)
+
+        # Make sure we've cached data which could change the query counts
+        # depending on test execution order
+        WaffleSwitchNamespace(name=COURSE_WAFFLE_NAMESPACE).is_enabled(u'enable_global_staff_optimization')
+        WaffleSwitchNamespace(name=STUDIO_WAFFLE_NAMESPACE).is_enabled(u'enable_policy_page')
+        WaffleSwitchNamespace(name=DJANGO_UTILS_NAMESPACE).is_enabled(u'enable_memory_middleware')
+
+    def check_index_page_with_query_count(self, separate_archived_courses, org, mongo_queries, sql_queries):
+        """
+        Checks the index page, and ensures the number of database queries is as expected.
+        """
+        with self.assertNumQueries(sql_queries):
+            with check_mongo_calls(mongo_queries):
+                self.check_index_page(separate_archived_courses=separate_archived_courses, org=org)
+
+    def check_index_page(self, separate_archived_courses, org):
+        """
+        Ensure that the index page displays the archived courses as expected.
+        """
+        index_url = '/home/'
+        index_params = {}
+        if org is not None:
+            index_params['org'] = org
+        index_response = self.client.get(index_url, index_params, HTTP_ACCEPT='text/html')
+        self.assertEquals(index_response.status_code, 200)
+
+        parsed_html = lxml.html.fromstring(index_response.content)
+        course_tab = parsed_html.find_class('courses')
+        self.assertEqual(len(course_tab), 1)
+        archived_course_tab = parsed_html.find_class('archived-courses')
+        self.assertEqual(len(archived_course_tab), 1 if separate_archived_courses else 0)
+
+    @ddt.data(
+        # Staff user has course staff access
+        (True, 'staff', None, 3, 18),
+        (False, 'staff', None, 3, 18),
+        # Base user has global staff access
+        (True, 'user', ORG, 3, 18),
+        (False, 'user', ORG, 3, 18),
+        (True, 'user', None, 3, 18),
+        (False, 'user', None, 3, 18),
+    )
+    @ddt.unpack
+    def test_separate_archived_courses(self, separate_archived_courses, username, org, mongo_queries, sql_queries):
+        """
+        Ensure that archived courses are shown as expected for all user types, when the feature is enabled/disabled.
+        Also ensure that enabling the feature does not adversely affect the database query count.
+        """
+        # Authenticate the requested user
+        user = getattr(self, username)
+        password = getattr(self, username + '_password')
+        self.client.login(username=user, password=password)
+
+        # Enable/disable the feature before viewing the index page.
+        features = settings.FEATURES.copy()
+        features['ENABLE_SEPARATE_ARCHIVED_COURSES'] = separate_archived_courses
+        with override_settings(FEATURES=features):
+            self.check_index_page_with_query_count(separate_archived_courses=separate_archived_courses,
+                                                   org=org,
+                                                   mongo_queries=mongo_queries,
+                                                   sql_queries=sql_queries)
+
+
+@ddt.ddt
 class TestCourseOutline(CourseTestCase):
     """
     Unit tests for the course outline.
     """
+    ENABLED_SIGNALS = ['course_published']
+
     def setUp(self):
         """
         Set up the for the course outline tests.
@@ -334,46 +453,52 @@ class TestCourseOutline(CourseTestCase):
             parent_location=self.vertical.location, category="video", display_name="My Video"
         )
 
-    def test_json_responses(self):
+    @ddt.data(True, False)
+    def test_json_responses(self, is_concise):
         """
         Verify the JSON responses returned for the course.
+
+        Arguments:
+            is_concise (Boolean) : If True, fetch concise version of course outline.
         """
         outline_url = reverse_course_url('course_handler', self.course.id)
+        outline_url = outline_url + '?format=concise' if is_concise else outline_url
         resp = self.client.get(outline_url, HTTP_ACCEPT='application/json')
         json_response = json.loads(resp.content)
 
         # First spot check some values in the root response
         self.assertEqual(json_response['category'], 'course')
-        self.assertEqual(json_response['id'], unicode(self.course.location))
+        self.assertEqual(json_response['id'], six.text_type(self.course.location))
         self.assertEqual(json_response['display_name'], self.course.display_name)
-        self.assertTrue(json_response['published'])
-        self.assertIsNone(json_response['visibility_state'])
+        self.assertNotEqual(json_response.get('published', False), is_concise)
+        self.assertIsNone(json_response.get('visibility_state'))
 
         # Now verify the first child
         children = json_response['child_info']['children']
         self.assertGreater(len(children), 0)
         first_child_response = children[0]
         self.assertEqual(first_child_response['category'], 'chapter')
-        self.assertEqual(first_child_response['id'], unicode(self.chapter.location))
+        self.assertEqual(first_child_response['id'], six.text_type(self.chapter.location))
         self.assertEqual(first_child_response['display_name'], 'Week 1')
-        self.assertTrue(json_response['published'])
-        self.assertEqual(first_child_response['visibility_state'], VisibilityState.unscheduled)
+        self.assertNotEqual(json_response.get('published', False), is_concise)
+        if not is_concise:
+            self.assertEqual(first_child_response['visibility_state'], VisibilityState.unscheduled)
         self.assertGreater(len(first_child_response['child_info']['children']), 0)
 
         # Finally, validate the entire response for consistency
-        self.assert_correct_json_response(json_response)
+        self.assert_correct_json_response(json_response, is_concise)
 
-    def assert_correct_json_response(self, json_response):
+    def assert_correct_json_response(self, json_response, is_concise=False):
         """
         Asserts that the JSON response is syntactically consistent
         """
         self.assertIsNotNone(json_response['display_name'])
         self.assertIsNotNone(json_response['id'])
         self.assertIsNotNone(json_response['category'])
-        self.assertTrue(json_response['published'])
+        self.assertNotEqual(json_response.get('published', False), is_concise)
         if json_response.get('child_info', None):
             for child_response in json_response['child_info']['children']:
-                self.assert_correct_json_response(child_response)
+                self.assert_correct_json_response(child_response, is_concise)
 
     def test_course_outline_initial_state(self):
         course_module = modulestore().get_item(self.course.location)
@@ -387,44 +512,12 @@ class TestCourseOutline(CourseTestCase):
         self.assertIsNone(course_outline_initial_state('no-such-locator', course_structure))
 
         # Verify that the correct initial state is returned for the test chapter
-        chapter_locator = unicode(self.chapter.location)
+        chapter_locator = six.text_type(self.chapter.location)
         initial_state = course_outline_initial_state(chapter_locator, course_structure)
         self.assertEqual(initial_state['locator_to_show'], chapter_locator)
         expanded_locators = initial_state['expanded_locators']
-        self.assertIn(unicode(self.sequential.location), expanded_locators)
-        self.assertIn(unicode(self.vertical.location), expanded_locators)
-
-    def test_start_date_on_page(self):
-        """
-        Verify that the course start date is included on the course outline page.
-        """
-        def _get_release_date(response):
-            """Return the release date from the course page"""
-            parsed_html = lxml.html.fromstring(response.content)
-            return parsed_html.find_class('course-status')[0].find_class('status-release-value')[0].text_content()
-
-        def _assert_settings_link_present(response):
-            """
-            Asserts there's a course settings link on the course page by the course release date.
-            """
-            parsed_html = lxml.html.fromstring(response.content)
-            settings_link = parsed_html.find_class('course-status')[0].find_class('action-edit')[0].find('a')
-            self.assertIsNotNone(settings_link)
-            self.assertEqual(settings_link.get('href'), reverse_course_url('settings_handler', self.course.id))
-
-        outline_url = reverse_course_url('course_handler', self.course.id)
-        response = self.client.get(outline_url, {}, HTTP_ACCEPT='text/html')
-
-        # A course with the default release date should display as "Unscheduled"
-        self.assertEqual(_get_release_date(response), 'Unscheduled')
-        _assert_settings_link_present(response)
-
-        self.course.start = datetime.datetime(2014, 1, 1, tzinfo=pytz.utc)
-        modulestore().update_item(self.course, ModuleStoreEnum.UserID.test)
-        response = self.client.get(outline_url, {}, HTTP_ACCEPT='text/html')
-
-        self.assertEqual(_get_release_date(response), get_default_time_display(self.course.start))
-        _assert_settings_link_present(response)
+        self.assertIn(six.text_type(self.sequential.location), expanded_locators)
+        self.assertIn(six.text_type(self.vertical.location), expanded_locators)
 
     def _create_test_data(self, course_module, create_blocks=False, publish=True, block_types=None):
         """
@@ -435,7 +528,7 @@ class TestCourseOutline(CourseTestCase):
                 ItemFactory.create(
                     parent_location=self.vertical.location,
                     category=block_type,
-                    display_name='{} Problem'.format(block_type)
+                    display_name=u'{} Problem'.format(block_type)
                 )
 
             if not publish:
@@ -452,14 +545,13 @@ class TestCourseOutline(CourseTestCase):
             expected_blocks.append(
                 [
                     reverse_usage_url('container_handler', self.vertical.location),
-                    '{} Problem'.format(block_type)
+                    u'{} Problem'.format(block_type)
                 ]
             )
 
-        self.assertEqual(info['block_types'], deprecated_block_types)
         self.assertEqual(
-            info['block_types_enabled'],
-            any(component in advanced_modules for component in deprecated_block_types)
+            info['deprecated_enabled_block_types'],
+            [component for component in advanced_modules if component in deprecated_block_types]
         )
 
         self.assertItemsEqual(info['blocks'], expected_blocks)
@@ -489,71 +581,25 @@ class TestCourseOutline(CourseTestCase):
         )
 
     @ddt.data(
-        {'delete_vertical': True},
-        {'delete_vertical': False},
+        (["a", "b", "c"], ["a", "b", "c"]),
+        (["a", "b", "c"], ["a", "b", "d"]),
+        (["a", "b", "c"], ["a", "d", "e"]),
+        (["a", "b", "c"], ["d", "e", "f"])
     )
     @ddt.unpack
-    def test_deprecated_blocks_list_updated_correctly(self, delete_vertical):
+    def test_verify_warn_only_on_enabled_modules(self, enabled_block_types, deprecated_block_types):
         """
-        Verify that deprecated blocks list shown on banner is updated correctly.
-
-        Here is the scenario:
-            This list of deprecated blocks shown on banner contains published
-            and un-published blocks. That list should be updated when we delete
-            un-published block(s). This behavior should be same if we delete
-            unpublished vertical or problem.
+        Verify that we only warn about block_types that are both deprecated and enabled.
         """
-        block_types = ['notes']
+        expected_block_types = list(set(enabled_block_types) & set(deprecated_block_types))
         course_module = modulestore().get_item(self.course.location)
-
-        vertical1 = ItemFactory.create(
-            parent_location=self.sequential.location, category='vertical', display_name='Vert1 Subsection1'
-        )
-        problem1 = ItemFactory.create(
-            parent_location=vertical1.location,
-            category='notes',
-            display_name='notes problem in vert1',
-            publish_item=False
-        )
-
-        info = _deprecated_blocks_info(course_module, block_types)
-        # info['blocks'] should be empty here because there is nothing
-        # published or un-published present
-        self.assertEqual(info['blocks'], [])
-
-        vertical2 = ItemFactory.create(
-            parent_location=self.sequential.location, category='vertical', display_name='Vert2 Subsection1'
-        )
-        ItemFactory.create(
-            parent_location=vertical2.location,
-            category='notes',
-            display_name='notes problem in vert2',
-            pubish_item=True
-        )
-        # At this point CourseStructure will contain both the above
-        # published and un-published verticals
-
-        info = _deprecated_blocks_info(course_module, block_types)
-        self.assertItemsEqual(
-            info['blocks'],
-            [
-                [reverse_usage_url('container_handler', vertical1.location), 'notes problem in vert1'],
-                [reverse_usage_url('container_handler', vertical2.location), 'notes problem in vert2']
-            ]
-        )
-
-        # Delete the un-published vertical or problem so that CourseStructure updates its data
-        if delete_vertical:
-            self.store.delete_item(vertical1.location, self.user.id)
-        else:
-            self.store.delete_item(problem1.location, self.user.id)
-
-        info = _deprecated_blocks_info(course_module, block_types)
-        # info['blocks'] should only contain the info about vertical2 which is published.
-        # There shouldn't be any info present about un-published vertical1
-        self.assertEqual(
-            info['blocks'],
-            [[reverse_usage_url('container_handler', vertical2.location), 'notes problem in vert2']]
+        self._create_test_data(course_module, create_blocks=True, block_types=enabled_block_types)
+        info = _deprecated_blocks_info(course_module, deprecated_block_types)
+        self._verify_deprecated_info(
+            course_module.id,
+            course_module.advanced_modules,
+            info,
+            expected_block_types
         )
 
 
@@ -562,6 +608,8 @@ class TestCourseReIndex(CourseTestCase):
     Unit tests for the course outline.
     """
     SUCCESSFUL_RESPONSE = _("Course has been successfully reindexed.")
+
+    ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
         """
@@ -632,7 +680,7 @@ class TestCourseReIndex(CourseTestCase):
         self.assertIn(self.SUCCESSFUL_RESPONSE, response.content)
         self.assertEqual(response.status_code, 200)
 
-    @mock.patch('xmodule.html_module.HtmlDescriptor.index_dictionary')
+    @mock.patch('xmodule.html_module.HtmlBlock.index_dictionary')
     def test_reindex_course_search_index_error(self, mock_index_dictionary):
         """
         Test json response with mocked error data for html
@@ -658,7 +706,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=unicode(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
         # Start manual reindex
@@ -670,10 +718,10 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=unicode(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
-    @mock.patch('xmodule.video_module.VideoDescriptor.index_dictionary')
+    @mock.patch('xmodule.video_module.VideoBlock.index_dictionary')
     def test_reindex_video_error_json_responses(self, mock_index_dictionary):
         """
         Test json response with mocked error data for video
@@ -684,7 +732,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=unicode(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
         # set mocked exception response
@@ -695,7 +743,7 @@ class TestCourseReIndex(CourseTestCase):
         with self.assertRaises(SearchIndexingError):
             reindex_course_and_check_access(self.course.id, self.user)
 
-    @mock.patch('xmodule.html_module.HtmlDescriptor.index_dictionary')
+    @mock.patch('xmodule.html_module.HtmlBlock.index_dictionary')
     def test_reindex_html_error_json_responses(self, mock_index_dictionary):
         """
         Test json response with mocked error data for html
@@ -706,7 +754,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=unicode(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
         # set mocked exception response
@@ -728,7 +776,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=unicode(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
         # set mocked exception response
@@ -768,7 +816,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=unicode(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
         # Start manual reindex
@@ -780,10 +828,10 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=unicode(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
-    @mock.patch('xmodule.video_module.VideoDescriptor.index_dictionary')
+    @mock.patch('xmodule.video_module.VideoBlock.index_dictionary')
     def test_indexing_video_error_responses(self, mock_index_dictionary):
         """
         Test do_course_reindex response with mocked error data for video
@@ -794,7 +842,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=unicode(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
         # set mocked exception response
@@ -805,7 +853,7 @@ class TestCourseReIndex(CourseTestCase):
         with self.assertRaises(SearchIndexingError):
             CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
 
-    @mock.patch('xmodule.html_module.HtmlDescriptor.index_dictionary')
+    @mock.patch('xmodule.html_module.HtmlBlock.index_dictionary')
     def test_indexing_html_error_responses(self, mock_index_dictionary):
         """
         Test do_course_reindex response with mocked error data for html
@@ -816,7 +864,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=unicode(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
         # set mocked exception response
@@ -838,7 +886,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=unicode(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
         # set mocked exception response

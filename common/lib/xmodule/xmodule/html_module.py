@@ -1,27 +1,39 @@
+from __future__ import absolute_import
+
 import copy
-from datetime import datetime
-from fs.errors import ResourceNotFoundError
 import logging
-from lxml import etree
 import os
-from path import Path as path
-from pkg_resources import resource_string
 import re
 import sys
 import textwrap
+from datetime import datetime
 
-import dogstats_wrapper as dog_stats_api
-from xmodule.util.misc import escape_html_characters
+from pkg_resources import resource_string
+
+import six
+from django.conf import settings
+from fs.errors import ResourceNotFound
+from lxml import etree
+from path import Path as path
+from web_fragments.fragment import Fragment
+from xblock.core import XBlock
+from xblock.fields import Boolean, List, Scope, String
 from xmodule.contentstore.content import StaticContent
-from xmodule.editing_module import EditingDescriptor
+from xmodule.editing_module import EditingMixin
 from xmodule.edxnotes_utils import edxnotes
 from xmodule.html_checker import check_html
 from xmodule.stringify import stringify_children
-from xmodule.x_module import XModule, DEPRECATION_VSCOMPAT_EVENT
-from xmodule.xml_module import XmlDescriptor, name_to_pathname
-from xblock.core import XBlock
-from xblock.fields import Scope, String, Boolean, List
-from xblock.fragment import Fragment
+from xmodule.util.misc import escape_html_characters
+from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.x_module import (
+    HTMLSnippet,
+    ResourceTemplates,
+    shim_xmodule_js,
+    XModuleMixin,
+    XModuleDescriptorToXBlockMixin,
+    XModuleToXBlockMixin,
+)
+from xmodule.xml_module import XmlMixin, name_to_pathname
 
 log = logging.getLogger("edx.courseware")
 
@@ -30,15 +42,18 @@ log = logging.getLogger("edx.courseware")
 _ = lambda text: text
 
 
-class HtmlBlock(object):
+@edxnotes
+@XBlock.needs("i18n")
+class HtmlBlock(
+    XmlMixin, EditingMixin,
+    XModuleDescriptorToXBlockMixin, XModuleToXBlockMixin, HTMLSnippet, ResourceTemplates, XModuleMixin,
+):
     """
-    This will eventually subclass XBlock and merge HtmlModule and HtmlDescriptor
-    into one. For now, it's a place to put the pieces that are already sharable
-    between the two (field information and XBlock handlers).
+    The HTML XBlock.
     """
     display_name = String(
         display_name=_("Display Name"),
-        help=_("This name appears in the horizontal navigation at the top of the page."),
+        help=_("The display name for this component."),
         scope=Scope.settings,
         # it'd be nice to have a useful default but it screws up other things; so,
         # use display_name_with_default for those
@@ -68,64 +83,88 @@ class HtmlBlock(object):
         scope=Scope.settings
     )
 
+    ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA = 'ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA'
+
     @XBlock.supports("multi_device")
     def student_view(self, _context):
         """
         Return a fragment that contains the html for the student view
         """
-        return Fragment(self.get_html())
+        fragment = Fragment(self.get_html())
+        add_webpack_to_fragment(fragment, 'HtmlBlockPreview')
+        shim_xmodule_js(fragment, 'HTMLModule')
+        return fragment
+
+    @XBlock.supports("multi_device")
+    def public_view(self, context):
+        """
+        Returns a fragment that contains the html for the preview view
+        """
+        return self.student_view(context)
+
+    def student_view_data(self, context=None):  # pylint: disable=unused-argument
+        """
+        Return a JSON representation of the student_view of this XBlock.
+        """
+        if getattr(settings, 'FEATURES', {}).get(self.ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA, False):
+            return {'enabled': True, 'html': self.get_html()}
+        else:
+            return {
+                'enabled': False,
+                'message': 'To enable, set FEATURES["{}"]'.format(self.ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA)
+            }
 
     def get_html(self):
-        """ Returns html required for rendering XModule. """
-
-        # When we switch this to an XBlock, we can merge this with student_view,
-        # but for now the XModule mixin requires that this method be defined.
+        """ Returns html required for rendering the block. """
         # pylint: disable=no-member
-        if self.system.anonymous_student_id:
+        if self.data is not None and getattr(self.system, 'anonymous_student_id', None) is not None:
             return self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
         return self.data
 
+    def studio_view(self, _context):
+        """
+        Return the studio view.
+        """
+        fragment = Fragment(
+            self.system.render_template(self.mako_template, self.get_context())
+        )
+        add_webpack_to_fragment(fragment, 'HtmlBlockStudio')
+        shim_xmodule_js(fragment, 'HTMLEditingDescriptor')
+        return fragment
 
-class HtmlModuleMixin(HtmlBlock, XModule):
-    """
-    Attributes and methods used by HtmlModules internally.
-    """
-    js = {
-        'coffee': [
-            resource_string(__name__, 'js/src/html/display.coffee'),
-        ],
+    preview_view_js = {
         'js': [
+            resource_string(__name__, 'js/src/html/display.js'),
             resource_string(__name__, 'js/src/javascript_loader.js'),
             resource_string(__name__, 'js/src/collapsible.js'),
             resource_string(__name__, 'js/src/html/imageModal.js'),
             resource_string(__name__, 'js/common_static/js/vendor/draggabilly.js'),
-        ]
+        ],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
     }
-    js_module_name = "HTMLModule"
-    css = {'scss': [resource_string(__name__, 'css/html/display.scss')]}
+    preview_view_css = {'scss': [resource_string(__name__, 'css/html/display.scss')]}
 
+    uses_xmodule_styles_setup = True
+    requires_per_student_anonymous_id = True
 
-@edxnotes
-class HtmlModule(HtmlModuleMixin):
-    """
-    Module for putting raw html in a course
-    """
-
-
-class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: disable=abstract-method
-    """
-    Module for putting raw html in a course
-    """
     mako_template = "widgets/html-edit.html"
-    module_class = HtmlModule
     resources_dir = None
     filename_extension = "xml"
     template_dir_name = "html"
     show_in_read_only_mode = True
 
-    js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
-    js_module_name = "HTMLEditingDescriptor"
-    css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/html/edit.scss')]}
+    studio_view_js = {
+        'js': [
+            resource_string(__name__, 'js/src/html/edit.js')
+        ],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+    }
+    studio_view_css = {
+        'scss': [
+            resource_string(__name__, 'css/editor/edit.scss'),
+            resource_string(__name__, 'css/html/edit.scss')
+        ]
+    }
 
     @classmethod
     def filter_templates(cls, template, course):
@@ -142,7 +181,7 @@ class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: di
         an override to add in specific rendering context, in this case we need to
         add in a base path to our c4x content addressing scheme
         """
-        _context = EditingDescriptor.get_context(self)
+        _context = EditingMixin.get_context(self)
         # Add some specific HTML rendering context when editing HTML modules where we pass
         # the root /c4x/ url for assets. This allows client-side substitutions to occur.
         _context.update({
@@ -187,14 +226,14 @@ class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: di
             # (not same as 'html/blah.html' when the pointer is in a directory itself)
             pointer_path = "{category}/{url_path}".format(
                 category='html',
-                url_path=name_to_pathname(location.name)
+                url_path=name_to_pathname(location.block_id)
             )
             base = path(pointer_path).dirname()
-            filepath = "{base}/{name}.html".format(base=base, name=filename)
+            filepath = u"{base}/{name}.html".format(base=base, name=filename)
 
             try:
-                with system.resources_fs.open(filepath) as infile:
-                    html = infile.read().decode('utf-8')
+                with system.resources_fs.open(filepath, encoding='utf-8') as infile:
+                    html = infile.read()
                     # Log a warning if we can't parse the file, but don't error
                     if not check_html(html) and len(html) > 0:
                         msg = "Couldn't parse html in {0}, content = {1}".format(filepath, html)
@@ -205,11 +244,11 @@ class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: di
 
                     return definition, []
 
-            except (ResourceNotFoundError) as err:
+            except ResourceNotFound as err:
                 msg = 'Unable to load file contents at path {0}: {1} '.format(
                     filepath, err)
                 # add more info and re-raise
-                raise Exception(msg), None, sys.exc_info()[2]
+                six.reraise(Exception(msg), None, sys.exc_info()[2])
 
     # TODO (vshnayder): make export put things in the right places.
 
@@ -225,8 +264,8 @@ class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: di
             pathname=pathname
         )
 
-        resource_fs.makedir(os.path.dirname(filepath), recursive=True, allow_recreate=True)
-        with resource_fs.open(filepath, 'w') as filestream:
+        resource_fs.makedirs(os.path.dirname(filepath), recreate=True)
+        with resource_fs.open(filepath, 'wb') as filestream:
             html_data = self.data.encode('utf-8')
             filestream.write(html_data)
 
@@ -242,12 +281,12 @@ class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: di
         """
         `use_latex_compiler` should not be editable in the Studio settings editor.
         """
-        non_editable_fields = super(HtmlDescriptor, self).non_editable_metadata_fields
-        non_editable_fields.append(HtmlDescriptor.use_latex_compiler)
+        non_editable_fields = super(HtmlBlock, self).non_editable_metadata_fields
+        non_editable_fields.append(HtmlBlock.use_latex_compiler)
         return non_editable_fields
 
     def index_dictionary(self):
-        xblock_body = super(HtmlDescriptor, self).index_dictionary()
+        xblock_body = super(HtmlBlock, self).index_dictionary()
         # Removing script and style
         html_content = re.sub(
             re.compile(
@@ -275,7 +314,7 @@ class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: di
 
 class AboutFields(object):
     display_name = String(
-        help=_("Display name for this module"),
+        help=_("The display name for this component."),
         scope=Scope.settings,
         default="overview",
     )
@@ -287,21 +326,12 @@ class AboutFields(object):
 
 
 @XBlock.tag("detached")
-class AboutModule(AboutFields, HtmlModuleMixin):
+class AboutBlock(AboutFields, HtmlBlock):
     """
-    Overriding defaults but otherwise treated as HtmlModule.
-    """
-    pass
-
-
-@XBlock.tag("detached")
-class AboutDescriptor(AboutFields, HtmlDescriptor):
-    """
-    These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
+    These pieces of course content are treated as HtmlBlocks but we need to overload where the templates are located
     in order to be able to create new ones
     """
     template_dir_name = "about"
-    module_class = AboutModule
 
 
 class StaticTabFields(object):
@@ -310,7 +340,7 @@ class StaticTabFields(object):
     """
     display_name = String(
         display_name=_("Display Name"),
-        help=_("This name appears in the horizontal navigation at the top of the page."),
+        help=_("The display name for this component."),
         scope=Scope.settings,
         default="Empty",
     )
@@ -331,21 +361,12 @@ class StaticTabFields(object):
 
 
 @XBlock.tag("detached")
-class StaticTabModule(StaticTabFields, HtmlModuleMixin):
+class StaticTabBlock(StaticTabFields, HtmlBlock):
     """
-    Supports the field overrides
-    """
-    pass
-
-
-@XBlock.tag("detached")
-class StaticTabDescriptor(StaticTabFields, HtmlDescriptor):
-    """
-    These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
+    These pieces of course content are treated as HtmlBlocks but we need to overload where the templates are located
     in order to be able to create new ones
     """
     template_dir_name = None
-    module_class = StaticTabModule
 
 
 class CourseInfoFields(object):
@@ -365,21 +386,17 @@ class CourseInfoFields(object):
 
 
 @XBlock.tag("detached")
-class CourseInfoModule(CourseInfoFields, HtmlModuleMixin):
+class CourseInfoBlock(CourseInfoFields, HtmlBlock):
     """
-    Just to support xblock field overrides
+    These pieces of course content are treated as HtmlBlock but we need to overload where the templates are located
+    in order to be able to create new ones
     """
     # statuses
     STATUS_VISIBLE = 'visible'
     STATUS_DELETED = 'deleted'
     TEMPLATE_DIR = 'courseware'
 
-    @XBlock.supports("multi_device")
-    def student_view(self, _context):
-        """
-        Return a fragment that contains the html for the student view
-        """
-        return Fragment(self.get_html())
+    template_dir_name = None
 
     def get_html(self):
         """ Returns html required for rendering XModule. """
@@ -392,17 +409,26 @@ class CourseInfoModule(CourseInfoFields, HtmlModuleMixin):
                 return self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
             return self.data
         else:
-            course_updates = [item for item in self.items if item.get('status') == self.STATUS_VISIBLE]
-            course_updates.sort(
-                key=lambda item: (CourseInfoModule.safe_parse_date(item['date']), item['id']),
-                reverse=True
-            )
+            # This should no longer be called on production now that we are using a separate updates page
+            # and using a fragment HTML file - it will be called in tests until those are removed.
+            course_updates = self.order_updates(self.items)
             context = {
                 'visible_updates': course_updates[:3],
                 'hidden_updates': course_updates[3:],
             }
-
             return self.system.render_template("{0}/course_updates.html".format(self.TEMPLATE_DIR), context)
+
+    @classmethod
+    def order_updates(self, updates):
+        """
+        Returns any course updates in reverse chronological order.
+        """
+        sorted_updates = [update for update in updates if update.get('status') == self.STATUS_VISIBLE]
+        sorted_updates.sort(
+            key=lambda item: (self.safe_parse_date(item['date']), item['id']),
+            reverse=True
+        )
+        return sorted_updates
 
     @staticmethod
     def safe_parse_date(date):
@@ -413,13 +439,3 @@ class CourseInfoModule(CourseInfoFields, HtmlModuleMixin):
             return datetime.strptime(date, '%B %d, %Y')
         except ValueError:  # occurs for ill-formatted date values
             return datetime.today()
-
-
-@XBlock.tag("detached")
-class CourseInfoDescriptor(CourseInfoFields, HtmlDescriptor):
-    """
-    These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
-    in order to be able to create new ones
-    """
-    template_dir_name = None
-    module_class = CourseInfoModule

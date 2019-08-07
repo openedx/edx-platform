@@ -9,16 +9,29 @@ not possible to have this LTI multiple times on a single page in LMS.
 
 """
 
-from uuid import uuid4
-import textwrap
-import urllib
-from oauthlib.oauth1.rfc5849 import signature, parameters
-import oauthlib.oauth1
-import hashlib
+from __future__ import absolute_import
+
 import base64
+import hashlib
+import logging
+import os
+import textwrap
+from uuid import uuid4
+
 import mock
+import oauthlib.oauth1
 import requests
-from http import StubHttpRequestHandler, StubHttpService
+import six
+import six.moves.urllib.error  # pylint: disable=import-error
+import six.moves.urllib.parse  # pylint: disable=import-error
+import six.moves.urllib.request  # pylint: disable=import-error
+from oauthlib.oauth1.rfc5849 import parameters, signature
+
+from openedx.core.djangolib.markup import HTML
+
+from .http import StubHttpRequestHandler, StubHttpService
+
+log = logging.getLogger(__name__)
 
 
 class StubLtiHandler(StubHttpRequestHandler):
@@ -28,7 +41,7 @@ class StubLtiHandler(StubHttpRequestHandler):
     DEFAULT_CLIENT_KEY = 'test_client_key'
     DEFAULT_CLIENT_SECRET = 'test_client_secret'
     DEFAULT_LTI_ENDPOINT = 'correct_lti_endpoint'
-    DEFAULT_LTI_ADDRESS = 'http://127.0.0.1:{port}/'
+    DEFAULT_LTI_ADDRESS = 'http://{host}:{port}/'
 
     def do_GET(self):
         """
@@ -43,37 +56,36 @@ class StubLtiHandler(StubHttpRequestHandler):
         Handle a POST request from the client and sends response back.
         """
         if 'grade' in self.path and self._send_graded_result().status_code == 200:
-            status_message = 'LTI consumer (edX) responded with XML content:<br>' + self.server.grade_data['TC answer']
+            status_message = HTML('LTI consumer (edX) responded with XML content:<br>{grade_data}').format(
+                grade_data=self.server.grade_data['TC answer']
+            )
             content = self._create_content(status_message)
             self.send_response(200, content)
         elif 'lti2_outcome' in self.path and self._send_lti2_outcome().status_code == 200:
-            status_message = 'LTI consumer (edX) responded with HTTP {}<br>'.format(
+            status_message = HTML('LTI consumer (edX) responded with HTTP {}<br>').format(
                 self.server.grade_data['status_code'])
             content = self._create_content(status_message)
             self.send_response(200, content)
         elif 'lti2_delete' in self.path and self._send_lti2_delete().status_code == 200:
-            status_message = 'LTI consumer (edX) responded with HTTP {}<br>'.format(
+            status_message = HTML('LTI consumer (edX) responded with HTTP {}<br>').format(
                 self.server.grade_data['status_code'])
             content = self._create_content(status_message)
             self.send_response(200, content)
         # Respond to request with correct lti endpoint
         elif self._is_correct_lti_request():
             params = {k: v for k, v in self.post_dict.items() if k != 'oauth_signature'}
-
             if self._check_oauth_signature(params, self.post_dict.get('oauth_signature', "")):
                 status_message = "This is LTI tool. Success."
-
                 # Set data for grades what need to be stored as server data
                 if 'lis_outcome_service_url' in self.post_dict:
                     self.server.grade_data = {
                         'callback_url': self.post_dict.get('lis_outcome_service_url').replace('https', 'http'),
                         'sourcedId': self.post_dict.get('lis_result_sourcedid')
                     }
-
-                submit_url = '//{}:{}'.format(*self.server.server_address)
+                host = os.environ.get('BOK_CHOY_HOSTNAME', self.server.server_address[0])
+                submit_url = '//{}:{}'.format(host, self.server.server_address[1])
                 content = self._create_content(status_message, submit_url)
                 self.send_response(200, content)
-
             else:
                 content = self._create_content("Wrong LTI signature")
                 self.send_response(200, content)
@@ -189,27 +201,27 @@ class StubLtiHandler(StubHttpRequestHandler):
         Return content (str) either for launch, send grade or get result from TC.
         """
         if submit_url:
-            submit_form = textwrap.dedent("""
+            submit_form = textwrap.dedent(HTML("""
                 <form action="{submit_url}/grade" method="post">
-                    <input type="submit" name="submit-button" value="Submit">
+                    <input type="submit" name="submit-button" value="Submit" id="submit-button">
                 </form>
                 <form action="{submit_url}/lti2_outcome" method="post">
-                    <input type="submit" name="submit-lti2-button" value="Submit">
+                    <input type="submit" name="submit-lti2-button" value="Submit" id="submit-lti2-button">
                 </form>
                 <form action="{submit_url}/lti2_delete" method="post">
-                    <input type="submit" name="submit-lti2-delete-button" value="Submit">
+                    <input type="submit" name="submit-lti2-delete-button" value="Submit" id="submit-lti-delete-button">
                 </form>
-            """).format(submit_url=submit_url)
+            """)).format(submit_url=submit_url)
         else:
             submit_form = ''
 
         # Show roles only for LTI launch.
         if self.post_dict.get('roles'):
-            role = '<h5>Role: {}</h5>'.format(self.post_dict['roles'])
+            role = HTML('<h5>Role: {}</h5>').format(self.post_dict['roles'])
         else:
             role = ''
 
-        response_str = textwrap.dedent("""
+        response_str = textwrap.dedent(HTML("""
                 <html>
                     <head>
                         <title>TEST TITLE</title>
@@ -224,11 +236,11 @@ class StubLtiHandler(StubHttpRequestHandler):
                         {submit_form}
                     </body>
                 </html>
-            """).format(response=response_text, role=role, submit_form=submit_form)
+            """)).format(response=response_text, role=role, submit_form=submit_form)
 
         # Currently LTI module doublequotes the lis_result_sourcedid parameter.
         # Unquote response two times.
-        return urllib.unquote(urllib.unquote(response_str))
+        return six.moves.urllib.parse.unquote(six.moves.urllib.parse.unquote(response_str))
 
     def _is_correct_lti_request(self):
         """
@@ -244,8 +256,8 @@ class StubLtiHandler(StubHttpRequestHandler):
         client_key = self.server.config.get('client_key', self.DEFAULT_CLIENT_KEY)
         client_secret = self.server.config.get('client_secret', self.DEFAULT_CLIENT_SECRET)
         client = oauthlib.oauth1.Client(
-            client_key=unicode(client_key),
-            client_secret=unicode(client_secret)
+            client_key=six.text_type(client_key),
+            client_secret=six.text_type(client_secret)
         )
         headers = {
             # This is needed for body encoding:
@@ -255,13 +267,13 @@ class StubLtiHandler(StubHttpRequestHandler):
         # Calculate and encode body hash. See http://oauth.googlecode.com/svn/spec/ext/body_hash/1.0/oauth-bodyhash.html
         sha1 = hashlib.sha1()
         sha1.update(body)
-        oauth_body_hash = unicode(base64.b64encode(sha1.digest()))
+        oauth_body_hash = six.text_type(base64.b64encode(sha1.digest()))
         mock_request = mock.Mock(
-            uri=unicode(urllib.unquote(url)),
+            uri=six.text_type(six.moves.urllib.parse.unquote(url)),
             headers=headers,
             body=u"",
             decoded_body=u"",
-            http_method=unicode(method),
+            http_method=six.text_type(method),
         )
         params = client.get_oauth_params(mock_request)
         mock_request.oauth_params = params
@@ -287,18 +299,17 @@ class StubLtiHandler(StubHttpRequestHandler):
         Returns `True` if signatures are correct, otherwise `False`.
 
         """
-        client_secret = unicode(self.server.config.get('client_secret', self.DEFAULT_CLIENT_SECRET))
-
+        client_secret = six.text_type(self.server.config.get('client_secret', self.DEFAULT_CLIENT_SECRET))
+        host = os.environ.get('BOK_CHOY_HOSTNAME', '127.0.0.1')
         port = self.server.server_address[1]
-        lti_base = self.DEFAULT_LTI_ADDRESS.format(port=port)
+        lti_base = self.DEFAULT_LTI_ADDRESS.format(host=host, port=port)
         lti_endpoint = self.server.config.get('lti_endpoint', self.DEFAULT_LTI_ENDPOINT)
         url = lti_base + lti_endpoint
-
         request = mock.Mock()
-        request.params = [(unicode(k), unicode(v)) for k, v in params.items()]
-        request.uri = unicode(url)
+        request.params = [(six.text_type(k), six.text_type(v)) for k, v in params.items()]
+        request.uri = six.text_type(url)
         request.http_method = u'POST'
-        request.signature = unicode(client_signature)
+        request.signature = six.text_type(client_signature)
         return signature.verify_hmac_sha1(request, client_secret)
 
 

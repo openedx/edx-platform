@@ -1,11 +1,12 @@
 """
 Template module
 """
-from xmodule.x_module import XModule, DEPRECATION_VSCOMPAT_EVENT
-from xmodule.raw_module import RawDescriptor
+from __future__ import absolute_import
+
 from lxml import etree
 from mako.template import Template
-import dogstats_wrapper as dog_stats_api
+from xmodule.raw_module import RawDescriptor
+from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, XModule
 
 
 class CustomTagModule(XModule):
@@ -47,11 +48,6 @@ class CustomTagDescriptor(RawDescriptor):
             template_name = xmltree.attrib['impl']
         else:
             # VS[compat]  backwards compatibility with old nested customtag structure
-            dog_stats_api.increment(
-                DEPRECATION_VSCOMPAT_EVENT,
-                tags=["location:customtag_descriptor_render_template"]
-            )
-
             child_impl = xmltree.find('impl')
             if child_impl is not None:
                 template_name = child_impl.text
@@ -60,7 +56,7 @@ class CustomTagDescriptor(RawDescriptor):
                 raise Exception("Could not find impl attribute in customtag {0}"
                                 .format(self.location))
 
-        params = dict(xmltree.items())
+        params = dict(list(xmltree.items()))
 
         # cdodge: look up the template as a module
         template_loc = self.location.replace(category='custom_tag_template', name=template_name)

@@ -1,27 +1,28 @@
 """
 Acceptance tests for Studio's Settings Details pages
 """
+from __future__ import absolute_import
+
 from datetime import datetime, timedelta
-from flaky import flaky
-from nose.plugins.attrib import attr
-from unittest import skip
+
+import six
 
 from common.test.acceptance.fixtures.config import ConfigModelFixture
 from common.test.acceptance.fixtures.course import CourseFixture
-from common.test.acceptance.pages.studio.settings import SettingsPage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage
-from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
+from common.test.acceptance.pages.studio.settings import SettingsPage
 from common.test.acceptance.tests.helpers import (
-    generate_course_key,
-    select_option_by_value,
-    is_option_value_selected,
     element_has_text,
+    generate_course_key,
+    is_option_value_selected,
+    select_option_by_value
 )
+from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
 
 
-@attr(shard=4)
 class StudioSettingsDetailsTest(StudioCourseTest):
     """Base class for settings and details page tests."""
+    shard = 4
 
     def setUp(self, is_staff=True):
         super(StudioSettingsDetailsTest, self).setUp(is_staff=is_staff)
@@ -36,11 +37,12 @@ class StudioSettingsDetailsTest(StudioCourseTest):
         self.settings_detail.visit()
 
 
-@attr(shard=4)
 class SettingsMilestonesTest(StudioSettingsDetailsTest):
     """
     Tests for milestones feature in Studio's settings tab
     """
+    shard = 4
+
     def test_page_has_prerequisite_field(self):
         """
         Test to make sure page has pre-requisite course field if milestones app is enabled.
@@ -48,7 +50,6 @@ class SettingsMilestonesTest(StudioSettingsDetailsTest):
 
         self.assertTrue(self.settings_detail.pre_requisite_course_options)
 
-    @skip("Too flaky for the flaky decorator  SOL-1811")  # SOL-1811
     def test_prerequisite_course_save_successfully(self):
         """
          Scenario: Selecting course from Pre-Requisite course drop down save the selected course as pre-requisite
@@ -71,7 +72,7 @@ class SettingsMilestonesTest(StudioSettingsDetailsTest):
             number=course_number,
             run='test_run'
         )
-        pre_requisite_course_id = unicode(pre_requisite_course_key)
+        pre_requisite_course_id = six.text_type(pre_requisite_course_key)
 
         # Refresh the page to load the new course fixture and populate the prrequisite course dropdown
         # Then select the prerequisite course and save the changes
@@ -140,41 +141,6 @@ class SettingsMilestonesTest(StudioSettingsDetailsTest):
         """
         self.assertTrue(self.settings_detail.entrance_exam_field)
 
-    @skip('Passes in devstack, passes individually in Jenkins, fails in suite in Jenkins.')
-    def test_enable_entrance_exam_for_course(self):
-        """
-        Test that entrance exam should be created after checking the 'enable entrance exam' checkbox.
-        And also that the entrance exam is destroyed after deselecting the checkbox.
-        """
-        self.settings_detail.require_entrance_exam(required=True)
-        self.settings_detail.save_changes()
-
-        # getting the course outline page.
-        course_outline_page = CourseOutlinePage(
-            self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']
-        )
-        course_outline_page.visit()
-
-        # title with text 'Entrance Exam' should be present on page.
-        self.assertTrue(element_has_text(
-            page=course_outline_page,
-            css_selector='span.section-title',
-            text='Entrance Exam'
-        ))
-
-        # Delete the currently created entrance exam.
-        self.settings_detail.visit()
-        self.settings_detail.require_entrance_exam(required=False)
-        self.settings_detail.save_changes()
-
-        course_outline_page.visit()
-        self.assertFalse(element_has_text(
-            page=course_outline_page,
-            css_selector='span.section-title',
-            text='Entrance Exam'
-        ))
-
-    @flaky  # TODO: SOL-1595
     def test_entrance_exam_has_unit_button(self):
         """
         Test that entrance exam should be created after checking the 'enable entrance exam' checkbox.
@@ -205,9 +171,9 @@ class SettingsMilestonesTest(StudioSettingsDetailsTest):
         ))
 
 
-@attr(shard=4)
 class CoursePacingTest(StudioSettingsDetailsTest):
     """Tests for setting a course to self-paced."""
+    shard = 4
 
     def populate_course_fixture(self, __):
         ConfigModelFixture('/config/self_paced', {'enabled': True}).install()

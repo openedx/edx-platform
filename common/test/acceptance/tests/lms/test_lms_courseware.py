@@ -3,29 +3,32 @@
 End-to-end tests for the LMS.
 """
 
+from __future__ import absolute_import
+
 import json
 from datetime import datetime, timedelta
 
 import ddt
-from flaky import flaky
-from nose.plugins.attrib import attr
+from six.moves import range
 
-from ..helpers import UniqueCourseTest, EventsTestMixin, auto_auth, create_multiple_choice_problem
+from openedx.core.lib.tests import attr
+
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
+from ...pages.common.auto_auth import AutoAuthPage
 from ...pages.common.logout import LogoutPage
-from ...pages.lms.course_nav import CourseNavPage
+from ...pages.lms.course_home import CourseHomePage
 from ...pages.lms.courseware import CoursewarePage, CoursewareSequentialTabPage
 from ...pages.lms.create_mode import ModeCreationPage
 from ...pages.lms.dashboard import DashboardPage
-from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage, FakeSoftwareSecureVerificationPage
+from ...pages.lms.pay_and_verify import FakePaymentPage, FakeSoftwareSecureVerificationPage, PaymentAndVerificationFlow
 from ...pages.lms.problem import ProblemPage
 from ...pages.lms.progress import ProgressPage
-from ...pages.lms.staff_view import StaffPage
 from ...pages.lms.track_selection import TrackSelectionPage
-from ...pages.studio.auto_auth import AutoAuthPage
-from ...pages.studio.overview import CourseOutlinePage
+from ...pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
+from ..helpers import EventsTestMixin, UniqueCourseTest, auto_auth, create_multiple_choice_problem
 
 
+@attr(shard=9)
 class CoursewareTest(UniqueCourseTest):
     """
     Test courseware.
@@ -37,9 +40,9 @@ class CoursewareTest(UniqueCourseTest):
         super(CoursewareTest, self).setUp()
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
-        self.course_nav = CourseNavPage(self.browser)
+        self.course_home_page = CourseHomePage(self.browser, self.course_id)
 
-        self.course_outline = CourseOutlinePage(
+        self.studio_course_outline = StudioCourseOutlinePage(
             self.browser,
             self.course_info['org'],
             self.course_info['number'],
@@ -76,10 +79,6 @@ class CoursewareTest(UniqueCourseTest):
         self.problem_page = ProblemPage(self.browser)  # pylint: disable=attribute-defined-outside-init
         self.assertEqual(self.problem_page.problem_name, 'Test Problem 1')
 
-    def _create_breadcrumb(self, index):
-        """ Create breadcrumb """
-        return ['Test Section {}'.format(index), 'Test Subsection {}'.format(index), 'Test Problem {}'.format(index)]
-
     def test_courseware(self):
         """
         Test courseware if recent visited subsection become unpublished.
@@ -93,10 +92,10 @@ class CoursewareTest(UniqueCourseTest):
         auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
 
         # Visit course outline page in studio.
-        self.course_outline.visit()
+        self.studio_course_outline.visit()
 
         # Set release date for subsection in future.
-        self.course_outline.change_problem_release_date()
+        self.studio_course_outline.change_problem_release_date()
 
         # Logout and login as a student.
         LogoutPage(self.browser).visit()
@@ -115,20 +114,24 @@ class CoursewareTest(UniqueCourseTest):
         And I visit my courseware page
         Then I should see correct course tree breadcrumb
         """
-        self.courseware_page.visit()
-
         xblocks = self.course_fix.get_nested_xblocks(category="problem")
         for index in range(1, len(xblocks) + 1):
-            self.course_nav.go_to_section('Test Section {}'.format(index), 'Test Subsection {}'.format(index))
-            courseware_page_breadcrumb = self.courseware_page.breadcrumb
-            expected_breadcrumb = self._create_breadcrumb(index)  # pylint: disable=no-member
-            self.assertEqual(courseware_page_breadcrumb, expected_breadcrumb)
+            test_section_title = u'Test Section {}'.format(index)
+            test_subsection_title = u'Test Subsection {}'.format(index)
+            test_unit_title = u'Test Problem {}'.format(index)
+            self.course_home_page.visit()
+            self.course_home_page.outline.go_to_section(test_section_title, test_subsection_title)
+            course_nav = self.courseware_page.nav
+            self.assertEqual(course_nav.breadcrumb_section_title, test_section_title)
+            self.assertEqual(course_nav.breadcrumb_subsection_title, test_subsection_title)
+            self.assertEqual(course_nav.breadcrumb_unit_title, test_unit_title)
 
 
+@attr(shard=9)
 @ddt.ddt
 class ProctoredExamTest(UniqueCourseTest):
     """
-    Test courseware.
+    Tests for proctored exams.
     """
     USERNAME = "STUDENT_TESTER"
     EMAIL = "student101@example.com"
@@ -138,7 +141,7 @@ class ProctoredExamTest(UniqueCourseTest):
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
 
-        self.course_outline = CourseOutlinePage(
+        self.studio_course_outline = StudioCourseOutlinePage(
             self.browser,
             self.course_info['org'],
             self.course_info['number'],
@@ -152,6 +155,9 @@ class ProctoredExamTest(UniqueCourseTest):
         )
         course_fix.add_advanced_settings({
             "enable_proctored_exams": {"value": "true"}
+        })
+        course_fix.add_advanced_settings({
+            "show_review_rules": {"value": "true"}
         })
 
         course_fix.add_children(
@@ -186,7 +192,14 @@ class ProctoredExamTest(UniqueCourseTest):
         login as a verififed user
         """
 
-        auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
+        auto_auth(
+            self.browser,
+            self.USERNAME,
+            self.EMAIL,
+            False,
+            self.course_id,
+            should_manually_verify=True
+        )
 
         # the track selection page cannot be visited. see the other tests to see if any prereq is there.
         # Navigate to the track selection page
@@ -201,28 +214,6 @@ class ProctoredExamTest(UniqueCourseTest):
         # Submit payment
         self.fake_payment_page.submit_payment()
 
-    def _verify_user(self):
-        """
-        Takes user through the verification flow and then marks the verification as 'approved'.
-        """
-        # Immediately verify the user
-        self.immediate_verification_page.immediate_verification()
-
-        # Take face photo and proceed to the ID photo step
-        self.payment_and_verification_flow.webcam_capture()
-        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
-
-        # Take ID photo and proceed to the review photos step
-        self.payment_and_verification_flow.webcam_capture()
-        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
-
-        # Submit photos and proceed to the enrollment confirmation step
-        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
-
-        # Mark the verification as passing.
-        verification = FakeSoftwareSecureVerificationPage(self.browser).visit()
-        verification.mark_approved()
-
     def test_can_create_proctored_exam_in_studio(self):
         """
         Given that I am a staff member
@@ -232,10 +223,10 @@ class ProctoredExamTest(UniqueCourseTest):
         """
         LogoutPage(self.browser).visit()
         auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
-        self.course_outline.visit()
+        self.studio_course_outline.visit()
 
-        self.course_outline.open_subsection_settings_dialog()
-        self.assertTrue(self.course_outline.proctoring_items_are_displayed())
+        self.studio_course_outline.open_subsection_settings_dialog()
+        self.assertTrue(self.studio_course_outline.proctoring_items_are_displayed())
 
     def test_proctored_exam_flow(self):
         """
@@ -249,16 +240,14 @@ class ProctoredExamTest(UniqueCourseTest):
         """
         LogoutPage(self.browser).visit()
         auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
-        self.course_outline.visit()
-        self.course_outline.open_subsection_settings_dialog()
+        self.studio_course_outline.visit()
+        self.studio_course_outline.open_subsection_settings_dialog()
 
-        self.course_outline.select_advanced_tab()
-        self.course_outline.make_exam_proctored()
+        self.studio_course_outline.select_advanced_tab()
+        self.studio_course_outline.make_exam_proctored()
 
         LogoutPage(self.browser).visit()
         self._login_as_a_verified_user()
-
-        self._verify_user()
 
         self.courseware_page.visit()
         self.assertTrue(self.courseware_page.can_start_proctored_exam)
@@ -270,11 +259,11 @@ class ProctoredExamTest(UniqueCourseTest):
         """
         LogoutPage(self.browser).visit()
         auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
-        self.course_outline.visit()
-        self.course_outline.open_subsection_settings_dialog()
+        self.studio_course_outline.visit()
+        self.studio_course_outline.open_subsection_settings_dialog()
 
-        self.course_outline.select_advanced_tab()
-        self.course_outline.make_exam_timed(hide_after_due=hide_after_due)
+        self.studio_course_outline.select_advanced_tab()
+        self.studio_course_outline.make_exam_timed(hide_after_due=hide_after_due)
 
         LogoutPage(self.browser).visit()
         self._login_as_a_verified_user()
@@ -284,11 +273,11 @@ class ProctoredExamTest(UniqueCourseTest):
         self.assertTrue(self.courseware_page.is_timer_bar_present)
 
         self.courseware_page.stop_timed_exam()
+        self.courseware_page.wait_for_page()
         self.assertTrue(self.courseware_page.has_submitted_exam_message())
 
         LogoutPage(self.browser).visit()
 
-    @flaky  # TNL-5643
     @ddt.data(True, False)
     def test_timed_exam_flow(self, hide_after_due):
         """
@@ -310,33 +299,14 @@ class ProctoredExamTest(UniqueCourseTest):
 
         LogoutPage(self.browser).visit()
         auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
-        self.course_outline.visit()
+        self.studio_course_outline.visit()
         last_week = (datetime.today() - timedelta(days=7)).strftime("%m/%d/%Y")
-        self.course_outline.change_problem_due_date(last_week)
+        self.studio_course_outline.change_problem_due_date(last_week)
 
         LogoutPage(self.browser).visit()
         auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
         self.courseware_page.visit()
         self.assertEqual(self.courseware_page.has_submitted_exam_message(), hide_after_due)
-
-    def test_masquerade_visibility_override(self):
-        """
-        Given that a timed exam problem exists in the course
-        And a student has taken that exam
-        And that exam is hidden to the student
-        And I am a staff user masquerading as the student
-        Then I should be able to see the exam content
-        """
-        self._setup_and_take_timed_exam()
-
-        LogoutPage(self.browser).visit()
-        auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
-        self.courseware_page.visit()
-        staff_page = StaffPage(self.browser, self.course_id)
-        self.assertEqual(staff_page.staff_view_mode, 'Staff')
-
-        staff_page.set_staff_view_mode_specific_student(self.USERNAME)
-        self.assertFalse(self.courseware_page.has_submitted_exam_message())
 
     def test_field_visiblity_with_all_exam_types(self):
         """
@@ -353,41 +323,41 @@ class ProctoredExamTest(UniqueCourseTest):
         """
         LogoutPage(self.browser).visit()
         auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
-        self.course_outline.visit()
+        self.studio_course_outline.visit()
 
-        self.course_outline.open_subsection_settings_dialog()
-        self.course_outline.select_advanced_tab()
+        self.studio_course_outline.open_subsection_settings_dialog()
+        self.studio_course_outline.select_advanced_tab()
 
-        self.course_outline.select_none_exam()
-        self.assertFalse(self.course_outline.time_allotted_field_visible())
-        self.assertFalse(self.course_outline.exam_review_rules_field_visible())
+        self.studio_course_outline.select_none_exam()
+        self.assertFalse(self.studio_course_outline.time_allotted_field_visible())
+        self.assertFalse(self.studio_course_outline.exam_review_rules_field_visible())
 
-        self.course_outline.select_timed_exam()
-        self.assertTrue(self.course_outline.time_allotted_field_visible())
-        self.assertFalse(self.course_outline.exam_review_rules_field_visible())
+        self.studio_course_outline.select_timed_exam()
+        self.assertTrue(self.studio_course_outline.time_allotted_field_visible())
+        self.assertFalse(self.studio_course_outline.exam_review_rules_field_visible())
 
-        self.course_outline.select_proctored_exam()
-        self.assertTrue(self.course_outline.time_allotted_field_visible())
-        self.assertTrue(self.course_outline.exam_review_rules_field_visible())
+        self.studio_course_outline.select_proctored_exam()
+        self.assertTrue(self.studio_course_outline.time_allotted_field_visible())
 
-        self.course_outline.select_practice_exam()
-        self.assertTrue(self.course_outline.time_allotted_field_visible())
-        self.assertFalse(self.course_outline.exam_review_rules_field_visible())
+        self.studio_course_outline.select_practice_exam()
+        self.assertTrue(self.studio_course_outline.time_allotted_field_visible())
+        self.assertFalse(self.studio_course_outline.exam_review_rules_field_visible())
 
 
-class CoursewareMultipleVerticalsTest(UniqueCourseTest, EventsTestMixin):
+class CoursewareMultipleVerticalsTestBase(UniqueCourseTest, EventsTestMixin):
     """
-    Test courseware with multiple verticals
+    Base class with setup for testing courseware with multiple verticals
     """
     USERNAME = "STUDENT_TESTER"
     EMAIL = "student101@example.com"
 
     def setUp(self):
-        super(CoursewareMultipleVerticalsTest, self).setUp()
+        super(CoursewareMultipleVerticalsTestBase, self).setUp()
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
+        self.course_home_page = CourseHomePage(self.browser, self.course_id)
 
-        self.course_outline = CourseOutlinePage(
+        self.studio_course_outline = StudioCourseOutlinePage(
             self.browser,
             self.course_info['org'],
             self.course_info['number'],
@@ -430,10 +400,17 @@ class CoursewareMultipleVerticalsTest(UniqueCourseTest, EventsTestMixin):
         # Auto-auth register for the course.
         AutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL,
                      course_id=self.course_id, staff=False).visit()
-        self.courseware_page.visit()
-        self.course_nav = CourseNavPage(self.browser)
+
+
+@attr(shard=9)
+class CoursewareMultipleVerticalsTest(CoursewareMultipleVerticalsTestBase):
+    """
+    Test courseware with multiple verticals
+    """
 
     def test_navigation_buttons(self):
+        self.courseware_page.visit()
+
         # start in first section
         self.assert_navigation_state('Test Section 1', 'Test Subsection 1,1', 0, next_enabled=True, prev_enabled=False)
 
@@ -546,71 +523,26 @@ class CoursewareMultipleVerticalsTest(UniqueCourseTest, EventsTestMixin):
             sequence_ui_events
         )
 
-    def test_outline_selected_events(self):
-        self.course_nav.go_to_section('Test Section 1', 'Test Subsection 1,2')
-
-        self.course_nav.go_to_section('Test Section 2', 'Test Subsection 2,1')
-
-        # test UI events emitted by navigating via the course outline
-        filter_selected_events = lambda event: event.get('name', '') == 'edx.ui.lms.outline.selected'
-        selected_events = self.wait_for_events(event_filter=filter_selected_events, timeout=2)
-
-        # note: target_url is tested in unit tests, as the url changes here with every test (it includes GUIDs).
-        self.assert_events_match(
-            [
-                {
-                    'event_type': 'edx.ui.lms.outline.selected',
-                    'name': 'edx.ui.lms.outline.selected',
-                    'event': {
-                        'target_name': 'Test Subsection 1,2 ',
-                        'widget_placement': 'accordion',
-                    }
-                },
-                {
-                    'event_type': 'edx.ui.lms.outline.selected',
-                    'name': 'edx.ui.lms.outline.selected',
-                    'event': {
-                        'target_name': 'Test Subsection 2,1 ',
-                        'widget_placement': 'accordion',
-
-                    }
-                },
-            ],
-            selected_events
-        )
-
-    def test_link_clicked_events(self):
-        """
-        Given that I am a user in the courseware
-        When I navigate via the left-hand nav
-        Then a link clicked event is logged
-        """
-        self.course_nav.go_to_section('Test Section 1', 'Test Subsection 1,2')
-        self.course_nav.go_to_section('Test Section 2', 'Test Subsection 2,1')
-
-        filter_link_clicked = lambda event: event.get('name', '') == 'edx.ui.lms.link_clicked'
-        link_clicked_events = self.wait_for_events(event_filter=filter_link_clicked, timeout=2)
-        self.assertEqual(len(link_clicked_events), 2)
-
     def assert_navigation_state(
             self, section_title, subsection_title, subsection_position, next_enabled, prev_enabled
     ):
         """
         Verifies that the navigation state is as expected.
         """
-        self.assertTrue(self.course_nav.is_on_section(section_title, subsection_title))
+        self.assertTrue(self.courseware_page.nav.is_on_section(section_title, subsection_title))
         self.assertEquals(self.courseware_page.sequential_position, subsection_position)
         self.assertEquals(self.courseware_page.is_next_button_enabled, next_enabled)
         self.assertEquals(self.courseware_page.is_previous_button_enabled, prev_enabled)
 
     def test_tab_position(self):
         # test that using the position in the url direct to correct tab in courseware
-        self.course_nav.go_to_section('Test Section 1', 'Test Subsection 1,1')
-        subsection_url = self.course_nav.active_subsection_url
-        url_part_list = subsection_url.split('/')
-        self.assertEqual(len(url_part_list), 9)
+        self.course_home_page.visit()
 
-        course_id = url_part_list[4]
+        self.course_home_page.outline.go_to_section('Test Section 1', 'Test Subsection 1,1')
+        subsection_url = self.browser.current_url
+        url_part_list = subsection_url.split('/')
+
+        course_id = url_part_list[-5]
         chapter_id = url_part_list[-3]
         subsection_id = url_part_list[-2]
         problem1_page = CoursewareSequentialTabPage(
@@ -649,18 +581,8 @@ class CoursewareMultipleVerticalsTest(UniqueCourseTest, EventsTestMixin):
         ).visit()
         self.assertIn('html 2 dummy body', html2_page.get_selected_tab_content())
 
-    @attr('a11y')
-    def test_courseware_a11y(self):
-        """
-        Run accessibility audit for the problem type.
-        """
-        self.course_nav.go_to_section('Test Section 1', 'Test Subsection 1,1')
-        # Set the scope to the sequence navigation
-        self.courseware_page.a11y_audit.config.set_scope(
-            include=['div.sequence-nav'])
-        self.courseware_page.a11y_audit.check_for_accessibility_errors()
 
-
+@attr(shard=9)
 class ProblemStateOnNavigationTest(UniqueCourseTest):
     """
     Test courseware with problems in multiple verticals.
@@ -784,43 +706,8 @@ class ProblemStateOnNavigationTest(UniqueCourseTest):
         self.assertIn(problem1_content_after_coming_back, problem1_content_before_switch)
         self.assertEqual(before_meta, after_meta)
 
-    def test_perform_problem_reset_and_navigate(self):
-        """
-        Scenario:
-        I go to sequential position 1
-        Facing problem1, I select 'choice_1'
-        Then perform the action – check and reset
-        Then I go to sequential position 2
-        Then I came back to sequential position 1 again
-        Facing problem1, I observe the problem1 content is not
-        outdated before and after sequence navigation
-        """
-        # Go to sequential position 1 and assert that we are on problem 1.
-        self.go_to_tab_and_assert_problem(1, self.problem1_name)
 
-        # Update problem 1's content state – by performing reset operation.
-        self.problem_page.click_choice('choice_choice_1')
-        self.problem_page.click_submit()
-        self.problem_page.wait_for_expected_status('label.choicegroup_incorrect', 'incorrect')
-        self.problem_page.click_reset()
-        self.problem_page.wait_for_expected_status('span.unanswered', 'unanswered')
-
-        # Save problem 1's content state as we're about to switch units in the sequence.
-        problem1_content_before_switch = self.problem_page.problem_content
-        before_meta = self.problem_page.problem_meta
-
-        # Go to sequential position 2 and assert that we are on problem 2.
-        self.go_to_tab_and_assert_problem(2, self.problem2_name)
-
-        # Come back to our original unit in the sequence and assert that the content hasn't changed.
-        self.go_to_tab_and_assert_problem(1, self.problem1_name)
-        problem1_content_after_coming_back = self.problem_page.problem_content
-        after_meta = self.problem_page.problem_meta
-
-        self.assertEqual(problem1_content_before_switch, problem1_content_after_coming_back)
-        self.assertEqual(before_meta, after_meta)
-
-
+@attr(shard=9)
 class SubsectionHiddenAfterDueDateTest(UniqueCourseTest):
     """
     Tests the "hide after due date" setting for
@@ -835,7 +722,7 @@ class SubsectionHiddenAfterDueDateTest(UniqueCourseTest):
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.logout_page = LogoutPage(self.browser)
 
-        self.course_outline = CourseOutlinePage(
+        self.studio_course_outline = StudioCourseOutlinePage(
             self.browser,
             self.course_info['org'],
             self.course_info['number'],
@@ -871,11 +758,11 @@ class SubsectionHiddenAfterDueDateTest(UniqueCourseTest):
         """
         self.logout_page.visit()
         auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
-        self.course_outline.visit()
-        self.course_outline.open_subsection_settings_dialog()
+        self.studio_course_outline.visit()
+        self.studio_course_outline.open_subsection_settings_dialog()
 
-        self.course_outline.select_advanced_tab('hide_after_due_date')
-        self.course_outline.make_subsection_hidden_after_due_date()
+        self.studio_course_outline.select_visibility_tab()
+        self.studio_course_outline.make_subsection_hidden_after_due_date()
 
         self.logout_page.visit()
         auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
@@ -911,9 +798,9 @@ class SubsectionHiddenAfterDueDateTest(UniqueCourseTest):
 
         self.logout_page.visit()
         auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
-        self.course_outline.visit()
+        self.studio_course_outline.visit()
         last_week = (datetime.today() - timedelta(days=7)).strftime("%m/%d/%Y")
-        self.course_outline.change_problem_due_date(last_week)
+        self.studio_course_outline.change_problem_due_date(last_week)
 
         self.logout_page.visit()
         auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
@@ -922,3 +809,134 @@ class SubsectionHiddenAfterDueDateTest(UniqueCourseTest):
 
         self.progress_page.visit()
         self.assertEqual(self.progress_page.scores('Test Section 1', 'Test Subsection 1'), [(0, 1)])
+
+
+@attr(shard=9)
+class CompletionTestCase(UniqueCourseTest, EventsTestMixin):
+    """
+    Test the completion on view functionality.
+    """
+    USERNAME = "STUDENT_TESTER"
+    EMAIL = "student101@example.com"
+    COMPLETION_BY_VIEWING_DELAY_MS = '1000'
+
+    def setUp(self):
+        super(CompletionTestCase, self).setUp()
+
+        self.studio_course_outline = StudioCourseOutlinePage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+
+        # Install a course with sections/problems, tabs, updates, and handouts
+        course_fix = CourseFixture(
+            self.course_info['org'], self.course_info['number'],
+            self.course_info['run'], self.course_info['display_name']
+        )
+
+        self.html_1_block = XBlockFixtureDesc('html', 'html 1', data="<html>html 1 dummy body</html>")
+        self.problem_1_block = XBlockFixtureDesc(
+            'problem', 'Test Problem 1', data='<problem>problem 1 dummy body</problem>'
+        )
+
+        course_fix.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section 1').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection 1,1').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit 1,1,1').add_children(
+                        XBlockFixtureDesc('html', 'html 1', data="<html>html 1 dummy body</html>"),
+                        XBlockFixtureDesc(
+                            'html', 'html 2',
+                            data=("<html>html 2 dummy body</html>" * 100) + "<span id='html2-end'>End</span>",
+                        ),
+                        XBlockFixtureDesc('problem', 'Test Problem 1', data='<problem>problem 1 dummy body</problem>'),
+                    ),
+                    XBlockFixtureDesc('vertical', 'Test Unit 1,1,2').add_children(
+                        XBlockFixtureDesc('html', 'html 1', data="<html>html 1 dummy body</html>"),
+                        XBlockFixtureDesc('problem', 'Test Problem 1', data='<problem>problem 1 dummy body</problem>'),
+                    ),
+                    XBlockFixtureDesc('vertical', 'Test Unit 1,1,2').add_children(
+                        self.html_1_block,
+                        self.problem_1_block,
+                    ),
+                ),
+            ),
+        ).install()
+
+        # Auto-auth register for the course.
+        AutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL,
+                     course_id=self.course_id, staff=False).visit()
+
+
+@attr(shard=9)
+class WordCloudTests(UniqueCourseTest):
+    """
+    Tests the Word Cloud.
+    """
+    USERNAME = "STUDENT_TESTER"
+    EMAIL = "student101@example.com"
+
+    def setUp(self):
+        super(WordCloudTests, self).setUp()
+
+        self.courseware_page = CoursewarePage(self.browser, self.course_id)
+
+        self.studio_course_outline = StudioCourseOutlinePage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+
+        # Install a course
+        course_fix = CourseFixture(
+            self.course_info['org'], self.course_info['number'],
+            self.course_info['run'], self.course_info['display_name']
+        )
+        # Set word cloud value against advanced modules in advanced settings
+        course_fix.add_advanced_settings({
+            "advanced_modules": {"value": ["word_cloud"]},
+        })
+
+        course_fix.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section 1').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection 1').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit').add_children(
+                        XBlockFixtureDesc(
+                            'word_cloud', 'advanced WORDCLOUD'
+                        )
+                    )
+                )
+            )
+        ).install()
+
+        auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
+        self.courseware_page.visit()
+
+    def test_word_cloud_is_rendered_with_empty_result(self):
+        """
+        Scenario: Word Cloud component in LMS is rendered with empty result
+        Given the course has a Word Cloud component
+            Then I view the word cloud and it has rendered
+        When I press the Save button
+            Then I see the empty result
+        """
+        self.assertTrue(self.courseware_page.is_word_cloud_rendered)
+        self.courseware_page.save_word_cloud()
+        self.assertEqual(self.courseware_page.word_cloud_answer_list, '')
+
+    def test_word_cloud_is_rendered_with_result(self):
+        """
+        Scenario: Word Cloud component in LMS is rendered with result
+        Given the course has a Word Cloud component
+            Then I view the word cloud and it has rendered
+        When I fill inputs
+        And I press the Save button
+            Then I see the result with words count
+        """
+        expected_data = ['test_wordcloud1', 'test_wordcloud2', 'test_wordcloud3', 'test_wordcloud4', 'test_wordcloud5']
+        self.assertTrue(self.courseware_page.is_word_cloud_rendered)
+        self.courseware_page.input_word_cloud('test_wordcloud')
+        self.courseware_page.save_word_cloud()
+        self.assertItemsEqual(expected_data, self.courseware_page.word_cloud_answer_list)

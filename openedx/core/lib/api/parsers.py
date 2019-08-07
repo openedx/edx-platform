@@ -7,6 +7,7 @@ desired parsers.  See http://www.django-rest-framework.org/api-guide/parsers/
 for details.
 """
 
+from __future__ import absolute_import
 from rest_framework.exceptions import ParseError, UnsupportedMediaType
 from rest_framework.parsers import FileUploadParser, JSONParser
 

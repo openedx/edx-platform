@@ -35,15 +35,15 @@
 
             initialize: function() {
                 this.events = {
-                    'ready': this.onReady,
-                    'play': this.onPlay,
+                    ready: this.onReady,
+                    play: this.onPlay,
                     'ended stop': this.onEnded,
-                    'skip': this.onSkip,
+                    skip: this.onSkip,
                     'language_menu:show': this.onShowLanguageMenu,
                     'language_menu:hide': this.onHideLanguageMenu,
                     'captions:show': this.onShowCaptions,
                     'captions:hide': this.onHideCaptions,
-                    'destroy': this.destroy
+                    destroy: this.destroy
                 };
                 this.bindHandlers();
             },

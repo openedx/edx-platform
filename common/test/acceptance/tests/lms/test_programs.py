@@ -1,71 +1,83 @@
 """Acceptance tests for LMS-hosted Programs pages"""
-from nose.plugins.attrib import attr
+from __future__ import absolute_import
 
-from common.test.acceptance.fixtures.catalog import CatalogFixture, CatalogConfigMixin
-from common.test.acceptance.fixtures.programs import ProgramsFixture, ProgramsConfigMixin
+from common.test.acceptance.fixtures.catalog import CatalogFixture, CatalogIntegrationMixin
 from common.test.acceptance.fixtures.course import CourseFixture
+from common.test.acceptance.fixtures.programs import ProgramsConfigMixin
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.catalog import CacheProgramsPage
+from common.test.acceptance.pages.lms.programs import ProgramDetailsPage, ProgramListingPage
 from common.test.acceptance.tests.helpers import UniqueCourseTest
-from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
-from common.test.acceptance.pages.lms.programs import ProgramListingPage, ProgramDetailsPage
-from openedx.core.djangoapps.catalog.tests import factories as catalog_factories
-from openedx.core.djangoapps.programs.tests import factories as program_factories
+from openedx.core.djangoapps.catalog.tests.factories import (
+    CourseFactory,
+    CourseRunFactory,
+    PathwayFactory,
+    ProgramFactory,
+    ProgramTypeFactory
+)
 
 
-class ProgramPageBase(ProgramsConfigMixin, CatalogConfigMixin, UniqueCourseTest):
+class ProgramPageBase(ProgramsConfigMixin, CatalogIntegrationMixin, UniqueCourseTest):
     """Base class used for program listing page tests."""
     def setUp(self):
         super(ProgramPageBase, self).setUp()
 
         self.set_programs_api_configuration(is_enabled=True)
 
-        self.programs = [catalog_factories.Program() for __ in range(3)]
-        self.course_run = catalog_factories.CourseRun(key=self.course_id)
-        self.stub_catalog_api()
+        self.programs = ProgramFactory.create_batch(3)
+        self.pathways = PathwayFactory.create_batch(3)
+        for pathway in self.pathways:
+            self.programs += pathway['programs']
 
-    def create_program(self, program_id=None, course_id=None):
-        """DRY helper for creating test program data."""
-        course_id = course_id if course_id else self.course_id
+        # add some of the previously created programs to some pathways
+        self.pathways[0]['programs'].extend([self.programs[0], self.programs[1]])
+        self.pathways[1]['programs'].append(self.programs[0])
 
-        run_mode = program_factories.RunMode(course_key=course_id)
-        course_code = program_factories.CourseCode(run_modes=[run_mode])
-        org = program_factories.Organization(key=self.course_info['org'])
-
-        if program_id:
-            program = program_factories.Program(
-                id=program_id,
-                status='active',
-                organizations=[org],
-                course_codes=[course_code]
-            )
-        else:
-            program = program_factories.Program(
-                status='active',
-                organizations=[org],
-                course_codes=[course_code]
-            )
-
-        return program
-
-    def stub_programs_api(self, programs, is_list=True):
-        """Stub out the programs API with fake data."""
-        ProgramsFixture().install_programs(programs, is_list=is_list)
-
-    def stub_catalog_api(self):
-        """Stub out the catalog API's program and course run endpoints."""
-        self.set_catalog_configuration(is_enabled=True)
-        CatalogFixture().install_programs(self.programs)
-        CatalogFixture().install_course_run(self.course_run)
+        self.username = None
 
     def auth(self, enroll=True):
         """Authenticate, enrolling the user in the configured course if requested."""
         CourseFixture(**self.course_info).install()
 
         course_id = self.course_id if enroll else None
-        AutoAuthPage(self.browser, course_id=course_id).visit()
+        auth_page = AutoAuthPage(self.browser, course_id=course_id)
+        auth_page.visit()
+
+        self.username = auth_page.user_info['username']
+
+    def create_program(self):
+        """DRY helper for creating test program data."""
+        course_run = CourseRunFactory(key=self.course_id)
+        course = CourseFactory(course_runs=[course_run])
+
+        program_type = ProgramTypeFactory()
+        return ProgramFactory(courses=[course], type=program_type['name'])
+
+    def stub_catalog_api(self, programs, pathways):
+        """
+        Stub the discovery service's program list and detail API endpoints, as well as
+        the credit pathway list endpoint.
+        """
+        self.set_catalog_integration(is_enabled=True, service_username=self.username)
+        CatalogFixture().install_programs(programs)
+
+        program_types = [program['type'] for program in programs]
+        CatalogFixture().install_program_types(program_types)
+
+        CatalogFixture().install_pathways(pathways)
+
+    def cache_programs(self):
+        """
+        Populate the LMS' cache of program data.
+        """
+        cache_programs_page = CacheProgramsPage(self.browser)
+        cache_programs_page.visit()
 
 
 class ProgramListingPageTest(ProgramPageBase):
     """Verify user-facing behavior of the program listing page."""
+    shard = 21
+
     def setUp(self):
         super(ProgramListingPageTest, self).setUp()
 
@@ -73,9 +85,9 @@ class ProgramListingPageTest(ProgramPageBase):
 
     def test_no_enrollments(self):
         """Verify that no cards appear when the user has no enrollments."""
-        program = self.create_program()
-        self.stub_programs_api([program])
         self.auth(enroll=False)
+        self.stub_catalog_api(self.programs, self.pathways)
+        self.cache_programs()
 
         self.listing_page.visit()
 
@@ -87,49 +99,39 @@ class ProgramListingPageTest(ProgramPageBase):
         Verify that no cards appear when the user has enrollments
         but none are included in an active program.
         """
-        course_id = self.course_id.replace(
-            self.course_info['run'],
-            'other_run'
-        )
-
-        program = self.create_program(course_id=course_id)
-        self.stub_programs_api([program])
         self.auth()
+        self.stub_catalog_api(self.programs, self.pathways)
+        self.cache_programs()
 
         self.listing_page.visit()
 
         self.assertTrue(self.listing_page.is_sidebar_present)
         self.assertFalse(self.listing_page.are_cards_present)
 
-    def test_enrollments_and_programs(self):
-        """
-        Verify that cards appear when the user has enrollments
-        which are included in at least one active program.
-        """
-        program = self.create_program()
-        self.stub_programs_api([program])
-        self.auth()
 
-        self.listing_page.visit()
-
-        self.assertTrue(self.listing_page.is_sidebar_present)
-        self.assertTrue(self.listing_page.are_cards_present)
-
-
-@attr('a11y')
 class ProgramListingPageA11yTest(ProgramPageBase):
     """Test program listing page accessibility."""
+    a11y = True
+
     def setUp(self):
         super(ProgramListingPageA11yTest, self).setUp()
 
         self.listing_page = ProgramListingPage(self.browser)
 
-        program = self.create_program()
-        self.stub_programs_api([program])
+        self.program = self.create_program()
 
     def test_empty_a11y(self):
         """Test a11y of the page's empty state."""
+        self.listing_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
+            ]
+        })
         self.auth(enroll=False)
+        self.stub_catalog_api(programs=[self.program], pathways=[])
+        self.cache_programs()
+
         self.listing_page.visit()
 
         self.assertTrue(self.listing_page.is_sidebar_present)
@@ -138,7 +140,17 @@ class ProgramListingPageA11yTest(ProgramPageBase):
 
     def test_cards_a11y(self):
         """Test a11y when program cards are present."""
+        self.listing_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'landmark-complementary-is-top-level',  # TODO: AC-939
+                'region',  # TODO: AC-932
+            ]
+        })
         self.auth()
+        self.stub_catalog_api(programs=[self.program], pathways=[])
+        self.cache_programs()
+
         self.listing_page.visit()
 
         self.assertTrue(self.listing_page.is_sidebar_present)
@@ -146,19 +158,31 @@ class ProgramListingPageA11yTest(ProgramPageBase):
         self.listing_page.a11y_audit.check_for_accessibility_errors()
 
 
-@attr('a11y')
 class ProgramDetailsPageA11yTest(ProgramPageBase):
     """Test program details page accessibility."""
+    a11y = True
+
     def setUp(self):
         super(ProgramDetailsPageA11yTest, self).setUp()
 
         self.details_page = ProgramDetailsPage(self.browser)
 
-        program = self.create_program(program_id=self.details_page.program_id)
-        self.stub_programs_api([program], is_list=False)
+        self.program = self.create_program()
+        self.program['uuid'] = self.details_page.program_uuid
 
     def test_a11y(self):
         """Test the page's a11y compliance."""
+        self.details_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'landmark-complementary-is-top-level',  # TODO: AC-939
+                'region',  # TODO: AC-932
+            ]
+        })
         self.auth()
+        self.stub_catalog_api(programs=[self.program], pathways=[])
+        self.cache_programs()
+
         self.details_page.visit()
+
         self.details_page.a11y_audit.check_for_accessibility_errors()

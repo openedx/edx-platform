@@ -1,13 +1,12 @@
 """
 Holds base classes for microsite tests
 """
-from mock import DEFAULT
+from __future__ import absolute_import
 
 from django.test import TestCase
-from microsite_configuration.tests.factories import (
-    MicrositeFactory,
-    MicrositeOrganizationMappingFactory,
-)
+from mock import DEFAULT
+
+from microsite_configuration.tests.factories import MicrositeFactory, MicrositeOrganizationMappingFactory
 
 MICROSITE_BACKENDS = (
     'microsite_configuration.backends.filebased.FilebasedMicrositeBackend',

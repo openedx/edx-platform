@@ -1,14 +1,19 @@
 """
 Email-marketing-related models.
 """
+from __future__ import absolute_import
+
+from config_models.models import ConfigurationModel
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from config_models.models import ConfigurationModel
-
 
 class EmailMarketingConfiguration(ConfigurationModel):
-    """ Email marketing configuration """
+    """
+    Email marketing configuration
+
+    .. no_pii:
+    """
 
     class Meta(object):
         app_label = "email_marketing"
@@ -48,11 +53,11 @@ class EmailMarketingConfiguration(ConfigurationModel):
         )
     )
 
-    sailthru_activation_template = models.fields.CharField(
+    sailthru_welcome_template = models.fields.CharField(
         max_length=20,
         blank=True,
         help_text=_(
-            "Sailthru template to use on activation send. "
+            "Sailthru template to use on welcome send."
         )
     )
 
@@ -76,6 +81,22 @@ class EmailMarketingConfiguration(ConfigurationModel):
         blank=True,
         help_text=_(
             "Sailthru send template to use on enrolling for audit. "
+        )
+    )
+
+    sailthru_verification_passed_template = models.fields.CharField(
+        max_length=20,
+        blank=True,
+        help_text=_(
+            "Sailthru send template to use on passed ID verification."
+        )
+    )
+
+    sailthru_verification_failed_template = models.fields.CharField(
+        max_length=20,
+        blank=True,
+        help_text=_(
+            "Sailthru send template to use on failed ID verification."
         )
     )
 
@@ -127,6 +148,24 @@ class EmailMarketingConfiguration(ConfigurationModel):
         )
     )
 
+    # The number of seconds to delay for welcome emails sending. This is needed to acommendate those
+    # learners who created user account during course enrollment so we can send a different message
+    # in our welcome email.
+    welcome_email_send_delay = models.fields.IntegerField(
+        default=600,
+        help_text=_(
+            "Number of seconds to delay the sending of User Welcome email after user has been created"
+        )
+    )
+
+    # The number of seconds to delay/timeout wait to get cookie values from sailthru.
+    user_registration_cookie_timeout_delay = models.fields.FloatField(
+        default=3.0,
+        help_text=_(
+            "The number of seconds to delay/timeout wait to get cookie values from sailthru."
+        )
+    )
+
     def __unicode__(self):
-        return u"Email marketing configuration: New user list %s, Activation template: %s" % \
-               (self.sailthru_new_user_list, self.sailthru_activation_template)
+        return u"Email marketing configuration: New user list %s, Welcome template: %s" % \
+               (self.sailthru_new_user_list, self.sailthru_welcome_template)

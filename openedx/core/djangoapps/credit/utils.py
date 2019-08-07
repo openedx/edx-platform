@@ -1,6 +1,8 @@
 """
 Utilities for the credit app.
 """
+from __future__ import absolute_import
+
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 

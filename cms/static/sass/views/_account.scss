@@ -4,7 +4,6 @@
 .view-signup,
 .view-signin,
 .view-util {
-
   .wrapper-content {
     margin: ($baseline*1.5) 0 0 0;
     padding: 0 $baseline;
@@ -14,7 +13,9 @@
 
   .content {
     @include clearfix();
+
     @extend %t-copy-base;
+
     max-width: $fg-max-width;
     min-width: $fg-min-width;
     width: flex-grid(12);
@@ -30,20 +31,25 @@
       h1 {
         @extend %t-title3;
         @extend %t-strong;
+
         margin: 0;
         padding: 0;
       }
 
       .action {
         @extend %t-action3;
+
         position: absolute;
+
         @include right(0);
+
         top: 40%;
       }
     }
 
     .introduction {
       @extend %t-copy-sub1;
+
       margin: 0 0 $baseline 0;
     }
   }
@@ -57,6 +63,7 @@
 
     form {
       @include box-sizing(border-box);
+
       box-shadow: 0 1px 2px $shadow-l1;
       border-radius: 2px;
       width: 100%;
@@ -70,8 +77,10 @@
         .action-primary {
           @include blue-button();
           @include transition(all $tmg-f3 linear 0s);
+
           @extend %t-action2;
           @extend %t-strong;
+
           display: block;
           width: 100%;
           padding: ($baseline*0.75) ($baseline/2);
@@ -90,12 +99,11 @@
           }
 
           &.required {
-
             label {
               @extend %t-strong;
             }
 
-            label:after {
+            label::after {
               margin-left: ($baseline/4);
               content: "*";
             }
@@ -107,7 +115,9 @@
 
           label {
             @extend %t-copy-sub1;
+
             @include transition(color $tmg-f3 ease-in-out 0s);
+
             margin: 0 0 ($baseline/4) 0;
 
             &.is-focused {
@@ -117,6 +127,7 @@
 
           input, textarea {
             @extend %t-copy-base;
+
             height: 100%;
             width: 100%;
             padding: ($baseline/2);
@@ -130,25 +141,28 @@
             }
 
             ::-webkit-input-placeholder {
-               color: $gray-l4;
+              color: $gray-l4;
             }
 
             :-moz-placeholder {
-               color: $gray-l3;
+              color: $gray-l3;
             }
 
             ::-moz-placeholder {
-               color: $gray-l3;
+              color: $gray-l3;
             }
 
             :-ms-input-placeholder {
-               color: $gray-l3;
+              color: $gray-l3;
             }
 
             &:focus {
-
               + .tip {
                 color: $gray-d1;
+              }
+
+              + .tip-error {
+                color: $red;
               }
             }
           }
@@ -170,15 +184,22 @@
 
           .tip {
             @extend %t-copy-sub2;
+
             @include transition(color $tmg-f3 ease-in-out 0s);
+
             display: block;
             margin-top: ($baseline/4);
             color: $gray-d1;
+          }
+
+          .tip-error {
+            color: $red;
           }
         }
 
         .field-group {
           @include clearfix();
+
           margin: 0 0 ($baseline/2) 0;
 
           .field {
@@ -211,6 +232,7 @@
 
     .bit {
       @extend %t-copy-sub1;
+
       margin: 0 0 $baseline 0;
       border-bottom: 1px solid $gray-l4;
       padding: 0 0 $baseline 0;
@@ -225,6 +247,7 @@
       h3 {
         @extend %t-title7;
         @extend %t-strong;
+
         margin: 0 0 ($baseline/4) 0;
         color: $gray-d2;
       }
@@ -237,8 +260,10 @@
 
     .action-forgotpassword {
       @extend %t-action3;
+
       position: absolute;
       top: 0;
+
       @include right(0);
     }
   }

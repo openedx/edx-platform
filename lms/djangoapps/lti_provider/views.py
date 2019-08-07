@@ -2,17 +2,21 @@
 LTI Provider view functions
 """
 
-from django.conf import settings
-from django.http import HttpResponseBadRequest, HttpResponseForbidden, Http404
-from django.views.decorators.csrf import csrf_exempt
+from __future__ import absolute_import
+
 import logging
 
-from lti_provider.outcomes import store_outcome_parameters
+import six
+from django.conf import settings
+from django.http import Http404, HttpResponseBadRequest, HttpResponseForbidden
+from django.views.decorators.csrf import csrf_exempt
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, UsageKey
+
 from lti_provider.models import LtiConsumer
+from lti_provider.outcomes import store_outcome_parameters
 from lti_provider.signature_validator import SignatureValidator
 from lti_provider.users import authenticate_lti_user
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys import InvalidKeyError
 from openedx.core.lib.url_utils import unquote_slashes
 from util.views import add_p3p_header
 
@@ -27,8 +31,8 @@ REQUIRED_PARAMETERS = [
 ]
 
 OPTIONAL_PARAMETERS = [
-    'lis_result_sourcedid', 'lis_outcome_service_url',
-    'tool_consumer_instance_guid'
+    'context_title', 'context_label', 'lis_result_sourcedid',
+    'lis_outcome_service_url', 'tool_consumer_instance_guid'
 ]
 
 
@@ -75,7 +79,7 @@ def lti_launch(request, course_id, usage_id):
         course_key, usage_key = parse_course_and_usage_keys(course_id, usage_id)
     except InvalidKeyError:
         log.error(
-            'Invalid course key %s or usage key %s from request %s',
+            u'Invalid course key %s or usage key %s from request %s',
             course_id,
             usage_id,
             request
@@ -143,7 +147,7 @@ def render_courseware(request, usage_key):
     """
     # return an HttpResponse object that contains the template and necessary context to render the courseware.
     from courseware.views.views import render_xblock
-    return render_xblock(request, unicode(usage_key), check_if_enrolled=False)
+    return render_xblock(request, six.text_type(usage_key), check_if_enrolled=False)
 
 
 def parse_course_and_usage_keys(course_id, usage_id):

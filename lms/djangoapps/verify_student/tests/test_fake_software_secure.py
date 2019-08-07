@@ -2,12 +2,14 @@
 Tests for the fake software secure response.
 """
 
-from django.test import TestCase
+from __future__ import absolute_import
 
+from django.test import TestCase
 from mock import patch
+
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from student.tests.factories import UserFactory
 from util.testing import UrlResetMixin
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 
 
 class SoftwareSecureFakeViewTest(UrlResetMixin, TestCase):
@@ -32,6 +34,7 @@ class SoftwareSecureFakeViewDisabledTest(SoftwareSecureFakeViewTest):
     Test the fake software secure response when feature flag
     'ENABLE_SOFTWARE_SECURE_FAKE' is not enabled.
     """
+
     def setUp(self):
         super(SoftwareSecureFakeViewDisabledTest, self).setUp(enable_software_secure_fake=False)
 
@@ -52,6 +55,7 @@ class SoftwareSecureFakeViewEnabledTest(SoftwareSecureFakeViewTest):
     Test the fake software secure response when feature flag
     'ENABLE_SOFTWARE_SECURE_FAKE' is enabled.
     """
+
     def setUp(self):
         super(SoftwareSecureFakeViewEnabledTest, self).setUp(enable_software_secure_fake=True)
 

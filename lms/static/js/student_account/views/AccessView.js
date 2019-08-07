@@ -9,15 +9,17 @@
         'js/student_account/models/LoginModel',
         'js/student_account/models/PasswordResetModel',
         'js/student_account/models/RegisterModel',
+        'js/student_account/models/AccountRecoveryModel',
         'js/student_account/views/LoginView',
         'js/student_account/views/PasswordResetView',
         'js/student_account/views/RegisterView',
         'js/student_account/views/InstitutionLoginView',
         'js/student_account/views/HintedLoginView',
+        'edx-ui-toolkit/js/utils/html-utils',
         'js/vendor/history'
     ],
-        function($, utility, _, _s, Backbone, LoginModel, PasswordResetModel, RegisterModel, LoginView,
-                 PasswordResetView, RegisterView, InstitutionLoginView, HintedLoginView) {
+        function($, utility, _, _s, Backbone, LoginModel, PasswordResetModel, RegisterModel, AccountRecoveryModel,
+                 LoginView, PasswordResetView, RegisterView, InstitutionLoginView, HintedLoginView, HtmlUtils) {
             return Backbone.View.extend({
                 tpl: '#access-tpl',
                 events: {
@@ -27,6 +29,7 @@
                     login: {},
                     register: {},
                     passwordHelp: {},
+                    accountRecoveryHelp: {},
                     institutionLogin: {},
                     hintedLogin: {}
                 },
@@ -52,11 +55,12 @@
 
                     this.thirdPartyAuthHint = options.third_party_auth_hint || null;
 
+                    // Account activation messages
+                    this.accountActivationMessages = options.account_activation_messages || [];
+                    this.accountRecoveryMessages = options.account_recovery_messages || [];
+
                     if (options.login_redirect_url) {
-                    // Ensure that the next URL is internal for security reasons
-                        if (! window.isExternal(options.login_redirect_url)) {
-                            this.nextUrl = options.login_redirect_url;
-                        }
+                        this.nextUrl = options.login_redirect_url;
                     }
 
                     this.formDescriptions = {
@@ -69,9 +73,20 @@
 
                     this.platformName = options.platform_name;
                     this.supportURL = options.support_link;
+                    this.passwordResetSupportUrl = options.password_reset_support_link;
+                    this.createAccountOption = options.account_creation_allowed;
+                    this.hideAuthWarnings = options.hide_auth_warnings || false;
+                    this.pipelineUserDetails = options.third_party_auth.pipeline_user_details;
+                    this.enterpriseName = options.enterprise_name || '';
+                    this.isAccountRecoveryFeatureEnabled = options.is_account_recovery_feature_enabled || false;
 
                 // The login view listens for 'sync' events from the reset model
                     this.resetModel = new PasswordResetModel({}, {
+                        method: 'GET',
+                        url: '#'
+                    });
+
+                    this.accountRecoveryModel = new AccountRecoveryModel({}, {
                         method: 'GET',
                         url: '#'
                     });
@@ -81,13 +96,22 @@
                 // Once the third party error message has been shown once,
                 // there is no need to show it again, if the user changes mode:
                     this.thirdPartyAuth.errorMessage = null;
+
+                    // Once the account activation/account recovery messages have been shown once,
+                    // there is no need to show it again, if the user changes mode:
+                    this.accountActivationMessages = [];
+                    this.accountRecoveryMessages = [];
                 },
 
                 render: function() {
-                    $(this.el).html(_.template(this.tpl)({
-                        mode: this.activeForm
-                    }));
-
+                    HtmlUtils.setHtml(
+                        $(this.el),
+                        HtmlUtils.HTML(
+                            _.template(this.tpl)({
+                                mode: this.activeForm
+                            })
+                        )
+                    )
                     this.postRender();
 
                     return this;
@@ -117,9 +141,17 @@
                             fields: data.fields,
                             model: model,
                             resetModel: this.resetModel,
+                            accountRecoveryModel: this.accountRecoveryModel,
                             thirdPartyAuth: this.thirdPartyAuth,
+                            accountActivationMessages: this.accountActivationMessages,
+                            accountRecoveryMessages: this.accountRecoveryMessages,
                             platformName: this.platformName,
-                            supportURL: this.supportURL
+                            supportURL: this.supportURL,
+                            passwordResetSupportUrl: this.passwordResetSupportUrl,
+                            createAccountOption: this.createAccountOption,
+                            hideAuthWarnings: this.hideAuthWarnings,
+                            pipelineUserDetails: this.pipelineUserDetails,
+                            enterpriseName: this.enterpriseName
                         });
 
                     // Listen for 'password-help' event to toggle sub-views
@@ -155,7 +187,8 @@
                             fields: data.fields,
                             model: model,
                             thirdPartyAuth: this.thirdPartyAuth,
-                            platformName: this.platformName
+                            platformName: this.platformName,
+                            hideAuthWarnings: this.hideAuthWarnings
                         });
 
                     // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.
@@ -203,7 +236,8 @@
                 toggleForm: function(e) {
                     var type = $(e.currentTarget).data('type'),
                         $form = $('#' + type + '-form'),
-                        $anchor = $('#' + type + '-anchor'),
+                        scrollX = window.scrollX,
+                        scrollY = window.scrollY,
                         queryParams = url('?'),
                         queryStr = queryParams.length > 0 ? '?' + queryParams : '';
 
@@ -222,7 +256,6 @@
                     this.element.hide($(this.el).find('.submission-success'));
                     this.element.hide($(this.el).find('.form-wrapper'));
                     this.element.show($form);
-                    this.element.scrollTop($anchor);
 
                 // Update url without reloading page
                     if (type != 'institution_login') {
@@ -232,6 +265,9 @@
 
                 // Focus on the form
                     $('#' + type).focus();
+
+               // Maintain original scroll position
+                    window.scrollTo(scrollX, scrollY);
                 },
 
             /**

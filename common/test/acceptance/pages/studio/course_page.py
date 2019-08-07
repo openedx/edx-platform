@@ -1,10 +1,15 @@
 """
 Base class for pages specific to a course in Studio.
 """
-from abc import abstractmethod
+from __future__ import absolute_import
+
 import os
-from opaque_keys.edx.locator import CourseLocator
+from abc import abstractmethod
+
+import six
 from bok_choy.page_object import PageObject
+from opaque_keys.edx.locator import CourseLocator
+
 from common.test.acceptance.pages.studio import BASE_URL
 from common.test.acceptance.pages.studio.utils import HelpMixin
 
@@ -54,4 +59,4 @@ class CoursePage(PageObject, HelpMixin):
             self.course_info['course_run'],
             deprecated=(default_store == 'draft')
         )
-        return "/".join([BASE_URL, self.url_path, unicode(course_key)])
+        return "/".join([BASE_URL, self.url_path, six.text_type(course_key)])

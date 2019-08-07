@@ -1,9 +1,12 @@
 """ Tests for analytics.csvs """
 
-from django.test import TestCase
-from nose.tools import raises
+from __future__ import absolute_import
 
-from instructor_analytics.csvs import create_csv_response, format_dictlist, format_instances
+import pytest
+from django.test import TestCase
+from six.moves import range
+
+from lms.djangoapps.instructor_analytics.csvs import create_csv_response, format_dictlist, format_instances
 
 
 class TestAnalyticsCSVS(TestCase):
@@ -15,7 +18,7 @@ class TestAnalyticsCSVS(TestCase):
 
         res = create_csv_response('robot.csv', header, datarows)
         self.assertEqual(res['Content-Type'], 'text/csv')
-        self.assertEqual(res['Content-Disposition'], 'attachment; filename={0}'.format('robot.csv'))
+        self.assertEqual(res['Content-Disposition'], u'attachment; filename={0}'.format('robot.csv'))
         self.assertEqual(res.content.strip(), '"Name","Email"')
 
     def test_create_csv_response(self):
@@ -24,7 +27,7 @@ class TestAnalyticsCSVS(TestCase):
 
         res = create_csv_response('robot.csv', header, datarows)
         self.assertEqual(res['Content-Type'], 'text/csv')
-        self.assertEqual(res['Content-Disposition'], 'attachment; filename={0}'.format('robot.csv'))
+        self.assertEqual(res['Content-Disposition'], u'attachment; filename={0}'.format('robot.csv'))
         self.assertEqual(res.content.strip(), '"Name","Email"\r\n"Jim","jim@edy.org"\r\n"Jake","jake@edy.org"\r\n"Jeeves","jeeves@edy.org"')
 
     def test_create_csv_response_empty(self):
@@ -33,7 +36,7 @@ class TestAnalyticsCSVS(TestCase):
 
         res = create_csv_response('robot.csv', header, datarows)
         self.assertEqual(res['Content-Type'], 'text/csv')
-        self.assertEqual(res['Content-Disposition'], 'attachment; filename={0}'.format('robot.csv'))
+        self.assertEqual(res['Content-Disposition'], u'attachment; filename={0}'.format('robot.csv'))
         self.assertEqual(res.content.strip(), '')
 
 
@@ -77,12 +80,13 @@ class TestAnalyticsFormatDictlist(TestCase):
 
         res = create_csv_response('robot.csv', header, datarows)
         self.assertEqual(res['Content-Type'], 'text/csv')
-        self.assertEqual(res['Content-Disposition'], 'attachment; filename={0}'.format('robot.csv'))
+        self.assertEqual(res['Content-Disposition'], u'attachment; filename={0}'.format('robot.csv'))
         self.assertEqual(res.content.strip(), '"Name","Email"\r\n"Jim","jim@edy.org"\r\n"Jake","jake@edy.org"\r\n"Jeeves","jeeves@edy.org"')
 
 
 class TestAnalyticsFormatInstances(TestCase):
     """ test format_instances method """
+
     class TestDataClass(object):
         """ Test class to generate objects for format_instances """
         def __init__(self):
@@ -97,7 +101,7 @@ class TestAnalyticsFormatInstances(TestCase):
 
     def setUp(self):
         super(TestAnalyticsFormatInstances, self).setUp()
-        self.instances = [self.TestDataClass() for _ in xrange(5)]
+        self.instances = [self.TestDataClass() for _ in range(5)]
 
     def test_format_instances_response(self):
         features = ['a_var', 'c_var', 'd_var']
@@ -107,7 +111,7 @@ class TestAnalyticsFormatInstances(TestCase):
             'aval',
             'cval',
             'dval',
-        ] for _ in xrange(len(self.instances))])
+        ] for _ in range(len(self.instances))])
 
     def test_format_instances_response_noinstances(self):
         features = ['a_var']
@@ -118,8 +122,8 @@ class TestAnalyticsFormatInstances(TestCase):
     def test_format_instances_response_nofeatures(self):
         header, datarows = format_instances(self.instances, [])
         self.assertEqual(header, [])
-        self.assertEqual(datarows, [[] for _ in xrange(len(self.instances))])
+        self.assertEqual(datarows, [[] for _ in range(len(self.instances))])
 
-    @raises(AttributeError)
     def test_format_instances_response_nonexistantfeature(self):
-        format_instances(self.instances, ['robot_not_a_real_feature'])
+        with pytest.raises(AttributeError):
+            format_instances(self.instances, ['robot_not_a_real_feature'])

@@ -1,7 +1,9 @@
 """Admin interface for the util app. """
 
-from ratelimitbackend import admin
-from util.models import RateLimitConfiguration
+from __future__ import absolute_import
 
+from django.contrib import admin
+
+from util.models import RateLimitConfiguration
 
 admin.site.register(RateLimitConfiguration)

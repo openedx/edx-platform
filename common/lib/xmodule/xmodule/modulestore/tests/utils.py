@@ -1,20 +1,22 @@
 """
 Helper classes and methods for running modulestore tests without Django.
 """
-import random
+from __future__ import absolute_import
 
+import io
+import os
 from contextlib import contextmanager, nested
 from importlib import import_module
-from opaque_keys.edx.keys import UsageKey
-from path import Path as path
 from shutil import rmtree
 from tempfile import mkdtemp
 from unittest import TestCase
+from uuid import uuid4
 
-from xblock.fields import XBlockMixin
-from xmodule.x_module import XModuleMixin
+import six
+from path import Path as path
+from six.moves import range, zip
+
 from xmodule.contentstore.mongo import MongoContentStore
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
@@ -23,9 +25,11 @@ from xmodule.modulestore.mongo.base import ModuleStoreEnum
 from xmodule.modulestore.mongo.draft import DraftModuleStore
 from xmodule.modulestore.split_mongo.split_draft import DraftVersioningModuleStore
 from xmodule.modulestore.tests.factories import ItemFactory
-from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
 from xmodule.modulestore.xml import XMLModuleStore
+from xmodule.modulestore.xml_importer import LocationMixin
 from xmodule.tests import DATA_DIR
+from xmodule.x_module import XModuleMixin
 
 
 def load_function(path):
@@ -74,25 +78,25 @@ def mock_tab_from_json(tab_dict):
     return tab_dict
 
 
-class LocationMixin(XBlockMixin):
+def add_temp_files_from_dict(file_dict, dir):
     """
-    Adds a `location` property to an :class:`XBlock` so it is more compatible
-    with old-style :class:`XModule` API. This is a simplified version of
-    :class:`XModuleMixin`.
+    Takes in a dict formatted as: { file_name: content }, and adds files to directory
     """
-    @property
-    def location(self):
-        """ Get the UsageKey of this block. """
-        return self.scope_ids.usage_id
+    for file_name in file_dict:
+        with io.open("{}/{}".format(dir, file_name), "w") as opened_file:
+            content = file_dict[file_name]
+            if content:
+                opened_file.write(six.text_type(content))
 
-    @location.setter
-    def location(self, value):
-        """ Set the UsageKey of this block. """
-        assert isinstance(value, UsageKey)
-        self.scope_ids = self.scope_ids._replace(
-            def_id=value,
-            usage_id=value,
-        )
+
+def remove_temp_files_from_list(file_list, dir):
+    """
+    Takes in a list of file names and removes them from dir if they exist
+    """
+    for file_name in file_list:
+        file_path = "{}/{}".format(dir, file_name)
+        if os.path.exists(file_path):
+            os.remove(file_path)
 
 
 class MixedSplitTestCase(TestCase):
@@ -110,7 +114,7 @@ class MixedSplitTestCase(TestCase):
     DOC_STORE_CONFIG = {
         'host': MONGO_HOST,
         'port': MONGO_PORT_NUM,
-        'db': 'test_mongo_libs',
+        'db': 'test_mongo_libs_{0}'.format(os.getpid()),
         'collection': 'modulestore',
         'asset_collection': 'assetstore',
     }
@@ -194,7 +198,7 @@ class MemoryCache(object):
     the modulestore, and stores the data in a dictionary in memory.
     """
     def __init__(self):
-        self._data = {}
+        self.data = {}
 
     def get(self, key, default=None):
         """
@@ -204,7 +208,7 @@ class MemoryCache(object):
             key: The key to update.
             default: The value to return if the key hasn't been set previously.
         """
-        return self._data.get(key, default)
+        return self.data.get(key, default)
 
     def set(self, key, value):
         """
@@ -214,7 +218,7 @@ class MemoryCache(object):
             key: The key to update.
             value: The value change the key to.
         """
-        self._data[key] = value
+        self.data[key] = value
 
 
 class MongoContentstoreBuilder(object):
@@ -228,7 +232,7 @@ class MongoContentstoreBuilder(object):
         when the context closes.
         """
         contentstore = MongoContentStore(
-            db='contentstore{}'.format(random.randint(0, 10000)),
+            db='contentstore{}'.format(THIS_UUID),
             collection='content',
             **COMMON_DOCSTORE_CONFIG
         )
@@ -255,19 +259,19 @@ class StoreBuilderBase(object):
         """
         contentstore = kwargs.pop('contentstore', None)
         if not contentstore:
-            with self.build_without_contentstore() as (contentstore, modulestore):
+            with self.build_without_contentstore(**kwargs) as (contentstore, modulestore):
                 yield contentstore, modulestore
         else:
-            with self.build_with_contentstore(contentstore) as modulestore:
+            with self.build_with_contentstore(contentstore, **kwargs) as modulestore:
                 yield modulestore
 
     @contextmanager
-    def build_without_contentstore(self):
+    def build_without_contentstore(self, **kwargs):
         """
         Build both the contentstore and the modulestore.
         """
         with MongoContentstoreBuilder().build() as contentstore:
-            with self.build_with_contentstore(contentstore) as modulestore:
+            with self.build_with_contentstore(contentstore, **kwargs) as modulestore:
                 yield contentstore, modulestore
 
 
@@ -276,7 +280,7 @@ class MongoModulestoreBuilder(StoreBuilderBase):
     A builder class for a DraftModuleStore.
     """
     @contextmanager
-    def build_with_contentstore(self, contentstore):
+    def build_with_contentstore(self, contentstore, **kwargs):
         """
         A contextmanager that returns an isolated mongo modulestore, and then deletes
         all of its data at the end of the context.
@@ -286,7 +290,7 @@ class MongoModulestoreBuilder(StoreBuilderBase):
                 all of its assets.
         """
         doc_store_config = dict(
-            db='modulestore{}'.format(random.randint(0, 10000)),
+            db='modulestore{}'.format(THIS_UUID),
             collection='xmodule',
             asset_collection='asset_metadata',
             **COMMON_DOCSTORE_CONFIG
@@ -324,7 +328,7 @@ class VersioningModulestoreBuilder(StoreBuilderBase):
     A builder class for a VersioningModuleStore.
     """
     @contextmanager
-    def build_with_contentstore(self, contentstore):
+    def build_with_contentstore(self, contentstore, **kwargs):
         """
         A contextmanager that returns an isolated versioning modulestore, and then deletes
         all of its data at the end of the context.
@@ -334,7 +338,7 @@ class VersioningModulestoreBuilder(StoreBuilderBase):
                 all of its assets.
         """
         doc_store_config = dict(
-            db='modulestore{}'.format(random.randint(0, 10000)),
+            db='modulestore{}'.format(THIS_UUID),
             collection='split_module',
             **COMMON_DOCSTORE_CONFIG
         )
@@ -347,6 +351,7 @@ class VersioningModulestoreBuilder(StoreBuilderBase):
             fs_root,
             render_template=repr,
             xblock_mixins=XBLOCK_MIXINS,
+            **kwargs
         )
         modulestore.ensure_indexes()
 
@@ -369,7 +374,7 @@ class XmlModulestoreBuilder(StoreBuilderBase):
     """
     # pylint: disable=unused-argument
     @contextmanager
-    def build_with_contentstore(self, contentstore=None, course_ids=None):
+    def build_with_contentstore(self, contentstore=None, course_ids=None, **kwargs):
         """
         A contextmanager that returns an isolated xml modulestore
 
@@ -403,7 +408,7 @@ class MixedModulestoreBuilder(StoreBuilderBase):
         self.mixed_modulestore = None
 
     @contextmanager
-    def build_with_contentstore(self, contentstore):
+    def build_with_contentstore(self, contentstore, **kwargs):
         """
         A contextmanager that returns a mixed modulestore built on top of modulestores
         generated by other builder classes.
@@ -412,12 +417,12 @@ class MixedModulestoreBuilder(StoreBuilderBase):
             contentstore: The contentstore that this modulestore should use to store
                 all of its assets.
         """
-        names, generators = zip(*self.store_builders)
+        names, generators = list(zip(*self.store_builders))
 
-        with nested(*(gen.build_with_contentstore(contentstore) for gen in generators)) as modulestores:
+        with nested(*(gen.build_with_contentstore(contentstore, **kwargs) for gen in generators)) as modulestores:
             # Make the modulestore creation function just return the already-created modulestores
             store_iterator = iter(modulestores)
-            next_modulestore = lambda *args, **kwargs: store_iterator.next()
+            next_modulestore = lambda *args, **kwargs: next(store_iterator)
 
             # Generate a fake list of stores to give the already generated stores appropriate names
             stores = [{'NAME': name, 'ENGINE': 'This space deliberately left blank'} for name in names]
@@ -454,6 +459,8 @@ class MixedModulestoreBuilder(StoreBuilderBase):
             return store.db_connection.structures
 
 
+THIS_UUID = uuid4().hex
+
 COMMON_DOCSTORE_CONFIG = {
     'host': MONGO_HOST,
     'port': MONGO_PORT_NUM,
@@ -488,9 +495,17 @@ DIRECT_MS_SETUPS_SHORT = (
 )
 MODULESTORE_SETUPS = DIRECT_MODULESTORE_SETUPS + MIXED_MODULESTORE_SETUPS
 MODULESTORE_SHORTNAMES = DIRECT_MS_SETUPS_SHORT + MIXED_MS_SETUPS_SHORT
-SHORT_NAME_MAP = dict(zip(MODULESTORE_SETUPS, MODULESTORE_SHORTNAMES))
+SHORT_NAME_MAP = dict(list(zip(MODULESTORE_SETUPS, MODULESTORE_SHORTNAMES)))
 
 CONTENTSTORE_SETUPS = (MongoContentstoreBuilder(),)
+
+DOT_FILES_DICT = {
+    ".DS_Store": None,
+    ".example.txt": "BLUE",
+}
+TILDA_FILES_DICT = {
+    "example.txt~": "RED"
+}
 
 
 class PureModulestoreTestCase(TestCase):

@@ -80,8 +80,8 @@ define([
                 reason: 'Financial Assistance'
             });
             AjaxHelpers.respondWithJson(requests, {
-                'enrolled_by': 'staff@edx.org',
-                'reason': 'Financial Assistance'
+                enrolled_by: 'staff@edx.org',
+                reason: 'Financial Assistance'
             });
             expect($('.enrollment-change-errors').css('display')).toEqual('none');
         });

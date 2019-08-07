@@ -3,22 +3,28 @@
 Tests for support views.
 """
 
-from datetime import datetime, timedelta
+from __future__ import absolute_import
+
 import itertools
 import json
 import re
+from datetime import datetime, timedelta
 
 import ddt
-from django.core.urlresolvers import reverse
-from nose.plugins.attrib import attr
+import six
+from django.contrib.auth.models import User
+from django.db.models import signals
+from django.urls import reverse
+from mock import patch
 from pytz import UTC
 
+from common.test.utils import disable_signal
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
-from student.models import CourseEnrollment, ManualEnrollmentAudit, ENROLLED_TO_ENROLLED
+from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAttribute, ManualEnrollmentAudit
 from student.roles import GlobalStaff, SupportStaffRole
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -41,7 +47,51 @@ class SupportViewTestCase(ModuleStoreTestCase):
         self.assertTrue(success, msg="Could not log in")
 
 
-@attr(shard=3)
+class SupportViewManageUserTests(SupportViewTestCase):
+    """
+    Base class for support view tests.
+    """
+
+    def setUp(self):
+        """Make the user support staff"""
+        super(SupportViewManageUserTests, self).setUp()
+        SupportStaffRole().add_users(self.user)
+
+    def test_get_support_form(self):
+        """
+        Tests Support View to return Manage User Form
+        """
+        url = reverse('support:manage_user')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_form_with_user_info(self):
+        """
+        Tests Support View to return Manage User Form
+        with user info
+        """
+        url = reverse('support:manage_user_detail') + self.user.username
+        response = self.client.get(url)
+        data = json.loads(response.content)
+        self.assertEqual(data['username'], self.user.username)
+
+    def test_disable_user_account(self):
+        """
+        Tests Support View to disable the user account
+        """
+        test_user = UserFactory(
+            username='foobar', email='foobar@foobar.com', password='foobar'
+        )
+        url = reverse('support:manage_user_detail') + test_user.username
+        response = self.client.post(url, data={
+            'username_or_email': test_user.username
+        })
+        data = json.loads(response.content)
+        self.assertEqual(data['success_msg'], 'User Disabled Successfully')
+        test_user = User.objects.get(username=test_user.username, email=test_user.email)
+        self.assertEqual(test_user.has_usable_password(), False)
+
+
 @ddt.ddt
 class SupportViewAccessTests(SupportViewTestCase):
     """
@@ -56,7 +106,9 @@ class SupportViewAccessTests(SupportViewTestCase):
             'support:certificates',
             'support:refund',
             'support:enrollment',
-            'support:enrollment_list'
+            'support:enrollment_list',
+            'support:manage_user',
+            'support:manage_user_detail',
         ), (
             (GlobalStaff, True),
             (SupportStaffRole, True),
@@ -81,7 +133,9 @@ class SupportViewAccessTests(SupportViewTestCase):
         "support:certificates",
         "support:refund",
         "support:enrollment",
-        "support:enrollment_list"
+        "support:enrollment_list",
+        "support:manage_user",
+        "support:manage_user_detail",
     )
     def test_require_login(self, url_name):
         url = reverse(url_name)
@@ -144,10 +198,10 @@ class SupportViewCertificatesTests(SupportViewTestCase):
 
     def test_certificates_along_with_course_filter(self):
         # Check that an initial filter is passed to the JavaScript client.
-        url = reverse("support:certificates") + "?user=student@example.com&course_id=" + unicode(self.course.id)
+        url = reverse("support:certificates") + "?user=student@example.com&course_id=" + six.text_type(self.course.id)
         response = self.client.get(url)
         self.assertContains(response, "userFilter: 'student@example.com'")
-        self.assertContains(response, "courseFilter: '" + unicode(self.course.id) + "'")
+        self.assertContains(response, "courseFilter: '" + six.text_type(self.course.id) + "'")
 
 
 @ddt.ddt
@@ -165,15 +219,15 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
                 CourseMode.AUDIT, CourseMode.PROFESSIONAL, CourseMode.CREDIT_MODE,
                 CourseMode.NO_ID_PROFESSIONAL_MODE, CourseMode.VERIFIED, CourseMode.HONOR
         ):
-            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)  # pylint: disable=no-member
+            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
 
         self.verification_deadline = VerificationDeadline(
-            course_key=self.course.id,  # pylint: disable=no-member
+            course_key=self.course.id,
             deadline=datetime.now(UTC) + timedelta(days=365)
         )
         self.verification_deadline.save()
 
-        CourseEnrollmentFactory.create(mode=CourseMode.AUDIT, user=self.student, course_id=self.course.id)  # pylint: disable=no-member
+        CourseEnrollmentFactory.create(mode=CourseMode.AUDIT, user=self.student, course_id=self.course.id)
 
         self.url = reverse('support:enrollment_list', kwargs={'username_or_email': self.student.username})
 
@@ -181,7 +235,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         """
         Assert that the student's enrollment has the correct mode.
         """
-        enrollment = CourseEnrollment.get_enrollment(self.student, self.course.id)  # pylint: disable=no-member
+        enrollment = CourseEnrollment.get_enrollment(self.student, self.course.id)
         self.assertEqual(enrollment.mode, mode)
 
     @ddt.data('username', 'email')
@@ -198,13 +252,14 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             'mode': CourseMode.AUDIT,
             'manual_enrollment': {},
             'user': self.student.username,
-            'course_id': unicode(self.course.id),  # pylint: disable=no-member
+            'course_id': six.text_type(self.course.id),
             'is_active': True,
             'verified_upgrade_deadline': None,
         }, data[0])
         self.assertEqual(
             {CourseMode.VERIFIED, CourseMode.AUDIT, CourseMode.HONOR,
-             CourseMode.NO_ID_PROFESSIONAL_MODE, CourseMode.PROFESSIONAL},
+             CourseMode.NO_ID_PROFESSIONAL_MODE, CourseMode.PROFESSIONAL,
+             CourseMode.CREDIT_MODE},
             {mode['slug'] for mode in data[0]['course_modes']}
         )
 
@@ -214,7 +269,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             self.student.email,
             ENROLLED_TO_ENROLLED,
             'Financial Assistance',
-            CourseEnrollment.objects.get(course_id=self.course.id, user=self.student)  # pylint: disable=no-member
+            CourseEnrollment.objects.get(course_id=self.course.id, user=self.student)
         )
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -223,6 +278,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             'reason': 'Financial Assistance',
         }, json.loads(response.content)[0]['manual_enrollment'])
 
+    @disable_signal(signals, 'post_save')
     @ddt.data('username', 'email')
     def test_change_enrollment(self, search_string_type):
         self.assertIsNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
@@ -231,7 +287,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             kwargs={'username_or_email': getattr(self.student, search_string_type)}
         )
         response = self.client.post(url, data={
-            'course_id': unicode(self.course.id),  # pylint: disable=no-member
+            'course_id': six.text_type(self.course.id),
             'old_mode': CourseMode.AUDIT,
             'new_mode': CourseMode.VERIFIED,
             'reason': 'Financial Assistance'
@@ -241,7 +297,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         self.assert_enrollment(CourseMode.VERIFIED)
 
     @ddt.data(
-        ({}, r"The field '\w+' is required."),
+        ({}, r"The field \"'\w+'\" is required."),  # The double quoting goes away in Django 2.0.1
         ({'course_id': 'bad course key'}, 'Could not parse course key.'),
         ({
             'course_id': 'course-v1:TestX+T101+2015',
@@ -267,28 +323,25 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         # `self` isn't available from within the DDT declaration, so
         # assign the course ID here
         if 'course_id' in data and data['course_id'] is None:
-            data['course_id'] = unicode(self.course.id)  # pylint: disable=no-member
+            data['course_id'] = six.text_type(self.course.id)
         response = self.client.post(self.url, data)
         self.assertEqual(response.status_code, 400)
         self.assertIsNotNone(re.match(error_message, response.content))
         self.assert_enrollment(CourseMode.AUDIT)
         self.assertIsNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
 
-    @ddt.data('honor', 'audit', 'verified', 'professional', 'no-id-professional')
+    @disable_signal(signals, 'post_save')
+    @ddt.data('honor', 'audit', 'verified', 'professional', 'no-id-professional', 'credit')
     def test_update_enrollment_for_all_modes(self, new_mode):
-        """ Verify support can changed the enrollment to all available modes
-        except credit. """
+        """ Verify support can changed the enrollment to all available modes"""
         self.assert_update_enrollment('username', new_mode)
 
+    @disable_signal(signals, 'post_save')
     @ddt.data('honor', 'audit', 'verified', 'professional', 'no-id-professional')
     def test_update_enrollment_for_ended_course(self, new_mode):
         """ Verify support can changed the enrollment of archived course. """
         self.set_course_end_date_and_expiry()
         self.assert_update_enrollment('username', new_mode)
-
-    def test_update_enrollment_with_credit_mode_throws_error(self):
-        """ Verify that enrollment cannot be changed to credit mode. """
-        self.assert_update_enrollment('username', CourseMode.CREDIT_MODE)
 
     @ddt.data('username', 'email')
     def test_get_enrollments_with_expired_mode(self, search_string_type):
@@ -301,6 +354,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         response = self.client.get(url)
         self._assert_generated_modes(response)
 
+    @disable_signal(signals, 'post_save')
     @ddt.data('username', 'email')
     def test_update_enrollments_with_expired_mode(self, search_string_type):
         """ Verify that enrollment can be updated to verified mode. """
@@ -310,7 +364,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
 
     def _assert_generated_modes(self, response):
         """Dry method to generate course modes dict and test with response data."""
-        modes = CourseMode.modes_for_course(self.course.id, include_expired=True)  # pylint: disable=no-member
+        modes = CourseMode.modes_for_course(self.course.id, include_expired=True, exclude_credit=False)
         modes_data = []
         for mode in modes:
             expiry = mode.expiration_datetime.strftime('%Y-%m-%dT%H:%M:%SZ') if mode.expiration_datetime else None
@@ -337,7 +391,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
 
         self.assertEqual(
             {CourseMode.VERIFIED, CourseMode.AUDIT, CourseMode.NO_ID_PROFESSIONAL_MODE,
-             CourseMode.PROFESSIONAL, CourseMode.HONOR},
+             CourseMode.PROFESSIONAL, CourseMode.HONOR, CourseMode.CREDIT_MODE},
             {mode['slug'] for mode in data[0]['course_modes']}
         )
 
@@ -348,19 +402,25 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             'support:enrollment_list',
             kwargs={'username_or_email': getattr(self.student, search_string_type)}
         )
-        response = self.client.post(url, data={
-            'course_id': unicode(self.course.id),  # pylint: disable=no-member
-            'old_mode': CourseMode.AUDIT,
-            'new_mode': new_mode,
-            'reason': 'Financial Assistance'
-        })
-        # Enrollment cannot be changed to credit mode.
-        if new_mode == CourseMode.CREDIT_MODE:
-            self.assertEqual(response.status_code, 400)
-        else:
-            self.assertEqual(response.status_code, 200)
-            self.assertIsNotNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
-            self.assert_enrollment(new_mode)
+
+        with patch('support.views.enrollments.get_credit_provider_attribute_values') as mock_method:
+            credit_provider = (
+                [u'Arizona State University'], 'You are now eligible for credit from Arizona State University'
+            )
+            mock_method.return_value = credit_provider
+            response = self.client.post(url, data={
+                'course_id': six.text_type(self.course.id),
+                'old_mode': CourseMode.AUDIT,
+                'new_mode': new_mode,
+                'reason': 'Financial Assistance'
+            })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
+        self.assert_enrollment(new_mode)
+        if new_mode == 'credit':
+            enrollment_attr = CourseEnrollmentAttribute.objects.first()
+            self.assertEqual(enrollment_attr.value, unicode(credit_provider[0]))
 
     def set_course_end_date_and_expiry(self):
         """ Set the course-end date and expire its verified mode."""
@@ -369,7 +429,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
 
         # change verified mode expiry.
         verified_mode = CourseMode.objects.get(
-            course_id=self.course.id,   # pylint: disable=no-member
+            course_id=self.course.id,
             mode_slug=CourseMode.VERIFIED
         )
         verified_mode.expiration_datetime = datetime(year=1970, month=1, day=9, tzinfo=UTC)

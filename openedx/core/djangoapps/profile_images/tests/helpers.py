@@ -1,6 +1,7 @@
 """
 Helper methods for use in profile image tests.
 """
+from __future__ import absolute_import
 from contextlib import contextmanager
 import os
 from tempfile import NamedTemporaryFile
@@ -8,10 +9,11 @@ from tempfile import NamedTemporaryFile
 from django.core.files.uploadedfile import UploadedFile
 import piexif
 from PIL import Image
+from six.moves import range
 
 
 @contextmanager
-def make_image_file(dimensions=(320, 240), extension=".jpeg", force_size=None, orientation=None):
+def make_image_file(dimensions=(320, 240), prefix='tmp', extension='.jpeg', force_size=None, orientation=None):
     """
     Yields a named temporary file created with the specified image type and
     options.
@@ -21,11 +23,15 @@ def make_image_file(dimensions=(320, 240), extension=".jpeg", force_size=None, o
 
     The temporary file will be closed and deleted automatically upon exiting
     the `with` block.
+
+    prefix - To add prefix to random image file name, after adding will be like <custom-prefix><random-name>.png
+            otherwise by default `tmp` is added making file name tmp<random-name>.png.
+
     """
     image = Image.new('RGB', dimensions, "green")
-    image_file = NamedTemporaryFile(suffix=extension)
+    image_file = NamedTemporaryFile(prefix=prefix, suffix=extension)
     try:
-        if orientation and orientation in xrange(1, 9):
+        if orientation and orientation in range(1, 9):
             exif_bytes = piexif.dump({'0th': {piexif.ImageIFD.Orientation: orientation}})
             image.save(image_file, exif=exif_bytes)
         else:
@@ -36,9 +42,9 @@ def make_image_file(dimensions=(320, 240), extension=".jpeg", force_size=None, o
             # write in hunks of 256 bytes
             hunk, byte_ = bytearray([0] * 256), bytearray([0])
             num_hunks, remainder = divmod(bytes_to_pad, 256)
-            for _ in xrange(num_hunks):
+            for _ in range(num_hunks):
                 image_file.write(hunk)
-            for _ in xrange(remainder):
+            for _ in range(remainder):
                 image_file.write(byte_)
             image_file.flush()
         image_file.seek(0)

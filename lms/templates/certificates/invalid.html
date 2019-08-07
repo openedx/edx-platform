@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%inherit file="accomplishment-base.html" />
 <%! from django.utils.translation import ugettext as _ %>
 
@@ -11,7 +12,7 @@
                 </div>
             </section>
         </main>
-        <aside role="complementary" class="content-secondary about" aria-label="About ${platform_name} Certificates">
+        <aside role="complementary" class="content-secondary about" aria-label="${_('About {platform_name} Certificates').format(platform_name=platform_name)}">
         </aside>
     </div>
 </div>

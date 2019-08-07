@@ -1,23 +1,29 @@
-define([
-    'jquery', 'underscore', 'js/models/xblock_info', 'js/views/pages/paged_container',
-    'js/views/library_container', 'js/collections/component_template', 'xmodule', 'cms/js/main',
-    'xblock/cms.runtime.v1'
-],
-function($, _, XBlockInfo, PagedContainerPage, LibraryContainerView, ComponentTemplates, xmoduleLoader) {
-    'use strict';
-    return function(componentTemplates, XBlockInfoJson, options) {
-        var main_options = {
-            el: $('#content'),
-            model: new XBlockInfo(XBlockInfoJson, {parse: true}),
-            templates: new ComponentTemplates(componentTemplates, {parse: true}),
-            action: 'view',
-            viewClass: LibraryContainerView,
-            canEdit: true
-        };
+import * as $ from 'jquery';
+import * as _ from 'underscore';
+import * as XBlockInfo from 'js/models/xblock_info';
+import * as PagedContainerPage from 'js/views/pages/paged_container';
+import * as LibraryContainerView from 'js/views/library_container';
+import * as ComponentTemplates from 'js/collections/component_template';
+import * as xmoduleLoader from 'xmodule';
+import './base';
+import 'cms/js/main';
+import 'xblock/cms.runtime.v1';
 
-        xmoduleLoader.done(function() {
-            var view = new PagedContainerPage(_.extend(main_options, options));
-            view.render();
-        });
+'use strict';
+export default function LibraryFactory(componentTemplates, XBlockInfoJson, options) {
+    var main_options = {
+        el: $('#content'),
+        model: new XBlockInfo(XBlockInfoJson, {parse: true}),
+        templates: new ComponentTemplates(componentTemplates, {parse: true}),
+        action: 'view',
+        viewClass: LibraryContainerView,
+        canEdit: true
     };
-});
+
+    xmoduleLoader.done(function() {
+        var view = new PagedContainerPage(_.extend(main_options, options));
+        view.render();
+    });
+};
+
+export {LibraryFactory}

@@ -3,18 +3,19 @@
 Tests of extended hints
 """
 
+from __future__ import absolute_import
 
 import unittest
 
-from ddt import ddt, data, unpack
+from ddt import data, ddt, unpack
+
+from capa.tests.helpers import load_fixture, new_loncapa_problem
 
 # With the use of ddt, some of the data expected_string cases below are naturally long stretches
 # of text text without whitespace. I think it's best to leave such lines intact
 # in the test code. Therefore:
 # pylint: disable=line-too-long
 # For out many ddt data cases, prefer a compact form of { .. }
-
-from capa.tests.helpers import new_loncapa_problem, load_fixture
 
 
 class HintTest(unittest.TestCase):
@@ -52,7 +53,7 @@ class TextInputHintsTest(HintTest):
         self.get_hint(u'1_3_1', u'Blue')
         self.problem.capa_module.runtime.track_function.assert_called_with(
             'edx.problem.hint.feedback_displayed',
-            {'module_id': 'i4x://Foo/bar/mock/abc',
+            {'module_id': u'i4x://Foo/bar/mock/abc',
              'problem_part_id': '1_2',
              'trigger_type': 'single',
              'hint_label': u'Correct:',
@@ -225,7 +226,7 @@ class NumericInputHintsTest(HintTest):
         self.get_hint(u'1_2_1', u'1.141')
         self.problem.capa_module.runtime.track_function.assert_called_with(
             'edx.problem.hint.feedback_displayed',
-            {'module_id': 'i4x://Foo/bar/mock/abc', 'problem_part_id': '1_1', 'trigger_type': 'single',
+            {'module_id': u'i4x://Foo/bar/mock/abc', 'problem_part_id': '1_1', 'trigger_type': 'single',
              'hint_label': u'Nice',
              'correctness': True,
              'student_answer': [u'1.141'],
@@ -364,7 +365,7 @@ class CheckboxHintsTestTracking(HintTest):
         self.problem.capa_module.runtime.track_function.assert_called_with(
             'edx.problem.hint.feedback_displayed',
             {'hint_label': u'Incorrect:',
-             'module_id': 'i4x://Foo/bar/mock/abc',
+             'module_id': u'i4x://Foo/bar/mock/abc',
              'problem_part_id': '1_1',
              'choice_all': ['choice_0', 'choice_1', 'choice_2'],
              'correctness': False,
@@ -427,7 +428,7 @@ class MultpleChoiceHintsTest(HintTest):
         self.get_hint(u'1_3_1', u'choice_2')
         self.problem.capa_module.runtime.track_function.assert_called_with(
             'edx.problem.hint.feedback_displayed',
-            {'module_id': 'i4x://Foo/bar/mock/abc', 'problem_part_id': '1_2', 'trigger_type': 'single',
+            {'module_id': u'i4x://Foo/bar/mock/abc', 'problem_part_id': '1_2', 'trigger_type': 'single',
              'student_answer': [u'choice_2'], 'correctness': False, 'question_type': 'multiplechoiceresponse',
              'hint_label': 'OOPS', 'hints': [{'text': 'Apple is a fruit.'}]}
         )
@@ -467,7 +468,7 @@ class MultpleChoiceHintsWithHtmlTest(HintTest):
         self.get_hint(u'1_2_1', u'choice_0')
         self.problem.capa_module.runtime.track_function.assert_called_with(
             'edx.problem.hint.feedback_displayed',
-            {'module_id': 'i4x://Foo/bar/mock/abc', 'problem_part_id': '1_1', 'trigger_type': 'single',
+            {'module_id': u'i4x://Foo/bar/mock/abc', 'problem_part_id': '1_1', 'trigger_type': 'single',
              'student_answer': [u'choice_0'], 'correctness': False, 'question_type': 'multiplechoiceresponse',
              'hint_label': 'Incorrect:', 'hints': [{'text': 'Mushroom <img src="#" ale="#"/>is a fungus, not a fruit.'}]}
         )
@@ -500,7 +501,7 @@ class DropdownHintsTest(HintTest):
         self.get_hint(u'1_3_1', u'FACES')
         self.problem.capa_module.runtime.track_function.assert_called_with(
             'edx.problem.hint.feedback_displayed',
-            {'module_id': 'i4x://Foo/bar/mock/abc', 'problem_part_id': '1_2', 'trigger_type': 'single',
+            {'module_id': u'i4x://Foo/bar/mock/abc', 'problem_part_id': '1_2', 'trigger_type': 'single',
              'student_answer': [u'FACES'], 'correctness': True, 'question_type': 'optionresponse',
              'hint_label': 'Correct:', 'hints': [{'text': 'With lots of makeup, doncha know?'}]}
         )

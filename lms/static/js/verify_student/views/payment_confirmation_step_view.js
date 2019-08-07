@@ -16,7 +16,6 @@ var edx = edx || {};
             return {
                 courseKey: '',
                 courseName: '',
-                courseStartDate: '',
                 coursewareUrl: '',
                 platformName: '',
                 requirements: []
@@ -159,4 +158,4 @@ var edx = edx || {};
             return Number(moneyStr).toFixed(2);
         }
     });
-})(jQuery, _, gettext);
+}(jQuery, _, gettext));

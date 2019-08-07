@@ -1,14 +1,18 @@
 """ Tests for models. """
+from __future__ import absolute_import
+
 import ddt
 from django.test import TestCase
 
-from commerce.api.v1.models import Course
 from course_modes.models import CourseMode
+
+from ..models import Course
 
 
 @ddt.ddt
 class CourseTests(TestCase):
     """ Tests for Course model. """
+
     def setUp(self):
         super(CourseTests, self).setUp()
         self.course = Course('a/b/c', [])

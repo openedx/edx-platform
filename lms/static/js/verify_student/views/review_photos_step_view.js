@@ -1,3 +1,4 @@
+/* globals _ */
 /**
  * View for the "review photos" step of the payment/verification flow.
  */
@@ -103,4 +104,4 @@ var edx = edx || {};
                 .attr('aria-disabled', !isEnabled);
         }
     });
-})(jQuery, gettext);
+}(jQuery, gettext));

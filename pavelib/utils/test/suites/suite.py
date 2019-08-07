@@ -1,11 +1,14 @@
+# pylint: disable=unicode-format-string
 """
 A class used for defining and running test suites
 """
-import sys
+from __future__ import absolute_import, print_function
+
+import os
 import subprocess
+import sys
 
 from paver import tasks
-from paver.easy import sh
 
 from pavelib.utils.process import kill_process
 
@@ -39,7 +42,7 @@ class TestSuite(object):
 
         i.e. Checking for and defining required directories.
         """
-        print "\nSetting up for {suite_name}".format(suite_name=self.root)
+        print(u"\nSetting up for {suite_name}".format(suite_name=self.root))
         self.failed_suites = []
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -52,7 +55,7 @@ class TestSuite(object):
 
         i.e. Cleaning mongo after the lms tests run.
         """
-        print "\nCleaning up after {suite_name}".format(suite_name=self.root)
+        print(u"\nCleaning up after {suite_name}".format(suite_name=self.root))
 
     @property
     def cmd(self):
@@ -60,6 +63,14 @@ class TestSuite(object):
         The command to run tests (as a string). For this base class there is none.
         """
         return None
+
+    @staticmethod
+    def is_success(exit_code):
+        """
+        Determine if the given exit code represents a success of the test
+        suite.  By default, only a zero counts as a success.
+        """
+        return exit_code == 0
 
     def run_test(self):
         """
@@ -83,17 +94,17 @@ class TestSuite(object):
         sys.stdout.write(msg)
         sys.stdout.flush()
 
+        if 'TEST_SUITE' not in os.environ:
+            os.environ['TEST_SUITE'] = self.root.replace("/", "_")
         kwargs = {'shell': True, 'cwd': None}
         process = None
 
         try:
             process = subprocess.Popen(cmd, **kwargs)
-            process.communicate()
+            return self.is_success(process.wait())
         except KeyboardInterrupt:
             kill_process(process)
             sys.exit(1)
-        else:
-            return process.returncode == 0
 
     def run_suite_tests(self):
         """
@@ -109,20 +120,20 @@ class TestSuite(object):
 
             for suite in self.subsuites:
                 suite.run_suite_tests()
-                if len(suite.failed_suites) > 0:
+                if suite.failed_suites:
                     self.failed_suites.extend(suite.failed_suites)
 
     def report_test_results(self):
         """
         Writes a list of failed_suites to sys.stderr
         """
-        if len(self.failed_suites) > 0:
-            msg = colorize('red', "\n\n{bar}\nTests failed in the following suites:\n* ".format(bar="=" * 48))
+        if self.failed_suites:
+            msg = colorize('red', u"\n\n{bar}\nTests failed in the following suites:\n* ".format(bar="=" * 48))
             msg += colorize('red', '\n* '.join([s.root for s in self.failed_suites]) + '\n\n')
         else:
-            msg = colorize('green', "\n\n{bar}\nNo test failures ".format(bar="=" * 48))
+            msg = colorize('green', u"\n\n{bar}\nNo test failures ".format(bar="=" * 48))
 
-        print msg
+        print(msg)
 
     def run(self):
         """
@@ -135,5 +146,5 @@ class TestSuite(object):
 
         self.report_test_results()
 
-        if len(self.failed_suites) > 0:
+        if self.failed_suites:
             sys.exit(1)

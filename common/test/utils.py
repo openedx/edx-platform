@@ -1,12 +1,17 @@
 """
 General testing utilities.
 """
+from __future__ import absolute_import
+
+import functools
 import sys
 from contextlib import contextmanager
+
+import moto
+import pytest
 from django.dispatch import Signal
 from markupsafe import escape
 from mock import Mock, patch
-import moto
 
 
 @contextmanager
@@ -89,7 +94,7 @@ class MockSignalHandlerMixin(object):
             mock_signal.connect(mock_handler)
             yield
             self.assertTrue(mock_handler.called)
-            mock_args, mock_kwargs = mock_handler.call_args  # pylint: disable=unpacking-non-sequence
+            mock_args, mock_kwargs = mock_handler.call_args
             if 'exclude_args' in kwargs:
                 for key in kwargs['exclude_args']:
                     self.assertIn(key, mock_kwargs)
@@ -106,8 +111,10 @@ def skip_signal(signal, **kwargs):
     and then reconnecting the signal.
     """
     signal.disconnect(**kwargs)
-    yield
-    signal.connect(**kwargs)
+    try:
+        yield
+    finally:
+        signal.connect(**kwargs)
 
 
 class MockS3Mixin(object):
@@ -117,9 +124,45 @@ class MockS3Mixin(object):
     """
     def setUp(self):
         super(MockS3Mixin, self).setUp()
-        self._mock_s3 = moto.mock_s3()
+        self._mock_s3 = moto.mock_s3_deprecated()
         self._mock_s3.start()
 
     def tearDown(self):
         self._mock_s3.stop()
         super(MockS3Mixin, self).tearDown()
+
+
+class reprwrapper(object):
+    """
+    Wrapper class for functions that need a normalized string representation.
+    """
+    def __init__(self, func):
+        self._func = func
+        self.repr = u'Func: {}'.format(func.__name__)
+        functools.update_wrapper(self, func)
+
+    def __call__(self, *args, **kw):
+        return self._func(*args, **kw)
+
+    def __repr__(self):
+        return self.repr
+
+
+def normalize_repr(func):
+    """
+    Function decorator used to normalize its string representation.
+    Used to wrap functions used as ddt parameters, so pytest-xdist
+    doesn't complain about the sequence of discovered tests differing
+    between worker processes.
+    """
+    return reprwrapper(func)
+
+
+# Decorator for skipping tests that are not ready to be run with Python 3.x.
+# While we expect many tests to fail with Python 3.x as we transition, this
+# is specifically for tests that rely on external or large scale fixes. It can
+# be added to individual tests or test classes.
+py2_only = pytest.mark.skipif(
+    sys.version_info > (3, 0),
+    reason="This test can only be run with Python 2.7, currently"
+)

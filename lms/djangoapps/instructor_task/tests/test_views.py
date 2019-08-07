@@ -2,20 +2,22 @@
 """
 Test for LMS instructor background task views.
 """
+from __future__ import absolute_import
+
 import json
-from celery.states import SUCCESS, FAILURE, REVOKED, PENDING
 
-from mock import Mock, patch
-
+from celery.states import FAILURE, PENDING, REVOKED, SUCCESS
 from django.http import QueryDict
+from mock import Mock, patch
+from six.moves import range
 
 from lms.djangoapps.instructor_task.models import PROGRESS
 from lms.djangoapps.instructor_task.tests.test_base import (
-    InstructorTaskTestCase,
+    TEST_FAILURE_EXCEPTION,
     TEST_FAILURE_MESSAGE,
-    TEST_FAILURE_EXCEPTION
+    InstructorTaskTestCase
 )
-from lms.djangoapps.instructor_task.views import instructor_task_status, get_task_completion_info
+from lms.djangoapps.instructor_task.views import get_task_completion_info, instructor_task_status
 
 
 class InstructorTaskReportTest(InstructorTaskTestCase):
@@ -366,7 +368,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
     def test_get_info_for_broken_output(self):
         # check for non-JSON task_output
         instructor_task = self._create_success_entry()
-        instructor_task.task_output = "{ bad"
+        instructor_task.task_output = u"{ bad"
         succeeded, message = get_task_completion_info(instructor_task)
         self.assertFalse(succeeded)
         self.assertEquals(message, "No parsable status information available")
@@ -382,7 +384,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
     def test_get_info_for_broken_input(self):
         # check for non-JSON task_input, but then just ignore it
         instructor_task = self._create_success_entry()
-        instructor_task.task_input = "{ bad"
+        instructor_task.task_input = u"{ bad"
         succeeded, message = get_task_completion_info(instructor_task)
         self.assertFalse(succeeded)
         self.assertEquals(message, "Status: rescored 2 of 3 (out of 5)")

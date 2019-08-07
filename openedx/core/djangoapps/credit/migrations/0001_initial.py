@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
-from django.db import migrations, models
-import openedx.core.djangoapps.credit.models
-import model_utils.fields
-import jsonfield.fields
+import django.core.validators
 import django.db.models.deletion
 import django.utils.timezone
+import jsonfield.fields
+import model_utils.fields
 from django.conf import settings
-import django.core.validators
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from django.db import migrations, models
+from opaque_keys.edx.django.models import CourseKeyField
+
+import openedx.core.djangoapps.credit.models
 
 
 class Migration(migrations.Migration):
@@ -35,7 +36,7 @@ class Migration(migrations.Migration):
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
                 ('username', models.CharField(max_length=255, db_index=True)),
                 ('deadline', models.DateTimeField(default=openedx.core.djangoapps.credit.models.default_deadline_for_credit_eligibility, help_text='Deadline for purchasing and requesting credit.')),
-                ('course', models.ForeignKey(related_name='eligibilities', to='credit.CreditCourse')),
+                ('course', models.ForeignKey(related_name='eligibilities', to='credit.CreditCourse', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name_plural': 'Credit eligibilities',
@@ -73,8 +74,8 @@ class Migration(migrations.Migration):
                 ('username', models.CharField(max_length=255, db_index=True)),
                 ('parameters', jsonfield.fields.JSONField()),
                 ('status', models.CharField(default=b'pending', max_length=255, choices=[(b'pending', b'Pending'), (b'approved', b'Approved'), (b'rejected', b'Rejected')])),
-                ('course', models.ForeignKey(related_name='credit_requests', to='credit.CreditCourse')),
-                ('provider', models.ForeignKey(related_name='credit_requests', to='credit.CreditProvider')),
+                ('course', models.ForeignKey(related_name='credit_requests', to='credit.CreditCourse', on_delete=models.CASCADE)),
+                ('provider', models.ForeignKey(related_name='credit_requests', to='credit.CreditProvider', on_delete=models.CASCADE)),
             ],
             options={
                 'get_latest_by': 'created',
@@ -92,7 +93,7 @@ class Migration(migrations.Migration):
                 ('order', models.PositiveIntegerField(default=0)),
                 ('criteria', jsonfield.fields.JSONField()),
                 ('active', models.BooleanField(default=True)),
-                ('course', models.ForeignKey(related_name='credit_requirements', to='credit.CreditCourse')),
+                ('course', models.ForeignKey(related_name='credit_requirements', to='credit.CreditCourse', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ['order'],
@@ -107,7 +108,7 @@ class Migration(migrations.Migration):
                 ('username', models.CharField(max_length=255, db_index=True)),
                 ('status', models.CharField(max_length=32, choices=[(b'satisfied', b'satisfied'), (b'failed', b'failed'), (b'declined', b'declined')])),
                 ('reason', jsonfield.fields.JSONField(default={})),
-                ('requirement', models.ForeignKey(related_name='statuses', to='credit.CreditRequirement')),
+                ('requirement', models.ForeignKey(related_name='statuses', to='credit.CreditRequirement', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(

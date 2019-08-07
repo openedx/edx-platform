@@ -1,19 +1,23 @@
 """
 Test LMS Notes
 """
-from unittest import skip
+from __future__ import absolute_import
+
 import random
-from uuid import uuid4
 from datetime import datetime
-from nose.plugins.attrib import attr
-from common.test.acceptance.tests.helpers import UniqueCourseTest, EventsTestMixin
+from unittest import skip
+from uuid import uuid4
+
+from six.moves import range
+
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
-from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
-from common.test.acceptance.pages.lms.course_nav import CourseNavPage
-from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.edxnotes import EdxNotesUnitPage, EdxNotesPage, EdxNotesPageNoContent
 from common.test.acceptance.fixtures.edxnotes import EdxNotesFixture, Note, Range
-from flaky import flaky
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.course_home import CourseHomePage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.edxnotes import EdxNotesPage, EdxNotesPageNoContent, EdxNotesUnitPage
+from common.test.acceptance.tests.helpers import EventsTestMixin, UniqueCourseTest
+from openedx.core.lib.tests import attr
 
 
 class EdxNotesTestMixin(UniqueCourseTest):
@@ -26,7 +30,7 @@ class EdxNotesTestMixin(UniqueCourseTest):
         """
         super(EdxNotesTestMixin, self).setUp()
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
-        self.course_nav = CourseNavPage(self.browser)
+        self.course_home_page = CourseHomePage(self.browser, self.course_id)
         self.note_unit_page = EdxNotesUnitPage(self.browser, self.course_id)
         self.notes_page = EdxNotesPage(self.browser, self.course_id)
 
@@ -51,7 +55,7 @@ class EdxNotesTestMixin(UniqueCourseTest):
                         XBlockFixtureDesc(
                             "html",
                             "Test HTML 1",
-                            data="""
+                            data=u"""
                                 <p><span class="{}">Annotate this!</span></p>
                                 <p>Annotate this</p>
                             """.format(self.selector)
@@ -59,14 +63,14 @@ class EdxNotesTestMixin(UniqueCourseTest):
                         XBlockFixtureDesc(
                             "html",
                             "Test HTML 2",
-                            data="""<p><span class="{}">Annotate this!</span></p>""".format(self.selector)
+                            data=u"""<p><span class="{}">Annotate this!</span></p>""".format(self.selector)
                         ),
                     ),
                     XBlockFixtureDesc("vertical", "Test Unit 2").add_children(
                         XBlockFixtureDesc(
                             "html",
                             "Test HTML 3",
-                            data="""<p><span class="{}">Annotate this!</span></p>""".format(self.selector)
+                            data=u"""<p><span class="{}">Annotate this!</span></p>""".format(self.selector)
                         ),
                     ),
                 ),
@@ -75,7 +79,7 @@ class EdxNotesTestMixin(UniqueCourseTest):
                         XBlockFixtureDesc(
                             "html",
                             "Test HTML 4",
-                            data="""
+                            data=u"""
                                 <p><span class="{}">Annotate this!</span></p>
                             """.format(self.selector)
                         ),
@@ -88,14 +92,14 @@ class EdxNotesTestMixin(UniqueCourseTest):
                         XBlockFixtureDesc(
                             "html",
                             "Test HTML 5",
-                            data="""
+                            data=u"""
                                 <p><span class="{}">Annotate this!</span></p>
                             """.format(self.selector)
                         ),
                         XBlockFixtureDesc(
                             "html",
                             "Test HTML 6",
-                            data="""<p><span class="{}">Annotate this!</span></p>""".format(self.selector)
+                            data=u"""<p><span class="{}">Annotate this!</span></p>""".format(self.selector)
                         ),
                     ),
                 ),
@@ -122,7 +126,7 @@ class EdxNotesTestMixin(UniqueCourseTest):
         self.edxnotes_fixture.install()
 
 
-@attr(shard=4)
+@attr(shard=18)
 class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
     """
     Tests for creation, editing, deleting annotations inside annotatable components in LMS.
@@ -132,7 +136,7 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
         index = offset
         for component in components:
             for note in component.create_note(".{}".format(self.selector)):
-                note.text = "TEST TEXT {}".format(index)
+                note.text = u"TEST TEXT {}".format(index)
                 index += 1
 
     def edit_notes(self, components, offset=0):
@@ -141,7 +145,7 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
         for component in components:
             self.assertGreater(len(component.notes), 0)
             for note in component.edit_note():
-                note.text = "TEST TEXT {}".format(index)
+                note.text = u"TEST TEXT {}".format(index)
                 index += 1
 
     def edit_tags_in_notes(self, components, tags):
@@ -166,12 +170,12 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
 
     def assert_text_in_notes(self, notes):
         actual = [note.text for note in notes]
-        expected = ["TEST TEXT {}".format(i) for i in xrange(len(notes))]
+        expected = [u"TEST TEXT {}".format(i) for i in range(len(notes))]
         self.assertEqual(expected, actual)
 
     def assert_tags_in_notes(self, notes, expected_tags):
         actual = [note.tags for note in notes]
-        expected = [expected_tags[i] for i in xrange(len(notes))]
+        expected = [expected_tags[i] for i in range(len(notes))]
         self.assertEqual(expected, actual)
 
     def test_can_create_notes(self):
@@ -239,40 +243,6 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
         self.courseware_page.go_to_sequential_position(1)
         components = self.note_unit_page.components
         self.assert_text_in_notes(self.note_unit_page.notes)
-
-    def test_can_delete_notes(self):
-        """
-        Scenario: User can delete notes.
-        Given I have a course with 3 components with notes
-        And I open the unit with 2 annotatable components
-        When I remove all notes on the page
-        Then I do not see any notes on the page
-        When I change sequential position to "2"
-        And I remove all notes on the page
-        Then I do not see any notes on the page
-        When I refresh the page
-        Then I do not see any notes on the page
-        When I change sequential position to "1"
-        Then I do not see any notes on the page
-        """
-        self._add_notes()
-        self.note_unit_page.visit()
-
-        components = self.note_unit_page.components
-        self.remove_notes(components)
-        self.assert_notes_are_removed(components)
-
-        self.courseware_page.go_to_sequential_position(2)
-        components = self.note_unit_page.components
-        self.remove_notes(components)
-        self.assert_notes_are_removed(components)
-
-        components = self.note_unit_page.refresh()
-        self.assert_notes_are_removed(components)
-
-        self.courseware_page.go_to_sequential_position(1)
-        components = self.note_unit_page.components
-        self.assert_notes_are_removed(components)
 
     def test_can_create_note_with_tags(self):
         """
@@ -1115,6 +1085,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         note = self.note_unit_page.notes[0]
         self.assertFalse(note.is_visible)
         self.courseware_page.go_to_sequential_position(1)
+        self.courseware_page.wait_for_ajax()
         note = self.note_unit_page.notes[0]
         self.assertFalse(note.is_visible)
 
@@ -1498,11 +1469,12 @@ class EdxNotesToggleNotesTest(EdxNotesTestMixin):
         """
         # Disable all notes
         self.note_unit_page.toggle_visibility()
-        self.assertEqual(len(self.note_unit_page.notes), 0)
+        self.note_unit_page.wait_for(lambda: len(self.note_unit_page.notes) == 0, u"Notes are hidden")
         self.courseware_page.go_to_sequential_position(2)
-        self.assertEqual(len(self.note_unit_page.notes), 0)
-        self.course_nav.go_to_section(u"Test Section 1", u"Test Subsection 2")
-        self.assertEqual(len(self.note_unit_page.notes), 0)
+        self.note_unit_page.wait_for(lambda: len(self.note_unit_page.notes) == 0, u"Notes are hidden")
+        self.course_home_page.visit()
+        self.course_home_page.outline.go_to_section(u"Test Section 1", u"Test Subsection 2")
+        self.note_unit_page.wait_for(lambda: len(self.note_unit_page.notes) == 0, u"Notes are hidden")
 
     def test_can_reenable_all_notes(self):
         """
@@ -1524,8 +1496,9 @@ class EdxNotesToggleNotesTest(EdxNotesTestMixin):
         # Enable notes to make sure that I can enable notes without refreshing
         # the page.
         self.note_unit_page.toggle_visibility()
-        self.assertGreater(len(self.note_unit_page.notes), 0)
+        self.note_unit_page.wait_for(lambda: len(self.note_unit_page.notes) > 0, u"Notes are visible")
         self.courseware_page.go_to_sequential_position(2)
-        self.assertGreater(len(self.note_unit_page.notes), 0)
-        self.course_nav.go_to_section(u"Test Section 1", u"Test Subsection 2")
-        self.assertGreater(len(self.note_unit_page.notes), 0)
+        self.note_unit_page.wait_for(lambda: len(self.note_unit_page.notes) > 0, u"Notes are visible")
+        self.course_home_page.visit()
+        self.course_home_page.outline.go_to_section(u"Test Section 1", u"Test Subsection 2")
+        self.note_unit_page.wait_for(lambda: len(self.note_unit_page.notes) > 0, u"Notes are visible")

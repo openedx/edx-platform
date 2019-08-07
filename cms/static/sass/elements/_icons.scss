@@ -7,6 +7,7 @@
 .icon-inline {
   display: inline-block;
   vertical-align: middle;
+
   @include margin-right($baseline/4);
 }
 
@@ -14,13 +15,16 @@
 .wrapper-ui-badge {
   position: absolute;
   top: -1px;
+
   @include left($baseline*1.5);
+
   width: 100%;
 }
 
 %ui-badge {
   @extend %t-title9;
   @extend %t-strong;
+
   position: relative;
   border-bottom-right-radius: ($baseline/10);
   border-bottom-left-radius: ($baseline/10);
@@ -34,10 +38,12 @@
   // OPTION: add this class for a visual hanging display
   &.is-hanging {
     @include box-sizing(border-box);
+
     @extend %ui-depth2;
+
     top: -($baseline/4);
 
-    &:after {
+    &::after {
       position: absolute;
       top: 0;
       right: -($baseline/4);

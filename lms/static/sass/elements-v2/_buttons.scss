@@ -1,0 +1,46 @@
+// ----------------------------
+// #UPGRADE
+// ----------------------------
+$upgrade-color: #009b00 !default;
+$upgrade-dark-color: #008100 !default;
+
+.btn-primary {
+  @extend .btn-brand;
+}
+
+.btn-upgrade {
+  @extend %btn;
+
+  border-color: $upgrade-color;
+  background: $upgrade-color;
+  color: palette(primary, x-back);
+  text-decoration: none;
+
+  // STATE: hover and focus
+  &:hover,
+  &.is-hovered,
+  &:focus,
+  &.is-focused {
+    border-color: $upgrade-dark-color;
+    background: $upgrade-dark-color;
+    text-decoration: none;
+  }
+
+  // STATE: is pressed or active
+  &:active,
+  &.is-pressed,
+  &.is-active {
+    border-color: $upgrade-dark-color;
+    background: $upgrade-dark-color;
+    text-decoration: none;
+  }
+
+  // STATE: is disabled
+  &:disabled,
+  &.is-disabled {
+    border-color: $btn-disabled-border-color;
+    background: $btn-disabled-background-color;
+    color: $btn-disabled-text-color;
+    text-decoration: none;
+  }
+}

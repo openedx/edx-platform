@@ -5,33 +5,34 @@ non-Mongo backed courses, regardless of email feature flag, and
 that the view is conditionally available when Course Auth is turned on.
 """
 
-from django.core.urlresolvers import reverse
-from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from __future__ import absolute_import
 
-from bulk_email.models import CourseAuthorization, BulkEmailFlag
-from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MIXED_MODULESTORE, SharedModuleStoreTestCase
-)
+from django.urls import reverse
+from opaque_keys.edx.keys import CourseKey
+from six import text_type
+
+from bulk_email.api import is_bulk_email_enabled_for_course, is_bulk_email_feature_enabled
+from bulk_email.models import BulkEmailFlag, CourseAuthorization
 from student.tests.factories import AdminFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
 class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
     """
     Check for email view on the new instructor dashboard
     for Mongo-backed courses
     """
+
     @classmethod
     def setUpClass(cls):
         super(TestNewInstructorDashboardEmailViewMongoBacked, cls).setUpClass()
         cls.course = CourseFactory.create()
 
         # URL for instructor dash
-        cls.url = reverse('instructor_dashboard', kwargs={'course_id': cls.course.id.to_deprecated_string()})
+        cls.url = reverse('instructor_dashboard', kwargs={'course_id': text_type(cls.course.id)})
         # URL for email view
-        cls.email_link = '<button type="button" class="btn-link" data-section="send_email">Email</button>'
+        cls.email_link = '<button type="button" class="btn-link send_email" data-section="send_email">Email</button>'
 
     def setUp(self):
         super(TestNewInstructorDashboardEmailViewMongoBacked, self).setUp()
@@ -51,7 +52,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=False)
         # Assert that instructor email is enabled for this course - since REQUIRE_COURSE_EMAIL_AUTH is False,
         # all courses should be authorized to use email.
-        self.assertTrue(BulkEmailFlag.feature_enabled(self.course.id))
+        self.assertTrue(is_bulk_email_feature_enabled(self.course.id))
         # Assert that the URL for the email view is in the response
         response = self.client.get(self.url)
         self.assertIn(self.email_link, response.content)
@@ -71,7 +72,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
     def test_course_not_authorized(self):
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=True)
         # Assert that instructor email is not enabled for this course
-        self.assertFalse(BulkEmailFlag.feature_enabled(self.course.id))
+        self.assertFalse(is_bulk_email_feature_enabled(self.course.id))
         # Assert that the URL for the email view is not in the response
         response = self.client.get(self.url)
         self.assertNotIn(self.email_link, response.content)
@@ -80,7 +81,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
     def test_course_authorized(self):
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=True)
         # Assert that instructor email is not enabled for this course
-        self.assertFalse(BulkEmailFlag.feature_enabled(self.course.id))
+        self.assertFalse(is_bulk_email_feature_enabled(self.course.id))
         # Assert that the URL for the email view is not in the response
         response = self.client.get(self.url)
         self.assertNotIn(self.email_link, response.content)
@@ -90,7 +91,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
         cauth.save()
 
         # Assert that instructor email is enabled for this course
-        self.assertTrue(BulkEmailFlag.feature_enabled(self.course.id))
+        self.assertTrue(is_bulk_email_feature_enabled(self.course.id))
         # Assert that the URL for the email view is in the response
         response = self.client.get(self.url)
         self.assertIn(self.email_link, response.content)
@@ -103,14 +104,13 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
         cauth.save()
 
         # Assert that this course is authorized for instructor email, but the feature is not enabled
-        self.assertFalse(BulkEmailFlag.feature_enabled(self.course.id))
-        self.assertTrue(CourseAuthorization.instructor_email_enabled(self.course.id))
+        self.assertFalse(is_bulk_email_feature_enabled(self.course.id))
+        self.assertTrue(is_bulk_email_enabled_for_course(self.course.id))
         # Assert that the URL for the email view IS NOT in the response
         response = self.client.get(self.url)
         self.assertNotIn(self.email_link, response.content)
 
 
-@attr(shard=1)
 class TestNewInstructorDashboardEmailViewXMLBacked(SharedModuleStoreTestCase):
     """
     Check for email view on the new instructor dashboard
@@ -121,12 +121,12 @@ class TestNewInstructorDashboardEmailViewXMLBacked(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestNewInstructorDashboardEmailViewXMLBacked, cls).setUpClass()
-        cls.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        cls.course_key = CourseKey.from_string('edX/toy/2012_Fall')
 
         # URL for instructor dash
-        cls.url = reverse('instructor_dashboard', kwargs={'course_id': cls.course_key.to_deprecated_string()})
+        cls.url = reverse('instructor_dashboard', kwargs={'course_id': text_type(cls.course_key)})
         # URL for email view
-        cls.email_link = '<button type="button" class="btn-link" data-section="send_email">Email</button>'
+        cls.email_link = '<button type="button" class="btn-link send_email" data-section="send_email">Email</button>'
 
     def setUp(self):
         super(TestNewInstructorDashboardEmailViewXMLBacked, self).setUp()
@@ -136,9 +136,9 @@ class TestNewInstructorDashboardEmailViewXMLBacked(SharedModuleStoreTestCase):
         self.client.login(username=instructor.username, password="test")
 
         # URL for instructor dash
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course_key.to_deprecated_string()})
+        self.url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course_key)})
         # URL for email view
-        self.email_link = '<button type="button" class="btn-link" data-section="send_email">Email</button>'
+        self.email_link = '<button type="button" class="btn-link send_email" data-section="send_email">Email</button>'
 
     def tearDown(self):
         super(TestNewInstructorDashboardEmailViewXMLBacked, self).tearDown()

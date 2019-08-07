@@ -3,40 +3,61 @@
 End-to-end tests for the LMS Instructor Dashboard.
 """
 
+from __future__ import absolute_import
+
 import ddt
-
-from nose.plugins.attrib import attr
 from bok_choy.promise import EmptyPromise
-from flaky import flaky
+from six.moves import range
 
-from common.test.acceptance.tests.helpers import UniqueCourseTest, get_modal_alert, EventsTestMixin
-from common.test.acceptance.pages.common.logout import LogoutPage
-from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
-from common.test.acceptance.pages.studio.overview import CourseOutlinePage
-from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
-from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage, EntranceExamAdmin
-from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
-from common.test.acceptance.pages.lms.dashboard import DashboardPage
-from common.test.acceptance.pages.lms.problem import ProblemPage
-from common.test.acceptance.pages.lms.track_selection import TrackSelectionPage
-from common.test.acceptance.pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
-from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage
-from common.test.acceptance.tests.helpers import disable_animations
 from common.test.acceptance.fixtures.certificates import CertificateConfigFixture
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.common.logout import LogoutPage
+from common.test.acceptance.pages.common.utils import enroll_user_track
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
+from common.test.acceptance.pages.lms.dashboard import DashboardPage
+from common.test.acceptance.pages.lms.instructor_dashboard import (
+    EntranceExamAdmin,
+    InstructorDashboardPage,
+    StudentAdminPage,
+    StudentSpecificAdmin
+)
+from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage
+from common.test.acceptance.pages.lms.problem import ProblemPage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
+from common.test.acceptance.tests.helpers import (
+    EventsTestMixin,
+    UniqueCourseTest,
+    create_multiple_choice_problem,
+    disable_animations,
+    get_modal_alert
+)
+from openedx.core.lib.tests import attr
 
 
 class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):
     """
     Mixin class for testing the instructor dashboard.
     """
-    def log_in_as_instructor(self):
+    def log_in_as_instructor(self, global_staff=True, course_access_roles=None):
         """
-        Logs in as an instructor and returns the id.
+        Login with an instructor account.
+
+        Args:
+            course_access_roles (str[]): List of course access roles that should be assigned to the user.
+
+        Returns
+            username (str)
+            user_id (int)
         """
-        username = "test_instructor_{uuid}".format(uuid=self.unique_id[0:6])
-        auto_auth_page = AutoAuthPage(self.browser, username=username, course_id=self.course_id, staff=True)
-        return username, auto_auth_page.visit().get_user_id()
+        course_access_roles = course_access_roles or []
+        auto_auth_page = AutoAuthPage(
+            self.browser, course_id=self.course_id, staff=global_staff, course_access_roles=course_access_roles
+        )
+        auto_auth_page.visit()
+        user_info = auto_auth_page.user_info
+        return user_info['username'], user_info['user_id'], user_info['email'], user_info['password']
 
     def visit_instructor_dashboard(self):
         """
@@ -59,6 +80,12 @@ class LMSInstructorDashboardA11yTest(BaseInstructorDashboardTest):
         self.instructor_dashboard_page = self.visit_instructor_dashboard()
 
     def test_instructor_dashboard_a11y(self):
+        self.instructor_dashboard_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
+            ]
+        })
         self.instructor_dashboard_page.a11y_audit.check_for_accessibility_errors()
 
 
@@ -67,6 +94,8 @@ class BulkEmailTest(BaseInstructorDashboardTest):
     """
     End-to-end tests for bulk emailing from instructor dash.
     """
+    shard = 23
+
     def setUp(self):
         super(BulkEmailTest, self).setUp()
         self.course_fixture = CourseFixture(**self.course_info).install()
@@ -90,12 +119,15 @@ class BulkEmailTest(BaseInstructorDashboardTest):
         self.send_email_page.a11y_audit.config.set_rules({
             "ignore": [
                 'button-name',  # TODO: TNL-5830
+                'aria-allowed-role',  # TODO: AC-936
+                'color-contrast',  # TODO: AC-938
+                'listitem'  # TODO: AC-937
             ]
         })
         self.send_email_page.a11y_audit.check_for_accessibility_errors()
 
 
-@attr(shard=7)
+@attr(shard=3)
 class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
     """
     End-to-end tests for Auto-Registration and enrollment functionality via CSV file.
@@ -144,7 +176,6 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
             password="123456",
             username=username,
             full_name="Test User",
-            terms_of_service=True,
             country="US",
             favorite_movie="Harry Potter",
         )
@@ -208,12 +239,62 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
         Auto-enrollment with CSV accessibility tests
         """
         self.auto_enroll_section.a11y_audit.config.set_scope([
-            '#member-list-widget-template'
+            '#membership-list-widget-tpl'
         ])
         self.auto_enroll_section.a11y_audit.check_for_accessibility_errors()
 
 
-@attr(shard=7)
+class BatchBetaTestersTest(BaseInstructorDashboardTest):
+    """
+    End-to-end tests for Batch beta testers functionality.
+    """
+    shard = 23
+
+    def setUp(self):
+        super(BatchBetaTestersTest, self).setUp()
+        self.username = "test_{uuid}".format(uuid=self.unique_id[0:6])
+        self.email = "{user}@example.com".format(user=self.username)
+        AutoAuthPage(self.browser, username=self.username, email=self.email, is_active=False).visit()
+        self.course_fixture = CourseFixture(**self.course_info).install()
+        self.instructor_username = self.log_in_as_instructor()
+        instructor_dashboard_page = self.visit_instructor_dashboard()
+        self.batch_beta_tester_section = instructor_dashboard_page.select_membership().batch_beta_tester_addition()
+        self.inactive_user_message = 'These users could not be added as beta testers ' \
+                                     'because their accounts are not yet activated:'
+
+    def test_enroll_inactive_beta_tester(self):
+        """
+        Scenario: On the Membership tab of the Instructor Dashboard, Batch Beta tester div is visible.
+            Given that I am on the Membership tab on the Instructor Dashboard
+            Then I enter the username and add it into beta testers.
+            Then I see the inactive user is not added in beta testers.
+        """
+        self.batch_beta_tester_section.fill_batch_beta_tester_addition_text_box(self.username)
+        header_text, username = self.batch_beta_tester_section.get_notification_text()
+        self.assertIn(self.inactive_user_message, header_text[0])
+        self.assertEqual(self.username, username[0])
+
+    def test_enroll_active_and_inactive_beta_tester(self):
+        """
+        Scenario: On the Membership tab of the Instructor Dashboard, Batch Beta tester div is visible.
+            Given that I am on the Membership tab on the Instructor Dashboard
+            Then I enter the active and inactive usernames and add it into beta testers.
+            Then I see the different messages related to active and inactive users.
+        """
+        active_and_inactive_username = self.username + ',' + self.instructor_username[0]
+        self.batch_beta_tester_section.fill_batch_beta_tester_addition_text_box(active_and_inactive_username)
+        header_text, username = self.batch_beta_tester_section.get_notification_text()
+
+        # Verify that Inactive username and message.
+        self.assertIn(self.inactive_user_message, header_text[1])
+        self.assertEqual(self.username, username[1])
+
+        # Verify that active username and message.
+        self.assertIn('These users were successfully added as beta testers:', header_text[0])
+        self.assertEqual(self.instructor_username[0], username[0])
+
+
+@attr(shard=10)
 class ProctoredExamsTest(BaseInstructorDashboardTest):
     """
     End-to-end tests for Proctoring Sections of the Instructor Dashboard.
@@ -227,7 +308,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
 
-        self.course_outline = CourseOutlinePage(
+        self.studio_course_outline = StudioCourseOutlinePage(
             self.browser,
             self.course_info['org'],
             self.course_info['number'],
@@ -247,13 +328,6 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
             )
         ).install()
 
-        self.track_selection_page = TrackSelectionPage(self.browser, self.course_id)
-        self.payment_and_verification_flow = PaymentAndVerificationFlow(self.browser, self.course_id)
-        self.immediate_verification_page = PaymentAndVerificationFlow(
-            self.browser, self.course_id, entry_point='verify-now'
-        )
-        self.upgrade_page = PaymentAndVerificationFlow(self.browser, self.course_id, entry_point='upgrade')
-        self.fake_payment_page = FakePaymentPage(self.browser, self.course_id)
         self.dashboard_page = DashboardPage(self.browser)
         self.problem_page = ProblemPage(self.browser)
 
@@ -279,19 +353,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         """
 
         self._auto_auth(self.USERNAME, self.EMAIL, False)
-
-        # the track selection page cannot be visited. see the other tests to see if any prereq is there.
-        # Navigate to the track selection page
-        self.track_selection_page.visit()
-
-        # Enter the payment and verification flow by choosing to enroll as verified
-        self.track_selection_page.enroll('verified')
-
-        # Proceed to the fake payment page
-        self.payment_and_verification_flow.proceed_to_payment()
-
-        # Submit payment
-        self.fake_payment_page.submit_payment()
+        enroll_user_track(self.browser, self.course_id, 'verified')
 
     def _create_a_proctored_exam_and_attempt(self):
         """
@@ -301,15 +363,15 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Visit the course outline page in studio
         LogoutPage(self.browser).visit()
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
-        self.course_outline.visit()
+        self.studio_course_outline.visit()
 
         # open the exam settings to make it a proctored exam.
-        self.course_outline.open_subsection_settings_dialog()
+        self.studio_course_outline.open_subsection_settings_dialog()
 
         # select advanced settings tab
-        self.course_outline.select_advanced_tab()
+        self.studio_course_outline.select_advanced_tab()
 
-        self.course_outline.make_exam_proctored()
+        self.studio_course_outline.make_exam_proctored()
 
         # login as a verified student and visit the courseware.
         LogoutPage(self.browser).visit()
@@ -327,15 +389,15 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Visit the course outline page in studio
         LogoutPage(self.browser).visit()
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
-        self.course_outline.visit()
+        self.studio_course_outline.visit()
 
         # open the exam settings to make it a proctored exam.
-        self.course_outline.open_subsection_settings_dialog()
+        self.studio_course_outline.open_subsection_settings_dialog()
 
         # select advanced settings tab
-        self.course_outline.select_advanced_tab()
+        self.studio_course_outline.select_advanced_tab()
 
-        self.course_outline.make_exam_timed()
+        self.studio_course_outline.make_exam_timed()
 
         # login as a verified student and visit the courseware.
         LogoutPage(self.browser).visit()
@@ -347,37 +409,8 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
 
         # Stop the timed exam.
         self.courseware_page.stop_timed_exam()
+        LogoutPage(self.browser).visit()
 
-    def test_can_add_remove_allowance(self):
-        """
-        Make sure that allowances can be added and removed.
-        """
-        # Given that an exam has been configured to be a timed exam.
-        self._create_a_timed_exam_and_attempt()
-
-        # When I log in as an instructor,
-        __, __ = self.log_in_as_instructor()
-
-        # And visit the Allowance Section of Instructor Dashboard's Special Exams tab
-        instructor_dashboard_page = self.visit_instructor_dashboard()
-        allowance_section = instructor_dashboard_page.select_special_exams().select_allowance_section()
-
-        # Then I can add Allowance to that exam for a student
-        self.assertTrue(allowance_section.is_add_allowance_button_visible)
-
-        # When I click the Add Allowance button
-        allowance_section.click_add_allowance_button()
-
-        # Then popup should be visible
-        self.assertTrue(allowance_section.is_add_allowance_popup_visible)
-
-        # When I fill and submit the allowance form
-        allowance_section.submit_allowance_form('10', self.USERNAME)
-
-        # Then, the added record should be visible
-        self.assertTrue(allowance_section.is_allowance_record_visible)
-
-    @flaky  # TNL-5832
     def test_can_reset_attempts(self):
         """
         Make sure that Exam attempts are visible and can be reset.
@@ -386,7 +419,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         self._create_a_timed_exam_and_attempt()
 
         # When I log in as an instructor,
-        __, __ = self.log_in_as_instructor()
+        __, __, __, __ = self.log_in_as_instructor()
 
         # And visit the Student Proctored Exam Attempts Section of Instructor Dashboard's Special Exams tab
         instructor_dashboard_page = self.visit_instructor_dashboard()
@@ -403,7 +436,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         self.assertFalse(exam_attempts_section.is_student_attempt_visible)
 
 
-@attr(shard=7)
+@attr(shard=10)
 @ddt.ddt
 class EntranceExamGradeTest(BaseInstructorDashboardTest):
     """
@@ -551,7 +584,7 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
         self.entrance_exam_admin.wait_for_task_history_table()
 
 
-@attr(shard=7)
+@attr(shard=10)
 class DataDownloadsTest(BaseInstructorDashboardTest):
     """
     Bok Choy tests for the "Data Downloads" tab.
@@ -559,7 +592,7 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
     def setUp(self):
         super(DataDownloadsTest, self).setUp()
         self.course_fixture = CourseFixture(**self.course_info).install()
-        self.instructor_username, self.instructor_id = self.log_in_as_instructor()
+        self.instructor_username, self.instructor_id, __, __ = self.log_in_as_instructor()
         instructor_dashboard_page = self.visit_instructor_dashboard()
         self.data_download_section = instructor_dashboard_page.select_data_download()
 
@@ -669,7 +702,105 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         self.data_download_section.a11y_audit.check_for_accessibility_errors()
 
 
-@attr(shard=7)
+@ddt.ddt
+class DataDownloadsWithMultipleRoleTests(BaseInstructorDashboardTest):
+    """
+    Bok Choy tests for the "Data Downloads" tab with multiple user roles.
+    """
+    shard = 23
+
+    def setUp(self):
+        super(DataDownloadsWithMultipleRoleTests, self).setUp()
+        self.course_fixture = CourseFixture(**self.course_info).install()
+
+    @ddt.data(['staff'], ['instructor'])
+    def test_list_student_profile_information_for_large_course(self, role):
+        """
+        Scenario: List enrolled students' profile information for a large course
+        Given I am "<Role>" for a very large course
+        When I visit the "Data Download" tab
+            Then I do not see a button to 'List enrolled students' profile information'
+            Examples:
+            | Role          |
+            | instructor    |
+            | staff         |
+
+        """
+        username, __, email, password = self.log_in_as_instructor(
+            global_staff=False,
+            course_access_roles=role
+        )
+        instructor_dashboard_page = self.visit_instructor_dashboard()
+        data_download_section = instructor_dashboard_page.select_data_download()
+
+        self.assertTrue(data_download_section.enrolled_student_profile_button_present)
+        LogoutPage(self.browser).visit()
+        for __ in range(5):
+            learner_username = "test_student_{uuid}".format(uuid=self.unique_id[0:8])
+            learner_email = "{user}@example.com".format(user=learner_username)
+
+            # Enroll test users in the course
+            AutoAuthPage(
+                self.browser,
+                username=learner_username,
+                email=learner_email,
+                course_id=self.course_id
+            ).visit()
+
+        # Login again with staff or instructor
+        AutoAuthPage(
+            self.browser,
+            username=username,
+            email=email,
+            password=password,
+            course_id=self.course_id,
+            staff=False,
+            course_access_roles=role
+        ).visit()
+
+        instructor_dashboard_page = self.visit_instructor_dashboard()
+        instructor_dashboard_page.select_data_download()
+        self.assertFalse(data_download_section.enrolled_student_profile_button_present)
+
+    @ddt.data(['staff'], ['instructor'])
+    def test_view_grading_configuration(self, role):
+        """
+        Scenario: View the grading configuration
+        Given I am "<Role>" for a course
+        When I click "Grading Configuration"
+            Then I see the grading configuration for the course
+            Examples:
+            | Role          |
+            | instructor    |
+            | staff         |
+        """
+        expected = u"""-----------------------------------------------------------------------------
+Course grader:
+<class 'xmodule.graders.WeightedSubsectionsGrader'>
+
+Graded sections:
+  subgrader=<class 'xmodule.graders.AssignmentFormatGrader'>, type=Homework, category=Homework, weight=0.15
+  subgrader=<class 'xmodule.graders.AssignmentFormatGrader'>, type=Lab, category=Lab, weight=0.15
+  subgrader=<class 'xmodule.graders.AssignmentFormatGrader'>, type=Midterm Exam, category=Midterm Exam, weight=0.3
+  subgrader=<class 'xmodule.graders.AssignmentFormatGrader'>, type=Final Exam, category=Final Exam, weight=0.4
+-----------------------------------------------------------------------------
+Listing grading context for course {}
+graded sections:
+[]
+all graded blocks:
+length=0""".format(self.course_id)
+        self.log_in_as_instructor(
+            global_staff=False,
+            course_access_roles=role
+        )
+        instructor_dashboard_page = self.visit_instructor_dashboard()
+        data_download_section = instructor_dashboard_page.select_data_download()
+
+        data_download_section.generate_grading_configuration_button.click()
+        self.assertEqual(data_download_section.grading_config_text, expected)
+
+
+@attr(shard=10)
 @ddt.ddt
 class CertificatesTest(BaseInstructorDashboardTest):
     """
@@ -690,7 +821,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         CourseFixture(**self.course_info).install()
         self.cert_fixture = CertificateConfigFixture(self.course_id, self.test_certificate_config)
         self.cert_fixture.install()
-        self.user_name, self.user_id = self.log_in_as_instructor()
+        self.user_name, self.user_id, __, __ = self.log_in_as_instructor()
         self.instructor_dashboard_page = self.visit_instructor_dashboard()
         self.certificates_section = self.instructor_dashboard_page.select_certificates()
         disable_animations(self.certificates_section)
@@ -848,7 +979,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.add_certificate_exception(self.user_name, '')
 
         self.assertIn(
-            '{user} already in exception list.'.format(user=self.user_name),
+            u'{user} already in exception list.'.format(user=self.user_name),
             self.certificates_section.message.text
         )
 
@@ -895,7 +1026,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.wait_for_ajax()
 
         self.assertIn(
-            "{user} does not exist in the LMS. Please check your spelling and retry.".format(user=invalid_user),
+            u"{user} does not exist in the LMS. Please check your spelling and retry.".format(user=invalid_user),
             self.certificates_section.message.text
         )
 
@@ -916,7 +1047,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         # Create a new user who is not enrolled in the course
         AutoAuthPage(self.browser, username=new_user, email=new_email).visit()
         # Login as instructor and visit Certificate Section of Instructor Dashboard
-        self.user_name, self.user_id = self.log_in_as_instructor()
+        self.user_name, self.user_id, __, __ = self.log_in_as_instructor()
         self.instructor_dashboard_page.visit()
         self.certificates_section = self.instructor_dashboard_page.select_certificates()
 
@@ -928,7 +1059,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.wait_for_ajax()
 
         self.assertIn(
-            "{user} is not enrolled in this course. Please check your spelling and retry.".format(user=new_user),
+            u"{user} is not enrolled in this course. Please check your spelling and retry.".format(user=new_user),
             self.certificates_section.message.text
         )
 
@@ -989,13 +1120,18 @@ class CertificatesTest(BaseInstructorDashboardTest):
         """
         Certificates page accessibility tests
         """
+        self.certificates_section.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-hidden-focus'  # TODO: AC-938
+            ]
+        })
         self.certificates_section.a11y_audit.config.set_scope([
             '.certificates-wrapper'
         ])
         self.certificates_section.a11y_audit.check_for_accessibility_errors()
 
 
-@attr(shard=7)
+@attr(shard=20)
 class CertificateInvalidationTest(BaseInstructorDashboardTest):
     """
     Tests for Certificates functionality on instructor dashboard.
@@ -1043,7 +1179,7 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
 
         self.cert_fixture = CertificateConfigFixture(self.course_id, self.test_certificate_config)
         self.cert_fixture.install()
-        self.user_name, self.user_id = self.log_in_as_instructor()
+        self.user_name, self.user_id, __, __ = self.log_in_as_instructor()
         self.instructor_dashboard_page = self.visit_instructor_dashboard()
         self.certificates_section = self.instructor_dashboard_page.select_certificates()
 
@@ -1066,7 +1202,7 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
 
         # Validate success message
         self.assertIn(
-            "Certificate has been successfully invalidated for {user}.".format(user=self.student_name),
+            u"Certificate has been successfully invalidated for {user}.".format(user=self.student_name),
             self.certificates_section.certificate_invalidation_message.text
         )
 
@@ -1177,7 +1313,7 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
         # Create a new user who is not enrolled in the course
         AutoAuthPage(self.browser, username=new_user, email=new_email).visit()
         # Login as instructor and visit Certificate Section of Instructor Dashboard
-        self.user_name, self.user_id = self.log_in_as_instructor()
+        self.user_name, self.user_id, __, __ = self.log_in_as_instructor()
         self.instructor_dashboard_page.visit()
         self.certificates_section = self.instructor_dashboard_page.select_certificates()
 
@@ -1198,7 +1334,163 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
         """
         Certificate invalidation accessibility tests
         """
+        self.certificates_section.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-hidden-focus'  # TODO: AC-938
+            ]
+        })
         self.certificates_section.a11y_audit.config.set_scope([
             '.certificates-wrapper'
         ])
         self.certificates_section.a11y_audit.check_for_accessibility_errors()
+
+
+@attr(shard=20)
+class EcommerceTest(BaseInstructorDashboardTest):
+    """
+    Bok Choy tests for the "E-Commerce" tab.
+    """
+    def setup_course(self, course_number):
+        """
+        Sets up the course
+        """
+        self.course_info['number'] = course_number
+        course_fixture = CourseFixture(
+            self.course_info["org"],
+            self.course_info["number"],
+            self.course_info["run"],
+            self.course_info["display_name"]
+        )
+        course_fixture.install()
+
+    def visit_ecommerce_section(self):
+        """
+        Log in to visit Instructor dashboard and click E-commerce tab
+        """
+        self.log_in_as_instructor(course_access_roles=['finance_admin'])
+        instructor_dashboard_page = self.visit_instructor_dashboard()
+        return instructor_dashboard_page.select_ecommerce_tab()
+
+    def add_course_mode(self, sku_value=None):
+        """
+        Add an honor mode to the course
+        """
+        ModeCreationPage(browser=self.browser, course_id=self.course_id, mode_slug=u'honor', min_price=10,
+                         sku=sku_value).visit()
+
+    def test_enrollment_codes_section_visible_for_non_ecommerce_course(self):
+        """
+        Test Enrollment Codes UI, under E-commerce Tab, should be visible in the Instructor Dashboard with non
+        e-commerce course
+        """
+        # Setup course
+        non_ecommerce_course_number = "34039497242734583224814321005482849780"
+        self.setup_course(non_ecommerce_course_number)
+
+        # Add an honor mode to the course
+        self.add_course_mode()
+
+        # Log in and visit E-commerce section under Instructor dashboard
+        self.assertIn(u'Enrollment Codes', self.visit_ecommerce_section().get_sections_header_values())
+
+    def test_coupon_codes_section_visible_for_non_ecommerce_course(self):
+        """
+        Test Coupon Codes UI, under E-commerce Tab, should be visible in the Instructor Dashboard with non
+        e-commerce course
+        """
+        # Setup course
+        non_ecommerce_course_number = "34039497242734583224814321005482849781"
+        self.setup_course(non_ecommerce_course_number)
+
+        # Add an honor mode to the course
+        self.add_course_mode()
+
+        # Log in and visit E-commerce section under Instructor dashboard
+        self.assertIn(u'Coupon Code List', self.visit_ecommerce_section().get_sections_header_values())
+
+    def test_enrollment_codes_section_not_visible_for_ecommerce_course(self):
+        """
+        Test Enrollment Codes UI, under E-commerce Tab, should not be visible in the Instructor Dashboard with
+        e-commerce course
+        """
+        # Setup course
+        ecommerce_course_number = "34039497242734583224814321005482849782"
+        self.setup_course(ecommerce_course_number)
+
+        # Add an honor mode to the course with sku value
+        self.add_course_mode('test_sku')
+
+        # Log in and visit E-commerce section under Instructor dashboard
+        self.assertNotIn(u'Enrollment Codes', self.visit_ecommerce_section().get_sections_header_values())
+
+    def test_coupon_codes_section_not_visible_for_ecommerce_course(self):
+        """
+        Test Coupon Codes UI, under E-commerce Tab, should not be visible in the Instructor Dashboard with
+        e-commerce course
+        """
+        # Setup course
+        ecommerce_course_number = "34039497242734583224814321005482849783"
+        self.setup_course(ecommerce_course_number)
+
+        # Add an honor mode to the course with sku value
+        self.add_course_mode('test_sku')
+
+        # Log in and visit E-commerce section under Instructor dashboard
+        self.assertNotIn(u'Coupon Code List', self.visit_ecommerce_section().get_sections_header_values())
+
+
+class StudentAdminTest(BaseInstructorDashboardTest):
+    SECTION_NAME = 'Test Section 1'
+    SUBSECTION_NAME = 'Test Subsection 1'
+    UNIT_NAME = 'Test Unit 1'
+    PROBLEM_NAME = 'Test Problem 1'
+
+    shard = 23
+
+    def setUp(self):
+        super(StudentAdminTest, self).setUp()
+        self.course_fix = CourseFixture(
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run'],
+            self.course_info['display_name']
+        )
+
+        self.problem = create_multiple_choice_problem(self.PROBLEM_NAME)
+        self.vertical = XBlockFixtureDesc('vertical', "Lab Unit")
+        self.course_fix.add_children(
+            XBlockFixtureDesc('chapter', self.SECTION_NAME).add_children(
+                XBlockFixtureDesc('sequential', self.SUBSECTION_NAME).add_children(
+                    self.vertical.add_children(self.problem)
+                )
+            ),
+        ).install()
+
+        self.username, __, __, __ = self.log_in_as_instructor()
+        self.instructor_dashboard_page = self.visit_instructor_dashboard()
+
+    def test_rescore_rescorable(self):
+        student_admin_section = self.instructor_dashboard_page.select_student_admin(StudentSpecificAdmin)
+        student_admin_section.set_student_email_or_username(self.username)
+        student_admin_section.set_problem_location(self.problem.locator)
+        getattr(student_admin_section, 'rescore_button').click()
+        alert = get_modal_alert(student_admin_section.browser)
+        alert.dismiss()
+        self.assertFalse(self.instructor_dashboard_page.is_rescore_unsupported_message_visible())
+
+    def test_task_list_visibility(self):
+        """
+        Test that instructor task list is visible on student admin section
+        to users who have access to instructor tab/dashboard
+        """
+        # first check for global staff users
+        student_admin_section = self.instructor_dashboard_page.select_student_admin(StudentAdminPage)
+        self.assertTrue(student_admin_section.running_tasks_section.visible)
+
+        # logout global-staff user and check for users with staff access to course
+        LogoutPage(self.browser).visit()
+        # having staff access to course is compulsory to access instructor dashboard
+        self.log_in_as_instructor(False, ['staff'])
+        self.instructor_dashboard_page = self.visit_instructor_dashboard()
+        student_admin_section = self.instructor_dashboard_page.select_student_admin(StudentAdminPage)
+        self.assertTrue(student_admin_section.running_tasks_section.visible)

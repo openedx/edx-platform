@@ -1,17 +1,19 @@
 """
 Forms to support third-party to first-party OAuth 2.0 access token exchange
 """
+from __future__ import absolute_import
+
+import provider.constants
 from django.contrib.auth.models import User
 from django.forms import CharField
 from edx_oauth2_provider.constants import SCOPE_NAMES
-import provider.constants
+from oauth2_provider.models import Application
 from provider.forms import OAuthForm, OAuthValidationError
 from provider.oauth2.forms import ScopeChoiceField, ScopeMixin
 from provider.oauth2.models import Client
-from oauth2_provider.models import Application
 from requests import HTTPError
-from social.backends import oauth as social_oauth
-from social.exceptions import AuthException
+from social_core.backends import oauth as social_oauth
+from social_core.exceptions import AuthException
 
 from third_party_auth import pipeline
 
@@ -36,7 +38,7 @@ class AccessTokenExchangeForm(ScopeMixin, OAuthForm):
             raise OAuthValidationError(
                 {
                     "error": "invalid_request",
-                    "error_description": "{} is required".format(field_name),
+                    "error_description": u"{} is required".format(field_name),
                 }
             )
         return field_val
@@ -62,7 +64,7 @@ class AccessTokenExchangeForm(ScopeMixin, OAuthForm):
             raise OAuthValidationError(
                 {
                     "error": "invalid_request",
-                    "error_description": "{} is not a supported provider".format(backend.name),
+                    "error_description": u"{} is not a supported provider".format(backend.name),
                 }
             )
 
@@ -75,7 +77,7 @@ class AccessTokenExchangeForm(ScopeMixin, OAuthForm):
             raise OAuthValidationError(
                 {
                     "error": "invalid_client",
-                    "error_description": "{} is not a valid client_id".format(client_id),
+                    "error_description": u"{} is not a valid client_id".format(client_id),
                 }
             )
         if client.client_type not in [provider.constants.PUBLIC, Application.CLIENT_PUBLIC]:
@@ -84,21 +86,22 @@ class AccessTokenExchangeForm(ScopeMixin, OAuthForm):
                     # invalid_client isn't really the right code, but this mirrors
                     # https://github.com/edx/django-oauth2-provider/blob/edx/provider/oauth2/forms.py#L331
                     "error": "invalid_client",
-                    "error_description": "{} is not a public client".format(client_id),
+                    "error_description": u"{} is not a public client".format(client_id),
                 }
             )
         self.cleaned_data["client"] = client
 
         user = None
+        access_token = self.cleaned_data.get("access_token")
         try:
-            user = backend.do_auth(self.cleaned_data.get("access_token"), allow_inactive_user=True)
+            user = backend.do_auth(access_token, allow_inactive_user=True)
         except (HTTPError, AuthException):
             pass
         if user and isinstance(user, User):
             self.cleaned_data["user"] = user
         else:
             # Ensure user does not re-enter the pipeline
-            self.request.social_strategy.clean_partial_pipeline()
+            self.request.social_strategy.clean_partial_pipeline(access_token)
             raise OAuthValidationError(
                 {
                     "error": "invalid_grant",

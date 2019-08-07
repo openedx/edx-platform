@@ -19,28 +19,28 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
                 };
 
                 data = [{
-                    'category': 'chapter',
-                    'display_name': 'Introduction',
-                    'due': null,
-                    'start': null,
-                    'location': 'i4x://edX/DemoX/chapter/d8a6192ade314473a78242dfeedfbf5b',
-                    'hidden': true,
-                    'children': [
+                    category: 'chapter',
+                    display_name: 'Introduction',
+                    due: null,
+                    start: null,
+                    location: 'i4x://edX/DemoX/chapter/d8a6192ade314473a78242dfeedfbf5b',
+                    hidden: true,
+                    children: [
                         {
-                            'category': 'sequential',
-                            'display_name': 'Demo Course Overview',
-                            'due': null,
-                            'start': null,
-                            'location': 'i4x://edX/DemoX/sequential/edx_introduction',
-                            'hidden': true,
-                            'children': [
+                            category: 'sequential',
+                            display_name: 'Demo Course Overview',
+                            due: null,
+                            start: null,
+                            location: 'i4x://edX/DemoX/sequential/edx_introduction',
+                            hidden: true,
+                            children: [
                                 {
-                                    'category': 'vertical',
-                                    'display_name': 'Introduction: Video and Sequences',
-                                    'due': null,
-                                    'start': null,
-                                    'location': 'i4x://edX/DemoX/vertical/vertical_0270f6de40fc',
-                                    'hidden': true
+                                    category: 'vertical',
+                                    display_name: 'Introduction: Video and Sequences',
+                                    due: null,
+                                    start: null,
+                                    location: 'i4x://edX/DemoX/vertical/vertical_0270f6de40fc',
+                                    hidden: true
                                 }
                             ]
                         }
@@ -203,7 +203,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
             });
 
             it('saves schedule changes', function() {
-                requests = AjaxHelpers['requests'](this);
+                requests = AjaxHelpers.requests(this);
                 view.save();
                 expect(requests.length).toEqual(1);
                 AjaxHelpers.expectJsonRequest(requests, 'POST', 'save_ccx', view.schedule);
@@ -216,7 +216,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
             });
 
             it('displays an error if the sync fails', function() {
-                requests = AjaxHelpers['requests'](this);
+                requests = AjaxHelpers.requests(this);
                 view.save();
                 requests[0].respond(500);
                 expect($('#ajax-error')).toHaveCss({display: 'block'});

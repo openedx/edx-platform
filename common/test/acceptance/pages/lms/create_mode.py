@@ -1,9 +1,12 @@
 """Mode creation page (used to add modes to courses during testing)."""
 
+from __future__ import absolute_import
+
 import re
-import urllib
 
 from bok_choy.page_object import PageObject
+import six.moves.urllib.parse  # pylint: disable=import-error
+
 from common.test.acceptance.pages.lms import BASE_URL
 
 
@@ -14,7 +17,8 @@ class ModeCreationPage(PageObject):
     created for an existing course.
     """
 
-    def __init__(self, browser, course_id, mode_slug=None, mode_display_name=None, min_price=None, suggested_prices=None, currency=None):
+    def __init__(self, browser, course_id, mode_slug=None, mode_display_name=None, min_price=None,
+                 suggested_prices=None, currency=None, sku=None):
         """The mode creation page is an endpoint for HTTP GET requests.
 
         By default, it will create an 'honor' mode for the given course with display name
@@ -30,6 +34,7 @@ class ModeCreationPage(PageObject):
             min_price (int): The minimum price a user must pay to enroll in the new course mode
             suggested_prices (str): Comma-separated prices to suggest to the user.
             currency (str): The currency in which to list prices.
+            sku (str): The product SKU value.
         """
         super(ModeCreationPage, self).__init__(browser)
 
@@ -51,6 +56,9 @@ class ModeCreationPage(PageObject):
         if currency is not None:
             self._parameters['currency'] = currency
 
+        if sku is not None:
+            self._parameters['sku'] = sku
+
     @property
     def url(self):
         """Construct the mode creation URL."""
@@ -59,7 +67,7 @@ class ModeCreationPage(PageObject):
             course_id=self._course_id
         )
 
-        query_string = urllib.urlencode(self._parameters)
+        query_string = six.moves.urllib.parse.urlencode(self._parameters)
         if query_string:
             url += '?' + query_string
 

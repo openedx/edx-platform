@@ -2,10 +2,15 @@
 Course API Block Transformers
 """
 
+from __future__ import absolute_import
+
 from lms.djangoapps.course_blocks.transformers.visibility import VisibilityTransformer
-from .student_view import StudentViewTransformer
+
+from .block_completion import BlockCompletionTransformer
 from .block_counts import BlockCountsTransformer
+from .milestones import MilestonesAndSpecialExamsTransformer
 from .navigation import BlockNavigationTransformer
+from .student_view import StudentViewTransformer
 
 
 class SupportedFieldType(object):
@@ -39,10 +44,13 @@ SUPPORTED_FIELDS = [
     SupportedFieldType('graded'),
     SupportedFieldType('format'),
     SupportedFieldType('due'),
+    SupportedFieldType('show_correctness'),
     # 'student_view_data'
     SupportedFieldType(StudentViewTransformer.STUDENT_VIEW_DATA, StudentViewTransformer),
     # 'student_view_multi_device'
     SupportedFieldType(StudentViewTransformer.STUDENT_VIEW_MULTI_DEVICE, StudentViewTransformer),
+
+    SupportedFieldType('special_exam_info', MilestonesAndSpecialExamsTransformer),
 
     # set the block_field_name to None so the entire data for the transformer is serialized
     SupportedFieldType(None, BlockCountsTransformer, BlockCountsTransformer.BLOCK_COUNTS),
@@ -59,5 +67,10 @@ SUPPORTED_FIELDS = [
         'merged_visible_to_staff_only',
         VisibilityTransformer,
         requested_field_name='visible_to_staff_only',
+    ),
+    SupportedFieldType(
+        BlockCompletionTransformer.COMPLETION,
+        BlockCompletionTransformer,
+        'completion'
     )
 ]

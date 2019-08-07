@@ -1,29 +1,37 @@
 """Models for API management."""
+from __future__ import absolute_import
+
 import logging
 from smtplib import SMTPException
-from urlparse import urlunsplit
 
+from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail
-from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
-from django.utils.translation import ugettext as _
-from django_extensions.db.models import TimeStampedModel
-from edxmako.shortcuts import render_to_string
-from simple_history.models import HistoricalRecords
+from django.urls import reverse
+from django.utils.translation import ugettext as _u
+from django.utils.translation import ugettext_lazy as _
+from model_utils.models import TimeStampedModel
+from six.moves.urllib.parse import urlunsplit  # pylint: disable=import-error
 
-from config_models.models import ConfigurationModel
+from edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)
 
 
 class ApiAccessRequest(TimeStampedModel):
-    """Model to track API access for a user."""
+    """
+    Model to track API access for a user.
+
+    .. pii: Stores a website, company name, company address for this user
+    .. pii_types: location, external_service, other
+    .. pii_retirement: local_api
+    """
 
     PENDING = 'pending'
     DENIED = 'denied'
@@ -33,7 +41,7 @@ class ApiAccessRequest(TimeStampedModel):
         (DENIED, _('Denied')),
         (APPROVED, _('Approved')),
     )
-    user = models.OneToOneField(User, related_name='api_access_request')
+    user = models.OneToOneField(User, related_name='api_access_request', on_delete=models.CASCADE)
     status = models.CharField(
         max_length=255,
         choices=STATUS_CHOICES,
@@ -45,10 +53,12 @@ class ApiAccessRequest(TimeStampedModel):
     reason = models.TextField(help_text=_('The reason this user wants to access the API.'))
     company_name = models.CharField(max_length=255, default='')
     company_address = models.CharField(max_length=255, default='')
-    site = models.ForeignKey(Site)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
     contacted = models.BooleanField(default=False)
 
-    history = HistoricalRecords()
+    class Meta:
+        get_latest_by = 'modified'
+        ordering = ('-modified', '-created',)
 
     @classmethod
     def has_api_access(cls, user):
@@ -79,15 +89,39 @@ class ApiAccessRequest(TimeStampedModel):
         except cls.DoesNotExist:
             return None
 
+    @classmethod
+    def retire_user(cls, user):
+        """
+        Retires the user's API acccess request table for GDPR
+
+        Arguments:
+            user (User): The user linked to the data to retire in the model.
+
+        Returns:
+            True: If the user has a linked data in the model and retirement is successful
+            False: user has no linked data in the model.
+        """
+        try:
+            retire_target = cls.objects.get(user=user)
+        except cls.DoesNotExist:
+            return False
+        else:
+            retire_target.website = ''
+            retire_target.company_address = ''
+            retire_target.company_name = ''
+            retire_target.reason = ''
+            retire_target.save()
+            return True
+
     def approve(self):
         """Approve this request."""
-        log.info('Approving API request from user [%s].', self.user.id)
+        log.info(u'Approving API request from user [%s].', self.user.id)
         self.status = self.APPROVED
         self.save()
 
     def deny(self):
         """Deny this request."""
-        log.info('Denying API request from user [%s].', self.user.id)
+        log.info(u'Denying API request from user [%s].', self.user.id)
         self.status = self.DENIED
         self.save()
 
@@ -96,7 +130,11 @@ class ApiAccessRequest(TimeStampedModel):
 
 
 class ApiAccessConfig(ConfigurationModel):
-    """Configuration for API management."""
+    """
+    Configuration for API management.
+
+    .. no_pii:
+    """
 
     def __unicode__(self):
         return u'ApiAccessConfig [enabled={}]'.format(self.enabled)
@@ -136,14 +174,14 @@ def _send_new_pending_email(instance):
     message = render_to_string('api_admin/api_access_request_email_new_request.txt', context)
     try:
         send_mail(
-            _('API access request from {company}').format(company=instance.company_name),
+            _u(u'API access request from {company}').format(company=instance.company_name),
             message,
             settings.API_ACCESS_FROM_EMAIL,
             [settings.API_ACCESS_MANAGER_EMAIL],
             fail_silently=False
         )
     except SMTPException:
-        log.exception('Error sending API user notification email for request [%s].', instance.id)
+        log.exception(u'Error sending API user notification email for request [%s].', instance.id)
 
 
 def _send_decision_email(instance):
@@ -171,7 +209,7 @@ def _send_decision_email(instance):
     )
     try:
         send_mail(
-            _('API access request'),
+            _u('API access request'),
             message,
             settings.API_ACCESS_FROM_EMAIL,
             [instance.user.email],
@@ -179,11 +217,15 @@ def _send_decision_email(instance):
         )
         instance.contacted = True
     except SMTPException:
-        log.exception('Error sending API user notification email for request [%s].', instance.id)
+        log.exception(u'Error sending API user notification email for request [%s].', instance.id)
 
 
 class Catalog(models.Model):
-    """A (non-Django-managed) model for Catalogs in the course discovery service."""
+    """
+    A (non-Django-managed) model for Catalogs in the course discovery service.
+
+    .. no_pii:
+    """
 
     id = models.IntegerField(primary_key=True)  # pylint: disable=invalid-name
     name = models.CharField(max_length=255, null=False, blank=False)

@@ -7,12 +7,11 @@ define(['js/views/baseview', 'underscore', 'jquery', 'js/views/edit_chapter', 'c
                     var chapters = this.model.get('chapters');
                     this.listenTo(chapters, 'add', this.addOne);
                     this.listenTo(chapters, 'reset', this.addAll);
-                    this.listenTo(chapters, 'all', this.render);
                 },
                 tagName: 'section',
                 className: 'textbook',
                 render: function() {
-                    this.$el.html(this.template({
+                    this.$el.html(this.template({ // xss-lint: disable=javascript-jquery-html
                         name: this.model.get('name'),
                         error: this.model.validationError
                     }));
@@ -21,7 +20,7 @@ define(['js/views/baseview', 'underscore', 'jquery', 'js/views/edit_chapter', 'c
                 },
                 events: {
                     'change input[name=textbook-name]': 'setName',
-                    'submit': 'setAndClose',
+                    submit: 'setAndClose',
                     'click .action-cancel': 'cancel',
                     'click .action-add-chapter': 'createChapter'
                 },
@@ -49,8 +48,8 @@ define(['js/views/baseview', 'underscore', 'jquery', 'js/views/edit_chapter', 'c
                         var chapter = that.model.get('chapters').at(i);
                         if (!chapter) { return; }
                         chapter.set({
-                            'name': $('.chapter-name', li).val(),
-                            'asset_path': $('.chapter-asset-path', li).val()
+                            name: $('.chapter-name', li).val(),
+                            asset_path: $('.chapter-asset-path', li).val()
                         });
                     });
                     return this;

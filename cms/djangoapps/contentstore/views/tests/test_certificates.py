@@ -3,30 +3,30 @@
 """
 Certificates Tests.
 """
+from __future__ import absolute_import
+
 import itertools
 import json
-import mock
-import ddt
 
+import ddt
+import mock
+import six
 from django.conf import settings
 from django.test.utils import override_settings
-
 from opaque_keys.edx.keys import AssetKey
+from six.moves import range
 
-from contentstore.utils import reverse_course_url
-from contentstore.views.certificates import CERTIFICATE_SCHEMA_VERSION
 from contentstore.tests.utils import CourseTestCase
-from xmodule.contentstore.django import contentstore
-from xmodule.contentstore.content import StaticContent
-from xmodule.exceptions import NotFoundError
+from contentstore.utils import get_lms_link_for_certificate_web_view, reverse_course_url
+from contentstore.views.certificates import CERTIFICATE_SCHEMA_VERSION, CertificateManager
+from course_modes.tests.factories import CourseModeFactory
 from student.models import CourseEnrollment
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
-from course_modes.tests.factories import CourseModeFactory
-from contentstore.views.certificates import CertificateManager
-from django.test.utils import override_settings
-from contentstore.utils import get_lms_link_for_certificate_web_view
 from util.testing import EventTestMixin, UrlResetMixin
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
+from xmodule.exceptions import NotFoundError
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
@@ -84,7 +84,7 @@ class HelperMethods(object):
                 'title': 'Title ' + str(i),
                 'signature_image_path': asset_path_format.format(i),
                 'id': i
-            } for i in xrange(signatory_count)
+            } for i in range(signatory_count)
 
         ]
 
@@ -99,7 +99,7 @@ class HelperMethods(object):
                 'signatories': signatories,
                 'version': CERTIFICATE_SCHEMA_VERSION,
                 'is_active': is_active
-            } for i in xrange(count)
+            } for i in range(count)
         ]
         self.course.certificates = {'certificates': certificates}
         self.save_course()
@@ -154,8 +154,8 @@ class CertificatesBaseTestCase(object):
         Test invalid json handling.
         """
         # Invalid JSON.
-        invalid_json = "{u'name': 'Test Name', u'description': 'Test description'," \
-                       " u'version': " + str(CERTIFICATE_SCHEMA_VERSION) + ", []}"
+        invalid_json = u"{u'name': 'Test Name', u'description': 'Test description'," \
+                       u" u'version': " + str(CERTIFICATE_SCHEMA_VERSION) + ", []}"
 
         response = self.client.post(
             self._url(),
@@ -203,6 +203,7 @@ class CertificatesListHandlerTestCase(
     """
     Test cases for certificates_list_handler.
     """
+
     def setUp(self):
         """
         Set up CertificatesListHandlerTestCase.
@@ -214,7 +215,7 @@ class CertificatesListHandlerTestCase(
         """
         Return url for the handler.
         """
-        return reverse_course_url('certificates.certificates_list_handler', self.course.id)
+        return reverse_course_url('certificates_list_handler', self.course.id)
 
     def test_can_create_certificate(self):
         """
@@ -239,7 +240,7 @@ class CertificatesListHandlerTestCase(
         self.assertEqual(content, expected)
         self.assert_event_emitted(
             'edx.certificate.configuration.created',
-            course_id=unicode(self.course.id),
+            course_id=six.text_type(self.course.id),
             configuration_id=certificate_id,
         )
 
@@ -268,7 +269,7 @@ class CertificatesListHandlerTestCase(
     @override_settings(LMS_BASE="lms_base_url")
     def test_lms_link_for_certificate_web_view(self):
         test_url = "//lms_base_url/certificates/user/" \
-                   + str(self.user.id) + "/course/" + unicode(self.course.id) + '?preview=honor'
+                   + str(self.user.id) + "/course/" + six.text_type(self.course.id) + '?preview=honor'
         link = get_lms_link_for_certificate_web_view(
             user_id=self.user.id,
             course_key=self.course.id,
@@ -429,7 +430,6 @@ class CertificatesDetailHandlerTestCase(
     """
     Test cases for CertificatesDetailHandlerTestCase.
     """
-
     _id = 0
 
     def setUp(self):  # pylint: disable=arguments-differ
@@ -445,7 +445,7 @@ class CertificatesDetailHandlerTestCase(
         """
         cid = cid if cid > 0 else self._id
         return reverse_course_url(
-            'certificates.certificates_detail_handler',
+            'certificates_detail_handler',
             self.course.id,
             kwargs={'certificate_id': cid},
         )
@@ -475,7 +475,7 @@ class CertificatesDetailHandlerTestCase(
         self.assertEqual(content, expected)
         self.assert_event_emitted(
             'edx.certificate.configuration.created',
-            course_id=unicode(self.course.id),
+            course_id=six.text_type(self.course.id),
             configuration_id=666,
         )
 
@@ -507,7 +507,7 @@ class CertificatesDetailHandlerTestCase(
         self.assertEqual(content, expected)
         self.assert_event_emitted(
             'edx.certificate.configuration.modified',
-            course_id=unicode(self.course.id),
+            course_id=six.text_type(self.course.id),
             configuration_id=1,
         )
         self.reload_course()
@@ -572,7 +572,7 @@ class CertificatesDetailHandlerTestCase(
         self.assertEqual(response.status_code, 204)
         self.assert_event_emitted(
             'edx.certificate.configuration.deleted',
-            course_id=unicode(self.course.id),
+            course_id=six.text_type(self.course.id),
             configuration_id='1',
         )
         self.reload_course()
@@ -596,7 +596,7 @@ class CertificatesDetailHandlerTestCase(
         self.assertEqual(response.status_code, 204)
         self.assert_event_emitted(
             'edx.certificate.configuration.deleted',
-            course_id=unicode(self.course.id),
+            course_id=six.text_type(self.course.id),
             configuration_id='1',
         )
         self.reload_course()
@@ -621,7 +621,7 @@ class CertificatesDetailHandlerTestCase(
         self.assertEqual(response.status_code, 204)
         self.assert_event_emitted(
             'edx.certificate.configuration.deleted',
-            course_id=unicode(self.course.id),
+            course_id=six.text_type(self.course.id),
             configuration_id='1',
         )
         self.reload_course()
@@ -768,7 +768,7 @@ class CertificatesDetailHandlerTestCase(
         """
         Activate and Deactivate the course certificate
         """
-        test_url = reverse_course_url('certificates.certificate_activation_handler', self.course.id)
+        test_url = reverse_course_url('certificate_activation_handler', self.course.id)
         self._add_course_certificates(count=1, signatory_count=2, asset_path_format=signatory_path)
 
         is_active = True
@@ -789,7 +789,7 @@ class CertificatesDetailHandlerTestCase(
             cert_event_type = 'activated' if is_active else 'deactivated'
             self.assert_event_emitted(
                 '.'.join(['edx.certificate.configuration', cert_event_type]),
-                course_id=unicode(self.course.id),
+                course_id=six.text_type(self.course.id),
             )
 
     @ddt.data(*itertools.product([True, False], [C4X_SIGNATORY_PATH, SIGNATORY_PATH]))
@@ -799,7 +799,7 @@ class CertificatesDetailHandlerTestCase(
         Tests certificate Activate and Deactivate should not be allowed if user
         does not have write permissions on course.
         """
-        test_url = reverse_course_url('certificates.certificate_activation_handler', self.course.id)
+        test_url = reverse_course_url('certificate_activation_handler', self.course.id)
         self._add_course_certificates(count=1, signatory_count=2, asset_path_format=signatory_path)
         user = UserFactory()
         self.client.login(username=user.username, password='test')
@@ -818,7 +818,7 @@ class CertificatesDetailHandlerTestCase(
         Certificate activation should fail when user has not read access to course then permission denied exception
         should raised.
         """
-        test_url = reverse_course_url('certificates.certificate_activation_handler', self.course.id)
+        test_url = reverse_course_url('certificate_activation_handler', self.course.id)
         test_user_client, test_user = self.create_non_staff_authed_user_client()
         CourseEnrollment.enroll(test_user, self.course.id)
         self._add_course_certificates(count=1, signatory_count=2, asset_path_format=signatory_path)

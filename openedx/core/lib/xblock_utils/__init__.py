@@ -2,30 +2,38 @@
 Functions that can are used to modify XBlock fragments for use in the LMS and Studio
 """
 
+from __future__ import absolute_import
 import datetime
 import json
 import logging
-import markupsafe
 import re
-import static_replace
 import uuid
+import static_replace
+import markupsafe
 from lxml import html, etree
 from contracts import contract
 
 from django.conf import settings
-from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.urlresolvers import reverse
-from django.utils.timezone import UTC
+from django.urls import reverse
 from django.utils.html import escape
 from django.contrib.auth.models import User
+from django.contrib.staticfiles.storage import staticfiles_storage
+from pytz import UTC
 from edxmako.shortcuts import render_to_string
+from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
-from xblock.fragment import Fragment
+from xblock.scorable import ScorableXBlockMixin
+from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 
 from xmodule.seq_module import SequenceModule
+from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.vertical_block import VerticalBlock
 from xmodule.x_module import shim_xmodule_js, XModuleDescriptor, XModule, PREVIEW_VIEWS, STUDIO_VIEW
+
+import webpack_loader.utils
+import six
+from six import text_type
 
 log = logging.getLogger(__name__)
 
@@ -36,7 +44,7 @@ def wrap_fragment(fragment, new_content):
     as its content, and all of the resources from fragment
     """
     wrapper_frag = Fragment(content=new_content)
-    wrapper_frag.add_frag_resources(fragment)
+    wrapper_frag.add_fragment_resources(fragment)
     return wrapper_frag
 
 
@@ -58,7 +66,7 @@ def wrap_xblock(
         block,
         view,
         frag,
-        context,                        # pylint: disable=unused-argument
+        context,
         usage_id_serializer,
         request_token,                  # pylint: disable=redefined-outer-name
         display_name_only=False,
@@ -90,6 +98,9 @@ def wrap_xblock(
     data = {}
     data.update(extra_data)
 
+    if context:
+        data.update(context.get('wrap_xblock_data', {}))
+
     css_classes = [
         'xblock',
         'xblock-{}'.format(markupsafe.escape(view)),
@@ -99,7 +110,7 @@ def wrap_xblock(
         )
     ]
 
-    if isinstance(block, (XModule, XModuleDescriptor)):
+    if isinstance(block, (XModule, XModuleDescriptor)) or getattr(block, 'uses_xmodule_styles_setup', False):
         if view in PREVIEW_VIEWS:
             # The block is acting as an XModule
             css_classes.append('xmodule_display')
@@ -111,8 +122,10 @@ def wrap_xblock(
             css_classes.append('is-hidden')
 
         css_classes.append('xmodule_' + markupsafe.escape(class_name))
+
+    if isinstance(block, (XModule, XModuleDescriptor)):
         data['type'] = block.js_module_name
-        shim_xmodule_js(block, frag)
+        shim_xmodule_js(frag, block.js_module_name)
 
     if frag.js_init_fn:
         data['init'] = frag.js_init_fn
@@ -122,6 +135,8 @@ def wrap_xblock(
     data['block-type'] = block.scope_ids.block_type
     data['usage-id'] = usage_id_serializer(block.scope_ids.usage_id)
     data['request-token'] = request_token
+    data['graded'] = getattr(block, 'graded', False)
+    data['has-score'] = getattr(block, 'has_score', False)
 
     if block.name:
         data['name'] = block.name
@@ -129,16 +144,19 @@ def wrap_xblock(
     template_context = {
         'content': block.display_name if display_name_only else frag.content,
         'classes': css_classes,
-        'display_name': block.display_name_with_default_escaped,
+        'display_name': block.display_name_with_default_escaped,  # xss-lint: disable=python-deprecated-display-name
         'data_attributes': u' '.join(u'data-{}="{}"'.format(markupsafe.escape(key), markupsafe.escape(value))
-                                     for key, value in data.iteritems()),
+                                     for key, value in six.iteritems(data)),
     }
 
     if hasattr(frag, 'json_init_args') and frag.json_init_args is not None:
-        # Replace / with \/ so that "</script>" in the data won't break things.
-        template_context['js_init_parameters'] = json.dumps(frag.json_init_args).replace("/", r"\/")
+        template_context['js_init_parameters'] = frag.json_init_args
     else:
         template_context['js_init_parameters'] = ""
+
+    if isinstance(block, (XModule, XModuleDescriptor)):
+        # Add the webpackified asset tags
+        add_webpack_to_fragment(frag, class_name)
 
     return wrap_fragment(frag, render_to_string('xblock_wrapper.html', template_context))
 
@@ -151,7 +169,8 @@ def wrap_xblock_aside(
         context,                        # pylint: disable=unused-argument
         usage_id_serializer,
         request_token,                   # pylint: disable=redefined-outer-name
-        extra_data=None
+        extra_data=None,
+        extra_classes=None
 ):
     """
     Wraps the results of rendering an XBlockAside view in a standard <section> with identifying
@@ -167,6 +186,7 @@ def wrap_xblock_aside(
     :param request_token: An identifier that is unique per-request, so that only xblocks
         rendered as part of this request will have their javascript initialized.
     :param extra_data: A dictionary with extra data values to be set on the wrapper
+    :param extra_classes: A list with extra classes to be set on the wrapper element
     """
 
     if extra_data is None:
@@ -183,6 +203,8 @@ def wrap_xblock_aside(
         ),
         'xblock_asides-v1'
     ]
+    if extra_classes:
+        css_classes.extend(extra_classes)
 
     if frag.js_init_fn:
         data['init'] = frag.js_init_fn
@@ -197,12 +219,11 @@ def wrap_xblock_aside(
         'content': frag.content,
         'classes': css_classes,
         'data_attributes': u' '.join(u'data-{}="{}"'.format(markupsafe.escape(key), markupsafe.escape(value))
-                                     for key, value in data.iteritems()),
+                                     for key, value in six.iteritems(data)),
     }
 
     if hasattr(frag, 'json_init_args') and frag.json_init_args is not None:
-        # Replace / with \/ so that "</script>" in the data won't break things.
-        template_context['js_init_parameters'] = json.dumps(frag.json_init_args).replace("/", r"\/")
+        template_context['js_init_parameters'] = frag.json_init_args
     else:
         template_context['js_init_parameters'] = ""
 
@@ -222,7 +243,7 @@ def replace_jump_to_id_urls(course_id, jump_to_id_base_url, block, view, frag, c
         redirect. e.g. /courses/<org>/<course>/<run>/jump_to_id. NOTE the <id> will be appended to
         the end of this URL at re-write time
 
-    output: a new :class:`~xblock.fragment.Fragment` that modifies `frag` with
+    output: a new :class:`~web_fragments.fragment.Fragment` that modifies `frag` with
         content that has been update with /jump_to_id links replaced
     """
     return wrap_fragment(frag, static_replace.replace_jump_to_id_urls(frag.content, course_id, jump_to_id_base_url))
@@ -262,14 +283,14 @@ def grade_histogram(module_id):
     from django.db import connection
     cursor = connection.cursor()
 
-    query = """\
+    query = u"""\
         SELECT courseware_studentmodule.grade,
         COUNT(courseware_studentmodule.student_id)
         FROM courseware_studentmodule
         WHERE courseware_studentmodule.module_id=%s
         GROUP BY courseware_studentmodule.grade"""
     # Passing module_id this way prevents sql-injection.
-    cursor.execute(query, [module_id.to_deprecated_string()])
+    cursor.execute(query, [text_type(module_id)])
 
     grades = list(cursor.fetchall())
     grades.sort(key=lambda x: x[0])  # Add ORDER BY to sql query?
@@ -286,8 +307,8 @@ def sanitize_html_id(html_id):
     return sanitized_html_id
 
 
-@contract(user=User, has_instructor_access=bool, block=XBlock, view=basestring, frag=Fragment, context="dict|None")
-def add_staff_markup(user, has_instructor_access, disable_staff_debug_info, block, view, frag, context):  # pylint: disable=unused-argument
+@contract(user=User, block=XBlock, view=six.string_types[0], frag=Fragment, context="dict|None")
+def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context):  # pylint: disable=unused-argument
     """
     Updates the supplied module with a new get_html function that wraps
     the output of the old get_html function with additional information
@@ -297,6 +318,9 @@ def add_staff_markup(user, has_instructor_access, disable_staff_debug_info, bloc
 
     Does nothing if module is a SequenceModule.
     """
+    if context and context.get('hide_staff_markup', False):
+        # If hide_staff_markup is passed, don't add the markup
+        return frag
     # TODO: make this more general, eg use an XModule attribute instead
     if isinstance(block, VerticalBlock) and (not context or not context.get('child_of_vertical', False)):
         # check that the course is a mongo backed Studio course before doing work
@@ -304,7 +328,7 @@ def add_staff_markup(user, has_instructor_access, disable_staff_debug_info, bloc
 
         if is_studio_course:
             # build edit link to unit in CMS. Can't use reverse here as lms doesn't load cms's urls.py
-            edit_link = "//" + settings.CMS_BASE + '/container/' + unicode(block.location)
+            edit_link = "//" + settings.CMS_BASE + '/container/' + text_type(block.location)
 
             # return edit link in rendered HTML for display
             return wrap_fragment(
@@ -349,7 +373,7 @@ def add_staff_markup(user, has_instructor_access, disable_staff_debug_info, bloc
     # Useful to indicate to staff if problem has been released or not.
     # TODO (ichuang): use _has_access_descriptor.can_load in lms.courseware.access,
     # instead of now>mstart comparison here.
-    now = datetime.datetime.now(UTC())
+    now = datetime.datetime.now(UTC)
     is_released = "unknown"
     mstart = block.start
 
@@ -381,11 +405,14 @@ def add_staff_markup(user, has_instructor_access, disable_staff_debug_info, bloc
         'render_histogram': render_histogram,
         'block_content': frag.content,
         'is_released': is_released,
-        'has_instructor_access': has_instructor_access,
         'can_reset_attempts': 'attempts' in block.fields,
-        'can_rescore_problem': hasattr(block, 'rescore_problem'),
+        'can_rescore_problem': hasattr(block, 'rescore'),
+        'can_override_problem_score': isinstance(block, ScorableXBlockMixin),
         'disable_staff_debug_info': disable_staff_debug_info,
     }
+    if isinstance(block, ScorableXBlockMixin):
+        staff_context['max_problem_score'] = block.max_score()
+
     return wrap_fragment(frag, render_to_string("staff_problem_info.html", staff_context))
 
 
@@ -426,6 +453,7 @@ def get_course_update_items(course_updates, provided_index=0):
         except (etree.XMLSyntaxError, etree.ParserError):
             log.error("Cannot parse: " + course_updates.data)
             escaped = escape(course_updates.data)
+            # xss-lint: disable=python-concat-html
             course_html_parsed = html.fromstring("<ol><li>" + escaped + "</li></ol>")
 
         # confirm that root is <ol>, iterate over <li>, pull out <h2> subs and then rest of val
@@ -457,9 +485,9 @@ def xblock_local_resource_url(block, uri):
     as a static asset which will use a CDN in production.
     """
     xblock_class = getattr(block.__class__, 'unmixed_class', block.__class__)
-    if settings.PIPELINE_ENABLED or not settings.REQUIRE_DEBUG:
+    if settings.PIPELINE['PIPELINE_ENABLED'] or not settings.REQUIRE_DEBUG:
         return staticfiles_storage.url('xblock/resources/{package_name}/{path}'.format(
-            package_name=xblock_class.__module__,
+            package_name=xblock_resource_pkg(xblock_class),
             path=uri
         ))
     else:
@@ -467,3 +495,58 @@ def xblock_local_resource_url(block, uri):
             'block_type': block.scope_ids.block_type,
             'uri': uri,
         })
+
+
+def xblock_resource_pkg(block):
+    """
+    Return the module name needed to find an XBlock's shared static assets.
+
+    This method will return the full module name that is one level higher than
+    the one the block is in. For instance, problem_builder.answer.AnswerBlock
+    has a __module__ value of 'problem_builder.answer'. This method will return
+    'problem_builder' instead. However, for edx-ora2's
+    openassessment.xblock.openassessmentblock.OpenAssessmentBlock, the value
+    returned is 'openassessment.xblock'.
+
+    XModules are special cased because they're local to this repo and they
+    actually don't share their resource files when compiled out as part of the
+    XBlock asset pipeline. This only covers XBlocks and XModules using the
+    XBlock-style of asset specification. If they use the XModule bundling part
+    of the asset pipeline (xmodule_assets), their assets are compiled through an
+    entirely separate mechanism and put into lms-modules.js/css.
+    """
+    # XModules are a special case because they map to different dirs for
+    # sub-modules.
+    module_name = block.__module__
+    if module_name.startswith('xmodule.'):
+        return module_name
+
+    return module_name.rsplit('.', 1)[0]
+
+
+def is_xblock_aside(usage_key):
+    """
+    Returns True if the given usage key is for an XBlock aside
+
+    Args:
+        usage_key (opaque_keys.edx.keys.UsageKey): A usage key
+
+    Returns:
+        bool: Whether or not the usage key is an aside key type
+    """
+    return isinstance(usage_key, (AsideUsageKeyV1, AsideUsageKeyV2))
+
+
+def get_aside_from_xblock(xblock, aside_type):
+    """
+    Gets an instance of an XBlock aside from the XBlock that it's decorating. This also
+    configures the aside instance with the runtime and fields of the given XBlock.
+
+    Args:
+        xblock (xblock.core.XBlock): The XBlock that the desired aside is decorating
+        aside_type (str): The aside type
+
+    Returns:
+        xblock.core.XBlockAside: Instance of an xblock aside
+    """
+    return xblock.runtime.get_aside_of_type(xblock, aside_type)

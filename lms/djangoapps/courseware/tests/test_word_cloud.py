@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 """Word cloud integration tests using mongo modulestore."""
 
+from __future__ import absolute_import
+
 import json
 from operator import itemgetter
-from nose.plugins.attrib import attr
 
-from . import BaseTestXmodule
 from xmodule.x_module import STUDENT_VIEW
 
+from .helpers import BaseTestXmodule
 
-@attr(shard=1)
+
 class TestWordCloud(BaseTestXmodule):
     """Integration test for word cloud xmodule."""
     CATEGORY = "word_cloud"
@@ -225,7 +226,7 @@ class TestWordCloud(BaseTestXmodule):
 
         for user in self.users:
             self.assertListEqual(
-                users_state[user.username]['student_words'].keys(),
+                list(users_state[user.username]['student_words'].keys()),
                 correct_words)
 
     def test_handle_ajax_incorrect_dispatch(self):
@@ -258,7 +259,7 @@ class TestWordCloud(BaseTestXmodule):
             'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url,
             'display_name': self.item_descriptor.display_name,
             'instructions': self.item_descriptor.instructions,
-            'element_class': self.item_descriptor.location.category,
+            'element_class': self.item_descriptor.location.block_type,
             'element_id': self.item_descriptor.location.html_id(),
             'num_inputs': 5,  # default value
             'submitted': False,  # default value,

@@ -2,8 +2,10 @@
 Tools for creating discussion content fixture data.
 """
 
-from datetime import datetime
+from __future__ import absolute_import
+
 import json
+from datetime import datetime
 
 import factory
 import requests
@@ -83,7 +85,7 @@ class DiscussionContentFixture(object):
         """
         Push the data to the stub comments service.
         """
-        requests.put(
+        return requests.put(
             '{}/set_config'.format(COMMENTS_STUB_URL),
             data=self.get_config_data()
         )

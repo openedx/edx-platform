@@ -102,7 +102,7 @@
                 };
 
                 return ModuleEdit;
-            })(XBlockView);
+            }(XBlockView));
             return ModuleEdit;
         });
 }).call(this);

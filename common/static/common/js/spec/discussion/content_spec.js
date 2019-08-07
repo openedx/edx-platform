@@ -8,8 +8,8 @@
         describe('Staff and TA Content', function() {
             beforeEach(function() {
                 return DiscussionUtil.loadRoles({
-                    'Moderator': [567],
-                    'Administrator': [567],
+                    Moderator: [567],
+                    Administrator: [567],
                     'Community TA': [567]
                 });
             });
@@ -54,13 +54,13 @@
             it('can update info', function() {
                 this.content.updateInfo({
                     ability: {
-                        'can_edit': true
+                        can_edit: true
                     },
                     voted: true,
                     subscribed: true
                 });
                 expect(this.content.get('ability')).toEqual({
-                    'can_edit': true
+                    can_edit: true
                 });
                 expect(this.content.get('voted')).toEqual(true);
                 return expect(this.content.get('subscribed')).toEqual(true);
@@ -104,8 +104,8 @@
             });
             return it('can be endorsed', function() {
                 DiscussionUtil.loadRoles({
-                    'Moderator': [111],
-                    'Administrator': [222],
+                    Moderator: [111],
+                    Administrator: [222],
                     'Community TA': [333]
                 });
                 this.discussionThread = new Thread({

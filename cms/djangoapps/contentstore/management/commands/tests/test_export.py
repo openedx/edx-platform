@@ -1,25 +1,26 @@
 """
 Tests for exporting courseware to the desired path
 """
-import unittest
+from __future__ import absolute_import
+
 import shutil
-import ddt
-from django.core.management import CommandError, call_command
+import unittest
 from tempfile import mkdtemp
 
-from xmodule.modulestore.tests.factories import CourseFactory
+import ddt
+import six
+from django.core.management import CommandError, call_command
+
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class TestArgParsingCourseExport(unittest.TestCase):
     """
     Tests for parsing arguments for the `export` management command
     """
-    def setUp(self):
-        super(TestArgParsingCourseExport, self).setUp()
-
     def test_no_args(self):
         """
         Test export command with no arguments
@@ -51,10 +52,10 @@ class TestCourseExport(ModuleStoreTestCase):
         Create a new course try exporting in a path specified
         """
         course = CourseFactory.create(default_store=store)
-        course_id = unicode(course.id)
+        course_id = six.text_type(course.id)
         self.assertTrue(
             modulestore().has_course(course.id),
-            "Could not find course in {}".format(store)
+            u"Could not find course in {}".format(store)
         )
         # Test `export` management command with invalid course_id
         errstring = "Invalid course_key: 'InvalidCourseID'."

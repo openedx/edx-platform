@@ -1,10 +1,14 @@
 """Tests covering the Organizations listing on the Studio home."""
+from __future__ import absolute_import
+
 import json
-from mock import patch
-from django.core.urlresolvers import reverse
+
 from django.test import TestCase
-from util.organizations_helpers import add_organization
+from django.urls import reverse
+from mock import patch
+
 from student.tests.factories import UserFactory
+from util.organizations_helpers import add_organization
 
 
 @patch.dict('django.conf.settings.FEATURES', {'ORGANIZATIONS_APP': True})
@@ -19,9 +23,9 @@ class TestOrganizationListing(TestCase):
         self.org_short_names = ["alphaX", "betaX", "orgX"]
         for index, short_name in enumerate(self.org_short_names):
             add_organization(organization_data={
-                'name': 'Test Organization %s' % index,
+                'name': u'Test Organization %s' % index,
                 'short_name': short_name,
-                'description': 'Testing Organization %s Description' % index,
+                'description': u'Testing Organization %s Description' % index,
             })
 
     def test_organization_list(self):

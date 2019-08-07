@@ -1,19 +1,22 @@
 """
 Tests for the Split Testing Module
 """
+from __future__ import absolute_import
+
 import ddt
 import lxml
-from mock import Mock, patch
+import six
 from fs.memoryfs import MemoryFS
+from mock import Mock, patch
 
-from xmodule.partitions.tests.test_partitions import StaticPartitionService, PartitionTestCase, MockUserPartitionScheme
-from xmodule.tests.xml import factories as xml
-from xmodule.tests.xml import XModuleXmlImportTest
-from xmodule.tests import get_test_system
-from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
-from xmodule.validation import StudioValidationMessage
+from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, Group, UserPartition
+from xmodule.partitions.tests.test_partitions import MockPartitionService, MockUserPartitionScheme, PartitionTestCase
 from xmodule.split_test_module import SplitTestDescriptor, SplitTestFields, get_split_user_partitions
-from xmodule.partitions.partitions import Group, UserPartition
+from xmodule.tests import get_test_system
+from xmodule.tests.xml import XModuleXmlImportTest
+from xmodule.tests.xml import factories as xml
+from xmodule.validation import StudioValidationMessage
+from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
 
 
 class SplitTestModuleFactory(xml.XmlImportFactory):
@@ -27,6 +30,7 @@ class SplitTestUtilitiesTest(PartitionTestCase):
     """
     Tests for utility methods related to split_test module.
     """
+
     def test_split_user_partitions(self):
         """
         Tests the get_split_user_partitions helper method.
@@ -81,21 +85,29 @@ class SplitTestModuleTest(XModuleXmlImportTest, PartitionTestCase):
         self.module_system.descriptor_runtime = self.course._runtime  # pylint: disable=protected-access
         self.course.runtime.export_fs = MemoryFS()
 
-        user = Mock(username='ma', email='ma@edx.org', is_staff=False, is_active=True)
-        self.partitions_service = StaticPartitionService(
-            [
-                self.user_partition,
-                UserPartition(
-                    1, 'second_partition', 'Second Partition',
-                    [Group("0", 'abel'), Group("1", 'baker'), Group("2", 'charlie')],
-                    MockUserPartitionScheme()
-                )
-            ],
-            user=user,
+        # Create mock partition service, as these tests are running with XML in-memory system.
+        self.course.user_partitions = [
+            self.user_partition,
+            UserPartition(
+                MINIMUM_STATIC_PARTITION_ID, 'second_partition', 'Second Partition',
+                [
+                    Group(six.text_type(MINIMUM_STATIC_PARTITION_ID + 1), 'abel'),
+                    Group(six.text_type(MINIMUM_STATIC_PARTITION_ID + 2), 'baker'), Group("103", 'charlie')
+                ],
+                MockUserPartitionScheme()
+            )
+        ]
+        partitions_service = MockPartitionService(
+            self.course,
             course_id=self.course.id,
-            track_function=Mock(name='track_function'),
         )
-        self.module_system._services['partitions'] = self.partitions_service  # pylint: disable=protected-access
+        self.module_system._services['partitions'] = partitions_service  # pylint: disable=protected-access
+
+        # Mock user_service user
+        user_service = Mock()
+        user = Mock(username='ma', email='ma@edx.org', is_staff=False, is_active=True)
+        user_service._django_user = user
+        self.module_system._services['user'] = user_service  # pylint: disable=protected-access
 
         self.split_test_module = self.course_sequence.get_children()[0]
         self.split_test_module.bind_for_student(
@@ -103,12 +115,27 @@ class SplitTestModuleTest(XModuleXmlImportTest, PartitionTestCase):
             user.id
         )
 
+        # Create mock modulestore for getting the course. Needed for rendering the HTML
+        # view, since mock services exist and the rendering code will not short-circuit.
+        mocked_modulestore = Mock()
+        mocked_modulestore.get_course.return_value = self.course
+        self.split_test_module.system.modulestore = mocked_modulestore
+
 
 @ddt.ddt
 class SplitTestModuleLMSTest(SplitTestModuleTest):
     """
     Test the split test module
     """
+
+    def setUp(self):
+        super(SplitTestModuleLMSTest, self).setUp()
+
+        content_gating_flag_patcher = patch(
+            'openedx.features.content_type_gating.partitions.ContentTypeGatingConfig.current',
+            return_value=Mock(enabled=False, studio_override_enabled=False),
+        ).start()
+        self.addCleanup(content_gating_flag_patcher.stop)
 
     @ddt.data((0, 'split_test_cond0'), (1, 'split_test_cond1'))
     @ddt.unpack
@@ -141,9 +168,9 @@ class SplitTestModuleLMSTest(SplitTestModuleTest):
         )
 
     # Patch the definition_to_xml for the html children.
-    @patch('xmodule.html_module.HtmlDescriptor.definition_to_xml')
+    @patch('xmodule.html_module.HtmlBlock.definition_to_xml')
     def test_export_import_round_trip(self, def_to_xml):
-        # The HtmlDescriptor definition_to_xml tries to write to the filesystem
+        # The HtmlBlock definition_to_xml tries to write to the filesystem
         # before returning an xml object. Patch this to just return the xml.
         def_to_xml.return_value = lxml.etree.Element('html')
 

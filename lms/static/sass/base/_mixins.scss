@@ -2,15 +2,15 @@
 // ====================
 
 // mixins - font sizing
-@mixin font-size($sizeValue: 16){
+@mixin font-size($sizeValue: 16) {
   font-size: $sizeValue + px;
- // font-size: ($sizeValue/10) + rem;
+  // font-size: ($sizeValue/10) + rem;
 }
 
 // mixins - line height
-@mixin line-height($fontSize: auto){
+@mixin line-height($fontSize: auto) {
   line-height: ($fontSize*1.48) + px;
- // line-height: (($fontSize/10)*1.48) + rem;
+  // line-height: (($fontSize/10)*1.48) + rem;
 }
 
 // image-replacement hidden text
@@ -20,7 +20,7 @@
   overflow: hidden;
 }
 
-@mixin vertically-and-horizontally-centered ( $height, $width ) {
+@mixin vertically-and-horizontally-centered ($height, $width) {
   left: 50%;
   margin-left: -$width / 2;
   //margin-top: -$height / 2;
@@ -31,14 +31,14 @@
 }
 
 // sunsetted, but still used mixins
-@mixin hide-text(){
+@mixin hide-text() {
   text-indent: -9999px;
   overflow: hidden;
   display: block;
 }
 
 @mixin show-hover-state() {
-    opacity: 1;
+  opacity: 1;
 }
 
 @function em($pxval, $base: 16) {
@@ -54,6 +54,7 @@
 
 // theme mixin styles
 @mixin login_register_h1_style {}
+
 @mixin footer_references_style {}
 
 // ====================
@@ -62,12 +63,14 @@
 %ui-wrapper {
   @include clearfix();
   @include box-sizing(border-box);
+
   width: 100%;
 }
 
 // extends - UI - window
 %ui-window {
   @include clearfix();
+
   border-radius: 3px;
   box-shadow: 0 1px 2px 1px $shadow-l1;
   margin-bottom: $baseline;
@@ -103,7 +106,6 @@
 
 // extends - UI - utility - nth-type style clearing
 %wipe-first-child {
-
   &:first-child {
     margin-top: 0;
     border-top: none;
@@ -113,7 +115,6 @@
 
 // extends - UI - utility - nth-type style clearing
 %wipe-last-child {
-
   &:last-child {
     margin-bottom: 0;
     border-bottom: none;
@@ -123,18 +124,18 @@
 
 // extends -hidden elems - screenreaders
 %text-sr {
-    // clip has been deprecated but is still supported
-    clip: rect(1px 1px 1px 1px);
-    clip: rect(1px, 1px, 1px, 1px);
-    position: absolute;
-    margin: -1px;
-    height: 1px;
-    width: 1px;
-    border: 0;
-    padding: 0;
-    overflow: hidden;
-    // ensure there are spaces in sr text
-    word-wrap: normal;
+  // clip has been deprecated but is still supported
+  clip: rect(1px 1px 1px 1px);
+  clip: rect(1px, 1px, 1px, 1px);
+  position: absolute;
+  margin: -1px;
+  height: 1px;
+  width: 1px;
+  border: 0;
+  padding: 0;
+  overflow: hidden;
+  // ensure there are spaces in sr text
+  word-wrap: normal;
 }
 
 // extends - ensures proper contrast for automated checkers
@@ -174,6 +175,7 @@
 // extends - text - text overflow by ellipsis
 %text-truncated {
   @include box-sizing(border-box);
+
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

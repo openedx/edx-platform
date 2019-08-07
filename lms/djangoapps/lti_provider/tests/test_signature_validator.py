@@ -2,6 +2,8 @@
 Tests for the SignatureValidator class.
 """
 
+from __future__ import absolute_import
+
 import ddt
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -88,6 +90,7 @@ class SignatureValidatorTest(TestCase):
     to check message signatures. Note that these tests mock out the library
     itself, since we assume it to be correct.
     """
+
     def setUp(self):
         super(SignatureValidatorTest, self).setUp()
         self.lti_consumer = get_lti_consumer()

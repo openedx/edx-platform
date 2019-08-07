@@ -1,7 +1,5 @@
 .editor-bar {
-
   .editor-tabs {
-
     .advanced-toggle {
       height: auto;
       margin-top: -4px;
@@ -47,10 +45,13 @@
   left: 100%;
   width: 0;
   border-radius: 0 3px 3px 0;
+
   @include linear-gradient(left, $shadow-l1, $transparent 4px);
+
   background-color: $white;
   overflow: hidden;
-  @include transition(width .3s linear 0s);
+
+  @include transition(width 0.3s linear 0s);
 
   &.shown {
     width: 20%;
@@ -70,6 +71,7 @@
 
   .row {
     @include clearfix();
+
     padding-bottom: 5px !important;
     margin-bottom: 10px !important;
     border-bottom: 1px solid #ddd !important;
@@ -88,7 +90,7 @@
       margin-right: 30px;
 
       .icon {
-          height: ($baseline * 1.5);
+        height: ($baseline * 1.5);
       }
     }
   }
@@ -105,8 +107,8 @@
 }
 
 .problem-editor {
-// adding padding to simple editor only - adjacent selector is needed since there are no toggles for CodeMirror
- .markdown-box+.CodeMirror {
+  // adding padding to simple editor only - adjacent selector is needed since there are no toggles for CodeMirror
+  .markdown-box + .CodeMirror {
     padding: 10px;
   }
 }
@@ -116,5 +118,5 @@
   width: 26px;
   height: 21px;
   vertical-align: middle;
-  color: $base-font-color;
+  color: $body-color;
 }

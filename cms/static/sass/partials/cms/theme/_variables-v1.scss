@@ -1,0 +1,305 @@
+// studio - utilities - variables
+// ====================
+
+// Table of Contents
+// * +Paths
+// * +Grid
+// * +Fonts
+// * +Colors - Utility
+// * +Colors - Primary
+// * +Colors - Shadow
+// * +Color - Application
+// * +Timing
+// * +Archetype UI
+// * +Specific UI
+// * +Deprecated
+
+$baseline: 20px;
+
+// +Paths
+// ====================
+$static-path: '..' !default;
+
+// +Grid
+// ====================
+$gw-column: ($baseline*3);
+$gw-gutter: $baseline;
+$fg-column: $gw-column;
+$fg-gutter: $gw-gutter;
+$fg-max-columns: 12;
+$fg-max-width: 1280px;
+$fg-min-width: 900px;
+
+// +Fonts
+// ====================
+$f-sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif;
+$f-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace;
+
+// +Colors - Utility
+// ====================
+$transparent: rgba(0, 0, 0, 0) !default; // used when color value is needed for UI width/transitions but element is transparent
+
+// +Colors - UXPL new pattern library colors
+// ====================
+$uxpl-blue-hover-active: rgb(6, 86, 131) !default; // wcag2a compliant
+$uxpl-light-blue-base: rgb(242, 248, 251) !default;
+
+$uxpl-green-base: rgb(0, 129, 0) !default; // wcag2a compliant
+$uxpl-green-hover-active: rgb(0, 155, 0) !default; // wcag2a compliant
+$uxpl-green-dark-hover-active: rgb(0, 88, 0) !default;
+
+$uxpl-pink-base: rgb(194, 56, 125) !default; // wcag2a compliant
+$uxpl-pink-hover-active: lighten($uxpl-pink-base, 7%) !default; // wcag2a compliant
+
+$uxpl-grayscale-x-back: rgb(245, 245, 245) !default; // UXPL grayscale, x-back
+
+$uxpl-primary-accent: rgb(14, 166, 236) !default;
+
+// +Colors - Primary
+// ====================
+$black: rgb(0, 0, 0) !default;
+$black-t0: rgba($black, 0.125) !default;
+$black-t1: rgba($black, 0.25) !default;
+$black-t2: rgba($black, 0.5) !default;
+$black-t3: rgba($black, 0.75) !default;
+$black-t4: rgba($black, 0.85) !default;
+
+$white: rgb(255, 255, 255) !default;
+$white-t0: rgba($white, 0.125) !default;
+$white-t1: rgba($white, 0.25) !default;
+$white-t2: rgba($white, 0.5) !default;
+$white-t3: rgba($white, 0.75) !default;
+
+$gray: rgb(127, 127, 127) !default;
+$gray-l1: tint($gray, 20%) !default;
+$gray-l2: tint($gray, 40%) !default;
+$gray-l3: tint($gray, 60%) !default;
+$gray-l4: tint($gray, 80%) !default;
+$gray-l5: tint($gray, 90%) !default;
+$gray-l6: tint($gray, 95%) !default;
+$gray-l7: tint($gray, 99%) !default;
+$gray-d1: shade($gray, 20%) !default;
+$gray-d2: shade($gray, 40%) !default;
+$gray-d3: shade($gray, 60%) !default;
+$gray-d4: shade($gray, 80%) !default;
+$gray-u1: #ecf0f1;
+
+
+// These define button styles similar to LMS
+// The goal here is consistency (until we can overhaul all of this...)
+$btn-lms-border: #d2c9c9 !default;
+$btn-lms-background: #f1f1f1 !default;
+$btn-lms-gradient: #d9d1d1 !default;
+$btn-lms-shadow: #fcfbfb !default;
+$btn-lms-shadow-hover: #fefefe !default;
+$btn-lms-background-hover: #e4e4e4 !default;
+$btn-lms-gradient-hover: #d1c9c9 !default;
+$btn-lms-shadow-active: #cac2c2 !default;
+
+$blue: rgb(0, 159, 230) !default;
+$blue-l1: tint($blue, 20%) !default;
+$blue-l2: tint($blue, 40%) !default;
+$blue-l3: tint($blue, 60%) !default;
+$blue-l4: tint($blue, 80%) !default;
+$blue-l5: tint($blue, 90%) !default;
+$blue-d1: shade($blue, 20%) !default;
+$blue-d2: shade($blue, 40%) !default;
+$blue-d3: shade($blue, 60%) !default;
+$blue-d4: shade($blue, 80%) !default;
+$blue-s1: saturate($blue, 15%) !default;
+$blue-s2: saturate($blue, 30%) !default;
+$blue-s3: saturate($blue, 45%) !default;
+$blue-u1: desaturate($blue, 15%) !default;
+$blue-u2: desaturate($blue, 30%) !default;
+$blue-u3: desaturate($blue, 45%) !default;
+$blue-t0: rgba($blue, 0.125) !default;
+$blue-t1: rgba($blue, 0.25) !default;
+$blue-t2: rgba($blue, 0.5) !default;
+$blue-t3: rgba($blue, 0.75) !default;
+
+$pink: rgb(183, 37, 103) !default; // #b72567;
+$pink-l1: tint($pink, 20%) !default;
+$pink-l2: tint($pink, 40%) !default;
+$pink-l3: tint($pink, 60%) !default;
+$pink-l4: tint($pink, 80%) !default;
+$pink-l5: tint($pink, 90%) !default;
+$pink-d1: shade($pink, 20%) !default;
+$pink-d2: shade($pink, 40%) !default;
+$pink-d3: shade($pink, 60%) !default;
+$pink-d4: shade($pink, 80%) !default;
+$pink-s1: saturate($pink, 15%) !default;
+$pink-s2: saturate($pink, 30%) !default;
+$pink-s3: saturate($pink, 45%) !default;
+$pink-u1: desaturate($pink, 15%) !default;
+$pink-u2: desaturate($pink, 30%) !default;
+$pink-u3: desaturate($pink, 45%) !default;
+
+$red: rgb(178, 6, 16) !default;  // #b20610;
+$red-l1: tint($red, 20%) !default;
+$red-l2: tint($red, 40%) !default;
+$red-l3: tint($red, 60%) !default;
+$red-l4: tint($red, 80%) !default;
+$red-l5: tint($red, 90%) !default;
+$red-d1: shade($red, 20%) !default;
+$red-d2: shade($red, 40%) !default;
+$red-d3: shade($red, 60%) !default;
+$red-d4: shade($red, 80%) !default;
+$red-s1: saturate($red, 15%) !default;
+$red-s2: saturate($red, 30%) !default;
+$red-s3: saturate($red, 45%) !default;
+$red-u1: desaturate($red, 15%) !default;
+$red-u2: desaturate($red, 30%) !default;
+$red-u3: desaturate($red, 45%) !default;
+
+$green: rgb(37, 184, 90) !default; // #25b85a
+$green-l1: tint($green, 20%) !default;
+$green-l2: tint($green, 40%) !default;
+$green-l3: tint($green, 60%) !default;
+$green-l4: tint($green, 80%) !default;
+$green-l5: tint($green, 90%) !default;
+$green-d1: shade($green, 20%) !default;
+$green-d2: shade($green, 40%) !default;
+$green-d3: shade($green, 60%) !default;
+$green-d4: shade($green, 80%) !default;
+$green-s1: saturate($green, 15%) !default;
+$green-s2: saturate($green, 30%) !default;
+$green-s3: saturate($green, 45%) !default;
+$green-u1: desaturate($green, 15%) !default;
+$green-u2: desaturate($green, 30%) !default;
+$green-u3: desaturate($green, 45%) !default;
+
+$yellow: rgb(237, 189, 60) !default;
+$yellow-l1: tint($yellow, 20%) !default;
+$yellow-l2: tint($yellow, 40%) !default;
+$yellow-l3: tint($yellow, 60%) !default;
+$yellow-l4: tint($yellow, 80%) !default;
+$yellow-l5: tint($yellow, 90%) !default;
+$yellow-d1: shade($yellow, 20%) !default;
+$yellow-d2: shade($yellow, 40%) !default;
+$yellow-d3: shade($yellow, 60%) !default;
+$yellow-d4: shade($yellow, 80%) !default;
+$yellow-s1: saturate($yellow, 15%) !default;
+$yellow-s2: saturate($yellow, 30%) !default;
+$yellow-s3: saturate($yellow, 45%) !default;
+$yellow-u1: desaturate($yellow, 15%) !default;
+$yellow-u2: desaturate($yellow, 30%) !default;
+$yellow-u3: desaturate($yellow, 45%) !default;
+
+$orange: rgb(237, 189, 60) !default;
+$orange-l1: tint($orange, 20%) !default;
+$orange-l2: tint($orange, 40%) !default;
+$orange-l3: tint($orange, 60%) !default;
+$orange-l4: tint($orange, 80%) !default;
+$orange-l5: tint($orange, 90%) !default;
+$orange-d1: shade($orange, 20%) !default;
+$orange-d2: shade($orange, 40%) !default;
+$orange-d3: shade($orange, 60%) !default;
+$orange-d4: shade($orange, 80%) !default;
+$orange-s1: saturate($orange, 15%) !default;
+$orange-s2: saturate($orange, 30%) !default;
+$orange-s3: saturate($orange, 45%) !default;
+$orange-u1: desaturate($orange, 15%) !default;
+$orange-u2: desaturate($orange, 30%) !default;
+$orange-u3: desaturate($orange, 45%) !default;
+
+// +Colors - Shadows
+// ====================
+$shadow: rgba($black, 0.2) !default;
+$shadow-l1: rgba($black, 0.1) !default;
+$shadow-l2: rgba($black, 0.05) !default;
+$shadow-d1: rgba($black, 0.4) !default;
+$shadow-d2: rgba($black, 0.6) !default;
+
+// +Colors - Application
+// ====================
+$color-draft: $gray-l3 !default;
+$color-live: $blue !default;
+$color-ready: $green !default;
+$color-warning: $orange-l2 !default;
+$color-error: $red-l2 !default;
+$color-staff-only: $black !default;
+$color-gated: $black !default;
+
+$color-heading-base: $gray-d2 !default;
+$color-copy-base: $gray-d2 !default;
+$color-copy-emphasized: $gray-d2 !default;
+
+// +Timing
+// ====================
+// used for animation/transition mixin syncing
+$tmg-s3: 3s;
+$tmg-s2: 2s;
+$tmg-s1: 1s;
+$tmg-avg: 0.75s;
+$tmg-f1: 0.5s;
+$tmg-f2: 0.25s;
+$tmg-f3: 0.125s;
+
+// +Archetype UI
+// ====================
+$ui-action-primary-color: $blue-u2 !default;
+$ui-action-primary-color-focus: $blue-s1 !default;
+
+$ui-link-color: $blue-u2 !default;
+$ui-link-color-focus: $blue-s1 !default;
+$link-color: $ui-link-color;
+
+// +Specific UI
+// ====================
+$ui-notification-height: ($baseline*10);
+$ui-update-color: $blue-l4 !default;
+
+// +Deprecated
+// ====================
+// do not use, future clean up will use updated styles
+$lighter-base-font-color: rgb(100, 100, 100) !default;
+$offBlack: #3c3c3c !default;
+$green: #108614 !default;
+$lightGrey: #edf1f5 !default;
+$mediumGrey: #b0b6c2 !default;
+$darkGrey: #8891a1 !default;
+$extraDarkGrey: #3d4043 !default;
+$paleYellow: #fffcf1 !default;
+$yellow: rgb(255, 254, 223) !default;
+$green: rgb(37, 184, 90) !default;
+$brightGreen: rgb(22, 202, 87) !default;
+$disabledGreen: rgb(124, 206, 153) !default;
+$darkGreen: rgb(52, 133, 76) !default;
+$lightBluishGrey: rgb(197, 207, 223) !default;
+$lightBluishGrey2: rgb(213, 220, 228) !default;
+$error-red: rgb(253, 87, 87) !default;
+
+
+//carryover from LMS for xmodules
+$sidebar-color: rgb(246, 246, 246) !default;
+
+// type
+$body-line-height: golden-ratio(0.875em, 1);
+
+// carried over from LMS for xmodules
+$action-primary-active-bg: #1aa1de !default; // $m-blue
+$very-light-text: $white !default;
+
+$color-background-alternate: rgb(242, 248, 251) !default;
+
+// ----------------------------
+// #COLORS- Bootstrap-style
+// ----------------------------
+
+$state-success-text: $black !default;
+$state-success-bg: #dff0d8 !default;
+$state-success-border: darken($state-success-bg, 5%) !default;
+
+$state-info-text: $black !default;
+$state-info-bg: #d9edf7 !default;
+$state-info-border: darken($state-info-bg, 7%) !default;
+
+$state-warning-text: $black !default;
+$state-warning-bg: #fcf8e3 !default;
+$state-warning-border: darken($state-warning-bg, 5%) !default;
+
+$state-danger-text: $black !default;
+$state-danger-bg: #f2dede !default;
+$state-danger-border: darken($state-danger-bg, 5%) !default;
+
+$text-dark-black-blue: #2c3e50;

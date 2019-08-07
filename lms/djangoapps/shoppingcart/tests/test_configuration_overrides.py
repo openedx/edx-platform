@@ -2,18 +2,17 @@
 """
 Dashboard with Shopping Cart History tests with configuration overrides.
 """
-from django.core.urlresolvers import reverse
+from __future__ import absolute_import
 
+from django.urls import reverse
 from mock import patch
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-from shoppingcart.models import (
-    Order, PaidCourseRegistration, CertificateItem, Donation
-)
-from student.tests.factories import UserFactory
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from shoppingcart.models import CertificateItem, Donation, Order, PaidCourseRegistration
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
@@ -21,6 +20,7 @@ class TestOrderHistoryOnSiteDashboard(SiteMixin, ModuleStoreTestCase):
     """
     Test for dashboard order history site configuration overrides.
     """
+
     def setUp(self):
         super(TestOrderHistoryOnSiteDashboard, self).setUp()
 

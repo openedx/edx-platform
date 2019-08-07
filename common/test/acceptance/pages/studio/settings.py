@@ -2,17 +2,17 @@
 """
 Course Schedule and Details Settings page.
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
+
 import os
-from bok_choy.promise import EmptyPromise
+
+import six
 from bok_choy.javascript import requirejs
+from bok_choy.promise import EmptyPromise
 
 from common.test.acceptance.pages.studio.course_page import CoursePage
 from common.test.acceptance.pages.studio.users import wait_for_ajax_or_reload
-from common.test.acceptance.pages.studio.utils import (
-    press_the_notification_button,
-    type_in_codemirror
-)
+from common.test.acceptance.pages.studio.utils import press_the_notification_button, type_in_codemirror
 
 
 @requirejs('js/factories/settings')
@@ -78,7 +78,7 @@ class SettingsPage(CoursePage):
         Set the values of the elements to those specified
         in the element_values dict.
         """
-        for css, value in element_values.iteritems():
+        for css, value in six.iteritems(element_values):
             element = self.get_element(css)
             element.clear()
             element.send_keys(value)
@@ -261,18 +261,21 @@ class SettingsPage(CoursePage):
         Set the entrance exam requirement via the checkbox.
         """
         checkbox = self.entrance_exam_field
+        # Wait for license section to load before interacting with the checkbox to avoid race condition
+        self.wait_for_element_presence('div.wrapper-license', 'License section present')
         selected = checkbox.is_selected()
+        self.scroll_to_element('#entrance-exam-enabled')
         if required and not selected:
             checkbox.click()
-            self.wait_for_element_visibility(
+            self.wait_for_element_presence(
                 '#entrance-exam-minimum-score-pct',
-                'Entrance exam minimum score percent is visible'
+                'Entrance exam minimum score percent is present'
             )
         if not required and selected:
             checkbox.click()
-            self.wait_for_element_invisibility(
+            self.wait_for_element_absence(
                 '#entrance-exam-minimum-score-pct',
-                'Entrance exam minimum score percent is invisible'
+                'Entrance exam minimum score percent is absent'
             )
 
     def save_changes(self, wait_for_confirmation=True):
@@ -285,6 +288,8 @@ class SettingsPage(CoursePage):
                 '#alert-confirmation-title',
                 'Save confirmation message is visible'
             )
+        # After visibility an ajax call is in process, waiting for that to complete
+        self.wait_for_ajax()
 
     def refresh_page(self, wait_for_confirmation=True):
         """

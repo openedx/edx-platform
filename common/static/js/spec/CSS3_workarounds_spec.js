@@ -13,7 +13,7 @@ describe('CSS3 workarounds', function() {
             // so that it includes 'pointerEvents'
             var mockBodyStyle = document.body.style;
             if (!('pointerEvents' in mockBodyStyle)) {
-                mockBodyStyle['pointerEvents'] = '';
+                mockBodyStyle.pointerEvents = '';
             }
 
             pointerEventsNone('.is-disabled', mockBodyStyle);

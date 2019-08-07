@@ -2,18 +2,18 @@
 """
 Commandline tool for doing operations on Problems
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
 
 import argparse
 import logging
 import sys
-from path import Path as path
-
-from cStringIO import StringIO
+from io import BytesIO
 
 from calc import UndefinedVariable
-from capa.capa_problem import LoncapaProblem
 from mako.lookup import TemplateLookup
+from path import Path as path
+
+from capa.capa_problem import LoncapaProblem
 
 logging.basicConfig(format="%(levelname)s %(message)s")
 log = logging.getLogger('capa.checker')
@@ -24,14 +24,11 @@ class DemoSystem(object):
         self.lookup = TemplateLookup(directories=[path(__file__).dirname() / 'templates'])
         self.DEBUG = True
 
-    def render_template(self, template_filename, dictionary, context=None):
-        if context is None:
-            context = {}
-
-        context_dict = {}
-        context_dict.update(dictionary)
-        context_dict.update(context)
-        return self.lookup.get_template(template_filename).render(**context_dict)
+    def render_template(self, template_filename, dictionary):
+        """
+        Render the specified template with the given dictionary of context data.
+        """
+        return self.lookup.get_template(template_filename).render(**dictionary)
 
 
 def main():
@@ -70,15 +67,15 @@ def main():
 
 def command_show(problem):
     """Display the text for this problem"""
-    print problem.get_html()
+    print(problem.get_html())
 
 
 def command_test(problem):
     # We're going to trap stdout/stderr from the problems (yes, some print)
     old_stdout, old_stderr = sys.stdout, sys.stderr
     try:
-        sys.stdout = StringIO()
-        sys.stderr = StringIO()
+        sys.stdout = BytesIO()
+        sys.stderr = BytesIO()
 
         check_that_suggested_answers_work(problem)
         check_that_blanks_fail(problem)

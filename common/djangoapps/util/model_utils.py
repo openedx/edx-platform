@@ -1,17 +1,13 @@
 """
 Utilities for django models.
 """
-import unicodedata
-import re
+from __future__ import absolute_import
 
-from eventtracking import tracker
-
+import six
 from django.conf import settings
-from django.utils.encoding import force_unicode
-from django.utils.safestring import mark_safe
 from django.dispatch import Signal
-
 from django_countries.fields import Country
+from eventtracking import tracker
 
 # The setting name used for events when "settings" (account settings, preferences, profile information) change.
 USER_SETTINGS_CHANGED_EVENT_NAME = u'edx.user.settings.changed'
@@ -168,24 +164,7 @@ def _get_truncated_setting_value(value, max_length=None):
         truncated_value (object): the possibly truncated version of the value.
         was_truncated (bool): returns true if the serialized value was truncated.
     """
-    if isinstance(value, basestring) and max_length is not None and len(value) > max_length:
+    if isinstance(value, six.string_types) and max_length is not None and len(value) > max_length:
         return value[0:max_length], True
     else:
         return value, False
-
-
-# Taken from Django 1.8 source code because it's not supported in 1.4
-def slugify(value):
-    """Converts value into a string suitable for readable URLs.
-
-    Converts to ASCII. Converts spaces to hyphens. Removes characters that
-    aren't alphanumerics, underscores, or hyphens. Converts to lowercase.
-    Also strips leading and trailing whitespace.
-
-    Args:
-        value (string): String to slugify.
-    """
-    value = force_unicode(value)
-    value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
-    value = re.sub(r'[^\w\s-]', '', value).strip().lower()
-    return mark_safe(re.sub(r'[-\s]+', '-', value))

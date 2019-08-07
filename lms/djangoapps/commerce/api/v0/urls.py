@@ -1,16 +1,18 @@
-""" API v0 URLs. """
-from django.conf.urls import patterns, url, include
+"""
+API v0 URLs.
+"""
+from __future__ import absolute_import
 
-from commerce.api.v0 import views
+from django.conf.urls import include, url
 
+from . import views
 
-BASKET_URLS = patterns(
-    '',
+BASKET_URLS = ([
     url(r'^$', views.BasketsView.as_view(), name='create'),
     url(r'^(?P<basket_id>[\w]+)/order/$', views.BasketOrderView.as_view(), name='retrieve_order'),
-)
+], 'baskets')
 
-urlpatterns = patterns(
-    '',
-    url(r'^baskets/', include(BASKET_URLS, namespace='baskets')),
-)
+app_name = 'v0'
+urlpatterns = [
+    url(r'^baskets/', include(BASKET_URLS)),
+]

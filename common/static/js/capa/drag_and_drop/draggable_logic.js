@@ -1,7 +1,7 @@
 (function(requirejs, require, define) {
     define(['js/capa/drag_and_drop/update_input', 'js/capa/drag_and_drop/targets'], function(updateInput, Targets) {
         return {
-            'moveDraggableTo': function(moveType, target, funcCallback) {
+            moveDraggableTo: function(moveType, target, funcCallback) {
                 var self, offset;
 
                 if (this.hasLoaded === false) {
@@ -36,8 +36,8 @@
 
                 if (this.iconImgEl !== null) {
                     this.iconImgEl.css({
-                        'width': this.iconWidth,
-                        'height': this.iconHeight
+                        width: this.iconWidth,
+                        height: this.iconHeight
                     });
                 }
 
@@ -45,19 +45,19 @@
                     'background-color': this.iconElBGColor,
                     'padding-left': this.iconElPadding,
                     'padding-right': this.iconElPadding,
-                    'border': this.iconElBorder,
-                    'width': this.iconWidth,
-                    'height': this.iconHeight
+                    border: this.iconElBorder,
+                    width: this.iconWidth,
+                    height: this.iconHeight
                 });
                 if (moveType === 'target') {
                     this.iconEl.css({
-                        'left': target.offset.left + 0.5 * target.w - this.iconWidth * 0.5 + offset - this.iconElLeftOffset,
-                        'top': target.offset.top + 0.5 * target.h - this.iconHeight * 0.5 + offset
+                        left: target.offset.left + 0.5 * target.w - this.iconWidth * 0.5 + offset - this.iconElLeftOffset,
+                        top: target.offset.top + 0.5 * target.h - this.iconHeight * 0.5 + offset
                     });
                 } else {
                     this.iconEl.css({
-                        'left': target.x - this.iconWidth * 0.5 + offset - this.iconElLeftOffset,
-                        'top': target.y - this.iconHeight * 0.5 + offset
+                        left: target.x - this.iconWidth * 0.5 + offset - this.iconElLeftOffset,
+                        top: target.y - this.iconHeight * 0.5 + offset
                     });
                 }
                 this.iconEl.appendTo(this.state.baseImageEl.parent());
@@ -70,17 +70,17 @@
                         'background-color': this.state.config.labelBgColor,
                         'padding-left': 8,
                         'padding-right': 8,
-                        'border': '1px solid black'
+                        border: '1px solid black'
                     });
                     if (moveType === 'target') {
                         this.labelEl.css({
-                            'left': target.offset.left + 0.5 * target.w - this.labelWidth * 0.5 + offset - 9, // Account for padding, border.
-                            'top': target.offset.top + 0.5 * target.h + this.iconHeight * 0.5 + 5 + offset
+                            left: target.offset.left + 0.5 * target.w - this.labelWidth * 0.5 + offset - 9, // Account for padding, border.
+                            top: target.offset.top + 0.5 * target.h + this.iconHeight * 0.5 + 5 + offset
                         });
                     } else {
                         this.labelEl.css({
-                            'left': target.x - this.labelWidth * 0.5 + offset - 9, // Account for padding, border.
-                            'top': target.y - this.iconHeight * 0.5 + this.iconHeight + 5 + offset
+                            left: target.x - this.labelWidth * 0.5 + offset - 9, // Account for padding, border.
+                            top: target.y - this.iconHeight * 0.5 + this.iconHeight + 5 + offset
                         });
                     }
                     this.labelEl.appendTo(this.state.baseImageEl.parent());
@@ -113,7 +113,7 @@
     // will either move the draggable back to the slider, or update
     // the input with the user's answer (X-Y position of the draggable,
     // or the ID of the target where it landed.
-            'checkLandingElement': function() {
+            checkLandingElement: function() {
                 var positionIE;
 
                 this.mousePressed = false;
@@ -174,7 +174,7 @@
     // positionIE is the object as returned by
     //
     //     this.iconEl.position()
-            'checkIfOnTarget': function(positionIE) {
+            checkIfOnTarget: function(positionIE) {
                 var c1, target;
 
                 for (c1 = 0; c1 < this.state.targets.length; c1 += 1) {
@@ -236,7 +236,7 @@
                 return false;
             },
 
-            'toggleTargets': function(isEnabled) {
+            toggleTargets: function(isEnabled) {
                 var effect = isEnabled ? 'move' : null;
 
                 this.state.baseImageEl.attr('aria-dropeffect', effect);
@@ -245,7 +245,7 @@
                 });
             },
 
-            'snapToTarget': function(target) {
+            snapToTarget: function(target) {
                 var offset;
 
                 offset = 0;
@@ -254,14 +254,14 @@
                 }
 
                 this.iconEl.css({
-                    'left': target.offset.left + 0.5 * target.w - this.iconWidth * 0.5 + offset - this.iconElLeftOffset,
-                    'top': target.offset.top + 0.5 * target.h - this.iconHeight * 0.5 + offset
+                    left: target.offset.left + 0.5 * target.w - this.iconWidth * 0.5 + offset - this.iconElLeftOffset,
+                    top: target.offset.top + 0.5 * target.h - this.iconHeight * 0.5 + offset
                 });
 
                 if (this.labelEl !== null) {
                     this.labelEl.css({
-                        'left': target.offset.left + 0.5 * target.w - this.labelWidth * 0.5 + offset - 9, // Acoount for padding, border.
-                        'top': target.offset.top + 0.5 * target.h + this.iconHeight * 0.5 + 5 + offset
+                        left: target.offset.left + 0.5 * target.w - this.labelWidth * 0.5 + offset - 9, // Acoount for padding, border.
+                        top: target.offset.top + 0.5 * target.h + this.iconHeight * 0.5 + 5 + offset
                     });
                 }
             },
@@ -276,7 +276,7 @@
     // will be on top of all of the other draggables. Also, the
     // ordering of the visibility (z-index) of the other draggables
     // will not change.
-            'correctZIndexes': function() {
+            correctZIndexes: function() {
                 var c1, highestZIndex;
 
                 highestZIndex = -10000;
@@ -322,7 +322,7 @@
     // If a draggable was released in a wrong positione, we will
     // move it back to the slider, placing it in the same position
     // that it was dragged out of.
-            'moveBackToSlider': function() {
+            moveBackToSlider: function() {
                 var c1;
 
                 Targets.destroyTargetField(this);
@@ -350,41 +350,41 @@
                 this.iconEl.detach();
                 if (this.iconImgEl !== null) {
                     this.iconImgEl.css({
-                        'width': this.iconWidthSmall,
-                        'height': this.iconHeightSmall
+                        width: this.iconWidthSmall,
+                        height: this.iconHeightSmall
                     });
                 }
                 this.iconEl.css({
-                    'border': 'none',
+                    border: 'none',
                     'background-color': 'transparent',
                     'padding-left': 0,
                     'padding-right': 0,
                     'z-index': this.zIndex,
-                    'width': this.iconWidthSmall,
-                    'height': this.iconHeightSmall,
-                    'left': 50 - this.iconWidthSmall * 0.5,
+                    width: this.iconWidthSmall,
+                    height: this.iconHeightSmall,
+                    left: 50 - this.iconWidthSmall * 0.5,
 
             // Before:
             // 'top': ((this.labelEl !== null) ? (100 - this.iconHeightSmall - 25) * 0.5 : 50 - this.iconHeightSmall * 0.5)
             // After:
-                    'top': ((this.labelEl !== null) ? 37.5 : 50.0) - 0.5 * this.iconHeightSmall
+                    top: ((this.labelEl !== null) ? 37.5 : 50.0) - 0.5 * this.iconHeightSmall
                 });
                 this.iconEl.appendTo(this.containerEl);
 
                 if (this.labelEl !== null) {
                     this.labelEl.detach();
                     this.labelEl.css({
-                        'border': 'none',
+                        border: 'none',
                         'background-color': 'transparent',
                         'padding-left': 0,
                         'padding-right': 0,
                         'z-index': this.zIndex,
-                        'left': 50 - this.labelWidth * 0.5,
+                        left: 50 - this.labelWidth * 0.5,
 
                 // Before:
                 // 'top': (100 - this.iconHeightSmall - 25) * 0.5 + this.iconHeightSmall + 5
                 // After:
-                        'top': 42.5 + 0.5 * this.iconHeightSmall
+                        top: 42.5 + 0.5 * this.iconHeightSmall
                     });
                     this.labelEl.appendTo(this.containerEl);
                 }

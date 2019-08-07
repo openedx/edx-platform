@@ -2,16 +2,18 @@
 Tests for pavelib/i18n.py.
 """
 
+from __future__ import absolute_import
+
 import os
 import textwrap
 import unittest
 
 from mock import mock_open, patch
-from paver.easy import task, call_task
+from paver.easy import call_task, task
 
 import pavelib.i18n
-
 from pavelib.paver_tests.utils import PaverTestCase
+from pavelib.utils.envs import Env
 
 TX_CONFIG_SIMPLE = """\
 [main]
@@ -30,7 +32,7 @@ source_lang = en
 type = PO
 
 """
-
+# xss-lint: disable=python-concat-html
 TX_CONFIG_RELEASE = TX_CONFIG_SIMPLE + """\
 [edx-platform.release-zebrawood]
 file_filter = conf/locale/<lang>/LC_MESSAGES/django.po
@@ -155,14 +157,14 @@ class TestI18nDummy(PaverTestCase):
         """
         self.reset_task_messages()
         os.environ['NO_PREREQ_INSTALL'] = "true"
-        call_task('pavelib.i18n.i18n_dummy', options={"settings": 'test'})
+        call_task('pavelib.i18n.i18n_dummy', options={"settings": Env.TEST_SETTINGS})
         self.assertEquals(
             self.task_messages,
             [
                 u'i18n_tool extract',
                 u'i18n_tool dummy',
                 u'i18n_tool generate',
-                u'python manage.py lms --settings=test compilejsi18n',
-                u'python manage.py cms --settings=test compilejsi18n',
+                u'python manage.py lms --settings={} compilejsi18n'.format(Env.TEST_SETTINGS),
+                u'python manage.py cms --settings={} compilejsi18n'.format(Env.TEST_SETTINGS),
             ]
         )

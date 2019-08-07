@@ -2,10 +2,11 @@
 Admin site bindings for contentstore
 """
 
-from django.contrib import admin
+from __future__ import absolute_import
 
 from config_models.admin import ConfigurationModelAdmin
-from contentstore.models import VideoUploadConfig, PushNotificationConfig
+from django.contrib import admin
+
+from contentstore.models import VideoUploadConfig
 
 admin.site.register(VideoUploadConfig, ConfigurationModelAdmin)
-admin.site.register(PushNotificationConfig, ConfigurationModelAdmin)

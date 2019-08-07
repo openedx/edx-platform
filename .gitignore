@@ -64,6 +64,7 @@ conf/locale/messages.mo
 .testids/
 .noseids
 nosetests.xml
+.cache/
 .coverage
 .coverage.*
 coverage.xml
@@ -72,10 +73,18 @@ cover_html/
 reports/
 jscover.log
 jscover.log.*
+.pytest_cache/
+pytest_task*.txt
 .tddium*
 common/test/data/test_unicode/static/
 test_root/courses/
+test_root/data/test_bare.git/
+test_root/export_course_repos/
+test_root/paver_logs/
+test_root/uploads/
 django-pyfs
+.tox/
+common/test/db_cache/bok_choy_*.yaml
 
 ### Installation artifacts
 *.egg-info
@@ -91,6 +100,9 @@ lms/static/css/
 lms/static/certificates/css/
 cms/static/css/
 common/static/common/js/vendor/
+common/static/common/css/vendor/
+common/static/bundles
+webpack-stats.json
 
 ### Styling generated from templates
 lms/static/sass/*.css
@@ -101,8 +113,7 @@ cms/static/css/
 cms/static/sass/*.css
 cms/static/sass/*.css.map
 cms/static/themed_sass/
-themes/**/css/*.css
-themes/**/css/discussion/*.css
+themes/**/css
 
 ### Logging artifacts
 log/
@@ -121,7 +132,14 @@ build
 /src/
 \#*\#
 .env/
-lms/lib/comment_client/python
+openedx/core/djangoapps/django_comment_common/comment_client/python
 autodeploy.properties
 .ws_migrations_complete
 dist
+*.bak
+
+# Visual Studio Code
+.vscode
+
+# Locally generated PII reports
+pii_report

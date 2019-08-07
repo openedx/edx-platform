@@ -8,11 +8,13 @@ $layout-direction: nil !default;
 @function flex-grid($columns, $container-columns: $fg-max-columns) {
   $width: $columns * $fg-column + ($columns - 1) * $fg-gutter;
   $container-width: $container-columns * $fg-column + ($container-columns - 1) * $fg-gutter;
+
   @return percentage($width / $container-width);
 }
 
 @function flex-gutter($container-columns: $fg-max-columns, $gutter: $fg-gutter) {
   $container-width: $container-columns * $fg-column + ($container-columns - 1) * $fg-gutter;
+
   @return percentage($gutter / $container-width);
 }
 
@@ -23,7 +25,9 @@ $layout-direction: nil !default;
 @function get-parent-columns($columns) {
   @if $columns != $grid-columns {
     $parent-columns: $columns !global;
-  } @else {
+  }
+
+  @else {
     $parent-columns: $grid-columns !global;
   }
 
@@ -35,7 +39,9 @@ $layout-direction: nil !default;
 
   @if $container-is-display-table == true {
     $display-table: true;
-  } @else if $display == table {
+  }
+
+  @else if $display == table {
     $display-table: true;
   }
 

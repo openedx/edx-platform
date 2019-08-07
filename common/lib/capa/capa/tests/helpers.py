@@ -1,18 +1,20 @@
 """Tools for helping with testing capa."""
 
+from __future__ import absolute_import
+
 import gettext
-from path import path  # pylint: disable=no-name-in-module
 import os
 import os.path
+import xml.sax.saxutils as saxutils
 
 import fs.osfs
+import six
+from mako.lookup import TemplateLookup
+from mock import MagicMock, Mock
+from path import Path
 
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
 from capa.inputtypes import Status
-from mock import Mock, MagicMock
-from mako.lookup import TemplateLookup
-
-import xml.sax.saxutils as saxutils
 
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -22,7 +24,7 @@ def get_template(template_name):
     Return template for a capa inputtype.
     """
     return TemplateLookup(
-        directories=[path(__file__).dirname().dirname() / 'templates'],
+        directories=[Path(__file__).dirname().dirname() / 'templates'],
         default_filters=['decode.utf8']
     ).get_template(template_name)
 
@@ -84,8 +86,17 @@ def mock_capa_module():
     """
     capa response types needs just two things from the capa_module: location and track_function.
     """
+    def mock_location_text(self):
+        """
+        Mock implementation of __unicode__ or __str__ for the module's location.
+        """
+        return u'i4x://Foo/bar/mock/abc'
+
     capa_module = Mock()
-    capa_module.location.to_deprecated_string.return_value = 'i4x://Foo/bar/mock/abc'
+    if six.PY2:
+        capa_module.location.__unicode__ = mock_location_text
+    else:
+        capa_module.location.__str__ = mock_location_text
     # The following comes into existence by virtue of being called
     # capa_module.runtime.track_function
     return capa_module

@@ -21,7 +21,6 @@
                     USER_DATA = {
                         email: 'xsy@edx.org',
                         password: 'xsyisawesome',
-                        remember: true
                     },
                     THIRD_PARTY_AUTH = {
                         currentProvider: null,
@@ -64,16 +63,6 @@
                                 type: 'password',
                                 required: true,
                                 instructions: 'Enter your password.',
-                                restrictions: {}
-                            },
-                            {
-                                placeholder: '',
-                                name: 'remember',
-                                label: 'Remember me',
-                                defaultValue: '',
-                                type: 'checkbox',
-                                required: true,
-                                instructions: 'Agree to the terms of service.',
                                 restrictions: {}
                             }
                         ]
@@ -119,9 +108,6 @@
                 // Simulate manual entry of login form data
                     $('#login-email').val(USER_DATA.email);
                     $('#login-password').val(USER_DATA.password);
-
-                // Check the 'Remember me' checkbox
-                    $('#login-remember').prop('checked', USER_DATA.remember);
 
                 // If validationSuccess isn't passed, we avoid
                 // spying on `view.validate` twice
@@ -191,10 +177,10 @@
                     });
 
                     AjaxHelpers.expectRequest(
-                    requests, 'POST',
-                    FORM_DESCRIPTION.submit_url,
-                    $.param(expectedData)
-                );
+                        requests, 'POST',
+                        FORM_DESCRIPTION.submit_url,
+                        $.param(expectedData)
+                    );
                 });
 
                 it('displays third-party auth login buttons', function() {
@@ -210,6 +196,21 @@
 
                 // Verify that the password reset link is displayed
                     expect($('.forgot-password')).toBeVisible();
+                });
+
+                it('displays password reset success message after password reset request', function() {
+                    createLoginView(this);
+
+                // Verify that the success message is not visible
+                    expect(view.$formFeedback.find('.' + view.passwordResetSuccessJsHook).length).toEqual(0);
+
+                /* After a successful password reset request, the resetModel will trigger a 'sync'
+                 * event, which lets the LoginView know to render the password reset success message.
+                 */
+                    view.resetModel.trigger('sync');
+
+                // Verify that the success message is visible
+                    expect(view.$formFeedback.find('.' + view.passwordResetSuccessJsHook).length).toEqual(1);
                 });
 
                 it('validates login form fields', function() {
@@ -229,10 +230,11 @@
                     submitForm(false);
 
                 // Verify that submission errors are visible
-                    expect(view.$errors).not.toHaveClass('hidden');
+                    expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(1);
 
                 // Expect auth complete NOT to have been triggered
                     expect(authComplete).toBe(false);
+
                 // Form button should be re-enabled when errors occur
                     expect(view.$submitButton).not.toHaveAttr('disabled');
                 });
@@ -247,8 +249,10 @@
                     AjaxHelpers.respondWithError(requests);
 
                 // Expect that an error is displayed and that auth complete is not triggered
-                    expect(view.$errors).not.toHaveClass('hidden');
+                    expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(1);
+
                     expect(authComplete).toBe(false);
+
                 // Form button should be re-enabled on server failure.
                     expect(view.$submitButton).not.toHaveAttr('disabled');
 
@@ -262,17 +266,18 @@
                     AjaxHelpers.respondWithJson(requests, {});
 
                 // Expect that the error is hidden and auth complete is triggered
-                    expect(view.$errors).toHaveClass('hidden');
+                    expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(0);
                     expect(authComplete).toBe(true);
                 });
 
                 it('displays an error if there is no internet connection', function() {
                     var clock,
                         oldTimeout,
-                        timeout;
+                        timeout,
+                        $error;
 
                 // We're defining "no internet connection" in this case as the
-                // request timing out.  We use a combination of the sinon fake
+                // request timing out. We use a combination of the sinon fake
                 // timer and jQuery.ajaxSetup() to force a request timeout.
                     clock = sinon.useFakeTimers();
                     oldTimeout = $.ajaxSetup().timeout;
@@ -288,11 +293,12 @@
                     clock.tick(timeout + 1);
 
                 // Expect that an error is displayed and that auth complete is not triggered
-                    expect(view.$errors).not.toHaveClass('hidden');
+                    $error = view.$formFeedback.find('.' + view.formErrorsJsHook);
+                    expect($error.length).toEqual(1);
+                    expect($error.text()).toContain(
+                        'An error has occurred. Check your Internet connection and try again.'
+                    );
                     expect(authComplete).toBe(false);
-                    expect(view.$errors.text()).toContain(
-                    'An error has occurred. Check your Internet connection and try again.'
-                );
 
                 // Finally, restore the old timeout and turn off the fake timer.
                     $.ajaxSetup({timeout: oldTimeout});
@@ -300,6 +306,7 @@
                 });
 
                 it('displays an error if there is a server error', function() {
+                    var $error;
                     createLoginView(this);
 
                 // Submit the form, with successful validation
@@ -309,11 +316,12 @@
                     AjaxHelpers.respondWithError(requests, 500);
 
                 // Expect that an error is displayed and that auth complete is not triggered
-                    expect(view.$errors).not.toHaveClass('hidden');
+                    $error = view.$formFeedback.find('.' + view.formErrorsJsHook);
+                    expect($error.length).toEqual(1);
+                    expect($error.text()).toContain(
+                        'An error has occurred. Try refreshing the page, or check your Internet connection.'
+                    );
                     expect(authComplete).toBe(false);
-                    expect(view.$errors.text()).toContain(
-                    'An error has occurred. Try refreshing the page, or check your Internet connection.'
-                );
                 });
             });
         });

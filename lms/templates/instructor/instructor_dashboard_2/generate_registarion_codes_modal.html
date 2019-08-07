@@ -1,7 +1,7 @@
 <%page args="section_data" expression_filter="h"/>
 <%!
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 %>
 <section id="registration_code_generation_modal" class="modal" role="dialog" tabindex="-1" aria-labelledby="header-registration-code">
     <h2 id="header-registration-code" class="hd hd-2">${_("Generate Registration Code Modal")}</h2>

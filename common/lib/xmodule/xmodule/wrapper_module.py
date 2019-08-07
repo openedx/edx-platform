@@ -1,6 +1,8 @@
 # Same as vertical,
 # But w/o css delimiters between children
 
+from __future__ import absolute_import
+
 from xmodule.vertical_block import VerticalBlock
 
 # HACK: This shouldn't be hard-coded to two types

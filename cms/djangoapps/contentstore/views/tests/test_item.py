@@ -1,47 +1,66 @@
 """Tests for items views."""
+from __future__ import absolute_import
+
 import json
 from datetime import datetime, timedelta
+
 import ddt
-
-from mock import patch, Mock, PropertyMock
-from pytz import UTC
-from pyquery import PyQuery
-from webob import Response
-
+import six
+from django.conf import settings
 from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
-from django.core.urlresolvers import reverse
-from contentstore.utils import reverse_usage_url, reverse_course_url
-
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
-from contentstore.views.component import (
-    component_handler, get_component_templates
-)
-
-from contentstore.views.item import (
-    create_xblock_info, ALWAYS, VisibilityState, _xblock_type_and_display_name, add_container_page_publishing_info
-)
-from contentstore.tests.utils import CourseTestCase
-from student.tests.factories import UserFactory
-from xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
-from xmodule.capa_module import CapaDescriptor
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
-from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory, check_mongo_calls, CourseFactory
-from xmodule.x_module import STUDIO_VIEW, STUDENT_VIEW
-from xmodule.course_module import DEFAULT_START_DATE
+from django.urls import reverse
+from mock import Mock, PropertyMock, patch
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.asides import AsideUsageKeyV2
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from pyquery import PyQuery
+from pytz import UTC
+from six import text_type
+from six.moves import range
+from web_fragments.fragment import Fragment
+from webob import Response
 from xblock.core import XBlockAside
-from xblock.fields import Scope, String, ScopeIds
-from xblock.fragment import Fragment
+from xblock.exceptions import NoSuchHandlerError
+from xblock.fields import Scope, ScopeIds, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.tools import TestRuntime
-from xblock.exceptions import NoSuchHandlerError
+from xblock.validation import ValidationMessage
+
+from contentstore.tests.utils import CourseTestCase
+from contentstore.utils import reverse_course_url, reverse_usage_url
+from contentstore.views.component import component_handler, get_component_templates
+from contentstore.views.item import (
+    ALWAYS,
+    VisibilityState,
+    _get_module_info,
+    _get_source_index,
+    _xblock_type_and_display_name,
+    add_container_page_publishing_info,
+    create_xblock_info,
+    highlights_setting
+)
+from lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
+from student.tests.factories import UserFactory
+from xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
 from xblock_django.user_service import DjangoXBlockUserService
-from opaque_keys.edx.keys import UsageKey, CourseKey
-from opaque_keys.edx.locations import Location
-from xmodule.partitions.partitions import Group, UserPartition
+from xmodule.capa_module import ProblemBlock
+from xmodule.course_module import DEFAULT_START_DATE
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls
+from xmodule.partitions.partitions import (
+    ENROLLMENT_TRACK_PARTITION_ID,
+    MINIMUM_STATIC_PARTITION_ID,
+    Group,
+    UserPartition
+)
+from xmodule.partitions.tests.test_partitions import MockPartitionService
+from xmodule.x_module import STUDENT_VIEW, STUDIO_VIEW
 
 
 class AsideTest(XBlockAside):
@@ -91,14 +110,16 @@ class ItemTest(CourseTestCase):
 
     def create_xblock(self, parent_usage_key=None, display_name=None, category=None, boilerplate=None):
         data = {
-            'parent_locator': unicode(self.usage_key) if parent_usage_key is None else unicode(parent_usage_key),
+            'parent_locator': six.text_type(
+                self.usage_key
+            )if parent_usage_key is None else six.text_type(parent_usage_key),
             'category': category
         }
         if display_name is not None:
             data['display_name'] = display_name
         if boilerplate is not None:
             data['boilerplate'] = boilerplate
-        return self.client.ajax_post(reverse('contentstore.views.xblock_handler'), json.dumps(data))
+        return self.client.ajax_post(reverse('xblock_handler'), json.dumps(data))
 
     def _create_vertical(self, parent_usage_key=None):
         """
@@ -234,7 +255,7 @@ class GetItemTest(ItemTest):
             html,
             # The instance of the wrapper class will have an auto-generated ID. Allow any
             # characters after wrapper.
-            r'"/container/{}" class="action-button">\s*<span class="action-button-text">View</span>'.format(
+            ur'"/container/{}" class="action-button">\s*<span class="action-button-text">View</span>'.format(
                 wrapper_usage_key
             )
         )
@@ -339,15 +360,17 @@ class GetItemTest(ItemTest):
         )
 
     def test_get_user_partitions_and_groups(self):
+        # Note about UserPartition and UserPartition Group IDs: these must not conflict with IDs used
+        # by dynamic user partitions.
         self.course.user_partitions = [
             UserPartition(
-                id=0,
-                name="Verification user partition",
-                scheme=UserPartition.get_scheme("verification"),
-                description="Verification user partition",
+                id=MINIMUM_STATIC_PARTITION_ID,
+                name="Random user partition",
+                scheme=UserPartition.get_scheme("random"),
+                description="Random user partition",
                 groups=[
-                    Group(id=0, name="Group A"),
-                    Group(id=1, name="Group B"),
+                    Group(id=MINIMUM_STATIC_PARTITION_ID + 1, name="Group A"),  # See note above.
+                    Group(id=MINIMUM_STATIC_PARTITION_ID + 2, name="Group B"),  # See note above.
                 ],
             ),
         ]
@@ -363,18 +386,31 @@ class GetItemTest(ItemTest):
         result = json.loads(resp.content)
         self.assertEqual(result["user_partitions"], [
             {
-                "id": 0,
-                "name": "Verification user partition",
-                "scheme": "verification",
+                "id": ENROLLMENT_TRACK_PARTITION_ID,
+                "name": "Enrollment Track Groups",
+                "scheme": "enrollment_track",
                 "groups": [
                     {
-                        "id": 0,
+                        "id": settings.COURSE_ENROLLMENT_MODES["audit"]["id"],
+                        "name": "Audit",
+                        "selected": False,
+                        "deleted": False,
+                    }
+                ]
+            },
+            {
+                "id": MINIMUM_STATIC_PARTITION_ID,
+                "name": "Random user partition",
+                "scheme": "random",
+                "groups": [
+                    {
+                        "id": MINIMUM_STATIC_PARTITION_ID + 1,
                         "name": "Group A",
                         "selected": False,
                         "deleted": False,
                     },
                     {
-                        "id": 1,
+                        "id": MINIMUM_STATIC_PARTITION_ID + 2,
                         "name": "Group B",
                         "selected": False,
                         "deleted": False,
@@ -384,10 +420,64 @@ class GetItemTest(ItemTest):
         ])
         self.assertEqual(result["group_access"], {})
 
+    @ddt.data('ancestorInfo', '')
+    def test_ancestor_info(self, field_type):
+        """
+        Test that we get correct ancestor info.
+
+        Arguments:
+            field_type (string): If field_type=ancestorInfo, fetch ancestor info of the XBlock otherwise not.
+        """
+
+        # Create a parent chapter
+        chap1 = self.create_xblock(parent_usage_key=self.course.location, display_name='chapter1', category='chapter')
+        chapter_usage_key = self.response_usage_key(chap1)
+
+        # create a sequential
+        seq1 = self.create_xblock(parent_usage_key=chapter_usage_key, display_name='seq1', category='sequential')
+        seq_usage_key = self.response_usage_key(seq1)
+
+        # create a vertical
+        vert1 = self.create_xblock(parent_usage_key=seq_usage_key, display_name='vertical1', category='vertical')
+        vert_usage_key = self.response_usage_key(vert1)
+
+        # create problem and an html component
+        problem1 = self.create_xblock(parent_usage_key=vert_usage_key, display_name='problem1', category='problem')
+        problem_usage_key = self.response_usage_key(problem1)
+
+        def assert_xblock_info(xblock, xblock_info):
+            """
+            Assert we have correct xblock info.
+
+            Arguments:
+                xblock (XBlock): An XBlock item.
+                xblock_info (dict): A dict containing xblock information.
+            """
+            self.assertEqual(six.text_type(xblock.location), xblock_info['id'])
+            self.assertEqual(xblock.display_name, xblock_info['display_name'])
+            self.assertEqual(xblock.category, xblock_info['category'])
+
+        for usage_key in (problem_usage_key, vert_usage_key, seq_usage_key, chapter_usage_key):
+            xblock = self.get_item_from_modulestore(usage_key)
+            url = reverse_usage_url('xblock_handler', usage_key) + '?fields={field_type}'.format(field_type=field_type)
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+            response = json.loads(response.content)
+            if field_type == 'ancestorInfo':
+                self.assertIn('ancestors', response)
+                for ancestor_info in response['ancestors']:
+                    parent_xblock = xblock.get_parent()
+                    assert_xblock_info(parent_xblock, ancestor_info)
+                    xblock = parent_xblock
+            else:
+                self.assertNotIn('ancestors', response)
+                self.assertEqual(_get_module_info(xblock), response)
+
 
 @ddt.ddt
 class DeleteItem(ItemTest):
     """Tests for '/xblock' DELETE url."""
+
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_delete_static_page(self, store):
         course = CourseFactory.create(default_store=store)
@@ -404,6 +494,7 @@ class TestCreateItem(ItemTest):
     """
     Test the create_item handler thoroughly
     """
+
     def test_create_nicely(self):
         """
         Try the straightforward use cases
@@ -438,7 +529,7 @@ class TestCreateItem(ItemTest):
         prob_usage_key = self.response_usage_key(resp)
         problem = self.get_item_from_modulestore(prob_usage_key, verify_is_draft=True)
         # check against the template
-        template = CapaDescriptor.get_template(template_id)
+        template = ProblemBlock.get_template(template_id)
         self.assertEqual(problem.data, template['data'])
         self.assertEqual(problem.display_name, template['metadata']['display_name'])
         self.assertEqual(problem.markdown, template['metadata']['markdown'])
@@ -506,21 +597,21 @@ class DuplicateHelper(object):
             self.assertEqual(duplicated_asides[0].field13, 'aside1_default_value3')
 
         self.assertNotEqual(
-            unicode(original_item.location),
-            unicode(duplicated_item.location),
+            six.text_type(original_item.location),
+            six.text_type(duplicated_item.location),
             "Location of duplicate should be different from original"
         )
 
         # Parent will only be equal for root of duplicated structure, in the case
         # where an item is duplicated in-place.
-        if parent_usage_key and unicode(original_item.parent) == unicode(parent_usage_key):
+        if parent_usage_key and six.text_type(original_item.parent) == six.text_type(parent_usage_key):
             self.assertEqual(
-                unicode(parent_usage_key), unicode(duplicated_item.parent),
+                six.text_type(parent_usage_key), six.text_type(duplicated_item.parent),
                 "Parent of duplicate should equal parent of source for root xblock when duplicated in-place"
             )
         else:
             self.assertNotEqual(
-                unicode(original_item.parent), unicode(duplicated_item.parent),
+                six.text_type(original_item.parent), six.text_type(duplicated_item.parent),
                 "Parent duplicate should be different from source"
             )
 
@@ -537,7 +628,7 @@ class DuplicateHelper(object):
                 len(duplicated_item.children),
                 "Duplicated item differs in number of children"
             )
-            for i in xrange(len(original_item.children)):
+            for i in range(len(original_item.children)):
                 if not self._check_equality(original_item.children[i], duplicated_item.children[i], is_child=True):
                     return False
             duplicated_item.children = original_item.children
@@ -552,10 +643,10 @@ class DuplicateHelper(object):
                 return duplicated_item.display_name == original_item.category
             return duplicated_item.display_name == original_item.display_name
         if original_item.display_name is not None:
-            return duplicated_item.display_name == "Duplicate of '{display_name}'".format(
+            return duplicated_item.display_name == u"Duplicate of '{display_name}'".format(
                 display_name=original_item.display_name
             )
-        return duplicated_item.display_name == "Duplicate of {display_name}".format(
+        return duplicated_item.display_name == u"Duplicate of {display_name}".format(
             display_name=original_item.category
         )
 
@@ -565,13 +656,13 @@ class DuplicateHelper(object):
         """
         # pylint: disable=no-member
         data = {
-            'parent_locator': unicode(parent_usage_key),
-            'duplicate_source_locator': unicode(source_usage_key)
+            'parent_locator': six.text_type(parent_usage_key),
+            'duplicate_source_locator': six.text_type(source_usage_key)
         }
         if display_name is not None:
             data['display_name'] = display_name
 
-        resp = self.client.ajax_post(reverse('contentstore.views.xblock_handler'), json.dumps(data))
+        resp = self.client.ajax_post(reverse('xblock_handler'), json.dumps(data))
         return self.response_usage_key(resp)
 
 
@@ -579,6 +670,7 @@ class TestDuplicateItem(ItemTest, DuplicateHelper):
     """
     Test the duplicate method.
     """
+
     def setUp(self):
         """ Creates the test course structure and a few components to 'duplicate'. """
         super(TestDuplicateItem, self).setUp()
@@ -680,10 +772,564 @@ class TestDuplicateItem(ItemTest, DuplicateHelper):
         verify_name(self.seq_usage_key, self.chapter_usage_key, "customized name", display_name="customized name")
 
 
+@ddt.ddt
+class TestMoveItem(ItemTest):
+    """
+    Tests for move item.
+    """
+
+    def setUp(self):
+        """
+        Creates the test course structure to build course outline tree.
+        """
+        super(TestMoveItem, self).setUp()
+        self.setup_course()
+
+    def setup_course(self, default_store=None):
+        """
+        Helper method to create the course.
+        """
+        if not default_store:
+            default_store = self.store.default_modulestore.get_modulestore_type()
+
+        self.course = CourseFactory.create(default_store=default_store)
+
+        # Create group configurations
+        self.course.user_partitions = [
+            UserPartition(0, 'first_partition', 'Test Partition', [Group("0", 'alpha'), Group("1", 'beta')])
+        ]
+        self.store.update_item(self.course, self.user.id)
+
+        # Create a parent chapter
+        chap1 = self.create_xblock(parent_usage_key=self.course.location, display_name='chapter1', category='chapter')
+        self.chapter_usage_key = self.response_usage_key(chap1)
+
+        chap2 = self.create_xblock(parent_usage_key=self.course.location, display_name='chapter2', category='chapter')
+        self.chapter2_usage_key = self.response_usage_key(chap2)
+
+        # Create a sequential
+        seq1 = self.create_xblock(parent_usage_key=self.chapter_usage_key, display_name='seq1', category='sequential')
+        self.seq_usage_key = self.response_usage_key(seq1)
+
+        seq2 = self.create_xblock(parent_usage_key=self.chapter_usage_key, display_name='seq2', category='sequential')
+        self.seq2_usage_key = self.response_usage_key(seq2)
+
+        # Create a vertical
+        vert1 = self.create_xblock(parent_usage_key=self.seq_usage_key, display_name='vertical1', category='vertical')
+        self.vert_usage_key = self.response_usage_key(vert1)
+
+        vert2 = self.create_xblock(parent_usage_key=self.seq_usage_key, display_name='vertical2', category='vertical')
+        self.vert2_usage_key = self.response_usage_key(vert2)
+
+        # Create problem and an html component
+        problem1 = self.create_xblock(parent_usage_key=self.vert_usage_key, display_name='problem1', category='problem')
+        self.problem_usage_key = self.response_usage_key(problem1)
+
+        html1 = self.create_xblock(parent_usage_key=self.vert_usage_key, display_name='html1', category='html')
+        self.html_usage_key = self.response_usage_key(html1)
+
+        # Create a content experiment
+        resp = self.create_xblock(category='split_test', parent_usage_key=self.vert_usage_key)
+        self.split_test_usage_key = self.response_usage_key(resp)
+
+    def setup_and_verify_content_experiment(self, partition_id):
+        """
+        Helper method to set up group configurations to content experiment.
+
+        Arguments:
+            partition_id (int): User partition id.
+        """
+        split_test = self.get_item_from_modulestore(self.split_test_usage_key, verify_is_draft=True)
+
+        # Initially, no user_partition_id is set, and the split_test has no children.
+        self.assertEqual(split_test.user_partition_id, -1)
+        self.assertEqual(len(split_test.children), 0)
+
+        # Set group configuration
+        self.client.ajax_post(
+            reverse_usage_url("xblock_handler", self.split_test_usage_key),
+            data={'metadata': {'user_partition_id': str(partition_id)}}
+        )
+        split_test = self.get_item_from_modulestore(self.split_test_usage_key, verify_is_draft=True)
+        self.assertEqual(split_test.user_partition_id, partition_id)
+        self.assertEqual(len(split_test.children), len(self.course.user_partitions[partition_id].groups))
+        return split_test
+
+    def _move_component(self, source_usage_key, target_usage_key, target_index=None):
+        """
+        Helper method to send move request and returns the response.
+
+        Arguments:
+            source_usage_key (BlockUsageLocator): Locator of source item.
+            target_usage_key (BlockUsageLocator): Locator of target parent.
+            target_index (int): If provided, insert source item at the provided index location in target_usage_key item.
+
+        Returns:
+            resp (JsonResponse): Response after the move operation is complete.
+        """
+        data = {
+            'move_source_locator': six.text_type(source_usage_key),
+            'parent_locator': six.text_type(target_usage_key)
+        }
+        if target_index is not None:
+            data['target_index'] = target_index
+
+        return self.client.patch(
+            reverse('xblock_handler'),
+            json.dumps(data),
+            content_type='application/json'
+        )
+
+    def assert_move_item(self, source_usage_key, target_usage_key, target_index=None):
+        """
+        Assert move component.
+
+        Arguments:
+            source_usage_key (BlockUsageLocator): Locator of source item.
+            target_usage_key (BlockUsageLocator): Locator of target parent.
+            target_index (int): If provided, insert source item at the provided index location in target_usage_key item.
+        """
+        parent_loc = self.store.get_parent_location(source_usage_key)
+        parent = self.get_item_from_modulestore(parent_loc)
+        source_index = _get_source_index(source_usage_key, parent)
+        expected_index = target_index if target_index is not None else source_index
+        response = self._move_component(source_usage_key, target_usage_key, target_index)
+        self.assertEqual(response.status_code, 200)
+        response = json.loads(response.content)
+        self.assertEqual(response['move_source_locator'], six.text_type(source_usage_key))
+        self.assertEqual(response['parent_locator'], six.text_type(target_usage_key))
+        self.assertEqual(response['source_index'], expected_index)
+
+        # Verify parent referance has been changed now.
+        new_parent_loc = self.store.get_parent_location(source_usage_key)
+        source_item = self.get_item_from_modulestore(source_usage_key)
+        self.assertEqual(source_item.parent, new_parent_loc)
+        self.assertEqual(new_parent_loc, target_usage_key)
+        self.assertNotEqual(parent_loc, new_parent_loc)
+
+        # Assert item is present in children list of target parent and not source parent
+        target_parent = self.get_item_from_modulestore(target_usage_key)
+        source_parent = self.get_item_from_modulestore(parent_loc)
+        self.assertIn(source_usage_key, target_parent.children)
+        self.assertNotIn(source_usage_key, source_parent.children)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_move_component(self, store_type):
+        """
+        Test move component with different xblock types.
+
+        Arguments:
+            store_type (ModuleStoreEnum.Type): Type of modulestore to create test course in.
+        """
+        self.setup_course(default_store=store_type)
+        for source_usage_key, target_usage_key in [
+                (self.html_usage_key, self.vert2_usage_key),
+                (self.vert_usage_key, self.seq2_usage_key),
+                (self.seq_usage_key, self.chapter2_usage_key)
+        ]:
+            self.assert_move_item(source_usage_key, target_usage_key)
+
+    def test_move_source_index(self):
+        """
+        Test moving an item to a particular index.
+        """
+        parent = self.get_item_from_modulestore(self.vert_usage_key)
+        children = parent.get_children()
+        self.assertEqual(len(children), 3)
+
+        # Create a component within vert2.
+        resp = self.create_xblock(parent_usage_key=self.vert2_usage_key, display_name='html2', category='html')
+        html2_usage_key = self.response_usage_key(resp)
+
+        # Move html2_usage_key inside vert_usage_key at second position.
+        self.assert_move_item(html2_usage_key, self.vert_usage_key, 1)
+        parent = self.get_item_from_modulestore(self.vert_usage_key)
+        children = parent.get_children()
+        self.assertEqual(len(children), 4)
+        self.assertEqual(children[1].location, html2_usage_key)
+
+    def test_move_undo(self):
+        """
+        Test move a component and move it back (undo).
+        """
+        # Get the initial index of the component
+        parent = self.get_item_from_modulestore(self.vert_usage_key)
+        original_index = _get_source_index(self.html_usage_key, parent)
+
+        # Move component and verify that response contains initial index
+        response = self._move_component(self.html_usage_key, self.vert2_usage_key)
+        response = json.loads(response.content)
+        self.assertEquals(original_index, response['source_index'])
+
+        # Verify that new parent has the moved component at the last index.
+        parent = self.get_item_from_modulestore(self.vert2_usage_key)
+        self.assertEqual(self.html_usage_key, parent.children[-1])
+
+        # Verify original and new index is different now.
+        source_index = _get_source_index(self.html_usage_key, parent)
+        self.assertNotEquals(original_index, source_index)
+
+        # Undo Move to the original index, use the source index fetched from the response.
+        response = self._move_component(self.html_usage_key, self.vert_usage_key, response['source_index'])
+        response = json.loads(response.content)
+        self.assertEquals(original_index, response['source_index'])
+
+    def test_move_large_target_index(self):
+        """
+        Test moving an item at a large index would generate an error message.
+        """
+        parent = self.get_item_from_modulestore(self.vert2_usage_key)
+        parent_children_length = len(parent.children)
+        response = self._move_component(self.html_usage_key, self.vert2_usage_key, parent_children_length + 10)
+        self.assertEqual(response.status_code, 400)
+        response = json.loads(response.content)
+
+        expected_error = u'You can not move {usage_key} at an invalid index ({target_index}).'.format(
+            usage_key=self.html_usage_key,
+            target_index=parent_children_length + 10
+        )
+        self.assertEqual(expected_error, response['error'])
+        new_parent_loc = self.store.get_parent_location(self.html_usage_key)
+        self.assertEqual(new_parent_loc, self.vert_usage_key)
+
+    def test_invalid_move(self):
+        """
+        Test invalid move.
+        """
+        parent_loc = self.store.get_parent_location(self.html_usage_key)
+        response = self._move_component(self.html_usage_key, self.seq_usage_key)
+        self.assertEqual(response.status_code, 400)
+        response = json.loads(response.content)
+
+        expected_error = u'You can not move {source_type} into {target_type}.'.format(
+            source_type=self.html_usage_key.block_type,
+            target_type=self.seq_usage_key.block_type
+        )
+        self.assertEqual(expected_error, response['error'])
+        new_parent_loc = self.store.get_parent_location(self.html_usage_key)
+        self.assertEqual(new_parent_loc, parent_loc)
+
+    def test_move_current_parent(self):
+        """
+        Test that a component can not be moved to it's current parent.
+        """
+        parent_loc = self.store.get_parent_location(self.html_usage_key)
+        self.assertEqual(parent_loc, self.vert_usage_key)
+        response = self._move_component(self.html_usage_key, self.vert_usage_key)
+        self.assertEqual(response.status_code, 400)
+        response = json.loads(response.content)
+
+        self.assertEqual(response['error'], 'Item is already present in target location.')
+        self.assertEqual(self.store.get_parent_location(self.html_usage_key), parent_loc)
+
+    def test_can_not_move_into_itself(self):
+        """
+        Test that a component can not be moved to itself.
+        """
+        library_content = self.create_xblock(
+            parent_usage_key=self.vert_usage_key, display_name='library content block', category='library_content'
+        )
+        library_content_usage_key = self.response_usage_key(library_content)
+        parent_loc = self.store.get_parent_location(library_content_usage_key)
+        self.assertEqual(parent_loc, self.vert_usage_key)
+        response = self._move_component(library_content_usage_key, library_content_usage_key)
+        self.assertEqual(response.status_code, 400)
+        response = json.loads(response.content)
+
+        self.assertEqual(response['error'], 'You can not move an item into itself.')
+        self.assertEqual(self.store.get_parent_location(self.html_usage_key), parent_loc)
+
+    def test_move_library_content(self):
+        """
+        Test that library content  can be moved to any other valid location.
+        """
+        library_content = self.create_xblock(
+            parent_usage_key=self.vert_usage_key, display_name='library content block', category='library_content'
+        )
+        library_content_usage_key = self.response_usage_key(library_content)
+        parent_loc = self.store.get_parent_location(library_content_usage_key)
+        self.assertEqual(parent_loc, self.vert_usage_key)
+        self.assert_move_item(library_content_usage_key, self.vert2_usage_key)
+
+    def test_move_into_library_content(self):
+        """
+        Test that a component can be moved into library content.
+        """
+        library_content = self.create_xblock(
+            parent_usage_key=self.vert_usage_key, display_name='library content block', category='library_content'
+        )
+        library_content_usage_key = self.response_usage_key(library_content)
+        self.assert_move_item(self.html_usage_key, library_content_usage_key)
+
+    def test_move_content_experiment(self):
+        """
+        Test that a content experiment can be moved.
+        """
+        self.setup_and_verify_content_experiment(0)
+
+        # Move content experiment
+        self.assert_move_item(self.split_test_usage_key, self.vert2_usage_key)
+
+    def test_move_content_experiment_components(self):
+        """
+        Test that component inside content experiment can be moved to any other valid location.
+        """
+        split_test = self.setup_and_verify_content_experiment(0)
+
+        # Add html component to Group A.
+        html1 = self.create_xblock(
+            parent_usage_key=split_test.children[0], display_name='html1', category='html'
+        )
+        html_usage_key = self.response_usage_key(html1)
+
+        # Move content experiment
+        self.assert_move_item(html_usage_key, self.vert2_usage_key)
+
+    def test_move_into_content_experiment_groups(self):
+        """
+        Test that a component can be moved to content experiment groups.
+        """
+        split_test = self.setup_and_verify_content_experiment(0)
+        self.assert_move_item(self.html_usage_key, split_test.children[0])
+
+    def test_can_not_move_into_content_experiment_level(self):
+        """
+        Test that a component can not be moved directly to content experiment level.
+        """
+        self.setup_and_verify_content_experiment(0)
+        response = self._move_component(self.html_usage_key, self.split_test_usage_key)
+        self.assertEqual(response.status_code, 400)
+        response = json.loads(response.content)
+
+        self.assertEqual(response['error'], 'You can not move an item directly into content experiment.')
+        self.assertEqual(self.store.get_parent_location(self.html_usage_key), self.vert_usage_key)
+
+    def test_can_not_move_content_experiment_into_its_children(self):
+        """
+        Test that a content experiment can not be moved inside any of it's children.
+        """
+        split_test = self.setup_and_verify_content_experiment(0)
+
+        # Try to move content experiment inside it's child groups.
+        for child_vert_usage_key in split_test.children:
+            response = self._move_component(self.split_test_usage_key, child_vert_usage_key)
+            self.assertEqual(response.status_code, 400)
+            response = json.loads(response.content)
+
+            self.assertEqual(response['error'], 'You can not move an item into it\'s child.')
+            self.assertEqual(self.store.get_parent_location(self.split_test_usage_key), self.vert_usage_key)
+
+        # Create content experiment inside group A and set it's group configuration.
+        resp = self.create_xblock(category='split_test', parent_usage_key=split_test.children[0])
+        child_split_test_usage_key = self.response_usage_key(resp)
+        self.client.ajax_post(
+            reverse_usage_url("xblock_handler", child_split_test_usage_key),
+            data={'metadata': {'user_partition_id': str(0)}}
+        )
+        child_split_test = self.get_item_from_modulestore(self.split_test_usage_key, verify_is_draft=True)
+
+        # Try to move content experiment further down the level to a child group A nested inside main group A.
+        response = self._move_component(self.split_test_usage_key, child_split_test.children[0])
+        self.assertEqual(response.status_code, 400)
+        response = json.loads(response.content)
+
+        self.assertEqual(response['error'], 'You can not move an item into it\'s child.')
+        self.assertEqual(self.store.get_parent_location(self.split_test_usage_key), self.vert_usage_key)
+
+    def test_move_invalid_source_index(self):
+        """
+        Test moving an item to an invalid index.
+        """
+        target_index = 'test_index'
+        parent_loc = self.store.get_parent_location(self.html_usage_key)
+        response = self._move_component(self.html_usage_key, self.vert2_usage_key, target_index)
+        self.assertEqual(response.status_code, 400)
+        response = json.loads(response.content)
+
+        error = u'You must provide target_index ({target_index}) as an integer.'.format(target_index=target_index)
+        self.assertEqual(response['error'], error)
+        new_parent_loc = self.store.get_parent_location(self.html_usage_key)
+        self.assertEqual(new_parent_loc, parent_loc)
+
+    def test_move_no_target_locator(self):
+        """
+        Test move an item without specifying the target location.
+        """
+        data = {'move_source_locator': six.text_type(self.html_usage_key)}
+        with self.assertRaises(InvalidKeyError):
+            self.client.patch(
+                reverse('xblock_handler'),
+                json.dumps(data),
+                content_type='application/json'
+            )
+
+    def test_no_move_source_locator(self):
+        """
+        Test patch request without providing a move source locator.
+        """
+        response = self.client.patch(
+            reverse('xblock_handler')
+        )
+        self.assertEqual(response.status_code, 400)
+        response = json.loads(response.content)
+        self.assertEqual(response['error'], 'Patch request did not recognise any parameters to handle.')
+
+    def _verify_validation_message(self, message, expected_message, expected_message_type):
+        """
+        Verify that the validation message has the expected validation message and type.
+        """
+        self.assertEqual(message.text, expected_message)
+        self.assertEqual(message.type, expected_message_type)
+
+    def test_move_component_nonsensical_access_restriction_validation(self):
+        """
+        Test that moving a component with non-contradicting access
+        restrictions into a unit that has contradicting access
+        restrictions brings up the nonsensical access validation
+        message and that the message does not show up when moved
+        into a unit where the component's access settings do not
+        contradict the unit's access settings.
+        """
+        group1 = self.course.user_partitions[0].groups[0]
+        group2 = self.course.user_partitions[0].groups[1]
+        vert2 = self.store.get_item(self.vert2_usage_key)
+        html = self.store.get_item(self.html_usage_key)
+
+        # Inject mock partition service as obtaining the course from the draft modulestore
+        # (which is the default for these tests) does not work.
+        partitions_service = MockPartitionService(
+            self.course,
+            course_id=self.course.id,
+        )
+        html.runtime._services['partitions'] = partitions_service
+
+        # Set access settings so html will contradict vert2 when moved into that unit
+        vert2.group_access = {self.course.user_partitions[0].id: [group1.id]}
+        html.group_access = {self.course.user_partitions[0].id: [group2.id]}
+        self.store.update_item(html, self.user.id)
+        self.store.update_item(vert2, self.user.id)
+
+        # Verify that there is no warning when html is in a non contradicting unit
+        validation = html.validate()
+        self.assertEqual(len(validation.messages), 0)
+
+        # Now move it and confirm that the html component has been moved into vertical 2
+        self.assert_move_item(self.html_usage_key, self.vert2_usage_key)
+        html.parent = self.vert2_usage_key
+        self.store.update_item(html, self.user.id)
+        validation = html.validate()
+        self.assertEqual(len(validation.messages), 1)
+        self._verify_validation_message(
+            validation.messages[0],
+            NONSENSICAL_ACCESS_RESTRICTION,
+            ValidationMessage.ERROR,
+        )
+
+        # Move the html component back and confirm that the warning is gone again
+        self.assert_move_item(self.html_usage_key, self.vert_usage_key)
+        html.parent = self.vert_usage_key
+        self.store.update_item(html, self.user.id)
+        validation = html.validate()
+        self.assertEqual(len(validation.messages), 0)
+
+    @patch('contentstore.views.item.log')
+    def test_move_logging(self, mock_logger):
+        """
+        Test logging when an item is successfully moved.
+
+        Arguments:
+            mock_logger (object):  A mock logger object.
+        """
+        insert_at = 0
+        self.assert_move_item(self.html_usage_key, self.vert2_usage_key, insert_at)
+        mock_logger.info.assert_called_with(
+            u'MOVE: %s moved from %s to %s at %d index',
+            six.text_type(self.html_usage_key),
+            six.text_type(self.vert_usage_key),
+            six.text_type(self.vert2_usage_key),
+            insert_at
+        )
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_move_and_discard_changes(self, store_type):
+        """
+        Verifies that discard changes operation brings moved component back to source location and removes the component
+        from target location.
+
+        Arguments:
+            store_type (ModuleStoreEnum.Type): Type of modulestore to create test course in.
+        """
+        self.setup_course(default_store=store_type)
+
+        old_parent_loc = self.store.get_parent_location(self.html_usage_key)
+
+        # Check that old_parent_loc is not yet published.
+        self.assertFalse(self.store.has_item(old_parent_loc, revision=ModuleStoreEnum.RevisionOption.published_only))
+
+        # Publish old_parent_loc unit
+        self.client.ajax_post(
+            reverse_usage_url("xblock_handler", old_parent_loc),
+            data={'publish': 'make_public'}
+        )
+
+        # Check that old_parent_loc is now published.
+        self.assertTrue(self.store.has_item(old_parent_loc, revision=ModuleStoreEnum.RevisionOption.published_only))
+        self.assertFalse(self.store.has_changes(self.store.get_item(old_parent_loc)))
+
+        # Move component html_usage_key in vert2_usage_key
+        self.assert_move_item(self.html_usage_key, self.vert2_usage_key)
+
+        # Check old_parent_loc becomes in draft mode now.
+        self.assertTrue(self.store.has_changes(self.store.get_item(old_parent_loc)))
+
+        # Now discard changes in old_parent_loc
+        self.client.ajax_post(
+            reverse_usage_url("xblock_handler", old_parent_loc),
+            data={'publish': 'discard_changes'}
+        )
+
+        # Check that old_parent_loc now is reverted to publish. Changes discarded, html_usage_key moved back.
+        self.assertTrue(self.store.has_item(old_parent_loc, revision=ModuleStoreEnum.RevisionOption.published_only))
+        self.assertFalse(self.store.has_changes(self.store.get_item(old_parent_loc)))
+
+        # Now source item should be back in the old parent.
+        source_item = self.get_item_from_modulestore(self.html_usage_key)
+        self.assertEqual(source_item.parent, old_parent_loc)
+        self.assertEqual(self.store.get_parent_location(self.html_usage_key), source_item.parent)
+
+        # Also, check that item is not present in target parent but in source parent
+        target_parent = self.get_item_from_modulestore(self.vert2_usage_key)
+        source_parent = self.get_item_from_modulestore(old_parent_loc)
+        self.assertIn(self.html_usage_key, source_parent.children)
+        self.assertNotIn(self.html_usage_key, target_parent.children)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_move_item_not_found(self, store_type=ModuleStoreEnum.Type.mongo):
+        """
+        Test that an item not found exception raised when an item is not found when getting the item.
+
+        Arguments:
+            store_type (ModuleStoreEnum.Type): Type of modulestore to create test course in.
+        """
+        self.setup_course(default_store=store_type)
+
+        data = {
+            'move_source_locator': six.text_type(self.usage_key.course_key.make_usage_key('html', 'html_test')),
+            'parent_locator': six.text_type(self.vert2_usage_key)
+        }
+        with self.assertRaises(ItemNotFoundError):
+            self.client.patch(
+                reverse('xblock_handler'),
+                json.dumps(data),
+                content_type='application/json'
+            )
+
+
 class TestDuplicateItemWithAsides(ItemTest, DuplicateHelper):
     """
     Test the duplicate method for blocks with asides.
     """
+
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
@@ -720,7 +1366,7 @@ class TestDuplicateItemWithAsides(ItemTest, DuplicateHelper):
 
             key_store = DictKeyValueStore()
             field_data = KvsFieldData(key_store)
-            runtime = TestRuntime(services={'field-data': field_data})  # pylint: disable=abstract-class-instantiated
+            runtime = TestRuntime(services={'field-data': field_data})
 
             def_id = runtime.id_generator.create_definition(block_type)
             usage_id = runtime.id_generator.create_usage(def_id)
@@ -746,6 +1392,7 @@ class TestEditItemSetup(ItemTest):
     """
     Setup for xblock update tests.
     """
+
     def setUp(self):
         """ Creates the test course structure and a couple problems to 'edit'. """
         super(TestEditItemSetup, self).setUp()
@@ -772,10 +1419,12 @@ class TestEditItemSetup(ItemTest):
         self.course_update_url = reverse_usage_url("xblock_handler", self.usage_key)
 
 
+@ddt.ddt
 class TestEditItem(TestEditItemSetup):
     """
     Test xblock update.
     """
+
     def test_delete_field(self):
         """
         Sending null in for a field 'deletes' it
@@ -825,6 +1474,32 @@ class TestEditItem(TestEditItemSetup):
         sequential = self.get_item_from_modulestore(self.seq_usage_key)
         self.assertEqual(sequential.due, datetime(2010, 11, 22, 4, 0, tzinfo=UTC))
         self.assertEqual(sequential.start, datetime(2010, 9, 12, 14, 0, tzinfo=UTC))
+
+    @ddt.data(
+        '1000-01-01T00:00Z',
+        '0150-11-21T14:45Z',
+        '1899-12-31T23:59Z',
+        '1789-06-06T22:10Z',
+        '1001-01-15T19:32Z',
+    )
+    def test_xblock_due_date_validity(self, date):
+        """
+        Test due date for the subsection is not pre-1900
+        """
+        self.client.ajax_post(
+            self.seq_update_url,
+            data={'metadata': {'due': date}}
+        )
+        sequential = self.get_item_from_modulestore(self.seq_usage_key)
+        xblock_info = create_xblock_info(
+            sequential,
+            include_child_info=True,
+            include_children_predicate=ALWAYS,
+            user=self.user
+        )
+        # Both display and actual value should be None
+        self.assertEquals(xblock_info['due_date'], u'')
+        self.assertIsNone(xblock_info['due'])
 
     def test_update_generic_fields(self):
         new_display_name = 'New Display Name'
@@ -885,7 +1560,13 @@ class TestEditItem(TestEditItemSetup):
 
         resp = self.client.ajax_post(
             self.seq_update_url,
-            data={'children': [unicode(self.problem_usage_key), unicode(unit2_usage_key), unicode(unit1_usage_key)]}
+            data={
+                'children': [
+                    six.text_type(self.problem_usage_key),
+                    six.text_type(unit2_usage_key),
+                    six.text_type(unit1_usage_key)
+                ]
+            }
         )
         self.assertEqual(resp.status_code, 200)
 
@@ -908,7 +1589,7 @@ class TestEditItem(TestEditItemSetup):
         # move unit 1 from sequential1 to sequential2
         resp = self.client.ajax_post(
             self.seq2_update_url,
-            data={'children': [unicode(unit_1_key), unicode(unit_2_key)]}
+            data={'children': [six.text_type(unit_1_key), six.text_type(unit_2_key)]}
         )
         self.assertEqual(resp.status_code, 200)
 
@@ -931,7 +1612,7 @@ class TestEditItem(TestEditItemSetup):
         # adding orphaned unit 1 should return an error
         resp = self.client.ajax_post(
             self.seq2_update_url,
-            data={'children': [unicode(unit_1_key)]}
+            data={'children': [six.text_type(unit_1_key)]}
         )
         self.assertEqual(resp.status_code, 400)
         self.assertIn("Invalid data, possibly caused by concurrent authors", resp.content)
@@ -956,7 +1637,7 @@ class TestEditItem(TestEditItemSetup):
         # remove unit 2 should return an error
         resp = self.client.ajax_post(
             self.seq2_update_url,
-            data={'children': [unicode(unit_1_key)]}
+            data={'children': [six.text_type(unit_1_key)]}
         )
         self.assertEqual(resp.status_code, 400)
         self.assertIn("Invalid data, possibly caused by concurrent authors", resp.content)
@@ -1124,7 +1805,7 @@ class TestEditItem(TestEditItemSetup):
         self.client.ajax_post(
             self.problem_update_url,
             data={
-                'id': unicode(self.problem_usage_key),
+                'id': six.text_type(self.problem_usage_key),
                 'metadata': {},
                 'data': "<p>Problem content draft.</p>"
             }
@@ -1179,7 +1860,7 @@ class TestEditItem(TestEditItemSetup):
         resp = self.client.ajax_post(
             unit_update_url,
             data={
-                'id': unicode(unit_usage_key),
+                'id': six.text_type(unit_usage_key),
                 'metadata': {},
             }
         )
@@ -1199,7 +1880,7 @@ class TestEditItem(TestEditItemSetup):
         response = self.client.ajax_post(
             update_url,
             data={
-                'id': unicode(video_usage_key),
+                'id': six.text_type(video_usage_key),
                 'metadata': {
                     'saved_video_position': "Not a valid relative time",
                 },
@@ -1225,7 +1906,7 @@ class TestEditItemSplitMongo(TestEditItemSetup):
         """
         view_url = reverse_usage_url("xblock_view_handler", self.problem_usage_key, {"view_name": STUDIO_VIEW})
 
-        for __ in xrange(3):
+        for __ in range(3):
             resp = self.client.get(view_url, HTTP_ACCEPT='application/json')
             self.assertEqual(resp.status_code, 200)
             content = json.loads(resp.content)
@@ -1236,18 +1917,34 @@ class TestEditSplitModule(ItemTest):
     """
     Tests around editing instances of the split_test module.
     """
+
     def setUp(self):
         super(TestEditSplitModule, self).setUp()
         self.user = UserFactory()
+
+        self.first_user_partition_group_1 = Group(six.text_type(MINIMUM_STATIC_PARTITION_ID + 1), 'alpha')
+        self.first_user_partition_group_2 = Group(six.text_type(MINIMUM_STATIC_PARTITION_ID + 2), 'beta')
+        self.first_user_partition = UserPartition(
+            MINIMUM_STATIC_PARTITION_ID, 'first_partition', 'First Partition',
+            [self.first_user_partition_group_1, self.first_user_partition_group_2]
+        )
+
+        # There is a test point below (test_create_groups) that purposefully wants the group IDs
+        # of the 2 partitions to overlap (which is not something that normally happens).
+        self.second_user_partition_group_1 = Group(six.text_type(MINIMUM_STATIC_PARTITION_ID + 1), 'Group 1')
+        self.second_user_partition_group_2 = Group(six.text_type(MINIMUM_STATIC_PARTITION_ID + 2), 'Group 2')
+        self.second_user_partition_group_3 = Group(six.text_type(MINIMUM_STATIC_PARTITION_ID + 3), 'Group 3')
+        self.second_user_partition = UserPartition(
+            MINIMUM_STATIC_PARTITION_ID + 10, 'second_partition', 'Second Partition',
+            [
+                self.second_user_partition_group_1,
+                self.second_user_partition_group_2,
+                self.second_user_partition_group_3
+            ]
+        )
         self.course.user_partitions = [
-            UserPartition(
-                0, 'first_partition', 'First Partition',
-                [Group("0", 'alpha'), Group("1", 'beta')]
-            ),
-            UserPartition(
-                1, 'second_partition', 'Second Partition',
-                [Group("0", 'Group 0'), Group("1", 'Group 1'), Group("2", 'Group 2')]
-            )
+            self.first_user_partition,
+            self.second_user_partition
         ]
         self.store.update_item(self.course, self.user.id)
         root_usage_key = self._create_vertical()
@@ -1295,8 +1992,8 @@ class TestEditSplitModule(ItemTest):
         self.assertEqual(-1, split_test.user_partition_id)
         self.assertEqual(0, len(split_test.children))
 
-        # Set the user_partition_id to 0.
-        split_test = self._update_partition_id(0)
+        # Set the user_partition_id to match the first user_partition.
+        split_test = self._update_partition_id(self.first_user_partition.id)
 
         # Verify that child verticals have been set to match the groups
         self.assertEqual(2, len(split_test.children))
@@ -1304,13 +2001,38 @@ class TestEditSplitModule(ItemTest):
         vertical_1 = self.get_item_from_modulestore(split_test.children[1], verify_is_draft=True)
         self.assertEqual("vertical", vertical_0.category)
         self.assertEqual("vertical", vertical_1.category)
-        self.assertEqual("Group ID 0", vertical_0.display_name)
-        self.assertEqual("Group ID 1", vertical_1.display_name)
+        self.assertEqual("Group ID " + six.text_type(MINIMUM_STATIC_PARTITION_ID + 1), vertical_0.display_name)
+        self.assertEqual("Group ID " + six.text_type(MINIMUM_STATIC_PARTITION_ID + 2), vertical_1.display_name)
 
         # Verify that the group_id_to_child mapping is correct.
         self.assertEqual(2, len(split_test.group_id_to_child))
-        self.assertEqual(vertical_0.location, split_test.group_id_to_child['0'])
-        self.assertEqual(vertical_1.location, split_test.group_id_to_child['1'])
+        self.assertEqual(vertical_0.location, split_test.group_id_to_child[str(self.first_user_partition_group_1.id)])
+        self.assertEqual(vertical_1.location, split_test.group_id_to_child[str(self.first_user_partition_group_2.id)])
+
+    def test_split_xblock_info_group_name(self):
+        """
+        Test that concise outline for split test component gives display name as group name.
+        """
+        split_test = self.get_item_from_modulestore(self.split_test_usage_key, verify_is_draft=True)
+        # Initially, no user_partition_id is set, and the split_test has no children.
+        self.assertEqual(split_test.user_partition_id, -1)
+        self.assertEqual(len(split_test.children), 0)
+        # Set the user_partition_id to match the first user_partition.
+        split_test = self._update_partition_id(self.first_user_partition.id)
+        # Verify that child verticals have been set to match the groups
+        self.assertEqual(len(split_test.children), 2)
+
+        # Get xblock outline
+        xblock_info = create_xblock_info(
+            split_test,
+            is_concise=True,
+            include_child_info=True,
+            include_children_predicate=lambda xblock: xblock.has_children,
+            course=self.course,
+            user=self.request.user
+        )
+        self.assertEqual(xblock_info['child_info']['children'][0]['display_name'], 'alpha')
+        self.assertEqual(xblock_info['child_info']['children'][1]['display_name'], 'beta')
 
     def test_change_user_partition_id(self):
         """
@@ -1318,13 +2040,13 @@ class TestEditSplitModule(ItemTest):
         group configuration.
         """
         # Set to first group configuration.
-        split_test = self._update_partition_id(0)
+        split_test = self._update_partition_id(self.first_user_partition.id)
         self.assertEqual(2, len(split_test.children))
         initial_vertical_0_location = split_test.children[0]
         initial_vertical_1_location = split_test.children[1]
 
         # Set to second group configuration
-        split_test = self._update_partition_id(1)
+        split_test = self._update_partition_id(self.second_user_partition.id)
         # We don't remove existing children.
         self.assertEqual(5, len(split_test.children))
         self.assertEqual(initial_vertical_0_location, split_test.children[0])
@@ -1335,9 +2057,9 @@ class TestEditSplitModule(ItemTest):
 
         # Verify that the group_id_to child mapping is correct.
         self.assertEqual(3, len(split_test.group_id_to_child))
-        self.assertEqual(vertical_0.location, split_test.group_id_to_child['0'])
-        self.assertEqual(vertical_1.location, split_test.group_id_to_child['1'])
-        self.assertEqual(vertical_2.location, split_test.group_id_to_child['2'])
+        self.assertEqual(vertical_0.location, split_test.group_id_to_child[str(self.second_user_partition_group_1.id)])
+        self.assertEqual(vertical_1.location, split_test.group_id_to_child[str(self.second_user_partition_group_2.id)])
+        self.assertEqual(vertical_2.location, split_test.group_id_to_child[str(self.second_user_partition_group_3.id)])
         self.assertNotEqual(initial_vertical_0_location, vertical_0.location)
         self.assertNotEqual(initial_vertical_1_location, vertical_1.location)
 
@@ -1346,12 +2068,12 @@ class TestEditSplitModule(ItemTest):
         Test that nothing happens when the user_partition_id is set to the same value twice.
         """
         # Set to first group configuration.
-        split_test = self._update_partition_id(0)
+        split_test = self._update_partition_id(self.first_user_partition.id)
         self.assertEqual(2, len(split_test.children))
         initial_group_id_to_child = split_test.group_id_to_child
 
         # Set again to first group configuration.
-        split_test = self._update_partition_id(0)
+        split_test = self._update_partition_id(self.first_user_partition.id)
         self.assertEqual(2, len(split_test.children))
         self.assertEqual(initial_group_id_to_child, split_test.group_id_to_child)
 
@@ -1362,7 +2084,7 @@ class TestEditSplitModule(ItemTest):
         The user_partition_id will be updated, but children and group_id_to_child map will not change.
         """
         # Set to first group configuration.
-        split_test = self._update_partition_id(0)
+        split_test = self._update_partition_id(self.first_user_partition.id)
         self.assertEqual(2, len(split_test.children))
         initial_group_id_to_child = split_test.group_id_to_child
 
@@ -1379,13 +2101,14 @@ class TestEditSplitModule(ItemTest):
         TODO: move tests that can go over to common after the mixed modulestore work is done.  # pylint: disable=fixme
         """
         # Set to first group configuration.
-        split_test = self._update_partition_id(0)
+        split_test = self._update_partition_id(self.first_user_partition.id)
 
         # Add a group to the first group configuration.
+        new_group_id = "1002"
         split_test.user_partitions = [
             UserPartition(
-                0, 'first_partition', 'First Partition',
-                [Group("0", 'alpha'), Group("1", 'beta'), Group("2", 'pie')]
+                self.first_user_partition.id, 'first_partition', 'First Partition',
+                [self.first_user_partition_group_1, self.first_user_partition_group_2, Group(new_group_id, 'pie')]
             )
         ]
         self.store.update_item(split_test, self.user.id)
@@ -1406,7 +2129,7 @@ class TestEditSplitModule(ItemTest):
         split_test = self._assert_children(3)
         self.assertNotEqual(group_id_to_child, split_test.group_id_to_child)
         group_id_to_child = split_test.group_id_to_child
-        self.assertEqual(split_test.children[2], group_id_to_child["2"])
+        self.assertEqual(split_test.children[2], group_id_to_child[new_group_id])
 
         # Call add_missing_groups again -- it should be a no-op.
         split_test.add_missing_groups(self.request)
@@ -1416,6 +2139,8 @@ class TestEditSplitModule(ItemTest):
 
 @ddt.ddt
 class TestComponentHandler(TestCase):
+    """Tests for component handler api"""
+
     def setUp(self):
         super(TestComponentHandler, self).setUp()
 
@@ -1430,9 +2155,10 @@ class TestComponentHandler(TestCase):
         # of the xBlock descriptor.
         self.descriptor = self.modulestore.return_value.get_item.return_value
 
-        self.usage_key_string = unicode(
-            Location('dummy_org', 'dummy_course', 'dummy_run', 'dummy_category', 'dummy_name')
+        self.usage_key = BlockUsageLocator(
+            CourseLocator('dummy_org', 'dummy_course', 'dummy_run'), 'dummy_category', 'dummy_name'
         )
+        self.usage_key_string = text_type(self.usage_key)
 
         self.user = UserFactory()
 
@@ -1470,6 +2196,43 @@ class TestComponentHandler(TestCase):
 
         self.assertEquals(component_handler(self.request, self.usage_key_string, 'dummy_handler').status_code,
                           status_code)
+
+    @ddt.data((True, True), (False, False),)
+    @ddt.unpack
+    def test_aside(self, is_xblock_aside, is_get_aside_called):
+        """
+        test get_aside_from_xblock called
+        """
+        def create_response(handler, request, suffix):  # pylint: disable=unused-argument
+            """create dummy response"""
+            return Response(status_code=200)
+
+        def get_usage_key():
+            """return usage key"""
+            return (
+                text_type(AsideUsageKeyV2(self.usage_key, "aside"))
+                if is_xblock_aside
+                else self.usage_key_string
+            )
+
+        self.descriptor.handle = create_response
+
+        with patch(
+            'contentstore.views.component.is_xblock_aside',
+            return_value=is_xblock_aside
+        ), patch(
+            'contentstore.views.component.get_aside_from_xblock'
+        ) as mocked_get_aside_from_xblock, patch(
+            "contentstore.views.component.webob_to_django_response"
+        ) as mocked_webob_to_django_response:
+            component_handler(
+                self.request,
+                get_usage_key(),
+                'dummy_handler'
+            )
+            assert mocked_webob_to_django_response.called is True
+
+        assert mocked_get_aside_from_xblock.called is is_get_aside_called
 
 
 class TestComponentTemplates(CourseTestCase):
@@ -1649,7 +2412,7 @@ class TestComponentTemplates(CourseTestCase):
 
         def verify_openassessment_present(support_level):
             """ Helper method to verify that openassessment template is present """
-            openassessment = get_xblock_problem('Peer Assessment')
+            openassessment = get_xblock_problem('Open Response Assessment')
             self.assertIsNotNone(openassessment)
             self.assertEqual(openassessment.get('category'), 'openassessment')
             self.assertEqual(openassessment.get('support_level'), support_level)
@@ -1711,11 +2474,13 @@ class TestXBlockInfo(ItemTest):
     """
     Unit tests for XBlock's outline handling.
     """
+
     def setUp(self):
         super(TestXBlockInfo, self).setUp()
         user_id = self.user.id
         self.chapter = ItemFactory.create(
-            parent_location=self.course.location, category='chapter', display_name="Week 1", user_id=user_id
+            parent_location=self.course.location, category='chapter', display_name="Week 1", user_id=user_id,
+            highlights=['highlight'],
         )
         self.sequential = ItemFactory.create(
             parent_location=self.chapter.location, category='sequential', display_name="Lesson 1", user_id=user_id
@@ -1896,14 +2661,25 @@ class TestXBlockInfo(ItemTest):
 
             self.assertEqual(xblock_info['start'], DEFAULT_START_DATE.strftime('%Y-%m-%dT%H:%M:%SZ'))
 
+    def test_highlights_enabled(self):
+        self.course.highlights_enabled_for_messaging = True
+        self.store.update_item(self.course, None)
+        chapter = self.store.get_item(self.chapter.location)
+        with highlights_setting.override():
+            chapter_xblock_info = create_xblock_info(chapter)
+            course_xblock_info = create_xblock_info(self.course)
+            self.assertTrue(chapter_xblock_info['highlights_enabled'])
+            self.assertTrue(course_xblock_info['highlights_enabled_for_messaging'])
+
     def validate_course_xblock_info(self, xblock_info, has_child_info=True, course_outline=False):
         """
         Validate that the xblock info is correct for the test course.
         """
         self.assertEqual(xblock_info['category'], 'course')
-        self.assertEqual(xblock_info['id'], unicode(self.course.location))
+        self.assertEqual(xblock_info['id'], six.text_type(self.course.location))
         self.assertEqual(xblock_info['display_name'], self.course.display_name)
         self.assertTrue(xblock_info['published'])
+        self.assertFalse(xblock_info['highlights_enabled_for_messaging'])
 
         # Finally, validate the entire response for consistency
         self.validate_xblock_info_consistency(xblock_info, has_child_info=has_child_info, course_outline=course_outline)
@@ -1913,7 +2689,7 @@ class TestXBlockInfo(ItemTest):
         Validate that the xblock info is correct for the test chapter.
         """
         self.assertEqual(xblock_info['category'], 'chapter')
-        self.assertEqual(xblock_info['id'], unicode(self.chapter.location))
+        self.assertEqual(xblock_info['id'], six.text_type(self.chapter.location))
         self.assertEqual(xblock_info['display_name'], 'Week 1')
         self.assertTrue(xblock_info['published'])
         self.assertIsNone(xblock_info.get('edited_by', None))
@@ -1922,6 +2698,8 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['graded'], False)
         self.assertEqual(xblock_info['due'], None)
         self.assertEqual(xblock_info['format'], None)
+        self.assertEqual(xblock_info['highlights'], self.chapter.highlights)
+        self.assertFalse(xblock_info['highlights_enabled'])
 
         # Finally, validate the entire response for consistency
         self.validate_xblock_info_consistency(xblock_info, has_child_info=has_child_info)
@@ -1931,7 +2709,7 @@ class TestXBlockInfo(ItemTest):
         Validate that the xblock info is correct for the test sequential.
         """
         self.assertEqual(xblock_info['category'], 'sequential')
-        self.assertEqual(xblock_info['id'], unicode(self.sequential.location))
+        self.assertEqual(xblock_info['id'], six.text_type(self.sequential.location))
         self.assertEqual(xblock_info['display_name'], 'Lesson 1')
         self.assertTrue(xblock_info['published'])
         self.assertIsNone(xblock_info.get('edited_by', None))
@@ -1944,7 +2722,7 @@ class TestXBlockInfo(ItemTest):
         Validate that the xblock info is correct for the test vertical.
         """
         self.assertEqual(xblock_info['category'], 'vertical')
-        self.assertEqual(xblock_info['id'], unicode(self.vertical.location))
+        self.assertEqual(xblock_info['id'], six.text_type(self.vertical.location))
         self.assertEqual(xblock_info['display_name'], 'Unit 1')
         self.assertTrue(xblock_info['published'])
         self.assertEqual(xblock_info['edited_by'], 'testuser')
@@ -1966,7 +2744,7 @@ class TestXBlockInfo(ItemTest):
         Validate that the xblock info is correct for the test component.
         """
         self.assertEqual(xblock_info['category'], 'video')
-        self.assertEqual(xblock_info['id'], unicode(self.video.location))
+        self.assertEqual(xblock_info['id'], six.text_type(self.video.location))
         self.assertEqual(xblock_info['display_name'], 'My Video')
         self.assertTrue(xblock_info['published'])
         self.assertIsNone(xblock_info.get('edited_by', None))
@@ -2007,7 +2785,10 @@ class TestXBlockInfo(ItemTest):
             self.assertIsNone(xblock_info.get('child_info', None))
 
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
-    def test_proctored_exam_xblock_info(self):
+    @patch('contentstore.views.item.does_backend_support_onboarding')
+    @patch('contentstore.views.item.get_exam_configuration_dashboard_url')
+    def test_proctored_exam_xblock_info(self, get_exam_configuration_dashboard_url_patch,
+                                        does_backend_support_onboarding_patch):
         self.course.enable_proctored_exams = True
         self.course.save()
         self.store.update_item(self.course, self.user.id)
@@ -2025,9 +2806,12 @@ class TestXBlockInfo(ItemTest):
             parent_location=self.chapter.location, category='sequential',
             display_name="Test Lesson 1", user_id=self.user.id,
             is_proctored_exam=True, is_time_limited=True,
-            default_time_limit_minutes=100
+            default_time_limit_minutes=100, is_onboarding_exam=False
         )
         sequential = modulestore().get_item(sequential.location)
+
+        get_exam_configuration_dashboard_url_patch.return_value = 'test_url'
+        does_backend_support_onboarding_patch.return_value = True
         xblock_info = create_xblock_info(
             sequential,
             include_child_info=True,
@@ -2037,12 +2821,17 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['is_proctored_exam'], True)
         self.assertEqual(xblock_info['is_time_limited'], True)
         self.assertEqual(xblock_info['default_time_limit_minutes'], 100)
+        self.assertEqual(xblock_info['proctoring_exam_configuration_link'], 'test_url')
+        self.assertEqual(xblock_info['supports_onboarding'], True)
+        self.assertEqual(xblock_info['is_onboarding_exam'], False)
+        get_exam_configuration_dashboard_url_patch.assert_called_with(self.course.id, xblock_info['id'])
 
 
 class TestLibraryXBlockInfo(ModuleStoreTestCase):
     """
     Unit tests for XBlock Info for XBlocks in a content library
     """
+
     def setUp(self):
         super(TestLibraryXBlockInfo, self).setUp()
         user_id = self.user.id
@@ -2072,7 +2861,7 @@ class TestLibraryXBlockInfo(ModuleStoreTestCase):
         ancestors = xblock_info['ancestor_info']['ancestors']
         self.assertEqual(len(ancestors), 2)
         self.assertEqual(ancestors[0]['category'], 'vertical')
-        self.assertEqual(ancestors[0]['id'], unicode(self.vertical.location))
+        self.assertEqual(ancestors[0]['id'], six.text_type(self.vertical.location))
         self.assertEqual(ancestors[1]['category'], 'library')
 
     def validate_component_xblock_info(self, xblock_info, original_block):
@@ -2080,7 +2869,7 @@ class TestLibraryXBlockInfo(ModuleStoreTestCase):
         Validate that the xblock info is correct for the test component.
         """
         self.assertEqual(xblock_info['category'], original_block.category)
-        self.assertEqual(xblock_info['id'], unicode(original_block.location))
+        self.assertEqual(xblock_info['id'], six.text_type(original_block.location))
         self.assertEqual(xblock_info['display_name'], original_block.display_name)
         self.assertIsNone(xblock_info.get('has_changes', None))
         self.assertIsNone(xblock_info.get('published', None))
@@ -2092,6 +2881,7 @@ class TestLibraryXBlockCreation(ItemTest):
     """
     Tests the adding of XBlocks to Library
     """
+
     def test_add_xblock(self):
         """
         Verify we can add an XBlock to a Library.
@@ -2456,7 +3246,6 @@ class TestXBlockPublishingInfo(ItemTest):
         Test that when item was initially in `scheduled` state in instructor mode, change course pacing to self-paced,
         now in self-paced course, item should have `live` visibility state.
         """
-        SelfPacedConfiguration(enabled=True).save()
 
         # Create course, chapter and setup future release date to make chapter in scheduled state
         course = CourseFactory.create(default_store=store_type)

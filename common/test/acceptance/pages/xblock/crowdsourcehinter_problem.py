@@ -1,6 +1,8 @@
 """
 PageObject for Crowdsourcehinter
 """
+from __future__ import absolute_import
+
 from bok_choy.page_object import PageObject
 
 
@@ -10,13 +12,6 @@ class CrowdsourcehinterProblemPage(PageObject):
     """
 
     url = None
-
-    def __init__(self, browser):
-        """
-        Args:
-            browser (selenium.webdriver): The Selenium-controlled browser that this page is loaded in.
-        """
-        super(CrowdsourcehinterProblemPage, self).__init__(browser)
 
     def is_browser_on_page(self):
         return len(self.browser.find_elements_by_class_name('crowdsourcehinter_block')) > 0

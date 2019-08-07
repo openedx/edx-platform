@@ -41,4 +41,4 @@ var edx = edx || {};
             $('#next_step_button').on('click', _.bind(this.nextStep, this));
         }
     });
-})(jQuery);
+}(jQuery));

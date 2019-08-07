@@ -1,10 +1,13 @@
 """Provides factories for User API models."""
-from factory.django import DjangoModelFactory
-from factory import SubFactory
-from student.tests.factories import UserFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from __future__ import absolute_import
 
-from ..models import UserPreference, UserCourseTag, UserOrgTag
+from factory import SubFactory
+from factory.django import DjangoModelFactory
+from opaque_keys.edx.locator import CourseLocator
+
+from student.tests.factories import UserFactory
+
+from ..models import UserCourseTag, UserOrgTag, UserPreference
 
 
 # Factories are self documenting
@@ -23,7 +26,7 @@ class UserCourseTagFactory(DjangoModelFactory):
         model = UserCourseTag
 
     user = SubFactory(UserFactory)
-    course_id = SlashSeparatedCourseKey('org', 'course', 'run')
+    course_id = CourseLocator('org', 'course', 'run')
     key = None
     value = None
 

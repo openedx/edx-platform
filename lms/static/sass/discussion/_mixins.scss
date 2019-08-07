@@ -17,9 +17,10 @@
 
 @mixin white-button {
   @include discussion-button();
+
   border-color: #aaa;
   background-color: $white;
-  color: $dark-gray;
+  color: theme-color("gray-dark");
 
   &:hover, &:focus {
     background-color: $white;
@@ -28,6 +29,7 @@
 
 @mixin discussion-wmd-input {
   @include border-radius($forum-border-radius, $forum-border-radius, 0, 0);
+
   box-sizing: border-box;
   margin-top: 0;
   border: 1px solid $forum-color-border;
@@ -36,28 +38,28 @@
   height: 125px;
   background: $forum-color-background;
   font-size: $forum-base-font-size;
-  font-family: $sans-serif;
+  font-family: $font-family-sans-serif;
   line-height: 1.6;
 }
 
 @mixin discussion-wmd-preview-container {
   @include border-radius(0, 0, $forum-border-radius, $forum-border-radius);
+
   box-sizing: border-box;
   border: 1px solid $forum-color-border;
-  border-top: none;
   width: 100%;
   background: $forum-color-background-light;
-  box-shadow: 0 1px 3px $shadow-l1 inset;
 }
 
 @mixin discussion-new-post-wmd-preview-container {
   @include discussion-wmd-preview-container;
+
   border-color: $forum-color-border;
-  box-shadow: 0 1px 3px $shadow-d1 inset;
 }
 
 @mixin discussion-wmd-preview-label {
   @include padding-left($baseline/4);
+
   padding-top: 3px;
   width: 100%;
   color: $forum-color-editor-preview-label;
@@ -73,11 +75,15 @@
     @include padding-left($baseline*2);
     @include padding-right(0);
   }
+
+  svg {
+    max-width: 100% !important;
+  }
 }
 
 @-webkit-keyframes fadeIn {
-  0% { opacity: 0.0; }
-  100% { opacity: 1.0; }
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
 // extends - content - text overflow by ellipsis
@@ -86,16 +92,4 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-}
-
-@mixin forum-user-label($color) {
-  @include margin-left($baseline/4);
-  @extend %t-weight5;
-  font-size: $forum-small-font-size;
-  vertical-align: middle;
-  border-radius: $forum-border-radius;
-  padding: 0 ($baseline/5);
-  background: $color;
-  font-style: normal;
-  color: white;
 }

@@ -1,36 +1,38 @@
 """
 Tests for xblock_utils.py
 """
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
-import ddt
-from nose.plugins.attrib import attr
 import uuid
 
+import ddt
+from django.conf import settings
 from django.test.client import RequestFactory
+from mock import patch
+from web_fragments.fragment import Fragment
 
+from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 from openedx.core.lib.url_utils import quote_slashes
-from xblock.fragment import Fragment
+from openedx.core.lib.xblock_builtin import get_css_dependencies, get_js_dependencies
+from openedx.core.lib.xblock_utils import (
+    is_xblock_aside,
+    get_aside_from_xblock,
+    replace_course_urls,
+    replace_jump_to_id_urls,
+    replace_static_urls,
+    request_token,
+    sanitize_html_id,
+    wrap_fragment,
+    wrap_xblock
+)
+from xblock.core import XBlockAside
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-
-from openedx.core.lib.xblock_utils import (
-    wrap_fragment,
-    request_token,
-    wrap_xblock,
-    replace_jump_to_id_urls,
-    replace_course_urls,
-    replace_static_urls,
-    sanitize_html_id,
-)
-from openedx.core.lib.xblock_builtin import (
-    get_css_dependencies,
-    get_js_dependencies,
-)
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.test_asides import AsideTestType
+import six
 
 
-@attr(shard=2)
 @ddt.ddt
 class TestXblockUtils(SharedModuleStoreTestCase):
     """
@@ -52,9 +54,6 @@ class TestXblockUtils(SharedModuleStoreTestCase):
             number='TS02',
             run='2015'
         )
-
-    def setUp(self):
-        super(TestXblockUtils, self).setUp()
 
     def create_fragment(self, content=None):
         """
@@ -107,8 +106,8 @@ class TestXblockUtils(SharedModuleStoreTestCase):
             block=course,
             view='baseview',
             frag=fragment,
-            context=None,
-            usage_id_serializer=lambda usage_id: quote_slashes(unicode(usage_id)),
+            context={"wrap_xblock_data": {"custom-attribute": "custom-value"}},
+            usage_id_serializer=lambda usage_id: quote_slashes(six.text_type(usage_id)),
             request_token=uuid.uuid1().get_hex()
         )
         self.assertIsInstance(test_wrap_output, Fragment)
@@ -116,6 +115,7 @@ class TestXblockUtils(SharedModuleStoreTestCase):
         self.assertIn('data-runtime-class="TestRuntime"', test_wrap_output.content)
         self.assertIn(data_usage_id, test_wrap_output.content)
         self.assertIn('<h1>Test!</h1>', test_wrap_output.content)
+        self.assertIn('data-custom-attribute="custom-value"', test_wrap_output.content)
         self.assertEqual(test_wrap_output.resources[0].data, u'body {background-color:red;}')
         self.assertEqual(test_wrap_output.resources[1].data, 'alert("Hi!");')
 
@@ -195,13 +195,15 @@ class TestXblockUtils(SharedModuleStoreTestCase):
         """
         Verify that `get_css_dependencies` returns correct list of files.
         """
-        pipeline_css = {
+        pipeline = settings.PIPELINE.copy()
+        pipeline['PIPELINE_ENABLED'] = pipeline_enabled
+        pipeline['STYLESHEETS'] = {
             'style-group': {
                 'source_filenames': ["a.css", "b.css", "c.css"],
                 'output_filename': "combined.css"
             }
         }
-        with self.settings(PIPELINE_ENABLED=pipeline_enabled, PIPELINE_CSS=pipeline_css):
+        with self.settings(PIPELINE=pipeline):
             css_dependencies = get_css_dependencies("style-group")
             self.assertEqual(css_dependencies, expected_css_dependencies)
 
@@ -214,12 +216,41 @@ class TestXblockUtils(SharedModuleStoreTestCase):
         """
         Verify that `get_js_dependencies` returns correct list of files.
         """
-        pipeline_js = {
+        pipeline = settings.PIPELINE.copy()
+        pipeline['PIPELINE_ENABLED'] = pipeline_enabled
+        pipeline['JAVASCRIPT'] = {
             'js-group': {
                 'source_filenames': ["a.js", "b.js", "c.js"],
                 'output_filename': "combined.js"
             }
         }
-        with self.settings(PIPELINE_ENABLED=pipeline_enabled, PIPELINE_JS=pipeline_js):
+        with self.settings(PIPELINE=pipeline):
             js_dependencies = get_js_dependencies("js-group")
             self.assertEqual(js_dependencies, expected_js_dependencies)
+
+
+class TestXBlockAside(SharedModuleStoreTestCase):
+    """Test the xblock aside function."""
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestXBlockAside, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.block = ItemFactory.create(category='aside', parent=cls.course)
+        cls.aside_v2 = AsideUsageKeyV2(cls.block.scope_ids.usage_id, "aside")
+        cls.aside_v1 = AsideUsageKeyV1(cls.block.scope_ids.usage_id, "aside")
+
+    def test_is_xblock_aside(self):
+        """test if xblock is aside"""
+        assert is_xblock_aside(self.aside_v2) is True
+        assert is_xblock_aside(self.aside_v1) is True
+
+    def test_is_not_xblock_aside(self):
+        """test if xblock is not aside"""
+        assert is_xblock_aside(self.block.scope_ids.usage_id) is False
+
+    @patch('xmodule.modulestore.xml.ImportSystem.applicable_aside_types', lambda self, block: ['test_aside'])
+    @XBlockAside.register_temp_plugin(AsideTestType, 'test_aside')
+    def test_get_aside(self):
+        """test get aside success"""
+        assert get_aside_from_xblock(self.block, six.text_type("test_aside")) is not None

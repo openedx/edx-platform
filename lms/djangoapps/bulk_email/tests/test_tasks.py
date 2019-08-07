@@ -6,41 +6,40 @@ Runs tasks on answers to course problems to validate that code
 paths actually work.
 
 """
+from __future__ import absolute_import, print_function
+
 import json
+from itertools import chain, cycle, repeat
+from smtplib import SMTPAuthenticationError, SMTPConnectError, SMTPDataError, SMTPServerDisconnected
 from uuid import uuid4
-from itertools import cycle, chain, repeat
-from mock import patch, Mock
-from nose.plugins.attrib import attr
-from smtplib import SMTPServerDisconnected, SMTPDataError, SMTPConnectError, SMTPAuthenticationError
-from boto.ses.exceptions import (
-    SESAddressNotVerifiedError,
-    SESIdentityNotVerifiedError,
-    SESDomainNotConfirmedError,
-    SESAddressBlacklistedError,
-    SESDailyQuotaExceededError,
-    SESMaxSendingRateExceededError,
-    SESDomainEndsWithDotError,
-    SESLocalAddressCharacterError,
-    SESIllegalAddressError,
-)
+
 from boto.exception import AWSConnectionError
-
-from celery.states import SUCCESS, FAILURE  # pylint: disable=no-name-in-module, import-error
-
+from boto.ses.exceptions import (
+    SESAddressBlacklistedError,
+    SESAddressNotVerifiedError,
+    SESDailyQuotaExceededError,
+    SESDomainEndsWithDotError,
+    SESDomainNotConfirmedError,
+    SESIdentityNotVerifiedError,
+    SESIllegalAddressError,
+    SESLocalAddressCharacterError,
+    SESMaxSendingRateExceededError
+)
+from celery.states import FAILURE, SUCCESS
 from django.conf import settings
 from django.core.management import call_command
+from mock import Mock, patch
+from opaque_keys.edx.locator import CourseLocator
+from six.moves import range
 
-from xmodule.modulestore.tests.factories import CourseFactory
-
-from bulk_email.models import CourseEmail, Optout, SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS
+from bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail, Optout
 from bulk_email.tasks import _get_course_email_context
-
-from lms.djangoapps.instructor_task.tasks import send_bulk_course_email
-from lms.djangoapps.instructor_task.subtasks import update_subtask_status, SubtaskStatus
 from lms.djangoapps.instructor_task.models import InstructorTask
-from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskCourseTestCase
+from lms.djangoapps.instructor_task.subtasks import SubtaskStatus, update_subtask_status
+from lms.djangoapps.instructor_task.tasks import send_bulk_course_email
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskCourseTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class TestTaskFailure(Exception):
@@ -76,7 +75,6 @@ def my_update_subtask_status(entry_id, current_task_id, new_subtask_status):
         update_subtask_status(entry_id, current_task_id, new_subtask_status)
 
 
-@attr(shard=3)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
     """Tests instructor task that send bulk email."""
@@ -123,7 +121,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
     def test_email_undefined_course(self):
         # Check that we fail when passing in a course that doesn't exist.
-        task_entry = self._create_input_entry(course_id=SlashSeparatedCourseKey("bogus", "course", "id"))
+        task_entry = self._create_input_entry(course_id=CourseLocator("bogus", "course", "id"))
         with self.assertRaises(ValueError):
             self._run_task_with_mock_celery(send_bulk_course_email, task_entry.id, task_entry.task_id)
 
@@ -141,7 +139,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
     def _create_students(self, num_students):
         """Create students for testing"""
-        return [self.create_student('robot%d' % i) for i in xrange(num_students)]
+        return [self.create_student('robot%d' % i) for i in range(num_students)]
 
     def _assert_single_subtask_status(self, entry, succeeded, failed=0, skipped=0, retried_nomax=0, retried_withmax=0):
         """Compare counts with 'subtasks' entry in InstructorTask table."""
@@ -152,11 +150,11 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         self.assertEquals(subtask_info.get('failed'), 0 if succeeded > 0 else 1)
         # verify individual subtask status:
         subtask_status_info = subtask_info.get('status')
-        task_id_list = subtask_status_info.keys()
+        task_id_list = list(subtask_status_info.keys())
         self.assertEquals(len(task_id_list), 1)
         task_id = task_id_list[0]
         subtask_status = subtask_status_info.get(task_id)
-        print "Testing subtask status: {}".format(subtask_status)
+        print(u"Testing subtask status: {}".format(subtask_status))
         self.assertEquals(subtask_status.get('task_id'), task_id)
         self.assertEquals(subtask_status.get('attempted'), succeeded + failed)
         self.assertEquals(subtask_status.get('succeeded'), succeeded)
@@ -281,6 +279,34 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
     def test_ses_domain_ends_with_dot(self):
         # Test that celery handles permanent SMTPDataErrors by failing and not retrying.
         self._test_email_address_failures(SESDomainEndsWithDotError(554, "Email address ends with a dot"))
+
+    def test_bulk_email_skip_with_non_ascii_emails(self):
+        """
+        Tests that bulk email skips the email address containing non-ASCII characters
+        and does not fail.
+        """
+        num_emails = 10
+        emails_with_non_ascii_chars = 3
+        num_of_course_instructors = 1
+
+        students = [self.create_student('robot%d' % i) for i in range(num_emails)]
+        for student in students[:emails_with_non_ascii_chars]:
+            student.email = '{username}@tesá.com'.format(username=student.username)
+            student.save()
+
+        total = num_emails + num_of_course_instructors
+        expected_succeeds = num_emails - emails_with_non_ascii_chars + num_of_course_instructors
+        expected_fails = emails_with_non_ascii_chars
+
+        with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
+            get_conn.return_value.send_messages.side_effect = cycle([None])
+            self._test_run_with_task(
+                task_class=send_bulk_course_email,
+                action_name='emailed',
+                total=total,
+                succeeded=expected_succeeds,
+                failed=expected_fails
+            )
 
     def _test_retry_after_limited_retry_error(self, exception):
         """Test that celery handles connection failures by retrying."""
@@ -440,6 +466,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         result = _get_course_email_context(self.course)
         self.assertIn('course_title', result)
         self.assertIn('course_root', result)
+        self.assertIn('course_language', result)
         self.assertIn('course_url', result)
         self.assertIn('course_image_url', result)
         self.assertIn('course_end_date', result)

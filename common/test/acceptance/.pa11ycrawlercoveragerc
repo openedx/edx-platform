@@ -6,7 +6,7 @@ source =
     cms
     common/djangoapps
     common/lib
-    openedx/core/djangoapps
+    openedx
     **/mako_lms/
     **/mako_cms/
 

@@ -2,13 +2,16 @@
 Integration tests of the payment flow, including course mode selection.
 """
 
-from django.core.urlresolvers import reverse
+from __future__ import absolute_import
 
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from student.tests.factories import UserFactory
-from student.models import CourseEnrollment
+import six
+from django.urls import reverse
+
 from course_modes.tests.factories import CourseModeFactory
+from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class TestProfEdVerification(ModuleStoreTestCase):
@@ -36,12 +39,12 @@ class TestProfEdVerification(ModuleStoreTestCase):
         self.urls = {
             'course_modes_choose': reverse(
                 'course_modes_choose',
-                args=[unicode(self.course_key)]
+                args=[six.text_type(self.course_key)]
             ),
 
             'verify_student_start_flow': reverse(
                 'verify_student_start_flow',
-                args=[unicode(self.course_key)]
+                args=[six.text_type(self.course_key)]
             ) + purchase_workflow,
         }
 

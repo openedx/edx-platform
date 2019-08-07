@@ -1,8 +1,10 @@
 """
 Tests stringify functions used in xmodule html
 """
-from nose.tools import assert_equals  # pylint: disable=no-name-in-module
+from __future__ import absolute_import, print_function
+
 from lxml import etree
+
 from xmodule.stringify import stringify_children
 
 
@@ -11,7 +13,7 @@ def test_stringify():
     html = '''<html a="b" foo="bar">{0}</html>'''.format(text)
     xml = etree.fromstring(html)
     out = stringify_children(xml)
-    assert_equals(out, text)
+    assert out == text
 
 
 def test_stringify_again():
@@ -36,9 +38,9 @@ def test_stringify_again():
     xml = etree.fromstring(html)
     out = stringify_children(xml)
 
-    print "output:"
-    print out
+    print("output:")
+    print(out)
 
     # Tracking strange content repeating bug
     # Should appear once
-    assert_equals(out.count("But it is "), 1)
+    assert out.count("But it is ") == 1

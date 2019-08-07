@@ -1,14 +1,18 @@
 """
 CourseBlocks API views
 """
+from __future__ import absolute_import
+
+import six
 from django.core.exceptions import ValidationError
 from django.http import Http404
-from rest_framework.generics import ListAPIView
-from rest_framework.response import Response
-
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.lib.api.view_utils import view_auth_classes, DeveloperErrorViewMixin
+from rest_framework.generics import ListAPIView
+from rest_framework.response import Response
+from six import text_type
+
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -128,6 +132,11 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
             the child blocks.  Returned only if "children" is included in the
             "requested_fields" parameter.
 
+          * completion: (float or None) The level of completion of the block.
+            Its value can vary between 0.0 and 1.0 or be equal to None
+            if block is not completable. Returned only if "completion"
+            is included in the "requested_fields" parameter.
+
           * block_counts: (dict) For each block type specified in the
             block_counts parameter to the endpoint, the aggregate number of
             blocks of that type for this block and all of its descendants.
@@ -172,9 +181,12 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
 
           * due: The due date of the block. Returned only if "due" is included
             in the "requested_fields" parameter.
+
+          * show_correctness: Whether to show scores/correctness to learners for the current sequence or problem.
+            Returned only if "show_correctness" is included in the "requested_fields" parameter.
     """
 
-    def list(self, request, usage_key_string):  # pylint: disable=arguments-differ
+    def list(self, request, usage_key_string, hide_access_denials=False):  # pylint: disable=arguments-differ
         """
         REST API endpoint for listing all the blocks information in the course,
         while regarding user access and roles.
@@ -204,10 +216,11 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
                     params.cleaned_data.get('student_view_data', []),
                     params.cleaned_data['return_type'],
                     params.cleaned_data.get('block_types_filter', None),
+                    hide_access_denials=hide_access_denials,
                 )
             )
         except ItemNotFoundError as exception:
-            raise Http404("Block not found: {}".format(exception.message))
+            raise Http404(u"Block not found: {}".format(text_type(exception)))
 
 
 @view_auth_classes()
@@ -251,7 +264,7 @@ class BlocksInCourseView(BlocksView):
         with a message indicating that the course_id is not valid.
     """
 
-    def list(self, request):  # pylint: disable=arguments-differ
+    def list(self, request, hide_access_denials=False):  # pylint: disable=arguments-differ
         """
         Retrieves the usage_key for the requested course, and then returns the
         same information that would be returned by BlocksView.list, called with
@@ -270,5 +283,5 @@ class BlocksInCourseView(BlocksView):
             course_key = CourseKey.from_string(course_key_string)
             course_usage_key = modulestore().make_course_usage_key(course_key)
         except InvalidKeyError:
-            raise ValidationError("'{}' is not a valid course key.".format(unicode(course_key_string)))
-        return super(BlocksInCourseView, self).list(request, course_usage_key)
+            raise ValidationError(u"'{}' is not a valid course key.".format(six.text_type(course_key_string)))
+        return super(BlocksInCourseView, self).list(request, course_usage_key, hide_access_denials=hide_access_denials)

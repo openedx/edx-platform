@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 //////////////////////////////////////////////////////////////////////////////
 //
 //  Circuit simulator
@@ -1886,27 +1888,25 @@ var cktsim = (function() {
 	    }
 	    var vgs = this.type_sign * ckt.get_two_terminal(this.g, this.s, soln);
 	    var vgst = vgs - this.vt;
-	    with (this) {
-		var gmgs,ids,gds;
-		if (vgst > 0.0 ) { // vgst < 0, transistor off, no subthreshold here.
-		    if (vgst < vds) { /* Saturation. */
-			gmgs =  beta * (1 + (lambda * vds)) * vgst;
-			ids = type_sign * 0.5 * gmgs * vgst;
-			gds = 0.5 * beta * vgst * vgst * lambda;
-		    } else {  /* Linear region */
-			gmgs =  beta * (1 + lambda * vds);
-			ids = type_sign * gmgs * vds * (vgst - 0.50 * vds);
-			gds = gmgs * (vgst - vds) + beta * lambda * vds * (vgst - 0.5 * vds);
-			gmgs *= vds;
-		    }
-		    ckt.add_to_rhs(d,-ids,rhs);  // current flows into the drain
-		    ckt.add_to_rhs(s, ids,rhs);   // and out the source
-		    ckt.add_conductance(d,s,gds);
-		    ckt.add_to_G(s,s, gmgs);
-		    ckt.add_to_G(d,s,-gmgs);
-		    ckt.add_to_G(d,g, gmgs);
-		    ckt.add_to_G(s,g,-gmgs);
+	    var gmgs,ids,gds;
+	    if (vgst > 0.0 ) { // vgst < 0, transistor off, no subthreshold here.
+		if (vgst < vds) { /* Saturation. */
+	    	gmgs =  this.beta * (1 + (this.lambda * vds)) * vgst;
+	    	ids = this.type_sign * 0.5 * gmgs * vgst;
+	    	gds = 0.5 * this.beta * vgst * vgst * this.lambda;
+		} else {  /* Linear region */
+	    	gmgs =  this.beta * (1 + this.lambda * vds);
+	    	ids = this.type_sign * gmgs * vds * (vgst - 0.50 * vds);
+	    	gds = gmgs * (vgst - vds) + this.beta * this.lambda * vds * (vgst - 0.5 * vds);
+	    	gmgs *= vds;
 		}
+		ckt.add_to_rhs(this.d,-ids,rhs);  // current flows into the drain
+		ckt.add_to_rhs(this.s, ids,rhs);   // and out the source
+		ckt.add_conductance(this.d,this.s,gds);
+		ckt.add_to_G(this.s,this.s, gmgs);
+		ckt.add_to_G(this.d,this.s,-gmgs);
+		ckt.add_to_G(this.d,this.g, gmgs);
+		ckt.add_to_G(this.s,this.g,-gmgs);
 	    }
 	}
 
@@ -2810,7 +2810,7 @@ schematic = (function() {
 			    // for each requested freq, interpolate response value
 			    for (var k = 1; k < flist.length; k++) {
 				var f = flist[k];
-				var v = interpolate(f,x_values,values);
+				var v = interpolate(f,x_values,values);  //xss-lint: disable=javascript-interpolate
 				// convert to dB
 				fvlist.push([f,v == undefined ? 'undefined' : 20.0 * Math.log(v)/Math.LN10]);
 			    }
@@ -2932,7 +2932,7 @@ schematic = (function() {
 				    // for each requested time, interpolate waveform value
 				    for (var k = 1; k < tlist.length; k++) {
 					var t = tlist[k];
-					var v = interpolate(t,times,values);
+					var v = interpolate(t,times,values); // xss-lint: disable=javascript-interpolate
 					tvlist.push([t,v == undefined ? 'undefined' : v]);
 				    }
 				    // save results as list of [t,value] pairs
@@ -2978,7 +2978,7 @@ schematic = (function() {
 
 	// t is the time at which we want a value
 	// times is a list of timepoints from the simulation
-	function interpolate(t,times,values) {
+	function interpolate(t,times,values) { // xss-lint: disable=javascript-interpolate
 	    if (values == undefined) return undefined;
 
 	    for (var i = 0; i < times.length; i++)
@@ -4588,7 +4588,7 @@ schematic = (function() {
 	    this.canvas.style.cursor = 'default';
 	    this.canvas.height = part_w;
 	    this.canvas.width = part_h;
-	    this.canvas.part = this;
+	    this.canvas.xpart = this;
 
 	    this.canvas.addEventListener('mouseover',part_enter,false);
 	    this.canvas.addEventListener('mouseout',part_leave,false);
@@ -4680,7 +4680,7 @@ schematic = (function() {
 	function part_enter(event) {
 	    if (!event) event = window.event;
 	    var canvas = (window.event) ? event.srcElement : event.target;
-	    var part = canvas.part;
+	    var part = canvas.xpart;
 
 	    // avoid Chrome bug that changes to text cursor whenever
 	    // drag starts.  We'll restore the default handler at
@@ -4697,7 +4697,7 @@ schematic = (function() {
 	function part_leave(event) {
 	    if (!event) event = window.event;
 	    var canvas = (window.event) ? event.srcElement : event.target;
-	    var part = canvas.part;
+	    var part = canvas.xpart;
 
 	    if (typeof part.sch.new_part == 'undefined') {
 		// leaving with no part selected?  revert handler
@@ -4711,7 +4711,7 @@ schematic = (function() {
 
 	function part_mouse_down(event) {
 	    if (!event) event = window.event;
-	    var part = (window.event) ? event.srcElement.part : event.target.part;
+	    var part = (window.event) ? event.srcElement.xpart : event.target.xpart;
 
 	    part.select(true);
 	    part.sch.new_part = part;
@@ -4720,7 +4720,7 @@ schematic = (function() {
 
 	function part_mouse_up(event) {
 	    if (!event) event = window.event;
-	    var part = (window.event) ? event.srcElement.part : event.target.part;
+	    var part = (window.event) ? event.srcElement.xpart : event.target.xpart;
 
 	    part.select(false);
 	    part.sch.new_part = undefined;
@@ -5099,8 +5099,14 @@ schematic = (function() {
 	}
 
 	ConnectionPoint.prototype.toString = function() {
-	    return '<ConnectionPoint ('+this.offset_x+','+this.offset_y+') '+this.parent.toString()+'>';
+	    return edx.StringUtils.interpolate('<ConnectionPoint ({offset_x},{offset_y}) {parent}>',
+	    {
+		offset_x: this.offset_x,
+		offset_y: this.offset_y,
+		parent: edx.HtmlUtils.ensureHTML(this.parent.toString())
+	    });
 	}
+
 
 	ConnectionPoint.prototype.json = function() {
 	    return this.label;
@@ -5213,9 +5219,16 @@ schematic = (function() {
 	}
 	Wire.prototype = new Component();
 	Wire.prototype.constructor = Wire;
-
-	Wire.prototype.toString = function() {
-	    return '<Wire ('+this.x+','+this.y+') ('+(this.x+this.dx)+','+(this.y+this.dy)+')>';
+    
+        Wire.prototype.toString = function() {
+	    return edx.StringUtils.interpolate(
+		'<Wire ({x},{y}) ({x_plus_dx},{y_plus_dy})>',
+		{
+		    x: this.x,
+		    y: this.y,
+		    x_plus_dx: this.x + this.dx,
+		    y_plus_dy: this.y + this.dy
+		});
 	}
 
 	// return connection point at other end of wire from specified cp
@@ -5328,9 +5341,14 @@ schematic = (function() {
 	Ground.prototype.constructor = Ground;
 
 	Ground.prototype.toString = function() {
-	    return '<Ground ('+this.x+','+this.y+')>';
+	    return edx.StringUtils.interpolate(
+		'<Ground ({x},{y})>',
+		{
+		    x: this.x,
+		    y: this.y
+		});
 	}
-
+    
 	Ground.prototype.draw = function(c) {
 	    Component.prototype.draw.call(this,c);   // give superclass a shot
 	    this.draw_line(c,0,0,0,8);
@@ -5369,7 +5387,12 @@ schematic = (function() {
 	Label.prototype.constructor = Label;
 
 	Label.prototype.toString = function() {
-	    return '<Label'+' ('+this.x+','+this.y+')>';
+	    return edx.StringUtils.interpolate(
+		'<Label ({x},{y})>',
+		{
+		    x: this.x,
+		    y: this.y
+		});
 	}
 
 	Label.prototype.draw = function(c) {
@@ -5418,7 +5441,12 @@ schematic = (function() {
 	Probe.prototype.constructor = Probe;
 
 	Probe.prototype.toString = function() {
-	    return '<Probe ('+this.x+','+this.y+')>';
+	    return edx.StringUtils.interpolate(
+		'<Probe ({x},{y})>',
+		{
+		    x: this.x,
+		    y: this.y
+		});
 	}
 
 	Probe.prototype.draw = function(c) {
@@ -5497,7 +5525,12 @@ schematic = (function() {
 	Ammeter.prototype.constructor = Ammeter;
 
 	Ammeter.prototype.toString = function() {
-	    return '<Ammeter ('+this.x+','+this.y+')>';
+	    return edx.StringUtils.interpolate(
+		'<Ammeter ({x},{y})>',
+		{
+		    x: this.x,
+		    y: this.y
+		});
 	}
 
 	Ammeter.prototype.move_end = function() {
@@ -5591,7 +5624,13 @@ schematic = (function() {
 	Resistor.prototype.constructor = Resistor;
 
 	Resistor.prototype.toString = function() {
-	    return '<Resistor '+this.properties['r']+' ('+this.x+','+this.y+')>';
+	    return edx.StringUtils.interpolate(
+		'<Resistor {r} ({x},{y})>',
+		{
+		    r: this.properties['r'],
+		    x: this.x,
+		    y: this.y
+		});
 	}
 
 	Resistor.prototype.draw = function(c) {
@@ -5634,7 +5673,13 @@ schematic = (function() {
 	Capacitor.prototype.constructor = Capacitor;
 
 	Capacitor.prototype.toString = function() {
-	    return '<Capacitor '+this.properties['r']+' ('+this.x+','+this.y+')>';
+	    return edx.StringUtils.interpolate(
+		'<Capacitor {r} ({x},{y})>',
+		{
+		    r: this.properties['r'],
+		    x: this.x,
+		    y: this.y
+		});
 	}
 
 	Capacitor.prototype.draw = function(c) {
@@ -5672,7 +5717,13 @@ schematic = (function() {
 	Inductor.prototype.constructor = Inductor;
 
 	Inductor.prototype.toString = function() {
-	    return '<Inductor '+this.properties['l']+' ('+this.x+','+this.y+')>';
+	    return edx.StringUtils.interpolate(
+		'<Inductor {l}, ({x},{y})>',
+		{
+		    l: this.properties['l'],
+		    x: this.x,
+		    y: this.y
+		});
 	}
 
 	Inductor.prototype.draw = function(c) {
@@ -5715,7 +5766,13 @@ schematic = (function() {
 	Diode.prototype.constructor = Diode;
 
 	Diode.prototype.toString = function() {
-	    return '<Diode '+this.properties['area']+' ('+this.x+','+this.y+')>';
+	    return edx.StringUtils.interpolate(
+		'<Diode {area} ({x},{y})>',
+		{
+		    area: this.properties['area'],
+		    x: this.x,
+		    y: this.y
+		});
 	}
 
 	Diode.prototype.draw = function(c) {
@@ -5786,7 +5843,13 @@ schematic = (function() {
 	NFet.prototype.constructor = NFet;
 
 	NFet.prototype.toString = function() {
-	    return '<NFet '+this.properties['W/L']+' ('+this.x+','+this.y+')>';
+	    return edx.StringUtils.interpolate(
+		'<NFet {W_L} ({x},{y})>',
+		{
+		    W_L: this.properties['W/L'],
+		    x: this.x,
+		    y: this.y
+		});
 	}
 
 	NFet.prototype.draw = function(c) {
@@ -5831,7 +5894,12 @@ schematic = (function() {
 	PFet.prototype.constructor = PFet;
 
 	PFet.prototype.toString = function() {
-	    return '<PFet '+this.properties['W/L']+' ('+this.x+','+this.y+')>';
+	    return edx.StringUtils.interpolate('<PFet {W_L} ({x},{y})>',
+	    {
+		W_L: this.properties['W/L'],
+		x: this.x,
+		y: this.y
+	    });
 	}
 
 	PFet.prototype.draw = function(c) {
@@ -5878,7 +5946,13 @@ schematic = (function() {
 	OpAmp.prototype.constructor = OpAmp;
 
 	OpAmp.prototype.toString = function() {
-	    return '<OpAmp'+this.properties['A']+' ('+this.x+','+this.y+')>';
+	    return edx.StringUtils.interpolate(
+		'<OpAmp{A} ({x},{y})>',
+		{
+		    A: this.properties['A'],
+		    x: this.x,
+		    y: this.y
+		});
 	}
 
 	OpAmp.prototype.draw = function(c) {
@@ -5927,7 +6001,14 @@ schematic = (function() {
 	Source.prototype.constructor = Source;
 
 	Source.prototype.toString = function() {
-	    return '<'+this.type+'source '+this.properties['params']+' ('+this.x+','+this.y+')>';
+	    return edx.StringUtils.interpolate(
+		'<{type}source {params} ({x},{y})>',
+		{
+		    type: this.type,
+		    params: this.properties['params'],
+		    x: this.x,
+		    y: this.y
+		});
 	}
 
 	Source.prototype.draw = function(c) {

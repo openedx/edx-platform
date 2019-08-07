@@ -1,6 +1,7 @@
 """
 Tests for helper function provided by site_configuration app.
 """
+from __future__ import absolute_import
 
 from django.test import TestCase
 
@@ -34,6 +35,10 @@ test_config = {   # pylint: disable=invalid-name
         "state": "required",
         "country": "required"
     },
+}
+
+test_config_multi_org = {   # pylint: disable=invalid-name
+    "course_org_filter": ["FooOrg", "BarOrg", "FooBarOrg"]
 }
 
 
@@ -189,3 +194,11 @@ class TestHelpers(TestCase):
                 list(configuration_helpers.get_all_orgs()),
                 test_orgs,
             )
+
+    @with_site_configuration(configuration=test_config_multi_org)
+    def test_get_current_site_orgs(self):
+        test_orgs = test_config_multi_org['course_org_filter']
+        self.assertItemsEqual(
+            list(configuration_helpers.get_current_site_orgs()),
+            test_orgs
+        )

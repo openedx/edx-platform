@@ -1,21 +1,24 @@
 """
 Unit tests for cloning a course between the same and different module stores.
 """
-import json
-from django.conf import settings
+from __future__ import absolute_import
 
+import json
+
+import six
+from django.conf import settings
+from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
-from xmodule.modulestore import ModuleStoreEnum, EdxJSONEncoder
-from contentstore.tests.utils import CourseTestCase
+
 from contentstore.tasks import rerun_course
-from student.auth import has_course_author_access
-from course_action_state.models import CourseRerunState
+from contentstore.tests.utils import CourseTestCase
 from course_action_state.managers import CourseRerunUIStateManager
-from mock import patch, Mock
+from course_action_state.models import CourseRerunState
+from student.auth import has_course_author_access
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
+from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory
-
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -28,15 +31,6 @@ class CloneCourseTest(CourseTestCase):
         """Tests cloning of a course as follows: XML -> Mongo (+ data) -> Mongo -> Split -> Split"""
         # 1. import and populate test toy course
         mongo_course1_id = self.import_and_populate_course()
-
-        # 2. clone course (mongo -> mongo)
-        # TODO - This is currently failing since clone_course doesn't handle Private content - fails on Publish
-        # mongo_course2_id = SlashSeparatedCourseKey('edX2', 'toy2', '2013_Fall')
-        # self.store.clone_course(mongo_course1_id, mongo_course2_id, self.user.id)
-        # self.assertCoursesEqual(mongo_course1_id, mongo_course2_id)
-        # self.check_populated_course(mongo_course2_id)
-
-        # NOTE: When the code above is uncommented this can be removed.
         mongo_course2_id = mongo_course1_id
 
         # 3. clone course (mongo -> split)
@@ -91,8 +85,8 @@ class CloneCourseTest(CourseTestCase):
         split_rerun_id = CourseLocator(org=org, course=course_number, run="2012_Q2")
         CourseRerunState.objects.initiated(course.id, split_rerun_id, self.user, fields['display_name'])
         result = rerun_course.delay(
-            unicode(course.id),
-            unicode(split_rerun_id),
+            six.text_type(course.id),
+            six.text_type(split_rerun_id),
             self.user.id,
             json.dumps(fields, cls=EdxJSONEncoder)
         )
@@ -115,7 +109,7 @@ class CloneCourseTest(CourseTestCase):
         # Mark the action as initiated
         fields = {'display_name': 'rerun'}
         CourseRerunState.objects.initiated(mongo_course1_id, split_course3_id, self.user, fields['display_name'])
-        result = rerun_course.delay(unicode(mongo_course1_id), unicode(split_course3_id), self.user.id,
+        result = rerun_course.delay(six.text_type(mongo_course1_id), six.text_type(split_course3_id), self.user.id,
                                     json.dumps(fields, cls=EdxJSONEncoder))
         self.assertEqual(result.get(), "succeeded")
         self.assertTrue(has_course_author_access(self.user, split_course3_id), "Didn't grant access")
@@ -123,7 +117,7 @@ class CloneCourseTest(CourseTestCase):
         self.assertEqual(rerun_state.state, CourseRerunUIStateManager.State.SUCCEEDED)
 
         # try creating rerunning again to same name and ensure it generates error
-        result = rerun_course.delay(unicode(mongo_course1_id), unicode(split_course3_id), self.user.id)
+        result = rerun_course.delay(six.text_type(mongo_course1_id), six.text_type(split_course3_id), self.user.id)
         self.assertEqual(result.get(), "duplicate course")
         # the below will raise an exception if the record doesn't exist
         CourseRerunState.objects.find_first(
@@ -136,7 +130,7 @@ class CloneCourseTest(CourseTestCase):
             split_course4_id = CourseLocator(org="edx3", course="split3", run="rerun_fail")
             fields = {'display_name': 'total failure'}
             CourseRerunState.objects.initiated(split_course3_id, split_course4_id, self.user, fields['display_name'])
-            result = rerun_course.delay(unicode(split_course3_id), unicode(split_course4_id), self.user.id,
+            result = rerun_course.delay(six.text_type(split_course3_id), six.text_type(split_course4_id), self.user.id,
                                         json.dumps(fields, cls=EdxJSONEncoder))
             self.assertIn("exception: ", result.get())
             self.assertIsNone(self.store.get_course(split_course4_id), "Didn't delete course after error")

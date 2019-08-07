@@ -3,23 +3,29 @@
 End-to-end tests for the LMS that utilize the
 progress page.
 """
-from contextlib import contextmanager
-import ddt
-import flaky
-from nose.plugins.attrib import attr
+from __future__ import absolute_import
 
-from ..helpers import (
-    UniqueCourseTest, auto_auth, create_multiple_choice_problem, create_multiple_choice_xml, get_modal_alert
-)
+from contextlib import contextmanager
+
+import ddt
+from six.moves import range
+
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.common.logout import LogoutPage
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.instructor_dashboard import InstructorDashboardPage, StudentSpecificAdmin
 from ...pages.lms.problem import ProblemPage
 from ...pages.lms.progress import ProgressPage
-from ...pages.studio.component_editor import ComponentEditorView
+from ...pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from ...pages.studio.utils import type_in_codemirror
-from ...pages.studio.overview import CourseOutlinePage
+from ...pages.studio.xblock_editor import XBlockEditorView
+from ..helpers import (
+    UniqueCourseTest,
+    auto_auth,
+    create_multiple_choice_problem,
+    create_multiple_choice_xml,
+    get_modal_alert
+)
 
 
 class ProgressPageBaseTest(UniqueCourseTest):
@@ -38,11 +44,11 @@ class ProgressPageBaseTest(UniqueCourseTest):
     def setUp(self):
         super(ProgressPageBaseTest, self).setUp()
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
-        self.problem_page = ProblemPage(self.browser)  # pylint: disable=attribute-defined-outside-init
+        self.problem_page = ProblemPage(self.browser)
         self.progress_page = ProgressPage(self.browser, self.course_id)
         self.logout_page = LogoutPage(self.browser)
 
-        self.course_outline = CourseOutlinePage(
+        self.studio_course_outline = StudioCourseOutlinePage(
             self.browser,
             self.course_info['org'],
             self.course_info['number'],
@@ -110,17 +116,16 @@ class ProgressPageBaseTest(UniqueCourseTest):
     def _logged_in_session(self, staff=False):
         """
         Ensure that the user is logged in and out appropriately at the beginning
-        and end of the current test.
+        and end of the current test.  But if there's an error, don't log out
+        before capturing a screenshot.
         """
         self.logout_page.visit()
-        try:
-            if staff:
-                auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
-            else:
-                auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
-            yield
-        finally:
-            self.logout_page.visit()
+        if staff:
+            auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
+        else:
+            auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
+        yield
+        self.logout_page.visit()
 
 
 @ddt.ddt
@@ -129,6 +134,8 @@ class PersistentGradesTest(ProgressPageBaseTest):
     Test that grades for completed assessments are persisted
     when various edits are made.
     """
+    shard = 22
+
     def setUp(self):
         super(PersistentGradesTest, self).setUp()
         self.instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
@@ -138,10 +145,11 @@ class PersistentGradesTest(ProgressPageBaseTest):
         Adds a unit to the subsection, which
         should not affect a persisted subsection grade.
         """
-        self.course_outline.visit()
-        subsection = self.course_outline.section(self.SECTION_NAME).subsection(self.SUBSECTION_NAME)
+        self.studio_course_outline.visit()
+        subsection = self.studio_course_outline.section(self.SECTION_NAME).subsection(self.SUBSECTION_NAME)
         subsection.expand_subsection()
         subsection.add_unit()
+        self.studio_course_outline.wait_for_ajax()
         subsection.publish()
 
     def _set_staff_lock_on_subsection(self, locked):
@@ -149,8 +157,8 @@ class PersistentGradesTest(ProgressPageBaseTest):
         Sets staff lock for a subsection, which should hide the
         subsection score from students on the progress page.
         """
-        self.course_outline.visit()
-        subsection = self.course_outline.section_at(0).subsection_at(0)
+        self.studio_course_outline.visit()
+        subsection = self.studio_course_outline.section_at(0).subsection_at(0)
         subsection.set_staff_lock(locked)
         self.assertEqual(subsection.has_staff_lock_warning, locked)
 
@@ -160,9 +168,9 @@ class PersistentGradesTest(ProgressPageBaseTest):
         along with its container unit, so any changes can
         be published.
         """
-        self.course_outline.visit()
-        self.course_outline.section_at(0).subsection_at(0).expand_subsection()
-        unit = self.course_outline.section_at(0).subsection_at(0).unit(self.UNIT_NAME).go_to()
+        self.studio_course_outline.visit()
+        self.studio_course_outline.section_at(0).subsection_at(0).expand_subsection()
+        unit = self.studio_course_outline.section_at(0).subsection_at(0).unit(self.UNIT_NAME).go_to()
         component = unit.xblocks[1]
         return unit, component
 
@@ -173,7 +181,7 @@ class PersistentGradesTest(ProgressPageBaseTest):
         """
         unit, component = self._get_problem_in_studio()
         component.edit()
-        component_editor = ComponentEditorView(self.browser, component.locator)
+        component_editor = XBlockEditorView(self.browser, component.locator)
         component_editor.set_field_value_and_save('Problem Weight', 5)
         unit.publish()
 
@@ -225,7 +233,6 @@ class PersistentGradesTest(ProgressPageBaseTest):
         _change_subsection_structure,
         _change_weight_for_problem
     )
-    @flaky.flaky  # TNL-6040
     def test_content_changes_do_not_change_score(self, edit):
         with self._logged_in_session():
             self.courseware_page.visit()
@@ -270,13 +277,13 @@ class PersistentGradesTest(ProgressPageBaseTest):
             self.assertEqual(self._get_section_score(), (0, 2))
 
 
-class SubsectionGradingPolicyTest(ProgressPageBaseTest):
+class SubsectionGradingPolicyBase(ProgressPageBaseTest):
     """
-    Tests changing a subsection's 'graded' field
-    and the effect it has on the progress page.
+    Base class for testing a subsection and its impact to
+    the progress page
     """
     def setUp(self):
-        super(SubsectionGradingPolicyTest, self).setUp()
+        super(SubsectionGradingPolicyBase, self).setUp()
         self._set_policy_for_subsection("Homework", 0)
         self._set_policy_for_subsection("Lab", 1)
 
@@ -286,8 +293,8 @@ class SubsectionGradingPolicyTest(ProgressPageBaseTest):
         If a section index is not provided, 0 is assumed.
         """
         with self._logged_in_session(staff=True):
-            self.course_outline.visit()
-            modal = self.course_outline.section_at(section).subsection_at(0).edit()
+            self.studio_course_outline.visit()
+            modal = self.studio_course_outline.section_at(section).subsection_at(0).edit()
             modal.policy = policy
             modal.save()
 
@@ -307,6 +314,13 @@ class SubsectionGradingPolicyTest(ProgressPageBaseTest):
         self.assertEqual(sr_text, self.progress_page.x_tick_sr_text(index))
         self.assertEqual([label, 'true' if label_hidden else None], self.progress_page.x_tick_label(index))
 
+
+class SubsectionGradingPolicyA11yTest(SubsectionGradingPolicyBase):
+    """
+    Class to test the accessibility of subsection grading
+    """
+    a11y = True
+
     def test_axis_a11y(self):
         """
         Tests that the progress chart axes have appropriate a11y (screenreader) markup.
@@ -318,13 +332,22 @@ class SubsectionGradingPolicyTest(ProgressPageBaseTest):
             self.courseware_page.click_next_button_on_top()
             # Answer the first Lab problem (unit only contains a single problem)
             self._answer_problem_correctly()
+
+            self.progress_page.a11y_audit.config.set_rules({
+                "ignore": [
+                    'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                    'region',  # TODO: AC-932
+                ]
+            })
             self.progress_page.visit()
+
+            # Verify the basic a11y of the progress page
+            self.progress_page.a11y_audit.check_for_accessibility_errors()
 
             # Verify that y-Axis labels are aria-hidden
             self.assertEqual(['100%', 'true'], self.progress_page.y_tick_label(0))
             self.assertEqual(['0%', 'true'], self.progress_page.y_tick_label(1))
-            self.assertEqual(['Pass 50%', 'true'], self.progress_page.y_tick_label(2))
-
+            self.assertEqual(['Pass 50%', 'true'], self.progress_page.y_tick_label(2))  # pylint: disable=unicode-format-string
             # Verify x-Axis labels and sr-text
             self._check_tick_text(0, [u'Homework 1 - Test Subsection 1 - 50% (1/2)'], u'HW 01')
 
@@ -385,38 +408,24 @@ class SubsectionGradingPolicyTest(ProgressPageBaseTest):
 
             # Verify the overall score. The first element in the array is the sr-only text, and the
             # second is the total text (including the sr-only text).
-            self.assertEqual(['Overall Score', 'Overall Score\n2%'], self.progress_page.graph_overall_score())
-
-    def test_subsection_grading_policy_on_progress_page(self):
-        with self._logged_in_session():
-            self._check_scores_and_page_text([(0, 1), (0, 1)], (0, 2), "Homework 1 - Test Subsection 1 - 0% (0/2)")
-            self.courseware_page.visit()
-            self._answer_problem_correctly()
-            self._check_scores_and_page_text([(1, 1), (0, 1)], (1, 2), "Homework 1 - Test Subsection 1 - 50% (1/2)")
-
-        self._set_policy_for_subsection("Not Graded")
-
-        with self._logged_in_session():
-            self.progress_page.visit()
-            self.assertEqual(self._get_problem_scores(), [(1, 1), (0, 1)])
-            self.assertEqual(self._get_section_score(), (1, 2))
-            self.assertFalse(self.progress_page.text_on_page("Homework 1 - Test Subsection 1"))
-
-        self._set_policy_for_subsection("Homework")
-
-        with self._logged_in_session():
-            self._check_scores_and_page_text([(1, 1), (0, 1)], (1, 2), "Homework 1 - Test Subsection 1 - 50% (1/2)")
+            self.assertEqual(['Overall Score', 'Overall Score\n2%'], self.progress_page.graph_overall_score())  # pylint: disable=unicode-format-string
 
 
-@attr('a11y')
 class ProgressPageA11yTest(ProgressPageBaseTest):
     """
     Class to test the accessibility of the progress page.
     """
+    a11y = True
 
     def test_progress_page_a11y(self):
         """
         Test the accessibility of the progress page.
         """
+        self.progress_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+                'region',  # TODO: AC-932
+            ]
+        })
         self.progress_page.visit()
         self.progress_page.a11y_audit.check_for_accessibility_errors()

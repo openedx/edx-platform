@@ -2,23 +2,23 @@
 Tests for certificate app views used by the support team.
 """
 
+from __future__ import absolute_import
+
 import json
 
 import ddt
+import six
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
-
-from certificates.models import (
-    CertificateInvalidation,
-    CertificateStatuses,
-    GeneratedCertificate
-)
-from certificates.tests.factories import CertificateInvalidationFactory
+from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
-from student.tests.factories import UserFactory
+
+from lms.djangoapps.certificates.models import CertificateInvalidation, CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from student.models import CourseEnrollment
 from student.roles import GlobalStaff, SupportStaffRole
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -95,12 +95,17 @@ class CertificateSearchTests(CertificateSupportTestCase):
     """
     Tests for the certificate search end-point used by the support team.
     """
+
     def setUp(self):
         """
         Create a course
         """
         super(CertificateSearchTests, self).setUp()
-        self.course = CourseFactory()
+        self.course = CourseFactory(
+            org=self.CERT_COURSE_KEY.org,
+            course=self.CERT_COURSE_KEY.course,
+            run=self.CERT_COURSE_KEY.run,
+        )
         self.course.cert_html_view_enabled = True
 
         #course certificate configurations
@@ -117,8 +122,12 @@ class CertificateSearchTests(CertificateSupportTestCase):
         ]
 
         self.course.certificates = {'certificates': certificates}
-        self.course.save()  # pylint: disable=no-member
+        self.course.save()
         self.store.update_item(self.course, self.user.id)
+        self.course_overview = CourseOverviewFactory(
+            id=self.course.id,
+            cert_html_view_enabled=True,
+        )
 
     @ddt.data(
         (GlobalStaff, True),
@@ -151,8 +160,10 @@ class CertificateSearchTests(CertificateSupportTestCase):
         ("bar@example.com", False),
         ("", False),
         (CertificateSupportTestCase.STUDENT_USERNAME, False, 'invalid_key'),
-        (CertificateSupportTestCase.STUDENT_USERNAME, False, unicode(CertificateSupportTestCase.COURSE_NOT_EXIST_KEY)),
-        (CertificateSupportTestCase.STUDENT_USERNAME, True, unicode(CertificateSupportTestCase.EXISTED_COURSE_KEY_1)),
+        (CertificateSupportTestCase.STUDENT_USERNAME, False,
+            six.text_type(CertificateSupportTestCase.COURSE_NOT_EXIST_KEY)),
+        (CertificateSupportTestCase.STUDENT_USERNAME, True,
+            six.text_type(CertificateSupportTestCase.EXISTED_COURSE_KEY_1)),
     )
     @ddt.unpack
     def test_search(self, user_filter, expect_result, course_filter=None):
@@ -169,7 +180,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
         Test that email address that contains '+' accepted by student support
         """
         self.student.email = "student+student@example.com"
-        self.student.save()  # pylint: disable=no-member
+        self.student.save()
 
         response = self._search(self.student.email)
         self.assertEqual(response.status_code, 200)
@@ -188,17 +199,18 @@ class CertificateSearchTests(CertificateSupportTestCase):
         retrieved_cert = results[0]
 
         self.assertEqual(retrieved_cert["username"], self.STUDENT_USERNAME)
-        self.assertEqual(retrieved_cert["course_key"], unicode(self.CERT_COURSE_KEY))
+        self.assertEqual(retrieved_cert["course_key"], six.text_type(self.CERT_COURSE_KEY))
         self.assertEqual(retrieved_cert["created"], self.cert.created_date.isoformat())
         self.assertEqual(retrieved_cert["modified"], self.cert.modified_date.isoformat())
-        self.assertEqual(retrieved_cert["grade"], unicode(self.CERT_GRADE))
+        self.assertEqual(retrieved_cert["grade"], six.text_type(self.CERT_GRADE))
         self.assertEqual(retrieved_cert["status"], self.CERT_STATUS)
         self.assertEqual(retrieved_cert["type"], self.CERT_MODE)
         self.assertEqual(retrieved_cert["download_url"], self.CERT_DOWNLOAD_URL)
+        self.assertFalse(retrieved_cert["regenerate"])
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_download_link(self):
-        self.cert.course_id = self.course.id  # pylint: disable=no-member
+        self.cert.course_id = self.course.id
         self.cert.download_url = ''
         self.cert.save()
 
@@ -213,9 +225,10 @@ class CertificateSearchTests(CertificateSupportTestCase):
             retrieved_cert["download_url"],
             reverse(
                 'certificates:html_view',
-                kwargs={"user_id": self.student.id, "course_id": self.course.id}  # pylint: disable=no-member
+                kwargs={"user_id": self.student.id, "course_id": self.course.id}
             )
         )
+        self.assertTrue(retrieved_cert["regenerate"])
 
     def _search(self, user_filter, course_filter=None):
         """Execute a search and return the response. """
@@ -270,8 +283,12 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
             self.assertEqual(response.status_code, 403)
 
     def test_regenerate_certificate(self):
+        """Test web certificate regenration."""
+        self.cert.download_url = ''
+        self.cert.save()
+
         response = self._regenerate(
-            course_key=self.course.id,  # pylint: disable=no-member
+            course_key=self.course.id,
             username=self.STUDENT_USERNAME,
         )
         self.assertEqual(response.status_code, 200)
@@ -293,7 +310,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
 
     def test_regenerate_no_such_user(self):
         response = self._regenerate(
-            course_key=unicode(self.CERT_COURSE_KEY),
+            course_key=six.text_type(self.CERT_COURSE_KEY),
             username="invalid_username",
         )
         self.assertEqual(response.status_code, 400)
@@ -401,7 +418,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
     def assertGeneratedCertExists(self, user, status):
         """ Dry method to check if certificate exists. """
         self.assertTrue(
-            GeneratedCertificate.objects.filter(  # pylint: disable=no-member
+            GeneratedCertificate.objects.filter(
                 user=user, status=status
             ).exists()
         )
@@ -453,7 +470,7 @@ class CertificateGenerateTests(CertificateSupportTestCase):
 
     def test_generate_certificate(self):
         response = self._generate(
-            course_key=self.course.id,  # pylint: disable=no-member
+            course_key=self.course.id,
             username=self.STUDENT_USERNAME,
         )
         self.assertEqual(response.status_code, 200)
@@ -469,7 +486,7 @@ class CertificateGenerateTests(CertificateSupportTestCase):
 
     def test_generate_no_such_user(self):
         response = self._generate(
-            course_key=unicode(self.EXISTED_COURSE_KEY_2),
+            course_key=six.text_type(self.EXISTED_COURSE_KEY_2),
             username="invalid_username",
         )
         self.assertEqual(response.status_code, 400)

@@ -1,17 +1,22 @@
 """
 CAPA HTML rendering tests.
 """
+from __future__ import absolute_import
+
+import os
 import textwrap
 import unittest
 
 import ddt
 import mock
-import os
-from capa.tests.helpers import test_capa_system, new_loncapa_problem
 from lxml import etree
+
+# Changes formatting of empty elements; import here to avoid test order dependence
+import xmodule.modulestore.xml  # pylint: disable=unused-import
+from capa.tests.helpers import new_loncapa_problem, test_capa_system
 from openedx.core.djangolib.markup import HTML
 
-from .response_xml_factory import StringResponseXMLFactory, CustomResponseXMLFactory
+from .response_xml_factory import CustomResponseXMLFactory, StringResponseXMLFactory
 
 
 @ddt.ddt
@@ -41,8 +46,8 @@ class CapaHtmlRenderTest(unittest.TestCase):
     def test_include_html(self):
         # Create a test file to include
         self._create_test_file(
-            'test_include.xml',
-            '<test>Test include</test>'
+            u'test_include.xml',
+            u'<test>Test include</test>'
         )
 
         # Generate some XML with an <include>
@@ -289,9 +294,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # Comments and processing instructions should be skipped.
         xml_str = textwrap.dedent("""\
             <?xml version="1.0" encoding="utf-8"?>
-            <!DOCTYPE html [
-                <!ENTITY % wacky "lxml.etree is wacky!">
-            ]>
+            <!DOCTYPE html []>
             <problem>
             <!-- A commment. -->
             <?ignore this processing instruction. ?>
@@ -303,7 +306,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         # Render the HTML
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div>\s+</div>")
+        self.assertRegexpMatches(the_html, r"<div>\s*</div>")
 
     def _create_test_file(self, path, content_str):
         test_fp = self.capa_system.filestore.open(path, "w")

@@ -2,22 +2,21 @@
 """
 Acceptance tests for licensing of the Video module
 """
-from __future__ import unicode_literals
-from nose.plugins.attrib import attr
+from __future__ import absolute_import, unicode_literals
+
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
 
-#from common.test.acceptance.tests.helpers import UniqueCourseTest
-from common.test.acceptance.pages.studio.overview import CourseOutlinePage
-from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 
-
-@attr(shard=2)
 class VideoLicenseTest(StudioCourseTest):
     """
     Tests for video module-level licensing (that is, setting the license,
     for a specific video module, to All Rights Reserved or Creative Commons)
     """
+    shard = 22
+
     def setUp(self):  # pylint: disable=arguments-differ
         super(VideoLicenseTest, self).setUp()
 
@@ -58,7 +57,7 @@ class VideoLicenseTest(StudioCourseTest):
         self.lms_courseware.visit()
         video = self.lms_courseware.q(css=".vert .xblock .video")
         self.assertTrue(video.is_present())
-        video_license = self.lms_courseware.q(css=".vert .xblock.xmodule_VideoModule .xblock-license")
+        video_license = self.lms_courseware.q(css=".vert .xblock.xmodule_VideoBlock .xblock-license")
         self.assertFalse(video_license.is_present())
 
     def test_arr_license(self):
@@ -79,12 +78,12 @@ class VideoLicenseTest(StudioCourseTest):
         video.open_advanced_tab()
         video.set_license('all-rights-reserved')
         video.save_settings()
-        container_page.publish_action.click()
+        container_page.publish()
 
         self.lms_courseware.visit()
         video = self.lms_courseware.q(css=".vert .xblock .video")
         self.assertTrue(video.is_present())
-        video_license_css = ".vert .xblock.xmodule_VideoModule .xblock-license"
+        video_license_css = ".vert .xblock.xmodule_VideoBlock .xblock-license"
         self.lms_courseware.wait_for_element_presence(
             video_license_css, "Video module license block is present"
         )
@@ -109,12 +108,12 @@ class VideoLicenseTest(StudioCourseTest):
         video.open_advanced_tab()
         video.set_license('creative-commons')
         video.save_settings()
-        container_page.publish_action.click()
+        container_page.publish()
 
         self.lms_courseware.visit()
         video = self.lms_courseware.q(css=".vert .xblock .video")
         self.assertTrue(video.is_present())
-        video_license_css = ".vert .xblock.xmodule_VideoModule .xblock-license"
+        video_license_css = ".vert .xblock.xmodule_VideoBlock .xblock-license"
         self.lms_courseware.wait_for_element_presence(
             video_license_css, "Video module license block is present"
         )

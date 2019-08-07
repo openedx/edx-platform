@@ -96,8 +96,8 @@ function() {
             });
 
             return {
-                'start': filteredTimes,
-                'captions': filteredCaptions
+                start: filteredTimes,
+                captions: filteredCaptions
             };
         }
 

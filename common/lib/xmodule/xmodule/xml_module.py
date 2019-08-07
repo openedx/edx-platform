@@ -1,22 +1,20 @@
-import json
+from __future__ import absolute_import
+
 import copy
+import json
 import logging
 import os
 import sys
-from lxml import etree
 
+import six
+from lxml import etree
+from lxml.etree import Element, ElementTree, XMLParser
 from xblock.core import XML_NAMESPACES
 from xblock.fields import Dict, Scope, ScopeIds
 from xblock.runtime import KvsFieldData
-from xmodule.x_module import XModuleDescriptor, DEPRECATION_VSCOMPAT_EVENT
-from xmodule.modulestore.inheritance import own_metadata, InheritanceKeyValueStore
 from xmodule.modulestore import EdxJSONEncoder
-
-import dogstats_wrapper as dog_stats_api
-
-from lxml.etree import (
-    Element, ElementTree, XMLParser,
-)
+from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
+from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, XModuleDescriptor
 
 log = logging.getLogger(__name__)
 
@@ -65,7 +63,7 @@ def serialize_field(value):
     If the value is a string, then we simply return what was passed in.
     Otherwise, we return json.dumps on the input value.
     """
-    if isinstance(value, basestring):
+    if isinstance(value, six.string_types):
         return value
 
     return json.dumps(value, cls=EdxJSONEncoder)
@@ -142,6 +140,14 @@ class XmlParserMixin(object):
                          # Used for storing xml attributes between import and export, for roundtrips
                          'xml_attributes')
 
+    # This is a categories to fields map that contains the block category specific fields which should not be
+    # cleaned and/or override while adding xml to node.
+    metadata_to_not_to_clean = {
+        # A category `video` having `sub` and `transcripts` fields
+        # which should not be cleaned/override in an xml object.
+        'video': ('sub', 'transcripts')
+    }
+
     metadata_to_export_to_policy = ('discussion_topics',)
 
     @staticmethod
@@ -168,13 +174,15 @@ class XmlParserMixin(object):
         raise NotImplementedError("%s does not implement definition_from_xml" % cls.__name__)
 
     @classmethod
-    def clean_metadata_from_xml(cls, xml_object):
+    def clean_metadata_from_xml(cls, xml_object, excluded_fields=()):
         """
         Remove any attribute named for a field with scope Scope.settings from the supplied
         xml_object
         """
         for field_name, field in cls.fields.items():
-            if field.scope == Scope.settings and xml_object.get(field_name) is not None:
+            if (field.scope == Scope.settings
+                    and field_name not in excluded_fields
+                    and xml_object.get(field_name) is not None):
                 del xml_object.attrib[field_name]
 
     @classmethod
@@ -202,7 +210,7 @@ class XmlParserMixin(object):
             # Add info about where we are, but keep the traceback
             msg = 'Unable to load file contents at path %s for item %s: %s ' % (
                 filepath, def_id, err)
-            raise Exception, msg, sys.exc_info()[2]
+            six.reraise(Exception, msg, sys.exc_info()[2])
 
     @classmethod
     def load_definition(cls, xml_object, system, def_id, id_generator):
@@ -226,11 +234,6 @@ class XmlParserMixin(object):
             filepath = ''
             aside_children = []
         else:
-            dog_stats_api.increment(
-                DEPRECATION_VSCOMPAT_EVENT,
-                tags=["location:xmlparser_util_mixin_load_definition_filename"]
-            )
-
             filepath = cls._format_filepath(xml_object.tag, filename)
 
             # VS[compat]
@@ -239,11 +242,6 @@ class XmlParserMixin(object):
             # again in the correct format.  This should go away once the CMS is
             # online and has imported all current (fall 2012) courses from xml
             if not system.resources_fs.exists(filepath) and hasattr(cls, 'backcompat_paths'):
-                dog_stats_api.increment(
-                    DEPRECATION_VSCOMPAT_EVENT,
-                    tags=["location:xmlparser_util_mixin_load_definition_backcompat"]
-                )
-
                 candidates = cls.backcompat_paths(filepath)
                 for candidate in candidates:
                     if system.resources_fs.exists(candidate):
@@ -277,19 +275,11 @@ class XmlParserMixin(object):
         Returns a dictionary {key: value}.
         """
         metadata = {'xml_attributes': {}}
-        for attr, val in xml_object.attrib.iteritems():
+        for attr, val in six.iteritems(xml_object.attrib):
             # VS[compat].  Remove after all key translations done
             attr = cls._translate(attr)
 
             if attr in cls.metadata_to_strip:
-                if attr in ('course', 'org', 'url_name', 'filename'):
-                    dog_stats_api.increment(
-                        DEPRECATION_VSCOMPAT_EVENT,
-                        tags=(
-                            "location:xmlparser_util_mixin_load_metadata",
-                            "metadata:{}".format(attr),
-                        )
-                    )
                 # don't load these
                 continue
 
@@ -305,7 +295,7 @@ class XmlParserMixin(object):
         Add the keys in policy to metadata, after processing them
         through the attrmap.  Updates the metadata dict in place.
         """
-        for attr, value in policy.iteritems():
+        for attr, value in six.iteritems(policy):
             attr = cls._translate(attr)
             if attr not in cls.fields:
                 # Store unknown attributes coming from policy.json
@@ -349,10 +339,6 @@ class XmlParserMixin(object):
         else:
             filepath = None
             definition_xml = node
-            dog_stats_api.increment(
-                DEPRECATION_VSCOMPAT_EVENT,
-                tags=["location:xmlparser_util_mixin_parse_xml"]
-            )
 
         # Note: removes metadata.
         definition, children = cls.load_definition(definition_xml, runtime, def_id, id_generator)
@@ -445,13 +431,20 @@ class XmlParserMixin(object):
         """
         # Get the definition
         xml_object = self.definition_to_xml(self.runtime.export_fs)
+
+        # If xml_object is None, we don't know how to serialize this node, but
+        # we shouldn't crash out the whole export for it.
+        if xml_object is None:
+            return
+
         for aside in self.runtime.get_asides(self):
             if aside.needs_serialization():
                 aside_node = etree.Element("unknown_root", nsmap=XML_NAMESPACES)
                 aside.add_xml_to_node(aside_node)
                 xml_object.append(aside_node)
 
-        self.clean_metadata_from_xml(xml_object)
+        not_to_clean_fields = self.metadata_to_not_to_clean.get(self.category, ())
+        self.clean_metadata_from_xml(xml_object, excluded_fields=not_to_clean_fields)
 
         # Set the tag on both nodes so we get the file path right.
         xml_object.tag = self.category
@@ -460,7 +453,9 @@ class XmlParserMixin(object):
         # Add the non-inherited metadata
         for attr in sorted(own_metadata(self)):
             # don't want e.g. data_dir
-            if attr not in self.metadata_to_strip and attr not in self.metadata_to_export_to_policy:
+            if (attr not in self.metadata_to_strip
+                    and attr not in self.metadata_to_export_to_policy
+                    and attr not in not_to_clean_fields):
                 val = serialize_field(self._field_data.get(self, attr))
                 try:
                     xml_object.set(attr, val)
@@ -477,9 +472,13 @@ class XmlParserMixin(object):
         if self.export_to_file():
             # Write the definition to a file
             url_path = name_to_pathname(self.url_name)
-            filepath = self._format_filepath(self.category, url_path)
-            self.runtime.export_fs.makedir(os.path.dirname(filepath), recursive=True, allow_recreate=True)
-            with self.runtime.export_fs.open(filepath, 'w') as fileobj:
+            # if folder is course then create file with name {course_run}.xml
+            filepath = self._format_filepath(
+                self.category,
+                self.location.run if self.category == 'course' else url_path,
+            )
+            self.runtime.export_fs.makedirs(os.path.dirname(filepath), recreate=True)
+            with self.runtime.export_fs.open(filepath, 'wb') as fileobj:
                 ElementTree(xml_object).write(fileobj, pretty_print=True, encoding='utf-8')
         else:
             # Write all attributes from xml_object onto node
@@ -515,7 +514,7 @@ class XmlParserMixin(object):
         return non_editable_fields
 
 
-class XmlDescriptor(XmlParserMixin, XModuleDescriptor):  # pylint: disable=abstract-method
+class XmlMixin(XmlParserMixin):
     """
     Mixin class for standardized parsing of XModule xml.
     """
@@ -541,7 +540,7 @@ class XmlDescriptor(XmlParserMixin, XModuleDescriptor):  # pylint: disable=abstr
         # This only exists to satisfy subclasses that both:
         #    a) define from_xml themselves
         #    b) call super(..).from_xml(..)
-        return super(XmlDescriptor, cls).parse_xml(
+        return super(XmlMixin, cls).parse_xml(
             etree.fromstring(xml_data),
             system,
             None,  # This is ignored by XmlParserMixin
@@ -553,12 +552,12 @@ class XmlDescriptor(XmlParserMixin, XModuleDescriptor):  # pylint: disable=abstr
         """
         Interpret the parsed XML in `node`, creating an XModuleDescriptor.
         """
-        if cls.from_xml != XmlDescriptor.from_xml:
+        if cls.from_xml != XmlMixin.from_xml:
             # Skip the parse_xml from XmlParserMixin to get the shim parse_xml
             # from XModuleDescriptor, which actually calls `from_xml`.
             return super(XmlParserMixin, cls).parse_xml(node, runtime, keys, id_generator)  # pylint: disable=bad-super-call
         else:
-            return super(XmlDescriptor, cls).parse_xml(node, runtime, keys, id_generator)
+            return super(XmlMixin, cls).parse_xml(node, runtime, keys, id_generator)
 
     def export_to_xml(self, resource_fs):
         """
@@ -578,7 +577,7 @@ class XmlDescriptor(XmlParserMixin, XModuleDescriptor):  # pylint: disable=abstr
         #    a) define export_to_xml themselves
         #    b) call super(..).export_to_xml(..)
         node = Element(self.category)
-        super(XmlDescriptor, self).add_xml_to_node(node)
+        super(XmlMixin, self).add_xml_to_node(node)
         return etree.tostring(node)
 
     def add_xml_to_node(self, node):
@@ -586,9 +585,13 @@ class XmlDescriptor(XmlParserMixin, XModuleDescriptor):  # pylint: disable=abstr
         Export this :class:`XModuleDescriptor` as XML, by setting attributes on the provided
         `node`.
         """
-        if self.export_to_xml != XmlDescriptor.export_to_xml:
+        if self.export_to_xml != XmlMixin.export_to_xml:
             # Skip the add_xml_to_node from XmlParserMixin to get the shim add_xml_to_node
             # from XModuleDescriptor, which actually calls `export_to_xml`.
             super(XmlParserMixin, self).add_xml_to_node(node)  # pylint: disable=bad-super-call
         else:
-            super(XmlDescriptor, self).add_xml_to_node(node)
+            super(XmlMixin, self).add_xml_to_node(node)
+
+
+class XmlDescriptor(XmlMixin, XModuleDescriptor):
+    pass

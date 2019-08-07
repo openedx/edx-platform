@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 from django.db import migrations, models
 
@@ -34,6 +34,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='tagavailablevalues',
             name='category',
-            field=models.ForeignKey(to='tagging.TagCategories'),
+            field=models.ForeignKey(to='tagging.TagCategories', on_delete=models.CASCADE),
         ),
     ]

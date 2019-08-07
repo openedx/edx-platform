@@ -1,8 +1,12 @@
-""" API URLs. """
-from django.conf.urls import patterns, url, include
+"""
+API URLs.
+"""
+from __future__ import absolute_import
 
-urlpatterns = patterns(
-    '',
-    url(r'^v0/', include('commerce.api.v0.urls', namespace='v0')),
-    url(r'^v1/', include('commerce.api.v1.urls', namespace='v1')),
-)
+from django.conf.urls import include, url
+
+app_name = 'commerce'
+urlpatterns = [
+    url(r'^v0/', include('lms.djangoapps.commerce.api.v0.urls')),
+    url(r'^v1/', include('lms.djangoapps.commerce.api.v1.urls')),
+]

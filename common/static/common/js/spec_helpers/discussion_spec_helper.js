@@ -58,16 +58,16 @@
                         children: [['Test Topic', 'entry'], ['Other Topic', 'entry']],
                         entries: {
                             'Test Topic': {
-                                is_cohorted: true,
+                                is_divided: true,
                                 id: 'test_topic'
                             },
                             'Other Topic': {
-                                is_cohorted: true,
+                                is_divided: true,
                                 id: 'other_topic'
                             }
                         }
                     },
-                    is_cohorted: true,
+                    is_discussion_division_enabled: true,
                     allow_anonymous: false,
                     allow_anonymous_to_peers: false
                 },
@@ -89,36 +89,8 @@
         };
 
         DiscussionSpecHelper.setUnderscoreFixtures = function() {
-            var templateFixture, templateName, templateNames, templateNamesNoTrailingTemplate, i, j, len;
-            templateNames = [
-                'thread', 'thread-show', 'thread-edit', 'thread-response', 'thread-response-show',
-                'thread-response-edit', 'response-comment-show', 'response-comment-edit', 'thread-list-item',
-                'search-alert', 'new-post', 'thread-type', 'new-post-menu-entry', 'new-post-alert',
-                'new-post-menu-category', 'topic', 'post-user-display', 'inline-discussion', 'pagination',
-                'profile-thread', 'customwmd-prompt', 'nav-loading'
-            ];
-            templateNamesNoTrailingTemplate = [
-                'forum-action-endorse', 'forum-action-answer', 'forum-action-follow', 'forum-action-vote',
-                'forum-action-report', 'forum-action-pin', 'forum-action-close', 'forum-action-edit',
-                'forum-action-delete', 'forum-actions', 'alert-popup', 'nav-load-more-link'
-            ];
-            for (i = 0, len = templateNames.length; i < len; i++) {
-                templateName = templateNames[i];
-                templateFixture = readFixtures('common/templates/discussion/' + templateName + '.underscore');
-                appendSetFixtures($('<script>', {
-                    id: templateName + '-template',
-                    type: 'text/template'
-                }).text(templateFixture));
-            }
-            for (j = 0, len = templateNamesNoTrailingTemplate.length; j < len; j++) {
-                templateName = templateNamesNoTrailingTemplate[j];
-                templateFixture = readFixtures('common/templates/discussion/' + templateName + '.underscore');
-                appendSetFixtures($('<script>', {
-                    id: templateName,
-                    type: 'text/template'
-                }).text(templateFixture));
-            }
-
+            var templateFixtures = readFixtures('common/templates/discussion/templates.underscore');
+            appendSetFixtures(templateFixtures);
             appendSetFixtures(
                 '<script type="text/template" id="thread-list-template">' +
                 '    <div class="forum-nav-header">' +
@@ -170,7 +142,7 @@
                 '                            <li' +
                 '                                class="forum-nav-browse-menu-item"' +
                 '                                data-discussion-id="child"' +
-                '                                data-cohorted="false"' +
+                '                                data-divided="false"' +
                 '                            >' +
                 '                                <a href="#" class="forum-nav-browse-title">Child</a>' +
                 '                            </li>' +
@@ -178,7 +150,7 @@
                 '                    <li' +
                 '                        class="forum-nav-browse-menu-item"' +
                 '                        data-discussion-id="sibling"' +
-                '                        data-cohorted="false"' +
+                '                        data-divided="false"' +
                 '                    >' +
                 '                        <a href="#" class="forum-nav-browse-title">Sibling</a>' +
                 '                    </li>' +
@@ -187,7 +159,7 @@
                 '            <li' +
                 '                class="forum-nav-browse-menu-item"' +
                 '                data-discussion-id="other"' +
-                '                data-cohorted="true"' +
+                '                data-divided="true"' +
                 '            >' +
                 '                <a href="#" class="forum-nav-browse-title">Other Category</a>' +
                 '            </li>' +
@@ -203,11 +175,11 @@
                 '                    <option value="flagged">Flagged</option>' +
                 '                </select>' +
                 '            </label>' +
-                '            <% if (isCohorted && isPrivilegedUser) { %>' +
+                '            <% if (isDiscussionDivisionEnabled && isPrivilegedUser) { %>' +
                 '            <label class="forum-nav-filter-cohort">' +
-                '                <span class="sr">Cohort:</span>' +
+                '                <span class="sr">Group:</span>' +
                 '                <select class="forum-nav-filter-cohort-control">' +
-                '                    <option value="">in all cohorts</option>' +
+                '                    <option value="">in all groups</option>' +
                 '                    <option value="1">Cohort1</option>' +
                 '                    <option value="2">Cohort2</option>' +
                 '                </select>' +

@@ -2,23 +2,26 @@
 Python tests for the Survey views
 """
 
+from __future__ import absolute_import
+
 import json
 from collections import OrderedDict
 
+import six
 from django.test.client import Client
-from django.core.urlresolvers import reverse
-
-from survey.models import SurveyForm, SurveyAnswer
+from django.urls import reverse
 
 from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory
+from survey.models import SurveyAnswer, SurveyForm
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class SurveyViewsTests(ModuleStoreTestCase):
     """
     All tests for the views.py file
     """
+
     def setUp(self):
         """
         Set up the test data used in the specific tests
@@ -83,7 +86,7 @@ class SurveyViewsTests(ModuleStoreTestCase):
         # is the SurveyForm html present in the HTML response?
         self.assertIn(self.test_form, resp.content)
 
-    def test_unautneticated_survey_postback(self):
+    def test_unauthenticated_survey_postback(self):
         """
         Asserts that an anonymous user cannot answer a survey
         """
@@ -129,7 +132,7 @@ class SurveyViewsTests(ModuleStoreTestCase):
 
         data['csrfmiddlewaretoken'] = 'foo'
         data['_redirect_url'] = 'bar'
-        data['course_id'] = unicode(self.course.id)
+        data['course_id'] = six.text_type(self.course.id)
 
         resp = self.client.post(
             self.postback_url,
@@ -148,7 +151,7 @@ class SurveyViewsTests(ModuleStoreTestCase):
         )
 
         for answer_obj in answer_objs:
-            self.assertEquals(unicode(answer_obj.course_key), data['course_id'])
+            self.assertEquals(six.text_type(answer_obj.course_key), data['course_id'])
 
     def test_encoding_answers(self):
         """

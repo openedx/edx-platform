@@ -1,10 +1,11 @@
 """
 Tests for url_utils module.
 """
-from ddt import ddt, data
+from __future__ import absolute_import
+from ddt import data, ddt
 from django.test import TestCase
-from openedx.core.lib.url_utils import quote_slashes, unquote_slashes
 
+from openedx.core.lib.url_utils import quote_slashes, unquote_slashes
 
 TEST_STRINGS = [
     '',

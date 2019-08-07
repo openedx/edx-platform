@@ -1,14 +1,17 @@
 """ Test the change_enrollment command line script."""
 
+from __future__ import absolute_import
+
 import ddt
-from mock import patch
-
 from django.core.management import call_command
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from mock import patch
+from six import text_type
 
-from student.tests.factories import UserFactory, CourseModeFactory
+from course_modes.tests.factories import CourseModeFactory
 from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt
@@ -52,13 +55,6 @@ class ChangeEnrollmentTests(SharedModuleStoreTestCase):
         """ The command should update the user's enrollment. """
         user_str = ','.join([getattr(user, method) for user in self.users])
         user_ids = [u.id for u in self.users]
-        command_args = {
-            'course_id': unicode(self.course.id),
-            'to_mode': 'honor',
-            'from_mode': 'audit',
-            'noop': noop,
-            method: user_str,
-        }
 
         # Verify users are not in honor mode yet
         self.assertEqual(
@@ -66,10 +62,18 @@ class ChangeEnrollmentTests(SharedModuleStoreTestCase):
             0
         )
 
-        call_command(
-            'change_enrollment',
-            **command_args
+        noop = " --noop" if noop else ""
+
+        # Hack around call_command bugs dealing with required options see:
+        # https://stackoverflow.com/questions/32036562/call-command-argument-is-required
+        command_args = '--course {course} --to honor --from audit --{method} {user_str}{noop}'.format(
+            course=text_type(self.course.id),
+            noop=noop,
+            method=method,
+            user_str=user_str
         )
+
+        call_command('change_enrollment', *command_args.split(' '))
 
         # Verify correct number of users are now in honor mode
         self.assertEqual(
@@ -94,12 +98,6 @@ class ChangeEnrollmentTests(SharedModuleStoreTestCase):
         all_users.append(fake_user)
         user_str = ','.join(all_users)
         real_user_ids = [u.id for u in self.users]
-        command_args = {
-            'course_id': unicode(self.course.id),
-            'to_mode': 'honor',
-            'from_mode': 'audit',
-            method: user_str,
-        }
 
         # Verify users are not in honor mode yet
         self.assertEqual(
@@ -107,10 +105,13 @@ class ChangeEnrollmentTests(SharedModuleStoreTestCase):
             0
         )
 
-        call_command(
-            'change_enrollment',
-            **command_args
+        command_args = '--course {course} --to honor --from audit --{method} {user_str}'.format(
+            course=text_type(self.course.id),
+            method=method,
+            user_str=user_str
         )
+
+        call_command('change_enrollment', *command_args.split(' '))
 
         # Verify correct number of users are now in honor mode
         self.assertEqual(

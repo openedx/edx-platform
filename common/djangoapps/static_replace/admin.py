@@ -2,9 +2,11 @@
 Django admin page for AssetBaseUrlConfig, which allows you to set the base URL
 that gets prepended to asset URLs in order to serve them from, say, a CDN.
 """
-from django.contrib import admin
+from __future__ import absolute_import
 
 from config_models.admin import ConfigurationModelAdmin
+from django.contrib import admin
+
 from .models import AssetBaseUrlConfig, AssetExcludedExtensionsConfig
 
 

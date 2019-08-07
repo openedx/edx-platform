@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
-from django.db import migrations, models
-import jsonfield.fields
-import badges.models
-from django.conf import settings
 import django.utils.timezone
+import jsonfield.fields
+from django.conf import settings
+from django.db import migrations, models
 from model_utils import fields
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from opaque_keys.edx.django.models import CourseKeyField
+
+import badges.models
 
 
 class Migration(migrations.Migration):
@@ -59,11 +60,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='badgeassertion',
             name='badge_class',
-            field=models.ForeignKey(to='badges.BadgeClass'),
+            field=models.ForeignKey(to='badges.BadgeClass', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='badgeassertion',
             name='user',
-            field=models.ForeignKey(to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
         ),
     ]

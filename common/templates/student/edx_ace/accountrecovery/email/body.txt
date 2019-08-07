@@ -1,0 +1,14 @@
+{% load i18n %}{% autoescape off %}
+{% blocktrans %}You're receiving this e-mail because you requested to create a password for your user account at {{ platform_name }}.{% endblocktrans %}
+
+{% blocktrans %}We've restored access to your {{ platform_name }} account using the recovery email you provided at registration.{% endblocktrans %}
+
+{% blocktrans %}Once you've created a password [below], you will be able to log in to {{ platform_name }} with this email ({{ email }}) and your new password.{% endblocktrans %}
+
+{% trans "If you didn't request this change, you can disregard this email - we have not yet reset your password." %}
+
+{{ reset_link }}
+
+{% trans "Thanks for using our site!" %}
+{% blocktrans %}The {{ platform_name }} Team{% endblocktrans %}
+{% endautoescape %}

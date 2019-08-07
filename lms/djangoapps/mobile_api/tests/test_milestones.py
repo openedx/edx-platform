@@ -1,17 +1,17 @@
 """
 Milestone related tests for the mobile_api
 """
+from __future__ import absolute_import
+
+import six
+from crum import set_current_request
 from django.conf import settings
 from mock import patch
 
-from courseware.access_response import MilestoneError
-from courseware.tests.test_entrance_exam import answer_entrance_exam_problem, add_entrance_exam_milestone
+from courseware.access_response import MilestoneAccessError
+from courseware.tests.test_entrance_exam import add_entrance_exam_milestone, answer_entrance_exam_problem
 from openedx.core.djangolib.testing.utils import get_mock_request
-from util.milestones_helpers import (
-    add_prerequisite_course,
-    fulfill_course_milestone,
-)
-from xmodule.modulestore.django import modulestore
+from util.milestones_helpers import add_prerequisite_course, fulfill_course_milestone
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
@@ -25,7 +25,7 @@ class MobileAPIMilestonesMixin(object):
     fulfilled.
     """
 
-    ALLOW_ACCESS_TO_MILESTONE_COURSE = False  # pylint: disable=invalid-name
+    ALLOW_ACCESS_TO_MILESTONE_COURSE = False
 
     @patch.dict(settings.FEATURES, {
         'ENABLE_PREREQUISITE_COURSES': True,
@@ -78,6 +78,7 @@ class MobileAPIMilestonesMixin(object):
         """
         Tests access when user has passed the entrance exam
         """
+        self.addCleanup(set_current_request, None)
         self._add_entrance_exam()
         self._pass_entrance_exam()
         self.init_course_access()
@@ -85,32 +86,40 @@ class MobileAPIMilestonesMixin(object):
 
     def _add_entrance_exam(self):
         """ Sets up entrance exam """
-        self.course.entrance_exam_enabled = True
+        with self.store.bulk_operations(self.course.id):
+            self.course.entrance_exam_enabled = True
 
-        self.entrance_exam = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
-            parent=self.course,
-            category="chapter",
-            display_name="Entrance Exam Chapter",
-            is_entrance_exam=True,
-            in_entrance_exam=True
-        )
-        self.problem_1 = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
-            parent=self.entrance_exam,
-            category='problem',
-            display_name="The Only Exam Problem",
-            graded=True,
-            in_entrance_exam=True
-        )
+            self.entrance_exam = ItemFactory.create(
+                parent=self.course,
+                category="chapter",
+                display_name="Entrance Exam Chapter",
+                is_entrance_exam=True,
+                in_entrance_exam=True,
+            )
+            self.subsection_1 = ItemFactory.create(
+                parent=self.entrance_exam,
+                category='sequential',
+                display_name="The Only Exam Sequential",
+                graded=True,
+                in_entrance_exam=True,
+            )
+            self.problem_1 = ItemFactory.create(
+                parent=self.subsection_1,
+                category='problem',
+                display_name="The Only Exam Problem",
+                graded=True,
+                in_entrance_exam=True,
+            )
 
-        add_entrance_exam_milestone(self.course, self.entrance_exam)
+            add_entrance_exam_milestone(self.course, self.entrance_exam)
 
-        self.course.entrance_exam_minimum_score_pct = 0.50
-        self.course.entrance_exam_id = unicode(self.entrance_exam.location)
-        modulestore().update_item(self.course, self.user.id)
+            self.course.entrance_exam_minimum_score_pct = 0.50
+            self.course.entrance_exam_id = six.text_type(self.entrance_exam.location)
+            self.store.update_item(self.course, self.user.id)
 
     def _add_prerequisite_course(self):
         """ Helper method to set up the prerequisite course """
-        self.prereq_course = CourseFactory.create()  # pylint: disable=attribute-defined-outside-init
+        self.prereq_course = CourseFactory.create()
         add_prerequisite_course(self.course.id, self.prereq_course.id)
 
     def _pass_entrance_exam(self):
@@ -132,4 +141,4 @@ class MobileAPIMilestonesMixin(object):
             self.api_response()
         else:
             response = self.api_response(expected_response_code=404)
-            self.assertEqual(response.data, MilestoneError().to_json())
+            self.assertEqual(response.data, MilestoneAccessError().to_json())

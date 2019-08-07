@@ -1,35 +1,35 @@
 """
 Segregation of pymongo functions from the data modeling mechanisms for split modulestore.
 """
+from __future__ import absolute_import
+
 import datetime
-import cPickle as pickle
+import logging
 import math
-import zlib
-import pymongo
-import pytz
 import re
+import zlib
 from contextlib import contextmanager
 from time import time
 
+import pymongo
+import pytz
+import six
+import six.moves.cPickle as pickle
+from contracts import check, new_contract
+from mongodb_proxy import autoretry_read
 # Import this just to export it
 from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
+
+from xmodule.exceptions import HeartbeatFailure
+from xmodule.modulestore import BlockData
+from xmodule.modulestore.split_mongo import BlockKey
+from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
 
 try:
     from django.core.cache import caches, InvalidCacheBackendError
     DJANGO_AVAILABLE = True
 except ImportError:
     DJANGO_AVAILABLE = False
-
-import dogstats_wrapper as dog_stats_api
-import logging
-
-from contracts import check, new_contract
-from mongodb_proxy import autoretry_read
-from xmodule.exceptions import HeartbeatFailure
-from xmodule.modulestore import BlockData
-from xmodule.modulestore.split_mongo import BlockKey
-from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
-
 
 new_contract('BlockData', BlockData)
 log = logging.getLogger(__name__)
@@ -83,7 +83,7 @@ class Tagger(object):
             **kwargs: Each keyword is treated as a tag name, and the
                 value of the argument is the tag value.
         """
-        self.added_tags.extend(kwargs.items())
+        self.added_tags.extend(list(kwargs.items()))
 
     @property
     def tags(self):
@@ -137,27 +137,6 @@ class QueryTimer(object):
             end = time()
             tags = tagger.tags
             tags.append('course:{}'.format(course_context))
-            for name, size in tagger.measures:
-                dog_stats_api.histogram(
-                    '{}.{}'.format(metric_name, name),
-                    size,
-                    timestamp=end,
-                    tags=[tag for tag in tags if not tag.startswith('{}:'.format(metric_name))],
-                    sample_rate=tagger.sample_rate,
-                )
-            dog_stats_api.histogram(
-                '{}.duration'.format(metric_name),
-                end - start,
-                timestamp=end,
-                tags=tags,
-                sample_rate=tagger.sample_rate,
-            )
-            dog_stats_api.increment(
-                metric_name,
-                timestamp=end,
-                tags=tags,
-                sample_rate=tagger.sample_rate,
-            )
 
 
 TIMER = QueryTimer(__name__, 0.01)
@@ -209,14 +188,14 @@ def structure_to_mongo(structure, course_context=None):
 
         check('BlockKey', structure['root'])
         check('dict(BlockKey: BlockData)', structure['blocks'])
-        for block in structure['blocks'].itervalues():
+        for block in six.itervalues(structure['blocks']):
             if 'children' in block.fields:
                 check('list(BlockKey)', block.fields['children'])
 
         new_structure = dict(structure)
         new_structure['blocks'] = []
 
-        for block_key, block in structure['blocks'].iteritems():
+        for block_key, block in six.iteritems(structure['blocks']):
             new_block = dict(block.to_storable())
             new_block.setdefault('block_type', block_key.type)
             new_block['block_id'] = block_key.id
@@ -333,7 +312,7 @@ class MongoConnection(object):
                     if doc is None:
                         log.warning(
                             "doc was None when attempting to retrieve structure for item with key %s",
-                            unicode(key)
+                            six.text_type(key)
                         )
                         return None
                     tagger_find_one.measure("blocks", len(doc['blocks']))
@@ -362,20 +341,21 @@ class MongoConnection(object):
             return docs
 
     @autoretry_read()
-    def find_course_blocks_by_id(self, ids, course_context=None):
+    def find_courselike_blocks_by_id(self, ids, block_type, course_context=None):
         """
-        Find all structures that specified in `ids`. Among the blocks only return block whose type is `course`.
+        Find all structures that specified in `ids`. Among the blocks only return block whose type is `block_type`.
 
         Arguments:
             ids (list): A list of structure ids
+            block_type: type of block to return
         """
-        with TIMER.timer("find_course_blocks_by_id", course_context) as tagger:
+        with TIMER.timer("find_courselike_blocks_by_id", course_context) as tagger:
             tagger.measure("requested_ids", len(ids))
             docs = [
                 structure_from_mongo(structure, course_context)
                 for structure in self.structures.find(
                     {'_id': {'$in': ids}},
-                    {'blocks': {'$elemMatch': {'block_type': 'course'}}, 'root': 1}
+                    {'blocks': {'$elemMatch': {'block_type': block_type}}, 'root': 1}
                 )
             ]
             tagger.measure("structures", len(docs))
@@ -451,7 +431,15 @@ class MongoConnection(object):
                 }
             return self.course_index.find_one(query)
 
-    def find_matching_course_indexes(self, branch=None, search_targets=None, org_target=None, course_context=None):
+    def find_matching_course_indexes(
+            self,
+            branch=None,
+            search_targets=None,
+            org_target=None,
+            course_context=None,
+            course_keys=None
+
+    ):
         """
         Find the course_index matching particular conditions.
 
@@ -464,17 +452,40 @@ class MongoConnection(object):
         """
         with TIMER.timer("find_matching_course_indexes", course_context):
             query = {}
-            if branch is not None:
-                query['versions.{}'.format(branch)] = {'$exists': True}
+            if course_keys:
+                courses_queries = self._generate_query_from_course_keys(branch, course_keys)
+                query['$or'] = courses_queries
+            else:
+                if branch is not None:
+                    query['versions.{}'.format(branch)] = {'$exists': True}
 
-            if search_targets:
-                for key, value in search_targets.iteritems():
-                    query['search_targets.{}'.format(key)] = value
+                if search_targets:
+                    for key, value in six.iteritems(search_targets):
+                        query['search_targets.{}'.format(key)] = value
 
-            if org_target:
-                query['org'] = org_target
+                if org_target:
+                    query['org'] = org_target
 
             return self.course_index.find(query)
+
+    def _generate_query_from_course_keys(self, branch, course_keys):
+        """
+        Generate query for courses using course keys
+        """
+        courses_queries = []
+        query = {}
+        if branch:
+            query = {'versions.{}'.format(branch): {'$exists': True}}
+
+        for course_key in course_keys:
+            course_query = {
+                key_attr: getattr(course_key, key_attr)
+                for key_attr in ('org', 'course', 'run')
+            }
+            course_query.update(query)
+            courses_queries.append(course_query)
+
+        return courses_queries
 
     def insert_course_index(self, course_index, course_context=None):
         """

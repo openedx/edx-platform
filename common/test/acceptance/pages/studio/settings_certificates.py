@@ -8,12 +8,16 @@ The methods in these classes are organized into several conceptual buckets:
     * Workflows: Complex orchestrations involving any/all of the above
 
 """
+from __future__ import absolute_import
+
 import os
 
 from bok_choy.promise import EmptyPromise
+from selenium.webdriver import ActionChains
+from six.moves import range
+
 from common.test.acceptance.pages.studio.course_page import CoursePage
 from common.test.acceptance.tests.helpers import disable_animations
-from selenium.webdriver import ActionChains
 
 
 class CertificatesPage(CoursePage):
@@ -85,7 +89,7 @@ class CertificatesPage(CoursePage):
         Return list of the certificates for the course.
         """
         css = self.certficate_css + ' .wrapper-collection'
-        return [CertificateSectionPage(self, self.certficate_css, index) for index in xrange(len(self.q(css=css)))]
+        return [CertificateSectionPage(self, self.certficate_css, index) for index in range(len(self.q(css=css)))]
 
     @property
     def no_certificates_message_shown(self):
@@ -195,7 +199,7 @@ class CertificateSectionPage(CertificatesPage):
 
         :return:
         """
-        self.selector = prefix + ' .certificates-list-item-{}'.format(index)
+        self.selector = prefix + u' .certificates-list-item-{}'.format(index)
         self.index = index
 
         super(CertificateSectionPage, self).__init__(container.browser, **container.course_info)
@@ -313,7 +317,7 @@ class CertificateSectionPage(CertificatesPage):
         Return list of the signatories for the certificate.
         """
         css = self.selector + ' .signatory-' + self.mode
-        return [SignatorySectionPage(self, self.selector, self.mode, index) for index in xrange(len(self.q(css=css)))]
+        return [SignatorySectionPage(self, self.selector, self.mode, index) for index in range(len(self.q(css=css)))]
 
     ################
     # Wait Actions
@@ -445,7 +449,7 @@ class SignatorySectionPage(CertificatesPage):
         """
         Return selector fo signatory container
         """
-        selector = self.prefix + ' .signatory-{}-view-{}'.format(self.mode, self.index)
+        selector = self.prefix + u' .signatory-{}-view-{}'.format(self.mode, self.index)
         return ' '.join([selector, css])
 
     def find_css(self, css_selector):

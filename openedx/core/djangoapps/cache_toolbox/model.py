@@ -54,9 +54,11 @@ instance::
     ... Foo.DoesNotExist
 """
 
-from django.db.models.signals import post_save, post_delete
+from __future__ import absolute_import
 
-from .core import get_instance, delete_instance
+from django.db.models.signals import post_delete, post_save
+
+from .core import delete_instance, get_instance
 
 
 def cache_model(model, timeout=None):

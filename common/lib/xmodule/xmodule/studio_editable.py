@@ -1,7 +1,10 @@
 """
 Mixin to support editing in Studio.
 """
-from xmodule.x_module import module_attr, STUDENT_VIEW, AUTHOR_VIEW
+from __future__ import absolute_import
+
+import six
+from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW, module_attr
 
 
 class StudioEditableBlock(object):
@@ -24,10 +27,10 @@ class StudioEditableBlock(object):
                 context['reorderable_items'].add(child.location)
             context['can_add'] = can_add
             rendered_child = child.render(StudioEditableModule.get_preview_view_name(child), context)
-            fragment.add_frag_resources(rendered_child)
+            fragment.add_fragment_resources(rendered_child)
 
             contents.append({
-                'id': unicode(child.location),
+                'id': six.text_type(child.location),
                 'content': rendered_child.content
             })
 

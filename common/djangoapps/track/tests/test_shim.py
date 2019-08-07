@@ -1,17 +1,18 @@
 """Ensure emitted events contain the fields legacy processors expect to find."""
 
+from __future__ import absolute_import
+
 from collections import namedtuple
 
 import ddt
-from mock import sentinel
 from django.test.utils import override_settings
+from mock import sentinel
 
 from openedx.core.lib.tests.assertions.events import assert_events_equal
 
-from . import EventTrackingTestCase, FROZEN_TIME
-from ..shim import PrefixedEventProcessor
 from .. import transformers
-
+from ..shim import PrefixedEventProcessor
+from . import FROZEN_TIME, EventTrackingTestCase
 
 LEGACY_SHIM_PROCESSOR = [
     {

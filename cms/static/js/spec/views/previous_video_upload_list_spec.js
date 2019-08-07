@@ -1,6 +1,6 @@
 define(
     ['jquery', 'underscore', 'backbone', 'js/views/previous_video_upload_list',
-     'common/js/spec_helpers/template_helpers', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'],
+        'common/js/spec_helpers/template_helpers', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'],
     function($, _, Backbone, PreviousVideoUploadListView, TemplateHelpers, AjaxHelpers) {
         'use strict';
         describe('PreviousVideoUploadListView', function() {
@@ -11,7 +11,8 @@ define(
                         duration: 42,
                         created: '2014-11-25T23:13:05',
                         edx_video_id: 'dummy_id',
-                        status: 'uploading'
+                        status: 'uploading',
+                        transcripts: []
                     };
                     var collection = new Backbone.Collection(
                         _.map(
@@ -25,7 +26,11 @@ define(
                     );
                     var view = new PreviousVideoUploadListView({
                         collection: collection,
-                        videoHandlerUrl: videoHandlerUrl
+                        videoHandlerUrl: videoHandlerUrl,
+                        transcriptAvailableLanguages: [],
+                        videoSupportedFileFormats: [],
+                        videoTranscriptSettings: {},
+                        videoImageSettings: {}
                     });
                     return view.render().$el;
                 },
@@ -43,10 +48,10 @@ define(
                     $el = render(numVideos),
                     firstVideoId = 'dummy_id_0',
                     requests = AjaxHelpers.requests(test),
-                    firstVideoSelector = '.js-table-body tr:first-child';
+                    firstVideoSelector = '.js-table-body .video-row:first-child';
 
                 // total number of videos should be 5 before remove
-                expect($el.find('.js-table-body tr').length).toEqual(numVideos);
+                expect($el.find('.js-table-body .video-row').length).toEqual(numVideos);
 
                 // get first video element
                 firstVideo = $el.find(firstVideoSelector);
@@ -71,7 +76,7 @@ define(
                 }
 
                 // verify total number of videos after Remove/Cancel
-                expect($el.find('.js-table-body tr').length).toEqual(numVideos);
+                expect($el.find('.js-table-body .video-row').length).toEqual(numVideos);
 
                 // verify first video id after Remove/Cancel
                 firstVideo = $el.find(firstVideoSelector);
@@ -81,13 +86,13 @@ define(
             it('should render an empty collection', function() {
                 var $el = render(0);
                 expect($el.find('.js-table-body').length).toEqual(1);
-                expect($el.find('.js-table-body tr').length).toEqual(0);
+                expect($el.find('.js-table-body .video-row').length).toEqual(0);
             });
 
             it('should render a non-empty collection', function() {
                 var $el = render(5);
                 expect($el.find('.js-table-body').length).toEqual(1);
-                expect($el.find('.js-table-body tr').length).toEqual(5);
+                expect($el.find('.js-table-body .video-row').length).toEqual(5);
             });
 
             it('removes video upon click on Remove button', function() {

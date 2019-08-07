@@ -74,9 +74,9 @@
              this.model.save();
          },
 
-         handleSubmitPhotoSuccess: function(redirect_url) {
+         handleSubmitPhotoSuccess: function(redirectUrl) {
             // Redirect back to the courseware at the checkpoint location
-             window.location.href = redirect_url;
+             window.location.href = redirectUrl;
          },
 
          handleSubmissionError: function(xhr) {
@@ -102,4 +102,4 @@
                 .attr('aria-disabled', !isEnabled);
          }
      });
- })(jQuery, _, _.str, Backbone, gettext, edx.HtmlUtils);
+ }(jQuery, _, _.str, Backbone, gettext, edx.HtmlUtils));

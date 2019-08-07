@@ -3,29 +3,35 @@ This module provides an abstraction for working with XModuleDescriptors
 that are stored in a database an accessible using their Location as an identifier
 """
 
+from __future__ import absolute_import
+
+import datetime
 import logging
 import re
-import json
-import datetime
-
-from pytz import UTC
+import threading
+from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 from contextlib import contextmanager
-import threading
 from operator import itemgetter
-from sortedcontainers import SortedListWithKey
 
-from abc import ABCMeta, abstractmethod
+import six
 from contracts import contract, new_contract
-from xblock.plugin import default_select
-
-from .exceptions import InvalidLocationError, InsufficientSpecificationError
-from xmodule.errortracker import make_error_tracker
-from xmodule.assetstore import AssetMetadata
-from opaque_keys.edx.keys import CourseKey, UsageKey, AssetKey
+from opaque_keys.edx.keys import AssetKey, CourseKey
 from opaque_keys.edx.locations import Location  # For import backwards compatibility
-from xblock.runtime import Mixologist
+from pytz import UTC
+from six.moves import range
+from sortedcontainers import SortedKeyList
 from xblock.core import XBlock
+from xblock.plugin import default_select
+from xblock.runtime import Mixologist
+
+# The below import is not used within this module, but ir is still needed becuase
+# other modules are imorting EdxJSONEncoder from here
+from openedx.core.lib.json_utils import EdxJSONEncoder  # pylint: disable=unused-import
+from xmodule.assetstore import AssetMetadata
+from xmodule.errortracker import make_error_tracker
+
+from .exceptions import InsufficientSpecificationError, InvalidLocationError
 
 log = logging.getLogger('edx.modulestore')
 
@@ -34,8 +40,8 @@ new_contract('AssetKey', AssetKey)
 new_contract('AssetMetadata', AssetMetadata)
 new_contract('XBlock', XBlock)
 
-LIBRARY_ROOT = 'library.xml'
-COURSE_ROOT = 'course.xml'
+LIBRARY_ROOT = u'library.xml'
+COURSE_ROOT = u'course.xml'
 
 # List of names of computed fields on xmodules that are of type usage keys.
 # This list can be used to determine which fields need to be stripped of
@@ -204,7 +210,7 @@ class BulkOperationsMixin(object):
 
         # Retrieve the bulk record based on matching org/course/run (possibly ignoring case)
         if ignore_case:
-            for key, record in self._active_bulk_ops.records.iteritems():
+            for key, record in six.iteritems(self._active_bulk_ops.records):
                 # Shortcut: check basic equivalence for cases where org/course/run might be None.
                 if (key == course_key) or (
                         (key.org and key.org.lower() == course_key.org.lower()) and
@@ -220,7 +226,7 @@ class BulkOperationsMixin(object):
         """
         Yield all active (CourseLocator, BulkOpsRecord) tuples.
         """
-        for course_key, record in self._active_bulk_ops.records.iteritems():
+        for course_key, record in six.iteritems(self._active_bulk_ops.records):
             if record.active:
                 yield (course_key, record)
 
@@ -506,7 +512,7 @@ class IncorrectlySortedList(Exception):
     pass
 
 
-class SortedAssetList(SortedListWithKey):
+class SortedAssetList(SortedKeyList):
     """
     List of assets that is sorted based on an asset attribute.
     """
@@ -546,12 +552,11 @@ class SortedAssetList(SortedListWithKey):
         """
         metadata_to_insert = asset_md.to_storable()
         asset_idx = self.find(asset_md.asset_id)
-        if asset_idx is None:
-            # Add new metadata sorted into the list.
-            self.add(metadata_to_insert)
-        else:
-            # Replace existing metadata.
-            self[asset_idx] = metadata_to_insert
+        if asset_idx is not None:
+            # Delete existing metadata.
+            del self[asset_idx]
+        # Add new metadata sorted into the list.
+        self.add(metadata_to_insert)
 
 
 class ModuleStoreAssetBase(object):
@@ -572,10 +577,7 @@ class ModuleStoreAssetBase(object):
             - the index of asset in list (None if asset does not exist)
         """
         course_assets = self._find_course_assets(asset_key.course_key)
-        all_assets = SortedAssetList(iterable=[])
-        # Assets should be pre-sorted, so add them efficiently without sorting.
-        # extend() will raise a ValueError if the passed-in list is not sorted.
-        all_assets.extend(course_assets.setdefault(asset_key.block_type, []))
+        all_assets = SortedAssetList(iterable=course_assets.setdefault(asset_key.block_type, []))
         idx = all_assets.find(asset_key)
 
         return course_assets, idx
@@ -602,7 +604,7 @@ class ModuleStoreAssetBase(object):
 
     @contract(
         course_key='CourseKey', asset_type='None | basestring',
-        start='int | None', maxresults='int | None', sort='tuple(str,(int,>=1,<=2))|None'
+        start='int | None', maxresults='int | None', sort='tuple(str,int) | None'
     )
     def get_all_asset_metadata(self, course_key, asset_type, start=0, maxresults=-1, sort=None, **kwargs):
         """
@@ -635,7 +637,7 @@ class ModuleStoreAssetBase(object):
         if asset_type is None:
             # Add assets of all types to the sorted list.
             all_assets = SortedAssetList(iterable=[], key=key_func)
-            for asset_type, val in course_assets.iteritems():
+            for asset_type, val in six.iteritems(course_assets):
                 all_assets.update(val)
         else:
             # Add assets of a single type to the sorted list.
@@ -656,7 +658,7 @@ class ModuleStoreAssetBase(object):
             end_idx = (num_assets - 1) - end_idx
 
         ret_assets = []
-        for idx in xrange(start_idx, end_idx, step_incr):
+        for idx in range(start_idx, end_idx, step_incr):
             raw_asset = all_assets[idx]
             asset_key = course_key.make_asset_key(raw_asset['asset_type'], raw_asset['filename'])
             new_asset = AssetMetadata(asset_key)
@@ -777,13 +779,11 @@ class ModuleStoreAssetWriteInterface(ModuleStoreAssetBase):
         pass
 
 
-class ModuleStoreRead(ModuleStoreAssetBase):
+class ModuleStoreRead(six.with_metaclass(ABCMeta, ModuleStoreAssetBase)):
     """
     An abstract interface for a database backend that stores XModuleDescriptor
     instances and extends read-only functionality
     """
-
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def has_item(self, usage_key):
@@ -878,7 +878,7 @@ class ModuleStoreRead(ModuleStoreAssetBase):
             else:
                 return True, field
 
-        for key, criteria in qualifiers.iteritems():
+        for key, criteria in six.iteritems(qualifiers):
             is_set, value = _is_set_on(key)
             if isinstance(criteria, dict) and '$exists' in criteria and criteria['$exists'] == is_set:
                 continue
@@ -1034,13 +1034,11 @@ class ModuleStoreRead(ModuleStoreAssetBase):
         pass
 
 
-class ModuleStoreWrite(ModuleStoreRead, ModuleStoreAssetWriteInterface):
+class ModuleStoreWrite(six.with_metaclass(ABCMeta, ModuleStoreRead, ModuleStoreAssetWriteInterface)):
     """
     An abstract interface for a database backend that stores XModuleDescriptor
     instances and extends both read and write functionality
     """
-
-    __metaclass__ = ABCMeta
 
     @abstractmethod
     def update_item(self, xblock, user_id, allow_not_found=False, force=False, **kwargs):
@@ -1301,7 +1299,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         if fields is None:
             return result
         cls = self.mixologist.mix(XBlock.load_class(category, select=prefer_xmodules))
-        for field_name, value in fields.iteritems():
+        for field_name, value in six.iteritems(fields):
             field = getattr(cls, field_name)
             result[field.scope][field_name] = value
         return result
@@ -1430,25 +1428,3 @@ def prefer_xmodules(identifier, entry_points):
         return default_select(identifier, from_xmodule)
     else:
         return default_select(identifier, entry_points)
-
-
-class EdxJSONEncoder(json.JSONEncoder):
-    """
-    Custom JSONEncoder that handles `Location` and `datetime.datetime` objects.
-
-    `Location`s are encoded as their url string form, and `datetime`s as
-    ISO date strings
-    """
-    def default(self, obj):
-        if isinstance(obj, (CourseKey, UsageKey)):
-            return unicode(obj)
-        elif isinstance(obj, datetime.datetime):
-            if obj.tzinfo is not None:
-                if obj.utcoffset() is None:
-                    return obj.isoformat() + 'Z'
-                else:
-                    return obj.isoformat()
-            else:
-                return obj.isoformat()
-        else:
-            return super(EdxJSONEncoder, self).default(obj)

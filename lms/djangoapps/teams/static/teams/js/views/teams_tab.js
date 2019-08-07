@@ -2,31 +2,31 @@
     'use strict';
 
     define(['backbone',
-            'jquery',
-            'underscore',
-            'gettext',
-            'edx-ui-toolkit/js/utils/html-utils',
-            'edx-ui-toolkit/js/utils/string-utils',
-            'common/js/components/views/search_field',
-            'js/components/header/views/header',
-            'js/components/header/models/header',
-            'teams/js/models/topic',
-            'teams/js/collections/topic',
-            'teams/js/models/team',
-            'teams/js/collections/team',
-            'teams/js/collections/my_teams',
-            'teams/js/utils/team_analytics',
-            'teams/js/views/teams_tabbed_view',
-            'teams/js/views/topics',
-            'teams/js/views/team_profile',
-            'teams/js/views/my_teams',
-            'teams/js/views/topic_teams',
-            'teams/js/views/edit_team',
-            'teams/js/views/edit_team_members',
-            'teams/js/views/team_profile_header_actions',
-            'teams/js/views/team_utils',
-            'teams/js/views/instructor_tools',
-            'text!teams/templates/teams_tab.underscore'],
+        'jquery',
+        'underscore',
+        'gettext',
+        'edx-ui-toolkit/js/utils/html-utils',
+        'edx-ui-toolkit/js/utils/string-utils',
+        'common/js/components/views/search_field',
+        'js/components/header/views/header',
+        'js/components/header/models/header',
+        'teams/js/models/topic',
+        'teams/js/collections/topic',
+        'teams/js/models/team',
+        'teams/js/collections/team',
+        'teams/js/collections/my_teams',
+        'teams/js/utils/team_analytics',
+        'teams/js/views/teams_tabbed_view',
+        'teams/js/views/topics',
+        'teams/js/views/team_profile',
+        'teams/js/views/my_teams',
+        'teams/js/views/topic_teams',
+        'teams/js/views/edit_team',
+        'teams/js/views/edit_team_members',
+        'teams/js/views/team_profile_header_actions',
+        'teams/js/views/team_utils',
+        'teams/js/views/instructor_tools',
+        'text!teams/templates/teams_tab.underscore'],
         function(Backbone, $, _, gettext, HtmlUtils, StringUtils, SearchFieldView, HeaderView, HeaderModel,
                   TopicModel, TopicCollection, TeamModel, TeamCollection, MyTeamsCollection, TeamAnalytics,
                   TeamsTabbedView, TopicsView, TeamProfileView, MyTeamsView, TopicTeamsView, TeamEditView,
@@ -174,8 +174,7 @@
                         TeamUtils.showMessage(gettext(
                             'Your request could not be completed. Reload the page and try again.'
                         ));
-                    }
-                    else if (xhr.status === 500) {
+                    } else if (xhr.status === 500) {
                         TeamUtils.showMessage(gettext(
                             'Your request could not be completed due to a server problem. Reload the page' +
                             ' and try again. If the issue persists, click the Help tab to report the problem.'
@@ -513,7 +512,7 @@
                 getTopic: function(topicID) {
                     // Try finding topic in the current page of the
                     // topicCollection.  Otherwise call the topic endpoint.
-                    var topic = this.topicsCollection.findWhere({'id': topicID}),
+                    var topic = this.topicsCollection.findWhere({id: topicID}),
                         self = this,
                         deferred = $.Deferred();
                     if (topic) {

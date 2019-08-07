@@ -1,23 +1,25 @@
 """ Code to allow module store to interface with courseware index """
 from __future__ import absolute_import
-from abc import ABCMeta, abstractmethod
-from datetime import timedelta
+
 import logging
 import re
-from six import add_metaclass
+from abc import ABCMeta, abstractmethod
+from datetime import timedelta
 
 from django.conf import settings
-from django.utils.translation import ugettext_lazy, ugettext as _
-from django.core.urlresolvers import resolve
+from django.urls import resolve
+from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy
+from search.search_engine_base import SearchEngine
+from six import add_metaclass
 
 from contentstore.course_group_config import GroupConfiguration
 from course_modes.models import CourseMode
 from eventtracking import tracker
 from openedx.core.lib.courses import course_image_url
-from search.search_engine_base import SearchEngine
 from xmodule.annotator_mixin import html_to_text
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.library_tools import normalize_key_for_search
+from xmodule.modulestore import ModuleStoreEnum
 
 # REINDEX_AGE is the default amount of time that we look back for changes
 # that might have happened. If we are provided with a time at which the
@@ -243,8 +245,8 @@ class SearchIndexerBase(object):
                 return item_content_groups
             except Exception as err:  # pylint: disable=broad-except
                 # broad exception so that index operation does not fail on one item of many
-                log.warning('Could not index item: %s - %r', item.location, err)
-                error_list.append(_('Could not index item: {}').format(item.location))
+                log.warning(u'Could not index item: %s - %r', item.location, err)
+                error_list.append(_(u'Could not index item: {}').format(item.location))
 
         try:
             with modulestore.branch_setting(ModuleStoreEnum.RevisionOption.published_only):
@@ -262,7 +264,7 @@ class SearchIndexerBase(object):
         except Exception as err:  # pylint: disable=broad-except
             # broad exception so that index operation does not prevent the rest of the application from working
             log.exception(
-                "Indexing error encountered, courseware index may be out of date %s - %r",
+                u"Indexing error encountered, courseware index may be out of date %s - %r",
                 structure_key,
                 err
             )
@@ -377,22 +379,21 @@ class CoursewareSearchIndexer(SearchIndexerBase):
     @classmethod
     def fetch_group_usage(cls, modulestore, structure):
         groups_usage_dict = {}
-        groups_usage_info = GroupConfiguration.get_content_groups_usage_info(modulestore, structure).items()
-        groups_usage_info.extend(
-            GroupConfiguration.get_content_groups_items_usage_info(
-                modulestore,
-                structure
-            ).items()
+        partitions_info = GroupConfiguration.get_partitions_usage_info(modulestore, structure)
+        content_group_info = GroupConfiguration.get_content_groups_items_usage_info(
+            modulestore,
+            structure
         )
-        if groups_usage_info:
-            for name, group in groups_usage_info:
-                for module in group:
-                    view, args, kwargs = resolve(module['url'])  # pylint: disable=unused-variable
-                    usage_key_string = unicode(kwargs['usage_key_string'])
-                    if groups_usage_dict.get(usage_key_string, None):
-                        groups_usage_dict[usage_key_string].append(name)
-                    else:
-                        groups_usage_dict[usage_key_string] = [name]
+        for group_info in (partitions_info, content_group_info):
+            for groups in group_info.values():
+                for name, group in groups.items():
+                    for module in group:
+                        view, args, kwargs = resolve(module['url'])  # pylint: disable=unused-variable
+                        usage_key_string = unicode(kwargs['usage_key_string'])
+                        if groups_usage_dict.get(usage_key_string, None):
+                            groups_usage_dict[usage_key_string].append(name)
+                        else:
+                            groups_usage_dict[usage_key_string] = [name]
         return groups_usage_dict
 
     @classmethod
@@ -595,7 +596,7 @@ class CourseAboutSearchIndexer(object):
 
         # load data for all of the 'about' modules for this course into a dictionary
         about_dictionary = {
-            item.location.name: item.data
+            item.location.block_id: item.data
             for item in modulestore.get_items(course.id, qualifiers={"category": "about"})
         }
 
@@ -611,7 +612,7 @@ class CourseAboutSearchIndexer(object):
             except:  # pylint: disable=bare-except
                 section_content = None
                 log.warning(
-                    "Course discovery could not collect property %s for course %s",
+                    u"Course discovery could not collect property %s for course %s",
                     about_information.property_name,
                     course_id,
                     exc_info=True,
@@ -629,15 +630,15 @@ class CourseAboutSearchIndexer(object):
         # Broad exception handler to protect around and report problems with indexing
         try:
             searcher.index(cls.DISCOVERY_DOCUMENT_TYPE, [course_info])
-        except:  # pylint: disable=bare-except
+        except:
             log.exception(
-                "Course discovery indexing error encountered, course discovery index may be out of date %s",
+                u"Course discovery indexing error encountered, course discovery index may be out of date %s",
                 course_id,
             )
             raise
 
         log.debug(
-            "Successfully added %s course to the course discovery index",
+            u"Successfully added %s course to the course discovery index",
             course_id
         )
 

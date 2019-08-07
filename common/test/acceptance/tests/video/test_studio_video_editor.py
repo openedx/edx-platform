@@ -3,18 +3,20 @@
 """
 Acceptance tests for CMS Video Editor.
 """
-from nose.plugins.attrib import attr
+from __future__ import absolute_import
+
+import ddt
+
+from common.test.acceptance.pages.common.utils import confirm_prompt
 from common.test.acceptance.tests.video.test_studio_video_module import CMSVideoBaseTest
 
 
-@attr(shard=6)
+@ddt.ddt
 class VideoEditorTest(CMSVideoBaseTest):
     """
     CMS Video Editor Test Class
     """
-
-    def setUp(self):
-        super(VideoEditorTest, self).setUp()
+    shard = 6
 
     def _create_video_component(self, subtitles=False):
         """
@@ -74,22 +76,6 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.save_unit_settings()
         self.assertFalse(self.video.is_captions_visible())
 
-    def test_shown_captions(self):
-        """
-        Scenario: Captions are shown when "transcript display" is true
-        Given I have created a Video component with subtitles
-        And I have set "transcript display" to True
-        Then when I view the video it does show the captions
-        """
-        self._create_video_component(subtitles=True)
-        # Prevent cookies from overriding course settings
-        self.browser.delete_cookie('hide_captions')
-        self.edit_component()
-        self.open_advanced_tab()
-        self.video.set_field_value('Show Transcript', 'True', 'select')
-        self.save_unit_settings()
-        self.assertTrue(self.video.is_captions_visible())
-
     def test_translations_uploading(self):
         """
         Scenario: Translations uploading works correctly
@@ -124,7 +110,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.save_unit_settings()
         self.assertTrue(self.video.is_captions_visible())
         self.assertIn(unicode_text, self.video.captions_text)
-        self.assertEqual(self.video.caption_languages.keys(), ['zh', 'uk'])
+        self.assertEqual(list(self.video.caption_languages.keys()), ['zh', 'uk'])
 
     def test_save_language_upload_no_transcript(self):
         """
@@ -145,7 +131,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         translations_count = self.video.translations_count()
         self.video.select_translation_language(language_code, translations_count - 1)
         self.save_unit_settings()
-        self.assertNotIn(language_code, self.video.caption_languages.keys())
+        self.assertNotIn(language_code, list(self.video.caption_languages.keys()))
 
     def test_upload_large_transcript(self):
         """
@@ -194,7 +180,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.edit_component()
         self.open_advanced_tab()
         self.assertEqual(self.video.translations(), ['zh', 'uk'])
-        self.assertEqual(self.video.caption_languages.keys(), ['zh', 'uk'])
+        self.assertEqual(list(self.video.caption_languages.keys()), ['zh', 'uk'])
         zh_unicode_text = "好 各位同学".decode('utf-8')
         self.assertTrue(self.video.download_translation('zh', zh_unicode_text))
         uk_unicode_text = "Привіт, edX вітає вас.".decode('utf-8')
@@ -223,59 +209,6 @@ class VideoEditorTest(CMSVideoBaseTest):
         uk_unicode_text = "Привіт, edX вітає вас.".decode('utf-8')
         self.assertTrue(self.video.download_translation('uk', uk_unicode_text))
 
-    def test_translations_remove_works_w_saving(self):
-        """
-        Scenario: Translations removing works correctly w/ preliminary saving
-        Given I have created a Video component
-        And I edit the component
-        And I open tab "Advanced"
-        And I upload transcript files:
-          |lang_code|filename               |
-          |uk       |uk_transcripts.srt     |
-          |zh       |chinese_transcripts.srt|
-        And I save changes
-        Then when I view the video it does show the captions
-        And I see "Привіт, edX вітає вас." text in the captions
-        And video language menu has "uk, zh" translations
-        And I edit the component
-        And I open tab "Advanced"
-        And I see translations for "uk, zh"
-        Then I remove translation for "uk" language code
-        And I save changes
-        Then when I view the video it does show the captions
-        And I see "好 各位同学" text in the captions
-        And I edit the component
-        And I open tab "Advanced"
-        And I see translations for "zh"
-        Then I remove translation for "zh" language code
-        And I save changes
-        Then when I view the video it does not show the captions
-        """
-        self._create_video_component()
-        self.edit_component()
-        self.open_advanced_tab()
-        self.video.upload_translation('uk_transcripts.srt', 'uk')
-        self.video.upload_translation('chinese_transcripts.srt', 'zh')
-        self.save_unit_settings()
-        self.assertTrue(self.video.is_captions_visible())
-        unicode_text = "Привіт, edX вітає вас.".decode('utf-8')
-        self.assertIn(unicode_text, self.video.captions_text)
-        self.assertEqual(self.video.caption_languages.keys(), ['zh', 'uk'])
-        self.edit_component()
-        self.open_advanced_tab()
-        self.assertEqual(self.video.translations(), ['zh', 'uk'])
-        self.video.remove_translation('uk')
-        self.save_unit_settings()
-        self.assertTrue(self.video.is_captions_visible())
-        unicode_text = "好 各位同学".decode('utf-8')
-        self.assertIn(unicode_text, self.video.captions_text)
-        self.edit_component()
-        self.open_advanced_tab()
-        self.assertEqual(self.video.translations(), ['zh'])
-        self.video.remove_translation('zh')
-        self.save_unit_settings()
-        self.assertFalse(self.video.is_captions_visible())
-
     def test_translations_remove_works_wo_saving(self):
         """
         Scenario: Translations removing works correctly w/o preliminary saving
@@ -294,69 +227,27 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.video.upload_translation('uk_transcripts.srt', 'uk')
         self.assertEqual(self.video.translations(), ['uk'])
         self.video.remove_translation('uk')
+        confirm_prompt(self.video)
         self.save_unit_settings()
         self.assertFalse(self.video.is_captions_visible())
 
-    def test_translations_clearing_works_w_saving(self):
+    def test_translations_entry_remove_works(self):
         """
-        Scenario: Translations clearing works correctly w/ preliminary saving
+        Scenario: Translations entry removal works correctly when transcript is not uploaded
         Given I have created a Video component
         And I edit the component
         And I open tab "Advanced"
-        And I upload transcript files:
-          |lang_code|filename               |
-          |uk       |uk_transcripts.srt     |
-          |zh       |chinese_transcripts.srt|
-        And I save changes
-        Then when I view the video it does show the captions
-        And I see "Привіт, edX вітає вас." text in the captions
-        And video language menu has "uk, zh" translations
-        And I edit the component
-        And I open tab "Advanced"
-        And I see translations for "uk, zh"
-        And I click button "Clear"
-        And I save changes
-        Then when I view the video it does not show the captions
+        And I click on "+ Add" button for "Transcript Languages" field
+        Then I click on "Remove" button
+        And I see newly created entry is removed
         """
         self._create_video_component()
         self.edit_component()
         self.open_advanced_tab()
-        self.video.upload_translation('uk_transcripts.srt', 'uk')
-        self.video.upload_translation('chinese_transcripts.srt', 'zh')
-        self.save_unit_settings()
-        self.assertTrue(self.video.is_captions_visible())
-        unicode_text = "Привіт, edX вітає вас.".decode('utf-8')
-        self.assertIn(unicode_text, self.video.captions_text)
-        self.assertEqual(self.video.caption_languages.keys(), ['zh', 'uk'])
-        self.edit_component()
-        self.open_advanced_tab()
-        self.assertEqual(self.video.translations(), ['zh', 'uk'])
-        self.video.click_button('translations_clear')
-        self.save_unit_settings()
-        self.assertFalse(self.video.is_captions_visible())
-
-    def test_translations_clearing_works_wo_saving(self):
-        """
-        Scenario: Translations clearing works correctly w/o preliminary saving
-        Given I have created a Video component
-        And I edit the component
-        And I open tab "Advanced"
-        And I upload transcript files:
-          |lang_code|filename               |
-          |uk       |uk_transcripts.srt     |
-          |zh       |chinese_transcripts.srt|
-        And I click button "Clear"
-        And I save changes
-        Then when I view the video it does not show the captions
-        """
-        self._create_video_component()
-        self.edit_component()
-        self.open_advanced_tab()
-        self.video.upload_translation('uk_transcripts.srt', 'uk')
-        self.video.upload_translation('chinese_transcripts.srt', 'zh')
-        self.video.click_button('translations_clear')
-        self.save_unit_settings()
-        self.assertFalse(self.video.is_captions_visible())
+        self.video.click_button("translation_add")
+        self.assertEqual(self.video.translations_count(), 1)
+        self.video.remove_translation("")
+        self.assertEqual(self.video.translations_count(), 0)
 
     def test_cannot_upload_sjson_translation(self):
         """
@@ -457,6 +348,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.video.upload_translation('chinese_transcripts.srt', 'zh')
         self.assertEqual(self.video.translations(), ['zh'])
         self.video.remove_translation('zh')
+        confirm_prompt(self.video)
         self.video.upload_translation('uk_transcripts.srt', 'zh')
         self.save_unit_settings()
         self.assertTrue(self.video.is_captions_visible())
@@ -480,8 +372,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.video.click_button('translation_add')
         self.video.select_translation_language('zh')
         self.video.click_button('translation_add')
-        self.video.select_translation_language('zh')
-        self.assertEqual(self.video.translations(), [u'zh', u''])
+        self.assertTrue(self.video.is_language_disabled('zh'))
 
     def test_table_of_contents(self):
         """
@@ -508,8 +399,8 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.assertTrue(self.video.is_captions_visible())
         unicode_text = "好 各位同学".decode('utf-8')
         self.assertIn(unicode_text, self.video.captions_text)
-        self.assertEqual(self.video.caption_languages.keys(), [u'ab', u'uk'])
-        self.assertEqual(self.video.caption_languages.keys()[0], 'ab')
+        self.assertEqual(list(self.video.caption_languages.keys()), [u'ab', u'uk'])
+        self.assertEqual(list(self.video.caption_languages.keys())[0], 'ab')
 
     def test_upload_transcript_with_BOM(self):
         """

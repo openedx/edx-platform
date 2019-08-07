@@ -4,11 +4,15 @@ Tests for BlockDepthTransformer.
 
 # pylint: disable=protected-access
 
-import ddt
+from __future__ import absolute_import
+
 from unittest import TestCase
 
-from openedx.core.lib.block_structure.tests.helpers import ChildrenMapTestMixin
-from openedx.core.lib.block_structure.block_structure import BlockStructureModulestoreData
+import ddt
+
+from openedx.core.djangoapps.content.block_structure.block_structure import BlockStructureModulestoreData
+from openedx.core.djangoapps.content.block_structure.tests.helpers import ChildrenMapTestMixin
+
 from ..block_depth import BlockDepthTransformer
 
 
@@ -17,6 +21,7 @@ class BlockDepthTransformerTestCase(TestCase, ChildrenMapTestMixin):
     """
     Test behavior of BlockDepthTransformer
     """
+
     @ddt.data(
         (0, [], [], []),
         (0, ChildrenMapTestMixin.SIMPLE_CHILDREN_MAP, [[], [], [], [], []], [1, 2, 3, 4]),

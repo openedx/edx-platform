@@ -1,8 +1,10 @@
 <%page expression_filter="h" args="online_help_token" />
 <%!
+from django.conf import settings
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
 %>
+<%namespace file="sock_links.html" import="get_sock_links" />
+
 <div class="wrapper-sock wrapper">
   <ul class="list-actions list-cta">
     <li class="action-item">
@@ -15,41 +17,11 @@ from django.core.urlresolvers import reverse
 
   <div class="wrapper-inner wrapper">
     <section class="sock" id="sock" aria-labelledby="sock-heading">
-        <h2 id="sock-heading" class="title sr-only">${_("{studio_name} Documentation").format(studio_name=settings.STUDIO_NAME)}</h2>
+      <h2 id="sock-heading" class="title sr-only">${_("{studio_name} Documentation").format(studio_name=settings.STUDIO_NAME)}</h2>
+      <%
+        links = get_sock_links()
+      %>
       <div class="support">
-        <%!
-        from django.conf import settings
-
-        partner_email = settings.PARTNER_SUPPORT_EMAIL
-
-        links = [{
-            'href': 'http://docs.edx.org',
-            'sr_mouseover_text': _('Access documentation on http://docs.edx.org'),
-            'text': _('edX Documentation'),
-            'condition': True
-        }, {
-            'href': 'https://open.edx.org',
-            'sr_mouseover_text': _('Access the Open edX Portal'),
-            'text': _('Open edX Portal'),
-            'condition': True
-        }, {
-            'href': 'https://www.edx.org/course/overview-creating-edx-course-edx-edx101#.VO4eaLPF-n1',
-            'sr_mouseover_text': _('Enroll in edX101: Overview of Creating an edX Course'),
-            'text': _('Enroll in edX101'),
-            'condition': True
-        }, {
-            'href': 'https://www.edx.org/course/creating-course-edx-studio-edx-studiox',
-            'sr_mouseover_text': _('Enroll in StudioX: Creating a Course with edX Studio'),
-            'text': _('Enroll in StudioX'),
-            'condition': True
-        }, {
-            'href': 'mailto:{email}'.format(email=partner_email),
-            'sr_mouseover_text': _('Send an email to {email}').format(email=partner_email),
-            'text': _('Contact Us'),
-            'condition': bool(partner_email)
-        }]
-        %>
-
         <ul class="list-actions">
           % for link in links:
             % if link['condition']:

@@ -1,8 +1,10 @@
+<%page expression_filter="h"/>
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
+from six import text_type
 %>
 
 <%block name="js_extra">
@@ -56,7 +58,7 @@ from django.core.urlresolvers import reverse
         %for student in students:
         <tr>
           <td>
-            <a href="${reverse('student_progress', kwargs=dict(course_id=course_id.to_deprecated_string(), student_id=student['id']))}">${student['username']}</a>
+            <a href="${reverse('student_progress', kwargs=dict(course_id=text_type(course_id), student_id=student['id']))}">${student['username']}</a>
           </td>
         </tr>
         %endfor

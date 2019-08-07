@@ -2,36 +2,43 @@
 Tests for class dashboard (Metrics tab in instructor dashboard)
 """
 
+from __future__ import absolute_import
+
 import json
 
-from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
+from django.urls import reverse
 from mock import patch
-from nose.plugins.attrib import attr
+from six import text_type
+from six.moves import range
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
-from courseware.tests.factories import StudentModuleFactory
-from student.tests.factories import UserFactory, CourseEnrollmentFactory, AdminFactory
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-
 from class_dashboard.dashboard_data import (
-    get_problem_grade_distribution, get_sequential_open_distrib,
-    get_problem_set_grade_distrib, get_d3_problem_grade_distrib,
-    get_d3_sequential_open_distrib, get_d3_section_grade_distrib,
-    get_section_display_name, get_array_section_has_problem,
-    get_students_opened_subsection, get_students_problem_grades,
+    get_array_section_has_problem,
+    get_d3_problem_grade_distrib,
+    get_d3_section_grade_distrib,
+    get_d3_sequential_open_distrib,
+    get_problem_grade_distribution,
+    get_problem_set_grade_distrib,
+    get_section_display_name,
+    get_sequential_open_distrib,
+    get_students_opened_subsection,
+    get_students_problem_grades
 )
 from class_dashboard.views import has_instructor_access_for_class
+from courseware.tests.factories import StudentModuleFactory
+from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 USER_COUNT = 11
 
 
-@attr(shard=1)
 class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
     """
     Tests related to class_dashboard/dashboard_data.py
     """
+
     @classmethod
     def setUpClass(cls):
         super(TestGetProblemGradeDistribution, cls).setUpClass()
@@ -56,7 +63,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
                 display_name=u"test unit omega \u03a9",
             )
             cls.items = []
-            for i in xrange(USER_COUNT - 1):
+            for i in range(USER_COUNT - 1):
                 item = ItemFactory.create(
                     parent_location=cls.unit.location,
                     category="problem",
@@ -76,7 +83,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
         self.attempts = 3
         self.users = [
             UserFactory.create(username="metric" + str(__))
-            for __ in xrange(USER_COUNT)
+            for __ in range(USER_COUNT)
         ]
 
         for user in self.users:
@@ -165,7 +172,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
 
     def test_get_students_problem_grades(self):
 
-        attributes = '?module_id=' + self.item.location.to_deprecated_string()
+        attributes = '?module_id=' + text_type(self.item.location)
         request = self.request_factory.get(reverse('get_students_problem_grades') + attributes)
 
         response = get_students_problem_grades(request)
@@ -183,7 +190,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
     def test_get_students_problem_grades_max(self):
 
         with patch('class_dashboard.dashboard_data.MAX_SCREEN_LIST_LENGTH', 2):
-            attributes = '?module_id=' + self.item.location.to_deprecated_string()
+            attributes = '?module_id=' + text_type(self.item.location)
             request = self.request_factory.get(reverse('get_students_problem_grades') + attributes)
 
             response = get_students_problem_grades(request)
@@ -196,8 +203,8 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
 
     def test_get_students_problem_grades_csv(self):
 
-        tooltip = 'P1.2.1 Q1 - 3382 Students (100%: 1/1 questions)'
-        attributes = '?module_id=' + self.item.location.to_deprecated_string() + '&tooltip=' + tooltip + '&csv=true'
+        tooltip = u'P1.2.1 Q1 - 3382 Students (100%: 1/1 questions)'
+        attributes = '?module_id=' + text_type(self.item.location) + '&tooltip=' + tooltip + '&csv=true'
         request = self.request_factory.get(reverse('get_students_problem_grades') + attributes)
 
         response = get_students_problem_grades(request)
@@ -217,7 +224,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
 
     def test_get_students_opened_subsection(self):
 
-        attributes = '?module_id=' + self.item.location.to_deprecated_string()
+        attributes = '?module_id=' + text_type(self.item.location)
         request = self.request_factory.get(reverse('get_students_opened_subsection') + attributes)
 
         response = get_students_opened_subsection(request)
@@ -230,7 +237,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
 
         with patch('class_dashboard.dashboard_data.MAX_SCREEN_LIST_LENGTH', 2):
 
-            attributes = '?module_id=' + self.item.location.to_deprecated_string()
+            attributes = '?module_id=' + text_type(self.item.location)
             request = self.request_factory.get(reverse('get_students_opened_subsection') + attributes)
 
             response = get_students_opened_subsection(request)
@@ -244,7 +251,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
     def test_get_students_opened_subsection_csv(self):
 
         tooltip = '4162 students opened Subsection 5: Relational Algebra Exercises'
-        attributes = '?module_id=' + self.item.location.to_deprecated_string() + '&tooltip=' + tooltip + '&csv=true'
+        attributes = '?module_id=' + text_type(self.item.location) + '&tooltip=' + tooltip + '&csv=true'
         request = self.request_factory.get(reverse('get_students_opened_subsection') + attributes)
 
         response = get_students_opened_subsection(request)
@@ -263,7 +270,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
 
         data = json.dumps({'sections': sections,
                            'tooltips': tooltips,
-                           'course_id': course_id.to_deprecated_string(),
+                           'course_id': text_type(course_id),
                            'data_type': data_type,
                            })
 
@@ -299,7 +306,7 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
 
         data = json.dumps({'sections': sections,
                            'tooltips': tooltips,
-                           'course_id': course_id.to_deprecated_string(),
+                           'course_id': text_type(course_id),
                            'data_type': data_type,
                            })
 

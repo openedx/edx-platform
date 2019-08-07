@@ -32,12 +32,12 @@
     };
     $.ajaxPrefilter(function(options, originalOptions, xhr) { if (!options.crossDomain) { form_ext.CSRFProtection(xhr); } });
     $(document).delegate('form', 'submit', function(e) {
-        var form = $(this),
-            remote = form.data('remote') !== undefined;
+        var $form = $(this),
+            remote = $form.data('remote') !== undefined;
 
         if (remote) {
-            form_ext.handleRemote(form);
+            form_ext.handleRemote($form);
             return false;
         }
     });
-})(jQuery);
+}(jQuery));

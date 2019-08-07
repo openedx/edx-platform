@@ -4,10 +4,12 @@
 .calc-main {
   @extend %ui-print-excluded;
 
-  bottom: -126px;
+  bottom: -129px;
   left: 0;
   position: fixed;
+
   @include transition(bottom $tmg-avg linear 0s);
+
   -webkit-appearance: none;
   width: 100%;
 
@@ -18,7 +20,8 @@
   .calc {
     @include transition(background-color $tmg-f2 ease-in-out 0s);
     @include float(right);
-    @include right($baseline*.75);
+    @include right($baseline*0.75);
+
     position: relative;
     top: -42px;
     border-bottom: 0;
@@ -62,7 +65,9 @@
 
     form {
       @extend .clearfix;
+
       @include box-sizing(border-box);
+
       padding: lh();
 
       .calc-output-label {
@@ -74,7 +79,9 @@
         border: 1px solid $white;
         border-radius: 0;
         box-shadow: none;
+
         @include box-sizing(border-box);
+
         color: $black;
         float: left;
         font-size: 30px;
@@ -84,7 +91,7 @@
         padding: 0;
         text-shadow: none;
         -webkit-appearance: none;
-        width: flex-grid(.5) + flex-gutter();
+        width: flex-grid(0.5) + flex-gutter();
 
         &:hover, &:focus {
           background: $blue-d2;
@@ -102,7 +109,9 @@
         background: $white;
         border: 1px solid $white;
         box-shadow: none;
+
         @include box-sizing(border-box);
+
         color: $black;
         float: left;
         font-size: 16px;
@@ -113,13 +122,14 @@
         width: flex-grid(4);
         
         &.has-result {
-            border: 1px solid $green-d1;
-            box-shadow: inset 0px 0px ($baseline/3) $green-d1;
+          border: 1px solid $green-d1;
+          box-shadow: inset 0 0 ($baseline/3) $green-d1;
         }
       }
 
       .input-wrapper {
         @extend .clearfix;
+
         float: left;
         margin: 0;
         position: relative;
@@ -134,7 +144,9 @@
           direction: ltr;  // Almost all of the real-world calculators are LTR
           border: none;
           box-shadow: none;
+
           @include box-sizing(border-box);
+
           font-size: 16px;
           padding: 10px;
           -webkit-appearance: none;
@@ -156,6 +168,7 @@
 
           #calculator_hint {
             @include hide-text;
+
             display: block;
             height: 35px;
             width: 35px;
@@ -177,6 +190,7 @@
 
           .help {
             @include transition(none);
+
             background: $white;
             border-radius: 3px;
             box-shadow: 0 0 3px #999;

@@ -1,21 +1,26 @@
 """
 Tests for XML importer.
 """
+from __future__ import absolute_import
+
+import importlib
+import os
+import unittest
+from uuid import uuid4
+
 import mock
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from xblock.fields import String, Scope, ScopeIds, List
-from xblock.runtime import Runtime, KvsFieldData, DictKeyValueStore
-from xmodule.x_module import XModuleMixin
-from opaque_keys.edx.locations import Location
+from path import Path as path
+from xblock.fields import List, Scope, ScopeIds, String
+from xblock.runtime import DictKeyValueStore, KvsFieldData, Runtime
+
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore.xml_importer import _update_and_import_module, _update_module_location
-from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
+from xmodule.modulestore.xml_importer import StaticContentImporter, _update_and_import_module, _update_module_location
 from xmodule.tests import DATA_DIR
-from uuid import uuid4
-import unittest
-import importlib
+from xmodule.x_module import XModuleMixin
 
 
 class ModuleStoreNoSettings(unittest.TestCase):
@@ -135,7 +140,7 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
     def test_remap_namespace_native_xblock(self):
 
         # Set the XBlock's location
-        self.xblock.location = Location("org", "import", "run", "category", "stubxblock")
+        self.xblock.location = BlockUsageLocator(CourseLocator("org", "import", "run"), "category", "stubxblock")
 
         # Explicitly set the content and settings fields
         self.xblock.test_content_field = "Explicitly set"
@@ -143,7 +148,7 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
         self.xblock.save()
 
         # Move to different runtime w/ different course id
-        target_location_namespace = SlashSeparatedCourseKey("org", "course", "run")
+        target_location_namespace = CourseKey.from_string("org/course/run")
         new_version = _update_and_import_module(
             self.xblock,
             modulestore(),
@@ -174,13 +179,13 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
     def test_remap_namespace_native_xblock_default_values(self):
 
         # Set the XBlock's location
-        self.xblock.location = Location("org", "import", "run", "category", "stubxblock")
+        self.xblock.location = BlockUsageLocator(CourseLocator("org", "import", "run"), "category", "stubxblock")
 
         # Do NOT set any values, so the fields should use the defaults
         self.xblock.save()
 
         # Remap the namespace
-        target_location_namespace = Location("org", "course", "run", "category", "stubxblock")
+        target_location_namespace = BlockUsageLocator(CourseLocator("org", "course", "run"), "category", "stubxblock")
         new_version = _update_and_import_module(
             self.xblock,
             modulestore(),
@@ -208,11 +213,11 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
     def test_remap_namespace_native_xblock_inherited_values(self):
 
         # Set the XBlock's location
-        self.xblock.location = Location("org", "import", "run", "category", "stubxblock")
+        self.xblock.location = BlockUsageLocator(CourseLocator("org", "import", "run"), "category", "stubxblock")
         self.xblock.save()
 
         # Remap the namespace
-        target_location_namespace = Location("org", "course", "run", "category", "stubxblock")
+        target_location_namespace = BlockUsageLocator(CourseLocator("org", "course", "run"), "category", "stubxblock")
         new_version = _update_and_import_module(
             self.xblock,
             modulestore(),
@@ -236,7 +241,7 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
         # TypeError.
 
         # Set the XBlock's location
-        self.xblock.location = Location("org", "import", "run", "category", "stubxblock")
+        self.xblock.location = BlockUsageLocator(CourseLocator("org", "import", "run"), "category", "stubxblock")
         # Explicitly set the content field
         self.xblock.test_content_field = ['Explicitly set']
         self.xblock.save()
@@ -299,7 +304,7 @@ class UpdateLocationTest(ModuleStoreNoSettings):
     def test_update_locations_native_xblock(self):
         """ Update locations updates location and keeps values and "is_set_on" status """
         # Set the XBlock's location
-        self.xblock.location = Location("org", "import", "run", "category", "stubxblock")
+        self.xblock.location = BlockUsageLocator(CourseLocator("org", "import", "run"), "category", "stubxblock")
 
         # Explicitly set the content, settings and children fields
         self.xblock.test_content_field = 'Explicitly set'
@@ -333,3 +338,51 @@ class UpdateLocationTest(ModuleStoreNoSettings):
         # Expect these fields pass "is_set_on" test
         for field in self.CONTENT_FIELDS + self.SETTINGS_FIELDS + self.CHILDREN_FIELDS:
             self.assertTrue(new_version.fields[field].is_set_on(new_version))
+
+
+class StaticContentImporterTest(unittest.TestCase):
+
+    def setUp(self):
+        self.course_data_path = path('/path')
+        self.mocked_content_store = mock.Mock()
+        self.static_content_importer = StaticContentImporter(
+            static_content_store=self.mocked_content_store,
+            course_data_path=self.course_data_path,
+            target_id=CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')
+        )
+
+    def test_import_static_content_directory(self):
+        static_content_dir = 'static'
+        expected_base_dir = path(self.course_data_path / static_content_dir)
+        mocked_os_walk_yield = [
+            ('static', None, ['file1.txt', 'file2.txt']),
+            ('static/inner', None, ['file1.txt']),
+        ]
+        with mock.patch(
+            'xmodule.modulestore.xml_importer.os.walk',
+            return_value=mocked_os_walk_yield
+        ), mock.patch.object(
+            self.static_content_importer, 'import_static_file'
+        ) as patched_import_static_file:
+            self.static_content_importer.import_static_content_directory('static')
+            patched_import_static_file.assert_any_call(
+                'static/file1.txt', base_dir=expected_base_dir
+            )
+            patched_import_static_file.assert_any_call(
+                'static/file2.txt', base_dir=expected_base_dir
+            )
+            patched_import_static_file.assert_any_call(
+                'static/inner/file1.txt', base_dir=expected_base_dir
+            )
+
+    def test_import_static_file(self):
+        base_dir = path('/path/to/dir')
+        full_file_path = os.path.join(base_dir, 'static/some_file.txt')
+        self.mocked_content_store.generate_thumbnail.return_value = (None, None)
+        with mock.patch("__builtin__.open", mock.mock_open(read_data="data")) as mock_file:
+            self.static_content_importer.import_static_file(
+                full_file_path=full_file_path,
+                base_dir=base_dir
+            )
+            mock_file.assert_called_with(full_file_path, 'rb')
+            self.mocked_content_store.assert_called_once()

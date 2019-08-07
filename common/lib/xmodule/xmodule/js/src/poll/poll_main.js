@@ -2,7 +2,7 @@
     define('PollMain', [], function() {
         PollMain.prototype = {
 
-            'showAnswerGraph': function(poll_answers, total) {
+            showAnswerGraph: function(poll_answers, total) {
                 var _this, totalValue;
 
                 totalValue = parseFloat(total);
@@ -25,12 +25,12 @@
                     _this.answersObj[index].statsEl.show();
                     _this.answersObj[index].numberEl.html('' + value + ' (' + percentValue.toFixed(1) + '%)');
                     _this.answersObj[index].percentEl.css({
-                        'width': '' + percentValue.toFixed(1) + '%'
+                        width: '' + percentValue.toFixed(1) + '%'
                     });
                 });
             },
 
-            'submitAnswer': function(answer, answerObj) {
+            submitAnswer: function(answer, answerObj) {
                 var _this;
 
     // Make sure that the user can answer a question only once.
@@ -70,7 +70,7 @@
             }, // End-of: 'submitAnswer': function (answer, answerEl) {
 
 
-            'submitReset': function() {
+            submitReset: function() {
                 var _this;
 
                 _this = this;
@@ -109,7 +109,7 @@
     );
             }, // End-of: 'submitAnswer': function (answer, answerEl) {
 
-            'postInit': function() {
+            postInit: function() {
                 var _this;
 
     // Access this object inside inner functions.

@@ -1,16 +1,20 @@
 """LTI integration tests"""
 
-from collections import OrderedDict
+from __future__ import absolute_import
+
 import json
+from collections import OrderedDict
+
 import mock
-from nose.plugins.attrib import attr
 import oauthlib
-import urllib
-
+import six.moves.urllib.error  # pylint: disable=import-error
+import six.moves.urllib.parse  # pylint: disable=import-error
+import six.moves.urllib.request  # pylint: disable=import-error
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
+from six import text_type
 
-from courseware.tests import BaseTestXmodule
+from courseware.tests.helpers import BaseTestXmodule
 from courseware.views.views import get_course_lti_endpoints
 from openedx.core.lib.url_utils import quote_slashes
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -18,7 +22,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.x_module import STUDENT_VIEW
 
 
-@attr(shard=1)
 class TestLTI(BaseTestXmodule):
     """
     Integration test for lti xmodule.
@@ -40,13 +43,15 @@ class TestLTI(BaseTestXmodule):
         mocked_decoded_signature = u'my_signature='
 
         # Note: this course_id is actually a course_key
-        context_id = self.item_descriptor.course_id.to_deprecated_string()
-        user_id = unicode(self.item_descriptor.xmodule_runtime.anonymous_student_id)
+        context_id = text_type(self.item_descriptor.course_id)
+        user_id = text_type(self.item_descriptor.xmodule_runtime.anonymous_student_id)
         hostname = self.item_descriptor.xmodule_runtime.hostname
-        resource_link_id = unicode(urllib.quote('{}-{}'.format(hostname, self.item_descriptor.location.html_id())))
+        resource_link_id = text_type(six.moves.urllib.parse.quote('{}-{}'.format(hostname,
+                                                                                 self.item_descriptor.location.html_id()
+                                                                                 )))
 
         sourcedId = "{context}:{resource_link}:{user_id}".format(
-            context=urllib.quote(context_id),
+            context=six.moves.urllib.parse.quote(context_id),
             resource_link=resource_link_id,
             user_id=user_id
         )
@@ -78,7 +83,7 @@ class TestLTI(BaseTestXmodule):
             'input_fields': self.correct_headers,
             'element_class': self.item_descriptor.category,
             'element_id': self.item_descriptor.location.html_id(),
-            'launch_url': 'http://www.example.com',  # default value
+            'launch_url': u'http://www.example.com',  # default value
             'open_in_a_new_page': True,
             'form_url': self.item_descriptor.xmodule_runtime.handler_url(self.item_descriptor,
                                                                          'preview_handler').rstrip('/?'),
@@ -124,7 +129,6 @@ class TestLTI(BaseTestXmodule):
         self.assertEqual(generated_content, expected_content)
 
 
-@attr(shard=1)
 class TestLTIModuleListing(SharedModuleStoreTestCase):
     """
     a test for the rest endpoint that lists LTI modules in a course
@@ -169,17 +173,13 @@ class TestLTIModuleListing(SharedModuleStoreTestCase):
             publish_item=False,
         )
 
-    def setUp(self):
-        """Create course, 2 chapters, 2 sections"""
-        super(TestLTIModuleListing, self).setUp()
-
     def expected_handler_url(self, handler):
         """convenience method to get the reversed handler urls"""
         return "https://{}{}".format(settings.SITE_NAME, reverse(
-            'courseware.module_render.handle_xblock_callback_noauth',
+            'xblock_handler_noauth',
             args=[
-                self.course.id.to_deprecated_string(),
-                quote_slashes(unicode(self.lti_published.scope_ids.usage_id.to_deprecated_string()).encode('utf-8')),
+                text_type(self.course.id),
+                quote_slashes(text_type(self.lti_published.scope_ids.usage_id).encode('utf-8')),
                 handler
             ]
         ))
@@ -196,7 +196,7 @@ class TestLTIModuleListing(SharedModuleStoreTestCase):
         """tests that the draft lti module is part of the endpoint response"""
         request = mock.Mock()
         request.method = 'GET'
-        response = get_course_lti_endpoints(request, course_id=self.course.id.to_deprecated_string())
+        response = get_course_lti_endpoints(request, course_id=text_type(self.course.id))
 
         self.assertEqual(200, response.status_code)
         self.assertEqual('application/json', response['Content-Type'])
@@ -215,5 +215,5 @@ class TestLTIModuleListing(SharedModuleStoreTestCase):
         for method in DISALLOWED_METHODS:
             request = mock.Mock()
             request.method = method
-            response = get_course_lti_endpoints(request, self.course.id.to_deprecated_string())
+            response = get_course_lti_endpoints(request, text_type(self.course.id))
             self.assertEqual(405, response.status_code)

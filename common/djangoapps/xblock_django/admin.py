@@ -2,12 +2,13 @@
 Django admin dashboard configuration.
 """
 
-from django.contrib import admin
+from __future__ import absolute_import
+
 from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
-from xblock_django.models import (
-    XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
-)
+from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
+
+from xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
 
 
 class XBlockConfigurationAdmin(KeyedConfigurationModelAdmin):

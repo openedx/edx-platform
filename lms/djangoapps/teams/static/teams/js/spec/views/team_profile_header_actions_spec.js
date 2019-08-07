@@ -49,9 +49,9 @@ define([
         createMembershipData = function(username) {
             return [
                 {
-                    'user': {
-                        'username': username,
-                        'url': ACCOUNTS_API_URL + username
+                    user: {
+                        username: username,
+                        url: ACCOUNTS_API_URL + username
                     }
                 }
             ];
@@ -68,7 +68,7 @@ define([
                 var view = createHeaderActionsView(requests, 1, 'ma', createTeamModelData('teamA', 'teamAlpha', []));
                 if (joinTeam) {
                     // if we want the error to return when user try to join team, respond with no membership
-                    AjaxHelpers.respondWithJson(requests, {'count': 0});
+                    AjaxHelpers.respondWithJson(requests, {count: 0});
                     view.$('.action.action-primary').click();
                 }
                 AjaxHelpers.respondWithTextError(requests, 400, errorMessage);
@@ -97,12 +97,12 @@ define([
                     requests,
                     'GET',
                     TeamSpecHelpers.testContext.teamMembershipsUrl + '?' + $.param({
-                        'username': currentUsername, 'course_id': TeamSpecHelpers.testCourseID
+                        username: currentUsername, course_id: TeamSpecHelpers.testCourseID
                     })
                 );
 
                 // current user is not a member of any team so we should see the Join Team button
-                AjaxHelpers.respondWithJson(requests, {'count': 0});
+                AjaxHelpers.respondWithJson(requests, {count: 0});
                 expect(view.$('.action.action-primary').length).toEqual(1);
 
                 // a post request will be sent to add current user to current team
@@ -111,7 +111,7 @@ define([
                     requests,
                     'POST',
                     TeamSpecHelpers.testContext.teamMembershipsUrl,
-                    $.param({'username': currentUsername, 'team_id': teamId})
+                    $.param({username: currentUsername, team_id: teamId})
                 );
                 AjaxHelpers.respondWithJson(requests, {});
 
@@ -142,12 +142,12 @@ define([
                     requests,
                     'GET',
                     TeamSpecHelpers.testContext.teamMembershipsUrl + '?' + $.param({
-                        'username': currentUsername, 'course_id': TeamSpecHelpers.testCourseID
+                        username: currentUsername, course_id: TeamSpecHelpers.testCourseID
                     })
                 );
 
                 // current user is a member of another team so we should see the correct message
-                AjaxHelpers.respondWithJson(requests, {'count': 1});
+                AjaxHelpers.respondWithJson(requests, {count: 1});
                 expect(view.$('.action.action-primary').length).toEqual(0);
                 expect(view.$('.join-team-message').text().trim()).toBe(view.alreadyMemberMessage);
             });
@@ -176,7 +176,7 @@ define([
                 // verify user_message
                 verifyErrorMessage(
                     requests,
-                    JSON.stringify({'user_message': "Can't be made member"}),
+                    JSON.stringify({user_message: "Can't be made member"}),
                     "Can't be made member",
                     true
                 );
@@ -192,7 +192,7 @@ define([
                 // verify error message when json parsing succeeded but error message format is incorrect
                 verifyErrorMessage(
                     requests,
-                    JSON.stringify({'blah': "Can't be made member"}),
+                    JSON.stringify({blah: "Can't be made member"}),
                     'An error occurred. Try again.',
                     true
                 );
@@ -204,7 +204,7 @@ define([
                 // verify user_message
                 verifyErrorMessage(
                     requests,
-                    JSON.stringify({'user_message': "Can't return user memberships"}),
+                    JSON.stringify({user_message: "Can't return user memberships"}),
                     "Can't return user memberships",
                     false
                 );

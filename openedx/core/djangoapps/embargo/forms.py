@@ -2,14 +2,14 @@
 Defines forms for providing validation of embargo admin details.
 """
 
+from __future__ import absolute_import
+import ipaddress
 from django import forms
 from django.utils.translation import ugettext as _
-
-import ipaddr
-
-from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+
+from xmodule.modulestore.django import modulestore
 
 from .models import IPFilter, RestrictedCourse
 
@@ -67,7 +67,7 @@ class IPFilterForm(forms.ModelForm):
         """Whether or not address is a valid ipv4 address or ipv6 address"""
         try:
             # Is this an valid ip address?
-            ipaddr.IPNetwork(address)
+            ipaddress.ip_network(address)
         except ValueError:
             return False
         return True
@@ -86,7 +86,7 @@ class IPFilterForm(forms.ModelForm):
             if not self._is_valid_ip(address):
                 error_addresses.append(address)
         if error_addresses:
-            msg = 'Invalid IP Address(es): {0}'.format(error_addresses)
+            msg = u'Invalid IP Address(es): {0}'.format(error_addresses)
             msg += ' Please fix the error(s) and try again.'
             raise forms.ValidationError(msg)
 

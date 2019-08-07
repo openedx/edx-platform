@@ -1,0 +1,79 @@
+## mako
+
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+<%def name="online_help_token()"><% return "profile" %></%def>
+<%namespace name='static' file='/static_content.html'/>
+
+<%!
+import json
+from django.urls import reverse
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
+from openedx.core.djangolib.markup import HTML
+%>
+
+<%block name="pagetitle">${_("Learner Profile")}</%block>
+
+<%block name="bodyclass">view-profile</%block>
+
+<%block name="headextra">
+<%static:css group='style-course'/>
+</%block>
+
+<div class="message-banner" aria-live="polite"></div>
+<main id="main" aria-label="Content" tabindex="-1">
+    <div class="wrapper-profile">
+        <div class="profile ${'profile-self' if own_profile else 'profile-other'}">
+            <div class="wrapper-profile-field-account-privacy">
+                % if own_profile and records_url:
+                    <div class="wrapper-profile-records">
+                        <a href="${records_url}">
+                            <button class="btn profile-records-button">${_("View My Records")}</button>
+                        </a>
+                    </div>
+                % endif
+            </div>
+            % if own_profile:
+                <div class="profile-header">
+                    <h2 class="header">${_("My Profile")}</h2>
+                    <div class="subheader">
+                        ${_('Build out your profile to personalize your identity on {platform_name}.').format(
+                            platform_name=platform_name,
+                        )}
+                    </div>
+                </div>
+            % endif
+            <div class="wrapper-profile-sections account-settings-container">
+                <div class="ui-loading-indicator">
+                    <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_("Loading")}</span></p>
+                </div>
+                <div class="wrapper-profile-section-container-one is-hidden">
+                    <div class="wrapper-profile-section-one">
+                        <div class="profile-image-field">
+                        </div>
+                        <div class="profile-section-one-fields">
+                        </div>
+                    </div>
+                    <div class="ui-loading-error is-hidden">
+                        <span class="fa fa-exclamation-triangle message-error" aria-hidden="true"></span>
+                        <span class="copy">${_("An error occurred. Try loading the page again.")}</span>
+                    </div>
+                </div>
+                <div class="wrapper-profile-section-container-two is-hidden">
+                    <div class="wrapper-profile-bio"></div>
+                    % if achievements_fragment:
+                        ${HTML(achievements_fragment.body_html())}
+                    % endif
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<%block name="js_extra">
+<%static:require_module module_name="learner_profile/js/learner_profile_factory" class_name="LearnerProfileFactory">
+    var options = ${data | n, dump_js_escaped_json};
+    LearnerProfileFactory(options);
+</%static:require_module>
+</%block>

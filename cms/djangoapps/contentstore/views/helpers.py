@@ -4,24 +4,22 @@ Helper methods for Studio views.
 
 from __future__ import absolute_import
 
-from uuid import uuid4
 import urllib
+from uuid import uuid4
 
 from django.conf import settings
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
-
-from edxmako.shortcuts import render_to_string
 from opaque_keys.edx.keys import UsageKey
 from xblock.core import XBlock
-import dogstats_wrapper as dog_stats_api
-from xmodule.modulestore.django import modulestore
-from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT
-from xmodule.tabs import StaticTab
 
 from contentstore.utils import reverse_course_url, reverse_library_url, reverse_usage_url
+from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
 from util.milestones_helpers import is_entrance_exams_enabled
+from xmodule.modulestore.django import modulestore
+from xmodule.tabs import StaticTab
+from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT
 
 __all__ = ['event']
 
@@ -45,11 +43,11 @@ def event(request):
     return HttpResponse(status=204)
 
 
-def render_from_lms(template_name, dictionary, context=None, namespace='main'):
+def render_from_lms(template_name, dictionary, namespace='main'):
     """
-    Render a template using the LMS MAKO_TEMPLATES
+    Render a template using the LMS Mako templates
     """
-    return render_to_string(template_name, dictionary, context, namespace="lms." + namespace)
+    return render_to_string(template_name, dictionary, namespace="lms." + namespace)
 
 
 def get_parent_xblock(xblock):
@@ -146,7 +144,7 @@ def xblock_type_display_name(xblock, default_display_name=None):
         return _('Unit')
     component_class = XBlock.load_class(category, select=settings.XBLOCK_SELECT_FUNCTION)
     if hasattr(component_class, 'display_name') and component_class.display_name.default:
-        return _(component_class.display_name.default)    # pylint: disable=translation-of-non-string
+        return _(component_class.display_name.default)
     else:
         return default_display_name
 
@@ -269,21 +267,12 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
         # if we add one then we need to also add it to the policy information (i.e. metadata)
         # we should remove this once we can break this reference from the course to static tabs
         if category == 'static_tab':
-
-            dog_stats_api.increment(
-                DEPRECATION_VSCOMPAT_EVENT,
-                tags=(
-                    "location:create_xblock_static_tab",
-                    u"course:{}".format(unicode(dest_usage_key.course_key)),
-                )
-            )
-
             display_name = display_name or _("Empty")  # Prevent name being None
             course = store.get_course(dest_usage_key.course_key)
             course.tabs.append(
                 StaticTab(
                     name=display_name,
-                    url_slug=dest_usage_key.name,
+                    url_slug=dest_usage_key.block_id,
                 )
             )
             store.update_item(course, user.id)
@@ -299,7 +288,7 @@ def is_item_in_course_tree(item):
     if its parent has been deleted and is now an orphan.
     """
     ancestor = item.get_parent()
-    while ancestor is not None and ancestor.location.category != "course":
+    while ancestor is not None and ancestor.location.block_type != "course":
         ancestor = ancestor.get_parent()
 
     return ancestor is not None

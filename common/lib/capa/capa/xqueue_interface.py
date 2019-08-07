@@ -1,12 +1,14 @@
 #
 #  LMS Interface to external queueing system (xqueue)
 #
+from __future__ import absolute_import
+
 import hashlib
 import json
 import logging
-import requests
-import dogstats_wrapper as dog_stats_api
 
+import requests
+import six
 
 log = logging.getLogger(__name__)
 dateformat = '%Y%m%d%H%M%S'
@@ -15,6 +17,8 @@ XQUEUE_METRIC_NAME = 'edxapp.xqueue'
 
 # Wait time for response from Xqueue.
 XQUEUE_TIMEOUT = 35  # seconds
+CONNECT_TIMEOUT = 3.05  # seconds
+READ_TIMEOUT = 10  # seconds
 
 
 def make_hashkey(seed):
@@ -52,7 +56,7 @@ def parse_xreply(xreply):
     """
     try:
         xreply = json.loads(xreply)
-    except ValueError, err:
+    except ValueError as err:
         log.error(err)
         return (1, 'unexpected reply from server')
 
@@ -68,7 +72,7 @@ class XQueueInterface(object):
     """
 
     def __init__(self, url, django_auth, requests_auth=None):
-        self.url = unicode(url)
+        self.url = six.text_type(url)
         self.auth = django_auth
         self.session = requests.Session()
         self.session.auth = requests_auth
@@ -90,10 +94,6 @@ class XQueueInterface(object):
         # log the send to xqueue
         header_info = json.loads(header)
         queue_name = header_info.get('queue_name', u'')
-        dog_stats_api.increment(XQUEUE_METRIC_NAME, tags=[
-            u'action:send_to_queue',
-            u'queue:{}'.format(queue_name)
-        ])
 
         # Attempt to send to queue
         (error, msg) = self._send_to_queue(header, body, files_to_upload)
@@ -111,7 +111,7 @@ class XQueueInterface(object):
                     f.seek(0)
             (error, msg) = self._send_to_queue(header, body, files_to_upload)
 
-        return (error, msg)
+        return error, msg
 
     def _login(self):
         payload = {
@@ -134,12 +134,18 @@ class XQueueInterface(object):
 
     def _http_post(self, url, data, files=None):
         try:
-            r = self.session.post(url, data=data, files=files)
-        except requests.exceptions.ConnectionError, err:
+            response = self.session.post(
+                url, data=data, files=files, timeout=(CONNECT_TIMEOUT, READ_TIMEOUT)
+            )
+        except requests.exceptions.ConnectionError as err:
             log.error(err)
-            return (1, 'cannot connect to server')
+            return 1, 'cannot connect to server'
 
-        if r.status_code not in [200]:
-            return (1, 'unexpected HTTP status code [%d]' % r.status_code)
+        except requests.exceptions.ReadTimeout as err:
+            log.error(err)
+            return 1, 'failed to read from the server'
 
-        return parse_xreply(r.text)
+        if response.status_code not in [200]:
+            return 1, 'unexpected HTTP status code [%d]' % response.status_code
+
+        return parse_xreply(response.text)

@@ -2,6 +2,8 @@
 Test overrides to support Safe Cookies with Test Clients.
 """
 
+from __future__ import absolute_import
+
 from django.test.client import Client
 
 
@@ -59,7 +61,7 @@ def safe_cookie_test_session_patch():
         """
         from django.apps import apps
         from django.conf import settings
-        from django.utils.importlib import import_module
+        from importlib import import_module
         from .middleware import SafeCookieData, SafeCookieError, SafeSessionMiddleware
 
         if apps.is_installed('django.contrib.sessions'):

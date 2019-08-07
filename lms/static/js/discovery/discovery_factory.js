@@ -5,17 +5,23 @@
         'js/discovery/views/search_form', 'js/discovery/views/courses_listing',
         'js/discovery/views/filter_bar', 'js/discovery/views/refine_sidebar'],
         function(Backbone, SearchState, Filters, SearchForm, CoursesListing, FilterBar, RefineSidebar) {
-            return function(meanings, searchQuery) {
+            return function(meanings, searchQuery, userLanguage, userTimezone) {
                 var dispatcher = _.extend({}, Backbone.Events);
                 var search = new SearchState();
                 var filters = new Filters();
-                var listing = new CoursesListing({model: search.discovery});
                 var form = new SearchForm();
                 var filterBar = new FilterBar({collection: filters});
                 var refineSidebar = new RefineSidebar({
                     collection: search.discovery.facetOptions,
                     meanings: meanings
                 });
+                var listing;
+                var courseListingModel = search.discovery;
+                courseListingModel.userPreferences = {
+                    userLanguage: userLanguage,
+                    userTimezone: userTimezone
+                };
+                listing = new CoursesListing({model: courseListingModel});
 
                 dispatcher.listenTo(form, 'search', function(query) {
                     filters.reset();
@@ -27,8 +33,7 @@
                     form.showLoadingIndicator();
                     if (filters.get(type)) {
                         removeFilter(type);
-                    }
-                    else {
+                    } else {
                         filters.add({type: type, query: query, name: name});
                         search.refineSearch(filters.getTerms());
                     }
@@ -57,8 +62,7 @@
                                 {merge: true}
                             );
                         }
-                    }
-                    else {
+                    } else {
                         form.showNotFoundMessage(query);
                         filters.reset();
                     }
@@ -68,7 +72,7 @@
                 });
 
                 dispatcher.listenTo(search, 'error', function() {
-                    form.showErrorMessage();
+                    form.showErrorMessage(search.errorMessage);
                     form.hideLoadingIndicator();
                 });
 
@@ -80,8 +84,7 @@
                     filters.remove(type);
                     if (type === 'search_query') {
                         form.doSearch('');
-                    }
-                    else {
+                    } else {
                         search.refineSearch(filters.getTerms());
                     }
                 }
@@ -91,4 +94,4 @@
                 }
             };
         });
-})(define || RequireJS.define);
+}(define || RequireJS.define));

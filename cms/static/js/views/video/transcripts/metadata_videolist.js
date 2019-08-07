@@ -20,9 +20,9 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
 
         // Pre-defined dict of placeholders: "videoType - placeholder" pairs.
         placeholders: {
-            'webm': '.webm',
-            'mp4': 'http://somesite.com/video.mp4',
-            'youtube': 'http://youtube.com/'
+            webm: '.webm',
+            mp4: 'http://somesite.com/video.mp4',
+            youtube: 'http://youtube.com/'
         },
 
         initialize: function(options) {
@@ -43,7 +43,7 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
                 .apply(this, arguments);
 
             this.$el.on(
-                'input', 'input',
+                'input', '.videolist-settings-item input',
                 _.debounce(_.bind(this.inputHandler, this), this.inputDelay)
             );
 
@@ -56,57 +56,45 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
             AbstractEditor.prototype.render
                 .apply(this, arguments);
 
-            var self = this,
-                component_locator = this.$el.closest('[data-locator]')
-                                                            .data('locator'),
-                videoList = this.getVideoObjectsList(),
-
-                showServerError = function(response) {
-                    var errorMessage = response.status ||
-                        gettext('Error: Connection with server failed.');
-
-                    self.messenger
-                        .render('not_found')
-                        .showError(
-                            errorMessage,
-                            true // hide buttons
-                        );
-                };
-
             this.$extraVideosBar = this.$el.find('.videolist-extra-videos');
 
-            if (videoList.length === 0) {
-                this.messenger
-                    .render('not_found')
-                    .showError(
-                        gettext('No sources'),
-                        true // hide buttons
-                    );
+            // Check current state of Timed Transcripts.
+            Backbone.trigger('transcripts:basicTabFieldChanged');
+        },
 
-                return void(0);
+        updateOnCheckTranscriptSuccess: function(videoList, response) {
+            var params = response,
+                len = videoList.length,
+                mode = (len === 1) ? videoList[0].mode : false;
+
+            // If there are more than 1 video or just html5 source is
+            // passed, video sources box should expand
+            if (len > 1 || mode === 'html5') {
+                this.openExtraVideosBar();
+            } else {
+                this.closeExtraVideosBar();
             }
 
-            // Check current state of Timed Transcripts.
-            Utils.command('check', component_locator, videoList)
-                .done(function(resp) {
-                    var params = resp,
-                        len = videoList.length,
-                        mode = (len === 1) ? videoList[0].mode : false;
+            this.messenger.render(response.command, params);
+            this.checkIsUniqVideoTypes();
+        },
 
-                    // If there are more than 1 video or just html5 source is
-                    // passed, video sources box should expand
-                    if (len > 1 || mode === 'html5') {
-                        self.openExtraVideosBar();
-                    } else {
-                        self.closeExtraVideosBar();
-                    }
+        /**
+         * Updates the message with error.
+         */
+        showServerError: function(response) {
+            var errorMessage = gettext('Error: Connection with server failed.');
 
-                    self.messenger.render(resp.command, params);
-                    self.checkIsUniqVideoTypes();
-                    // Synchronize transcripts field in the `Advanced` tab.
-                    Utils.Storage.set('sub', resp.subs);
-                })
-                .fail(showServerError);
+            if (response.responseJSON !== undefined) {
+                errorMessage = response.responseJSON.status;
+            }
+
+            this.messenger
+                .render('not_found')
+                .showError(
+                    errorMessage,
+                    true // hide buttons
+                );
         },
 
         /**

@@ -2,47 +2,45 @@
 """
 Unit tests for preference APIs.
 """
-import datetime
-import ddt
-import unittest
-from mock import patch
-from nose.plugins.attrib import attr
-from pytz import common_timezones, utc
+from __future__ import absolute_import
 
-from django.conf import settings
+import datetime
+
+import ddt
+from dateutil.parser import parse as parse_datetime
 from django.contrib.auth.models import User
 from django.test.utils import override_settings
-from dateutil.parser import parse as parse_datetime
+from mock import patch
+from pytz import common_timezones, utc
 
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.time_zone_utils import get_display_time_zone
+from student.models import UserProfile
 from student.tests.factories import UserFactory
-
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from ...accounts.api import create_account
 from ...errors import (
-    UserNotFound,
-    UserNotAuthorized,
-    PreferenceValidationError,
-    PreferenceUpdateError,
     CountryCodeError,
+    PreferenceUpdateError,
+    PreferenceValidationError,
+    UserNotAuthorized,
+    UserNotFound
 )
-from ...models import UserProfile, UserOrgTag
+from ...models import UserOrgTag
 from ...preferences.api import (
+    delete_user_preference,
+    get_country_time_zones,
     get_user_preference,
     get_user_preferences,
     set_user_preference,
-    update_user_preferences,
-    delete_user_preference,
     update_email_opt_in,
-    get_country_time_zones,
+    update_user_preferences
 )
 
 
-@attr(shard=2)
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+@skip_unless_lms
 class TestPreferenceAPI(CacheIsolationTestCase):
     """
     These tests specifically cover the parts of the API methods that are not covered by test_views.py.
@@ -55,9 +53,8 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         super(TestPreferenceAPI, self).setUp()
         self.user = UserFactory.create(password=self.password)
         self.different_user = UserFactory.create(password=self.password)
-        self.staff_user = UserFactory(is_staff=True, password=self.password)
-        self.no_such_user = UserFactory.create(password=self.password)
-        self.no_such_user.username = "no_such_user"
+        self.staff_user = UserFactory.create(is_staff=True, password=self.password)
+        self.no_such_user = UserFactory.build(password=self.password, username="no_such_user")
         self.test_preference_key = "test_key"
         self.test_preference_value = "test_value"
         set_user_preference(self.user, self.test_preference_key, self.test_preference_value)
@@ -79,7 +76,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         """
         Verifies that get_user_preference returns appropriate errors.
         """
-        with self.assertRaises(UserNotFound):
+        with self.assertRaises(UserNotAuthorized):
             get_user_preference(self.user, self.test_preference_key, username="no_such_user")
 
         with self.assertRaises(UserNotFound):
@@ -102,7 +99,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         """
         Verifies that get_user_preferences returns appropriate errors.
         """
-        with self.assertRaises(UserNotFound):
+        with self.assertRaises(UserNotAuthorized):
             get_user_preferences(self.user, username="no_such_user")
 
         with self.assertRaises(UserNotFound):
@@ -127,7 +124,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         """
         Verifies that set_user_preference returns appropriate errors.
         """
-        with self.assertRaises(UserNotFound):
+        with self.assertRaises(UserNotAuthorized):
             set_user_preference(self.user, self.test_preference_key, "new_value", username="no_such_user")
 
         with self.assertRaises(UserNotFound):
@@ -143,7 +140,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         with self.assertRaises(PreferenceValidationError) as context_manager:
             set_user_preference(self.user, too_long_key, "new_value")
         errors = context_manager.exception.preference_errors
-        self.assertEqual(len(errors.keys()), 1)
+        self.assertEqual(len(list(errors.keys())), 1)
         self.assertEqual(
             errors[too_long_key],
             {
@@ -156,7 +153,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
             with self.assertRaises(PreferenceValidationError) as context_manager:
                 set_user_preference(self.user, self.test_preference_key, empty_value)
             errors = context_manager.exception.preference_errors
-            self.assertEqual(len(errors.keys()), 1)
+            self.assertEqual(len(list(errors.keys())), 1)
             self.assertEqual(
                 errors[self.test_preference_key],
                 {
@@ -229,7 +226,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         update_data = {
             self.test_preference_key: "new_value"
         }
-        with self.assertRaises(UserNotFound):
+        with self.assertRaises(UserNotAuthorized):
             update_user_preferences(self.user, update_data, user="no_such_user")
 
         with self.assertRaises(UserNotFound):
@@ -245,7 +242,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         with self.assertRaises(PreferenceValidationError) as context_manager:
             update_user_preferences(self.user, {too_long_key: "new_value"})
         errors = context_manager.exception.preference_errors
-        self.assertEqual(len(errors.keys()), 1)
+        self.assertEqual(len(list(errors.keys())), 1)
         self.assertEqual(
             errors[too_long_key],
             {
@@ -258,7 +255,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
             with self.assertRaises(PreferenceValidationError) as context_manager:
                 update_user_preferences(self.user, {self.test_preference_key: empty_value})
             errors = context_manager.exception.preference_errors
-            self.assertEqual(len(errors.keys()), 1)
+            self.assertEqual(len(list(errors.keys())), 1)
             self.assertEqual(
                 errors[self.test_preference_key],
                 {
@@ -305,7 +302,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         """
         Verifies that delete_user_preference returns appropriate errors.
         """
-        with self.assertRaises(UserNotFound):
+        with self.assertRaises(UserNotAuthorized):
             delete_user_preference(self.user, self.test_preference_key, username="no_such_user")
 
         with self.assertRaises(UserNotFound):
@@ -330,15 +327,14 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         )
 
 
-@attr(shard=2)
 @ddt.ddt
 class UpdateEmailOptInTests(ModuleStoreTestCase):
     """
     Test cases to cover API-driven email list opt-in update workflows
     """
-    USERNAME = u'frank-underwood'
+    USERNAME = u'claire-underwood'
     PASSWORD = u'ṕáśśẃőŕd'
-    EMAIL = u'frank+underwood@example.com'
+    EMAIL = u'claire+underwood@example.com'
 
     @ddt.data(
         # Check that a 27 year old can opt-in
@@ -447,10 +443,14 @@ class CountryTimeZoneTest(CacheIsolationTestCase):
     """
 
     @ddt.data(('ES', ['Africa/Ceuta', 'Atlantic/Canary', 'Europe/Madrid']),
-              (None, common_timezones[:10]))
+              (None, common_timezones[:10]),
+              ('AA', common_timezones[:10]))
     @ddt.unpack
     def test_get_country_time_zones(self, country_code, expected_time_zones):
-        """Verify that list of common country time zones dictionaries is returned"""
+        """
+        Verify that list of common country time zones dictionaries is returned
+        An unrecognized country code (e.g. AA) will return the list of common timezones
+        """
         expected_dict = [
             {
                 'time_zone': time_zone,
@@ -461,11 +461,6 @@ class CountryTimeZoneTest(CacheIsolationTestCase):
         country_time_zones_dicts = get_country_time_zones(country_code)[:10]
         self.assertEqual(country_time_zones_dicts, expected_dict)
 
-    def test_country_code_errors(self):
-        """Verify that country code error is raised for invalid country code"""
-        with self.assertRaises(CountryCodeError):
-            get_country_time_zones('AA')
-
 
 def get_expected_validation_developer_message(preference_key, preference_value):
     """
@@ -475,7 +470,7 @@ def get_expected_validation_developer_message(preference_key, preference_value):
         preference_key=preference_key,
         preference_value=preference_value,
         error={
-            "key": [u"Ensure this value has at most 255 characters (it has 256)."]
+            "key": [u"Ensure this field has no more than 255 characters."]
         }
     )
 
@@ -491,4 +486,4 @@ def get_empty_preference_message(preference_key):
     """
     Returns the validation message shown for an empty preference.
     """
-    return "Preference '{preference_key}' cannot be set to an empty value.".format(preference_key=preference_key)
+    return u"Preference '{preference_key}' cannot be set to an empty value.".format(preference_key=preference_key)

@@ -1,0 +1,59 @@
+<%page expression_filter="h"/>
+<%! 
+from django.utils.translation import ugettext as _ 
+from openedx.core.djangolib.markup import HTML, Text
+%>
+<%
+accomplishment_course_title = accomplishment_copy_course_name
+if certificate_data and certificate_data.get('course_title', ''):
+    accomplishment_course_title = certificate_data.get('course_title', '')
+course_mode_class = course_mode if course_mode else ''
+%>
+<div id="fb-root"></div>
+<div class="wrapper-banner wrapper-banner-user">
+    <section class="banner banner-user">
+    <div class="message message-block message-notice">
+        <div class="message-text">
+            <h2 class="message-title">${Text(_("Congratulations, {user_name}!")).format(
+                        user_name=accomplishment_copy_name
+                    )}
+            </h2>
+            <p class="message-copy">
+                ${Text(_("You worked hard to earn your certificate from {accomplishment_copy_course_org} {dash} share it with colleagues, friends, and family to get the word out about what you mastered in {accomplishment_course_title}.")).format(
+                    dash=HTML('&mdash;'),
+                    accomplishment_copy_course_org=accomplishment_copy_course_org,
+                    accomplishment_course_title=accomplishment_course_title
+                )}
+            </p>
+        </div>
+        <div class="message-actions">
+            <div class="message-actions-box">
+                <h3 class="sr-only">${_("Print or share your certificate:")}</h3>
+                    % if facebook_share_enabled:
+                    <button class="action action-share-facebook btn icon-only" id="action-share-facebook" title="${_('Share on Facebook')}">
+                        <i class="icon fa fa-facebook-official" aria-hidden="true"></i>
+                        <span class="action-label">${_("Share this certificate on Facebook (opens a new tab/window)")}</span>
+                    </button>
+                    %endif
+                    % if twitter_share_enabled:
+                    <button title="${_('Share on Twitter')}"
+                        class="action action-share-twitter btn icon-only">
+                        <i class="icon fa fa-twitter" aria-hidden="true"></i>
+                        <span class="action-label">${_("Tweet this certificate (opens a new tab/window)")}</span>
+                    </button>
+                    %endif
+                    %if linked_in_url:
+                    <button class="action action-share-linkedin btn icon-only" id="action-share-linkedin" title="${_('Add to LinkedIn Profile')}" data-course-id="${course_id}" data-certificate-mode="${course_mode}">
+                        <i class="icon fa fa-linkedin" aria-hidden="true"></i>
+                        <span class="action-label">${_("Add this certificate to your LinkedIn profile (opens a new tab/window)")}</span>
+                    </button>
+                    %endif
+                    <button title="${_('Print')}" class="action action-print btn icon-only" id="action-print-view">
+                        <i class="icon fa fa-print" aria-hidden="true"></i>
+                        <span class="action-label">${_("Print this certificate")}</span>
+                    </button>
+            </div>
+        </div>
+    </div>
+    </section>
+</div>

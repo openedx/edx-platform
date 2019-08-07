@@ -1,22 +1,27 @@
 """
 MongoDB/GridFS-level code for the contentstore.
 """
-import os
-import json
-import pymongo
-import gridfs
-from gridfs.errors import NoFile
-from fs.osfs import OSFS
-from bson.son import SON
+from __future__ import absolute_import
 
+import json
+import os
+
+import gridfs
+import pymongo
+import six
+from bson.son import SON
+from fs.osfs import OSFS
+from gridfs.errors import NoFile
 from mongodb_proxy import autoretry_read
 from opaque_keys.edx.keys import AssetKey
+
 from xmodule.contentstore.content import XASSET_LOCATION_TAG
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import ASSET_IGNORE_REGEX
-from xmodule.util.misc import escape_invalid_characters
 from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
-from .content import StaticContent, ContentStore, StaticContentStream
+from xmodule.util.misc import escape_invalid_characters
+
+from .content import ContentStore, StaticContent, StaticContentStream
 
 
 class MongoContentStore(ContentStore):
@@ -88,7 +93,7 @@ class MongoContentStore(ContentStore):
         self.delete(content_id)  # delete is a noop if the entry doesn't exist; so, don't waste time checking
 
         thumbnail_location = content.thumbnail_location.to_deprecated_list_repr() if content.thumbnail_location else None
-        with self.fs.new_file(_id=content_id, filename=unicode(content.location), content_type=content.content_type,
+        with self.fs.new_file(_id=content_id, filename=six.text_type(content.location), content_type=content.content_type,
                               displayname=content.name, content_son=content_son,
                               thumbnail_location=thumbnail_location,
                               import_path=content.import_path,
@@ -194,9 +199,9 @@ class MongoContentStore(ContentStore):
             # When debugging course exports, this might be a good place
             # to look. -- pmitros
             self.export(asset['asset_key'], output_directory)
-            for attr, value in asset.iteritems():
+            for attr, value in six.iteritems(asset):
                 if attr not in ['_id', 'md5', 'uploadDate', 'length', 'chunkSize', 'asset_key']:
-                    policy.setdefault(asset['asset_key'].name, {})[attr] = value
+                    policy.setdefault(asset['asset_key'].block_id, {})[attr] = value
 
         with open(assets_policy_file, 'w') as f:
             json.dump(policy, f, sort_keys=True, indent=4)
@@ -247,19 +252,65 @@ class MongoContentStore(ContentStore):
             contentType: The mimetype string of the asset
             md5: An md5 hash of the asset content
         '''
-        query = query_for_course(course_key, "asset" if not get_thumbnails else "thumbnail")
-        find_args = {"sort": sort}
-        if maxresults > 0:
-            find_args.update({
-                "skip": start,
-                "limit": maxresults,
-            })
+        # TODO: Using an aggregate() instead of a find() here is a hack to get around the fact that Mongo 3.2 does not
+        # support sorting case-insensitively.
+        # If a sort on displayname is requested, the aggregation pipeline creates a new field:
+        # `insensitive_displayname`, a lowercase version of `displayname` that is sorted on instead.
+        # Mongo 3.4 does not require this hack. When upgraded, change this aggregation back to a find and specifiy
+        # a collation based on user's language locale instead.
+        # See: https://openedx.atlassian.net/browse/EDUCATOR-2221
+        pipeline_stages = []
+        query = query_for_course(course_key, 'asset' if not get_thumbnails else 'thumbnail')
         if filter_params:
             query.update(filter_params)
+        pipeline_stages.append({'$match': query})
 
-        items = self.fs_files.find(query, **find_args)
-        count = items.count()
-        assets = list(items)
+        if sort:
+            sort = dict(sort)
+            if 'displayname' in sort:
+                pipeline_stages.append({
+                    '$project': {
+                        'contentType': 1,
+                        'locked': 1,
+                        'chunkSize': 1,
+                        'content_son': 1,
+                        'displayname': 1,
+                        'filename': 1,
+                        'length': 1,
+                        'import_path': 1,
+                        'uploadDate': 1,
+                        'thumbnail_location': 1,
+                        'md5': 1,
+                        'insensitive_displayname': {
+                            '$toLower': '$displayname'
+                        }
+                    }
+                })
+                sort = {'insensitive_displayname': sort['displayname']}
+            pipeline_stages.append({'$sort': sort})
+
+        # This is another hack to get the total query result count, but only the Nth page of actual documents
+        # See: https://stackoverflow.com/a/39784851/6620612
+        pipeline_stages.append({'$group': {'_id': None, 'count': {'$sum': 1}, 'results': {'$push': '$$ROOT'}}})
+        if maxresults > 0:
+            pipeline_stages.append({
+                '$project': {
+                    'count': 1,
+                    'results': {
+                        '$slice': ['$results', start, maxresults]
+                    }
+                }
+            })
+
+        items = self.fs_files.aggregate(pipeline_stages)
+        if items['result']:
+            result = items['result'][0]
+            count = result['count']
+            assets = list(result['results'])
+        else:
+            # no results
+            count = 0
+            assets = []
 
         # We're constructing the asset key immediately after retrieval from the database so that
         # callers are insulated from knowing how our identifiers are stored.
@@ -303,7 +354,7 @@ class MongoContentStore(ContentStore):
 
         :param location:  a c4x asset location
         """
-        for attr in attr_dict.iterkeys():
+        for attr in six.iterkeys(attr_dict):
             if attr in ['_id', 'md5', 'uploadDate', 'length']:
                 raise AttributeError("{} is a protected attribute.".format(attr))
         asset_db_key, __ = self.asset_db_key(location)
@@ -341,7 +392,7 @@ class MongoContentStore(ContentStore):
             asset_key = self.make_id_son(asset)
             # don't convert from string until fs access
             source_content = self.fs.get(asset_key)
-            if isinstance(asset_key, basestring):
+            if isinstance(asset_key, six.string_types):
                 asset_key = AssetKey.from_string(asset_key)
                 __, asset_key = self.asset_db_key(asset_key)
             asset_key['org'] = dest_course_key.org
@@ -352,7 +403,7 @@ class MongoContentStore(ContentStore):
                 asset_id = asset_key
             else:  # add the run, since it's the last field, we're golden
                 asset_key['run'] = dest_course_key.run
-                asset_id = unicode(
+                asset_id = six.text_type(
                     dest_course_key.make_asset_key(asset_key['category'], asset_key['name']).for_branch(None)
                 )
 
@@ -384,20 +435,29 @@ class MongoContentStore(ContentStore):
     # stability of order is more important than sanity of order as any changes to order make things
     # unfindable
     ordered_key_fields = ['category', 'name', 'course', 'tag', 'org', 'revision']
+    property_names = {
+        'category': 'block_type',
+        'name': 'block_id',
+        'course': 'course',
+        'tag': 'DEPRECATED_TAG',
+        'org': 'org',
+        'revision': 'branch',
+    }
 
     @classmethod
     def asset_db_key(cls, location):
         """
         Returns the database _id and son structured lookup to find the given asset location.
         """
-        dbkey = SON((field_name, getattr(location, field_name)) for field_name in cls.ordered_key_fields)
+        dbkey = SON((field_name,
+                     getattr(location, cls.property_names[field_name])) for field_name in cls.ordered_key_fields)
         if getattr(location, 'deprecated', False):
             content_id = dbkey
         else:
             # NOTE, there's no need to state that run doesn't exist in the negative case b/c access via
             # SON requires equivalence (same keys and values in exact same order)
             dbkey['run'] = location.run
-            content_id = unicode(location.for_branch(None))
+            content_id = six.text_type(location.for_branch(None))
         return content_id, dbkey
 
     def make_id_son(self, fs_entry):
@@ -407,7 +467,7 @@ class MongoContentStore(ContentStore):
             fs_entry: the element returned by self.fs_files.find
         """
         _id_field = fs_entry.get('_id', fs_entry)
-        if isinstance(_id_field, basestring):
+        if isinstance(_id_field, six.string_types):
             return _id_field
         dbkey = SON((field_name, _id_field.get(field_name)) for field_name in self.ordered_key_fields)
         if 'run' in _id_field:
@@ -419,18 +479,19 @@ class MongoContentStore(ContentStore):
 
     def ensure_indexes(self):
         # Index needed thru 'category' by `_get_all_content_for_course` and others. That query also takes a sort
-        # which can be `uploadDate`, `display_name`,
-        create_collection_index(
-            self.fs_files,
-            [
-                ('_id.tag', pymongo.ASCENDING),
-                ('_id.org', pymongo.ASCENDING),
-                ('_id.course', pymongo.ASCENDING),
-                ('_id.category', pymongo.ASCENDING)
-            ],
-            sparse=True,
-            background=True
-        )
+        # which can be `uploadDate`, `displayname`,
+        # TODO: uncomment this line once this index in prod is cleaned up. See OPS-2863 for tracking clean up.
+        #  create_collection_index(
+        #      self.fs_files,
+        #      [
+        #          ('_id.tag', pymongo.ASCENDING),
+        #          ('_id.org', pymongo.ASCENDING),
+        #          ('_id.course', pymongo.ASCENDING),
+        #          ('_id.category', pymongo.ASCENDING)
+        #      ],
+        #      sparse=True,
+        #      background=True
+        #  )
         create_collection_index(
             self.fs_files,
             [
@@ -476,7 +537,7 @@ class MongoContentStore(ContentStore):
             [
                 ('_id.org', pymongo.ASCENDING),
                 ('_id.course', pymongo.ASCENDING),
-                ('display_name', pymongo.ASCENDING)
+                ('displayname', pymongo.ASCENDING)
             ],
             sparse=True,
             background=True
@@ -496,7 +557,7 @@ class MongoContentStore(ContentStore):
             [
                 ('content_son.org', pymongo.ASCENDING),
                 ('content_son.course', pymongo.ASCENDING),
-                ('display_name', pymongo.ASCENDING)
+                ('displayname', pymongo.ASCENDING)
             ],
             sparse=True,
             background=True

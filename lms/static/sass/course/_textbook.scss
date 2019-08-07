@@ -1,7 +1,8 @@
 div.book-wrapper {
-  max-width: 1150px;
+  max-width: map-get($container-max-widths, xl);
   margin: 0 auto;
   width: 100%;
+
   /*background-color: $white;*/
 
   #open_close_accordion {
@@ -20,7 +21,9 @@ div.book-wrapper {
   section.book-sidebar {
     @extend .sidebar;
     @extend .tran;
+
     @include box-sizing(border-box);
+
     padding: ($baseline/2) 0;
     border-radius: 3px 0 0 3px;
     border: 1px solid $gray-l3;
@@ -28,7 +31,7 @@ div.book-wrapper {
     width: 180px;
 
     #booknav {
-        list-style: none;
+      list-style: none;
 
       .chapter {
         line-height: 1.4em;
@@ -36,13 +39,15 @@ div.book-wrapper {
 
       .page-number {
         @include float(right);
+
         width: 12%;
-        font-size: .8em;
+        font-size: 0.8em;
         line-height: 2.1em;
         text-align: right;
         color: #9a9a9a;
-        opacity: 0.0;
-        @include transition(opacity .15s linear 0s);
+        opacity: 0;
+
+        @include transition(opacity 0.15s linear 0s);
       }
 
       li {
@@ -52,22 +57,22 @@ div.book-wrapper {
 
         a {
           @include clearfix();
+
           padding: 0;
-          color: $uxpl-blue-base;
+          color: theme-color("primary");
 
           &:hover, &:focus {
             background-color: transparent;
             color: $uxpl-blue-hover-active;
 
             .page-number {
-              opacity: 1.0;
+              opacity: 1;
             }
           }
         }
 
         div.hitarea {
           background-image: url('#{$static-path}/images/treeview-default.gif');
-
           position: relative;
           top: 4px;
 
@@ -79,8 +84,8 @@ div.book-wrapper {
 
         ul {
           background: none;
-          margin-top: lh(.25);
-          padding-top: lh(.25);
+          margin-top: lh(0.25);
+          padding-top: lh(0.25);
 
           li {
             padding-bottom: ($baseline/2);
@@ -97,6 +102,7 @@ div.book-wrapper {
 
   .book {
     @extend .content;
+
     padding: 0;
     width:76%;
 
@@ -105,6 +111,7 @@ div.book-wrapper {
 
       a {
         @extend .block-link;
+
         padding: 0 lh();
       }
 
@@ -118,21 +125,25 @@ div.book-wrapper {
           z-index: 1;
 
           a {
-            background-color: rgba(#000, .7);
+            background-color: rgba(#000, 0.7);
             background-position: center;
             background-repeat: no-repeat;
+
             @include box-sizing(border-box);
+
             display: table;
             height: 100%;
-            opacity: 0.0;
+            opacity: 0;
             filter: alpha(opacity=0);
             text-indent: -9999px;
+
             @include transition(none);
+
             vertical-align: middle;
             width: 100%;
 
             &:hover, &:focus {
-              opacity: 1.0;
+              opacity: 1;
             }
 
             &.is-disabled {
@@ -183,19 +194,19 @@ div.book-wrapper {
 
       div {
         text-align: left;
-      	line-height: 1.6em;
-      	margin: ($baseline/4);
+        line-height: 1.6em;
+        margin: ($baseline/4);
 
-	.Paragraph, h2 {
-	   margin-top: ($baseline/2);
-	}
+        .Paragraph, h2 {
+          margin-top: ($baseline/2);
+        }
       }
     }
   }
 
   &.closed {
     section.book-sidebar {
-      width: flex-grid(.6);
+      width: flex-grid(0.6);
 
       header#open_close_accordion {
         padding: 0;

@@ -16,12 +16,16 @@ To start this stub server on its own from Vagrant:
 3.) Locally, try accessing http://localhost:8031/ and see that
     you get "Unused url" message inside the browser.
 """
-from .http import StubHttpRequestHandler, StubHttpService
+from __future__ import absolute_import
+
 import json
 import time
-import requests
-from urlparse import urlparse
 from collections import OrderedDict
+
+import requests
+from six.moves.urllib.parse import urlparse
+
+from .http import StubHttpRequestHandler, StubHttpService
 
 
 class StubYouTubeHandler(StubHttpRequestHandler):

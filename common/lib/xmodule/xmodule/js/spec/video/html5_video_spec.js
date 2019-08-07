@@ -1,12 +1,18 @@
 (function(undefined) {
     describe('Video HTML5Video', function() {
         var STATUS = window.STATUS;
-        var state, oldOTBD, playbackRates = [0.75, 1.0, 1.25, 1.5];
+        var state,
+            oldOTBD,
+            playbackRates = [0.75, 1.0, 1.25, 1.5],
+            describeInfo,
+            POSTER_URL = '/media/video-images/poster.png';
 
         beforeEach(function() {
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice').and.returnValue(null);
+
+            state = jasmine.initializePlayer('video_html5.html');
         });
 
         afterEach(function() {
@@ -17,10 +23,8 @@
             window.onTouchBasedDevice = oldOTBD;
         });
 
-        describe('on non-Touch devices', function() {
+        describeInfo = new jasmine.DescribeInfo('on non-Touch devices ', function() {
             beforeEach(function() {
-                state = jasmine.initializePlayer('video_html5.html');
-
                 state.videoPlayer.player.config.events.onReady = jasmine.createSpy('onReady');
             });
 
@@ -44,15 +48,6 @@
                         it('player state was changed', function(done) {
                             jasmine.waitUntil(function() {
                                 return state.videoPlayer.player.getPlayerState() === STATUS.PLAYING;
-                            }).always(done);
-                        });
-
-                        // Flaky. Checking the parameters of calls to onStateChange() will likely be more reliable.
-                        xit('callback was not called', function(done) {
-                            jasmine.waitUntil(function() {
-                                return state.videoPlayer.player.getPlayerState() !== STATUS.PAUSED;
-                            }).then(function() {
-                                expect(state.videoPlayer.player.callStateChangeCallback).not.toHaveBeenCalled();
                             }).always(done);
                         });
                     });
@@ -104,8 +99,9 @@
                         jasmine.waitUntil(function() {
                             return state.videoPlayer.player.getPlayerState() !== STATUS.PAUSED;
                         }).then(function() {
-                            expect(state.videoPlayer.player.getPlayerState())
-                                .toBe(STATUS.BUFFERING);
+                            expect([STATUS.BUFFERING, STATUS.PLAYING]).toContain(
+                                state.videoPlayer.player.getPlayerState()
+                            );
                         }).always(done);
                     });
 
@@ -158,8 +154,7 @@
                 describe('[loadedmetadata]', function() {
                     it(
                         'player state was changed, start/end was defined, ' +
-                        'onReady called', function(done)
-                    {
+                        'onReady called', function(done) {
                         jasmine.fireEvent(state.videoPlayer.player.video, 'loadedmetadata');
                         jasmine.waitUntil(function() {
                             return state.videoPlayer.player.getPlayerState() !== STATUS.UNSTARTED;
@@ -218,7 +213,7 @@
                         }).done(done);
                     });
 
-                    it('set new inccorrect values', function() {
+                    it('set new incorrect values', function() {
                         var seek = state.videoPlayer.player.video.currentTime;
                         state.videoPlayer.player.seekTo(-50);
                         expect(state.videoPlayer.player.getCurrentTime()).toBe(seek);
@@ -319,6 +314,53 @@
                     }).done(done);
                 });
             });
+
+            describe('poster', function() {
+                it('has url in player config', function() {
+                    expect(state.videoPlayer.player.config.poster).toEqual(POSTER_URL);
+                    expect(state.videoPlayer.player.videoEl).toHaveAttrs({
+                        poster: POSTER_URL
+                    });
+                });
+            });
+        });
+
+        describe('non-hls encoding', function() {
+            beforeEach(function(done) {
+                state = jasmine.initializePlayer('video_html5.html');
+                done();
+            });
+            jasmine.getEnv().describe(describeInfo.description, describeInfo.specDefinitions);
+        });
+
+        describe('hls encoding', function() {
+            beforeEach(function(done) {
+                state = jasmine.initializeHLSPlayer();
+                done();
+            });
+            jasmine.getEnv().describe(describeInfo.description, describeInfo.specDefinitions);
+        });
+
+        it('does not show poster for html5 video if url is not present', function() {
+            state = jasmine.initializePlayer(
+                'video_html5.html',
+                {
+                    poster: null
+                }
+            );
+            expect(state.videoPlayer.player.config.poster).toEqual(null);
+            expect(state.videoPlayer.player.videoEl).not.toHaveAttr('poster');
+        });
+
+        it('does not show poster for hls video if url is not present', function() {
+            state = jasmine.initializePlayer(
+                'video_hls.html',
+                {
+                    poster: null
+                }
+            );
+            expect(state.videoPlayer.player.config.poster).toEqual(null);
+            expect(state.videoPlayer.player.videoEl).not.toHaveAttr('poster');
         });
 
         it('native controls are used on  iPhone', function() {

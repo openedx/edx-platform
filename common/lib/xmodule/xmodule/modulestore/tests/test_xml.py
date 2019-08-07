@@ -2,18 +2,22 @@
 Tests around our XML modulestore, including importing
 well-formed and not-well-formed XML.
 """
+from __future__ import absolute_import
+
 import os.path
-import unittest
 from glob import glob
-from mock import patch, Mock
 
-from xmodule.modulestore.xml import XMLModuleStore
+from django.test import TestCase
+from mock import Mock, patch
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import CourseLocator
+
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.x_module import XModuleMixin
-
-from xmodule.tests import DATA_DIR
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.test_modulestore import check_has_course_method
+from xmodule.modulestore.tests.utils import TILDA_FILES_DICT, add_temp_files_from_dict, remove_temp_files_from_list
+from xmodule.modulestore.xml import XMLModuleStore
+from xmodule.tests import DATA_DIR
+from xmodule.x_module import XModuleMixin
 
 
 def glob_tildes_at_end(path):
@@ -27,10 +31,11 @@ def glob_tildes_at_end(path):
     return no_tildes + with_tildes
 
 
-class TestXMLModuleStore(unittest.TestCase):
+class TestXMLModuleStore(TestCase):
     """
     Test around the XML modulestore
     """
+
     @patch('xmodule.tabs.CourseTabList.initialize_default', Mock())
     def test_unicode_chars_in_xml_content(self):
         # edX/full/6.002_Spring_2012 has non-ASCII chars, and during
@@ -51,18 +56,8 @@ class TestXMLModuleStore(unittest.TestCase):
             load_error_modules=False)
 
         # Look up the errors during load. There should be none.
-        errors = modulestore.get_course_errors(SlashSeparatedCourseKey("edX", "toy", "2012_Fall"))
+        errors = modulestore.get_course_errors(CourseKey.from_string("edX/toy/2012_Fall"))
         assert errors == []
-
-    @patch("xmodule.modulestore.xml.glob.glob", side_effect=glob_tildes_at_end)
-    def test_tilde_files_ignored(self, _fake_glob):
-        modulestore = XMLModuleStore(DATA_DIR, source_dirs=['tilde'], load_error_modules=False)
-        about_location = SlashSeparatedCourseKey('edX', 'tilde', '2012_Fall').make_usage_key(
-            'about', 'index',
-        )
-        about_module = modulestore.get_item(about_location)
-        self.assertIn("GREEN", about_module.data)
-        self.assertNotIn("RED", about_module.data)
 
     def test_get_courses_for_wiki(self):
         """
@@ -78,7 +73,7 @@ class TestXMLModuleStore(unittest.TestCase):
         self.assertEqual(len(course_locations), 0)
 
         # now set toy course to share the wiki with simple course
-        toy_course = store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
+        toy_course = store.get_course(CourseKey.from_string('edX/toy/2012_Fall'))
         toy_course.wiki_slug = 'simple'
 
         course_locations = store.get_courses_for_wiki('toy')
@@ -87,7 +82,7 @@ class TestXMLModuleStore(unittest.TestCase):
         course_locations = store.get_courses_for_wiki('simple')
         self.assertEqual(len(course_locations), 2)
         for course_number in ['toy', 'simple']:
-            self.assertIn(SlashSeparatedCourseKey('edX', course_number, '2012_Fall'), course_locations)
+            self.assertIn(CourseKey.from_string('/'.join(['edX', course_number, '2012_Fall'])), course_locations)
 
     def test_has_course(self):
         """
@@ -95,8 +90,8 @@ class TestXMLModuleStore(unittest.TestCase):
         """
         check_has_course_method(
             XMLModuleStore(DATA_DIR, source_dirs=['toy', 'simple']),
-            SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'),
-            locator_key_fields=SlashSeparatedCourseKey.KEY_FIELDS
+            CourseKey.from_string('edX/toy/2012_Fall'),
+            locator_key_fields=CourseLocator.KEY_FIELDS
         )
 
     def test_branch_setting(self):
@@ -138,9 +133,28 @@ class TestXMLModuleStore(unittest.TestCase):
         self.assertIsNotNone(parent, "get_parent failed to return a value")
         parent_loc = course_key.make_usage_key('vertical', 'vertical_test')
         self.assertEqual(parent.location, parent_loc)
-        self.assertIn(shared_item, parent.get_children())
+        self.assertIn(shared_item.location, [x.location for x in parent.get_children()])
         # ensure it's still a child of the other parent even tho it doesn't claim the other parent as its parent
         other_parent_loc = course_key.make_usage_key('vertical', 'zeta')
         other_parent = store.get_item(other_parent_loc)
         # children rather than get_children b/c the instance returned by get_children != shared_item
         self.assertIn(shared_item_loc, other_parent.children)
+
+
+class TestModuleStoreIgnore(TestXMLModuleStore):
+    course_dir = DATA_DIR / "course_ignore"
+
+    def setUp(self):
+        super(TestModuleStoreIgnore, self).setUp()
+        self.addCleanup(remove_temp_files_from_list, list(TILDA_FILES_DICT.keys()), self.course_dir / "static")
+        add_temp_files_from_dict(TILDA_FILES_DICT, self.course_dir / "static")
+
+    @patch("xmodule.modulestore.xml.glob.glob", side_effect=glob_tildes_at_end)
+    def test_tilde_files_ignored(self, _fake_glob):
+        modulestore = XMLModuleStore(DATA_DIR, source_dirs=['course_ignore'], load_error_modules=False)
+        about_location = CourseKey.from_string('edX/course_ignore/2014_Fall').make_usage_key(
+            'about', 'index',
+        )
+        about_module = modulestore.get_item(about_location)
+        self.assertIn("GREEN", about_module.data)
+        self.assertNotIn("RED", about_module.data)

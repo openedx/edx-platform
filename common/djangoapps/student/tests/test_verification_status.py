@@ -1,41 +1,46 @@
 """Tests for per-course verification status on the dashboard. """
-from datetime import datetime, timedelta
+from __future__ import absolute_import
 
 import unittest
+from datetime import datetime, timedelta
+
 import ddt
-from mock import patch
-from nose.plugins.attrib import attr
-from pytz import UTC
-from django.core.urlresolvers import reverse
+import six
 from django.conf import settings
 from django.test import override_settings
+from django.urls import reverse
+from mock import patch
+from pytz import UTC
 
+from course_modes.tests.factories import CourseModeFactory
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from student.helpers import (
-    VERIFY_STATUS_NEED_TO_VERIFY,
-    VERIFY_STATUS_SUBMITTED,
-    VERIFY_STATUS_RESUBMITTED,
     VERIFY_STATUS_APPROVED,
     VERIFY_STATUS_MISSED_DEADLINE,
-    VERIFY_STATUS_NEED_TO_REVERIFY
+    VERIFY_STATUS_NEED_TO_REVERIFY,
+    VERIFY_STATUS_NEED_TO_VERIFY,
+    VERIFY_STATUS_RESUBMITTED,
+    VERIFY_STATUS_SUBMITTED
 )
-
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from course_modes.tests.factories import CourseModeFactory
-from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=3)
 @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
 class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
     """Tests for per-course verification status on the dashboard. """
 
-    PAST = datetime.now(UTC) - timedelta(days=5)
-    FUTURE = datetime.now(UTC) + timedelta(days=5)
+    PAST = 'past'
+    FUTURE = 'future'
+    DATES = {
+        PAST: datetime.now(UTC) - timedelta(days=5),
+        FUTURE: datetime.now(UTC) + timedelta(days=5),
+        None: None,
+    }
 
     URLCONF_MODULES = ['verify_student.urls']
 
@@ -92,14 +97,14 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         self._assert_course_verification_status(VERIFY_STATUS_NEED_TO_VERIFY)
 
     def test_need_to_verify_expiration(self):
-        self._setup_mode_and_enrollment(self.FUTURE, "verified")
+        self._setup_mode_and_enrollment(self.DATES[self.FUTURE], "verified")
         response = self.client.get(self.dashboard_url)
         self.assertContains(response, self.BANNER_ALT_MESSAGES[VERIFY_STATUS_NEED_TO_VERIFY])
         self.assertContains(response, "You only have 4 days left to verify for this course.")
 
     @ddt.data(None, FUTURE)
     def test_waiting_approval(self, expiration):
-        self._setup_mode_and_enrollment(expiration, "verified")
+        self._setup_mode_and_enrollment(self.DATES[expiration], "verified")
 
         # The student has submitted a photo verification
         attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
@@ -111,7 +116,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
 
     @ddt.data(None, FUTURE)
     def test_fully_verified(self, expiration):
-        self._setup_mode_and_enrollment(expiration, "verified")
+        self._setup_mode_and_enrollment(self.DATES[expiration], "verified")
 
         # The student has an approved verification
         attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
@@ -128,7 +133,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
 
     def test_missed_verification_deadline(self):
         # Expiration date in the past
-        self._setup_mode_and_enrollment(self.PAST, "verified")
+        self._setup_mode_and_enrollment(self.DATES[self.PAST], "verified")
 
         # The student does NOT have an approved verification
         # so the status should show that the student missed the deadline.
@@ -136,7 +141,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
 
     def test_missed_verification_deadline_verification_was_expired(self):
         # Expiration date in the past
-        self._setup_mode_and_enrollment(self.PAST, "verified")
+        self._setup_mode_and_enrollment(self.DATES[self.PAST], "verified")
 
         # Create a verification, but the expiration date of the verification
         # occurred before the deadline.
@@ -144,7 +149,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         attempt.mark_ready()
         attempt.submit()
         attempt.approve()
-        attempt.created_at = self.PAST - timedelta(days=900)
+        attempt.created_at = self.DATES[self.PAST] - timedelta(days=900)
         attempt.save()
 
         # The student didn't have an approved verification at the deadline,
@@ -153,14 +158,14 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
 
     def test_missed_verification_deadline_but_later_verified(self):
         # Expiration date in the past
-        self._setup_mode_and_enrollment(self.PAST, "verified")
+        self._setup_mode_and_enrollment(self.DATES[self.PAST], "verified")
 
         # Successfully verify, but after the deadline has already passed
         attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
         attempt.mark_ready()
         attempt.submit()
         attempt.approve()
-        attempt.created_at = self.PAST - timedelta(days=900)
+        attempt.created_at = self.DATES[self.PAST] - timedelta(days=900)
         attempt.save()
 
         # The student didn't have an approved verification at the deadline,
@@ -169,7 +174,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
 
     def test_verification_denied(self):
         # Expiration date in the future
-        self._setup_mode_and_enrollment(self.FUTURE, "verified")
+        self._setup_mode_and_enrollment(self.DATES[self.FUTURE], "verified")
 
         # Create a verification with the specified status
         attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
@@ -183,7 +188,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
 
     def test_verification_error(self):
         # Expiration date in the future
-        self._setup_mode_and_enrollment(self.FUTURE, "verified")
+        self._setup_mode_and_enrollment(self.DATES[self.FUTURE], "verified")
 
         # Create a verification with the specified status
         attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
@@ -197,7 +202,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
     @override_settings(VERIFY_STUDENT={"DAYS_GOOD_FOR": 5, "EXPIRING_SOON_WINDOW": 10})
     def test_verification_will_expire_by_deadline(self):
         # Expiration date in the future
-        self._setup_mode_and_enrollment(self.FUTURE, "verified")
+        self._setup_mode_and_enrollment(self.DATES[self.FUTURE], "verified")
 
         # Create a verification attempt that:
         # 1) Is current (submitted in the last year)
@@ -214,7 +219,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
     @override_settings(VERIFY_STUDENT={"DAYS_GOOD_FOR": 5, "EXPIRING_SOON_WINDOW": 10})
     def test_reverification_submitted_with_current_approved_verificaiton(self):
         # Expiration date in the future
-        self._setup_mode_and_enrollment(self.FUTURE, "verified")
+        self._setup_mode_and_enrollment(self.DATES[self.FUTURE], "verified")
 
         # Create a verification attempt that is approved but expiring soon
         attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
@@ -237,7 +242,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
 
     def test_verification_occurred_after_deadline(self):
         # Expiration date in the past
-        self._setup_mode_and_enrollment(self.PAST, "verified")
+        self._setup_mode_and_enrollment(self.DATES[self.PAST], "verified")
 
         # The deadline has passed, and we've asked the student
         # to reverify (through the support team).
@@ -251,7 +256,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
     def test_with_two_verifications(self):
         # checking if a user has two verification and but most recent verification course deadline is expired
 
-        self._setup_mode_and_enrollment(self.FUTURE, "verified")
+        self._setup_mode_and_enrollment(self.DATES[self.FUTURE], "verified")
 
         # The student has an approved verification
         attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
@@ -275,7 +280,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         CourseModeFactory.create(
             course_id=course2.id,
             mode_slug="verified",
-            expiration_datetime=self.PAST
+            expiration_datetime=self.DATES[self.PAST]
         )
         CourseEnrollmentFactory(
             course_id=course2.id,
@@ -357,7 +362,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         response = self.client.get(self.dashboard_url)
 
         # Sanity check: verify that the course is on the page
-        self.assertContains(response, unicode(self.course.id))
+        self.assertContains(response, six.text_type(self.course.id))
 
         # Verify that the correct banner is rendered on the dashboard
         alt_text = self.BANNER_ALT_MESSAGES.get(status)
@@ -367,7 +372,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         # Verify that the correct banner color is rendered
         self.assertContains(
             response,
-            "<article class=\"course {}\">".format(self.MODE_CLASSES[status])
+            "<article class=\"course {}\"".format(self.MODE_CLASSES[status])
         )
 
         # Verify that the correct copy is rendered on the dashboard

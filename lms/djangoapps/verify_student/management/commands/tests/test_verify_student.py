@@ -3,20 +3,22 @@ Tests for django admin commands in the verify_student module
 
 Lots of imports from verify_student's model tests, since they cover similar ground
 """
+from __future__ import absolute_import
+
 import boto
-from nose.tools import assert_equals
+from django.conf import settings
+from django.core.management import call_command
+from django.test import TestCase
 from mock import patch
 
-from django.test import TestCase
-from django.conf import settings
-
 from common.test.utils import MockS3Mixin
-from student.tests.factories import UserFactory
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from django.core.management import call_command
 from lms.djangoapps.verify_student.tests.test_models import (
-    mock_software_secure_post, mock_software_secure_post_error, FAKE_SETTINGS,
+    FAKE_SETTINGS,
+    mock_software_secure_post,
+    mock_software_secure_post_error
 )
+from student.tests.factories import UserFactory
 
 
 # Lots of patching to stub in our own settings, and HTTP posting
@@ -57,8 +59,8 @@ class TestVerifyStudentCommand(MockS3Mixin, TestCase):
         with patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post_error):
             self.create_and_submit("RetryRick")
         # check to make sure we had two successes and two failures; otherwise we've got problems elsewhere
-        assert_equals(len(SoftwareSecurePhotoVerification.objects.filter(status="submitted")), 1)
-        assert_equals(len(SoftwareSecurePhotoVerification.objects.filter(status='must_retry')), 2)
+        assert len(SoftwareSecurePhotoVerification.objects.filter(status="submitted")) == 1
+        assert len(SoftwareSecurePhotoVerification.objects.filter(status='must_retry')) == 2
         call_command('retry_failed_photo_verifications')
         attempts_to_retry = SoftwareSecurePhotoVerification.objects.filter(status='must_retry')
-        assert_equals(bool(attempts_to_retry), False)
+        assert not attempts_to_retry

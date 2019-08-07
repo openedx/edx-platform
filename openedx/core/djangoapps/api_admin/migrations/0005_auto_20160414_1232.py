@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
-from django.db import migrations, models
 from django.conf import settings
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='apiaccessrequest',
             name='user',
-            field=models.OneToOneField(related_name='api_access_request', to=settings.AUTH_USER_MODEL),
+            field=models.OneToOneField(related_name='api_access_request', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
         ),
     ]

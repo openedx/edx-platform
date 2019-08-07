@@ -1,5 +1,8 @@
 """ Handlers for OpenID Connect provider. """
 
+from __future__ import absolute_import
+
+import six
 from django.conf import settings
 from django.core.cache import cache
 
@@ -7,9 +10,8 @@ from courseware.access import has_access
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.models import UserPreference
-from student.models import anonymous_id_for_user
-from student.models import UserProfile
-from student.roles import GlobalStaff, CourseStaffRole, CourseInstructorRole
+from student.models import UserProfile, anonymous_id_for_user
+from student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
 
 
 class OpenIDHandler(object):
@@ -54,7 +56,7 @@ class ProfileHandler(object):
 
     def scope_profile(self, _data):
         """ Add specialized claims. """
-        return ['name', 'locale']
+        return ['name', 'locale', 'user_tracking_id']
 
     def claim_name(self, data):
         """ User displayable full name. """
@@ -76,6 +78,10 @@ class ProfileHandler(object):
             language = settings.LANGUAGE_CODE
 
         return language
+
+    def claim_user_tracking_id(self, data):
+        """ User tracking ID. """
+        return data['user'].id
 
 
 class CourseAccessHandler(object):
@@ -206,7 +212,7 @@ class CourseAccessHandler(object):
             if not GlobalStaff().has_user(user):
                 course_keys = [course_key for course_key in course_keys if has_access(user, access_type, course_key)]
 
-            course_ids = [unicode(course_key) for course_key in course_keys]
+            course_ids = [six.text_type(course_key) for course_key in course_keys]
 
             cache.set(key, course_ids, self.COURSE_CACHE_TIMEOUT)
 

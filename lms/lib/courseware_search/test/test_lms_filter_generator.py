@@ -1,13 +1,16 @@
 """
 Tests for the lms_filter_generator
 """
-from mock import patch, Mock
+from __future__ import absolute_import
 
-from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from student.tests.factories import UserFactory
-from student.models import CourseEnrollment
+import six
+from mock import Mock, patch
+
 from lms.lib.courseware_search.lms_filter_generator import LmsSearchFilterGenerator
+from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
@@ -63,8 +66,8 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
         field_dictionary, filter_dictionary, _ = LmsSearchFilterGenerator.generate_field_filters(user=self.user)
 
         self.assertIn('start_date', filter_dictionary)
-        self.assertIn(unicode(self.courses[0].id), field_dictionary['course'])
-        self.assertIn(unicode(self.courses[1].id), field_dictionary['course'])
+        self.assertIn(six.text_type(self.courses[0].id), field_dictionary['course'])
+        self.assertIn(six.text_type(self.courses[1].id), field_dictionary['course'])
 
     def test_course_id_provided(self):
         """
@@ -72,11 +75,11 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
         """
         field_dictionary, filter_dictionary, _ = LmsSearchFilterGenerator.generate_field_filters(
             user=self.user,
-            course_id=unicode(self.courses[0].id)
+            course_id=six.text_type(self.courses[0].id)
         )
 
         self.assertIn('start_date', filter_dictionary)
-        self.assertEqual(unicode(self.courses[0].id), field_dictionary['course'])
+        self.assertEqual(six.text_type(self.courses[0].id), field_dictionary['course'])
 
     def test_user_not_provided(self):
         """
@@ -109,7 +112,7 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
         field_dictionary, _, exclude_dictionary = LmsSearchFilterGenerator.generate_field_filters(user=self.user)
         self.assertNotIn('org', exclude_dictionary)
         self.assertIn('org', field_dictionary)
-        self.assertEqual('TestSiteX', field_dictionary['org'])
+        self.assertEqual(['TestSiteX'], field_dictionary['org'])
 
     @patch(
         'openedx.core.djangoapps.site_configuration.helpers.get_all_orgs',
@@ -134,4 +137,4 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
         field_dictionary, _, exclude_dictionary = LmsSearchFilterGenerator.generate_field_filters(user=self.user)
         self.assertNotIn('org', exclude_dictionary)
         self.assertIn('org', field_dictionary)
-        self.assertEqual('TestSite3', field_dictionary['org'])
+        self.assertEqual(['TestSite3'], field_dictionary['org'])

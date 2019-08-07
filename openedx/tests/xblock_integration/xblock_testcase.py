@@ -34,29 +34,28 @@ Our next steps would be to:
 * Move more blocks out of the platform, and more tests into the
   blocks themselves.
 """
+from __future__ import absolute_import, print_function
 
-import HTMLParser
 import collections
-from datetime import datetime, timedelta
 import json
-import mock
 import sys
-import pytz
 import unittest
+from datetime import datetime, timedelta
 
+import mock
+import pytz
+import six
+import six.moves.html_parser  # pylint: disable=import-error
 from bs4 import BeautifulSoup
-
+from django.conf import settings
+from django.urls import reverse
+from six.moves import range
 from xblock.plugin import Plugin
 
-from django.conf import settings
-from django.core.urlresolvers import reverse
-
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-
-from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
-
 import lms.djangoapps.lms_xblock.runtime
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class XBlockEventTestMixin(object):
@@ -276,10 +275,10 @@ class XBlockScenarioTestCaseMixin(object):
                     )
                     cls.xblocks[xblock_config['urlname']] = xblock
 
-                scenario_url = unicode(reverse(
+                scenario_url = six.text_type(reverse(
                     'courseware_section',
                     kwargs={
-                        'course_id': unicode(cls.course.id),
+                        'course_id': six.text_type(cls.course.id),
                         'chapter': "ch_" + chapter_config['urlname'],
                         'section': "sec_" + chapter_config['urlname']
                     }
@@ -370,19 +369,13 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
             raise unittest.SkipTest('Test only valid in lms')
         super(XBlockTestCase, cls).setUpClass()
 
-    def setUp(self):
-        """
-        Call setups of all parents
-        """
-        super(XBlockTestCase, self).setUp()
-
     def get_handler_url(self, handler, xblock_name=None):
         """
         Get url for the specified xblock handler
         """
         return reverse('xblock_handler', kwargs={
-            'course_id': unicode(self.course.id),
-            'usage_id': unicode(
+            'course_id': six.text_type(self.course.id),
+            'usage_id': six.text_type(
                 self.course.id.make_usage_key('done', xblock_name)
             ),
             'handler': handler,
@@ -401,13 +394,13 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
         try:
             ajax_response.data = json.loads(resp.content)
         except ValueError:
-            print "Invalid JSON response"
-            print "(Often a redirect if e.g. not logged in)"
-            print >>sys.stderr, "Could not load JSON from AJAX call"
-            print >>sys.stderr, "Status:", resp.status_code
-            print >>sys.stderr, "URL:", url
-            print >>sys.stderr, "Block", block_urlname
-            print >>sys.stderr, "Response", repr(resp.content)
+            print("Invalid JSON response")
+            print("(Often a redirect if e.g. not logged in)")
+            print("Could not load JSON from AJAX call", file=sys.stderr)
+            print("Status:", resp.status_code, file=sys.stderr)
+            print("URL:", url, file=sys.stderr)
+            print("Block", block_urlname, file=sys.stderr)
+            print("Response", repr(resp.content), file=sys.stderr)
             raise
         ajax_response.status_code = resp.status_code
         return ajax_response
@@ -422,9 +415,9 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
                 if block["urlname"] == xblock_name:
                     xblock_type = block["blocktype"]
 
-        key = unicode(self.course.id.make_usage_key(xblock_type, xblock_name))
+        key = six.text_type(self.course.id.make_usage_key(xblock_type, xblock_name))
         return reverse('xblock_handler', kwargs={
-            'course_id': unicode(self.course.id),
+            'course_id': six.text_type(self.course.id),
             'usage_id': key,
             'handler': handler,
             'suffix': ''
@@ -458,23 +451,23 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
         usage_id = self.xblocks[urlname].scope_ids.usage_id
         # First, we get out our <div>
         soup_html = BeautifulSoup(content)
-        xblock_html = unicode(soup_html.find(id="seq_contents_0"))
+        xblock_html = six.text_type(soup_html.find(id="seq_contents_0"))
         # Now, we get out the text of the <div>
         try:
             escaped_html = xblock_html.split('<')[1].split('>')[1]
         except IndexError:
-            print >>sys.stderr, "XBlock page could not render"
-            print >>sys.stderr, "(Often, a redirect if e.g. not logged in)"
-            print >>sys.stderr, "URL Name:", repr(urlname)
-            print >>sys.stderr, "Usage ID", repr(usage_id)
-            print >>sys.stderr, "Content", repr(content)
-            print >>sys.stderr, "Split 1", repr(xblock_html.split('<'))
-            print >>sys.stderr, "Dice 1:", repr(xblock_html.split('<')[1])
-            print >> sys.stderr, "Split 2", repr(xblock_html.split('<')[1].split('>'))
-            print >> sys.stderr, "Dice 2", repr(xblock_html.split('<')[1].split('>')[1])
+            print("XBlock page could not render", file=sys.stderr)
+            print("(Often, a redirect if e.g. not logged in)", file=sys.stderr)
+            print("URL Name:", repr(urlname), file=sys.stderr)
+            print("Usage ID", repr(usage_id), file=sys.stderr)
+            print("Content", repr(content), file=sys.stderr)
+            print("Split 1", repr(xblock_html.split('<')), file=sys.stderr)
+            print("Dice 1:", repr(xblock_html.split('<')[1]), file=sys.stderr)
+            print("Split 2", repr(xblock_html.split('<')[1].split('>')), file=sys.stderr)
+            print("Dice 2", repr(xblock_html.split('<')[1].split('>')[1]), file=sys.stderr)
             raise
         # Finally, we unescape the contents
-        decoded_html = HTMLParser.HTMLParser().unescape(escaped_html).strip()
+        decoded_html = six.moves.html_parser.HTMLParser().unescape(escaped_html).strip()
 
         return decoded_html
 

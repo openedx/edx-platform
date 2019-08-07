@@ -70,7 +70,7 @@
     //     close_text: text that should be displayed when the collapsible
     //         is closed.
     function toggleFull(event, open_text, close_text) {
-        var el, new_text, parent;
+        var $el, new_text, parent;
 
         event.preventDefault();
 
@@ -85,12 +85,12 @@
         }
 
         if ($(event.target).hasClass('full')) {
-            el = parent.find('.full');
+            $el = parent.find('.full');
         } else {
-            el = $(event.target);
+            $el = $(event.target);
         }
 
-        el.text(new_text);
+        $el.text(new_text);
     }
 
     // [function toggleHint]

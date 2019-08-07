@@ -14,11 +14,11 @@ define([
         var editTeamID = 'av',
             DEFAULT_MEMBERSHIP = [
                 {
-                    'user': {
-                        'username': 'frodo',
-                        'profile_image': {
-                            'has_image': true,
-                            'image_url_medium': '/frodo-image-url'
+                    user: {
+                        username: 'frodo',
+                        profile_image: {
+                            has_image: true,
+                            image_url_medium: '/frodo-image-url'
                         }
                     },
                     last_activity_at: '2015-08-21T18:53:01.145Z',
@@ -30,8 +30,7 @@ define([
                 // Confirm delete dialog
                 if (confirm) {
                     $('.action-primary').click();
-                }
-                else {
+                } else {
                     $('.action-secondary').click();
                 }
             },

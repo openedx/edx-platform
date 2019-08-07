@@ -141,15 +141,15 @@
             plugin.destroy();
             expect(state.bumperState.videoEventsBumperPlugin).toBeUndefined();
             expect($.fn.off).toHaveBeenCalledWith({
-                'ready': plugin.onReady,
-                'play': plugin.onPlay,
+                ready: plugin.onReady,
+                play: plugin.onPlay,
                 'ended stop': plugin.onEnded,
-                'skip': plugin.onSkip,
+                skip: plugin.onSkip,
                 'language_menu:show': plugin.onShowLanguageMenu,
                 'language_menu:hide': plugin.onHideLanguageMenu,
                 'captions:show': plugin.onShowCaptions,
                 'captions:hide': plugin.onHideCaptions,
-                'destroy': plugin.destroy
+                destroy: plugin.destroy
             });
         });
     });

@@ -28,10 +28,7 @@
     var img_white = /^(<img\ssrc="(https?:\/\/|\/)[-A-Za-z0-9+&@#\/%?=~_|!:,.;\(\)]+"(\swidth="\d{1,3}")?(\sheight="\d{1,3}")?(\salt="[^"<>]*")?(\stitle="[^"<>]*")?\s?\/?>)$/i;
 
     function sanitizeTag(tag) {
-        if (tag.match(basic_tag_whitelist) || tag.match(a_white) || tag.match(img_white))
-            return tag;
-        else
-            return '';
+        if (tag.match(basic_tag_whitelist) || tag.match(a_white) || tag.match(img_white)) { return tag; } else { return ''; }
     }
 
     // / <summary>
@@ -43,8 +40,7 @@
     // / adapted from CODESNIPPET: A8591DBA-D1D3-11DE-947C-BA5556D89593
     // / </summary>
     function balanceTags(html) {
-        if (html == '')
-            return '';
+        if (html == '') { return ''; }
 
         var re = /<\/?\w+[^>]*(\s|$|>)/g;
         // convert everything to lower case; this makes
@@ -53,8 +49,7 @@
 
         // no HTML tags present? nothing to do; exit now
         var tagcount = (tags || []).length;
-        if (tagcount == 0)
-            return html;
+        if (tagcount == 0) { return html; }
 
         var tagname, tag;
         var ignoredtags = '<p><img><br><li><hr>';
@@ -68,8 +63,7 @@
             tagname = tags[ctag].replace(/<\/?(\w+).*/, '$1');
             // skip any already paired tags
             // and skip tags in our ignore list; assume they're self-closed
-            if (tagpaired[ctag] || ignoredtags.search('<' + tagname + '>') > -1)
-                continue;
+            if (tagpaired[ctag] || ignoredtags.search('<' + tagname + '>') > -1) { continue; }
 
             tag = tags[ctag];
             match = -1;
@@ -85,14 +79,11 @@
                 }
             }
 
-            if (match == -1)
-                needsRemoval = tagremove[ctag] = true; // mark for removal
-            else
-                tagpaired[match] = true; // mark paired
+            if (match == -1) { needsRemoval = tagremove[ctag] = true; } // mark for removal
+            else { tagpaired[match] = true; } // mark paired
         }
 
-        if (!needsRemoval)
-            return html;
+        if (!needsRemoval) { return html; }
 
         // delete all orphaned tags from the string
 
@@ -104,4 +95,4 @@
         });
         return html;
     }
-})();
+}());

@@ -1,22 +1,27 @@
 """
 Models for bulk email
 """
-import logging
-import markupsafe
+from __future__ import absolute_import
 
+import logging
+
+import markupsafe
+import six
+from config_models.models import ConfigurationModel
 from django.contrib.auth.models import User
 from django.db import models
+from opaque_keys.edx.django.models import CourseKeyField
+from six import text_type
+from six.moves import zip
 
-from openedx.core.djangoapps.course_groups.models import CourseUserGroup
+from course_modes.models import CourseMode
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_name
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup
+from openedx.core.djangoapps.enrollments.api import validate_course_mode
+from openedx.core.djangoapps.enrollments.errors import CourseModeNotFoundError
 from openedx.core.lib.html_to_text import html_to_text
 from openedx.core.lib.mail_utils import wrap_message
-
-from config_models.models import ConfigurationModel
-from student.roles import CourseStaffRole, CourseInstructorRole
-
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
-
+from student.roles import CourseInstructorRole, CourseStaffRole
 from util.keyword_substitution import substitute_keywords_with_data
 from util.query import use_read_replica_if_available
 
@@ -26,8 +31,10 @@ log = logging.getLogger(__name__)
 class Email(models.Model):
     """
     Abstract base class for common information for an email.
+
+    .. no_pii:
     """
-    sender = models.ForeignKey(User, default=1, blank=True, null=True)
+    sender = models.ForeignKey(User, default=1, blank=True, null=True, on_delete=models.CASCADE)
     slug = models.CharField(max_length=128, db_index=True)
     subject = models.CharField(max_length=128, blank=True)
     html_message = models.TextField(null=True, blank=True)
@@ -45,10 +52,11 @@ SEND_TO_MYSELF = 'myself'
 SEND_TO_STAFF = 'staff'
 SEND_TO_LEARNERS = 'learners'
 SEND_TO_COHORT = 'cohort'
-EMAIL_TARGET_CHOICES = zip(
-    [SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS, SEND_TO_COHORT],
-    ['Myself', 'Staff and instructors', 'All students', 'Specific cohort']
-)
+SEND_TO_TRACK = 'track'
+EMAIL_TARGET_CHOICES = list(zip(
+    [SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS, SEND_TO_COHORT, SEND_TO_TRACK],
+    ['Myself', 'Staff and instructors', 'All students', 'Specific cohort', 'Specific course mode']
+))
 EMAIL_TARGETS = {target[0] for target in EMAIL_TARGET_CHOICES}
 
 
@@ -63,6 +71,8 @@ class Target(models.Model):
     SEND_TO_COHORT), then explicitly call the method on self.cohorttarget, which is created
     by django as part of this inheritance setup. These calls require pylint disable no-member in
     several locations in this class.
+
+    .. no_pii:
     """
     target_type = models.CharField(max_length=64, choices=EMAIL_TARGET_CHOICES)
 
@@ -77,7 +87,9 @@ class Target(models.Model):
         Returns a short display name
         """
         if self.target_type == SEND_TO_COHORT:
-            return self.cohorttarget.short_display()  # pylint: disable=no-member
+            return self.cohorttarget.short_display()
+        elif self.target_type == SEND_TO_TRACK:
+            return self.coursemodetarget.short_display()
         else:
             return self.target_type
 
@@ -86,7 +98,9 @@ class Target(models.Model):
         Returns a long display name
         """
         if self.target_type == SEND_TO_COHORT:
-            return self.cohorttarget.long_display()  # pylint: disable=no-member
+            return self.cohorttarget.long_display()
+        elif self.target_type == SEND_TO_TRACK:
+            return self.coursemodetarget.long_display()
         else:
             return self.get_target_type_display()
 
@@ -99,11 +113,12 @@ class Target(models.Model):
         staff_qset = CourseStaffRole(course_id).users_with_role()
         instructor_qset = CourseInstructorRole(course_id).users_with_role()
         staff_instructor_qset = (staff_qset | instructor_qset)
-        enrollment_qset = User.objects.filter(
+        enrollment_query = models.Q(
             is_active=True,
             courseenrollment__course_id=course_id,
             courseenrollment__is_active=True
         )
+        enrollment_qset = User.objects.filter(enrollment_query)
         if self.target_type == SEND_TO_MYSELF:
             if user_id is None:
                 raise ValueError("Must define self user to send email to self.")
@@ -112,18 +127,29 @@ class Target(models.Model):
         elif self.target_type == SEND_TO_STAFF:
             return use_read_replica_if_available(staff_instructor_qset)
         elif self.target_type == SEND_TO_LEARNERS:
-            return use_read_replica_if_available(enrollment_qset.exclude(id__in=staff_instructor_qset))
+            return use_read_replica_if_available(
+                enrollment_qset.exclude(id__in=staff_instructor_qset)
+            )
         elif self.target_type == SEND_TO_COHORT:
-            return self.cohorttarget.cohort.users.filter(id__in=enrollment_qset)  # pylint: disable=no-member
+            return self.cohorttarget.cohort.users.filter(id__in=enrollment_qset)
+        elif self.target_type == SEND_TO_TRACK:
+            return use_read_replica_if_available(
+                User.objects.filter(
+                    models.Q(courseenrollment__mode=self.coursemodetarget.track.mode_slug)
+                    & enrollment_query
+                )
+            )
         else:
-            raise ValueError("Unrecognized target type {}".format(self.target_type))
+            raise ValueError(u"Unrecognized target type {}".format(self.target_type))
 
 
 class CohortTarget(Target):
     """
     Subclass of Target, specifically referring to a cohort.
+
+    .. no_pii:
     """
-    cohort = models.ForeignKey('course_groups.CourseUserGroup')
+    cohort = models.ForeignKey('course_groups.CourseUserGroup', on_delete=models.CASCADE)
 
     class Meta:
         app_label = "bulk_email"
@@ -131,6 +157,9 @@ class CohortTarget(Target):
     def __init__(self, *args, **kwargs):
         kwargs['target_type'] = SEND_TO_COHORT
         super(CohortTarget, self).__init__(*args, **kwargs)
+
+    def __unicode__(self):
+        return self.short_display()
 
     def short_display(self):
         return "{}-{}".format(self.target_type, self.cohort.name)
@@ -151,17 +180,66 @@ class CohortTarget(Target):
             cohort = get_cohort_by_name(name=cohort_name, course_key=course_id)
         except CourseUserGroup.DoesNotExist:
             raise ValueError(
-                "Cohort {cohort} does not exist in course {course_id}".format(
+                u"Cohort {cohort} does not exist in course {course_id}".format(
                     cohort=cohort_name,
                     course_id=course_id
-                )
+                ).encode('utf8')
             )
         return cohort
+
+
+class CourseModeTarget(Target):
+    """
+    Subclass of Target, specifically for course modes.
+
+    .. no_pii:
+    """
+    track = models.ForeignKey('course_modes.CourseMode', on_delete=models.CASCADE)
+
+    class Meta:
+        app_label = "bulk_email"
+
+    def __init__(self, *args, **kwargs):
+        kwargs['target_type'] = SEND_TO_TRACK
+        super(CourseModeTarget, self).__init__(*args, **kwargs)
+
+    def __unicode__(self):
+        return self.short_display()
+
+    def short_display(self):
+        return "{}-{}".format(self.target_type, self.track.mode_slug)  # pylint: disable=no-member
+
+    def long_display(self):
+        course_mode = self.track
+        long_course_mode_display = u'Course mode: {}'.format(course_mode.mode_display_name)
+        if course_mode.mode_slug not in CourseMode.AUDIT_MODES:
+            mode_currency = u'Currency: {}'.format(course_mode.currency)
+            long_course_mode_display = u'{}, {}'.format(long_course_mode_display, mode_currency)
+        return long_course_mode_display
+
+    @classmethod
+    def ensure_valid_mode(cls, mode_slug, course_id):
+        """
+        Ensures mode_slug is a valid mode for course_id. Will raise an error if invalid.
+        """
+        if mode_slug is None:
+            raise ValueError("Cannot create a CourseModeTarget without specifying a mode_slug.")
+        try:
+            validate_course_mode(six.text_type(course_id), mode_slug, include_expired=True)
+        except CourseModeNotFoundError:
+            raise ValueError(
+                u"Track {track} does not exist in course {course_id}".format(
+                    track=mode_slug,
+                    course_id=course_id
+                ).encode('utf8')
+            )
 
 
 class CourseEmail(Email):
     """
     Stores information for an email to a course.
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "bulk_email"
@@ -179,7 +257,7 @@ class CourseEmail(Email):
     @classmethod
     def create(
             cls, course_id, sender, targets, subject, html_message,
-            text_message=None, template_name=None, from_addr=None, cohort_name=None):
+            text_message=None, template_name=None, from_addr=None):
         """
         Create an instance of CourseEmail.
         """
@@ -189,17 +267,25 @@ class CourseEmail(Email):
 
         new_targets = []
         for target in targets:
-            # split target, to handle cohort:cohort_name
+            # split target, to handle cohort:cohort_name and track:mode_slug
             target_split = target.split(':', 1)
             # Ensure our desired target exists
             if target_split[0] not in EMAIL_TARGETS:
-                fmt = 'Course email being sent to unrecognized target: "{target}" for "{course}", subject "{subject}"'
-                msg = fmt.format(target=target, course=course_id, subject=subject)
+                fmt = u'Course email being sent to unrecognized target: "{target}" for "{course}", subject "{subject}"'
+                msg = fmt.format(target=target, course=course_id, subject=subject).encode('utf8')
                 raise ValueError(msg)
             elif target_split[0] == SEND_TO_COHORT:
                 # target_split[1] will contain the cohort name
                 cohort = CohortTarget.ensure_valid_cohort(target_split[1], course_id)
                 new_target, _ = CohortTarget.objects.get_or_create(target_type=target_split[0], cohort=cohort)
+            elif target_split[0] == SEND_TO_TRACK:
+                # target_split[1] contains the desired mode slug
+                CourseModeTarget.ensure_valid_mode(target_split[1], course_id)
+
+                # There could exist multiple CourseModes that match this query, due to differing currency types.
+                # The currencies do not affect user lookup though, so we can just use the first result.
+                mode = CourseMode.objects.filter(course_id=course_id, mode_slug=target_split[1])[0]
+                new_target, _ = CourseModeTarget.objects.get_or_create(target_type=target_split[0], track=mode)
             else:
                 new_target, _ = Target.objects.get_or_create(target_type=target_split[0])
             new_targets.append(new_target)
@@ -230,16 +316,25 @@ class CourseEmail(Email):
 class Optout(models.Model):
     """
     Stores users that have opted out of receiving emails from a course.
+
+    .. no_pii:
     """
     # Allowing null=True to support data migration from email->user.
     # We need to first create the 'user' column with some sort of default in order to run the data migration,
     # and given the unique index, 'null' is the best default value.
-    user = models.ForeignKey(User, db_index=True, null=True)
+    user = models.ForeignKey(User, db_index=True, null=True, on_delete=models.CASCADE)
     course_id = CourseKeyField(max_length=255, db_index=True)
 
     class Meta(object):
         app_label = "bulk_email"
         unique_together = ('user', 'course_id')
+
+    @classmethod
+    def is_user_opted_out_for_course(cls, user, course_id):
+        return cls.objects.filter(
+            user=user,
+            course_id=course_id,
+        ).exists()
 
 
 # Defines the tag that must appear in a template, to indicate
@@ -255,6 +350,8 @@ class CourseEmailTemplate(models.Model):
     Initialization takes place in a migration that in turn loads a fixture.
     The admin console interface disables add and delete operations.
     Validation is handled in the CourseEmailTemplateForm class.
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "bulk_email"
@@ -326,8 +423,8 @@ class CourseEmailTemplate(models.Model):
         stored HTML template and the provided `context` dict.
         """
         # HTML-escape string values in the context (used for keyword substitution).
-        for key, value in context.iteritems():
-            if isinstance(value, basestring):
+        for key, value in six.iteritems(context):
+            if isinstance(value, six.string_types):
                 context[key] = markupsafe.escape(value)
         return CourseEmailTemplate._render(self.html_template, htmltext, context)
 
@@ -335,6 +432,8 @@ class CourseEmailTemplate(models.Model):
 class CourseAuthorization(models.Model):
     """
     Enable the course email feature on a course-by-course basis.
+
+    .. no_pii:
     """
     class Meta(object):
         app_label = "bulk_email"
@@ -360,10 +459,14 @@ class CourseAuthorization(models.Model):
         not_en = "Not "
         if self.email_enabled:
             not_en = ""
-        # pylint: disable=no-member
-        return u"Course '{}': Instructor Email {}Enabled".format(self.course_id.to_deprecated_string(), not_en)
+        return u"Course '{}': Instructor Email {}Enabled".format(text_type(self.course_id), not_en)
 
 
+# .. toggle_name: require_course_email_auth .. toggle_type: ConfigurationModel .. toggle_default: True (enabled) ..
+# toggle_description: If the flag is enabled, course-specific authorization is required, and the course_id is either
+# not provided or not authorixed, the feature is not available. .. toggle_category: bulk email .. toggle_use_cases:
+# open_edx .. toggle_creation_date: 2016-05-05 .. toggle_expiration_date: None .. toggle_warnings: None ..
+# toggle_tickets: None .. toggle_status: supported
 class BulkEmailFlag(ConfigurationModel):
     """
     Enables site-wide configuration for the bulk_email feature.
@@ -371,6 +474,8 @@ class BulkEmailFlag(ConfigurationModel):
     Staff can only send bulk email for a course if all the following conditions are true:
     1. BulkEmailFlag is enabled.
     2. Course-specific authorization not required, or course authorized to use bulk email.
+
+    .. no_pii:
     """
     # boolean field 'enabled' inherited from parent ConfigurationModel
     require_course_email_auth = models.BooleanField(default=True)

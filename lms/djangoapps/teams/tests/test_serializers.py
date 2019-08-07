@@ -2,19 +2,17 @@
 """
 Tests for custom Teams Serializers.
 """
+from __future__ import absolute_import
+
+import six
 from django.core.paginator import Paginator
 from django.test.client import RequestFactory
 
+from lms.djangoapps.teams.serializers import BulkTeamCountTopicSerializer, MembershipSerializer, TopicSerializer
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
-from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
-from lms.djangoapps.teams.serializers import (
-    BulkTeamCountTopicSerializer,
-    TopicSerializer,
-    MembershipSerializer,
-)
 
 
 class SerializerTestCase(SharedModuleStoreTestCase):
@@ -76,6 +74,7 @@ class TopicSerializerTestCase(SerializerTestCase):
     Tests for the `TopicSerializer`, which should serialize team count data for
     a single topic.
     """
+
     def test_topic_with_no_team_count(self):
         """
         Verifies that the `TopicSerializer` correctly displays a topic with a
@@ -124,6 +123,7 @@ class BaseTopicSerializerTestCase(SerializerTestCase):
     """
     Base class for testing the two paginated topic serializers.
     """
+
     __test__ = False
     PAGE_SIZE = 5
     # Extending test classes should specify their serializer class.
@@ -142,13 +142,13 @@ class BaseTopicSerializerTestCase(SerializerTestCase):
         """
         self.course.teams_configuration['topics'] = []
         topics = [
-            {u'name': u'Tøpic {}'.format(i), u'description': u'The bést topic! {}'.format(i), u'id': unicode(i)}
-            for i in xrange(num_topics)
+            {u'name': u'Tøpic {}'.format(i), u'description': u'The bést topic! {}'.format(i), u'id': six.text_type(i)}
+            for i in six.moves.range(num_topics)
         ]
-        for i in xrange(num_topics):
-            topic_id = unicode(i)
+        for i in six.moves.range(num_topics):
+            topic_id = six.text_type(i)
             self.course.teams_configuration['topics'].append(topics[i])
-            for _ in xrange(teams_per_topic):
+            for _ in six.moves.range(teams_per_topic):
                 CourseTeamFactory.create(course_id=self.course.id, topic_id=topic_id)
         return topics
 
@@ -237,13 +237,13 @@ class BulkTeamCountTopicSerializerTestCase(BaseTopicSerializerTestCase):
         """
         self.course.teams_configuration['topics'] = []
         topics = [
-            {u'name': u'Tøpic {}'.format(i), u'description': u'The bést topic! {}'.format(i), u'id': unicode(i)}
-            for i in xrange(num_topics)
+            {u'name': u'Tøpic {}'.format(i), u'description': u'The bést topic! {}'.format(i), u'id': six.text_type(i)}
+            for i in six.moves.range(num_topics)
         ]
-        for i in xrange(num_topics):
-            topic_id = unicode(i)
+        for i in six.moves.range(num_topics):
+            topic_id = six.text_type(i)
             self.course.teams_configuration['topics'].append(topics[i])
-            for _ in xrange(teams_per_topic):
+            for _ in six.moves.range(teams_per_topic):
                 CourseTeamFactory.create(course_id=self.course.id, topic_id=topic_id)
         return topics
 

@@ -1,25 +1,28 @@
 '''
 Utilities for contentstore tests
 '''
+from __future__ import absolute_import
+
 import json
 import textwrap
-from mock import Mock
 
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test.client import Client
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
+from mock import Mock
+from opaque_keys.edx.keys import AssetKey, CourseKey
 
 from contentstore.utils import reverse_url
 from student.models import Registration
-from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.inheritance import own_metadata
+from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin
+from xmodule.modulestore.xml_importer import import_course_from_xml
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -48,7 +51,7 @@ class AjaxEnabledTestClient(Client):
         Convenience method for client post which serializes the data into json and sets the accept type
         to json
         """
-        if not isinstance(data, basestring):
+        if not isinstance(data, six.string_types):
             data = json.dumps(data or {})
         kwargs.setdefault("HTTP_X_REQUESTED_WITH", "XMLHttpRequest")
         kwargs.setdefault("HTTP_ACCEPT", "application/json")
@@ -97,7 +100,6 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
         client = AjaxEnabledTestClient()
         if authenticate:
             client.login(username=nonstaff.username, password=password)
-        nonstaff.is_authenticated = lambda: authenticate
         return client, nonstaff
 
     def reload_course(self):
@@ -121,7 +123,7 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
     SEQUENTIAL = 'vertical_sequential'
     DRAFT_HTML = 'draft_html'
     DRAFT_VIDEO = 'draft_video'
-    LOCKED_ASSET_KEY = AssetLocation.from_deprecated_string('/c4x/edX/toy/asset/sample_static.html')
+    LOCKED_ASSET_KEY = AssetKey.from_string('/c4x/edX/toy/asset/sample_static.html')
 
     def import_and_populate_course(self):
         """
@@ -129,7 +131,7 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
         """
         content_store = contentstore()
         import_course_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'], static_content_store=content_store)
-        course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        course_id = CourseKey.from_string('/'.join(['edX', 'toy', '2012_Fall']))
 
         # create an Orphan
         # We had a bug where orphaned draft nodes caused export to fail. This is here to cover that case.
@@ -137,7 +139,7 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
         vertical.location = vertical.location.replace(name='no_references')
         self.store.update_item(vertical, self.user.id, allow_not_found=True)
         orphan_vertical = self.store.get_item(vertical.location)
-        self.assertEqual(orphan_vertical.location.name, 'no_references')
+        self.assertEqual(orphan_vertical.location.block_id, 'no_references')
         self.assertEqual(len(orphan_vertical.children), len(vertical.children))
 
         # create an orphan vertical and html; we already don't try to import
@@ -313,7 +315,12 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
                 self.assertEqual(course1_item.data, course2_item.data)
 
             # compare meta-data
-            self.assertEqual(own_metadata(course1_item), own_metadata(course2_item))
+            course1_metadata = own_metadata(course1_item)
+            course2_metadata = own_metadata(course2_item)
+            # Omit edx_video_id as it can be different in case of extrnal video imports.
+            course1_metadata.pop('edx_video_id', None)
+            course2_metadata.pop('edx_video_id', None)
+            self.assertEqual(course1_metadata, course2_metadata)
 
             # compare children
             self.assertEqual(course1_item.has_children, course2_item.has_children)
@@ -350,7 +357,7 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
         course1_asset_attrs = content_store.get_attrs(course1_id.make_asset_key(category, filename))
         course2_asset_attrs = content_store.get_attrs(course2_id.make_asset_key(category, filename))
         self.assertEqual(len(course1_asset_attrs), len(course2_asset_attrs))
-        for key, value in course1_asset_attrs.iteritems():
+        for key, value in six.iteritems(course1_asset_attrs):
             if key in ['_id', 'filename', 'uploadDate', 'content_son', 'thumbnail_location']:
                 pass
             else:

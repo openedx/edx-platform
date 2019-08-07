@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
-from django.db import migrations, models
 import django.db.models.deletion
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='apiaccessrequest',
             name='site',
-            field=models.ForeignKey(default=1, to='sites.Site'),
+            field=models.ForeignKey(default=1, to='sites.Site', on_delete=models.CASCADE),
             preserve_default=False,
         ),
         migrations.AddField(

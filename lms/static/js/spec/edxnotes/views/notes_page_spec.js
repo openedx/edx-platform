@@ -33,13 +33,13 @@ define([
             this.view.$('.search-notes-input').val('test_query');
             this.view.$('.search-notes-submit').click();
             AjaxHelpers.respondWithJson(requests, {
-                'count': 0,
-                'current_page': 1,
-                'num_pages': 1,
-                'start': 0,
-                'next': null,
-                'previous': null,
-                'results': []
+                count: 0,
+                current_page: 1,
+                num_pages: 1,
+                start: 0,
+                next: null,
+                previous: null,
+                results: []
             });
             expect(this.view.$('#view-search-results')).toHaveClass('is-active');
             expect(this.view.$('#view-recent-activity')).toExist();

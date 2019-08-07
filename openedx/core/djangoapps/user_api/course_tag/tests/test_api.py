@@ -1,23 +1,24 @@
 """
 Test the user course tag API.
 """
+from __future__ import absolute_import
+
 from django.test import TestCase
+from opaque_keys.edx.locator import CourseLocator
 
-from student.tests.factories import UserFactory
-from nose.plugins.attrib import attr
 from openedx.core.djangoapps.user_api.course_tag import api as course_tag_api
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from student.tests.factories import UserFactory
 
 
-@attr(shard=2)
 class TestCourseTagAPI(TestCase):
     """
     Test the user service
     """
+
     def setUp(self):
         super(TestCourseTagAPI, self).setUp()
         self.user = UserFactory.create()
-        self.course_id = SlashSeparatedCourseKey('test_org', 'test_course_number', 'test_run')
+        self.course_id = CourseLocator('test_org', 'test_course_number', 'test_run')
         self.test_key = 'test_key'
 
     def test_get_set_course_tag(self):

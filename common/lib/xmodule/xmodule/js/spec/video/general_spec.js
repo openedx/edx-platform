@@ -1,7 +1,5 @@
 (function(undefined) {
     describe('Video', function() {
-        var oldOTBD, state;
-
         afterEach(function() {
             $('source').remove();
             window.VideoState = {};
@@ -11,6 +9,8 @@
 
         describe('constructor', function() {
             describe('YT', function() {
+                var state;
+
                 beforeEach(function() {
                     loadFixtures('video.html');
                     $.cookie.and.returnValue('0.50');
@@ -18,24 +18,24 @@
 
                 describe('by default', function() {
                     beforeEach(function() {
-                        this.state = jasmine.initializePlayerYouTube('video_html5.html');
+                        state = jasmine.initializePlayerYouTube('video_html5.html');
                     });
 
                     afterEach(function() {
-                        this.state.storage.clear();
-                        this.state.videoPlayer.destroy();
+                        state.storage.clear();
+                        state.videoPlayer.destroy();
                     });
 
                     it('check videoType', function() {
-                        expect(this.state.videoType).toEqual('youtube');
+                        expect(state.videoType).toEqual('youtube');
                     });
 
                     it('set the elements', function() {
-                        expect(this.state.el).toEqual($('#video_id'));
+                        expect(state.el).toEqual($('#video_id'));
                     });
 
                     it('parse the videos', function() {
-                        expect(this.state.videos).toEqual({
+                        expect(state.videos).toEqual({
                             '0.50': '7tqY6eQzVhE',
                             '1.0': 'cogebirgzzM',
                             '1.50': 'abcdefghijkl'
@@ -43,11 +43,11 @@
                     });
 
                     it('parse available video speeds', function() {
-                        expect(this.state.speeds).toEqual(['0.50', '1.0', '1.50']);
+                        expect(state.speeds).toEqual(['0.50', '1.0', '1.50']);
                     });
 
                     it('set current video speed via cookie', function() {
-                        expect(this.state.speed).toEqual('1.50');
+                        expect(state.speed).toEqual('1.50');
                     });
                 });
             });
@@ -85,7 +85,7 @@
                     });
 
                     it('set current video speed via cookie', function() {
-                        expect(state.speed).toEqual('1.50');
+                        expect(state.speed).toEqual(1.5);
                     });
                 });
 
@@ -172,8 +172,8 @@
             function itFabrique(itDescription, data, expectData) {
                 it(itDescription, function() {
                     state = jasmine.initializePlayer('video.html', {
-                        'start': data.start,
-                        'end': data.end
+                        start: data.start,
+                        end: data.end
                     });
 
                     expect(state.config.startTime).toBe(expectData.start);
@@ -207,8 +207,7 @@
 
             it(
                 'check for YT availability is performed only once',
-                function()
-            {
+                function() {
                     var numAjaxCalls = 0;
 
                 // Total ajax calls made.

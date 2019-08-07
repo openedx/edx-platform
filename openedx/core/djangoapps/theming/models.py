@@ -1,9 +1,10 @@
 """
 Django models supporting the Comprehensive Theming subsystem
 """
-from django.db import models
-from django.conf import settings
+from __future__ import absolute_import
+
 from django.contrib.sites.models import Site
+from django.db import models
 
 
 class SiteTheme(models.Model):
@@ -12,8 +13,10 @@ class SiteTheme(models.Model):
 
     `site` field is foreignkey to django Site model
     `theme_dir_name` contains directory name having Site's theme
+
+    .. no_pii:
     """
-    site = models.ForeignKey(Site, related_name='themes')
+    site = models.ForeignKey(Site, related_name='themes', on_delete=models.CASCADE)
     theme_dir_name = models.CharField(max_length=255)
 
     def __unicode__(self):

@@ -1,14 +1,14 @@
 """
 Tests for VisibilityTransformer.
 """
+from __future__ import absolute_import
+
 import ddt
-from nose.plugins.attrib import attr
 
 from ..visibility import VisibilityTransformer
 from .helpers import BlockParentsMapTestCase, update_block
 
 
-@attr(shard=3)
 @ddt.ddt
 class VisibilityTransformerTestCase(BlockParentsMapTestCase):
     """

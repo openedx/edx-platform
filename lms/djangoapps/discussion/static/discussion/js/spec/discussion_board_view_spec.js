@@ -30,6 +30,14 @@
                     return discussionBoardView;
                 };
 
+                describe('Thread List View', function() {
+                    it('should ensure the mode is all', function() {
+                        var discussionBoardView = createDiscussionBoardView().render(),
+                            threadListView = discussionBoardView.discussionThreadListView;
+                        expect(threadListView.mode).toBe('all');
+                    });
+                });
+
                 describe('Search events', function() {
                     it('perform search when enter pressed inside search textfield', function() {
                         var discussionBoardView = createDiscussionBoardView(),
@@ -49,7 +57,7 @@
                         discussionBoardView.render();
                         threadListView = discussionBoardView.discussionThreadListView;
                         spyOn(threadListView, 'performSearch');
-                        discussionBoardView.$el.find('.search-btn').click();
+                        discussionBoardView.$el.find('.search-button').click();
                         expect(threadListView.performSearch).toHaveBeenCalled();
                     });
                 });

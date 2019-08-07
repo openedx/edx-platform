@@ -2,7 +2,7 @@
 <%def name="online_help_token()"><% return "register" %></%def>
 <%!
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 %>
 
 <%block name="title">${_("Sign Up")}</%block>
@@ -50,6 +50,7 @@ from django.core.urlresolvers import reverse
             <li class="field text required" id="field-password">
               <label for="password">${_("Password")}</label>
               <input id="password" type="password" name="password" />
+              <span id="password_error" class="tip tip-error hidden" role="alert"></span>
             </li>
 
             <li class="field-group">

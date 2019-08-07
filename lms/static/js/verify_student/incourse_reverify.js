@@ -10,7 +10,7 @@
  (function($, _) {
      'use strict';
      var errorView,
-         el = $('#incourse-reverify-container');
+         $el = $('#incourse-reverify-container');
 
      edx.verify_student = edx.verify_student || {};
 
@@ -19,9 +19,9 @@
      });
 
      return new edx.verify_student.InCourseReverifyView({
-         courseKey: el.data('course-key'),
-         platformName: el.data('platform-name'),
-         usageId: el.data('usage-id'),
+         courseKey: $el.data('course-key'),
+         platformName: $el.data('platform-name'),
+         usageId: $el.data('usage-id'),
          errorModel: errorView.model
      }).render();
- })(jQuery, _);
+ }(jQuery, _));

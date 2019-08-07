@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
-from django.db import migrations, models
-import lms.djangoapps.verify_student.models
-import model_utils.fields
 import django.db.models.deletion
 import django.utils.timezone
+import model_utils.fields
 from django.conf import settings
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from django.db import migrations, models
+from opaque_keys.edx.django.models import CourseKeyField
+
+import lms.djangoapps.verify_student.models
 
 
 class Migration(migrations.Migration):
@@ -88,9 +89,9 @@ class Migration(migrations.Migration):
                 ('error_msg', models.TextField(blank=True)),
                 ('error_code', models.CharField(max_length=50, blank=True)),
                 ('photo_id_key', models.TextField(max_length=1024)),
-                ('copy_id_photo_from', models.ForeignKey(blank=True, to='verify_student.SoftwareSecurePhotoVerification', null=True)),
-                ('reviewing_user', models.ForeignKey(related_name='photo_verifications_reviewed', default=None, to=settings.AUTH_USER_MODEL, null=True)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('copy_id_photo_from', models.ForeignKey(blank=True, to='verify_student.SoftwareSecurePhotoVerification', null=True, on_delete=models.CASCADE)),
+                ('reviewing_user', models.ForeignKey(related_name='photo_verifications_reviewed', default=None, to=settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ['-created_at'],
@@ -127,8 +128,8 @@ class Migration(migrations.Migration):
                 ('timestamp', models.DateTimeField(auto_now_add=True)),
                 ('response', models.TextField(null=True, blank=True)),
                 ('error', models.TextField(null=True, blank=True)),
-                ('checkpoint', models.ForeignKey(related_name='checkpoint_status', to='verify_student.VerificationCheckpoint')),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('checkpoint', models.ForeignKey(related_name='checkpoint_status', to='verify_student.VerificationCheckpoint', on_delete=models.CASCADE)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'get_latest_by': 'timestamp',
@@ -139,12 +140,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='skippedreverification',
             name='checkpoint',
-            field=models.ForeignKey(related_name='skipped_checkpoint', to='verify_student.VerificationCheckpoint'),
+            field=models.ForeignKey(related_name='skipped_checkpoint', to='verify_student.VerificationCheckpoint', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='skippedreverification',
             name='user',
-            field=models.ForeignKey(to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
         ),
         migrations.AlterUniqueTogether(
             name='verificationcheckpoint',

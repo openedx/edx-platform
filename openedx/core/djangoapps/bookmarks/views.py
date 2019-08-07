@@ -4,31 +4,29 @@ HTTP end-points for the Bookmarks API.
 For more information, see:
 https://openedx.atlassian.net/wiki/display/TNL/Bookmarks+API
 """
-import eventtracking
+from __future__ import absolute_import
+
 import logging
 
+import eventtracking
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.translation import ugettext as _, ugettext_noop
-
-from rest_framework import status
-from rest_framework import permissions
+from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_noop
+from edx_rest_framework_extensions.paginators import DefaultPagination
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from rest_framework import permissions, status
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_oauth.authentication import OAuth2Authentication
 
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from django.conf import settings
 from openedx.core.djangoapps.bookmarks.api import BookmarksLimitReachedError
-
 from openedx.core.lib.api.permissions import IsUserInUrl
-
-from xmodule.modulestore.exceptions import ItemNotFoundError
-
-from openedx.core.lib.api.paginators import DefaultPagination
 from openedx.core.lib.url_utils import unquote_slashes
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from . import DEFAULT_FIELDS, OPTIONAL_FIELDS, api
 from .serializers import BookmarkSerializer
@@ -91,7 +89,7 @@ class BookmarksViewMixin(object):
         return Response(
             {
                 "developer_message": developer_message,
-                "user_message": _(user_message)  # pylint: disable=translation-of-non-string
+                "user_message": _(user_message)
             },
             status=error_status
         )
@@ -322,7 +320,7 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
             log.error(error_message)
             return self.error_response(error_message, error_status=status.HTTP_404_NOT_FOUND)
 
-    def get(self, request, username=None, usage_id=None):  # pylint: disable=unused-argument
+    def get(self, request, username=None, usage_id=None):
         """
         GET /api/bookmarks/v1/bookmarks/{username},{usage_id}?fields=display_name,path
         """

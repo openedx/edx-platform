@@ -23,10 +23,9 @@ var edx = edx || {};
         defaultContext: function() {
             return {
                 courseName: '',
-                courseStartDate: '',
                 coursewareUrl: '',
                 platformName: ''
             };
         }
     });
-})();
+}());

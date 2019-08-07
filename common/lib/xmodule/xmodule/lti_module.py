@@ -1,4 +1,6 @@
 """
+THIS MODULE IS DEPRECATED IN FAVOR OF https://github.com/edx/xblock-lti-consumer
+
 Learning Tools Interoperability (LTI) module.
 
 
@@ -51,34 +53,39 @@ What is supported:
             GET / PUT / DELETE HTTP methods respectively
 """
 
-import datetime
-from django.utils.timezone import UTC
-import logging
-import oauthlib.oauth1
-from oauthlib.oauth1.rfc5849 import signature
-import hashlib
+from __future__ import absolute_import
+
 import base64
-import urllib
+import datetime
+import hashlib
+import logging
 import textwrap
-import bleach
-from lxml import etree
-from webob import Response
-import mock
 from xml.sax.saxutils import escape
 
+from pkg_resources import resource_string
+
+import bleach
+import mock
+import oauthlib.oauth1
+import six
+import six.moves.urllib.parse
+from lxml import etree
+from oauthlib.oauth1.rfc5849 import signature
+from pytz import UTC
+from six import text_type
+from webob import Response
+from xblock.core import List, Scope, String, XBlock
+from xblock.fields import Boolean, Float
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
+from xmodule.lti_2_util import LTI20ModuleMixin, LTIError
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.x_module import XModule, module_attr
-from xmodule.lti_2_util import LTI20ModuleMixin, LTIError
-from pkg_resources import resource_string
-from xblock.core import String, Scope, List, XBlock
-from xblock.fields import Boolean, Float
 
 log = logging.getLogger(__name__)
 
 DOCS_ANCHOR_TAG_OPEN = (
     "<a target='_blank' "
-    "href='http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/lti_component.html'>"
+    "href='https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/lti_component.html'>"
 )
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
@@ -109,7 +116,7 @@ class LTIFields(object):
     display_name = String(
         display_name=_("Display Name"),
         help=_(
-            "Enter the name that students see for this component.  "
+            "The display name for this component. "
             "Analytics reports may also use the display name to identify this component."
         ),
         scope=Scope.settings,
@@ -248,6 +255,8 @@ class LTIFields(object):
 
 class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
     """
+    THIS MODULE IS DEPRECATED IN FAVOR OF https://github.com/edx/xblock-lti-consumer
+
     Module provides LTI integration to course.
 
     Except usual Xmodule structure it proceeds with OAuth signing.
@@ -391,7 +400,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
             if param_name not in PARAMETERS:
                 param_name = 'custom_' + param_name
 
-            custom_parameters[unicode(param_name)] = unicode(param_value)
+            custom_parameters[six.text_type(param_name)] = six.text_type(param_value)
 
         return self.oauth_params(
             custom_parameters,
@@ -454,7 +463,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
     def get_user_id(self):
         user_id = self.runtime.anonymous_student_id
         assert user_id is not None
-        return unicode(urllib.quote(user_id))
+        return six.text_type(six.moves.urllib.parse.quote(user_id))
 
     def get_outcome_service_url(self, service_name="grade_handler"):
         """
@@ -500,7 +509,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         i4x-2-3-lti-31de800015cf4afb973356dbe81496df this part of resource_link_id:
         makes resource_link_id to be unique among courses inside same system.
         """
-        return unicode(urllib.quote("{}-{}".format(self.system.hostname, self.location.html_id())))
+        return six.text_type(six.moves.urllib.parse.quote("{}-{}".format(self.system.hostname, self.location.html_id())))
 
     def get_lis_result_sourcedid(self):
         """
@@ -512,7 +521,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         This field is generally optional, but is required for grading.
         """
         return "{context}:{resource_link}:{user_id}".format(
-            context=urllib.quote(self.context_id),
+            context=six.moves.urllib.parse.quote(self.context_id),
             resource_link=self.get_resource_link_id(),
             user_id=self.get_user_id()
         )
@@ -531,7 +540,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         context_id is an opaque identifier that uniquely identifies the context (e.g., a course)
         that contains the link being launched.
         """
-        return self.course_id.to_deprecated_string()
+        return text_type(self.course_id)
 
     @property
     def role(self):
@@ -556,8 +565,8 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         """
 
         client = oauthlib.oauth1.Client(
-            client_key=unicode(client_key),
-            client_secret=unicode(client_secret)
+            client_key=text_type(client_key),
+            client_secret=text_type(client_secret)
         )
 
         # Must have parameters for correct signing from LTI:
@@ -613,7 +622,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
 
         try:
             __, headers, __ = client.sign(
-                unicode(self.launch_url.strip()),
+                six.text_type(self.launch_url.strip()),
                 http_method=u'POST',
                 body=body,
                 headers=headers)
@@ -643,7 +652,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         # so '='' becomes '%3D'.
         # We send form via browser, so browser will encode it again,
         # So we need to decode signature back:
-        params[u'oauth_signature'] = urllib.unquote(params[u'oauth_signature']).decode('utf8')
+        params[u'oauth_signature'] = six.moves.urllib.parse.unquote(params[u'oauth_signature']).decode('utf8')
 
         # Add LTI parameters to OAuth parameters for sending in form.
         params.update(body)
@@ -732,7 +741,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         try:
             imsx_messageIdentifier, sourcedId, score, action = self.parse_grade_xml_body(request.body)
         except Exception as e:
-            error_message = "Request body XML parsing error: " + escape(e.message)
+            error_message = "Request body XML parsing error: " + escape(text_type(e))
             log.debug("[LTI]: " + error_message)
             failure_values['imsx_description'] = error_message
             return Response(response_xml_template.format(**failure_values), content_type="application/xml")
@@ -742,12 +751,12 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             self.verify_oauth_body_sign(request)
         except (ValueError, LTIError) as e:
             failure_values['imsx_messageIdentifier'] = escape(imsx_messageIdentifier)
-            error_message = "OAuth verification error: " + escape(e.message)
+            error_message = "OAuth verification error: " + escape(text_type(e))
             failure_values['imsx_description'] = error_message
             log.debug("[LTI]: " + error_message)
             return Response(response_xml_template.format(**failure_values), content_type="application/xml")
 
-        real_user = self.system.get_real_user(urllib.unquote(sourcedId.split(':')[-1]))
+        real_user = self.system.get_real_user(six.moves.urllib.parse.unquote(sourcedId.split(':')[-1]))
         if not real_user:  # that means we can't save to database, as we do not have real user id.
             failure_values['imsx_messageIdentifier'] = escape(imsx_messageIdentifier)
             failure_values['imsx_description'] = "User not found."
@@ -816,7 +825,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
 
         client_key, client_secret = self.get_client_key_secret()
         headers = {
-            'Authorization': unicode(request.headers.get('Authorization')),
+            'Authorization': six.text_type(request.headers.get('Authorization')),
             'Content-Type': content_type,
         }
 
@@ -827,15 +836,15 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         oauth_headers = dict(oauth_params)
         oauth_signature = oauth_headers.pop('oauth_signature')
         mock_request_lti_1 = mock.Mock(
-            uri=unicode(urllib.unquote(self.get_outcome_service_url())),
-            http_method=unicode(request.method),
-            params=oauth_headers.items(),
+            uri=six.text_type(six.moves.urllib.parse.unquote(self.get_outcome_service_url())),
+            http_method=six.text_type(request.method),
+            params=list(oauth_headers.items()),
             signature=oauth_signature
         )
         mock_request_lti_2 = mock.Mock(
-            uri=unicode(urllib.unquote(request.url)),
-            http_method=unicode(request.method),
-            params=oauth_headers.items(),
+            uri=six.text_type(six.moves.urllib.parse.unquote(request.url)),
+            http_method=six.text_type(request.method),
+            params=list(oauth_headers.items()),
             signature=oauth_signature
         )
         if oauth_body_hash != oauth_headers.get('oauth_body_hash'):
@@ -856,7 +865,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
                       "headers:{} url:{} method:{}".format(
                           oauth_headers,
                           self.get_outcome_service_url(),
-                          unicode(request.method)
+                          six.text_type(request.method)
                       ))
             raise LTIError("OAuth signature verification has failed.")
 
@@ -888,7 +897,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             close_date = due_date + self.graceperiod  # pylint: disable=no-member
         else:
             close_date = due_date
-        return close_date is not None and datetime.datetime.now(UTC()) > close_date
+        return close_date is not None and datetime.datetime.now(UTC) > close_date
 
 
 class LTIDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):

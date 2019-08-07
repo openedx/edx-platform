@@ -1,0 +1,5 @@
+{% autoescape off %}
+{% load i18n %}
+
+{% blocktrans trimmed %}Welcome to week {{ week_num }} {% endblocktrans %}
+{% endautoescape %}

@@ -1,68 +1,53 @@
-(function(define) {
-    'use strict';
+import Backbone from 'backbone';
 
-    define(['backbone',
-            'jquery',
-            'underscore',
-            'gettext',
-            'edx-ui-toolkit/js/utils/string-utils',
-            'edx-ui-toolkit/js/utils/html-utils',
-            'text!../../../templates/learner_dashboard/empty_programs_list.underscore'
-        ],
-        function(Backbone,
-                  $,
-                  _,
-                  gettext,
-                  StringUtils,
-                  HtmlUtils,
-                  emptyProgramsListTpl) {
-            return Backbone.View.extend({
+import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
+import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 
-                initialize: function(data) {
-                    this.childView = data.childView;
-                    this.context = data.context;
-                    this.titleContext = data.titleContext;
-                },
+import emptyProgramsListTpl from '../../../templates/learner_dashboard/empty_programs_list.underscore';
 
-                render: function() {
-                    var childList;
+class CollectionListView extends Backbone.View {
+  initialize(data) {
+    this.childView = data.childView;
+    this.context = data.context;
+    this.titleContext = data.titleContext;
+  }
 
-                    if (!this.collection.length) {
-                        if (this.context.marketingUrl) {
-                            // Only show the advertising panel if the link is passed in
-                            HtmlUtils.setHtml(this.$el, HtmlUtils.template(emptyProgramsListTpl)(this.context));
-                        }
-                    } else {
-                        childList = [];
+  render() {
+    if (!this.collection.length) {
+      if (this.context.marketingUrl) {
+        // Only show the advertising panel if the link is passed in
+        HtmlUtils.setHtml(this.$el, HtmlUtils.template(emptyProgramsListTpl)(this.context));
+      }
+    } else {
+      const childList = [];
 
-                        this.collection.each(function(model) {
-                            var child = new this.childView({
-                                model: model,
-                                context: this.context
-                            });
-                            childList.push(child.el);
-                        }, this);
+      this.collection.each((model) => {
+        const child = new this.childView({ // eslint-disable-line new-cap
+          model,
+          context: this.context,
+        });
+        childList.push(child.el);
+      }, this);
 
-                        if (this.titleContext) {
-                            this.$el.before(HtmlUtils.ensureHtml(this.getTitleHtml()).toString());
-                        }
+      if (this.titleContext) {
+        this.$el.before(HtmlUtils.ensureHtml(this.getTitleHtml()).toString());
+      }
 
-                        this.$el.html(childList);
-                    }
-                },
+      this.$el.html(childList);
+    }
+  }
 
-                getTitleHtml: function() {
-                    var titleHtml = HtmlUtils.joinHtml(
-                        HtmlUtils.HTML('<'),
-                        this.titleContext.el,
-                        HtmlUtils.HTML(' class="sr-only collection-title">'),
-                        StringUtils.interpolate(this.titleContext.title),
-                        HtmlUtils.HTML('</'),
-                        this.titleContext.el,
-                        HtmlUtils.HTML('>'));
-                    return titleHtml;
-                }
-            });
-        }
-    );
-}).call(this, define || RequireJS.define);
+  getTitleHtml() {
+    const titleHtml = HtmlUtils.joinHtml(
+      HtmlUtils.HTML('<'),
+      this.titleContext.el,
+      HtmlUtils.HTML(' class="sr-only collection-title">'),
+      StringUtils.interpolate(this.titleContext.title),
+      HtmlUtils.HTML('</'),
+      this.titleContext.el,
+      HtmlUtils.HTML('>'));
+    return titleHtml;
+  }
+}
+
+export default CollectionListView;

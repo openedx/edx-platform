@@ -38,7 +38,9 @@
                 noTags: gettext('[no tags]'),  // User-defined tags cannot have spaces, so no risk of a collision.
 
                 renderContent: function() {
-                    var notesByTag = {}, noTags = this.noTags, addNoteForTag, noteList, tags, i,
+                    var notesByTag = {},
+                        noTags = this.noTags,
+                        addNoteForTag, noteList, tags, i,
                         sortedTagNames, container, group, noteGroup, tagTitle, titleMap;
 
                 // Iterate through all the notes and build up a dictionary structure by tag.
@@ -61,8 +63,7 @@
                         tags = note.get('tags');
                         if (tags.length === 0) {
                             addNoteForTag(note, noTags);
-                        }
-                        else {
+                        } else {
                             for (i = 0; i < tags.length; i++) {
                                 addNoteForTag(note, tags[i]);
                             }
@@ -73,19 +74,15 @@
                     // "no tags" should always appear last
                         if (a === noTags) {
                             return 1;
-                        }
-                        else if (b === noTags) {
+                        } else if (b === noTags) {
                             return -1;
+                        } else if (notesByTag[a].length > notesByTag[b].length) {
+                            return -1;
+                        } else if (notesByTag[a].length < notesByTag[b].length) {
+                            return 1;
+                        } else {
+                            return a.toLowerCase() <= b.toLowerCase() ? -1 : 1;
                         }
-                    else if (notesByTag[a].length > notesByTag[b].length) {
-                        return -1;
-                    }
-                    else if (notesByTag[a].length < notesByTag[b].length) {
-                        return 1;
-                    }
-                    else {
-                        return a.toLowerCase() <= b.toLowerCase() ? -1 : 1;
-                    }
                     });
 
                     container = document.createDocumentFragment();

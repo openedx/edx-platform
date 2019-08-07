@@ -1,6 +1,7 @@
 """
 Defuse vulnerabilities in XML packages.
 """
+from __future__ import absolute_import
 
 
 def defuse_xml_libs():

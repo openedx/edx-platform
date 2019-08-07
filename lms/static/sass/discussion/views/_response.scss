@@ -11,7 +11,7 @@
 // * +comments styling
 
 // +wrapper - response list
-.container .discussion-body .responses {
+.discussion .responses {
   @extend %ui-no-list;
 
   &:empty {
@@ -20,7 +20,7 @@
 
   // wrapper - response plus comment area
   .forum-response {
-    @include animation(fadeIn .3s);
+    animation: fadeIn 0.3s;
     position: relative;
     margin: $baseline 0;
     border: 1px solid $forum-color-border;
@@ -31,7 +31,9 @@
   // wrapper - main response area
   .discussion-response {
     box-sizing: border-box;
+
     @include border-radius($forum-border-radius, $forum-border-radius, 0, 0);
+
     padding: $baseline;
     background-color: $forum-color-background;
   }
@@ -48,6 +50,7 @@
     // CASE: larger username for responses 
     .username {
       @extend %t-weight5;
+
       font-size: $forum-base-font-size;
     }
   }
@@ -60,7 +63,7 @@
 }
 
 // +element - add response area
-.container .discussion-body .add-response {
+.discussion .add-response {
   display: inline;
   padding: $baseline/2;
 }
@@ -72,13 +75,13 @@
   display: block;
   padding: ($baseline/2) $baseline;
   width: 100%;
-  background: $gray-l6;
+  background: theme-color("lightest");
   box-shadow: 0 1px 3px -1px $shadow inset;
 }
 
 // +response - labels and banners
 // NOTE - these styles seem to no longer be in use. They have been isolated here, but should be ideally removed or fixed. 
-.container .discussion-body .responses .forum-response {
+.discussion .responses .forum-response {
 
   // CASE: label - staff response
   &.staff {
@@ -87,7 +90,7 @@
   }
 
   // CASE: label - community TA response
-  &.community-ta{
+  &.community-ta {
     padding-top: 38px;
     border-color: $forum-color-community-ta;
   }
@@ -96,6 +99,7 @@
   .staff-banner {
     @include border-radius($forum-border-radius, $forum-border-radius, 0, 0);
     @include left(0);
+
     position: absolute;
     top: 0;
     width: 100%;
@@ -109,9 +113,10 @@
   }
 
   // CASE: banner - community TA response
-  .community-ta-banner{
+  .community-ta-banner {
     @include border-radius($forum-border-radius, $forum-border-radius, 0, 0);
     @include left(0);
+
     position: absolute;
     top: 0;
     width: 100%;
@@ -135,10 +140,12 @@
 }
 
 // +comments styling
-.container .discussion-body .comments {
+.discussion .comments {
   @extend %ui-no-list;
+
   @include border-radius(0, 0, $forum-border-radius, $forum-border-radius);
-  background: $gray-l6;
+
+  background: theme-color("lightest");
   box-shadow: 0 1px 3px -1px $shadow inset;
 
   > li {
@@ -148,7 +155,7 @@
   }
 
   blockquote {
-    background: $gray-l4;
+    background: $forum-color-background-light;
     border-radius: $forum-border-radius;
     padding: ($baseline/4) ($baseline/2);
     font-size: $forum-base-font-size;
@@ -156,6 +163,8 @@
 
   .comment-form {
     @include clearfix();
+
+    padding: ($baseline/2) 0;
 
     .comment-form-input {
       padding: ($baseline/4) ($baseline/2);
@@ -165,15 +174,50 @@
 
     .discussion-submit-comment {
       @include float(left);
+
       margin-top: 8px;
     }
 
     .wmd-input {
+      @include transition(all 0.2s linear 0s);
+
       height: 40px;
     }
 
     .discussion-errors {
       margin: 0;
     }
+  }
+}
+
+.response-count {
+  @include float(right);
+  @include margin-right($baseline / 2);
+
+  color: $forum-color-response-count;
+  font-size: $forum-base-font-size;
+}
+
+.response-pagination {
+  visibility: visible;
+  margin: ($baseline / 2) 0;
+
+  &:empty {
+    visibility: hidden;
+  }
+
+  .response-display-count {
+    display: block;
+    padding: ($baseline/2) 0;
+    color: $forum-color-response-count;
+    font-size: $forum-base-font-size;
+  }
+
+  .load-response-button {
+    @include text-align(left);
+
+    position: relative;
+    margin: ($baseline/2) 0;
+    width: 100%;
   }
 }

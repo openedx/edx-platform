@@ -20,4 +20,4 @@
             window.location = redirectUrl;
         });
     });
-})(jQuery);
+}(jQuery));

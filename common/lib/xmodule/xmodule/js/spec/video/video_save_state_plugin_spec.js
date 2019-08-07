@@ -1,5 +1,8 @@
+import * as Time from 'time.js';
+
 (function(undefined) {
     'use strict';
+
     describe('VideoPlayer Save State plugin', function() {
         var state, oldOTBD;
 
@@ -42,7 +45,6 @@
 
             beforeEach(function() {
                 state.videoPlayer.currentTime = videoPlayerCurrentTime;
-                spyOn(window.Time, 'formatFull').and.callThrough();
             });
 
             it('data is not an object, async is true', function() {
@@ -126,6 +128,7 @@
             });
 
             function itSpec(value) {
+                state.config.saveStateEnabled = true;
                 var asyncVal = value.asyncVal,
                     speedVal = value.speedVal,
                     positionVal = value.positionVal,
@@ -147,9 +150,7 @@
                         positionVal,
                         true
                     );
-                    expect(Time.formatFull).toHaveBeenCalledWith(
-                        positionVal
-                    );
+                    expect(ajaxData.saved_video_position).toBe(Time.formatFull(positionVal));
                 }
                 expect($.ajax).toHaveBeenCalledWith({
                     url: state.config.saveStateUrl,
@@ -163,6 +164,11 @@
 
         it('can save state on speed change', function() {
             state.el.trigger('speedchange', ['2.0']);
+            expect($.ajax).not.toHaveBeenCalledWith({
+                url: state.config.saveStateUrl
+            });
+            state.config.saveStateEnabled = true;
+            state.el.trigger('speedchange', ['2.0']);
             expect($.ajax).toHaveBeenCalledWith({
                 url: state.config.saveStateUrl,
                 type: 'POST',
@@ -175,6 +181,12 @@
         it('can save state on page unload', function() {
             $.ajax.calls.reset();
             state.videoSaveStatePlugin.onUnload();
+            expect($.ajax).not.toHaveBeenCalledWith({
+                url: state.config.saveStateUrl
+            })
+            state.config.saveStateEnabled = true;
+            $.ajax.calls.reset();
+            state.videoSaveStatePlugin.onUnload();
             expect($.ajax).toHaveBeenCalledWith({
                 url: state.config.saveStateUrl,
                 type: 'POST',
@@ -185,6 +197,11 @@
         });
 
         it('can save state on pause', function() {
+            state.el.trigger('pause');
+            expect($.ajax).not.toHaveBeenCalledWith({
+                url: state.config.saveStateUrl
+            })
+            state.config.saveStateEnabled = true;
             state.el.trigger('pause');
             expect($.ajax).toHaveBeenCalledWith({
                 url: state.config.saveStateUrl,
@@ -213,6 +230,11 @@
             expect($.ajax).not.toHaveBeenCalled();
 
             // Test that we can go from unavailable -> available
+            state.config.saveStateEnabled = false;
+            state.config.recordedYoutubeIsAvailable = false;
+            state.el.trigger('youtube_availability', [true]);
+            expect($.ajax).not.toHaveBeenCalled()
+            state.config.saveStateEnabled = true;
             state.config.recordedYoutubeIsAvailable = false;
             state.el.trigger('youtube_availability', [true]);
             expect($.ajax).toHaveBeenCalledWith({
@@ -241,11 +263,12 @@
             state.videoSaveStatePlugin.destroy();
             expect(state.videoSaveStatePlugin).toBeUndefined();
             expect($.fn.off).toHaveBeenCalledWith({
-                'speedchange': plugin.onSpeedChange,
-                'play': plugin.bindUnloadHandler,
+                speedchange: plugin.onSpeedChange,
+                autoadvancechange: plugin.onAutoAdvanceChange,
+                play: plugin.bindUnloadHandler,
                 'pause destroy': plugin.saveStateHandler,
                 'language_menu:change': plugin.onLanguageChange,
-                'youtube_availability': plugin.onYoutubeAvailability
+                youtube_availability: plugin.onYoutubeAvailability
             });
             expect($.fn.off).toHaveBeenCalledWith('destroy', plugin.destroy);
             expect($.fn.off).toHaveBeenCalledWith('unload', plugin.onUnload);

@@ -6,7 +6,11 @@
 
 <main id="main" aria-label="Content" tabindex="-1">
     <section class="container about">
-        <h1>${_("Blog")}</h1>
-        <p>${_("This page left intentionally blank. Feel free to add your own content.")}</p>
+        <h1>
+            <%block name="pageheader">${page_header or _("Blog")}</%block>
+        </h1>
+        <p>
+            <%block name="pagecontent">${page_content or _("This page left intentionally blank. Feel free to add your own content.")}</%block>
+        </p>
     </section>
 </main>

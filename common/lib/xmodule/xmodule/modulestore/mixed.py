@@ -5,28 +5,34 @@ In this way, courses can be served up via either SplitMongoModuleStore or MongoM
 
 """
 
+from __future__ import absolute_import
+
+import functools
+import itertools
 import logging
 from contextlib import contextmanager
-import itertools
-import functools
-from contracts import contract, new_contract
 
+import six
+from contracts import contract, new_contract
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, AssetKey
+from opaque_keys.edx.keys import AssetKey, CourseKey
 from opaque_keys.edx.locator import LibraryLocator
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
 from xmodule.assetstore import AssetMetadata
 
-from . import ModuleStoreWriteBase, ModuleStoreEnum, XMODULE_FIELDS_WITH_USAGE_KEYS
-from .exceptions import ItemNotFoundError, DuplicateCourseError
+from . import XMODULE_FIELDS_WITH_USAGE_KEYS, ModuleStoreEnum, ModuleStoreWriteBase
 from .draft_and_published import ModuleStoreDraftAndPublished
+from .exceptions import DuplicateCourseError, ItemNotFoundError
 from .split_migrator import SplitMigrator
 
 new_contract('CourseKey', CourseKey)
 new_contract('AssetKey', AssetKey)
 new_contract('AssetMetadata', AssetMetadata)
 new_contract('LibraryLocator', LibraryLocator)
-new_contract('long', long)
+if six.PY2:
+    new_contract('long', long)
+else:
+    new_contract('long', int)
 
 log = logging.getLogger(__name__)
 
@@ -80,7 +86,7 @@ def strip_key(func):
                 if isinstance(field_value, list):
                     field_value = [strip_key_func(fv) for fv in field_value]
                 elif isinstance(field_value, dict):
-                    for key, val in field_value.iteritems():
+                    for key, val in six.iteritems(field_value):
                         field_value[key] = strip_key_func(val)
                 else:
                     field_value = strip_key_func(field_value)
@@ -120,7 +126,7 @@ def prepare_asides_to_store(asides_source):
         asides = []
         for asd in asides_source:
             aside_fields = {}
-            for asd_field_key, asd_field_val in asd.fields.iteritems():
+            for asd_field_key, asd_field_val in six.iteritems(asd.fields):
                 aside_fields[asd_field_key] = asd_field_val.read_from(asd)
             asides.append({
                 'aside_type': asd.scope_ids.block_type,
@@ -157,15 +163,12 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         self.modulestores = []
         self.mappings = {}
 
-        for course_id, store_name in mappings.iteritems():
+        for course_id, store_name in six.iteritems(mappings):
             try:
                 self.mappings[CourseKey.from_string(course_id)] = store_name
             except InvalidKeyError:
-                try:
-                    self.mappings[SlashSeparatedCourseKey.from_deprecated_string(course_id)] = store_name
-                except InvalidKeyError:
-                    log.exception("Invalid MixedModuleStore configuration. Unable to parse course_id %r", course_id)
-                    continue
+                log.exception("Invalid MixedModuleStore configuration. Unable to parse course_id %r", course_id)
+                continue
 
         for store_settings in stores:
             key = store_settings['NAME']
@@ -180,7 +183,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 signal_handler=signal_handler,
             )
             # replace all named pointers to the store into actual pointers
-            for course_key, store_name in self.mappings.iteritems():
+            for course_key, store_name in six.iteritems(self.mappings):
                 if store_name == key:
                     self.mappings[course_key] = store
             self.modulestores.append(store)
@@ -308,7 +311,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                     )
                 else:
                     course_summaries[course_id] = course_summary
-        return course_summaries.values()
+        return list(course_summaries.values())
 
     @strip_key
     def get_courses(self, **kwargs):
@@ -323,7 +326,24 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 if course_id not in courses:
                     # course is indeed unique. save it in result
                     courses[course_id] = course
-        return courses.values()
+        return list(courses.values())
+
+    @strip_key
+    def get_library_summaries(self, **kwargs):
+        """
+        Returns a list of LibrarySummary objects.
+        Information contains `location`, `display_name`, `locator` of the libraries in this modulestore.
+        """
+        library_summaries = {}
+        for store in self.modulestores:
+            if not hasattr(store, 'get_libraries'):
+                continue
+            # fetch library summaries and filter out any duplicated entry across/within stores
+            for library_summary in store.get_library_summaries(**kwargs):
+                library_id = self._clean_locator_for_mapping(library_summary.location)
+                if library_id not in library_summaries:
+                    library_summaries[library_id] = library_summary
+        return list(library_summaries.values())
 
     @strip_key
     def get_libraries(self, **kwargs):
@@ -340,7 +360,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 if library_id not in libraries:
                     # library is indeed unique. save it in result
                     libraries[library_id] = library
-        return libraries.values()
+        return list(libraries.values())
 
     def make_course_key(self, org, course, run):
         """
@@ -350,7 +370,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         This key may represent a course that doesn't exist in this modulestore.
         """
         # If there is a mapping that match this org/course/run, use that
-        for course_id, store in self.mappings.iteritems():
+        for course_id, store in six.iteritems(self.mappings):
             candidate_key = store.make_course_key(org, course, run)
             if candidate_key == course_id:
                 return candidate_key
@@ -640,12 +660,16 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         # first make sure an existing course doesn't already exist in the mapping
         course_key = self.make_course_key(org, course, run)
+
+        log.info('Creating course run %s...', course_key)
         if course_key in self.mappings and self.mappings[course_key].has_course(course_key):
+            log.error('Cannot create course run %s. It already exists!', course_key)
             raise DuplicateCourseError(course_key, course_key)
 
         # create the course
         store = self._verify_modulestore_support(None, 'create_course')
         course = store.create_course(org, course, run, user_id, **kwargs)
+        log.info('Course run %s created successfully!', course_key)
 
         # add new course to the mapping
         self.mappings[course_key] = store
@@ -863,7 +887,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         # could be done in parallel threads if needed
         return dict(
             itertools.chain.from_iterable(
-                store.heartbeat().iteritems()
+                six.iteritems(store.heartbeat())
                 for store in self.modulestores
             )
         )

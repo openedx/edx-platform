@@ -1,23 +1,26 @@
 """
 Module implementing `xblock.runtime.Runtime` functionality for the LMS
 """
+from __future__ import absolute_import
+
+import six
+import xblock.reference.plugins
+from completion.services import CompletionService
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
+from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
 
 from badges.service import BadgingService
 from badges.utils import badges_enabled
+from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from openedx.core.djangoapps.user_api.course_tag import api as user_course_tag_api
-from openedx.core.lib.xblock_utils import xblock_local_resource_url
 from openedx.core.lib.url_utils import quote_slashes
-from request_cache.middleware import RequestCache
-import xblock.reference.plugins
+from openedx.core.lib.xblock_utils import wrap_xblock_aside, xblock_local_resource_url
 from xmodule.library_tools import LibraryToolsService
-from xmodule.modulestore.django import modulestore, ModuleI18nService
+from xmodule.modulestore.django import ModuleI18nService, modulestore
 from xmodule.partitions.partitions_service import PartitionService
 from xmodule.services import SettingsService
 from xmodule.x_module import ModuleSystem
-
-from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 
 
 def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
@@ -35,7 +38,7 @@ def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
         # to ask for handler URLs without a student context.
         func = getattr(block.__class__, handler_name, None)
         if not func:
-            raise ValueError("{!r} is not a function name".format(handler_name))
+            raise ValueError(u"{!r} is not a function name".format(handler_name))
 
         # Is the following necessary? ProxyAttribute causes an UndefinedContext error
         # if trying this without the module system.
@@ -47,8 +50,8 @@ def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
         view_name = 'xblock_handler_noauth'
 
     url = reverse(view_name, kwargs={
-        'course_id': unicode(block.location.course_key),
-        'usage_id': quote_slashes(unicode(block.scope_ids.usage_id).encode('utf-8')),
+        'course_id': six.text_type(block.location.course_key),
+        'usage_id': quote_slashes(six.text_type(block.scope_ids.usage_id).encode('utf-8')),
         'handler': handler_name,
         'suffix': suffix,
     })
@@ -80,22 +83,6 @@ def local_resource_url(block, uri):
     return xblock_local_resource_url(block, uri)
 
 
-class LmsPartitionService(PartitionService):
-    """
-    Another runtime mixin that provides access to the student partitions defined on the
-    course.
-
-    (If and when XBlock directly provides access from one block (e.g. a split_test_module)
-    to another (e.g. a course_module), this won't be necessary, but for now it seems like
-    the least messy way to hook things through)
-
-    """
-    @property
-    def course_partitions(self):
-        course = modulestore().get_course(self._course_id)
-        return course.user_partitions
-
-
 class UserTagsService(object):
     """
     A runtime class that provides an interface to the user service.  It handles filling in
@@ -120,7 +107,7 @@ class UserTagsService(object):
             key: the key for the value we want
         """
         if scope != user_course_tag_api.COURSE_SCOPE:
-            raise ValueError("unexpected scope {0}".format(scope))
+            raise ValueError(u"unexpected scope {0}".format(scope))
 
         return user_course_tag_api.get_course_tag(
             self._get_current_user(),
@@ -136,7 +123,7 @@ class UserTagsService(object):
             value: the value to set
         """
         if scope != user_course_tag_api.COURSE_SCOPE:
-            raise ValueError("unexpected scope {0}".format(scope))
+            raise ValueError(u"unexpected scope {0}".format(scope))
 
         return user_course_tag_api.set_course_tag(
             self._get_current_user(),
@@ -149,18 +136,20 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     ModuleSystem specialized to the LMS
     """
     def __init__(self, **kwargs):
-        request_cache_dict = RequestCache.get_request_cache().data
+        request_cache_dict = DEFAULT_REQUEST_CACHE.data
+        store = modulestore()
+
         services = kwargs.setdefault('services', {})
+        user = kwargs.get('user')
+        if user and user.is_authenticated:
+            services['completion'] = CompletionService(user=user, course_key=kwargs.get('course_id'))
         services['fs'] = xblock.reference.plugins.FSService()
         services['i18n'] = ModuleI18nService
-        services['library_tools'] = LibraryToolsService(modulestore())
-        services['partitions'] = LmsPartitionService(
-            user=kwargs.get('user'),
+        services['library_tools'] = LibraryToolsService(store)
+        services['partitions'] = PartitionService(
             course_id=kwargs.get('course_id'),
-            track_function=kwargs.get('track_function', None),
             cache=request_cache_dict
         )
-        store = modulestore()
         services['settings'] = SettingsService()
         services['user_tags'] = UserTagsService(self)
         if badges_enabled():
@@ -200,19 +189,28 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         The default implementation creates a frag to wraps frag w/ a div identifying the xblock. If you have
         javascript, you'll need to override this impl
         """
+        if not frag.content:
+            return frag
+
+        runtime_class = 'LmsRuntime'
         extra_data = {
-            'block-id': quote_slashes(unicode(block.scope_ids.usage_id)),
+            'block-id': quote_slashes(six.text_type(block.scope_ids.usage_id)),
+            'course-id': quote_slashes(six.text_type(block.course_id)),
             'url-selector': 'asideBaseUrl',
-            'runtime-class': 'LmsRuntime',
+            'runtime-class': runtime_class,
         }
         if self.request_token:
             extra_data['request-token'] = self.request_token
 
-        return self._wrap_ele(
+        return wrap_xblock_aside(
+            runtime_class,
             aside,
             view,
             frag,
-            extra_data,
+            context,
+            usage_id_serializer=six.text_type,
+            request_token=self.request_token,
+            extra_data=extra_data,
         )
 
     def applicable_aside_types(self, block):
