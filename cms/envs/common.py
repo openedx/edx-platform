@@ -1067,7 +1067,8 @@ WEBPACK_CONFIG_PATH = 'webpack.prod.config.js'
 # Auto discover tasks fails to detect contentstore tasks
 CELERY_IMPORTS = (
     'cms.djangoapps.contentstore.tasks',
-    'openedx.core.djangoapps.bookmarks.tasks'
+    'openedx.core.djangoapps.bookmarks.tasks',
+    'openedx.core.djangoapps.ccxcon.tasks',
 )
 
 # Message configuration
