@@ -79,7 +79,7 @@ git+https://github.com/edx/django-celery.git@756cb57aad765cb2b0d37372c1855b8f5f3
 git+https://github.com/edx/bridgekeeper.git@4e34894e4ac5d0467ed1901811a81fd87ee01937#egg=bridgekeeper==0.0
 
 # Our libraries:
--e git+https://github.com/edx/codejail.git@a320d43ce6b9c93b17636b2491f724d9e433be47#egg=codejail
+-e git+https://github.com/edx/codejail.git@ed3d36c27913254a23273da95ad627a1bbbffa44#egg=codejail
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
 git+https://github.com/edx/edx-ora2.git@2.2.6#egg=ora2==2.2.6
 git+https://github.com/edx/RecommenderXBlock.git@1.4.0#egg=recommender-xblock==1.4.0
