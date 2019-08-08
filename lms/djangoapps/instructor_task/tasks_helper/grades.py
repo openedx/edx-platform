@@ -604,6 +604,23 @@ class ProblemGradeReport(object):
 
 class ProblemResponses(object):
 
+    @staticmethod
+    def _build_block_base_path(block):
+        """
+        Return the display names of the blocks that lie above the supplied block in hierarchy.
+
+        Arguments:
+            block: a single block
+
+        Returns:
+            List[str]: a list of display names of blocks starting from the root block (Course)
+        """
+        path = []
+        while block.parent:
+            block = block.get_parent()
+            path.append(block.display_name)
+        return list(reversed(path))
+
     @classmethod
     def _build_problem_list(cls, course_blocks, root, path=None):
         """
@@ -632,7 +649,9 @@ class ProblemResponses(object):
                 yield result
 
     @classmethod
-    def _build_student_data(cls, user_id, course_key, usage_key_str):
+    def _build_student_data(
+        cls, user_id, course_key, usage_key_str_list, filter_types=None,
+    ):
         """
         Generate a list of problem responses for all problem under the
         ``problem_location`` root.
@@ -641,17 +660,21 @@ class ProblemResponses(object):
             user_id (int): The user id for the user generating the report
             course_key (CourseKey): The ``CourseKey`` for the course whose report
                 is being generated
-            usage_key_str (str): The generated report will include this
-                block and it child blocks.
+            usage_key_str_list (List[str]): The generated report will include these
+                blocks and their child blocks.
+            filter_types (List[str]): The report generator will only include data for
+                block types in this list.
 
         Returns:
               Tuple[List[Dict], List[str]]: Returns a list of dictionaries
                 containing the student data which will be included in the
                 final csv, and the features/keys to include in that CSV.
         """
-        usage_key = UsageKey.from_string(usage_key_str).map_into_course(course_key)
+        usage_keys = [
+            UsageKey.from_string(usage_key_str).map_into_course(course_key)
+            for usage_key_str in usage_key_str_list
+        ]
         user = get_user_model().objects.get(pk=user_id)
-        course_blocks = get_course_blocks(user, usage_key)
 
         student_data = []
         max_count = settings.FEATURES.get('MAX_PROBLEM_RESPONSES_COUNT')
@@ -662,53 +685,61 @@ class ProblemResponses(object):
         student_data_keys = set()
 
         with store.bulk_operations(course_key):
-            for title, path, block_key in cls._build_problem_list(course_blocks, usage_key):
-                # Chapter and sequential blocks are filtered out since they include state
-                # which isn't useful for this report.
-                if block_key.block_type in ('sequential', 'chapter'):
-                    continue
+            for usage_key in usage_keys:
+                if max_count is not None and max_count <= 0:
+                    break
+                course_blocks = get_course_blocks(user, usage_key)
+                base_path = cls._build_block_base_path(store.get_item(usage_key))
+                for title, path, block_key in cls._build_problem_list(course_blocks, usage_key):
+                    # Chapter and sequential blocks are filtered out since they include state
+                    # which isn't useful for this report.
+                    if block_key.block_type in ('sequential', 'chapter'):
+                        continue
 
-                block = store.get_item(block_key)
-                generated_report_data = defaultdict(list)
+                    if filter_types is not None and block_key.block_type not in filter_types:
+                        continue
 
-                # Blocks can implement the generate_report_data method to provide their own
-                # human-readable formatting for user state.
-                if hasattr(block, 'generate_report_data'):
-                    try:
-                        user_state_iterator = user_state_client.iter_all_for_block(block_key)
-                        for username, state in block.generate_report_data(user_state_iterator, max_count):
-                            generated_report_data[username].append(state)
-                    except NotImplementedError:
-                        pass
+                    block = store.get_item(block_key)
+                    generated_report_data = defaultdict(list)
 
-                responses = []
+                    # Blocks can implement the generate_report_data method to provide their own
+                    # human-readable formatting for user state.
+                    if hasattr(block, 'generate_report_data'):
+                        try:
+                            user_state_iterator = user_state_client.iter_all_for_block(block_key)
+                            for username, state in block.generate_report_data(user_state_iterator, max_count):
+                                generated_report_data[username].append(state)
+                        except NotImplementedError:
+                            pass
 
-                for response in list_problem_responses(course_key, block_key, max_count):
-                    response['title'] = title
-                    # A human-readable location for the current block
-                    response['location'] = ' > '.join(path)
-                    # A machine-friendly location for the current block
-                    response['block_key'] = str(block_key)
-                    # A block that has a single state per user can contain multiple responses
-                    # within the same state.
-                    user_states = generated_report_data.get(response['username'], [])
-                    if user_states:
-                        # For each response in the block, copy over the basic data like the
-                        # title, location, block_key and state, and add in the responses
-                        for user_state in user_states:
-                            user_response = response.copy()
-                            user_response.update(user_state)
-                            student_data_keys = student_data_keys.union(list(user_state.keys()))
-                            responses.append(user_response)
-                    else:
-                        responses.append(response)
+                    responses = []
 
-                student_data += responses
+                    for response in list_problem_responses(course_key, block_key, max_count):
+                        response['title'] = title
+                        # A human-readable location for the current block
+                        response['location'] = ' > '.join(base_path + path)
+                        # A machine-friendly location for the current block
+                        response['block_key'] = str(block_key)
+                        # A block that has a single state per user can contain multiple responses
+                        # within the same state.
+                        user_states = generated_report_data.get(response['username'])
+                        if user_states:
+                            # For each response in the block, copy over the basic data like the
+                            # title, location, block_key and state, and add in the responses
+                            for user_state in user_states:
+                                user_response = response.copy()
+                                user_response.update(user_state)
+                                student_data_keys = student_data_keys.union(list(user_state.keys()))
+                                responses.append(user_response)
+                        else:
+                            responses.append(response)
 
-                if max_count is not None:
-                    max_count -= len(responses)
-                    if max_count <= 0:
-                        break
+                    student_data += responses
+
+                    if max_count is not None:
+                        max_count -= len(responses)
+                        if max_count <= 0:
+                            break
 
         # Keep the keys in a useful order, starting with username, title and location,
         # then the columns returned by the xblock report generator in sorted order and
@@ -733,13 +764,19 @@ class ProblemResponses(object):
         task_progress = TaskProgress(action_name, num_reports, start_time)
         current_step = {'step': 'Calculating students answers to problem'}
         task_progress.update_task_state(extra_meta=current_step)
-        problem_location = task_input.get('problem_location')
+        problem_locations = task_input.get('problem_locations')
+        problem_types_filter = task_input.get('problem_types_filter')
+
+        filter_types = None
+        if problem_types_filter:
+            filter_types = problem_types_filter.split(',')
 
         # Compute result table and format it
         student_data, student_data_keys = cls._build_student_data(
             user_id=task_input.get('user_id'),
             course_key=course_id,
-            usage_key_str=problem_location
+            usage_key_str_list=problem_locations.split(','),
+            filter_types=filter_types,
         )
 
         for data in student_data:
@@ -757,7 +794,9 @@ class ProblemResponses(object):
         task_progress.update_task_state(extra_meta=current_step)
 
         # Perform the upload
-        problem_location = re.sub(r'[:/]', '_', problem_location)
+        # Limit problem locations string to 200 characters in case a large number of
+        # problem locations are selected.
+        problem_location = re.sub(r'[:/]', '_', problem_locations)[:200]
         csv_name = 'student_state_from_{}'.format(problem_location)
         report_name = upload_csv_to_report_store(rows, csv_name, course_id, start_date)
         current_step = {'step': 'CSV uploaded', 'report_name': report_name}
