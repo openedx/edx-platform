@@ -222,7 +222,7 @@ scipy==1.2.1
 semantic-version==2.6.0   # via edx-drf-extensions
 shapely==1.6.4.post2
 shortuuid==0.5.0          # via edx-django-oauth2-provider
-simplejson==3.16.0        # via mailsnake, sailthru-client
+simplejson==3.16.0        # via mailsnake, sailthru-client, zendesk
 singledispatch==3.4.0.3
 six==1.11.0
 slumber==0.7.1            # via edx-enterprise, edx-rest-api-client
@@ -254,6 +254,7 @@ xblock-utils==1.2.2
 xblock==1.2.3
 xmlsec==1.3.3             # via python3-saml
 xss-utils==0.1.1
+zendesk==1.1.1
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools==41.0.1        # via fs, lazy, python-levenshtein

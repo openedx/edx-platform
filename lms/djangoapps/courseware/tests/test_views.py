@@ -38,7 +38,6 @@ from xblock.fields import Scope, String
 
 import courseware.views.views as views
 import shoppingcart
-
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -847,8 +846,8 @@ class ViewsTestCase(ModuleStoreTestCase):
         url = reverse('submit_financial_assistance_request')
         return self.client.post(url, json.dumps(data), content_type='application/json')
 
-    @patch.object(views, 'create_zendesk_ticket', return_value=200)
-    def test_submit_financial_assistance_request(self, mock_create_zendesk_ticket):
+    @patch.object(views, '_record_feedback_in_zendesk')
+    def test_submit_financial_assistance_request(self, mock_record_feedback):
         username = self.user.username
         course = six.text_type(self.course_key)
         legal_name = 'Jesse Pinkman'
@@ -872,12 +871,10 @@ class ViewsTestCase(ModuleStoreTestCase):
         response = self._submit_financial_assistance_form(data)
         self.assertEqual(response.status_code, 204)
 
-        __, __, ticket_subject, __ = mock_create_zendesk_ticket.call_args[0]
-        mocked_kwargs = mock_create_zendesk_ticket.call_args[1]
-        group_name = mocked_kwargs['group']
-        tags = mocked_kwargs['tags']
-        additional_info = mocked_kwargs['additional_info']
-
+        __, __, ticket_subject, __, tags, additional_info = mock_record_feedback.call_args[0]
+        mocked_kwargs = mock_record_feedback.call_args[1]
+        group_name = mocked_kwargs['group_name']
+        require_update = mocked_kwargs['require_update']
         private_comment = '\n'.join(list(additional_info.values()))
         for info in (country, income, reason_for_applying, goals, effort, username, legal_name, course):
             self.assertIn(info, private_comment)
@@ -894,9 +891,10 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertDictContainsSubset({'course_id': course}, tags)
         self.assertIn('Client IP', additional_info)
         self.assertEqual(group_name, 'Financial Assistance')
+        self.assertTrue(require_update)
 
-    @patch.object(views, 'create_zendesk_ticket', return_value=500)
-    def test_zendesk_submission_failed(self, _mock_create_zendesk_ticket):
+    @patch.object(views, '_record_feedback_in_zendesk', return_value=False)
+    def test_zendesk_submission_failed(self, _mock_record_feedback):
         response = self._submit_financial_assistance_form({
             'username': self.user.username,
             'course': six.text_type(self.course.id),
