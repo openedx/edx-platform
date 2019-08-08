@@ -24,12 +24,15 @@ from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
 from django.urls import reverse as django_reverse
 from django.utils.translation import ugettext as _
+from edx_when.api import get_overrides_for_user
+from edx_when.signals import extract_dates
 from mock import Mock, NonCallableMock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
 from pytz import UTC
 from six import text_type, unichr  # pylint: disable=redefined-builtin
 from six.moves import range, zip
+from testfixtures import LogCapture
 
 from bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
 from course_modes.models import CourseMode
@@ -43,8 +46,7 @@ from courseware.tests.factories import (
     UserProfileFactory
 )
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from edx_when.api import get_overrides_for_user
-from edx_when.signals import extract_dates
+from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
@@ -2010,6 +2012,18 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
         # from failed assertions in the event of a test failure.
         # (comment because pylint C0103(invalid-name))
         # self.maxDiff = None
+
+    def test_beta_tester_must_not_earn_cert(self):
+        """
+        Test to ensure that beta tester must not earn certificate in a course
+        in which he/she is a beta-tester.
+        """
+        with LogCapture() as capture:
+            message = u'Cancelling course certificate generation for user [{}] against course [{}], ' \
+                      u'user is a Beta Tester.'
+            message = message.format(self.course.id, self.beta_tester.username)
+            generate_user_certificates(self.beta_tester, self.course.id, self.course)
+            capture.check_present(('edx.certificate', 'INFO', message))
 
     def test_missing_params(self):
         """ Test missing all query parameters. """
