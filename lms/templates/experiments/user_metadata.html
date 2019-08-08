@@ -3,6 +3,7 @@
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
+import six
 %>
 <%
 user_metadata = {
@@ -59,7 +60,7 @@ if course_key:
 
         if not course_id:
             user_metadata['course_id'] = unicode(course_key)
-    elif isinstance(course_key, basestring):
+    elif isinstance(course_key, six.string_types):
         user_metadata['course_id'] = course_key
 
 %>
