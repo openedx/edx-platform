@@ -134,7 +134,7 @@ glob2==0.7
 gunicorn==19.9.0
 help-tokens==1.0.4
 html5lib==1.0.1
-httplib2==0.13.1
+httplib2==0.13.1          # via zendesk
 idna==2.8
 inflection==0.3.1         # via drf-yasg
 ipaddress==1.0.22
@@ -159,7 +159,7 @@ markey==0.8               # via django-babel-underscore
 markupsafe==1.1.1
 maxminddb==1.4.1          # via geoip2
 mock==1.0.1
-git+https://github.com/edx/MongoDBProxy.git@25b99097615bda06bd7cdfe5669ed80dc2a7fed0#egg=MongoDBProxy==0.1.0
+git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a#egg=MongoDBProxy==0.1.0+edx.2
 mongoengine==0.10.0
 mpmath==1.1.0             # via sympy
 mysqlclient==1.4.2.post1
@@ -234,7 +234,7 @@ soupsieve==1.9.2          # via beautifulsoup4
 sqlparse==0.3.0
 staff-graded-xblock==0.5
 stevedore==1.30.1
-super-csv==0.8
+super-csv==0.9
 sympy==1.4
 testfixtures==6.10.0      # via edx-enterprise
 tincan==0.0.5             # via edx-enterprise
