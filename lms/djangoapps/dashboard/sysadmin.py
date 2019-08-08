@@ -7,7 +7,7 @@ from __future__ import absolute_import
 import json
 import logging
 import os
-import StringIO
+from six import StringIO
 import subprocess
 
 import mongoengine
@@ -78,7 +78,7 @@ class SysadminDashboardView(TemplateView):
         data should be iterable and is used to stream object over http
         """
 
-        csv_file = StringIO.StringIO()
+        csv_file = StringIO()
         writer = csv.writer(csv_file, dialect='excel', quotechar='"',
                             quoting=csv.QUOTE_ALL)
 
@@ -293,7 +293,7 @@ class Courses(SysadminDashboardView):
         log.debug(u'Adding course using git repo %s', gitloc)
 
         # Grab logging output for debugging imports
-        output = StringIO.StringIO()
+        output = StringIO()
         import_log_handler = logging.StreamHandler(output)
         import_log_handler.setLevel(logging.DEBUG)
 

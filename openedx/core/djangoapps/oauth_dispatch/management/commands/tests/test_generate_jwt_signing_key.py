@@ -8,7 +8,7 @@ import os
 import sys
 import tempfile
 from contextlib import contextmanager
-from StringIO import StringIO
+from six import StringIO
 
 import ddt
 import yaml

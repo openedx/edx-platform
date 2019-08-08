@@ -6,7 +6,7 @@ from __future__ import absolute_import
 
 import json
 from datetime import datetime
-from StringIO import StringIO
+from six import StringIO
 
 import ddt
 import six

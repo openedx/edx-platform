@@ -5,7 +5,7 @@ from __future__ import absolute_import
 
 import copy
 import time
-from cStringIO import StringIO
+from six import StringIO
 
 import boto
 from django.conf import settings

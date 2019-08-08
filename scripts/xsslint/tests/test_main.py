@@ -5,7 +5,7 @@ Tests for main.py
 from __future__ import absolute_import
 
 import re
-from StringIO import StringIO
+from six import StringIO
 from unittest import TestCase
 
 import mock

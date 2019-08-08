@@ -11,7 +11,7 @@ import random
 import textwrap
 import unittest
 import zipfile
-from cStringIO import StringIO
+from six import StringIO
 from datetime import datetime
 
 import mock

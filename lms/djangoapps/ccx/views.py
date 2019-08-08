@@ -9,7 +9,7 @@ import functools
 import json
 import logging
 from copy import deepcopy
-from cStringIO import StringIO
+from six import StringIO
 
 import pytz
 import six

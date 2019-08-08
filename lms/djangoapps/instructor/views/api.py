@@ -14,7 +14,7 @@ import logging
 import random
 import re
 import string
-import StringIO
+from six import StringIO
 import time
 
 import six
@@ -1842,7 +1842,7 @@ def generate_registration_codes(request, course_id):
     invoice_attachment = render_to_string('emails/registration_codes_sale_invoice_attachment.txt', context)
 
     #send_mail(subject, message, from_address, recipient_list, fail_silently=False)
-    csv_file = StringIO.StringIO()
+    csv_file = StringIO()
     csv_writer = csv.writer(csv_file)
     for registration_code in registration_codes:
         full_redeem_code_url = 'http://{base_url}{redeem_code_url}'.format(
@@ -1867,7 +1867,7 @@ def generate_registration_codes(request, course_id):
         if pdf_file is not None:
             email.attach(u'Invoice.pdf', pdf_file.getvalue(), 'application/pdf')
         else:
-            file_buffer = StringIO.StringIO(_('pdf download unavailable right now, please contact support.'))
+            file_buffer = StringIO(_('pdf download unavailable right now, please contact support.'))
             email.attach(u'pdf_unavailable.txt', file_buffer.getvalue(), 'text/plain')
         email.send()
 

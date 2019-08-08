@@ -8,7 +8,7 @@ from __future__ import absolute_import
 import logging
 import os
 import re
-import StringIO
+from six import StringIO
 import subprocess
 
 import mongoengine
@@ -261,7 +261,7 @@ def add_repo(repo, rdir_in, branch=None):
     ret_git += u'{0}Branch: {1}'.format('   \n', branch)
 
     # Get XML logging logger and capture debug to parse results
-    output = StringIO.StringIO()
+    output = StringIO()
     import_log_handler = logging.StreamHandler(output)
     import_log_handler.setLevel(logging.DEBUG)
 

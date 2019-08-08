@@ -7,7 +7,7 @@ from __future__ import absolute_import
 import shutil
 import tarfile
 import unittest
-from StringIO import StringIO
+from six import StringIO
 from tempfile import mkdtemp
 
 import ddt
