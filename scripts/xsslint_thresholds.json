@@ -1,10 +1,10 @@
 {
     "rules": {
-        "javascript-concat-html": 137,
+        "javascript-concat-html": 142,
         "javascript-escape": 7,
         "javascript-interpolate": 23,
         "javascript-jquery-append": 68,
-        "javascript-jquery-html": 139,
+        "javascript-jquery-html": 146,
         "javascript-jquery-insert-into-target": 18,
         "javascript-jquery-insertion": 19,
         "javascript-jquery-prepend": 6,
@@ -37,5 +37,5 @@
         "django-html-interpolation-missing": 1,
         "django-html-interpolation-invalid-tag": 0
     },
-    "total": 1137
+    "total": 1150
 }
