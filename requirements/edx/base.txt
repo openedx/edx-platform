@@ -6,7 +6,7 @@
 #
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
 -e common/lib/capa
--e git+https://github.com/edx/codejail.git@a320d43ce6b9c93b17636b2491f724d9e433be47#egg=codejail
+-e git+https://github.com/edx/codejail.git@ed3d36c27913254a23273da95ad627a1bbbffa44#egg=codejail
 -e git+https://github.com/edx/django-wiki.git@v0.0.23#egg=django-wiki
 -e git+https://github.com/edx/DoneXBlock.git@01a14f3bd80ae47dd08cdbbe2f88f3eb88d00fba#egg=done-xblock
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
