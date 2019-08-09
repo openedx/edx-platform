@@ -4,7 +4,6 @@ import json
 import logging
 import sys
 from functools import wraps
-from smtplib import SMTPException
 
 import calc
 import crum
@@ -12,9 +11,7 @@ import zendesk
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.cache import caches
-from django.core.mail import send_mail
-from django.core.validators import ValidationError, validate_email
-from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseServerError
+from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.views.decorators.csrf import requires_csrf_token
 from django.views.defaults import server_error
 from opaque_keys import InvalidKeyError
@@ -22,17 +19,12 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from six.moves import map
 
 import track.views
-from edxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.features.enterprise_support import api as enterprise_api
 from student.models import CourseEnrollment
 from student.roles import GlobalStaff
 
 log = logging.getLogger(__name__)
-
-DATADOG_FEEDBACK_METRIC = "lms_feedback_submissions"
-SUPPORT_BACKEND_ZENDESK = "support_ticket"
-SUPPORT_BACKEND_EMAIL = "email"
 
 
 def ensure_valid_course_key(view_func):
@@ -400,99 +392,6 @@ def get_feedback_form_context(request):
     context["support_email"] = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
 
     return context
-
-
-def submit_feedback(request):
-    """
-    Create a Zendesk ticket or if not available, send an email with the
-    feedback form fields.
-
-    If feedback submission is not enabled, any request will raise `Http404`.
-    If any configuration parameter (`ZENDESK_URL`, `ZENDESK_USER`, or
-    `ZENDESK_API_KEY`) is missing, any request will raise an `Exception`.
-    The request must be a POST request specifying `subject` and `details`.
-    If the user is not authenticated, the request must also specify `name` and
-    `email`. If the user is authenticated, the `name` and `email` will be
-    populated from the user's information. If any required parameter is
-    missing, a 400 error will be returned indicating which field is missing and
-    providing an error message. If Zendesk ticket creation fails, 500 error
-    will be returned with no body; if ticket creation succeeds, an empty
-    successful response (200) will be returned.
-    """
-    if not settings.FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
-        raise Http404()
-    if request.method != "POST":
-        return HttpResponseNotAllowed(["POST"])
-
-    def build_error_response(status_code, field, err_msg):
-        return HttpResponse(json.dumps({"field": field, "error": err_msg}), status=status_code)
-
-    required_fields = ["subject", "details"]
-
-    if not request.user.is_authenticated:
-        required_fields += ["name", "email"]
-
-    required_field_errs = {
-        "subject": "Please provide a subject.",
-        "details": "Please provide details.",
-        "name": "Please provide your name.",
-        "email": "Please provide a valid e-mail.",
-    }
-    for field in required_fields:
-        if field not in request.POST or not request.POST[field]:
-            return build_error_response(400, field, required_field_errs[field])
-
-    if not request.user.is_authenticated:
-        try:
-            validate_email(request.POST["email"])
-        except ValidationError:
-            return build_error_response(400, "email", required_field_errs["email"])
-
-    success = False
-    context = get_feedback_form_context(request)
-
-    # Update the tag info with 'enterprise_learner' if the user belongs to an enterprise customer.
-    enterprise_learner_data = enterprise_api.get_enterprise_learner_data(user=request.user)
-    if enterprise_learner_data:
-        context["tags"]["learner_type"] = "enterprise_learner"
-
-    support_backend = configuration_helpers.get_value('CONTACT_FORM_SUBMISSION_BACKEND', SUPPORT_BACKEND_ZENDESK)
-
-    if support_backend == SUPPORT_BACKEND_EMAIL:
-        try:
-            send_mail(
-                subject=render_to_string('emails/contact_us_feedback_email_subject.txt', context),
-                message=render_to_string('emails/contact_us_feedback_email_body.txt', context),
-                from_email=context["support_email"],
-                recipient_list=[context["support_email"]],
-                fail_silently=False
-            )
-            success = True
-        except SMTPException:
-            log.exception('Error sending feedback to contact_us email address.')
-            success = False
-
-    else:
-        if not settings.ZENDESK_URL or not settings.ZENDESK_USER or not settings.ZENDESK_API_KEY:
-            raise Exception("Zendesk enabled but not configured")
-
-        custom_fields = None
-        if settings.ZENDESK_CUSTOM_FIELDS:
-            custom_field_context = _get_zendesk_custom_field_context(request, learner_data=enterprise_learner_data)
-            custom_fields = _format_zendesk_custom_fields(custom_field_context)
-
-        success = _record_feedback_in_zendesk(
-            context["realname"],
-            context["email"],
-            context["subject"],
-            context["details"],
-            context["tags"],
-            context["additional_info"],
-            support_email=context["support_email"],
-            custom_fields=custom_fields
-        )
-
-    return HttpResponse(status=(200 if success else 500))
 
 
 def info(request):

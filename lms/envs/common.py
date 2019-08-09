@@ -167,9 +167,6 @@ FEATURES = {
     # Staff Debug tool.
     'ENABLE_STUDENT_HISTORY_VIEW': True,
 
-    # Provide a UI to allow users to submit feedback from the LMS (left-hand help modal)
-    'ENABLE_FEEDBACK_SUBMISSION': False,
-
     # Turn on a page that lets staff enter Python code to be run in the
     # sandbox, for testing whether it's enabled properly.
     'ENABLE_DEBUG_RUN_PYTHON': False,
@@ -1346,9 +1343,6 @@ WIKI_CAN_ASSIGN = course_wiki_settings.CAN_ASSIGN
 WIKI_USE_BOOTSTRAP_SELECT_WIDGET = False
 WIKI_LINK_LIVE_LOOKUPS = False
 WIKI_LINK_DEFAULT_LEVEL = 2
-
-##### Feedback submission mechanism #####
-FEEDBACK_SUBMISSION_EMAIL = None
 
 ##### Zendesk #####
 ZENDESK_URL = ''

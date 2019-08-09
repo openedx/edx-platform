@@ -90,9 +90,6 @@ urlpatterns = [
 
     url(r'^i18n/', include('django.conf.urls.i18n')),
 
-    # Feedback Form endpoint
-    url(r'^submit_feedback$', util_views.submit_feedback),
-
     # Enrollment API RESTful endpoints
     url(r'^api/enrollment/v1/', include('openedx.core.djangoapps.enrollments.urls')),
 
