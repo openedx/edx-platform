@@ -1063,23 +1063,22 @@ def get_problem_responses(request, course_id):
     Responds with BadRequest if problem location is faulty.
     """
     course_key = CourseKey.from_string(course_id)
-    # A comma-separated list of problem locations
-    # The name of the POST parameter is `problem_location` (not pluralised) in
-    # order to preserve backwards compatibility with existing third-party
-    # scripts.
-    problem_locations = request.POST.get('problem_location', '')
-    # A comma-separated list of block types
-    problem_types_filter = request.POST.get('problem_types_filter', '')
+    problem_location = request.POST.get('problem_location', '')
     report_type = _('problem responses')
 
     try:
-        for problem_location in problem_locations.split(','):
+        problem_key = UsageKey.from_string(problem_location)
+        # Are we dealing with an "old-style" problem location?
+        run = problem_key.run
+        if not run:
             problem_key = UsageKey.from_string(problem_location).map_into_course(course_key)
+        if problem_key.course_key != course_key:
+            raise InvalidKeyError(type(problem_key), problem_key)
     except InvalidKeyError:
         return JsonResponseBadRequest(_("Could not find problem with this location."))
 
     task = task_api.submit_calculate_problem_responses_csv(
-        request, course_key, problem_locations, problem_types_filter,
+        request, course_key, problem_location
     )
     success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
 
