@@ -11,11 +11,19 @@ from django.core.management.base import CommandError
 from django.test import TestCase
 
 from edx_django_utils.cache import RequestCache
-from lms.djangoapps.program_enrollments.management.commands import link_program_enrollments
+from lms.djangoapps.program_enrollments.management.commands.link_program_enrollments import (
+    Command,
+    INCORRECT_PARAMETER_TPL,
+    DUPLICATE_KEY_TPL,
+    NO_PROGRAM_ENROLLMENT_TPL,
+    NO_LMS_USER_TPL,
+    COURSE_ENROLLMENT_FAILURE_TPL,
+    EXISTING_USER_TPL,
+)
 from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
-from student.tests.factories import UserFactory
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from student.tests.factories import UserFactory
 
 COMMAND_PATH = 'lms.djangoapps.program_enrollments.management.commands.link_program_enrollments'
 
@@ -25,7 +33,7 @@ class TestLinkProgramEnrollmentsMixin(object):
 
     @classmethod
     def setUpTestData(cls):  # pylint: disable=missing-docstring
-        cls.command = link_program_enrollments.Command()
+        cls.command = Command()
         cls.program = uuid4()
         cls.other_program = uuid4()
         cls.fruit_course = CourseKey.from_string('course-v1:edX+Oranges+Apples')
@@ -172,11 +180,11 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
     """ Tests for link_program_enrollments error behavior """
 
     def test_incorrectly_formatted_input(self):
-        with self.assertRaisesRegex(CommandError, 'incorrectly formatted argument'):
+        with self.assertRaisesRegex(CommandError, INCORRECT_PARAMETER_TPL.format('whoops')):
             call_command(self.command, self.program, 'learner-01:user-01', 'whoops', 'learner-03:user-03')
 
     def test_repeated_user_key(self):
-        with self.assertRaisesRegex(CommandError, 'external user key learner-01 provided multiple times'):
+        with self.assertRaisesRegex(CommandError, DUPLICATE_KEY_TPL.format('learner-01')):
             self.call_command(self.program, ('learner-01', 'user-01'), ('learner-01', 'user-02'))
 
     def test_program_enrollment_not_found__nonexistant(self):
@@ -197,13 +205,7 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
         with LogCapture() as logger:
             self.call_command(self.program, ('0001', self.user_1.username), ('0002', self.user_2.username))
             logger.check_present(
-                (
-                    COMMAND_PATH,
-                    'WARNING',
-                    u'No program enrollment found for program uuid={} and external student key=0002'.format(
-                        self.program
-                    )
-                )
+                (COMMAND_PATH, 'WARNING', NO_PROGRAM_ENROLLMENT_TPL.format(self.program, '0002'))
             )
 
         self._assert_program_enrollment(self.user_1, self.program, '0001')
@@ -216,7 +218,7 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
         with LogCapture() as logger:
             self.call_command(self.program, ('0001', self.user_1.username), ('0002', 'nonexistant-user'))
             logger.check_present(
-                (COMMAND_PATH, 'WARNING', 'No user found with username nonexistant-user')
+                (COMMAND_PATH, 'WARNING', NO_LMS_USER_TPL.format('nonexistant-user'))
             )
 
         self._assert_program_enrollment(self.user_1, self.program, '0001')
@@ -234,9 +236,9 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
 
         with LogCapture() as logger:
             self.call_command(self.program, ('0001', self.user_1.username), ('0002', self.user_2.username))
-            msg = ('Program enrollment with external_student_key=0002 '
-                   'is already linked to target account username=' + self.user_2.username)
-            logger.check_present((COMMAND_PATH, 'WARNING', msg))
+            logger.check_present(
+                (COMMAND_PATH, 'WARNING', EXISTING_USER_TPL.format('0002', 'target', self.user_2.username))
+            )
 
         self._assert_program_enrollment(self.user_1, self.program, '0001')
         self._assert_program_enrollment(self.user_2, self.program, '0002')
@@ -255,9 +257,9 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
 
         with LogCapture() as logger:
             self.call_command(self.program, ('0001', self.user_1.username), ('0003', self.user_2.username))
-            msg = ('Program enrollment with external_student_key=0003 '
-                   'is already linked to a different account username=' + user_3.username)
-            logger.check_present((COMMAND_PATH, 'WARNING', msg))
+            logger.check_present(
+                (COMMAND_PATH, 'WARNING', EXISTING_USER_TPL.format('0003', 'a different', user_3.username))
+            )
 
         self._assert_program_enrollment(self.user_1, self.program, '0001')
         self._assert_no_program_enrollment(self.user_2, self.program)
@@ -274,9 +276,8 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
         self._create_waiting_course_enrollment(program_enrollment_2, nonexistant_course)
         self._create_waiting_course_enrollment(program_enrollment_2, self.animal_course)
 
-        msg_tpl = u'Failed to enroll user {} with waiting program course enrollment for course {}'
-        msg_1 = msg_tpl.format(self.user_1.username, nonexistant_course)
-        msg_2 = msg_tpl.format(self.user_2.username, nonexistant_course)
+        msg_1 = COURSE_ENROLLMENT_FAILURE_TPL.format(self.user_1.username, nonexistant_course)
+        msg_2 = COURSE_ENROLLMENT_FAILURE_TPL.format(self.user_2.username, nonexistant_course)
         with LogCapture() as logger:
             self.call_command(self.program, ('0001', self.user_1.username), ('0002', self.user_2.username))
             logger.check_present((COMMAND_PATH, 'WARNING', msg_1))
