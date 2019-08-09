@@ -5,7 +5,7 @@ from __future__ import absolute_import
 
 import io
 import os
-from contextlib import contextmanager, nested
+from contextlib import contextmanager, ExitStack
 from importlib import import_module
 from shutil import rmtree
 from tempfile import mkdtemp
@@ -419,7 +419,8 @@ class MixedModulestoreBuilder(StoreBuilderBase):
         """
         names, generators = list(zip(*self.store_builders))
 
-        with nested(*(gen.build_with_contentstore(contentstore, **kwargs) for gen in generators)) as modulestores:
+        with ExitStack() as stack:
+            modulstores = [ stack.enter_context(gen.build_with_contentstore(contentstore, **kwargs)) for gen in generators ]
             # Make the modulestore creation function just return the already-created modulestores
             store_iterator = iter(modulestores)
             next_modulestore = lambda *args, **kwargs: next(store_iterator)
