@@ -68,7 +68,7 @@ coverage==5.0a6
 git+https://github.com/nedbat/coverage_pytest_plugin.git@29de030251471e200ff255eb9e549218cd60e872#egg=coverage_pytest_plugin==0.0
 git+https://github.com/edx/crowdsourcehinter.git@a7ffc85b134b7d8909bf1fefd23dbdb8eb28e467#egg=crowdsourcehinter-xblock==0.2
 cryptography==2.7
-cssselect==1.0.3
+cssselect==1.1.0
 cssutils==1.0.2
 ddt==1.2.1
 decorator==4.4.0
@@ -152,7 +152,7 @@ elasticsearch==1.9.0
 entrypoints==0.3
 enum34==1.1.6
 event-tracking==0.2.9
-execnet==1.6.1
+execnet==1.7.0
 factory_boy==2.8.1
 faker==2.0.0
 faulthandler==3.1 ; python_version == "2.7"
@@ -213,7 +213,7 @@ mongoengine==0.10.0
 more-itertools==5.0.0
 moto==1.3.1
 mpmath==1.1.0
-mysqlclient==1.4.2.post1
+mysqlclient==1.4.3
 networkx==1.7
 newrelic==4.20.1.121
 nltk==3.4.4
@@ -280,7 +280,7 @@ pytz==2019.2
 pyuca==1.1
 pyyaml==5.1.2
 radon==3.0.3
-git+https://github.com/edx/RecommenderXBlock.git@1.4.0#egg=recommender-xblock==1.4.0
+git+https://github.com/edx/RecommenderXBlock.git@1.4.1#egg=recommender-xblock==1.4.1
 redis==2.10.6
 reportlab==3.5.23
 requests-oauthlib==1.1.0
@@ -315,7 +315,7 @@ sphinxcontrib-websupport==1.1.2  # via sphinx
 sqlparse==0.3.0
 staff-graded-xblock==0.5
 stevedore==1.30.1
-super-csv==0.8
+super-csv==0.9
 sympy==1.4
 testfixtures==6.10.0
 text-unidecode==1.2
