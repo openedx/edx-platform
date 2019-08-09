@@ -349,7 +349,6 @@ xblock==1.2.3
 xmlsec==1.3.3
 xmltodict==0.12.0
 xss-utils==0.1.1
-zendesk==1.1.1
 zipp==0.5.2
 
 # The following packages are considered to be unsafe in a requirements file:
