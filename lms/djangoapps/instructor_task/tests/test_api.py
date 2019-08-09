@@ -240,7 +240,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         api_call = lambda: submit_calculate_problem_responses_csv(
             self.create_task_request(self.instructor),
             self.course.id,
-            problem_locations='',
+            problem_location=''
         )
         self._test_resubmission(api_call)
 
