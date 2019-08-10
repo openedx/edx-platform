@@ -4,6 +4,7 @@
 #
 #    make upgrade
 #
+numpy==1.7.2
 common/lib/sandbox-packages
 common/lib/symmath
 asn1crypto==0.24.0
@@ -21,7 +22,6 @@ markupsafe==1.1.1
 matplotlib==2.2.4
 networkx==1.7
 nltk==3.4.4
-numpy==1.7.2
 pycparser==2.19
 pyparsing==2.2.0
 python-dateutil==2.8.0    # via matplotlib
