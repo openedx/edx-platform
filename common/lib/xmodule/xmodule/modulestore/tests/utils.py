@@ -255,7 +255,7 @@ class StoreBuilderBase(object):
     @contextmanager
     def build(self, **kwargs):
         """
-        Build the modulstore, optionally building the contentstore as well.
+        Build the modulestore, optionally building the contentstore as well.
         """
         contentstore = kwargs.pop('contentstore', None)
         if not contentstore:
@@ -420,7 +420,7 @@ class MixedModulestoreBuilder(StoreBuilderBase):
         names, generators = list(zip(*self.store_builders))
 
         with ExitStack() as stack:
-            modulstores = [ stack.enter_context(gen.build_with_contentstore(contentstore, **kwargs)) for gen in generators ]
+            modulestores = [ stack.enter_context(gen.build_with_contentstore(contentstore, **kwargs)) for gen in generators ]
             # Make the modulestore creation function just return the already-created modulestores
             store_iterator = iter(modulestores)
             next_modulestore = lambda *args, **kwargs: next(store_iterator)
