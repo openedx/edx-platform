@@ -164,7 +164,7 @@ mongoengine==0.10.0
 mpmath==1.1.0             # via sympy
 mysqlclient==1.4.2.post1
 networkx==1.7
-newrelic==5.0.0.124
+newrelic==4.20.1.121
 nltk==3.4.4
 nodeenv==1.1.1
 numpy==1.16.4
