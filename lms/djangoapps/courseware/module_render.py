@@ -888,6 +888,7 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
         system,
         user.id,
         [
+            partial(DateLookupFieldData, course_id=course_id, user=user),
             partial(OverrideFieldData.wrap, user, course),
             partial(LmsFieldData, student_data=student_data),
         ],

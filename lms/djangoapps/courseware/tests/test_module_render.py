@@ -26,6 +26,7 @@ from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactor
 from edx_proctoring.api import create_exam, create_exam_attempt, update_attempt_status
 from edx_proctoring.runtime import set_runtime_service
 from edx_proctoring.tests.test_services import MockCertificateService, MockCreditService, MockGradesService
+from edx_when.field_data import DateLookupFieldData
 from freezegun import freeze_time
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import MagicMock, Mock, patch
@@ -493,10 +494,14 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             OverrideFieldData
         )
 
-        # the OverrideFieldData should point to the original unwrapped field_data
-        self.assertIs(
+        # the OverrideFieldData should point to the date FieldData
+        self.assertIsInstance(
             # pylint: disable=protected-access
             descriptor._field_data._authored_data._source.fallback,
+            DateLookupFieldData
+        )
+        self.assertIs(
+            descriptor._field_data._authored_data._source.fallback._defaults,
             descriptor._unwrapped_field_data
         )
 
