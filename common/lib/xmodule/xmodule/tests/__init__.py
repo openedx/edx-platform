@@ -16,7 +16,7 @@ import pprint
 import sys
 import traceback
 import unittest
-from contextlib import contextmanager, nested
+from contextlib import contextmanager
 from functools import wraps
 
 import six
