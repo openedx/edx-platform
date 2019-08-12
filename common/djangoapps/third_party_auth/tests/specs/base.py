@@ -20,6 +20,8 @@ from social_core import actions, exceptions
 from social_django import utils as social_utils
 from social_django import views as social_views
 
+from waffle.testutils import override_switch
+from third_party_auth import ENABLE_OKTA_AUTH_FIX
 from lms.djangoapps.commerce.tests import TEST_API_URL
 from openedx.core.djangoapps.user_authn.views.deprecated import signin_user, create_account, register_user
 from openedx.core.djangoapps.user_authn.views.login import login_user
@@ -909,6 +911,14 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         _, strategy = self.get_request_and_strategy(auth_entry=None, redirect_uri='social:complete')
         response = self.fake_auth_complete(strategy)
         self.assertEqual(response.url, reverse('signin_user'))
+
+    @override_switch(ENABLE_OKTA_AUTH_FIX.namespaced_switch_name, active=True)
+    def test_pipeline_assumes_login_if_auth_entry_missing_okta_fix(self):
+        print("is enabled?", ENABLE_OKTA_AUTH_FIX.is_enabled())
+        _, strategy = self.get_request_and_strategy(auth_entry=None, redirect_uri='social:complete')
+        response = self.fake_auth_complete(strategy)
+        self.assertEqual(response.url, reverse('signin_user'))
+        self.assertTrue(False)
 
     def assert_first_party_auth_trumps_third_party_auth(self, email=None, password=None, success=None):
         """Asserts first party auth was used in place of third party auth.

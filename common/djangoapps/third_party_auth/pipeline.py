@@ -454,6 +454,8 @@ def parse_query_params(strategy, response, *args, **kwargs):
     # If auth_entry is not in the session, we got here by a non-standard workflow.
     # We simply assume 'login' in that case.
     auth_entry = strategy.request.session.get(AUTH_ENTRY_KEY, AUTH_ENTRY_LOGIN)
+    # import pdb; pdb.set_trace()
+    print("is enabled in parse_query_params?", ENABLE_OKTA_AUTH_FIX.is_enabled())
     if auth_entry not in _AUTH_ENTRY_CHOICES:
         if not auth_entry and ENABLE_OKTA_AUTH_FIX.is_enabled():
             # This change is for get okta working with the pipeline.

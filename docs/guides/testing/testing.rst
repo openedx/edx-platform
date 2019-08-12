@@ -256,10 +256,10 @@ How to output coverage locally
 
 These are examples of how to run a single test and get coverage::
 
-    pytest cms/djangoapps/contentstore/tests/test_import.py --cov --cov-conifg=.coveragerc-local # cms example
-    pytest lms/djangoapps/courseware/tests/test_module_render.py --cov --cov-conifg=.coveragerc-local # lms example
+    pytest cms/djangoapps/contentstore/tests/test_import.py --cov --cov-config=.coveragerc-local # cms example
+    pytest lms/djangoapps/courseware/tests/test_module_render.py --cov --cov-config=.coveragerc-local # lms example
 
-That ``--cov-conifg=.coveragerc-local`` option is important - without it, the coverage
+That ``--cov-config=.coveragerc-local`` option is important - without it, the coverage
 tool will look for paths that exist on our jenkins test servers, but not on your local devstack.
 
 How to spit out coverage for a single file with a list of each line that is missing coverage::
@@ -289,7 +289,7 @@ Use this command to generate an HTML report::
 
     coverage html
 
-The report is then saved in reports/common/lib/xmodule/cover/index.html
+The report is then saved in reports/cover/index.html
 
 To run tests for stub servers, for example for `YouTube stub server`_, you can
 run one of these commands::
