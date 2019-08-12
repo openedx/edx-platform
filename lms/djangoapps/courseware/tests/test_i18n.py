@@ -6,6 +6,7 @@ from __future__ import absolute_import
 
 import json
 import re
+import six
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -36,7 +37,8 @@ class BaseI18nTestCase(CacheIsolationTestCase):
 
     def assert_tag_has_attr(self, content, tag, attname, value):
         """Assert that a tag in `content` has a certain value in a certain attribute."""
-        regex = ur"""<{tag} [^>]*\b{attname}=['"]([\w\d\- ]+)['"][^>]*>""".format(tag=tag, attname=attname)
+        regex_string = six.text_type(r"""<{tag} [^>]*\b{attname}=['"]([\w\d\- ]+)['"][^>]*>""")  # noqa: W605,E501 pylint: disable=unicode-format-string
+        regex = regex_string.format(tag=tag, attname=attname)
         match = re.search(regex, content)
         self.assertTrue(match, u"Couldn't find desired tag '%s' with attr '%s' in %r" % (tag, attname, content))
         attvalues = match.group(1).split()

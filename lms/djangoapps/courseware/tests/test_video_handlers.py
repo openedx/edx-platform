@@ -34,7 +34,7 @@ from .test_video_xml import SOURCE_XML
 
 TRANSCRIPT = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}
 BUMPER_TRANSCRIPT = {"start": [1], "end": [10], "text": ["A bumper"]}
-SRT_content = textwrap.dedent("""
+SRT_content = textwrap.dedent(u"""
         0
         00:00:00,12 --> 00:00:00,100
         Привіт, edX вітає вас.
@@ -46,9 +46,10 @@ def _create_srt_file(content=None):
     Create srt file in filesystem.
     """
     content = content or SRT_content
+
     srt_file = tempfile.NamedTemporaryFile(suffix=".srt")
     srt_file.content_type = 'application/x-subrip; charset=utf-8'
-    srt_file.write(content)
+    srt_file.write(content.encode('utf-8'))
     srt_file.seek(0)
     return srt_file
 
@@ -985,7 +986,7 @@ class TestStudioTranscriptTranslationPostDispatch(TestVideo):
             "edx_video_id": "",
             "language_code": "ar",
             "new_language_code": "uk",
-            "file": ("filename.srt", SRT_content.decode("utf8").encode("cp1251"))
+            "file": ("filename.srt", SRT_content.encode("cp1251"))
         }
 
         request = Request.blank("/translation", POST=post_data)
