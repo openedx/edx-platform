@@ -59,7 +59,7 @@ click-log==0.3.2
 click==7.0
 code-annotations==0.3.2
 colorama==0.4.1
-configparser==3.7.4
+configparser==3.8.1
 contextlib2==0.5.5
 cookies==2.2.1
 coreapi==2.3.3
@@ -213,7 +213,7 @@ mongoengine==0.10.0
 more-itertools==5.0.0
 moto==1.3.1
 mpmath==1.1.0
-mysqlclient==1.4.3
+mysqlclient==1.4.4
 networkx==1.7
 newrelic==4.20.1.121
 nltk==3.4.4
@@ -290,7 +290,7 @@ rfc6266-parser==0.0.5.post2
 ruamel.ordereddict==0.4.14 ; python_version == "2.7"
 ruamel.yaml.clib==0.1.2
 ruamel.yaml==0.16.1
-rules==2.0.1
+rules==2.1
 s3transfer==0.1.13
 sailthru-client==2.2.3
 scandir==1.10.0
