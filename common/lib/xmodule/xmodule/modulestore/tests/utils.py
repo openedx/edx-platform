@@ -5,7 +5,8 @@ from __future__ import absolute_import
 
 import io
 import os
-from contextlib import contextmanager, ExitStack
+from contextlib import contextmanager
+from contextlib2 import ExitStack
 from importlib import import_module
 from shutil import rmtree
 from tempfile import mkdtemp
