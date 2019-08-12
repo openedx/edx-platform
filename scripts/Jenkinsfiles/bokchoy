@@ -4,16 +4,21 @@ def runBokchoyTests() {
     if (env.ghprbActualCommit) {
         git_branch = "${ghprbActualCommit}"
         git_refspec = "+refs/pull/${ghprbPullId}/*:refs/remotes/origin/pr/${ghprbPullId}/*"
+        target_branch = "origin/${ghprbTargetBranch}"
     } else {
         git_branch = "${BRANCH_NAME}"
         git_refspec = "+refs/heads/${BRANCH_NAME}:refs/remotes/origin/${BRANCH_NAME}"
+        target_branch = "origin/${BRANCH_NAME}"
     }
     sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
         checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: git_branch]],
             doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', honorRefspec: true,
             noTags: true, shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-worker',
             refspec: git_refspec, url: "git@github.com:edx/${REPO_NAME}.git"]]]
-        sh 'bash scripts/all-tests.sh'
+        sh """
+        export TARGET_BRANCH=$target_branch
+        ./scripts/all-tests.sh
+        """
         stash includes: 'reports/bok_choy/*coverage*', name: "${TEST_SUITE}-reports-${SHARD}", allowEmpty: true
     }
 }

@@ -51,7 +51,7 @@ else
 fi
 
 if [[ -n "$FILTER_WHO_TESTS_WHAT" ]]; then
-    PAVER_ARGS="$PAVER_ARGS --with-wtw=origin/master"
+    PAVER_ARGS="$PAVER_ARGS --with-wtw=$TARGET_BRANCH"
 fi
 if [[ -n "$COLLECT_WHO_TESTS_WHAT" ]]; then
     PAVER_ARGS="$PAVER_ARGS --pytest-contexts"
