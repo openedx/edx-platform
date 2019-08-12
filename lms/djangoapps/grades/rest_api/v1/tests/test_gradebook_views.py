@@ -29,7 +29,8 @@ from lms.djangoapps.grades.models import (
     BlockRecordList,
     PersistentSubsectionGrade,
     PersistentSubsectionGradeOverride,
-    PersistentSubsectionGradeOverrideHistory
+    PersistentSubsectionGradeOverrideHistory,
+    PersistentCourseGrade,
 )
 from lms.djangoapps.grades.rest_api.v1.tests.mixins import GradeViewTestMixin
 from lms.djangoapps.grades.rest_api.v1.views import CourseEnrollmentPagination
@@ -1030,6 +1031,184 @@ class GradebookViewTest(GradebookViewTestBase):
                 if expected_page_size > user_size:
                     expected_page_size = user_size
                 self.assertEqual(len(actual_data['results']), expected_page_size)
+
+    @ddt.data(
+        ['login_staff', 4],
+        ['login_course_admin', 5],
+        ['login_course_staff', 5]
+    )
+    @ddt.unpack
+    def test_filter_course_grade_min(self, login_method, num_enrollments):
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
+            # even though we're creating actual PersistentCourseGrades below, we still need
+            # mocked subsection grades
+            mock_grade.side_effect = [
+                self.mock_course_grade(self.student, passed=True, percent=0.85),
+                self.mock_course_grade(self.program_student, passed=True, percent=0.75),
+            ]
+
+            PersistentCourseGrade(
+                user_id=self.student.id,
+                course_id=self.course_key,
+                percent_grade=0.85
+            ).save()
+            PersistentCourseGrade(
+                user_id=self.other_student.id,
+                course_id=self.course_key,
+                percent_grade=0.45
+            ).save()
+            PersistentCourseGrade(
+                user_id=self.program_student.id,
+                course_id=self.course_key,
+                percent_grade=0.75
+            ).save()
+
+            with override_waffle_flag(self.waffle_flag, active=True):
+                getattr(self, login_method)()
+                resp = self.client.get(
+                    self.get_url(course_key=self.course.id) + '?course_grade_min=50'
+                )
+
+                expected_results = [
+                    OrderedDict([
+                        ('user_id', self.student.id),
+                        ('username', self.student.username),
+                        ('email', ''),
+                        ('percent', 0.85),
+                        ('section_breakdown', self.expected_subsection_grades()),
+                    ]),
+                    OrderedDict([
+                        ('user_id', self.program_student.id),
+                        ('username', self.program_student.username),
+                        ('email', ''),
+                        ('external_user_key', 'program_user_key_0'),
+                        ('percent', 0.75),
+                        ('section_breakdown', self.expected_subsection_grades()),
+                    ])
+                ]
+
+                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                actual_data = dict(resp.data)
+                self.assertEqual(expected_results, actual_data['results'])
+                self.assertEqual(actual_data['total_users_count'], num_enrollments)
+                self.assertEqual(actual_data['filtered_users_count'], 2)
+
+    @ddt.data(
+        ['login_staff', 4],
+        ['login_course_admin', 5],
+        ['login_course_staff', 5]
+    )
+    @ddt.unpack
+    def test_filter_course_grade_min_and_max(self, login_method, num_enrollments):
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
+            # even though we're creating actual PersistentCourseGrades below, we still need
+            # mocked subsection grades
+            mock_grade.side_effect = [
+                self.mock_course_grade(self.program_student, passed=True, percent=0.75),
+            ]
+
+            PersistentCourseGrade(
+                user_id=self.student.id,
+                course_id=self.course_key,
+                percent_grade=0.85
+            ).save()
+            PersistentCourseGrade(
+                user_id=self.other_student.id,
+                course_id=self.course_key,
+                percent_grade=0.45
+            ).save()
+            PersistentCourseGrade(
+                user_id=self.program_student.id,
+                course_id=self.course_key,
+                percent_grade=0.75
+            ).save()
+
+            with override_waffle_flag(self.waffle_flag, active=True):
+                getattr(self, login_method)()
+                resp = self.client.get(
+                    self.get_url(course_key=self.course.id) + '?course_grade_min=50&course_grade_max=80'
+                )
+
+                expected_results = [
+                    OrderedDict([
+                        ('user_id', self.program_student.id),
+                        ('username', self.program_student.username),
+                        ('email', ''),
+                        ('external_user_key', 'program_user_key_0'),
+                        ('percent', 0.75),
+                        ('section_breakdown', self.expected_subsection_grades()),
+                    ]),
+                ]
+
+                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                actual_data = dict(resp.data)
+                self.assertEqual(expected_results, actual_data['results'])
+                self.assertEqual(actual_data['total_users_count'], num_enrollments)
+                self.assertEqual(actual_data['filtered_users_count'], 1)
+
+    @ddt.data(
+        ['login_staff', 4],
+        ['login_course_admin', 5],
+        ['login_course_staff', 5]
+    )
+    @ddt.unpack
+    def test_filter_course_grade_absent(self, login_method, num_enrollments):
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
+            # even though we're creating actual PersistentCourseGrades below, we still need
+            # mocked subsection grades
+            mock_grade.side_effect = [
+                self.mock_course_grade(self.student, passed=True, percent=0.0),
+                self.mock_course_grade(self.other_student, passed=False, percent=0.45),
+                self.mock_course_grade(self.program_student, passed=True, percent=0.75),
+            ]
+
+            PersistentCourseGrade(
+                user_id=self.other_student.id,
+                course_id=self.course_key,
+                percent_grade=0.45
+            ).save()
+            PersistentCourseGrade(
+                user_id=self.program_student.id,
+                course_id=self.course_key,
+                percent_grade=0.75
+            ).save()
+
+            with override_waffle_flag(self.waffle_flag, active=True):
+                getattr(self, login_method)()
+                resp = self.client.get(
+                    self.get_url(course_key=self.course.id) + '?course_grade_min=0'
+                )
+
+                expected_results = [
+                    OrderedDict([
+                        ('user_id', self.student.id),
+                        ('username', self.student.username),
+                        ('email', ''),
+                        ('percent', 0.0),
+                        ('section_breakdown', self.expected_subsection_grades()),
+                    ]),
+                    OrderedDict([
+                        ('user_id', self.other_student.id),
+                        ('username', self.other_student.username),
+                        ('email', ''),
+                        ('percent', 0.45),
+                        ('section_breakdown', self.expected_subsection_grades()),
+                    ]),
+                    OrderedDict([
+                        ('user_id', self.program_student.id),
+                        ('username', self.program_student.username),
+                        ('email', ''),
+                        ('external_user_key', 'program_user_key_0'),
+                        ('percent', 0.75),
+                        ('section_breakdown', self.expected_subsection_grades()),
+                    ])
+                ]
+
+                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                actual_data = dict(resp.data)
+                self.assertEqual(expected_results, actual_data['results'])
+                self.assertEqual(actual_data['total_users_count'], num_enrollments)
+                self.assertEqual(actual_data['filtered_users_count'], num_enrollments)
 
 
 @ddt.ddt
