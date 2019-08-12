@@ -1350,6 +1350,10 @@ ZENDESK_USER = ''
 ZENDESK_API_KEY = ''
 ZENDESK_CUSTOM_FIELDS = {}
 ZENDESK_OAUTH_ACCESS_TOKEN = ''
+# A mapping of string names to Zendesk Group IDs
+# To get the IDs of your groups you can go to
+# {zendesk_url}/api/v2/groups.json
+ZENDESK_GROUP_ID_MAPPING = {}
 
 ##### EMBARGO #####
 EMBARGO_SITE_REDIRECT_URL = None

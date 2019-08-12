@@ -61,16 +61,21 @@ def create_zendesk_ticket(
         }
     }
 
+    # Encode the data to create a JSON payload
+    payload = json.dumps(data)
+
     if not (settings.ZENDESK_URL and settings.ZENDESK_OAUTH_ACCESS_TOKEN):
-        log.error(_std_error_message("zendesk not configured", data))
+        log.error(_std_error_message("zendesk not configured", payload))
         return status.HTTP_503_SERVICE_UNAVAILABLE
 
     if group:
-        group_id = get_zendesk_group_by_name(group)
-        data['ticket']['group_id'] = group_id
-
-    # Encode the data to create a JSON payload
-    payload = json.dumps(data)
+        if group in settings.ZENDESK_GROUP_ID_MAPPING:
+            group_id = settings.ZENDESK_GROUP_ID_MAPPING[group]
+            data['ticket']['group_id'] = group_id
+        else:
+            msg = u"Group ID not found for group {}. Please update ZENDESK_GROUP_ID_MAPPING".format(group)
+            log.error(_std_error_message(msg, payload))
+            return status.HTTP_503_SERVICE_UNAVAILABLE
 
     # Set the request parameters
     url = urljoin(settings.ZENDESK_URL, '/api/v2/tickets.json')
@@ -96,28 +101,6 @@ def create_zendesk_ticket(
     except Exception:  # pylint: disable=broad-except
         log.exception(_std_error_message('Internal server error', payload))
         return status.HTTP_500_INTERNAL_SERVER_ERROR
-
-
-def get_zendesk_group_by_name(name):
-    """
-    Calls the Zendesk list-groups api
-
-    Returns the group Id matching the name.
-    """
-    url = urljoin(settings.ZENDESK_URL, '/api/v2/groups.json')
-
-    try:
-        response = requests.get(url, headers=_get_request_headers())
-
-        groups = json.loads(response.text)['groups']
-        for group in groups:
-            if group['name'] == name:
-                return group['id']
-    except Exception as exception:  # pylint: disable=broad-except
-        log.exception(_std_error_message('Internal server error', response.text))
-        raise exception
-    log.exception(_std_error_message('Tried to get zendesk group which does not exist', name))
-    raise Exception
 
 
 def post_additional_info_as_comment(ticket_id, additional_info):
