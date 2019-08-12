@@ -388,7 +388,7 @@ def generate_activation_email_context(user, registration):
 
 def create_or_set_user_attribute_created_on_site(user, site):
     """
-    Create or Set UserAttribute indicating the microsite site the user account was created on.
+    Create or Set UserAttribute indicating the site the user account was created on.
     User maybe created on 'courses.edx.org', or a white-label site. Due to the very high
     traffic on this table we now ignore the default site (eg. 'courses.edx.org') and
     code which comsumes this attribute should assume a 'created_on_site' which doesn't exist

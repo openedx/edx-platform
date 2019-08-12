@@ -255,9 +255,6 @@ FEATURES = {
     # defaults, so that we maintain current behavior
     'ALLOW_WIKI_ROOT_ACCESS': True,
 
-    # Turn on/off Microsites feature
-    'USE_MICROSITES': False,
-
     # Turn on third-party auth. Disabled for now because full implementations are not yet available. Remember to run
     # migrations if you enable this; we don't create tables by default.
     'ENABLE_THIRD_PARTY_AUTH': False,
@@ -646,8 +643,6 @@ def _make_mako_template_dirs(settings):
         for theme in get_themes_unchecked(themes_dirs, settings.PROJECT_ROOT):
             if theme.themes_base_dir not in settings.MAKO_TEMPLATE_DIRS_BASE:
                 settings.MAKO_TEMPLATE_DIRS_BASE.insert(0, theme.themes_base_dir)
-    if settings.FEATURES.get('USE_MICROSITES', False) and getattr(settings, "MICROSITE_CONFIGURATION", False):
-        settings.MAKO_TEMPLATE_DIRS_BASE.insert(0, settings.MICROSITE_ROOT_DIR)
     return settings.MAKO_TEMPLATE_DIRS_BASE
 
 
@@ -672,9 +667,6 @@ CONTEXT_PROCESSORS = [
 
     # Timezone processor (sends language and time_zone preference)
     'courseware.context_processor.user_timezone_locale_prefs',
-
-    # Allows the open edX footer to be leveraged in Django Templates.
-    'edxmako.shortcuts.footer_context_processor',
 
     # Online contextual help
     'help_tokens.context_processor',
@@ -731,19 +723,6 @@ TEMPLATES = [
 derived_collection_entry('TEMPLATES', 1, 'DIRS')
 DEFAULT_TEMPLATE_ENGINE = TEMPLATES[0]
 DEFAULT_TEMPLATE_ENGINE_DIRS = DEFAULT_TEMPLATE_ENGINE['DIRS'][:]
-
-
-def _add_microsite_dirs_to_default_template_engine(settings):
-    """
-    Derives the final DEFAULT_TEMPLATE_ENGINE['DIRS'] setting from other settings.
-    """
-    if settings.FEATURES.get('USE_MICROSITES', False) and getattr(settings, "MICROSITE_CONFIGURATION", False):
-        DEFAULT_TEMPLATE_ENGINE_DIRS.append(settings.MICROSITE_ROOT_DIR)
-    return DEFAULT_TEMPLATE_ENGINE_DIRS
-
-
-DEFAULT_TEMPLATE_ENGINE['DIRS'] = _add_microsite_dirs_to_default_template_engine
-derived_collection_entry('DEFAULT_TEMPLATE_ENGINE', 'DIRS')
 
 ###############################################################################################
 
@@ -1450,7 +1429,6 @@ MIDDLEWARE_CLASSES = [
 
     'mobile_api.middleware.AppVersionUpgrade',
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
-    'microsite_configuration.middleware.MicrositeMiddleware',
     'lms.djangoapps.discussion.django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sites.middleware.CurrentSiteMiddleware',
@@ -2383,7 +2361,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.dark_lang',
 
     # Microsite configuration
-    'microsite_configuration.apps.MicrositeConfigurationConfig',
+    'microsite_configuration.MicrositeConfigurationConfig',
 
     # RSS Proxy
     'rss_proxy',
@@ -3440,23 +3418,6 @@ EDX_DRF_EXTENSIONS = {
     # user data from values in (possibly stale) JWTs.
     'JWT_PAYLOAD_USER_ATTRIBUTE_MAPPING': {},
 }
-
-################################ Settings for Microsites ################################
-
-### Select an implementation for the microsite backend
-# for MICROSITE_BACKEND possible choices are
-# 1. microsite_configuration.backends.filebased.FilebasedMicrositeBackend
-# 2. microsite_configuration.backends.database.DatabaseMicrositeBackend
-MICROSITE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrositeBackend'
-# for MICROSITE_TEMPLATE_BACKEND possible choices are
-# 1. microsite_configuration.backends.filebased.FilebasedMicrositeTemplateBackend
-# 2. microsite_configuration.backends.database.DatabaseMicrositeTemplateBackend
-MICROSITE_TEMPLATE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrositeTemplateBackend'
-# TTL for microsite database template cache
-MICROSITE_DATABASE_TEMPLATE_CACHE_TTL = 5 * 60
-
-MICROSITE_ROOT_DIR = '/edx/app/edxapp/edx-microsite'
-MICROSITE_CONFIGURATION = {}
 
 ################################ Settings for rss_proxy ################################
 

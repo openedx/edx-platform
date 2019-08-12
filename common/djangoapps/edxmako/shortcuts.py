@@ -129,17 +129,6 @@ def marketing_link_context_processor(request):
     )
 
 
-def footer_context_processor(request):  # pylint: disable=unused-argument
-    """
-    Checks the site name to determine whether to use the edX.org footer or the Open Source Footer.
-    """
-    return dict(
-        [
-            ("IS_REQUEST_IN_MICROSITE", is_request_in_themed_site())
-        ]
-    )
-
-
 def render_to_string(template_name, dictionary, namespace='main', request=None):
     """
     Render a Mako template to as a string.

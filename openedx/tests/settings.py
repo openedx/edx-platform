@@ -101,9 +101,6 @@ LMS_ROOT_URL = "http://localhost:8000"
 
 MEDIA_ROOT = tempfile.mkdtemp()
 
-MICROSITE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrositeBackend'
-MICROSITE_TEMPLATE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrositeTemplateBackend'
-
 RECALCULATE_GRADES_ROUTING_KEY = 'edx.core.default'
 POLICY_CHANGE_GRADES_ROUTING_KEY = 'edx.core.default'
 POLICY_CHANGE_TASK_RATE_LIMIT = '300/h'
