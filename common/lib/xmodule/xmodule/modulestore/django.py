@@ -9,6 +9,8 @@ from __future__ import absolute_import
 from importlib import import_module
 import gettext
 import logging
+
+import six
 from pkg_resources import resource_filename
 import re
 
@@ -250,7 +252,7 @@ def create_modulestore_instance(
 
     FUNCTION_KEYS = ['render_template']
     for key in FUNCTION_KEYS:
-        if key in _options and isinstance(_options[key], basestring):
+        if key in _options and isinstance(_options[key], six.string_types):
             _options[key] = load_function(_options[key])
 
     request_cache = DEFAULT_REQUEST_CACHE

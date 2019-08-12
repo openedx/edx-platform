@@ -11,7 +11,7 @@ from django.urls import resolve
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from search.search_engine_base import SearchEngine
-from six import add_metaclass
+from six import add_metaclass, string_types
 
 from contentstore.course_group_config import GroupConfiguration
 from course_modes.models import CourseMode
@@ -621,7 +621,7 @@ class CourseAboutSearchIndexer(object):
             if section_content:
                 if about_information.index_flags & AboutInfo.ANALYSE:
                     analyse_content = section_content
-                    if isinstance(section_content, basestring):
+                    if isinstance(section_content, string_types):
                         analyse_content = strip_html_content_to_text(section_content)
                     course_info['content'][about_information.property_name] = analyse_content
                 if about_information.index_flags & AboutInfo.PROPERTY:

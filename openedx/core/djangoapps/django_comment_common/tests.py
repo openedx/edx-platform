@@ -127,7 +127,7 @@ class CourseDiscussionSettingsTest(ModuleStoreTestCase):
     def test_invalid_data_types(self):
         exception_msg_template = "Incorrect field type for `{}`. Type must be `{}`"
         fields = [
-            {'name': 'division_scheme', 'type': basestring},
+            {'name': 'division_scheme', 'type': six.string_types[0]},
             {'name': 'always_divide_inline_discussions', 'type': bool},
             {'name': 'divided_discussions', 'type': list}
         ]

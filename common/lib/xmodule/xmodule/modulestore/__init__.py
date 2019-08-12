@@ -603,7 +603,7 @@ class ModuleStoreAssetBase(object):
         return mdata
 
     @contract(
-        course_key='CourseKey', asset_type='None | basestring',
+        course_key='CourseKey', asset_type='None | str',
         start='int | None', maxresults='int | None', sort='tuple(str,int) | None'
     )
     def get_all_asset_metadata(self, course_key, asset_type, start=0, maxresults=-1, sort=None, **kwargs):
