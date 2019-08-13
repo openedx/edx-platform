@@ -3,7 +3,6 @@ Defines an endpoint for gradebook data related to a course.
 """
 from __future__ import absolute_import
 
-import hashlib
 import logging
 from collections import namedtuple
 from contextlib import contextmanager
@@ -11,7 +10,7 @@ from functools import wraps
 
 import six
 from django.core.cache import cache
-from django.db.models import Q
+from django.db.models import Case, Exists, F, OuterRef, When, Q
 from django.urls import reverse
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -534,6 +533,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             return Response(serializer.data)
         else:
             q_objects = []
+            annotations = {}
             if request.GET.get('user_contains'):
                 search_term = request.GET.get('user_contains')
                 q_objects.append(
@@ -551,12 +551,40 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
                     q_objects.append(Q(user__in=[]))
             if request.GET.get('enrollment_mode'):
                 q_objects.append(Q(mode=request.GET.get('enrollment_mode')))
+            if request.GET.get('assignment') and (
+                    request.GET.get('assignment_grade_max')
+                    or request.GET.get('assignment_grade_min')):
+                subqueryset = PersistentSubsectionGrade.objects.annotate(
+                    effective_grade_percentage=Case(
+                        When(override__isnull=False,
+                             then=(
+                                 F('override__earned_all_override')
+                                 / F('override__possible_all_override')
+                             ) * 100),
+                        default=(F('earned_all') / F('possible_all')) * 100
+                    )
+                )
+                grade_conditions = {
+                    'effective_grade_percentage__range': (
+                        request.GET.get('assignment_grade_min', 0),
+                        request.GET.get('assignment_grade_max', 100)
+                    )
+                }
+                annotations['selected_assignment_grade_in_range'] = Exists(
+                    subqueryset.filter(
+                        course_id=OuterRef('course'),
+                        user_id=OuterRef('user'),
+                        usage_key=UsageKey.from_string(request.GET.get('assignment')),
+                        **grade_conditions
+                    )
+                )
+                q_objects.append(Q(selected_assignment_grade_in_range=True))
 
             entries = []
             related_models = ['user']
-            users = self._paginate_users(course_key, q_objects, related_models)
+            users = self._paginate_users(course_key, q_objects, related_models, annotations=annotations)
 
-            users_counts = self._get_users_counts(course_key, q_objects)
+            users_counts = self._get_users_counts(course_key, q_objects, annotations=annotations)
 
             with bulk_gradebook_view_context(course_key, users):
                 for user, course_grade, exc in CourseGradeFactory().iter(
@@ -569,23 +597,26 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             serializer = StudentGradebookEntrySerializer(entries, many=True)
             return self.get_paginated_response(serializer.data, **users_counts)
 
-    def _get_user_count(self, query_args, cache_time=3600):
+    def _get_user_count(self, query_args, cache_time=3600, annotations=None):
         """
         Return the user count for the given query arguments to CourseEnrollment.
 
         caches the count for cache_time seconds.
         """
-        hasher = hashlib.md5()
-        for arg in query_args:
-            hasher.update(bytes(arg))
-        cache_key = 'usercount.%s' % hasher.hexdigest()
+        queryset = CourseEnrollment.objects
+        if annotations:
+            queryset = queryset.annotate(**annotations)
+        queryset = queryset.filter(*query_args)
+
+        cache_key = 'usercount.%s' % queryset.query
         user_count = cache.get(cache_key, None)
         if user_count is None:
-            user_count = CourseEnrollment.objects.filter(*query_args).count()
+            user_count = queryset.count()
             cache.set(cache_key, user_count, cache_time)
+
         return user_count
 
-    def _get_users_counts(self, course_key, course_enrollment_filters):
+    def _get_users_counts(self, course_key, course_enrollment_filters, annotations=None):
         """
         Return a dictionary containing data about the total number of users and total number
         of users matching a given filter in a given course.
@@ -593,6 +624,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
         Arguments:
             course_key: the opaque key for the course
             course_enrollment_filters: a list of Q objects representing filters to be applied to CourseEnrollments
+            annotations: Optional dict of fields to add to the queryset via annotation
 
         Returns:
             dict:
@@ -613,7 +645,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
         filtered_users_count = (
             total_users_count
             if not course_enrollment_filters
-            else self._get_user_count(filter_args)
+            else self._get_user_count(filter_args, annotations=annotations)
         )
 
         return {
