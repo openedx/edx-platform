@@ -583,24 +583,25 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             if request.GET.get('course_grade_min') or request.GET.get('course_grade_max'):
                 grade_conditions = {}
                 q_object = Q()
-                if request.GET.get('course_grade_min'):
+                course_grade_min = request.GET.get('course_grade_min')
+                if course_grade_min:
                     course_grade_min = float(request.GET.get('course_grade_min')) / 100
                     grade_conditions['percent_grade__gte'] = course_grade_min
-
-                    if course_grade_min == 0:
-                        subquery_grade_absent = ~Exists(
-                            PersistentCourseGrade.objects.filter(
-                                course_id=OuterRef('course'),
-                                user_id=OuterRef('user_id'),
-                            )
-                        )
-
-                        annotations['course_grade_absent'] = subquery_grade_absent
-                        q_object |= Q(course_grade_absent=True)
 
                 if request.GET.get('course_grade_max'):
                     course_grade_max = float(request.GET.get('course_grade_max')) / 100
                     grade_conditions['percent_grade__lte'] = course_grade_max
+
+                if not course_grade_min or course_grade_min == 0:
+                    subquery_grade_absent = ~Exists(
+                        PersistentCourseGrade.objects.filter(
+                            course_id=OuterRef('course'),
+                            user_id=OuterRef('user_id'),
+                        )
+                    )
+
+                    annotations['course_grade_absent'] = subquery_grade_absent
+                    q_object |= Q(course_grade_absent=True)
 
                 subquery_grade_in_range = Exists(
                     PersistentCourseGrade.objects.filter(
