@@ -109,6 +109,7 @@ from student.models import (
     Registration,
     UserProfile,
     anonymous_id_for_user,
+    get_user_by_username_or_email,
     get_user_by_username_or_email_inside_organization,
     unique_id_for_user,
     is_email_retired
@@ -3126,7 +3127,10 @@ def get_student(username_or_email, course_key):
     try:
         # Appsembler Specific: We call our custom method insted the default one,
         # to make sure the user is get inside the org.
-        student = get_user_by_username_or_email_inside_organization(username_or_email)
+        if settings.FEATURES.get('TAHOE_MULTITENANT_BULK_ENROLLMENT', False):
+            student = get_user_by_username_or_email_inside_organization(username_or_email)
+        else:
+            student = get_user_by_username_or_email(username_or_email)
     except ObjectDoesNotExist:
         raise ValueError(_("{user} does not exist in the LMS. Please check your spelling and retry.").format(
             user=username_or_email
@@ -3243,7 +3247,10 @@ def generate_bulk_certificate_exceptions(request, course_id):  # pylint: disable
             try:
                 # Appsembler Specific: We call our custom method insted the default one,
                 # to make sure the user is get inside the org.
-                user = get_user_by_username_or_email_inside_organization(user)
+                if settings.FEATURES.get('TAHOE_MULTITENANT_BULK_ENROLLMENT', False):
+                    user = get_user_by_username_or_email_inside_organization(user)
+                else:
+                    user = get_user_by_username_or_email(user)
             except ObjectDoesNotExist:
                 build_row_errors('user_not_exist', user, row_num)
                 log.info(u'student %s does not exist', user)
