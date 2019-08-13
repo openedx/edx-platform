@@ -17,8 +17,8 @@ from lms.djangoapps.program_enrollments.management.commands.link_program_enrollm
     DUPLICATE_KEY_TPL,
     NO_PROGRAM_ENROLLMENT_TPL,
     NO_LMS_USER_TPL,
-    COURSE_ENROLLMENT_FAILURE_TPL,
-    EXISTING_USER_TPL,
+    COURSE_ENROLLMENT_ERR_TPL,
+    get_existing_user_message,
 )
 from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
 from opaque_keys.edx.keys import CourseKey
@@ -107,10 +107,12 @@ class TestLinkProgramEnrollmentsMixin(object):
         """
         user.refresh_from_db()
         program_enrollment = user.programenrollment_set.get(user=user, program_uuid=program_uuid)
-        program_course_enrollments = program_enrollment.program_course_enrollments \
-                                                       .select_related('course_enrollment__course') \
-                                                       .filter(course_enrollment__isnull=False) \
-                                                       .all()
+        all_course_enrollments = program_enrollment.program_course_enrollments
+        program_course_enrollments = all_course_enrollments.select_related(
+            'course_enrollment__course'
+        ).filter(
+            course_enrollment__isnull=False
+        )
         course_enrollments = [
             program_course_enrollment.course_enrollment
             for program_course_enrollment in program_course_enrollments
@@ -205,7 +207,10 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
         with LogCapture() as logger:
             self.call_command(self.program, ('0001', self.user_1.username), ('0002', self.user_2.username))
             logger.check_present(
-                (COMMAND_PATH, 'WARNING', NO_PROGRAM_ENROLLMENT_TPL.format(self.program, '0002'))
+                (COMMAND_PATH, 'WARNING', NO_PROGRAM_ENROLLMENT_TPL.format(
+                    program_uuid=self.program,
+                    external_student_key='0002'
+                ))
             )
 
         self._assert_program_enrollment(self.user_1, self.program, '0001')
@@ -226,7 +231,7 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
 
     def test_enrollment_already_linked_to_target_user(self):
         self._create_waiting_enrollment(self.program, '0001')
-        ProgramEnrollmentFactory.create(
+        program_enrollment = ProgramEnrollmentFactory.create(
             user=self.user_2,
             program_uuid=self.program,
             external_user_key='0002',
@@ -237,7 +242,7 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
         with LogCapture() as logger:
             self.call_command(self.program, ('0001', self.user_1.username), ('0002', self.user_2.username))
             logger.check_present(
-                (COMMAND_PATH, 'WARNING', EXISTING_USER_TPL.format('0002', 'target', self.user_2.username))
+                (COMMAND_PATH, 'WARNING', get_existing_user_message(program_enrollment, self.user_2))
             )
 
         self._assert_program_enrollment(self.user_1, self.program, '0001')
@@ -258,7 +263,7 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
         with LogCapture() as logger:
             self.call_command(self.program, ('0001', self.user_1.username), ('0003', self.user_2.username))
             logger.check_present(
-                (COMMAND_PATH, 'WARNING', EXISTING_USER_TPL.format('0003', 'a different', user_3.username))
+                (COMMAND_PATH, 'WARNING', get_existing_user_message(enrollment, self.user_2))
             )
 
         self._assert_program_enrollment(self.user_1, self.program, '0001')
@@ -276,8 +281,8 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
         self._create_waiting_course_enrollment(program_enrollment_2, nonexistant_course)
         self._create_waiting_course_enrollment(program_enrollment_2, self.animal_course)
 
-        msg_1 = COURSE_ENROLLMENT_FAILURE_TPL.format(self.user_1.username, nonexistant_course)
-        msg_2 = COURSE_ENROLLMENT_FAILURE_TPL.format(self.user_2.username, nonexistant_course)
+        msg_1 = COURSE_ENROLLMENT_ERR_TPL.format(user=self.user_1.username, course=nonexistant_course)
+        msg_2 = COURSE_ENROLLMENT_ERR_TPL.format(user=self.user_2.username, course=nonexistant_course)
         with LogCapture() as logger:
             self.call_command(self.program, ('0001', self.user_1.username), ('0002', self.user_2.username))
             logger.check_present((COMMAND_PATH, 'WARNING', msg_1))

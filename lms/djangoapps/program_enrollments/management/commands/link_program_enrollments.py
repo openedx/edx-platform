@@ -12,14 +12,43 @@ User = get_user_model()
 
 INCORRECT_PARAMETER_TPL = u'incorrectly formatted argument {}, must be in form <external user key>:<lms username>'
 DUPLICATE_KEY_TPL = u'external user key {} provided multiple times'
-NO_PROGRAM_ENROLLMENT_TPL = u'No program enrollment found for program uuid={} and external student key={}'
+NO_PROGRAM_ENROLLMENT_TPL = (u'No program enrollment found for program uuid={program_uuid} and external student '
+                             'key={external_student_key}')
 NO_LMS_USER_TPL = u'No user found with username {}'
-COURSE_ENROLLMENT_FAILURE_TPL = u'Failed to enroll user {} with waiting program course enrollment for course {}'
-EXISTING_USER_TPL = u'Program enrollment with external_student_key={} is already linked to {} account username={}'
+COURSE_ENROLLMENT_ERR_TPL = u'Failed to enroll user {user} with waiting program course enrollment for course {course}'
+EXISTING_USER_TPL = (u'Program enrollment with external_student_key={external_student_key} is already linked to '
+                     u'{account_relation} account username={username}')
 
 
 class Command(BaseCommand):
-    # pylint: disable=missing-docstring
+    """
+    Management command to manually link ProgramEnrollments without an LMS user to an LMS user by username
+
+    Usage:
+        ./manage.py lms link_program_enrollments <program_uuid> <user_item>*
+        where a <user_item> is a string formatted as <external_user_key>:<lms_username>
+
+    Normally, program enrollments should be linked by the Django Social Auth post_save signal handler
+    `lms.djangoapps.program_enrollments.signals.matriculate_learner`, but in the case that a partner does not
+    have an IDP set up for learners to log in through, we need a way to link enrollments
+
+    Provided a program uuid and a list of external_user_key:lms_username, this command will look up the matching
+    program enrollments and users, and update the program enrollments with the matching user. If the program
+    enrollment has course enrollments, we will enroll the user into their waiting program courses.
+
+    If an external user key is specified twice, an exception will be raised and no enrollments will be modified.
+
+    For each external_user_key:lms_username, if:
+        - The user is not found
+        - No enrollment is found for the given program and external_user_key
+        - The enrollment already has a user
+    An error message will be logged and the input will be skipped. All other inputs will be processed and
+    enrollments updated.
+
+    If there is an error while enrolling a user in a waiting program course enrollment, the error will be
+    logged, but we will continue attempting to enroll the user in courses, and we will process all other
+    input users
+    """
 
     help = u'Manually links ProgramEnrollment records to LMS users'
 
@@ -43,7 +72,10 @@ class Command(BaseCommand):
         for external_student_key, username in ext_keys_to_usernames.items():
             program_enrollment = program_enrollments.get(external_student_key)
             if not program_enrollment:
-                logger.warning(NO_PROGRAM_ENROLLMENT_TPL.format(program_uuid, external_student_key))
+                logger.warning(NO_PROGRAM_ENROLLMENT_TPL.format(
+                    program_uuid=program_uuid,
+                    external_student_key=external_student_key
+                ))
                 continue
 
             user = users.get(username)
@@ -80,12 +112,15 @@ class Command(BaseCommand):
         Does a bulk read of ProgramEnrollments for a given program and list of external student keys
         and returns a dict keyed by external student key
         """
-        qs = ProgramEnrollment.bulk_read_by_student_key(program_uuid, external_student_keys)
-        qs = qs.prefetch_related('program_course_enrollments')
-        qs = qs.select_related('user')
+        program_enrollments = ProgramEnrollment.bulk_read_by_student_key(
+            program_uuid,
+            external_student_keys
+        ).prefetch_related(
+            'program_course_enrollments'
+        ).select_related('user')
         return {
             program_enrollment.external_user_key: program_enrollment
-            for program_enrollment in qs.iterator()
+            for program_enrollment in program_enrollments
         }
 
     def get_lms_users(self, lms_usernames):
@@ -94,7 +129,7 @@ class Command(BaseCommand):
         """
         return {
             user.username: user
-            for user in User.objects.filter(username__in=lms_usernames).iterator()
+            for user in User.objects.filter(username__in=lms_usernames)
         }
 
     def link_program_enrollment(self, program_enrollment, user):
@@ -103,7 +138,7 @@ class Command(BaseCommand):
         If the enrollment has any program course enrollments, enroll the user in those courses as well
         """
         if program_enrollment.user:
-            self.log_existing_user_message(program_enrollment, user)
+            logger.warning(get_existing_user_message(program_enrollment, user))
             return
         logger.info(u'Linking external student key {} and user {}'.format(
             program_enrollment.external_user_key,
@@ -116,19 +151,20 @@ class Command(BaseCommand):
             try:
                 program_course_enrollment.enroll(user)
             except CourseEnrollmentException:
-                logger.warning(COURSE_ENROLLMENT_FAILURE_TPL.format(
-                    user.username,
-                    program_course_enrollment.course_key
+                logger.warning(COURSE_ENROLLMENT_ERR_TPL.format(
+                    user=user.username,
+                    course=program_course_enrollment.course_key
                 ))
 
-    def log_existing_user_message(self, program_enrollment, user):
-        """
-        Logs an error message that the specified program enrollment is already linked to an lms user
-        """
-        existing_username = program_enrollment.user.username
-        external_student_key = program_enrollment.external_user_key
-        logger.warning(EXISTING_USER_TPL.format(
-            external_student_key,
-            'target' if program_enrollment.user.id == user.id else 'a different',
-            existing_username,
-        ))
+
+def get_existing_user_message(program_enrollment, user):
+    """
+    Creates an error message that the specified program enrollment is already linked to an lms user
+    """
+    existing_username = program_enrollment.user.username
+    external_student_key = program_enrollment.external_user_key
+    return EXISTING_USER_TPL.format(
+        external_student_key=external_student_key,
+        account_relation='target' if program_enrollment.user.id == user.id else 'a different',
+        username=existing_username,
+    )
