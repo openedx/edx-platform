@@ -33,6 +33,7 @@ from lms.djangoapps.grades.grade_utils import are_grades_frozen
 from lms.djangoapps.grades.models import (
     PersistentSubsectionGrade,
     PersistentSubsectionGradeOverride,
+    PersistentCourseGrade,
 )
 from lms.djangoapps.grades.rest_api.serializers import (
     StudentGradebookEntrySerializer,
@@ -579,6 +580,39 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
                     )
                 )
                 q_objects.append(Q(selected_assignment_grade_in_range=True))
+            if request.GET.get('course_grade_min') or request.GET.get('course_grade_max'):
+                grade_conditions = {}
+                q_object = Q()
+                if request.GET.get('course_grade_min'):
+                    course_grade_min = float(request.GET.get('course_grade_min')) / 100
+                    grade_conditions['percent_grade__gte'] = course_grade_min
+
+                    if course_grade_min == 0:
+                        subquery_grade_absent = ~Exists(
+                            PersistentCourseGrade.objects.filter(
+                                course_id=OuterRef('course'),
+                                user_id=OuterRef('user_id'),
+                            )
+                        )
+
+                        annotations['course_grade_absent'] = subquery_grade_absent
+                        q_object |= Q(course_grade_absent=True)
+
+                if request.GET.get('course_grade_max'):
+                    course_grade_max = float(request.GET.get('course_grade_max')) / 100
+                    grade_conditions['percent_grade__lte'] = course_grade_max
+
+                subquery_grade_in_range = Exists(
+                    PersistentCourseGrade.objects.filter(
+                        course_id=OuterRef('course'),
+                        user_id=OuterRef('user_id'),
+                        **grade_conditions
+                    )
+                )
+                annotations['course_grade_in_range'] = subquery_grade_in_range
+                q_object |= Q(course_grade_in_range=True)
+
+                q_objects.append(q_object)
 
             entries = []
             related_models = ['user']
