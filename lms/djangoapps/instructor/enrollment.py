@@ -24,6 +24,11 @@ from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.events import STATE_DELETED_EVENT_TYPE
 from lms.djangoapps.grades.signals.handlers import disconnect_submissions_signal_receiver
 from lms.djangoapps.grades.signals.signals import PROBLEM_RAW_SCORE_CHANGED
+from lms.djangoapps.instructor.sites import (
+    user_exists_in_organization,
+    get_organization_for_site,
+    get_user_in_organization_by_email,
+)
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_current_site
@@ -53,12 +58,13 @@ class EmailEnrollmentState(object):
         # N.B. retired users are not a concern here because they should be
         # handled at a higher level (i.e. in enroll_email).  Besides, this
         # class creates readonly objects.
-        organization = get_current_site().organizations.first()
-        exists_user = organization.userorganizationmapping_set.filter(user__email=email).exists()
+        site = get_current_site()
+        organization = get_organization_for_site(site)
+        exists_user = user_exists_in_organization(email, organization)
         if exists_user:
             # Appsembler Specific: We look for the user inside the organization
             # to avoid leakage if the user belong to another organization.
-            user = organization.userorganizationmapping_set.get(user__email=email).user
+            user = get_user_in_organization_by_email(email, organization)
             mode, is_active = CourseEnrollment.enrollment_mode_for_user(user, course_id)
             # is_active is `None` if the user is not enrolled in the course
             exists_ce = is_active is not None and is_active

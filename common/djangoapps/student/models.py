@@ -55,6 +55,7 @@ from openedx.core.djangoapps.theming.helpers import get_current_site
 import lms.lib.comment_client as cc
 from student.signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED
 from lms.djangoapps.certificates.models import GeneratedCertificate
+from lms.djangoapps.instructor.sites import get_organization_for_site
 from course_modes.models import CourseMode
 from courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
@@ -1609,7 +1610,8 @@ class CourseEnrollment(models.Model):
         verified the user authentication and access.
         """
         try:
-            organization = get_current_site().organizations.first()
+            site = get_current_site()
+            organization = get_organization_for_site(site)
             user = organization.userorganizationmapping_set.get(user__email=email).user
             return cls.enroll(user, course_id, mode)
         except UserOrganizationMapping.DoesNotExist:
@@ -2386,7 +2388,8 @@ def get_user_by_username_or_email_inside_organization(username_or_email):
     """
     username_or_email = strip_if_string(username_or_email)
     # there should be one user with either username or email equal to username_or_email
-    organization = get_current_site().organizations.first()
+    site = get_current_site()
+    organization = get_organization_for_site(site)
     try:
         user = organization.userorganizationmapping_set.get(Q(user__email=username_or_email) | Q(user__username=username_or_email)).user
     except UserOrganizationMapping.DoesNotExist:
