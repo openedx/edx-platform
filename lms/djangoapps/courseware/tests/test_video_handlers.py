@@ -259,7 +259,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
         self.assertEqual(json.loads(response.body), ['en'])
 
     def test_available_translation_non_en(self):
-        _upload_file(self.srt_file, self.item_descriptor.location, os.path.split(self.srt_file.name)[1])
+        _upload_file(_create_srt_file(), self.item_descriptor.location, os.path.split(self.srt_file.name)[1])
 
         request = Request.blank('/available_translations')
         response = self.item.transcript(request=request, dispatch='available_translations')
