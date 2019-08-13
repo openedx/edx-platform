@@ -35,7 +35,7 @@ from xmodule.video_module.transcripts_utils import (
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
-SRT_TRANSCRIPT_CONTENT = """0
+SRT_TRANSCRIPT_CONTENT = b"""0
 00:00:10,500 --> 00:00:13,000
 Elephant's Dream
 

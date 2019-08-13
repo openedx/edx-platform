@@ -624,13 +624,13 @@ class Transcript(object):
     """
     Container for transcript methods.
     """
-    SRT = 'srt'
-    TXT = 'txt'
-    SJSON = 'sjson'
+    SRT = u'srt'
+    TXT = u'txt'
+    SJSON = u'sjson'
     mime_types = {
-        SRT: 'application/x-subrip; charset=utf-8',
-        TXT: 'text/plain; charset=utf-8',
-        SJSON: 'application/json',
+        SRT: u'application/x-subrip; charset=utf-8',
+        TXT: u'text/plain; charset=utf-8',
+        SJSON: u'application/json',
     }
 
     @staticmethod
