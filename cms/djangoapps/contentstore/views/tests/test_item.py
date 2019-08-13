@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 
 import json
+import re
 from datetime import datetime, timedelta
 
 import ddt
@@ -255,8 +256,8 @@ class GetItemTest(ItemTest):
             html,
             # The instance of the wrapper class will have an auto-generated ID. Allow any
             # characters after wrapper.
-            ur'"/container/{}" class="action-button">\s*<span class="action-button-text">View</span>'.format(
-                wrapper_usage_key
+            u'"/container/{}" class="action-button">\\s*<span class="action-button-text">View</span>'.format(
+                re.escape(six.text_type(wrapper_usage_key))
             )
         )
 
