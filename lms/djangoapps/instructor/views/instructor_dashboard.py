@@ -8,6 +8,7 @@ import datetime
 import logging
 import uuid
 
+import pkg_resources
 import pytz
 import six
 from django.conf import settings
@@ -233,6 +234,11 @@ def instructor_dashboard_2(request, course_id):
     )
 
     certificate_invalidations = CertificateInvalidation.get_certificate_invalidations(course_key)
+
+    # load externally registered sections
+    for entrypoint in pkg_resources.iter_entry_points(group="lms.instructor_dashboard.section"):
+        section = entrypoint.load()
+        sections.append(section(course, access))
 
     context = {
         'course': course,
