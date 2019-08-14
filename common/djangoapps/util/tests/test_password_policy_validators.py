@@ -48,7 +48,7 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
 
     def test_unicode_password(self):
         """ Tests that validate_password enforces unicode """
-        byte_str = b'𤭮'
+        byte_str = u'𤭮'.encode('utf-8')
         unicode_str = u'𤭮'
 
         # Sanity checks and demonstration of why this test is useful
