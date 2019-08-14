@@ -11,6 +11,7 @@ from uuid import uuid4
 
 import pytest
 from pytz import UTC
+import six
 from six.moves import map
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
@@ -1042,7 +1043,7 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
         self.page.set_new_post_editor_value(
             six.text_type(
                 r'\begin{equation}'
-                r'\tau_g(\omega) = - \frac{d}{d\omega}\phi(\omega) \hspace{2em} (1) '
+                r'\tau_g(\omega) = - \frac{d}{d\omega}\phi(\omega) \hspace{2em} (1) '  # pylint: disable=unicode-format-string
                 r'\end{equation}'
             )
         )
