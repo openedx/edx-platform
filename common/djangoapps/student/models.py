@@ -2366,6 +2366,7 @@ def get_user_by_username_or_email(username_or_email):
             raise User.DoesNotExist
     return user
 
+
 def get_user_by_username_or_email_inside_organization(username_or_email):
     """
     Appsembler Specific: This funtion is a copy of
@@ -2400,6 +2401,7 @@ def get_user_by_username_or_email_inside_organization(username_or_email):
         if UserRetirementRequest.has_user_requested_retirement(user):
             raise User.DoesNotExist
     return user
+
 
 def get_user(email):
     user = User.objects.get(email=email)
