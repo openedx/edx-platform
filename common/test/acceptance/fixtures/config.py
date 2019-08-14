@@ -88,7 +88,8 @@ class ConfigModelFixture(object):
         if response.ok:
             # auto_auth returns information about the newly created user
             # capture this so it can be used by by the testcases.
-            user_pattern = re.compile(ur'Logged in user {0} \({1}\) with password {2} and user_id {3}'.format(
+            user_pattern = re.compile(
+                six.text_type(r'Logged in user {0} \({1}\) with password {2} and user_id {3}').format(
                 r'(?P<username>\S+)', r'(?P<email>[^\)]+)', r'(?P<password>\S+)', r'(?P<user_id>\d+)'))
             user_matches = re.match(user_pattern, response.text)
             if user_matches:
