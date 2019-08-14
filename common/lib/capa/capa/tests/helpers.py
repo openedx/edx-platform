@@ -118,4 +118,7 @@ def load_fixture(relpath):
     abspath = os.path.join(os.path.dirname(__file__), 'test_files', relpath)
     with open(abspath) as fixture_file:
         contents = fixture_file.read()
-    return contents.decode('utf8')
+    if six.PY2:
+        return contents.decode('utf-8')
+    else:
+        return contents
