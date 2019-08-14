@@ -18,6 +18,7 @@ from entitlements.utils import is_course_run_entitlement_fulfillable
 from openedx.core.constants import COURSE_PUBLISHED
 from openedx.core.djangoapps.catalog.cache import (
     COURSE_PROGRAMS_CACHE_KEY_TPL,
+    PROGRAMS_BY_ORGANIZATION_CACHE_KEY_TPL,
     PATHWAY_CACHE_KEY_TPL,
     PROGRAM_CACHE_KEY_TPL,
     PROGRAMS_BY_TYPE_CACHE_KEY_TPL,
@@ -86,7 +87,7 @@ def check_catalog_integration_and_get_user(error_message_field):
 
 
 # pylint: disable=redefined-outer-name
-def get_programs(site=None, uuid=None, uuids=None, course=None):
+def get_programs(site=None, uuid=None, uuids=None, course=None, organization=None):
     """Read programs from the cache.
 
     The cache is populated by a management command, cache_programs.
@@ -96,12 +97,13 @@ def get_programs(site=None, uuid=None, uuids=None, course=None):
         uuid (string): UUID identifying a specific program to read from the cache.
         uuids (list of string): UUIDs identifying a specific programs to read from the cache.
         course (string): course id identifying a specific course run to read from the cache.
+        organization (string): short name for specific organization to read from the cache.
 
     Returns:
         list of dict, representing programs.
         dict, if a specific program is requested.
     """
-    if len([arg for arg in (site, uuid, uuids, course) if arg is not None]) != 1:
+    if len([arg for arg in (site, uuid, uuids, course, organization) if arg is not None]) != 1:
         raise TypeError('get_programs takes exactly one argument')
 
     if uuid:
@@ -120,6 +122,10 @@ def get_programs(site=None, uuid=None, uuids=None, course=None):
         uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [])
         if not uuids:
             logger.warning(u'Failed to get program UUIDs from the cache for site {}.'.format(site.domain))
+    elif organization:
+        uuids = get_programs_for_organization(organization)
+        if not uuids:
+            return []
 
     return get_programs_by_uuids(uuids)
 
@@ -623,3 +629,10 @@ def _course_runs_from_container(container):
 def normalize_program_type(program_type):
     """ Function that normalizes a program type string for use in a cache key. """
     return str(program_type).lower()
+
+
+def get_programs_for_organization(organization):
+    """
+    Retrieve list of program uuids authored by a given organization
+    """
+    return cache.get(PROGRAMS_BY_ORGANIZATION_CACHE_KEY_TPL.format(org_key=organization))

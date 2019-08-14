@@ -17,8 +17,8 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from program_enrollments.utils import (
     OrganizationDoesNotExistException,
     ProgramDoesNotExistException,
+    ProviderConfigurationException,
     ProviderDoesNotExistException,
-    UserLookupException,
     get_user_by_program_id
 )
 from student.tests.factories import UserFactory
@@ -140,5 +140,5 @@ class GetPlatformUserTests(CacheIsolationTestCase):
         # create a second active config for the same organization
         SAMLProviderConfigFactory.create(organization=organization, slug='foox')
 
-        with pytest.raises(UserLookupException):
+        with pytest.raises(ProviderConfigurationException):
             get_user_by_program_id(self.external_user_id, self.program_uuid)

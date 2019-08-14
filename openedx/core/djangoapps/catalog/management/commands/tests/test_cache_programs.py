@@ -10,6 +10,7 @@ from django.core.management import call_command
 
 from openedx.core.djangoapps.catalog.cache import (
     COURSE_PROGRAMS_CACHE_KEY_TPL,
+    PROGRAMS_BY_ORGANIZATION_CACHE_KEY_TPL,
     PATHWAY_CACHE_KEY_TPL,
     PROGRAM_CACHE_KEY_TPL,
     PROGRAMS_BY_TYPE_CACHE_KEY_TPL,
@@ -17,7 +18,7 @@ from openedx.core.djangoapps.catalog.cache import (
     SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 )
 from openedx.core.djangoapps.catalog.utils import normalize_program_type
-from openedx.core.djangoapps.catalog.tests.factories import PathwayFactory, ProgramFactory
+from openedx.core.djangoapps.catalog.tests.factories import OrganizationFactory, PathwayFactory, ProgramFactory
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
@@ -56,6 +57,8 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
 
         self.programs[0]['curricula'][0]['programs'].append(self.child_program)
         self.programs.append(self.child_program)
+
+        self.programs[0]['authoring_organizations'] = OrganizationFactory.create_batch(2)
 
         for pathway in self.pathways:
             self.programs += pathway['programs']
@@ -193,13 +196,19 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
                 self.assertIn(self.child_program['uuid'], cache.get(course_run_cache_key))
 
         # for each program, assert that the program's UUID is in a cached list of
-        # program UUIDS by program type
+        # program UUIDS by program type and a cached list of UUIDs by authoring organization
         for program in self.programs:
             program_type = normalize_program_type(program.get('type', 'None'))
             program_type_cache_key = PROGRAMS_BY_TYPE_CACHE_KEY_TPL.format(
                 site_id=self.site.id, program_type=program_type
             )
             self.assertIn(program['uuid'], cache.get(program_type_cache_key))
+
+            for organization in program['authoring_organizations']:
+                organization_cache_key = PROGRAMS_BY_ORGANIZATION_CACHE_KEY_TPL.format(
+                    org_key=organization['key']
+                )
+                self.assertIn(program['uuid'], cache.get(organization_cache_key))
 
     def test_handle_pathways(self):
         """

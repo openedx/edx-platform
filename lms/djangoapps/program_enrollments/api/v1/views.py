@@ -7,66 +7,71 @@ from __future__ import absolute_import, unicode_literals
 import logging
 from functools import wraps
 
-from django.http import Http404
+from ccx_keys.locator import CCXLocator
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.core.management import call_command
+from django.db import transaction
+from django.http import Http404
 from django.utils.functional import cached_property
 from edx_rest_framework_extensions import permissions
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys.edx.keys import CourseKey
+from organizations.models import Organization
 from rest_framework import status
-from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
+from rest_framework.views import APIView
 from six import text_type
 
-from ccx_keys.locator import CCXLocator
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import get_certificate_for_user
-from lms.djangoapps.grades.api import (
-    CourseGradeFactory,
-    clear_prefetched_course_grades,
-    prefetch_course_grades,
-)
+from lms.djangoapps.grades.api import CourseGradeFactory, clear_prefetched_course_grades, prefetch_course_grades
 from lms.djangoapps.grades.rest_api.v1.utils import CourseEnrollmentPagination
-from lms.djangoapps.program_enrollments.api.v1.constants import (
-    CourseEnrollmentResponseStatuses,
-    MAX_ENROLLMENT_RECORDS,
-    ProgramEnrollmentResponseStatuses,
-)
 from lms.djangoapps.program_enrollments.api.api import (
-    get_due_dates,
+    get_course_run_status,
     get_course_run_url,
-    get_emails_enabled,
-    get_course_run_status
+    get_due_dates,
+    get_emails_enabled
+)
+from lms.djangoapps.program_enrollments.api.v1.constants import (
+    ENABLE_ENROLLMENT_RESET_FLAG,
+    MAX_ENROLLMENT_RECORDS,
+    CourseEnrollmentResponseStatuses,
+    ProgramEnrollmentResponseStatuses,
 )
 from lms.djangoapps.program_enrollments.api.v1.serializers import (
     CourseRunOverviewListSerializer,
     ProgramCourseEnrollmentListSerializer,
     ProgramCourseEnrollmentRequestSerializer,
-    ProgramCourseGradeResult,
     ProgramCourseGradeErrorResult,
+    ProgramCourseGradeResult,
     ProgramCourseGradeResultSerializer,
     ProgramEnrollmentCreateRequestSerializer,
     ProgramEnrollmentListSerializer,
-    ProgramEnrollmentModifyRequestSerializer,
+    ProgramEnrollmentModifyRequestSerializer
 )
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
-from lms.djangoapps.program_enrollments.utils import get_user_by_program_id, ProviderDoesNotExistException
-from student.helpers import get_resume_urls_for_enrollments
-from student.models import CourseEnrollment
-from student.roles import CourseInstructorRole, CourseStaffRole, UserBasedRole
+from lms.djangoapps.program_enrollments.utils import (
+    ProviderDoesNotExistException,
+    get_provider_slug,
+    get_user_by_program_id
+)
 from openedx.core.djangoapps.catalog.utils import (
     course_run_keys_for_program,
     get_programs,
     get_programs_by_type,
-    normalize_program_type,
+    get_programs_for_organization,
+    normalize_program_type
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, PaginatedAPIView, verify_course_exists
+from student.helpers import get_resume_urls_for_enrollments
+from student.models import CourseEnrollment
+from student.roles import CourseInstructorRole, CourseStaffRole, UserBasedRole
 from util.query import use_read_replica_if_available
 
 logger = logging.getLogger(__name__)
@@ -1111,7 +1116,6 @@ class ProgramCourseGradesView(
     ------------------------------------------------------------------------------------
 
     **Returns**
-
         * 200: OK - Contains a paginated set of program courserun grades.
         * 204: No Content - No grades to return
         * 207: Mixed result - Contains mixed list of program courserun grades
@@ -1156,7 +1160,6 @@ class ProgramCourseGradesView(
                 ...
             ],
         }
-
     """
     authentication_classes = (
         JwtAuthentication,
@@ -1273,3 +1276,62 @@ class ProgramCourseGradesView(
         if any(result.is_error for result in grade_results):
             return status.HTTP_207_MULTI_STATUS
         return status.HTTP_200_OK
+
+
+class EnrollmentDataResetView(APIView):
+    """
+    Resets enrollments and users for a given organization and set of programs.
+    Note, this will remove ALL users from the input organization.
+
+    Path: ``/api/program_enrollments/v1/integration-reset/``
+
+    Accepts: [POST]
+
+    ------------------------------------------------------------------------------------
+    POST
+    ------------------------------------------------------------------------------------
+
+    **Returns**
+        * 200: OK - Enrollments and users sucessfully deleted
+        * 400: Bad Requeset - Program does not match the requested organization
+        * 401: Unauthorized - The requesting user is not authenticated.
+        * 404: Not Found - A requested program does not exist.
+
+    **Response**
+    """
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (permissions.JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS,)
+
+    @transaction.atomic
+    def post(self, request):
+        """
+        Reset enrollment and user data for organization
+        """
+        if not settings.FEATURES.get(ENABLE_ENROLLMENT_RESET_FLAG):
+            return Response('reset not enabled on this environment', status.HTTP_501_NOT_IMPLEMENTED)
+
+        try:
+            org_key = request.data['organization']
+        except KeyError:
+            return Response("missing required body content 'organization'", status.HTTP_400_BAD_REQUEST)
+
+        try:
+            organization = Organization.objects.get(short_name=org_key)
+        except Organization.DoesNotExist:
+            return Response('organization {} not found'.format(org_key), status.HTTP_404_NOT_FOUND)
+
+        try:
+            idp_slug = get_provider_slug(organization)
+            call_command('remove_social_auth_users', idp_slug, force=True)
+        except ProviderDoesNotExistException:
+            pass
+
+        programs = get_programs_for_organization(organization=organization.short_name)
+        if programs:
+            call_command('reset_enrollment_data', ','.join(programs), force=True)
+
+        return Response('success')
