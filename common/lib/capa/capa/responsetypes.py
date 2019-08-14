@@ -1830,7 +1830,7 @@ class NumericalResponse(LoncapaResponse):
 
 @registry.register
 class StringResponse(LoncapaResponse):
-    """
+    r"""
     This response type allows one or more answers.
 
     Additional answers are added by `additional_answer` tag.
