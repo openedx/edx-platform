@@ -1928,7 +1928,7 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
             start=datetime.now()
         )
         discussion_topics = {
-            "Topic B": {"id": "Topic B"},
+            "Topic B": {"id": "Topic_B"},
         }
         config_course_cohorts(self.course, is_cohorted=True)
         config_course_discussions(
@@ -2073,7 +2073,7 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
     def test_update_course_wide_discussion_settings(self):
         """Test whether the 'divided_course_wide_discussions' setting is updated."""
         discussion_topics = {
-            'Topic B': {'id': 'Topic B'}
+            'Topic B': {'id': 'Topic_B'}
         }
         config_course_cohorts(self.course, is_cohorted=True)
         config_course_discussions(self.course, discussion_topics=discussion_topics)
