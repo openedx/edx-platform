@@ -3,6 +3,7 @@
 from __future__ import absolute_import
 
 import gettext
+import io
 import os
 import os.path
 import xml.sax.saxutils as saxutils
@@ -116,9 +117,6 @@ def load_fixture(relpath):
     in the same directory as the test file.
     """
     abspath = os.path.join(os.path.dirname(__file__), 'test_files', relpath)
-    with open(abspath) as fixture_file:
+    with io.open(abspath) as fixture_file:
         contents = fixture_file.read()
-    if six.PY2:
-        return contents.decode('utf-8')
-    else:
         return contents
