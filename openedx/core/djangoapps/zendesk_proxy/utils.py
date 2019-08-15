@@ -75,7 +75,7 @@ def create_zendesk_ticket(
         else:
             msg = u"Group ID not found for group {}. Please update ZENDESK_GROUP_ID_MAPPING".format(group)
             log.error(_std_error_message(msg, payload))
-            return status.HTTP_503_SERVICE_UNAVAILABLE
+            return status.HTTP_400_BAD_REQUEST
 
     # Set the request parameters
     url = urljoin(settings.ZENDESK_URL, '/api/v2/tickets.json')
@@ -94,7 +94,17 @@ def create_zendesk_ticket(
                 )
             )
         if additional_info:
-            ticket = json.loads(response.text)['ticket']
+            try:
+                ticket = response.json()['ticket']
+            except ValueError as e:
+                log.error(
+                    _std_error_message(
+                        u"Got a non json response from zendesk api. Can't"
+                        " get the ticket number to add extra info. {}".format(additional_info),
+                        response.content
+                    )
+                )
+                return status.HTTP_400_BAD_REQUEST
             return post_additional_info_as_comment(ticket['id'], additional_info)
 
         return response.status_code
@@ -117,7 +127,7 @@ def post_additional_info_as_comment(ticket_id, additional_info):
         'ticket': {
             'comment': {
                 'body': additional_info_string,
-                'publuc': False
+                'public': False
             }
         }
     }
@@ -126,7 +136,7 @@ def post_additional_info_as_comment(ticket_id, additional_info):
 
     try:
         response = requests.put(url, data=json.dumps(data), headers=_get_request_headers())
-        if response.status_code >= 200 and response.status_code < 300:
+        if response.status_code == 200:
             log.debug(u'Successfully created comment for ticket {}'.format(ticket_id))
         else:
             log.error(
