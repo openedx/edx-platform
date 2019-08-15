@@ -33,4 +33,4 @@ subprocess32==3.5.4       # via matplotlib
 sympy==0.7.1
 
 # The following packages are considered to be unsafe in a requirements file:
-# setuptools==41.0.1        # via kiwisolver
+# setuptools==41.1.0        # via kiwisolver
