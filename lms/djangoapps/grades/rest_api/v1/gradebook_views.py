@@ -559,10 +559,10 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
                     effective_grade_percentage=Case(
                         When(override__isnull=False,
                              then=(
-                                 F('override__earned_all_override')
-                                 / F('override__possible_all_override')
+                                 F('override__earned_graded_override')
+                                 / F('override__possible_graded_override')
                              ) * 100),
-                        default=(F('earned_all') / F('possible_all')) * 100
+                        default=(F('earned_graded') / F('possible_graded')) * 100
                     )
                 )
                 grade_conditions = {
