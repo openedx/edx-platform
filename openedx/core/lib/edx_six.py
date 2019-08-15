@@ -6,7 +6,7 @@ This is internal and should not be referenced outside of the edx-platform repo.
 import six
 
 
-def gettext(o):
+def get_gettext(o):
     """
     In python 2 return the ugettext attribute. In python 3 return gettext.
     """
