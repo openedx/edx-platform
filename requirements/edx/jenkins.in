@@ -1,0 +1,15 @@
+# A single requirements file for prebuilt virtualenvs on Jenkins
+# Please do not use this file for packages that are needed in production
+#
+# DON'T JUST ADD NEW DEPENDENCIES!!!
+#
+# If you open a pull request that adds a new dependency, you should:
+#   * verify that the dependency has a license compatible with AGPLv3
+#   * confirm that it has no system requirements beyond what we already install
+#   * run "make upgrade" to update the detailed requirements files
+#   * add an appropriate pattern to scripts/dependencies/testing.py
+
+-c ../constraints.txt
+
+-r django.txt             # Specifically install Django for testing w/ tox
+-r testing.txt            # Libraries used for running tests against the edx-platform
