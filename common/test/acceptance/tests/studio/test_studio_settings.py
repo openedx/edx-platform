@@ -454,25 +454,6 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
             "Button text should change to 'Show Deprecated Settings' after the click"
         )
 
-    def test_multi_line_input(self):
-        """
-        Scenario: Test that advanced settings correctly shows the multi-line input
-            Given I am on the Advanced Course Settings page in Studio
-            When I create a JSON object as a value for "Discussion Topic Mapping"
-                Then it is displayed as formatted
-        """
-
-        inputs = {
-            "key": "value",
-            "key_2": "value_2"
-        }
-        json_input = json.dumps(inputs)
-        self.advanced_settings.set('Discussion Topic Mapping', json_input)
-        self.assertEqual(
-            self.advanced_settings.get('Discussion Topic Mapping'),
-            '{\n    "key": "value",\n    "key_2": "value_2"\n}'
-        )
-
     def test_automatic_quoting_of_non_json_value(self):
         """
         Scenario: Test that advanced settings automatically quotes the field input

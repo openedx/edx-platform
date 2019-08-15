@@ -120,7 +120,19 @@ def topic_name_to_id(course, name):
     """
     Given a discussion topic name, return an id for that name (includes
     course and url_name).
+    The set of valid characters for topic id is a smaller subset of valid
+    characters for topic name. Topic id can only have
+    these characters: a-z, A-Z, 0-9, underscore, hyphen, and period
+    Whereas, topic name character choice is much larger.
+    This function goes through all the characters in name and removes all invalid
+    characters and returns the resulting topic id.
     """
+    for index, indexed_character in enumerate(name):
+        if not (indexed_character.isalnum()
+                or indexed_character == "-"
+                or indexed_character == "_"
+                or indexed_character == "."):
+            name = name[:index] + "_" + name[index + 1:]
     return "{course}_{run}_{name}".format(
         course=course.location.course,
         run=course.url_name,

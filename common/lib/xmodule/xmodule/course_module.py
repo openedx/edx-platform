@@ -269,6 +269,53 @@ def get_available_providers():
     return available_providers
 
 
+class DiscussionTopicMapping(Dict):
+    """
+    DiscussionTopicMapping field, which includes validation of the topic id
+    """
+
+    _default = {}
+
+    def from_json(self, value):
+        """
+        Return python dict type. Performs validation on id key for
+        each discussion topic. Whenever Discussion Topic Mapping field is saved or
+        uploaded from data, this function is called to validate input mapping
+        """
+        if value is None:
+            return None
+        """
+        if statement checks to make sure value is a dict,
+        each topic in dict has a key id and the id value only has valid characters
+        """
+        if isinstance(value, dict):
+            for key in value:
+                if "id" in value[key].keys():
+                    if not self._validate_topic_id_value(value[key]["id"]):
+                        raise ValueError("For discussion topic ids, the only characters that are supported are the English alphabet(a-z, A-Z), integers(0-9), underscore, hyphen, and period.")
+                else:
+                    raise ValueError("All discussion topics must have an ID value set.")
+        else:
+            raise TypeError('Invalid JSON format found in Discussion Topic Mapping.' % type(value))
+        return value
+    enforce_type = from_json
+
+    def _validate_topic_id_value(self, value):
+        """
+        Function validates discussion topic ids. Will return true if
+        only valid characters(a-z,A-Z,0-9,underscore(_), hyphen(-), and period(.))
+        are used in id body
+        inputs: value(str)
+        """
+        for character in value:
+            if not (character.isalnum()
+                    or character == "-"
+                    or character == "_"
+                    or character == "."):
+                return False
+        return True
+
+
 class CourseFields(object):
     lti_passports = List(
         display_name=_("LTI Passports"),
@@ -360,7 +407,7 @@ class CourseFields(object):
         ),
         scope=Scope.settings
     )
-    discussion_topics = Dict(
+    discussion_topics = DiscussionTopicMapping(
         display_name=_("Discussion Topic Mapping"),
         help=_(
             'Enter discussion categories in the following format: "CategoryName": '
