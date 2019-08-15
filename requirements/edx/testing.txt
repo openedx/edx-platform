@@ -117,7 +117,7 @@ docutils==0.15.2
 drf-yasg==1.16
 edx-ace==0.1.10
 edx-analytics-data-api-client==0.15.3
-edx-bulk-grades==0.4.3
+edx-bulk-grades==0.5
 edx-ccx-keys==0.2.2
 edx-celeryutils==0.3.0
 edx-completion==2.0.0
@@ -125,8 +125,8 @@ edx-django-oauth2-provider==1.3.5
 edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==2.0.0
-edx-drf-extensions==2.3.8
-edx-enterprise==1.8.8
+edx-drf-extensions==2.4.0
+edx-enterprise==1.9.0
 edx-i18n-tools==0.4.8
 edx-lint==1.3.0
 edx-milestones==0.2.3
@@ -280,7 +280,7 @@ rest-condition==1.0.3
 rfc6266-parser==0.0.5.post2
 ruamel.ordereddict==0.4.14 ; python_version == "2.7"
 ruamel.yaml.clib==0.1.2
-ruamel.yaml==0.16.1
+ruamel.yaml==0.16.2
 rules==2.1
 s3transfer==0.1.13
 sailthru-client==2.2.3
@@ -302,7 +302,7 @@ soupsieve==1.9.2
 sqlparse==0.3.0
 staff-graded-xblock==0.5
 stevedore==1.30.1
-super-csv==0.9
+super-csv==0.9.1
 sympy==1.4
 testfixtures==6.10.0
 text-unidecode==1.2       # via faker
@@ -319,7 +319,7 @@ uritemplate==3.0.0
 urllib3==1.23
 user-util==0.1.5
 virtualenv==16.7.2        # via tox
-voluptuous==0.11.5
+voluptuous==0.11.7
 watchdog==0.9.0
 wcwidth==0.1.7            # via pytest
 web-fragments==0.3.0
@@ -339,4 +339,4 @@ zendesk==1.1.1
 zipp==0.5.2               # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
-# setuptools==41.0.1        # via caniusepython3, fs, lazy, pytest, python-levenshtein
+# setuptools==41.1.0        # via caniusepython3, fs, lazy, pytest, python-levenshtein

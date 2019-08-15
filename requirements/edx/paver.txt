@@ -29,4 +29,4 @@ watchdog==0.9.0
 wrapt==1.10.5
 
 # The following packages are considered to be unsafe in a requirements file:
-# setuptools==41.0.1        # via lazy
+# setuptools==41.1.0        # via lazy
