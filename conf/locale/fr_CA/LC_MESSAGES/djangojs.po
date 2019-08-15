@@ -1,33 +1,33 @@
 # #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# edX translation file.
+# edX community translations have been downloaded from French (Canada) (https://www.transifex.com/open-edx/teams/6205/fr_CA/).
 # Copyright (C) 2018 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2018.
-# 
+#
 # #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# edX translation file.
+# edX community translations have been downloaded from French (Canada) (https://www.transifex.com/open-edx/teams/6205/fr_CA/).
 # Copyright (C) 2018 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2018.
-# 
+#
 # #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
-# edX translation file
+# edX community translations have been downloaded from French (Canada) (https://www.transifex.com/open-edx/teams/6205/fr_CA/)
 # Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2018.
-# 
+#
 # #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
+# edX community translations have been downloaded from French (Canada) (https://www.transifex.com/open-edx/teams/6205/fr_CA/)
 # Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2018.
-# 
+#
 # Translators:
 # Etienne Laurin <etienne.laurin@gmail.com>, 2018
 # Pierre Mailhot <pierre.mailhot@gmail.com>, 2018
 # Keivan Farzaneh <keivan.farzaneh@edulib.org>, 2018
 # Omar Al-Ithawi <i@omardo.com>, 2019
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
@@ -36,12 +36,12 @@ msgstr ""
 "PO-Revision-Date: 2018-08-07 20:02+0000\n"
 "Last-Translator: Omar Al-Ithawi <i@omardo.com>, 2019\n"
 "Language-Team: French (Canada) (https://www.transifex.com/open-edx/teams/6205/fr_CA/)\n"
+"Language: fr_CA\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 1.3\n"
-"Language: fr_CA\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Generated-By: Babel 1.3\n"
 
 #: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
 #: cms/static/js/views/video_transcripts.js common/static/bundles/commons.js
@@ -1119,8 +1119,8 @@ msgstr "Répondre à l'annotation"
 #: common/static/bundles/CapaModule.js
 msgid "%(num_points)s point possible (graded, results hidden)"
 msgid_plural "%(num_points)s points possible (graded, results hidden)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(num_points)s point possible (noté, résultat caché)"
+msgstr[1] "%(num_points)s points possibles (noté, résultats cachés)"
 
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10).;
@@ -1128,8 +1128,8 @@ msgstr[1] ""
 #: common/static/bundles/CapaModule.js
 msgid "%(num_points)s point possible (ungraded, results hidden)"
 msgid_plural "%(num_points)s points possible (ungraded, results hidden)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(num_points)s point possible (pas noté, résultats cachés)"
+msgstr[1] "%(num_points)s points possibles (pas noté, résultats cachés)"
 
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10).;
@@ -1137,8 +1137,8 @@ msgstr[1] ""
 #: common/static/bundles/CapaModule.js
 msgid "%(num_points)s point possible (graded)"
 msgid_plural "%(num_points)s points possible (graded)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(num_points)s point possible (noté)"
+msgstr[1] "%(num_points)s points possibles (noté)"
 
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10).;
@@ -1146,8 +1146,8 @@ msgstr[1] ""
 #: common/static/bundles/CapaModule.js
 msgid "%(num_points)s point possible (ungraded)"
 msgid_plural "%(num_points)s points possible (ungraded)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(num_points)s point possible (pas noté)"
+msgstr[1] "%(num_points)s points possibles (pas noté)"
 
 #. Translators: %(earned)s is the number of points earned. %(possible)s is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
@@ -1157,8 +1157,8 @@ msgstr[1] ""
 #: common/static/bundles/CapaModule.js
 msgid "%(earned)s/%(possible)s point (graded)"
 msgid_plural "%(earned)s/%(possible)s points (graded)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(earned)s/%(possible)s point (noté)"
+msgstr[1] "%(earned)s/%(possible)s points (noté)"
 
 #. Translators: %(earned)s is the number of points earned. %(possible)s is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
@@ -1168,8 +1168,8 @@ msgstr[1] ""
 #: common/static/bundles/CapaModule.js
 msgid "%(earned)s/%(possible)s point (ungraded)"
 msgid_plural "%(earned)s/%(possible)s points (ungraded)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(earned)s/%(possible)s point (pas noté)"
+msgstr[1] "%(earned)s/%(possible)s points (pas noté)"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
@@ -2895,22 +2895,22 @@ msgstr "Position de la vidéo"
 #: common/static/bundles/VideoModule.js
 msgid "%(value)s hour"
 msgid_plural "%(value)s hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(value)s heure"
+msgstr[1] "%(value)s heures"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 #: common/static/bundles/VideoModule.js
 msgid "%(value)s minute"
 msgid_plural "%(value)s minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(value)s minute"
+msgstr[1] "%(value)s minutes"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 #: common/static/bundles/VideoModule.js
 msgid "%(value)s second"
 msgid_plural "%(value)s seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(value)s seconde"
+msgstr[1] "%(value)s secondes"
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 #: common/static/bundles/VideoModule.js
@@ -3655,14 +3655,14 @@ msgstr "image omise"
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "there is currently {numVotes} vote"
 msgid_plural "there are currently {numVotes} votes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "il y a actuellement {numVotes} vote"
+msgstr[1] "il y a actuellement {numVotes} votes"
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "{numVotes} Vote"
 msgid_plural "{numVotes} Votes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{numVotes} Vote"
+msgstr[1] "{numVotes} Votes"
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
@@ -3814,14 +3814,14 @@ msgstr ""
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "{numResponses} other response"
 msgid_plural "{numResponses} other responses"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{numResponses} autre réponse"
+msgstr[1] "{numResponses} autres réponses"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "{numResponses} response"
 msgid_plural "{numResponses} responses"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{numResponses} réponse"
+msgstr[1] "{numResponses} réponses"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Showing all responses"
@@ -3830,8 +3830,8 @@ msgstr "Afficher toutes les réponses"
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Showing first response"
 msgid_plural "Showing first {numResponses} responses"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Affichage de la première réponse"
+msgstr[1] "Affichage des premières {numResponses} réponses"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Load all responses"
@@ -3949,8 +3949,8 @@ msgstr "environ une minute"
 #, javascript-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d minute"
+msgstr[1] "%d minutes"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about an hour"
@@ -3960,8 +3960,8 @@ msgstr "environ une heure"
 #, javascript-format
 msgid "about %d hour"
 msgid_plural "about %d hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "environ %d heure"
+msgstr[1] "environ %d heures"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "a day"
@@ -3971,8 +3971,8 @@ msgstr "un jour"
 #, javascript-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d jour"
+msgstr[1] "%d jours"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a month"
@@ -3982,8 +3982,8 @@ msgstr "environ un mois"
 #, javascript-format
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d mois"
+msgstr[1] "%d mois"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a year"
@@ -3993,8 +3993,8 @@ msgstr "environ un an"
 #, javascript-format
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d an"
+msgstr[1] "%d ans"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "User"
@@ -4111,16 +4111,16 @@ msgstr "Cochez la case pour supprimer tous les drapeaux."
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "Check the box to remove %(totalFlags)s flag."
 msgid_plural "Check the box to remove %(totalFlags)s flags."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Cochez la case pour supprimer %(totalFlags)s drapeau."
+msgstr[1] "Cochez la case pour supprimer %(totalFlags)s drapeaux."
 
 #. Translators: 'count' is the number of flags solely for that annotation that
 #. will be removed
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "Check the box to remove %(count)s flag."
 msgid_plural "Check the box to remove %(count)s flags."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Cochez la case pour supprimer %(count)s drapeau."
+msgstr[1] "Cochez la case pour supprimer %(count)s drapeaux."
 
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "All flags have been removed. To undo, uncheck the box."
@@ -4138,8 +4138,8 @@ msgstr "Signaler une annotation comme inappropriée ou offensante."
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "This annotation has %(count)s flag."
 msgid_plural "This annotation has %(count)s flags."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Cette annotation a %(count)s drapeau."
+msgstr[1] "Cette annotation a %(count)s drapeaux."
 
 #: lms/djangoapps/support/static/support/js/views/certificates.js
 msgid "An unexpected error occurred.  Please try again."
@@ -4375,8 +4375,8 @@ msgstr "Cette équipe est pleine."
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
 msgid "%(memberCount)s / %(maxMemberCount)s Member"
 msgid_plural "%(memberCount)s / %(maxMemberCount)s Members"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(memberCount)s / %(maxMemberCount)s membre"
+msgstr[1] "%(memberCount)s / %(maxMemberCount)s membres"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
 msgid "All teams"
@@ -4493,8 +4493,8 @@ msgstr "L'équipe \"{team}\" n'a pu être trouvée."
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "%(team_count)s Team"
 msgid_plural "%(team_count)s Teams"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(team_count)s Équipe"
+msgstr[1] "%(team_count)s Équipes"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "Topic"
@@ -4609,8 +4609,8 @@ msgstr "Veuillez fournir un URL valide."
 #: lms/static/js/Markdown.Editor.js
 msgid "%(errorCount)s error found in form."
 msgid_plural "%(errorCount)s errors found in form."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(errorCount)s erreur trouvé dans le formulaire."
+msgstr[1] "%(errorCount)s erreurs trouvées dans le formulaire."
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Bold (Ctrl+B)"
@@ -4962,8 +4962,8 @@ msgstr ""
 #, javascript-format
 msgid "Viewing %s course"
 msgid_plural "Viewing %s courses"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Voir %s cours"
+msgstr[1] "Voir %s cours"
 
 #: lms/static/js/discovery/views/search_form.js
 #, javascript-format
@@ -5151,20 +5151,20 @@ msgstr "Entrez un nom d'utilisateur ou un courriel"
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "{numUsersAdded} learner has been added to this cohort. "
 msgid_plural "{numUsersAdded} learners have been added to this cohort. "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{numUsersAdded} apprenant a été ajouté à cette cohorte."
+msgstr[1] "{numUsersAdded} apprenants ont été ajoutés à cette cohorte."
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "{numMoved} learner was moved from {prevCohort}"
 msgid_plural "{numMoved} learners were moved from {prevCohort}"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{numMoved} apprenant a été déplacé depuis {prevCohort}"
+msgstr[1] "{numMoved} apprenants ont été déplacés depuis {prevCohort}"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "{numPresent} learner was already in the cohort"
 msgid_plural "{numPresent} learners were already in the cohort"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{numPresent} apprenant était déjà dans la cohorte"
+msgstr[1] "{numPresent} apprenants étaient déjà dans la cohorte"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "{email}"
@@ -5178,7 +5178,12 @@ msgid_plural ""
 "{numPreassigned} learners were pre-assigned for this cohort. These learners "
 "will automatically be added to the cohort when they enroll in the course."
 msgstr[0] ""
+"{numPreassigned} apprenant a été pré-assigné à cette cohorte. Cet apprenant "
+"sera automatiquement ajouté à la cohorte lorsqu'il s'inscrira au cours."
 msgstr[1] ""
+"{numPreassigned} apprenants ont été pré-assignés à cette cohorte. Ces "
+"apprenants seront automatiquement ajoutés à la cohorte lorsqu'ils "
+"s'inscriront au cours."
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Unknown username: {user}"
@@ -5191,8 +5196,8 @@ msgstr "Adresse courriel invalide : {email}"
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "There was an error when trying to add learners:"
 msgid_plural "{numErrors} learners could not be added to this cohort:"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Un problème est survenu en tentant d'ajouter les apprenants :"
+msgstr[1] "{numErrors} apprenants n'ont pas pu être ajoutés à cette cohorte :"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "View all errors"
@@ -6686,20 +6691,20 @@ msgstr ""
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "%(num_students)s student opened Subsection"
 msgid_plural "%(num_students)s students opened Subsection"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(num_students)s étudiant a ouvert cette sous-section"
+msgstr[1] "%(num_students)s étudiants ont ouvert la sous-section"
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "%(num_students)s student"
 msgid_plural "%(num_students)s students"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(num_students)s étudiant"
+msgstr[1] "%(num_students)s étudiants"
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "%(num_questions)s question"
 msgid_plural "%(num_questions)s questions"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(num_questions)s question"
+msgstr[1] "%(num_questions)s questions"
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "Number of Students"
@@ -6712,8 +6717,8 @@ msgstr "Note globale"
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
 msgid_plural "{total_results} results"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{total_results} résultat"
+msgstr[1] "{total_results} résultats"
 
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Profile Visibility:"
@@ -7287,8 +7292,8 @@ msgstr "Une erreur est survenue lors de l'export."
 #: cms/static/js/views/group_configuration_details.js
 msgid "Contains {count} group"
 msgid_plural "Contains {count} groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Contient {count} groupe"
+msgstr[1] "Contient {count} groupes"
 
 #: cms/static/js/views/group_configuration_details.js
 #: cms/static/js/views/partition_group_details.js
@@ -7303,8 +7308,8 @@ msgstr "Non utilisé"
 #: cms/static/js/views/partition_group_details.js
 msgid "Used in {count} location"
 msgid_plural "Used in {count} locations"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Utilisé en {count} emplacement"
+msgstr[1] "Utilisé dans {count} emplacements"
 
 #. Translators: this refers to a collection of groups.
 #: cms/static/js/views/group_configuration_item.js
@@ -8026,8 +8031,8 @@ msgstr "apprové %(time_ago)s"
 #, python-format
 msgid "Show Comment (%(num_comments)s)"
 msgid_plural "Show Comments (%(num_comments)s)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Afficher (%(num_comments)s) commentaire"
+msgstr[1] "Afficher (%(num_comments)s) commentaires"
 
 #: common/static/common/templates/discussion/thread-response.underscore
 msgid "Add a comment"
@@ -8968,8 +8973,8 @@ msgstr "Créer un groupe de contenu"
 #, python-format
 msgid "(contains %(student_count)s student)"
 msgid_plural "(contains %(student_count)s students)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "(contient %(student_count)s étudiant)"
+msgstr[1] "(contient %(student_count)s étudiants)"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
 msgid ""
@@ -9183,8 +9188,8 @@ msgstr "Explorez les nouveaux programmes"
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Course"
 msgid_plural "Courses"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Cours"
+msgstr[1] "Cours"
 
 #: lms/templates/learner_dashboard/program_card.underscore
 msgid "Completed"
@@ -10070,8 +10075,8 @@ msgstr ""
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
 msgid "Load next {num_items} result"
 msgid_plural "Load next {num_items} results"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Afficher le prochain {num_items} résultat"
+msgstr[1] "Afficher les {num_items} prochains résultats"
 
 #: openedx/features/course_search/static/course_search/templates/course_search_results.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
