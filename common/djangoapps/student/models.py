@@ -654,7 +654,6 @@ def user_post_save_callback(sender, **kwargs):
 
     Additionally, emit analytics events after saving the User.
     """
-
     from lms.djangoapps.philu_overrides.tasks import task_enroll_user_in_pending_courses
 
     user = kwargs['instance']
