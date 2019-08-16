@@ -146,7 +146,7 @@ git+https://github.com/mitodl/edx-sga.git@3828ba9e413080a81b907a3381e5ffa05e063f
 edx-sphinx-theme==1.5.0
 edx-submissions==2.1.1
 edx-user-state-client==1.1.1
-edx-when==0.2
+edx-when==0.3
 edxval==1.1.25
 elasticsearch==1.9.0
 entrypoints==0.3
