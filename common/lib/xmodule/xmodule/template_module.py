@@ -1,8 +1,9 @@
 """
 Template module
 """
+from string import Template
+
 from lxml import etree
-from mako.template import Template
 
 from xmodule.raw_module import RawDescriptor
 from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, XModule
@@ -13,8 +14,9 @@ class CustomTagModule(XModule):
     This module supports tags of the form
     <customtag option="val" option2="val2" impl="tagname"/>
 
-    In this case, $tagname should refer to a file in data/custom_tags, which contains
-    a mako template that uses ${option} and ${option2} for the content.
+    In this case, $tagname should refer to a file in data/custom_tags, which
+    contains a Python string.Template formatted template that uses ${option} and
+    ${option2} for the content.
 
     For instance:
 
@@ -63,7 +65,7 @@ class CustomTagDescriptor(RawDescriptor):
         template_module = system.load_item(template_loc)
         template_module_data = template_module.data
         template = Template(template_module_data)
-        return template.render(**params)
+        return template.safe_substitute(params)
 
     @property
     def rendered_html(self):
