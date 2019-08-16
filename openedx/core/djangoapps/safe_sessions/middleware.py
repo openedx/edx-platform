@@ -201,7 +201,7 @@ class SafeCookieData(object):
         """
         hash_func = sha256()
         for data_item in [self.version, self.session_id, user_id]:
-            hash_func.update(six.text_type(data_item))
+            hash_func.update(six.b(six.text_type(data_item)))
             hash_func.update('|')
         return hash_func.hexdigest()
 
