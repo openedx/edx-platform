@@ -617,6 +617,10 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS,
 # We continue to load production.py over aws.py
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_constants.SettingsType.PRODUCTION)
 
+########################## Philu related settings ########################
+
+NODEBB_RETRY_DELAY = 60
+
 ########################## Derive Any Derived Settings  #######################
 
 derive_settings(__name__)

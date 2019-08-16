@@ -5,19 +5,19 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save, pre_save, post_delete, pre_delete
 from django.dispatch import receiver
 
-from common.djangoapps.nodebb.tasks import (task_create_user_on_nodebb, task_update_user_profile_on_nodebb,
+from nodebb.tasks import (task_create_user_on_nodebb, task_update_user_profile_on_nodebb,
                                             task_delete_user_on_nodebb, task_activate_user_on_nodebb,
                                             task_join_group_on_nodebb, task_un_join_group_on_nodebb)
 from common.lib.nodebb_client.client import NodeBBClient
 from lms.djangoapps.onboarding.helpers import COUNTRIES
-from certificates.models import GeneratedCertificate
+from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.onboarding.models import (
     UserExtendedProfile, Organization, FocusArea, EmailPreference, )
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from mailchimp_pipeline.signals.handlers import send_user_info_to_mailchimp, \
      send_user_course_completions_to_mailchimp, send_user_enrollments_to_mailchimp
 from nodebb.models import DiscussionCommunity, TeamGroupChat
-from common.djangoapps.nodebb.helpers import get_community_id
+from nodebb.helpers import get_community_id
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED
 

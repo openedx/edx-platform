@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from lms.djangoapps.oef.models import OptionLevel, TopicQuestion, Option, OefSurvey, \
+from oef.models import OptionLevel, TopicQuestion, Option, OefSurvey, \
     Instruction, OrganizationOefScore, OrganizationOefUpdatePrompt
 
 

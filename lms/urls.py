@@ -51,6 +51,11 @@ from staticbook import views as staticbook_views
 from student import views as student_views
 from track import views as track_views
 from util import views as util_views
+from nodebb.views import nodebb_embedded_topic
+from lms.djangoapps.philu_overrides.views import render_404, render_500
+from openedx.features.course_card.views import get_course_cards
+from lms.djangoapps.philu_overrides.views import course_about, course_auto_enroll
+from lms.djangoapps.philu_overrides.courseware.views.views import generate_user_cert
 
 
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
@@ -64,7 +69,7 @@ if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
 # Custom error pages
 # These are used by Django to render these error codes. Do not remove.
 # pylint: disable=invalid-name
-handler404 = 'philu_overrides.views.render_404'
+handler404 = render_404
 handler500 = static_template_view_views.render_500
 
 urlpatterns = [
@@ -116,8 +121,8 @@ urlpatterns = [
     # Course API
     url(r'^api/courses/', include('course_api.urls')),
 
-    url(r'^404$', 'philu_overrides.views.render_404'),
-    url(r'^500$', 'philu_overrides.views.render_500'),
+    url(r'^404$', render_404),
+    url(r'^500$', render_500),
 
     url(r'^philu/api/', include('lms.djangoapps.philu_api.urls')),
 
@@ -304,14 +309,14 @@ urlpatterns += [
     # TODO: These views need to be updated before they work
     url(r'^calculate$', util_views.calculate),
 
-    url(r'^courses/?$', 'openedx.features.course_card.views.get_course_cards', name="courses"),
+    url(r'^courses/?$', get_course_cards, name="courses"),
 
     #About the course
     url(
         r'^courses/{}/about$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'lms.djangoapps.philu_overrides.views.course_about',
+        course_about,
         name='about_course',
     ),
 
@@ -320,7 +325,7 @@ urlpatterns += [
         r'^courses/{}/enroll$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'lms.djangoapps.philu_overrides.views.course_auto_enroll',
+        course_auto_enroll,
         name='course_auto_enroll',
     ),
 
@@ -726,7 +731,7 @@ urlpatterns += [
         r'^courses/{}/generate_user_cert'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'philu_overrides.courseware.views.views.generate_user_cert',
+        generate_user_cert,
         name='generate_user_cert',
     ),
 ]
@@ -752,7 +757,7 @@ if settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
         ),
         url(
             r'^courses/discussion/nodebb/?',
-            'nodebb.views.nodebb_embedded_topic'
+            nodebb_embedded_topic
         ),
         url(
             r'^notification_prefs/enable/',

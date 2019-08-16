@@ -11,10 +11,9 @@ from lms.djangoapps.philu_api.helpers import get_course_custom_settings
 
 from certificates import api as certs_api
 from courseware.courses import get_course
-from certificates.models import (
+from lms.djangoapps.certificates.models import (
     GeneratedCertificate,
     CertificateStatuses)
-from common.djangoapps.student.views import get_course_enrollments
 
 from helpers import get_certificate_image_url, get_philu_certificate_social_context
 
@@ -32,6 +31,8 @@ def student_certificates(request):
         The generated certifcates list response.
 
     """
+    from common.djangoapps.student.views import get_course_enrollments
+
     user = request.user
 
     # we want to filter and only show enrollments for courses within

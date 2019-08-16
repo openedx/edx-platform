@@ -61,7 +61,7 @@ from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
 from enrollment.api import add_enrollment
 from ipware.ip import get_ip
-from common.djangoapps.student.views import get_course_related_keys
+from lms.djangoapps.philu_overrides.courseware.views.views import get_course_related_keys
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import CertificateStatuses
@@ -340,6 +340,17 @@ def course_info(request, course_id):
                 })
                 return url
         return None
+
+
+@ensure_csrf_cookie
+@ensure_valid_course_key
+@data_sharing_consent_required
+def course_info(request, course_id):
+    """
+    Display the course's info.html, or 404 if there is no such course.
+
+    Assumes the course_id is in a valid format.
+    """
 
     course_key = CourseKey.from_string(course_id)
 

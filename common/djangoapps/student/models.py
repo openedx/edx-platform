@@ -54,7 +54,6 @@ from edx_django_utils.cache import RequestCache
 import lms.lib.comment_client as cc
 from student.signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED
 from lms.djangoapps.certificates.models import GeneratedCertificate
-from lms.djangoapps.philu_overrides.tasks import task_enroll_user_in_pending_courses
 from course_modes.models import CourseMode
 from courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
@@ -655,6 +654,9 @@ def user_post_save_callback(sender, **kwargs):
 
     Additionally, emit analytics events after saving the User.
     """
+
+    from lms.djangoapps.philu_overrides.tasks import task_enroll_user_in_pending_courses
+
     user = kwargs['instance']
 
     changed_fields = user._changed_fields

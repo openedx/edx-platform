@@ -1,8 +1,6 @@
 import logging
 
-from common.djangoapps.student.views import get_course_related_keys
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.courseware.views.views import get_last_accessed_courseware
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.models import CourseEnrollment
 from django.core.urlresolvers import reverse
@@ -103,6 +101,9 @@ def get_course_first_chapter_link(course, request=None):
     """
     Helper function to get first chapter link in course enrollment email
     """
+    from lms.djangoapps.philu_overrides.courseware.views.views import get_course_related_keys
+    from lms.djangoapps.courseware.views.views import get_last_accessed_courseware
+
     if not request:
 
         course_desc = get_course_by_id(course.id)
