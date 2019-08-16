@@ -7,12 +7,16 @@ from __future__ import absolute_import
 import json
 import sys
 
+import six
 from django.conf import settings
 from django.test import TestCase
 from django.urls import clear_url_caches, resolve
 from mock import patch
 
 from util.db import CommitOnSuccessManager, OuterAtomic
+
+if six.PY3:
+    from importlib import reload  # pylint: disable=no-name-in-module,redefined-builtin
 
 
 class UrlResetMixin(object):
@@ -86,13 +90,13 @@ class EventTestMixin(object):
         """
         Ensures no events were emitted since the last event related assertion.
         """
-        self.assertFalse(self.mock_tracker.emit.called)  # pylint: disable=maybe-no-member
+        self.assertFalse(self.mock_tracker.emit.called)
 
     def assert_event_emitted(self, event_name, **kwargs):
         """
         Verify that an event was emitted with the given parameters.
         """
-        self.mock_tracker.emit.assert_any_call(  # pylint: disable=maybe-no-member
+        self.mock_tracker.emit.assert_any_call(
             event_name,
             kwargs
         )
