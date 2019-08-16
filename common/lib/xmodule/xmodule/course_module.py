@@ -27,6 +27,7 @@ from xmodule.course_metadata_utils import DEFAULT_GRADING_POLICY, DEFAULT_START_
 from xmodule.graders import grader_from_conf
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.tabs import CourseTabList, InvalidTabsException
+from util.date_utils import course_absolute_time
 
 from .fields import Date
 
@@ -1389,7 +1390,10 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
 
         try:
             ret = [
-                {"start": date_proxy.from_json(start), "end": date_proxy.from_json(end)}
+                {
+                    "start": course_absolute_time(self, date_proxy.from_json(start)),
+                    "end": course_absolute_time(self, date_proxy.from_json(end))
+                }
                 for start, end
                 in [blackout_date for blackout_date in blackout_dates if blackout_date]
             ]
@@ -1398,7 +1402,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
                     raise ValueError
             return ret
         except (TypeError, ValueError):
-            log.info(
+            log.warning(
                 "Error parsing discussion_blackouts %s for course %s",
                 blackout_dates,
                 self.id

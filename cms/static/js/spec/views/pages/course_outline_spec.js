@@ -25,6 +25,7 @@ describe('CourseOutlinePage', function() {
             category: 'course',
             enable_proctored_exams: true,
             enable_timed_exams: true,
+            enable_relative_dates: true,
             studio_url: '/course/slashes:MockCourse',
             is_container: true,
             has_changes: false,
@@ -51,6 +52,7 @@ describe('CourseOutlinePage', function() {
             category: 'course',
             enable_proctored_exams: true,
             enable_timed_exams: true,
+            enable_relative_dates: true,
             studio_url: '/course/slashes:MockCourse',
             is_container: true,
             has_changes: false,
@@ -78,6 +80,7 @@ describe('CourseOutlinePage', function() {
             category: 'chapter',
             studio_url: '/course/slashes:MockCourse',
             is_container: true,
+            enable_relative_dates: true,
             has_changes: false,
             published: true,
             edited_on: 'Jul 02, 2014 at 20:56 UTC',
@@ -103,6 +106,7 @@ describe('CourseOutlinePage', function() {
             category: 'sequential',
             studio_url: '/course/slashes:MockCourse',
             is_container: true,
+            enable_relative_dates: true,
             has_changes: false,
             published: true,
             edited_on: 'Jul 02, 2014 at 20:56 UTC',
@@ -133,6 +137,7 @@ describe('CourseOutlinePage', function() {
             category: 'vertical',
             studio_url: '/container/mock-unit',
             is_container: true,
+            enable_relative_dates: true,
             has_changes: false,
             published: true,
             visibility_state: 'unscheduled',
@@ -2248,12 +2253,31 @@ describe('CourseOutlinePage', function() {
             outlinePage.$('.outline-subsection .configure-button').click();
             expect($('#start_date').val()).toBe('');
             expect($('#start_time').val()).toBe('');
-            DateUtils.setDate($('#start_date'), ('#start_time'), '2015-08-10T05:10:00Z');
+            expect($('#start_relative').val()).toBe('');
+            DateUtils.setDate($('#start_date'), $('#start_time'), $('#start_relative'), '2015-08-10T05:10:00Z');
             expect($('#start_date').val()).toBe('8/10/2015');
             expect($('#start_time').val()).toBe('05:10');
-            DateUtils.setDate($('#start_date'), ('#start_time'), '2014-07-09T00:00:00+00:00');
+            expect($('#start_relative').val()).toBe('');
+            DateUtils.setDate($('#start_date'), $('#start_time'), $('#start_relative'), '2014-07-09T00:00:00+00:00');
             expect($('#start_date').val()).toBe('7/9/2014');
             expect($('#start_time').val()).toBe('00:00');
+            expect($('#start_relative').val()).toBe('');
         });
+        // Relative dates can be +1234.0 or -1234.0
+        it('can parse relative dates from the server', function() {
+          createCourseOutlinePage(this, mockCourseJSON, false);
+          outlinePage.$('.outline-subsection .configure-button').click();
+          expect($('#start_date').val()).toBe('');
+          expect($('#start_time').val()).toBe('');
+          expect($('#start_relative').val()).toBe('');
+          DateUtils.setDate($('#start_date'), $('#start_time'), $('#start_relative'), 1234);
+          expect($('#start_date').val()).toBe('');
+          expect($('#start_time').val()).toBe('');
+          expect($('#start_relative').val()).toBe('1234');
+          DateUtils.setDate($('#start_date'), $('#start_time'), $('#start_relative'), -4321);
+          expect($('#start_date').val()).toBe('');
+          expect($('#start_time').val()).toBe('');
+          expect($('#start_relative').val()).toBe('-4321');
+      });
     });
 });

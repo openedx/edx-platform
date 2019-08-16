@@ -62,8 +62,8 @@ class DateTest(unittest.TestCase):
             datetime.datetime(2012, 12, 31, 23, 0, 1, tzinfo=UTC)
         )
         self.assertEqual(
-            DateTest.date.enforce_type(1234567890000),
-            datetime.datetime(2009, 2, 13, 23, 31, 30, tzinfo=UTC)
+            DateTest.date.enforce_type(64000),
+            datetime.timedelta(seconds=64000)
         )
         self.assertEqual(
             DateTest.date.enforce_type(datetime.datetime(2014, 5, 9, 21, 1, 27, tzinfo=UTC)),
@@ -94,12 +94,6 @@ class DateTest(unittest.TestCase):
         """
         Test the non-standard args being passed to from_json
         """
-        now = datetime.datetime.now(UTC)
-        delta = now - datetime.datetime.fromtimestamp(0, UTC)
-        self.assertEqual(
-            DateTest.date.from_json(delta.total_seconds() * 1000),
-            now
-        )
         yesterday = datetime.datetime.now(UTC) - datetime.timedelta(days=-1)
         self.assertEqual(DateTest.date.from_json(yesterday), yesterday)
 

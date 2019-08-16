@@ -1124,9 +1124,20 @@ class VideoBlock(
                 }
 
         available_translations = self.available_translations(self.get_transcripts_info())
+
+        def get_transcript_url(lang):
+            try:
+                return self.runtime.handler_url(self, 'transcript', 'download', query="lang=" + lang, thirdparty=True)
+            except NotImplementedError:
+                log.exception("Unable to find transcript url")
+                return None
         transcripts = {
-            lang: self.runtime.handler_url(self, 'transcript', 'download', query="lang=" + lang, thirdparty=True)
-            for lang in available_translations
+            lang: url
+            for lang, url in (
+                (lang, get_transcript_url(lang))
+                for lang in available_translations
+            )
+            if url is not None
         }
 
         return {

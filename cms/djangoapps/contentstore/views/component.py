@@ -142,7 +142,7 @@ def container_handler(request, usage_key_string):
             xblock_info = create_xblock_info(xblock, include_ancestor_info=is_unit_page)
 
             if is_unit_page:
-                add_container_page_publishing_info(xblock, xblock_info)
+                add_container_page_publishing_info(course, xblock, xblock_info)
 
             # need to figure out where this item is in the list of children as the
             # preview will need this

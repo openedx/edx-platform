@@ -2,18 +2,26 @@ define(['jquery', 'date', 'js/utils/change_on_enter', 'jquery.ui', 'jquery.timep
 function($, date, TriggerChangeEventOnEnter) {
     'use strict';
 
-    function getDate(datepickerInput, timepickerInput) {
-        // given a pair of inputs (datepicker and timepicker), return a JS Date
-        // object that corresponds to the datetime.js that they represent. Assume
-        // UTC timezone, NOT the timezone of the user's browser.
+    function getDate(datepickerInput, timepickerInput, relativeTimeInput) {
+        // given a set of inputs (datepicker, timepicker, and relative time picker), return a JS Date
+        // object that corresponds to the datetime.js that they represent, or a float representing a relative
+        // time. Assume UTC timezone, NOT the timezone of the user's browser.
         var selectedDate = null,
-            selectedTime = null;
+            selectedTime = null,
+            selectedRelative = null;
         if (datepickerInput.length > 0) {
             selectedDate = $(datepickerInput).datepicker('getDate');
         }
         if (timepickerInput.length > 0) {
             selectedTime = $(timepickerInput).timepicker('getTime');
         }
+        if (relativeTimeInput.length > 0) {
+            selectedRelative = $(relativeTimeInput).val();
+        }
+        if (selectedDate && selectedRelative) {
+            return null;
+        }
+
         if (selectedDate && selectedTime) {
             return new Date(Date.UTC(
                 selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(),
@@ -22,19 +30,31 @@ function($, date, TriggerChangeEventOnEnter) {
         } else if (selectedDate) {
             return new Date(Date.UTC(
                 selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate()));
+        } else if (selectedRelative) {
+            return parseFloat(selectedRelative);
         } else {
             return null;
         }
     }
 
-    function setDate(datepickerInput, timepickerInput, datetime) {
+    function setDate(datepickerInput, timepickerInput, relativeTimeInput, datetime) {
+        var parsedRelativeDate, parsedDatetime;
+
         // given a pair of inputs (datepicker and timepicker) and the date as an
-        // ISO-formatted date string.
-        var parsedDatetime = Date.parse(datetime);
-        if (parsedDatetime) {
-            $(datepickerInput).datepicker('setDate', parsedDatetime);
-            if (timepickerInput.length > 0) {
-                $(timepickerInput).timepicker('setTime', parsedDatetime);
+        // ISO-formatted date string or a relative date formatted as +FLOAT or -FLOAT
+        // where INT is a number of seconds
+        if (datetime && typeof datetime === 'number') {
+            parsedRelativeDate = datetime;
+            if (parsedRelativeDate) {
+                $(relativeTimeInput).val(parsedRelativeDate);
+            }
+        } else {
+            parsedDatetime = Date.parse(datetime);
+            if (parsedDatetime) {
+                $(datepickerInput).datepicker('setDate', parsedDatetime);
+                if (timepickerInput.length > 0) {
+                    $(timepickerInput).timepicker('setTime', parsedDatetime);
+                }
             }
         }
     }
@@ -58,13 +78,14 @@ function($, date, TriggerChangeEventOnEnter) {
     }
 
     function convertDateStringsToObjects(obj, dateFields) {
-        var i;
+        var i,
+            out = Object.assign({}, obj);
         for (i = 0; i < dateFields.length; i++) {
             if (obj[dateFields[i]]) {
-                obj[dateFields[i]] = parseDateFromString(obj[dateFields[i]]);
+                out[dateFields[i]] = parseDateFromString(obj[dateFields[i]]);
             }
         }
-        return obj;
+        return out;
     }
 
     function setupDatePicker(fieldName, view, index) {
@@ -72,6 +93,7 @@ function($, date, TriggerChangeEventOnEnter) {
         var div;
         var datefield;
         var timefield;
+        var relativefield;
         var cacheview;
         var setfield;
         var currentDate;
@@ -84,9 +106,10 @@ function($, date, TriggerChangeEventOnEnter) {
         }
         datefield = $(div).find('input.date');
         timefield = $(div).find('input.time');
+        relativefield = $(div).find('input.relative');
         cacheview = view;
         setfield = function(event) {
-            var newVal = getDate(datefield, timefield);
+            var newVal = getDate(datefield, timefield, relativefield);
 
             // Setting to null clears the time as well, as date and time are linked.
             // Note also that the validation logic prevents us from clearing the start date
@@ -104,6 +127,7 @@ function($, date, TriggerChangeEventOnEnter) {
         datefield.change(setfield).keyup(TriggerChangeEventOnEnter);
         timefield.on('changeTime', setfield);
         timefield.on('input', setfield);
+        relativefield.change(setfield);
 
         currentDate = null;
         if (cacheModel) {
@@ -111,11 +135,12 @@ function($, date, TriggerChangeEventOnEnter) {
         }
         // timepicker doesn't let us set null, so check that we have a time
         if (currentDate) {
-            setDate(datefield, timefield, currentDate);
+            setDate(datefield, timefield, relativefield, currentDate);
         } else {
              // but reset fields either way
             timefield.val('');
             datefield.val('');
+            relativefield.val('');
         }
     }
 

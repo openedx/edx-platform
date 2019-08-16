@@ -10,31 +10,70 @@ from datetime import datetime, timedelta
 import six
 from django.utils.translation import pgettext, ugettext
 from pytz import UnknownTimeZoneError, timezone, utc
+from xmodule.course_module import DEFAULT_START_DATE
+from openedx.core.djangoapps.schedules.models import Schedule
 
 
-def get_default_time_display(dtime):
+def is_unset(date_field_value):
+    if isinstance(date_field_value, timedelta):
+        return date_field_value.total_seconds() <= 0
+    else:
+        return date_field_value == DEFAULT_START_DATE
+
+
+def course_absolute_time(course, date_field_value):
     """
-    Converts a datetime to a string representation. This is the default
+    Return an absolute time for a given course and date_field_value.
+    The date_field_value may be absolute or relative.
+    """
+    if isinstance(date_field_value, timedelta):
+        return course.start + date_field_value
+    else:
+        return date_field_value
+
+
+def user_absolute_time(user, course_key, date_field_value):
+    # This is a delayed import to allow the CourseDescriptor to use course_absolute_time
+
+    from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+    if isinstance(date_field_value, timedelta):
+        try:
+            course_start = user.courseenrollment_set.get(course_id=course_key).schedule.start
+        except Schedule.DoesNotExist:
+            course_start = user.courseenrollment_set.get(course_id=course_key).course.start
+        return course_start + date_field_value
+    else:
+        return date_field_value
+
+
+def get_default_time_display(time_to_display):
+    """
+    Converts a datetime or timedelta to a string representation. This is the default
     representation used in Studio and LMS.
 
-    It will use the "DATE_TIME" format in the current language, if provided,
-    or defaults to "Apr 09, 2013 at 16:00 UTC".
+    If `time_to_display` is a datetime, it will use the "DATE_TIME" format
+    in the current language, if provided, or defaults to "Apr 09, 2013 at 16:00 UTC".
+    If `time_to_display` is a timedelta, it will display the total number of seconds.
 
     If None is passed in for dt, an empty string will be returned.
 
     """
-    if dtime is None:
+    if time_to_display is None:
         return u""
-    if dtime.tzinfo is not None:
-        try:
-            timezone = u" " + dtime.tzinfo.tzname(dtime)
-        except NotImplementedError:
-            timezone = dtime.strftime('%z')
+    if isinstance(time_to_display, timedelta):
+        # TODO: Make this a more human-readible display
+        return "{} seconds".format(time_to_display.total_seconds())
     else:
-        timezone = u" UTC"
+        if time_to_display.tzinfo is not None:
+            try:
+                timezone = u" " + time_to_display.tzinfo.tzname(time_to_display)
+            except NotImplementedError:
+                timezone = time_to_display.strftime('%z')
+        else:
+            timezone = u" UTC"
 
-    localized = strftime_localized(dtime, "DATE_TIME")
-    return (localized + timezone).strip()
+        localized = strftime_localized(time_to_display, "DATE_TIME")
+        return (localized + timezone).strip()
 
 
 def get_time_display(dtime, format_string=None, coerce_tz=None):

@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from datetime import timedelta
+
 from config_models.models import ConfigurationModel
 from django.contrib.sites.models import Site
 from django.db import models
@@ -34,6 +36,18 @@ class Schedule(TimeStampedModel):
             return self.experience.experience_type
         except ScheduleExperience.DoesNotExist:
             return ScheduleExperience.EXPERIENCES.default
+
+    def absolute_datetime(self, date_or_delta):
+        """
+        Return an absolute datetime based on this schedule.
+
+        If it is a `timedelta`, then this method adds that delta to `self.start`.
+        Otherwise, it returns `date_or_delta` unchanged.
+        """
+        if isinstance(date_or_delta, timedelta):
+            return self.start + date_or_delta
+        else:
+            return date_or_delta
 
     class Meta(object):
         verbose_name = _('Schedule')

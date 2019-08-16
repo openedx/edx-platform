@@ -25,6 +25,7 @@ from openedx.core.djangolib.markup import HTML
 from student.models import CourseEnrollment
 from student.role_helpers import has_staff_roles
 from util.json_request import JsonResponse, expect_json
+from util.date_utils import user_absolute_time
 from xmodule.partitions.partitions import NoSuchUserPartitionGroupError
 
 log = logging.getLogger(__name__)
@@ -200,6 +201,12 @@ def check_content_start_date_for_masquerade_user(course_key, user, request, cour
     due to the content start date being in the future.
     """
     now = datetime.now(utc)
+    course_start = user_absolute_time(user, course_key, course_start)
+    if chapter_start:
+        chapter_start = user_absolute_time(user, course_key, chapter_start)
+    if section_start:
+        section_start = user_absolute_time(user, course_key, section_start)
+
     most_future_date = course_start
     if chapter_start and section_start:
         most_future_date = max(course_start, chapter_start, section_start)

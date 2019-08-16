@@ -25,7 +25,8 @@ from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
 from xblock.scorable import ScorableXBlockMixin
 from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
-
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from util.date_utils import course_absolute_time
 from xmodule.seq_module import SequenceModule
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.vertical_block import VerticalBlock
@@ -375,7 +376,7 @@ def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context)
     # instead of now>mstart comparison here.
     now = datetime.datetime.now(UTC)
     is_released = "unknown"
-    mstart = block.start
+    mstart = course_absolute_time(CourseOverview.get_from_id(block.scope_ids.usage_id.course_key), block.start)
 
     if mstart is not None:
         is_released = "<font color='red'>Yes!</font>" if (now > mstart) else "<font color='green'>Not yet</font>"

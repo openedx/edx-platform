@@ -19,6 +19,7 @@ from openedx.core.djangolib.markup import HTML
 from openedx.features.course_experience import COURSE_PRE_START_ACCESS_FLAG
 from student.roles import CourseBetaTesterRole
 from xmodule.util.xmodule_django import get_current_request_hostname
+from util.date_utils import user_absolute_time
 
 DEBUG_ACCESS = False
 log = getLogger(__name__)
@@ -44,6 +45,8 @@ def adjust_start_date(user, days_early_for_beta, start, course_key):
     Returns:
         A datetime.  Either the same as start, or earlier for beta testers.
     """
+    start = user_absolute_time(user, course_key, start)
+
     if days_early_for_beta is None:
         # bail early if no beta testing is set up
         return start
@@ -82,7 +85,7 @@ def check_start_date(user, days_early_for_beta, start, course_key, display_error
         if now > effective_start:
             return ACCESS_GRANTED
 
-        return StartDateError(start, display_error_to_user=display_error_to_user)
+        return StartDateError(effective_start, display_error_to_user=display_error_to_user)
 
 
 def in_preview_mode():

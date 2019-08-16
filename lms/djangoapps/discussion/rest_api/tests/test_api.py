@@ -172,7 +172,8 @@ class GetCourseTestBlackouts(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCa
         # A variety of formats is accepted
         self.course.discussion_blackouts = [
             ["2015-06-09T00:00:00Z", "6-10-15"],
-            [1433980800000, datetime(2015, 6, 12)],
+            [259200, datetime(2015, 6, 12)],
+            [1234, 4567]
         ]
         modulestore().update_item(self.course, self.user.id)
         result = get_course(self.request, self.course.id)
@@ -180,7 +181,8 @@ class GetCourseTestBlackouts(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCa
             result["blackouts"],
             [
                 {"start": "2015-06-09T00:00:00+00:00", "end": "2015-06-10T00:00:00+00:00"},
-                {"start": "2015-06-11T00:00:00+00:00", "end": "2015-06-12T00:00:00+00:00"},
+                {"start": "2030-01-04T00:00:00+00:00", "end": "2015-06-12T00:00:00+00:00"},
+                {"start": "2030-01-01T00:20:34+00:00", "end": "2030-01-01T01:16:07+00:00"},
             ]
         )
 

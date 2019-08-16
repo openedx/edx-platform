@@ -160,6 +160,8 @@ define(['jquery', 'underscore', 'js/views/xblock_outline', 'common/js/components
                 var modal;
                 var enableProctoredExams = false;
                 var enableTimedExams = false;
+                var enableRelativeDates = this.model.get('enable_relative_dates');
+
                 if (this.model.get('category') === 'sequential') {
                     if (this.parentView.parentView.model.has('enable_proctored_exams')) {
                         enableProctoredExams = this.parentView.parentView.model.get('enable_proctored_exams');
@@ -174,6 +176,7 @@ define(['jquery', 'underscore', 'js/views/xblock_outline', 'common/js/components
                     parentInfo: this.parentInfo,
                     enable_proctored_exams: enableProctoredExams,
                     enable_timed_exams: enableTimedExams,
+                    enable_relative_dates: enableRelativeDates,
                     xblockType: XBlockViewUtils.getXBlockType(
                         this.model.get('category'), this.parentView.model, true
                     )

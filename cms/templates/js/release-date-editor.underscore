@@ -13,6 +13,14 @@
               value=""
               placeholder="HH:MM" class="start-time release-time time input input-text" autocomplete="off" />
         </li>
+        <% if (enable_relative_dates) { %>
+        <li class="field field-text field-start-relative field-release-relative">
+            <label for="start_relative" class="label"><%- gettext('Release Date Relative to Content Availability:') %></label>
+            <input type="text" id="start_relative" name="start_relative"
+              value=""
+              placeholder="12345" class="start-relative release-relative relative input input-text" autocomplete="off" />
+        </li>
+        <% } %>
     </ul>
 
     <% if (xblockInfo.isSequential()) { %>

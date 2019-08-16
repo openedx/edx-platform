@@ -4,7 +4,7 @@ from __future__ import absolute_import
 import hashlib
 import logging
 from collections import OrderedDict
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import partial
 from uuid import uuid4
 
@@ -54,7 +54,7 @@ from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.xblock_utils import request_token, wrap_xblock, wrap_xblock_aside
 from static_replace import replace_static_urls
 from student.auth import has_studio_read_access, has_studio_write_access
-from util.date_utils import get_default_time_display
+from util.date_utils import get_default_time_display, course_absolute_time, is_unset
 from util.json_request import JsonResponse, expect_json
 from util.milestones_helpers import is_entrance_exams_enabled
 from xblock_config.models import CourseEditLTIFieldsEnabledFlag
@@ -85,6 +85,7 @@ ALWAYS = lambda x: True
 
 
 highlights_setting = WaffleSwitch(u'dynamic_pacing', u'studio_course_update')
+relative_dates_setting = WaffleSwitch(u'always_available', u'edit_relative_dates')
 
 
 def hash_resource(resource):
@@ -469,7 +470,9 @@ def xblock_container_handler(request, usage_key_string):
     if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         with modulestore().bulk_operations(usage_key.course_key):
             response = _get_module_info(
-                _get_xblock(usage_key, request.user), include_ancestor_info=True, include_publishing_info=True
+                _get_xblock(usage_key, request.user),
+                include_ancestor_info=True,
+                include_publishing_info=True,
             )
         return JsonResponse(response)
     else:
@@ -502,6 +505,7 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
     to default).
 
     """
+
     store = modulestore()
     # Perform all xblock changes within a (single-versioned) transaction
     with store.bulk_operations(xblock.location.course_key):
@@ -588,20 +592,21 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
                     else:
                         try:
                             value = field.from_json(value)
-                        except ValueError as verr:
+                        except (ValueError, TypeError) as err:
                             reason = _("Invalid data")
-                            if text_type(verr):
-                                reason = _(u"Invalid data ({details})").format(details=text_type(verr))
+                            if text_type(err):
+                                reason = _(u"Invalid data ({details})").format(details=text_type(err))
                             return JsonResponse({"error": reason}, 400)
 
                         field.write_to(xblock, value)
 
-        validate_and_update_xblock_due_date(xblock)
+        course = store.get_course(xblock.location.course_key)
+
+        validate_and_update_xblock_due_date(course, xblock)
         # update the xblock and call any xblock callbacks
         xblock = _update_with_callback(xblock, user, old_metadata, old_content)
 
         # for static tabs, their containing course also records their display name
-        course = store.get_course(xblock.location.course_key)
         if xblock.location.block_type == 'static_tab':
             # find the course's reference to this tab and update the name.
             static_tab = CourseTabList.get_tab_by_slug(course.tabs, xblock.location.name)
@@ -1027,14 +1032,18 @@ def _get_module_info(xblock, rewrite_static_links=True, include_ancestor_info=Fa
         # Pre-cache has changes for the entire course because we'll need it for the ancestor info
         # Except library blocks which don't [yet] use draft/publish
         if not isinstance(xblock.location, LibraryUsageLocator):
-            modulestore().has_changes(modulestore().get_course(xblock.location.course_key, depth=None))
+            course = modulestore().get_course(xblock.location.course_key, depth=None)
+            modulestore().has_changes(course)
+        else:
+            course = None
 
         # Note that children aren't being returned until we have a use case.
         xblock_info = create_xblock_info(
             xblock, data=data, metadata=own_metadata(xblock), include_ancestor_info=include_ancestor_info
         )
         if include_publishing_info:
-            add_container_page_publishing_info(xblock, xblock_info)
+            assert course is not None
+            add_container_page_publishing_info(course, xblock, xblock_info)
 
         return xblock_info
 
@@ -1132,7 +1141,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
 
     if xblock.category != 'course' and not is_concise:
         visibility_state = _compute_visibility_state(
-            xblock, child_info, is_xblock_unit and has_changes, is_self_paced(course)
+            course, xblock, child_info, is_xblock_unit and has_changes, is_self_paced(course)
         )
     else:
         visibility_state = None
@@ -1174,12 +1183,13 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         xblock_info['display_name'] = group_display_name if group_display_name else xblock_info['display_name']
     else:
         user_partitions = get_user_partition_info(xblock, course=course)
+
         xblock_info.update({
             'edited_on': get_default_time_display(xblock.subtree_edited_on) if xblock.subtree_edited_on else None,
             'published': published,
             'published_on': published_on,
             'studio_url': xblock_studio_url(xblock, parent_xblock),
-            'released_to_students': datetime.now(UTC) > xblock.start,
+            'released_to_students': datetime.now(UTC) > course_absolute_time(course, xblock.start),
             'release_date': release_date,
             'visibility_state': visibility_state,
             'has_explicit_staff_lock': xblock.fields['visible_to_staff_only'].is_set_on(xblock),
@@ -1251,6 +1261,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                     'show_review_rules': show_review_rules
                 })
 
+        xblock_info['enable_relative_dates'] = relative_dates_setting.is_enabled()
+
         # Update with gating info
         xblock_info.update(_get_gating_info(course, xblock))
 
@@ -1291,7 +1303,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     return xblock_info
 
 
-def add_container_page_publishing_info(xblock, xblock_info):
+def add_container_page_publishing_info(course, xblock, xblock_info):
     """
     Adds information about the xblock's publish state to the supplied
     xblock_info for the container page.
@@ -1315,7 +1327,7 @@ def add_container_page_publishing_info(xblock, xblock_info):
 
     xblock_info["edited_by"] = safe_get_username(xblock.subtree_edited_by)
     xblock_info["published_by"] = safe_get_username(xblock.published_by)
-    xblock_info["currently_visible_to_students"] = is_currently_visible_to_students(xblock)
+    xblock_info["currently_visible_to_students"] = is_currently_visible_to_students(course, xblock)
     xblock_info["has_partition_group_components"] = has_children_visible_to_specific_partition_groups(xblock)
     if xblock_info["release_date"]:
         xblock_info["release_date_from"] = _get_release_date_from(xblock)
@@ -1354,7 +1366,7 @@ class VisibilityState(object):
     gated = 'gated'
 
 
-def _compute_visibility_state(xblock, child_info, is_unit_with_changes, is_course_self_paced=False):
+def _compute_visibility_state(course, xblock, child_info, is_unit_with_changes, is_course_self_paced=False):
     """
     Returns the current publish state for the specified xblock and its children
     """
@@ -1365,8 +1377,8 @@ def _compute_visibility_state(xblock, child_info, is_unit_with_changes, is_cours
         # as well as previously published units with draft content.
         return VisibilityState.needs_attention
 
-    is_unscheduled = xblock.start == DEFAULT_START_DATE
-    is_live = is_course_self_paced or datetime.now(UTC) > xblock.start
+    is_unscheduled = is_unset(xblock.start)
+    is_live = is_course_self_paced or datetime.now(UTC) > course_absolute_time(course, xblock.start)
     if child_info and child_info.get('children', []):
         all_staff_only = True
         all_unscheduled = True
@@ -1458,8 +1470,12 @@ def _get_release_date(xblock, user=None):
     """
     # If year of start date is less than 1900 then reset the start date to DEFAULT_START_DATE
     reset_to_default = False
+    start = xblock.start
     try:
-        reset_to_default = xblock.start.year < 1900
+        if isinstance(start, timedelta):
+            reset_to_default = start.total_seconds() <= 0
+        else:
+            reset_to_default = start.year < 1900
     except ValueError:
         # For old mongo courses, accessing the start attribute calls `to_json()`,
         # which raises a `ValueError` for years < 1900.
@@ -1473,11 +1489,11 @@ def _get_release_date(xblock, user=None):
     return get_default_time_display(xblock.start) if xblock.start != DEFAULT_START_DATE else None
 
 
-def validate_and_update_xblock_due_date(xblock):
+def validate_and_update_xblock_due_date(course, xblock):
     """
     Validates the due date for the xblock, and set to None if pre-1900 due date provided
     """
-    if xblock.due and xblock.due.year < 1900:
+    if xblock.due and course_absolute_time(course, xblock.due).year < 1900:
         xblock.due = None
 
 

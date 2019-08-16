@@ -20,6 +20,7 @@ from lms.djangoapps.courseware.courses import (
 )
 from openedx.core.lib.api.view_utils import LazySequence
 from xmodule.modulestore.django import modulestore
+from util.date_utils import user_absolute_time
 
 from .permissions import can_view_courses_for_username
 
@@ -178,6 +179,7 @@ def get_due_dates(request, course_key, user):
 
     due_dates = []
     for (block_key, date_type), date in six.iteritems(dates):
+        date = user_absolute_time(request.user, course_key, date)
         if date_type == 'due':
             block = store.get_item(block_key)
 

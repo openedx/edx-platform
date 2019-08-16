@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 import logging
 
+from datetime import datetime, timedelta
 import dateutil
 import six
 from pytz import UTC
@@ -122,7 +123,10 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
             [
                 {'id': six.text_type(a.location), 'display_name': a.display_name}
                 for a in assignments_with_dates
-                if a.due < course.start
+                if (
+                    (isinstance(a.due, datetime) and a.due < course.start) or
+                    (isinstance(a.due, timedelta) and a.due < timedelta(0))
+                )
             ]
             if self._has_start_date(course)
             else []

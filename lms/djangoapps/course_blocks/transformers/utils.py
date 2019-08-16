@@ -1,6 +1,10 @@
 """
 Common Helper utilities for transformers
 """
+from datetime import datetime, timedelta
+import logging
+
+LOG = logging.getLogger(__name__)
 
 
 def get_field_on_block(block, field_name, default_value=None):
@@ -120,26 +124,51 @@ def collect_merged_date_field(
 
         parents = block_structure.get_parents(block_key)
         block_date = get_field_on_block(block_structure.get_xblock(block_key), xblock_field_name)
+        if block_date:
+            block_date_cls = type(block_date)
+        else:
+            block_date_cls = None
+
         if not parents:
             # no parents so just use value on block or default
             merged_date_value = block_date or default_date
 
         else:
-            # compute merged value of date from all parents
-            merged_all_parents_date = func_merge_parents(
+            parent_dates = [
                 block_structure.get_transformer_block_field(
                     parent_key, transformer, merged_field_name, default_date,
                 )
                 for parent_key in parents
-            )
+            ]
 
-            if not block_date:
-                # no value on this block so take value from parents
-                merged_date_value = merged_all_parents_date
+            if block_date_cls is None:
+                if any(isinstance(pdate, timedelta) for pdate in parent_dates):
+                    block_date_cls = timedelta
+                else:
+                    block_date_cls = datetime
 
+            compatible_parent_dates = [pdate for pdate in parent_dates if isinstance(pdate, block_date_cls)]
+            if compatible_parent_dates != parent_dates:
+                LOG.warning(
+                    u"Not all parents of block %s use the same date format: %s != %s",
+                    block_key,
+                    compatible_parent_dates,
+                    parent_dates,
+                )
+
+            if compatible_parent_dates:
+                # compute merged value of date from all parents
+                merged_all_parents_date = func_merge_parents(compatible_parent_dates)
+
+                if not block_date:
+                    # no value on this block so take value from parents
+                    merged_date_value = merged_all_parents_date
+
+                else:
+                    # compute merged date of the block and the parent
+                    merged_date_value = func_merge_ancestors(merged_all_parents_date, block_date)
             else:
-                # compute merged date of the block and the parent
-                merged_date_value = func_merge_ancestors(merged_all_parents_date, block_date)
+                merged_date_value = block_date
 
         block_structure.set_transformer_block_field(
             block_key,
