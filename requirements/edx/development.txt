@@ -121,7 +121,7 @@ docutils==0.15.2
 drf-yasg==1.16
 edx-ace==0.1.10
 edx-analytics-data-api-client==0.15.3
-edx-bulk-grades==0.5
+edx-bulk-grades==0.5.2
 edx-ccx-keys==0.2.2
 edx-celeryutils==0.3.0
 edx-completion==2.0.0
@@ -146,7 +146,7 @@ git+https://github.com/mitodl/edx-sga.git@3828ba9e413080a81b907a3381e5ffa05e063f
 edx-sphinx-theme==1.5.0
 edx-submissions==2.1.1
 edx-user-state-client==1.1.1
-edx-when==0.2
+edx-when==0.3
 edxval==1.1.25
 elasticsearch==1.9.0
 entrypoints==0.3
@@ -289,7 +289,7 @@ rest-condition==1.0.3
 rfc6266-parser==0.0.5.post2
 ruamel.ordereddict==0.4.14 ; python_version == "2.7"
 ruamel.yaml.clib==0.1.2
-ruamel.yaml==0.16.2
+ruamel.yaml==0.16.4
 rules==2.1
 s3transfer==0.1.13
 sailthru-client==2.2.3
@@ -331,7 +331,7 @@ unidiff==0.5.5
 uritemplate==3.0.0
 urllib3==1.23
 user-util==0.1.5
-virtualenv==16.7.2
+virtualenv==16.7.3
 voluptuous==0.11.7
 vulture==1.0
 watchdog==0.9.0

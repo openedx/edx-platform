@@ -62,6 +62,7 @@ REQ_FILES = \
 	requirements/edx-sandbox/base \
 	requirements/edx/base \
 	requirements/edx/testing \
+	requirements/edx/jenkins \
 	requirements/edx/development \
 	scripts/xblock/requirements
 
