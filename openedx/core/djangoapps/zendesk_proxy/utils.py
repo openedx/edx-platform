@@ -96,11 +96,11 @@ def create_zendesk_ticket(
         if additional_info:
             try:
                 ticket = response.json()['ticket']
-            except ValueError as e:
+            except (ValueError, KeyError):
                 log.error(
                     _std_error_message(
-                        u"Got a non json response from zendesk api. Can't"
-                        " get the ticket number to add extra info. {}".format(additional_info),
+                        u"Got an unexpected response from zendesk api. Can't"
+                        u" get the ticket number to add extra info. {}".format(additional_info),
                         response.content
                     )
                 )
