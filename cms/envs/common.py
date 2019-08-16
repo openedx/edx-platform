@@ -206,9 +206,6 @@ FEATURES = {
     # based on their location.
     'EMBARGO': False,
 
-    # Turn on/off Microsites feature
-    'USE_MICROSITES': False,
-
     # Allow creating courses with non-ascii characters in the course id
     'ALLOW_UNICODE_COURSE_ID': False,
 
@@ -1680,21 +1677,6 @@ DEFAULT_SITE_THEME = None
 
 ENABLE_COMPREHENSIVE_THEMING = False
 
-################################ Settings for Microsites ################################
-
-### Select an implementation for the microsite backend
-# for MICROSITE_BACKEND possible choices are
-# 1. microsite_configuration.backends.filebased.FilebasedMicrositeBackend
-# 2. microsite_configuration.backends.database.DatabaseMicrositeBackend
-MICROSITE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrositeBackend'
-# for MICROSITE_TEMPLATE_BACKEND possible choices are
-# 1. microsite_configuration.backends.filebased.FilebasedMicrositeTemplateBackend
-# 2. microsite_configuration.backends.database.DatabaseMicrositeTemplateBackend
-MICROSITE_TEMPLATE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrositeTemplateBackend'
-# TTL for microsite database template cache
-MICROSITE_DATABASE_TEMPLATE_CACHE_TTL = 5 * 60
-
-
 ############################ Global Database Configuration #####################
 
 DATABASE_ROUTERS = [
@@ -1969,10 +1951,6 @@ BULK_EMAIL_DEFAULT_FROM_EMAIL = 'no-reply@example.com'
 # Flag to indicate if individual email addresses should be logged as they are sent
 # a bulk email message.
 BULK_EMAIL_LOG_SENT_EMAILS = False
-
-################################ Settings for Microsites ################################
-MICROSITE_ROOT_DIR = '/edx/app/edxapp/edx-microsite'
-MICROSITE_CONFIGURATION = {}
 
 ############### Settings for django file storage ##################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'

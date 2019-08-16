@@ -9,7 +9,6 @@ from django.conf import settings
 from django.test import TestCase
 
 from edxmako import LOOKUP, add_lookup
-from microsite_configuration import microsite
 
 log = logging.getLogger(__name__)
 
@@ -32,21 +31,3 @@ class LmsModuleTests(TestCase):
         assert settings.FEATURES['ENABLE_API_DOCS']
         response = self.client.get('/api-docs/')
         self.assertEqual(200, response.status_code)
-
-
-class TemplateLookupTests(TestCase):
-    """
-    Tests for TemplateLookup.
-    """
-
-    def test_add_lookup_to_main(self):
-        """Test that any template directories added are not cleared when microsites are enabled."""
-
-        add_lookup('main', 'external_module', __name__)
-        directories = LOOKUP['main'].directories
-        self.assertEqual(len([directory for directory in directories if 'external_module' in directory]), 1)
-
-        # This should not clear the directories list
-        microsite.enable_microsites(log)
-        directories = LOOKUP['main'].directories
-        self.assertEqual(len([directory for directory in directories if 'external_module' in directory]), 1)
