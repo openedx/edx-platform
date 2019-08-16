@@ -27,6 +27,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.partitions.partitions_service import get_all_partitions_for_course
+from util.date_utils import course_absolute_time
 
 log = logging.getLogger(__name__)
 
@@ -157,7 +158,7 @@ def get_lms_link_for_certificate_web_view(user_id, course_key, mode):
 
 
 # pylint: disable=invalid-name
-def is_currently_visible_to_students(xblock):
+def is_currently_visible_to_students(course, xblock):
     """
     Returns true if there is a published version of the xblock that is currently visible to students.
     This means that it has a release date in the past, and the xblock has not been set to staff only.
@@ -175,7 +176,7 @@ def is_currently_visible_to_students(xblock):
 
     # Check start date
     if 'detached' not in published._class_tags and published.start is not None:
-        return datetime.now(UTC) > published.start
+        return datetime.now(UTC) > course_absolute_time(course, published.start)
 
     # No start date, so it's always visible
     return True

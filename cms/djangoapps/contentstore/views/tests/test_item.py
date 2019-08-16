@@ -2625,7 +2625,7 @@ class TestXBlockInfo(ItemTest):
             include_ancestor_info=True,
             user=self.user
         )
-        add_container_page_publishing_info(vertical, xblock_info)
+        add_container_page_publishing_info(self.course, vertical, xblock_info)
         self.validate_vertical_xblock_info(xblock_info)
 
     def test_component_xblock_info(self):
@@ -3122,7 +3122,7 @@ class TestXBlockPublishingInfo(ItemTest):
         self._verify_explicit_staff_lock_state(xblock_info, False, path=self.FIRST_UNIT_PATH)
 
         vertical_info = self._get_xblock_info(vertical.location)
-        add_container_page_publishing_info(vertical, vertical_info)
+        add_container_page_publishing_info(self.course, vertical, vertical_info)
         self.assertEqual(_xblock_type_and_display_name(chapter), vertical_info["staff_lock_from"])
 
     def test_no_staff_only_section(self):
@@ -3155,7 +3155,7 @@ class TestXBlockPublishingInfo(ItemTest):
         self._verify_explicit_staff_lock_state(xblock_info, False, path=self.FIRST_UNIT_PATH)
 
         vertical_info = self._get_xblock_info(vertical.location)
-        add_container_page_publishing_info(vertical, vertical_info)
+        add_container_page_publishing_info(self.course, vertical, vertical_info)
         self.assertEqual(_xblock_type_and_display_name(sequential), vertical_info["staff_lock_from"])
 
     def test_no_staff_only_subsection(self):
@@ -3186,7 +3186,7 @@ class TestXBlockPublishingInfo(ItemTest):
         self._verify_explicit_staff_lock_state(xblock_info, True, path=self.FIRST_UNIT_PATH)
 
         vertical_info = self._get_xblock_info(vertical.location)
-        add_container_page_publishing_info(vertical, vertical_info)
+        add_container_page_publishing_info(self.course, vertical, vertical_info)
         self.assertEqual(_xblock_type_and_display_name(vertical), vertical_info["staff_lock_from"])
 
     def test_unscheduled_section_with_live_subsection(self):

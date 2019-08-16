@@ -140,7 +140,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                                     model: this.model,
                                     xblockType: this.options.xblockType,
                                     enable_proctored_exams: this.options.enable_proctored_exams,
-                                    enable_timed_exams: this.options.enable_timed_exams
+                                    enable_timed_exams: this.options.enable_timed_exams,
+                                    enable_relative_dates: this.options.enable_relative_dates
                                 });
                             }, this)
                         );
@@ -311,7 +312,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 xblockInfo: this.model,
                 xblockType: this.options.xblockType,
                 enable_proctored_exam: this.options.enable_proctored_exams,
-                enable_timed_exam: this.options.enable_timed_exams
+                enable_timed_exam: this.options.enable_timed_exams,
+                enable_relative_dates: this.options.enable_relative_dates
             }, this.getContext()));
 
             HtmlUtils.setHtml(this.$el, HtmlUtils.HTML(html));
@@ -344,7 +346,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             });
             if (this.model.get(this.fieldName)) {
                 DateUtils.setDate(
-                    this.$('input.date'), this.$('input.time'),
+                    this.$('input.date'), this.$('input.time'), this.$('input.relative'),
                     this.model.get(this.fieldName)
                 );
             }
@@ -357,18 +359,19 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         className: 'modal-section-content has-actions due-date-input grading-due-date',
 
         getValue: function() {
-            return DateUtils.getDate(this.$('#due_date'), this.$('#due_time'));
+            return DateUtils.getDate(this.$('#due_date'), this.$('#due_time'), this.$('#due_relative'));
         },
 
         clearValue: function(event) {
             event.preventDefault();
-            this.$('#due_time, #due_date').val('');
+            this.$('#due_time, #due_date, #due_relative').val('');
         },
 
         getRequestData: function() {
+            var newDueDate = this.getValue();
             return {
                 metadata: {
-                    due: this.getValue()
+                    due: newDueDate
                 }
             };
         }
@@ -388,12 +391,12 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         getValue: function() {
-            return DateUtils.getDate(this.$('#start_date'), this.$('#start_time'));
+            return DateUtils.getDate(this.$('#start_date'), this.$('#start_time'), this.$('#start_relative'));
         },
 
         clearValue: function(event) {
             event.preventDefault();
-            this.$('#start_time, #start_date').val('');
+            this.$('#start_time, #start_date, #start_relative').val('');
         },
 
         getRequestData: function() {
@@ -851,7 +854,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 } else {
                     display = 'none';
                 }
-                $.each(warning, function(_, element) {
+                $.each(warning, function(__, element) {
                     element.style.display = display;
                 });
             }

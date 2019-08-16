@@ -19,6 +19,10 @@ class Date(JSONField):
     '''
     Date fields know how to parse and produce json (iso) compatible formats. Converts to tz aware datetimes.
     '''
+    # TODO: migrate features upstream, and just re-export the DateTime field from xblock
+    # TODO: Merge DateTime and TimeDelta fields and make it easy to configure particular instances
+    # to only allow a subset of data.
+
     # See note below about not defaulting these
     CURRENT_YEAR = datetime.datetime.now(UTC).year
     PREVENT_DEFAULT_DAY_MON_SEED1 = datetime.datetime(CURRENT_YEAR, 1, 1, tzinfo=UTC)
@@ -56,7 +60,7 @@ class Date(JSONField):
         elif isinstance(field, six.string_types):
             return self._parse_date_wo_default_month_day(field)
         elif isinstance(field, six.integer_types) or isinstance(field, float):
-            return datetime.datetime.fromtimestamp(field / 1000, UTC)
+            return datetime.timedelta(seconds=field)
         elif isinstance(field, time.struct_time):
             return datetime.datetime.fromtimestamp(time.mktime(field), UTC)
         elif isinstance(field, datetime.datetime):
@@ -85,6 +89,8 @@ class Date(JSONField):
                 return value.strftime('%Y-%m-%dT%H:%M:%SZ')
             else:
                 return value.isoformat()
+        elif isinstance(value, datetime.timedelta):
+            return value.total_seconds()
         else:
             raise TypeError("Cannot convert {!r} to json".format(value))
 

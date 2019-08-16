@@ -96,11 +96,18 @@ class BlockStructureStore(object):
 
         try:
             serialized_data = self._get_from_cache(bs_model)
+            try:
+                deserialized_data = self._deserialize(serialized_data, root_block_usage_key)
+            except:
+                # If there is any deserialization error, log it and then recompute from the backing store
+                logger.warning("Unable to deserialize cached blockstore data", exc_info=True)
+                raise BlockStructureNotFound(root_block_usage_key)
         except BlockStructureNotFound:
             serialized_data = self._get_from_store(bs_model)
             self._add_to_cache(serialized_data, bs_model)
+            deserialized_data = self._deserialize(serialized_data, root_block_usage_key)
 
-        return self._deserialize(serialized_data, root_block_usage_key)
+        return deserialized_data
 
     def delete(self, root_block_usage_key):
         """
