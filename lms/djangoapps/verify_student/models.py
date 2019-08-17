@@ -10,6 +10,7 @@ photo verification process as generic as possible.
 """
 from __future__ import absolute_import
 
+import codecs
 import functools
 import json
 import logging
@@ -620,7 +621,11 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
             return
 
         aes_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["FACE_IMAGE_AES_KEY"]
-        aes_key = aes_key_str.decode("hex")
+
+        if six.PY3:
+            aes_key = codecs.decode(aes_key_str, "hex")
+        else:
+            aes_key = aes_key_str.decode("hex")
 
         path = self._get_path("face")
         buff = ContentFile(encrypt_and_encode(img_data, aes_key))
@@ -658,7 +663,11 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         self._storage.save(path, buff)
 
         # Update our record fields
-        self.photo_id_key = rsa_encrypted_aes_key.encode('base64')
+        if six.PY3:
+            self.photo_id_key = codecs.encode(rsa_encrypted_aes_key, 'base64')
+        else:
+            self.photo_id_key = rsa_encrypted_aes_key.encode('base64')
+
         self.save()
 
     @status_before_must_be("must_retry", "ready", "submitted")
