@@ -617,6 +617,19 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS,
 # We continue to load production.py over aws.py
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_constants.SettingsType.PRODUCTION)
 
+########################## Philu related settings ########################
+
+# Project Base URL
+LMS_BASE_URL = ENV_TOKENS.get('LMS_BASE_URL', None)
+
+# NodeBB settings for NodeBBClient Initialization
+NODEBB_MASTER_TOKEN = AUTH_TOKENS.get('NODEBB_MASTER_TOKEN', None)
+NODEBB_ENDPOINT = ENV_TOKENS.get('NODEBB_ENDPOINT', None)
+NODEBB_RETRY_DELAY = 60
+
+MAILCHIMP_API_KEY = AUTH_TOKENS.get('MAILCHIMP_API_KEY', None)
+MAILCHIMP_LEARNERS_LIST_ID = AUTH_TOKENS.get('MAILCHIMP_LEARNERS_LIST_ID', None)
+
 ########################## Derive Any Derived Settings  #######################
 
 derive_settings(__name__)
