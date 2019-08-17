@@ -217,7 +217,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, Retireme
         social_links = [
             dict(platform="unsupported", social_link="https://www.unsupported.com/{}".format(self.user.username))
         ]
-        with self.assertRaises(AccountUpdateError):
+        with self.assertRaises(AccountValidationError):
             update_account_settings(self.user, {"social_links": social_links})
 
     def test_update_success_for_enterprise(self):
