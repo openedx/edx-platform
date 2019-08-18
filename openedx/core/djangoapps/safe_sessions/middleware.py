@@ -202,7 +202,7 @@ class SafeCookieData(object):
         hash_func = sha256()
         for data_item in [self.version, self.session_id, user_id]:
             hash_func.update(six.b(six.text_type(data_item)))
-            hash_func.update('|')
+            hash_func.update(b'|')
         return hash_func.hexdigest()
 
     @staticmethod
@@ -475,7 +475,7 @@ def _delete_cookie(request, response):
     cookie_header = request.META.get('HTTP_COOKIE', '')[:4096]
     log.warning(
         u"Malformed Cookie Header? First 4K, in Base64: %s",
-        b64encode(cookie_header)
+        b64encode(six.b(cookie_header))
     )
 
     # Note, there is no request.user attribute at this point.
