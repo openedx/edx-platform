@@ -3826,3 +3826,7 @@ SOCIAL_AUTH_SAML_SP_PRIVATE_KEY = ""
 SOCIAL_AUTH_SAML_SP_PUBLIC_CERT = ""
 SOCIAL_AUTH_SAML_SP_PRIVATE_KEY_DICT = {}
 SOCIAL_AUTH_SAML_SP_PUBLIC_CERT_DICT = {}
+
+######################### rate limit for yt_video_metadata api ############
+
+RATE_LIMIT_FOR_VIDEO_METADATA_API = '10/minute'
