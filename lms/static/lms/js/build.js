@@ -34,6 +34,7 @@
             'js/header_factory',
             'js/student_account/logistration_factory',
             'js/student_account/views/account_settings_factory',
+            'st-lutherx/js/student_account/views/edly_account_settings_factory',
             'js/student_account/views/finish_auth_factory',
             'js/views/message_banner',
             'learner_profile/js/learner_profile_factory',
