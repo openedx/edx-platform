@@ -1045,7 +1045,7 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         mock_search.return_value = NOTES_VIEW_EMPTY_RESPONSE
         enable_edxnotes_for_the_course(self.course, self.user.id)
         response = self.client.get(self.notes_url, {"text": "test"})
-        self.assertEqual(json.loads(response.content), NOTES_VIEW_EMPTY_RESPONSE)
+        self.assertEqual(json.loads(response.content.decode('utf-8')), NOTES_VIEW_EMPTY_RESPONSE)
         self.assertEqual(response.status_code, 200)
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": False})

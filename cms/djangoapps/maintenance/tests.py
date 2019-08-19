@@ -244,7 +244,7 @@ class TestForcePublish(MaintenanceViewTestCase):
             'course-id': six.text_type(course.id)
         }
         response = self.client.post(self.view_url, data=data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         return response_data
 
     def test_force_publish_dry_run(self):

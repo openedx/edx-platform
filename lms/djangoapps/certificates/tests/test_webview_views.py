@@ -1039,7 +1039,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         request_certificate_url = reverse('request_certificate')
         response = self.client.post(request_certificate_url, {'course_id': six.text_type(self.course.id)})
         self.assertEqual(response.status_code, 200)
-        response_json = json.loads(response.content)
+        response_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(CertificateStatuses.notpassing, response_json['add_status'])
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_DISABLED)
@@ -1053,7 +1053,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             with mock_passing_grade():
                 response = self.client.post(request_certificate_url, {'course_id': six.text_type(self.course.id)})
                 self.assertEqual(response.status_code, 200)
-                response_json = json.loads(response.content)
+                response_json = json.loads(response.content.decode('utf-8'))
                 self.assertEqual(CertificateStatuses.generating, response_json['add_status'])
 
     #TEMPLATES WITHOUT LANGUAGE TESTS

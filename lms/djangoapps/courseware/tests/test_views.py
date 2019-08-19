@@ -2659,7 +2659,7 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
             quote_slashes(six.text_type(self.html_1_1.scope_ids.usage_id)),
             'publish_completion',
         )
-        self.assertEqual(json.loads(response.content), {'result': "ok"})
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {'result': "ok"})
 
         response = self.client.get(self.section_1_url)
         self.assertIn('data-mark-completed-on-view-after-delay', response.content)
@@ -2677,7 +2677,7 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
             quote_slashes(six.text_type(self.html_1_2.scope_ids.usage_id)),
             'publish_completion',
         )
-        self.assertEqual(json.loads(response.content), {'result': "ok"})
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {'result': "ok"})
 
         response = self.client.get(self.section_1_url)
         self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
@@ -2936,7 +2936,7 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
             'publish_completion',
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content), {'result': "ok"})
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {'result': "ok"})
 
         response = self.get_response(usage_key=self.html_block.location)
         self.assertEqual(response.status_code, 200)

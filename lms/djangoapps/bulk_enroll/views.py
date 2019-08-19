@@ -90,7 +90,7 @@ class BulkEnrollView(APIView):
             for course_id, cohort_name in itertools.izip_longest(serializer.data.get('courses'),
                                                                  serializer.data.get('cohorts', [])):
                 response = students_update_enrollment(self.request, course_id=course_id)
-                response_content = json.loads(response.content)
+                response_content = json.loads(response.content.decode('utf-8'))
 
                 if cohort_name:
                     try:

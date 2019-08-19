@@ -202,7 +202,7 @@ class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
         self.assertEqual(response.status_code, 201)
 
         # Verify the API returns the serialized CreditCourse
-        self.assertDictEqual(json.loads(response.content), data)
+        self.assertDictEqual(json.loads(response.content.decode('utf-8')), data)
 
         # Verify the CreditCourse was actually created
         course_key = CourseKey.from_string(course_id)
@@ -243,7 +243,7 @@ class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
         self.assertEqual(response.status_code, 200)
 
         # Verify the API returns the serialized CreditCourse
-        self.assertDictEqual(json.loads(response.content), self._serialize_credit_course(cc1))
+        self.assertDictEqual(json.loads(response.content.decode('utf-8')), self._serialize_credit_course(cc1))
 
     def test_list(self):
         """ Verify the endpoint supports listing all CreditCourse objects. """
@@ -255,7 +255,7 @@ class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
         self.assertEqual(response.status_code, 200)
 
         # Verify the API returns a list of serialized CreditCourse objects
-        self.assertListEqual(json.loads(response.content), expected)
+        self.assertListEqual(json.loads(response.content.decode('utf-8')), expected)
 
     def test_update(self):
         """ Verify the endpoint supports updating a CreditCourse object. """
@@ -269,7 +269,7 @@ class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
         self.assertEqual(response.status_code, 200)
 
         # Verify the serialized CreditCourse is returned
-        self.assertDictEqual(json.loads(response.content), data)
+        self.assertDictEqual(json.loads(response.content.decode('utf-8')), data)
 
         # Verify the data was persisted
         credit_course = CreditCourse.objects.get(course_key=credit_course.course_key)
@@ -378,7 +378,7 @@ class CreditProviderRequestCreateViewTests(ApiTestCaseMixin, UserMixin, TestCase
         self.assertEqual(request.status, 'pending')
 
         # Check request parameters
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         parameters = content['parameters']
 
         self.assertEqual(content['url'], self.provider.provider_url)

@@ -323,7 +323,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
 
         response = self.client.post(url)
         self.assertEqual(response.status_code, 200)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertIsNotNone(res_json['message'])
         self.assertIsNotNone(res_json['task_id'])
 
@@ -348,7 +348,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
 
         # Assert 200 status code in response
         self.assertEqual(response.status_code, 200)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert request is successful
         self.assertTrue(res_json['success'])
@@ -420,7 +420,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
 
                 # Assert 200 status code in response
                 self.assertEquals(response.status_code, 200)
-                res_json = json.loads(response.content)
+                res_json = json.loads(response.content.decode('utf-8'))
 
                 # Assert request is successful
                 self.assertTrue(res_json['success'])
@@ -461,7 +461,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
 
         # Assert 400 status code in response
         self.assertEqual(response.status_code, 400)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert Error Message
         self.assertEqual(
@@ -475,7 +475,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
 
         # Assert 400 status code in response
         self.assertEqual(response.status_code, 400)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert Error Message
         self.assertEqual(res_json['message'], u'Please select certificate statuses from the list only.')
@@ -538,7 +538,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         )
         # Assert successful request processing
         self.assertEqual(response.status_code, 200)
-        certificate_exception = json.loads(response.content)
+        certificate_exception = json.loads(response.content.decode('utf-8'))
 
         # Assert Certificate Exception Updated data
         self.assertEqual(certificate_exception['user_email'], self.user.email)
@@ -560,7 +560,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
 
         # Assert 400 status code in response
         self.assertEqual(response.status_code, 400)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert Request not successful
         self.assertFalse(res_json['success'])
@@ -585,7 +585,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
 
         # Assert 400 status code in response
         self.assertEqual(response.status_code, 400)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert Request not successful
         self.assertFalse(res_json['success'])
@@ -610,7 +610,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
 
         # Assert 400 status code in response
         self.assertEqual(response.status_code, 400)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert Request not successful
         self.assertFalse(res_json['success'])
@@ -633,7 +633,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
-        certificate_exception = json.loads(response.content)
+        certificate_exception = json.loads(response.content.decode('utf-8'))
 
         # Assert Certificate Exception Updated data
         self.assertEqual(certificate_exception['user_email'], self.user.email)
@@ -654,7 +654,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        certificate_exception = json.loads(response.content)
+        certificate_exception = json.loads(response.content.decode('utf-8'))
 
         # Assert Certificate Exception Updated data
         self.assertEqual(certificate_exception['user_email'], self.user.email)
@@ -676,7 +676,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
 
         # Assert 400 status code in response
         self.assertEqual(response.status_code, 400)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert Request not successful
         self.assertFalse(res_json['success'])
@@ -731,7 +731,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         # Assert error on request
         self.assertEqual(response.status_code, 400)
 
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert Request not successful
         self.assertFalse(res_json['success'])
@@ -755,7 +755,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         # Assert error on request
         self.assertEqual(response.status_code, 400)
 
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert Request not successful
         self.assertFalse(res_json['success'])
@@ -817,7 +817,7 @@ class GenerateCertificatesInstructorApiTest(SharedModuleStoreTestCase):
         # Assert Success
         self.assertEqual(response.status_code, 200)
 
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert Request is successful
         self.assertTrue(res_json['success'])
@@ -845,7 +845,7 @@ class GenerateCertificatesInstructorApiTest(SharedModuleStoreTestCase):
         # Assert Success
         self.assertEqual(response.status_code, 200)
 
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert Request is successful
         self.assertTrue(res_json['success'])
@@ -873,7 +873,7 @@ class GenerateCertificatesInstructorApiTest(SharedModuleStoreTestCase):
         # Assert Failure
         self.assertEqual(response.status_code, 400)
 
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert Request is not successful
         self.assertFalse(res_json['success'])
@@ -959,7 +959,7 @@ class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTest
         uploaded_file = SimpleUploadedFile("temp.jpg", io.BytesIO(b"some initial binary data: \x00\x01").read())
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertNotEquals(len(data['general_errors']), 0)
         self.assertEquals(data['general_errors'][0], 'Make sure that the file you upload is in CSV format with '
                                                      'no extraneous characters or rows.')
@@ -971,7 +971,7 @@ class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTest
         uploaded_file = SimpleUploadedFile("temp.csv", io.BytesIO(b"some initial binary data: \x00\x01").read())
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertNotEquals(len(data['general_errors']), 0)
         self.assertEquals(data['general_errors'][0], 'Could not read uploaded file.')
 
@@ -1025,7 +1025,7 @@ class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTest
 
         response = self.client.post(self.url, {'file_not_found': uploaded_file})
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEquals(len(data['general_errors']), 1)
         self.assertEquals(len(data['success']), 0)
 
@@ -1037,7 +1037,7 @@ class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTest
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         return data
 
 
@@ -1105,7 +1105,7 @@ class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
         )
         # Assert successful request processing
         self.assertEqual(response.status_code, 200)
-        result = json.loads(response.content)
+        result = json.loads(response.content.decode('utf-8'))
 
         # Assert Certificate Exception Updated data
         self.assertEqual(result['user'], self.enrolled_user_1.username)
@@ -1143,7 +1143,7 @@ class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
 
         # Assert 400 status code in response
         self.assertEqual(response.status_code, 400)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert Error Message
         self.assertEqual(
@@ -1168,7 +1168,7 @@ class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
 
         # Assert 400 status code in response
         self.assertEqual(response.status_code, 400)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert Error Message
         self.assertEqual(
@@ -1190,7 +1190,7 @@ class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
 
         # Assert 400 status code in response
         self.assertEqual(response.status_code, 400)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert Error Message
         self.assertEqual(
@@ -1214,7 +1214,7 @@ class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
 
         # Assert 400 status code in response
         self.assertEqual(response.status_code, 400)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert Error Message
         self.assertEqual(
@@ -1241,7 +1241,7 @@ class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
 
         # Assert 400 status code in response
         self.assertEqual(response.status_code, 400)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert Error Message
         self.assertEqual(
@@ -1271,7 +1271,7 @@ class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
 
         # Assert 400 status code in response
         self.assertEqual(response.status_code, 400)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert Error Message
         self.assertEqual(
@@ -1327,7 +1327,7 @@ class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
 
         # Assert 400 status code in response
         self.assertEqual(response.status_code, 400)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert Error Message
         self.assertEqual(

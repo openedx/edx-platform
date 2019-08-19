@@ -186,7 +186,7 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
         mock_request = Mock()
         mock_request.GET = mock_request.POST = {'task_id': task_id}
         response = instructor_task_status(mock_request)
-        status = json.loads(response.content)
+        status = json.loads(response.content.decode('utf-8'))
         return status
 
     def create_task_request(self, requester_username):

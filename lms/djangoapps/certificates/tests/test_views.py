@@ -179,7 +179,7 @@ class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
 
     def _assert_response(self, response):
         """Check the response from the callback end-point. """
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(content['return_code'], 0)
 

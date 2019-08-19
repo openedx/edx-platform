@@ -471,7 +471,7 @@ def shim_student_view(view_func, check_logged_in=False):
         # the third party auth pipeline, we redirect them from the pipeline
         # completion end-point directly.
         try:
-            response_dict = json.loads(response.content)
+            response_dict = json.loads(response.content.decode('utf-8'))
             msg = response_dict.get("value", u"")
             success = response_dict.get("success")
         except (ValueError, TypeError):

@@ -333,7 +333,7 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         )
 
         self.assertEquals(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         # strip_none is being used to perform the same transform that the
         # django view performs prior to writing thread data to the response
         self.assertEquals(
@@ -369,7 +369,7 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
             "test_thread_id"
         )
         self.assertEquals(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         # strip_none is being used to perform the same transform that the
         # django view performs prior to writing thread data to the response
         self.assertEquals(
@@ -486,7 +486,7 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
                     test_thread_id
                 )
             self.assertEquals(response.status_code, 200)
-            self.assertEquals(len(json.loads(response.content)["content"]["children"]), num_thread_responses)
+            self.assertEquals(len(json.loads(response.content.decode('utf-8'))["content"]["children"]), num_thread_responses)
 
         # Test uncached first, then cached now that the cache is warm.
         cached_calls = [
@@ -529,7 +529,7 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
         )
 
         self.assertEquals(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         self.assertEquals(
             response_data["content"],
             make_mock_thread_data(
@@ -723,7 +723,7 @@ class ForumFormDiscussionContentGroupTestCase(ForumsEnableMixin, ContentGroupTes
         Verify that a users have access to the threads in their assigned
         cohorts and non-cohorted modules.
         """
-        discussion_data = json.loads(response.content)['discussion_data']
+        discussion_data = json.loads(response.content.decode('utf-8'))['discussion_data']
         self.assertEqual(len(discussion_data), expected_discussion_threads)
 
     def call_view(self, mock_request, user):
@@ -926,7 +926,7 @@ class InlineDiscussionContextTestCase(ForumsEnableMixin, ModuleStoreTestCase):
             self.discussion_topic_id,
         )
 
-        json_response = json.loads(response.content)
+        json_response = json.loads(response.content.decode('utf-8'))
         self.assertEqual(json_response['discussion_data'][0]['context'], ThreadContext.STANDALONE)
 
 
@@ -1330,7 +1330,7 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
         response = self.get_response(mock_request, params, HTTP_X_REQUESTED_WITH="XMLHttpRequest")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/json; charset=utf-8')
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             sorted(response_data.keys()),
             ["annotated_content_info", "discussion_data", "num_pages", "page"]
@@ -1489,7 +1489,7 @@ class InlineDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCa
             request, text_type(self.course.id), self.course.discussion_topics['General']['id']
         )
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response_data["discussion_data"][0]["title"], text)
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
@@ -1518,7 +1518,7 @@ class ForumFormDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTes
 
         response = views.forum_form_discussion(request, text_type(self.course.id))
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response_data["discussion_data"][0]["title"], text)
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
@@ -1607,7 +1607,7 @@ class ForumDiscussionSearchUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreT
 
         response = views.forum_form_discussion(request, text_type(self.course.id))
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response_data["discussion_data"][0]["title"], text)
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
@@ -1637,7 +1637,7 @@ class SingleThreadUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, 
 
         response = views.single_thread(request, text_type(self.course.id), "dummy_discussion_id", thread_id)
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response_data["content"]["title"], text)
         self.assertEqual(response_data["content"]["body"], text)
 
@@ -1666,7 +1666,7 @@ class UserProfileUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, U
 
         response = views.user_profile(request, text_type(self.course.id), str(self.student.id))
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response_data["discussion_data"][0]["title"], text)
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
@@ -1695,7 +1695,7 @@ class FollowedThreadsUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCas
 
         response = views.followed_threads(request, text_type(self.course.id), str(self.student.id))
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response_data["discussion_data"][0]["title"], text)
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 

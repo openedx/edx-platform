@@ -221,7 +221,7 @@ class GroupConfigurationsBaseTestCase(object):
             )
             self.assertEqual(response.status_code, 400)
             self.assertNotIn("Location", response)
-            content = json.loads(response.content)
+            content = json.loads(response.content.decode('utf-8'))
             self.assertIn("error", content)
 
     def test_invalid_json(self):
@@ -240,7 +240,7 @@ class GroupConfigurationsBaseTestCase(object):
         )
         self.assertEqual(response.status_code, 400)
         self.assertNotIn("Location", response)
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertIn("error", content)
 
 
@@ -309,7 +309,7 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
         )
         self.assertEqual(response.status_code, 201)
         self.assertIn("Location", response)
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         configuration_id, group_ids = self._remove_ids(content)  # pylint: disable=unused-variable
         self.assertEqual(content, expected)
         # IDs are unique
@@ -392,7 +392,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
             HTTP_ACCEPT="application/json",
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(content, expected)
         self.reload_course()
@@ -433,7 +433,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
             HTTP_ACCEPT="application/json",
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(content, expected)
         self.reload_course()
 
@@ -485,7 +485,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 400)
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertTrue(content['error'])
         self.reload_course()
         # Verify that user_partitions and groups are still the same.
@@ -538,7 +538,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
             HTTP_ACCEPT="application/json",
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(content, expected)
         self.reload_course()
         # Verify that user_partitions in the course contains the new group configuration.
@@ -579,7 +579,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
             HTTP_ACCEPT="application/json",
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(content, expected)
         self.reload_course()
 
@@ -627,7 +627,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 400)
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertTrue(content['error'])
         self.reload_course()
         # Verify that user_partitions is still the same.

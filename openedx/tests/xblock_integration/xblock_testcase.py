@@ -392,7 +392,7 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
         ajax_response = collections.namedtuple('AjaxResponse',
                                                ['data', 'status_code'])
         try:
-            ajax_response.data = json.loads(resp.content)
+            ajax_response.data = json.loads(resp.content.decode('utf-8'))
         except ValueError:
             print("Invalid JSON response")
             print("(Often a redirect if e.g. not logged in)")

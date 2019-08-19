@@ -1220,7 +1220,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
 class JsonResponseTestCase(TestCase, UnicodeTestMixin):
     def _test_unicode_data(self, text):
         response = utils.JsonResponse(text)
-        reparsed = json.loads(response.content)
+        reparsed = json.loads(response.content.decode('utf-8'))
         self.assertEqual(reparsed, text)
 
 

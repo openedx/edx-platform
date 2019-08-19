@@ -260,7 +260,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             'message': 'test message for myself'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEquals(json.loads(response.content.decode('utf-8')), self.success_content)
 
         # Check that outbox is as expected
         self.assertEqual(len(mail.outbox), 1)
@@ -286,7 +286,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             'message': 'test message for subject'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEquals(json.loads(response.content.decode('utf-8')), self.success_content)
 
         # the 1 is for the instructor in this test and others
         self.assertEquals(len(mail.outbox), 1 + len(self.staff))
@@ -309,7 +309,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             'message': 'test message for cohort'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEquals(json.loads(response.content.decode('utf-8')), self.success_content)
 
         self.assertItemsEqual(
             [e.to[0] for e in mail.outbox],
@@ -331,7 +331,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             'message': 'test message for cohort'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEquals(json.loads(response.content.decode('utf-8')), self.success_content)
 
         self.assertEquals(len(mail.outbox), len(self.students) - 1)
         self.assertNotIn(self.students[-1].email, [e.to[0] for e in mail.outbox])
@@ -350,7 +350,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             'message': 'test message for test track',
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEquals(json.loads(response.content.decode('utf-8')), self.success_content)
 
         self.assertItemsEqual(
             [e.to[0] for e in mail.outbox],
@@ -387,7 +387,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             'message': 'test message for test_mode track',
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEquals(json.loads(response.content.decode('utf-8')), self.success_content)
 
         # Only the the student in the test mode in the course the email was
         # sent from should receive an email
@@ -406,7 +406,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             'message': 'test message for all'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEquals(json.loads(response.content.decode('utf-8')), self.success_content)
 
         # the 1 is for the instructor
         self.assertEquals(len(mail.outbox), 1 + len(self.staff) + len(self.students))
@@ -464,7 +464,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             'message': 'test message for all'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEquals(json.loads(response.content.decode('utf-8')), self.success_content)
 
         self.assertEquals(len(mail.outbox), 1 + len(self.staff) + len(self.students))
         self.assertItemsEqual(
@@ -490,7 +490,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             'message': 'test message for all'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEquals(json.loads(response.content.decode('utf-8')), self.success_content)
 
         self.assertEquals(len(mail.outbox), 1 + len(self.staff) + len(self.students))
 
@@ -543,7 +543,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         self.login_as_user(instructor)
         send_mail_url = reverse('send_email', kwargs={'course_id': six.text_type(course.id)})
         response = self.client.post(send_mail_url, test_email)
-        self.assertTrue(json.loads(response.content)['success'])
+        self.assertTrue(json.loads(response.content.decode('utf-8'))['success'])
 
         self.assertEqual(len(mail.outbox), 1)
         from_email = mail.outbox[0].from_email
@@ -586,7 +586,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             'message': 'test message for all'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEquals(json.loads(response.content.decode('utf-8')), self.success_content)
 
         self.assertEquals(mock_factory.emails_sent,
                           1 + len(self.staff) + len(self.students) + LARGE_NUM_EMAILS - len(optouts))
@@ -620,7 +620,7 @@ class TestEmailSendFromDashboard(EmailSendFromDashboardTestCase):
             'message': uni_message
         }
         response = self.client.post(self.send_mail_url, test_email)
-        self.assertEquals(json.loads(response.content), self.success_content)
+        self.assertEquals(json.loads(response.content.decode('utf-8')), self.success_content)
 
         self.assertEquals(len(mail.outbox), 1 + len(self.staff) + len(self.students))
         self.assertItemsEqual(

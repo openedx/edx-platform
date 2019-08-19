@@ -146,7 +146,7 @@ class CertificatesBaseTestCase(object):
 
             self.assertEqual(response.status_code, 400)
             self.assertNotIn("Location", response)
-            content = json.loads(response.content)
+            content = json.loads(response.content.decode('utf-8'))
             self.assertIn("error", content)
 
     def test_invalid_json(self):
@@ -167,7 +167,7 @@ class CertificatesBaseTestCase(object):
 
         self.assertEqual(response.status_code, 400)
         self.assertNotIn("Location", response)
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertIn("error", content)
 
     def test_certificate_data_validation(self):
@@ -235,7 +235,7 @@ class CertificatesListHandlerTestCase(
 
         self.assertEqual(response.status_code, 201)
         self.assertIn("Location", response)
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         certificate_id = self._remove_ids(content)
         self.assertEqual(content, expected)
         self.assert_event_emitted(
@@ -297,7 +297,7 @@ class CertificatesListHandlerTestCase(
 
         # in JSON response
         response = self.client.get_json(self._url())
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEquals(len(data), 1)
         self.assertEqual(data[0]['name'], 'Test certificate')
         self.assertEqual(data[0]['description'], 'Test description')
@@ -417,7 +417,7 @@ class CertificatesListHandlerTestCase(
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
 
-        new_certificate = json.loads(response.content)
+        new_certificate = json.loads(response.content.decode('utf-8'))
         for prev_certificate in self.course.certificates['certificates']:
             self.assertNotEqual(new_certificate.get('id'), prev_certificate.get('id'))
 
@@ -471,7 +471,7 @@ class CertificatesDetailHandlerTestCase(
             HTTP_ACCEPT="application/json",
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(content, expected)
         self.assert_event_emitted(
             'edx.certificate.configuration.created',
@@ -503,7 +503,7 @@ class CertificatesDetailHandlerTestCase(
             HTTP_ACCEPT="application/json",
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(content, expected)
         self.assert_event_emitted(
             'edx.certificate.configuration.modified',
@@ -554,7 +554,7 @@ class CertificatesDetailHandlerTestCase(
             HTTP_X_REQUESTED_WITH="XMLHttpRequest",
         )
         self.assertEqual(response.status_code, 201)
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(content, expected)
 
     @ddt.data(C4X_SIGNATORY_PATH, SIGNATORY_PATH)

@@ -60,7 +60,7 @@ class TestFooter(CacheIsolationTestCase):
             resp = self._get_footer()
 
         self.assertEqual(resp.status_code, 200)
-        json_data = json.loads(resp.content)
+        json_data = json.loads(resp.content.decode('utf-8'))
         self.assertTrue(isinstance(json_data, dict))
 
         # Logo
@@ -119,7 +119,7 @@ class TestFooter(CacheIsolationTestCase):
             resp = self._get_footer()
 
         self.assertEqual(resp.status_code, 200)
-        json_data = json.loads(resp.content)
+        json_data = json.loads(resp.content.decode('utf-8'))
 
         self.assertEqual(json_data["logo_image"], cdn_url)
 
@@ -138,7 +138,7 @@ class TestFooter(CacheIsolationTestCase):
         # Load the footer with the specified language
         resp = self._get_footer(params={'language': language})
         self.assertEqual(resp.status_code, 200)
-        json_data = json.loads(resp.content)
+        json_data = json.loads(resp.content.decode('utf-8'))
 
         # Verify that the translation occurred
         self.assertIn(expected_copyright, json_data['copyright'])
