@@ -88,9 +88,5 @@ numpy<1.17.0
 #  jsondiff==1.2.0 (from -r requirements/edx/base.txt (line 146))
 jsondiff==1.1.1
 
-# 5.0.0.124 is raising 500 errors
-# TODO: remove this once the problem is fixed
-newrelic<5.0
-
 # Pinning edx-enterprise to last stable version
 edx-enterprise==1.8.8

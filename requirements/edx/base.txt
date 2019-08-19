@@ -165,7 +165,7 @@ mongoengine==0.10.0
 mpmath==1.1.0             # via sympy
 mysqlclient==1.4.4
 networkx==1.7
-newrelic==4.20.1.121
+newrelic==5.0.2.126
 nltk==3.4.4
 nodeenv==1.1.1
 numpy==1.16.4
@@ -184,7 +184,7 @@ polib==1.1.0              # via edx-i18n-tools
 psutil==1.2.1
 py2neo==3.1.2
 pycontracts==1.7.1
-pycountry==19.7.15
+pycountry==19.8.18
 pycparser==2.19
 pycryptodome==3.8.2       # via pdfminer.six
 pycryptodomex==3.4.7
@@ -215,7 +215,7 @@ rest-condition==1.0.3
 rfc6266-parser==0.0.5.post2
 ruamel.ordereddict==0.4.14 ; python_version == "2.7"  # via ruamel.yaml
 ruamel.yaml.clib==0.1.2   # via ruamel.yaml
-ruamel.yaml==0.16.4       # via drf-yasg
+ruamel.yaml==0.16.5       # via drf-yasg
 rules==2.1
 s3transfer==0.1.13        # via boto3
 sailthru-client==2.2.3
@@ -231,7 +231,7 @@ social-auth-app-django==2.1.0
 social-auth-core==1.7.0
 sorl-thumbnail==12.3
 sortedcontainers==2.1.0
-soupsieve==1.9.2          # via beautifulsoup4
+soupsieve==1.9.3          # via beautifulsoup4
 sqlparse==0.3.0
 staff-graded-xblock==0.5
 stevedore==1.30.1
