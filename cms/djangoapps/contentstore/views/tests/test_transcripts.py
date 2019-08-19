@@ -141,7 +141,7 @@ class BaseTranscripts(CourseTestCase):
         return usage_key
 
     def assert_response(self, response, expected_status_code, expected_message):
-        response_content = json.loads(response.content)
+        response_content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response.status_code, expected_status_code)
         self.assertEqual(response_content['status'], expected_message)
 
@@ -253,7 +253,7 @@ class TestUploadTranscripts(BaseTranscripts):
         self.assert_response(response, expected_status_code=200, expected_message='Success')
 
         # Verify the `edx_video_id` on the video component
-        json_response = json.loads(response.content)
+        json_response = json.loads(response.content.decode('utf-8'))
         expected_edx_video_id = edx_video_id if edx_video_id else json_response['edx_video_id']
         video = modulestore().get_item(self.video_usage_key)
         self.assertEqual(video.edx_video_id, expected_edx_video_id)
@@ -441,7 +441,7 @@ class TestChooseTranscripts(BaseTranscripts):
         self.assert_response(response, expected_status_code=200, expected_message='Success')
 
         # Verify the `edx_video_id` on the video component
-        json_response = json.loads(response.content)
+        json_response = json.loads(response.content.decode('utf-8'))
         expected_edx_video_id = edx_video_id if edx_video_id else json_response['edx_video_id']
         video = modulestore().get_item(self.video_usage_key)
         self.assertEqual(video.edx_video_id, expected_edx_video_id)
@@ -558,7 +558,7 @@ class TestRenameTranscripts(BaseTranscripts):
         self.assert_response(response, expected_status_code=200, expected_message='Success')
 
         # Verify the `edx_video_id` on the video component
-        json_response = json.loads(response.content)
+        json_response = json.loads(response.content.decode('utf-8'))
         expected_edx_video_id = edx_video_id if edx_video_id else json_response['edx_video_id']
         video = modulestore().get_item(self.video_usage_key)
         self.assertEqual(video.edx_video_id, expected_edx_video_id)
@@ -686,7 +686,7 @@ class TestReplaceTranscripts(BaseTranscripts):
         self.assert_response(response, expected_status_code=200, expected_message='Success')
 
         # Verify the `edx_video_id` on the video component
-        json_response = json.loads(response.content)
+        json_response = json.loads(response.content.decode('utf-8'))
         expected_edx_video_id = edx_video_id if edx_video_id else json_response['edx_video_id']
         video = modulestore().get_item(self.video_usage_key)
         self.assertEqual(video.edx_video_id, expected_edx_video_id)
@@ -1113,7 +1113,7 @@ class TestCheckTranscripts(BaseTranscripts):
         # Assert the response
         self.assertEqual(response.status_code, 200)
         self.assertDictEqual(
-            json.loads(response.content),
+            json.loads(response.content.decode('utf-8')),
             {
                 u'status': u'Success',
                 u'youtube_local': False,

@@ -894,7 +894,7 @@ class YouTubeStubConfig(object):
         response = requests.get(youtube_stub_config_url)
 
         if response.ok:
-            return json.loads(response.content)
+            return json.loads(response.content.decode('utf-8'))
         else:
             return {}
 

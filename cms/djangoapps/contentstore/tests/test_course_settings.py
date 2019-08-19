@@ -690,7 +690,7 @@ class CourseGradingTest(CourseTestCase):
 
     def _model_from_url(self, url_base):
         response = self.client.get_json(url_base)
-        return json.loads(response.content)
+        return json.loads(response.content.decode('utf-8'))
 
     def test_get_set_grader_types_ajax(self):
         """
@@ -735,7 +735,7 @@ class CourseGradingTest(CourseTestCase):
         )
         grading_policy_hash1 = self._grading_policy_hash_for_course()
         self.assertEqual(200, response.status_code)
-        grader_sample = json.loads(response.content)
+        grader_sample = json.loads(response.content.decode('utf-8'))
         new_grader['id'] = len(original_model['graders'])
         self.assertEqual(new_grader, grader_sample)
 
@@ -775,12 +775,12 @@ class CourseGradingTest(CourseTestCase):
         response = self.client.ajax_post(grade_type_url, {'graderType': u'Homework'})
         self.assertEqual(200, response.status_code)
         response = self.client.get_json(grade_type_url + '?fields=graderType')
-        self.assertEqual(json.loads(response.content).get('graderType'), u'Homework')
+        self.assertEqual(json.loads(response.content.decode('utf-8')).get('graderType'), u'Homework')
         # and unset
         response = self.client.ajax_post(grade_type_url, {'graderType': u'notgraded'})
         self.assertEqual(200, response.status_code)
         response = self.client.get_json(grade_type_url + '?fields=graderType')
-        self.assertEqual(json.loads(response.content).get('graderType'), u'notgraded')
+        self.assertEqual(json.loads(response.content.decode('utf-8')).get('graderType'), u'notgraded')
 
     def _grading_policy_hash_for_course(self):
         return hash_grading_policy(modulestore().get_course(self.course.id).grading_policy)
@@ -1092,12 +1092,12 @@ class CourseMetadataEditingTest(CourseTestCase):
 
     def test_http_fetch_initial_fields(self):
         response = self.client.get_json(self.course_setting_url)
-        test_model = json.loads(response.content)
+        test_model = json.loads(response.content.decode('utf-8'))
         self.assertIn('display_name', test_model, 'Missing editable metadata field')
         self.assertEqual(test_model['display_name']['value'], self.course.display_name)
 
         response = self.client.get_json(self.fullcourse_setting_url)
-        test_model = json.loads(response.content)
+        test_model = json.loads(response.content.decode('utf-8'))
         self.assertNotIn('graceperiod', test_model, 'blacklisted field leaked in')
         self.assertIn('display_name', test_model, 'full missing editable metadata field')
         self.assertEqual(test_model['display_name']['value'], self.fullcourse.display_name)
@@ -1110,18 +1110,18 @@ class CourseMetadataEditingTest(CourseTestCase):
             "advertised_start": {"value": "start A"},
             "days_early_for_beta": {"value": 2},
         })
-        test_model = json.loads(response.content)
+        test_model = json.loads(response.content.decode('utf-8'))
         self.update_check(test_model)
 
         response = self.client.get_json(self.course_setting_url)
-        test_model = json.loads(response.content)
+        test_model = json.loads(response.content.decode('utf-8'))
         self.update_check(test_model)
         # now change some of the existing metadata
         response = self.client.ajax_post(self.course_setting_url, {
             "advertised_start": {"value": "start B"},
             "display_name": {"value": "jolly roger"}
         })
-        test_model = json.loads(response.content)
+        test_model = json.loads(response.content.decode('utf-8'))
         self.assertIn('display_name', test_model, 'Missing editable metadata field')
         self.assertEqual(test_model['display_name']['value'], 'jolly roger', "not expected value")
         self.assertIn('advertised_start', test_model, 'Missing revised advertised_start metadata field')

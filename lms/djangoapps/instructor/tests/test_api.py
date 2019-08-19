@@ -677,7 +677,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEquals(len(data['row_errors']), 0)
         self.assertEquals(len(data['warnings']), 0)
         self.assertEquals(len(data['general_errors']), 0)
@@ -698,7 +698,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEquals(len(data['row_errors']), 0)
         self.assertEquals(len(data['warnings']), 0)
         self.assertEquals(len(data['general_errors']), 0)
@@ -721,7 +721,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEquals(len(data['row_errors']), 0)
         self.assertEquals(len(data['warnings']), 0)
         self.assertEquals(len(data['general_errors']), 0)
@@ -744,7 +744,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         uploaded_file = SimpleUploadedFile("temp.jpg", io.BytesIO(b"some initial binary data: \x00\x01").read())
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertNotEquals(len(data['general_errors']), 0)
         self.assertEquals(data['general_errors'][0]['response'], 'Make sure that the file you upload is in CSV format with no extraneous characters or rows.')
 
@@ -758,7 +758,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         uploaded_file = SimpleUploadedFile("temp.csv", io.BytesIO(b"some initial binary data: \x00\x01").read())
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertNotEquals(len(data['general_errors']), 0)
         self.assertEquals(data['general_errors'][0]['response'], 'Could not read uploaded file.')
 
@@ -773,7 +773,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEquals(len(data['row_errors']), 0)
         self.assertEquals(len(data['warnings']), 0)
         self.assertEquals(len(data['general_errors']), 1)
@@ -790,7 +790,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
 
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response.status_code, 200)
         self.assertNotEquals(len(data['row_errors']), 0)
         self.assertEquals(len(data['warnings']), 0)
@@ -831,7 +831,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         warning_message = u'An account with email {email} exists but the provided username {username} ' \
                           u'is different. Enrolling anyway with {email}.'.format(email='test_student@example.com', username='test_student_2')
         self.assertNotEquals(len(data['warnings']), 0)
@@ -865,7 +865,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertNotEquals(len(data['row_errors']), 0)
         self.assertEquals(
             data['row_errors'][0]['response'],
@@ -885,7 +885,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
 
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertNotEquals(len(data['row_errors']), 0)
         self.assertEquals(data['row_errors'][0]['response'], u'Username {user} already exists.'.format(user='test_student_1'))
 
@@ -900,7 +900,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
 
         response = self.client.post(self.url, {'file_not_found': uploaded_file})
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertNotEquals(len(data['general_errors']), 0)
         self.assertEquals(data['general_errors'][0]['response'], 'File is not attached.')
 
@@ -920,7 +920,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
             response = self.client.post(self.url, {'students_list': uploaded_file})
 
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertNotEquals(len(data['row_errors']), 0)
         self.assertEquals(data['row_errors'][0]['response'], 'NonExistentCourseError')
 
@@ -953,7 +953,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertNotEquals(len(data['row_errors']), 0)
         self.assertEquals(
             data['row_errors'][0]['response'],
@@ -1004,7 +1004,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         response = self.client.post(self.audit_course_url, {'students_list': uploaded_file})
 
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEquals(len(data['row_errors']), 0)
         self.assertEquals(len(data['warnings']), 0)
         self.assertEquals(len(data['general_errors']), 0)
@@ -1035,7 +1035,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         response = self.client.post(self.white_label_course_url, {'students_list': uploaded_file})
 
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEquals(len(data['row_errors']), 0)
         self.assertEquals(len(data['warnings']), 0)
         self.assertEquals(len(data['general_errors']), 0)
@@ -1061,7 +1061,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         response = self.client.post(self.white_label_course_url, {'students_list': uploaded_file})
 
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEquals(len(data['row_errors']), 0)
         self.assertEquals(len(data['warnings']), 0)
         self.assertEquals(len(data['general_errors']), 0)
@@ -1155,7 +1155,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
             ]
         }
 
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
     def test_invalid_username(self):
@@ -1176,7 +1176,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
             ]
         }
 
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
     def test_enroll_with_username(self):
@@ -1210,7 +1210,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 1)
         self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ENROLLED)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
     def test_enroll_without_email(self):
@@ -1250,7 +1250,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 1)
         self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ENROLLED)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
         # Check the outbox
@@ -1293,7 +1293,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
             ]
         }
 
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
         # Check the outbox
@@ -1497,7 +1497,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 1)
         self.assertEqual(manual_enrollments[0].state_transition, ENROLLED_TO_UNENROLLED)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
         # Check the outbox
@@ -1540,7 +1540,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 1)
         self.assertEqual(manual_enrollments[0].state_transition, ENROLLED_TO_UNENROLLED)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
         # Check the outbox
@@ -1597,7 +1597,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 1)
         self.assertEqual(manual_enrollments[0].state_transition, ALLOWEDTOENROLL_TO_UNENROLLED)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
         # Check the outbox
@@ -1802,7 +1802,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
                 }
             ]
         }
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
     def test_unenrolled_already_not_enrolled_user(self):
@@ -1849,7 +1849,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         self.assertEqual(manual_enrollments.count(), 1)
         self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_UNENROLLED)
 
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
     def test_unenroll_and_enroll_verified(self):
@@ -1922,7 +1922,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         }
         response = self.client.post(url, params)
         self.assertEqual(response.status_code, 200)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             res_json['enrollment_status'],
             'Enrollment status for EnrolledStudent: active'
@@ -1936,7 +1936,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
 
         response = self.client.post(url, params)
         self.assertEqual(response.status_code, 200)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             res_json['enrollment_status'],
             'Enrollment status for EnrolledStudent: inactive'
@@ -1949,7 +1949,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
 
         response = self.client.post(url, params)
         self.assertEqual(response.status_code, 200)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             res_json['enrollment_status'],
             'Enrollment status for robot-allowed@robot.org: pending'
@@ -1962,7 +1962,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
 
         response = self.client.post(url, params)
         self.assertEqual(response.status_code, 200)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             res_json['enrollment_status'],
             'Enrollment status for nonotever@example.com: never enrolled'
@@ -2050,7 +2050,7 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
             ]
         }
 
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
         # Check the outbox
@@ -2101,7 +2101,7 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
                 }
             ]
         }
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
         # Check the outbox
@@ -2157,7 +2157,7 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
                 }
             ]
         }
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
         # Check the outbox
@@ -2234,7 +2234,7 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
                 }
             ]
         }
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
         # Check the outbox
@@ -2265,7 +2265,7 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
                 }
             ]
         }
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
         # Check the outbox
@@ -2296,7 +2296,7 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
                 }
             ]
         }
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
         # Check the outbox
         self.assertEqual(len(mail.outbox), 1)
@@ -2424,7 +2424,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
             'unique_student_identifier': 'GandalfTheGrey',
             'userDoesNotExist': True,
         }
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
     def test_modify_access_with_inactive_user(self):
@@ -2441,7 +2441,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
             'unique_student_identifier': self.other_user.username,
             'inactiveUser': True,
         }
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
     def test_modify_access_revoke_not_allowed(self):
@@ -2472,7 +2472,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
             'action': 'revoke',
             'removingSelfAsInstructor': True,
         }
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
     def test_list_course_role_members_noparams(self):
@@ -2508,7 +2508,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
                 }
             ]
         }
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
     def test_list_course_role_members_beta(self):
@@ -2523,7 +2523,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
             'course_id': text_type(self.course.id),
             'beta': []
         }
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
     def test_update_forum_role_membership(self):
@@ -2808,7 +2808,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
         url = reverse('get_sale_records', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, {})
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertIn('sale', res_json)
 
         for res in res_json['sale']:
@@ -2858,7 +2858,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
         url = reverse('get_sale_records', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, {})
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertIn('sale', res_json)
 
         self.validate_sale_records_response(
@@ -2906,7 +2906,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         problem_location = ''
 
         response = self.client.post(url, {'problem_location': problem_location})
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, 'Could not find problem with this location.')
 
     def valid_problem_location(test):  # pylint: disable=no-self-argument
@@ -2941,7 +2941,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         problem_location = ''
 
         response = self.client.post(url, {'problem_location': problem_location})
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertIn('status', res_json)
         status = res_json['status']
         self.assertIn('is being created', status)
@@ -2978,7 +2978,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             student.profile.save()
         url = reverse('get_students_features', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, {})
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertIn('students', res_json)
         for student in self.students:
             student_json = [
@@ -3000,7 +3000,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         set_course_cohorted(self.course.id, is_cohorted)
 
         response = self.client.post(url, {})
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual('cohort' in res_json['feature_names'], is_cohorted)
 
@@ -3020,7 +3020,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         url = reverse('get_students_features', kwargs={'course_id': text_type(self.course.id)})
 
         response = self.client.post(url, {})
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual('team' in res_json['feature_names'], has_teams)
 
@@ -3292,7 +3292,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             ex_reason,
         )
 
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, {"downloads": []})
 
     def test_list_report_downloads(self):
@@ -3318,7 +3318,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
                 }
             ]
         }
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected_response)
 
     @ddt.data(*REPORTS_DATA)
@@ -3412,7 +3412,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         data = {'unique_student_identifier': self.students[0].email.encode("utf-8")}
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertIn('progress_url', res_json)
 
     def test_get_student_progress_url_from_uname(self):
@@ -3421,7 +3421,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         data = {'unique_student_identifier': self.students[0].username.encode("utf-8")}
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertIn('progress_url', res_json)
 
     def test_get_student_progress_url_noparams(self):
@@ -3836,7 +3836,7 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
         self.assertEqual(response.status_code, 200)
 
         # check response
-        tasks = json.loads(response.content)['tasks']
+        tasks = json.loads(response.content.decode('utf-8'))['tasks']
         self.assertEqual(len(tasks), 1)
         self.assertEqual(tasks[0]['status'], _('Complete'))
 
@@ -3847,7 +3847,7 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
         self.assertEqual(response.status_code, 200)
 
         # check response
-        tasks = json.loads(response.content)['tasks']
+        tasks = json.loads(response.content.decode('utf-8'))['tasks']
         self.assertEqual(len(tasks), 0)
 
     def test_list_entrance_exam_instructor_with_invalid_exam_key(self):
@@ -4113,7 +4113,7 @@ class TestInstructorAPITaskLists(SharedModuleStoreTestCase, LoginEnrollmentTestC
         # check response
         self.assertTrue(act.called)
         expected_tasks = [ftask.to_dict() for ftask in self.tasks]
-        actual_tasks = json.loads(response.content)['tasks']
+        actual_tasks = json.loads(response.content.decode('utf-8'))['tasks']
         for exp_task, act_task in zip(expected_tasks, actual_tasks):
             self.assertDictEqual(exp_task, act_task)
         self.assertEqual(actual_tasks, expected_tasks)
@@ -4134,7 +4134,7 @@ class TestInstructorAPITaskLists(SharedModuleStoreTestCase, LoginEnrollmentTestC
         # check response
         self.assertTrue(act.called)
         expected_tasks = [ftask.to_dict() for ftask in self.tasks]
-        actual_tasks = json.loads(response.content)['tasks']
+        actual_tasks = json.loads(response.content.decode('utf-8'))['tasks']
         for exp_task, act_task in zip(expected_tasks, actual_tasks):
             self.assertDictEqual(exp_task, act_task)
         self.assertEqual(actual_tasks, expected_tasks)
@@ -4157,7 +4157,7 @@ class TestInstructorAPITaskLists(SharedModuleStoreTestCase, LoginEnrollmentTestC
         # check response
         self.assertTrue(act.called)
         expected_tasks = [ftask.to_dict() for ftask in self.tasks]
-        actual_tasks = json.loads(response.content)['tasks']
+        actual_tasks = json.loads(response.content.decode('utf-8'))['tasks']
         for exp_task, act_task in zip(expected_tasks, actual_tasks):
             self.assertDictEqual(exp_task, act_task)
         self.assertEqual(actual_tasks, expected_tasks)
@@ -4181,7 +4181,7 @@ class TestInstructorAPITaskLists(SharedModuleStoreTestCase, LoginEnrollmentTestC
         # check response
         self.assertTrue(act.called)
         expected_tasks = [ftask.to_dict() for ftask in self.tasks]
-        actual_tasks = json.loads(response.content)['tasks']
+        actual_tasks = json.loads(response.content.decode('utf-8'))['tasks']
         for exp_task, act_task in zip(expected_tasks, actual_tasks):
             self.assertDictEqual(exp_task, act_task)
 
@@ -4241,7 +4241,7 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
         response = self.get_email_content_response(num_emails, task_history_request, with_failures)
         self.assertTrue(task_history_request.called)
         expected_email_info = [email_info.to_dict() for email_info in self.emails_info.values()]
-        actual_email_info = json.loads(response.content)['emails']
+        actual_email_info = json.loads(response.content.decode('utf-8'))['emails']
 
         self.assertEqual(len(actual_email_info), num_emails)
         for exp_email, act_email in zip(expected_email_info, actual_email_info):
@@ -4253,7 +4253,7 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
         """ Test listing of bulk emails when email list has one email """
         response = self.get_email_content_response(1, task_history_request)
         self.assertTrue(task_history_request.called)
-        email_info = json.loads(response.content)['emails']
+        email_info = json.loads(response.content.decode('utf-8'))['emails']
 
         # Emails list should have one email
         self.assertEqual(len(email_info), 1)
@@ -4268,7 +4268,7 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
         """ Test listing of bulk emails when email list empty """
         response = self.get_email_content_response(0, task_history_request)
         self.assertTrue(task_history_request.called)
-        email_info = json.loads(response.content)['emails']
+        email_info = json.loads(response.content.decode('utf-8'))['emails']
 
         # Emails list should be empty
         self.assertEqual(len(email_info), 0)
@@ -4287,7 +4287,7 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
         self.assertEqual(response.status_code, 200)
 
         self.assertTrue(task_history_request.called)
-        returned_email_info = json.loads(response.content)['emails']
+        returned_email_info = json.loads(response.content.decode('utf-8'))['emails']
         self.assertEqual(len(returned_email_info), 1)
         returned_info = returned_email_info[0]
         for info in ['created', 'sent_to', 'email', 'number_sent', 'requester']:
@@ -4313,7 +4313,7 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
         self.assertEqual(response.status_code, 200)
 
         self.assertTrue(task_history_request.called)
-        returned_info_list = json.loads(response.content)['emails']
+        returned_info_list = json.loads(response.content.decode('utf-8'))['emails']
 
         self.assertEqual(len(returned_info_list), 1)
         returned_info = returned_info_list[0]
@@ -4511,7 +4511,7 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
                       kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, {'url': text_type(self.week1.location)})
         self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             u'data': [{u'Extended Due Date': u'2013-12-30 00:00',
                        u'Full Name': self.user1.profile.name,
                        u'Username': self.user1.username}],
@@ -4525,7 +4525,7 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
                       kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, {'student': self.user1.username})
         self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             u'data': [{u'Extended Due Date': u'2013-12-30 00:00',
                        u'Unit': self.week1.display_name}],
             u'header': [u'Unit', u'Extended Due Date'],
@@ -4683,14 +4683,14 @@ class TestCourseIssuedCertificatesData(SharedModuleStoreTestCase):
             self.generate_certificate(course_id=self.course.id, mode='honor', status=CertificateStatuses.generating)
 
         response = self.client.post(url)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertIn('certificates', res_json)
         self.assertEqual(len(res_json['certificates']), 0)
 
         # Certificates with status 'downloadable' should be in response.
         self.generate_certificate(course_id=self.course.id, mode='honor', status=CertificateStatuses.downloadable)
         response = self.client.post(url)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertIn('certificates', res_json)
         self.assertEqual(len(res_json['certificates']), 1)
 
@@ -4705,7 +4705,7 @@ class TestCourseIssuedCertificatesData(SharedModuleStoreTestCase):
             self.generate_certificate(course_id=self.course.id, mode='honor', status=CertificateStatuses.downloadable)
 
         response = self.client.post(url)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertIn('certificates', res_json)
         self.assertEqual(len(res_json['certificates']), 1)
 
@@ -4724,7 +4724,7 @@ class TestCourseIssuedCertificatesData(SharedModuleStoreTestCase):
             )
 
         response = self.client.post(url)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertIn('certificates', res_json)
 
         # total certificate count should be 2 for 'verified' mode.
@@ -4853,7 +4853,7 @@ class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
                                               kwargs={'course_id': text_type(self.course.id)})
 
         response = self.client.post(url_user_invoice_preference, data)
-        result = json.loads(response.content)
+        result = json.loads(response.content.decode('utf-8'))
         self.assertEqual(result['invoice_copy'], True)
 
         # updating the user invoice copy preference during code generation flow
@@ -4867,7 +4867,7 @@ class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
                                               kwargs={'course_id': text_type(self.course.id)})
 
         response = self.client.post(url_user_invoice_preference, data)
-        result = json.loads(response.content)
+        result = json.loads(response.content.decode('utf-8'))
         self.assertEqual(result['invoice_copy'], False)
 
     def test_generate_course_registration_codes_csv(self):
@@ -5253,7 +5253,7 @@ class TestBulkCohorting(SharedModuleStoreTestCase):
         self.client.login(username=self.staff_user.username, password='test')
         response = self.call_add_users_to_cohorts(file_content, suffix=file_suffix)
         self.assertEqual(response.status_code, 400)
-        result = json.loads(response.content)
+        result = json.loads(response.content.decode('utf-8'))
         self.assertEqual(result['error'], error)
 
     def verify_success_on_file_content(self, file_content, mock_store_upload, mock_cohort_task):

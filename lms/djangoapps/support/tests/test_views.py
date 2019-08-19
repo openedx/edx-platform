@@ -72,7 +72,7 @@ class SupportViewManageUserTests(SupportViewTestCase):
         """
         url = reverse('support:manage_user_detail') + self.user.username
         response = self.client.get(url)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data['username'], self.user.username)
 
     def test_disable_user_account(self):
@@ -86,7 +86,7 @@ class SupportViewManageUserTests(SupportViewTestCase):
         response = self.client.post(url, data={
             'username_or_email': test_user.username
         })
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data['success_msg'], 'User Disabled Successfully')
         test_user = User.objects.get(username=test_user.username, email=test_user.email)
         self.assertEqual(test_user.has_usable_password(), False)
@@ -246,7 +246,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(len(data), 1)
         self.assertDictContainsSubset({
             'mode': CourseMode.AUDIT,
@@ -276,7 +276,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         self.assertDictContainsSubset({
             'enrolled_by': self.user.email,
             'reason': 'Financial Assistance',
-        }, json.loads(response.content)[0]['manual_enrollment'])
+        }, json.loads(response.content.decode('utf-8'))[0]['manual_enrollment'])
 
     @disable_signal(signals, 'post_save')
     @ddt.data('username', 'email')
@@ -381,7 +381,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             })
 
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(len(data), 1)
 
         self.assertEqual(

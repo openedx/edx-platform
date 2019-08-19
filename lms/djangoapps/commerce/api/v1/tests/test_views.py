@@ -99,7 +99,7 @@ class CourseListViewTests(CourseApiViewTestMixin, ModuleStoreTestCase):
         response = self.client.get(self.path, content_type=JSON_CONTENT_TYPE)
 
         self.assertEqual(response.status_code, 200)
-        actual = json.loads(response.content)
+        actual = json.loads(response.content.decode('utf-8'))
         expected = [self._serialize_course(self.course, [self.course_mode])]
         self.assertListEqual(actual, expected)
 
@@ -142,7 +142,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         response = self.client.get(self.path, content_type=JSON_CONTENT_TYPE)
         self.assertEqual(response.status_code, 200)
 
-        actual = json.loads(response.content)
+        actual = json.loads(response.content.decode('utf-8'))
         expected = self._serialize_course(self.course, [self.course_mode])
         self.assertEqual(actual, expected)
 
@@ -183,7 +183,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         self.assertEqual(response.status_code, 200)
 
         # Verify the course and modes are returned as JSON
-        actual = json.loads(response.content)
+        actual = json.loads(response.content.decode('utf-8'))
         self.assertEqual(actual, expected)
 
         # Verify the verification deadline is updated
@@ -199,7 +199,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         self.assertEqual(response.status_code, 400)
 
         # Verify the error message is correct
-        actual = json.loads(response.content)
+        actual = json.loads(response.content.decode('utf-8'))
         expected = {
             'non_field_errors': ['Verification deadline must be after the course mode upgrade deadlines.']
         }
@@ -318,7 +318,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         # Check modes list in response, disregarding its order.
         expected_dict = self._serialize_course(self.course, [new_mode])
         expected_items = expected_dict['modes']
-        actual_items = json.loads(response.content)['modes']
+        actual_items = json.loads(response.content.decode('utf-8'))['modes']
         self.assertCountEqual(actual_items, expected_items)
 
         # The existing non-Masters CourseMode should have been removed.
@@ -379,7 +379,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         response = self.client.put(path, json.dumps(expected), content_type=JSON_CONTENT_TYPE, **request_kwargs)
         self.assertEqual(response.status_code, 201)
 
-        actual = json.loads(response.content)
+        actual = json.loads(response.content.decode('utf-8'))
         self.assertEqual(actual, expected)
 
         # Verify the display names are correct
@@ -438,7 +438,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
                 )
             ]
         }
-        self.assertDictEqual(expected_dict, json.loads(response.content))
+        self.assertDictEqual(expected_dict, json.loads(response.content.decode('utf-8')))
 
 
 class OrderViewTests(UserMixin, TestCase):
@@ -458,7 +458,7 @@ class OrderViewTests(UserMixin, TestCase):
             response = self.client.get(self.path)
 
         self.assertEqual(response.status_code, 200)
-        actual = json.loads(response.content)
+        actual = json.loads(response.content.decode('utf-8'))
         self.assertEqual(actual, self.MOCK_ORDER)
 
     def test_order_not_found(self):

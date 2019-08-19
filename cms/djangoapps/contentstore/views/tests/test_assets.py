@@ -514,7 +514,7 @@ class DeleteAssetTestCase(AssetsTestCase):
 
         response = self.client.post(self.url, {"name": self.asset_name, "file": self.asset})
         self.assertEquals(response.status_code, 200)
-        self.uploaded_url = json.loads(response.content)['asset']['url']
+        self.uploaded_url = json.loads(response.content.decode('utf-8'))['asset']['url']
 
         self.asset_location = AssetKey.from_string(self.uploaded_url)
         self.content = contentstore().find(self.asset_location)
@@ -534,12 +534,12 @@ class DeleteAssetTestCase(AssetsTestCase):
         # upload image
         response = self.client.post(self.url, {"name": "delete_image_test", "file": image_asset})
         self.assertEquals(response.status_code, 200)
-        uploaded_image_url = json.loads(response.content)['asset']['url']
+        uploaded_image_url = json.loads(response.content.decode('utf-8'))['asset']['url']
 
         # upload image thumbnail
         response = self.client.post(self.url, {"name": "delete_image_thumb_test", "file": thumbnail_image_asset})
         self.assertEquals(response.status_code, 200)
-        thumbnail_url = json.loads(response.content)['asset']['url']
+        thumbnail_url = json.loads(response.content.decode('utf-8'))['asset']['url']
         thumbnail_location = StaticContent.get_location_from_path(thumbnail_url)
 
         image_asset_location = AssetKey.from_string(uploaded_image_url)

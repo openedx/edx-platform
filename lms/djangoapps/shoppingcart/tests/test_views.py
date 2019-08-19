@@ -2006,7 +2006,7 @@ class DonationViewTest(SharedModuleStoreTestCase):
 
         # Use the fake payment implementation to simulate the parameters
         # we would receive from the payment processor.
-        payment_info = json.loads(response.content)
+        payment_info = json.loads(response.content.decode('utf-8'))
         self.assertEqual(payment_info["payment_url"], "/shoppingcart/payment_fake")
 
         # If this is a per-course donation, verify that we're sending

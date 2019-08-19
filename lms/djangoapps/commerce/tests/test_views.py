@@ -65,13 +65,13 @@ class ReceiptViewTests(UserMixin, ModuleStoreTestCase):
         # Enroll as verified in the course with the current user.
         CourseEnrollment.enroll(self.user, self.course.id, mode=CourseMode.VERIFIED)
         response = self.client.get(reverse('commerce:user_verification_status'), data={'course_id': self.course.id})
-        json_data = json.loads(response.content)
+        json_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(json_data['is_verification_required'], True)
 
         # Enroll as honor in the course with the current user.
         CourseEnrollment.enroll(self.user, self.course.id, mode=CourseMode.HONOR)
         response = self.client.get(reverse('commerce:user_verification_status'), data={'course_id': self.course.id})
-        json_data = json.loads(response.content)
+        json_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(json_data['is_verification_required'], False)
 
     def test_user_verification_status_failure(self):
