@@ -205,7 +205,7 @@ def edxnotes_visibility(request, course_id):
         raise Http404
 
     try:
-        visibility = json.loads(request.body)["visibility"]
+        visibility = json.loads(request.body.decode('utf8'))["visibility"]
         course_module.edxnotes_visibility = visibility
         course_module.save()
         return JsonResponse(status=200)

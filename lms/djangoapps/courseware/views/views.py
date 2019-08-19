@@ -1633,7 +1633,7 @@ def financial_assistance(_request):
 def financial_assistance_request(request):
     """Submit a request for financial assistance to Zendesk."""
     try:
-        data = json.loads(request.body)
+        data = json.loads(request.body.decode('utf8'))
         # Simple sanity check that the session belongs to the user
         # submitting an FA request
         username = data['username']
