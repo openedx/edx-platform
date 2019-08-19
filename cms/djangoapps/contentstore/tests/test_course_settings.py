@@ -254,7 +254,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             resp = self.client.get_html(course_details_url)
             self.assertEqual(
                 feature_flags[2],
-                '<h3 id="heading-entrance-exam">' in resp.content
+                b'<h3 id="heading-entrance-exam">' in resp.content
             )
 
     @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
