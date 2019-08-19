@@ -3273,7 +3273,7 @@ def parse_request_data(request):
     :return: dict object containing parsed json data.
     """
     try:
-        data = json.loads(request.body or '{}')
+        data = json.loads(request.body.decode('utf8') or u'{}')
     except ValueError:
         raise ValueError(_('The record is not in the correct format. Please add a valid username or email address.'))
 
