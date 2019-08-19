@@ -3,6 +3,7 @@ Signal handlers for course goals.
 """
 from __future__ import absolute_import
 
+import six
 from django.db import models
 from django.dispatch import receiver
 

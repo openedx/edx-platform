@@ -162,8 +162,8 @@ def anonymous_id_for_user(user, course_id, save=True):
 
     # include the secret key as a salt, and to make the ids unique across different LMS installs.
     hasher = hashlib.md5()
-    hasher.update(settings.SECRET_KEY)
-    hasher.update(text_type(user.id))
+    hasher.update(settings.SECRET_KEY.encode('utf8'))
+    hasher.update(text_type(user.id).encode('utf8'))
     if course_id:
         hasher.update(text_type(course_id).encode('utf-8'))
     digest = hasher.hexdigest()
