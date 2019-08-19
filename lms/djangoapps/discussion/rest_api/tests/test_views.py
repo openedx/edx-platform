@@ -2041,7 +2041,7 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
     def test_empty_body_patch_request(self):
         """Test the response status code on sending a PATCH request with an empty body or missing fields."""
         self._login_as_staff()
-        response = self.patch_request(b"")
+        response = self.patch_request("")
         self.assertEqual(response.status_code, 400)
 
         response = self.patch_request({})
