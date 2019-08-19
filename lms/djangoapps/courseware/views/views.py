@@ -61,7 +61,7 @@ from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
 from enrollment.api import add_enrollment
 from ipware.ip import get_ip
-from common.djangoapps.student.views import get_course_related_keys
+from lms.djangoapps.philu_overrides.courseware.views.views import get_course_related_keys
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import CertificateStatuses
@@ -308,6 +308,31 @@ def jump_to(_request, course_id, location):
     return redirect(redirect_url)
 
 
+# TODO: LEARNER-611: This can be deleted with Course Info removal.  The new
+#    Course Home is using its own processing of last accessed.
+def get_last_accessed_courseware(course, request, user):
+    """
+    Returns the courseware module URL that the user last accessed, or None if it cannot be found.
+    """
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        course.id, request.user, course, depth=2
+    )
+    course_module = get_module_for_descriptor(
+        user, request, course, field_data_cache, course.id, course=course
+    )
+    chapter_module = get_current_child(course_module)
+    if chapter_module is not None:
+        section_module = get_current_child(chapter_module)
+        if section_module is not None:
+            url = reverse('courseware_section', kwargs={
+                'course_id': text_type(course.id),
+                'chapter': chapter_module.url_name,
+                'section': section_module.url_name
+            })
+            return url
+    return None
+
+
 @ensure_csrf_cookie
 @ensure_valid_course_key
 @data_sharing_consent_required
@@ -317,29 +342,6 @@ def course_info(request, course_id):
 
     Assumes the course_id is in a valid format.
     """
-    # TODO: LEARNER-611: This can be deleted with Course Info removal.  The new
-    #    Course Home is using its own processing of last accessed.
-    def get_last_accessed_courseware(course, request, user):
-        """
-        Returns the courseware module URL that the user last accessed, or None if it cannot be found.
-        """
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            course.id, request.user, course, depth=2
-        )
-        course_module = get_module_for_descriptor(
-            user, request, course, field_data_cache, course.id, course=course
-        )
-        chapter_module = get_current_child(course_module)
-        if chapter_module is not None:
-            section_module = get_current_child(chapter_module)
-            if section_module is not None:
-                url = reverse('courseware_section', kwargs={
-                    'course_id': text_type(course.id),
-                    'chapter': chapter_module.url_name,
-                    'section': section_module.url_name
-                })
-                return url
-        return None
 
     course_key = CourseKey.from_string(course_id)
 

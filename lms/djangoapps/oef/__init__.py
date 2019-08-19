@@ -1,2 +1,1 @@
-# imported it here so that oef handlers can be interpreted
-import lms.djangoapps.oef.handlers
+default_app_config = 'lms.djangoapps.oef.apps.OefConfig'

@@ -31,8 +31,7 @@ def validate_course_open_date(settings, course_open_date):
             course_open_date = course_open_date.replace(tzinfo=utc)
             course = CourseOverview.objects.get(id=settings.id)
 
-            if (course.end and course.end < course_open_date) or \
-               (course.start and course_open_date < course.start):
+            if course.end < course_open_date or course_open_date < course.start:
                 raise ValueError('invalid date object', course_open_date)
 
         else:

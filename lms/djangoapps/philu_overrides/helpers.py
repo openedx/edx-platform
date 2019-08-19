@@ -11,7 +11,7 @@ from openedx.core.djangoapps.models.course_details import CourseDetails
 from lms.djangoapps.courseware.courses import get_course_by_id
 from student.models import Registration
 from util.json_request import JsonResponse
-from util.request import safe_get_host
+from openedx.core.lib.request_utils import safe_get_host
 from common.lib.mandrill_client.client import MandrillClient
 utc = pytz.UTC
 
@@ -143,7 +143,7 @@ def get_user_current_enrolled_class(request, course):
     from datetime import datetime
     from django.core.urlresolvers import reverse
     from opaque_keys.edx.locations import SlashSeparatedCourseKey
-    from common.djangoapps.student.views import get_course_related_keys
+    from lms.djangoapps.philu_overrides.courseware.views.views import get_course_related_keys
     from student.models import CourseEnrollment
     from course_action_state.models import CourseRerunState
 

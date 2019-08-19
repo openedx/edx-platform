@@ -10,6 +10,11 @@ class CourseCard(models.Model):
     organization: if given, it will make course card private for that organization
     is_enabled: whether to publish the course or not
     """
+
+    class Meta:
+        app_label = 'course_card'
+
+
     course_id = CourseKeyField(db_index=True, max_length=255, null=False)
     course_name = models.CharField(max_length=255, blank=True, null=True)
     is_enabled = models.BooleanField(default=False, null=False)

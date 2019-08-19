@@ -5,7 +5,7 @@ from requests.exceptions import ConnectionError
 
 from courseware.tabs import get_course_tab_list
 from common.lib.nodebb_client.client import NodeBBClient
-from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from nodebb.models import DiscussionCommunity, TeamGroupChat
 from nodebb.tasks import task_update_onboarding_surveys_status
 

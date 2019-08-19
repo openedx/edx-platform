@@ -9,22 +9,55 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
+from django.http import HttpRequest
+from django.core.urlresolvers import resolve
+
 from edxmako.shortcuts import render_to_response, render_to_string
 from philu_overrides.helpers import reactivation_email_for_user_custom, get_course_next_classes, \
     get_user_current_enrolled_class, get_next_url_for_login_page_override, is_user_enrolled_in_any_class
-from student.views import (
+from openedx.core.djangoapps.user_authn.views.deprecated import (
     signin_user as old_login_view,
     register_user as old_register_view
 )
 from third_party_auth.decorators import xframe_allow_whitelisted
-from util.enterprise_helpers import set_enterprise_branding_filter_param
 from lms.djangoapps.onboarding.helpers import reorder_registration_form_fields, get_alquity_community_url
-from lms.djangoapps.student_account.views import _local_server_get, _external_auth_intercept
+
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 
 AUDIT_LOG = logging.getLogger("audit")
 log = logging.getLogger(__name__)
 User = get_user_model()  # pylint:disable=invalid-name
+
+def local_server_get(url, session):
+    """Simulate a server-server GET request for an in-process API.
+
+    Arguments:
+        url (str): The URL of the request (excluding the protocol and domain)
+        session (SessionStore): The session of the original request,
+            used to get past the CSRF checks.
+
+    Returns:
+        str: The content of the response
+
+    """
+    # Since the user API is currently run in-process,
+    # we simulate the server-server API call by constructing
+    # our own request object.  We don't need to include much
+    # information in the request except for the session
+    # (to get past through CSRF validation)
+    request = HttpRequest()
+    request.method = "GET"
+    request.session = session
+
+    # Call the Django view function, simulating
+    # the server-server API call
+    view, args, kwargs = resolve(url)
+    response = view(request, *args, **kwargs)
+
+    # Return the content of the response
+    return response.content
+
+
 
 
 def _get_form_descriptions(request):
@@ -39,9 +72,9 @@ def _get_form_descriptions(request):
 
     """
     return {
-        'login': _local_server_get('/user_api/v1/account/login_session/', request.session),
-        'registration': _local_server_get('/user_api/v2/account/registration/', request.session),
-        'password_reset': _local_server_get('/user_api/v1/account/password_reset/', request.session)
+        'login': local_server_get('/user_api/v1/account/login_session/', request.session),
+        'registration': local_server_get('/user_api/v2/account/registration/', request.session),
+        'password_reset': local_server_get('/user_api/v1/account/password_reset/', request.session)
     }
 
 
@@ -121,8 +154,11 @@ def login_and_registration_form(request, initial_mode="login", org_name=None, ad
         initial_mode (string): Either "login" or "register".
 
     """
+    from openedx.core.djangoapps.user_authn.views.login_form import _external_auth_intercept
+
+
     # Determine the URL to redirect to following login/registration/third_party_auth
-    _local_server_get('/user_api/v2/account/registration/', request.session)
+    local_server_get('/user_api/v2/account/registration/', request.session)
     redirect_to = get_next_url_for_login_page_override(request)
     # If we're already logged in, redirect to the dashboard
     if request.user.is_authenticated():
@@ -143,8 +179,6 @@ def login_and_registration_form(request, initial_mode="login", org_name=None, ad
                 initial_mode = "hinted_login"
         except (KeyError, ValueError, IndexError):
             pass
-
-    set_enterprise_branding_filter_param(request=request, provider_id=third_party_auth_hint)
 
     # If this is a themed site, revert to the old login/registration pages.
     # We need to do this for now to support existing themes.
@@ -227,10 +261,9 @@ import json
 import logging
 
 import analytics
-import dogstats_wrapper as dog_stats_api
 import third_party_auth
 from celery.task import task
-from common.djangoapps.util.request import safe_get_host
+from openedx.core.lib.request_utils import safe_get_host
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
@@ -245,9 +278,9 @@ from eventtracking import tracker
 from notification_prefs.views import enable_notifications
 from pytz import UTC
 from requests import HTTPError
-from social.exceptions import AuthException, AuthAlreadyAssociated
+from social_core.exceptions import AuthException, AuthAlreadyAssociated
 from mailchimp_pipeline.signals.handlers import task_send_account_activation_email
-from student.cookies import set_logged_in_cookies
+from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.user_api.helpers import shim_student_view, require_post_params
 from student.forms import AccountCreationForm, get_registration_extension_form
 from student.models import Registration, create_comments_service_user, UserProfile
@@ -255,13 +288,13 @@ from third_party_auth import pipeline, provider
 from util.json_request import JsonResponse
 
 from social_django import utils as social_utils
-from common.djangoapps.student.helpers import AccountValidationError
 from openedx.core.djangoapps.user_authn.views.register import REGISTER_USER, record_registration_attributions
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_api.views import RegistrationView, LoginSessionView
+from student.helpers import AccountValidationError
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -476,8 +509,6 @@ def create_account_with_params_custom(request, params, is_alquity_user):
             enable_notifications(user)
         except Exception:  # pylint: disable=broad-except
             log.exception("Enable discussion notifications failed for user {id}.".format(id=user.id))
-
-    dog_stats_api.increment("common.student.account_created")
 
     # If the user is registering via 3rd party auth, track which provider they use
     third_party_provider = None

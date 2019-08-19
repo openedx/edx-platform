@@ -3,7 +3,12 @@ from django.conf import settings
 from django.conf.urls import include, url
 
 from openedx.core.djangoapps.user_api.accounts import settings_views
-from .views import login_form, login, deprecated
+from openedx.features.student_account.views import login_and_registration_form as\
+    login_and_registration_form_v2
+
+from lms.djangoapps.philu_overrides.views import login_and_registration_form
+
+from .views import login, deprecated
 
 
 urlpatterns = [
@@ -19,14 +24,14 @@ urlpatterns = [
 if settings.FEATURES.get('ENABLE_COMBINED_LOGIN_REGISTRATION'):
     # Backwards compatibility with old URL structure, but serve the new views
     urlpatterns += [
-        url(r'^login$', 'philu_overrides.views.login_and_registration_form',
+        url(r'^login$', login_and_registration_form,
             {'initial_mode': 'login'}, name="signin_user"),
-        url(r'^register$', 'philu_overrides.views.login_and_registration_form',
+        url(r'^register$', login_and_registration_form,
             {'initial_mode': 'register'}, name="register_user"),
-        url(r'^signup', 'openedx.features.student_account.views.login_and_registration_form',
+        url(r'^signup', login_and_registration_form_v2,
             {'initial_mode': 'register'}, name="register_user"),
         url(r'^register/(?P<org_name>[^/]*)/(?P<admin_email>[^/]*)/$',
-            'philu_overrides.views.login_and_registration_form',
+            login_and_registration_form,
             {'initial_mode': 'register'}, name="register_user"),
     ]
 else:

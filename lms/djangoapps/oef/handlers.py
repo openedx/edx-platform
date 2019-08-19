@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from lms.djangoapps.oef.models import OrganizationOefScore, OrganizationOefUpdatePrompt
+from oef.models import OrganizationOefScore, OrganizationOefUpdatePrompt
 from lms.djangoapps.onboarding.helpers import convert_date_to_utcdatetime, its_been_year
 
 
