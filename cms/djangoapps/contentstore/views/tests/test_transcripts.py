@@ -1072,7 +1072,10 @@ class TestCheckTranscripts(BaseTranscripts):
         link = reverse('check_transcripts')
         resp = self.client.get(link, {'data': json.dumps(data)})
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual(json.loads(resp.content.decode('utf-8')).get('status'), 'Transcripts are supported only for "video" modules.')
+        self.assertEqual(
+            json.loads(resp.content.decode('utf-8')).get('status'),
+            'Transcripts are supported only for "video" modules.',
+        )
 
     @patch('xmodule.video_module.transcripts_utils.get_video_transcript_content')
     def test_command_for_fallback_transcript(self, mock_get_video_transcript_content):

@@ -2,9 +2,10 @@
 Tabs for courseware.
 """
 from __future__ import absolute_import
+from functools import cmp_to_key
+
 from openedx.core.lib.plugins import PluginManager
 
-from functools import cmp_to_key
 
 # Stevedore extension point namespaces
 COURSE_TAB_NAMESPACE = 'openedx.course_tab'

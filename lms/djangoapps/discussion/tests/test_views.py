@@ -486,7 +486,10 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
                     test_thread_id
                 )
             self.assertEquals(response.status_code, 200)
-            self.assertEquals(len(json.loads(response.content.decode('utf-8'))["content"]["children"]), num_thread_responses)
+            self.assertEquals(
+                len(json.loads(response.content.decode('utf-8'))["content"]["children"]),
+                num_thread_responses
+            )
 
         # Test uncached first, then cached now that the cache is warm.
         cached_calls = [

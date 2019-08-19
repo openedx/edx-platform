@@ -942,7 +942,10 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             self.assertEqual(is_active, old_is_active)
             self.assertEqual(course_mode, old_mode)
             # error message should contain specific text.  Otto checks for this text in the message.
-            self.assertRegexpMatches(json.loads(response.content.decode('utf-8'))['message'], 'Enrollment mode mismatch')
+            self.assertRegexpMatches(
+                json.loads(response.content.decode('utf-8'))['message'],
+                'Enrollment mode mismatch'
+            )
         else:
             # call should have succeeded
             self.assertEqual(is_active, new_is_active)

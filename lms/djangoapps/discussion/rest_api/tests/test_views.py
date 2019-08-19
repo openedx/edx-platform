@@ -1731,7 +1731,10 @@ class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase,
         self.register_get_thread_response(cs_thread)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content.decode('utf-8')), self.expected_thread_data({"unread_comment_count": 1}))
+        self.assertEqual(
+            json.loads(response.content.decode('utf-8')),
+            self.expected_thread_data({"unread_comment_count": 1})
+        )
         self.assertEqual(httpretty.last_request().method, "GET")
 
     def test_retrieve_nonexistent_thread(self):
