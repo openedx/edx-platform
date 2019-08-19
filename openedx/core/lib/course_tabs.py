@@ -2,6 +2,7 @@
 Tabs for courseware.
 """
 from __future__ import absolute_import
+from functools import cmp_to_key
 from openedx.core.lib.plugins import PluginManager
 
 # Stevedore extension point namespaces
@@ -41,5 +42,5 @@ class CourseTabPluginManager(PluginManager):
             else:
                 return 1
         tab_types = list(cls.get_available_plugins().values())
-        tab_types.sort(cmp=compare_tabs)
+        tab_types.sort(key=cmp_to_key(compare_tabs))
         return tab_types
