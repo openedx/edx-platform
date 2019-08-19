@@ -208,7 +208,7 @@ moto==1.3.1
 mpmath==1.1.0
 mysqlclient==1.4.4
 networkx==1.7
-newrelic==4.20.1.121
+newrelic==5.0.2.126
 nltk==3.4.4
 nodeenv==1.1.1
 numpy==1.16.4
@@ -233,7 +233,7 @@ py==1.8.0                 # via pytest, tox
 pyaml==19.4.1             # via moto
 pycodestyle==2.5.0
 pycontracts==1.7.1
-pycountry==19.7.15
+pycountry==19.8.18
 pycparser==2.19
 pycryptodome==3.8.2
 pycryptodomex==3.4.7
@@ -280,7 +280,7 @@ rest-condition==1.0.3
 rfc6266-parser==0.0.5.post2
 ruamel.ordereddict==0.4.14 ; python_version == "2.7"
 ruamel.yaml.clib==0.1.2
-ruamel.yaml==0.16.4
+ruamel.yaml==0.16.5
 rules==2.1
 s3transfer==0.1.13
 sailthru-client==2.2.3
@@ -298,7 +298,7 @@ social-auth-app-django==2.1.0
 social-auth-core==1.7.0
 sorl-thumbnail==12.3
 sortedcontainers==2.1.0
-soupsieve==1.9.2
+soupsieve==1.9.3
 sqlparse==0.3.0
 staff-graded-xblock==0.5
 stevedore==1.30.1
