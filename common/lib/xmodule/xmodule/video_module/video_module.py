@@ -852,7 +852,7 @@ class VideoBlock(
         Arguments:
             id_generator is used to generate course-specific urls and identifiers
         """
-        if isinstance(xml, str) or isinstance(xml, unicode):
+        if isinstance(xml, six.string_types):
             xml = etree.fromstring(xml)
 
         field_data = {}
