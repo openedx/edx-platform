@@ -160,7 +160,7 @@ class ApiTest(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertNotEqual(resp.content, '')
 
-        content = json.loads(resp.content)
+        content = json.loads(resp.content.decode('utf-8'))
 
         self.assertEqual(set(('name', 'version')), set(content.keys()))
         self.assertIsInstance(content['version'], int)
@@ -173,7 +173,7 @@ class ApiTest(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertNotEqual(resp.content, '')
 
-        content = json.loads(resp.content)
+        content = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(len(content), 0)
 
     def test_index_with_notes(self):
@@ -185,7 +185,7 @@ class ApiTest(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertNotEqual(resp.content, '')
 
-        content = json.loads(resp.content)
+        content = json.loads(resp.content.decode('utf-8'))
         self.assertIsInstance(content, list)
         self.assertEqual(len(content), num_notes)
 
@@ -200,7 +200,7 @@ class ApiTest(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertNotEqual(resp.content, '')
 
-        content = json.loads(resp.content)
+        content = json.loads(resp.content.decode('utf-8'))
         self.assertIsInstance(content, list)
         self.assertEqual(len(content), MAX_LIMIT)
 
@@ -259,7 +259,7 @@ class ApiTest(TestCase):
             self.assertEqual(resp.status_code, 200)
             self.assertNotEqual(resp.content, '')
 
-            content = json.loads(resp.content)
+            content = json.loads(resp.content.decode('utf-8'))
             self.assertEqual(content['id'], note.pk)
             self.assertEqual(content['user_id'], note.user_id)
 
@@ -377,7 +377,7 @@ class ApiTest(TestCase):
             self.assertEqual(resp.status_code, 200)
             self.assertNotEqual(resp.content, '')
 
-            content = json.loads(resp.content)
+            content = json.loads(resp.content.decode('utf-8'))
 
             for expected_key in ('total', 'rows'):
                 self.assertIn(expected_key, content)

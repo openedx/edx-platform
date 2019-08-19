@@ -40,7 +40,7 @@ class ApiTestCase(TestCase):
         resp = self.request_with_auth("get", *args, **kwargs)
         self.assertHttpOK(resp)
         self.assertTrue(resp["Content-Type"].startswith("application/json"))
-        return json.loads(resp.content)
+        return json.loads(resp.content.decode('utf-8'))
 
     def assertAllowedMethods(self, uri, expected_methods):
         """Assert that the allowed methods for the given URI match the expected list"""

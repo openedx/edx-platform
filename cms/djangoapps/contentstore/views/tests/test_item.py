@@ -148,7 +148,7 @@ class GetItemTest(ItemTest):
         """
         resp = self._get_preview(usage_key, data)
         self.assertEqual(resp.status_code, 200)
-        resp_content = json.loads(resp.content)
+        resp_content = json.loads(resp.content.decode('utf-8'))
         html = resp_content['html']
         self.assertTrue(html)
         resources = resp_content['resources']
@@ -384,7 +384,7 @@ class GetItemTest(ItemTest):
         self.assertEqual(resp.status_code, 200)
 
         # Check that the partition and group information was returned
-        result = json.loads(resp.content)
+        result = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(result["user_partitions"], [
             {
                 "id": ENROLLMENT_TRACK_PARTITION_ID,
@@ -1910,7 +1910,7 @@ class TestEditItemSplitMongo(TestEditItemSetup):
         for __ in range(3):
             resp = self.client.get(view_url, HTTP_ACCEPT='application/json')
             self.assertEqual(resp.status_code, 200)
-            content = json.loads(resp.content)
+            content = json.loads(resp.content.decode('utf-8'))
             self.assertEqual(len(PyQuery(content['html'])('.xblock-{}'.format(STUDIO_VIEW))), 1)
 
 
@@ -2496,7 +2496,7 @@ class TestXBlockInfo(ItemTest):
     def test_json_responses(self):
         outline_url = reverse_usage_url('xblock_outline_handler', self.usage_key)
         resp = self.client.get(outline_url, HTTP_ACCEPT='application/json')
-        json_response = json.loads(resp.content)
+        json_response = json.loads(resp.content.decode('utf-8'))
         self.validate_course_xblock_info(json_response, course_outline=True)
 
     @ddt.data(

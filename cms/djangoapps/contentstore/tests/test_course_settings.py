@@ -108,7 +108,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         payload['enrollment_start'] = CourseDetailsViewTest.convert_datetime_to_iso(details.enrollment_start)
         payload['enrollment_end'] = CourseDetailsViewTest.convert_datetime_to_iso(details.enrollment_end)
         resp = self.client.ajax_post(url, payload)
-        self.compare_details_with_encoding(json.loads(resp.content), details.__dict__, field + str(val))
+        self.compare_details_with_encoding(json.loads(resp.content.decode('utf-8')), details.__dict__, field + str(val))
 
         MilestoneRelationshipType.objects.get_or_create(name='requires')
         MilestoneRelationshipType.objects.get_or_create(name='fulfills')
@@ -126,7 +126,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         # resp s/b json from here on
         url = get_url(self.course.id)
         resp = self.client.get_json(url)
-        self.compare_details_with_encoding(json.loads(resp.content), details.__dict__, "virgin get")
+        self.compare_details_with_encoding(json.loads(resp.content.decode('utf-8')), details.__dict__, "virgin get")
 
         self.alter_field(url, details, 'start_date', datetime.datetime(2012, 11, 12, 1, 30, tzinfo=UTC))
         self.alter_field(url, details, 'start_date', datetime.datetime(2012, 11, 1, 13, 30, tzinfo=UTC))
@@ -192,7 +192,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
 
         url = get_url(self.course.id)
         resp = self.client.get_json(url)
-        course_detail_json = json.loads(resp.content)
+        course_detail_json = json.loads(resp.content.decode('utf-8'))
         # assert pre_requisite_courses is initialized
         self.assertEqual([], course_detail_json['pre_requisite_courses'])
 
@@ -205,7 +205,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
 
         # fetch updated course to assert pre_requisite_courses has new values
         resp = self.client.get_json(url)
-        course_detail_json = json.loads(resp.content)
+        course_detail_json = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(pre_requisite_course_keys, course_detail_json['pre_requisite_courses'])
 
         self.assertTrue(milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id),
@@ -215,7 +215,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         course_detail_json['pre_requisite_courses'] = []
         self.client.ajax_post(url, course_detail_json)
         resp = self.client.get_json(url)
-        course_detail_json = json.loads(resp.content)
+        course_detail_json = json.loads(resp.content.decode('utf-8'))
         self.assertEqual([], course_detail_json['pre_requisite_courses'])
 
         self.assertFalse(milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id),
@@ -225,7 +225,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
     def test_invalid_pre_requisite_course(self):
         url = get_url(self.course.id)
         resp = self.client.get_json(url)
-        course_detail_json = json.loads(resp.content)
+        course_detail_json = json.loads(resp.content.decode('utf-8'))
 
         # update pre requisite courses one valid and one invalid key
         pre_requisite_course = CourseFactory.create(org='edX', course='900', run='test_run')
@@ -1161,7 +1161,7 @@ class CourseMetadataEditingTest(CourseTestCase):
                     'model': {'display_name': 'Tabs Exception'}
                 }
             ]
-            self.assertEqual(json.loads(resp.content), error_msg)
+            self.assertEqual(json.loads(resp.content.decode('utf-8')), error_msg)
 
             # verify that the course wasn't saved into the modulestore
             course = modulestore().get_course(self.course.id)
@@ -1401,7 +1401,7 @@ class CourseGraderUpdatesTest(CourseTestCase):
         """Test getting a specific grading type record."""
         resp = self.client.get_json(self.url + '/0')
         self.assertEqual(resp.status_code, 200)
-        obj = json.loads(resp.content)
+        obj = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(self.starting_graders[0], obj)
 
     def test_delete(self):
@@ -1424,7 +1424,7 @@ class CourseGraderUpdatesTest(CourseTestCase):
         }
         resp = self.client.ajax_post(self.url + '/0', grader)
         self.assertEqual(resp.status_code, 200)
-        obj = json.loads(resp.content)
+        obj = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(obj, grader)
         current_graders = CourseGradingModel.fetch(self.course.id).graders
         self.assertEqual(len(self.starting_graders), len(current_graders))
@@ -1443,7 +1443,7 @@ class CourseGraderUpdatesTest(CourseTestCase):
         }
         resp = self.client.ajax_post('{}/{}'.format(self.url, len(self.starting_graders) + 1), grader)
         self.assertEqual(resp.status_code, 200)
-        obj = json.loads(resp.content)
+        obj = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(obj['id'], len(self.starting_graders))
         del obj['id']
         self.assertEqual(obj, grader)
