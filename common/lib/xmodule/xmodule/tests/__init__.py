@@ -395,7 +395,7 @@ class CourseComparisonTest(TestCase):
         }
         # Split Mongo and Old-Mongo disagree about what the block_id of courses is, so skip those in
         # this comparison
-        self.assertItemsEqual(
+        six.assertCountEqual(
             [map_key(item.location) for item in expected_items if item.scope_ids.block_type != 'course'],
             [key for key in actual_item_map.keys() if key[0] != 'course'],
         )

@@ -7,6 +7,7 @@ from unittest import TestCase
 
 import ddt
 import paver.tasks
+import six
 from mock import patch
 from paver.easy import call_task, path
 from watchdog.observers import Observer
@@ -78,7 +79,7 @@ class TestPaverAssetTasks(PaverTestCase):
                 u'rtlcss cms/static/css/bootstrap/studio-main.css cms/static/css/bootstrap/studio-main-rtl.css'
             )
 
-        self.assertItemsEqual(self.task_messages, expected_messages)
+        six.assertCountEqual(self.task_messages, expected_messages)
 
 
 @ddt.ddt
@@ -195,7 +196,7 @@ class TestPaverThemeAssetTasks(PaverTestCase):
                 u'rtlcss cms/static/css/bootstrap/studio-main.css cms/static/css/bootstrap/studio-main-rtl.css'
             )
 
-        self.assertItemsEqual(self.task_messages, expected_messages)
+        self.six.assertCountEqual(self.task_messages, expected_messages)
 
 
 class TestPaverWatchAssetTasks(TestCase):
@@ -245,7 +246,7 @@ class TestPaverWatchAssetTasks(TestCase):
 
                     self.assertIsInstance(sass_watcher_args[0], Observer)
                     self.assertIsInstance(sass_watcher_args[1], list)
-                    self.assertItemsEqual(sass_watcher_args[1], self.expected_sass_directories)
+                    self.six.assertCountEqual(sass_watcher_args[1], self.expected_sass_directories)
 
     def test_watch_theme_assets(self):
         """
@@ -275,7 +276,7 @@ class TestPaverWatchAssetTasks(TestCase):
                     sass_watcher_args = mock_register.call_args_list[0][0]
                     self.assertIsInstance(sass_watcher_args[0], Observer)
                     self.assertIsInstance(sass_watcher_args[1], list)
-                    self.assertItemsEqual(sass_watcher_args[1], self.expected_sass_directories)
+                    self.six.assertCountEqual(sass_watcher_args[1], self.expected_sass_directories)
 
 
 @ddt.ddt

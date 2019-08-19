@@ -187,7 +187,7 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
         Test migrating transcripts
         """
         translations = self.video_descriptor.available_translations(self.video_descriptor.get_transcripts_info())
-        self.assertItemsEqual(translations, ['hr', 'ge'])
+        six.assertCountEqual(translations, ['hr', 'ge'])
         self.assertFalse(api.is_transcript_available(self.video_descriptor.edx_video_id, 'hr'))
         self.assertFalse(api.is_transcript_available(self.video_descriptor.edx_video_id, 'ge'))
 
@@ -202,7 +202,7 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
         Test migrating transcripts multiple times
         """
         translations = self.video_descriptor.available_translations(self.video_descriptor.get_transcripts_info())
-        self.assertItemsEqual(translations, ['hr', 'ge'])
+        six.assertCountEqual(translations, ['hr', 'ge'])
         self.assertFalse(api.is_transcript_available(self.video_descriptor.edx_video_id, 'hr'))
         self.assertFalse(api.is_transcript_available(self.video_descriptor.edx_video_id, 'ge'))
 

@@ -68,13 +68,13 @@ class StaffAccessExperiment(laboratory.Experiment):
 
     def publish(self, result):
         if not result.match:
-
-            LOG.warning(
-                u"StaffAccessExperiment: control=%r, candidate=%r\n%s",
-                result.control,
-                result.candidates[0],
-                "".join(traceback.format_stack(limit=10))
-            )
+            pass
+            # LOG.warning(
+            #     u"StaffAccessExperiment: control=%r, candidate=%r\n%s",
+            #     result.control,
+            #     result.candidates[0],
+            #     "".join(traceback.format_stack(limit=10))
+            # )
 
 
 class HasStaffAccessToContent(Rule):

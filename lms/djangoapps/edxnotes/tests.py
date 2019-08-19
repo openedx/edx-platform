@@ -10,6 +10,7 @@ from unittest import skipUnless
 
 import ddt
 import jwt
+import six
 from six import text_type
 from six.moves.urllib.parse import urlparse, parse_qs  # pylint: disable=import-error
 from django.conf import settings
@@ -334,7 +335,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             }
         )
 
-        self.assertItemsEqual(
+        six.assertCountEqual(
             {
                 "count": 2,
                 "current_page": 1,
@@ -440,7 +441,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             ]
         })
 
-        self.assertItemsEqual(
+        six.assertCountEqual(
             {
                 "count": 2,
                 "current_page": 1,
@@ -524,7 +525,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         Tests no results.
         """
         mock_get.return_value.content = json.dumps(NOTES_API_EMPTY_RESPONSE)
-        self.assertItemsEqual(
+        six.assertCountEqual(
             NOTES_VIEW_EMPTY_RESPONSE,
             helpers.get_notes(self.request, self.course)
         )
@@ -571,7 +572,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             },
         ]
 
-        self.assertItemsEqual(
+        six.assertCountEqual(
             [{
                 u"quote": u"quote text",
                 u"text": u"text",
@@ -617,7 +618,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         ]
         self.html_module_2.visible_to_staff_only = True
         self.store.update_item(self.html_module_2, self.user.id)
-        self.assertItemsEqual(
+        six.assertCountEqual(
             [{
                 u"quote": u"quote text",
                 u"text": u"text",
@@ -660,7 +661,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000).isoformat(),
         }]
 
-        self.assertItemsEqual(
+        six.assertCountEqual(
             [], helpers.preprocess_collection(self.user, self.course, initial_collection)
         )
 
@@ -684,7 +685,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             },
         ]
 
-        self.assertItemsEqual(
+        six.assertCountEqual(
             [
                 {
 

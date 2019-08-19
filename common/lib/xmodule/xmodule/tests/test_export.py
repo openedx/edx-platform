@@ -14,6 +14,7 @@ import ddt
 import lxml.etree
 import mock
 import pytz
+import six
 from django.utils.translation import ugettext_lazy
 from fs.osfs import OSFS
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
@@ -136,7 +137,7 @@ class RoundTripTestCase(unittest.TestCase):
         course_id = initial_course.id
 
         print("Checking key equality")
-        self.assertItemsEqual(
+        six.assertCountEqual(
             list(initial_import.modules[course_id].keys()),
             list(second_import.modules[course_id].keys())
         )

@@ -1576,7 +1576,7 @@ class TestVideoBlockStudentViewJson(BaseTestVideoXBlock, CacheIsolationTestCase)
         self.video.transcripts = transcripts
         self.video.sub = english_sub
         student_view_response = self.get_result()
-        self.assertItemsEqual(list(student_view_response['transcripts'].keys()), expected_transcripts)
+        six.assertCountEqual(list(student_view_response['transcripts'].keys()), expected_transcripts)
 
 
 @ddt.ddt

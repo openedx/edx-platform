@@ -8,6 +8,7 @@ import json
 # pylint: disable=attribute-defined-outside-init
 import os
 import shutil
+import six
 from tempfile import mkdtemp
 from uuid import uuid4
 
@@ -369,8 +370,8 @@ class TestReportMixin(object):
                 self.assertEqual(csv_rows, expected_rows)
                 self.assertEqual(numeric_csv_rows, numeric_expected_rows)
             else:
-                self.assertItemsEqual(csv_rows, expected_rows)
-                self.assertItemsEqual(numeric_csv_rows, numeric_expected_rows)
+                six.assertCountEqual(csv_rows, expected_rows)
+                six.assertCountEqual(numeric_csv_rows, numeric_expected_rows)
 
     @staticmethod
     def _extract_and_round_numeric_items(dictionary):

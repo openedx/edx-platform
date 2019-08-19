@@ -6,6 +6,7 @@ from __future__ import absolute_import
 
 import itertools
 import json
+import six
 from datetime import datetime, timedelta
 from unittest import skip
 
@@ -1713,7 +1714,7 @@ class DeprecationWarningMessageTest(CourseOutlineTest):
         self.assertEqual(self.course_outline_page.components_visible, components_present)
         if components_present:
             self.assertEqual(self.course_outline_page.components_list_heading, self.COMPONENT_LIST_HEADING)
-            self.assertItemsEqual(self.course_outline_page.components_display_names, components_display_name_list)
+            six.assertCountEqual(self.course_outline_page.components_display_names, components_display_name_list)
 
     def test_no_deprecation_warning_message_present(self):
         """
