@@ -16,6 +16,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='studentmodule',
             name='id',
-            field=coursewarehistoryextended.fields.UnsignedBigIntAutoField(primary_key=True, serialize=False),
+            field=UnsignedBigIntAutoField(primary_key=True, serialize=False),
         ),
     ]
