@@ -38,7 +38,7 @@ class AccessResponse(object):
         if has_access:
             assert error_code is None
 
-    def __nonzero__(self):
+    def __bool__(self):
         """
         Overrides bool().
 
@@ -51,6 +51,8 @@ class AccessResponse(object):
 
         """
         return self.has_access
+
+    __nonzero__ = __bool__
 
     def to_json(self):
         """
