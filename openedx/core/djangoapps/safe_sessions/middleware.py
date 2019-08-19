@@ -88,6 +88,7 @@ class SafeCookieError(Exception):
         log.error(error_message)
 
 
+@python_2_unicode_compatible
 class SafeCookieData(object):
     """
     Cookie data that cryptographically binds and timestamps the user
@@ -162,7 +163,6 @@ class SafeCookieData(object):
                     ))
             return safe_cookie_data
 
-    @python_2_unicode_compatible
     def __str__(self):
         """
         Returns a string serialization of the safe cookie data.
