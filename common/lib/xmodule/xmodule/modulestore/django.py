@@ -425,7 +425,7 @@ def _get_modulestore_branch_setting():
 
             # compare hostname against the regex expressions set of mappings which will tell us which branch to use
             if mappings:
-                for key in mappings.iterkeys():
+                for key in mappings:
                     if re.match(key, hostname):
                         return mappings[key]
         if branch is None:
