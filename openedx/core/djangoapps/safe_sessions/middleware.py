@@ -160,7 +160,7 @@ class SafeCookieData(object):
                     ))
             return safe_cookie_data
 
-    def __unicode__(self):
+    def __str__(self):
         """
         Returns a string serialization of the safe cookie data.
         """
@@ -202,7 +202,7 @@ class SafeCookieData(object):
         hash_func = sha256()
         for data_item in [self.version, self.session_id, user_id]:
             hash_func.update(six.b(six.text_type(data_item)))
-            hash_func.update(b'|')
+            hash_func.update(six.b('|'))
         return hash_func.hexdigest()
 
     @staticmethod
@@ -317,7 +317,6 @@ class SafeSessionMiddleware(SessionMiddleware):
         Step 4. Delete the cookie, if it's marked for deletion.
 
         """
-
         response = super(SafeSessionMiddleware, self).process_response(request, response)  # Step 1
 
         if not _is_cookie_marked_for_deletion(request) and _is_cookie_present(response):
