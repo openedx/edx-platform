@@ -51,7 +51,7 @@ def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
 
     url = reverse(view_name, kwargs={
         'course_id': six.text_type(block.location.course_key),
-        'usage_id': quote_slashes(six.text_type(block.scope_ids.usage_id).encode('utf-8')),
+        'usage_id': quote_slashes(six.text_type(block.scope_ids.usage_id)),
         'handler': handler_name,
         'suffix': suffix,
     })
