@@ -9,5 +9,4 @@ imgkit==1.0.1
 # this commit is in zeshan/LP-1530
 # TODO: Merge this branch with master. OR simply rename it to master because it already contains philu and ironwood's code
 -e git+https://github.com/philanthropy-u/edx-notifications.git@df45af93e96f240bd461027900fee22f247d90a1#egg=edx-notifications
-# -e git+https://github.com/edx/edx-notifications.git@9ec2264f06439dbb8b4db29b7d4779dd97e9dfb4#egg=edx-notifications
 -e git+https://github.com/philanthropy-u/django-simple-history.git@9187c9b4907da5a2a0564eff45929fd15b784309#egg=django-simple-history

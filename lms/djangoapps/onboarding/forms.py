@@ -502,15 +502,16 @@ class OrganizationInfoForm(BaseOnboardingModelForm):
 
     def clean_url(self):
         is_org_url_exist = int(self.data.get('is_org_url_exist')) if self.data.get('is_org_url_exist') else None
-        organization_website = self.cleaned_data.get('url', '').replace('http://', 'https://', 1)
+        org_website = self.cleaned_data.get('url', '')
+        org_website = org_website and org_website.replace('http://', 'https://', 1)
 
-        if is_org_url_exist and not organization_website:
+        if is_org_url_exist and not org_website:
             raise forms.ValidationError(EMPTY_FIELD_ERROR.format(ugettext_noop('Organization Website')))
 
         elif not is_org_url_exist:
-            organization_website = ''
+            org_website = ''
 
-        return organization_website
+        return org_website
 
     def clean(self):
         """

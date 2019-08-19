@@ -308,38 +308,29 @@ def jump_to(_request, course_id, location):
     return redirect(redirect_url)
 
 
-@ensure_csrf_cookie
-@ensure_valid_course_key
-@data_sharing_consent_required
-def course_info(request, course_id):
+# TODO: LEARNER-611: This can be deleted with Course Info removal.  The new
+#    Course Home is using its own processing of last accessed.
+def get_last_accessed_courseware(course, request, user):
     """
-    Display the course's info.html, or 404 if there is no such course.
-
-    Assumes the course_id is in a valid format.
+    Returns the courseware module URL that the user last accessed, or None if it cannot be found.
     """
-    # TODO: LEARNER-611: This can be deleted with Course Info removal.  The new
-    #    Course Home is using its own processing of last accessed.
-    def get_last_accessed_courseware(course, request, user):
-        """
-        Returns the courseware module URL that the user last accessed, or None if it cannot be found.
-        """
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            course.id, request.user, course, depth=2
-        )
-        course_module = get_module_for_descriptor(
-            user, request, course, field_data_cache, course.id, course=course
-        )
-        chapter_module = get_current_child(course_module)
-        if chapter_module is not None:
-            section_module = get_current_child(chapter_module)
-            if section_module is not None:
-                url = reverse('courseware_section', kwargs={
-                    'course_id': text_type(course.id),
-                    'chapter': chapter_module.url_name,
-                    'section': section_module.url_name
-                })
-                return url
-        return None
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        course.id, request.user, course, depth=2
+    )
+    course_module = get_module_for_descriptor(
+        user, request, course, field_data_cache, course.id, course=course
+    )
+    chapter_module = get_current_child(course_module)
+    if chapter_module is not None:
+        section_module = get_current_child(chapter_module)
+        if section_module is not None:
+            url = reverse('courseware_section', kwargs={
+                'course_id': text_type(course.id),
+                'chapter': chapter_module.url_name,
+                'section': section_module.url_name
+            })
+            return url
+    return None
 
 
 @ensure_csrf_cookie
