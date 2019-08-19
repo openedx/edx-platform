@@ -225,7 +225,7 @@ class CourseOverview(TimeStampedModel):
             if isinstance(course, CourseDescriptor):
                 course_overview = CourseOverview.objects.filter(id=course.id).first()
                 if not course_overview:
-                    course_overview = cls._create_from_course(course)
+                    course_overview = cls._create_or_update(course)
                     course_overview.save()
                     try:
                         with transaction.atomic():
