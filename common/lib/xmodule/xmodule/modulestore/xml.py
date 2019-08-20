@@ -435,8 +435,6 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         log.debug('========> Starting courselike import from %s', course_dir)
         with open(self.data_dir / course_dir / self.parent_xml) as course_file:
-
-
             course_data = etree.parse(course_file, parser=edx_xml_parser).getroot()
 
             org = course_data.get('org')
