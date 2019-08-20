@@ -248,7 +248,7 @@ class BadgeAssertionTest(ModuleStoreTestCase):
         Verify that grabbing all assertions for a user behaves as expected.
 
         This function uses object IDs because for some reason Jenkins trips up
-        on its six.assertCountEqual check here despite the items being equal.
+        on its assertItemsEqual check here despite the items being equal.
         """
         user = UserFactory()
         assertions = [BadgeAssertionFactory.create(user=user).id for _i in range(3)]

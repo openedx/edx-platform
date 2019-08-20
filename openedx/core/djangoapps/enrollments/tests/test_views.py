@@ -363,7 +363,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         response = self.client.get(reverse('courseenrollments'), {'user': self.user.username}, **kwargs)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = json.loads(response.content.decode('utf-8'))
-        six.assertCountEqual(
+        self.assertItemsEqual(
             [(datum['course_details']['course_id'], datum['course_details']['course_name']) for datum in data],
             [(six.text_type(course.id), course.display_name_with_default) for course in courses]
         )
@@ -1680,4 +1680,4 @@ class CourseEnrollmentsApiListTest(APITestCase, ModuleStoreTestCase):
         content = self._assert_list_of_enrollments(query_params, status.HTTP_200_OK)
         results = content['results']
 
-        six.assertCountEqual(results, expected_results)
+        self.assertItemsEqual(results, expected_results)

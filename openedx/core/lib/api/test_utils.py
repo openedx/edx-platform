@@ -5,7 +5,6 @@ from __future__ import absolute_import
 import base64
 import json
 import re
-import six
 
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -50,7 +49,7 @@ class ApiTestCase(TestCase):
         allow_header = resp.get("Allow")
         self.assertIsNotNone(allow_header)
         allowed_methods = re.split('[^A-Z]+', allow_header)
-        six.assertCountEqual(allowed_methods, expected_methods)
+        self.assertItemsEqual(allowed_methods, expected_methods)
 
     def assertSelfReferential(self, obj):
         """Assert that accessing the "url" entry in the given object returns the same object"""

@@ -762,7 +762,7 @@ class CertificatesBrandingTest(TestCase):
         data = certs_api.get_certificate_header_context(is_secure=True)
 
         # Make sure there are not unexpected keys in dict returned by 'get_certificate_header_context'
-        six.assertCountEqual(
+        self.assertItemsEqual(
             list(data.keys()),
             ['logo_src', 'logo_url']
         )
@@ -787,7 +787,7 @@ class CertificatesBrandingTest(TestCase):
         data = certs_api.get_certificate_footer_context()
 
         # Make sure there are not unexpected keys in dict returned by 'get_certificate_footer_context'
-        six.assertCountEqual(
+        self.assertItemsEqual(
             list(data.keys()),
             ['company_about_url', 'company_privacy_url', 'company_tos_url']
         )

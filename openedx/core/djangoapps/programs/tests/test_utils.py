@@ -674,7 +674,7 @@ class TestProgramProgressMeter(TestCase):
         self._create_certificates(unknown['key'], status='unknown')
 
         meter = ProgramProgressMeter(self.site, self.user)
-        six.assertCountEqual(
+        self.assertItemsEqual(
             meter.completed_course_runs,
             [
                 {'course_run_id': downloadable['key'], 'type': CourseMode.VERIFIED},

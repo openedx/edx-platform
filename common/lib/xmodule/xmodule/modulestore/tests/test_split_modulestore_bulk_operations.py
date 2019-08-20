@@ -8,7 +8,6 @@ import copy
 import unittest
 
 import ddt
-import six
 from bson.objectid import ObjectId
 from mock import MagicMock, Mock, call
 from opaque_keys.edx.locator import CourseLocator
@@ -170,7 +169,7 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.bulk.update_structure(self.course_key.replace(branch='b'), other_structure)
         self.assertConnCalls()
         self.bulk._end_bulk_operation(self.course_key)
-        six.assertCountEqual(
+        self.assertItemsEqual(
             [
                 call.insert_structure(self.structure, self.course_key),
                 call.insert_structure(other_structure, self.course_key)
@@ -206,7 +205,7 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.bulk.update_definition(self.course_key.replace(branch='b'), other_definition)
         self.bulk.insert_course_index(self.course_key, {'versions': {'a': self.definition['_id'], 'b': other_definition['_id']}})
         self.bulk._end_bulk_operation(self.course_key)
-        six.assertCountEqual(
+        self.assertItemsEqual(
             [
                 call.insert_definition(self.definition, self.course_key),
                 call.insert_definition(other_definition, self.course_key),
@@ -237,7 +236,7 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.bulk.update_definition(self.course_key.replace(branch='b'), other_definition)
         self.assertConnCalls()
         self.bulk._end_bulk_operation(self.course_key)
-        six.assertCountEqual(
+        self.assertItemsEqual(
             [
                 call.insert_definition(self.definition, self.course_key),
                 call.insert_definition(other_definition, self.course_key)
@@ -273,7 +272,7 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.bulk.update_structure(self.course_key.replace(branch='b'), other_structure)
         self.bulk.insert_course_index(self.course_key, {'versions': {'a': self.structure['_id'], 'b': other_structure['_id']}})
         self.bulk._end_bulk_operation(self.course_key)
-        six.assertCountEqual(
+        self.assertItemsEqual(
             [
                 call.insert_structure(self.structure, self.course_key),
                 call.insert_structure(other_structure, self.course_key),
@@ -393,7 +392,7 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
         expected = matching + db_indexes
         self.conn.find_matching_course_indexes.return_value = db_indexes
         result = self.bulk.find_matching_course_indexes(branch, search_targets)
-        six.assertCountEqual(result, expected)
+        self.assertItemsEqual(result, expected)
         for item in unmatching:
             self.assertNotIn(item, result)
 
@@ -581,7 +580,7 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
         self.conn.find_ancestor_structures.return_value = db_match + db_unmatch
         results = self.bulk.find_ancestor_structures(original_version, block_id)
         self.conn.find_ancestor_structures.assert_called_once_with(original_version, block_id)
-        six.assertCountEqual(active_match + db_match, results)
+        self.assertItemsEqual(active_match + db_match, results)
 
 
 @ddt.ddt

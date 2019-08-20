@@ -19,7 +19,7 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC, common_timezones_set
-from six import text_type, assertCountEqual
+from six import text_type
 from six.moves import range
 from social_django.models import Partial, UserSocialAuth
 
@@ -93,8 +93,8 @@ class UserAPITestCase(ApiTestCase):
 
     def assertUserIsValid(self, user):
         """Assert that the given user result is valid"""
-        assertCountEqual(list(user.keys()), ["email", "id", "name", "username", "preferences", "url"])
-        assertCountEqual(
+        self.assertItemsEqual(list(user.keys()), ["email", "id", "name", "username", "preferences", "url"])
+        self.assertItemsEqual(
             list(user["preferences"].items()),
             [(pref.key, pref.value) for pref in self.prefs if pref.user.id == user["id"]]
         )
@@ -104,7 +104,7 @@ class UserAPITestCase(ApiTestCase):
         """
         Assert that the given preference is acknowledged by the system
         """
-        assertCountEqual(list(pref.keys()), ["user", "key", "value", "url"])
+        self.assertItemsEqual(list(pref.keys()), ["user", "key", "value", "url"])
         self.assertSelfReferential(pref)
         self.assertUserIsValid(pref["user"])
 

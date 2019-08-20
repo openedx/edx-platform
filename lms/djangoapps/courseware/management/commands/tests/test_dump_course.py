@@ -135,7 +135,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
         self.assertEqual(dump[video_id]['category'], 'video')
         video_metadata = dump[video_id]['metadata']
         video_metadata.pop('edx_video_id', None)
-        six.assertCountEqual(
+        self.assertItemsEqual(
             list(video_metadata.keys()),
             ['youtube_id_0_75', 'youtube_id_1_0', 'youtube_id_1_25', 'youtube_id_1_5']
         )

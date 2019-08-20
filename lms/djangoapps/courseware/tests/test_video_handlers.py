@@ -366,7 +366,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
         # Make request to available translations dispatch.
         request = Request.blank('/available_translations')
         response = self.item.transcript(request=request, dispatch='available_translations')
-        six.assertCountEqual(json.loads(response.body.decode('utf8')), result)
+        self.assertItemsEqual(json.loads(response.body), result)
 
     @patch('xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages')
     def test_val_available_translations_feature_disabled(self, mock_get_available_transcript_languages):

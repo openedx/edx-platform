@@ -10,7 +10,6 @@ import itertools
 from datetime import timedelta
 
 import ddt
-import six
 from django.core.exceptions import ValidationError
 from django.test import TestCase, override_settings
 from django.utils.timezone import now
@@ -400,11 +399,11 @@ class CourseModeModelTest(TestCase):
 
         # Check the selectable modes, which should exclude credit
         selectable_modes = CourseMode.modes_for_course_dict(self.course_key)
-        six.assertCountEqual(list(selectable_modes.keys()), expected_selectable_modes)
+        self.assertItemsEqual(list(selectable_modes.keys()), expected_selectable_modes)
 
         # When we get all unexpired modes, we should see credit as well
         all_modes = CourseMode.modes_for_course_dict(self.course_key, only_selectable=False)
-        six.assertCountEqual(list(all_modes.keys()), available_modes)
+        self.assertItemsEqual(list(all_modes.keys()), available_modes)
 
     def _enrollment_display_modes_dicts(self, dict_type):
         """

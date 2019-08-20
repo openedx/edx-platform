@@ -554,7 +554,7 @@ class TestCourseOutline(CourseTestCase):
             [component for component in advanced_modules if component in deprecated_block_types]
         )
 
-        six.assertCountEqual(info['blocks'], expected_blocks)
+        self.assertItemsEqual(info['blocks'], expected_blocks)
         self.assertEqual(
             info['advance_settings_url'],
             reverse_course_url('advanced_settings_handler', course_id)

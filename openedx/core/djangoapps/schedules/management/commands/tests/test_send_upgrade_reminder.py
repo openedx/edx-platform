@@ -7,7 +7,6 @@ import logging
 from unittest import skipUnless
 
 import ddt
-import six
 from django.conf import settings
 from edx_ace import Message
 from edx_ace.utils.date import serialize
@@ -87,7 +86,7 @@ class TestUpgradeReminder(ScheduleSendEmailTestMixin, CacheIsolationTestCase):
             messages = [Message.from_string(m) for m in sent_messages]
             self.assertEqual(len(messages), 1)
             message = messages[0]
-            six.assertCountEqual(
+            self.assertItemsEqual(
                 message.context['course_ids'],
                 [str(schedules[i].enrollment.course.id) for i in (1, 2, 4)]
             )
