@@ -106,7 +106,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==2.0.0
 edx-drf-extensions==2.4.0
-edx-enterprise==1.9.1
+edx-enterprise==1.9.3
 edx-i18n-tools==0.4.8
 edx-milestones==0.2.3
 edx-oauth2-provider==1.3.0
@@ -121,7 +121,7 @@ git+https://github.com/mitodl/edx-sga.git@3828ba9e413080a81b907a3381e5ffa05e063f
 edx-submissions==2.1.1
 edx-user-state-client==1.1.1
 edx-when==0.3
-edxval==1.1.25
+edxval==1.1.26
 elasticsearch==1.9.0      # via edx-search
 enum34==1.1.6
 event-tracking==0.2.9
@@ -166,7 +166,7 @@ mpmath==1.1.0             # via sympy
 mysqlclient==1.4.4
 networkx==1.7
 newrelic==5.0.2.126
-nltk==3.4.4
+nltk==3.4.5
 nodeenv==1.1.1
 numpy==1.16.4
 git+https://github.com/joestump/python-oauth2.git@b94f69b1ad195513547924e380d9265133e995fa#egg=oauth2
