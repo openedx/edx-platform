@@ -363,7 +363,7 @@ class ViewsTestCaseMixin(object):
                 data={"body": "foo", "title": "foo", "commentable_id": "some_topic"}
             )
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data['body'], 'foo')
         self.assertEqual(data['title'], 'foo')
         self.assertEqual(data['commentable_id'], 'some_topic')
@@ -1970,7 +1970,7 @@ class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRe
         response = self.make_request(username="other")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            json.loads(response.content)["users"],
+            json.loads(response.content.decode('utf-8'))["users"],
             [{"id": self.other_user.id, "username": self.other_user.username}]
         )
 
@@ -1979,7 +1979,7 @@ class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRe
         self.set_post_counts(mock_request)
         response = self.make_request(username="othor")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content)["users"], [])
+        self.assertEqual(json.loads(response.content.decode('utf-8'))["users"], [])
 
     def test_requires_GET(self):
         response = self.make_request(method='post', username="other")
@@ -1988,7 +1988,7 @@ class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRe
     def test_requires_username_param(self):
         response = self.make_request()
         self.assertEqual(response.status_code, 400)
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertIn("errors", content)
         self.assertNotIn("users", content)
 
@@ -1997,7 +1997,7 @@ class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRe
         response = self.make_request(course_id=course_id, username="other")
 
         self.assertEqual(response.status_code, 404)
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertIn("errors", content)
         self.assertNotIn("users", content)
 
@@ -2007,7 +2007,7 @@ class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRe
 
         response = self.make_request(username="other")
         self.assertEqual(response.status_code, 404)
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertIn("errors", content)
         self.assertNotIn("users", content)
 
@@ -2016,7 +2016,7 @@ class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRe
         self.set_post_counts(mock_request, 0, 0)
         response = self.make_request(username="other")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content)["users"], [])
+        self.assertEqual(json.loads(response.content.decode('utf-8'))["users"], [])
 
 
 @ddt.ddt

@@ -55,7 +55,7 @@ SSL-protected channel.  Otherwise, a session hijacker could copy
 the entire cookie and use it to impersonate the victim.
 
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from base64 import b64encode
 from contextlib import contextmanager
@@ -70,6 +70,8 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.core import signing
 from django.http import HttpResponse
 from django.utils.crypto import get_random_string
+from django.utils.encoding import python_2_unicode_compatible
+
 from six import text_type  # pylint: disable=ungrouped-imports
 
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
@@ -86,6 +88,7 @@ class SafeCookieError(Exception):
         log.error(error_message)
 
 
+@python_2_unicode_compatible
 class SafeCookieData(object):
     """
     Cookie data that cryptographically binds and timestamps the user
@@ -145,7 +148,7 @@ class SafeCookieData(object):
         safe_cookie_string.
         """
         try:
-            raw_cookie_components = safe_cookie_string.split(cls.SEPARATOR)
+            raw_cookie_components = six.text_type(safe_cookie_string).split(cls.SEPARATOR)
             safe_cookie_data = SafeCookieData(*raw_cookie_components)
         except TypeError:
             raise SafeCookieError(

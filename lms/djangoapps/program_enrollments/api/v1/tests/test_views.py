@@ -226,7 +226,7 @@ class UserProgramReadOnlyAccessViewTest(ListViewTestMixin, APITestCase):
         mock_get_programs.assert_has_calls([
             mock.call(course=self.course_id),
             mock.call(course=other_course_key),
-        ])
+        ], any_order=True)
 
     @mock.patch('lms.djangoapps.program_enrollments.api.v1.views.get_programs', autospec=True, return_value=None)
     def test_learner_200_if_no_programs_enrolled(self, mock_get_programs):

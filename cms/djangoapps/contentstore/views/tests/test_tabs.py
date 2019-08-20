@@ -38,7 +38,7 @@ class TabsPageTests(CourseTestCase):
         """Verify response is an error listing the invalid_tab_id"""
 
         self.assertEqual(resp.status_code, 400)
-        resp_content = json.loads(resp.content)
+        resp_content = json.loads(resp.content.decode('utf-8'))
         self.assertIn("error", resp_content)
         self.assertIn("invalid_tab_id", resp_content['error'])
 
@@ -120,7 +120,7 @@ class TabsPageTests(CourseTestCase):
             data={'tabs': [{'tab_id': tab_id} for tab_id in tab_ids]},
         )
         self.assertEqual(resp.status_code, 400)
-        resp_content = json.loads(resp.content)
+        resp_content = json.loads(resp.content.decode('utf-8'))
         self.assertIn("error", resp_content)
 
     def test_reorder_tabs_invalid_tab(self):
@@ -184,7 +184,7 @@ class TabsPageTests(CourseTestCase):
 
         resp = self.client.get(preview_url, HTTP_ACCEPT='application/json')
         self.assertEqual(resp.status_code, 200)
-        resp_content = json.loads(resp.content)
+        resp_content = json.loads(resp.content.decode('utf-8'))
         html = resp_content['html']
 
         # Verify that the HTML contains the expected elements

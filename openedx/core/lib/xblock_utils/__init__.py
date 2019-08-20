@@ -56,7 +56,7 @@ def request_token(request):
     """
     # pylint: disable=protected-access
     if not hasattr(request, '_xblock_token'):
-        request._xblock_token = uuid.uuid1().get_hex()
+        request._xblock_token = uuid.uuid1().hex
 
     return request._xblock_token
 

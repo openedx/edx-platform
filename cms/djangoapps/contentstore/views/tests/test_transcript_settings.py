@@ -270,7 +270,7 @@ class TranscriptDownloadTest(CourseTestCase):
         response = self.client.get(self.view_url, data=request_payload)
         # Assert the response
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(json.loads(response.content)['error'], expected_error_message)
+        self.assertEqual(json.loads(response.content.decode('utf-8'))['error'], expected_error_message)
 
 
 @ddt.ddt
@@ -372,7 +372,7 @@ class TranscriptUploadTest(CourseTestCase):
         # Make request to transcript upload handler
         response = self.client.post(self.view_url, request_payload, format='multipart')
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(json.loads(response.content)['error'], expected_error_message)
+        self.assertEqual(json.loads(response.content.decode('utf-8'))['error'], expected_error_message)
 
     @patch('contentstore.views.transcript_settings.get_available_transcript_languages', Mock(return_value=['en', 'es']))
     def test_transcript_upload_handler_existing_transcript(self):
@@ -389,7 +389,7 @@ class TranscriptUploadTest(CourseTestCase):
         response = self.client.post(self.view_url, request_payload, format='multipart')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
-            json.loads(response.content)['error'],
+            json.loads(response.content.decode('utf-8'))['error'],
             u'A transcript with the "es" language code already exists.'
         )
 
@@ -413,7 +413,7 @@ class TranscriptUploadTest(CourseTestCase):
 
             self.assertEqual(response.status_code, 400)
             self.assertEqual(
-                json.loads(response.content)['error'],
+                json.loads(response.content.decode('utf-8'))['error'],
                 u'There is a problem with this transcript file. Try to upload a different file.'
             )
 
@@ -437,7 +437,7 @@ class TranscriptUploadTest(CourseTestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
-            json.loads(response.content)['error'],
+            json.loads(response.content.decode('utf-8'))['error'],
             u'There is a problem with this transcript file. Try to upload a different file.'
         )
 

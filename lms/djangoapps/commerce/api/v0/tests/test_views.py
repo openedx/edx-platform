@@ -65,7 +65,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
 
     def assertResponseMessage(self, response, expected_msg):
         """ Asserts the detail field in the response's JSON body equals the expected message. """
-        actual = json.loads(response.content)['detail']
+        actual = json.loads(response.content.decode('utf-8'))['detail']
         self.assertEqual(actual, expected_msg)
 
     def setUp(self):
@@ -98,7 +98,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         with restrict_course(self.course.id) as redirect_url:
             response = self._post_to_view()
             self.assertEqual(403, response.status_code)
-            body = json.loads(response.content)
+            body = json.loads(response.content.decode('utf-8'))
             self.assertEqual(get_absolute_url(redirect_url), body['user_message_url'])
 
     def test_login_required(self):
@@ -300,7 +300,7 @@ class BasketOrderViewTests(UserMixin, TestCase):
             response = self.client.get(self.path)
 
         self.assertEqual(response.status_code, 200)
-        actual = json.loads(response.content)
+        actual = json.loads(response.content.decode('utf-8'))
         self.assertEqual(actual, self.MOCK_ORDER)
 
     def test_order_not_found(self):

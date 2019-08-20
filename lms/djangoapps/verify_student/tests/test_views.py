@@ -1152,7 +1152,7 @@ class CheckoutTestMixin(object):
             self.assertEqual(args['course_key'], expected_course_key)
             self.assertEqual(args['course_mode'].slug, expected_mode_slug)
             # ensure response data was correct
-            data = json.loads(response.content)
+            data = json.loads(response.content.decode('utf-8'))
             self.assertEqual(set(data.keys()), PAYMENT_DATA_KEYS)
         else:
             self.assertFalse(patched_create_order.called)
@@ -1225,7 +1225,7 @@ class CheckoutTestMixin(object):
         self.assertEqual(args['course_key'], self.course.id)
         self.assertEqual(args['course_mode'].slug, 'verified')
         # ensure response data was correct
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data, {'foo': 'bar'})
 
 
@@ -1364,7 +1364,7 @@ class TestCreateOrderView(ModuleStoreTestCase):
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_create_order_success(self):
         response = self._create_order(50, self.course_id)
-        json_response = json.loads(response.content)
+        json_response = json.loads(response.content.decode('utf-8'))
         self.assertIsNotNone(json_response['payment_form_data'].get('orderNumber'))  # TODO not canonical
 
         # Verify that the order exists and is configured correctly
@@ -1401,7 +1401,7 @@ class TestCreateOrderView(ModuleStoreTestCase):
         self.assertEqual(response.status_code, expect_status_code)
 
         if expect_status_code == 200:
-            json_response = json.loads(response.content)
+            json_response = json.loads(response.content.decode('utf-8'))
             if expect_success:
                 self.assertEqual(set(json_response.keys()), PAYMENT_DATA_KEYS)
             else:

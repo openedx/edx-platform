@@ -273,7 +273,7 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-        schedule = json.loads(response.content)['schedule']
+        schedule = json.loads(response.content.decode('utf-8'))['schedule']
         self.assertEqual(schedule[0]['hidden'], False)
         self.assertEqual(schedule[0]['start'], start)
         self.assertEqual(schedule[0]['children'][0]['start'], start)
@@ -519,7 +519,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
             url, json.dumps(schedule), content_type='application/json'
         )
 
-        schedule = json.loads(response.content)['schedule']
+        schedule = json.loads(response.content.decode('utf-8'))['schedule']
         self.assertEqual(schedule[0]['hidden'], False)
         self.assertEqual(schedule[0]['start'], u'2014-11-20 00:00')
         self.assertEqual(

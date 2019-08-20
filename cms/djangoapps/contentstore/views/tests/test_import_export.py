@@ -353,7 +353,7 @@ class ImportTestCase(CourseTestCase):
                     kwargs={'filename': os.path.split(tarpath)[1]}
                 )
             )
-            status = json.loads(resp.content)["ImportStatus"]
+            status = json.loads(resp.content.decode('utf-8'))["ImportStatus"]
             self.assertEqual(status, -1)
 
         try_tar(self._fifo_tar())
@@ -566,7 +566,7 @@ class ExportTestCase(CourseTestCase):
         resp = self.client.post(self.url)
         self.assertEquals(resp.status_code, 200)
         resp = self.client.get(self.status_url)
-        result = json.loads(resp.content)
+        result = json.loads(resp.content.decode('utf-8'))
         status = result['ExportStatus']
         self.assertEquals(status, 3)
         self.assertIn('ExportOutput', result)
@@ -673,7 +673,7 @@ class ExportTestCase(CourseTestCase):
         self.assertEquals(resp.status_code, 200)
         resp = self.client.get(self.status_url)
         self.assertEquals(resp.status_code, 200)
-        result = json.loads(resp.content)
+        result = json.loads(resp.content.decode('utf-8'))
         self.assertNotIn('ExportOutput', result)
         self.assertIn('ExportError', result)
         error = result['ExportError']
@@ -761,7 +761,7 @@ class ExportTestCase(CourseTestCase):
         """
         resp = self.client.get(self.status_url)
         self.assertEqual(resp.status_code, 200)
-        result = json.loads(resp.content)
+        result = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(result['ExportStatus'], 0)
 
     def test_output_non_course_author(self):
@@ -800,7 +800,7 @@ class ExportTestCase(CourseTestCase):
             file_url='/path/to/testfile.tar.gz',
         )
         resp = self.client.get(self.status_url)
-        result = json.loads(resp.content)
+        result = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(result['ExportOutput'], '/path/to/testfile.tar.gz')
 
     @patch('contentstore.views.import_export._latest_task_status')
@@ -820,7 +820,7 @@ class ExportTestCase(CourseTestCase):
             file_url='/s3/file/path/testfile.tar.gz',
         )
         resp = self.client.get(self.status_url)
-        result = json.loads(resp.content)
+        result = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(result['ExportOutput'], '/s3/file/path/testfile.tar.gz')
 
     @patch('contentstore.views.import_export._latest_task_status')
@@ -837,7 +837,7 @@ class ExportTestCase(CourseTestCase):
         mock_latest_task_status.return_value = Mock(state=UserTaskStatus.SUCCEEDED)
         mock_get_user_task_artifact.return_value = self._mock_artifact(spec=FileSystemStorage)
         resp = self.client.get(self.status_url)
-        result = json.loads(resp.content)
+        result = json.loads(resp.content.decode('utf-8'))
         file_export_output_url = reverse_course_url('export_output_handler', self.course.id)
         self.assertEqual(result['ExportOutput'], file_export_output_url)
 

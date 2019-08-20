@@ -47,7 +47,7 @@ class GroupIdAssertionMixin(object):
             occurrence of a thread model within that payload).  if None is
             passed, the identity function is assumed.
         """
-        payload = json.loads(response.content)
+        payload = json.loads(response.content.decode('utf-8'))
         thread = extract_thread(payload) if extract_thread else payload
         self._assert_thread_contains_group_info(thread)
 

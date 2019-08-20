@@ -134,7 +134,7 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
 
         # Add a new child sequential to the exam module
         # Confirm that the grader type is 'Entrance Exam'
-        chapter_locator_string = json.loads(resp.content).get('locator')
+        chapter_locator_string = json.loads(resp.content.decode('utf-8')).get('locator')
         # chapter_locator = UsageKey.from_string(chapter_locator_string)
         seq_data = {
             'category': "sequential",
@@ -142,7 +142,7 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
             'parent_locator': chapter_locator_string,
         }
         resp = self.client.ajax_post(reverse_url('xblock_handler'), seq_data)
-        seq_locator_string = json.loads(resp.content).get('locator')
+        seq_locator_string = json.loads(resp.content.decode('utf-8')).get('locator')
         seq_locator = UsageKey.from_string(seq_locator_string)
         section_grader_type = CourseGradingModel.get_section_grader_type(seq_locator)
         self.assertEqual(GRADER_TYPES['ENTRANCE_EXAM'], section_grader_type['graderType'])
