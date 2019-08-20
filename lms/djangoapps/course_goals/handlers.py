@@ -21,9 +21,7 @@ def update_course_goal_on_enroll_change(sender, instance, **kwargs):  # pylint: 
     1) Set the course goal to 'certify' when the user enrolls as a verified user.
     2) Remove the course goal when the user's enrollment is no longer active.
     """
-    course_id = instance.course_id
-    if isinstance(course_id, six.binary_type):
-        course_id = course_id.decode('utf8', 'ignore')
+    course_id = six.text_type(instance.course_id)
     if not instance.is_active:
         remove_course_goal(instance.user, course_id)
     elif instance.mode == CourseMode.VERIFIED:
