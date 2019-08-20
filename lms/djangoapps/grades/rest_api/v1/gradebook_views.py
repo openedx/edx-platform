@@ -26,6 +26,7 @@ from lms.djangoapps.grades.api import constants as grades_constants
 from lms.djangoapps.grades.api import context as grades_context
 from lms.djangoapps.grades.api import events as grades_events
 from lms.djangoapps.grades.api import is_writable_gradebook_enabled, prefetch_course_and_subsection_grades
+from lms.djangoapps.grades.api import gradebook_can_see_bulk_management as can_see_bulk_management
 from lms.djangoapps.grades.course_data import CourseData
 from lms.djangoapps.grades.grade_utils import are_grades_frozen
 # TODO these imports break abstraction of the core Grades layer. This code needs
@@ -276,6 +277,7 @@ class CourseGradingView(BaseCourseView):
                 'assignment_types': self._get_assignment_types(course),
                 'subsections': self._get_subsections(course, graded_only),
                 'grades_frozen': are_grades_frozen(course_key),
+                'can_see_bulk_management': can_see_bulk_management(course_key),
             }
             return Response(results)
 

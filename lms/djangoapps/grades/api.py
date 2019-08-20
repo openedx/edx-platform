@@ -15,7 +15,7 @@ from six import text_type
 from lms.djangoapps.grades import constants, context, course_data, events
 # Grades APIs that should NOT belong within the Grades subsystem
 # TODO move Gradebook to be an external feature outside of core Grades
-from lms.djangoapps.grades.config.waffle import is_writable_gradebook_enabled
+from lms.djangoapps.grades.config.waffle import is_writable_gradebook_enabled, gradebook_can_see_bulk_management
 # Public Grades Factories
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.models_api import *

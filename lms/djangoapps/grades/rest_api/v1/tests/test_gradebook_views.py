@@ -197,6 +197,7 @@ class CourseGradingViewTest(SharedModuleStoreTestCase, APITestCase):
                 },
             ],
             'grades_frozen': False,
+            'can_see_bulk_management': False,
         }
 
     def test_student_fails(self):
