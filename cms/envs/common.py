@@ -1296,9 +1296,6 @@ INSTALLED_APPS = [
     # System Wide Roles
     'openedx.core.djangoapps.system_wide_roles',
 
-    # Microsite configuration application
-    'microsite_configuration',
-
     # Static i18n support
     'statici18n',
 

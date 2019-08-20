@@ -2364,9 +2364,6 @@ INSTALLED_APPS = [
     # Dark-launching languages
     'openedx.core.djangoapps.dark_lang',
 
-    # Microsite configuration
-    'microsite_configuration.MicrositeConfigurationConfig',
-
     # RSS Proxy
     'rss_proxy',
 
