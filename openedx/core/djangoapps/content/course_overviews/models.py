@@ -223,39 +223,37 @@ class CourseOverview(TimeStampedModel):
         with store.bulk_operations(course_id):
             course = store.get_course(course_id)
             if isinstance(course, CourseDescriptor):
-                course_overview = CourseOverview.objects.filter(id=course.id).first()
-                if not course_overview:
-                    course_overview = cls._create_or_update(course)
-                    course_overview.save()
-                    try:
-                        with transaction.atomic():
-                            # Remove and recreate all the course tabs
-                            CourseOverviewTab.objects.filter(course_overview=course_overview).delete()
-                            CourseOverviewTab.objects.bulk_create([
-                                CourseOverviewTab(tab_id=tab.tab_id, course_overview=course_overview)
-                                for tab in course.tabs
-                            ])
-                            # Remove and recreate course images
-                            CourseOverviewImageSet.objects.filter(course_overview=course_overview).delete()
-                            CourseOverviewImageSet.create(course_overview, course)
+                course_overview = cls._create_or_update(course)
+                try:
+                    with transaction.atomic():
+                        course_overview.save()
+                        # Remove and recreate all the course tabs
+                        CourseOverviewTab.objects.filter(course_overview=course_overview).delete()
+                        CourseOverviewTab.objects.bulk_create([
+                            CourseOverviewTab(tab_id=tab.tab_id, course_overview=course_overview)
+                            for tab in course.tabs
+                        ])
+                        # Remove and recreate course images
+                        CourseOverviewImageSet.objects.filter(course_overview=course_overview).delete()
+                        CourseOverviewImageSet.create(course_overview, course)
 
-                    except IntegrityError:
-                        # There is a rare race condition that will occur if
-                        # CourseOverview.get_from_id is called while a
-                        # another identical overview is already in the process
-                        # of being created.
-                        # One of the overviews will be saved normally, while the
-                        # other one will cause an IntegrityError because it tries
-                        # to save a duplicate.
-                        # (see: https://openedx.atlassian.net/browse/TNL-2854).
-                        log.error("IntegrityError error for '%s'" % course_id)
-                        pass
-                    except Exception:
-                        log.exception(
-                            "CourseOverview for course %s failed!",
-                            course_id,
-                        )
-                        raise
+                except IntegrityError:
+                    # There is a rare race condition that will occur if
+                    # CourseOverview.get_from_id is called while a
+                    # another identical overview is already in the process
+                    # of being created.
+                    # One of the overviews will be saved normally, while the
+                    # other one will cause an IntegrityError because it tries
+                    # to save a duplicate.
+                    # (see: https://openedx.atlassian.net/browse/TNL-2854).
+                    log.error("IntegrityError error for '%s'" % course_id)
+                    pass
+                except Exception:
+                    log.exception(
+                        "CourseOverview for course %s failed!",
+                        course_id,
+                    )
+                    raise
 
                 return course_overview
             elif course is not None:
