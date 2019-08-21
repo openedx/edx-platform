@@ -273,7 +273,7 @@ python-dateutil==2.4.0
 python-levenshtein==0.12.0
 python-memcached==1.59
 python-openid==2.2.5 ; python_version == "2.7"
-python-slugify==1.2.6
+python-slugify==3.0.3
 python-swiftclient==3.8.0
 python3-saml==1.5.0
 pytz==2019.2
@@ -301,7 +301,7 @@ shapely==1.6.4.post2
 shortuuid==0.5.0
 simplejson==3.16.0
 singledispatch==3.4.0.3
-six==1.11.0
+six==1.12.0
 slumber==0.7.1
 snakefood==1.4
 snowballstemmer==1.9.0    # via sphinx
@@ -323,13 +323,12 @@ tincan==0.0.5
 toml==0.10.0
 tox-battery==0.5.1
 tox==3.13.2
-transifex-client==0.13.6
+transifex-client==0.13.4
 typing==3.7.4
 unicodecsv==0.14.1
-unidecode==1.1.1
 unidiff==0.5.5
 uritemplate==3.0.0
-urllib3==1.23
+urllib3==1.25.3
 user-util==0.1.5
 virtualenv==16.7.3
 voluptuous==0.11.7
