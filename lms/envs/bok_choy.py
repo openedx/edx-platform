@@ -57,6 +57,12 @@ CAPTURE_CONSOLE_LOG = True
 PLATFORM_NAME = ugettext_lazy(u"édX")
 PLATFORM_DESCRIPTION = ugettext_lazy(u"Open édX Platform")
 
+# We need to test different scenarios, following setting effectively disbale rate limiting
+PASSWORD_RESET_EMAIL_RATE_LIMIT = {
+    'no_of_emails': 1,
+    'per_seconds': 1
+}
+
 ############################ STATIC FILES #############################
 
 # Enable debug so that static assets are served by Django

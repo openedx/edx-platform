@@ -1,6 +1,8 @@
+<%page expression_filter="h"/>
 <%!
 from django.urls import reverse
 from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import js_escaped_string
 %>
 <%namespace name='static' file='../static_content.html'/>
 
@@ -9,8 +11,8 @@ from django.utils.translation import ugettext as _
 <%block name="js_extra">
 <%static:require_module module_name="support/js/certificates_factory" class_name="CertificatesFactory">
     new CertificatesFactory({
-        userFilter: '${ user_filter }',
-        courseFilter: '${course_filter}'
+        userFilter: '${ user_filter | n, js_escaped_string }',
+        courseFilter: '${ course_filter | n, js_escaped_string }'
     });
 </%static:require_module>
 </%block>
