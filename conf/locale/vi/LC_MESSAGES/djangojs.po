@@ -105,9 +105,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-07-24 06:10+0000\n"
-"PO-Revision-Date: 2019-07-21 20:42+0000\n"
-"Last-Translator: Hoà Lê Thanh <hoa.lethanh@gmail.com>\n"
+"POT-Creation-Date: 2019-08-18 20:42+0000\n"
+"PO-Revision-Date: 2019-07-28 20:42+0000\n"
+"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"
@@ -9650,14 +9650,6 @@ msgid ""
 msgstr ""
 "Có mã không hợp lệ trong nội dung của bạn. Vui lòng kiểm tra để chắc chắn "
 "rằng đó là HTML hợp lệ."
-
-#: cms/templates/js/course_info_update.underscore
-msgid "Send push notification to mobile apps"
-msgstr "Gửi thông báo đẩy-push tới ứng dụng dành cho thiết bị di động"
-
-#: cms/templates/js/course_info_update.underscore
-msgid "Send notification to mobile apps"
-msgstr "Gửi thông báo cho ứng dụng dành cho thiết bị di động"
 
 #: cms/templates/js/course_info_update.underscore
 msgid "Post"
