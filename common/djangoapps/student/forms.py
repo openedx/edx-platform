@@ -49,9 +49,9 @@ def send_password_reset_email_for_user(user, request, preferred_email=None):
     password_reset_link = '{protocol}://{site_name}{reset_link}'.format(
         protocol='https' if request.is_secure() else 'http',
         site_name=site_name,
-        reset_link=reverse('student.views.password_reset_confirm_wrapper', kwargs={
-            'uidb36': int_to_base36(user.id), 
-            'token': default_token_generator.make_token(user)
+        reset_link=reverse('password_reset_confirm', kwargs={
+            'uidb36': int_to_base36(user.id),
+            'token': default_token_generator.make_token(user),
         })
     )
 
