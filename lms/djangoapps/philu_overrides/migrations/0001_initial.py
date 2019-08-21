@@ -11,8 +11,18 @@ class Migration(migrations.Migration):
 
     def add_history_columns(apps, schema_editor):
         cursor = connection.cursor()
-        query = 'ALTER TABLE enterprise_historicalenterprisecustomer ADD start_date DATETIME NULL, ADD end_date DATETIME NULL;'
-        cursor.execute(query)
+        tables = [
+            'enterprise_historicalenterprisecustomer',
+            'enterprise_historicalenterprisecustomerentitlement',
+            'enterprise_historicalenterprisecourseenrollment',
+            'enterprise_historicalenterprisecustomercatalog',
+            'enterprise_historicalenrollmentnotificationemailtemplate',
+            'consent_historicaldatasharingconsent',
+            'degreed_historicaldegreedenterprisecustomerconfiguration'
+        ]
+        for t in tables:
+            query = 'ALTER TABLE %s ADD start_date DATETIME NULL, ADD end_date DATETIME NULL;' % t
+            cursor.execute(query)
 
     operations = [
         migrations.RunPython(add_history_columns),
