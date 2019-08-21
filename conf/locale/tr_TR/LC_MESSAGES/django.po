@@ -128,7 +128,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-07-24 06:10+0000\n"
+"POT-Creation-Date: 2019-08-18 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2019\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -218,7 +218,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/djangoapps/instructor/views/api.py lms/templates/help_modal.html
+#: lms/djangoapps/instructor/views/api.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/shoppingcart/billing_details.html
@@ -489,8 +489,8 @@ msgstr ""
 #, python-format
 msgid "%(count)d student account was unlocked."
 msgid_plural "%(count)d student accounts were unlocked."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(count)d öğrenci hesabının kilidi açıldı."
+msgstr[1] "%(count)d öğrenci hesabının kilidi açıldı."
 
 #: common/djangoapps/student/forms.py
 msgid ""
@@ -518,7 +518,7 @@ msgstr "Geçerli biçimde e-posta adresi gerekiyor"
 
 #: common/djangoapps/student/forms.py
 msgid "Your legal name must be a minimum of one character long"
-msgstr ""
+msgstr "En az bir harften oluşan ve kimliğinizde yazan isminiz gerekiyor"
 
 #: common/djangoapps/student/forms.py
 #, python-format
@@ -1168,7 +1168,7 @@ msgstr ""
 msgid "The Site that this SAML configuration belongs to."
 msgstr "Bu SAML yapılandırmasının ait olduğu Site."
 
-#: common/djangoapps/third_party_auth/models.py lms/templates/help_modal.html
+#: common/djangoapps/third_party_auth/models.py
 #, python-brace-format
 msgid "{platform_name} Support"
 msgstr "{platform_name} Desteği"
@@ -2488,8 +2488,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py
 #: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
 #: cms/templates/index.html cms/templates/videos_index_pagination.html
-#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
-#: lms/templates/register-shib.html
+#: lms/templates/manage_user_standing.html lms/templates/register-shib.html
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/peer_grading/peer_grading_problem.html
@@ -2560,7 +2559,7 @@ msgstr[1] "Yanlış ({progress} puan)"
 #, python-brace-format
 msgid "Correct ({progress} point)"
 msgid_plural "Correct ({progress} points)"
-msgstr[0] ""
+msgstr[0] "Doğru ({progress} puan)"
 msgstr[1] "Doğru ({progress} puan)"
 
 #: common/lib/xmodule/xmodule/capa_base.py
@@ -2920,13 +2919,13 @@ msgstr "Tartışma Konusu Eşleştirme"
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
-"must be unique. In \"id\" values, the only special characters that are "
-"supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
+"category must be unique. In \"id\" values, the only special characters that "
+"are supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 "Tartışma kategorilerini belirtilen formatta girin: \"KategoriAdı\": {\"id\":"
 " \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. Örneğin bir "
@@ -4676,7 +4675,7 @@ msgstr "Ana Sayfa"
 #: lms/djangoapps/courseware/views/views.py
 #: lms/djangoapps/shoppingcart/reports.py
 #: openedx/features/course_experience/__init__.py
-#: cms/templates/widgets/header.html lms/templates/help_modal.html
+#: cms/templates/widgets/header.html
 #: lms/templates/courseware/course_navigation.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
@@ -5093,8 +5092,8 @@ msgstr "Hesap Kilidini Aç"
 #: common/templates/admin/student/loginfailures/change_form_template.html
 #: lms/templates/wiki/edit.html lms/templates/wiki/history.html
 #: lms/templates/wiki/includes/cheatsheet.html lms/templates/dashboard.html
-#: lms/templates/forgot_password_modal.html lms/templates/help_modal.html
-#: lms/templates/signup_modal.html lms/templates/ccx/schedule.html
+#: lms/templates/forgot_password_modal.html lms/templates/signup_modal.html
+#: lms/templates/ccx/schedule.html
 #: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
@@ -5179,6 +5178,10 @@ msgid ""
 "%(platform_name)s account from %(old_email)s to %(new_email)s. If this is "
 "correct, please confirm your new e-mail address by visiting:"
 msgstr ""
+"%(platform_name)s platformundaki eski %(old_email)se-posta adresinizin "
+"%(new_email)s şeklinde değiştirilmesi için bir talep aldık. Eğer bu isteği "
+"siz yaptıysanız, yeni e-posta hesabınızı lütfen aşağıdaki adrese giderek "
+"doğrulayın:"
 
 #: common/templates/student/edx_ace/emailchange/email/body.html
 msgid "Confirm Email Change"
@@ -5192,6 +5195,10 @@ msgid ""
 " any more email from us. Please do not reply to this e-mail; if you require "
 "assistance, check the help section of the %(platform_name)s web site."
 msgstr ""
+"Eğer bunu talep etmediyseniz, hiçbir şey yapmaya ihtiyacınız yoktur; bizden "
+"daha fazla e-posta almayacaksınız. Lütfen bu e-postayı cevaplamayın; eğer "
+"yardıma ihtiyaç duyarsanız, %(platform_name)s websitesinin yardım bölümüne "
+"başvurun."
 
 #: common/templates/student/edx_ace/emailchange/email/subject.txt
 #, python-format
@@ -6389,6 +6396,8 @@ msgid ""
 "This user does not have access to this content because"
 "                         the content start date is in the future"
 msgstr ""
+"Bu kullanıcının bu ilgili içeriğe erişimi yok çünkü içeriğin başlama tarihi "
+"gelecekte"
 
 #: lms/djangoapps/courseware/masquerade.py
 msgid ""
@@ -6531,7 +6540,7 @@ msgstr "Ders içeriğini görmek için, {sign_in_link} ya da {register_link}."
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
 msgid "{sign_in_link} or {register_link}."
-msgstr ""
+msgstr "{sign_in_link} ya da {register_link}."
 
 #: lms/djangoapps/courseware/views/views.py
 #: openedx/features/course_experience/views/course_home_messages.py
@@ -6639,6 +6648,8 @@ msgid ""
 "Non usable git url provided. Expecting something like: "
 "git@github.com:edx/edx4edx_lite.git"
 msgstr ""
+"Kullanılamayan git url'si verildi. Bunun gibi bir şey bekliyoruz: "
+"git@github.com:edx/edx4edx_lite.git"
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid "Unable to get git log"
@@ -6688,7 +6699,7 @@ msgstr "Tam isim vermelisiniz"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Password must be supplied"
-msgstr ""
+msgstr "Parola sağlanmalı"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "email address required (not username)"
@@ -6851,7 +6862,7 @@ msgstr "İyi"
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
 #, python-format
 msgid "%(comment_username)s replied to <b>%(thread_title)s</b>:"
-msgstr ""
+msgstr "%(comment_username)s <b>%(thread_title)s</b> başlığına cevap yazdı:"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
@@ -6946,11 +6957,11 @@ msgstr ""
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Use the Sailthru content API to fetch course tags."
-msgstr ""
+msgstr "Ders etiketlerini getirirken Sailthru içerik API'sini kullan."
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Number of seconds to cache course content retrieved from Sailthru."
-msgstr ""
+msgstr "Ders içeriğini Sailthru'dan önbelleğe taşırken geçen süre."
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Cost in cents to report to Sailthru for enrolls."
@@ -7153,7 +7164,7 @@ msgstr "Verilen Sertifikaların Toplamı"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Date Report Run"
-msgstr ""
+msgstr "Tarih Raporunu Çalıştır"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/api_helper.py
@@ -9460,15 +9471,10 @@ msgid "Are you sure you want to cancel retirement for user \"%(username)s\"? "
 msgstr ""
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
 #, python-format
-msgid ""
-"\n"
-"                    Welcome to %(course_name)s\n"
-"                "
-msgstr ""
-"\n"
-"                    %(course_name)s dersine hoş geldiniz\n"
-"                "
+msgid "Welcome to %(course_name)s"
+msgstr "%(course_name)s dersine hoş geldiniz"
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
 #, python-format
@@ -9501,11 +9507,6 @@ msgstr "Parolanı değiştirmen önerilmektedir."
 #, python-format
 msgid "Sincerely yours, The %(course_name)s Team"
 msgstr "Saygılarımızla, %(course_name)s Takımı"
-
-#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
-#, python-format
-msgid "Welcome to %(course_name)s"
-msgstr "%(course_name)s dersine hoş geldiniz"
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
 #, python-format
@@ -9552,8 +9553,12 @@ msgstr "%(course_name)s dersini ziyaret et"
 
 #: lms/templates/instructor/edx_ace/addbetatester/email/body.html
 #, python-format
-msgid "Visit %(site_name)s"
-msgstr "%(site_name)s sitesine git"
+msgid ""
+"Visit %(site_name)s\n"
+"                "
+msgstr ""
+"%(site_name)ssitesine git\n"
+"                "
 
 #: lms/templates/instructor/edx_ace/addbetatester/email/body.html
 #: lms/templates/instructor/edx_ace/addbetatester/email/body.txt
@@ -9688,6 +9693,8 @@ msgid ""
 "To access this course visit %(course_about_url)s and register for this "
 "course."
 msgstr ""
+"Bu derse erişmek için %(course_about_url)s adresini ziyaret edin ve derse "
+"kaydolun."
 
 #: lms/templates/instructor/edx_ace/allowedenroll/email/body.txt
 #, python-format
@@ -9799,6 +9806,8 @@ msgstr "Ders İçeriklerine Hemen Erişin"
 msgid ""
 "You have been removed as a beta tester for %(course_name)s at %(site_name)s"
 msgstr ""
+"%(site_name)s sitesindeki %(course_name)s dersinin beta testinden "
+"çıkarıldınız"
 
 #: lms/templates/instructor/edx_ace/removebetatester/email/body.html
 #, python-format
@@ -9806,12 +9815,16 @@ msgid ""
 "You have been removed as a beta tester for %(course_name)s at %(site_name)s "
 "by a member of the course staff."
 msgstr ""
+"%(site_name)s platformundaki %(course_name)s dersinin beta testinden bir "
+"akademik personel tarafından çıkarıldınız"
 
 #: lms/templates/instructor/edx_ace/removebetatester/email/body.html
 msgid ""
 "This course will remain on your dashboard, but you will no longer be part of"
 " the beta testing group."
 msgstr ""
+"Bu ders panelinizde yer almaya devam edecek, ama artık beta testi grubunun "
+"üyesi olmayacaksınız."
 
 #: lms/templates/instructor/edx_ace/removebetatester/email/body.txt
 #, python-format
@@ -9949,12 +9962,12 @@ msgstr "Teşekkürler,"
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
 msgid "The %(platform_name)s Team "
-msgstr ""
+msgstr "%(platform_name)s Ekibi"
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
 msgid "Hello %(full_name)s, "
-msgstr ""
+msgstr "Merhaba %(full_name)s, "
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/subject.txt
 #, python-format
@@ -11139,10 +11152,10 @@ msgid "Welcome to week %(week_num)s of %(course_name)s!"
 msgstr "%(course_name)s dersinin %(week_num)s. haftasına hoş geldiniz!"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
-"We hope you're enjoying <strong>%(course_name)s</strong>! We want to let you"
-" know what you can look forward to in week %(week_num)s:"
+"We hope you're enjoying {start_strong}%(course_name)s{end_strong}! We want "
+"to let you know what you can look forward to in week %(week_num)s:"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
@@ -11198,16 +11211,12 @@ msgid "Keep up the momentum!"
 msgstr "Başaracaksın. Çalışmaya devam!"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
-"Many %(platform_name)s learners in <strong>%(course_name)s</strong> are "
-"completing more problems every week, and participating in the discussion "
-"forums. What do you want to do to keep learning?"
+"Many %(platform_name)s learners in {start_strong}%(course_name)s{end_strong}"
+" are completing more problems every week, and participating in the "
+"discussion forums. What do you want to do to keep learning?"
 msgstr ""
-"%(platform_name)s platformundaki pek çok "
-"<strong>%(course_name)s</strong>öğrencisi her hafta çok sayıda problem "
-"çözüyor ve tartışma forumlarına katılıyor. Öğrenmeye devam etmek istiyor "
-"musunuz?  "
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
@@ -11242,21 +11251,17 @@ msgid "Keep learning today"
 msgstr "Bugün öğrenmeye devam edin"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
-"Remember when you enrolled in <strong>%(course_name)s</strong>, and other "
-"courses on %(platform_name)s? We do, and we’re glad to have you! Come see "
-"what everyone is learning."
+"Remember when you enrolled in {start_strong}%(course_name)s{end_strong}, and"
+" other courses on %(platform_name)s? We do, and we’re glad to have you! Come"
+" see what everyone is learning."
 msgstr ""
-"%(platform_name)s platformunda <strong>%(course_name)s</strong>eğitimine ve "
-"diğer eğitimlere ne zaman kaydolduğunu hatırlıyor musun? Biz hatırlıyoruz, "
-"ve üyemiz olduğun için mutluyuz! Gel ve diğerlerinin neler öğrendiğine göz "
-"at. "
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
-"Remember when you enrolled in <strong>%(course_name)s</strong> on "
+"Remember when you enrolled in {start_strong}%(course_name)s{end_strong} on "
 "%(platform_name)s? We do, and we’re glad to have you! Come see what everyone"
 " is learning."
 msgstr ""
@@ -11302,29 +11307,29 @@ msgid "Upgrade now"
 msgstr "Şimdi yükselt"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
 "We hope you are enjoying learning with us so far on "
-"<strong>%(platform_name)s</strong>! A verified certificate allows you to "
-"highlight your new knowledge and skills. An %(platform_name)s certificate is"
-" official and easily shareable."
+"{start_strong}%(platform_name)s{end_strong}! A verified certificate allows "
+"you to highlight your new knowledge and skills. An %(platform_name)s "
+"certificate is official and easily shareable."
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
 "We hope you are enjoying learning with us so far in "
-"<strong>%(first_course_name)s</strong>! A verified certificate allows you to"
-" highlight your new knowledge and skills. An %(platform_name)s certificate "
-"is official and easily shareable."
+"{start_strong}%(first_course_name)s{end_strong}! A verified certificate "
+"allows you to highlight your new knowledge and skills. An %(platform_name)s "
+"certificate is official and easily shareable."
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
-#, python-format
-msgid "Upgrade by <strong>%(user_schedule_upgrade_deadline_time)s</strong>."
+#, python-format, python-brace-format
+msgid ""
+"Upgrade by "
+"{start_strong}%(user_schedule_upgrade_deadline_time)s{end_strong}."
 msgstr ""
-"<strong>%(user_schedule_upgrade_deadline_time)s</strong> itibariyle "
-"güncelle."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
 msgid "You are eligible to upgrade in these courses:"
@@ -13130,10 +13135,9 @@ msgid "Required Information to Sign In to {studio_name}"
 msgstr "{studio_name} Platformuna Kaydolmak İçin Gerekli Bilgiler"
 
 #: cms/templates/login.html cms/templates/register.html
-#: lms/templates/help_modal.html lms/templates/login.html
-#: lms/templates/provider_login.html lms/templates/register-form.html
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: themes/red-theme/cms/templates/login.html
+#: lms/templates/login.html lms/templates/provider_login.html
+#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/signup_modal.html themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "E-mail"
@@ -13185,8 +13189,7 @@ msgstr "Eğitmenler"
 msgid "Requirements"
 msgstr "Gereklilikler"
 
-#: cms/templates/studio_xblock_wrapper.html lms/templates/help_modal.html
-#: lms/templates/module-error.html
+#: cms/templates/studio_xblock_wrapper.html lms/templates/module-error.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Details"
 msgstr "Ayrıntılar"
@@ -13674,150 +13677,6 @@ msgstr "Parolamı Sıfırla"
 #: lms/templates/forgot_password_modal.html
 msgid "Email is incorrect."
 msgstr "E-posta hatalı."
-
-#: lms/templates/help_modal.html
-msgid "Support"
-msgstr "Destek"
-
-#: lms/templates/help_modal.html
-msgid ""
-"For {strong_start}questions on course lectures, homework, tools, or "
-"materials for this course{strong_end}, post in the {link_start}course "
-"discussion forum{link_end}."
-msgstr ""
-"Ders saatlerine ilişkin {strong_start}sorular, ev ödevi, araçlar veya ders "
-"materyalleri {strong_end} için, {link_start}ders tartışma forumuna{link_end}"
-" ileti gönderin."
-
-#: lms/templates/help_modal.html
-msgid ""
-"Have {strong_start}general questions about {platform_name}{strong_end}? You "
-"can find lots of helpful information in the {platform_name} "
-"{link_start}FAQ{link_end}."
-msgstr ""
-"{platform_name} hakkında {strong_start}genel sorularınız{strong_end} mı var?"
-" {platform_name} {link_start}SSS{link_end} bölümünde birçok yararlı bilgi "
-"bulabilirsiniz."
-
-#: lms/templates/help_modal.html
-msgid ""
-"Have a {strong_start}question about something specific{strong_end}? You can "
-"contact the {platform_name} general support team directly:"
-msgstr ""
-"{strong_start}Daha spesifik bir konuda{strong_end} bir sorunuz mu var? "
-"{platform_name} genel destek ekibiyle doğrudan iletişime geçebilirsiniz:"
-
-#: lms/templates/help_modal.html
-msgid "Report a problem"
-msgstr "Sorunu bildir"
-
-#: lms/templates/help_modal.html
-msgid "Make a suggestion"
-msgstr "Öneride bulunun"
-
-#: lms/templates/help_modal.html
-msgid "Ask a question"
-msgstr "Soru sor"
-
-#: lms/templates/help_modal.html
-msgid ""
-"Please note: The {platform_name} support team is English speaking. While we "
-"will do our best to address your inquiry in any language, our responses will"
-" be in English."
-msgstr ""
-"Lütfen dikkat:  {platform_name} destek takımı İngilizce bilmektedir. "
-"Herhangi bir dilde yazılan soruları anlamak için elimizden geleni yaparken, "
-"yanıtlarımız İngilizce olacaktır."
-
-#: lms/templates/help_modal.html
-msgid "Briefly describe your issue"
-msgstr "Sorununuzu basitçe açıklayınız"
-
-#: lms/templates/help_modal.html
-msgid "Tell us the details"
-msgstr "Ayrıntıları anlatınız"
-
-#: lms/templates/help_modal.html
-msgid ""
-"Describe what you were doing when you encountered the issue. Include any "
-"details that will help us to troubleshoot, including error messages that you"
-" saw."
-msgstr ""
-"Bu sorun ile nasıl karşılaştığınızı anlatın. Hata ayıklama sürecinde bize "
-"yardımcı olabilecek tüm ayrıntı ve karşınıza çıkan uyarı mesajlarını, lütfen"
-" bizimle paylaşın."
-
-#: lms/templates/help_modal.html
-msgid "Thank You!"
-msgstr "Teşekkürler!"
-
-#: lms/templates/help_modal.html
-msgid ""
-"Thank you for your inquiry or feedback.  We typically respond to a request "
-"within one business day, Monday to Friday.  In the meantime, please review "
-"our {link_start}detailed FAQs{link_end} where most questions have already "
-"been answered."
-msgstr ""
-"Sorunuz ve geri beslemeniz için teşekkür ederiz. Genellikle herhangi bir "
-"isteğe, pazartesi-cuma arası bir mesai günü içinde cevap veriyoruz. Bu arada"
-" pek çok sorunun yanıtlandığı {link_start}ayrıntılı SSS{link_end} sayfamızı "
-"inceleyebilirsiniz."
-
-#: lms/templates/help_modal.html
-msgid "- Select -"
-msgstr "- Seçin -"
-
-#: lms/templates/help_modal.html
-msgid "problem"
-msgstr "sorun"
-
-#: lms/templates/help_modal.html
-msgid "Report a Problem"
-msgstr "Bir sorunu bildiriniz"
-
-#: lms/templates/help_modal.html
-msgid "Brief description of the problem"
-msgstr "Sorunu kısaca açıklayınız"
-
-#: lms/templates/help_modal.html
-msgid "Details of the problem you are encountering{asterisk}"
-msgstr "Karşılaştığınız sorunun ayrıntıları{asterisk}"
-
-#: lms/templates/help_modal.html
-msgid "suggestion"
-msgstr "öneri"
-
-#: lms/templates/help_modal.html
-msgid "Make a Suggestion"
-msgstr "Bir Öneride Bulunun"
-
-#: lms/templates/help_modal.html
-msgid "Brief description of your suggestion"
-msgstr "Önerinizin kısa bir açıklaması"
-
-#: lms/templates/help_modal.html
-msgid "question"
-msgstr "soru"
-
-#: lms/templates/help_modal.html
-msgid "Ask a Question"
-msgstr "Bir Soru Sorun"
-
-#: lms/templates/help_modal.html
-msgid "Brief summary of your question"
-msgstr "Sorunuzun kısa bir özeti"
-
-#: lms/templates/help_modal.html
-msgid "An error has occurred."
-msgstr "Bir hata oluştu."
-
-#: lms/templates/help_modal.html
-msgid "Please {link_start}send us e-mail{link_end}."
-msgstr "Lütfen {link_start}bize e-posta gönderin{link_end}."
-
-#: lms/templates/help_modal.html
-msgid "Please try again later."
-msgstr "Lütfen daha sonra tekrar deneyiniz."
 
 #: lms/templates/hidden_content.html
 msgid "The course has ended."

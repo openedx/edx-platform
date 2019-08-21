@@ -22,6 +22,7 @@
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
 # Mateusz <blue90pl@gmail.com>, 2014
 # Michał Szkutnik <michal7x7@o2.pl>, 2015
+# Monika Biskupska <monika.biskupska@nask.pl>, 2019
 # Cairath, 2014
 # Ola Kleniewska <anyzeklove@gmail.com>, 2016
 # Piotr Jańczuk <piotr.janczuk@gmail.com>, 2015
@@ -94,9 +95,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-07-24 06:10+0000\n"
-"PO-Revision-Date: 2019-07-21 20:42+0000\n"
-"Last-Translator: Greg Wasowski <gwasowski@salesforce.com>\n"
+"POT-Creation-Date: 2019-08-18 20:42+0000\n"
+"PO-Revision-Date: 2019-07-28 20:42+0000\n"
+"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Polish (http://www.transifex.com/open-edx/edx-platform/language/pl/)\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -9801,14 +9802,6 @@ msgid ""
 msgstr ""
 "W twojej treści znajduje się błędny kod. Proszę sprawdzić i upewnić się, że "
 "nie ma błędnych zapisów HTML."
-
-#: cms/templates/js/course_info_update.underscore
-msgid "Send push notification to mobile apps"
-msgstr "Wyślij powiadomienie typu \"push\" na aplikacje mobilne"
-
-#: cms/templates/js/course_info_update.underscore
-msgid "Send notification to mobile apps"
-msgstr "Wyślij powiadomienie na aplikacje mobilne"
 
 #: cms/templates/js/course_info_update.underscore
 msgid "Post"

@@ -176,9 +176,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-07-24 06:10+0000\n"
-"PO-Revision-Date: 2019-07-21 20:42+0000\n"
-"Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
+"POT-Creation-Date: 2019-08-18 20:42+0000\n"
+"PO-Revision-Date: 2019-07-28 20:42+0000\n"
+"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -530,8 +530,8 @@ msgstr "Вы отправили файл {filename}; разрешены толь
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Your file {filename} is too large (max size: {maxSize}MB)."
 msgstr ""
-"Файл «{filename}» слишком велик (максимально допустимый размер: {maxSize} "
-"Мб)."
+"Файл «{filename}» слишком велик (максимально допустимый размер: "
+"{maxSize} Мб)."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "You did not submit the required files: {requiredFiles}."
@@ -9911,14 +9911,6 @@ msgid ""
 " HTML."
 msgstr ""
 "Неверный код в содержимом. Пожалуйста, убедитесь в верности HTML-кода."
-
-#: cms/templates/js/course_info_update.underscore
-msgid "Send push notification to mobile apps"
-msgstr "Отправить уведомление по продвижению для мобильных приложений"
-
-#: cms/templates/js/course_info_update.underscore
-msgid "Send notification to mobile apps"
-msgstr "Отправить уведомление для мобильных приложений"
 
 #: cms/templates/js/course_info_update.underscore
 msgid "Post"
