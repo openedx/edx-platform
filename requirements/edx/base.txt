@@ -200,7 +200,7 @@ python-dateutil==2.4.0
 python-levenshtein==0.12.0
 python-memcached==1.59
 python-openid==2.2.5 ; python_version == "2.7"  # via social-auth-core
-python-slugify==1.2.6     # via code-annotations
+python-slugify==3.0.3     # via code-annotations
 python-swiftclient==3.8.0
 python3-saml==1.5.0
 pytz==2019.2
@@ -225,7 +225,7 @@ shapely==1.6.4.post2
 shortuuid==0.5.0          # via edx-django-oauth2-provider
 simplejson==3.16.0        # via mailsnake, sailthru-client
 singledispatch==3.4.0.3
-six==1.11.0
+six==1.12.0
 slumber==0.7.1            # via edx-bulk-grades, edx-enterprise, edx-rest-api-client
 social-auth-app-django==2.1.0
 social-auth-core==1.7.0
@@ -238,10 +238,11 @@ stevedore==1.30.1
 super-csv==0.9.1
 sympy==1.4
 testfixtures==6.10.0      # via edx-enterprise
+text-unidecode==1.2       # via python-slugify
 tincan==0.0.5             # via edx-enterprise
 unicodecsv==0.14.1
 uritemplate==3.0.0        # via coreapi, drf-yasg
-urllib3==1.23
+urllib3==1.25.3
 user-util==0.1.5
 voluptuous==0.11.7
 watchdog==0.9.0
