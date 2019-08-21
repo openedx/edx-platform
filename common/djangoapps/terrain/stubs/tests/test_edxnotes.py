@@ -9,6 +9,7 @@ from uuid import uuid4
 
 import ddt
 import requests
+import six
 import six.moves.urllib.parse  # pylint: disable=import-error
 from six.moves import range
 
@@ -192,7 +193,7 @@ class StubEdxNotesServiceTest(unittest.TestCase):
         updated_note = self._get_notes()[0]
         self.assertEqual("new test text", updated_note["text"])
         self.assertEqual(note["id"], updated_note["id"])
-        self.assertItemsEqual(note, updated_note)
+        six.assertCountEqual(self, note, updated_note)
 
         response = requests.get(self._get_url("api/v1/annotations/does_not_exist"))
         self.assertEqual(response.status_code, 404)

@@ -93,8 +93,9 @@ class UserAPITestCase(ApiTestCase):
 
     def assertUserIsValid(self, user):
         """Assert that the given user result is valid"""
-        self.assertItemsEqual(list(user.keys()), ["email", "id", "name", "username", "preferences", "url"])
-        self.assertItemsEqual(
+        six.assertCountEqual(self, list(user.keys()), ["email", "id", "name", "username", "preferences", "url"])
+        six.assertCountEqual(
+            self,
             list(user["preferences"].items()),
             [(pref.key, pref.value) for pref in self.prefs if pref.user.id == user["id"]]
         )
@@ -104,7 +105,7 @@ class UserAPITestCase(ApiTestCase):
         """
         Assert that the given preference is acknowledged by the system
         """
-        self.assertItemsEqual(list(pref.keys()), ["user", "key", "value", "url"])
+        six.assertCountEqual(self, list(pref.keys()), ["user", "key", "value", "url"])
         self.assertSelfReferential(pref)
         self.assertUserIsValid(pref["user"])
 

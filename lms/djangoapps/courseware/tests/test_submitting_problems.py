@@ -803,8 +803,8 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
         self.assertEqual(name, "post")
         self.assertEqual(len(args), 1)
         self.assertTrue(args[0].endswith("/submit/"))
-        self.assertItemsEqual(list(kwargs.keys()), ["files", "data", "timeout"])
-        self.assertItemsEqual(list(kwargs['files'].keys()), filenames.split())
+        six.assertCountEqual(self, list(kwargs.keys()), ["files", "data", "timeout"])
+        six.assertCountEqual(self, list(kwargs['files'].keys()), filenames.split())
 
 
 class TestPythonGradedResponse(TestSubmittingProblems):
