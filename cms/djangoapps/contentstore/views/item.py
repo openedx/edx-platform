@@ -225,7 +225,10 @@ def xblock_handler(request, usage_key_string):
                 request.user,
                 request.json.get('display_name'),
             )
-            return JsonResponse({'locator': text_type(dest_usage_key), 'courseKey': text_type(dest_usage_key.course_key)})
+            return JsonResponse({
+                'locator': text_type(dest_usage_key),
+                'courseKey': text_type(dest_usage_key.course_key)
+            })
         else:
             return _create_item(request)
     elif request.method == 'PATCH':
