@@ -97,7 +97,7 @@ docutils==0.15.2          # via botocore
 drf-yasg==1.16
 edx-ace==0.1.10
 edx-analytics-data-api-client==0.15.3
-edx-bulk-grades==0.5.5
+edx-bulk-grades==0.5.6
 edx-ccx-keys==0.2.2
 edx-celeryutils==0.3.0
 edx-completion==2.0.0
@@ -257,4 +257,4 @@ xmlsec==1.3.3             # via python3-saml
 xss-utils==0.1.1
 
 # The following packages are considered to be unsafe in a requirements file:
-# setuptools==41.1.0        # via fs, lazy, python-levenshtein
+# setuptools==41.2.0        # via fs, lazy, python-levenshtein
