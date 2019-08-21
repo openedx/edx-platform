@@ -91,9 +91,6 @@ def _is_in_holdback(user):
     if datetime(2020, 8, 1, tzinfo=pytz.UTC) <= datetime.now(tz=pytz.UTC):
         return False
 
-    if not datetime(2019, 8, 1, tzinfo=pytz.UTC) <= user.date_joined <= datetime(2019, 11, 1, tzinfo=pytz.UTC):
-        return False
-
     # Holdback is 50/50
     bucket = stable_bucketing_hash_group(DISCOUNT_APPLICABILITY_HOLDBACK, 2, user.username)
 
