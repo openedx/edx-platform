@@ -906,7 +906,7 @@ def is_comment_too_deep(parent):
     return (
         MAX_COMMENT_DEPTH is not None and (
             MAX_COMMENT_DEPTH < 0 or
-            (parent and parent["depth"] >= MAX_COMMENT_DEPTH)
+            (parent and (parent["depth"] or 0) >= MAX_COMMENT_DEPTH)
         )
     )
 

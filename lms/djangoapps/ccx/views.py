@@ -313,7 +313,7 @@ def save_ccx(request, course, ccx=None):
         return earliest, ccx_ids_to_delete
 
     graded = {}
-    earliest, ccx_ids_to_delete = override_fields(course, json.loads(request.body), graded, [])
+    earliest, ccx_ids_to_delete = override_fields(course, json.loads(request.body.decode('utf8')), graded, [])
     bulk_delete_ccx_override_fields(ccx, ccx_ids_to_delete)
     if earliest:
         override_field_for_ccx(ccx, course, 'start', earliest)

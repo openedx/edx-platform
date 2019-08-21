@@ -538,7 +538,7 @@ def _update_asset(request, course_key, asset_key):
 
         # update existing asset
         try:
-            modified_asset = json.loads(request.body)
+            modified_asset = json.loads(request.body.decode('utf8'))
         except ValueError:
             return HttpResponseBadRequest()
         contentstore().set_attr(asset_key, 'locked', modified_asset['locked'])
