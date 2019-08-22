@@ -16,7 +16,7 @@ from contextlib import contextmanager
 from datetime import datetime, timedelta
 
 import ddt
-import six
+import unicodecsv
 from six import text_type
 from six.moves.urllib.parse import quote  # pylint: disable=import-error
 from six.moves import range, zip
@@ -89,11 +89,6 @@ from xmodule.partitions.partitions import Group, UserPartition
 from ..models import ReportStore
 from ..tasks_helper.utils import UPDATE_STATUS_FAILED, UPDATE_STATUS_SUCCEEDED
 
-if six.PY3:
-    import csv as unicodecsv
-else:
-    import unicodecsv
-
 
 class InstructorGradeReportTestCase(TestReportMixin, InstructorTaskCourseTestCase):
     """ Base class for grade report tests. """
@@ -109,10 +104,8 @@ class InstructorGradeReportTestCase(TestReportMixin, InstructorTaskCourseTestCas
             report_csv_filename = report_store.links_for(course_id)[0][0]
             report_path = report_store.path_to(course_id, report_csv_filename)
             found_user = False
-            with report_store.storage.open(report_path, mode='rt') as csv_file:
+            with report_store.storage.open(report_path) as csv_file:
                 for row in unicodecsv.DictReader(csv_file):
-                    import pdb;
-                    pdb.set_trace()
                     if row.get('Username') == username:
                         self.assertEqual(row[column_header], expected_cell_content)
                         found_user = True
@@ -869,8 +862,6 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         with report_store.storage.open(report_path) as csv_file:
             # Expand the dict reader generator so we don't lose it's content
             for row in unicodecsv.DictReader(csv_file):
-                import pdb;
-                pdb.set_trace()
                 if row.get('Username') == username:
                     self.assertEqual(row[column_header], expected_cell_content)
 
@@ -1562,8 +1553,6 @@ class TestTeamStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
             found_user = False
             with report_store.storage.open(report_path) as csv_file:
                 for row in unicodecsv.DictReader(csv_file):
-                    import pdb;
-                    pdb.set_trace()
                     if row.get('username') == username:
                         self.assertEqual(row['team'], expected_team)
                         found_user = True
@@ -2071,7 +2060,7 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
             report_csv_filename = report_store.links_for(self.course.id)[0][0]
             report_path = report_store.path_to(self.course.id, report_csv_filename)
             found_user = False
-            with report_store.storage.open(report_path, mode='r') as csv_file:
+            with report_store.storage.open(report_path) as csv_file:
                 for row in unicodecsv.DictReader(csv_file):
                     if row.get('Username') == username:
                         csv_row_data = [row[column] for column in self.columns_to_check]

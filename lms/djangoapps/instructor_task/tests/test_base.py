@@ -9,7 +9,7 @@ import json
 import os
 import shutil
 import six
-import io
+import unicodecsv
 from tempfile import mkdtemp
 from uuid import uuid4
 
@@ -35,11 +35,6 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-
-if six.PY3:
-    import csv as unicodecsv
-else:
-    import unicodecsv
 
 TEST_COURSE_ORG = 'edx'
 TEST_COURSE_NAME = 'test_course'
@@ -362,16 +357,9 @@ class TestReportMixin(object):
         report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
         report_csv_filename = report_store.links_for(self.course.id)[file_index][0]
         report_path = report_store.path_to(self.course.id, report_csv_filename)
-        with report_store.storage.open(report_path,mode='r') as csv_file:
+        with report_store.storage.open(report_path) as csv_file:
             # Expand the dict reader generator so we don't lose it's content
-            if six.PY3:
-                csv_rows = [row for row in unicodecsv.DictReader(csv_file)]
-            else:
-                csv_rows = [row for row in unicodecsv.DictReader(csv_file, encoding='utf-8-sig')]
-
-            import pdb;
-            pdb.set_trace()
-            # csv_rows = ([x.decode('utf-8') for x in row] for row in csv_rows)
+            csv_rows = [row for row in unicodecsv.DictReader(csv_file, encoding='utf-8-sig')]
 
             if ignore_other_columns:
                 csv_rows = [
@@ -417,8 +405,5 @@ class TestReportMixin(object):
         report_csv_filename = report_store.links_for(self.course.id)[0][0]
         report_path = report_store.path_to(self.course.id, report_csv_filename)
         with report_store.storage.open(report_path) as csv_file:
-            if six.PY3:
-                rows = unicodecsv.reader(csv_file)
-            else:
-                rows = unicodecsv.reader(csv_file, encoding='utf-8-sig')
+            rows = unicodecsv.reader(csv_file, encoding='utf-8-sig')
             return next(rows)

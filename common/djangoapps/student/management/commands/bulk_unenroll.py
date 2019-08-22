@@ -1,8 +1,8 @@
 from __future__ import absolute_import
 
 import logging
+import unicodecsv
 
-import six
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management.base import BaseCommand
 from django.db.models import Q
@@ -11,10 +11,6 @@ from opaque_keys.edx.keys import CourseKey
 
 from student.models import CourseEnrollment, User
 
-if six.PY3:
-    import csv as unicodecsv
-else:
-    import unicodecsv
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 

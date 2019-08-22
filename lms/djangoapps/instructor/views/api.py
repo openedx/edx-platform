@@ -16,8 +16,9 @@ import re
 import string
 from six import StringIO
 import time
-
 import six
+import unicodecsv
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist, PermissionDenied, ValidationError
@@ -161,11 +162,6 @@ from ..permissions import (
     GIVE_STUDENT_EXTENSION,
     VIEW_ISSUED_CERTIFICATES,
 )
-
-if six.PY3:
-    import csv as unicodecsv
-else:
-    import unicodecsv
 
 
 log = logging.getLogger(__name__)

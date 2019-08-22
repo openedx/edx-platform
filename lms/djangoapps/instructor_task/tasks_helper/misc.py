@@ -11,6 +11,8 @@ from datetime import datetime
 from time import time
 
 import six
+import unicodecsv
+
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.files.storage import DefaultStorage
@@ -26,11 +28,6 @@ from util.file import UniversalNewlineIterator
 
 from .runner import TaskProgress
 from .utils import UPDATE_STATUS_FAILED, UPDATE_STATUS_SUCCEEDED, upload_csv_to_report_store
-
-if six.PY3:
-    import csv as unicodecsv
-else:
-    import unicodecsv
 
 # define different loggers for use within tasks and on client side
 TASK_LOG = logging.getLogger('edx.celery.task')
@@ -156,7 +153,6 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
     with DefaultStorage().open(task_input['file_name']) as f:
         total_assignments = 0
         for _line in unicodecsv.DictReader(UniversalNewlineIterator(f)):
-            import pdb;pdb.set_trace()
             total_assignments += 1
 
     task_progress = TaskProgress(action_name, total_assignments, start_time)

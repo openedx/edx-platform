@@ -9,7 +9,7 @@ import os
 import uuid
 from datetime import datetime
 
-import six
+import unicodecsv
 from bok_choy.promise import EmptyPromise
 from pytz import UTC, utc
 
@@ -21,12 +21,6 @@ from common.test.acceptance.tests.discussion.helpers import CohortTestMixin
 from common.test.acceptance.tests.helpers import EventsTestMixin, UniqueCourseTest, create_user_partition_json
 from openedx.core.lib.tests import attr
 from xmodule.partitions.partitions import Group
-
-if six.PY3:
-    import csv as unicodecsv
-else:
-    import unicodecsv
-
 
 @attr(shard=8)
 class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin):
