@@ -2277,8 +2277,8 @@ class TestComponentTemplates(CourseTestCase):
         """
         self._verify_basic_component("discussion", "Discussion")
         self._verify_basic_component("video", "Video")
-        self.assertGreater(self.get_templates_of_type('html'), 0)
-        self.assertGreater(self.get_templates_of_type('problem'), 0)
+        self.assertGreater(len(self.get_templates_of_type('html')), 0)
+        self.assertGreater(len(self.get_templates_of_type('problem')), 0)
         self.assertIsNone(self.get_templates_of_type('advanced'))
 
         # Now fully disable video through XBlockConfiguration
