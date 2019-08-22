@@ -33,6 +33,7 @@ from organizations.models import OrganizationCourse
 from path import Path as path
 from pytz import UTC
 from six import iteritems, text_type
+from six.moves import range
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.tasks import UserTask
 
@@ -102,7 +103,7 @@ def enqueue_update_thumbnail_tasks(course_videos, videos_per_task, run):
     start = 0
     end = videos_per_task
     chunks_count = int(ceil(batch_size / float(videos_per_task)))
-    for __ in xrange(0, chunks_count):
+    for __ in range(0, chunks_count):  # pylint: disable=C7620
         course_videos_chunk = course_videos[start:end]
         tasks.append(task_scrape_youtube_thumbnail.s(
             course_videos_chunk, run
