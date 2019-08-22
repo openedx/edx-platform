@@ -16,9 +16,9 @@ import re
 import string
 from six import StringIO
 import time
-
 import six
 import unicodecsv
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist, PermissionDenied, ValidationError
@@ -128,6 +128,8 @@ from student.models import (
 from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
 from util.file import (
     FileValidationException,
+
+
     UniversalNewlineIterator,
     course_and_time_based_filename_generator,
     store_uploaded_file

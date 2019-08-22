@@ -103,6 +103,7 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
     A KeyValueStore that maps keyed data access to one of the 3 data areas
     known to the MongoModuleStore (data, children, and metadata)
     """
+
     def __init__(self, data, parent, children, metadata):
         super(MongoKeyValueStore, self).__init__()
         if not isinstance(data, dict):
@@ -181,6 +182,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
     A system that has a cache of module json that it will use to load modules
     from, with a backup of calling to the underlying modulestore for more data
     """
+
     def __repr__(self):
         return "CachingDescriptorSystem{!r}".format((
             self.modulestore,
@@ -328,7 +330,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                 # decache any computed pending field settings
                 module.save()
                 return module
-            except Exception:                   # pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-except
                 log.warning("Failed to load descriptor from %s", json_data, exc_info=True)
                 return ErrorDescriptor.from_json(
                     json_data,
@@ -472,6 +474,7 @@ class MongoBulkOpsRecord(BulkOpsRecord):
     """
     Tracks whether there've been any writes per course and disables inheritance generation
     """
+
     def __init__(self):
         super(MongoBulkOpsRecord, self).__init__()
         self.dirty = False
@@ -515,6 +518,7 @@ class ParentLocationCache(dict):
     """
     Dict-based object augmented with a more cache-like interface, for internal use.
     """
+
     # pylint: disable=missing-docstring
 
     @contract(key=six.text_type)
@@ -993,8 +997,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         of inherited metadata onto the item
         """
         category = item['location']['category']
-        apply_cached_metadata = category not in DETACHED_XBLOCK_TYPES and \
-            not (category == 'course' and depth == 0)
+        apply_cached_metadata = category not in DETACHED_XBLOCK_TYPES and not (category == 'course' and depth == 0)
         return apply_cached_metadata
 
     @autoretry_read()
@@ -1003,6 +1006,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         Returns a list of `CourseSummary`. This accepts an optional parameter of 'org' which
         will apply an efficient filter to only get courses with the specified ORG
         """
+
         def extract_course_summary(course):
             """
             Extract course information from the course block for mongo.
@@ -1072,10 +1076,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                 # I tried to add '$and': [{'_id.org': {'$ne': 'edx'}}, {'_id.course': {'$ne': 'templates'}}]
                 # but it didn't do the right thing (it filtered all edx and all templates out)
                 in course_records
-                if not (  # TODO kill this
-                    course['_id']['org'] == 'edx' and
-                    course['_id']['course'] == 'templates'
-                )
+                # TODO kill this
+                if not (course['_id']['org'] == 'edx' and course['_id']['course'] == 'templates')
             ],
             []
         )
@@ -1223,14 +1225,14 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
     @autoretry_read()
     def get_items(
-            self,
-            course_id,
-            settings=None,
-            content=None,
-            key_revision=MongoRevisionKey.published,
-            qualifiers=None,
-            using_descriptor_system=None,
-            **kwargs
+        self,
+        course_id,
+        settings=None,
+        content=None,
+        key_revision=MongoRevisionKey.published,
+        qualifiers=None,
+        using_descriptor_system=None,
+        **kwargs
     ):
         """
         Returns:

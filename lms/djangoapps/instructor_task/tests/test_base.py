@@ -8,6 +8,8 @@ import json
 # pylint: disable=attribute-defined-outside-init
 import os
 import shutil
+import six
+import unicodecsv
 from tempfile import mkdtemp
 from uuid import uuid4
 
@@ -54,6 +56,7 @@ class InstructorTaskTestCase(CacheIsolationTestCase):
     """
     Tests API and view methods that involve the reporting of status for background tasks.
     """
+
     def setUp(self):
         super(InstructorTaskTestCase, self).setUp()
 
@@ -205,6 +208,7 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
     Base test class for InstructorTask-related tests that require
     the setup of a course and problem in order to access StudentModule state.
     """
+
     @staticmethod
     def problem_location(problem_url_name, course_key=None):
         """
@@ -269,6 +273,7 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
 
         Assumes the input list of responses has two values.
         """
+
         def get_input_id(response_id):
             """Creates input id using information about the test course and the current problem."""
             # Note that this is a capa-specific convention.  The form is a version of the problem's
@@ -383,7 +388,7 @@ class TestReportMixin(object):
         to four decimal places.
         """
         extracted = {}
-        for key, value in dictionary.items():
+        for key, value in list(dictionary.items()):
             try:
                 float(value)
                 extracted[key] = round(float(dictionary.pop(key)), 4)

@@ -1966,7 +1966,7 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
                         u'Homework 1: Subsection': '0.5',
                         u'Homework 2: Unattempted': 'Not Attempted',
                         u'Homework 3: Empty': 'Not Attempted',
-                        u'Homework (Avg)': text_type(1.0 / 6.0),
+                        u'Homework (Avg)': text_type('%.17f' % (1.0 / 6.0)),
                     },
                 ],
                 ignore_other_columns=True,

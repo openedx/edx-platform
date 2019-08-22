@@ -64,6 +64,7 @@ class InstructorTask(models.Model):
 
     .. no_pii:
     """
+
     class Meta(object):
         app_label = "instructor_task"
 
@@ -86,8 +87,7 @@ class InstructorTask(models.Model):
             'task_input': self.task_input,
             'task_id': self.task_id,
             'task_state': self.task_state,
-            'task_output': self.task_output,
-        },)
+            'task_output': self.task_output},)
 
     def __unicode__(self):
         return six.text_type(repr(self))
@@ -185,6 +185,7 @@ class ReportStore(object):
     can simply be appended to for the sake of memory efficiency, rather than
     passing in the whole dataset. Doing that for now just because it's simpler.
     """
+
     @classmethod
     def from_config(cls, config_name):
         """
@@ -229,6 +230,7 @@ class DjangoStorageReportStore(ReportStore):
     """
     ReportStore implementation that delegates to django's storage api.
     """
+
     def __init__(self, storage_class=None, storage_kwargs=None):
         if storage_kwargs is None:
             storage_kwargs = {}
@@ -270,7 +272,8 @@ class DjangoStorageReportStore(ReportStore):
         """
         output_buffer = ContentFile('')
         # Adding unicode signature (BOM) for MS Excel 2013 compatibility
-        output_buffer.write(codecs.BOM_UTF8)
+        content = codecs.BOM_UTF8.decode('utf-8') if six.PY3 else codecs.BOM_UTF8
+        output_buffer.write(content)
         csvwriter = csv.writer(output_buffer)
         csvwriter.writerows(self._get_utf8_encoded_rows(rows))
         output_buffer.seek(0)
@@ -308,5 +311,5 @@ class DjangoStorageReportStore(ReportStore):
         """
         Return the full path to a given file for a given course.
         """
-        hashed_course_id = hashlib.sha1(text_type(course_id)).hexdigest()
+        hashed_course_id = hashlib.sha1(text_type(course_id).encode('utf-8')).hexdigest()
         return os.path.join(hashed_course_id, filename)

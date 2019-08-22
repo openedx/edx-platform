@@ -7,11 +7,12 @@ from __future__ import absolute_import
 import json
 import logging
 import os
+
 from six import StringIO
 import subprocess
 
-import mongoengine
 import unicodecsv as csv
+import mongoengine
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -39,6 +40,7 @@ from openedx.core.djangolib.markup import HTML
 from student.models import CourseEnrollment, Registration, UserProfile
 from student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.modulestore.django import modulestore
+
 
 log = logging.getLogger(__name__)
 
