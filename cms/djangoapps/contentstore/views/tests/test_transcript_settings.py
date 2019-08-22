@@ -243,7 +243,7 @@ class TranscriptDownloadTest(CourseTestCase):
 
         # Assert the actual response
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, expected_content)
+        self.assertEqual(response.content.decode('utf-8'), expected_content)
         for attribute, value in six.iteritems(expected_headers):
             self.assertEqual(response.get(attribute), value)
 
