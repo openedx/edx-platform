@@ -38,8 +38,8 @@ def get_all_course_progress(student, course):
         Return course overall progress percentage for a student
     """
 
-    course_grade = CourseGradeFactory().create(student, course)
-    courseware_summary = course_grade.chapter_grades
+    course_grade = CourseGradeFactory().read(student, course)
+    courseware_summary = course_grade.chapter_grades.values()
 
     total_score = 0
     earned_score = 0
