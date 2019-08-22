@@ -85,7 +85,7 @@ from openedx.core.djangolib.markup import HTML, Text
 log = logging.getLogger(__name__)
 
 DOCS_ANCHOR_TAG_OPEN = (
-    "<a target='_blank' "
+    "<a rel='noopener' target='_blank' "
     "href='https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/lti_component.html'>"
 )
 BREAK_TAG = '<br />'

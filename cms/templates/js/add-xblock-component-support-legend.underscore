@@ -1,7 +1,7 @@
 <% if (support_legend.show_legend) { %>
     <span class="support-documentation">
         <a class="support-documentation-link"
-           href="https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/create_exercises_and_tools.html#levels-of-support-for-tools" target="_blank">
+           href="https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/create_exercises_and_tools.html#levels-of-support-for-tools" rel="noopener" target="_blank">
             <%- support_legend.documentation_label %>
         </a>
         <span class="support-documentation-level">

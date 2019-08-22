@@ -140,7 +140,7 @@ def instructor_dashboard_2(request, course_id):
     if show_analytics_dashboard_message(course_key):
         # Construct a URL to the external analytics dashboard
         analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, six.text_type(course_key))
-        link_start = HTML(u"<a href=\"{}\" target=\"_blank\">").format(analytics_dashboard_url)
+        link_start = HTML(u"<a href=\"{}\" rel=\"noopener\" target=\"_blank\">").format(analytics_dashboard_url)
         analytics_dashboard_message = _(
             u"To gain insights into student enrollment and participation {link_start}"
             u"visit {analytics_dashboard_name}, our new course analytics product{link_end}."
@@ -773,7 +773,7 @@ def _section_send_email(course, access):
 def _get_dashboard_link(course_key):
     """ Construct a URL to the external analytics dashboard """
     analytics_dashboard_url = u'{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, six.text_type(course_key))
-    link = HTML(u"<a href=\"{0}\" target=\"_blank\">{1}</a>").format(
+    link = HTML(u"<a href=\"{0}\" rel=\"noopener\" target=\"_blank\">{1}</a>").format(
         analytics_dashboard_url, settings.ANALYTICS_DASHBOARD_NAME
     )
     return link

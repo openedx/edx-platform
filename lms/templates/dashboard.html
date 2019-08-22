@@ -297,7 +297,7 @@ from student.models import CourseEnrollment
                 <li class="order-history">
                   <span class="title">${_("Order History")}</span>
                   % for order_history_item in order_history_list:
-                    <span><a href="${order_history_item['receipt_url']}" target="_blank" class="edit-name">${order_history_item['order_date']}</a></span>
+                    <span><a href="${order_history_item['receipt_url']}" rel="noopener" target="_blank" class="edit-name">${order_history_item['order_date']}</a></span>
                   % endfor
                 </li>
                 % endif
