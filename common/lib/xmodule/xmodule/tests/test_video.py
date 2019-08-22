@@ -12,32 +12,35 @@ You can then use the CourseFactory and XModuleItemFactory as defined
 in common/lib/xmodule/xmodule/modulestore/tests/factories.py to create
 the course, section, subsection, unit, etc.
 """
+from __future__ import absolute_import
+
+import datetime
 import json
 import os
-import unittest
-import datetime
 import shutil
+import unittest
+from tempfile import mkdtemp
 from uuid import uuid4
 
-from tempfile import mkdtemp
-from lxml import etree
-from mock import ANY, Mock, patch, MagicMock
 import ddt
-
+import six
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
-
 from fs.osfs import OSFS
-from opaque_keys.edx.locator import CourseLocator
+from lxml import etree
+from mock import ANY, MagicMock, Mock, patch
 from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import CourseLocator
+from six.moves import zip
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from xmodule.tests import get_test_descriptor_system
 from xmodule.validation import StudioValidationMessage
-from xmodule.video_module import VideoBlock, create_youtube_string, EXPORT_IMPORT_STATIC_DIR
-from xmodule.video_module.transcripts_utils import download_youtube_subs, save_to_store, save_subs_to_store
+from xmodule.video_module import EXPORT_IMPORT_STATIC_DIR, VideoBlock, create_youtube_string
+from xmodule.video_module.transcripts_utils import download_youtube_subs, save_subs_to_store, save_to_store
+
 from .test_import import DummySystem
 
 SRT_FILEDATA = '''
@@ -640,7 +643,7 @@ class VideoBlockImportTestCase(TestCase):
         def mock_val_import(xml, edx_video_id, resource_fs, static_dir, external_transcripts, course_id):
             """Mock edxval.api.import_from_xml"""
             self.assertEqual(xml.tag, 'video_asset')
-            self.assertEqual(dict(xml.items()), {'mock_attr': ''})
+            self.assertEqual(dict(list(xml.items())), {'mock_attr': ''})
             self.assertEqual(edx_video_id, 'test_edx_video_id')
             self.assertEqual(static_dir, EXPORT_IMPORT_STATIC_DIR)
             self.assertIsNotNone(resource_fs)
@@ -760,7 +763,7 @@ class VideoExportTestCase(VideoBlockTestBase):
             video_id=edx_video_id,
             static_dir=EXPORT_IMPORT_STATIC_DIR,
             resource_fs=self.file_system,
-            course_id=unicode(self.descriptor.runtime.course_id.for_branch(None)),
+            course_id=six.text_type(self.descriptor.runtime.course_id.for_branch(None)),
         )
 
     @patch('xmodule.video_module.video_module.edxval_api')

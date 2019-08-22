@@ -206,9 +206,6 @@ FEATURES = {
     # based on their location.
     'EMBARGO': False,
 
-    # Turn on/off Microsites feature
-    'USE_MICROSITES': False,
-
     # Allow creating courses with non-ascii characters in the course id
     'ALLOW_UNICODE_COURSE_ID': False,
 
@@ -450,6 +447,7 @@ LOGIN_URL = reverse_lazy('login_redirect_to_lms')
 AUTHENTICATION_BACKENDS = [
     'rules.permissions.ObjectPermissionBackend',
     'openedx.core.djangoapps.oauth_dispatch.dot_overrides.backends.EdxRateLimitedAllowAllUsersModelBackend',
+    'bridgekeeper.backends.RulePermissionBackend',
 ]
 
 STATIC_ROOT_BASE = '/edx/var/edxapp/staticfiles'
@@ -1064,7 +1062,11 @@ WEBPACK_CONFIG_PATH = 'webpack.prod.config.js'
 ################################# CELERY ######################################
 
 # Auto discover tasks fails to detect contentstore tasks
-CELERY_IMPORTS = ('cms.djangoapps.contentstore.tasks')
+CELERY_IMPORTS = (
+    'cms.djangoapps.contentstore.tasks',
+    'openedx.core.djangoapps.bookmarks.tasks',
+    'openedx.core.djangoapps.ccxcon.tasks',
+)
 
 # Message configuration
 
@@ -1243,7 +1245,6 @@ INSTALLED_APPS = [
     'mptt',
     'sekizai',
     'openedx.core.djangoapps.user_api',
-    'django_openid_auth',
 
     # Country embargo support
     'openedx.core.djangoapps.embargo',
@@ -1295,9 +1296,6 @@ INSTALLED_APPS = [
     # System Wide Roles
     'openedx.core.djangoapps.system_wide_roles',
 
-    # Microsite configuration application
-    'microsite_configuration',
-
     # Static i18n support
     'statici18n',
 
@@ -1312,6 +1310,7 @@ INSTALLED_APPS = [
 
     # rule-based authorization
     'rules.apps.AutodiscoverRulesConfig',
+    'bridgekeeper',
 
     # management of user-triggered async tasks (course import/export, etc.)
     'user_tasks',
@@ -1483,6 +1482,7 @@ OPTIONAL_APPS = (
     ('integrated_channels.degreed', None),
     ('integrated_channels.sap_success_factors', None),
     ('integrated_channels.xapi', None),
+    ('integrated_channels.cornerstone', None),
 )
 
 
@@ -1674,21 +1674,6 @@ DEFAULT_SITE_THEME = None
 
 ENABLE_COMPREHENSIVE_THEMING = False
 
-################################ Settings for Microsites ################################
-
-### Select an implementation for the microsite backend
-# for MICROSITE_BACKEND possible choices are
-# 1. microsite_configuration.backends.filebased.FilebasedMicrositeBackend
-# 2. microsite_configuration.backends.database.DatabaseMicrositeBackend
-MICROSITE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrositeBackend'
-# for MICROSITE_TEMPLATE_BACKEND possible choices are
-# 1. microsite_configuration.backends.filebased.FilebasedMicrositeTemplateBackend
-# 2. microsite_configuration.backends.database.DatabaseMicrositeTemplateBackend
-MICROSITE_TEMPLATE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrositeTemplateBackend'
-# TTL for microsite database template cache
-MICROSITE_DATABASE_TEMPLATE_CACHE_TTL = 5 * 60
-
-
 ############################ Global Database Configuration #####################
 
 DATABASE_ROUTERS = [
@@ -1786,7 +1771,6 @@ ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + LMS_ENROLLMENT_API_PATH
 ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
 ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 # The default value of this needs to be a 16 character string
-ENTERPRISE_REPORTING_SECRET = '0000000000000000'
 ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = {}
 
 BASE_COOKIE_DOMAIN = 'localhost'
@@ -1857,6 +1841,10 @@ ZENDESK_USER = None
 ZENDESK_API_KEY = None
 ZENDESK_CUSTOM_FIELDS = {}
 ZENDESK_OAUTH_ACCESS_TOKEN = ''
+# A mapping of string names to Zendesk Group IDs
+# To get the IDs of your groups you can go to
+# {zendesk_url}/api/v2/groups.json
+ZENDESK_GROUP_ID_MAPPING = {}
 
 ############## Settings for Completion API #########################
 
@@ -1964,10 +1952,6 @@ BULK_EMAIL_DEFAULT_FROM_EMAIL = 'no-reply@example.com'
 # Flag to indicate if individual email addresses should be logged as they are sent
 # a bulk email message.
 BULK_EMAIL_LOG_SENT_EMAILS = False
-
-################################ Settings for Microsites ################################
-MICROSITE_ROOT_DIR = '/edx/app/edxapp/edx-microsite'
-MICROSITE_CONFIGURATION = {}
 
 ############### Settings for django file storage ##################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'

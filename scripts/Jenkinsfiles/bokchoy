@@ -14,13 +14,16 @@ def runBokchoyTests() {
             noTags: true, shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-worker',
             refspec: git_refspec, url: "git@github.com:edx/${REPO_NAME}.git"]]]
         sh 'bash scripts/all-tests.sh'
+        stash includes: 'reports/bok_choy/*coverage*', name: "${TEST_SUITE}-reports-${SHARD}", allowEmpty: true
     }
 }
 
 def bokchoyTestCleanup() {
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'test_root/log/**/*.log,test_root/log/**/*.png'
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/bok_choy/*.coverage*,test_root/log/**/*.log,test_root/log/**/*.png'
     junit '**/reports/bok_choy/**/xunit.xml'
 }
+
+def shardCount = 25
 
 pipeline {
     agent { label "jenkins-worker" }
@@ -56,7 +59,7 @@ pipeline {
             steps {
                 script {
                     def parallel_stages = [:]
-                    for (int i = 1; i <= 25; i++) {
+                    for (int i = 1; i <= shardCount; i++) {
                         int index = i
                         parallel_stages["${index}"] = {
                             node('jenkins-worker') {
@@ -73,6 +76,39 @@ pipeline {
                         }
                     }
                     parallel parallel_stages
+                }
+            }
+        }
+        stage("Combine Coverage") {
+            when {
+                // Only combine coverage during context-collection
+                environment name: 'COLLECT_WHO_TESTS_WHAT', value: 'true'
+            }
+            steps {
+                script {
+                    sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
+                        checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: git_branch]],
+                            doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', honorRefspec: true,
+                            noTags: true, shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+                            refspec: git_refspec, url: "git@github.com:edx/${REPO_NAME}.git"]]]
+
+                        for (int i = 1; i <= shardCount; i++) {
+                            unstash "bok-choy-reports-${i}"
+                        }
+                        sh """
+                        export TEST_SUITE=bok-choy
+                        source scripts/jenkins-common.sh
+                        paver coverage --rcfile=common/test/acceptance/.coveragerc
+                        paver upload_coverage_to_s3
+                        """
+                    }
+                }
+            }
+            post {
+                always {
+                    script {
+                        archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.coverage'
+                    }
                 }
             }
         }

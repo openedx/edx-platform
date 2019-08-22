@@ -4,22 +4,25 @@ This is the default template for our main set of AWS servers.
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=wildcard-import, unused-wildcard-import
+# pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-order
+
+from __future__ import absolute_import
 
 import codecs
 import os
 import yaml
 
-from path import Path as path
-from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
-from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse_lazy
+from path import Path as path
 
 from .common import *
 
-from openedx.core.lib.derived import derive_settings  # pylint: disable=wrong-import-order
-from openedx.core.lib.logsettings import get_logger_config  # pylint: disable=wrong-import-order
+from openedx.core.djangoapps.plugins import constants as plugin_constants
+from openedx.core.djangoapps.plugins import plugin_settings
+from openedx.core.lib.derived import derive_settings
+from openedx.core.lib.logsettings import get_logger_config
+from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
 
 
 def get_env_setting(setting):
@@ -317,6 +320,7 @@ FILE_UPLOAD_STORAGE_PREFIX = ENV_TOKENS.get('FILE_UPLOAD_STORAGE_PREFIX', FILE_U
 # Zendesk
 ZENDESK_URL = ENV_TOKENS.get('ZENDESK_URL', ZENDESK_URL)
 ZENDESK_CUSTOM_FIELDS = ENV_TOKENS.get('ZENDESK_CUSTOM_FIELDS', ZENDESK_CUSTOM_FIELDS)
+ZENDESK_GROUP_ID_MAPPING = ENV_TOKENS.get('ZENDESK_GROUP_ID_MAPPING', ZENDESK_GROUP_ID_MAPPING)
 
 ############### XBlock filesystem field config ##########
 if 'DJFS' in AUTH_TOKENS and AUTH_TOKENS['DJFS'] is not None:
@@ -442,7 +446,7 @@ CELERY_QUEUES.update(
     {
         alternate: {}
         for alternate in ALTERNATE_QUEUES
-        if alternate not in CELERY_QUEUES.keys()
+        if alternate not in list(CELERY_QUEUES.keys())
     }
 )
 
@@ -511,19 +515,6 @@ XBLOCK_SETTINGS = ENV_TOKENS.get('XBLOCK_SETTINGS', {})
 XBLOCK_SETTINGS.setdefault("VideoBlock", {})["licensing_enabled"] = FEATURES.get("LICENSING", False)
 XBLOCK_SETTINGS.setdefault("VideoBlock", {})['YOUTUBE_API_KEY'] = AUTH_TOKENS.get('YOUTUBE_API_KEY', YOUTUBE_API_KEY)
 
-################# MICROSITE ####################
-# microsite specific configurations.
-MICROSITE_CONFIGURATION = ENV_TOKENS.get('MICROSITE_CONFIGURATION', {})
-MICROSITE_ROOT_DIR = path(ENV_TOKENS.get('MICROSITE_ROOT_DIR', ''))
-# this setting specify which backend to be used when pulling microsite specific configuration
-MICROSITE_BACKEND = ENV_TOKENS.get("MICROSITE_BACKEND", MICROSITE_BACKEND)
-# this setting specify which backend to be used when loading microsite specific templates
-MICROSITE_TEMPLATE_BACKEND = ENV_TOKENS.get("MICROSITE_TEMPLATE_BACKEND", MICROSITE_TEMPLATE_BACKEND)
-# TTL for microsite database template cache
-MICROSITE_DATABASE_TEMPLATE_CACHE_TTL = ENV_TOKENS.get(
-    "MICROSITE_DATABASE_TEMPLATE_CACHE_TTL", MICROSITE_DATABASE_TEMPLATE_CACHE_TTL
-)
-
 ############################ OAUTH2 Provider ###################################
 
 # OpenID Connect issuer ID. Normally the URL of the authentication endpoint.
@@ -580,12 +571,6 @@ COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get(
 )
 
 ####################### Enterprise Settings ######################
-# A shared secret to be used for encrypting passwords passed from the enterprise api
-# to the enteprise reporting script.
-ENTERPRISE_REPORTING_SECRET = AUTH_TOKENS.get(
-    'ENTERPRISE_REPORTING_SECRET',
-    ENTERPRISE_REPORTING_SECRET
-)
 
 # A default dictionary to be used for filtering out enterprise customer catalog.
 ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = ENV_TOKENS.get(

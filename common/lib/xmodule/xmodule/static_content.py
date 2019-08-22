@@ -22,6 +22,7 @@ from docopt import docopt
 from path import Path as path
 
 from xmodule.capa_module import ProblemBlock
+from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
 from xmodule.x_module import XModuleDescriptor, HTMLSnippet
 
 LOG = logging.getLogger(__name__)
@@ -63,7 +64,11 @@ class VideoBlock(HTMLSnippet):
 # List of XBlocks which use this static content setup.
 # Should only be used for XModules being converted to XBlocks.
 XBLOCK_CLASSES = [
+    AboutBlock,
+    CourseInfoBlock,
+    HtmlBlock,
     ProblemBlock,
+    StaticTabBlock,
     VideoBlock,
 ]
 

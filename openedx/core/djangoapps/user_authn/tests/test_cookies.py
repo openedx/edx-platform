@@ -66,7 +66,7 @@ class CookieTests(TestCase):
         If can_recreate is False, verifies that a JWT cannot be recreated.
         """
         self._copy_cookies_to_request(response, self.request)
-        JwtAuthCookieMiddleware().process_request(self.request)
+        JwtAuthCookieMiddleware().process_view(self.request, None, None, None)
         self.assertEqual(
             cookies_api.jwt_cookies.jwt_cookie_name() in self.request.COOKIES,
             can_recreate,
@@ -94,7 +94,6 @@ class CookieTests(TestCase):
             'version': settings.EDXMKTG_USER_INFO_COOKIE_VERSION,
             'username': self.user.username,
             'header_urls': self._get_expected_header_urls(),
-            'enrollmentStatusHash': CourseEnrollment.generate_enrollment_status_hash(self.user)
         }
 
         self.assertDictEqual(actual, expected)

@@ -46,6 +46,7 @@ from six.moves import map, range, zip
 import capa.safe_exec as safe_exec
 import capa.xqueue_interface as xqueue_interface
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.lib import edx_six
 
 from . import correctmap
 from .registry import TagRegistry
@@ -254,7 +255,7 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
           - renderer : procedure which produces HTML given an ElementTree
           - response_msg: a message displayed at the end of the Response
         """
-        _ = self.capa_system.i18n.ugettext
+        _ = edx_six.get_gettext(self.capa_system.i18n)
 
         # response_id = problem_id + response index
         response_id = self.xml.attrib['id']
@@ -344,7 +345,7 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
         e.g. [{'text': 'a hint', 'trigger':[{'choice': 'choice_0', 'selected': True},
               {'choice': 'choice_1', 'selected':True}]}]
         """
-        _ = self.capa_system.i18n.ugettext
+        _ = edx_six.get_gettext(self.capa_system.i18n)
         # 1. Establish the hint_texts
         # This can lead to early-exit if the hint is blank.
         if not hint_log:
@@ -489,7 +490,7 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
                     unsafely=self.capa_system.can_execute_unsafe_code(),
                 )
             except Exception as err:
-                _ = self.capa_system.i18n.ugettext
+                _ = edx_six.get_gettext(self.capa_system.i18n)
                 msg = _('Error {err} in evaluating hint function {hintfn}.').format(err=err, hintfn=hintfn)
                 sourcenum = getattr(self.xml, 'sourceline', _('(Source code line unavailable)'))
                 msg += "\n" + _("See XML source line {sourcenum}.").format(sourcenum=sourcenum)
@@ -1184,7 +1185,7 @@ class MultipleChoiceResponse(LoncapaResponse):
         Fails with LoncapaProblemError if called on a response that is not masking.
         """
         # if not self.has_mask():
-        #     _ = self.capa_system.i18n.ugettext
+        #     _ = edx_six.get_gettext(self.capa_system.i18n)
         #     # Translators: 'unmask_name' is a method name and should not be translated.
         #     msg = "unmask_name called on response that is not masked"
         #     raise LoncapaProblemError(msg)
@@ -1215,7 +1216,7 @@ class MultipleChoiceResponse(LoncapaResponse):
         if choicegroups:
             choicegroup = choicegroups[0]
             if choicegroup.get('answer-pool') is not None:
-                _ = self.capa_system.i18n.ugettext
+                _ = edx_six.get_gettext(self.capa_system.i18n)
                 # Translators: 'shuffle' and 'answer-pool' are attribute names and should not be translated.
                 msg = _("Do not use shuffle and answer-pool at the same time")
                 raise LoncapaProblemError(msg)
@@ -1298,7 +1299,7 @@ class MultipleChoiceResponse(LoncapaResponse):
             try:
                 num_choices = int(num_str)
             except ValueError:
-                _ = self.capa_system.i18n.ugettext
+                _ = edx_six.get_gettext(self.capa_system.i18n)
                 # Translators: 'answer-pool' is an attribute name and should not be translated.
                 msg = _("answer-pool value should be an integer")
                 raise LoncapaProblemError(msg)
@@ -1365,7 +1366,7 @@ class MultipleChoiceResponse(LoncapaResponse):
         # Or perhaps in the overall author workflow, these errors are unhelpful and
         # should all be removed.
         if len(correct_choices) < 1 or len(incorrect_choices) < 1:
-            _ = self.capa_system.i18n.ugettext
+            _ = edx_six.get_gettext(self.capa_system.i18n)
             # Translators: 'Choicegroup' is an input type and should not be translated.
             msg = _("Choicegroup must include at least 1 correct and 1 incorrect choice")
             raise LoncapaProblemError(msg)
@@ -1535,7 +1536,7 @@ class NumericalResponse(LoncapaResponse):
                 self.correct_answer = answer[0] + self.answer_range[0] + ', ' + self.answer_range[1] + answer[-1]
             except Exception:
                 log.debug("Content error--answer '%s' is not a valid range tolerance answer", answer)
-                _ = self.capa_system.i18n.ugettext
+                _ = edx_six.get_gettext(self.capa_system.i18n)
                 raise StudentInputError(
                     _("There was a problem with the staff answer to this problem.")
                 )
@@ -1567,7 +1568,7 @@ class NumericalResponse(LoncapaResponse):
                 correct_ans = evaluator({}, {}, answer)
             except Exception:
                 log.debug("Content error--answer '%s' is not a valid number", answer)
-                _ = self.capa_system.i18n.ugettext
+                _ = edx_six.get_gettext(self.capa_system.i18n)
                 raise StudentInputError(
                     _("There was a problem with the staff answer to this problem.")
                 )
@@ -1591,7 +1592,7 @@ class NumericalResponse(LoncapaResponse):
 
         student_answer = student_answers[self.answer_id]
 
-        _ = self.capa_system.i18n.ugettext
+        _ = edx_six.get_gettext(self.capa_system.i18n)
         general_exception = StudentInputError(
             _(u"Could not interpret '{student_answer}' as a number.").format(student_answer=cgi.escape(student_answer))
         )
@@ -1778,7 +1779,7 @@ class NumericalResponse(LoncapaResponse):
             return False
 
     def get_answers(self):
-        _ = self.capa_system.i18n.ugettext
+        _ = edx_six.get_gettext(self.capa_system.i18n)
         # Example: "Answer: Answer_1 or Answer_2 or Answer_3".
         separator = Text(' {b_start}{or_separator}{b_end} ').format(
             # Translators: Separator used in NumericalResponse to display multiple answers.
@@ -1833,7 +1834,7 @@ class StringResponse(LoncapaResponse):
     This response type allows one or more answers.
 
     Additional answers are added by `additional_answer` tag.
-    If `regexp` is in `type` attribute, than answers and hints are treated as regular expressions.
+    If `regexp` is in `type` attribute, then answers and hints are treated as regular expressions.
 
     Examples:
         <stringresponse answer="Michigan">
@@ -2028,7 +2029,7 @@ class StringResponse(LoncapaResponse):
         if not given:
             return False
 
-        _ = self.capa_system.i18n.ugettext
+        _ = edx_six.get_gettext(self.capa_system.i18n)
         # backward compatibility, should be removed in future.
         if self.backward:
             return self.check_string_backward(expected, given)
@@ -2067,7 +2068,7 @@ class StringResponse(LoncapaResponse):
         return hints_to_show
 
     def get_answers(self):
-        _ = self.capa_system.i18n.ugettext
+        _ = edx_six.get_gettext(self.capa_system.i18n)
         # Translators: Separator used in StringResponse to display multiple answers.
         # Example: "Answer: Answer_1 or Answer_2 or Answer_3".
         separator = HTML(' <b>{}</b> ').format(_('or'))
@@ -2171,7 +2172,7 @@ class CustomResponse(LoncapaResponse):
         student_answers is a dict with everything from request.POST, but with the first part
         of each key removed (the string before the first "_").
         """
-        _ = self.capa_system.i18n.ugettext
+        _ = edx_six.get_gettext(self.capa_system.i18n)
 
         log.debug('%s: student_answers=%s', six.text_type(self), student_answers)
 
@@ -2431,7 +2432,7 @@ class CustomResponse(LoncapaResponse):
                 # Raise an exception
                 else:
                     log.error(traceback.format_exc())
-                    _ = self.capa_system.i18n.ugettext
+                    _ = edx_six.get_gettext(self.capa_system.i18n)
                     raise ResponseError(
                         _("CustomResponse: check function returned an invalid dictionary!")
                     )
@@ -2555,7 +2556,7 @@ class SymbolicResponse(CustomResponse):
         except Exception as err:
             log.error("oops in SymbolicResponse (cfn) error %s", err)
             log.error(traceback.format_exc())
-            _ = self.capa_system.i18n.ugettext
+            _ = edx_six.get_gettext(self.capa_system.i18n)
             # Translators: 'SymbolicResponse' is a problem type and should not be translated.
             msg = _(u"An error occurred with SymbolicResponse. The error was: {error_msg}").format(
                 error_msg=err,
@@ -2651,12 +2652,12 @@ class CodeResponse(LoncapaResponse):
 
         self.initial_display = find_with_default(
             codeparam, 'initial_display', '')
-        _ = self.capa_system.i18n.ugettext
+        _ = edx_six.get_gettext(self.capa_system.i18n)
         self.answer = find_with_default(codeparam, 'answer_display',
                                         _(u'No answer provided.'))
 
     def get_score(self, student_answers):
-        _ = self.capa_system.i18n.ugettext
+        _ = edx_six.get_gettext(self.capa_system.i18n)
         try:
             # Note that submission can be a file
             submission = student_answers[self.answer_id]
@@ -2732,7 +2733,7 @@ class CodeResponse(LoncapaResponse):
 
         cmap = CorrectMap()
         if error:
-            _ = self.capa_system.i18n.ugettext
+            _ = edx_six.get_gettext(self.capa_system.i18n)
             error_msg = _('Unable to deliver your submission to grader (Reason: {error_msg}).'
                           ' Please try again later.').format(error_msg=msg)
             cmap.set(self.answer_id, queuestate=None, msg=error_msg)
@@ -2752,7 +2753,7 @@ class CodeResponse(LoncapaResponse):
         """Updates the user's score based on the returned message from the grader."""
         (valid_score_msg, correct, points, msg) = self._parse_score_msg(score_msg)
 
-        _ = self.capa_system.i18n.ugettext
+        _ = edx_six.get_gettext(self.capa_system.i18n)
 
         if not valid_score_msg:
             # Translators: 'grader' refers to the edX automatic code grader.
@@ -3086,7 +3087,7 @@ class FormulaResponse(LoncapaResponse):
         Each dictionary represents a test case for the answer.
         Returns a tuple of formula evaluation results.
         """
-        _ = self.capa_system.i18n.ugettext
+        _ = edx_six.get_gettext(self.capa_system.i18n)
 
         out = []
         for var_dict in var_dict_list:
@@ -3283,7 +3284,7 @@ class SchematicResponse(LoncapaResponse):
                 unsafely=self.capa_system.can_execute_unsafe_code(),
             )
         except Exception as err:
-            _ = self.capa_system.i18n.ugettext
+            _ = edx_six.get_gettext(self.capa_system.i18n)
             # Translators: 'SchematicResponse' is a problem type and should not be translated.
             msg = _('Error in evaluating SchematicResponse. The error was: {error_msg}').format(error_msg=err)
             raise ResponseError(msg)
@@ -3339,7 +3340,7 @@ class ImageResponse(LoncapaResponse):
         self.answer_ids = [ie.get('id') for ie in self.ielements]
 
     def get_score(self, student_answers):
-        _ = self.capa_system.i18n.ugettext
+        _ = edx_six.get_gettext(self.capa_system.i18n)
         correct_map = CorrectMap()
         expectedset = self.get_mapped_answers()
         for aid in self.answer_ids:  # loop through IDs of <imageinput>
@@ -3601,7 +3602,7 @@ class ChoiceTextResponse(LoncapaResponse):
         and `answer_values` is used for displaying correct answers.
 
         """
-        _ = self.capa_system.i18n.ugettext
+        _ = edx_six.get_gettext(self.capa_system.i18n)
         context = self.context
         self.answer_values = {self.answer_id: []}
         self.assign_choice_names()
@@ -3849,7 +3850,7 @@ class ChoiceTextResponse(LoncapaResponse):
 
         Returns True if and only if all student inputs are correct.
         """
-        _ = self.capa_system.i18n.ugettext
+        _ = edx_six.get_gettext(self.capa_system.i18n)
         inputs_correct = True
         for answer_name, answer_value in six.iteritems(numtolerance_inputs):
             # If `self.corrrect_inputs` does not contain an entry for

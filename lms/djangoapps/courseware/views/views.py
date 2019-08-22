@@ -1,13 +1,20 @@
 """
 Courseware views functions
 """
+from __future__ import absolute_import
+from __future__ import division
+
 import json
 import logging
-import urllib
+import requests
+from requests.exceptions import Timeout, ConnectionError
 from collections import OrderedDict, namedtuple
 from datetime import datetime
 
 import bleach
+import six.moves.urllib.error  # pylint: disable=import-error
+import six.moves.urllib.parse  # pylint: disable=import-error
+import six.moves.urllib.request  # pylint: disable=import-error
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser, User
@@ -21,20 +28,25 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.http import urlquote_plus
 from django.utils.text import slugify
-from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
+from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from django.views.generic import View
 from edx_django_utils.monitoring import set_custom_metrics_for_course_key
+from ipware.ip import get_ip
 from markupsafe import escape
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from pytz import UTC
 from rest_framework import status
+from rest_framework.decorators import api_view, throttle_classes
+from rest_framework.response import Response
+from rest_framework.throttling import UserRateThrottle
 from six import text_type
+from web_fragments.fragment import Fragment
 
 import shoppingcart
 import survey.views
@@ -57,10 +69,10 @@ from courseware.courses import (
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache
 from courseware.models import BaseStudentModuleHistory, StudentModule
+from courseware.permissions import MASQUERADE_AS_STUDENT, VIEW_COURSE_HOME, VIEW_COURSEWARE, VIEW_XQA_INTERFACE
 from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
-from ipware.ip import get_ip
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import CertificateStatuses
@@ -81,18 +93,20 @@ from openedx.core.djangoapps.credit.api import (
     is_user_eligible_for_credit
 )
 from openedx.core.djangoapps.enrollments.api import add_enrollment
+from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.programs.utils import ProgramMarketingDataExtender
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
+from openedx.core.djangoapps.zendesk_proxy.utils import create_zendesk_ticket
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from openedx.features.course_experience import (
-    UNIFIED_COURSE_TAB_FLAG,
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
-    course_home_url_name,
+    UNIFIED_COURSE_TAB_FLAG,
+    course_home_url_name
 )
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
@@ -105,9 +119,8 @@ from track import segment
 from util.cache import cache, cache_if_anonymous
 from util.db import outer_atomic
 from util.milestones_helpers import get_prerequisite_courses_display
-from util.views import _record_feedback_in_zendesk, ensure_valid_course_key, ensure_valid_usage_key
+from util.views import ensure_valid_course_key, ensure_valid_usage_key
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
-from web_fragments.fragment import Fragment
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.tabs import CourseTabList
@@ -250,6 +263,55 @@ def courses(request):
     )
 
 
+class PerUserVideoMetadataThrottle(UserRateThrottle):
+    """
+    setting rate limit for  yt_video_metadata API
+    """
+    rate = settings.RATE_LIMIT_FOR_VIDEO_METADATA_API
+
+
+@ensure_csrf_cookie
+@login_required
+@api_view(['GET'])
+@throttle_classes([PerUserVideoMetadataThrottle])
+def yt_video_metadata(request):
+    """
+    Will hit the youtube API if the key is available in settings
+    :return: youtube video metadata
+    """
+    response = {}
+    status_code = 500
+    video_id = request.GET.get('id', None)
+    if settings.YOUTUBE_API_KEY and video_id:
+        yt_api_key = settings.YOUTUBE_API_KEY
+        yt_metadata_url = settings.YOUTUBE['METADATA_URL']
+        yt_timeout = settings.YOUTUBE.get('TEST_TIMEOUT', 1500) / 1000  # converting milli seconds to seconds
+        payload = {'id': video_id, 'part': 'contentDetails', 'key': yt_api_key}
+        try:
+            res = requests.get(yt_metadata_url, params=payload, timeout=yt_timeout)
+            status_code = res.status_code
+            if res.status_code == 200:
+                try:
+                    res = res.json()
+                    if res.get('items', []):
+                        response = res
+                    else:
+                        logging.warning(u'Unable to find the items in response. Following response '
+                                        u'was received: {res}'.format(res=res.text))
+                except ValueError:
+                    logging.warning(u'Unable to decode response to json. Following response '
+                                    u'was received: {res}'.format(res=res.text))
+            else:
+                logging.warning(u'YouTube API request failed with status code={status} - '
+                                u'Error message is={message}'.format(status=status_code, message=res.text))
+        except (Timeout, ConnectionError):
+            logging.warning(u'YouTube API request failed because of connection time out or connection error')
+    else:
+        logging.warning(u'YouTube API key or video id is None. Please make sure API key and video id is not None')
+
+    return Response(response, status=status_code, content_type='application/json')
+
+
 @ensure_csrf_cookie
 @ensure_valid_course_key
 def jump_to_id(request, course_id, module_id):
@@ -281,9 +343,7 @@ def jump_to_id(request, course_id, module_id):
 def jump_to(_request, course_id, location):
     """
     Show the page that contains a specific location.
-
     If the location is invalid or not in any class, return a 404.
-
     Otherwise, delegates to the index view to figure out whether this user
     has access, and what they should see.
     """
@@ -308,7 +368,6 @@ def jump_to(_request, course_id, location):
 def course_info(request, course_id):
     """
     Display the course's info.html, or 404 if there is no such course.
-
     Assumes the course_id is in a valid format.
     """
     # TODO: LEARNER-611: This can be deleted with Course Info removal.  The new
@@ -350,8 +409,8 @@ def course_info(request, course_id):
     with modulestore().bulk_operations(course_key):
         course = get_course_with_access(request.user, 'load', course_key)
 
-        staff_access = has_access(request.user, 'staff', course)
-        masquerade, user = setup_masquerade(request, course_key, staff_access, reset_masquerade_data=True)
+        can_masquerade = request.user.has_perm(MASQUERADE_AS_STUDENT, course)
+        masquerade, user = setup_masquerade(request, course_key, can_masquerade, reset_masquerade_data=True)
 
         # LEARNER-612: CCX redirect handled by new Course Home (DONE)
         # LEARNER-1697: Transition banner messages to new Course Home (DONE)
@@ -427,7 +486,7 @@ def course_info(request, course_id):
             'course_subtitle': course_subtitle,
             'show_subtitle': course_homepage_show_subtitle,
             'show_org': course_homepage_show_org,
-            'staff_access': staff_access,
+            'can_masquerade': can_masquerade,
             'masquerade': masquerade,
             'supports_preview_menu': True,
             'studio_url': get_studio_url(course, 'course_info'),
@@ -640,11 +699,16 @@ class CourseTabView(EdxFragmentView):
         """
         Creates the context for the fragment's template.
         """
-        staff_access = has_access(request.user, 'staff', course)
+        can_masquerade = request.user.has_perm(MASQUERADE_AS_STUDENT, course)
         supports_preview_menu = tab.get('supports_preview_menu', False)
         uses_bootstrap = self.uses_bootstrap(request, course, tab=tab)
         if supports_preview_menu:
-            masquerade, masquerade_user = setup_masquerade(request, course.id, staff_access, reset_masquerade_data=True)
+            masquerade, masquerade_user = setup_masquerade(
+                request,
+                course.id,
+                can_masquerade,
+                reset_masquerade_data=True,
+            )
             request.user = masquerade_user
         else:
             masquerade = None
@@ -653,7 +717,7 @@ class CourseTabView(EdxFragmentView):
             'course': course,
             'tab': tab,
             'active_page': tab.get('type', None),
-            'staff_access': staff_access,
+            'can_masquerade': can_masquerade,
             'masquerade': masquerade,
             'supports_preview_menu': supports_preview_menu,
             'uses_bootstrap': uses_bootstrap,
@@ -698,7 +762,6 @@ class CourseTabView(EdxFragmentView):
 def syllabus(request, course_id):
     """
     Display the course's syllabus.html, or 404 if there is no such course.
-
     Assumes the course_id is in a valid format.
     """
 
@@ -728,15 +791,12 @@ def registered_for_course(course, user):
 class EnrollStaffView(View):
     """
     Displays view for registering in the course to a global staff user.
-
     User can either choose to 'Enroll' or 'Don't Enroll' in the course.
       Enroll: Enrolls user in course and redirects to the courseware.
       Don't Enroll: Redirects user to course about page.
-
     Arguments:
      - request    : HTTP request
      - course_id  : course id
-
     Returns:
      - RedirectResponse
     """
@@ -766,7 +826,7 @@ class EnrollStaffView(View):
         Either enrolls the user in course or redirects user to course about page
         depending upon the option (Enroll, Don't Enroll) chosen by the user.
         """
-        _next = urllib.quote_plus(request.GET.get('next', 'info'), safe='/:?=')
+        _next = six.moves.urllib.parse.quote_plus(request.GET.get('next', 'info'), safe='/:?=')  # pylint: disable=redundant-keyword-arg
         course_key = CourseKey.from_string(course_id)
         enroll = 'enroll' in request.POST
         if enroll:
@@ -810,14 +870,14 @@ def course_about(request, course_id):
         staff_access = bool(has_access(request.user, 'staff', course))
         studio_url = get_studio_url(course, 'settings/details')
 
-        if has_access(request.user, 'load', course):
+        if request.user.has_perm(VIEW_COURSE_HOME, course):
             course_target = reverse(course_home_url_name(course.id), args=[text_type(course.id)])
         else:
             course_target = reverse('about_course', args=[text_type(course.id)])
 
         show_courseware_link = bool(
             (
-                has_access(request.user, 'load', course)
+                request.user.has_perm(VIEW_COURSEWARE, course)
             ) or settings.FEATURES.get('ENABLE_LMS_MIGRATION')
         )
 
@@ -833,7 +893,7 @@ def course_about(request, course_id):
                     shoppingcart.models.CourseRegCodeItem.contained_in_order(cart, course_key)
 
             reg_then_add_to_cart_link = "{reg_url}?course_id={course_id}&enrollment_action=add_to_cart".format(
-                reg_url=reverse('register_user'), course_id=urllib.quote(str(course_id))
+                reg_url=reverse('register_user'), course_id=six.moves.urllib.parse.quote(str(course_id))
             )
 
         # If the ecommerce checkout flow is enabled and the mode of the course is
@@ -859,7 +919,7 @@ def course_about(request, course_id):
         can_add_course_to_cart = _is_shopping_cart_enabled and registration_price and not ecommerce_checkout_link
 
         # Used to provide context to message to student if enrollment not allowed
-        can_enroll = bool(has_access(request.user, 'enroll', course))
+        can_enroll = bool(request.user.has_perm(ENROLL_IN_COURSE, course))
         invitation_only = course.invitation_only
         is_course_full = CourseEnrollment.objects.is_course_full(course)
 
@@ -967,9 +1027,7 @@ def progress(request, course_id, student_id=None):
 def _progress(request, course_key, student_id):
     """
     Unwrapped version of "progress".
-
     User progress. We show the grade bar and every problem score.
-
     Course staff are allowed to see the progress of students in their class.
     """
 
@@ -983,11 +1041,12 @@ def _progress(request, course_key, student_id):
     course = get_course_with_access(request.user, 'load', course_key)
 
     staff_access = bool(has_access(request.user, 'staff', course))
+    can_masquerade = request.user.has_perm(MASQUERADE_AS_STUDENT, course)
 
     masquerade = None
     if student_id is None or student_id == request.user.id:
         # This will be a no-op for non-staff users, returning request.user
-        masquerade, student = setup_masquerade(request, course_key, staff_access, reset_masquerade_data=True)
+        masquerade, student = setup_masquerade(request, course_key, can_masquerade, reset_masquerade_data=True)
     else:
         try:
             coach_access = has_ccx_coach_role(request.user, course_key)
@@ -1017,7 +1076,7 @@ def _progress(request, course_key, student_id):
     # student instead of request.user in the rest of the function.
 
     course_grade = CourseGradeFactory().read(student, course)
-    courseware_summary = course_grade.chapter_grades.values()
+    courseware_summary = list(course_grade.chapter_grades.values())
 
     studio_url = get_studio_url(course, 'settings/grading')
     # checking certificate generation configuration
@@ -1030,6 +1089,7 @@ def _progress(request, course_key, student_id):
         'courseware_summary': courseware_summary,
         'studio_url': studio_url,
         'grade_summary': course_grade.summary,
+        'can_masquerade': can_masquerade,
         'staff_access': staff_access,
         'masquerade': masquerade,
         'supports_preview_menu': True,
@@ -1096,13 +1156,11 @@ def _certificate_message(student, course, enrollment_mode):
 
 def _get_cert_data(student, course, enrollment_mode, course_grade=None):
     """Returns students course certificate related data.
-
     Arguments:
         student (User): Student for whom certificate to retrieve.
         course (Course): Course object for which certificate data to retrieve.
         enrollment_mode (String): Course mode in which student is enrolled.
         course_grade (CourseGrade): Student's course grade record.
-
     Returns:
         returns dict if course certificate is available else None.
     """
@@ -1121,14 +1179,11 @@ def _get_cert_data(student, course, enrollment_mode, course_grade=None):
 
 def _credit_course_requirements(course_key, student):
     """Return information about which credit requirements a user has satisfied.
-
     Arguments:
         course_key (CourseKey): Identifier for the course.
         student (User): Currently logged in user.
-
     Returns: dict if the credit eligibility enabled and it is a credit course
     and the user is enrolled in either verified or credit mode, and None otherwise.
-
     """
     # If credit eligibility is not enabled or this is not a credit course,
     # short-circuit and return `None`.  This indicates that credit requirements
@@ -1185,7 +1240,6 @@ def _course_home_redirect_enabled():
     """
     Return True value if user needs to be redirected to course home based on value of
     `ENABLE_MKTG_SITE` and `ENABLE_COURSE_HOME_REDIRECT feature` flags
-
     Returns: boolean True or False
     """
     if configuration_helpers.get_value(
@@ -1305,16 +1359,13 @@ def get_static_tab_fragment(request, course, tab):
 def get_course_lti_endpoints(request, course_id):
     """
     View that, given a course_id, returns the a JSON object that enumerates all of the LTI endpoints for that course.
-
     The LTI 2.0 result service spec at
     http://www.imsglobal.org/lti/ltiv2p0/uml/purl.imsglobal.org/vocab/lis/v2/outcomes/Result/service.html
     says "This specification document does not prescribe a method for discovering the endpoint URLs."  This view
     function implements one way of discovering these endpoints, returning a JSON array when accessed.
-
     Arguments:
         request (django request object):  the HTTP request object that triggered this view function
         course_id (unicode):  id associated with the course
-
     Returns:
         (django response object):  HTTP response.  404 if course is not found, otherwise 200 with JSON body.
     """
@@ -1391,12 +1442,10 @@ def course_survey(request, course_id):
 def is_course_passed(student, course, course_grade=None):
     """
     check user's course passing status. return True if passed
-
     Arguments:
         student : user object
         course : course object
         course_grade (CourseGrade) : contains student grade details.
-
     Returns:
         returns bool value
     """
@@ -1410,24 +1459,19 @@ def is_course_passed(student, course, course_grade=None):
 @require_POST
 def generate_user_cert(request, course_id):
     """Start generating a new certificate for the user.
-
     Certificate generation is allowed if:
     * The user has passed the course, and
     * The user does not already have a pending/completed certificate.
-
     Note that if an error occurs during certificate generation
     (for example, if the queue is down), then we simply mark the
     certificate generation task status as "error" and re-run
     the task with a management command.  To students, the certificate
     will appear to be "generating" until it is re-run.
-
     Args:
         request (HttpRequest): The POST request to this view.
         course_id (unicode): The identifier for the course.
-
     Returns:
         HttpResponse: 200 on success, 400 if a new certificate cannot be generated.
-
     """
 
     if not request.user.is_authenticated:
@@ -1478,13 +1522,11 @@ def generate_user_cert(request, course_id):
 def _track_successful_certificate_generation(user_id, course_id):
     """
     Track a successful certificate generation event.
-
     Arguments:
         user_id (str): The ID of the user generating the certificate.
         course_id (CourseKey): Identifier for the course.
     Returns:
         None
-
     """
     event_name = 'edx.bi.user.certificate.generate'
     segment.track(user_id, event_name, {
@@ -1545,7 +1587,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'disable_footer': True,
             'disable_window_wrap': True,
             'enable_completion_on_view_service': enable_completion_on_view_service,
-            'staff_access': bool(has_access(request.user, 'staff', course)),
+            'staff_access': bool(request.user.has_perm(VIEW_XQA_INTERFACE, course)),
             'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://your_xqa_server.com'),
         }
         return render_to_response('courseware/courseware-chromeless.html', context)
@@ -1568,17 +1610,13 @@ FINANCIAL_ASSISTANCE_HEADER = _(
 
 
 FA_INCOME_LABEL = _('Annual Household Income')
-FA_REASON_FOR_APPLYING_LABEL = _(
-    'Tell us about your current financial situation. Why do you need assistance?'
-)
-FA_GOALS_LABEL = _(
-    'Tell us about your learning or professional goals. How will a Verified Certificate in'
-    ' this course help you achieve these goals?'
-)
-FA_EFFORT_LABEL = _(
-    'Tell us about your plans for this course. What steps will you take to help you complete'
-    ' the course work and receive a certificate?'
-)
+FA_REASON_FOR_APPLYING_LABEL = 'Tell us about your current financial situation. Why do you need assistance?'
+FA_GOALS_LABEL = 'Tell us about your learning or professional goals. How will a Verified Certificate in ' \
+                 'this course help you achieve these goals?'
+
+FA_EFFORT_LABEL = 'Tell us about your plans for this course. What steps will you take to help you complete ' \
+                  'the course work and receive a certificate?'
+
 FA_SHORT_ANSWER_INSTRUCTIONS = _('Use between 250 and 500 words or so in your response.')
 
 
@@ -1595,7 +1633,7 @@ def financial_assistance(_request):
 def financial_assistance_request(request):
     """Submit a request for financial assistance to Zendesk."""
     try:
-        data = json.loads(request.body)
+        data = json.loads(request.body.decode('utf8'))
         # Simple sanity check that the session belongs to the user
         # submitting an FA request
         username = data['username']
@@ -1623,7 +1661,7 @@ def financial_assistance_request(request):
         # Thrown if fields are missing
         return HttpResponseBadRequest(u'The field {} is required.'.format(text_type(err)))
 
-    zendesk_submitted = _record_feedback_in_zendesk(
+    zendesk_submitted = create_zendesk_ticket(
         legal_name,
         email,
         u'Financial assistance request for learner {username} in course {course_name}'.format(
@@ -1631,12 +1669,12 @@ def financial_assistance_request(request):
             course_name=course.display_name
         ),
         u'Financial Assistance Request',
-        {'course_id': course_id},
+        tags={'course_id': course_id},
         # Send the application as additional info on the ticket so
         # that it is not shown when support replies. This uses
         # OrderedDict so that information is presented in the right
         # order.
-        OrderedDict((
+        additional_info=OrderedDict((
             ('Username', username),
             ('Full Name', legal_name),
             ('Course ID', course_id),
@@ -1648,11 +1686,9 @@ def financial_assistance_request(request):
             (FA_EFFORT_LABEL, '\n' + effort + '\n\n'),
             ('Client IP', ip_address),
         )),
-        group_name='Financial Assistance',
-        require_update=True
+        group='Financial Assistance',
     )
-
-    if not zendesk_submitted:
+    if not (zendesk_submitted == 200 or zendesk_submitted == 201):
         # The call to Zendesk failed. The frontend will display a
         # message to the user.
         return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1710,7 +1746,7 @@ def financial_assistance_form(request):
             {
                 'name': 'reason_for_applying',
                 'type': 'textarea',
-                'label': FA_REASON_FOR_APPLYING_LABEL,
+                'label': _(FA_REASON_FOR_APPLYING_LABEL),  # pylint: disable=translation-of-non-string
                 'placeholder': '',
                 'defaultValue': '',
                 'required': True,
@@ -1723,7 +1759,7 @@ def financial_assistance_form(request):
             {
                 'name': 'goals',
                 'type': 'textarea',
-                'label': FA_GOALS_LABEL,
+                'label': _(FA_GOALS_LABEL),  # pylint: disable=translation-of-non-string
                 'placeholder': '',
                 'defaultValue': '',
                 'required': True,
@@ -1736,7 +1772,7 @@ def financial_assistance_form(request):
             {
                 'name': 'effort',
                 'type': 'textarea',
-                'label': FA_EFFORT_LABEL,
+                'label': _(FA_EFFORT_LABEL),  # pylint: disable=translation-of-non-string
                 'placeholder': '',
                 'defaultValue': '',
                 'required': True,

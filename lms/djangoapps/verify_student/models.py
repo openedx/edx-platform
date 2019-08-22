@@ -8,6 +8,9 @@ of a student over a period of time. Right now, the only models are the abstract
 `SoftwareSecurePhotoVerification`. The hope is to keep as much of the
 photo verification process as generic as possible.
 """
+from __future__ import absolute_import, unicode_literals
+
+import codecs
 import functools
 import json
 import logging
@@ -20,11 +23,9 @@ import requests
 import six
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.cache import cache
 from django.core.files.base import ContentFile
-from django.urls import reverse
 from django.db import models
-from django.dispatch import receiver
+from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy
@@ -40,7 +41,6 @@ from lms.djangoapps.verify_student.ssencrypt import (
 )
 from openedx.core.djangoapps.signals.signals import LEARNER_NOW_VERIFIED
 from openedx.core.storage import get_storage
-
 from .utils import earliest_allowed_verification_date
 
 log = logging.getLogger(__name__)
@@ -48,7 +48,7 @@ log = logging.getLogger(__name__)
 
 def generateUUID():  # pylint: disable=invalid-name
     """ Utility function; generates UUIDs """
-    return str(uuid.uuid4())
+    return six.text_type(uuid.uuid4())
 
 
 class VerificationException(Exception):
@@ -621,7 +621,11 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
             return
 
         aes_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["FACE_IMAGE_AES_KEY"]
-        aes_key = aes_key_str.decode("hex")
+
+        if six.PY3:
+            aes_key = codecs.decode(aes_key_str, "hex")
+        else:
+            aes_key = aes_key_str.decode("hex")
 
         path = self._get_path("face")
         buff = ContentFile(encrypt_and_encode(img_data, aes_key))
@@ -659,7 +663,11 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         self._storage.save(path, buff)
 
         # Update our record fields
-        self.photo_id_key = rsa_encrypted_aes_key.encode('base64')
+        if six.PY3:
+            self.photo_id_key = codecs.encode(rsa_encrypted_aes_key, 'base64')
+        else:
+            self.photo_id_key = rsa_encrypted_aes_key.encode('base64')
+
         self.save()
 
     @status_before_must_be("must_retry", "ready", "submitted")
@@ -943,7 +951,10 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         Returns:
             SoftwareSecurePhotoVerification (object) or None
         """
-        recent_verification = SoftwareSecurePhotoVerification.objects.filter(status='approved', user_id=user.id)
+        recent_verification = SoftwareSecurePhotoVerification.objects.filter(status='approved',
+                                                                             user_id=user.id,
+                                                                             expiry_date__isnull=False)
+
         return recent_verification.latest('updated_at') if recent_verification.exists() else None
 
     @classmethod

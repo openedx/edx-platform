@@ -74,7 +74,7 @@ def delete_logged_in_cookies(response):
     """
     for cookie_name in ALL_LOGGED_IN_COOKIE_NAMES:
         response.delete_cookie(
-            cookie_name.encode('utf-8'),
+            cookie_name,
             path='/',
             domain=settings.SESSION_COOKIE_DOMAIN
         )
@@ -139,6 +139,7 @@ def set_logged_in_cookies(request, response, user):
     # Note: The user may not yet be set on the request object by this time,
     # especially during third party authentication.  So use the user object
     # that is passed in when needed.
+
     if user.is_authenticated and not user.is_anonymous:
 
         # JWT cookies expire at the same time as other login-related cookies
@@ -182,7 +183,7 @@ def _set_deprecated_user_info_cookie(response, request, user, cookie_settings):
     """
     user_info = _get_user_info_cookie_data(request, user)
     response.set_cookie(
-        settings.EDXMKTG_USER_INFO_COOKIE_NAME.encode('utf-8'),
+        settings.EDXMKTG_USER_INFO_COOKIE_NAME,
         json.dumps(user_info),
         **cookie_settings
     )
@@ -196,7 +197,7 @@ def _set_deprecated_logged_in_cookie(response, cookie_settings):
     # In the future, we should be able to replace this with the "user info"
     # cookie set below.
     response.set_cookie(
-        settings.EDXMKTG_LOGGED_IN_COOKIE_NAME.encode('utf-8'),
+        settings.EDXMKTG_LOGGED_IN_COOKIE_NAME,
         'true',
         **cookie_settings
     )
@@ -238,7 +239,6 @@ def _get_user_info_cookie_data(request, user):
         'version': settings.EDXMKTG_USER_INFO_COOKIE_VERSION,
         'username': user.username,
         'header_urls': header_urls,
-        'enrollmentStatusHash': CourseEnrollment.generate_enrollment_status_hash(user)
     }
 
     return user_info

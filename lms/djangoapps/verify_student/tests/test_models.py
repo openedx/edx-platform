@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
 import json
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 import boto
 import ddt
@@ -11,8 +13,10 @@ from django.test import TestCase
 from django.utils.timezone import now
 from freezegun import freeze_time
 from mock import patch
-from opaque_keys.edx.keys import CourseKey
+from six.moves import range
+from student.tests.factories import UserFactory
 from testfixtures import LogCapture
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from common.test.utils import MockS3Mixin
 from lms.djangoapps.verify_student.models import (
@@ -21,9 +25,6 @@ from lms.djangoapps.verify_student.models import (
     ManualVerification,
     VerificationException,
 )
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 FAKE_SETTINGS = {
     "SOFTWARE_SECURE": {
@@ -93,6 +94,7 @@ class TestVerification(TestCase):
     """
     Common tests across all types of Verications (e.g., SoftwareSecurePhotoVerication, SSOVerification)
     """
+
     def verification_active_at_datetime(self, attempt):
         """
         Tests to ensure the Verification is active or inactive at the appropriate datetimes.
@@ -380,6 +382,7 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
             # Make an approved verification
             attempt = SoftwareSecurePhotoVerification(user=user)
             attempt.status = 'approved'
+            attempt.expiry_date = datetime.now()
             attempt.save()
 
         # Test method 'get_recent_verification' returns the most recent
@@ -387,6 +390,25 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
         recent_verification = SoftwareSecurePhotoVerification.get_recent_verification(user=user)
         self.assertIsNotNone(recent_verification)
         self.assertEqual(recent_verification.id, attempt.id)
+
+    def test_get_recent_verification_expiry_null(self):
+        """Test that method 'get_recent_verification' of model
+        'SoftwareSecurePhotoVerification' will return None when expiry_date
+        is NULL for 'approved' verifications based on updated_at value.
+        """
+        user = UserFactory.create()
+        attempt = None
+
+        for _ in range(2):
+            # Make an approved verification
+            attempt = SoftwareSecurePhotoVerification(user=user)
+            attempt.status = 'approved'
+            attempt.save()
+
+        # Test method 'get_recent_verification' returns None
+        # as attempts don't have an expiry_date
+        recent_verification = SoftwareSecurePhotoVerification.get_recent_verification(user=user)
+        self.assertIsNone(recent_verification)
 
     def test_no_approved_verification(self):
         """Test that method 'get_recent_verification' of model
@@ -423,6 +445,7 @@ class SSOVerificationTest(TestVerification):
     """
     Tests for the SSOVerification model
     """
+
     def test_active_at_datetime(self):
         user = UserFactory.create()
         attempt = SSOVerification.objects.create(user=user)
@@ -433,6 +456,7 @@ class ManualVerificationTest(TestVerification):
     """
     Tests for the ManualVerification model
     """
+
     def test_active_at_datetime(self):
         user = UserFactory.create()
         verification = ManualVerification.objects.create(user=user)

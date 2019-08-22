@@ -7,7 +7,7 @@ from __future__ import absolute_import
 import copy
 import os
 import shutil
-import StringIO
+from six import StringIO
 import subprocess
 import unittest
 from uuid import uuid4
@@ -60,18 +60,18 @@ class TestGitExport(CourseTestCase):
         test output.
         """
         with self.assertRaisesRegexp(CommandError, 'Error: unrecognized arguments:*'):
-            call_command('git_export', 'blah', 'blah', 'blah', stderr=StringIO.StringIO())
+            call_command('git_export', 'blah', 'blah', 'blah', stderr=StringIO())
 
         with self.assertRaisesMessage(CommandError, 'Error: too few arguments'):
-            call_command('git_export', stderr=StringIO.StringIO())
+            call_command('git_export', stderr=StringIO())
 
         # Send bad url to get course not exported
         with self.assertRaisesRegexp(CommandError, six.text_type(GitExportError.URL_BAD)):
-            call_command('git_export', 'foo/bar/baz', 'silly', stderr=StringIO.StringIO())
+            call_command('git_export', 'foo/bar/baz', 'silly', stderr=StringIO())
 
         # Send bad course_id to get course not exported
         with self.assertRaisesRegexp(CommandError, six.text_type(GitExportError.BAD_COURSE)):
-            call_command('git_export', 'foo/bar:baz', 'silly', stderr=StringIO.StringIO())
+            call_command('git_export', 'foo/bar:baz', 'silly', stderr=StringIO())
 
     def test_error_output(self):
         """

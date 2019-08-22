@@ -2,45 +2,49 @@
 Functions for accessing and displaying courses within the
 courseware.
 """
+from __future__ import absolute_import
+
 import logging
 from collections import defaultdict
 from datetime import datetime
 
-import branding
 import pytz
+import six
 from crum import get_current_request
-from openedx.features.course_duration_limits.access import AuditExpiredError
+from django.conf import settings
+from django.db.models import Prefetch
+from django.http import Http404, QueryDict
+from django.urls import reverse
+from fs.errors import ResourceNotFound
+from opaque_keys.edx.keys import UsageKey
+from path import Path as path
+from six import text_type
+
+import branding
+from course_modes.models import CourseMode
 from courseware.access import has_access
-from courseware.access_response import StartDateError, MilestoneAccessError
+from courseware.access_response import MilestoneAccessError, StartDateError
 from courseware.date_summary import (
+    CertificateAvailableDate,
     CourseEndDate,
     CourseStartDate,
     TodaysDate,
     VerificationDeadlineDate,
-    VerifiedUpgradeDeadlineDate,
-    CertificateAvailableDate
+    VerifiedUpgradeDeadlineDate
 )
 from courseware.masquerade import check_content_start_date_for_masquerade_user
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
-from course_modes.models import CourseMode
-from django.conf import settings
-from django.db.models import Prefetch
-from django.urls import reverse
-from django.http import Http404, QueryDict
 from edxmako.shortcuts import render_to_string
-from fs.errors import ResourceNotFound
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
-from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.enrollments.api import get_course_enrollment_details
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.view_utils import LazySequence
+from openedx.features.course_duration_limits.access import AuditExpiredError
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
-from path import Path as path
-from six import text_type
 from static_replace import replace_static_urls
 from student.models import CourseEnrollment
 from survey.utils import is_survey_required_and_unanswered
@@ -81,7 +85,7 @@ def get_course_by_id(course_key, depth=0):
     if course:
         return course
     else:
-        raise Http404(u"Course not found: {}.".format(unicode(course_key)))
+        raise Http404(u"Course not found: {}.".format(six.text_type(course_key)))
 
 
 def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=False, check_survey_complete=True):
@@ -175,12 +179,12 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
     if check_if_enrolled:
         # If the user is not enrolled, redirect them to the about page
         if not CourseEnrollment.is_enrolled(user, course.id):
-            raise CourseAccessRedirect(reverse('about_course', args=[unicode(course.id)]))
+            raise CourseAccessRedirect(reverse('about_course', args=[six.text_type(course.id)]))
 
     # Redirect if the user must answer a survey before entering the course.
     if check_survey_complete and action == 'load':
         if is_survey_required_and_unanswered(user, course):
-            raise CourseAccessRedirect(reverse('course_survey', args=[unicode(course.id)]))
+            raise CourseAccessRedirect(reverse('course_survey', args=[six.text_type(course.id)]))
 
 
 def can_self_enroll_in_course(course_key):
@@ -205,7 +209,7 @@ def course_open_for_self_enrollment(course_key):
         return False
 
     # Check the enrollment start and end dates.
-    course_details = get_course_enrollment_details(unicode(course_key))
+    course_details = get_course_enrollment_details(six.text_type(course_key))
     now = datetime.now().replace(tzinfo=pytz.UTC)
     start = course_details['enrollment_start']
     end = course_details['enrollment_end']
@@ -379,7 +383,7 @@ def get_course_info_section(request, user, course, section_key):
             html = render_to_string('courseware/error-message.html', None)
             log.exception(
                 u"Error rendering course_id=%s, section_key=%s",
-                unicode(course.id), section_key
+                six.text_type(course.id), section_key
             )
 
     return html
@@ -524,7 +528,7 @@ def get_cms_course_link(course, page='course'):
     """
     # This is fragile, but unfortunately the problem is that within the LMS we
     # can't use the reverse calls from the CMS
-    return u"//{}/{}/{}".format(settings.CMS_BASE, page, unicode(course.id))
+    return u"//{}/{}/{}".format(settings.CMS_BASE, page, six.text_type(course.id))
 
 
 def get_cms_block_link(block, page):
@@ -571,7 +575,7 @@ def get_problems_in_section(section):
         for vertical in subsection.get_children():
             for component in vertical.get_children():
                 if component.location.block_type == 'problem' and getattr(component, 'has_score', False):
-                    problem_descriptors[unicode(component.location)] = component
+                    problem_descriptors[six.text_type(component.location)] = component
 
     return problem_descriptors
 
@@ -643,7 +647,7 @@ def get_course_chapter_ids(course_key):
     except Exception:  # pylint: disable=broad-except
         log.exception('Failed to retrieve course from modulestore.')
         return []
-    return [unicode(chapter_key) for chapter_key in chapter_keys if chapter_key.block_type == 'chapter']
+    return [six.text_type(chapter_key) for chapter_key in chapter_keys if chapter_key.block_type == 'chapter']
 
 
 def allow_public_access(course, visibilities):

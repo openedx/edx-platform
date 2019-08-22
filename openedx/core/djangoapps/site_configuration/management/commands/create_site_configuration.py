@@ -3,9 +3,11 @@ Run by ansible to setup a single site configuration in sandbox environments
 """
 import json
 import logging
+from textwrap import dedent
 
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
+
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
 LOG = logging.getLogger(__name__)
@@ -20,6 +22,8 @@ class Command(BaseCommand):
     ./manage.py lms create_configuration uox.sandbox.edx.org
       --configuration="{'COURSE_CATALOG_API_URL':'https://discovery-uox.sandbox.edx.org/api/v1'}"
     """
+    help = dedent(__doc__).strip()
+
     def add_arguments(self, parser):
         parser.add_argument('domain')
         parser.add_argument(

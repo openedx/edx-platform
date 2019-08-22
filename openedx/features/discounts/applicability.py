@@ -8,6 +8,8 @@ Keep in mind that the code in this file only applies to discounts controlled in 
 not other discounts like coupons or enterprise/program offers configured in ecommerce.
 
 """
+from __future__ import absolute_import
+
 from datetime import datetime
 
 import crum
@@ -87,9 +89,6 @@ def _is_in_holdback(user):
     Return whether the specified user is in the first-purchase-discount holdback group.
     """
     if datetime(2020, 8, 1, tzinfo=pytz.UTC) <= datetime.now(tz=pytz.UTC):
-        return False
-
-    if not datetime(2019, 8, 1, tzinfo=pytz.UTC) <= user.date_joined <= datetime(2019, 11, 1, tzinfo=pytz.UTC):
         return False
 
     # Holdback is 50/50

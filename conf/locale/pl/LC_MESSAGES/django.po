@@ -126,7 +126,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-07-14 20:42+0000\n"
+"POT-Creation-Date: 2019-08-18 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Polish (https://www.transifex.com/open-edx/teams/6205/pl/)\n"
@@ -215,7 +215,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/djangoapps/instructor/views/api.py lms/templates/help_modal.html
+#: lms/djangoapps/instructor/views/api.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/shoppingcart/billing_details.html
@@ -1165,7 +1165,7 @@ msgstr ""
 msgid "The Site that this SAML configuration belongs to."
 msgstr "Strona www do której należy ta konfiguracja SAML."
 
-#: common/djangoapps/third_party_auth/models.py lms/templates/help_modal.html
+#: common/djangoapps/third_party_auth/models.py
 #, python-brace-format
 msgid "{platform_name} Support"
 msgstr "Centrum Pomocy {platform_name}"
@@ -2544,8 +2544,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py
 #: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
 #: cms/templates/index.html cms/templates/videos_index_pagination.html
-#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
-#: lms/templates/register-shib.html
+#: lms/templates/manage_user_standing.html lms/templates/register-shib.html
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/peer_grading/peer_grading_problem.html
@@ -4789,7 +4788,7 @@ msgstr "Strona główna"
 #: lms/djangoapps/courseware/views/views.py
 #: lms/djangoapps/shoppingcart/reports.py
 #: openedx/features/course_experience/__init__.py
-#: cms/templates/widgets/header.html lms/templates/help_modal.html
+#: cms/templates/widgets/header.html
 #: lms/templates/courseware/course_navigation.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
@@ -5208,8 +5207,8 @@ msgstr ""
 #: common/templates/admin/student/loginfailures/change_form_template.html
 #: lms/templates/wiki/edit.html lms/templates/wiki/history.html
 #: lms/templates/wiki/includes/cheatsheet.html lms/templates/dashboard.html
-#: lms/templates/forgot_password_modal.html lms/templates/help_modal.html
-#: lms/templates/signup_modal.html lms/templates/ccx/schedule.html
+#: lms/templates/forgot_password_modal.html lms/templates/signup_modal.html
+#: lms/templates/ccx/schedule.html
 #: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
@@ -6722,30 +6721,6 @@ msgstr ""
 #: lms/djangoapps/courseware/views/views.py
 msgid "Annual Household Income"
 msgstr "Miesięczny przychód gospodarstwa domowego"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your current financial situation. Why do you need assistance?"
-msgstr ""
-"Powiedz nam o swojej obecnej sytuacji finansowej. Dlaczego potrzebujesz "
-"pomocy?"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your learning or professional goals. How will a Verified "
-"Certificate in this course help you achieve these goals?"
-msgstr ""
-"Powiedz nam o swoich celach edukacyjnych i zawodowych. W jaki sposób "
-"certyfikat potwierdzający ukończenie tego kursu pomoże w rozwoju twojej "
-"kariery lub edukacji?"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your plans for this course. What steps will you take to help "
-"you complete the course work and receive a certificate?"
-msgstr ""
-"Powiedz nam o swoich planach dotyczących tego kursu. Jakie kroki podejmiesz,"
-" aby go ukończyć i otrzymać certyfikat?"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Use between 250 and 500 words or so in your response."
@@ -9543,11 +9518,9 @@ msgid "Are you sure you want to cancel retirement for user \"%(username)s\"? "
 msgstr ""
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
 #, python-format
-msgid ""
-"\n"
-"                    Welcome to %(course_name)s\n"
-"                "
+msgid "Welcome to %(course_name)s"
 msgstr ""
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
@@ -9580,11 +9553,6 @@ msgstr ""
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
 #, python-format
 msgid "Sincerely yours, The %(course_name)s Team"
-msgstr ""
-
-#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
-#, python-format
-msgid "Welcome to %(course_name)s"
 msgstr ""
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
@@ -9627,7 +9595,9 @@ msgstr ""
 
 #: lms/templates/instructor/edx_ace/addbetatester/email/body.html
 #, python-format
-msgid "Visit %(site_name)s"
+msgid ""
+"Visit %(site_name)s\n"
+"                "
 msgstr ""
 
 #: lms/templates/instructor/edx_ace/addbetatester/email/body.html
@@ -11193,10 +11163,10 @@ msgid "Welcome to week %(week_num)s of %(course_name)s!"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
-"We hope you're enjoying <strong>%(course_name)s</strong>! We want to let you"
-" know what you can look forward to in week %(week_num)s:"
+"We hope you're enjoying {start_strong}%(course_name)s{end_strong}! We want "
+"to let you know what you can look forward to in week %(week_num)s:"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
@@ -11247,11 +11217,11 @@ msgid "Keep up the momentum!"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
-"Many %(platform_name)s learners in <strong>%(course_name)s</strong> are "
-"completing more problems every week, and participating in the discussion "
-"forums. What do you want to do to keep learning?"
+"Many %(platform_name)s learners in {start_strong}%(course_name)s{end_strong}"
+" are completing more problems every week, and participating in the "
+"discussion forums. What do you want to do to keep learning?"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
@@ -11281,17 +11251,17 @@ msgid "Keep learning today"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
-"Remember when you enrolled in <strong>%(course_name)s</strong>, and other "
-"courses on %(platform_name)s? We do, and we’re glad to have you! Come see "
-"what everyone is learning."
+"Remember when you enrolled in {start_strong}%(course_name)s{end_strong}, and"
+" other courses on %(platform_name)s? We do, and we’re glad to have you! Come"
+" see what everyone is learning."
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
-"Remember when you enrolled in <strong>%(course_name)s</strong> on "
+"Remember when you enrolled in {start_strong}%(course_name)s{end_strong} on "
 "%(platform_name)s? We do, and we’re glad to have you! Come see what everyone"
 " is learning."
 msgstr ""
@@ -11337,26 +11307,28 @@ msgid "Upgrade now"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
 "We hope you are enjoying learning with us so far on "
-"<strong>%(platform_name)s</strong>! A verified certificate allows you to "
-"highlight your new knowledge and skills. An %(platform_name)s certificate is"
-" official and easily shareable."
+"{start_strong}%(platform_name)s{end_strong}! A verified certificate allows "
+"you to highlight your new knowledge and skills. An %(platform_name)s "
+"certificate is official and easily shareable."
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
-#, python-format
+#, python-format, python-brace-format
 msgid ""
 "We hope you are enjoying learning with us so far in "
-"<strong>%(first_course_name)s</strong>! A verified certificate allows you to"
-" highlight your new knowledge and skills. An %(platform_name)s certificate "
-"is official and easily shareable."
+"{start_strong}%(first_course_name)s{end_strong}! A verified certificate "
+"allows you to highlight your new knowledge and skills. An %(platform_name)s "
+"certificate is official and easily shareable."
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
-#, python-format
-msgid "Upgrade by <strong>%(user_schedule_upgrade_deadline_time)s</strong>."
+#, python-format, python-brace-format
+msgid ""
+"Upgrade by "
+"{start_strong}%(user_schedule_upgrade_deadline_time)s{end_strong}."
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
@@ -13138,10 +13110,9 @@ msgid "Required Information to Sign In to {studio_name}"
 msgstr "Informacje wymagane do zalogowania się do {studio_name}"
 
 #: cms/templates/login.html cms/templates/register.html
-#: lms/templates/help_modal.html lms/templates/login.html
-#: lms/templates/provider_login.html lms/templates/register-form.html
-#: lms/templates/register-shib.html lms/templates/signup_modal.html
-#: themes/red-theme/cms/templates/login.html
+#: lms/templates/login.html lms/templates/provider_login.html
+#: lms/templates/register-form.html lms/templates/register-shib.html
+#: lms/templates/signup_modal.html themes/red-theme/cms/templates/login.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "E-mail"
@@ -13193,8 +13164,7 @@ msgstr "Prowadzący"
 msgid "Requirements"
 msgstr "Wymagania"
 
-#: cms/templates/studio_xblock_wrapper.html lms/templates/help_modal.html
-#: lms/templates/module-error.html
+#: cms/templates/studio_xblock_wrapper.html lms/templates/module-error.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Details"
 msgstr "Szczegóły"
@@ -13688,149 +13658,6 @@ msgstr "Zresetuj moje hasło"
 #: lms/templates/forgot_password_modal.html
 msgid "Email is incorrect."
 msgstr "Nieprawidłowy adres e-mail"
-
-#: lms/templates/help_modal.html
-msgid "Support"
-msgstr "Pomoc techniczna"
-
-#: lms/templates/help_modal.html
-msgid ""
-"For {strong_start}questions on course lectures, homework, tools, or "
-"materials for this course{strong_end}, post in the {link_start}course "
-"discussion forum{link_end}."
-msgstr ""
-"Czy masz {strong_start}pytanie dotyczące treści kursu, prac domowych lub "
-"materiałów kursowych,{strong_end}? Zadaj pytanie {link_start}na forum "
-"dyskusyjnym kursu{link_end}."
-
-#: lms/templates/help_modal.html
-msgid ""
-"Have {strong_start}general questions about {platform_name}{strong_end}? You "
-"can find lots of helpful information in the {platform_name} "
-"{link_start}FAQ{link_end}."
-msgstr ""
-"Czy masz {strong_start}pytanie ogólne dotyczące {platform_name}{strong_end}?"
-" Znajdziesz wiele pomocnych informacji w sekcji {platform_name} "
-"{link_start}PiO{link_end}."
-
-#: lms/templates/help_modal.html
-msgid ""
-"Have a {strong_start}question about something specific{strong_end}? You can "
-"contact the {platform_name} general support team directly:"
-msgstr ""
-"Czy masz {strong_start}pytanie dotyczące specyficznej kwestii{strong_end}? "
-"Możesz skontaktować się z działem obsługi platformy {platform_name}:"
-
-#: lms/templates/help_modal.html
-msgid "Report a problem"
-msgstr "Zgłoś problem"
-
-#: lms/templates/help_modal.html
-msgid "Make a suggestion"
-msgstr "Zgłoś sugestię"
-
-#: lms/templates/help_modal.html
-msgid "Ask a question"
-msgstr "Zadaj pytanie"
-
-#: lms/templates/help_modal.html
-msgid ""
-"Please note: The {platform_name} support team is English speaking. While we "
-"will do our best to address your inquiry in any language, our responses will"
-" be in English."
-msgstr ""
-"Uwaga: Dział pomocy {platform_name} jest anglojęzyczny. Chociaż staramy się "
-"odczytać wiadomość w każdym języku, nasze odpowiedzi będą wyłącznie po "
-"angielsku."
-
-#: lms/templates/help_modal.html
-msgid "Briefly describe your issue"
-msgstr "Krótko opisz swoją sprawę"
-
-#: lms/templates/help_modal.html
-msgid "Tell us the details"
-msgstr "Podaj szczegóły"
-
-#: lms/templates/help_modal.html
-msgid ""
-"Describe what you were doing when you encountered the issue. Include any "
-"details that will help us to troubleshoot, including error messages that you"
-" saw."
-msgstr ""
-"Opisz w jaki sposób doszło do problemu. Zawrzyj wszelkie szczegóły, które "
-"pomogą nam zidentyfikować problem, w tym treść komunikatu o błędzie."
-
-#: lms/templates/help_modal.html
-msgid "Thank You!"
-msgstr "Dziękujemy!"
-
-#: lms/templates/help_modal.html
-msgid ""
-"Thank you for your inquiry or feedback.  We typically respond to a request "
-"within one business day, Monday to Friday.  In the meantime, please review "
-"our {link_start}detailed FAQs{link_end} where most questions have already "
-"been answered."
-msgstr ""
-"Dziękujemy za przesłaną wiadomość. Z reguły odpowiadamy w czasie jednego "
-"dnia roboczego. W międzyczasie proszę zapoznać się z "
-"naszym{link_start}działem PiO{link_end}, gdzie znajdują się odpowiedzi na "
-"najczęściej zadawane pytania. "
-
-#: lms/templates/help_modal.html
-msgid "- Select -"
-msgstr "- Wybierz -"
-
-#: lms/templates/help_modal.html
-msgid "problem"
-msgstr "problem"
-
-#: lms/templates/help_modal.html
-msgid "Report a Problem"
-msgstr "Zgłoś problem"
-
-#: lms/templates/help_modal.html
-msgid "Brief description of the problem"
-msgstr "Krótki opis problemu"
-
-#: lms/templates/help_modal.html
-msgid "Details of the problem you are encountering{asterisk}"
-msgstr "Szczegóły problemu {asterisk}"
-
-#: lms/templates/help_modal.html
-msgid "suggestion"
-msgstr "sugestia"
-
-#: lms/templates/help_modal.html
-msgid "Make a Suggestion"
-msgstr "Zgłoś sugestię"
-
-#: lms/templates/help_modal.html
-msgid "Brief description of your suggestion"
-msgstr "Krótki opis twojej sugestii"
-
-#: lms/templates/help_modal.html
-msgid "question"
-msgstr "pytanie"
-
-#: lms/templates/help_modal.html
-msgid "Ask a Question"
-msgstr "Zadaj pytanie"
-
-#: lms/templates/help_modal.html
-msgid "Brief summary of your question"
-msgstr "Krótki opis twojego pytania"
-
-#: lms/templates/help_modal.html
-msgid "An error has occurred."
-msgstr "Wystąpił błąd."
-
-#: lms/templates/help_modal.html
-msgid "Please {link_start}send us e-mail{link_end}."
-msgstr "Prosimy {link_start}o e-mail{link_end}."
-
-#: lms/templates/help_modal.html
-msgid "Please try again later."
-msgstr "Spróbuj ponownie później."
 
 #: lms/templates/hidden_content.html
 msgid "The course has ended."

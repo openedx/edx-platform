@@ -58,7 +58,7 @@ from shoppingcart.models import Coupon, CourseRegCodeItem, PaidCourseRegistratio
 from student.models import CourseEnrollment
 from student.roles import CourseFinanceAdminRole, CourseInstructorRole, CourseSalesAdminRole, CourseStaffRole
 from util.json_request import JsonResponse
-from xmodule.html_module import HtmlDescriptor
+from xmodule.html_module import HtmlBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab
 
@@ -504,7 +504,7 @@ def _section_course_info(course, access):
 
     try:
         sorted_cutoffs = sorted(list(course.grade_cutoffs.items()), key=lambda i: i[1], reverse=True)
-        advance = lambda memo, (letter, score): u"{}: {}, ".format(letter, score) + memo
+        advance = lambda memo, letter_score_tuple: u"{}: {}, ".format(letter_score_tuple[0], letter_score_tuple[1]) + memo  # pylint: disable=line-too-long
         section_data['grade_cutoffs'] = reduce(advance, sorted_cutoffs, "")[:-2]
     except Exception:  # pylint: disable=broad-except
         section_data['grade_cutoffs'] = "Not Available"
@@ -714,7 +714,7 @@ def _section_data_download(course, access):
 def null_applicable_aside_types(block):  # pylint: disable=unused-argument
     """
     get_aside method for monkey-patching into applicable_aside_types
-    while rendering an HtmlDescriptor for email text editing. This returns
+    while rendering an HtmlBlock for email text editing. This returns
     an empty list.
     """
     return []
@@ -726,8 +726,8 @@ def _section_send_email(course, access):
 
     # Monkey-patch applicable_aside_types to return no asides for the duration of this render
     with patch.object(course.runtime, 'applicable_aside_types', null_applicable_aside_types):
-        # This HtmlDescriptor is only being used to generate a nice text editor.
-        html_module = HtmlDescriptor(
+        # This HtmlBlock is only being used to generate a nice text editor.
+        html_module = HtmlBlock(
             course.system,
             DictFieldData({'data': ''}),
             ScopeIds(None, None, None, course_key.make_usage_key('html', 'fake'))
@@ -739,7 +739,7 @@ def _section_send_email(course, access):
         usage_id_serializer=lambda usage_id: quote_slashes(six.text_type(usage_id)),
         # Generate a new request_token here at random, because this module isn't connected to any other
         # xblock rendering.
-        request_token=uuid.uuid1().get_hex()
+        request_token=uuid.uuid1().hex
     )
     cohorts = []
     if is_course_cohorted(course_key):

@@ -19,10 +19,6 @@ pysqlite ; python_version == "2.7"
 #   https://github.com/jazzband/pip-tools/issues/852
 pip-tools==3.8.0
 
-# six is at 1.12.0, but transifex-client requires ==1.11.0
-# https://github.com/transifex/transifex-client/issues/252
-six==1.11.0
-
 # Convert text markup to HTML; used in capa problems, forums, and course wikis; pin Markdown version as tests failed for its upgrade to latest release
 Markdown==2.6.11
 
@@ -33,8 +29,9 @@ mysqlclient<1.5
 # Can be removed when we get to Python 3.
 pylint-plugin-utils==0.3
 
-# transifex-client 0.13.6 requires urllib3<1.24, but requests will pull in urllib3==1.24 (https://github.com/transifex/transifex-client/pull/241/files)
-urllib3<1.24
+# transifex-client 0.13.5 and 0.13.6 pin six and urllib3 to old versions needlessly
+#   https://github.com/transifex/transifex-client/issues/252
+transifex-client==0.13.4
 
 # Bumping requests-oauthlib to 1.2 updates oauthlib to 3.0.0, which changes a response code in certain cases
 # This causes a test to fail. Before fixing, we would need to make sure mobile apps are functional with this change
@@ -55,12 +52,6 @@ scipy<=1.2.1
 # xmodule.tests.test_resource_templates.ResourceTemplatesTests See TE-2391 for details.
 pytest<4.6.0
 
-# Pinning to older version of edx-rbac until ENT-2002 is resolved.
-edx-rbac==0.2.1
-
-# transifex-client 0.13.6 requires python-slugify 1.2.6, but the latest version is 3.0.2
-python-slugify==1.2.6
-
 # 1.2.3 breaks unittest in
 # lms.djangoapps.course_api.tests.test_views.CourseListSearchViewTest.test_list_all_with_search_term
 # acceptance.tests.lms.test_lms_course_discovery.CourseDiscoveryTest.test_search
@@ -72,3 +63,22 @@ ruamel.ordereddict; python_version == "2.7"
 
 # 1.16.1 requires djangorestframework>=3.8
 drf-yasg==1.16
+
+# 2.0.0 is a dummy package, because faulthandler has been incorporated into pytest 5.0
+pytest-faulthandler<2.0.0
+
+# faulthandler is part of core python staring with python 3.3
+faulthandler; python_version == "2.7"
+
+# Numpy 1.17.0 only supports python >= 3.5
+numpy<1.17.0
+
+# Pinned by moto to this but since moto is only a test requirement, we don't
+# see the constraint when generating base.txt
+#
+# There are incompatible versions in the resolved dependencies:
+#  jsondiff (from edx-enterprise==1.8.6->-r requirements/edx/base.txt (line 108))
+#  jsondiff==1.1.1 (from moto==1.2.0->-r requirements/edx/testing.in (line 33))
+#  jsondiff==1.2.0 (from -r requirements/edx/base.txt (line 146))
+jsondiff==1.1.1
+

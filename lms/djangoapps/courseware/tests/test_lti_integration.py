@@ -207,7 +207,7 @@ class TestLTIModuleListing(SharedModuleStoreTestCase):
             self.expected_handler_url('lti_2_0_result_rest_handler') + "/user/{anon_user_id}",
             "display_name": self.lti_published.display_name,
         }
-        self.assertEqual([expected], json.loads(response.content))
+        self.assertEqual([expected], json.loads(response.content.decode('utf-8')))
 
     def test_lti_rest_non_get(self):
         """tests that the endpoint returns 404 when hit with NON-get"""

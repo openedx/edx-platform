@@ -2,6 +2,7 @@
 Manages the creation and termination of EC2 workers, to be used with pytest-xdist
 as part of the CI process on Jenkins.
 """
+from __future__ import absolute_import
 import argparse
 import logging
 import time
@@ -11,6 +12,7 @@ from botocore.config import Config
 from botocore.exceptions import ClientError
 import socket
 from multiprocessing import Pool
+from six.moves import range
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -65,7 +67,7 @@ class PytestWorkerManager():
             except ClientError as err:
                 # Handle AWS throttling with an exponential backoff
                 if retry == self.MAX_RUN_WORKER_RETRIES:
-                    raise StandardError(
+                    raise Exception(
                         "MAX_RUN_WORKER_RETRIES ({}) reached while spinning up workers due to AWS throttling.".format(self.MAX_RUN_WORKER_RETRIES)
                     )
                 logger.info("Hit error: {}. Retrying".format(err))
@@ -83,7 +85,11 @@ class PytestWorkerManager():
         ip_addresses = []
         all_running = False
         for attempt in range(0, self.WORKER_BOOTUP_TIMEOUT_MINUTES * 12):
-            list_workers_response = self.ec2.describe_instances(InstanceIds=not_running)
+            try:
+                list_workers_response = self.ec2.describe_instances(InstanceIds=not_running)
+            except:
+                logger.info("Exception hit trying to describe instances.")
+                continue
             del not_running[:]
             for reservations in list_workers_response['Reservations']:
                 for instance_info in reservations['Instances']:
@@ -101,7 +107,7 @@ class PytestWorkerManager():
                 break
 
         if not all_running:
-            raise StandardError(
+            raise Exception(
                 "Timed out waiting to spin up all workers."
             )
         logger.info("Successfully booted up {} workers.".format(number_of_workers))
@@ -122,7 +128,7 @@ class PytestWorkerManager():
                 break
 
             if ssh_try == self.WORKER_SSH_ATTEMPTS - 1:
-                raise StandardError(
+                raise Exception(
                     "Max ssh tries to remote workers reached."
                 )
 

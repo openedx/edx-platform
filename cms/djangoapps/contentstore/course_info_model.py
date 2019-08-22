@@ -20,9 +20,8 @@ import re
 from django.http import HttpResponseBadRequest
 from django.utils.translation import ugettext as _
 
-from cms.djangoapps.contentstore.push_notification import enqueue_push_course_update
 from openedx.core.lib.xblock_utils import get_course_update_items
-from xmodule.html_module import CourseInfoModule
+from xmodule.html_module import CourseInfoBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -49,7 +48,6 @@ def update_course_updates(location, update, passed_id=None, user=None):
     Either add or update the given course update.
     Add:
         If the passed_id is absent or None, the course update is added.
-        If push_notification_selected is set in the update, a celery task for the push notification is created.
     Update:
         It will update it if it has a passed_id which has a valid value.
         Until updates have distinct values, the passed_id is the location url + an index into the html structure.
@@ -76,10 +74,9 @@ def update_course_updates(location, update, passed_id=None, user=None):
             "id": len(course_update_items) + 1,
             "date": update["date"],
             "content": update["content"],
-            "status": CourseInfoModule.STATUS_VISIBLE
+            "status": CourseInfoBlock.STATUS_VISIBLE
         }
         course_update_items.append(course_update_dict)
-        enqueue_push_course_update(update, location.course_key)
 
     # update db record
     save_course_update_items(location, course_updates, course_update_items, user)
@@ -106,14 +103,14 @@ def _get_visible_update(course_update_items):
     """
     if isinstance(course_update_items, dict):
         # single course update item
-        if course_update_items.get("status") != CourseInfoModule.STATUS_DELETED:
+        if course_update_items.get("status") != CourseInfoBlock.STATUS_DELETED:
             return _make_update_dict(course_update_items)
         else:
             # requested course update item has been deleted (soft delete)
             return {"error": _("Course update not found."), "status": 404}
 
     return ([_make_update_dict(update) for update in course_update_items
-             if update.get("status") != CourseInfoModule.STATUS_DELETED])
+             if update.get("status") != CourseInfoBlock.STATUS_DELETED])
 
 
 # pylint: disable=unused-argument
@@ -138,7 +135,7 @@ def delete_course_update(location, update, passed_id, user):
     if 0 < passed_index <= len(course_update_items):
         course_update_item = course_update_items[passed_index - 1]
         # soft delete course update item
-        course_update_item["status"] = CourseInfoModule.STATUS_DELETED
+        course_update_item["status"] = CourseInfoBlock.STATUS_DELETED
         course_update_items[passed_index - 1] = course_update_item
 
         # update db record

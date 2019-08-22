@@ -34,6 +34,7 @@ boto==2.39.0                        # Deprecated version of the AWS SDK; we shou
 boto3==1.4.8                        # Amazon Web Services SDK for Python
 botocore==1.8.17                    # via boto3, s3transfer
 celery==3.1.25                      # Asynchronous task execution library
+contextlib2                         # We need contextlib2.ExitStack so we can stop using contextlib.nested which doesn't exist in python 3
 defusedxml
 Django<1.12                     # Web application framework
 django-babel-underscore             # underscore template extractor for django-babel (internationalization utilities)
@@ -68,7 +69,6 @@ djangorestframework-jwt
 drf-yasg                            # Replacement for django-rest-swagger
 edx-ace==0.1.10
 edx-analytics-data-api-client
-edx-bulk-grades
 edx-ccx-keys
 edx-celeryutils
 edx-completion
@@ -92,7 +92,6 @@ edxval
 enum34==1.1.6                       # Backport of Enum from Python 3.4+
 event-tracking
 feedparser==5.1.3
-firebase-token-generator==1.3.2
 fs==2.0.18
 fs-s3fs==0.1.8
 glob2                               # Enhanced glob module, used in openedx.core.lib.rooted_paths
@@ -101,6 +100,7 @@ help-tokens
 html5lib                            # HTML parser, used for capa problems
 ipaddress                           # Ip network support for Embargo feature
 jsonfield                           # Django model field for validated JSON; used in several apps
+laboratory                          # Library for testing that code refactors/infrastructure changes produce identical results
 mailsnake                           # Needed for mailchimp (mailing djangoapp)
 mako==1.0.2                         # Primary template language used for server-side page rendering
 Markdown                            # Convert text markup to HTML; used in capa problems, forums, and course wikis
@@ -154,6 +154,5 @@ web-fragments                       # Provides the ability to render fragments o
 XBlock                              # Courseware component architecture
 xblock-utils                        # Provides utilities used by the Discussion XBlock
 xss-utils                           # https://github.com/edx/edx-platform/pull/20633 Fix XSS via Translations
-zendesk                             # Python API for the Zendesk customer support system
 geoip2==2.9.0                       # Python API for the GeoIP web services and databases
 edx-bulk-grades                     # LMS REST API for managing bulk grading operations

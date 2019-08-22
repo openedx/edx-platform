@@ -2,28 +2,28 @@
 """
 Tests of XML export
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+
+import shutil
+import unittest
+from datetime import datetime, timedelta, tzinfo
+from tempfile import mkdtemp
+from textwrap import dedent
 
 import ddt
 import lxml.etree
 import mock
 import pytz
-import shutil
-import unittest
-
-from datetime import datetime, timedelta, tzinfo
+import six
 from django.utils.translation import ugettext_lazy
 from fs.osfs import OSFS
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from path import Path as path
 from six import text_type
-from tempfile import mkdtemp
-from textwrap import dedent
-
 from xblock.core import XBlock
-from xblock.fields import String, Scope, Integer
+from xblock.fields import Integer, Scope, String
 from xblock.test.tools import blocks_are_equivalent
 
-from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.tests import DATA_DIR
@@ -137,9 +137,10 @@ class RoundTripTestCase(unittest.TestCase):
         course_id = initial_course.id
 
         print("Checking key equality")
-        self.assertItemsEqual(
-            initial_import.modules[course_id].keys(),
-            second_import.modules[course_id].keys()
+        six.assertCountEqual(
+            self,
+            list(initial_import.modules[course_id].keys()),
+            list(second_import.modules[course_id].keys())
         )
 
         print("Checking module equality")

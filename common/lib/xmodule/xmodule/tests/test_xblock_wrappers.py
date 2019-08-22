@@ -6,48 +6,57 @@ functionality
 # For tests, ignore access to protected members
 # pylint: disable=protected-access
 
-import webob
+from __future__ import absolute_import
+
+from unittest.case import SkipTest, TestCase
+
 import ddt
+import webob
 from factory import (
     BUILD_STRATEGY,
     Factory,
-    lazy_attribute,
     LazyAttributeSequence,
-    post_generation,
     SubFactory,
-    use_strategy,
+    lazy_attribute,
+    post_generation,
+    use_strategy
 )
 from fs.memoryfs import MemoryFS
 from lxml import etree
 from mock import Mock
-from unittest.case import SkipTest, TestCase
-
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from six.moves import range
+from xblock.core import XBlock
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
-from xblock.core import XBlock
 
-from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-
-from xmodule.x_module import ModuleSystem, XModule, XModuleDescriptor, DescriptorSystem, STUDENT_VIEW, STUDIO_VIEW, PUBLIC_VIEW
 from xmodule.annotatable_module import AnnotatableDescriptor
-from xmodule.course_module import CourseDescriptor
-from xmodule.html_module import HtmlDescriptor
-from xmodule.poll_module import PollDescriptor
-from xmodule.word_cloud_module import WordCloudDescriptor
-from xmodule.seq_module import SequenceDescriptor
 from xmodule.conditional_module import ConditionalDescriptor
+from xmodule.course_module import CourseDescriptor
+from xmodule.html_module import HtmlBlock
+from xmodule.poll_module import PollDescriptor
 from xmodule.randomize_module import RandomizeDescriptor
-from xmodule.vertical_block import VerticalBlock
-from xmodule.wrapper_module import WrapperBlock
+from xmodule.seq_module import SequenceDescriptor
 from xmodule.tests import get_test_descriptor_system, get_test_system
-
+from xmodule.vertical_block import VerticalBlock
+from xmodule.word_cloud_module import WordCloudDescriptor
+from xmodule.wrapper_module import WrapperBlock
+from xmodule.x_module import (
+    PUBLIC_VIEW,
+    STUDENT_VIEW,
+    STUDIO_VIEW,
+    DescriptorSystem,
+    ModuleSystem,
+    XModule,
+    XModuleDescriptor
+)
 
 # A dictionary that maps specific XModuleDescriptor classes without children
 # to a list of sample field values to test with.
 # TODO: Add more types of sample data
 LEAF_XMODULES = {
     AnnotatableDescriptor: [{}],
-    HtmlDescriptor: [{}],
+    HtmlBlock: [{}],
     PollDescriptor: [{'display_name': 'Poll Display Name'}],
     WordCloudDescriptor: [{}],
 }
@@ -127,7 +136,7 @@ class ContainerModuleRuntimeFactory(ModuleSystemFactory):
         """
         # pylint: disable=no-member
         if depth == 0:
-            self.get_module.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlDescriptor)
+            self.get_module.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlBlock)
         else:
             self.get_module.side_effect = lambda x: ContainerModuleFactory(
                 descriptor_cls=VerticalBlock,
@@ -155,7 +164,7 @@ class ContainerDescriptorRuntimeFactory(DescriptorSystemFactory):
         """
         # pylint: disable=no-member
         if depth == 0:
-            self.load_item.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlDescriptor)
+            self.load_item.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlBlock)
         else:
             self.load_item.side_effect = lambda x: ContainerModuleFactory(
                 descriptor_cls=VerticalBlock,
@@ -238,7 +247,7 @@ class ContainerDescriptorFactory(LeafDescriptorFactory):
     Factory to generate XModuleDescriptors that are containers.
     """
     runtime = SubFactory(ContainerDescriptorRuntimeFactory)
-    children = range(3)
+    children = list(range(3))
 
 
 class ContainerModuleFactory(LeafModuleFactory):

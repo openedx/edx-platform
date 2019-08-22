@@ -2,11 +2,13 @@
 Custom field types for mongoengine
 """
 from __future__ import absolute_import
+
 import mongoengine
-from opaque_keys.edx.locations import Location
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from six import text_type
 import six
+
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.locations import Location
+from six import text_type
 
 
 class CourseKeyField(mongoengine.StringField):

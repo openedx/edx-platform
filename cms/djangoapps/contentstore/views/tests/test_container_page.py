@@ -63,9 +63,9 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
                 u'data-locator="{0}" data-course-key="{0.course_key}">'.format(self.child_container.location)
             ),
             expected_breadcrumbs=(
-                ur'<a href="/course/{course}{section_parameters}" class="{classes}">\s*Week 1\s*</a>\s*'
-                ur'<a href="/course/{course}{subsection_parameters}" class="{classes}">\s*Lesson 1\s*</a>\s*'
-                ur'<a href="/container/{unit}" class="{classes}">\s*Unit\s*</a>'
+                u'<a href="/course/{course}{section_parameters}" class="{classes}">\\s*Week 1\\s*</a>\\s*'
+                u'<a href="/course/{course}{subsection_parameters}" class="{classes}">\\s*Lesson 1\\s*</a>\\s*'
+                u'<a href="/container/{unit}" class="{classes}">\\s*Unit\\s*</a>'
             ).format(
                 course=re.escape(six.text_type(self.course.id)),
                 unit=re.escape(six.text_type(self.vertical.location)),
@@ -91,10 +91,10 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
                     u'data-locator="{0}" data-course-key="{0.course_key}">'.format(draft_container.location)
                 ),
                 expected_breadcrumbs=(
-                    ur'<a href="/course/{course}{section_parameters}" class="{classes}">\s*Week 1\s*</a>\s*'
-                    ur'<a href="/course/{course}{subsection_parameters}" class="{classes}">\s*Lesson 1\s*</a>\s*'
-                    ur'<a href="/container/{unit}" class="{classes}">\s*Unit\s*</a>\s*'
-                    ur'<a href="/container/{split_test}" class="{classes}">\s*Split Test\s*</a>'
+                    u'<a href="/course/{course}{section_parameters}" class="{classes}">\\s*Week 1\\s*</a>\\s*'
+                    u'<a href="/course/{course}{subsection_parameters}" class="{classes}">\\s*Lesson 1\\s*</a>\\s*'
+                    u'<a href="/container/{unit}" class="{classes}">\\s*Unit\\s*</a>\\s*'
+                    u'<a href="/container/{split_test}" class="{classes}">\\s*Split Test\\s*</a>'
                 ).format(
                     course=re.escape(six.text_type(self.course.id)),
                     unit=re.escape(six.text_type(self.vertical.location)),

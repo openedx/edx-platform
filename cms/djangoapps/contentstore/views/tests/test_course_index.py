@@ -142,7 +142,7 @@ class TestCourseIndex(CourseTestCase):
         ItemFactory.create(parent_location=subsection.location, category="video", display_name="My Video")
 
         resp = self.client.get(outline_url, HTTP_ACCEPT='application/json')
-        json_response = json.loads(resp.content)
+        json_response = json.loads(resp.content.decode('utf-8'))
 
         # First spot check some values in the root response
         self.assertEqual(json_response['category'], 'course')
@@ -198,7 +198,7 @@ class TestCourseIndex(CourseTestCase):
         })
         resp = self.client.get(notification_url, HTTP_ACCEPT='application/json')
 
-        json_response = json.loads(resp.content)
+        json_response = json.loads(resp.content.decode('utf-8'))
 
         self.assertEquals(json_response['state'], state)
         self.assertEquals(json_response['action'], action)
@@ -464,7 +464,7 @@ class TestCourseOutline(CourseTestCase):
         outline_url = reverse_course_url('course_handler', self.course.id)
         outline_url = outline_url + '?format=concise' if is_concise else outline_url
         resp = self.client.get(outline_url, HTTP_ACCEPT='application/json')
-        json_response = json.loads(resp.content)
+        json_response = json.loads(resp.content.decode('utf-8'))
 
         # First spot check some values in the root response
         self.assertEqual(json_response['category'], 'course')
@@ -554,7 +554,7 @@ class TestCourseOutline(CourseTestCase):
             [component for component in advanced_modules if component in deprecated_block_types]
         )
 
-        self.assertItemsEqual(info['blocks'], expected_blocks)
+        six.assertCountEqual(self, info['blocks'], expected_blocks)
         self.assertEqual(
             info['advance_settings_url'],
             reverse_course_url('advanced_settings_handler', course_id)
@@ -680,7 +680,7 @@ class TestCourseReIndex(CourseTestCase):
         self.assertIn(self.SUCCESSFUL_RESPONSE, response.content)
         self.assertEqual(response.status_code, 200)
 
-    @mock.patch('xmodule.html_module.HtmlDescriptor.index_dictionary')
+    @mock.patch('xmodule.html_module.HtmlBlock.index_dictionary')
     def test_reindex_course_search_index_error(self, mock_index_dictionary):
         """
         Test json response with mocked error data for html
@@ -743,7 +743,7 @@ class TestCourseReIndex(CourseTestCase):
         with self.assertRaises(SearchIndexingError):
             reindex_course_and_check_access(self.course.id, self.user)
 
-    @mock.patch('xmodule.html_module.HtmlDescriptor.index_dictionary')
+    @mock.patch('xmodule.html_module.HtmlBlock.index_dictionary')
     def test_reindex_html_error_json_responses(self, mock_index_dictionary):
         """
         Test json response with mocked error data for html
@@ -853,7 +853,7 @@ class TestCourseReIndex(CourseTestCase):
         with self.assertRaises(SearchIndexingError):
             CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
 
-    @mock.patch('xmodule.html_module.HtmlDescriptor.index_dictionary')
+    @mock.patch('xmodule.html_module.HtmlBlock.index_dictionary')
     def test_indexing_html_error_responses(self, mock_index_dictionary):
         """
         Test do_course_reindex response with mocked error data for html

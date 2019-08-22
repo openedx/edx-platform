@@ -23,7 +23,7 @@
           <pre>{% trans "[Article Name](wiki:ArticleName)" as tmsg%}{{tmsg|force_escape}}</pre>
         </section>
         <section>
-          <h3>{% filter force_escape %}{% blocktrans with platform_name=settings.PLATFORM_NAME %}{{ platform_name }} Additions:{% endblocktrans %}{%endfilter}</h3>
+          <h3>{% filter force_escape %}{% blocktrans with platform_name=settings.PLATFORM_NAME %}{{ platform_name }} Additions:{% endblocktrans %}{% endfilter %}</h3>
           <pre>$LaTeX {% trans "Math Expression" as tmsg %}{{tmsg|force_escape}}$</pre>
         </section>
       </div>

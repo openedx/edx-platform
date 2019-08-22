@@ -69,4 +69,4 @@ class CohortingSettingsTestCase(SharedModuleStoreTestCase):
         request.user = AdminFactory()
         response = cohorting_settings(request, six.text_type(self.course.id))
         self.assertEqual(200, response.status_code)
-        self.assertEqual(expected_response, json.loads(response.content))
+        self.assertEqual(expected_response, json.loads(response.content.decode('utf-8')))

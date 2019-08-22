@@ -2,6 +2,7 @@
 
 <%!
 import urllib
+import six
 
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
@@ -149,7 +150,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                         % endif
                     </span>
                 % else:
-                    % if isinstance(course_date, basestring):
+                    % if isinstance(course_date, six.string_types):
                         <span class="info-date-block">${container_string.format(date=course_date)}</span>
                     % elif course_date is not None:
                         <span class="info-date-block localized-datetime" data-language="${user_language}" data-timezone="${user_timezone}" data-datetime="${course_date.strftime('%Y-%m-%dT%H:%M:%S%z')}" data-format=${format} data-string="${container_string}"></span>

@@ -162,8 +162,8 @@ def anonymous_id_for_user(user, course_id, save=True):
 
     # include the secret key as a salt, and to make the ids unique across different LMS installs.
     hasher = hashlib.md5()
-    hasher.update(settings.SECRET_KEY)
-    hasher.update(text_type(user.id))
+    hasher.update(settings.SECRET_KEY.encode('utf8'))
+    hasher.update(text_type(user.id).encode('utf8'))
     if course_id:
         hasher.update(text_type(course_id).encode('utf-8'))
     digest = hasher.hexdigest()
@@ -1255,7 +1255,7 @@ class CourseEnrollment(models.Model):
 
         Arguments:
             user (User): the user for whom we want the program enrollment
-            coure_id (CourseKey): the id of the course the user has a course enrollment in
+            course_id (CourseKey): the id of the course the user has a course enrollment in
 
         Returns:
             ProgramEnrollment object or None
@@ -1272,10 +1272,9 @@ class CourseEnrollment(models.Model):
         Returns a boolean value regarding whether the user has access to enroll in the course. Returns False if the
         enrollment has been closed.
         """
-        # Disable the pylint error here, as per ormsbee. This local import was previously
-        # in CourseEnrollment.enroll
-        from courseware.access import has_access  # pylint: disable=import-error
-        return not has_access(user, 'enroll', course)
+        # pylint: disable=import-error
+        from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
+        return not user.has_perm(ENROLL_IN_COURSE, course)
 
     def update_enrollment(self, mode=None, is_active=None, skip_refund=False):
         """

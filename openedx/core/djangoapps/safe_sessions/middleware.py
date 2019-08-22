@@ -55,7 +55,7 @@ SSL-protected channel.  Otherwise, a session hijacker could copy
 the entire cookie and use it to impersonate the victim.
 
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from base64 import b64encode
 from contextlib import contextmanager
@@ -70,6 +70,8 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.core import signing
 from django.http import HttpResponse
 from django.utils.crypto import get_random_string
+from django.utils.encoding import python_2_unicode_compatible
+
 from six import text_type  # pylint: disable=ungrouped-imports
 
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
@@ -86,6 +88,7 @@ class SafeCookieError(Exception):
         log.error(error_message)
 
 
+@python_2_unicode_compatible
 class SafeCookieData(object):
     """
     Cookie data that cryptographically binds and timestamps the user
@@ -145,7 +148,7 @@ class SafeCookieData(object):
         safe_cookie_string.
         """
         try:
-            raw_cookie_components = safe_cookie_string.split(cls.SEPARATOR)
+            raw_cookie_components = six.text_type(safe_cookie_string).split(cls.SEPARATOR)
             safe_cookie_data = SafeCookieData(*raw_cookie_components)
         except TypeError:
             raise SafeCookieError(
@@ -160,7 +163,7 @@ class SafeCookieData(object):
                     ))
             return safe_cookie_data
 
-    def __unicode__(self):
+    def __str__(self):
         """
         Returns a string serialization of the safe cookie data.
         """
@@ -201,8 +204,8 @@ class SafeCookieData(object):
         """
         hash_func = sha256()
         for data_item in [self.version, self.session_id, user_id]:
-            hash_func.update(six.text_type(data_item))
-            hash_func.update('|')
+            hash_func.update(six.b(six.text_type(data_item)))
+            hash_func.update(six.b('|'))
         return hash_func.hexdigest()
 
     @staticmethod
@@ -317,7 +320,6 @@ class SafeSessionMiddleware(SessionMiddleware):
         Step 4. Delete the cookie, if it's marked for deletion.
 
         """
-
         response = super(SafeSessionMiddleware, self).process_response(request, response)  # Step 1
 
         if not _is_cookie_marked_for_deletion(request) and _is_cookie_present(response):
@@ -475,7 +477,7 @@ def _delete_cookie(request, response):
     cookie_header = request.META.get('HTTP_COOKIE', '')[:4096]
     log.warning(
         u"Malformed Cookie Header? First 4K, in Base64: %s",
-        b64encode(cookie_header)
+        b64encode(six.b(cookie_header))
     )
 
     # Note, there is no request.user attribute at this point.

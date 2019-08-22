@@ -7,6 +7,7 @@ from __future__ import absolute_import
 import urllib
 from uuid import uuid4
 
+import six
 from django.conf import settings
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
@@ -222,7 +223,7 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
 
         # TODO need to fix components that are sending definition_data as strings, instead of as dicts
         # For now, migrate them into dicts here.
-        if isinstance(data, basestring):
+        if isinstance(data, six.string_types):
             data = {'data': data}
 
         created_block = store.create_child(

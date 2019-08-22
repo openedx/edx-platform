@@ -335,7 +335,7 @@ class TestProgramProgressMeter(TestCase):
 
         self.assertEqual(meter.progress(count_only=True), expected)
 
-    def test_mutiple_program_enrollment(self, mock_get_programs):
+    def test_multiple_program_enrollment(self, mock_get_programs):
         """
         Verify that correct programs are returned in the correct order when the
         user is enrolled in course runs appearing in programs.
@@ -674,7 +674,8 @@ class TestProgramProgressMeter(TestCase):
         self._create_certificates(unknown['key'], status='unknown')
 
         meter = ProgramProgressMeter(self.site, self.user)
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             meter.completed_course_runs,
             [
                 {'course_run_id': downloadable['key'], 'type': CourseMode.VERIFIED},
@@ -1162,7 +1163,7 @@ class TestProgramDataExtender(ModuleStoreTestCase):
 
     def test_learner_eligibility_for_one_click_purchase_user_entitlements(self):
         """
-        Learner should be eligibile for one click purchase if they hold an entitlement in one or more courses
+        Learner should be eligible for one click purchase if they hold an entitlement in one or more courses
         in the program and there are remaining unpurchased courses in the program with entitlement products.
         """
         course1 = _create_course(self, self.course_price, course_run_count=2, make_entitlement=True)
@@ -1236,7 +1237,7 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         """
         course1 = _create_course(self, self.course_price)
         course2 = _create_course(self, self.course_price, course_run_count=2, make_entitlement=True)
-        # The above statement makes a verfied entitlement for the course, which is an applicable seat type
+        # The above statement makes a verified entitlement for the course, which is an applicable seat type
         # and the statement below makes a professional entitlement for the same course, which is not applicable
         course2['entitlements'].append(EntitlementFactory(mode=CourseMode.PROFESSIONAL))
         expected_skus = set([course1['course_runs'][0]['seats'][0]['sku'], course2['entitlements'][0]['sku']])
@@ -1488,12 +1489,12 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         self.assertEqual(data['avg_price_per_course'], 0.0)
 
     @ddt.data(True, False)
-    @mock.patch(UTILS_MODULE + '.has_access')
-    def test_can_enroll(self, can_enroll, mock_has_access):
+    @mock.patch('django.contrib.auth.models.PermissionsMixin.has_perm')
+    def test_can_enroll(self, can_enroll, mock_has_perm):
         """
         Verify that the student's can_enroll status is included.
         """
-        mock_has_access.return_value = can_enroll
+        mock_has_perm.return_value = can_enroll
 
         data = ProgramMarketingDataExtender(self.program, self.user).extend()
 

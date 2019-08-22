@@ -12,9 +12,12 @@ file and check it in at the same time as your model changes. To do that,
 ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 """
+from __future__ import absolute_import
+
 import itertools
 import logging
 
+import six
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -22,11 +25,11 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
+from opaque_keys.edx.django.models import BlockTypeKeyField, CourseKeyField, UsageKeyField
 from six import text_type
+from six.moves import range
 
 import coursewarehistoryextended
-from opaque_keys.edx.django.models import BlockTypeKeyField, CourseKeyField, UsageKeyField
-
 from openedx.core.djangolib.markup import HTML
 
 log = logging.getLogger("edx.courseware")
@@ -37,7 +40,7 @@ def chunks(items, chunk_size):
     Yields the values from items in chunks of size chunk_size
     """
     items = list(items)
-    return (items[i:i + chunk_size] for i in xrange(0, len(items), chunk_size))
+    return (items[i:i + chunk_size] for i in range(0, len(items), chunk_size))
 
 
 class ChunkingManager(models.Manager):
@@ -67,7 +70,7 @@ class ChunkingManager(models.Manager):
         """
         chunk_size = kwargs.pop('chunk_size', 500)
         res = itertools.chain.from_iterable(
-            self.filter(**dict([(chunk_field, chunk)] + kwargs.items()))
+            self.filter(**dict([(chunk_field, chunk)] + list(kwargs.items())))
             for chunk in chunks(items, chunk_size)
         )
         return res
@@ -151,7 +154,7 @@ class StudentModule(models.Model):
             },)
 
     def __unicode__(self):
-        return unicode(repr(self))
+        return six.text_type(repr(self))
 
     @classmethod
     def get_state_by_params(cls, course_id, module_state_keys, student_id=None):
@@ -245,7 +248,7 @@ class StudentModuleHistory(BaseStudentModuleHistory):
     student_module = models.ForeignKey(StudentModule, db_index=True, db_constraint=False, on_delete=models.CASCADE)
 
     def __unicode__(self):
-        return unicode(repr(self))
+        return six.text_type(repr(self))
 
     def save_history(sender, instance, **kwargs):  # pylint: disable=no-self-argument, unused-argument
         """

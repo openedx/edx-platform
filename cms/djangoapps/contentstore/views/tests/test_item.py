@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 
 import json
+import re
 from datetime import datetime, timedelta
 
 import ddt
@@ -101,7 +102,7 @@ class ItemTest(CourseTestCase):
         Get the UsageKey from the response payload and verify that the status_code was 200.
         :param response:
         """
-        parsed = json.loads(response.content)
+        parsed = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response.status_code, 200)
         key = UsageKey.from_string(parsed['locator'])
         if key.course_key.run is None:
@@ -147,7 +148,7 @@ class GetItemTest(ItemTest):
         """
         resp = self._get_preview(usage_key, data)
         self.assertEqual(resp.status_code, 200)
-        resp_content = json.loads(resp.content)
+        resp_content = json.loads(resp.content.decode('utf-8'))
         html = resp_content['html']
         self.assertTrue(html)
         resources = resp_content['resources']
@@ -255,8 +256,8 @@ class GetItemTest(ItemTest):
             html,
             # The instance of the wrapper class will have an auto-generated ID. Allow any
             # characters after wrapper.
-            ur'"/container/{}" class="action-button">\s*<span class="action-button-text">View</span>'.format(
-                wrapper_usage_key
+            u'"/container/{}" class="action-button">\\s*<span class="action-button-text">View</span>'.format(
+                re.escape(six.text_type(wrapper_usage_key))
             )
         )
 
@@ -383,7 +384,7 @@ class GetItemTest(ItemTest):
         self.assertEqual(resp.status_code, 200)
 
         # Check that the partition and group information was returned
-        result = json.loads(resp.content)
+        result = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(result["user_partitions"], [
             {
                 "id": ENROLLMENT_TRACK_PARTITION_ID,
@@ -462,7 +463,7 @@ class GetItemTest(ItemTest):
             url = reverse_usage_url('xblock_handler', usage_key) + '?fields={field_type}'.format(field_type=field_type)
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
-            response = json.loads(response.content)
+            response = json.loads(response.content.decode('utf-8'))
             if field_type == 'ancestorInfo':
                 self.assertIn('ancestors', response)
                 for ancestor_info in response['ancestors']:
@@ -895,7 +896,7 @@ class TestMoveItem(ItemTest):
         expected_index = target_index if target_index is not None else source_index
         response = self._move_component(source_usage_key, target_usage_key, target_index)
         self.assertEqual(response.status_code, 200)
-        response = json.loads(response.content)
+        response = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response['move_source_locator'], six.text_type(source_usage_key))
         self.assertEqual(response['parent_locator'], six.text_type(target_usage_key))
         self.assertEqual(response['source_index'], expected_index)
@@ -958,7 +959,7 @@ class TestMoveItem(ItemTest):
 
         # Move component and verify that response contains initial index
         response = self._move_component(self.html_usage_key, self.vert2_usage_key)
-        response = json.loads(response.content)
+        response = json.loads(response.content.decode('utf-8'))
         self.assertEquals(original_index, response['source_index'])
 
         # Verify that new parent has the moved component at the last index.
@@ -971,7 +972,7 @@ class TestMoveItem(ItemTest):
 
         # Undo Move to the original index, use the source index fetched from the response.
         response = self._move_component(self.html_usage_key, self.vert_usage_key, response['source_index'])
-        response = json.loads(response.content)
+        response = json.loads(response.content.decode('utf-8'))
         self.assertEquals(original_index, response['source_index'])
 
     def test_move_large_target_index(self):
@@ -982,7 +983,7 @@ class TestMoveItem(ItemTest):
         parent_children_length = len(parent.children)
         response = self._move_component(self.html_usage_key, self.vert2_usage_key, parent_children_length + 10)
         self.assertEqual(response.status_code, 400)
-        response = json.loads(response.content)
+        response = json.loads(response.content.decode('utf-8'))
 
         expected_error = u'You can not move {usage_key} at an invalid index ({target_index}).'.format(
             usage_key=self.html_usage_key,
@@ -999,7 +1000,7 @@ class TestMoveItem(ItemTest):
         parent_loc = self.store.get_parent_location(self.html_usage_key)
         response = self._move_component(self.html_usage_key, self.seq_usage_key)
         self.assertEqual(response.status_code, 400)
-        response = json.loads(response.content)
+        response = json.loads(response.content.decode('utf-8'))
 
         expected_error = u'You can not move {source_type} into {target_type}.'.format(
             source_type=self.html_usage_key.block_type,
@@ -1017,7 +1018,7 @@ class TestMoveItem(ItemTest):
         self.assertEqual(parent_loc, self.vert_usage_key)
         response = self._move_component(self.html_usage_key, self.vert_usage_key)
         self.assertEqual(response.status_code, 400)
-        response = json.loads(response.content)
+        response = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(response['error'], 'Item is already present in target location.')
         self.assertEqual(self.store.get_parent_location(self.html_usage_key), parent_loc)
@@ -1034,7 +1035,7 @@ class TestMoveItem(ItemTest):
         self.assertEqual(parent_loc, self.vert_usage_key)
         response = self._move_component(library_content_usage_key, library_content_usage_key)
         self.assertEqual(response.status_code, 400)
-        response = json.loads(response.content)
+        response = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(response['error'], 'You can not move an item into itself.')
         self.assertEqual(self.store.get_parent_location(self.html_usage_key), parent_loc)
@@ -1099,7 +1100,7 @@ class TestMoveItem(ItemTest):
         self.setup_and_verify_content_experiment(0)
         response = self._move_component(self.html_usage_key, self.split_test_usage_key)
         self.assertEqual(response.status_code, 400)
-        response = json.loads(response.content)
+        response = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(response['error'], 'You can not move an item directly into content experiment.')
         self.assertEqual(self.store.get_parent_location(self.html_usage_key), self.vert_usage_key)
@@ -1114,7 +1115,7 @@ class TestMoveItem(ItemTest):
         for child_vert_usage_key in split_test.children:
             response = self._move_component(self.split_test_usage_key, child_vert_usage_key)
             self.assertEqual(response.status_code, 400)
-            response = json.loads(response.content)
+            response = json.loads(response.content.decode('utf-8'))
 
             self.assertEqual(response['error'], 'You can not move an item into it\'s child.')
             self.assertEqual(self.store.get_parent_location(self.split_test_usage_key), self.vert_usage_key)
@@ -1131,7 +1132,7 @@ class TestMoveItem(ItemTest):
         # Try to move content experiment further down the level to a child group A nested inside main group A.
         response = self._move_component(self.split_test_usage_key, child_split_test.children[0])
         self.assertEqual(response.status_code, 400)
-        response = json.loads(response.content)
+        response = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(response['error'], 'You can not move an item into it\'s child.')
         self.assertEqual(self.store.get_parent_location(self.split_test_usage_key), self.vert_usage_key)
@@ -1144,7 +1145,7 @@ class TestMoveItem(ItemTest):
         parent_loc = self.store.get_parent_location(self.html_usage_key)
         response = self._move_component(self.html_usage_key, self.vert2_usage_key, target_index)
         self.assertEqual(response.status_code, 400)
-        response = json.loads(response.content)
+        response = json.loads(response.content.decode('utf-8'))
 
         error = u'You must provide target_index ({target_index}) as an integer.'.format(target_index=target_index)
         self.assertEqual(response['error'], error)
@@ -1171,7 +1172,7 @@ class TestMoveItem(ItemTest):
             reverse('xblock_handler')
         )
         self.assertEqual(response.status_code, 400)
-        response = json.loads(response.content)
+        response = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response['error'], 'Patch request did not recognise any parameters to handle.')
 
     def _verify_validation_message(self, message, expected_message, expected_message_type):
@@ -1887,7 +1888,7 @@ class TestEditItem(TestEditItemSetup):
             }
         )
         self.assertEqual(response.status_code, 400)
-        parsed = json.loads(response.content)
+        parsed = json.loads(response.content.decode('utf-8'))
         self.assertIn("error", parsed)
         self.assertIn("Incorrect RelativeTime value", parsed["error"])  # See xmodule/fields.py
 
@@ -1909,7 +1910,7 @@ class TestEditItemSplitMongo(TestEditItemSetup):
         for __ in range(3):
             resp = self.client.get(view_url, HTTP_ACCEPT='application/json')
             self.assertEqual(resp.status_code, 200)
-            content = json.loads(resp.content)
+            content = json.loads(resp.content.decode('utf-8'))
             self.assertEqual(len(PyQuery(content['html'])('.xblock-{}'.format(STUDIO_VIEW))), 1)
 
 
@@ -2276,8 +2277,8 @@ class TestComponentTemplates(CourseTestCase):
         """
         self._verify_basic_component("discussion", "Discussion")
         self._verify_basic_component("video", "Video")
-        self.assertGreater(self.get_templates_of_type('html'), 0)
-        self.assertGreater(self.get_templates_of_type('problem'), 0)
+        self.assertGreater(len(self.get_templates_of_type('html')), 0)
+        self.assertGreater(len(self.get_templates_of_type('problem')), 0)
         self.assertIsNone(self.get_templates_of_type('advanced'))
 
         # Now fully disable video through XBlockConfiguration
@@ -2495,7 +2496,7 @@ class TestXBlockInfo(ItemTest):
     def test_json_responses(self):
         outline_url = reverse_usage_url('xblock_outline_handler', self.usage_key)
         resp = self.client.get(outline_url, HTTP_ACCEPT='application/json')
-        json_response = json.loads(resp.content)
+        json_response = json.loads(resp.content.decode('utf-8'))
         self.validate_course_xblock_info(json_response, course_outline=True)
 
     @ddt.data(

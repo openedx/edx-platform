@@ -3,17 +3,18 @@ Sync courses from catalog service.  This is used to setup a master's
 integration environment.
 """
 import logging
-from six import text_type
+from textwrap import dedent
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
+from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 from contentstore.management.commands.utils import user_from_str
 from contentstore.views.course import create_new_course_in_store
-from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.catalog.utils import get_course_runs
-from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.exceptions import DuplicateCourseError
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +25,7 @@ class Command(BaseCommand):
 
     Example: ./manage.py cms sync_courses staff@example.com
     """
+    help = dedent(__doc__).strip()
 
     def add_arguments(self, parser):
         parser.add_argument('instructor')

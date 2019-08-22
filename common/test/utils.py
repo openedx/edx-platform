@@ -1,6 +1,8 @@
 """
 General testing utilities.
 """
+from __future__ import absolute_import
+
 import functools
 import sys
 from contextlib import contextmanager
@@ -122,7 +124,7 @@ class MockS3Mixin(object):
     """
     def setUp(self):
         super(MockS3Mixin, self).setUp()
-        self._mock_s3 = moto.mock_s3()
+        self._mock_s3 = moto.mock_s3_deprecated()
         self._mock_s3.start()
 
     def tearDown(self):

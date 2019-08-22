@@ -29,7 +29,7 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 def parse_json(response):
     """Parse response, which is assumed to be json"""
-    return json.loads(response.content)
+    return json.loads(response.content.decode('utf-8'))
 
 
 def user(email):

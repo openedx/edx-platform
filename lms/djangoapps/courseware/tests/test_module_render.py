@@ -26,6 +26,7 @@ from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactor
 from edx_proctoring.api import create_exam, create_exam_attempt, update_attempt_status
 from edx_proctoring.runtime import set_runtime_service
 from edx_proctoring.tests.test_services import MockCertificateService, MockCreditService, MockGradesService
+from edx_when.field_data import DateLookupFieldData
 from freezegun import freeze_time
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import MagicMock, Mock, patch
@@ -66,6 +67,7 @@ from student.models import CourseEnrollment, anonymous_id_for_user
 from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from xblock_django.models import XBlockConfiguration
 from xmodule.capa_module import ProblemBlock
+from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
 from xmodule.lti_module import LTIDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -365,27 +367,27 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         dispatch_url = self._get_dispatch_url()
         response = self.client.post(dispatch_url)
         self.assertEqual(200, response.status_code)
-        self.assertEqual(json.loads(response.content), {'success': True})
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {'success': True})
 
         response = self.client.post(dispatch_url, {'position': ''})
         self.assertEqual(200, response.status_code)
-        self.assertEqual(json.loads(response.content), {'success': True})
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {'success': True})
 
         response = self.client.post(dispatch_url, {'position': '-1'})
         self.assertEqual(200, response.status_code)
-        self.assertEqual(json.loads(response.content), {'success': True})
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {'success': True})
 
         response = self.client.post(dispatch_url, {'position': "string"})
         self.assertEqual(200, response.status_code)
-        self.assertEqual(json.loads(response.content), {'success': True})
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {'success': True})
 
         response = self.client.post(dispatch_url, {'position': u"Φυσικά"})
         self.assertEqual(200, response.status_code)
-        self.assertEqual(json.loads(response.content), {'success': True})
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {'success': True})
 
         response = self.client.post(dispatch_url, {'position': None})
         self.assertEqual(200, response.status_code)
-        self.assertEqual(json.loads(response.content), {'success': True})
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {'success': True})
 
     @ddt.data('pure', 'vertical')
     @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
@@ -492,10 +494,14 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             OverrideFieldData
         )
 
-        # the OverrideFieldData should point to the original unwrapped field_data
-        self.assertIs(
+        # the OverrideFieldData should point to the date FieldData
+        self.assertIsInstance(
             # pylint: disable=protected-access
             descriptor._field_data._authored_data._source.fallback,
+            DateLookupFieldData
+        )
+        self.assertIs(
+            descriptor._field_data._authored_data._source.fallback._defaults,
             descriptor._unwrapped_field_data
         )
 
@@ -906,6 +912,26 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         with self.assertRaises(BlockCompletion.DoesNotExist):
             BlockCompletion.objects.get(block_key=block.scope_ids.usage_id)
 
+    @XBlock.register_temp_plugin(GradedStatelessXBlock, identifier='stateless_scorer')
+    @patch('lms.djangoapps.courseware.module_render.grades_signals.SCORE_PUBLISHED.send')
+    def test_anonymous_user_not_be_graded(self, mock_score_signal):
+        course = CourseFactory.create()
+        descriptor_kwargs = {
+            'category': 'problem',
+        }
+        request = self.request_factory.get('/')
+        request.user = AnonymousUser()
+        descriptor = ItemFactory.create(**descriptor_kwargs)
+
+        render.handle_xblock_callback(
+            request,
+            text_type(course.id),
+            quote_slashes(text_type(descriptor.location)),
+            'xmodule_handler',
+            'problem_check',
+        )
+        self.assertFalse(mock_score_signal.called)
+
 
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_XBLOCK_VIEW_ENDPOINT': True})
@@ -935,7 +961,7 @@ class TestXBlockView(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEquals(200, response.status_code)
 
         expected = ['csrf_token', 'html', 'resources']
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         for section in expected:
             self.assertIn(section, content)
         doc = PyQuery(content['html'])
@@ -955,7 +981,7 @@ class TestXBlockView(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         response = render.xblock_view(request, *self.view_args)
         self.assertEquals(200, response.status_code)
 
-        html = json.loads(response.content)['html']
+        html = json.loads(response.content.decode('utf-8'))['html']
         self.assertEqual('Staff Debug Info' in html, not hide)
 
     def test_xblock_view_handler_not_authenticated(self):
@@ -1524,7 +1550,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         )
         result_fragment = module.render(STUDENT_VIEW)
 
-        self.assertEquals(len(PyQuery(result_fragment.content)('div.xblock.xblock-student_view.xmodule_HtmlModule')), 1)
+        self.assertEquals(len(PyQuery(result_fragment.content)('div.xblock.xblock-student_view.xmodule_HtmlBlock')), 1)
 
     def test_xmodule_display_wrapper_disabled(self):
         module = render.get_module(
@@ -1536,7 +1562,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         )
         result_fragment = module.render(STUDENT_VIEW)
 
-        self.assertNotIn('div class="xblock xblock-student_view xmodule_display xmodule_HtmlModule"',
+        self.assertNotIn('div class="xblock xblock-student_view xmodule_display xmodule_HtmlBlock"',
                          result_fragment.content)
 
     def test_static_link_rewrite(self):
@@ -1933,7 +1959,11 @@ class TestStaffDebugInfo(SharedModuleStoreTestCase):
 
 PER_COURSE_ANONYMIZED_DESCRIPTORS = (LTIDescriptor, )
 PER_STUDENT_ANONYMIZED_XBLOCKS = [
+    AboutBlock,
+    CourseInfoBlock,
+    HtmlBlock,
     ProblemBlock,
+    StaticTabBlock,
     VideoBlock,
 ]
 

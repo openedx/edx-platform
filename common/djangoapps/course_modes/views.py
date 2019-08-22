@@ -28,12 +28,12 @@ from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
 from course_modes.models import CourseMode
-from courseware.access import has_access
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from openedx.core.djangoapps.catalog.utils import get_currency_data
 from openedx.core.djangoapps.embargo import api as embargo_api
+from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.utils import get_first_purchase_offer_banner_fragment
@@ -150,7 +150,7 @@ class ChooseModeView(View):
         # When a credit mode is available, students will be given the option
         # to upgrade from a verified mode to a credit mode at the end of the course.
         # This allows students who have completed photo verification to be eligible
-        # for univerity credit.
+        # for university credit.
         # Since credit isn't one of the selectable options on the track selection page,
         # we need to check *all* available course modes in order to determine whether
         # a credit mode is available.  If so, then we show slightly different messaging
@@ -259,7 +259,7 @@ class ChooseModeView(View):
         # This is a bit redundant with logic in student.views.change_enrollment,
         # but I don't really have the time to refactor it more nicely and test.
         course = modulestore().get_course(course_key)
-        if not has_access(user, 'enroll', course):
+        if not user.has_perm(ENROLL_IN_COURSE, course):
             error_msg = _("Enrollment is closed")
             return self.get(request, course_id, error=error_msg)
 

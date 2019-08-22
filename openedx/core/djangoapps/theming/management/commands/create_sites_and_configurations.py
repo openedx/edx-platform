@@ -8,6 +8,7 @@ import fnmatch
 import json
 import logging
 import os
+from textwrap import dedent
 
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
@@ -31,6 +32,7 @@ class Command(BaseCommand):
     Example:
     ./manage.py lms create_sites_and_configurations --dns-name whitelabel --theme-path /edx/src/edx-themes/edx-platform
     """
+    help = dedent(__doc__).strip()
     dns_name = None
     theme_path = None
     ecommerce_user = None

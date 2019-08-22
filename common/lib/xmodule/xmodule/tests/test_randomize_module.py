@@ -1,16 +1,18 @@
 """
 Test cases covering workflows and behaviors for the Randomize XModule
 """
+from __future__ import absolute_import
+
 import unittest
 from datetime import datetime, timedelta
 
-from pytz import UTC
 from opaque_keys.edx.locator import BlockUsageLocator
+from pytz import UTC
 from xblock.fields import ScopeIds
+
 from xmodule.randomize_module import RandomizeModule
 
 from .test_course_module import DummySystem as DummyImportSystem
-
 
 ORG = 'test_org'
 COURSE = 'test_course'

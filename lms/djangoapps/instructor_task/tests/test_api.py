@@ -126,28 +126,6 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
         with self.assertRaises(NotImplementedError):
             submit_rescore_problem_for_all_students(request, problem_url)
 
-    def _test_submit_with_long_url(self, task_function, student=None):
-        problem_url_name = 'x' * 255
-        self.define_option_problem(problem_url_name)
-        location = InstructorTaskModuleTestCase.problem_location(problem_url_name)
-        with self.assertRaises(ValueError):
-            if student is not None:
-                task_function(self.create_task_request(self.instructor), location, student)
-            else:
-                task_function(self.create_task_request(self.instructor), location)
-
-    def test_submit_rescore_all_with_long_url(self):
-        self._test_submit_with_long_url(submit_rescore_problem_for_all_students)
-
-    def test_submit_rescore_student_with_long_url(self):
-        self._test_submit_with_long_url(submit_rescore_problem_for_student, self.student)
-
-    def test_submit_reset_all_with_long_url(self):
-        self._test_submit_with_long_url(submit_reset_problem_attempts_for_all_students)
-
-    def test_submit_delete_all_with_long_url(self):
-        self._test_submit_with_long_url(submit_delete_problem_state_for_all_students)
-
     @ddt.data(
         (normalize_repr(submit_rescore_problem_for_all_students), 'rescore_problem'),
         (

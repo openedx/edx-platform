@@ -153,10 +153,11 @@ def set_course_discussion_settings(course_key, **kwargs):
         A CourseDiscussionSettings object.
     """
     fields = {
-        'division_scheme': basestring,
+        'division_scheme': six.string_types[0],
         'always_divide_inline_discussions': bool,
         'divided_discussions': list,
     }
+
     course_discussion_settings = get_course_discussion_settings(course_key)
     for field, field_type in fields.items():
         if field in kwargs:

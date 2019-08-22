@@ -7,6 +7,7 @@ import json
 
 import ddt
 import mock
+import six
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from edx_django_utils.cache import RequestCache
@@ -1019,7 +1020,8 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             "Topic B": {"id": "Topic_B"},
             "Topic C": {"id": "Topic_C"}
         }
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             utils.get_discussion_categories_ids(self.course, self.user),
             ["Topic_A", "Topic_B", "Topic_C"]
         )
@@ -1031,7 +1033,8 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion")
         self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion")
         self.create_discussion("Chapter 3 / Section 1", "Discussion")
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             utils.get_discussion_categories_ids(self.course, self.user),
             ["discussion1", "discussion2", "discussion3", "discussion4", "discussion5", "discussion6"]
         )
@@ -1045,7 +1048,8 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter 1", "Discussion 1")
         self.create_discussion("Chapter 2", "Discussion")
         self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion")
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             utils.get_discussion_categories_ids(self.course, self.user),
             ["Topic_A", "Topic_B", "Topic_C", "discussion1", "discussion2", "discussion3"]
         )
@@ -1220,7 +1224,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
 class JsonResponseTestCase(TestCase, UnicodeTestMixin):
     def _test_unicode_data(self, text):
         response = utils.JsonResponse(text)
-        reparsed = json.loads(response.content)
+        reparsed = json.loads(response.content.decode('utf-8'))
         self.assertEqual(reparsed, text)
 
 

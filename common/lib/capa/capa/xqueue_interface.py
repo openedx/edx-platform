@@ -1,12 +1,14 @@
 #
 #  LMS Interface to external queueing system (xqueue)
 #
+from __future__ import absolute_import
+
 import hashlib
 import json
 import logging
 
 import requests
-
+import six
 
 log = logging.getLogger(__name__)
 dateformat = '%Y%m%d%H%M%S'
@@ -70,7 +72,7 @@ class XQueueInterface(object):
     """
 
     def __init__(self, url, django_auth, requests_auth=None):
-        self.url = unicode(url)
+        self.url = six.text_type(url)
         self.auth = django_auth
         self.session = requests.Session()
         self.session.auth = requests_auth
@@ -102,8 +104,6 @@ class XQueueInterface(object):
             if error != 0:
                 # when the login fails
                 log.debug("Failed to login to queue: %s", content)
-                log.info(u"Login failed content information : {content} with error: {error}".format(
-                    content=content, error=error))
                 return (error, content)
             if files_to_upload is not None:
                 # Need to rewind file pointers
@@ -111,7 +111,7 @@ class XQueueInterface(object):
                     f.seek(0)
             (error, msg) = self._send_to_queue(header, body, files_to_upload)
 
-        return (error, msg)
+        return error, msg
 
     def _login(self):
         payload = {
@@ -139,13 +139,13 @@ class XQueueInterface(object):
             )
         except requests.exceptions.ConnectionError as err:
             log.error(err)
-            return (1, 'cannot connect to server')
+            return 1, 'cannot connect to server'
 
         except requests.exceptions.ReadTimeout as err:
             log.error(err)
-            return (1, 'failed to read from the server')
+            return 1, 'failed to read from the server'
 
         if response.status_code not in [200]:
-            return (1, 'unexpected HTTP status code [%d]' % response.status_code)
+            return 1, 'unexpected HTTP status code [%d]' % response.status_code
 
         return parse_xreply(response.text)

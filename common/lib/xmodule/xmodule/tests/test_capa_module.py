@@ -5,39 +5,41 @@ Tests of the Capa XModule
 # pylint: disable=missing-docstring
 # pylint: disable=invalid-name
 
+from __future__ import absolute_import
+
 import datetime
 import json
-import random
-import requests
 import os
+import random
 import textwrap
 import unittest
 
 import ddt
+import requests
+import six
+import webob
 from django.utils.encoding import smart_text
 from edx_user_state_client.interface import XBlockUserState
 from lxml import etree
-from mock import Mock, patch, DEFAULT
-import six
-import webob
-from webob.multidict import MultiDict
-
-import xmodule
-from xmodule.tests import DATA_DIR
-from capa import responsetypes
-from capa.responsetypes import (StudentInputError, LoncapaProblemError,
-                                ResponseError)
-from capa.xqueue_interface import XQueueInterface
-from xmodule.capa_module import ComplexEncoder, ProblemBlock
+from mock import DEFAULT, Mock, patch
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from pytz import UTC
+from six.moves import range, zip
+from webob.multidict import MultiDict
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xblock.scorable import Score
 
-from . import get_test_system
-from pytz import UTC
+import xmodule
+from capa import responsetypes
 from capa.correctmap import CorrectMap
+from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
+from capa.xqueue_interface import XQueueInterface
+from xmodule.capa_module import ComplexEncoder, ProblemBlock
+from xmodule.tests import DATA_DIR
+
 from ..capa_base import RANDOMIZATION, SHOWANSWER
+from . import get_test_system
 
 
 class CapaFactory(object):
@@ -76,13 +78,8 @@ class CapaFactory(object):
         """
         Return the key stored in the capa problem answer dict
         """
-        return (
-            "%s_%d_%d" % (
-                "-".join(['i4x', 'edX', 'capa_test', 'problem', 'SampleProblem%d' % cls.num]),
-                response_num,
-                input_num
-            )
-        )
+        return ("%s_%d_%d" % ("-".join(['i4x', 'edX', 'capa_test', 'problem', 'SampleProblem%d' % cls.num]),
+                              response_num, input_num))
 
     @classmethod
     def create(cls, attempts=None, problem_state=None, correct=False, xml=None, override_get_score=True, **kwargs):
@@ -272,34 +269,18 @@ class ProblemBlockTest(unittest.TestCase):
 
     @ddt.data(
         # If show_correctness=always, Answer is visible after attempted
-        ({
-            'showanswer': 'attempted',
-            'max_attempts': '1',
-            'show_correctness': 'always',
-        }, False, True),
+        ({'showanswer': 'attempted', 'max_attempts': '1', 'show_correctness': 'always', }, False, True),
         # If show_correctness=never, Answer is never visible
-        ({
-            'showanswer': 'attempted',
-            'max_attempts': '1',
-            'show_correctness': 'never',
-        }, False, False),
+        ({'showanswer': 'attempted', 'max_attempts': '1', 'show_correctness': 'never', }, False, False),
         # If show_correctness=past_due, answer is not visible before due date
-        ({
-            'showanswer': 'attempted',
-            'show_correctness': 'past_due',
-            'max_attempts': '1',
-            'due': 'tomorrow_str',
-        }, False, False),
+        ({'showanswer': 'attempted', 'show_correctness': 'past_due', 'max_attempts': '1', 'due': 'tomorrow_str', },
+         False, False),
         # If show_correctness=past_due, answer is visible after due date
-        ({
-            'showanswer': 'attempted',
-            'show_correctness': 'past_due',
-            'max_attempts': '1',
-            'due': 'yesterday_str',
-        }, True, True),
-    )
+        ({'showanswer': 'attempted', 'show_correctness': 'past_due', 'max_attempts': '1', 'due': 'yesterday_str', },
+         True, True))
     @ddt.unpack
-    def test_showanswer_hide_correctness(self, problem_data, answer_available_no_attempt, answer_available_after_attempt):
+    def test_showanswer_hide_correctness(self, problem_data, answer_available_no_attempt,
+                                         answer_available_after_attempt):
         """
         Ensure that the answer will not be shown when correctness is being hidden.
         """
@@ -618,36 +599,15 @@ class ProblemBlockTest(unittest.TestCase):
 
     @ddt.data(
         # Correctness not visible if due date in the future, even after using up all attempts
-        ({
-            'show_correctness': 'past_due',
-            'max_attempts': '1',
-            'attempts': '1',
-            'due': 'tomorrow_str',
-        }, False),
+        ({'show_correctness': 'past_due', 'max_attempts': '1', 'attempts': '1', 'due': 'tomorrow_str', }, False),
         # Correctness visible if due date in the past
-        ({
-            'show_correctness': 'past_due',
-            'max_attempts': '1',
-            'attempts': '0',
-            'due': 'yesterday_str',
-        }, True),
+        ({'show_correctness': 'past_due', 'max_attempts': '1', 'attempts': '0', 'due': 'yesterday_str', }, True),
         # Correctness not visible if due date in the future
-        ({
-            'show_correctness': 'past_due',
-            'max_attempts': '1',
-            'attempts': '0',
-            'due': 'tomorrow_str',
-        }, False),
+        ({'show_correctness': 'past_due', 'max_attempts': '1', 'attempts': '0', 'due': 'tomorrow_str', }, False),
         # Correctness not visible because grace period hasn't expired,
         # even after using up all attempts
-        ({
-            'show_correctness': 'past_due',
-            'max_attempts': '1',
-            'attempts': '1',
-            'due': 'yesterday_str',
-            'graceperiod': 'two_day_delta_str',
-        }, False),
-    )
+        ({'show_correctness': 'past_due', 'max_attempts': '1', 'attempts': '1', 'due': 'yesterday_str',
+          'graceperiod': 'two_day_delta_str', }, False))
     @ddt.unpack
     def test_show_correctness_past_due(self, problem_data, expected_result):
         """
@@ -903,8 +863,8 @@ class ProblemBlockTest(unittest.TestCase):
 
         self.assertEqual(xqueue_interface._http_post.call_count, 1)
         _, kwargs = xqueue_interface._http_post.call_args  # pylint: disable=unpacking-non-sequence
-        self.assertItemsEqual(fpaths, kwargs['files'].keys())
-        for fpath, fileobj in kwargs['files'].iteritems():
+        six.assertCountEqual(self, fpaths, list(kwargs['files'].keys()))
+        for fpath, fileobj in six.iteritems(kwargs['files']):
             self.assertEqual(fpath, fileobj.name)
 
     def test_submit_problem_with_files_as_xblock(self):
@@ -936,8 +896,8 @@ class ProblemBlockTest(unittest.TestCase):
 
         self.assertEqual(xqueue_interface._http_post.call_count, 1)
         _, kwargs = xqueue_interface._http_post.call_args  # pylint: disable=unpacking-non-sequence
-        self.assertItemsEqual(fnames, kwargs['files'].keys())
-        for fpath, fileobj in kwargs['files'].iteritems():
+        six.assertCountEqual(self, fnames, list(kwargs['files'].keys()))
+        for fpath, fileobj in six.iteritems(kwargs['files']):
             self.assertEqual(fpath, fileobj.name)
 
     def test_submit_problem_error(self):
@@ -947,7 +907,6 @@ class ProblemBlockTest(unittest.TestCase):
                              LoncapaProblemError,
                              ResponseError]
         for exception_class in exception_classes:
-
             # Create the module
             module = CapaFactory.create(attempts=1, user_is_staff=False)
 
@@ -988,7 +947,7 @@ class ProblemBlockTest(unittest.TestCase):
                         '  File "jailed_code", line 15, in <module>\\n'
                         '    exec code in g_dict\\n  File "<string>", line 67, in <module>\\n'
                         '  File "<string>", line 65, in check_func\\n'
-                        'Exception: Couldn\'t execute jailed code\\n\' with status code: 1',)
+                        'Exception: Couldn\'t execute jailed code\\n\' with status code: 1', )
                 except ResponseError as err:
                     mock_grade.side_effect = exception_class(six.text_type(err))
                 get_request_dict = {CapaFactory.input_key(): '3.14'}
@@ -1047,7 +1006,6 @@ class ProblemBlockTest(unittest.TestCase):
                              LoncapaProblemError,
                              ResponseError]
         for exception_class in exception_classes:
-
             # Create the module
             module = CapaFactory.create(attempts=1, user_is_staff=False)
 
@@ -1074,7 +1032,6 @@ class ProblemBlockTest(unittest.TestCase):
         for exception_class in [StudentInputError,
                                 LoncapaProblemError,
                                 ResponseError]:
-
             # Create the module
             module = CapaFactory.create(attempts=1, user_is_staff=True)
 
@@ -1685,7 +1642,7 @@ class ProblemBlockTest(unittest.TestCase):
 
         # check to make sure that the input_state and the keys have the same values
         module1.set_state_from_lcp()
-        self.assertEqual(module1.lcp.inputs.keys(), module1.input_state.keys())
+        self.assertEqual(list(module1.lcp.inputs.keys()), list(module1.input_state.keys()))
 
         module2.set_state_from_lcp()
 
@@ -1877,6 +1834,7 @@ class ProblemBlockTest(unittest.TestCase):
         """
         Run the test for each possible rerandomize value
         """
+
         def _reset_and_get_seed(module):
             """
             Reset the XModule and return the module's seed
@@ -1896,7 +1854,7 @@ class ProblemBlockTest(unittest.TestCase):
         seed = module.seed
         self.assertIsNotNone(seed)
 
-        #the seed should never change because the student hasn't finished the problem
+        # the seed should never change because the student hasn't finished the problem
         self.assertEqual(seed, _reset_and_get_seed(module))
 
     @ddt.data(
@@ -2122,7 +2080,6 @@ class ProblemBlockTest(unittest.TestCase):
 
 @ddt.ddt
 class ProblemBlockXMLTest(unittest.TestCase):
-
     sample_checkbox_problem_xml = textwrap.dedent("""
         <problem>
             <p>Title</p>

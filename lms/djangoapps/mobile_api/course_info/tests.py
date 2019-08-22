@@ -11,7 +11,7 @@ from six.moves import range
 
 from mobile_api.testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
 from mobile_api.utils import API_V1, API_V05
-from xmodule.html_module import CourseInfoModule
+from xmodule.html_module import CourseInfoBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_importer import import_course_from_xml
@@ -60,7 +60,7 @@ class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTest
                         "id": num,
                         "date": "Date" + str(num),
                         "content": "<a href=\"/static/\">Update" + str(num) + "</a>",
-                        "status": CourseInfoModule.STATUS_VISIBLE
+                        "status": CourseInfoBlock.STATUS_VISIBLE
                     }
                 )
         else:

@@ -89,7 +89,7 @@ def setup_students_and_grades(context):
         context.student = student = UserFactory.create()
         CourseEnrollmentFactory.create(user=student, course_id=context.course.id)
 
-        context.student2 = student2 = UserFactory.create()
+        context.student2 = student2 = UserFactory.create(username=u'u\u0131\u028c\u0279\u0250\u026f')
         CourseEnrollmentFactory.create(user=student2, course_id=context.course.id)
 
         # create grades for self.student as if they'd submitted the ccx
@@ -273,7 +273,7 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-        schedule = json.loads(response.content)['schedule']
+        schedule = json.loads(response.content.decode('utf-8'))['schedule']
         self.assertEqual(schedule[0]['hidden'], False)
         self.assertEqual(schedule[0]['start'], start)
         self.assertEqual(schedule[0]['children'][0]['start'], start)
@@ -519,7 +519,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
             url, json.dumps(schedule), content_type='application/json'
         )
 
-        schedule = json.loads(response.content)['schedule']
+        schedule = json.loads(response.content.decode('utf-8'))['schedule']
         self.assertEqual(schedule[0]['hidden'], False)
         self.assertEqual(schedule[0]['start'], u'2014-11-20 00:00')
         self.assertEqual(

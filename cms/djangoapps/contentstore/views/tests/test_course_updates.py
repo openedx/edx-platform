@@ -9,7 +9,6 @@ from django.test.utils import override_settings
 from mock import patch
 from opaque_keys.edx.keys import UsageKey
 
-from contentstore.models import PushNotificationConfig
 from contentstore.tests.test_course_settings import CourseTestCase
 from contentstore.utils import reverse_course_url, reverse_usage_url
 from xmodule.modulestore.django import modulestore
@@ -38,7 +37,7 @@ class CourseUpdateTest(CourseTestCase):
             resp = self.client.ajax_post(url, payload)
             self.assertContains(resp, '', status_code=200)
 
-            return json.loads(resp.content)
+            return json.loads(resp.content.decode('utf-8'))
 
         resp = self.client.get_html(
             reverse_course_url('course_info_handler', self.course.id)
@@ -58,7 +57,7 @@ class CourseUpdateTest(CourseTestCase):
             first_update_url, payload, HTTP_X_HTTP_METHOD_OVERRIDE="PUT", REQUEST_METHOD="POST"
         )
 
-        self.assertHTMLEqual(content, json.loads(resp.content)['content'],
+        self.assertHTMLEqual(content, json.loads(resp.content.decode('utf-8'))['content'],
                              "iframe w/ div")
         # refetch using provided id
         refetched = self.client.get_json(first_update_url)
@@ -73,7 +72,7 @@ class CourseUpdateTest(CourseTestCase):
 
         course_update_url = self.create_update_url()
         resp = self.client.get_json(course_update_url)
-        payload = json.loads(resp.content)
+        payload = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(len(payload), 2)
 
         # try json w/o required fields
@@ -120,12 +119,12 @@ class CourseUpdateTest(CourseTestCase):
         self.assertHTMLEqual(content, payload['content'], "single iframe")
         # first count the entries
         resp = self.client.get_json(course_update_url)
-        payload = json.loads(resp.content)
+        payload = json.loads(resp.content.decode('utf-8'))
         before_delete = len(payload)
 
         url = self.create_update_url(provided_id=this_id)
         resp = self.client.delete(url)
-        payload = json.loads(resp.content)
+        payload = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(len(payload), before_delete - 1)
 
     def test_course_updates_compatibility(self):
@@ -150,7 +149,7 @@ class CourseUpdateTest(CourseTestCase):
         # test getting all updates list
         course_update_url = self.create_update_url()
         resp = self.client.get_json(course_update_url)
-        payload = json.loads(resp.content)
+        payload = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(payload, [{u'date': update_date, u'content': update_content, u'id': 1}])
         self.assertEqual(len(payload), 1)
 
@@ -158,7 +157,7 @@ class CourseUpdateTest(CourseTestCase):
 
         first_update_url = self.create_update_url(provided_id=payload[0]['id'])
         resp = self.client.get_json(first_update_url)
-        payload = json.loads(resp.content)
+        payload = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(payload, {u'date': u'January 23, 2014', u'content': u'Hello world!', u'id': 1})
         self.assertHTMLEqual(update_date, payload['date'])
         self.assertHTMLEqual(update_content, payload['content'])
@@ -173,7 +172,7 @@ class CourseUpdateTest(CourseTestCase):
         resp = self.client.ajax_post(
             course_update_url + '1', payload, HTTP_X_HTTP_METHOD_OVERRIDE="PUT", REQUEST_METHOD="POST"
         )
-        self.assertHTMLEqual(update_content, json.loads(resp.content)['content'])
+        self.assertHTMLEqual(update_content, json.loads(resp.content.decode('utf-8'))['content'])
         course_updates = modulestore().get_item(location)
         self.assertEqual(course_updates.items, [{u'date': update_date, u'content': update_content, u'id': 1}])
         # course_updates 'data' field should not update automatically
@@ -184,7 +183,7 @@ class CourseUpdateTest(CourseTestCase):
         self.assertEqual(course_updates.items, [{u'date': update_date, u'content': update_content, u'id': 1}])
         # now try to delete first update item
         resp = self.client.delete(course_update_url + '1')
-        self.assertEqual(json.loads(resp.content), [])
+        self.assertEqual(json.loads(resp.content.decode('utf-8')), [])
         # confirm that course update is soft deleted ('status' flag set to 'deleted') in db
         course_updates = modulestore().get_item(location)
         self.assertEqual(course_updates.items,
@@ -192,7 +191,7 @@ class CourseUpdateTest(CourseTestCase):
 
         # now try to get deleted update
         resp = self.client.get_json(course_update_url + '1')
-        payload = json.loads(resp.content)
+        payload = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(payload.get('error'), u"Course update not found.")
         self.assertEqual(resp.status_code, 404)
 
@@ -207,7 +206,7 @@ class CourseUpdateTest(CourseTestCase):
         resp = self.client.ajax_post(
             course_update_url, payload, REQUEST_METHOD="POST"
         )
-        self.assertHTMLEqual(update_content, json.loads(resp.content)['content'])
+        self.assertHTMLEqual(update_content, json.loads(resp.content.decode('utf-8'))['content'])
 
     def test_no_ol_course_update(self):
         '''Test trying to add to a saved course_update which is not an ol.'''
@@ -230,16 +229,16 @@ class CourseUpdateTest(CourseTestCase):
         course_update_url = self.create_update_url()
         resp = self.client.ajax_post(course_update_url, payload)
 
-        payload = json.loads(resp.content)
+        payload = json.loads(resp.content.decode('utf-8'))
 
         self.assertHTMLEqual(payload['content'], content)
 
         # now confirm that the bad news and the iframe make up single update
         resp = self.client.get_json(course_update_url)
-        payload = json.loads(resp.content)
+        payload = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(len(payload), 1)
 
-    def post_course_update(self, send_push_notification=False):
+    def post_course_update(self):
         """
         Posts an update to the course
         """
@@ -250,25 +249,19 @@ class CourseUpdateTest(CourseTestCase):
 
         content = u"Sample update"
         payload = {'content': content, 'date': 'January 8, 2013'}
-        if send_push_notification:
-            payload['push_notification_selected'] = True
         resp = self.client.ajax_post(course_update_url, payload)
 
         # check that response status is 200 not 400
         self.assertEqual(resp.status_code, 200)
 
-        payload = json.loads(resp.content)
+        payload = json.loads(resp.content.decode('utf-8'))
         self.assertHTMLEqual(payload['content'], content)
 
-    @patch("contentstore.push_notification.send_push_course_update")
-    def test_post_course_update(self, mock_push_update):
+    def test_post_course_update(self):
         """
         Test that a user can successfully post on course updates and handouts of a course
         """
         self.post_course_update()
-
-        # check that push notifications are not sent
-        self.assertFalse(mock_push_update.called)
 
         updates_location = self.course.id.make_usage_key('course_info', 'updates')
         self.assertTrue(isinstance(updates_location, UsageKey))
@@ -285,34 +278,5 @@ class CourseUpdateTest(CourseTestCase):
         # check that response status is 200 not 500
         self.assertEqual(resp.status_code, 200)
 
-        payload = json.loads(resp.content)
+        payload = json.loads(resp.content.decode('utf-8'))
         self.assertHTMLEqual(payload['data'], content)
-
-    @patch("contentstore.push_notification.send_push_course_update")
-    def test_notifications_enabled_but_not_requested(self, mock_push_update):
-        PushNotificationConfig(enabled=True).save()
-        self.post_course_update()
-        self.assertFalse(mock_push_update.called)
-
-    @patch("contentstore.push_notification.send_push_course_update")
-    def test_notifications_enabled_and_sent(self, mock_push_update):
-        PushNotificationConfig(enabled=True).save()
-        self.post_course_update(send_push_notification=True)
-        self.assertTrue(mock_push_update.called)
-
-    @override_settings(PARSE_KEYS={"APPLICATION_ID": "TEST_APPLICATION_ID", "REST_API_KEY": "TEST_REST_API_KEY"})
-    @patch("contentstore.push_notification.Push")
-    def test_notifications_sent_to_parse(self, mock_parse_push):
-        PushNotificationConfig(enabled=True).save()
-        self.post_course_update(send_push_notification=True)
-        self.assertEquals(mock_parse_push.alert.call_count, 2)
-
-    @override_settings(PARSE_KEYS={"APPLICATION_ID": "TEST_APPLICATION_ID", "REST_API_KEY": "TEST_REST_API_KEY"})
-    @patch("contentstore.push_notification.log_exception")
-    @patch("contentstore.push_notification.Push")
-    def test_notifications_error_from_parse(self, mock_parse_push, mock_log_exception):
-        PushNotificationConfig(enabled=True).save()
-        from parse_rest.core import ParseError
-        mock_parse_push.alert.side_effect = ParseError
-        self.post_course_update(send_push_notification=True)
-        self.assertTrue(mock_log_exception.called)

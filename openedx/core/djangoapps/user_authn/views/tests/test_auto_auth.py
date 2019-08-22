@@ -181,7 +181,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
     def test_json_response(self):
         """ The view should return JSON. """
         response = self._auto_auth()
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode('utf-8'))
         for key in ['created_status', 'username', 'email', 'password', 'user_id', 'anonymous_id']:
             self.assertIn(key, response_data)
         user = User.objects.get(username=response_data['username'])
@@ -288,7 +288,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
             'course_access_roles': ','.join(expected_roles)
         }
         response = self._auto_auth(params)
-        user_info = json.loads(response.content)
+        user_info = json.loads(response.content.decode('utf-8'))
 
         for role in expected_roles:
             self.assertTrue(

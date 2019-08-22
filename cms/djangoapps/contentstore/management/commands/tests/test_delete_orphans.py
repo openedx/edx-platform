@@ -116,6 +116,6 @@ class TestDeleteOrphan(TestOrphanBase):
         # there should be one in published
         self.assertOrphanCount(course.id, 0)
         self.assertOrphanCount(published_branch, 1)
-        self.assertIn(orphan, self.store.get_items(published_branch))
+        self.assertIn(orphan.location, [x.location for x in self.store.get_items(published_branch)])
 
         return course, orphan

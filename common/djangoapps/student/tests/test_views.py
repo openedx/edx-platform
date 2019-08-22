@@ -141,13 +141,13 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
         with patch('student.models.CourseEnrollment.refundable', return_value=True):
             response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
 
-        self.assertEquals(json.loads(response.content), {'course_refundable_status': True})
+        self.assertEquals(json.loads(response.content.decode('utf-8')), {'course_refundable_status': True})
         self.assertEqual(response.status_code, 200)
 
         with patch('student.models.CourseEnrollment.refundable', return_value=False):
             response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
 
-        self.assertEquals(json.loads(response.content), {'course_refundable_status': False})
+        self.assertEquals(json.loads(response.content.decode('utf-8')), {'course_refundable_status': False})
         self.assertEqual(response.status_code, 200)
 
     def test_course_run_refund_status_invalid_course_key(self):
@@ -157,7 +157,7 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
                                                         InvalidKeyError during look up.')
             response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
 
-        self.assertEquals(json.loads(response.content), {'course_refundable_status': ''})
+        self.assertEquals(json.loads(response.content.decode('utf-8')), {'course_refundable_status': ''})
         self.assertEqual(response.status_code, 406)
 
 
@@ -213,19 +213,6 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             course_overview.social_sharing_url = 'http://www.testurl.com/social/url/'
 
         course_overview.save()
-
-    def test_user_info_cookie(self):
-        """
-        Verify visiting the learner dashboard sets the user info cookie.
-        """
-        self.assertNotIn(settings.EDXMKTG_USER_INFO_COOKIE_NAME, self.client.cookies)
-
-        request = RequestFactory().get(self.path)
-        request.user = self.user
-        expected = json.dumps(_get_user_info_cookie_data(request, self.user))
-        self.client.get(self.path)
-        actual = self.client.cookies[settings.EDXMKTG_USER_INFO_COOKIE_NAME].value
-        self.assertEqual(actual, expected)
 
     def test_redirect_account_settings(self):
         """

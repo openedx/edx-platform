@@ -10,7 +10,7 @@ import re
 from contextlib import contextmanager
 from datetime import datetime
 from functools import wraps
-from StringIO import StringIO
+from six import StringIO
 
 import dateutil.parser
 import ddt
@@ -228,7 +228,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
     def test_get_json(self):
         response = self.client.get_json(self.url)
         self.assertEqual(response.status_code, 200)
-        response_videos = json.loads(response.content)['videos']
+        response_videos = json.loads(response.content.decode('utf-8'))['videos']
         self.assertEqual(len(response_videos), len(self.previous_uploads))
         for i, response_video in enumerate(response_videos):
             # Videos should be returned by creation date descending
@@ -313,7 +313,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
 
         response = self.client.get_json(self.url)
         self.assertEqual(response.status_code, 200)
-        response_videos = json.loads(response.content)['videos']
+        response_videos = json.loads(response.content.decode('utf-8'))['videos']
         self.assertEqual(len(response_videos), len(self.previous_uploads))
 
         for response_video in response_videos:
@@ -423,7 +423,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             content_type="application/json"
         )
         self.assertEqual(response.status_code, expected_status)
-        response = json.loads(response.content)
+        response = json.loads(response.content.decode('utf-8'))
 
         if expected_status == 200:
             self.assertNotIn('error', response)
@@ -449,7 +449,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 400)
-        response = json.loads(response.content)
+        response = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response['error'], u'The file name for %s must contain only ASCII characters.' % file_name)
 
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
@@ -494,7 +494,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
-        response_obj = json.loads(response.content)
+        response_obj = json.loads(response.content.decode('utf-8'))
 
         mock_conn.assert_called_once_with(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
         self.assertEqual(len(response_obj['files']), len(files))
@@ -622,7 +622,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         """
         response = self.client.get_json(url)
         self.assertEqual(response.status_code, 200)
-        response_videos = json.loads(response.content)["videos"]
+        response_videos = json.loads(response.content.decode('utf-8'))["videos"]
         self.assertEqual(len(response_videos), len(self.previous_uploads) - deleted_videos)
 
         if deleted_videos:
@@ -699,7 +699,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         """
         response = self.client.get_json(url)
         self.assertEqual(response.status_code, 200)
-        videos = json.loads(response.content)["videos"]
+        videos = json.loads(response.content.decode('utf-8'))["videos"]
         for video in videos:
             if video['edx_video_id'] == edx_video_id:
                 return self.assertEqual(video['status'], status)
@@ -825,7 +825,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
             error_message: Expected error message.
         """
         self.assertEqual(response.status_code, 400)
-        response = json.loads(response.content)
+        response = json.loads(response.content.decode('utf-8'))
         self.assertIn('error', response)
         self.assertEqual(response['error'], error_message)
 
@@ -886,7 +886,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
 
         response = self.client.get_json(get_videos_url)
         self.assertEqual(response.status_code, 200)
-        response_videos = json.loads(response.content)["videos"]
+        response_videos = json.loads(response.content.decode('utf-8'))["videos"]
         for response_video in response_videos:
             if response_video['edx_video_id'] == edx_video_id:
                 self.assertEqual(response_video['course_video_image_url'], val_image_url)
@@ -1275,7 +1275,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 content_type='application/json'
             )
         status_code = response.status_code
-        response = json.loads(response.content) if is_video_transcript_enabled else response
+        response = json.loads(response.content.decode('utf-8')) if is_video_transcript_enabled else response
 
         self.assertEqual(status_code, expected_status_code)
         self.assertEqual(response.get('error', ''), error_message)

@@ -1,11 +1,14 @@
 """Tests of openedx.features.discounts.applicability"""
 # -*- coding: utf-8 -*-
 
-from datetime import timedelta, datetime
+from __future__ import absolute_import
+
+from datetime import datetime, timedelta
+
 import ddt
-from django.utils.timezone import now
-from mock import patch, Mock
 import pytz
+from django.utils.timezone import now
+from mock import Mock, patch
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -13,11 +16,11 @@ from entitlements.tests.factories import CourseEntitlementFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.discounts.models import DiscountRestrictionConfig
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..applicability import can_receive_discount, DISCOUNT_APPLICABILITY_FLAG, _is_in_holdback
+from ..applicability import DISCOUNT_APPLICABILITY_FLAG, _is_in_holdback, can_receive_discount
 
 
 @ddt.ddt
@@ -119,26 +122,12 @@ class TestApplicability(ModuleStoreTestCase):
     @ddt.unpack
     def test_holdback_group_ids(self, group_number, in_holdback):
         with patch('openedx.features.discounts.applicability.stable_bucketing_hash_group', return_value=group_number):
-            with patch.object(self.user, 'date_joined', datetime(2019, 8, 1, 0, 1, tzinfo=pytz.UTC)):
-                assert _is_in_holdback(self.user) == in_holdback
-
-    @ddt.data(
-        (datetime(2019, 7, 31, tzinfo=pytz.UTC), False),
-        (datetime(2019, 8, 1, 0, 1, tzinfo=pytz.UTC), True),
-        (datetime(2019, 10, 30, 23, 59, tzinfo=pytz.UTC), True),
-        (datetime(2019, 11, 1, 0, 1, tzinfo=pytz.UTC), False),
-    )
-    @ddt.unpack
-    def test_holdback_registration_limits(self, registration_date, in_holdback):
-        with patch('openedx.features.discounts.applicability.stable_bucketing_hash_group', return_value=0):
-            with patch.object(self.user, 'date_joined', registration_date):
-                assert _is_in_holdback(self.user) == in_holdback
+            assert _is_in_holdback(self.user) == in_holdback
 
     def test_holdback_expiry(self):
         with patch('openedx.features.discounts.applicability.stable_bucketing_hash_group', return_value=0):
-            with patch.object(self.user, 'date_joined', datetime(2019, 8, 1, 0, 1, tzinfo=pytz.UTC)):
-                with patch(
-                    'openedx.features.discounts.applicability.datetime',
-                    Mock(now=Mock(return_value=datetime(2020, 8, 1, 0, 1, tzinfo=pytz.UTC)))
-                ):
-                    assert not _is_in_holdback(self.user)
+            with patch(
+                'openedx.features.discounts.applicability.datetime',
+                Mock(now=Mock(return_value=datetime(2020, 8, 1, 0, 1, tzinfo=pytz.UTC)))
+            ):
+                assert not _is_in_holdback(self.user)

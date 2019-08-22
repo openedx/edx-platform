@@ -4,7 +4,6 @@ Tests for Blocks Views
 from __future__ import absolute_import
 
 from datetime import datetime
-from string import join
 
 import six
 from six.moves.urllib.parse import urlencode, urlunparse  # pylint: disable=import-error
@@ -239,7 +238,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         query = urlencode(list(self.query_params.items()) + [
             ('requested_fields', self.requested_fields[0]),
             ('requested_fields', self.requested_fields[1]),
-            ('requested_fields', join(self.requested_fields[1:], ',')),
+            ('requested_fields', ",".join(self.requested_fields[1:])),
         ])
         self.query_params = None
         response = self.verify_response(

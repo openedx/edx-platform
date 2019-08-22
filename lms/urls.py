@@ -90,9 +90,6 @@ urlpatterns = [
 
     url(r'^i18n/', include('django.conf.urls.i18n')),
 
-    # Feedback Form endpoint
-    url(r'^submit_feedback$', util_views.submit_feedback),
-
     # Enrollment API RESTful endpoints
     url(r'^api/enrollment/v1/', include('openedx.core.djangoapps.enrollments.urls')),
 
@@ -294,7 +291,11 @@ urlpatterns += [
         courseware_views.course_about,
         name='about_course',
     ),
-
+    url(
+        r'^courses/yt_video_metadata$',
+        courseware_views.yt_video_metadata,
+        name='yt_video_metadata',
+    ),
     url(
         r'^courses/{}/enroll_staff$'.format(
             settings.COURSE_ID_PATTERN,
@@ -975,5 +976,10 @@ if settings.FEATURES.get('ENABLE_API_DOCS'):
 urlpatterns += [
     url(r'', include('csrf.urls')),
 ]
+
+if 'openedx.testing.coverage_context_listener' in settings.INSTALLED_APPS:
+    urlpatterns += [
+        url(r'coverage_context', include('openedx.testing.coverage_context_listener.urls'))
+    ]
 
 urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.LMS))

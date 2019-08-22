@@ -175,6 +175,12 @@ case "$TEST_SUITE" in
     "bok-choy")
 
         PAVER_ARGS="-n $NUMBER_OF_BOKCHOY_THREADS"
+        if [[ -n "$FILTER_WHO_TESTS_WHAT" ]]; then
+            PAVER_ARGS="$PAVER_ARGS --with-wtw=origin/master"
+        fi
+        if [[ -n "$COLLECT_WHO_TESTS_WHAT" ]]; then
+            PAVER_ARGS="$PAVER_ARGS --pytest-remote-contexts --coveragerc=common/test/acceptance/.coveragerc"
+        fi
         export BOKCHOY_HEADLESS=true
 
         case "$SHARD" in
