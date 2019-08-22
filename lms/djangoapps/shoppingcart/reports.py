@@ -4,7 +4,7 @@ from __future__ import absolute_import
 
 from decimal import Decimal
 
-import unicodecsv
+import six
 from django.utils.translation import ugettext as _
 from six import text_type
 
@@ -14,6 +14,11 @@ from shoppingcart.models import CertificateItem, OrderItem
 from student.models import CourseEnrollment
 from util.query import use_read_replica_if_available
 from xmodule.modulestore.django import modulestore
+
+if six.PY3:
+    import csv as unicodecsv
+else:
+    import unicodecsv
 
 
 class Report(object):

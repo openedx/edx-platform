@@ -16,10 +16,10 @@ from contextlib import contextmanager
 from datetime import datetime, timedelta
 
 import ddt
+import six
 from six import text_type
 from six.moves.urllib.parse import quote  # pylint: disable=import-error
 from six.moves import range, zip
-import unicodecsv
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
@@ -88,6 +88,11 @@ from xmodule.partitions.partitions import Group, UserPartition
 
 from ..models import ReportStore
 from ..tasks_helper.utils import UPDATE_STATUS_FAILED, UPDATE_STATUS_SUCCEEDED
+
+if six.PY3:
+    import csv as unicodecsv
+else:
+    import unicodecsv
 
 
 class InstructorGradeReportTestCase(TestReportMixin, InstructorTaskCourseTestCase):
@@ -859,6 +864,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         report_path = report_store.path_to(self.course.id, report_csv_filename)
         with report_store.storage.open(report_path) as csv_file:
             # Expand the dict reader generator so we don't lose it's content
+            import pdb;pdb.set_trace()
             for row in unicodecsv.DictReader(csv_file):
                 if row.get('Username') == username:
                     self.assertEqual(row[column_header], expected_cell_content)
@@ -1546,6 +1552,7 @@ class TestTeamStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
             found_user = False
             with report_store.storage.open(report_path) as csv_file:
                 for row in unicodecsv.DictReader(csv_file):
+                    import pdb;pdb.set_trace()
                     if row.get('username') == username:
                         self.assertEqual(row['team'], expected_team)
                         found_user = True

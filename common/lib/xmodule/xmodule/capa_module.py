@@ -200,7 +200,7 @@ class ProblemBlock(
                 self.scope_ids.user_id
             )
             _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
-            six.reraise(ProcessingError(generic_error_message), None, traceback_obj)
+            six.reraise(ProcessingError,ProcessingError(generic_error_message), traceback_obj)
 
         after = self.get_progress()
         after_attempts = self.attempts

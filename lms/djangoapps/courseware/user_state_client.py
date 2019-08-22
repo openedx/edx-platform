@@ -421,7 +421,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             page = p.page(page_number)
 
             for sm in page.object_list:
-                state = json.loads(sm.state)
+                state = json.loads(sm.state.decode('utf-8'))
 
                 if state == {}:
                     continue

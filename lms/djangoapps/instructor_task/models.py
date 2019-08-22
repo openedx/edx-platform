@@ -270,7 +270,7 @@ class DjangoStorageReportStore(ReportStore):
         """
         output_buffer = ContentFile('')
         # Adding unicode signature (BOM) for MS Excel 2013 compatibility
-        output_buffer.write(codecs.BOM_UTF8)
+        output_buffer.write(codecs.BOM_UTF8.decode('utf-8'))
         csvwriter = csv.writer(output_buffer)
         csvwriter.writerows(self._get_utf8_encoded_rows(rows))
         output_buffer.seek(0)
@@ -308,5 +308,5 @@ class DjangoStorageReportStore(ReportStore):
         """
         Return the full path to a given file for a given course.
         """
-        hashed_course_id = hashlib.sha1(text_type(course_id)).hexdigest()
+        hashed_course_id = hashlib.sha1(text_type(course_id).encode('utf-8')).hexdigest()
         return os.path.join(hashed_course_id, filename)
