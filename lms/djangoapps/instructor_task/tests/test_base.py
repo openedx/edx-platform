@@ -362,12 +362,12 @@ class TestReportMixin(object):
         report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
         report_csv_filename = report_store.links_for(self.course.id)[file_index][0]
         report_path = report_store.path_to(self.course.id, report_csv_filename)
-        with report_store.storage.open(report_path) as csv_file:
+        with report_store.storage.open(report_path,mode='r') as csv_file:
             # Expand the dict reader generator so we don't lose it's content
             if six.PY3:
-                csv_rows = [six.u(row) for row in unicodecsv.DictReader(csv_file)]
+                csv_rows = [row for row in unicodecsv.DictReader(csv_file)]
             else:
-                csv_rows = [six.u(row) for row in unicodecsv.DictReader(csv_file, encoding='utf-8-sig')]
+                csv_rows = [row for row in unicodecsv.DictReader(csv_file, encoding='utf-8-sig')]
 
             import pdb;
             pdb.set_trace()
@@ -417,5 +417,8 @@ class TestReportMixin(object):
         report_csv_filename = report_store.links_for(self.course.id)[0][0]
         report_path = report_store.path_to(self.course.id, report_csv_filename)
         with report_store.storage.open(report_path) as csv_file:
-            rows = unicodecsv.reader(csv_file, encoding='utf-8-sig')
+            if six.PY3:
+                rows = unicodecsv.reader(csv_file)
+            else:
+                rows = unicodecsv.reader(csv_file, encoding='utf-8-sig')
             return next(rows)

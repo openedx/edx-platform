@@ -109,8 +109,10 @@ class InstructorGradeReportTestCase(TestReportMixin, InstructorTaskCourseTestCas
             report_csv_filename = report_store.links_for(course_id)[0][0]
             report_path = report_store.path_to(course_id, report_csv_filename)
             found_user = False
-            with report_store.storage.open(report_path) as csv_file:
+            with report_store.storage.open(report_path, mode='rt') as csv_file:
                 for row in unicodecsv.DictReader(csv_file):
+                    import pdb;
+                    pdb.set_trace()
                     if row.get('Username') == username:
                         self.assertEqual(row[column_header], expected_cell_content)
                         found_user = True
@@ -122,6 +124,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
     """
     Tests that CSV grade report generation works.
     """
+
     def setUp(self):
         super(TestInstructorGradeReport, self).setUp()
         self.course = CourseFactory.create()
@@ -621,9 +624,9 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
     @patch('lms.djangoapps.instructor_task.tasks_helper.grades.list_problem_responses')
     @patch('xmodule.capa_module.ProblemBlock.generate_report_data', create=True)
     def test_build_student_data_for_block_with_generate_report_data_not_implemented(
-            self,
-            mock_generate_report_data,
-            mock_list_problem_responses,
+        self,
+        mock_generate_report_data,
+        mock_list_problem_responses,
     ):
         """
         Ensure that if ``generate_report_data`` raises a NotImplementedError,
@@ -672,6 +675,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
     """
     Tests that CSV detailed enrollment generation works.
     """
+
     def setUp(self):
         super(TestInstructorDetailedEnrollmentReport, self).setUp()
         self.course = CourseFactory.create()
@@ -864,8 +868,9 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         report_path = report_store.path_to(self.course.id, report_csv_filename)
         with report_store.storage.open(report_path) as csv_file:
             # Expand the dict reader generator so we don't lose it's content
-            import pdb;pdb.set_trace()
             for row in unicodecsv.DictReader(csv_file):
+                import pdb;
+                pdb.set_trace()
                 if row.get('Username') == username:
                     self.assertEqual(row[column_header], expected_cell_content)
 
@@ -875,6 +880,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
     """
     Test that the problem CSV generation works.
     """
+
     def setUp(self):
         super(TestProblemGradeReport, self).setUp()
         self.initialize_course()
@@ -1156,6 +1162,7 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
     """
     Test the problem report on a course that has cohorted content.
     """
+
     def setUp(self):
         super(TestProblemReportCohortedContent, self).setUp()
         # construct cohorted problems to work on.
@@ -1252,6 +1259,7 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
     """
     Tests that Executive Summary report generation works.
     """
+
     def setUp(self):
         super(TestExecutiveSummaryReport, self).setUp()
         self.course = CourseFactory.create()
@@ -1383,6 +1391,7 @@ class TestCourseSurveyReport(TestReportMixin, InstructorTaskCourseTestCase):
     """
     Tests that Course Survey report generation works.
     """
+
     def setUp(self):
         super(TestCourseSurveyReport, self).setUp()
         self.course = CourseFactory.create()
@@ -1479,6 +1488,7 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
     """
     Tests that CSV student profile report generation works.
     """
+
     def setUp(self):
         super(TestStudentReport, self).setUp()
         self.course = CourseFactory.create()
@@ -1552,7 +1562,8 @@ class TestTeamStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
             found_user = False
             with report_store.storage.open(report_path) as csv_file:
                 for row in unicodecsv.DictReader(csv_file):
-                    import pdb;pdb.set_trace()
+                    import pdb;
+                    pdb.set_trace()
                     if row.get('username') == username:
                         self.assertEqual(row['team'], expected_team)
                         found_user = True
@@ -1590,6 +1601,7 @@ class TestListMayEnroll(TestReportMixin, InstructorTaskCourseTestCase):
     students who may enroll in a given course (but have not signed up
     for it yet) works.
     """
+
     def _create_enrollment(self, email):
         "Factory method for creating CourseEnrollmentAllowed objects."
         return CourseEnrollmentAllowed.objects.create(
@@ -1630,6 +1642,7 @@ class TestListMayEnroll(TestReportMixin, InstructorTaskCourseTestCase):
 
 class MockDefaultStorage(object):
     """Mock django's DefaultStorage"""
+
     def __init__(self):
         pass
 
@@ -1643,6 +1656,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
     """
     Tests that bulk student cohorting works.
     """
+
     def setUp(self):
         super(TestCohortStudents, self).setUp()
 
@@ -1721,7 +1735,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         result = self._cohort_students_and_upload(
             u'username,email,cohort\n'
             u'student_1\xec,student_1@example.com,Cohort 1\n'  # valid username and email
-            u'Invalid,student_2@example.com,Cohort 2'      # invalid username, valid email
+            u'Invalid,student_2@example.com,Cohort 2'  # invalid username, valid email
         )
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
@@ -1902,6 +1916,7 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
     """
     Test that grade report has correct grade values.
     """
+
     def setUp(self):
         super(TestGradeReport, self).setUp()
         self.create_course()
@@ -1997,6 +2012,7 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
     """
     Test that grade report has correct user enrollment, verification, and certificate information.
     """
+
     def setUp(self):
         super(TestGradeReportEnrollmentAndCertificateInfo, self).setUp()
 
@@ -2055,7 +2071,7 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
             report_csv_filename = report_store.links_for(self.course.id)[0][0]
             report_path = report_store.path_to(self.course.id, report_csv_filename)
             found_user = False
-            with report_store.storage.open(report_path) as csv_file:
+            with report_store.storage.open(report_path, mode='r') as csv_file:
                 for row in unicodecsv.DictReader(csv_file):
                     if row.get('Username') == username:
                         csv_row_data = [row[column] for column in self.columns_to_check]
@@ -2116,15 +2132,15 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
     )
     @ddt.unpack
     def test_grade_report_enrollment_and_certificate_info(
-            self,
-            user_enroll_mode,
-            has_passed,
-            whitelisted,
-            is_embargoed,
-            verification_status,
-            certificate_status,
-            certificate_mode,
-            expected_output
+        self,
+        user_enroll_mode,
+        has_passed,
+        whitelisted,
+        is_embargoed,
+        verification_status,
+        certificate_status,
+        certificate_mode,
+        expected_output
     ):
 
         user = self._create_user_data(
@@ -2703,6 +2719,7 @@ class TestInstructorOra2Report(SharedModuleStoreTestCase):
     """
     Tests that ORA2 response report generation works.
     """
+
     @classmethod
     def setUpClass(cls):
         super(TestInstructorOra2Report, cls).setUpClass()

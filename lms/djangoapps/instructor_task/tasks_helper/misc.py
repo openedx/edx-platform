@@ -27,7 +27,6 @@ from util.file import UniversalNewlineIterator
 from .runner import TaskProgress
 from .utils import UPDATE_STATUS_FAILED, UPDATE_STATUS_SUCCEEDED, upload_csv_to_report_store
 
-import pdb;pdb.set_trace()
 if six.PY3:
     import csv as unicodecsv
 else:
@@ -155,9 +154,9 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
 
     # Iterate through rows to get total assignments for task progress
     with DefaultStorage().open(task_input['file_name']) as f:
-        import pdb;pdb.set_trace()
         total_assignments = 0
         for _line in unicodecsv.DictReader(UniversalNewlineIterator(f)):
+            import pdb;pdb.set_trace()
             total_assignments += 1
 
     task_progress = TaskProgress(action_name, total_assignments, start_time)
