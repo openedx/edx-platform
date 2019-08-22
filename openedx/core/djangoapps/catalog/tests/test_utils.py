@@ -842,7 +842,7 @@ class TestGetProgramsByType(CacheIsolationTestCase):
 
     def test_get_masters_programs(self):
         expected_programs = [self.masters_program_1, self.masters_program_2]
-        self.assertItemsEqual(expected_programs, get_programs_by_type(self.site, 'masters'))
+        six.assertCountEqual(self, expected_programs, get_programs_by_type(self.site, 'masters'))
 
     def test_get_bachelors_programs(self):
         expected_programs = [self.bachelors_program]

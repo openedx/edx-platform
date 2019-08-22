@@ -59,7 +59,7 @@ if course_key:
         }
 
         if not course_id:
-            user_metadata['course_id'] = unicode(course_key)
+            user_metadata['course_id'] = six.text_type(course_key)
     elif isinstance(course_key, six.string_types):
         user_metadata['course_id'] = course_key
 

@@ -1,9 +1,10 @@
+<%page expression_filter="h"/>
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "textbooks" %></%def>
 <%namespace name='static' file='static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
-from openedx.core.djangolib.js_utils import dump_js_escaped_json
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 %>
 
 <%block name="title">${_("Textbooks")}</%block>
@@ -21,9 +22,9 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json
 <script type="text/javascript">
 window.CMS = window.CMS || {};
 CMS.URL = CMS.URL || {};
-CMS.URL.UPLOAD_ASSET = "${upload_asset_url}"
-CMS.URL.TEXTBOOKS = "${textbook_url}"
-CMS.URL.LMS_BASE = "${settings.LMS_BASE}"
+CMS.URL.UPLOAD_ASSET = "${upload_asset_url | n, js_escaped_string}"
+CMS.URL.TEXTBOOKS = "${textbook_url | n, js_escaped_string}"
+CMS.URL.LMS_BASE = "${settings.LMS_BASE | n, js_escaped_string}"
 </script>
 </%block>
 

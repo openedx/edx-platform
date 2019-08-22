@@ -17,9 +17,6 @@ from datetime import datetime, timedelta
 
 import ddt
 import unicodecsv
-from six import text_type
-from six.moves.urllib.parse import quote  # pylint: disable=import-error
-from six.moves import range, zip
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
@@ -27,17 +24,20 @@ from edx_django_utils.cache import RequestCache
 from freezegun import freeze_time
 from mock import ANY, MagicMock, Mock, patch
 from pytz import UTC
+from six import text_type
+from six.moves import range, zip
+from six.moves.urllib.parse import quote  # pylint: disable=import-error
 
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import InstructorFactory
-from lms.djangoapps.instructor_analytics.basic import UNAVAILABLE, list_problem_responses
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
 from lms.djangoapps.grades.models import PersistentCourseGrade
 from lms.djangoapps.grades.transformer import GradesTransformer
+from lms.djangoapps.instructor_analytics.basic import UNAVAILABLE, list_problem_responses
 from lms.djangoapps.instructor_task.tasks_helper.certs import generate_students_certificates
 from lms.djangoapps.instructor_task.tasks_helper.enrollments import (
     upload_enrollment_report,
@@ -117,7 +117,6 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
     """
     Tests that CSV grade report generation works.
     """
-
     def setUp(self):
         super(TestInstructorGradeReport, self).setUp()
         self.course = CourseFactory.create()
@@ -617,9 +616,9 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
     @patch('lms.djangoapps.instructor_task.tasks_helper.grades.list_problem_responses')
     @patch('xmodule.capa_module.ProblemBlock.generate_report_data', create=True)
     def test_build_student_data_for_block_with_generate_report_data_not_implemented(
-        self,
-        mock_generate_report_data,
-        mock_list_problem_responses,
+            self,
+            mock_generate_report_data,
+            mock_list_problem_responses,
     ):
         """
         Ensure that if ``generate_report_data`` raises a NotImplementedError,
@@ -668,7 +667,6 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
     """
     Tests that CSV detailed enrollment generation works.
     """
-
     def setUp(self):
         super(TestInstructorDetailedEnrollmentReport, self).setUp()
         self.course = CourseFactory.create()
@@ -871,7 +869,6 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
     """
     Test that the problem CSV generation works.
     """
-
     def setUp(self):
         super(TestProblemGradeReport, self).setUp()
         self.initialize_course()
@@ -1153,7 +1150,6 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
     """
     Test the problem report on a course that has cohorted content.
     """
-
     def setUp(self):
         super(TestProblemReportCohortedContent, self).setUp()
         # construct cohorted problems to work on.
@@ -1250,7 +1246,6 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
     """
     Tests that Executive Summary report generation works.
     """
-
     def setUp(self):
         super(TestExecutiveSummaryReport, self).setUp()
         self.course = CourseFactory.create()
@@ -1382,7 +1377,6 @@ class TestCourseSurveyReport(TestReportMixin, InstructorTaskCourseTestCase):
     """
     Tests that Course Survey report generation works.
     """
-
     def setUp(self):
         super(TestCourseSurveyReport, self).setUp()
         self.course = CourseFactory.create()
@@ -1479,7 +1473,6 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
     """
     Tests that CSV student profile report generation works.
     """
-
     def setUp(self):
         super(TestStudentReport, self).setUp()
         self.course = CourseFactory.create()
@@ -1590,7 +1583,6 @@ class TestListMayEnroll(TestReportMixin, InstructorTaskCourseTestCase):
     students who may enroll in a given course (but have not signed up
     for it yet) works.
     """
-
     def _create_enrollment(self, email):
         "Factory method for creating CourseEnrollmentAllowed objects."
         return CourseEnrollmentAllowed.objects.create(
@@ -1631,7 +1623,6 @@ class TestListMayEnroll(TestReportMixin, InstructorTaskCourseTestCase):
 
 class MockDefaultStorage(object):
     """Mock django's DefaultStorage"""
-
     def __init__(self):
         pass
 
@@ -1645,7 +1636,6 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
     """
     Tests that bulk student cohorting works.
     """
-
     def setUp(self):
         super(TestCohortStudents, self).setUp()
 
@@ -1724,7 +1714,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         result = self._cohort_students_and_upload(
             u'username,email,cohort\n'
             u'student_1\xec,student_1@example.com,Cohort 1\n'  # valid username and email
-            u'Invalid,student_2@example.com,Cohort 2'  # invalid username, valid email
+            u'Invalid,student_2@example.com,Cohort 2'      # invalid username, valid email
         )
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
@@ -1905,7 +1895,6 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
     """
     Test that grade report has correct grade values.
     """
-
     def setUp(self):
         super(TestGradeReport, self).setUp()
         self.create_course()
@@ -2001,7 +1990,6 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
     """
     Test that grade report has correct user enrollment, verification, and certificate information.
     """
-
     def setUp(self):
         super(TestGradeReportEnrollmentAndCertificateInfo, self).setUp()
 
@@ -2121,15 +2109,15 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
     )
     @ddt.unpack
     def test_grade_report_enrollment_and_certificate_info(
-        self,
-        user_enroll_mode,
-        has_passed,
-        whitelisted,
-        is_embargoed,
-        verification_status,
-        certificate_status,
-        certificate_mode,
-        expected_output
+            self,
+            user_enroll_mode,
+            has_passed,
+            whitelisted,
+            is_embargoed,
+            verification_status,
+            certificate_status,
+            certificate_mode,
+            expected_output
     ):
 
         user = self._create_user_data(
@@ -2187,7 +2175,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'failed': 3,
             'skipped': 2
         }
-        with self.assertNumQueries(122):
+        with self.assertNumQueries(130):
             self.assertCertificatesGenerated(task_input, expected_results)
 
         expected_results = {
@@ -2708,7 +2696,6 @@ class TestInstructorOra2Report(SharedModuleStoreTestCase):
     """
     Tests that ORA2 response report generation works.
     """
-
     @classmethod
     def setUpClass(cls):
         super(TestInstructorOra2Report, cls).setUpClass()

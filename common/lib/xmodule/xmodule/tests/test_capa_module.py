@@ -863,7 +863,7 @@ class ProblemBlockTest(unittest.TestCase):
 
         self.assertEqual(xqueue_interface._http_post.call_count, 1)
         _, kwargs = xqueue_interface._http_post.call_args  # pylint: disable=unpacking-non-sequence
-        self.assertItemsEqual(fpaths, list(kwargs['files'].keys()))
+        six.assertCountEqual(self, fpaths, list(kwargs['files'].keys()))
         for fpath, fileobj in six.iteritems(kwargs['files']):
             self.assertEqual(fpath, fileobj.name)
 
@@ -896,7 +896,7 @@ class ProblemBlockTest(unittest.TestCase):
 
         self.assertEqual(xqueue_interface._http_post.call_count, 1)
         _, kwargs = xqueue_interface._http_post.call_args  # pylint: disable=unpacking-non-sequence
-        self.assertItemsEqual(fnames, list(kwargs['files'].keys()))
+        six.assertCountEqual(self, fnames, list(kwargs['files'].keys()))
         for fpath, fileobj in six.iteritems(kwargs['files']):
             self.assertEqual(fpath, fileobj.name)
 

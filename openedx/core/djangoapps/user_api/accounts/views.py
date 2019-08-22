@@ -526,6 +526,14 @@ class AccountRetirementPartnerReportView(ViewSet):
             # Org can concievably be blank or this bogus default value
             if org and org != 'outdated_entry':
                 orgs.add(org)
+        try:
+            # if the user has ever launched a managed Zoom xblock,
+            # we'll notify Zoom to delete their records.
+            if user.launchlog_set.filter(managed=True).count():
+                orgs.add('zoom')
+        except AttributeError:
+            # Zoom XBlock not installed
+            pass
         return orgs
 
     def retirement_partner_report(self, request):  # pylint: disable=unused-argument

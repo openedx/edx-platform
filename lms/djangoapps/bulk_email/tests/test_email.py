@@ -290,7 +290,8 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
 
         # the 1 is for the instructor in this test and others
         self.assertEquals(len(mail.outbox), 1 + len(self.staff))
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             [e.to[0] for e in mail.outbox],
             [self.instructor.email] + [s.email for s in self.staff]
         )
@@ -311,7 +312,8 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         response = self.client.post(self.send_mail_url, test_email)
         self.assertEquals(json.loads(response.content.decode('utf-8')), self.success_content)
 
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             [e.to[0] for e in mail.outbox],
             [s.email for s in self.students]
         )
@@ -352,7 +354,8 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         response = self.client.post(self.send_mail_url, test_email)
         self.assertEquals(json.loads(response.content.decode('utf-8')), self.success_content)
 
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             [e.to[0] for e in mail.outbox],
             [s.email for s in self.students]
         )
@@ -410,7 +413,8 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
 
         # the 1 is for the instructor
         self.assertEquals(len(mail.outbox), 1 + len(self.staff) + len(self.students))
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             [e.to[0] for e in mail.outbox],
             [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
         )
@@ -467,7 +471,8 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         self.assertEquals(json.loads(response.content.decode('utf-8')), self.success_content)
 
         self.assertEquals(len(mail.outbox), 1 + len(self.staff) + len(self.students))
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             [e.to[0] for e in mail.outbox],
             [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
         )
@@ -494,7 +499,8 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
 
         self.assertEquals(len(mail.outbox), 1 + len(self.staff) + len(self.students))
 
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             [e.to[0] for e in mail.outbox],
             [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
         )
@@ -595,7 +601,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
                                 [s.email for s in self.staff] +
                                 [s.email for s in self.students] +
                                 [s.email for s in added_users if s not in optouts])
-        self.assertItemsEqual(outbox_contents, should_send_contents)
+        six.assertCountEqual(self, outbox_contents, should_send_contents)
 
 
 @skipIf(os.environ.get("TRAVIS") == 'true', "Skip this test in Travis CI.")
@@ -623,7 +629,8 @@ class TestEmailSendFromDashboard(EmailSendFromDashboardTestCase):
         self.assertEquals(json.loads(response.content.decode('utf-8')), self.success_content)
 
         self.assertEquals(len(mail.outbox), 1 + len(self.staff) + len(self.students))
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             [e.to[0] for e in mail.outbox],
             [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
         )

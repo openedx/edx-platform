@@ -5,36 +5,36 @@ Base test classes for LMS instructor-initiated background tasks
 from __future__ import absolute_import
 
 import json
-# pylint: disable=attribute-defined-outside-init
-import os
 import shutil
-import six
-import unicodecsv
 from tempfile import mkdtemp
 from uuid import uuid4
 
+# pylint: disable=attribute-defined-outside-init
+import os
+import six
+import unicodecsv
+from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from celery.states import FAILURE, SUCCESS
+from courseware.model_data import StudentModule
+from courseware.tests.tests import LoginEnrollmentTestCase
 from django.contrib.auth.models import User
 from django.urls import reverse
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
 from six import text_type
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-from capa.tests.response_xml_factory import OptionResponseXMLFactory
-from courseware.model_data import StudentModule
-from courseware.tests.tests import LoginEnrollmentTestCase
 from lms.djangoapps.instructor_task.api_helper import encode_problem_and_student_input
 from lms.djangoapps.instructor_task.models import PROGRESS, QUEUING, ReportStore
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from lms.djangoapps.instructor_task.views import instructor_task_status
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.lib.url_utils import quote_slashes
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 TEST_COURSE_ORG = 'edx'
 TEST_COURSE_NAME = 'test_course'
@@ -54,7 +54,6 @@ class InstructorTaskTestCase(CacheIsolationTestCase):
     """
     Tests API and view methods that involve the reporting of status for background tasks.
     """
-
     def setUp(self):
         super(InstructorTaskTestCase, self).setUp()
 
@@ -206,7 +205,6 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
     Base test class for InstructorTask-related tests that require
     the setup of a course and problem in order to access StudentModule state.
     """
-
     @staticmethod
     def problem_location(problem_url_name, course_key=None):
         """
@@ -271,7 +269,6 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
 
         Assumes the input list of responses has two values.
         """
-
         def get_input_id(response_id):
             """Creates input id using information about the test course and the current problem."""
             # Note that this is a capa-specific convention.  The form is a version of the problem's
@@ -373,8 +370,8 @@ class TestReportMixin(object):
                 self.assertEqual(csv_rows, expected_rows)
                 self.assertEqual(numeric_csv_rows, numeric_expected_rows)
             else:
-                self.assertItemsEqual(csv_rows, expected_rows)
-                self.assertItemsEqual(numeric_csv_rows, numeric_expected_rows)
+                six.assertCountEqual(self, csv_rows, expected_rows)
+                six.assertCountEqual(self, numeric_csv_rows, numeric_expected_rows)
 
     @staticmethod
     def _extract_and_round_numeric_items(dictionary):
@@ -386,7 +383,6 @@ class TestReportMixin(object):
         to four decimal places.
         """
         extracted = {}
-
         for key, value in dictionary.items():
             if value is None:
                 continue

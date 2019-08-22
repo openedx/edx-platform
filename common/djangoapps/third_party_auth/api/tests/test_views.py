@@ -133,7 +133,7 @@ class UserViewsMixin(object):
         self.assertEqual(response.status_code, expect_result)
         if expect_result == 200:
             self.assertIn("active", response.data)
-            self.assertItemsEqual(response.data["active"], self.expected_active(target_user))
+            six.assertCountEqual(self, response.data["active"], self.expected_active(target_user))
 
     @ddt.data(
         # A server with a valid API key can query any user's list of providers
@@ -149,7 +149,7 @@ class UserViewsMixin(object):
         self.assertEqual(response.status_code, expect_result)
         if expect_result == 200:
             self.assertIn("active", response.data)
-            self.assertItemsEqual(response.data["active"], self.expected_active(target_user))
+            six.assertCountEqual(self, response.data["active"], self.expected_active(target_user))
 
     @ddt.data(
         (True, ALICE_USERNAME, 200, True),
@@ -352,7 +352,7 @@ class UserMappingViewAPITests(TpaAPITestCase):
         if expect_code == 200:
             for item in ['results', 'count', 'num_pages']:
                 self.assertIn(item, response.data)
-            self.assertItemsEqual(response.data['results'], expect_result)
+            six.assertCountEqual(self, response.data['results'], expect_result)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

@@ -349,7 +349,7 @@ def certificate_activation_handler(request, course_key_string):
         msg = _(u'PermissionDenied: Failed in authenticating {user}').format(user=request.user)
         return JsonResponse({"error": msg}, status=403)
 
-    data = json.loads(request.body)
+    data = json.loads(request.body.decode('utf8'))
     is_active = data.get('is_active', False)
     certificates = CertificateManager.get_certificates(course)
 

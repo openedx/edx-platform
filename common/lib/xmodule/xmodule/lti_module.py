@@ -80,6 +80,7 @@ from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.lti_2_util import LTI20ModuleMixin, LTIError
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.x_module import XModule, module_attr
+from openedx.core.djangolib.markup import HTML, Text
 
 log = logging.getLogger(__name__)
 
@@ -87,6 +88,7 @@ DOCS_ANCHOR_TAG_OPEN = (
     "<a target='_blank' "
     "href='https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/lti_component.html'>"
 )
+BREAK_TAG = '<br />'
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
@@ -124,39 +126,42 @@ class LTIFields(object):
     )
     lti_id = String(
         display_name=_("LTI ID"),
-        help=_(
+        help=Text(_(
             "Enter the LTI ID for the external LTI provider.  "
             "This value must be the same LTI ID that you entered in the "
             "LTI Passports setting on the Advanced Settings page."
-            "<br />See {docs_anchor_open}the edX LTI documentation{anchor_close} for more details on this setting."
-        ).format(
-            docs_anchor_open=DOCS_ANCHOR_TAG_OPEN,
-            anchor_close="</a>"
+            "{break_tag}See {docs_anchor_open}the edX LTI documentation{anchor_close} for more details on this setting."
+        )).format(
+            break_tag=HTML(BREAK_TAG),
+            docs_anchor_open=HTML(DOCS_ANCHOR_TAG_OPEN),
+            anchor_close=HTML("</a>")
         ),
         default='',
         scope=Scope.settings
     )
     launch_url = String(
         display_name=_("LTI URL"),
-        help=_(
+        help=Text(_(
             "Enter the URL of the external tool that this component launches. "
             "This setting is only used when Hide External Tool is set to False."
-            "<br />See {docs_anchor_open}the edX LTI documentation{anchor_close} for more details on this setting."
-        ).format(
-            docs_anchor_open=DOCS_ANCHOR_TAG_OPEN,
-            anchor_close="</a>"
+            "{break_tag}See {docs_anchor_open}the edX LTI documentation{anchor_close} for more details on this setting."
+        )).format(
+            break_tag=HTML(BREAK_TAG),
+            docs_anchor_open=HTML(DOCS_ANCHOR_TAG_OPEN),
+            anchor_close=HTML("</a>")
         ),
         default='http://www.example.com',
         scope=Scope.settings)
     custom_parameters = List(
         display_name=_("Custom Parameters"),
-        help=_(
+        help=Text(_(
             "Add the key/value pair for any custom parameters, such as the page your e-book should open to or "
             "the background color for this component."
-            "<br />See {docs_anchor_open}the edX LTI documentation{anchor_close} for more details on this setting."
-        ).format(
-            docs_anchor_open=DOCS_ANCHOR_TAG_OPEN,
-            anchor_close="</a>"
+            "{break_tag}See {docs_anchor_open}the edX LTI documentation{anchor_close} for more details on this setting."
+        )).format(
+            break_tag=HTML(BREAK_TAG),
+            docs_anchor_open=HTML(DOCS_ANCHOR_TAG_OPEN),
+            anchor_close=HTML("</a>")
         ),
         scope=Scope.settings)
     open_in_a_new_page = Boolean(
