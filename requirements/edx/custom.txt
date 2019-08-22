@@ -31,3 +31,4 @@ git+https://github.com/edx-solutions/mobileapps-edx-platform-extensions.git@v1.3
 git+https://github.com/edx-solutions/progress-edx-platform-extensions.git@1.0.8#egg=progress-edx-platform-extensions==1.0.8
 openedx-completion-aggregator==1.5.23
 git+https://github.com/mckinseyacademy/openedx-user-manager-api@v1.1.0#egg=openedx-user-manager-api==1.1.0
+-e git+https://github.com/mckinseyacademy/xblock-brightcove-player@development#egg=xblock-brightcove-player==1.0.0
