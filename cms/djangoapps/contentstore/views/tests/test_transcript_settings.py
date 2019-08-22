@@ -106,7 +106,7 @@ class TranscriptCredentialsTest(CourseTestCase):
             content_type='application/json'
         )
         self.assertEqual(response.status_code, expected_status_code)
-        self.assertEqual(response.content, expected_response)
+        self.assertEqual(response.content.decode('utf-8'), expected_response)
 
 
 @ddt.ddt
