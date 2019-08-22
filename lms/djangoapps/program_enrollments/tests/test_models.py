@@ -6,6 +6,7 @@ from __future__ import absolute_import, unicode_literals
 from uuid import uuid4
 
 import ddt
+from django.db.utils import IntegrityError
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 from six.moves import range
@@ -32,13 +33,36 @@ class ProgramEnrollmentModelTests(TestCase):
         self.user = UserFactory.create()
         self.program_uuid = uuid4()
         self.other_program_uuid = uuid4()
+        self.curriculum_uuid = uuid4()
         self.enrollment = ProgramEnrollment.objects.create(
             user=self.user,
             external_user_key='abc',
             program_uuid=self.program_uuid,
-            curriculum_uuid=uuid4(),
+            curriculum_uuid=self.curriculum_uuid,
             status='enrolled'
         )
+
+    def test_unique_external_key_program_curriculum(self):
+        """ A record with the same (external_user_key, program_uuid, curriculum_uuid) cannot be duplicated. """
+        with self.assertRaises(IntegrityError):
+            _ = ProgramEnrollment.objects.create(
+                user=None,
+                external_user_key='abc',
+                program_uuid=self.program_uuid,
+                curriculum_uuid=self.curriculum_uuid,
+                status='pending',
+            )
+
+    def test_unique_user_program_curriculum(self):
+        """ A record with the same (user, program_uuid, curriculum_uuid) cannot be duplicated. """
+        with self.assertRaises(IntegrityError):
+            _ = ProgramEnrollment.objects.create(
+                user=self.user,
+                external_user_key=None,
+                program_uuid=self.program_uuid,
+                curriculum_uuid=self.curriculum_uuid,
+                status='suspended',
+            )
 
     def test_bulk_read_by_student_key(self):
         curriculum_a = uuid4()
