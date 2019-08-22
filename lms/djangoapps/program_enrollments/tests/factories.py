@@ -20,8 +20,8 @@ class ProgramEnrollmentFactory(DjangoModelFactory):
 
     user = factory.SubFactory(UserFactory)
     external_user_key = None
-    program_uuid = uuid4()
-    curriculum_uuid = uuid4()
+    program_uuid = factory.LazyFunction(uuid4)
+    curriculum_uuid = factory.LazyFunction(uuid4)
     status = 'enrolled'
 
 

@@ -39,12 +39,12 @@ class ProgramEnrollment(TimeStampedModel):  # pylint: disable=model-missing-unic
 
     class Meta(object):
         app_label = "program_enrollments"
-        unique_together = ('external_user_key', 'program_uuid', 'curriculum_uuid')
 
         # A student enrolled in a given (program, curriculum) should always
         # have a non-null ``user`` or ``external_user_key`` field (or both).
         unique_together = (
-            ('user', 'external_user_key', 'program_uuid', 'curriculum_uuid'),
+            ('user', 'program_uuid', 'curriculum_uuid'),
+            ('external_user_key', 'program_uuid', 'curriculum_uuid'),
         )
 
     user = models.ForeignKey(
