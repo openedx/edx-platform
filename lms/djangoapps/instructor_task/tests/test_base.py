@@ -11,6 +11,7 @@ import shutil
 from tempfile import mkdtemp
 from uuid import uuid4
 
+import six
 import unicodecsv
 from celery.states import FAILURE, SUCCESS
 from django.contrib.auth.models import User
@@ -369,8 +370,8 @@ class TestReportMixin(object):
                 self.assertEqual(csv_rows, expected_rows)
                 self.assertEqual(numeric_csv_rows, numeric_expected_rows)
             else:
-                self.assertItemsEqual(csv_rows, expected_rows)
-                self.assertItemsEqual(numeric_csv_rows, numeric_expected_rows)
+                six.assertCountEqual(self, csv_rows, expected_rows)
+                six.assertCountEqual(self, numeric_csv_rows, numeric_expected_rows)
 
     @staticmethod
     def _extract_and_round_numeric_items(dictionary):

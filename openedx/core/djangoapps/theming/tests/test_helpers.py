@@ -3,6 +3,7 @@ Test helpers for Comprehensive Theming.
 """
 from __future__ import absolute_import
 
+import six
 from django.conf import settings
 from django.test import TestCase, override_settings
 from edx_django_utils.cache import RequestCache
@@ -38,7 +39,7 @@ class TestHelpers(TestCase):
             Theme('test-theme', 'test-theme', get_theme_base_dir('test-theme'), settings.PROJECT_ROOT),
         ]
         actual_themes = get_themes()
-        self.assertItemsEqual(expected_themes, actual_themes)
+        six.assertCountEqual(self, expected_themes, actual_themes)
 
     @override_settings(COMPREHENSIVE_THEME_DIRS=[settings.TEST_THEME.dirname()])
     def test_get_themes_2(self):
@@ -49,7 +50,7 @@ class TestHelpers(TestCase):
             Theme('test-theme', 'test-theme', get_theme_base_dir('test-theme'), settings.PROJECT_ROOT),
         ]
         actual_themes = get_themes()
-        self.assertItemsEqual(expected_themes, actual_themes)
+        six.assertCountEqual(self, expected_themes, actual_themes)
 
     def test_get_value_returns_override(self):
         """
