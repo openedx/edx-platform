@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-08-21 06:34+0000\n"
-"PO-Revision-Date: 2019-08-21 06:34:12.763181\n"
+"POT-Creation-Date: 2019-08-22 11:48+0000\n"
+"PO-Revision-Date: 2019-08-22 11:48:21.847435\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -4557,12 +4557,12 @@ msgstr "LTÌ ÌD Ⱡ'σяєм ιρѕυ#"
 msgid ""
 "Enter the LTI ID for the external LTI provider.  This value must be the same"
 " LTI ID that you entered in the LTI Passports setting on the Advanced "
-"Settings page.<br />See {docs_anchor_open}the edX LTI "
+"Settings page.{break_tag}See {docs_anchor_open}the edX LTI "
 "documentation{anchor_close} for more details on this setting."
 msgstr ""
 "Éntér thé LTÌ ÌD för thé éxtérnäl LTÌ prövïdér.  Thïs välüé müst ßé thé sämé"
 " LTÌ ÌD thät ýöü éntéréd ïn thé LTÌ Pässpörts séttïng ön thé Àdvänçéd "
-"Séttïngs pägé.<br />Séé {docs_anchor_open}thé édX LTÌ "
+"Séttïngs pägé.{break_tag}Séé {docs_anchor_open}thé édX LTÌ "
 "döçüméntätïön{anchor_close} för möré détäïls ön thïs séttïng. Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
 "ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
@@ -4578,12 +4578,12 @@ msgstr "LTÌ ÛRL Ⱡ'σяєм ιρѕυм #"
 #, python-brace-format
 msgid ""
 "Enter the URL of the external tool that this component launches. This "
-"setting is only used when Hide External Tool is set to False.<br />See "
+"setting is only used when Hide External Tool is set to False.{break_tag}See "
 "{docs_anchor_open}the edX LTI documentation{anchor_close} for more details "
 "on this setting."
 msgstr ""
 "Éntér thé ÛRL öf thé éxtérnäl tööl thät thïs çömpönént läünçhés. Thïs "
-"séttïng ïs önlý üséd whén Hïdé Éxtérnäl Tööl ïs sét tö Fälsé.<br />Séé "
+"séttïng ïs önlý üséd whén Hïdé Éxtérnäl Tööl ïs sét tö Fälsé.{break_tag}Séé "
 "{docs_anchor_open}thé édX LTÌ döçüméntätïön{anchor_close} för möré détäïls "
 "ön thïs séttïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, "
 "ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм "
@@ -4599,18 +4599,19 @@ msgstr "Çüstöm Pärämétérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм
 #, python-brace-format
 msgid ""
 "Add the key/value pair for any custom parameters, such as the page your "
-"e-book should open to or the background color for this component.<br />See "
-"{docs_anchor_open}the edX LTI documentation{anchor_close} for more details "
-"on this setting."
+"e-book should open to or the background color for this "
+"component.{break_tag}See {docs_anchor_open}the edX LTI "
+"documentation{anchor_close} for more details on this setting."
 msgstr ""
 "Àdd thé kéý/välüé päïr för äný çüstöm pärämétérs, süçh äs thé pägé ýöür "
-"é-ßöök shöüld öpén tö ör thé ßäçkgröünd çölör för thïs çömpönént.<br />Séé "
-"{docs_anchor_open}thé édX LTÌ döçüméntätïön{anchor_close} för möré détäïls "
-"ön thïs séttïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, "
-"ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм "
-"α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ "
-"єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє"
-" νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя#"
+"é-ßöök shöüld öpén tö ör thé ßäçkgröünd çölör för thïs "
+"çömpönént.{break_tag}Séé {docs_anchor_open}thé édX LTÌ "
+"döçüméntätïön{anchor_close} för möré détäïls ön thïs séttïng. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя#"
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Open in New Page"
@@ -25054,13 +25055,20 @@ msgid "For anyone, anywhere, anytime"
 msgstr "För änýöné, änýwhéré, änýtïmé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
 msgstr ""
 "Réqüïréd fïélds äré nötéd ßý <strong class=\"indicator\">ßöld téxt änd än "
 "ästérïsk (*)</strong>. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid ""
+"Required fields are noted by {strong_indicator}bold text and an asterisk "
+"(*).{strong_close}"
+msgstr ""
+"Réqüïréd fïélds äré nötéd ßý {strong_indicator}ßöld téxt änd än ästérïsk "
+"(*).{strong_close} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
@@ -25407,9 +25415,10 @@ msgstr ""
 msgid "Learn more about certificates"
 msgstr "Léärn möré äßöüt çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
-#: cms/templates/certificates.html cms/templates/settings_graders.html
-msgid "Details &amp; Schedule"
-msgstr "Détäïls &amp; Sçhédülé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+#: cms/templates/certificates.html cms/templates/group_configurations.html
+#: cms/templates/settings_advanced.html
+msgid "Details & Schedule"
+msgstr "Détäïls & Sçhédülé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
@@ -26690,11 +26699,6 @@ msgstr ""
 "α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
 " αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
 "ηιѕι υт αłιqυιρ є#"
-
-#: cms/templates/group_configurations.html
-#: cms/templates/settings_advanced.html
-msgid "Details & Schedule"
-msgstr "Détäïls & Sçhédülé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: cms/templates/howitworks.html
 msgid "Welcome"
@@ -28959,6 +28963,10 @@ msgstr ""
 "¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт"
 " єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłł#"
+
+#: cms/templates/settings_graders.html
+msgid "Details &amp; Schedule"
+msgstr "Détäïls &amp; Sçhédülé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"
