@@ -782,8 +782,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         course_id = self.fill_in_run(course_id)
         if not force_refresh:
             # see if we are first in the request cache (if present)
-            if self.request_cache is not None and six.text_type(course_id) in self.request_cache.data.get(
-                'metadata_inheritance', {}):
+            if self.request_cache is not None and six.text_type(course_id) in self.request_cache.data.get('metadata_inheritance', {}):
                 return self.request_cache.data['metadata_inheritance'][six.text_type(course_id)]
 
             # then look in any caching subsystem (e.g. memcached)
@@ -998,8 +997,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         of inherited metadata onto the item
         """
         category = item['location']['category']
-        apply_cached_metadata = category not in DETACHED_XBLOCK_TYPES and \
-                                not (category == 'course' and depth == 0)
+        apply_cached_metadata = category not in DETACHED_XBLOCK_TYPES and not (category == 'course' and depth == 0)
         return apply_cached_metadata
 
     @autoretry_read()
@@ -1078,10 +1076,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                 # I tried to add '$and': [{'_id.org': {'$ne': 'edx'}}, {'_id.course': {'$ne': 'templates'}}]
                 # but it didn't do the right thing (it filtered all edx and all templates out)
                 in course_records
-                if not (  # TODO kill this
-                course['_id']['org'] == 'edx' and
-                course['_id']['course'] == 'templates'
-            )
+                # TODO kill this
+                if not (course['_id']['org'] == 'edx' and course['_id']['course'] == 'templates')
             ],
             []
         )
@@ -1652,7 +1648,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         '''
         assert location.branch is None
         assert revision == ModuleStoreEnum.RevisionOption.published_only \
-               or revision == ModuleStoreEnum.RevisionOption.draft_preferred
+            or revision == ModuleStoreEnum.RevisionOption.draft_preferred
 
         parent_cache = self._get_parent_cache(self.get_branch_setting())
         if parent_cache.has(six.text_type(location)):

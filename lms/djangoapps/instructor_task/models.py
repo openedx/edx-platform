@@ -82,13 +82,12 @@ class InstructorTask(models.Model):
 
     def __repr__(self):
         return 'InstructorTask<%r>' % ({
-                                           'task_type': self.task_type,
-                                           'course_id': self.course_id,
-                                           'task_input': self.task_input,
-                                           'task_id': self.task_id,
-                                           'task_state': self.task_state,
-                                           'task_output': self.task_output,
-                                       },)
+            'task_type': self.task_type,
+            'course_id': self.course_id,
+            'task_input': self.task_input,
+            'task_id': self.task_id,
+            'task_state': self.task_state,
+            'task_output': self.task_output},)
 
     def __unicode__(self):
         return six.text_type(repr(self))

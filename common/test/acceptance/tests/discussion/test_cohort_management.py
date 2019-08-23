@@ -22,6 +22,7 @@ from common.test.acceptance.tests.helpers import EventsTestMixin, UniqueCourseTe
 from openedx.core.lib.tests import attr
 from xmodule.partitions.partitions import Group
 
+
 @attr(shard=8)
 class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin):
     """

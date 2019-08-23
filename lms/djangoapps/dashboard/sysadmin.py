@@ -12,6 +12,7 @@ from six import StringIO
 import subprocess
 
 import unicodecsv as csv
+import mongoengine
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
