@@ -1689,7 +1689,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         # Also verify the content of created transcript file.
         expected_transcript_content = File(open(expected_transcript_path)).read()
         transcript = get_video_transcript_data(video_id=self.descriptor.edx_video_id, language_code=language_code)
-        self.assertEqual(transcript['content'], expected_transcript_content)
+        self.assertEqual(transcript['content'].decode('utf-8'), expected_transcript_content)
 
     @ddt.data(
         (['en', 'da'], 'test_sub', ''),
