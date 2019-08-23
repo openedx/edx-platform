@@ -14,6 +14,7 @@ def runPythonTests() {
 
 def pythonTestCleanup() {
     archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/**/*,test_root/log/**/*.log,**/nosetests.xml,*.log'
+    sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
     junit '**/nosetests.xml'
     sh '''source $HOME/edx-venv/bin/activate
     bash scripts/xdist/terminate_xdist_nodes.sh'''
@@ -38,6 +39,7 @@ def xdist_git_refspec() {
 pipeline {
     agent { label "jenkins-worker" }
     options {
+        sendSplunkConsoleLog()
         timestamps()
         timeout(60)
     }
@@ -176,6 +178,7 @@ pipeline {
                 always {
                     script {
                         archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*.coverage'
+                        sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
                         publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true,
                             reportDir: 'reports/cover', reportFiles: 'index.html',
                             reportName: 'Coverage.py Report', reportTitles: ''])
@@ -192,7 +195,7 @@ pipeline {
     }
     post {
         always {
-            script{
+            script {
                 if (env.ghprbPullId != null) {
                     // For PR jobs, run the edx-platform-test-notifier for PR reporting
                     build job: 'edx-platform-test-notifier', parameters: [string(name: 'REPO', value: "${REPO_NAME}"), string(name: 'PR_NUMBER', value: "${ghprbPullId}")], wait: false
