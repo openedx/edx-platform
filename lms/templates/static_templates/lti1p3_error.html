@@ -1,0 +1,8 @@
+% if http_code == 400:
+<h1>BAD REQUEST (400).</h1>
+% elif http_code == 403:
+<h1>FORBIDDEN (403).</h1>
+% elif http_code == 404:
+<h1>NOT FOUND (404).</h1>
+% endif
+<h2>${message}</h2>

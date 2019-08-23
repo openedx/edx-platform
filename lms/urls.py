@@ -912,6 +912,7 @@ if settings.FEATURES.get('CUSTOM_COURSES_EDX'):
 if settings.FEATURES.get('ENABLE_LTI_PROVIDER'):
     urlpatterns += [
         url(r'^lti_provider/', include('lti_provider.urls')),
+        url(r'^lti1p3_tool/', include('lti1p3_tool.urls')),
     ]
 
 urlpatterns += [

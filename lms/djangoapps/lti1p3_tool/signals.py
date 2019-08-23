@@ -6,7 +6,7 @@ import logging
 
 from django.dispatch import receiver
 from lms.djangoapps.grades.api import signals as grades_signals
-from .tasks import ScoresService
+from .tasks import Lti1p3ScoresService
 
 log = logging.getLogger(__name__)
 
@@ -17,5 +17,5 @@ def score_changed_handler(sender, **kwargs):  # pylint: disable=unused-argument
     Consume signals that indicate score changes. See the definition of
     PROBLEM_WEIGHTED_SCORE_CHANGED for a description of the signal.
     """
-    scores = ScoresService()
+    scores = Lti1p3ScoresService()
     scores.score_changed_handler(**kwargs)

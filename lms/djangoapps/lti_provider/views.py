@@ -16,7 +16,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from lti_provider.models import LtiConsumer
 from lti_provider.outcomes import store_outcome_parameters
 from lti_provider.signature_validator import SignatureValidator
-from lti_provider.users import authenticate_lti_user
+from lti_provider.users import UserService
 from openedx.core.lib.url_utils import unquote_slashes
 from util.views import add_p3p_header
 
@@ -90,7 +90,8 @@ def lti_launch(request, course_id, usage_id):
 
     # Create an edX account if the user identifed by the LTI launch doesn't have
     # one already, and log the edX account into the platform.
-    authenticate_lti_user(request, params['user_id'], lti_consumer)
+    user_service = UserService()
+    user_service.authenticate_lti_user(request, params['user_id'], lti_consumer)
 
     # Store any parameters required by the outcome service in order to report
     # scores back later. We know that the consumer exists, since the record was
