@@ -103,6 +103,7 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
     A KeyValueStore that maps keyed data access to one of the 3 data areas
     known to the MongoModuleStore (data, children, and metadata)
     """
+
     def __init__(self, data, parent, children, metadata):
         super(MongoKeyValueStore, self).__init__()
         if not isinstance(data, dict):
@@ -181,6 +182,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
     A system that has a cache of module json that it will use to load modules
     from, with a backup of calling to the underlying modulestore for more data
     """
+
     def __repr__(self):
         return "CachingDescriptorSystem{!r}".format((
             self.modulestore,
@@ -328,7 +330,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                 # decache any computed pending field settings
                 module.save()
                 return module
-            except Exception:                   # pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-except
                 log.warning("Failed to load descriptor from %s", json_data, exc_info=True)
                 return ErrorDescriptor.from_json(
                     json_data,
@@ -472,6 +474,7 @@ class MongoBulkOpsRecord(BulkOpsRecord):
     """
     Tracks whether there've been any writes per course and disables inheritance generation
     """
+
     def __init__(self):
         super(MongoBulkOpsRecord, self).__init__()
         self.dirty = False
@@ -515,6 +518,7 @@ class ParentLocationCache(dict):
     """
     Dict-based object augmented with a more cache-like interface, for internal use.
     """
+
     # pylint: disable=missing-docstring
 
     @contract(key=six.text_type)
@@ -778,7 +782,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         course_id = self.fill_in_run(course_id)
         if not force_refresh:
             # see if we are first in the request cache (if present)
-            if self.request_cache is not None and six.text_type(course_id) in self.request_cache.data.get('metadata_inheritance', {}):
+            if self.request_cache is not None and six.text_type(course_id) in self.request_cache.data.get(
+                'metadata_inheritance', {}):
                 return self.request_cache.data['metadata_inheritance'][six.text_type(course_id)]
 
             # then look in any caching subsystem (e.g. memcached)
@@ -859,13 +864,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         course_key = self.fill_in_run(course_key)
         parent_cache = self._get_parent_cache(self.get_branch_setting())
 
-        should_process = False
-        if depth is None:
-            should_process = True
-        elif depth >= 0:
-            should_process = True
-
-        while to_process and should_process:
+        while to_process and (depth is None or depth >= 0):
             children = []
             for item in to_process:
                 self._clean_item_data(item)
@@ -1000,7 +999,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
         category = item['location']['category']
         apply_cached_metadata = category not in DETACHED_XBLOCK_TYPES and \
-            not (category == 'course' and depth == 0)
+                                not (category == 'course' and depth == 0)
         return apply_cached_metadata
 
     @autoretry_read()
@@ -1009,6 +1008,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         Returns a list of `CourseSummary`. This accepts an optional parameter of 'org' which
         will apply an efficient filter to only get courses with the specified ORG
         """
+
         def extract_course_summary(course):
             """
             Extract course information from the course block for mongo.
@@ -1079,9 +1079,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                 # but it didn't do the right thing (it filtered all edx and all templates out)
                 in course_records
                 if not (  # TODO kill this
-                    course['_id']['org'] == 'edx' and
-                    course['_id']['course'] == 'templates'
-                )
+                course['_id']['org'] == 'edx' and
+                course['_id']['course'] == 'templates'
+            )
             ],
             []
         )
@@ -1229,14 +1229,14 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
     @autoretry_read()
     def get_items(
-            self,
-            course_id,
-            settings=None,
-            content=None,
-            key_revision=MongoRevisionKey.published,
-            qualifiers=None,
-            using_descriptor_system=None,
-            **kwargs
+        self,
+        course_id,
+        settings=None,
+        content=None,
+        key_revision=MongoRevisionKey.published,
+        qualifiers=None,
+        using_descriptor_system=None,
+        **kwargs
     ):
         """
         Returns:
@@ -1652,7 +1652,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         '''
         assert location.branch is None
         assert revision == ModuleStoreEnum.RevisionOption.published_only \
-            or revision == ModuleStoreEnum.RevisionOption.draft_preferred
+               or revision == ModuleStoreEnum.RevisionOption.draft_preferred
 
         parent_cache = self._get_parent_cache(self.get_branch_setting())
         if parent_cache.has(six.text_type(location)):
