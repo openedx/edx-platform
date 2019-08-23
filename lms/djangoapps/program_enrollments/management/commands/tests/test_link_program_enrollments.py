@@ -274,19 +274,23 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
         nonexistant_course = CourseKey.from_string('course-v1:edX+Zilch+Bupkis')
 
         program_enrollment_1 = self._create_waiting_enrollment(self.program, '0001')
-        self._create_waiting_course_enrollment(program_enrollment_1, nonexistant_course)
-        self._create_waiting_course_enrollment(program_enrollment_1, self.animal_course)
+        course_enrollment_1 = self._create_waiting_course_enrollment(program_enrollment_1, nonexistant_course)
+        course_enrollment_2 = self._create_waiting_course_enrollment(program_enrollment_1, self.animal_course)
 
         program_enrollment_2 = self._create_waiting_enrollment(self.program, '0002')
-        self._create_waiting_course_enrollment(program_enrollment_2, nonexistant_course)
+        self._create_waiting_course_enrollment(program_enrollment_2, self.fruit_course)
         self._create_waiting_course_enrollment(program_enrollment_2, self.animal_course)
 
-        msg_1 = COURSE_ENROLLMENT_ERR_TPL.format(user=self.user_1.username, course=nonexistant_course)
-        msg_2 = COURSE_ENROLLMENT_ERR_TPL.format(user=self.user_2.username, course=nonexistant_course)
+        msg = COURSE_ENROLLMENT_ERR_TPL.format(user=self.user_1.username, course=nonexistant_course)
         with LogCapture() as logger:
             self.call_command(self.program, ('0001', self.user_1.username), ('0002', self.user_2.username))
-            logger.check_present((COMMAND_PATH, 'WARNING', msg_1))
-            logger.check_present((COMMAND_PATH, 'WARNING', msg_2))
+            logger.check_present((COMMAND_PATH, 'WARNING', msg))
 
-        self._assert_user_enrolled_in_program_courses(self.user_1, self.program, self.animal_course)
-        self._assert_user_enrolled_in_program_courses(self.user_2, self.program, self.animal_course)
+        self._assert_no_program_enrollment(self.user_1, self.program)
+        self._assert_no_user(program_enrollment_1)
+        course_enrollment_1.refresh_from_db()
+        self.assertIsNone(course_enrollment_1.course_enrollment)
+        course_enrollment_2.refresh_from_db()
+        self.assertIsNone(course_enrollment_2.course_enrollment)
+
+        self._assert_user_enrolled_in_program_courses(self.user_2, self.program, self.animal_course, self.fruit_course)

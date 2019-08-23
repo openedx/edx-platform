@@ -46,8 +46,11 @@ class Command(BaseCommand):
     enrollments updated.
 
     If there is an error while enrolling a user in a waiting program course enrollment, the error will be
-    logged, but we will continue attempting to enroll the user in courses, and we will process all other
-    input users
+    logged, and we will roll back all transactions for that user so that their db state will be the same as
+    it was before this command was run. This is to allow the re-running of the same command again to correctly enroll
+    the user once the issue preventing the enrollment has been resolved.
+
+    No other users will be affected, they will be processed normally.
     """
 
     help = u'Manually links ProgramEnrollment records to LMS users'
@@ -82,8 +85,11 @@ class Command(BaseCommand):
             if not user:
                 logger.warning(NO_LMS_USER_TPL.format(username))
                 continue
-
-            self.link_program_enrollment(program_enrollment, user)
+            try:
+                with transaction.atomic():
+                    self.link_program_enrollment(program_enrollment, user)
+            except CourseEnrollmentException:
+                pass  # transaction rolled back
 
     def parse_user_items(self, user_items):
         """
@@ -136,6 +142,9 @@ class Command(BaseCommand):
         """
         Attempts to link the given program enrollment to the given user
         If the enrollment has any program course enrollments, enroll the user in those courses as well
+
+        Raises: CourseEnrollmentException if there is an error enrolling user in a waiting
+                program course enrollment
         """
         if program_enrollment.user:
             logger.warning(get_existing_user_message(program_enrollment, user))
@@ -150,11 +159,12 @@ class Command(BaseCommand):
         for program_course_enrollment in program_enrollment.program_course_enrollments.all():
             try:
                 program_course_enrollment.enroll(user)
-            except CourseEnrollmentException:
+            except CourseEnrollmentException as e:
                 logger.warning(COURSE_ENROLLMENT_ERR_TPL.format(
                     user=user.username,
                     course=program_course_enrollment.course_key
                 ))
+                raise e
 
 
 def get_existing_user_message(program_enrollment, user):
