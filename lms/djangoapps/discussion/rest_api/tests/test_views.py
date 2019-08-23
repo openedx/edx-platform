@@ -193,7 +193,7 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assertEqual(response.status_code, expected_status)
 
         if expected_content:
-            self.assertEqual(text_type(response.content), expected_content)
+            self.assertEqual(response.content.decode('utf-8'), expected_content)
 
     def build_jwt_headers(self, user):
         """
