@@ -145,10 +145,12 @@
                 discussionsBodyTop = $discussionBody[0] ? $discussionBody.offset().top : undefined;
                 discussionsBodyBottom = discussionsBodyTop + $discussionBody.outerHeight();
                 $sidebar = this.$('.forum-nav');
-                if (scrollTop > discussionsBodyTop - this.sidebar_padding) {
-                    $sidebar.css('top', scrollTop - discussionsBodyTop + this.sidebar_padding);
-                } else {
-                    $sidebar.css('top', '0');
+                if (!$('body').hasClass('new-theme')) {
+                    if (scrollTop > discussionsBodyTop - this.sidebar_padding) {
+                        $sidebar.css('top', scrollTop - discussionsBodyTop + this.sidebar_padding);
+                    } else {
+                        $sidebar.css('top', '0');
+                    }
                 }
                 sidebarHeight = windowHeight - Math.max(discussionsBodyTop - scrollTop, this.sidebar_padding);
                 topOffset = scrollTop + windowHeight;
@@ -156,7 +158,9 @@
                 amount = Math.max(topOffset - discussionBottomOffset, 0);
                 sidebarHeight = sidebarHeight - this.sidebar_padding - amount;
                 sidebarHeight = Math.min(sidebarHeight + 1, $discussionBody.outerHeight());
-                $sidebar.css('height', sidebarHeight);
+                if (!$('body').hasClass('new-theme')) {
+                    $sidebar.css('height', sidebarHeight);
+                }
                 headerHeight = this.$('.forum-nav-header').outerHeight();
                 refineBarHeight = this.$('.forum-nav-refine-bar').outerHeight();
                 browseFilterHeight = this.$('.forum-nav-browse-filter').outerHeight();
