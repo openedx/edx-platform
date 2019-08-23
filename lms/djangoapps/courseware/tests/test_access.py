@@ -874,29 +874,25 @@ class CCXTestCase(SharedModuleStoreTestCase):
     """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
-    def setUp(self):
-        """
-        Set up tests
-        """
-        super(CCXTestCase, self).setUp()
-
-        course = CourseFactory.create(enable_ccx=True)
-        CourseOverview.load_from_module_store(course.id)
-        self.course = course
+    @classmethod
+    def setUpClass(cls):
+        super(CCXTestCase, cls).setUpClass()
+        cls.course = CourseFactory.create(enable_ccx=True)
+        CourseOverview.load_from_module_store(cls.course.id)
 
         student = UserFactory.create()
         staff = AdminFactory.create()
         coach = UserFactory.create()
 
         ccx = CustomCourseForEdX(
-            course_id=course.id,
+            course_id=cls.course.id,
             coach=coach,
             display_name="Test CCX"
         )
         ccx.save()
-        self.ccx_overview = CourseOverview.get_from_id(ccx.locator)
+        cls.ccx_overview = CourseOverview.get_from_id(ccx.locator)
 
-        self.users = {
+        cls.users = {
             'coach': coach,
             'student': student,
             'staff': staff,
