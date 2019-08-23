@@ -95,10 +95,10 @@ class TestViews(ModuleStoreTestCase):
         self.request.user = instructor
 
         response = views.all_sequential_open_distrib(self.request, text_type(course.id))
-        self.assertEqual('[]', response.content)
+        self.assertEqual('[]', response.content.decode('utf-8'))
 
         response = views.all_problem_grade_distribution(self.request, text_type(course.id))
-        self.assertEqual('[]', response.content)
+        self.assertEqual('[]', response.content.decode('utf-8'))
 
         response = views.section_problem_grade_distrib(self.request, text_type(course.id), 'no section')
-        self.assertEqual('{"error": "error"}', response.content)
+        self.assertEqual('{"error": "error"}', response.content.decode('utf-8'))
