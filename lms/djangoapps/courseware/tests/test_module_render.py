@@ -636,7 +636,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
                 text_type(self.course_key),
                 quote_slashes(text_type(self.location)),
                 'dummy_handler'
-            ).content,
+            ).content.decode('utf-8'),
             json.dumps({
                 'success': u'Submission aborted! Maximum %d files may be submitted at once' %
                            settings.MAX_FILEUPLOADS_PER_INPUT
