@@ -4764,7 +4764,7 @@ class TestCourseIssuedCertificatesData(SharedModuleStoreTestCase):
         self.assertEqual(response['Content-Type'], 'text/csv')
         self.assertEqual(response['Content-Disposition'], u'attachment; filename={0}'.format('issued_certificates.csv'))
         self.assertEqual(
-            response.content.strip(),
+            response.content.strip().decode('utf-8'),
             '"CourseID","Certificate Type","Total Certificates Issued","Date Report Run"\r\n"'
             + str(self.course.id) + '","honor","3","' + current_date + '"'
         )
