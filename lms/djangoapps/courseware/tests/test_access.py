@@ -876,8 +876,11 @@ class CCXTestCase(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(CCXTestCase, cls).setUpClass()
-        cls.course = CourseFactory.create(enable_ccx=True)
+        with super(CCXTestCase, cls).setUpClassAndTestData():
+            cls.course = CourseFactory.create(enable_ccx=True)
+
+    @classmethod
+    def setUpTestData(cls):
         CourseOverview.load_from_module_store(cls.course.id)
 
         student = UserFactory.create()
