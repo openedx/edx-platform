@@ -1121,7 +1121,7 @@ class XModuleDescriptorToXBlockMixin(object):
         Interpret the parsed XML in `node`, creating an XModuleDescriptor.
         """
         # It'd be great to not reserialize and deserialize the xml
-        xml = etree.tostring(node)
+        xml = etree.tostring(node).decode('utf-8')
         block = cls.from_xml(xml, runtime, id_generator)
         return block
 

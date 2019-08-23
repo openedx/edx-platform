@@ -1,7 +1,9 @@
 from __future__ import absolute_import
 
+import codecs
 import glob
 import hashlib
+import io
 import itertools
 import json
 import logging
@@ -623,7 +625,7 @@ class XMLModuleStore(ModuleStoreReadBase):
             if filepath.endswith('~'):  # skip *~ files
                 continue
 
-            with open(filepath) as f:
+            with io.open(filepath) as f:
                 try:
                     if filepath.find('.json') != -1:
                         # json file with json data content
@@ -645,7 +647,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                         slug = os.path.splitext(os.path.basename(filepath))[0]
                         loc = course_descriptor.scope_ids.usage_id.replace(category=category, name=slug)
                         # html file with html data content
-                        html = f.read().decode('utf-8')
+                        html = f.read()
                         try:
                             module = system.load_item(loc)
                             module.data = html
