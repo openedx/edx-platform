@@ -270,7 +270,7 @@ class DjangoStorageReportStore(ReportStore):
         """
         output_buffer = ContentFile('')
         # Adding unicode signature (BOM) for MS Excel 2013 compatibility
-        output_buffer.write(codecs.BOM_UTF8.decode('utf-8'))
+        output_buffer.write(codecs.BOM_UTF8)
         csvwriter = csv.writer(output_buffer)
         csvwriter.writerows(self._get_utf8_encoded_rows(rows))
         output_buffer.seek(0)
