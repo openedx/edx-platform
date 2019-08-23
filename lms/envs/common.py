@@ -1465,6 +1465,7 @@ from xmodule.x_module import XModuleMixin
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin, EditInfoMixin)
+XBLOCK_EXTRA_MIXINS = ()
 
 # .. setting_name: XBLOCK_SELECT_FUNCTION
 # .. setting_default: prefer_xmodules
