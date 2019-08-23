@@ -634,7 +634,7 @@ DEBUG = False
 SESSION_COOKIE_SECURE = False
 SESSION_SAVE_EVERY_REQUEST = False
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
-SESSION_COOKIE_AGE = 86400 # Default: 24 hours, in seconds
+SESSION_COOKIE_AGE = 2592000 # Default: 30 days, in seconds
 
 
 # Site info
