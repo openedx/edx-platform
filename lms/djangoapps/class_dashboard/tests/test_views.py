@@ -36,7 +36,7 @@ class TestViews(ModuleStoreTestCase):
         has_access.return_value = True
         response = views.all_problem_grade_distribution(self.request, 'test/test/test')
 
-        self.assertEqual(json.dumps(self.simple_data), response.content)
+        self.assertEqual(json.dumps(self.simple_data), response.content.decode('utf-8'))
 
     @patch('class_dashboard.views.has_instructor_access_for_class')
     def test_all_problem_grade_distribution_no_access(self, has_access):
