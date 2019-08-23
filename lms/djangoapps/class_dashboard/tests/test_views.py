@@ -46,7 +46,10 @@ class TestViews(ModuleStoreTestCase):
         has_access.return_value = False
         response = views.all_problem_grade_distribution(self.request, 'test/test/test')
 
-        self.assertEqual("{\"error\": \"Access Denied: User does not have access to this course\'s data\"}", response.content)
+        self.assertEqual(
+            "{\"error\": \"Access Denied: User does not have access to this course\'s data\"}",
+            response.content.decode('utf-8')
+        )
 
     @patch('class_dashboard.views.has_instructor_access_for_class')
     def test_all_sequential_open_distribution_has_access(self, has_access):
