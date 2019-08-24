@@ -31,7 +31,7 @@ def student_certificates(request):
         The generated certifcates list response.
 
     """
-    from common.djangoapps.student.views import get_course_enrollments
+    from student.views import get_course_enrollments
 
     user = request.user
 
@@ -71,7 +71,7 @@ def student_certificates(request):
         if cert_downloadable_status['is_downloadable']:
             certificate_url = cert_downloadable_status['download_url']
 
-            if certs_api.has_html_certificates_enabled(course_id, course):
+            if certs_api.has_html_certificates_enabled(course):
                 if certs_api.get_active_web_certificate(course) is not None:
                     certificate_url = certs_api.get_certificate_url(
                         course_id=course_id, uuid=cert_downloadable_status['uuid']

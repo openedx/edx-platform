@@ -17,7 +17,7 @@ from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, is_comm
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from student.models import CourseEnrollment
-from .models import CommerceConfiguration
+from lms.djangoapps.commerce.models import CommerceConfiguration
 
 log = logging.getLogger(__name__)
 

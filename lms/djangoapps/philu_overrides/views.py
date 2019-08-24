@@ -517,9 +517,9 @@ def course_about(request, course_id):
     from util.milestones_helpers import get_prerequisite_courses_display
     from openedx.core.djangoapps.models.course_details import CourseDetails
     from commerce.utils import EcommerceService
-    from course_modes.models import CourseMode
+    from course_modes.models import CourseMode, get_cosmetic_display_price
     from lms.djangoapps.courseware.access_utils import ACCESS_DENIED
-    from lms.djangoapps.courseware.views.views import registered_for_course, get_cosmetic_display_price
+    from lms.djangoapps.courseware.views.views import registered_for_course
     from lms.djangoapps.courseware.courses import (
         get_courses,
         get_permission_for_course_about,
@@ -533,7 +533,6 @@ def course_about(request, course_id):
     from lms.envs.common import DEFAULT_IMAGE_NAME
     import shoppingcart
     from shoppingcart.utils import is_shopping_cart_enabled
-    from openedx.core.djangoapps.coursetalk.helpers import inject_coursetalk_keys_into_context
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
@@ -594,7 +593,7 @@ def course_about(request, course_id):
             course_key,
             settings.PAID_COURSE_REGISTRATION_CURRENCY[0]
         )
-        course_price = get_cosmetic_display_price(course, registration_price)
+        course_price = get_cosmetic_display_price(course)
 
         # Determine which checkout workflow to use -- LMS shoppingcart or Otto basket
         can_add_course_to_cart = _is_shopping_cart_enabled and registration_price and not ecommerce_checkout_link
@@ -672,7 +671,6 @@ def course_about(request, course_id):
             'social_sharing_urls': social_sharing_urls,
             'org_survey_status': user_org_survey_completion_status(request.user)
         }
-        inject_coursetalk_keys_into_context(context, course_key)
 
         return render_to_response('courseware/course_about.html', context)
 
