@@ -128,7 +128,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-08-18 20:42+0000\n"
+"POT-Creation-Date: 2019-08-25 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2019\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -3983,13 +3983,9 @@ msgstr "LTI No"
 msgid ""
 "Enter the LTI ID for the external LTI provider.  This value must be the same"
 " LTI ID that you entered in the LTI Passports setting on the Advanced "
-"Settings page.<br />See {docs_anchor_open}the edX LTI "
+"Settings page.{break_tag}See {docs_anchor_open}the edX LTI "
 "documentation{anchor_close} for more details on this setting."
 msgstr ""
-"Dış LTI sağlayıcısı için LTI kimliğini girin. Bu değer Gelişmiş Ayarlar "
-"sayfasındaki LTI Pasaportları ayarı içerisine girdiğiniz LTI kimliğiyle aynı"
-" olmalıdır.<br />Bu ayar hakkında ayrıntılı bilgi için {docs_anchor_open}edX"
-" LTI belgelendirmesi{anchor_close}ne bakın."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "LTI URL"
@@ -3999,13 +3995,10 @@ msgstr "LTI URL"
 #, python-brace-format
 msgid ""
 "Enter the URL of the external tool that this component launches. This "
-"setting is only used when Hide External Tool is set to False.<br />See "
+"setting is only used when Hide External Tool is set to False.{break_tag}See "
 "{docs_anchor_open}the edX LTI documentation{anchor_close} for more details "
 "on this setting."
 msgstr ""
-"Bileşenin başlattığı harici aracın URL'sini girin. Bu ayar Harici Aracı "
-"Gizle ayarı False olduğunda kullanılır.<br /> Bu ayar hakkında daha fazla "
-"bilgi için {docs_anchor_open}edX LTI belgelendirmesine{anchor_close} bakın."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Custom Parameters"
@@ -4015,14 +4008,10 @@ msgstr "Özel yapılmış parametreler"
 #, python-brace-format
 msgid ""
 "Add the key/value pair for any custom parameters, such as the page your "
-"e-book should open to or the background color for this component.<br />See "
-"{docs_anchor_open}the edX LTI documentation{anchor_close} for more details "
-"on this setting."
+"e-book should open to or the background color for this "
+"component.{break_tag}See {docs_anchor_open}the edX LTI "
+"documentation{anchor_close} for more details on this setting."
 msgstr ""
-"E-kitabınızın hangi sayfadan açılacağı ya da bu bileşenin arkaplan rengi "
-"gibi her özel parametre için anahtar/değer çifti ekleyin.<br />Bu ayar "
-"hakkında daha detaylı bilgi için {docs_anchor_open}edX LTI "
-"belgelendirmesine{anchor_close} bakın."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Open in New Page"
@@ -21414,13 +21403,18 @@ msgid "For anyone, anywhere, anytime"
 msgstr "Herkes için, her zaman, her yerde"
 
 #: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
 msgstr ""
 "Gerekli kısımlar <strong class=\"indicator\">(*) yıldızla ve "
 "kalınlaştırılarak</strong> vurgulanmıştır."
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid ""
+"Required fields are noted by {strong_indicator}bold text and an asterisk "
+"(*).{strong_close}"
+msgstr ""
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
@@ -21699,9 +21693,10 @@ msgstr ""
 msgid "Learn more about certificates"
 msgstr "Sertifikalar hakkında daha fazla öğren"
 
-#: cms/templates/certificates.html cms/templates/settings_graders.html
-msgid "Details &amp; Schedule"
-msgstr "Ayrıntılar &amp; Takvim"
+#: cms/templates/certificates.html cms/templates/group_configurations.html
+#: cms/templates/settings_advanced.html
+msgid "Details & Schedule"
+msgstr "Ayrıntılar & Takvim"
 
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
@@ -22775,11 +22770,6 @@ msgstr ""
 "Bir grup yapılandırmasını yalnızca bir deneyde kullanılmıyorsa "
 "silebilirsiniz. Yapılandırmayı silmek için kutucuğun üzerine gelin ve sil "
 "simgesine tıklayın. "
-
-#: cms/templates/group_configurations.html
-#: cms/templates/settings_advanced.html
-msgid "Details & Schedule"
-msgstr "Ayrıntılar & Takvim"
 
 #: cms/templates/howitworks.html
 msgid "Welcome"
@@ -24671,6 +24661,10 @@ msgstr ""
 "Aynı zamanda, ödev, lab, test ve sınavlar gibi görevleri oluşturabilir ve "
 "her bir görevin öğrencinin notuna ne kadar katkıda bulunacağını "
 "belirleyebilirsiniz."
+
+#: cms/templates/settings_graders.html
+msgid "Details &amp; Schedule"
+msgstr "Ayrıntılar &amp; Takvim"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"

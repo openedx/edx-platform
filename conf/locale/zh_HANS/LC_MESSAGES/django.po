@@ -393,7 +393,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-08-18 20:42+0000\n"
+"POT-Creation-Date: 2019-08-25 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: ifLab <webmaster@iflab.org>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/open-edx/teams/6205/zh_CN/)\n"
@@ -3955,11 +3955,9 @@ msgstr "LTI ID"
 msgid ""
 "Enter the LTI ID for the external LTI provider.  This value must be the same"
 " LTI ID that you entered in the LTI Passports setting on the Advanced "
-"Settings page.<br />See {docs_anchor_open}the edX LTI "
+"Settings page.{break_tag}See {docs_anchor_open}the edX LTI "
 "documentation{anchor_close} for more details on this setting."
 msgstr ""
-"输入外部LTI提供商提供的LTI编号。该值必须和您的LTI账号里高级设置里的LTI编号相同。<br />关于该设置的更多信息请访问 "
-"{docs_anchor_open}edx LTI 文档{anchor_close} "
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "LTI URL"
@@ -3969,12 +3967,10 @@ msgstr "LTI URL"
 #, python-brace-format
 msgid ""
 "Enter the URL of the external tool that this component launches. This "
-"setting is only used when Hide External Tool is set to False.<br />See "
+"setting is only used when Hide External Tool is set to False.{break_tag}See "
 "{docs_anchor_open}the edX LTI documentation{anchor_close} for more details "
 "on this setting."
 msgstr ""
-"输入启动该组件的外部工具的URL。这个设置只有在“隐藏外部工具”为False时才能使用。<br "
-"/>关于该设置的更多信息请访问{docs_anchor_open}edX LTI文档{anchor_close}。"
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Custom Parameters"
@@ -3984,12 +3980,10 @@ msgstr "自定义参数"
 #, python-brace-format
 msgid ""
 "Add the key/value pair for any custom parameters, such as the page your "
-"e-book should open to or the background color for this component.<br />See "
-"{docs_anchor_open}the edX LTI documentation{anchor_close} for more details "
-"on this setting."
+"e-book should open to or the background color for this "
+"component.{break_tag}See {docs_anchor_open}the edX LTI "
+"documentation{anchor_close} for more details on this setting."
 msgstr ""
-"任意自定义的参数都要添加键/值且成对，例如您要打开的电子书的页面或者这个组件的背景颜色。<br "
-"/>这项设置的更多信息请查看{docs_anchor_open}edX LTI文档{anchor_close} "
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Open in New Page"
@@ -20322,11 +20316,16 @@ msgid "For anyone, anywhere, anytime"
 msgstr "任何人，任何地点，任何时间"
 
 #: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
 msgstr "必需的字段已经被<strong class=\"indicator\">粗体和星号(*)</strong>所标记。"
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid ""
+"Required fields are noted by {strong_indicator}bold text and an asterisk "
+"(*).{strong_close}"
+msgstr ""
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
@@ -20563,9 +20562,10 @@ msgstr "课程开始后{em_start}不要{em_end}删除证书;已经获得证书�
 msgid "Learn more about certificates"
 msgstr "了解更多关于证书的信息"
 
-#: cms/templates/certificates.html cms/templates/settings_graders.html
-msgid "Details &amp; Schedule"
-msgstr "细节＆日程"
+#: cms/templates/certificates.html cms/templates/group_configurations.html
+#: cms/templates/settings_advanced.html
+msgid "Details & Schedule"
+msgstr "细节与日程"
 
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
@@ -21513,11 +21513,6 @@ msgid ""
 "and click the delete icon."
 msgstr ""
 "点击{em_start}新建组配置{em_end}来添加一个新的配置；如果要编辑某个配置，请点击该配置的{em_start}编辑{em_end}按钮；一个组配置只有在未被任何一个实验使用的情况下可以被删除，请点击某个组配置的删除图标以删除该组配置。"
-
-#: cms/templates/group_configurations.html
-#: cms/templates/settings_advanced.html
-msgid "Details & Schedule"
-msgstr "细节与日程"
 
 #: cms/templates/howitworks.html
 msgid "Welcome"
@@ -23176,6 +23171,10 @@ msgid ""
 "exams, and specify how much of a student's grade each assignment type is "
 "worth."
 msgstr "您也可以创建作业类型，比如家庭作业、实验、测验、以及考试，并且指定每个作业是否计入最终的成绩及其评价分值。"
+
+#: cms/templates/settings_graders.html
+msgid "Details &amp; Schedule"
+msgstr "细节＆日程"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"

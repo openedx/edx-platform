@@ -121,7 +121,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-08-18 20:42+0000\n"
+"POT-Creation-Date: 2019-08-25 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Ukrainian (https://www.transifex.com/open-edx/teams/6205/uk/)\n"
@@ -4107,14 +4107,9 @@ msgstr "LTI ID "
 msgid ""
 "Enter the LTI ID for the external LTI provider.  This value must be the same"
 " LTI ID that you entered in the LTI Passports setting on the Advanced "
-"Settings page.<br />See {docs_anchor_open}the edX LTI "
+"Settings page.{break_tag}See {docs_anchor_open}the edX LTI "
 "documentation{anchor_close} for more details on this setting."
 msgstr ""
-"Введіть ідентифікатор LTI  для зовнішнього оператора LTI . Це значення "
-"повинно збігатися з ідентифікатором LTI введеним вами в налаштуваннях "
-"«Реєстраційні дані LTI » на сторінці розширених налаштувань. <br />Див. "
-"{docs_anchor_open}the edX LTI documentation {anchor_close} для отримання "
-"докладної інформації."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "LTI URL"
@@ -4124,15 +4119,10 @@ msgstr "LTI URL"
 #, python-brace-format
 msgid ""
 "Enter the URL of the external tool that this component launches. This "
-"setting is only used when Hide External Tool is set to False.<br />See "
+"setting is only used when Hide External Tool is set to False.{break_tag}See "
 "{docs_anchor_open}the edX LTI documentation{anchor_close} for more details "
 "on this setting."
 msgstr ""
-"Введіть посилання на зовнішній засіб навчання, який запускає цей компонент. "
-"Це налаштування застосовується тільки коли  «Приховати зовнішню програму» "
-"присвоєно значення «false».<br /> Див. {docs_anchor_open} edX LTI "
-"documentation {anchor_close} для отримання детальної інформації по цій "
-"настройці."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Custom Parameters"
@@ -4142,14 +4132,10 @@ msgstr "Персональні параметри"
 #, python-brace-format
 msgid ""
 "Add the key/value pair for any custom parameters, such as the page your "
-"e-book should open to or the background color for this component.<br />See "
-"{docs_anchor_open}the edX LTI documentation{anchor_close} for more details "
-"on this setting."
+"e-book should open to or the background color for this "
+"component.{break_tag}See {docs_anchor_open}the edX LTI "
+"documentation{anchor_close} for more details on this setting."
 msgstr ""
-"Додати пару ключ/значення для будь-яких параметрів користувача, таких як "
-"сторінка, на якій повинна відкриватися ваша електронна книга, або колір фону"
-" для даного компонента.<br />Див. {docs_anchor_open} edX LTI documentation "
-"{anchor_close} для отримання детальної інформації по цьому налаштуванню."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Open in New Page"
@@ -21007,10 +20993,15 @@ msgid "For anyone, anywhere, anytime"
 msgstr ""
 
 #: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid ""
+"Required fields are noted by {strong_indicator}bold text and an asterisk "
+"(*).{strong_close}"
 msgstr ""
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
@@ -21247,8 +21238,9 @@ msgstr ""
 msgid "Learn more about certificates"
 msgstr "Дізнайтеся більше про сертифікати"
 
-#: cms/templates/certificates.html cms/templates/settings_graders.html
-msgid "Details &amp; Schedule"
+#: cms/templates/certificates.html cms/templates/group_configurations.html
+#: cms/templates/settings_advanced.html
+msgid "Details & Schedule"
 msgstr ""
 
 #: cms/templates/certificates.html cms/templates/group_configurations.html
@@ -22247,11 +22239,6 @@ msgstr ""
 "групи лише у тому випадку, якщо вона не використовується у блоці. Щоб "
 "видалити налаштування, наведіть курсор миші на її поле та натисніть кнопку "
 "видалення."
-
-#: cms/templates/group_configurations.html
-#: cms/templates/settings_advanced.html
-msgid "Details & Schedule"
-msgstr ""
 
 #: cms/templates/howitworks.html
 msgid "Welcome"
@@ -23968,6 +23955,10 @@ msgstr ""
 "Ви також можете створювати власні типи завдань, наприклад, домашні завдання,"
 " лабораторні роботи, вікторини та іспити, а також визначати, як оцінювати "
 "кожний тип завдання, виконаний студентом."
+
+#: cms/templates/settings_graders.html
+msgid "Details &amp; Schedule"
+msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"
