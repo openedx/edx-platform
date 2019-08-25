@@ -11782,6 +11782,10 @@ msgid ""
 "you to highlight your new knowledge and skills. An %(platform_name)s "
 "certificate is official and easily shareable."
 msgstr ""
+"¡Esperamos que estés disfrutando la experiencia de aprendizaje en "
+"{start_strong}%(platform_name)s{end_strong}! Un Certificado Verificado te "
+"permite resaltar tus nuevos conocimientos y habilidades. Un certificado de "
+"%(platform_name)s es oficial y además es fácil de compartir."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
 #, python-format, python-brace-format
@@ -11791,6 +11795,10 @@ msgid ""
 "allows you to highlight your new knowledge and skills. An %(platform_name)s "
 "certificate is official and easily shareable."
 msgstr ""
+"¡Esperamos que estés disfrutando la experiencia de aprendizaje en "
+"{start_strong}%(first_course_name)s{end_strong}! Un Certificado Verificado "
+"te permite resaltar tus nuevos conocimientos y habilidades. Un certificado "
+"de %(platform_name)s es oficial y además es fácil de compartir."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
 #, python-format, python-brace-format
@@ -11798,6 +11806,8 @@ msgid ""
 "Upgrade by "
 "{start_strong}%(user_schedule_upgrade_deadline_time)s{end_strong}."
 msgstr ""
+"Cambiate a la opción verificada antes del "
+"{start_strong}%(user_schedule_upgrade_deadline_time)s{end_strong}."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
 msgid "You are eligible to upgrade in these courses:"
