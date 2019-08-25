@@ -30,7 +30,7 @@ from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
 
-from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag
+from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag, CourseYoutubeBlockedFlag
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE, waffle_flags
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.license import LicenseMixin
@@ -199,6 +199,12 @@ class VideoBlock(
         # is enabled for this course
         return waffle_flags()[DEPRECATE_YOUTUBE].is_enabled(self.location.course_key)
 
+    def youtube_disabled_for_course(self):
+        if CourseYoutubeBlockedFlag.feature_enabled(self.location.course_key):
+            return True
+        else:
+            return False
+
     def prioritize_hls(self, youtube_streams, html5_sources):
         """
         Decide whether hls can be prioritized as primary playback or not.
@@ -206,7 +212,7 @@ class VideoBlock(
         If both the youtube and hls sources are present then make decision on flag
         If only either youtube or hls is present then play whichever is present
         """
-        yt_present = bool(youtube_streams.strip())
+        yt_present = bool(youtube_streams.strip()) if youtube_streams else False
         hls_present = any(source for source in html5_sources if source.strip().endswith('.m3u8'))
 
         if yt_present and hls_present:
@@ -340,7 +346,10 @@ class VideoBlock(
         cdn_eval = False
         cdn_exp_group = None
 
-        self.youtube_streams = youtube_streams or create_youtube_string(self)  # pylint: disable=W0201
+        if self.youtube_disabled_for_course():
+            self.youtube_streams = ''
+        else:
+            self.youtube_streams = youtube_streams or create_youtube_string(self)  # pylint: disable=W0201
 
         settings_service = self.runtime.service(self, 'settings')
 
