@@ -656,7 +656,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
                 text_type(self.course_key),
                 quote_slashes(text_type(self.location)),
                 'dummy_handler'
-            ).content,
+            ).content.decode('utf-8'),
             json.dumps({
                 'success': u'Submission aborted! Your file "%s" is too large (max size: %d MB)' %
                            (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))
