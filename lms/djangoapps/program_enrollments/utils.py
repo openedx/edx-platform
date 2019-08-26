@@ -98,7 +98,7 @@ def get_provider_slug(organization):
         ProviderConfigurationException
     """
     try:
-        return organization.samlproviderconfig_set.current_set().get().provider_id.strip('saml-')
+        return organization.samlproviderconfig_set.current_set().get(enabled=True).provider_id.strip('saml-')
     except SAMLProviderConfig.DoesNotExist:
         log.error(u'No SAML provider found for organization id [%s]', organization.id)
         raise ProviderDoesNotExistException
