@@ -69,6 +69,13 @@ def dump_js_escaped_json(obj, cls=EdxJSONEncoder):
         (string) Escaped encoded JSON.
 
     """
+    if isinstance(obj, dict) and 'courseId' in obj:
+        obj['courseId'] = obj.get('courseId').decode('utf-8') if isinstance(obj.get('courseId'), bytes) \
+            else obj.get('courseId')
+    if isinstance(obj, dict) and 'usageId' in obj:
+        obj['usageId'] = obj.get('usageId').decode('utf-8') if isinstance(obj.get('usageId'), bytes)\
+            else obj.get('usageId')
+
     json_string = json.dumps(obj, ensure_ascii=True, cls=cls)
     json_string = _escape_json_for_js(json_string)
     return json_string
