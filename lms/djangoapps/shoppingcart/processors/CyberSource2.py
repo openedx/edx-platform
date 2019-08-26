@@ -417,6 +417,7 @@ def _record_purchase(params, order):
     else:
         ccnum = "####"
 
+    params['signature'] = params.get('signature').decode('utf-8')
     if settings.FEATURES.get("LOG_POSTPAY_CALLBACKS"):
         log.info(
             u"Order %d purchased with params: %s", order.id, json.dumps(params)
