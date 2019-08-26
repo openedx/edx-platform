@@ -159,12 +159,12 @@ class Command(BaseCommand):
         for program_course_enrollment in program_enrollment.program_course_enrollments.all():
             try:
                 program_course_enrollment.enroll(user)
-            except CourseEnrollmentException as e:
+            except CourseEnrollmentException:
                 logger.warning(COURSE_ENROLLMENT_ERR_TPL.format(
                     user=user.username,
                     course=program_course_enrollment.course_key
                 ))
-                raise e
+                raise
 
 
 def get_existing_user_message(program_enrollment, user):
