@@ -29,7 +29,7 @@
 # Harry Li <harry75369@gmail.com>, 2014
 # hohomi <hohomi@gmail.com>, 2014,2016
 # hohomi <hohomi@gmail.com>, 2014,2016
-# bnw, 2014
+# 5b4c6a53e2e9f6d66be0455f2c8d22a2, 2014
 # HYY <wingyin.wong@outlook.com>, 2019
 # ifLab <webmaster@iflab.org>, 2018-2019
 # Jerome Huang <canni3269@gmail.com>, 2014
@@ -103,7 +103,7 @@
 # Harry Li <harry75369@gmail.com>, 2014
 # hohomi <hohomi@gmail.com>, 2016
 # hohomi <hohomi@gmail.com>, 2016
-# bnw, 2014
+# 5b4c6a53e2e9f6d66be0455f2c8d22a2, 2014
 # HYY <wingyin.wong@outlook.com>, 2018
 # Jerome Huang <canni3269@gmail.com>, 2014
 # Jianfei Wang <me@thinxer.com>, 2013

@@ -56,7 +56,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-08-18 20:42+0000\n"
+"POT-Creation-Date: 2019-08-25 20:42+0000\n"
 "PO-Revision-Date: 2019-07-28 20:42+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Georgian (http://www.transifex.com/open-edx/edx-platform/language/ka/)\n"
@@ -8798,25 +8798,17 @@ msgstr ""
 "შემდეგი საფეხურები."
 
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-#, python-format
 msgid ""
-"Create a %(link_start)sMozilla Backpack%(link_end)s account, or log in to "
-"your existing account"
+"Create a {link_start}Mozilla Backpack{link_end} account, or log in to your "
+"existing account"
 msgstr ""
-"შექმენით %(link_start)sMozilla Backpack%(link_end)s-ის ანგარიში, ან თუ "
-"გაქვთ, შედით თქვენს არსებულ ანგარიშზე."
 
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-#, python-format
 msgid ""
-"%(download_link_start)sDownload this image (right-click or option-click, "
-"save as)%(link_end)s and then %(upload_link_start)supload%(link_end)s it to "
-"your backpack.</li>"
+"{download_link_start}Download this image (right-click or option-click, save "
+"as){link_end} and then {upload_link_start}upload{link_end} it to your "
+"backpack."
 msgstr ""
-"%(download_link_start)sგადმოტვირთეთ ეს გამოსახულება (დააწკაპუნეთ მარჯვენა "
-"ღილაკზე, ან დააჭირეთ option ღილაკს და დააწკაპუნეთ, შემდეგ აირჩიეთ „შეინახე "
-"როგორც“)%(link_end)s და ამის შემდეგ %(upload_link_start)s "
-"ატვირთეთ%(link_end)s ის თქვენს backpack-ზე.</li>"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"
