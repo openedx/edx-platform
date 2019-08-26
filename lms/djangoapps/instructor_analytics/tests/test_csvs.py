@@ -37,7 +37,7 @@ class TestAnalyticsCSVS(TestCase):
         res = create_csv_response('robot.csv', header, datarows)
         self.assertEqual(res['Content-Type'], 'text/csv')
         self.assertEqual(res['Content-Disposition'], u'attachment; filename={0}'.format('robot.csv'))
-        self.assertEqual(res.content.strip(), '')
+        self.assertEqual(res.content.strip().decode('utf-8'), '')
 
 
 class TestAnalyticsFormatDictlist(TestCase):
