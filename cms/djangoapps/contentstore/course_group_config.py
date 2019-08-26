@@ -60,7 +60,7 @@ class GroupConfiguration(object):
         Deserialize given json that represents group configuration.
         """
         try:
-            configuration = json.loads(json_string)
+            configuration = json.loads(json_string.decode("utf-8"))
         except ValueError:
             raise GroupConfigurationsValidationError(_("invalid JSON"))
         configuration["version"] = UserPartition.VERSION
