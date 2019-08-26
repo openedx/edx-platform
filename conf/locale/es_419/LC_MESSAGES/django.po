@@ -5500,6 +5500,8 @@ msgid ""
 "at:"
 msgstr ""
 
+#: common/templates/student/edx_ace/emailchangeconfirmation/email/body.html
+#: common/templates/student/edx_ace/emailchangeconfirmation/email/body.txt
 #: themes/stanford-style/lms/templates/emails/confirm_email_change.txt
 msgid ""
 "We keep a log of old e-mails, so if this request was unintentional, we can "
@@ -10350,6 +10352,8 @@ msgstr ""
 msgid "ID verification FAQ : %(help_center_link)s "
 msgstr ""
 
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #: lms/templates/emails/failed_verification_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
 #: lms/templates/emails/passed_verification_email.txt
@@ -11128,10 +11132,11 @@ msgid ""
 "should be formatted as 'org+course' (i.e. MITx+6.002x, HarvardX+CS50)."
 msgstr ""
 
+#: openedx/core/djangoapps/config_model_utils/models.py
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html
 msgid "Course Run"
-msgstr "El curso se desarrollará en"
+msgstr "Versión del curso"
 
 #: openedx/core/djangoapps/config_model_utils/models.py
 msgid ""
