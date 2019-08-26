@@ -83,14 +83,11 @@ class ExpireWaitingEnrollmentsTest(TestCase):
                         expired_course_enrollments[1].course_key,
                     )
                 ),
-                (
-                    log.name,
-                    'INFO',
-                    u'Removed 3 expired records:'
-                    u' {u\'program_enrollments.ProgramCourseEnrollment\': 2,'
-                    u' u\'program_enrollments.ProgramEnrollment\': 1}'
-                ),
             )
+
+            self.assertIn('Removed 3 expired records:', log_capture.records[3].getMessage())
+            self.assertIn("program_enrollments.ProgramCourseEnrollment': 2", log_capture.records[3].getMessage())
+            self.assertIn("program_enrollments.ProgramEnrollment': 1", log_capture.records[3].getMessage())
 
         program_enrollments = ProgramEnrollment.objects.all()
         program_course_enrollments = ProgramCourseEnrollment.objects.all()
