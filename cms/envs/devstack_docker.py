@@ -9,8 +9,8 @@ LOGGING['handlers']['local'] = LOGGING['handlers']['tracking'] = {
 
 LOGGING['loggers']['tracking']['handlers'] = ['console']
 
-LMS_BASE = 'localhost:18000'
-CMS_BASE = 'localhost:18010'
+LMS_BASE = 'local.philanthropyu.org:18000'
+CMS_BASE = 'local.philanthropyu.org:18010'
 LMS_ROOT_URL = 'http://{}'.format(LMS_BASE)
 
 FEATURES.update({

@@ -45,6 +45,7 @@ def nodebb_forum_discussion(request, course_id):
 
     course_link = reverse('about_course', args=[get_related_card_id(course_key)])
     browse_teams_link = reverse('teams_dashboard', args=[course_id])
+    courseware_link = reverse('courseware', args=[course_id])
 
     context = {
         "provider": current_course.org,
@@ -57,7 +58,8 @@ def nodebb_forum_discussion(request, course_id):
         "community_url": course_community.community_url if course_community else "",
         "custom_community_link": custom_community_link,
         "is_community_topic_link": is_community_topic_link,
-        "browse_teams_link": browse_teams_link
+        "browse_teams_link": browse_teams_link,
+        "courseware_link": courseware_link
     }
 
     return render(request, 'discussion_nodebb/discussion_board.html', context)
