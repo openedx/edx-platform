@@ -60,7 +60,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-08-18 20:42+0000\n"
+"POT-Creation-Date: 2019-08-25 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Georgian (https://www.transifex.com/open-edx/teams/6205/ka/)\n"
@@ -3904,13 +3904,9 @@ msgstr "LTI ID"
 msgid ""
 "Enter the LTI ID for the external LTI provider.  This value must be the same"
 " LTI ID that you entered in the LTI Passports setting on the Advanced "
-"Settings page.<br />See {docs_anchor_open}the edX LTI "
+"Settings page.{break_tag}See {docs_anchor_open}the edX LTI "
 "documentation{anchor_close} for more details on this setting."
 msgstr ""
-"LTI-ს გარე მომწოდებლისთვის შეიყვანეთ LTI-ს ID, რომელიც უნდა ემთხვეოდეს "
-"თქვენს მიერ დამატებითი პარამეტრების გვერდზე LTI-ს პასპორტების პარამეტრებში "
-"შეყვანილ  LTI ID-ს. ამ პარამეტრებზე დამატებითი ინფორმაციისთვის <br "
-"/>იხილეთ{docs_anchor_open}edX-ის LTI დოკუმენტაცია{anchor_close}."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "LTI URL"
@@ -3920,14 +3916,10 @@ msgstr "LTI URL"
 #, python-brace-format
 msgid ""
 "Enter the URL of the external tool that this component launches. This "
-"setting is only used when Hide External Tool is set to False.<br />See "
+"setting is only used when Hide External Tool is set to False.{break_tag}See "
 "{docs_anchor_open}the edX LTI documentation{anchor_close} for more details "
 "on this setting."
 msgstr ""
-"შეიყვანეთ გარე ხელსაწყოს URL-ი, რომელსაც უშვებს ეს კომპონენტი. პარამეტრი "
-"გამოიყენება მხოლოდ მაშინ, როდესაც \"დამალე გარე ხელსაწყო\" მონიშნულია, "
-"როგორც მცდარი. ამ პარამეტრზე დამატებითი ინფორმაციისთვის <br />იხილეთ "
-"{docs_anchor_open}edX-ის LTI დოკუმენტაცია{anchor_close}."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Custom Parameters"
@@ -3937,14 +3929,10 @@ msgstr "მორგებული პარამეტრები"
 #, python-brace-format
 msgid ""
 "Add the key/value pair for any custom parameters, such as the page your "
-"e-book should open to or the background color for this component.<br />See "
-"{docs_anchor_open}the edX LTI documentation{anchor_close} for more details "
-"on this setting."
+"e-book should open to or the background color for this "
+"component.{break_tag}See {docs_anchor_open}the edX LTI "
+"documentation{anchor_close} for more details on this setting."
 msgstr ""
-"მორგებული პარამეტრებისთვის დაამატეთ ღილაკი/მნიშვნელობის წყვილი, თქვენს "
-"ელექტრონული წიგნში გახსნილი გვერდის ან ამ კომპონენტის ფონის ფერის "
-"მსგავსად.<br />იხილეთ {docs_anchor_open}edX-ის LTI "
-"dდოკუმენტაცია{anchor_close} ამ პარამეტრის დამატებითი დეტალებისთვის."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Open in New Page"
@@ -21199,13 +21187,18 @@ msgid "For anyone, anywhere, anytime"
 msgstr "ყველასთვის, ყველგან, ნებისმიერ დროს"
 
 #: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
 msgstr ""
 "სავალდებულო ველები აღნიშნულია <strong class=\"indicator\">გამუქებული "
 "ტექსტითა და ვარსკვლავით (*)</strong>."
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid ""
+"Required fields are noted by {strong_indicator}bold text and an asterisk "
+"(*).{strong_close}"
+msgstr ""
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
@@ -21470,9 +21463,10 @@ msgstr ""
 msgid "Learn more about certificates"
 msgstr "გაიგეთ მეტი სერტიფიკატების შესახებ"
 
-#: cms/templates/certificates.html cms/templates/settings_graders.html
-msgid "Details &amp; Schedule"
-msgstr "დეტალები &amp; განრიგი"
+#: cms/templates/certificates.html cms/templates/group_configurations.html
+#: cms/templates/settings_advanced.html
+msgid "Details & Schedule"
+msgstr "დეტალები და განრიგი"
 
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
@@ -22534,11 +22528,6 @@ msgstr ""
 "დააწკაპუნეთ {em_start}რედაქტირება{em_end}-ზე. თქვენ შეგიძლიათ ჯგუფის "
 "კონფიგურაციის წაშლა, თუკი ის არ გამოიყენება ექსპერიმენტში. კონფიგურაციის "
 "წასაშლელად გადადით და დააწკაპუნეთ ღილაკზე „წაშლა“."
-
-#: cms/templates/group_configurations.html
-#: cms/templates/settings_advanced.html
-msgid "Details & Schedule"
-msgstr "დეტალები და განრიგი"
 
 #: cms/templates/howitworks.html
 msgid "Welcome"
@@ -24440,6 +24429,10 @@ msgstr ""
 "შეგიძლიათ სხვადასხვა ტიპის დავალებების შექმნა, როგორიცაა საშინაო დავალება, "
 "ლაბორატორიული სავარჯიშოები, ქვიზები, გამოცდები. ასევე, თითოეული ტიპის "
 "დავალებისთვის, შეგიძლიათ განსაზღვროთ სტუდენტის შეფასების ქულები."
+
+#: cms/templates/settings_graders.html
+msgid "Details &amp; Schedule"
+msgstr "დეტალები &amp; განრიგი"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"

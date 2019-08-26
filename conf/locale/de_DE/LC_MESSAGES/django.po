@@ -158,7 +158,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-08-18 20:42+0000\n"
+"POT-Creation-Date: 2019-08-25 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019\n"
 "Language-Team: German (Germany) (https://www.transifex.com/open-edx/teams/6205/de_DE/)\n"
@@ -3912,7 +3912,7 @@ msgstr "LTI ID"
 msgid ""
 "Enter the LTI ID for the external LTI provider.  This value must be the same"
 " LTI ID that you entered in the LTI Passports setting on the Advanced "
-"Settings page.<br />See {docs_anchor_open}the edX LTI "
+"Settings page.{break_tag}See {docs_anchor_open}the edX LTI "
 "documentation{anchor_close} for more details on this setting."
 msgstr ""
 
@@ -3924,7 +3924,7 @@ msgstr "LTI URL"
 #, python-brace-format
 msgid ""
 "Enter the URL of the external tool that this component launches. This "
-"setting is only used when Hide External Tool is set to False.<br />See "
+"setting is only used when Hide External Tool is set to False.{break_tag}See "
 "{docs_anchor_open}the edX LTI documentation{anchor_close} for more details "
 "on this setting."
 msgstr ""
@@ -3937,9 +3937,9 @@ msgstr "Individuelle Parameter"
 #, python-brace-format
 msgid ""
 "Add the key/value pair for any custom parameters, such as the page your "
-"e-book should open to or the background color for this component.<br />See "
-"{docs_anchor_open}the edX LTI documentation{anchor_close} for more details "
-"on this setting."
+"e-book should open to or the background color for this "
+"component.{break_tag}See {docs_anchor_open}the edX LTI "
+"documentation{anchor_close} for more details on this setting."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
@@ -20789,13 +20789,18 @@ msgid "For anyone, anywhere, anytime"
 msgstr "Für jeden, überall, immer"
 
 #: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
 msgstr ""
 "Erforderliche Felder sind mit <strong class=\"indicator\">hervorgehobenem "
 "Text und einem Sternchen (*)</strong> markiert. "
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid ""
+"Required fields are noted by {strong_indicator}bold text and an asterisk "
+"(*).{strong_close}"
+msgstr ""
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
@@ -21082,9 +21087,10 @@ msgstr ""
 msgid "Learn more about certificates"
 msgstr "Erfahre mehr über Zertifikate"
 
-#: cms/templates/certificates.html cms/templates/settings_graders.html
-msgid "Details &amp; Schedule"
-msgstr "Details &amp; Terminplan"
+#: cms/templates/certificates.html cms/templates/group_configurations.html
+#: cms/templates/settings_advanced.html
+msgid "Details & Schedule"
+msgstr "Details & Terminplan"
 
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
@@ -22092,11 +22098,6 @@ msgid ""
 "not in use in an experiment. To delete a configuration, hover over its box "
 "and click the delete icon."
 msgstr ""
-
-#: cms/templates/group_configurations.html
-#: cms/templates/settings_advanced.html
-msgid "Details & Schedule"
-msgstr "Details & Terminplan"
 
 #: cms/templates/howitworks.html
 msgid "Welcome"
@@ -23842,6 +23843,10 @@ msgstr ""
 "Du kannst auch weitere Aufgabentypen, wie Hausaufgaben, Laborarbeit, Quizz "
 "und Klausuren erstellen. Dann kannst du festlegen, wie viel die Note des "
 "Teilnehmers für die jeweilige Aufgabe wert ist."
+
+#: cms/templates/settings_graders.html
+msgid "Details &amp; Schedule"
+msgstr "Details &amp; Terminplan"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"

@@ -25,8 +25,8 @@
 # 1c836b125659bc943ac07aaf233cadb5, 2015
 # GoodLuck <1833447072@qq.com>, 2014
 # Wentao Han <wentao.han@gmail.com>, 2013
-# bnw, 2014
-# bnw, 2014
+# 5b4c6a53e2e9f6d66be0455f2c8d22a2, 2014
+# 5b4c6a53e2e9f6d66be0455f2c8d22a2, 2014
 # HYY <wingyin.wong@outlook.com>, 2018-2019
 # ifLab <webmaster@iflab.org>, 2015,2018-2019
 # Jerome Huang <canni3269@gmail.com>, 2014
@@ -175,8 +175,8 @@
 # hohomi <hohomi@gmail.com>, 2014,2016
 # hohomi <hohomi@gmail.com>, 2014,2016
 # Hu Tong <buildmindht@outlook.com>, 2014
-# bnw, 2014
-# bnw, 2014
+# 5b4c6a53e2e9f6d66be0455f2c8d22a2, 2014
+# 5b4c6a53e2e9f6d66be0455f2c8d22a2, 2014
 # HYY <wingyin.wong@outlook.com>, 2019
 # ifLab <webmaster@iflab.org>, 2014-2015
 # ifLab <webmaster@iflab.org>, 2018-2019

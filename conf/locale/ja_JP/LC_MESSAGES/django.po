@@ -113,7 +113,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-08-18 20:42+0000\n"
+"POT-Creation-Date: 2019-08-25 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Japanese (Japan) (https://www.transifex.com/open-edx/teams/6205/ja_JP/)\n"
@@ -3693,11 +3693,9 @@ msgstr "LTI ID"
 msgid ""
 "Enter the LTI ID for the external LTI provider.  This value must be the same"
 " LTI ID that you entered in the LTI Passports setting on the Advanced "
-"Settings page.<br />See {docs_anchor_open}the edX LTI "
+"Settings page.{break_tag}See {docs_anchor_open}the edX LTI "
 "documentation{anchor_close} for more details on this setting."
 msgstr ""
-"外部のLTIプロバイダ用のLTI IDを入力してください。この値は詳細設定ページのLTIパスポートに入力されたものと同じである必要があります。<br "
-"/>詳細は{docs_anchor_open}edX LTIドキュメント{anchor_close}を参照してください。"
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "LTI URL"
@@ -3707,12 +3705,10 @@ msgstr "LTI URL"
 #, python-brace-format
 msgid ""
 "Enter the URL of the external tool that this component launches. This "
-"setting is only used when Hide External Tool is set to False.<br />See "
+"setting is only used when Hide External Tool is set to False.{break_tag}See "
 "{docs_anchor_open}the edX LTI documentation{anchor_close} for more details "
 "on this setting."
 msgstr ""
-"このコンポーネントが起動する外部ツールのURLを入力してください。この設定は外部ツール非表示設定をFalseにした時のみ使用されます。<br "
-"/>詳細は{docs_anchor_open}edX LTIドキュメント{anchor_close}を参照してください。"
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Custom Parameters"
@@ -3722,12 +3718,10 @@ msgstr "カスタムパラメータ"
 #, python-brace-format
 msgid ""
 "Add the key/value pair for any custom parameters, such as the page your "
-"e-book should open to or the background color for this component.<br />See "
-"{docs_anchor_open}the edX LTI documentation{anchor_close} for more details "
-"on this setting."
+"e-book should open to or the background color for this "
+"component.{break_tag}See {docs_anchor_open}the edX LTI "
+"documentation{anchor_close} for more details on this setting."
 msgstr ""
-"カスタムパラメータ用のキー／値のペアを入力してください。パラメータの例としては、e-bookで開くページや、このコンポーネントの背景色などがあります。<br"
-" />詳細は{docs_anchor_open}edX LTIドキュメント{anchor_close}を参照してください。"
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Open in New Page"
@@ -19964,11 +19958,16 @@ msgid "For anyone, anywhere, anytime"
 msgstr "いつでも、どこでも、誰にでも"
 
 #: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
 msgstr "<strong class=\"indicator\">(*)付きの太字の項目</strong>は必須です。"
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid ""
+"Required fields are noted by {strong_indicator}bold text and an asterisk "
+"(*).{strong_close}"
+msgstr ""
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
@@ -20213,9 +20212,10 @@ msgstr ""
 msgid "Learn more about certificates"
 msgstr "修了証について詳しく知る"
 
-#: cms/templates/certificates.html cms/templates/settings_graders.html
-msgid "Details &amp; Schedule"
-msgstr "詳細 &amp; スケジュール"
+#: cms/templates/certificates.html cms/templates/group_configurations.html
+#: cms/templates/settings_advanced.html
+msgid "Details & Schedule"
+msgstr "詳細＆日程"
 
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
@@ -21192,11 +21192,6 @@ msgid ""
 msgstr ""
 "{em_start}新規グループ設定{em_end} "
 "をクリックし、新しい設定を追加してください。設定を編集するには、ボックスの上で{em_start}編集{em_end}をクリックしてください。ユニットで使用していない場合に限り、コンテンツグループを削除することもできます。コンテンツグループを削除するには、そのボックスの上で削除アイコンをクリックします。"
-
-#: cms/templates/group_configurations.html
-#: cms/templates/settings_advanced.html
-msgid "Details & Schedule"
-msgstr "詳細＆日程"
 
 #: cms/templates/howitworks.html
 msgid "Welcome"
@@ -22890,6 +22885,10 @@ msgid ""
 "exams, and specify how much of a student's grade each assignment type is "
 "worth."
 msgstr "宿題、実習、小テスト、試験などの課題タイプを作成することができ、それぞれの課題タイプの配点を設定できます。"
+
+#: cms/templates/settings_graders.html
+msgid "Details &amp; Schedule"
+msgstr "詳細 &amp; スケジュール"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"

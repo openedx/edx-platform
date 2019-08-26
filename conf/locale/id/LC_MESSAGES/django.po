@@ -96,7 +96,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-08-18 20:42+0000\n"
+"POT-Creation-Date: 2019-08-25 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019\n"
 "Language-Team: Indonesian (https://www.transifex.com/open-edx/teams/6205/id/)\n"
@@ -3985,13 +3985,9 @@ msgstr "ID LTI"
 msgid ""
 "Enter the LTI ID for the external LTI provider.  This value must be the same"
 " LTI ID that you entered in the LTI Passports setting on the Advanced "
-"Settings page.<br />See {docs_anchor_open}the edX LTI "
+"Settings page.{break_tag}See {docs_anchor_open}the edX LTI "
 "documentation{anchor_close} for more details on this setting."
 msgstr ""
-"Masukkan ID LTI untuk penyedia LTI eksternal. Nilai ini harus sama dengan ID"
-" LTI yang Anda masukkan dalam pengaturan Paspor LTI pada halaman Pengaturan "
-"Lanjutan.<br />Lihat {docs_anchor_open} dokumentasi edX LTI {anchor_close} "
-"untuk detail lebih lanjut tentang pengaturan ini."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "LTI URL"
@@ -4001,13 +3997,10 @@ msgstr "URL LTI"
 #, python-brace-format
 msgid ""
 "Enter the URL of the external tool that this component launches. This "
-"setting is only used when Hide External Tool is set to False.<br />See "
+"setting is only used when Hide External Tool is set to False.{break_tag}See "
 "{docs_anchor_open}the edX LTI documentation{anchor_close} for more details "
 "on this setting."
 msgstr ""
-"Masukkan URL tool eksternal yang dilaunch oleh koponen ini.<br />Lihat "
-"{docs_anchor_open}dokumentasi edX LTI{anchor_close} untuk detail penyetelan "
-"lebih lanjut."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Custom Parameters"
@@ -4017,14 +4010,10 @@ msgstr "Parameter Kustom"
 #, python-brace-format
 msgid ""
 "Add the key/value pair for any custom parameters, such as the page your "
-"e-book should open to or the background color for this component.<br />See "
-"{docs_anchor_open}the edX LTI documentation{anchor_close} for more details "
-"on this setting."
+"e-book should open to or the background color for this "
+"component.{break_tag}See {docs_anchor_open}the edX LTI "
+"documentation{anchor_close} for more details on this setting."
 msgstr ""
-"Tambahkan pasangan kunci / nilai untuk parameter khusus apa pun, seperti "
-"halaman yang akan dibuka oleh e-book Anda atau warna latar belakang untuk "
-"komponen ini.<br />Lihat {docs_anchor_open} dokumentasi edX LTI "
-"{anchor_close} untuk detail lebih lanjut tentang pengaturan ini."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Open in New Page"
@@ -21654,13 +21643,18 @@ msgid "For anyone, anywhere, anytime"
 msgstr "Untuk siapa saja, di mana saja, kapan saja"
 
 #: themes/stanford-style/lms/templates/register-form.html
-#: themes/stanford-style/lms/templates/register-shib.html
 msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
 msgstr ""
 "Isian yang wajib ditandai dengan <strong class=\"indicator\">teks tebal dan "
 "tanda bintang (*)</strong>."
+
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid ""
+"Required fields are noted by {strong_indicator}bold text and an asterisk "
+"(*).{strong_close}"
+msgstr ""
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
@@ -21920,9 +21914,10 @@ msgstr ""
 msgid "Learn more about certificates"
 msgstr "Pelajari lebih lanjut tentang sertifikat"
 
-#: cms/templates/certificates.html cms/templates/settings_graders.html
-msgid "Details &amp; Schedule"
-msgstr "Detil &amp; Jadwal"
+#: cms/templates/certificates.html cms/templates/group_configurations.html
+#: cms/templates/settings_advanced.html
+msgid "Details & Schedule"
+msgstr ""
 
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
@@ -22861,11 +22856,6 @@ msgid ""
 "{em_start}Edit{em_end}. You can delete a group configuration only if it is "
 "not in use in an experiment. To delete a configuration, hover over its box "
 "and click the delete icon."
-msgstr ""
-
-#: cms/templates/group_configurations.html
-#: cms/templates/settings_advanced.html
-msgid "Details & Schedule"
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -24546,6 +24536,10 @@ msgid ""
 msgstr ""
 "Anda dapat membuat beberapa jenis penugasan, seperti pekerjaan rumah, lab, "
 "kuis, dan ujian, dan menentukan bobot masing-masing terhadap nilai peserta."
+
+#: cms/templates/settings_graders.html
+msgid "Details &amp; Schedule"
+msgstr "Detil &amp; Jadwal"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"
