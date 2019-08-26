@@ -262,10 +262,22 @@ class CreateSubsectionGrade(NonZeroSubsectionGrade):
                 start_node=subsection.location,
         ):
             problem_score = self._compute_block_score(block_key, course_structure, submissions_scores, csm_scores)
+
+            # TODO: Remove as part of EDUCATOR-4602.
+            if str(block_key.course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+                log.info(u'Calculated problem score ***{}*** for block ***{!s}***'
+                         u' in subsection ***{}***.'
+                         .format(problem_score, block_key, subsection.location))
             if problem_score:
                 self.problem_scores[block_key] = problem_score
 
         all_total, graded_total = graders.aggregate_scores(list(self.problem_scores.values()))
+
+        # TODO: Remove as part of EDUCATOR-4602.
+        if str(subsection.location.course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+            log.info(u'Calculated aggregate all_total ***{}***'
+                     u' and grade_total ***{}*** for subsection ***{}***'
+                     .format(all_total, graded_total, subsection.location))
 
         super(CreateSubsectionGrade, self).__init__(subsection, all_total, graded_total)
 
@@ -274,6 +286,11 @@ class CreateSubsectionGrade(NonZeroSubsectionGrade):
         Saves or updates the subsection grade in a persisted model.
         """
         if self._should_persist_per_attempted(score_deleted, force_update_subsections):
+            # TODO: Remove as part of EDUCATOR-4602.
+            if str(self.location.course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+                log.info(u'Updating PersistentSubsectionGrade for student ***{}*** in'
+                         u' subsection ***{}*** with params ***{}***.'
+                         .format(student.id, self.location, self._persisted_model_params(student)))
             model = PersistentSubsectionGrade.update_or_create_grade(**self._persisted_model_params(student))
 
             if hasattr(model, 'override'):

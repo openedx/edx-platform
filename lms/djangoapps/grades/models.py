@@ -436,6 +436,13 @@ class PersistentSubsectionGrade(TimeStampedModel):
             usage_key=usage_key,
             defaults=params,
         )
+
+        # TODO: Remove as part of EDUCATOR-4602.
+        if str(usage_key.course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+            log.info(u'Created/updated grade ***{}*** for user ***{}*** in course ***{}***'
+                     u'for subsection ***{}*** with default params ***{}***'
+                     .format(grade, user_id, usage_key.course_key, usage_key, params))
+
         grade.override = PersistentSubsectionGradeOverride.get_override(user_id, usage_key)
         if first_attempted is not None and grade.first_attempted is None:
             grade.first_attempted = first_attempted
@@ -717,6 +724,12 @@ class PersistentSubsectionGradeOverride(models.Model):
         grade_defaults = cls._prepare_override_params(subsection_grade_model, override_data)
         grade_defaults['override_reason'] = override_data['comment'] if 'comment' in override_data else None
         grade_defaults['system'] = override_data['system'] if 'system' in override_data else None
+
+        # TODO: Remove as part of EDUCATOR-4602.
+        if str(subsection_grade_model.course_id) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+            log.info(u'Creating override for user ***{}*** for PersistentSubsectionGrade'
+                     u'***{}*** with override data ***{}*** and derived grade_defaults ***{}***.'
+                     .format(requesting_user, subsection_grade_model, override_data, grade_defaults))
         override, _ = PersistentSubsectionGradeOverride.objects.update_or_create(
             grade=subsection_grade_model,
             defaults=grade_defaults,
