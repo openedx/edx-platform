@@ -3279,9 +3279,6 @@ COURSE_CATALOG_API_URL = 'http://localhost:8008/api/v1'
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:8005'
 CREDENTIALS_PUBLIC_SERVICE_URL = None
 
-JOURNALS_URL_ROOT = 'https://journals-localhost:18000'
-JOURNALS_API_URL = 'https://journals-localhost:18000/api/v1/'
-
 COMMENTS_SERVICE_URL = 'http://localhost:18080'
 COMMENTS_SERVICE_KEY = 'password'
 
