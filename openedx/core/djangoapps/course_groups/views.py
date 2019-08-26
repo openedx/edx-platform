@@ -503,6 +503,7 @@ class CohortHandler(DeveloperErrorViewMixin, APIPermissions):
             * user_partition_id: The integer identified of the UserPartition.
             * group_id: The integer identified of the specific group in the partition.
     """
+    queryset = ''
     def get(self, request, course_key_string, cohort_id=None):
         """
         Endpoint to get either one or all cohorts.
@@ -528,6 +529,8 @@ class CohortHandler(DeveloperErrorViewMixin, APIPermissions):
                                  'Please use the parent endpoint.',
                                  'wrong-endpoint')
         course_key, course = _get_course_with_access(request, course_key_string)
+
+        # TODO: add bulk import support for this
         name = request.data.get('name')
         if not name:
             raise self.api_error(status.HTTP_400_BAD_REQUEST,
