@@ -1809,12 +1809,6 @@ def generate_registration_codes(request, course_id):
         dashboard=reverse('dashboard')
     )
 
-    try:
-        pdf_file = sale_invoice.generate_pdf_invoice(course, course_price, int(quantity), float(sale_price))
-    except Exception:  # pylint: disable=broad-except
-        log.exception('Exception at creating pdf file.')
-        pdf_file = None
-
     from_address = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
     context = {
         'invoice': sale_invoice,
@@ -1867,11 +1861,6 @@ def generate_registration_codes(request, course_id):
         email.to = [recipient]
         email.attach(u'RegistrationCodes.csv', csv_file.getvalue(), 'text/csv')
         email.attach(u'Invoice.txt', invoice_attachment, 'text/plain')
-        if pdf_file is not None:
-            email.attach(u'Invoice.pdf', pdf_file.getvalue(), 'application/pdf')
-        else:
-            file_buffer = StringIO(_('pdf download unavailable right now, please contact support.'))
-            email.attach(u'pdf_unavailable.txt', file_buffer.getvalue(), 'text/plain')
         email.send()
 
     return registration_codes_csv("Registration_Codes.csv", registration_codes)

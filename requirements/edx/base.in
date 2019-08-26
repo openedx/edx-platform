@@ -129,7 +129,6 @@ python3-openid ; python_version>='3'
 python3-saml
 pyuca==1.1                          # For more accurate sorting of translated country names in django-countries
 recommender-xblock                  # https://github.com/edx/RecommenderXBlock
-reportlab                           # Used for shopping cart's pdf invoice/receipt generation
 rest-condition                      # DRF's recommendation for supporting complex permissions
 rfc6266-parser                      # Used to generate Content-Disposition headers.
 social-auth-app-django<3.0.0
