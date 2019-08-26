@@ -8,5 +8,5 @@ imgkit==1.0.1
 -e git+https://github.com/philanthropy-u/xblock-poll#egg=xblock-poll
 # this commit is in zeshan/LP-1530
 # TODO: Merge this branch with master. OR simply rename it to master because it already contains philu and ironwood's code
--e git+https://github.com/philanthropy-u/edx-notifications.git@df45af93e96f240bd461027900fee22f247d90a1#egg=edx-notifications
+-e git+https://github.com/philanthropy-u/edx-notifications.git@fd9fbb41b8f1c592202d332faef33234683b1109#egg=edx-notifications
 -e git+https://github.com/philanthropy-u/django-simple-history.git@9187c9b4907da5a2a0564eff45929fd15b784309#egg=django-simple-history
