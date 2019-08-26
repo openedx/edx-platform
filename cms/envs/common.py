@@ -1874,9 +1874,6 @@ ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:8005'
 CREDENTIALS_PUBLIC_SERVICE_URL = None
 
-JOURNALS_URL_ROOT = 'https://journals-localhost:18000'
-JOURNALS_API_URL = 'https://journals-localhost:18000/api/v1/'
-
 ANALYTICS_DASHBOARD_URL = 'http://localhost:18110/courses'
 ANALYTICS_DASHBOARD_NAME = 'Your Platform Name Here Insights'
 
