@@ -117,7 +117,7 @@ docutils==0.15.2
 drf-yasg==1.16
 edx-ace==0.1.10
 edx-analytics-data-api-client==0.15.3
-edx-bulk-grades==0.5.7
+edx-bulk-grades==0.5.8
 edx-ccx-keys==0.2.2
 edx-celeryutils==0.3.0
 edx-completion==2.0.0
@@ -203,7 +203,7 @@ mccabe==0.6.1             # via flake8, pylint
 mock==1.0.1
 git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a#egg=MongoDBProxy==0.1.0+edx.2
 mongoengine==0.10.0
-more-itertools==5.0.0     # via pytest
+more-itertools==5.0.0     # via pytest, zipp
 moto==1.3.1
 mpmath==1.1.0
 mysqlclient==1.4.4
@@ -334,7 +334,7 @@ xblock==1.2.3
 xmlsec==1.3.3
 xmltodict==0.12.0         # via moto
 xss-utils==0.1.1
-zipp==0.5.2               # via importlib-metadata
+zipp==0.6.0               # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools==41.2.0        # via caniusepython3, fs, lazy, pytest, python-levenshtein
