@@ -1,5 +1,5 @@
 """
-Custom fields for use in the coursewarehistoryextended django app.
+Custom fields
 """
 
 from __future__ import absolute_import
