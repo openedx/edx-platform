@@ -4,8 +4,10 @@ from __future__ import absolute_import
 
 from decimal import Decimal
 
+import csv
 import unicodecsv
 from django.utils.translation import ugettext as _
+import six
 from six import text_type
 
 from course_modes.models import CourseMode
@@ -52,7 +54,10 @@ class Report(object):
         generates a CSV report of the appropriate type.
         """
         items = self.rows()
-        writer = unicodecsv.writer(filelike, encoding="utf-8")
+        if six.PY2:
+            writer = unicodecsv.writer(filelike, encoding="utf-8")
+        else:
+            writer = csv.writer(filelike)
         writer.writerow(self.header())
         for item in items:
             writer.writerow(item)
