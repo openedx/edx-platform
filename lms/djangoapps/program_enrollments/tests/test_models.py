@@ -167,9 +167,9 @@ class ProgramCourseEnrollmentModelTests(TestCase):
             # (program_enrollment, course_enrollment) alone.
             ProgramCourseEnrollment.objects.create(
                 program_enrollment=pce.program_enrollment,
-                course_key="dummy-value",
+                course_key="course-v1:dummy+value+101",
                 course_enrollment=pce.course_enrollment,
-                status="pending",
+                status="inactive",
             )
 
     def test_unique_waiting_enrollment(self):
@@ -183,12 +183,12 @@ class ProgramCourseEnrollmentModelTests(TestCase):
                 program_enrollment=pce.program_enrollment,
                 course_key=pce.course_key,
                 course_enrollment=None,
-                status="suspended",
+                status="inactive",
             )
 
     def _create_completed_program_course_enrollment(self):
         """ helper function create program course enrollment """
-        CourseEnrollmentFactory.create(
+        course_enrollment = CourseEnrollmentFactory.create(
             course_id=self.course_key,
             user=self.user,
             mode=CourseMode.MASTERS
@@ -196,8 +196,8 @@ class ProgramCourseEnrollmentModelTests(TestCase):
         program_course_enrollment = ProgramCourseEnrollment.objects.create(
             program_enrollment=self.program_enrollment,
             course_key=self.course_key,
-            course_enrollment=None,
-            status="canceled",
+            course_enrollment=course_enrollment,
+            status="active"
         )
         return program_course_enrollment
 
