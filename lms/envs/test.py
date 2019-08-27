@@ -205,7 +205,6 @@ if os.environ.get('DISABLE_MIGRATIONS'):
     MIGRATION_MODULES = NoOpMigrationModules()
 
 # Make sure we test with the extended history table
-FEATURES['ENABLE_CSMH_EXTENDED'] = True
 INSTALLED_APPS.append('coursewarehistoryextended')
 
 CACHES = {
