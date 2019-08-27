@@ -126,7 +126,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==2.0.0
 edx-drf-extensions==2.4.0
-edx-enterprise==1.9.6
+edx-enterprise==1.9.8
 edx-i18n-tools==0.4.8
 edx-lint==1.3.0
 edx-milestones==0.2.3
@@ -287,7 +287,7 @@ sailthru-client==2.2.3
 scandir==1.10.0           # via pathlib2
 scipy==1.2.1
 selenium==3.141.0
-semantic-version==2.6.0
+semantic-version==2.8.0
 shapely==1.6.4.post2
 shortuuid==0.5.0
 simplejson==3.16.0
