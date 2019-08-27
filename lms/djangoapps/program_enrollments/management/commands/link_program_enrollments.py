@@ -89,7 +89,7 @@ class Command(BaseCommand):
                 with transaction.atomic():
                     self.link_program_enrollment(program_enrollment, user)
             except (CourseEnrollmentException, IntegrityError):
-                logger.warning(u"Rolling back all operations for {}:{}".format(
+                logger.exception(u"Rolling back all operations for {}:{}".format(
                     external_student_key,
                     username,
                 ))
@@ -154,9 +154,9 @@ class Command(BaseCommand):
         try:
             self._link_program_enrollment(program_enrollment, user)
             self._link_course_enrollments(program_enrollment, user)
-        except IntegrityError as e:
-            logger.warning(e)
-            raise e
+        except IntegrityError:
+            logger.exception("Integrity error while linking program enrollments")
+            raise
 
     def _link_program_enrollment(self, program_enrollment, user):
         """
@@ -186,7 +186,7 @@ class Command(BaseCommand):
             for program_course_enrollment in program_enrollment.program_course_enrollments.all():
                 program_course_enrollment.enroll(user)
         except CourseEnrollmentException:
-            logger.warning(COURSE_ENROLLMENT_ERR_TPL.format(
+            logger.exception(COURSE_ENROLLMENT_ERR_TPL.format(
                 user=user.username,
                 course=program_course_enrollment.course_key
             ))

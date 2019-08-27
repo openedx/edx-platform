@@ -286,7 +286,7 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
         msg = COURSE_ENROLLMENT_ERR_TPL.format(user=self.user_1.username, course=nonexistant_course)
         with LogCapture() as logger:
             self.call_command(self.program, ('0001', self.user_1.username), ('0002', self.user_2.username))
-            logger.check_present((COMMAND_PATH, 'WARNING', msg))
+            logger.check_present((COMMAND_PATH, 'ERROR', msg))
 
         self._assert_no_program_enrollment(self.user_1, self.program)
         self._assert_no_user(program_enrollment_1)
@@ -305,14 +305,10 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
         program_enrollment_1 = self._create_waiting_enrollment(self.program, '0001')
         self._create_waiting_enrollment(self.program, '0002')
 
-        message = ('UNIQUE constraint failed: '
-                   'program_enrollments_programenrollment.user_id, '
-                   'program_enrollments_programenrollment.program_uuid, '
-                   'program_enrollments_programenrollment.curriculum_uuid')
-
+        msg = 'Integrity error while linking program enrollments'
         with LogCapture() as logger:
             self.call_command(self.program, ('0001', self.user_1.username), ('0002', self.user_2.username))
-            logger.check_present((COMMAND_PATH, 'WARNING', message))
+            logger.check_present((COMMAND_PATH, 'ERROR', msg))
 
         self._assert_no_user(program_enrollment_1)
         self._assert_program_enrollment(self.user_2, self.program, '0002')
