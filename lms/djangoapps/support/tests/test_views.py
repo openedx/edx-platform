@@ -420,7 +420,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         self.assert_enrollment(new_mode)
         if new_mode == 'credit':
             enrollment_attr = CourseEnrollmentAttribute.objects.first()
-            self.assertEqual(enrollment_attr.value, unicode(credit_provider[0]))
+            self.assertEqual(enrollment_attr.value, six.text_type(credit_provider[0]))
 
     def set_course_end_date_and_expiry(self):
         """ Set the course-end date and expire its verified mode."""
