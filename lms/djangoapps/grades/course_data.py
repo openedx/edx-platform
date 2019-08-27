@@ -106,7 +106,10 @@ class CourseData(object):
             return getattr(course_block, 'subtree_edited_on', None)
 
     def __str__(self):
-        return 'Course: course_key: {}'.format(self.course_key)
+        """
+        Return human-readable string representation.
+        """
+        return u'Course: course_key: {}'.format(self.course_key)
 
     def full_string(self):
         if self.effective_structure:

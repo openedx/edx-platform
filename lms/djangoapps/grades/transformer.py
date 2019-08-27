@@ -93,7 +93,7 @@ class GradesTransformer(BlockStructureTransformer):
             separators=(',', ':'),  # Remove spaces from separators for more compact representation
             sort_keys=True,
         )
-        return b64encode(sha1(ordered_policy.encode('utf-8')).digest())
+        return b64encode(sha1(ordered_policy.encode('utf-8')).digest()).decode('utf-8')
 
     @classmethod
     def _collect_explicit_graded(cls, block_structure):
