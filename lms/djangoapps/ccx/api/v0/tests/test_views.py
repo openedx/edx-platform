@@ -94,7 +94,7 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
         }
         token_resp = self.client.post(reverse('oauth2:access_token'), data=token_data, format='multipart')
         self.assertEqual(token_resp.status_code, status.HTTP_200_OK)
-        token_resp_json = json.loads(token_resp.content)
+        token_resp_json = json.loads(token_resp.content.decode('utf-8'))
         return u'{token_type} {token}'.format(
             token_type=token_resp_json['token_type'],
             token=token_resp_json['access_token']
