@@ -23,6 +23,7 @@ Modulestore virtual   |          XML physical (draft, published)
 from __future__ import absolute_import, print_function
 
 import json
+import io
 import logging
 import mimetypes
 import os
@@ -926,9 +927,9 @@ def _import_course_draft(
                 # Skip any OSX quarantine files, prefixed with a '._'.
                 continue
             module_path = os.path.join(rootdir, filename)
-            with open(module_path, 'r') as f:
+            with io.open(module_path, 'r') as f:
                 try:
-                    xml = f.read().decode('utf-8')
+                    xml = f.read()
 
                     # The process_xml() call below recursively processes all descendants. If
                     # we call this on all verticals in a course with verticals nested below
