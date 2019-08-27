@@ -3,7 +3,7 @@ import logging
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from lms.djangoapps.program_enrollments.models import ProgramEnrollment
 from student.models import CourseEnrollmentException
 
@@ -88,8 +88,12 @@ class Command(BaseCommand):
             try:
                 with transaction.atomic():
                     self.link_program_enrollment(program_enrollment, user)
-            except CourseEnrollmentException:
-                pass  # transaction rolled back
+            except (CourseEnrollmentException, IntegrityError):
+                logger.warning(u"Rolling back all operations for {}:{}".format(
+                    external_student_key,
+                    username,
+                ))
+                continue  # transaction rolled back
 
     def parse_user_items(self, user_items):
         """
@@ -145,6 +149,20 @@ class Command(BaseCommand):
 
         Raises: CourseEnrollmentException if there is an error enrolling user in a waiting
                 program course enrollment
+                IntegrityError if we try to create invalid records.
+        """
+        try:
+            self._link_program_enrollment(program_enrollment, user)
+            self._link_course_enrollments(program_enrollment, user)
+        except IntegrityError as e:
+            logger.warning(e)
+            raise e
+
+    def _link_program_enrollment(self, program_enrollment, user):
+        """
+        Links program enrollment to user.
+
+        Raises IntegrityError if ProgramEnrollment is invalid
         """
         if program_enrollment.user:
             logger.warning(get_existing_user_message(program_enrollment, user))
@@ -156,15 +174,23 @@ class Command(BaseCommand):
         program_enrollment.user = user
         program_enrollment.save()
 
-        for program_course_enrollment in program_enrollment.program_course_enrollments.all():
-            try:
+    def _link_course_enrollments(self, program_enrollment, user):
+        """
+        Enrolls user in waiting program course enrollments
+
+        Raises:
+            IntegrityError if a constraint is violated
+            CourseEnrollmentException if there is an issue enrolling the user in a course
+        """
+        try:
+            for program_course_enrollment in program_enrollment.program_course_enrollments.all():
                 program_course_enrollment.enroll(user)
-            except CourseEnrollmentException:
-                logger.warning(COURSE_ENROLLMENT_ERR_TPL.format(
-                    user=user.username,
-                    course=program_course_enrollment.course_key
-                ))
-                raise
+        except CourseEnrollmentException:
+            logger.warning(COURSE_ENROLLMENT_ERR_TPL.format(
+                user=user.username,
+                course=program_course_enrollment.course_key
+            ))
+            raise
 
 
 def get_existing_user_message(program_enrollment, user):

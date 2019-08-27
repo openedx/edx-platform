@@ -35,6 +35,7 @@ class TestLinkProgramEnrollmentsMixin(object):
     def setUpTestData(cls):  # pylint: disable=missing-docstring
         cls.command = Command()
         cls.program = uuid4()
+        cls.curriculum = uuid4()
         cls.other_program = uuid4()
         cls.fruit_course = CourseKey.from_string('course-v1:edX+Oranges+Apples')
         cls.animal_course = CourseKey.from_string('course-v1:edX+Cats+Dogs')
@@ -62,6 +63,7 @@ class TestLinkProgramEnrollmentsMixin(object):
         return ProgramEnrollmentFactory.create(
             user=None,
             program_uuid=program_uuid,
+            curriculum_uuid=self.curriculum,
             external_user_key=external_user_key,
         )
 
@@ -294,3 +296,23 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
         self.assertIsNone(course_enrollment_2.course_enrollment)
 
         self._assert_user_enrolled_in_program_courses(self.user_2, self.program, self.animal_course, self.fruit_course)
+
+    def test_integrity_error(self):
+        existing_program_enrollment = self._create_waiting_enrollment(self.program, 'learner-0')
+        existing_program_enrollment.user = self.user_1
+        existing_program_enrollment.save()
+
+        program_enrollment_1 = self._create_waiting_enrollment(self.program, '0001')
+        self._create_waiting_enrollment(self.program, '0002')
+
+        message = ('UNIQUE constraint failed: '
+                   'program_enrollments_programenrollment.user_id, '
+                   'program_enrollments_programenrollment.program_uuid, '
+                   'program_enrollments_programenrollment.curriculum_uuid')
+
+        with LogCapture() as logger:
+            self.call_command(self.program, ('0001', self.user_1.username), ('0002', self.user_2.username))
+            logger.check_present((COMMAND_PATH, 'WARNING', message))
+
+        self._assert_no_user(program_enrollment_1)
+        self._assert_program_enrollment(self.user_2, self.program, '0002')
