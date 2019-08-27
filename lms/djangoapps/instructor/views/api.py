@@ -520,7 +520,7 @@ def generate_random_string(length):
         if char not in 'aAeEiIoOuU1l'
     ]
 
-    return string.join((random.choice(chars) for __ in range(length)), '')
+    return ''.join((random.choice(chars) for i in range(length)))
 
 
 def generate_unique_password(generated_passwords, password_length=12):
