@@ -26,20 +26,31 @@ def _listen_for_lms_retire(sender, **kwargs):  # pylint: disable=unused-argument
 
 
 @receiver(post_save, sender=UserSocialAuth)
-def matriculate_learner(sender, instance, created, **kwargs):  # pylint: disable=unused-argument
+def listen_for_social_auth_creation(sender, instance, created, **kwargs):  # pylint: disable=unused-argument
     """
-    Post-save signal to update any waiting program enrollments with a user,
-    and enroll the user in any waiting course enrollments.
-
-    In most cases this will just short-circuit. Enrollments will only be updated
-    for a SAML provider with a linked organization.
+    Post-save signal that will attempt to link a social auth entry with waiting enrollments
     """
     if not created:
         return
 
     try:
-        user = instance.user
-        provider_slug, external_user_key = instance.uid.split(':')
+        matriculate_learner(instance.user, instance.uid)
+    except Exception as e:
+        msg_tmpl = u'Unable to link waiting enrollments for user {}, social auth creation failed: {}'
+        logger.warning(msg_tmpl.format(instance.user, instance.uid))
+        raise e
+
+
+def matriculate_learner(user, uid):
+    """
+    Update any waiting program enrollments with a user,
+    and enroll the user in any waiting course enrollments.
+
+    In most cases this will just short-circuit. Enrollments will only be updated
+    for a SAML provider with a linked organization.
+    """
+    try:
+        provider_slug, external_user_key = uid.split(':')
         authorizing_org = SAMLProviderConfig.objects.current_set().get(slug=provider_slug).organization
 
         if not authorizing_org:
