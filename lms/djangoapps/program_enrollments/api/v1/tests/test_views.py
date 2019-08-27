@@ -1432,7 +1432,8 @@ class ProgramCourseEnrollmentOverviewViewTests(ProgramCacheTestCaseMixin, Shared
             cls.yesterday = datetime.utcnow() - timedelta(1)
             cls.tomorrow = datetime.utcnow() + timedelta(1)
 
-        cls.certificate_download_url = 'www.certificates.com'
+        cls.relative_certificate_download_url = '/download-the-certificates'
+        cls.absolute_certificate_download_url = 'http://www.certificates.com/'
 
     def setUp(self):
         super(ProgramCourseEnrollmentOverviewViewTests, self).setUp()
@@ -1471,13 +1472,13 @@ class ProgramCourseEnrollmentOverviewViewTests(ProgramCacheTestCaseMixin, Shared
         self.program['curricula'][0]['courses'].append(self.course)
         self.set_program_in_catalog_cache(self.program_uuid, self.program)
 
-    def create_generated_certificate(self):
+    def create_generated_certificate(self, download_url=None):
         return GeneratedCertificateFactory.create(
             user=self.student,
             course_id=self.course_id,
             status=CertificateStatuses.downloadable,
             mode='verified',
-            download_url=self.certificate_download_url,
+            download_url=(download_url or self.relative_certificate_download_url),
             grade="0.88",
             verify_uuid=uuid4(),
         )
@@ -1540,33 +1541,60 @@ class ProgramCourseEnrollmentOverviewViewTests(ProgramCacheTestCaseMixin, Shared
         expected_course_run_ids = {text_type(other_course_key), text_type(self.course_id)}
         self.assertEqual(expected_course_run_ids, actual_course_run_ids)
 
-    @mock.patch('lms.djangoapps.program_enrollments.api.v1.views.get_resume_urls_for_enrollments')
-    def test_resume_urls(self, mock_get_resume_urls):
-        self.client.login(username=self.student.username, password=self.password)
+    _GET_RESUME_URL = 'lms.djangoapps.program_enrollments.api.v1.views.get_resume_urls_for_enrollments'
 
+    @mock.patch(_GET_RESUME_URL)
+    def test_blank_resume_url_omitted(self, mock_get_resume_urls):
+        self.client.login(username=self.student.username, password=self.password)
         mock_get_resume_urls.return_value = {self.course_id: ''}
         response = self.client.get(self.get_url(self.program_uuid))
         self.assertNotIn('resume_course_run_url', response.data['course_runs'][0])
 
-        resume_url = 'www.resume.com'
+    @mock.patch(_GET_RESUME_URL)
+    def test_relative_resume_url_becomes_absolute(self, mock_get_resume_urls):
+        self.client.login(username=self.student.username, password=self.password)
+        resume_url = '/resume-here'
         mock_get_resume_urls.return_value = {self.course_id: resume_url}
         response = self.client.get(self.get_url(self.program_uuid))
-        self.assertEqual(resume_url, response.data['course_runs'][0]['resume_course_run_url'])
+        response_resume_url = response.data['course_runs'][0]['resume_course_run_url']
+        self.assertTrue(response_resume_url.startswith("http://testserver"))
+        self.assertTrue(response_resume_url.endswith(resume_url))
 
-    def test_no_certificate_available(self):
+    @mock.patch(_GET_RESUME_URL)
+    def test_absolute_resume_url_stays_absolute(self, mock_get_resume_urls):
         self.client.login(username=self.student.username, password=self.password)
+        resume_url = 'http://www.resume.com/'
+        mock_get_resume_urls.return_value = {self.course_id: resume_url}
+        response = self.client.get(self.get_url(self.program_uuid))
+        response_resume_url = response.data['course_runs'][0]['resume_course_run_url']
+        self.assertEqual(response_resume_url, resume_url)
 
+    def test_no_url_without_certificate(self):
+        self.client.login(username=self.student.username, password=self.password)
         response = self.client.get(self.get_url(self.program_uuid))
         self.assertEqual(status.HTTP_200_OK, response.status_code)
-        assert 'certificate_download_url' not in response.data['course_runs'][0]
+        self.assertNotIn('certificate_download_url', response.data['course_runs'][0])
 
-    def test_certificate_available(self):
+    def test_relative_certificate_url_becomes_absolute(self):
         self.client.login(username=self.student.username, password=self.password)
-        self.create_generated_certificate()
-
+        self.create_generated_certificate(
+            download_url=self.relative_certificate_download_url
+        )
         response = self.client.get(self.get_url(self.program_uuid))
         self.assertEqual(status.HTTP_200_OK, response.status_code)
-        self.assertEqual(response.data['course_runs'][0]['certificate_download_url'], self.certificate_download_url)
+        response_url = response.data['course_runs'][0]['certificate_download_url']
+        self.assertTrue(response_url.startswith("http://testserver"))
+        self.assertTrue(response_url.endswith(self.relative_certificate_download_url))
+
+    def test_absolute_certificate_url_stays_absolute(self):
+        self.client.login(username=self.student.username, password=self.password)
+        self.create_generated_certificate(
+            download_url=self.absolute_certificate_download_url
+        )
+        response = self.client.get(self.get_url(self.program_uuid))
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        response_url = response.data['course_runs'][0]['certificate_download_url']
+        self.assertEqual(response_url, self.absolute_certificate_download_url)
 
     def test_no_due_dates(self):
         self.client.login(username=self.student.username, password=self.password)
