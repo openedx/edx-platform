@@ -25,6 +25,11 @@ class ProgramEnrollmentFactory(DjangoModelFactory):
     status = 'enrolled'
 
 
+PROGRAM_COURSE_ENROLLMENT_DEFAULT_COURSE_KEY = (
+    CourseKey.from_string("course-v1:edX+DemoX+Demo_Course")
+)
+
+
 class ProgramCourseEnrollmentFactory(DjangoModelFactory):
     """ A factory for the ProgramCourseEnrollment model. """
     class Meta(object):
@@ -32,5 +37,11 @@ class ProgramCourseEnrollmentFactory(DjangoModelFactory):
 
     program_enrollment = factory.SubFactory(ProgramEnrollmentFactory)
     course_enrollment = factory.SubFactory(CourseEnrollmentFactory)
-    course_key = CourseKey.from_string("course-v1:edX+DemoX+Demo_Course")
+    course_key = factory.LazyAttribute(
+        lambda pce: (
+            pce.course_enrollment.course_id
+            if pce.course_enrollment
+            else PROGRAM_COURSE_ENROLLMENT_DEFAULT_COURSE_KEY
+        )
+    )
     status = 'active'
