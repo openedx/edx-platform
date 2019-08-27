@@ -62,8 +62,15 @@ class TestGitExport(CourseTestCase):
         with self.assertRaisesRegexp(CommandError, 'Error: unrecognized arguments:*'):
             call_command('git_export', 'blah', 'blah', 'blah', stderr=StringIO())
 
-        with self.assertRaisesMessage(CommandError, 'Error: too few arguments'):
-            call_command('git_export', stderr=StringIO())
+        if six.PY2:
+            with self.assertRaisesMessage(CommandError, 'Error: too few arguments'):
+                call_command('git_export', stderr=StringIO())
+        else:
+            with self.assertRaisesMessage(
+                CommandError,
+                'Error: the following arguments are required: course_loc, git_url'
+            ):
+                call_command('git_export', stderr=StringIO())
 
         # Send bad url to get course not exported
         with self.assertRaisesRegexp(CommandError, six.text_type(GitExportError.URL_BAD)):

@@ -21,7 +21,11 @@ class TestDeleteOrphan(TestOrphanBase):
         """
         Test delete_orphans command with no arguments
         """
-        with self.assertRaisesRegexp(CommandError, 'Error: too few arguments'):
+        if six.PY2:
+            errstring = 'Error: too few arguments'
+        else:
+            errstring = 'Error: the following arguments are required: course_id'
+        with self.assertRaisesRegexp(CommandError, errstring):
             call_command('delete_orphans')
 
     @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)

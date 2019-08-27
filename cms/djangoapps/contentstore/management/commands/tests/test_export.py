@@ -25,7 +25,10 @@ class TestArgParsingCourseExport(unittest.TestCase):
         """
         Test export command with no arguments
         """
-        errstring = "Error: too few arguments"
+        if six.PY2:
+            errstring = "Error: too few arguments"
+        else:
+            errstring = "Error: the following arguments are required: course_id, output_path"
         with self.assertRaisesRegexp(CommandError, errstring):
             call_command('export')
 

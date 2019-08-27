@@ -6,6 +6,7 @@ from __future__ import absolute_import
 import logging
 import os
 import shutil
+import six
 from six import StringIO
 import subprocess
 import unittest
@@ -73,7 +74,10 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
         Validate argument checking
         """
         # No argument given.
-        self.assertCommandFailureRegexp('Error: too few arguments')
+        if six.PY2:
+            self.assertCommandFailureRegexp('Error: too few arguments')
+        else:
+            self.assertCommandFailureRegexp('Error: the following arguments are required: repository_url')
         # Extra/Un-named arguments given.
         self.assertCommandFailureRegexp(
             'Error: unrecognized arguments: blah blah blah',

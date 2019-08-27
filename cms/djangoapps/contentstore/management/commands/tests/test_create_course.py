@@ -23,7 +23,10 @@ class TestArgParsing(TestCase):
         super(TestArgParsing, self).setUp()
 
     def test_no_args(self):
-        errstring = "Error: too few arguments"
+        if six.PY2:
+            errstring = "Error: too few arguments"
+        else:
+            errstring = "Error: the following arguments are required: modulestore, user, org, number, run"
         with self.assertRaisesRegexp(CommandError, errstring):
             call_command('create_course')
 
