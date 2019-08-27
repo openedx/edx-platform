@@ -155,6 +155,37 @@ class ProgramCourseEnrollmentModelTests(TestCase):
         self.course_key = CourseKey.from_string(generate_course_run_key())
         CourseOverviewFactory(id=self.course_key)
 
+    def test_unique_completed_enrollment(self):
+        """
+        A record with the same (program_enrollment, course_enrollment)
+        cannot be created.
+        """
+        self._create_completed_program_course_enrollment()
+        with self.assertRaises(IntegrityError):
+            # Purposefully mis-set the course_key in order to test
+            # that there is a constraint on
+            # (program_enrollment, course_enrollment) alone.
+            ProgramCourseEnrollment.objects.create(
+                program_enrollment=self.program_enrollment,
+                course_key="dummy-value",
+                course_enrollment=course_enrollment,
+                status="pending",
+            )
+
+    def test_unique_waiting_enrollment(self):
+        """
+        A record with the same (program_enrollment, course_key)
+        cannot be created.
+        """
+        self._create_waiting_program_course_enrollment()
+        with self.assertRaises(IntegrityError):
+            ProgramCourseEnrollment.objects.create(
+                program_enrollment=self.program_enrollment,
+                course_key=self.course_key,
+                course_enrollment=None,
+                status="suspended",
+            )
+
     def _create_completed_program_course_enrollment(self):
         """ helper function create program course enrollment """
         course_enrollment = CourseEnrollmentFactory.create(
@@ -165,8 +196,8 @@ class ProgramCourseEnrollmentModelTests(TestCase):
         program_course_enrollment = ProgramCourseEnrollment.objects.create(
             program_enrollment=self.program_enrollment,
             course_key=self.course_key,
-            course_enrollment=course_enrollment,
-            status="active"
+            course_enrollment=None,
+            status="canceled",
         )
         return program_course_enrollment
 
