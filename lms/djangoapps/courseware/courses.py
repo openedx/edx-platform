@@ -608,7 +608,7 @@ def get_current_child(xmodule, min_depth=None, requested_child=None):
 
     def _get_default_child_module(child_modules):
         """Returns the first child of xmodule, subject to min_depth."""
-        if min_depth <= 0:
+        if min_depth is None or min_depth <= 0:
             return _get_child(child_modules)
         else:
             content_children = [
@@ -625,7 +625,7 @@ def get_current_child(xmodule, min_depth=None, requested_child=None):
                 pos = xmodule.position - 1  # position is 1-indexed
                 if 0 <= pos < len(children):
                     child = children[pos]
-                    if min_depth > 0 and not child.has_children_at_depth(min_depth - 1):
+                    if min_depth is not None and (min_depth > 0 and not child.has_children_at_depth(min_depth - 1)):
                         child = None
             if child is None:
                 child = _get_default_child_module(children)
