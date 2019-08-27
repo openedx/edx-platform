@@ -160,15 +160,15 @@ class ProgramCourseEnrollmentModelTests(TestCase):
         A record with the same (program_enrollment, course_enrollment)
         cannot be created.
         """
-        self._create_completed_program_course_enrollment()
+        pce = self._create_completed_program_course_enrollment()
         with self.assertRaises(IntegrityError):
             # Purposefully mis-set the course_key in order to test
             # that there is a constraint on
             # (program_enrollment, course_enrollment) alone.
             ProgramCourseEnrollment.objects.create(
-                program_enrollment=self.program_enrollment,
+                program_enrollment=pce.program_enrollment,
                 course_key="dummy-value",
-                course_enrollment=course_enrollment,
+                course_enrollment=pce.course_enrollment,
                 status="pending",
             )
 
@@ -177,18 +177,18 @@ class ProgramCourseEnrollmentModelTests(TestCase):
         A record with the same (program_enrollment, course_key)
         cannot be created.
         """
-        self._create_waiting_program_course_enrollment()
+        pce = self._create_waiting_program_course_enrollment()
         with self.assertRaises(IntegrityError):
             ProgramCourseEnrollment.objects.create(
-                program_enrollment=self.program_enrollment,
-                course_key=self.course_key,
+                program_enrollment=pce.program_enrollment,
+                course_key=pce.course_key,
                 course_enrollment=None,
                 status="suspended",
             )
 
     def _create_completed_program_course_enrollment(self):
         """ helper function create program course enrollment """
-        course_enrollment = CourseEnrollmentFactory.create(
+        CourseEnrollmentFactory.create(
             course_id=self.course_key,
             user=self.user,
             mode=CourseMode.MASTERS
