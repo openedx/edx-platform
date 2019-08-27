@@ -791,7 +791,7 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
         else:
             try:
                 target_index = int(target_index) if target_index is not None else None
-                if len(target_parent.children) < target_index:
+                if target_index is not None and len(target_parent.children) < target_index:
                     error = _(u'You can not move {source_usage_key} at an invalid index ({target_index}).').format(
                         source_usage_key=text_type(source_usage_key),
                         target_index=target_index
