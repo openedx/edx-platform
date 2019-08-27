@@ -368,7 +368,7 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
 
         with mock.patch('lms.djangoapps.program_enrollments.models.ProgramCourseEnrollment.enroll') as enrollMock:
             enrollMock.side_effect = Exception('unexpected error')
-            with self.assertRaises(Exception):
+            with self.assertRaisesRegex(Exception, 'unexpected error'):
                 with LogCapture(logger.name) as log:
                     UserSocialAuth.objects.create(
                         user=self.user,

@@ -36,9 +36,12 @@ def listen_for_social_auth_creation(sender, instance, created, **kwargs):  # pyl
     try:
         matriculate_learner(instance.user, instance.uid)
     except Exception as e:
-        msg_tmpl = u'Unable to link waiting enrollments for user {}, social auth creation failed: {}'
-        logger.warning(msg_tmpl.format(instance.user, instance.uid))
-        raise e
+        logger.warning(
+            u'Unable to link waiting enrollments for user %s, social auth creation failed: %s',
+            instance.user.id,
+            e,
+        )
+        raise
 
 
 def matriculate_learner(user, uid):
