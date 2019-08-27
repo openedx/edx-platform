@@ -6,8 +6,6 @@ from __future__ import absolute_import
 
 import json
 import shutil
-import six
-import unicodecsv
 from tempfile import mkdtemp
 from uuid import uuid4
 
