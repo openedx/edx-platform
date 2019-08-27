@@ -302,7 +302,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         ])
         self.assertIn(
             js_escaped_string(self.linkedin_url.format(params=urlencode(params))),
-            response.content
+            response.content.decode('utf-8')
         )
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
