@@ -78,6 +78,41 @@ class CourseHLSPlaybackEnabledFlag(ConfigurationModel):
         )
 
 
+class CourseYoutubeBlockedFlag(ConfigurationModel):
+    """
+    Disables the playback of youtube videos for a given course.
+    If the flag is present for the course, and set to "enabled",
+    then youtube is disabled for that course.
+    .. no_pii
+    """
+    KEY_FIELDS = ('course_id',)
+
+    course_id = CourseKeyField(max_length=255, db_index=True)
+
+    @classmethod
+    def feature_enabled(cls, course_id):
+        """
+        Determine if the youtube blocking feature is enabled for the specified course id.
+        Argument:
+         course_id (CourseKey): course id for whom feature will be checked
+        """
+        feature = (CourseYoutubeBlockedFlag.objects
+                   .filter(course_id=course_id)
+                   .order_by('-change_date')
+                   .first())
+        return feature.enabled if feature else False
+
+    def __unicode__(self):
+        not_en = "Not "
+        if self.enabled:
+            not_en = ""
+
+        return u"Course '{course_key}': Youtube Block {not_enabled}Enabled".format(
+            course_key=six.text_type(self.course_id),
+            not_enabled=not_en
+        )
+
+
 class VideoTranscriptEnabledFlag(ConfigurationModel):
     """
     Enables Video Transcript across the platform.
