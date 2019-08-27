@@ -2378,7 +2378,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=579 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=580 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -4686,6 +4686,7 @@ CREATE TABLE `program_enrollments_programcourseenrollment` (
   `program_enrollment_id` int(11) NOT NULL,
   `course_key` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `program_enrollments_prog_program_enrollment_id_co_7d2701fb_uniq` (`program_enrollment_id`,`course_key`),
   UNIQUE KEY `course_enrollment_id` (`course_enrollment_id`),
   KEY `program_enrollments__course_id_4f564456_fk_course_ov` (`course_id`),
   KEY `program_enrollments__program_enrollment_i_02ce2c32_fk_program_e` (`program_enrollment_id`),
