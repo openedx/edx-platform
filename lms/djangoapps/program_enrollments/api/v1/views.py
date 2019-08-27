@@ -961,7 +961,7 @@ class ProgramCourseEnrollmentOverviewView(DeveloperErrorViewMixin, ProgramSpecif
             * course_run_url: the url for the course run
             * start_date: the start date for the course run; null if no start date
             * end_date: the end date for the course run' null if no end date
-            * course_status: the status of the course; one of "in-progress", "upcoming", and "completed"
+            * course_run_status: the status of the course; one of "in_progress", "upcoming", and "completed"
             * emails_enabled: boolean representing whether emails are enabled for the course;
                 if absent, the bulk email feature is either not enable at the platform level or is not enabled for the course;
                 if True or False, bulk email feature is enabled, and value represents whether or not user wants to receive emails
@@ -984,7 +984,7 @@ class ProgramCourseEnrollmentOverviewView(DeveloperErrorViewMixin, ProgramSpecif
                     "course_run_url": "https://courses.edx.org/courses/course-v1:edX+AnimalsX+Aardvarks/course/",
                     "start_date": "2017-02-05T05:00:00Z",
                     "end_date": "2018-02-05T05:00:00Z",
-                    "course_status": "completed"
+                    "course_run_status": "completed"
                     "emails_enabled": true,
                     "due_dates": [
                         {
@@ -1007,7 +1007,7 @@ class ProgramCourseEnrollmentOverviewView(DeveloperErrorViewMixin, ProgramSpecif
                     "course_run_url": "https://courses.edx.org/courses/course-v1:edX+AnimalsX+Baboons/course/",
                     "start_date": "2018-02-05T05:00:00Z",
                     "end_date": null,
-                    "course_status": "in-progress"
+                    "course_run_status": "in_progress"
                     "emails_enabled": false,
                     "due_dates": [],
                     "micromasters_title": "Animals",
