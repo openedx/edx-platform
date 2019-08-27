@@ -179,7 +179,7 @@ class TestLTIModuleListing(SharedModuleStoreTestCase):
             'xblock_handler_noauth',
             args=[
                 text_type(self.course.id),
-                quote_slashes(text_type(self.lti_published.scope_ids.usage_id).encode('utf-8')),
+                quote_slashes(text_type(self.lti_published.scope_ids.usage_id)),
                 handler
             ]
         ))
