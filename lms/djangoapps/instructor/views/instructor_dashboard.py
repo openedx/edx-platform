@@ -30,6 +30,7 @@ from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
+from openedx.core.lib.instructor_dashboard_tabs import InstructorDashboardTabPluginManager
 from bulk_email.api import is_bulk_email_feature_enabled
 from class_dashboard.dashboard_data import get_array_section_has_problem, get_section_display_name
 from course_modes.models import CourseMode, CourseModesArchive
@@ -236,9 +237,8 @@ def instructor_dashboard_2(request, course_id):
     certificate_invalidations = CertificateInvalidation.get_certificate_invalidations(course_key)
 
     # load externally registered sections
-    for entrypoint in pkg_resources.iter_entry_points(group="lms.instructor_dashboard.section"):
-        section = entrypoint.load()
-        sections.append(section(course, access))
+    for Tab in InstructorDashboardTabPluginManager.get_tabs():
+        sections.append(Tab(course, access).to_dict())
 
     context = {
         'course': course,
