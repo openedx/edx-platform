@@ -810,11 +810,19 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         faces.
         """
         face_aes_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["FACE_IMAGE_AES_KEY"]
-        face_aes_key = face_aes_key_str.decode("hex")
+
+        if six.PY3:
+            face_aes_key = codecs.decode(face_aes_key_str, "hex")
+        else:
+            face_aes_key = face_aes_key_str.decode("hex")
+
         rsa_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["RSA_PUBLIC_KEY"]
         rsa_encrypted_face_aes_key = rsa_encrypt(face_aes_key, rsa_key_str)
 
-        return rsa_encrypted_face_aes_key.encode("base64")
+        if six.PY3:
+            return codecs.encode(rsa_encrypted_face_aes_key, "base64")
+        else:
+            return rsa_encrypted_face_aes_key.encode("base64")
 
     def create_request(self, copy_id_photo_from=None):
         """
@@ -855,10 +863,10 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
             "EdX-ID": str(self.receipt_id),
             "ExpectedName": self.name,
             "PhotoID": photo_id_url,
-            "PhotoIDKey": photo_id_key,
+            "PhotoIDKey": photo_id_key.decode("utf-8"),
             "SendResponseTo": callback_url,
             "UserPhoto": self.image_url("face"),
-            "UserPhotoKey": self._encrypted_user_photo_key_str(),
+            "UserPhotoKey": self._encrypted_user_photo_key_str().decode("utf-8"),
         }
         headers = {
             "Content-Type": "application/json",
@@ -915,7 +923,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         response = requests.post(
             settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["API_URL"],
             headers=headers,
-            data=json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False).encode('utf-8'),
+            data=json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False),
             verify=False
         )
 

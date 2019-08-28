@@ -175,8 +175,8 @@ def generate_signed_message(method, headers_dict, body_dict, access_key, secret_
     message = signing_format_message(method, headers_dict, body_dict)
 
     # hmac needs a byte string for it's starting key, can't be unicode.
-    hashed = hmac.new(secret_key.encode('utf-8'), message, sha256)
-    signature = binascii.b2a_base64(hashed.digest()).rstrip('\n')
+    hashed = hmac.new(secret_key.encode('utf-8'), message.encode('utf-8'), sha256)
+    signature = binascii.b2a_base64(hashed.digest()).decode('utf-8').rstrip('\n')
     authorization_header = u"SSI {}:{}".format(access_key, signature)
 
     message += '\n'
@@ -223,12 +223,12 @@ def body_string(body_dict, prefix=""):
                 if isinstance(arr, dict):
                     body_list.append(body_string(arr, u"{}.{}.".format(key, i)))
                 else:
-                    body_list.append(u"{}.{}:{}\n".format(key, i, arr).encode('utf-8'))
+                    body_list.append(u"{}.{}:{}\n".format(key, i, arr))
         elif isinstance(value, dict):
             body_list.append(body_string(value, key + ":"))
         else:
             if value is None:
                 value = "null"
-            body_list.append(u"{}{}:{}\n".format(prefix, key, value).encode('utf-8'))
+            body_list.append(u"{}{}:{}\n".format(prefix, key, value))
 
     return "".join(body_list)  # Note that trailing \n's are important

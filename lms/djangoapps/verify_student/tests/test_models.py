@@ -4,6 +4,7 @@ from __future__ import absolute_import
 import json
 from datetime import datetime, timedelta
 
+import base64
 import boto
 import ddt
 import mock
@@ -66,8 +67,8 @@ def mock_software_secure_post(url, headers=None, data=None, **kwargs):
         assert data_dict.get(key)
 
     # The keys should be stored as Base64 strings, i.e. this should not explode
-    data_dict["PhotoIDKey"].decode("base64")
-    data_dict["UserPhotoKey"].decode("base64")
+    base64.b64decode(data_dict["PhotoIDKey"])
+    base64.b64decode(data_dict["UserPhotoKey"])
 
     response = requests.Response()
     response.status_code = 200
