@@ -1521,24 +1521,29 @@ class ProgramCourseEnrollmentOverviewViewTests(ProgramCacheTestCaseMixin, Shared
             start=self.yesterday,
         )
 
-    def test_multiple_enrollments_all_enrolled(self):
+    @ddt.data(False, True)
+    def test_multiple_enrollments_all_enrolled(self, other_enrollment_active):
         other_course_key = CourseKey.from_string('course-v1:edX+ToyX+Other_Course')
         self._add_new_course_to_program(other_course_key, self.program)
 
         # add a second course enrollment, which doesn't need a ProgramCourseEnrollment
         # to be returned.
-        CourseEnrollmentFactory.create(
+        other_enrollment = CourseEnrollmentFactory.create(
             course_id=other_course_key,
             user=self.student,
             mode=CourseMode.VERIFIED,
         )
+        if not other_enrollment_active:
+            other_enrollment.deactivate()
 
         self.client.login(username=self.student.username, password=self.password)
         response = self.client.get(self.get_url(self.program_uuid))
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         actual_course_run_ids = {run['course_run_id'] for run in response.data['course_runs']}
-        expected_course_run_ids = {text_type(other_course_key), text_type(self.course_id)}
+        expected_course_run_ids = {text_type(self.course_id)}
+        if other_enrollment_active:
+            expected_course_run_ids.add(text_type(other_course_key))
         self.assertEqual(expected_course_run_ids, actual_course_run_ids)
 
     _GET_RESUME_URL = 'lms.djangoapps.program_enrollments.api.v1.views.get_resume_urls_for_enrollments'

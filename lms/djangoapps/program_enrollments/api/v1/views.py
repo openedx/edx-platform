@@ -1041,6 +1041,7 @@ class ProgramCourseEnrollmentOverviewView(DeveloperErrorViewMixin, ProgramSpecif
             user=user,
             course_id__in=course_run_keys,
             mode__in=[CourseMode.VERIFIED, CourseMode.MASTERS],
+            is_active=True,
         )
 
         overviews = CourseOverview.get_from_ids_if_exists(course_run_keys)
