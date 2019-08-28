@@ -848,9 +848,6 @@ def create_order(request):
     else:
         payment_data = checkout_with_shoppingcart(request, request.user, course_id, current_mode, amount)
 
-    payment_form_data = payment_data.get('payment_form_data')
-    if 'signature' in payment_form_data:
-        payment_data['payment_form_data']['signature'] = payment_form_data.get('signature').decode('utf-8')
     if 'processor' not in request.POST:
         # (XCOM-214) To be removed after release.
         # the absence of this key in the POST payload indicates that the request was initiated from
