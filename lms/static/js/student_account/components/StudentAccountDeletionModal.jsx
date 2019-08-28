@@ -31,7 +31,7 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
     this.props.onClose();
 
     removeLoggedInCookies();
-    window.location.href = this.props.lmsUrlRoot;
+    window.location.href = this.props.mktgRootLink;
   }
 
   deleteAccount() {
@@ -215,14 +215,14 @@ StudentAccountDeletionConfirmationModal.propTypes = {
   onClose: PropTypes.func,
   platformName: PropTypes.string,
   siteName: PropTypes.string,
-  lmsUrlRoot: PropTypes.string,
+  mktgRootLink: PropTypes.string,
 };
 
 StudentAccountDeletionConfirmationModal.defaultProps = {
   onClose: () => {},
   platformName: "",
   siteName: "",
-  lmsUrlRoot: "",
+  mktgRootLink: "",
 };
 
 export default StudentAccountDeletionConfirmationModal;

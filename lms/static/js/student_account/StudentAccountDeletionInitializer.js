@@ -21,7 +21,7 @@ const wrapperRendered = setInterval(() => {
         isActive: window.isActive,
         platformName: window.platformName,
         siteName: window.siteName,
-        lmsUrlRoot: window.lmsUrlRoot
+        mktgRootLink: window.mktgRootLink
       },
     });
   }
