@@ -30,6 +30,7 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
 
             view: 'container_preview',
 
+
             defaultViewClass: ContainerView,
 
             // Overridable by subclasses-- determines whether the XBlock component
