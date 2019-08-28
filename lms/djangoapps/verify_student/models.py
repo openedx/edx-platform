@@ -923,7 +923,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         response = requests.post(
             settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["API_URL"],
             headers=headers,
-            data=json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False),
+            data=json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False).encode('utf-8'),
             verify=False
         )
 

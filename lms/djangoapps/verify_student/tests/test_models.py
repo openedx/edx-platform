@@ -56,7 +56,7 @@ def mock_software_secure_post(url, headers=None, data=None, **kwargs):
     on the fields we send over to make sure we're not missing headers or giving
     total garbage.
     """
-    data_dict = json.loads(data)
+    data_dict = json.loads(data.decode('utf-8'))
 
     # Basic sanity checking on the keys
     EXPECTED_KEYS = [
