@@ -1529,7 +1529,7 @@ class TestSubmitPhotosForVerification(TestCase):
         }
         params[invalid_param] = ""
         response = self._submit_photos(expected_status_code=400, **params)
-        self.assertEqual(response.content, "Image data is not valid.")
+        self.assertEqual(response.content.decode('utf-8'), "Image data is not valid.")
 
     def test_invalid_name(self):
         response = self._submit_photos(
