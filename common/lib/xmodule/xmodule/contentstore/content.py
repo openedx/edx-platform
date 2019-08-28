@@ -290,7 +290,7 @@ class StaticContent(object):
         if encode:
             asset_path = quote_plus(asset_path, '/:+@')
 
-        return urlunparse((None, base_url.encode('utf-8'), asset_path, params, urlencode(updated_query_params), None))
+        return urlunparse(('', base_url.encode('utf-8'), asset_path, params, urlencode(updated_query_params), ''))
 
     def stream_data(self):
         yield self._data
