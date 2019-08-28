@@ -416,7 +416,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
         return JsonResponse({
             'html': fragment.content,
-            'resources': hashed_resources.items()
+            'resources': list(hashed_resources.items())
         })
 
     else:
