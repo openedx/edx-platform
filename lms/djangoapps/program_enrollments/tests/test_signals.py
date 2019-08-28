@@ -358,3 +358,27 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
                         error_tmpl.format(self.user.id, program_course_enrollments[0].id, 'something has gone wrong')
                     )
                 )
+
+    def test_log_on_unexpected_exception(self):
+        """
+        unexpected errors as part of the account linking process should be logged and re-raised
+        """
+        program_enrollment = self._create_waiting_program_enrollment()
+        self._create_waiting_course_enrollments(program_enrollment)
+
+        with mock.patch('lms.djangoapps.program_enrollments.models.ProgramCourseEnrollment.enroll') as enrollMock:
+            enrollMock.side_effect = Exception('unexpected error')
+            with LogCapture(logger.name) as log:
+                with self.assertRaisesRegex(Exception, 'unexpected error'):
+                    UserSocialAuth.objects.create(
+                        user=self.user,
+                        uid='{0}:{1}'.format(self.provider_slug, self.external_id),
+                    )
+                error_tmpl = u'Unable to link waiting enrollments for user {}, social auth creation failed: {}'
+                log.check_present(
+                    (
+                        logger.name,
+                        'WARNING',
+                        error_tmpl.format(self.user.id, 'unexpected error')
+                    )
+                )
