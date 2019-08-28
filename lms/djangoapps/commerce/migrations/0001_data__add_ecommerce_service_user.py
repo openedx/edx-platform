@@ -18,7 +18,13 @@ def backwards(apps, schema_editor):
     """Remove the service user."""
     User.objects.get(username=USERNAME, email=EMAIL).delete()
 
+
 class Migration(migrations.Migration):
+
+    dependencies = [
+        ('user_manager', '0001_initial'),
+        ('user_manager', '0002_auto_20180721_1501'),
+    ]
 
     operations = [
         migrations.RunPython(forwards, backwards),
