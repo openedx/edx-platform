@@ -1520,17 +1520,20 @@ class ProgramCourseEnrollmentOverviewViewTests(ProgramCacheTestCaseMixin, Shared
             start=self.yesterday,
         )
 
-    def test_multiple_enrollments_all_enrolled(self):
+    @ddt.data(False, True)
+    def test_multiple_enrollments_all_enrolled(self, other_enrollment_active):
         other_course_key = CourseKey.from_string('course-v1:edX+ToyX+Other_Course')
         self._add_new_course_to_program(other_course_key, self.program)
 
         # add a second course enrollment, which doesn't need a ProgramCourseEnrollment
         # to be returned.
-        CourseEnrollmentFactory.create(
+        other_enrollment = CourseEnrollmentFactory.create(
             course_id=other_course_key,
             user=self.student,
             mode=CourseMode.VERIFIED,
         )
+        if not other_enrollment_active:
+            other_enrollment.deactivate()
 
         self.client.login(username=self.student.username, password=self.password)
         response = self.client.get(self.get_url(self.program_uuid))
