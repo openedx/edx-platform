@@ -664,7 +664,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
         # Update our record fields
         if six.PY3:
-            self.photo_id_key = codecs.encode(rsa_encrypted_aes_key, 'base64')
+            self.photo_id_key = codecs.encode(rsa_encrypted_aes_key, 'base64').decode('utf-8')
         else:
             self.photo_id_key = rsa_encrypted_aes_key.encode('base64')
 
@@ -810,11 +810,18 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         faces.
         """
         face_aes_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["FACE_IMAGE_AES_KEY"]
-        face_aes_key = face_aes_key_str.decode("hex")
+        if six.PY3:
+            face_aes_key = codecs.decode(face_aes_key_str, "hex")
+        else:
+            face_aes_key = face_aes_key_str.decode("hex")
+
         rsa_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["RSA_PUBLIC_KEY"]
         rsa_encrypted_face_aes_key = rsa_encrypt(face_aes_key, rsa_key_str)
 
-        return rsa_encrypted_face_aes_key.encode("base64")
+        if six.PY3:
+            return codecs.encode(rsa_encrypted_face_aes_key, "base64").decode("utf-8")
+        else:
+            return rsa_encrypted_face_aes_key.encode("base64")
 
     def create_request(self, copy_id_photo_from=None):
         """
@@ -915,7 +922,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         response = requests.post(
             settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["API_URL"],
             headers=headers,
-            data=json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False).encode('utf-8'),
+            data=json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False),
             verify=False
         )
 

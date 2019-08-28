@@ -66,8 +66,11 @@ def mock_software_secure_post(url, headers=None, data=None, **kwargs):
         assert data_dict.get(key)
 
     # The keys should be stored as Base64 strings, i.e. this should not explode
-    data_dict["PhotoIDKey"].decode("base64")
-    data_dict["UserPhotoKey"].decode("base64")
+    if isinstance(data_dict["PhotoIDKey"], (bytes, bytearray)):
+        data_dict["PhotoIDKey"].decode("base64")
+
+    if isinstance(data_dict["UserPhotoKey"], (bytes, bytearray)):
+        data_dict["UserPhotoKey"].decode("base64")
 
     response = requests.Response()
     response.status_code = 200
