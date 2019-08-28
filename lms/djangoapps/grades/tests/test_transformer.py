@@ -100,7 +100,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         for field in expectations:
             self.assertEqual(
                 expectations[field],
-                block_structure.get_transformer_block_field(usage_key, transformer_class, field),
+                block_structure.get_transformer_block_field(usage_key, transformer_class, field).decode('utf-8'),
                 msg=u'in {} and field {}'.format(transformer_class, repr(field)),
             )
 
