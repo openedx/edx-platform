@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 import logging
+import six
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -130,9 +131,10 @@ def container_handler(request, usage_key_string):
 
             assert unit is not None, "Could not determine unit page"
             subsection = get_parent_xblock(unit)
-            assert subsection is not None, "Could not determine parent subsection from unit " + unicode(unit.location)
+            assert subsection is not None, "Could not determine parent subsection from unit " + six.text_type(
+                unit.location)
             section = get_parent_xblock(subsection)
-            assert section is not None, "Could not determine ancestor section from unit " + unicode(unit.location)
+            assert section is not None, "Could not determine ancestor section from unit " + six.text_type(unit.location)
 
             # Fetch the XBlock info for use by the container page. Note that it includes information
             # about the block's ancestors and siblings for use by the Unit Outline.
