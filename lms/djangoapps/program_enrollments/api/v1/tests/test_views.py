@@ -1540,7 +1540,9 @@ class ProgramCourseEnrollmentOverviewViewTests(ProgramCacheTestCaseMixin, Shared
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         actual_course_run_ids = {run['course_run_id'] for run in response.data['course_runs']}
-        expected_course_run_ids = {text_type(other_course_key), text_type(self.course_id)}
+        expected_course_run_ids = {text_type(self.course_id)}
+        if other_enrollment_active:
+            expected_course_run_ids.add(text_type(other_course_key))
         self.assertEqual(expected_course_run_ids, actual_course_run_ids)
 
     @mock.patch('lms.djangoapps.program_enrollments.api.v1.views.get_resume_urls_for_enrollments')
