@@ -1553,7 +1553,7 @@ class TestSubmitPhotosForVerification(TestCase):
         # Since the user doesn't have an initial verification attempt, this should fail
         response = self._submit_photos(expected_status_code=400, face_image=self.IMAGE_DATA)
         self.assertEqual(
-            response.content,
+            response.content.decode('utf-8'),
             "Photo ID image is required if the user does not have an initial verification attempt."
         )
 
