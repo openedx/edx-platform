@@ -956,9 +956,10 @@ class ProgramCourseEnrollmentOverviewView(DeveloperErrorViewMixin, ProgramSpecif
         program course enrollment overview, where each overview contains the following keys:
             * course_run_id: the id for the course run
             * display_name: display name of the course run
-            * resume_course_run_url: the url that takes the user back to their position in the course run;
+            * resume_course_run_url: the absolute url that takes the user back to
+                their position in the course run;
                 if absent, user has not made progress in the course
-            * course_run_url: the url for the course run
+            * course_run_url: the absolute url for the course run
             * start_date: the start date for the course run; null if no start date
             * end_date: the end date for the course run' null if no end date
             * course_run_status: the status of the course; one of "in_progress", "upcoming", and "completed"
@@ -1068,13 +1069,20 @@ class ProgramCourseEnrollmentOverviewView(DeveloperErrorViewMixin, ProgramSpecif
                 course_run_dict['emails_enabled'] = emails_enabled
 
             if certificate_info.get('download_url'):
-                course_run_dict['certificate_download_url'] = certificate_info['download_url']
+                course_run_dict['certificate_download_url'] = request.build_absolute_uri(
+                    certificate_info['download_url']
+                )
 
             if self.program['type'] == 'MicroMasters':
                 course_run_dict['micromasters_title'] = self.program['title']
 
             if course_run_resume_urls.get(enrollment.course_id):
-                course_run_dict['resume_course_run_url'] = course_run_resume_urls.get(enrollment.course_id)
+                relative_resume_course_run_url = course_run_resume_urls.get(
+                    enrollment.course_id
+                )
+                course_run_dict['resume_course_run_url'] = request.build_absolute_uri(
+                    relative_resume_course_run_url
+                )
 
             course_runs.append(course_run_dict)
 
