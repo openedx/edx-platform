@@ -137,8 +137,8 @@ def index(request, extra_context=None, user=AnonymousUser()):
     courses = get_courses(user)
 
     if configuration_helpers.get_value(
-            "ENABLE_COURSE_SORTING_BY_START_DATE",
-            settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"],
+        "ENABLE_COURSE_SORTING_BY_START_DATE",
+        settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"],
     ):
         courses = sort_by_start_date(courses)
     else:
@@ -685,7 +685,6 @@ def password_change_request_handler(request):
             # no user associated with the email
             if configuration_helpers.get_value('ENABLE_PASSWORD_RESET_FAILURE_EMAIL',
                                                settings.FEATURES['ENABLE_PASSWORD_RESET_FAILURE_EMAIL']):
-
                 site = get_current_site()
                 message_context = get_base_template_context(site)
 
@@ -809,6 +808,9 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
 
     try:
         uid_int = base36_to_int(uidb36)
+        if request.user.is_authenticated and request.user.id != uid_int:
+            raise Http404
+
         user = User.objects.get(id=uid_int)
     except (ValueError, User.DoesNotExist):
         # if there's any error getting a user, just let django's
@@ -1167,7 +1169,7 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
         # Send it to the old email...
         try:
             ace.send(msg)
-        except Exception:    # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             log.warning('Unable to send confirmation email to old address', exc_info=True)
             response = render_to_response("email_change_failed.html", {'email': user.email})
             transaction.set_rollback(True)
