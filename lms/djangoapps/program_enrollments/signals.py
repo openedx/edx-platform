@@ -4,9 +4,11 @@ Signal handlers for program enrollments
 from __future__ import absolute_import
 
 import logging
+
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from social_django.models import UserSocialAuth
+
 from lms.djangoapps.program_enrollments.models import ProgramEnrollment
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_LMS_MISC

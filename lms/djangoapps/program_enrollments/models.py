@@ -16,10 +16,10 @@ from simple_history.models import HistoricalRecords
 from six import text_type
 
 from course_modes.models import CourseMode
-from lms.djangoapps.program_enrollments.api.v1.constants import \
-    CourseEnrollmentResponseStatuses as ProgramCourseEnrollmentResponseStatuses
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment, NonExistentCourseError
+
+from .constants import ProgramCourseEnrollmentStatuses, ProgramEnrollmentStatuses
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -32,11 +32,8 @@ class ProgramEnrollment(TimeStampedModel):  # pylint: disable=model-missing-unic
     .. pii_types: other
     .. pii_retirement: local_api
     """
-    STATUSES = (
-        ('enrolled', 'enrolled'),
-        ('pending', 'pending'),
-        ('suspended', 'suspended'),
-        ('canceled', 'canceled'),
+    STATUS_CHOICES = (
+        (status, status) for status in ProgramEnrollmentStatuses.__ALL__
     )
 
     class Meta(object):
@@ -61,7 +58,7 @@ class ProgramEnrollment(TimeStampedModel):  # pylint: disable=model-missing-unic
     )
     program_uuid = models.UUIDField(db_index=True, null=False)
     curriculum_uuid = models.UUIDField(db_index=True, null=False)
-    status = models.CharField(max_length=9, choices=STATUSES)
+    status = models.CharField(max_length=9, choices=STATUS_CHOICES)
     historical_records = HistoricalRecords()
 
     def clean(self):
@@ -121,9 +118,8 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
 
     .. no_pii:
     """
-    STATUSES = (
-        ('active', 'active'),
-        ('inactive', 'inactive'),
+    STATUS_CHOICES = (
+        (status, status) for status in ProgramCourseEnrollmentStatuses.__ALL__
     )
 
     class Meta(object):
@@ -151,7 +147,7 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
         blank=True,
     )
     course_key = CourseKeyField(max_length=255)
-    status = models.CharField(max_length=9, choices=STATUSES)
+    status = models.CharField(max_length=9, choices=STATUS_CHOICES)
     historical_records = HistoricalRecords()
 
     def __str__(self):
@@ -182,9 +178,9 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
 
         self.status = status
         if self.course_enrollment:
-            if status == ProgramCourseEnrollmentResponseStatuses.ACTIVE:
+            if status == ProgramCourseEnrollmentStatuses.ACTIVE:
                 self.course_enrollment.activate()
-            elif status == ProgramCourseEnrollmentResponseStatuses.INACTIVE:
+            elif status == ProgramCourseEnrollmentStatuses.INACTIVE:
                 self.course_enrollment.deactivate()
             else:
                 message = ("Changed {enrollment} status to {status}, not changing course_enrollment"
@@ -192,8 +188,8 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
                 logger.warn(message.format(
                     enrollment=self,
                     status=status,
-                    active=ProgramCourseEnrollmentResponseStatuses.ACTIVE,
-                    inactive=ProgramCourseEnrollmentResponseStatuses.INACTIVE
+                    active=ProgramCourseEnrollmentStatuses.ACTIVE,
+                    inactive=ProgramCourseEnrollmentStatuses.INACTIVE
                 ))
         elif self.program_enrollment.user:
             logger.warn("User {user} {program_enrollment} {course_key} has no course_enrollment".format(
@@ -219,13 +215,16 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
                 user=user,
                 course_id=self.course_key,
             )
-            if course_enrollment.mode == CourseMode.AUDIT or course_enrollment.mode == CourseMode.HONOR:
+            if course_enrollment.mode in {CourseMode.AUDIT, CourseMode.HONOR}:
                 course_enrollment.mode = CourseMode.MASTERS
                 course_enrollment.save()
             self.course_enrollment = course_enrollment
-            message = ("Attempted to create course enrollment for user={user} and course={course}"
-                       " but an enrollment already exists. Existing enrollment will be used instead")
-            logger.info(message.format(user=user.id, course=self.course_key))
+            message_fmt = (
+                "Attempted to create course enrollment for user={user} "
+                "and course={course} but an enrollment already exists. "
+                "Existing enrollment will be used instead."
+            )
+            logger.info(message_fmt.format(user=user.id, course=self.course_key))
         else:
             self.course_enrollment = CourseEnrollment.enroll(
                 user,
@@ -233,6 +232,6 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
                 mode=CourseMode.MASTERS,
                 check_access=False,
             )
-        if self.status == ProgramCourseEnrollmentResponseStatuses.INACTIVE:
+        if self.status == ProgramCourseEnrollmentStatuses.INACTIVE:
             self.course_enrollment.deactivate()
         self.save()

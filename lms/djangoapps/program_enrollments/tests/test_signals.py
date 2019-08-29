@@ -4,30 +4,29 @@ Test signal handlers for program_enrollments
 
 from __future__ import absolute_import
 
-from django.core.cache import cache
 import mock
-from opaque_keys.edx.keys import CourseKey
 import pytest
+from django.core.cache import cache
+from edx_django_utils.cache import RequestCache
+from opaque_keys.edx.keys import CourseKey
+from organizations.tests.factories import OrganizationFactory
 from social_django.models import UserSocialAuth
 from testfixtures import LogCapture
 
 from course_modes.models import CourseMode
-from edx_django_utils.cache import RequestCache
 from lms.djangoapps.program_enrollments.signals import _listen_for_lms_retire, logger
 from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
-from organizations.tests.factories import OrganizationFactory
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL
-from openedx.core.djangoapps.catalog.tests.factories import (
-    OrganizationFactory as CatalogOrganizationFactory, ProgramFactory
-)
+from openedx.core.djangoapps.catalog.tests.factories import OrganizationFactory as CatalogOrganizationFactory
+from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import fake_completed_retirement
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.models import CourseEnrollmentException
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from third_party_auth.tests.factories import SAMLProviderConfigFactory
 from third_party_auth.models import SAMLProviderConfig
+from third_party_auth.tests.factories import SAMLProviderConfigFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 

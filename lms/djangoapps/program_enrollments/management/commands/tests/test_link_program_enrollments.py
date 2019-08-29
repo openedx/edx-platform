@@ -4,24 +4,24 @@ Tests for the link_program_enrollments management command.
 from __future__ import absolute_import
 
 from uuid import uuid4
-from testfixtures import LogCapture
 
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
-
 from edx_django_utils.cache import RequestCache
+from opaque_keys.edx.keys import CourseKey
+from testfixtures import LogCapture
+
 from lms.djangoapps.program_enrollments.management.commands.link_program_enrollments import (
-    Command,
-    INCORRECT_PARAMETER_TPL,
-    DUPLICATE_KEY_TPL,
-    NO_PROGRAM_ENROLLMENT_TPL,
-    NO_LMS_USER_TPL,
     COURSE_ENROLLMENT_ERR_TPL,
-    get_existing_user_message,
+    DUPLICATE_KEY_TPL,
+    INCORRECT_PARAMETER_TPL,
+    NO_LMS_USER_TPL,
+    NO_PROGRAM_ENROLLMENT_TPL,
+    Command,
+    get_existing_user_message
 )
 from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
-from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from student.tests.factories import UserFactory
 

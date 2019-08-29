@@ -4,6 +4,7 @@ import logging
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
 from django.db import IntegrityError, transaction
+
 from lms.djangoapps.program_enrollments.models import ProgramEnrollment
 from student.models import CourseEnrollmentException
 
