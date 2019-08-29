@@ -293,7 +293,7 @@ class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         url = reverse('about_course', args=[text_type(self.xml_course_id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
-        self.assertIn(self.xml_data, resp.content)
+        self.assertIn(self.xml_data, resp.content.decode('utf-8'))
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_anonymous_user_xml(self):
