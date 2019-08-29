@@ -679,7 +679,7 @@ class MiscCourseTests(ContentStoreTestCase):
         self.assertEqual(resp.status_code, 200)
 
         for expected in expected_types:
-            self.assertIn(expected, resp.content)
+            self.assertIn(expected, resp.content.decode('utf-8'))
 
     @ddt.data("<script>alert(1)</script>", "alert('hi')", "</script><script>alert(1)</script>")
     def test_container_handler_xss_prevent(self, malicious_code):

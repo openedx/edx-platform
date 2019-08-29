@@ -4,7 +4,6 @@ Helper methods for Studio views.
 
 from __future__ import absolute_import
 
-import urllib
 from uuid import uuid4
 
 import six
@@ -112,7 +111,7 @@ def xblock_studio_url(xblock, parent_xblock=None):
     elif category in ('chapter', 'sequential'):
         return u'{url}?show={usage_key}'.format(
             url=reverse_course_url('course_handler', xblock.location.course_key),
-            usage_key=urllib.quote(unicode(xblock.location))
+            usage_key=six.moves.urllib.parse.quote(six.text_type(xblock.location))
         )
     elif category == 'library':
         library_key = xblock.location.course_key
