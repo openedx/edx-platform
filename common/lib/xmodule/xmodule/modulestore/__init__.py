@@ -637,7 +637,7 @@ class ModuleStoreAssetBase(object):
         if asset_type is None:
             # Add assets of all types to the sorted list.
             all_assets = SortedAssetList(iterable=[], key=key_func)
-            for asset_type, val in six.iteritems(course_assets):
+            for asset_type, val in course_assets.iteritems():
                 all_assets.update(val)
         else:
             # Add assets of a single type to the sorted list.
