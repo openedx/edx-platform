@@ -2,7 +2,6 @@
 Content Library Transformer.
 """
 import json
-import random
 
 from courseware.models import StudentModule
 from eventtracking import tracker
@@ -99,7 +98,6 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
                 # Save back any changes
                 if any(block_keys[changed] for changed in ('invalid', 'overlimit', 'added')):
                     state_dict['selected'] = list(selected)
-                    random.shuffle(state_dict['selected'])
                     StudentModule.save_state(  # pylint: disable=no-value-for-parameter
                         student=usage_info.user,
                         course_id=usage_info.course_key,
@@ -175,48 +173,3 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
             format_block_keys,
             publish_event,
         )
-
-
-class ContentLibraryOrderTransformer(BlockStructureTransformer):
-    """
-    A transformer that manipulates the block structure by modifying the order of the
-    selected blocks within a library_content module to match the order of the selections
-    made by the ContentLibraryTransformer or the corresponding XBlock. So this transformer
-    requires the selections for the randomized content block to be already
-    made either by the ContentLibraryTransformer or the XBlock.
-
-    Staff users are *not* exempted from library content pathways/
-    """
-    WRITE_VERSION = 1
-    READ_VERSION = 1
-
-    @classmethod
-    def name(cls):
-        """
-        Unique identifier for the transformer's class;
-        same identifier used in setup.py
-        """
-        return "library_content_randomize"
-
-    @classmethod
-    def collect(cls, block_structure):
-        """
-        Collects any information that's necessary to execute this
-        transformer's transform method.
-        """
-        # There is nothing to collect.
-        pass
-
-    def transform(self, usage_info, block_structure):
-        """
-        Transforms the order of the children of the randomized content block
-        to match the order of the selections made and stored in the XBlock 'selected' field.
-        """
-        for block_key in block_structure:
-            if block_key.block_type != 'library_content':
-                continue
-
-            state_dict = get_student_module_as_dict(usage_info.user, usage_info.course_key, block_key)
-            library_children = block_structure.get_children(block_key)
-            ordering_data = {block[1]: position for position, block in enumerate(state_dict['selected'])}
-            library_children.sort(key=lambda block, data=ordering_data: data[block.block_id])
