@@ -336,12 +336,12 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.login_user()
         resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item_id, 'qty': qty})
         self.assertEqual(resp.status_code, 404)
-        self.assertEqual('Order item does not exist.', resp.content)
+        self.assertEqual('Order item does not exist.', resp.content.decode('utf-8'))
 
         # now testing the case if item id not found in request,
         resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'qty': qty})
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual('Order item not found in request.', resp.content)
+        self.assertEqual('Order item not found in request.', resp.content.decode('utf-8'))
 
     def test_purchase_type_should_be_personal_when_qty_is_one(self):
         qty = 1
