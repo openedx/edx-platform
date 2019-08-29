@@ -100,7 +100,10 @@ export class StudentAccountDeletion extends React.Component {
       <div className="account-deletion-details">
         <p className="account-settings-header-subtitle">{ gettext('We’re sorry to see you go!') }</p>
         <p className="account-settings-header-subtitle">{noteDeletion}</p>
-        <p className="account-settings-header-subtitle">{bodyDeletion}</p>
+        <p className="account-settings-header-subtitle">
+              <span>{bodyDeletion} </span>
+              <span>{ gettext('This includes access to edx.org from your employer’s or university’s system and access to private sites offered by MIT Open Learning, Wharton Executive Education, and Harvard Medical School.') }</span>
+        </p>
         <p
           className="account-settings-header-subtitle"
           dangerouslySetInnerHTML={{ __html: loseAccessText }}

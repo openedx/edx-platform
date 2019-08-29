@@ -153,7 +153,10 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
                     </div>
                     <div className="alert-content">
                       <h3 className="alert-title">{noteDeletion}</h3>
-                      <p>{bodyDeletion}</p>
+                      <p>
+                        <span>{bodyDeletion} </span>
+                        <span>{ gettext('This includes access to edx.org from your employer’s or university’s system and access to private sites offered by MIT Open Learning, Wharton Executive Education, and Harvard Medical School.') }</span>
+                      </p>
                       <p dangerouslySetInnerHTML={{ __html: loseAccessText }} />
                     </div>
                   </div>
