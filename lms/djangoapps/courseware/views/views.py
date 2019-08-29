@@ -1062,7 +1062,6 @@ def _progress(request, course_key, student_id):
         'courseware_summary': courseware_summary,
         'studio_url': studio_url,
         'grade_summary': course_grade.summary,
-        'can_masquerade': can_masquerade,
         'staff_access': staff_access,
         'masquerade': masquerade,
         'supports_preview_menu': True,
