@@ -445,3 +445,16 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
             subj, _, _, _ = send_email.call_args[0]
 
             self.assertIn(platform_name, subj)
+
+    def test_reset_password_with_other_user_link(self):
+        """
+        Tests that user should not be able to reset password through other user reset link
+        Make Authenticated request to password_reset_confirm
+        """
+        user = UserFactory.create(username='student', password='test', email='student_88@test.com')
+        self.client.login(username=user.username, password='test')
+        response = self.client.get(reverse(
+            "password_reset_confirm",
+            kwargs={"uidb36": self.uidb36, "token": self.token}
+        ))
+        self.assertEqual(response.status_code, 404)
