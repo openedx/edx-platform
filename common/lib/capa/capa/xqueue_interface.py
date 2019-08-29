@@ -26,7 +26,7 @@ def make_hashkey(seed):
     Generate a string key by hashing
     """
     h = hashlib.md5()
-    h.update(str(seed))
+    h.update(six.text_type(seed).encode('utf-8'))
     return h.hexdigest()
 
 
