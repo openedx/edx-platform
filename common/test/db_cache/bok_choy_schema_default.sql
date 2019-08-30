@@ -1867,7 +1867,7 @@ DROP TABLE IF EXISTS `courseware_studentmodule`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `courseware_studentmodule` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `module_type` varchar(32) NOT NULL,
   `module_id` varchar(255) NOT NULL,
   `course_id` varchar(255) NOT NULL,
@@ -2378,7 +2378,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=580 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=583 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3015,7 +3015,9 @@ CREATE TABLE `enterprise_enterprisecustomerreportingconfiguration` (
   `data_type` varchar(20) NOT NULL,
   `report_type` varchar(20) NOT NULL,
   `pgp_encryption_key` longtext,
+  `uuid` char(32) NOT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `enterprise_enterprisecus_uuid_9df3c307_uniq` (`uuid`),
   KEY `enterprise_enterprisecustom_enterprise_customer_id_d5b55543` (`enterprise_customer_id`),
   CONSTRAINT `enterprise_enterpris_enterprise_customer__d5b55543_fk_enterpris` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -3071,7 +3073,7 @@ CREATE TABLE `enterprise_enterprisefeaturerole` (
   `description` longtext,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `enterprise_enterprisefeatureuserroleassignment`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
