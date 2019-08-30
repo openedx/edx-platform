@@ -35,6 +35,7 @@ XBLOCKS = [
     "library = xmodule.library_root_xblock:LibraryRoot",
     "problem = xmodule.capa_module:ProblemBlock",
     "static_tab = xmodule.html_module:StaticTabBlock",
+    "unit = xmodule.unit_block:UnitBlock",
     "vertical = xmodule.vertical_block:VerticalBlock",
     "video = xmodule.video_module:VideoBlock",
     "videoalpha = xmodule.video_module:VideoBlock",

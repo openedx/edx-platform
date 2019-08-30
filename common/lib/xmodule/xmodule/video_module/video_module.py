@@ -598,6 +598,25 @@ class VideoBlock(
         return editable_fields
 
     @classmethod
+    def parse_xml_new_runtime(cls, node, runtime, keys):
+        """
+        Implement the video block's special XML parsing requirements for the
+        new runtime only. For all other runtimes, use the existing XModule-style
+        methods like .from_xml().
+        """
+        video_block = runtime.construct_xblock_from_class(cls, keys)
+        field_data = cls.parse_video_xml(node)
+        for key, val in field_data.items():
+            setattr(video_block, key, cls.fields[key].from_json(val))
+        # Update VAL with info extracted from `xml_object`
+        video_block.edx_video_id = video_block.import_video_info_into_val(
+            node,
+            runtime.resources_fs,
+            keys.usage_id.context_key,
+        )
+        return video_block
+
+    @classmethod
     def from_xml(cls, xml_data, system, id_generator):
         """
         Creates an instance of this descriptor from the supplied xml_data.

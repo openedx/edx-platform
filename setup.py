@@ -72,6 +72,7 @@ setup(
             "announcements = openedx.features.announcements.apps:AnnouncementsConfig",
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
             "credentials = openedx.core.djangoapps.credentials.apps:CredentialsConfig",
+            "content_libraries = openedx.core.djangoapps.content_libraries.apps:ContentLibrariesConfig",
             "discussion = lms.djangoapps.discussion.apps:DiscussionConfig",
             "grades = lms.djangoapps.grades.apps:GradesConfig",
             "plugins = openedx.core.djangoapps.plugins.apps:PluginsConfig",
@@ -87,6 +88,7 @@ setup(
         "cms.djangoapp": [
             "announcements = openedx.features.announcements.apps:AnnouncementsConfig",
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
+            "content_libraries = openedx.core.djangoapps.content_libraries.apps:ContentLibrariesConfig",
             # Importing an LMS app into the Studio process is not a good
             # practice. We're ignoring this for Discussions here because its
             # placement in LMS is a historical artifact. The eventual goal is to
@@ -101,6 +103,18 @@ setup(
             "password_policy = openedx.core.djangoapps.password_policy.apps:PasswordPolicyConfig",
             "user_authn = openedx.core.djangoapps.user_authn.apps:UserAuthnConfig",
             "instructor = lms.djangoapps.instructor.apps:InstructorConfig",
+        ],
+        'definition_key': [
+            'bundle-olx = openedx.core.djangoapps.xblock.learning_context.keys:BundleDefinitionLocator',
+        ],
+        'context_key': [
+            'lib = openedx.core.djangoapps.content_libraries.keys:LibraryLocatorV2',
+        ],
+        'usage_key': [
+            'lb = openedx.core.djangoapps.content_libraries.keys:LibraryUsageLocatorV2',
+        ],
+        'openedx.learning_context': [
+            'lib = openedx.core.djangoapps.content_libraries.library_context:LibraryContextImpl',
         ],
     }
 )

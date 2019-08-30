@@ -293,6 +293,20 @@ class HtmlBlock(
                 # add more info and re-raise
                 six.reraise(Exception(msg), None, sys.exc_info()[2])
 
+    @classmethod
+    def parse_xml_new_runtime(cls, node, runtime, keys):
+        """
+        Parse XML in the new blockstore-based runtime. Since it doesn't yet
+        support loading separate .html files, the HTML data is assumed to be in
+        a CDATA child or otherwise just inline in the OLX.
+        """
+        block = runtime.construct_xblock_from_class(cls, keys)
+        block.data = stringify_children(node)
+        # Attributes become fields.
+        for name, value in node.items():
+            cls._set_field_if_present(block, name, value, {})
+        return block
+
     # TODO (vshnayder): make export put things in the right places.
 
     def definition_to_xml(self, resource_fs):

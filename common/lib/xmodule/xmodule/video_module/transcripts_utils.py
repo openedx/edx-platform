@@ -20,6 +20,7 @@ from six import text_type
 from six.moves import range, zip
 from six.moves.html_parser import HTMLParser  # pylint: disable=import-error
 
+from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
@@ -1016,6 +1017,12 @@ def get_transcript(video, lang=None, output_format=Transcript.SRT, youtube_id=No
             raise NotFoundError
         return get_transcript_from_val(edx_video_id, lang, output_format)
     except NotFoundError:
+        # If this is not in a modulestore course or library, don't try loading from contentstore:
+        if not isinstance(video.scope_ids.usage_id.course_key, (CourseLocator, LibraryLocator)):
+            raise NotFoundError(
+                u'Video transcripts cannot yet be loaded from Blockstore (block: {})'.format(video.scope_ids.usage_id),
+            )
+
         return get_transcript_from_contentstore(
             video,
             lang,

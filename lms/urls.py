@@ -270,6 +270,9 @@ urlpatterns += [
         name='xblock_resource_url',
     ),
 
+    # New (Blockstore-based) XBlock REST API
+    url(r'', include('openedx.core.djangoapps.xblock.rest_api.urls', namespace='xblock_api')),
+
     url(
         r'^courses/{}/xqueue/(?P<userid>[^/]*)/(?P<mod_id>.*?)/(?P<dispatch>[^/]*)$'.format(
             settings.COURSE_ID_PATTERN,
