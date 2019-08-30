@@ -8,7 +8,6 @@ import datetime
 import logging
 import uuid
 
-import pkg_resources
 import pytz
 import six
 from django.conf import settings
