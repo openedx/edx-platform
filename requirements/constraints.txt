@@ -82,3 +82,5 @@ numpy<1.17.0
 #  jsondiff==1.2.0 (from -r requirements/edx/base.txt (line 146))
 jsondiff==1.1.1
 
+# Temoporary constraint while correcting error in edx-enterprise
+edx-enterprise==1.9.6
