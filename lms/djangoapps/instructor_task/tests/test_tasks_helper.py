@@ -1367,7 +1367,7 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
         report_html_filename = report_store.links_for(self.course.id)[0][0]
         report_path = report_store.path_to(self.course.id, report_html_filename)
         with report_store.storage.open(report_path) as html_file:
-            html_file_data = html_file.read()
+            html_file_data = html_file.read().decode('utf-8')
             for data in expected_data:
                 self.assertIn(data, html_file_data)
 

@@ -321,5 +321,5 @@ class DjangoStorageReportStore(ReportStore):
         """
         Return the full path to a given file for a given course.
         """
-        hashed_course_id = hashlib.sha1(text_type(course_id)).hexdigest()
+        hashed_course_id = hashlib.sha1(text_type(course_id).encode('utf-8')).hexdigest()
         return os.path.join(hashed_course_id, filename)
