@@ -1045,10 +1045,10 @@ def settings_handler(request, course_key_string):
 
             # see if the ORG of this course can be attributed to a defined configuration . In that case, the
             # course about page should be editable in Studio
-            marketing_site_enabled = configuration_helpers.get_value_for_org(
+            publisher_enabled = configuration_helpers.get_value_for_org(
                 course_module.location.org,
-                'ENABLE_MKTG_SITE',
-                settings.FEATURES.get('ENABLE_MKTG_SITE', False)
+                'ENABLE_PUBLISHER',
+                settings.FEATURES.get('ENABLE_PUBLISHER', False)
             )
             enable_extended_course_details = configuration_helpers.get_value_for_org(
                 course_module.location.org,
@@ -1056,8 +1056,8 @@ def settings_handler(request, course_key_string):
                 settings.FEATURES.get('ENABLE_EXTENDED_COURSE_DETAILS', False)
             )
 
-            about_page_editable = not marketing_site_enabled
-            enrollment_end_editable = GlobalStaff().has_user(request.user) or not marketing_site_enabled
+            about_page_editable = not publisher_enabled
+            enrollment_end_editable = GlobalStaff().has_user(request.user) or not publisher_enabled
             short_description_editable = configuration_helpers.get_value_for_org(
                 course_module.location.org,
                 'EDITABLE_SHORT_DESCRIPTION',

@@ -292,6 +292,9 @@ FEATURES = {
     # Let students save and manage their annotations
     'ENABLE_EDXNOTES': False,
 
+    # Toggle to enable coordination with the Publisher tool (keep in sync with cms/envs/common.py)
+    'ENABLE_PUBLISHER': False,
+
     # Milestones application flag
     'MILESTONES_APP': False,
 
