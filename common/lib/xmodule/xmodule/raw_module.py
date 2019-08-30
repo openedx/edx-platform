@@ -60,6 +60,28 @@ class RawMixin(object):
             )
             raise SerializationError(self.location, msg)
 
+    @classmethod
+    def parse_xml_new_runtime(cls, node, runtime, keys):
+        """
+        Interpret the parsed XML in `node`, creating a new instance of this
+        module.
+        """
+        # In the new/blockstore-based runtime, XModule parsing (from
+        # XmlMixin) is disabled, so definition_from_xml will not be
+        # called, and instead the "normal" XBlock parse_xml will be used.
+        # However, it's not compatible with RawMixin, so we implement
+        # support here.
+        data_field_value = cls.definition_from_xml(node, None)[0]["data"]
+        for child in node.getchildren():
+            node.remove(child)
+        # Get attributes, if any, via normal parse_xml.
+        try:
+            block = super(RawMixin, cls).parse_xml_new_runtime(node, runtime, keys)
+        except AttributeError:
+            block = super(RawMixin, cls).parse_xml(node, runtime, keys, id_generator=None)
+        block.data = data_field_value
+        return block
+
 
 class RawDescriptor(RawMixin, XmlDescriptor, XMLEditingDescriptor):
     """

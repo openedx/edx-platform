@@ -2285,6 +2285,9 @@ INSTALLED_APPS = [
     'bulk_email',
     'branding',
 
+    # New (Blockstore-based) XBlock runtime
+    'openedx.core.djangoapps.xblock.apps.LmsXBlockAppConfig',
+
     # Student support tools
     'support',
 

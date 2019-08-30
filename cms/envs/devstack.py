@@ -181,6 +181,9 @@ IDA_LOGOUT_URI_LIST = [
     'http://localhost:18150/logout/',  # credentials
 ]
 
+############################### BLOCKSTORE #####################################
+BLOCKSTORE_API_URL = "http://edx.devstack.blockstore:18250/api/v1/"
+
 #####################################################################
 
 # pylint: disable=wrong-import-order, wrong-import-position

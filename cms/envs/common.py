@@ -1201,6 +1201,9 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
     'xblock_config.apps.XBlockConfig',
 
+    # New (Blockstore-based) XBlock runtime
+    'openedx.core.djangoapps.xblock.apps.StudioXBlockAppConfig',
+
     # Maintenance tools
     'maintenance',
     'openedx.core.djangoapps.util.apps.UtilConfig',
@@ -1683,6 +1686,13 @@ DATABASE_ROUTERS = [
 ############################ Cache Configuration ###############################
 
 CACHES = {
+    'blockstore': {
+        'KEY_PREFIX': 'blockstore',
+        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'LOCATION': ['localhost:11211'],
+        'TIMEOUT': '86400',  # This data should be long-lived for performance, BundleCache handles invalidation
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+    },
     'course_structure_cache': {
         'KEY_PREFIX': 'course_structure',
         'KEY_FUNCTION': 'util.memcache.safe_key',
