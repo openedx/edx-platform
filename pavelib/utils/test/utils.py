@@ -23,7 +23,7 @@ MINIMUM_FIREFOX_VERSION = 28.0
 
 COVERAGE_CACHE_BUCKET = "edx-tools-coverage-caches"
 COVERAGE_CACHE_BASEPATH = "test_root/who_tests_what"
-COVERAGE_CACHE_BASELINE = "who_tests_what.{}.baseline".format(os.environ.get('TEST_SUITE', 'all'))
+COVERAGE_CACHE_BASELINE = "who_tests_what.{}.baseline".format(os.environ.get('WTW_CONTEXT', 'all'))
 WHO_TESTS_WHAT_DIFF = "who_tests_what.diff"
 
 
