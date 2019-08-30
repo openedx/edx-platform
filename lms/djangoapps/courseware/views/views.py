@@ -281,9 +281,15 @@ def yt_video_metadata(request):
         yt_api_key = settings.YOUTUBE_API_KEY
         yt_metadata_url = settings.YOUTUBE['METADATA_URL']
         yt_timeout = settings.YOUTUBE.get('TEST_TIMEOUT', 1500) / 1000  # converting milli seconds to seconds
+
+        headers = {}
+        http_referer = request.META.get('HTTP_REFERER')
+        if http_referer:
+            headers['Referer'] = http_referer
+
         payload = {'id': video_id, 'part': 'contentDetails', 'key': yt_api_key}
         try:
-            res = requests.get(yt_metadata_url, params=payload, timeout=yt_timeout)
+            res = requests.get(yt_metadata_url, params=payload, timeout=yt_timeout, headers=headers)
             status_code = res.status_code
             if res.status_code == 200:
                 try:
