@@ -383,9 +383,9 @@ class TestReportMixin(object):
         to four decimal places.
         """
         extracted = {}
-        for key, value in dictionary.items():
+        for key in list(dictionary):
             try:
-                float(value)
+                float(dictionary[key])
                 extracted[key] = round(float(dictionary.pop(key)), 4)
             except ValueError:
                 pass

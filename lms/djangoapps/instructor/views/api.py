@@ -519,7 +519,6 @@ def generate_random_string(length):
         char for char in string.ascii_uppercase + string.digits + string.ascii_lowercase
         if char not in 'aAeEiIoOuU1l'
     ]
-
     return ''.join((random.choice(chars) for i in range(length)))
 
 
