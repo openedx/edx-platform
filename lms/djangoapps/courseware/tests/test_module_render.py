@@ -333,7 +333,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         response = self.client.post(dispatch_url, {'position': 2})
 
         # https://openedx.atlassian.net/browse/LEARNER-7131
-        self.assertEquals('Unauthenticated', response.content)
+        self.assertEquals('Unauthenticated', response.content.decode('utf-8'))
         self.assertEquals(403, response.status_code)
 
     def test_session_authentication(self):
