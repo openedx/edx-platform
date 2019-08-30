@@ -1546,7 +1546,7 @@ class TestSubmitPhotosForVerification(TestCase):
             'photo_id_image': self.IMAGE_DATA
         }
         response = self._submit_photos(expected_status_code=400, **params)
-        self.assertEqual(response.content, "Missing required parameter face_image")
+        self.assertEqual(response.content.decode('utf-8'), "Missing required parameter face_image")
 
     def test_no_photo_id_and_no_initial_verification(self):
         # Submit face image data, but not photo ID data.
