@@ -3,7 +3,7 @@
 Only include view classes here. See the tests/test_permissions.py:get_api_classes()
 method.
 """
-
+from distutils.util import strtoobool
 from functools import partial
 import logging
 import random
@@ -171,14 +171,21 @@ class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):
 
         # set the honor_code and honor_code like checked,
         # so we can use the already defined methods for creating an user
-        data['honor_code'] = "True"
-        data['terms_of_service'] = "True"
+        data['honor_code'] = True
+        data['terms_of_service'] = True
 
         if password_provided:
-            if 'send_activation_email' in data and data['send_activation_email'] == "False":
-                data['send_activation_email'] = False
-            else:
-                data['send_activation_email'] = True
+            try:
+                # Default behavior is True - send the email
+                data['send_activation_email'] = strtobool(
+                    str(data.get('send_activation_email', True)))
+            except ValueError:
+                errors = {
+                    'user_message': '{0} is not a valid value for "send_activation_email"'.format(
+                        data['send_activation_email'])
+                }
+                return Response(errors, status=400)
+
         else:
             data['password'] = create_password()
             data['send_activation_email'] = False
