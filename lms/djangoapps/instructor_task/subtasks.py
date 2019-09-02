@@ -1,6 +1,8 @@
 """
 This module contains celery task functions for handling the management of subtasks.
 """
+from __future__ import absolute_import
+
 import json
 import logging
 from contextlib import contextmanager
@@ -9,9 +11,11 @@ from time import time
 from uuid import uuid4
 
 import psutil
+import six
 from celery.states import READY_STATES, RETRY, SUCCESS
 from django.core.cache import cache
 from django.db import DatabaseError, transaction
+from six.moves import range, zip
 
 from util.db import outer_atomic
 
@@ -203,7 +207,7 @@ class SubtaskStatus(object):
 
     def __unicode__(self):
         """Return unicode version of a SubtaskStatus object representation."""
-        return unicode(repr(self))
+        return six.text_type(repr(self))
 
 
 def initialize_subtask_info(entry, action_name, total_num, subtask_id_list):

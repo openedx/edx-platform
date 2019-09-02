@@ -5,51 +5,73 @@ ProgramEnrollment Views
 from __future__ import absolute_import, unicode_literals
 
 import logging
-from collections import Counter, OrderedDict
-from datetime import datetime, timedelta
 from functools import wraps
-from pytz import UTC
 
-from django.http import Http404
+from ccx_keys.locator import CCXLocator
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.urls import reverse
+from django.core.management import call_command
+from django.db import transaction
+from django.http import Http404
+from django.utils.functional import cached_property
 from edx_rest_framework_extensions import permissions
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys.edx.keys import CourseKey
+from organizations.models import Organization
 from rest_framework import status
-from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError
-from rest_framework.pagination import CursorPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from six import text_type
 
-from six import iteritems
-
-from bulk_email.api import is_bulk_email_feature_enabled, is_user_opted_out_for_course
-from edx_when.api import get_dates_for_course
+from course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import get_certificate_for_user
+from lms.djangoapps.grades.api import CourseGradeFactory, clear_prefetched_course_grades, prefetch_course_grades
+from lms.djangoapps.grades.rest_api.v1.utils import CourseEnrollmentPagination
+from lms.djangoapps.program_enrollments.api.api import (
+    get_course_run_status,
+    get_course_run_url,
+    get_due_dates,
+    get_emails_enabled
+)
 from lms.djangoapps.program_enrollments.api.v1.constants import (
-    CourseEnrollmentResponseStatuses,
-    CourseRunProgressStatuses,
+    ENABLE_ENROLLMENT_RESET_FLAG,
     MAX_ENROLLMENT_RECORDS,
-    REQUEST_STUDENT_KEY,
+    CourseEnrollmentResponseStatuses,
+    ProgramEnrollmentResponseStatuses,
 )
 from lms.djangoapps.program_enrollments.api.v1.serializers import (
     CourseRunOverviewListSerializer,
     ProgramCourseEnrollmentListSerializer,
     ProgramCourseEnrollmentRequestSerializer,
+    ProgramCourseGradeErrorResult,
+    ProgramCourseGradeResult,
+    ProgramCourseGradeResultSerializer,
+    ProgramEnrollmentCreateRequestSerializer,
     ProgramEnrollmentListSerializer,
-    ProgramEnrollmentSerializer,
+    ProgramEnrollmentModifyRequestSerializer
 )
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
-from lms.djangoapps.program_enrollments.utils import get_user_by_program_id, ProviderDoesNotExistException
-from student.helpers import get_resume_urls_for_enrollments
-from xmodule.modulestore.django import modulestore
-from openedx.core.djangoapps.catalog.utils import get_programs
+from lms.djangoapps.program_enrollments.utils import (
+    ProviderDoesNotExistException,
+    get_provider_slug,
+    get_user_by_program_id
+)
+from openedx.core.djangoapps.catalog.utils import (
+    course_run_keys_for_program,
+    get_programs,
+    get_programs_by_type,
+    get_programs_for_organization,
+    normalize_program_type
+)
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, PaginatedAPIView, verify_course_exists
+from student.helpers import get_resume_urls_for_enrollments
+from student.models import CourseEnrollment
+from student.roles import CourseInstructorRole, CourseStaffRole, UserBasedRole
 from util.query import use_read_replica_if_available
 
 logger = logging.getLogger(__name__)
@@ -123,25 +145,11 @@ def verify_course_exists_and_in_program(view_func):
     return wrapped_function
 
 
-class ProgramEnrollmentPagination(CursorPagination):
+class ProgramEnrollmentPagination(CourseEnrollmentPagination):
     """
-    Pagination class for Program Enrollments.
+    Pagination class for views in the Program Enrollments app.
     """
-    ordering = 'id'
     page_size = 100
-    page_size_query_param = 'page_size'
-
-    def get_page_size(self, request):
-        """
-        Get the page size based on the defined page size parameter if defined.
-        """
-        try:
-            page_size_string = request.query_params[self.page_size_query_param]
-            return int(page_size_string)
-        except (KeyError, ValueError):
-            pass
-
-        return self.page_size
 
 
 class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
@@ -345,150 +353,162 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
         """
         Create program enrollments for a list of learners
         """
-        if len(request.data) > MAX_ENROLLMENT_RECORDS:
-            return Response(
-                status=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-                content_type='application/json',
-            )
-
-        program_uuid = kwargs['program_uuid']
-        student_data = self._request_data_by_student_key(request, program_uuid)
-        if None in student_data:
-            return Response(
-                'invalid enrollment record',
-                status.HTTP_422_UNPROCESSABLE_ENTITY
-            )
-
-        response_data = {}
-        response_data.update(self._remove_duplicate_entries(request, student_data))
-        response_data.update(self._remove_existing_entries(program_uuid, student_data))
-
-        enrollments_to_create = {}
-
-        for student_key, data in student_data.items():
-            curriculum_uuid = data['curriculum_uuid']
-
-            try:
-                existing_user = get_user_by_program_id(student_key, program_uuid)
-                if existing_user:
-                    data['user'] = existing_user.id
-            except ProviderDoesNotExistException:
-                pass  # IDP has not yet been set up, just create waiting enrollments
-
-            serializer = ProgramEnrollmentSerializer(data=data)
-            if serializer.is_valid():
-                enrollments_to_create[(student_key, curriculum_uuid)] = serializer
-                response_data[student_key] = data.get('status')
-            else:
-                if 'status' in serializer.errors and serializer.errors['status'][0].code == 'invalid_choice':
-                    response_data[student_key] = CourseEnrollmentResponseStatuses.INVALID_STATUS
-                else:
-                    return Response(
-                        'invalid enrollment record',
-                        status.HTTP_422_UNPROCESSABLE_ENTITY
-                    )
-
-        # TODO: make this a bulk save - https://openedx.atlassian.net/browse/EDUCATOR-4305
-        for (student_key, _), enrollment_serializer in enrollments_to_create.items():
-            enrollment_serializer.save()
-
-        return self._get_created_or_updated_response(request, enrollments_to_create, response_data)
+        return self.create_or_modify_enrollments(
+            request,
+            kwargs['program_uuid'],
+            ProgramEnrollmentCreateRequestSerializer,
+            self.create_program_enrollment,
+            status.HTTP_201_CREATED,
+        )
 
     @verify_program_exists
     def patch(self, request, **kwargs):
         """
-        Modify the program enrollments for a list of learners
+        Modify program enrollments for a list of learners
         """
-        if len(request.data) > MAX_ENROLLMENT_RECORDS:
-            return Response(
-                status=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-                content_type='application/json',
-            )
-
-        program_uuid = kwargs['program_uuid']
-        student_data = self._request_data_by_student_key(request, program_uuid)
-        if None in student_data:
-            return Response(
-                'invalid enrollment record',
-                status.HTTP_422_UNPROCESSABLE_ENTITY
-            )
-
-        response_data = {}
-        response_data.update(self._remove_duplicate_entries(request, student_data))
-
-        existing_enrollments = {
-            enrollment.external_user_key: enrollment
-            for enrollment in
-            ProgramEnrollment.bulk_read_by_student_key(program_uuid, student_data)
-        }
-
-        enrollments_to_create = {}
-
-        for external_user_key in student_data.keys():
-            if external_user_key not in existing_enrollments:
-                student_data.pop(external_user_key)
-                response_data[external_user_key] = CourseEnrollmentResponseStatuses.NOT_IN_PROGRAM
-
-        for external_user_key, enrollment in existing_enrollments.items():
-            student = {key: value for key, value in student_data[external_user_key].items() if key == 'status'}
-            enrollment_serializer = ProgramEnrollmentSerializer(enrollment, data=student, partial=True)
-            if enrollment_serializer.is_valid():
-                enrollments_to_create[(external_user_key, enrollment.curriculum_uuid)] = enrollment_serializer
-                enrollment_serializer.save()
-                response_data[external_user_key] = student['status']
-            else:
-                serializer_is_invalid = enrollment_serializer.errors['status'][0].code == 'invalid_choice'
-                if 'status' in enrollment_serializer.errors and serializer_is_invalid:
-                    response_data[external_user_key] = CourseEnrollmentResponseStatuses.INVALID_STATUS
-
-        return self._get_created_or_updated_response(request, enrollments_to_create, response_data, status.HTTP_200_OK)
-
-    def _remove_duplicate_entries(self, request, student_data):
-        """ Helper method to remove duplicate entries (based on student key) from request data. """
-        result = {}
-        key_counter = Counter([enrollment.get(REQUEST_STUDENT_KEY) for enrollment in request.data])
-        for student_key, count in key_counter.items():
-            if count > 1:
-                result[student_key] = CourseEnrollmentResponseStatuses.DUPLICATED
-                student_data.pop(student_key)
-        return result
-
-    def _request_data_by_student_key(self, request, program_uuid):
-        """
-        Helper method that returns an OrderedDict of rows from request.data,
-        keyed by the `external_user_key`.
-        """
-        return OrderedDict((
-            row.get(REQUEST_STUDENT_KEY),
-            {
-                'program_uuid': program_uuid,
-                'curriculum_uuid': row.get('curriculum_uuid'),
-                'status': row.get('status'),
-                'external_user_key': row.get(REQUEST_STUDENT_KEY),
-            })
-            for row in request.data
+        return self.create_or_modify_enrollments(
+            request,
+            kwargs['program_uuid'],
+            ProgramEnrollmentModifyRequestSerializer,
+            self.modify_program_enrollment,
+            status.HTTP_200_OK,
         )
 
-    def _remove_existing_entries(self, program_uuid, student_data):
-        """ Helper method to remove entries that have existing ProgramEnrollment records. """
-        result = {}
-        existing_enrollments = ProgramEnrollment.bulk_read_by_student_key(program_uuid, student_data)
-        for enrollment in existing_enrollments:
-            result[enrollment.external_user_key] = CourseEnrollmentResponseStatuses.CONFLICT
-            student_data.pop(enrollment.external_user_key)
-        return result
+    @verify_program_exists
+    def put(self, request, **kwargs):
+        """
+        Create/modify program enrollments for a list of learners
+        """
+        return self.create_or_modify_enrollments(
+            request,
+            kwargs['program_uuid'],
+            ProgramEnrollmentCreateRequestSerializer,
+            self.create_or_modify_program_enrollment,
+            status.HTTP_200_OK,
+        )
 
-    def _get_created_or_updated_response(
-            self, request, created_or_updated_data, response_data, default_status=status.HTTP_201_CREATED
-    ):
+    def validate_enrollment_request(self, enrollment, seen_student_keys, serializer_class):
+        """
+        Validates the given enrollment record and checks that it isn't a duplicate
+        """
+        student_key = enrollment['student_key']
+        if student_key in seen_student_keys:
+            return CourseEnrollmentResponseStatuses.DUPLICATED
+        seen_student_keys.add(student_key)
+        enrollment_serializer = serializer_class(data=enrollment)
+        try:
+            enrollment_serializer.is_valid(raise_exception=True)
+        except ValidationError as e:
+            if enrollment_serializer.has_invalid_status():
+                return CourseEnrollmentResponseStatuses.INVALID_STATUS
+            else:
+                raise e
+
+    def create_or_modify_enrollments(self, request, program_uuid, serializer_class, operation, success_status):
+        """
+        Process a list of program course enrollment request objects
+        and create or modify enrollments based on method
+        """
+        results = {}
+        seen_student_keys = set()
+        enrollments = []
+
+        if not isinstance(request.data, list):
+            return Response('invalid enrollment record', status.HTTP_422_UNPROCESSABLE_ENTITY)
+        if len(request.data) > MAX_ENROLLMENT_RECORDS:
+            return Response(
+                'enrollment limit {}'.format(MAX_ENROLLMENT_RECORDS),
+                status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
+            )
+
+        try:
+            for enrollment_request in request.data:
+                error_status = self.validate_enrollment_request(enrollment_request, seen_student_keys, serializer_class)
+                if error_status:
+                    results[enrollment_request["student_key"]] = error_status
+                else:
+                    enrollments.append(enrollment_request)
+        except KeyError:  # student_key is not in enrollment_request
+            return Response('invalid enrollment record', status.HTTP_422_UNPROCESSABLE_ENTITY)
+        except TypeError:  # enrollment_request isn't a dict
+            return Response('invalid enrollment record', status.HTTP_422_UNPROCESSABLE_ENTITY)
+        except ValidationError:  # there was some other error raised by the serializer
+            return Response('invalid enrollment record', status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+        program_enrollments = self.get_existing_program_enrollments(program_uuid, enrollments)
+        for enrollment in enrollments:
+            student_key = enrollment["student_key"]
+            if student_key in results and results[student_key] == ProgramEnrollmentResponseStatuses.DUPLICATED:
+                continue
+            try:
+                program_enrollment = program_enrollments[student_key]
+            except KeyError:
+                program_enrollment = None
+            results[student_key] = operation(enrollment, program_uuid, program_enrollment)
+
+        return self._get_created_or_updated_response(results, success_status)
+
+    def create_program_enrollment(self, request_data, program_uuid, program_enrollment):
+        """
+        Create new ProgramEnrollment, unless the learner is already enrolled in the program
+        """
+        if program_enrollment:
+            return ProgramEnrollmentResponseStatuses.CONFLICT
+
+        student_key = request_data.get('student_key')
+        try:
+            user = get_user_by_program_id(student_key, program_uuid)
+        except ProviderDoesNotExistException:
+            # IDP has not yet been set up, just create waiting enrollments
+            user = None
+
+        enrollment = ProgramEnrollment.objects.create(
+            user=user,
+            external_user_key=student_key,
+            program_uuid=program_uuid,
+            curriculum_uuid=request_data.get('curriculum_uuid'),
+            status=request_data.get('status')
+        )
+        return enrollment.status
+
+    # pylint: disable=unused-argument
+    def modify_program_enrollment(self, request_data, program_uuid, program_enrollment):
+        """
+        Change the status of an existing program enrollment
+        """
+        if not program_enrollment:
+            return ProgramEnrollmentResponseStatuses.NOT_IN_PROGRAM
+
+        program_enrollment.status = request_data.get('status')
+        program_enrollment.save()
+        return program_enrollment.status
+
+    def create_or_modify_program_enrollment(self, request_data, program_uuid, program_enrollment):
+        if program_enrollment:
+            return self.modify_program_enrollment(request_data, program_uuid, program_enrollment)
+        else:
+            return self.create_program_enrollment(request_data, program_uuid, program_enrollment)
+
+    def get_existing_program_enrollments(self, program_uuid, student_data):
+        """ Returns the existing program enrollments for the given students and program """
+        student_keys = [data['student_key'] for data in student_data]
+        return {
+            e.external_user_key: e
+            for e in ProgramEnrollment.bulk_read_by_student_key(program_uuid, student_keys)
+        }
+
+    def _get_created_or_updated_response(self, response_data, default_status=status.HTTP_201_CREATED):
         """
         Helper method to determine an appropirate HTTP response status code.
         """
         response_status = default_status
-
-        if not created_or_updated_data:
+        good_count = len([
+            v for v in response_data.values()
+            if v not in CourseEnrollmentResponseStatuses.ERROR_STATUSES
+        ])
+        if not good_count:
             response_status = status.HTTP_422_UNPROCESSABLE_ENTITY
-        elif len(request.data) != len(created_or_updated_data):
+        elif good_count != len(response_data):
             response_status = status.HTTP_207_MULTI_STATUS
 
         return Response(
@@ -498,18 +518,29 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
         )
 
 
-class LearnerProgramEnrollmentsView(DeveloperErrorViewMixin, APIView):
+class UserProgramReadOnlyAccessView(DeveloperErrorViewMixin, PaginatedAPIView):
     """
-    A view for checking the currently logged-in learner's program enrollments
+    A view for checking the currently logged-in user's program read only access
+    There are three major categories of users this API is differentiating. See the table below.
+
+    --------------------------------------------------------------------------------------------
+    | User Type        | API Returns                                                           |
+    --------------------------------------------------------------------------------------------
+    | edX staff        | All programs                                                          |
+    --------------------------------------------------------------------------------------------
+    | course staff     | All programs containing the courses of which the user is course staff |
+    --------------------------------------------------------------------------------------------
+    | learner          | All programs the learner is enrolled in                               |
+    --------------------------------------------------------------------------------------------
 
     Path: `/api/program_enrollments/v1/programs/enrollments/`
 
     Returns:
-      * 200: OK - Contains a list of all programs in which the learner is enrolled.
+      * 200: OK - Contains a list of all programs in which the user has read only acccess to.
       * 401: The requesting user is not authenticated.
 
     The list will be a list of objects with the following keys:
-      * `uuid` - the identifier of the program in which the learner is enrolled.
+      * `uuid` - the identifier of the program in which the user has read only access to.
       * `slug` - the string from which a link to the corresponding program page can be constructed.
 
     Example:
@@ -531,23 +562,79 @@ class LearnerProgramEnrollmentsView(DeveloperErrorViewMixin, APIView):
     )
     permission_classes = (IsAuthenticated,)
 
+    DEFAULT_PROGRAM_TYPE = 'masters'
+
     def get(self, request):
         """
         How to respond to a GET request to this endpoint
         """
-        program_enrollments = ProgramEnrollment.objects.filter(
-            user=request.user,
-            status__in=('enrolled', 'pending')
-        )
 
-        uuids = [enrollment.program_uuid for enrollment in program_enrollments]
+        request_user = request.user
 
-        catalog_data_of_programs = get_programs(uuids=uuids) or []
-        programs_in_which_learner_is_enrolled = [{'uuid': program['uuid'], 'slug': program['marketing_slug']}
-                                                 for program
-                                                 in catalog_data_of_programs]
+        programs = []
+        requested_program_type = normalize_program_type(request.GET.get('type', self.DEFAULT_PROGRAM_TYPE))
 
-        return Response(programs_in_which_learner_is_enrolled, status.HTTP_200_OK)
+        if request_user.is_staff:
+            programs = get_programs_by_type(request.site, requested_program_type)
+        elif self.is_course_staff(request_user):
+            programs = self.get_programs_user_is_course_staff_for(request_user, requested_program_type)
+        else:
+            program_enrollments = ProgramEnrollment.objects.filter(
+                user=request.user,
+                status__in=('enrolled', 'pending')
+            )
+
+            uuids = [enrollment.program_uuid for enrollment in program_enrollments]
+
+            programs = get_programs(uuids=uuids) or []
+
+        programs_in_which_user_has_access = [
+            {'uuid': program['uuid'], 'slug': program['marketing_slug']}
+            for program in programs
+        ]
+
+        return Response(programs_in_which_user_has_access, status.HTTP_200_OK)
+
+    def is_course_staff(self, user):
+        """
+        Returns true if the user is a course_staff member of any course within a program
+        """
+        staff_course_keys = self.get_course_keys_user_is_staff_for(user)
+        return len(staff_course_keys)
+
+    def get_course_keys_user_is_staff_for(self, user):
+        """
+        Return all the course keys the user is course instructor or course staff role for
+        """
+        # Get all the courses of which the user is course staff for. If None, return false
+        def filter_ccx(course_access):
+            """ CCXs cannot be edited in Studio and should not be filtered """
+            return not isinstance(course_access.course_id, CCXLocator)
+
+        instructor_courses = UserBasedRole(user, CourseInstructorRole.ROLE).courses_with_role()
+        staff_courses = UserBasedRole(user, CourseStaffRole.ROLE).courses_with_role()
+        all_courses = list(filter(filter_ccx, instructor_courses | staff_courses))
+        course_keys = {}
+        for course_access in all_courses:
+            if course_access.course_id is not None:
+                course_keys[course_access.course_id] = course_access.course_id
+
+        return list(course_keys.values())
+
+    def get_programs_user_is_course_staff_for(self, user, program_type_filter):
+        """
+        Return a list of programs the user is course staff for.
+        This function would take a list of course runs the user is staff of, and then
+        try to get the Masters program associated with each course_runs.
+        """
+        program_list = []
+        for course_key in self.get_course_keys_user_is_staff_for(user):
+            course_run_programs = get_programs(course=course_key)
+            for course_run_program in course_run_programs:
+                if course_run_program and course_run_program.get('type').lower() == program_type_filter:
+                    program_list.append(course_run_program)
+
+        return program_list
 
 
 class ProgramSpecificViewMixin(object):
@@ -555,7 +642,7 @@ class ProgramSpecificViewMixin(object):
     A mixin for views that operate on or within a specific program.
     """
 
-    @property
+    @cached_property
     def program(self):
         """
         The program specified by the `program_uuid` URL parameter.
@@ -588,13 +675,13 @@ class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpec
 
     Path: ``/api/program_enrollments/v1/programs/{program_uuid}/courses/{course_id}/enrollments/``
 
-    Accepts: [GET, POST]
+    Accepts: [GET, POST, PATCH, PUT]
 
     For GET requests, the path can contain an optional `page_size?=N` query parameter.
     The default page size is 100.
 
     ------------------------------------------------------------------------------------
-    POST
+    POST, PATCH, PUT
     ------------------------------------------------------------------------------------
 
     **Returns**
@@ -702,6 +789,19 @@ class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpec
             self.modify_learner_enrollment_status
         )
 
+    @verify_program_exists
+    @verify_course_exists_and_in_program
+    # pylint: disable=unused-argument
+    def put(self, request, program_uuid=None, course_id=None):
+        """
+        Create or Update the program course enrollments of a list of learners
+        """
+        return self.create_or_modify_enrollments(
+            request,
+            program_uuid,
+            self.create_or_update_learner_enrollment
+        )
+
     def create_or_modify_enrollments(self, request, program_uuid, operation):
         """
         Process a list of program course enrollment request objects
@@ -712,7 +812,7 @@ class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpec
         enrollments = []
 
         if not isinstance(request.data, list):
-            return Response('invalid enrollment record', status.HTTP_422_UNPROCESSABLE_ENTITY)
+            return Response('invalid enrollment record', status.HTTP_400_BAD_REQUEST)
         if len(request.data) > MAX_ENROLLMENT_RECORDS:
             return Response(
                 'enrollment limit 25', status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
@@ -726,11 +826,11 @@ class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpec
                 else:
                     enrollments.append(enrollment_request)
         except KeyError:  # student_key is not in enrollment_request
-            return Response('invalid enrollment record', status.HTTP_422_UNPROCESSABLE_ENTITY)
+            return Response('invalid enrollment record', status.HTTP_400_BAD_REQUEST)
         except TypeError:  # enrollment_request isn't a dict
-            return Response('invalid enrollment record', status.HTTP_422_UNPROCESSABLE_ENTITY)
+            return Response('invalid enrollment record', status.HTTP_400_BAD_REQUEST)
         except ValidationError:  # there was some other error raised by the serializer
-            return Response('invalid enrollment record', status.HTTP_422_UNPROCESSABLE_ENTITY)
+            return Response('invalid enrollment record', status.HTTP_400_BAD_REQUEST)
 
         program_enrollments = self.get_existing_program_enrollments(program_uuid, enrollments)
         for enrollment in enrollments:
@@ -812,6 +912,22 @@ class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpec
             return CourseEnrollmentResponseStatuses.NOT_FOUND
         return program_course_enrollment.change_status(enrollment_request['status'])
 
+    def create_or_update_learner_enrollment(self, enrollment_request, program_enrollment, program_course_enrollment):
+        """
+        Attempts to create or update the specified user's enrollment in the given course
+        in the given program
+        """
+        if program_course_enrollment is None:
+            # create the course enrollment
+            return ProgramCourseEnrollment.create_program_course_enrollment(
+                program_enrollment,
+                self.course_key,
+                enrollment_request['status']
+            )
+        else:
+            # Update course enrollment
+            return program_course_enrollment.change_status(enrollment_request['status'])
+
 
 class ProgramCourseEnrollmentOverviewView(DeveloperErrorViewMixin, ProgramSpecificViewMixin, APIView):
     """
@@ -840,12 +956,13 @@ class ProgramCourseEnrollmentOverviewView(DeveloperErrorViewMixin, ProgramSpecif
         program course enrollment overview, where each overview contains the following keys:
             * course_run_id: the id for the course run
             * display_name: display name of the course run
-            * resume_course_run_url: the url that takes the user back to their position in the course run;
+            * resume_course_run_url: the absolute url that takes the user back to
+                their position in the course run;
                 if absent, user has not made progress in the course
-            * course_run_url: the url for the course run
+            * course_run_url: the absolute url for the course run
             * start_date: the start date for the course run; null if no start date
             * end_date: the end date for the course run' null if no end date
-            * course_status: the status of the course; one of "in-progress", "upcoming", and "completed"
+            * course_run_status: the status of the course; one of "in_progress", "upcoming", and "completed"
             * emails_enabled: boolean representing whether emails are enabled for the course;
                 if absent, the bulk email feature is either not enable at the platform level or is not enabled for the course;
                 if True or False, bulk email feature is enabled, and value represents whether or not user wants to receive emails
@@ -868,7 +985,7 @@ class ProgramCourseEnrollmentOverviewView(DeveloperErrorViewMixin, ProgramSpecif
                     "course_run_url": "https://courses.edx.org/courses/course-v1:edX+AnimalsX+Aardvarks/course/",
                     "start_date": "2017-02-05T05:00:00Z",
                     "end_date": "2018-02-05T05:00:00Z",
-                    "course_status": "completed"
+                    "course_run_status": "completed"
                     "emails_enabled": true,
                     "due_dates": [
                         {
@@ -891,7 +1008,7 @@ class ProgramCourseEnrollmentOverviewView(DeveloperErrorViewMixin, ProgramSpecif
                     "course_run_url": "https://courses.edx.org/courses/course-v1:edX+AnimalsX+Baboons/course/",
                     "start_date": "2018-02-05T05:00:00Z",
                     "end_date": null,
-                    "course_status": "in-progress"
+                    "course_run_status": "in_progress"
                     "emails_enabled": false,
                     "due_dates": [],
                     "micromasters_title": "Animals",
@@ -915,198 +1032,315 @@ class ProgramCourseEnrollmentOverviewView(DeveloperErrorViewMixin, ProgramSpecif
         for a user as part of a program.
         """
         user = request.user
+        self._check_program_enrollment_exists(user, program_uuid)
 
-        user_program_enrollment = ProgramEnrollment.objects.filter(
-            program_uuid=program_uuid,
+        program = get_programs(uuid=program_uuid)
+        course_run_keys = [CourseKey.from_string(key) for key in course_run_keys_for_program(program)]
+
+        course_enrollments = CourseEnrollment.objects.filter(
             user=user,
-            status='enrolled',
-        ).order_by(
-            '-modified',
+            course_id__in=course_run_keys,
+            mode__in=[CourseMode.VERIFIED, CourseMode.MASTERS],
+            is_active=True,
         )
 
-        user_program_enrollment_count = user_program_enrollment.count()
+        overviews = CourseOverview.get_from_ids_if_exists(course_run_keys)
 
-        if user_program_enrollment_count > 1:
-            # in the unusual and unlikely case of a user having two
-            # active program enrollments for the same program,
-            # choose the most recently modified enrollment and log
-            # a warning
-            user_program_enrollment = user_program_enrollment[0]
-            logger.warning(
-                ('User with user_id {} has more than program enrollment'
-                 'with an enrolled status for program uuid {}.').format(
-                    user.id,
-                    program_uuid,
-                )
-            )
-        elif user_program_enrollment_count == 0:
-            # if the user is not enrolled in the program, they are not authorized
-            # to view the information returned by this endpoint
-            raise PermissionDenied
+        course_run_resume_urls = get_resume_urls_for_enrollments(user, course_enrollments)
 
-        user_program_course_enrollments = ProgramCourseEnrollment.objects.filter(
-            program_enrollment=user_program_enrollment
-        ).select_related('course_enrollment')
+        course_runs = []
 
-        enrollment_dict = {enrollment.course_key: enrollment.course_enrollment for enrollment in user_program_course_enrollments}
+        for enrollment in course_enrollments:
+            overview = overviews[enrollment.course_id]
 
-        overviews = CourseOverview.get_from_ids_if_exists(enrollment_dict.keys())
-
-        resume_course_run_urls = get_resume_urls_for_enrollments(user, enrollment_dict.values())
-
-        response = {
-            'course_runs': [],
-        }
-
-        for enrollment in user_program_course_enrollments:
-            overview = overviews[enrollment.course_key]
-
-            certificate_download_url = None
-            is_certificate_passing = None
-            certificate_creation_date = None
-            certificate_info = get_certificate_for_user(user.username, enrollment.course_key)
-
-            if certificate_info:
-                certificate_download_url = certificate_info['download_url']
-                is_certificate_passing = certificate_info['is_passing']
-                certificate_creation_date = certificate_info['created']
+            certificate_info = get_certificate_for_user(user.username, enrollment.course_id) or {}
 
             course_run_dict = {
-                'course_run_id': enrollment.course_key,
+                'course_run_id': enrollment.course_id,
                 'display_name': overview.display_name_with_default,
-                'course_run_status': self.get_course_run_status(overview, is_certificate_passing, certificate_creation_date),
-                'course_run_url': self.get_course_run_url(request, enrollment.course_key),
+                'course_run_status': get_course_run_status(overview, certificate_info),
+                'course_run_url': get_course_run_url(request, enrollment.course_id),
                 'start_date': overview.start,
                 'end_date': overview.end,
-                'due_dates': self.get_due_dates(request, enrollment.course_key, user),
+                'due_dates': get_due_dates(request, enrollment.course_id, user),
             }
 
-            if certificate_download_url:
-                course_run_dict['certificate_download_url'] = certificate_download_url
-
-            emails_enabled = self.get_emails_enabled(user, enrollment.course_key)
+            emails_enabled = get_emails_enabled(user, enrollment.course_id)
             if emails_enabled is not None:
                 course_run_dict['emails_enabled'] = emails_enabled
 
-            micromasters_title = self.program['title'] if self.program['type'] == 'MicroMasters' else None
-            if micromasters_title:
-                course_run_dict['micromasters_title'] = micromasters_title
+            if certificate_info.get('download_url'):
+                course_run_dict['certificate_download_url'] = request.build_absolute_uri(
+                    certificate_info['download_url']
+                )
 
-            # if the url is '', then the url is None so we can omit it from the response
-            resume_course_run_url = resume_course_run_urls[enrollment.course_key]
-            if resume_course_run_url:
-                course_run_dict['resume_course_run_url'] = resume_course_run_url
+            if self.program['type'] == 'MicroMasters':
+                course_run_dict['micromasters_title'] = self.program['title']
 
-            response['course_runs'].append(course_run_dict)
+            if course_run_resume_urls.get(enrollment.course_id):
+                relative_resume_course_run_url = course_run_resume_urls.get(
+                    enrollment.course_id
+                )
+                course_run_dict['resume_course_run_url'] = request.build_absolute_uri(
+                    relative_resume_course_run_url
+                )
 
-        serializer = CourseRunOverviewListSerializer(response)
+            course_runs.append(course_run_dict)
+
+        serializer = CourseRunOverviewListSerializer({'course_runs': course_runs})
         return Response(serializer.data)
 
     @staticmethod
-    def get_due_dates(request, course_key, user):
+    def _check_program_enrollment_exists(user, program_uuid):
         """
-        Get due date information for a user for blocks in a course.
-
-        Arguments:
-            request: the request object
-            course_key (CourseKey): the CourseKey for the course
-            user: the user object for which we want due date information
-
-        Returns:
-            due_dates (list): a list of dictionaries containing due date information
-                keys:
-                    name: the display name of the block
-                    url: the deep link to the block
-                    date: the due date for the block
+        Raises ``PermissionDenied`` if the user is not enrolled in the program with the given UUID.
         """
-        dates = get_dates_for_course(
-            course_key,
-            user,
+        program_enrollments = ProgramEnrollment.objects.filter(
+            program_uuid=program_uuid,
+            user=user,
+            status='enrolled',
         )
+        if not program_enrollments:
+            raise PermissionDenied
 
-        store = modulestore()
 
-        due_dates = []
-        for (block_key, date_type), date in iteritems(dates):
-            if date_type == 'due':
-                block = store.get_item(block_key)
+class ProgramCourseGradesView(
+        DeveloperErrorViewMixin,
+        ProgramCourseRunSpecificViewMixin,
+        PaginatedAPIView,
+):
+    """
+    A view for retrieving a paginated list of grades for all students enrolled
+    in a given courserun through a given program.
 
-                # get url to the block in the course
-                block_url = reverse('jump_to', args=[course_key, block_key])
-                block_url = request.build_absolute_uri(block_url)
+    Path: ``/api/program_enrollments/v1/programs/{program_uuid}/courses/{course_id}/grades/``
 
-                due_dates.append({
-                    'name': block.display_name,
-                    'url': block_url,
-                    'date': date,
-                })
-        return due_dates
+    Accepts: [GET]
 
-    @staticmethod
-    def get_course_run_url(request, course_id):
+    For GET requests, the path can contain an optional `page_size?=N` query parameter.
+    The default page size is 100.
+
+    ------------------------------------------------------------------------------------
+    GETs
+    ------------------------------------------------------------------------------------
+
+    **Returns**
+        * 200: OK - Contains a paginated set of program courserun grades.
+        * 204: No Content - No grades to return
+        * 207: Mixed result - Contains mixed list of program courserun grades
+               and grade-fetching errors
+        * 422: All failed - Contains list of grade-fetching errors
+        * 401: The requesting user is not authenticated.
+        * 403: The requesting user lacks access for the given program/course.
+        * 404: The requested program or course does not exist.
+
+    **Response**
+
+        In the case of a 200/207/422 response code, the response will include a
+        paginated data set.  The `results` section of the response consists of a
+        list of grade records, where each successfully loaded record contains:
+          * student_key: The identifier of the student enrolled in the program and course.
+          * letter_grade: A letter grade as defined in grading policy
+            (e.g. 'A' 'B' 'C' for 6.002x) or None.
+          * passed: Boolean representing whether the course has been
+            passed according to the course's grading policy.
+          * percent: A float representing the overall grade for the course.
+        and failed-to-load records contain:
+          * student_key
+          * error: error message from grades Exception
+
+    **Example**
+
+        207 Multi-Status
+        {
+            "next": null,
+            "previous": "http://example.com/api/program_enrollments/v1/programs/{program_uuid}/courses/{course_id}/grades/?cursor=abcd",
+            "results": [;
+                {
+                    "student_key": "01709bffeae2807b6a7317",
+                    "letter_grade": "Pass",
+                    "percent": 0.95,
+                    "passed": true
+                },
+                {
+                    "student_key": "2cfe15e3380a52e7198237",
+                    "error": "Timeout while calculating grade"
+                },
+                ...
+            ],
+        }
+    """
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (permissions.JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS,)
+    pagination_class = ProgramEnrollmentPagination
+
+    @verify_course_exists
+    @verify_program_exists
+    def get(self, request, program_uuid=None, course_id=None):
         """
-        Get the URL to a course run.
+        Defines the GET list endpoint for ProgramCourseGrade objects.
+        """
+        course_key = CourseKey.from_string(course_id)
+        grade_results = self._load_grade_results(program_uuid, course_key)
+        serializer = ProgramCourseGradeResultSerializer(grade_results, many=True)
+        response_code = self._calc_response_code(grade_results)
+        return self.get_paginated_response(serializer.data, status_code=response_code)
+
+    def _load_grade_results(self, program_uuid, course_key):
+        """
+        Load grades (or grading errors) for a given program courserun.
 
         Arguments:
-            request: the request object
-            course_id (string): the course id of the course
+            program_uuid (str)
+            course_key (CourseKey)
 
-        Returns:
-            (string): the URL to the course run associated with course_id
+        Returns: list[ProgramCourseGradeResult|ProgramCourseGradeErrorResult]
         """
-        course_run_url = reverse('openedx.course_experience.course_home', args=[course_id])
-        return request.build_absolute_uri(course_run_url)
+        enrollments_qs = use_read_replica_if_available(
+            ProgramCourseEnrollment.objects.filter(
+                program_enrollment__program_uuid=program_uuid,
+                program_enrollment__user__isnull=False,
+                course_key=course_key,
+            ).select_related(
+                'program_enrollment',
+                'program_enrollment__user',
+            )
+        )
+        paginated_enrollments = self.paginate_queryset(enrollments_qs)
+        if not paginated_enrollments:
+            return []
+
+        # Hint: `zip(*(list))` can be read as "unzip(list)"
+        enrollments, users = zip(*(
+            (enrollment, enrollment.program_enrollment.user)
+            for enrollment in paginated_enrollments
+        ))
+        enrollment_grade_pairs = zip(
+            enrollments, self._iter_grades(course_key, list(users))
+        )
+        grade_results = [
+            (
+                ProgramCourseGradeResult(enrollment, grade)
+                if grade
+                else ProgramCourseGradeErrorResult(enrollment, exception)
+            )
+            for enrollment, (grade, exception) in enrollment_grade_pairs
+        ]
+        return grade_results
 
     @staticmethod
-    def get_emails_enabled(user, course_id):
+    def _iter_grades(course_key, users):
         """
-        Get whether or not emails are enabled in the context of a course.
+        Load a user grades for a course, using bulk fetching for efficiency.
 
         Arguments:
-            user: the user object for which we want to check whether emails are enabled
-            course_id (string): the course id of the course
+            course_key (CourseKey)
+            users (list[User])
 
-        Returns:
-            (bool): True if emails are enabled for the course associated with course_id for the user;
-            False otherwise
+        Returns: iterable[( CourseGradeBase|NoneType, Exception|NoneType )]
+            Iterable of pairs, in same order as `users`.
+            The first item in the pair is the grade, or None if loading the
+                grade failed.
+            The second item in the pair is an exception or None.
         """
-        if is_bulk_email_feature_enabled(course_id=course_id):
-            return not is_user_opted_out_for_course(user=user, course_id=course_id)
-        else:
-            return None
+        prefetch_course_grades(course_key, users)
+        try:
+            grades_iter = CourseGradeFactory().iter(users, course_key=course_key)
+            for user, course_grade, exception in grades_iter:
+                if not course_grade:
+                    fmt = 'Failed to load course grade for user ID {} in {}: {}'
+                    err_str = fmt.format(
+                        user.id,
+                        course_key,
+                        text_type(exception) if exception else 'Unknown error'
+                    )
+                    logger.error(err_str)
+                yield course_grade, exception
+        finally:
+            clear_prefetched_course_grades(course_key)
 
     @staticmethod
-    def get_course_run_status(course_overview, is_certificate_passing, certificate_creation_date):
+    def _calc_response_code(grade_results):
         """
-        Get the progress status of a course run.
+        Returns HTTP status code appropriate for list of results,
+        which may be grades or errors.
 
         Arguments:
-            course_overview (CourseOverview): the overview for the course run
-            is_certificate_passing (bool): True if the user has a passing certificate in
-                this course run; False otherwise
-            certificate_creation_date: the date the certificate was created
+            enrollment_grade_results: list[ProgramCourseGradeResult]
 
-        Returns:
-            status: one of CourseRunProgressStatuses.COMPLETE,
-                CourseRunProgressStatuses.IN_PROGRESS,
-                or CourseRunProgressStatuses.UPCOMING
+        Returns: int
+          * 200 for all success
+          * 207 for mixed result
+          * 422 for all failure
+          * 204 for empty
         """
-        if course_overview.pacing == 'instructor':
-            if course_overview.has_ended():
-                return CourseRunProgressStatuses.COMPLETED
-            elif course_overview.has_started():
-                return CourseRunProgressStatuses.IN_PROGRESS
-            else:
-                return CourseRunProgressStatuses.UPCOMING
-        elif course_overview.pacing == 'self':
-            has_ended = course_overview.has_ended()
-            thirty_days_ago = datetime.now(UTC) - timedelta(30)
-            # a self paced course run is completed when either the course run has ended
-            # OR the user has earned a certificate 30 days ago or more
-            if has_ended or is_certificate_passing and (certificate_creation_date and certificate_creation_date <= thirty_days_ago):
-                return CourseRunProgressStatuses.COMPLETED
-            elif course_overview.has_started():
-                return CourseRunProgressStatuses.IN_PROGRESS
-            else:
-                return CourseRunProgressStatuses.UPCOMING
-        return None
+        if not grade_results:
+            return status.HTTP_204_NO_CONTENT
+        if all(result.is_error for result in grade_results):
+            return status.HTTP_422_UNPROCESSABLE_ENTITY
+        if any(result.is_error for result in grade_results):
+            return status.HTTP_207_MULTI_STATUS
+        return status.HTTP_200_OK
+
+
+class EnrollmentDataResetView(APIView):
+    """
+    Resets enrollments and users for a given organization and set of programs.
+    Note, this will remove ALL users from the input organization.
+
+    Path: ``/api/program_enrollments/v1/integration-reset/``
+
+    Accepts: [POST]
+
+    ------------------------------------------------------------------------------------
+    POST
+    ------------------------------------------------------------------------------------
+
+    **Returns**
+        * 200: OK - Enrollments and users sucessfully deleted
+        * 400: Bad Requeset - Program does not match the requested organization
+        * 401: Unauthorized - The requesting user is not authenticated.
+        * 404: Not Found - A requested program does not exist.
+
+    **Response**
+    """
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (permissions.JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS,)
+
+    @transaction.atomic
+    def post(self, request):
+        """
+        Reset enrollment and user data for organization
+        """
+        if not settings.FEATURES.get(ENABLE_ENROLLMENT_RESET_FLAG):
+            return Response('reset not enabled on this environment', status.HTTP_501_NOT_IMPLEMENTED)
+
+        try:
+            org_key = request.data['organization']
+        except KeyError:
+            return Response("missing required body content 'organization'", status.HTTP_400_BAD_REQUEST)
+
+        try:
+            organization = Organization.objects.get(short_name=org_key)
+        except Organization.DoesNotExist:
+            return Response('organization {} not found'.format(org_key), status.HTTP_404_NOT_FOUND)
+
+        try:
+            idp_slug = get_provider_slug(organization)
+            call_command('remove_social_auth_users', idp_slug, force=True)
+        except ProviderDoesNotExistException:
+            pass
+
+        programs = get_programs_for_organization(organization=organization.short_name)
+        if programs:
+            call_command('reset_enrollment_data', ','.join(programs), force=True)
+
+        return Response('success')

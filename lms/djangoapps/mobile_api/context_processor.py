@@ -2,6 +2,8 @@
 Django template context processors.
 """
 
+from __future__ import absolute_import
+
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
 

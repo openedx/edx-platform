@@ -117,7 +117,7 @@ class SurveyViewsTests(ModuleStoreTestCase):
             self.student_answers
         )
         self.assertEquals(resp.status_code, 200)
-        data = json.loads(resp.content)
+        data = json.loads(resp.content.decode('utf-8'))
         self.assertIn('redirect_url', data)
 
         answers = self.survey.get_answers(self.student)

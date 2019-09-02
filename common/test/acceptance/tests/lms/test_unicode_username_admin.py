@@ -4,6 +4,7 @@ End-to-end tests for admin change view.
 """
 
 from __future__ import absolute_import
+
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.admin import ChangeUserAdminPage
 from common.test.acceptance.tests.helpers import AcceptanceTest

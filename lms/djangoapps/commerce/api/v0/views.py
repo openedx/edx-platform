@@ -1,11 +1,14 @@
 """ API v0 views. """
+from __future__ import absolute_import
+
 import logging
 
+import six
 from django.urls import reverse
 from edx_rest_api_client import exceptions
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import HTTP_406_NOT_ACCEPTABLE, HTTP_409_CONFLICT
@@ -67,7 +70,7 @@ class BasketsView(APIView):
 
     def _enroll(self, course_key, user, mode=CourseMode.DEFAULT_MODE_SLUG):
         """ Enroll the user in the course. """
-        add_enrollment(user.username, unicode(course_key), mode)
+        add_enrollment(user.username, six.text_type(course_key), mode)
 
     def _handle_marketing_opt_in(self, request, course_key, user):
         """
@@ -100,7 +103,7 @@ class BasketsView(APIView):
             return embargo_response
 
         # Don't do anything if an enrollment already exists
-        course_id = unicode(course_key)
+        course_id = six.text_type(course_key)
         enrollment = CourseEnrollment.get_enrollment(user, course_key)
         if enrollment and enrollment.is_active:
             msg = Messages.ENROLLMENT_EXISTS.format(course_id=course_id, username=user.username)
@@ -123,13 +126,18 @@ class BasketsView(APIView):
         if CourseEntitlement.check_for_existing_entitlement_and_enroll(user=user, course_run_key=course_key):
             return JsonResponse(
                 {
-                    'redirect_destination': reverse('courseware', args=[unicode(course_id)]),
+                    'redirect_destination': reverse('courseware', args=[six.text_type(course_id)]),
                 },
             )
 
         # Accept either honor or audit as an enrollment mode to
         # maintain backwards compatibility with existing courses
         default_enrollment_mode = audit_mode or honor_mode
+        course_name = None
+        course_announcement = None
+        if course is not None:
+            course_name = course.display_name
+            course_announcement = course.announcement
         if default_enrollment_mode:
             msg = Messages.ENROLL_DIRECTLY.format(
                 username=user.username,
@@ -140,7 +148,9 @@ class BasketsView(APIView):
                 msg = Messages.NO_SKU_ENROLLED.format(
                     enrollment_mode=default_enrollment_mode.slug,
                     course_id=course_id,
-                    username=user.username
+                    course_name=course_name,
+                    username=user.username,
+                    announcement=course_announcement
                 )
             log.info(msg)
             self._enroll(course_key, user, default_enrollment_mode.slug)

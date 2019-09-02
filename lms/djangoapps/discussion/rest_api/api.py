@@ -61,6 +61,7 @@ from openedx.core.djangoapps.django_comment_common.signals import (
     thread_voted
 )
 from openedx.core.djangoapps.django_comment_common.utils import get_course_discussion_settings
+from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.djangoapps.user_api.accounts.views import AccountViewSet
 from openedx.core.lib.exceptions import CourseNotFoundError, DiscussionNotFoundError, PageNotFoundError
 
@@ -365,10 +366,11 @@ def _get_user_profile_dict(request, usernames):
 
         A dict with username as key and user profile details as value.
     """
-    request.GET = request.GET.copy()  # Make a mutable copy of the GET parameters.
-    request.GET['username'] = usernames
-    user_profile_details = AccountViewSet.as_view({'get': 'list'})(request).data
-
+    if usernames:
+        username_list = usernames.split(",")
+    else:
+        username_list = []
+    user_profile_details = get_account_settings(request, username_list)
     return {user['username']: user for user in user_profile_details}
 
 
@@ -674,7 +676,7 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, requested_fi
     # behavior and return a PageNotFoundError in that case
     if not responses and page != 1:
         raise PageNotFoundError("Page not found (No results on this page).")
-    num_pages = (resp_total + page_size - 1) / page_size if resp_total else 1
+    num_pages = (resp_total + page_size - 1) // page_size if resp_total else 1
 
     results = _serialize_discussion_entities(request, context, responses, requested_fields, DiscussionEntity.comment)
 

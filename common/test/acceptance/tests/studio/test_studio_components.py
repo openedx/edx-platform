@@ -1,6 +1,8 @@
 """
 Acceptance tests for adding components in Studio.
 """
+from __future__ import absolute_import
+
 import ddt
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc

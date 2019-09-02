@@ -2,8 +2,11 @@
 Code related to the handling of Proctored Exams in Studio
 """
 
+from __future__ import absolute_import
+
 import logging
 
+import six
 from django.conf import settings
 from edx_proctoring.api import (
     create_exam,
@@ -36,7 +39,7 @@ def register_special_exams(course_key):
 
     course = modulestore().get_course(course_key)
     if course is None:
-        raise ItemNotFoundError(u"Course {} does not exist", unicode(course_key))
+        raise ItemNotFoundError(u"Course {} does not exist", six.text_type(course_key))
 
     if not course.enable_proctored_exams and not course.enable_timed_exams:
         # likewise if course does not have these features turned on
@@ -66,7 +69,7 @@ def register_special_exams(course_key):
     for timed_exam in timed_exams:
         msg = (
             u'Found {location} as a timed-exam in course structure. Inspecting...'.format(
-                location=unicode(timed_exam.location)
+                location=six.text_type(timed_exam.location)
             )
         )
         log.info(msg)
@@ -74,7 +77,7 @@ def register_special_exams(course_key):
         exam_metadata = {
             'exam_name': timed_exam.display_name,
             'time_limit_mins': timed_exam.default_time_limit_minutes,
-            'due_date': timed_exam.due,
+            'due_date': timed_exam.due if not course.self_paced else None,
             'is_proctored': timed_exam.is_proctored_exam,
             # backends that support onboarding exams will treat onboarding exams as practice
             'is_practice_exam': timed_exam.is_practice_exam or timed_exam.is_onboarding_exam,
@@ -84,7 +87,7 @@ def register_special_exams(course_key):
         }
 
         try:
-            exam = get_exam_by_content_id(unicode(course_key), unicode(timed_exam.location))
+            exam = get_exam_by_content_id(six.text_type(course_key), six.text_type(timed_exam.location))
             # update case, make sure everything is synced
             exam_metadata['exam_id'] = exam['id']
 
@@ -93,8 +96,8 @@ def register_special_exams(course_key):
             log.info(msg)
 
         except ProctoredExamNotFoundException:
-            exam_metadata['course_id'] = unicode(course_key)
-            exam_metadata['content_id'] = unicode(timed_exam.location)
+            exam_metadata['course_id'] = six.text_type(course_key)
+            exam_metadata['content_id'] = six.text_type(timed_exam.location)
 
             exam_id = create_exam(**exam_metadata)
             msg = u'Created new timed exam {exam_id}'.format(exam_id=exam_id)
@@ -132,7 +135,7 @@ def register_special_exams(course_key):
 
             search = [
                 timed_exam for timed_exam in timed_exams if
-                unicode(timed_exam.location) == exam['content_id']
+                six.text_type(timed_exam.location) == exam['content_id']
             ]
             if not search:
                 # This means it was turned off in Studio, we need to mark

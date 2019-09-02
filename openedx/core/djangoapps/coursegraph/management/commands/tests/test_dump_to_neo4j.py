@@ -8,6 +8,7 @@ from datetime import datetime
 
 import ddt
 import mock
+import six
 from django.core.management import call_command
 from django.utils import six
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -422,7 +423,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         # 2 nodes and no relationships from the second
 
         self.assertEqual(len(mock_graph.nodes), 11)
-        self.assertItemsEqual(submitted, self.course_strings)
+        six.assertCountEqual(self, submitted, self.course_strings)
 
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.authenticate_and_create_graph')
@@ -445,7 +446,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
             number_rollbacks=2,
         )
 
-        self.assertItemsEqual(submitted, self.course_strings)
+        six.assertCountEqual(self, submitted, self.course_strings)
 
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.authenticate_and_create_graph')

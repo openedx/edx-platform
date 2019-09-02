@@ -3,9 +3,11 @@
 End-to-end tests for LibraryContent block in LMS
 """
 from __future__ import absolute_import
+
 import textwrap
 
 import ddt
+import six
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.fixtures.library import LibraryFixture
@@ -17,7 +19,6 @@ from common.test.acceptance.pages.lms.library import LibraryContentXBlockWrapper
 from common.test.acceptance.pages.studio.library import StudioLibraryContainerXBlockWrapper, StudioLibraryContentEditor
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from common.test.acceptance.tests.helpers import TestWithSearchIndexMixin, UniqueCourseTest
-import six
 
 SECTION_NAME = 'Test Section'
 SUBSECTION_NAME = 'Test Subsection'

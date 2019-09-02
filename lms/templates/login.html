@@ -11,7 +11,7 @@ from third_party_auth import provider, pipeline
 %>
 
 <%!
-from openedx.core.djangolib.js_utils import js_escaped_string
+from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_json
 %>
 
 <%block name="pagetitle">${_("Log into your {platform_name} Account").format(platform_name=platform_name)}</%block>
@@ -60,7 +60,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string
         if (request.status === 403) {
           $('.message.submission-error').removeClass('is-shown');
           $('.third-party-signin.message').addClass('is-shown').focus();
-          $('.third-party-signin.message .instructions').HtmlUtils.setHtml(request.responseText);
+          $('.third-party-signin.message .instructions').text(request.responseText);
         } else {
           $('.third-party-signin.message').removeClass('is-shown');
           $('.message.submission-error').addClass('is-shown').focus();
@@ -70,7 +70,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string
 
       $('#login-form').on('ajax:success', function(event, json, xhr) {
         if(json.success) {
-          var nextUrl = "${login_redirect_url | n}"; // xss-lint: disable=mako-invalid-js-filter
+          var nextUrl = "${login_redirect_url |  n, js_escaped_string}";
           if (json.redirect_url) {
             nextUrl = json.redirect_url; // Most likely third party auth completion. This trumps 'nextUrl' above.
           }
@@ -89,7 +89,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string
         } else {
           toggleSubmitButton(true);
           $('.message.submission-error').addClass('is-shown').focus();
-          $('.message.submission-error .message-copy').HtmlUtils.setHtml(json.value);
+          $('.message.submission-error .message-copy').text(json.value);
         }
       });
       $("#forgot-password-link").click(function() {
@@ -101,15 +101,22 @@ from openedx.core.djangolib.js_utils import js_escaped_string
 
     function toggleSubmitButton(enable) {
       var $submitButton = $('form .form-actions #submit');
-      var $var1 = '${_('Log into My {platform_name} Account').format(platform_name=platform_name) | n, js_escaped_string}'
-      var $var2 = '${_('Access My Courses') | n, js_escaped_string}'
 
       if(enable) {
+        var platform = "${_('Log into My {platform_name} Account').format(platform_name=platform_name) | n, js_escaped_string}";
+        var msg = "${_('Access My Courses') | n, js_escaped_string}";
+        var content  = edx.HtmlUtils.interpolateHtml(
+        edx.HtmlUtils.HTML("{platform}<span class='orn-plus'>+</span>{msg}"),
+        {
+            platform:platform,
+            msg:msg
+        });
+
         $submitButton.
           removeClass('is-disabled').
           attr('aria-disabled', false).
           prop('disabled', false).
-          HtmlUtils.setHtml("$var1 <span class='orn-plus'>+</span> $var2");
+          html(HtmlUtils.ensureHtml(content).toString());
       }
       else {
         $submitButton.
@@ -133,7 +140,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string
        if (pipeline_running) {
          $('#login-form').submit();
        }
-    })('${pipeline_running | n, js_escaped_string}')
+    })(${pipeline_running | n, dump_js_escaped_json})
   </script>
 </%block>
 
@@ -178,7 +185,10 @@ from openedx.core.djangolib.js_utils import js_escaped_string
       % endif
 
       <p class="instructions sr">
-        ${HTML(_('Please provide the following information to log into your {platform_name} account. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.')).format(platform_name=platform_name)}
+        ${Text(_('Please provide the following information to log into your {platform_name} account. Required fields are noted by {strong_start}bold text and an asterisk (*){strong_end}.')).format(
+          strong_start=HTML('<strong class="indicator">'),
+          strong_end=HTML('</strong>'),
+          platform_name=platform_name)}
       </p>
 
       <div class="group group-form group-form-requiredinformation">

@@ -7,26 +7,36 @@
     <tr>
         <td>
             <h1>
+                {% filter force_escape %}
                 {% blocktrans %}You have been removed as a beta tester for {{ course_name }} at {{ site_name }}{% endblocktrans %}
+                {% endfilter %}
             </h1>
 
             <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
                 {% blocktrans %}You have been removed as a beta tester for {{ course_name }} at {{ site_name }} by a member of the course staff.{% endblocktrans %}
+                {% endfilter %}
                 <br />
             </p>
 
             <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
                 {% blocktrans %}This course will remain on your dashboard, but you will no longer be part of the beta testing group.{% endblocktrans %}
+                {% endfilter %}
                 <br />
             </p>
 
             <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
                 {% blocktrans %}Your other courses have not been affected.{% endblocktrans %}
+                {% endfilter %}
                 <br />
             </p>
 
             <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
                 {% blocktrans %}This email was automatically sent from {{ site_name }} to {{ email_address }}{% endblocktrans %}
+                {% endfilter %}
                 <br />
             </p>
         </td>

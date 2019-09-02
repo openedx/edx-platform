@@ -37,7 +37,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         request = Mock()
         request.GET = request.POST = {'task_id': task_id}
         response = instructor_task_status(request)
-        output = json.loads(response.content)
+        output = json.loads(response.content.decode('utf-8'))
         self.assertEquals(output['task_id'], task_id)
 
     def test_missing_instructor_task_status(self):
@@ -45,7 +45,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         request = Mock()
         request.GET = request.POST = {'task_id': task_id}
         response = instructor_task_status(request)
-        output = json.loads(response.content)
+        output = json.loads(response.content.decode('utf-8'))
         self.assertEquals(output, {})
 
     def test_instructor_task_status_list(self):
@@ -58,7 +58,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         task_ids_query_dict.update({'task_ids[]': task_ids})
         request.GET = request.POST = task_ids_query_dict
         response = instructor_task_status(request)
-        output = json.loads(response.content)
+        output = json.loads(response.content.decode('utf-8'))
         self.assertEquals(len(output), len(task_ids))
         for task_id in task_ids:
             self.assertEquals(output[task_id]['task_id'], task_id)
@@ -68,7 +68,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         instructor_task = self._create_failure_entry()
         task_id = instructor_task.task_id
         response = self._get_instructor_task_status(task_id)
-        output = json.loads(response.content)
+        output = json.loads(response.content.decode('utf-8'))
         self.assertEquals(output['message'], TEST_FAILURE_MESSAGE)
         self.assertEquals(output['succeeded'], False)
         self.assertEquals(output['task_id'], task_id)
@@ -85,7 +85,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         instructor_task = self._create_success_entry()
         task_id = instructor_task.task_id
         response = self._get_instructor_task_status(task_id)
-        output = json.loads(response.content)
+        output = json.loads(response.content.decode('utf-8'))
         self.assertEquals(output['message'], "Problem rescored for 2 of 3 students (out of 5)")
         self.assertEquals(output['succeeded'], False)
         self.assertEquals(output['task_id'], task_id)
@@ -111,7 +111,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         instructor_task = self._create_entry(task_state=SUCCESS, task_output=legacy_progress)
         task_id = instructor_task.task_id
         response = self._get_instructor_task_status(task_id)
-        output = json.loads(response.content)
+        output = json.loads(response.content.decode('utf-8'))
         self.assertEquals(output['message'], "Problem rescored for 2 of 3 students (out of 5)")
         self.assertEquals(output['succeeded'], False)
         self.assertEquals(output['task_id'], task_id)
@@ -139,7 +139,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         instructor_task = self._create_email_subtask_entry(skipped=1)
         task_id = instructor_task.task_id
         response = self._get_instructor_task_status(task_id)
-        output = json.loads(response.content)
+        output = json.loads(response.content.decode('utf-8'))
         self.assertEquals(output['message'], "Progress: emailed 2 of 3 so far (skipping 1) (out of 5)")
         self.assertEquals(output['succeeded'], False)
         self.assertEquals(output['task_id'], task_id)
@@ -161,7 +161,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         with patch('celery.result.AsyncResult.__new__') as mock_result_ctor:
             mock_result_ctor.return_value = mock_result
             response = self._get_instructor_task_status(task_id)
-        output = json.loads(response.content)
+        output = json.loads(response.content.decode('utf-8'))
         self.assertEquals(output['task_id'], task_id)
         return output
 

@@ -3,6 +3,8 @@ CCX Enrollment operations for use by Coach APIs.
 
 Does not include any access control, be sure to check access before calling.
 """
+from __future__ import absolute_import
+
 import datetime
 import logging
 from contextlib import contextmanager
@@ -11,9 +13,10 @@ from smtplib import SMTPException
 import pytz
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.urls import reverse
 from django.core.validators import validate_email
+from django.urls import reverse
 from django.utils.translation import ugettext as _
+from six.moves import map
 
 from courseware.courses import get_course_by_id
 from lms.djangoapps.ccx.custom_exception import CCXUserValidationException
@@ -26,7 +29,6 @@ from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment, CourseEnrollmentException
 from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
-
 
 log = logging.getLogger("edx.ccx")
 
@@ -143,8 +145,8 @@ def parse_date(datestring):
     """
     if datestring:
         date, time = datestring.split(' ')
-        year, month, day = map(int, date.split('-'))
-        hour, minute = map(int, time.split(':'))
+        year, month, day = list(map(int, date.split('-')))
+        hour, minute = list(map(int, time.split(':')))
         if validate_date(year, month, day, hour, minute):
             return datetime.datetime(
                 year, month, day, hour, minute, tzinfo=pytz.UTC)
@@ -258,14 +260,14 @@ def ccx_students_enrolling_center(action, identifiers, email_students, course_ke
                 if student:
                     must_enroll = student in staff or student in admins or student == coach
             except CCXUserValidationException as exp:
-                log.info("%s", exp)
-                errors.append("{0}".format(exp))
+                log.info(u"%s", exp)
+                errors.append(u"{0}".format(exp))
                 continue
 
             if CourseEnrollment.objects.is_course_full(ccx_course_overview) and not must_enroll:
                 error = _(u'The course is full: the limit is {max_student_enrollments_allowed}').format(
                     max_student_enrollments_allowed=ccx_course_overview.max_student_enrollments_allowed)
-                log.info("%s", error)
+                log.info(u"%s", error)
                 errors.append(error)
                 break
             enroll_email(course_key, email, auto_enroll=True, email_students=email_students, email_params=email_params)
@@ -274,8 +276,8 @@ def ccx_students_enrolling_center(action, identifiers, email_students, course_ke
             try:
                 email, __ = get_valid_student_with_email(identifier)
             except CCXUserValidationException as exp:
-                log.info("%s", exp)
-                errors.append("{0}".format(exp))
+                log.info(u"%s", exp)
+                errors.append(u"{0}".format(exp))
                 continue
             unenroll_email(course_key, email, email_students=email_students, email_params=email_params)
     return errors

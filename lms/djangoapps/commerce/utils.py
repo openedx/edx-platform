@@ -1,22 +1,25 @@
 """Utilities to assist with commerce tasks."""
+from __future__ import absolute_import
+
 import json
 import logging
-from urllib import urlencode
-from urlparse import urljoin
 
 import requests
+import six
 import waffle
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import CourseKey
+from six.moves.urllib.parse import urlencode, urljoin  # pylint: disable=import-error
 
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, is_commerce_service_configured
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from student.models import CourseEnrollment
+
 from .models import CommerceConfiguration
 
 log = logging.getLogger(__name__)
@@ -227,7 +230,7 @@ def refund_seat(course_enrollment, change_mode=False):
         exceptions.Timeout: if the attempt to reach the commerce service timed out.
     """
     User = get_user_model()  # pylint:disable=invalid-name
-    course_key_str = unicode(course_enrollment.course_id)
+    course_key_str = six.text_type(course_enrollment.course_id)
     enrollee = course_enrollment.user
 
     service_user = User.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
@@ -376,7 +379,7 @@ def create_zendesk_ticket(requester_name, requester_email, subject, body, tags=N
         'ticket': {
             'requester': {
                 'name': requester_name,
-                'email': unicode(requester_email)
+                'email': six.text_type(requester_email)
             },
             'subject': subject,
             'comment': {'body': body},

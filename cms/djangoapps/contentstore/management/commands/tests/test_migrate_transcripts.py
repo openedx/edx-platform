@@ -2,25 +2,27 @@
 """
 Tests for course transcript migration management command.
 """
+from __future__ import absolute_import
+
 import itertools
 import logging
 from datetime import datetime
-import pytz
 
 import ddt
+import pytz
+import six
+from django.core.management import CommandError, call_command
 from django.test import TestCase
-from django.core.management import call_command, CommandError
+from edxval import api as api
 from mock import patch
+from testfixtures import LogCapture
 
-from openedx.core.djangoapps.video_config.models import (
-    TranscriptMigrationSetting, MigrationEnqueuedCourse
-)
+from openedx.core.djangoapps.video_config.models import MigrationEnqueuedCourse, TranscriptMigrationSetting
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.video_module import VideoBlock
 from xmodule.video_module.transcripts_utils import save_to_store
-from edxval import api as api
-from testfixtures import LogCapture
 
 LOGGER_NAME = "cms.djangoapps.contentstore.tasks"
 
@@ -93,7 +95,7 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
             'client_video_id': 'test1.mp4',
             'duration': 42.0,
             'status': 'upload',
-            'courses': [unicode(self.course.id)],
+            'courses': [six.text_type(self.course.id)],
             'encoded_videos': [],
             'created': datetime.now(pytz.utc)
         }
@@ -105,9 +107,9 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
                    youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
                    show_captions="false"
                    download_track="false"
-                   start_time="00:00:01"
+                   start_time="1.0"
                    download_video="false"
-                   end_time="00:01:00">
+                   end_time="60.0">
               <source src="http://www.example.com/source.mp4"/>
               <track src="http://www.example.com/track"/>
               <handout src="http://www.example.com/handout"/>
@@ -122,9 +124,9 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
                    youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
                    show_captions="false"
                    download_track="false"
-                   start_time="00:00:01"
+                   start_time="1.0"
                    download_video="false"
-                   end_time="00:01:00">
+                   end_time="60.0">
               <source src="http://www.example.com/source.mp4"/>
               <track src="http://www.example.com/track"/>
               <handout src="http://www.example.com/handout"/>
@@ -133,11 +135,11 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
         '''
         self.video_descriptor = ItemFactory.create(
             parent_location=self.course.location, category='video',
-            data={'data': video_sample_xml}
+            **VideoBlock.parse_video_xml(video_sample_xml)
         )
         self.video_descriptor_2 = ItemFactory.create(
             parent_location=self.course_2.location, category='video',
-            data={'data': video_sample_xml_2}
+            **VideoBlock.parse_video_xml(video_sample_xml_2)
         )
 
         save_to_store(SRT_FILEDATA, 'subs_grmtran1.srt', 'text/srt', self.video_descriptor.location)
@@ -154,7 +156,7 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
         self.assertFalse(api.is_transcript_available(self.video_descriptor.edx_video_id, 'ge'))
 
         # now call migrate_transcripts command and check the transcript availability
-        call_command('migrate_transcripts', '--course-id', unicode(self.course.id), '--commit')
+        call_command('migrate_transcripts', '--course-id', six.text_type(self.course.id), '--commit')
 
         languages = api.get_available_transcript_languages(self.video_descriptor.edx_video_id)
         self.assertEqual(len(languages), 2)
@@ -172,7 +174,7 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
         self.assertFalse(api.is_transcript_available(self.video_descriptor.edx_video_id, 'ge'))
 
         # now call migrate_transcripts command and check the transcript availability
-        call_command('migrate_transcripts', '--course-id', unicode(self.course.id))
+        call_command('migrate_transcripts', '--course-id', six.text_type(self.course.id))
 
         # check that transcripts still do not exist
         languages = api.get_available_transcript_languages(self.video_descriptor.edx_video_id)
@@ -185,12 +187,12 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
         Test migrating transcripts
         """
         translations = self.video_descriptor.available_translations(self.video_descriptor.get_transcripts_info())
-        self.assertItemsEqual(translations, ['hr', 'ge'])
+        six.assertCountEqual(self, translations, ['hr', 'ge'])
         self.assertFalse(api.is_transcript_available(self.video_descriptor.edx_video_id, 'hr'))
         self.assertFalse(api.is_transcript_available(self.video_descriptor.edx_video_id, 'ge'))
 
         # now call migrate_transcripts command and check the transcript availability
-        call_command('migrate_transcripts', '--course-id', unicode(self.course.id), '--commit')
+        call_command('migrate_transcripts', '--course-id', six.text_type(self.course.id), '--commit')
 
         self.assertTrue(api.is_transcript_available(self.video_descriptor.edx_video_id, 'hr'))
         self.assertTrue(api.is_transcript_available(self.video_descriptor.edx_video_id, 'ge'))
@@ -200,24 +202,24 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
         Test migrating transcripts multiple times
         """
         translations = self.video_descriptor.available_translations(self.video_descriptor.get_transcripts_info())
-        self.assertItemsEqual(translations, ['hr', 'ge'])
+        six.assertCountEqual(self, translations, ['hr', 'ge'])
         self.assertFalse(api.is_transcript_available(self.video_descriptor.edx_video_id, 'hr'))
         self.assertFalse(api.is_transcript_available(self.video_descriptor.edx_video_id, 'ge'))
 
         # now call migrate_transcripts command and check the transcript availability
-        call_command('migrate_transcripts', '--course-id', unicode(self.course.id), '--commit')
+        call_command('migrate_transcripts', '--course-id', six.text_type(self.course.id), '--commit')
 
         self.assertTrue(api.is_transcript_available(self.video_descriptor.edx_video_id, 'hr'))
         self.assertTrue(api.is_transcript_available(self.video_descriptor.edx_video_id, 'ge'))
 
         # now call migrate_transcripts command again and check the transcript availability
-        call_command('migrate_transcripts', '--course-id', unicode(self.course.id), '--commit')
+        call_command('migrate_transcripts', '--course-id', six.text_type(self.course.id), '--commit')
 
         self.assertTrue(api.is_transcript_available(self.video_descriptor.edx_video_id, 'hr'))
         self.assertTrue(api.is_transcript_available(self.video_descriptor.edx_video_id, 'ge'))
 
         # now call migrate_transcripts command with --force-update and check the transcript availability
-        call_command('migrate_transcripts', '--course-id', unicode(self.course.id), '--force-update', '--commit')
+        call_command('migrate_transcripts', '--course-id', six.text_type(self.course.id), '--force-update', '--commit')
 
         self.assertTrue(api.is_transcript_available(self.video_descriptor.edx_video_id, 'hr'))
         self.assertTrue(api.is_transcript_available(self.video_descriptor.edx_video_id, 'ge'))
@@ -226,7 +228,7 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
         """
         Test migrate transcripts logging and output
         """
-        course_id = unicode(self.course.id)
+        course_id = six.text_type(self.course.id)
         expected_log = (
             (
                 'cms.djangoapps.contentstore.tasks', 'INFO',
@@ -254,7 +256,7 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
         )
 
         with LogCapture(LOGGER_NAME, level=logging.INFO) as logger:
-            call_command('migrate_transcripts', '--course-id', unicode(self.course.id))
+            call_command('migrate_transcripts', '--course-id', six.text_type(self.course.id))
             logger.check(
                 *expected_log
             )
@@ -263,7 +265,7 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
         """
         Test migrate transcripts exception logging
         """
-        course_id = unicode(self.course_2.id)
+        course_id = six.text_type(self.course_2.id)
         expected_log = (
             (
                 'cms.djangoapps.contentstore.tasks', 'INFO',
@@ -291,7 +293,7 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
         )
 
         with LogCapture(LOGGER_NAME, level=logging.INFO) as logger:
-            call_command('migrate_transcripts', '--course-id', unicode(self.course_2.id), '--commit')
+            call_command('migrate_transcripts', '--course-id', six.text_type(self.course_2.id), '--commit')
             logger.check(
                 *expected_log
             )

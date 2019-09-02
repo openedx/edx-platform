@@ -1,13 +1,15 @@
 """
 Helper functions for bok_choy test tasks
 """
-from __future__ import print_function
-import httplib
+from __future__ import absolute_import, print_function
+
 import os
 import subprocess
 import sys
 import time
 
+import six
+import six.moves.http_client  # pylint: disable=import-error
 from paver import tasks
 from paver.easy import cmdopts, needs, sh, task
 
@@ -40,7 +42,7 @@ def start_servers(options):
         print(cmd, logfile)
         run_background_process(cmd, out_log=logfile, err_log=logfile, cwd=cwd)
 
-    for service, info in Env.BOK_CHOY_SERVERS.iteritems():
+    for service, info in six.iteritems(Env.BOK_CHOY_SERVERS):
         address = "0.0.0.0:{}".format(info['port'])
         cmd = (u"DEFAULT_STORE={default_store} ").format(default_store=options.default_store)
         if coveragerc:
@@ -57,7 +59,7 @@ def start_servers(options):
         )
         start_server(cmd, info['log'])
 
-    for service, info in Env.BOK_CHOY_STUBS.iteritems():
+    for service, info in six.iteritems(Env.BOK_CHOY_STUBS):
         cmd = (
             u"python -m stubs.start {service} {port} "
             "{config}".format(
@@ -88,7 +90,7 @@ def wait_for_server(server, port):
 
     while attempts < 120:
         try:
-            connection = httplib.HTTPConnection(server, port, timeout=10)
+            connection = six.moves.http_client.HTTPConnection(server, port, timeout=10)
             connection.request('GET', '/')
             response = connection.getresponse()
 
@@ -109,7 +111,7 @@ def wait_for_test_servers():
     Wait until we get a successful response from the servers or time out
     """
 
-    for service, info in Env.BOK_CHOY_SERVERS.iteritems():
+    for service, info in six.iteritems(Env.BOK_CHOY_SERVERS):
         ready = wait_for_server(info['host'], info['port'])
         if not ready:
             msg = colorize(
@@ -145,7 +147,7 @@ def is_mysql_running():
     """
     # We need to check whether or not mysql is running as a process
     # even if it is not daemonized.
-    with open(os.devnull, 'w') as os_devnull:
+    with open(os.devnull, 'w') as os_devnull:  # pylint: disable=W6005
         #pgrep returns the PID, which we send to /dev/null
         returncode = subprocess.call("pgrep mysqld", stdout=os_devnull, shell=True)
     return returncode == 0

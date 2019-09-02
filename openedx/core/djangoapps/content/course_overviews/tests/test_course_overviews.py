@@ -6,7 +6,7 @@ from __future__ import absolute_import
 import datetime
 import itertools
 import math
-from cStringIO import StringIO
+from six import StringIO
 
 import ddt
 import mock

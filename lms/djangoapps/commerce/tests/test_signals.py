@@ -184,7 +184,7 @@ class TestRefundSignal(TestCase):
                 self.assertFalse(mock_send_notification.called)
 
                 last_request = httpretty.last_request()
-                self.assertDictEqual(json.loads(last_request.body), {'action': 'approve_payment_only'})
+                self.assertDictEqual(json.loads(last_request.body.decode('utf8')), {'action': 'approve_payment_only'})
 
     @mock.patch('lms.djangoapps.commerce.utils._send_refund_notification')
     def test_notification_no_refund(self, mock_send_notification):
@@ -305,8 +305,9 @@ class TestRefundSignal(TestCase):
         # Verify the headers
         expected = {
             'content-type': JSON,
-            'Authorization': 'Basic ' + base64.b64encode(
-                '{user}/token:{pwd}'.format(user=ZENDESK_USER, pwd=ZENDESK_API_KEY))
+            'Authorization': 'Basic {}'.format(base64.b64encode(
+                '{user}/token:{pwd}'.format(user=ZENDESK_USER, pwd=ZENDESK_API_KEY).encode('utf8')).decode('utf8')
+            )
         }
         self.assertDictContainsSubset(expected, last_request.headers)
 
@@ -322,4 +323,4 @@ class TestRefundSignal(TestCase):
                 'tags': ['LMS'] + tags
             }
         }
-        self.assertDictEqual(json.loads(last_request.body), expected)
+        self.assertDictEqual(json.loads(last_request.body.decode('utf8')), expected)

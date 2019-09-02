@@ -2,15 +2,18 @@
 Helper functions for the account/profile Python APIs.
 This is NOT part of the public API.
 """
+from __future__ import absolute_import
+
 import json
 import logging
 import traceback
 from collections import defaultdict
 from functools import wraps
 
+import six
 from django import forms
 from django.core.serializers.json import DjangoJSONEncoder
-from django.http import HttpResponseBadRequest, HttpRequest
+from django.http import HttpRequest, HttpResponseBadRequest
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
 
@@ -58,7 +61,7 @@ def intercept_errors(api_error, ignore_errors=None):
                             u"with arguments '{args}' and keyword arguments '{kwargs}': "
                             u"{exception}"
                         ).format(
-                            func_name=func.func_name,
+                            func_name=func.__name__,
                             args=args,
                             kwargs=kwargs,
                             exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex)
@@ -74,7 +77,7 @@ def intercept_errors(api_error, ignore_errors=None):
                     u"with arguments '{args}' and keyword arguments '{kwargs}' from {caller}: "
                     u"{exception}"
                 ).format(
-                    func_name=func.func_name,
+                    func_name=func.__name__,
                     args=args,
                     kwargs=kwargs,
                     exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex),
@@ -264,7 +267,7 @@ class FormDescription(object):
 
         if restrictions is not None:
             allowed_restrictions = self.ALLOWED_RESTRICTIONS.get(field_type, [])
-            for key, val in restrictions.iteritems():
+            for key, val in six.iteritems(restrictions):
                 if key in allowed_restrictions:
                     field_dict["restrictions"][key] = val
                 else:
@@ -361,7 +364,7 @@ class FormDescription(object):
 
         self._field_overrides[field_name].update({
             property_name: property_value
-            for property_name, property_value in kwargs.iteritems()
+            for property_name, property_value in six.iteritems(kwargs)
             if property_name in self.OVERRIDE_FIELD_PROPERTIES
         })
 
@@ -468,7 +471,7 @@ def shim_student_view(view_func, check_logged_in=False):
         # the third party auth pipeline, we redirect them from the pipeline
         # completion end-point directly.
         try:
-            response_dict = json.loads(response.content)
+            response_dict = json.loads(response.content.decode('utf-8'))
             msg = response_dict.get("value", u"")
             success = response_dict.get("success")
         except (ValueError, TypeError):

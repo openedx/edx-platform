@@ -18,6 +18,8 @@ from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, reverse
 from mock import patch
+from six.moves import range
+
 from openedx.core.djangoapps.password_policy.compliance import (
     NonCompliantPasswordException,
     NonCompliantPasswordWarning
@@ -26,7 +28,6 @@ from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRI
 from openedx.core.djangoapps.user_authn.cookies import jwt_cookies
 from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from six.moves import range
 from student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
 
 
@@ -421,7 +422,7 @@ class LoginTest(CacheIsolationTestCase):
             response, _ = self._login_response(
                 self.user_email, self.password, extra_post_params=extra_post_params,
             )
-        response_content = json.loads(response.content)
+        response_content = json.loads(response.content.decode('utf-8'))
         self.assertIsNone(response_content["redirect_url"])
         self._assert_response(response, success=True)
 
@@ -437,7 +438,7 @@ class LoginTest(CacheIsolationTestCase):
             response, _ = self._login_response(
                 self.user_email, self.password, extra_post_params=extra_post_params,
             )
-        response_content = json.loads(response.content)
+        response_content = json.loads(response.content.decode('utf-8'))
         self.assertIsNone(response_content["redirect_url"])
         self._assert_response(response, success=True)
 
@@ -450,7 +451,7 @@ class LoginTest(CacheIsolationTestCase):
         with patch(enforce_compliance_path) as mock_check_password_policy_compliance:
             mock_check_password_policy_compliance.return_value = HttpResponse()
             response, _ = self._login_response(self.user_email, self.password)
-            response_content = json.loads(response.content)
+            response_content = json.loads(response.content.decode('utf-8'))
         self.assertTrue(response_content.get('success'))
 
     @override_settings(PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG={'ENFORCE_COMPLIANCE_ON_LOGIN': True})
@@ -465,7 +466,7 @@ class LoginTest(CacheIsolationTestCase):
                 self.user_email,
                 self.password
             )
-            response_content = json.loads(response.content)
+            response_content = json.loads(response.content.decode('utf-8'))
         self.assertFalse(response_content.get('success'))
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn('Password reset', mail.outbox[0].subject)
@@ -479,7 +480,7 @@ class LoginTest(CacheIsolationTestCase):
         with patch(enforce_compliance_on_login) as mock_enforce_compliance_on_login:
             mock_enforce_compliance_on_login.side_effect = NonCompliantPasswordWarning('Test warning')
             response, _ = self._login_response(self.user_email, self.password)
-            response_content = json.loads(response.content)
+            response_content = json.loads(response.content.decode('utf-8'))
             self.assertIn('Test warning', self.client.session['_messages'])
         self.assertTrue(response_content.get('success'))
 
@@ -529,7 +530,7 @@ class LoginTest(CacheIsolationTestCase):
         self.assertEqual(response.status_code, 200)
 
         try:
-            response_dict = json.loads(response.content)
+            response_dict = json.loads(response.content.decode('utf-8'))
         except ValueError:
             self.fail(u"Could not parse response content as JSON: %s"
                       % str(response.content))

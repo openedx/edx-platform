@@ -2,10 +2,13 @@
 Test LMS Notes
 """
 from __future__ import absolute_import
+
 import random
 from datetime import datetime
 from unittest import skip
 from uuid import uuid4
+
+from six.moves import range
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.fixtures.edxnotes import EdxNotesFixture, Note, Range
@@ -15,7 +18,6 @@ from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.edxnotes import EdxNotesPage, EdxNotesPageNoContent, EdxNotesUnitPage
 from common.test.acceptance.tests.helpers import EventsTestMixin, UniqueCourseTest
 from openedx.core.lib.tests import attr
-from six.moves import range
 
 
 class EdxNotesTestMixin(UniqueCourseTest):

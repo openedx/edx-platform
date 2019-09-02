@@ -10,33 +10,34 @@ Note: The access control logic in this file does NOT check for enrollment in
   If enrollment is to be checked, use get_course_with_access in courseware.courses.
   It is a wrapper around has_access that additionally checks for enrollment.
 """
+from __future__ import absolute_import
+
 import logging
 from datetime import datetime
 
+import six
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from pytz import UTC
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from pytz import UTC
 from six import text_type
 from xblock.core import XBlock
 
 from courseware.access_response import (
+    IncorrectPartitionGroupError,
     MilestoneAccessError,
     MobileAvailabilityError,
-    VisibilityError,
+    NoAllowedPartitionGroupsError,
+    VisibilityError
 )
 from courseware.access_utils import (
     ACCESS_DENIED,
     ACCESS_GRANTED,
     adjust_start_date,
+    check_course_open_for_learner,
     check_start_date,
     debug,
-    in_preview_mode,
-    check_course_open_for_learner,
-)
-from courseware.access_response import (
-    NoAllowedPartitionGroupsError,
-    IncorrectPartitionGroupError,
+    in_preview_mode
 )
 from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
@@ -162,7 +163,7 @@ def has_access(user, action, obj, course_key=None):
     if isinstance(obj, UsageKey):
         return _has_access_location(user, action, obj, course_key)
 
-    if isinstance(obj, basestring):
+    if isinstance(obj, six.string_types):
         return _has_access_string(user, action, obj)
 
     # Passing an unknown object here is a coding error, so rather than
@@ -812,7 +813,12 @@ def _can_access_descriptor_with_milestones(user, descriptor, course_key):
         descriptor: the object being accessed
         course_key: key for the course for this descriptor
     """
-    if milestones_helpers.get_course_content_milestones(course_key, unicode(descriptor.location), 'requires', user.id):
+    if milestones_helpers.get_course_content_milestones(
+        course_key,
+        six.text_type(descriptor.location),
+        'requires',
+        user.id
+    ):
         debug("Deny: user has not completed all milestones for content")
         return ACCESS_DENIED
     else:

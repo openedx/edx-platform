@@ -48,7 +48,7 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response["Content-Type"], "application/json")
         self.assertEqual(
-            json.loads(response.content),
+            json.loads(response.content.decode('utf-8')),
             {u"error": expected_error, u"error_description": expected_error_description}
         )
 
@@ -56,7 +56,7 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
         response = self.csrf_client.post(self.url, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/json")
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(set(content.keys()), self.get_token_response_keys())
         self.assertEqual(content["token_type"], "Bearer")
         self.assertLessEqual(
@@ -74,7 +74,7 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
             """
             Returns the access token from the response payload.
             """
-            return json.loads(response.content)["access_token"]
+            return json.loads(response.content.decode('utf-8'))["access_token"]
 
         self._setup_provider_response(success=True)
         for single_access_token in [True, False]:
@@ -95,7 +95,7 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
         response = self.client.get(self.url, self.data)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
-            json.loads(response.content),
+            json.loads(response.content.decode('utf-8')),
             {
                 "error": "invalid_request",
                 "error_description": "Only POST requests allowed.",

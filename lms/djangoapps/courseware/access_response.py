@@ -2,6 +2,8 @@
 This file contains all the classes used by has_access for error handling
 """
 
+from __future__ import absolute_import
+
 from django.utils.translation import ugettext as _
 
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
@@ -36,7 +38,7 @@ class AccessResponse(object):
         if has_access:
             assert error_code is None
 
-    def __nonzero__(self):
+    def __bool__(self):
         """
         Overrides bool().
 
@@ -49,6 +51,8 @@ class AccessResponse(object):
 
         """
         return self.has_access
+
+    __nonzero__ = __bool__
 
     def to_json(self):
         """

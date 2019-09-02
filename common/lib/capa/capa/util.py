@@ -1,16 +1,17 @@
 """
 Utility functions for capa.
 """
+from __future__ import absolute_import
+
 import re
+from cmath import isinf, isnan
 from decimal import Decimal
 
 import bleach
+from calc import evaluator
 from lxml import etree
 
-from calc import evaluator
-from cmath import isinf, isnan
 from openedx.core.djangolib.markup import HTML
-
 
 #-----------------------------------------------------------------------------
 #
@@ -101,7 +102,7 @@ def contextualize_text(text, context):  # private
     """
     if not text:
         return text
-    for key in sorted(context, lambda x, y: cmp(len(y), len(x))):
+    for key in sorted(context, key=len, reverse=True):
         # TODO (vshnayder): This whole replacement thing is a big hack
         # right now--context contains not just the vars defined in the
         # program, but also e.g. a reference to the numpy module.

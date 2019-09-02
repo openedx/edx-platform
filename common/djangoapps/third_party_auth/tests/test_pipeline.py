@@ -1,5 +1,7 @@
 """Unit tests for third_party_auth/pipeline.py."""
 
+from __future__ import absolute_import
+
 import unittest
 
 from third_party_auth import pipeline

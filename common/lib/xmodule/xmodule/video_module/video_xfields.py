@@ -15,7 +15,7 @@ _ = lambda text: text
 
 
 class VideoFields(object):
-    """Fields for `VideoModule` and `VideoDescriptor`."""
+    """Fields for `VideoBlock`."""
     display_name = String(
         help=_("The display name for this component."),
         display_name=_("Component Display Name"),
@@ -76,14 +76,6 @@ class VideoFields(object):
     )
     #front-end code of video player checks logical validity of (start_time, end_time) pair.
 
-    # `source` is deprecated field and should not be used in future.
-    # `download_video` is used instead.
-    source = String(
-        help=_("The external URL to download the video."),
-        display_name=_("Download Video"),
-        scope=Scope.settings,
-        default=""
-    )
     download_video = Boolean(
         help=_("Allow students to download versions of this video in different formats if they cannot use the edX video player or do not have access to YouTube. You must add at least one non-YouTube URL in the Video File URLs field."),  # pylint: disable=line-too-long
         display_name=_("Video Download Allowed"),

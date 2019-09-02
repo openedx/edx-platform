@@ -9,30 +9,51 @@ MAX_ENROLLMENT_RECORDS = 25
 # The name of the key that identifies students for POST/PATCH requests
 REQUEST_STUDENT_KEY = 'student_key'
 
+ENABLE_ENROLLMENT_RESET_FLAG = 'ENABLE_ENROLLMENT_RESET'
 
-class CourseEnrollmentResponseStatuses(object):
+
+class BaseEnrollmentResponseStatuses(object):
     """
-    Class to group response statuses returned by the course enrollment endpoint
+    Class to group common response statuses
     """
-    ACTIVE = "active"
-    INACTIVE = "inactive"
-    DUPLICATED = "duplicated"
+    DUPLICATED = 'duplicated'
     INVALID_STATUS = "invalid-status"
     CONFLICT = "conflict"
     ILLEGAL_OPERATION = "illegal-operation"
     NOT_IN_PROGRAM = "not-in-program"
-    NOT_FOUND = "not-found"
     INTERNAL_ERROR = "internal-error"
 
-    ERROR_STATUSES = (
+    ERROR_STATUSES = {
         DUPLICATED,
         INVALID_STATUS,
         CONFLICT,
         ILLEGAL_OPERATION,
         NOT_IN_PROGRAM,
-        NOT_FOUND,
         INTERNAL_ERROR,
-    )
+    }
+
+
+class CourseEnrollmentResponseStatuses(BaseEnrollmentResponseStatuses):
+    """
+    Class to group response statuses returned by the course enrollment endpoint
+    """
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    NOT_FOUND = "not-found"
+
+    ERROR_STATUSES = BaseEnrollmentResponseStatuses.ERROR_STATUSES | {NOT_FOUND}
+
+
+class ProgramEnrollmentResponseStatuses(BaseEnrollmentResponseStatuses):
+    """
+    Class to group response statuses returned by the program enrollment endpoint
+    """
+    ENROLLED = 'enrolled'
+    PENDING = 'pending'
+    SUSPENDED = 'suspended'
+    CANCELED = 'canceled'
+
+    VALID_STATUSES = [ENROLLED, PENDING, SUSPENDED, CANCELED]
 
 
 class CourseRunProgressStatuses(object):

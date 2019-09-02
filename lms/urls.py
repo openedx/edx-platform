@@ -2,16 +2,18 @@
 URLs for LMS
 """
 
+from __future__ import absolute_import
+
+from config_models.views import ConfigurationModelCurrentAPIView
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib.admin import autodiscover as django_autodiscover
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import RedirectView
-from rest_framework_swagger.views import get_swagger_view
+from ratelimitbackend import admin
 
 from branding import views as branding_views
-from config_models.views import ConfigurationModelCurrentAPIView
 from courseware.masquerade import handle_ajax as courseware_masquerade_handle_ajax
 from courseware.module_render import handle_xblock_callback, handle_xblock_callback_noauth, xblock_view, xqueue_callback
 from courseware.views import views as courseware_views
@@ -42,8 +44,8 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.verified_track_content import views as verified_track_content_views
+from openedx.core.openapi import schema_view
 from openedx.features.enterprise_support.api import enterprise_enabled
-from ratelimitbackend import admin
 from static_template_view import views as static_template_view_views
 from staticbook import views as staticbook_views
 from student import views as student_views
@@ -87,9 +89,6 @@ urlpatterns = [
     url(r'^notifier_api/', include('lms.djangoapps.discussion.notifier_api.urls')),
 
     url(r'^i18n/', include('django.conf.urls.i18n')),
-
-    # Feedback Form endpoint
-    url(r'^submit_feedback$', util_views.submit_feedback),
 
     # Enrollment API RESTful endpoints
     url(r'^api/enrollment/v1/', include('openedx.core.djangoapps.enrollments.urls')),
@@ -271,6 +270,9 @@ urlpatterns += [
         name='xblock_resource_url',
     ),
 
+    # New (Blockstore-based) XBlock REST API
+    url(r'', include('openedx.core.djangoapps.xblock.rest_api.urls', namespace='xblock_api')),
+
     url(
         r'^courses/{}/xqueue/(?P<userid>[^/]*)/(?P<mod_id>.*?)/(?P<dispatch>[^/]*)$'.format(
             settings.COURSE_ID_PATTERN,
@@ -292,7 +294,11 @@ urlpatterns += [
         courseware_views.course_about,
         name='about_course',
     ),
-
+    url(
+        r'^courses/yt_video_metadata$',
+        courseware_views.yt_video_metadata,
+        name='yt_video_metadata',
+    ),
     url(
         r'^courses/{}/enroll_staff$'.format(
             settings.COURSE_ID_PATTERN,
@@ -964,12 +970,19 @@ if settings.BRANCH_IO_KEY:
 
 if settings.FEATURES.get('ENABLE_API_DOCS'):
     urlpatterns += [
-        url(r'^api-docs/$', get_swagger_view(title='LMS API')),
+        url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+        url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+        url(r'^api-docs/$', schema_view.with_ui('swagger', cache_timeout=0)),
     ]
 
 # edx-drf-extensions csrf app
 urlpatterns += [
     url(r'', include('csrf.urls')),
 ]
+
+if 'openedx.testing.coverage_context_listener' in settings.INSTALLED_APPS:
+    urlpatterns += [
+        url(r'coverage_context', include('openedx.testing.coverage_context_listener.urls'))
+    ]
 
 urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.LMS))

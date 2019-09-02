@@ -50,7 +50,7 @@ class TestFooter(CacheIsolationTestCase):
 
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp["Content-Type"], content_type)
-        self.assertIn(content, resp.content)
+        self.assertIn(content, resp.content.decode('utf-8'))
 
     @mock.patch.dict(settings.FEATURES, {'ENABLE_FOOTER_MOBILE_APP_LINKS': True})
     @ddt.data("edx.org", None)
@@ -60,7 +60,7 @@ class TestFooter(CacheIsolationTestCase):
             resp = self._get_footer()
 
         self.assertEqual(resp.status_code, 200)
-        json_data = json.loads(resp.content)
+        json_data = json.loads(resp.content.decode('utf-8'))
         self.assertTrue(isinstance(json_data, dict))
 
         # Logo
@@ -119,7 +119,7 @@ class TestFooter(CacheIsolationTestCase):
             resp = self._get_footer()
 
         self.assertEqual(resp.status_code, 200)
-        json_data = json.loads(resp.content)
+        json_data = json.loads(resp.content.decode('utf-8'))
 
         self.assertEqual(json_data["logo_image"], cdn_url)
 
@@ -138,7 +138,7 @@ class TestFooter(CacheIsolationTestCase):
         # Load the footer with the specified language
         resp = self._get_footer(params={'language': language})
         self.assertEqual(resp.status_code, 200)
-        json_data = json.loads(resp.content)
+        json_data = json.loads(resp.content.decode('utf-8'))
 
         # Verify that the translation occurred
         self.assertIn(expected_copyright, json_data['copyright'])
@@ -160,7 +160,7 @@ class TestFooter(CacheIsolationTestCase):
             resp = self._get_footer(accepts="text/html", params={'language': language})
 
         self.assertEqual(resp.status_code, 200)
-        self.assertIn(static_path, resp.content)
+        self.assertIn(static_path, resp.content.decode('utf-8'))
 
     @ddt.data(
         # OpenEdX
@@ -182,9 +182,9 @@ class TestFooter(CacheIsolationTestCase):
         self.assertEqual(resp.status_code, 200)
 
         if show_logo:
-            self.assertIn('alt="Powered by Open edX"', resp.content)
+            self.assertIn('alt="Powered by Open edX"', resp.content.decode('utf-8'))
         else:
-            self.assertNotIn('alt="Powered by Open edX"', resp.content)
+            self.assertNotIn('alt="Powered by Open edX"', resp.content.decode('utf-8'))
 
     @ddt.data(
         # OpenEdX
@@ -205,9 +205,9 @@ class TestFooter(CacheIsolationTestCase):
         self.assertEqual(resp.status_code, 200)
 
         if include_dependencies:
-            self.assertIn("vendor", resp.content)
+            self.assertIn("vendor", resp.content.decode('utf-8'))
         else:
-            self.assertNotIn("vendor", resp.content)
+            self.assertNotIn("vendor", resp.content.decode('utf-8'))
 
     @ddt.data(
         # OpenEdX
@@ -239,7 +239,7 @@ class TestFooter(CacheIsolationTestCase):
             selected_language = language if language else 'en'
             self._verify_language_selector(resp, selected_language)
         else:
-            self.assertNotIn('footer-language-selector', resp.content)
+            self.assertNotIn('footer-language-selector', resp.content.decode('utf-8'))
 
     def test_no_supported_accept_type(self):
         self._set_feature_flag(True)
@@ -315,4 +315,4 @@ class TestIndex(SiteMixin, TestCase):
         self.use_site(self.site_other)
         self.client.login(username=self.user.username, password="password")
         response = self.client.get(reverse("dashboard"))
-        self.assertIn(self.site_configuration_other.values["MKTG_URLS"]["ROOT"], response.content)
+        self.assertIn(self.site_configuration_other.values["MKTG_URLS"]["ROOT"], response.content.decode('utf-8'))

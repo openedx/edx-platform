@@ -15,7 +15,6 @@ from courseware.tabs import EnrolledTab
 from edxmako.shortcuts import render_to_response
 from notes.models import Note
 from notes.utils import notes_enabled_for_course
-from xmodule.annotator_token import retrieve_token
 
 
 @login_required
@@ -35,7 +34,7 @@ def notes(request, course_id):
         'notes': notes,
         'student': student,
         'storage': storage,
-        'token': retrieve_token(student.email, course.annotation_token_secret),
+        'token': None,
         'default_tab': 'myNotes',
     }
 

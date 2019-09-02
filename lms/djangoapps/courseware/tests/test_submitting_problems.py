@@ -457,7 +457,7 @@ class TestCourseGrader(TestSubmittingProblems):
             "The state of this problem has changed since you loaded this page. "
             "Please refresh your page."
         )
-        self.assertEqual(json.loads(resp.content).get("success"), err_msg)
+        self.assertEqual(json.loads(resp.content.decode('utf-8')).get("success"), err_msg)
 
     def test_submission_reset(self):
         """Test problem ProcessingErrors due to resets"""
@@ -470,7 +470,7 @@ class TestCourseGrader(TestSubmittingProblems):
             "The state of this problem has changed since you loaded this page. "
             "Please refresh your page."
         )
-        self.assertEqual(json.loads(resp.content).get("success"), err_msg)
+        self.assertEqual(json.loads(resp.content.decode('utf-8')).get("success"), err_msg)
 
     def test_submission_show_answer(self):
         """Test problem for ProcessingErrors due to showing answer"""
@@ -481,7 +481,7 @@ class TestCourseGrader(TestSubmittingProblems):
             "The state of this problem has changed since you loaded this page. "
             "Please refresh your page."
         )
-        self.assertEqual(json.loads(resp.content).get("success"), err_msg)
+        self.assertEqual(json.loads(resp.content.decode('utf-8')).get("success"), err_msg)
 
     def test_show_answer_doesnt_write_to_csm(self):
         self.basic_setup()
@@ -795,7 +795,7 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
             resp = self.submit_question_answer("the_problem", {'2_1': fileobjs})
 
         self.assertEqual(resp.status_code, 200)
-        json_resp = json.loads(resp.content)
+        json_resp = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(json_resp['success'], "incorrect")
 
         # See how post got called.
@@ -803,8 +803,8 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
         self.assertEqual(name, "post")
         self.assertEqual(len(args), 1)
         self.assertTrue(args[0].endswith("/submit/"))
-        self.assertItemsEqual(list(kwargs.keys()), ["files", "data", "timeout"])
-        self.assertItemsEqual(list(kwargs['files'].keys()), filenames.split())
+        six.assertCountEqual(self, list(kwargs.keys()), ["files", "data", "timeout"])
+        six.assertCountEqual(self, list(kwargs['files'].keys()), filenames.split())
 
 
 class TestPythonGradedResponse(TestSubmittingProblems):
@@ -985,7 +985,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
         """
         resp = self.submit_question_answer(name, {'2_1': self.correct_responses[name]})
 
-        respdata = json.loads(resp.content)
+        respdata = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(respdata['success'], 'correct')
 
     def _check_incorrect(self, name):
@@ -994,7 +994,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
         """
         resp = self.submit_question_answer(name, {'2_1': self.incorrect_responses[name]})
 
-        respdata = json.loads(resp.content)
+        respdata = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(respdata['success'], 'incorrect')
 
     def _check_ireset(self, name):
@@ -1008,7 +1008,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
         # then get it right
         resp = self.submit_question_answer(name, {'2_1': self.correct_responses[name]})
 
-        respdata = json.loads(resp.content)
+        respdata = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(respdata['success'], 'correct')
 
     def test_schematic_correct(self):

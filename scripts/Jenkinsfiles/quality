@@ -36,12 +36,14 @@ def getTargetBranch(job_name) {
 
 def qualityTestCleanup() {
     archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/**/*,test_root/log/**/*.log,*.log'
+    sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
     junit 'reports/quality_junitxml/*.xml'
 }
 
 pipeline {
     agent { label "jenkins-worker" }
     options {
+        sendSplunkConsoleLog()
         timestamps()
         timeout(60)
     }

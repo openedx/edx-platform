@@ -16,9 +16,6 @@ from contextlib import contextmanager
 from datetime import datetime, timedelta
 
 import ddt
-from six import text_type
-from six.moves.urllib.parse import quote  # pylint: disable=import-error
-from six.moves import range, zip
 import unicodecsv
 from django.conf import settings
 from django.test.utils import override_settings
@@ -27,17 +24,20 @@ from edx_django_utils.cache import RequestCache
 from freezegun import freeze_time
 from mock import ANY, MagicMock, Mock, patch
 from pytz import UTC
+from six import text_type
+from six.moves import range, zip
+from six.moves.urllib.parse import quote  # pylint: disable=import-error
 
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import InstructorFactory
-from instructor_analytics.basic import UNAVAILABLE, list_problem_responses
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
 from lms.djangoapps.grades.models import PersistentCourseGrade
 from lms.djangoapps.grades.transformer import GradesTransformer
+from lms.djangoapps.instructor_analytics.basic import UNAVAILABLE, list_problem_responses
 from lms.djangoapps.instructor_task.tasks_helper.certs import generate_students_certificates
 from lms.djangoapps.instructor_task.tasks_helper.enrollments import (
     upload_enrollment_report,
@@ -1367,7 +1367,7 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
         report_html_filename = report_store.links_for(self.course.id)[0][0]
         report_path = report_store.path_to(self.course.id, report_html_filename)
         with report_store.storage.open(report_path) as html_file:
-            html_file_data = html_file.read()
+            html_file_data = html_file.read().decode('utf-8')
             for data in expected_data:
                 self.assertIn(data, html_file_data)
 
@@ -1463,7 +1463,7 @@ class TestCourseSurveyReport(TestReportMixin, InstructorTaskCourseTestCase):
         with report_store.storage.open(report_path) as csv_file:
             csv_file_data = csv_file.read()
             # Removing unicode signature (BOM) from the beginning
-            csv_file_data = csv_file_data.decode("utf-8-sig").encode("utf-8")
+            csv_file_data = csv_file_data.decode("utf-8-sig")
             for data in expected_data:
                 self.assertIn(data, csv_file_data)
 
@@ -2175,7 +2175,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'failed': 3,
             'skipped': 2
         }
-        with self.assertNumQueries(122):
+        with self.assertNumQueries(130):
             self.assertCertificatesGenerated(task_input, expected_results)
 
         expected_results = {

@@ -21,9 +21,12 @@ course.certificates: {
     ]
 }
 """
+from __future__ import absolute_import
+
 import json
 import logging
 
+import six
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -31,6 +34,7 @@ from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
+from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, CourseKey
 from six import text_type
@@ -40,7 +44,6 @@ from contentstore.views.assets import delete_asset
 from contentstore.views.exception import AssetNotFoundException
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
-from eventtracking import tracker
 from student.auth import has_studio_write_access
 from student.roles import GlobalStaff
 from util.db import MYSQL_MAX_INT, generate_int_id
@@ -346,7 +349,7 @@ def certificate_activation_handler(request, course_key_string):
         msg = _(u'PermissionDenied: Failed in authenticating {user}').format(user=request.user)
         return JsonResponse({"error": msg}, status=403)
 
-    data = json.loads(request.body)
+    data = json.loads(request.body.decode('utf8'))
     is_active = data.get('is_active', False)
     certificates = CertificateManager.get_certificates(course)
 
@@ -358,7 +361,7 @@ def certificate_activation_handler(request, course_key_string):
     store.update_item(course, request.user.id)
     cert_event_type = 'activated' if is_active else 'deactivated'
     CertificateManager.track_event(cert_event_type, {
-        'course_id': unicode(course.id),
+        'course_id': six.text_type(course.id),
     })
     return HttpResponse(status=200)
 
@@ -446,7 +449,7 @@ def certificates_list_handler(request, course_key_string):
                 )
                 store.update_item(course, request.user.id)
                 CertificateManager.track_event('created', {
-                    'course_id': unicode(course.id),
+                    'course_id': six.text_type(course.id),
                     'configuration_id': new_certificate.id
                 })
                 course = _get_course_and_check_access(course_key, request.user)
@@ -503,7 +506,7 @@ def certificates_detail_handler(request, course_key_string, certificate_id):
 
         store.update_item(course, request.user.id)
         CertificateManager.track_event(cert_event_type, {
-            'course_id': unicode(course.id),
+            'course_id': six.text_type(course.id),
             'configuration_id': serialized_certificate["id"]
         })
         return JsonResponse(serialized_certificate, status=201)
@@ -525,7 +528,7 @@ def certificates_detail_handler(request, course_key_string, certificate_id):
             certificate_id=certificate_id
         )
         CertificateManager.track_event('deleted', {
-            'course_id': unicode(course.id),
+            'course_id': six.text_type(course.id),
             'configuration_id': certificate_id
         })
         return JsonResponse(status=204)

@@ -1,7 +1,10 @@
+<%page expression_filter="h"/>
 <%!
 import third_party_auth
+import six
 from third_party_auth import pipeline, provider
 from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
 from django_countries import countries
 from student.models import UserProfile
 %>
@@ -26,7 +29,7 @@ from student.models import UserProfile
 
   % for enabled in provider.Registry.displayed_for_login():
     ## Translators: provider_name is the name of an external, third-party user authentication service (like Google or LinkedIn).
-    <button type="submit" class="button button-primary button-${enabled.provider_id} register-${enabled.provider_id}" onclick="thirdPartySignin(event, '${pipeline_urls[enabled.provider_id]}');">
+    <button type="submit" class="button button-primary button-${enabled.provider_id} register-${enabled.provider_id}" onclick="thirdPartySignin(event, '${pipeline_urls[enabled.provider_id] | n, decode.utf8}');">
       % if enabled.icon_class:
       <span class="icon fa ${enabled.icon_class}" aria-hidden="true"></span>
       % else:
@@ -46,7 +49,9 @@ from student.models import UserProfile
 
   <p class="instructions">
     ${_('Create your own {platform_name} account below').format(platform_name=platform_name)}
-    <span class="note">${_('Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.')}</span>
+    <span class="note">${Text(_('Required fields are noted by {strong_start}bold text and an asterisk (*){strong_end}.')).format(
+        strong_start=HTML('<strong class="indicator">'),
+        strong_end=HTML('</strong>'))}</span>
   </p>
 
 
@@ -54,7 +59,7 @@ from student.models import UserProfile
 
   <p class="instructions">
     ## Translators: selected_provider is the name of an external, third-party user authentication service (like Google or LinkedIn).
-    ${_("You've successfully signed in with {selected_provider}.").format(selected_provider='<strong>%s</strong>' % selected_provider)}<br />
+    ${Text(_("You've successfully signed in with {selected_provider}.")).format(selected_provider=HTML('<strong>{selected_provider}</strong>').format(selected_provider=selected_provider))}<br />
     ${_("We just need a little more information before you start learning with {platform_name}.").format(platform_name=settings.PLATFORM_NAME)}
   </p>
 
@@ -64,7 +69,8 @@ from student.models import UserProfile
 
 <p class="instructions">
   ${_("Please complete the following fields to register for an account. ")}<br />
-  ${_('Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.')}
+  ${Text(_('Required fields are noted by {strong_start}bold text and an asterisk (*){strong_end}.')).format( \
+    strong_start=HTML('<strong class="indicator">'), strong_end=HTML('</strong>'))}
 </p>
 
 % endif
@@ -164,7 +170,7 @@ from student.models import UserProfile
         <select id="country" name="country" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['country'] == 'required' else ''}>
           <option value="">--</option>
           %for code, country_name in countries:
-          <option value="${code}">${ unicode(country_name) }</option>
+          <option value="${code}">${ six.text_type(country_name) }</option>
           %endfor
         </select>
       </div>
@@ -239,9 +245,9 @@ from student.models import UserProfile
       % if has_extauth_info is UNDEFINED or ask_for_tos :
       <div class="field required checkbox" id="field-tos">
         <input id="tos-yes" type="checkbox" name="terms_of_service" value="true" required aria-required="true" />
-        <label for="tos-yes">${_('I agree to the {link_start}Terms of Service{link_end}').format(
-          link_start='<a href="{url}" class="new-vp" tabindex="-1">'.format(url=marketing_link('TOS')),
-          link_end='</a>')}</label>
+        <label for="tos-yes">${Text(_('I agree to the {link_start}Terms of Service{link_end}')).format(
+          link_start=HTML('<a href="{url}" class="new-vp" tabindex="-1">').format(url=marketing_link('TOS')),
+          link_end=HTML('</a>'))}</label>
       </div>
       % endif
 
@@ -253,9 +259,9 @@ from student.models import UserProfile
         <%
           honor_code_path = marketing_link('HONOR')
         %>
-        <label for="honorcode-yes">${_('I agree to the {link_start}Honor Code{link_end}').format(
-          link_start='<a href="{url}" class="new-vp" tabindex="-1">'.format(url=honor_code_path),
-          link_end='</a>')}</label>
+        <label for="honorcode-yes">${Text(_('I agree to the {link_start}Honor Code{link_end}')).format(
+          link_start=HTML('<a href="{url}" class="new-vp" tabindex="-1">').format(url=honor_code_path),
+          link_end=HTML('</a>'))}</label>
       </div>
       % endif
       % endif
@@ -264,5 +270,5 @@ from student.models import UserProfile
 </div>
 
 <div class="form-actions">
-  <button name="submit" type="submit" id="submit" class="action action-primary action-update register-button">${_('Register')} <span class="orn-plus">+</span> ${_('Create My Account')}</button>
+  <button name="submit" type="submit" id="submit" class="action action-primary action-update register-button">${_('Register')} <span class="orn-plus">+</span> ${Text(_('Create My Account'))}</button>
 </div>

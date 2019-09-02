@@ -2,6 +2,8 @@
 Tests for the bok-choy paver commands themselves.
 Run just this test with: paver test_lib -t pavelib/paver_tests/test_paver_bok_choy_cmds.py
 """
+from __future__ import absolute_import
+
 import os
 import unittest
 from test.test_support import EnvironmentVarGuard

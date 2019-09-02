@@ -77,12 +77,14 @@ class GradeViewTestMixin(SharedModuleStoreTestCase):
                 created=self.date,
             )
 
-    def _create_user_program_enrollments(self, *users):
+    def _create_user_program_enrollments(self, *users, **kwargs):
+        # supply mode for enrollment. Use 'masters' to create a masters track enrollment
         for index, user in enumerate(users):
             course_enrollment = CourseEnrollmentFactory(
                 course_id=self.course.id,
                 user=user,
                 created=self.date,
+                mode=kwargs.get('mode', 'audit')
             )
 
             program_enrollment = ProgramEnrollmentFactory(
@@ -111,8 +113,14 @@ class GradeViewTestMixin(SharedModuleStoreTestCase):
             username='program_student',
             email='i_love_learning@example.com',
         )
+        self.program_masters_student = UserFactory(
+            password=self.password,
+            username='program_masters_student',
+            email='i_love_learning@example.com',
+        )
         self._create_user_enrollments(self.student, self.other_student)
         self._create_user_program_enrollments(self.program_student)
+        self._create_user_program_enrollments(self.program_masters_student, mode='masters')
 
     @classmethod
     def _create_test_course_with_default_grading_policy(cls, display_name, run):

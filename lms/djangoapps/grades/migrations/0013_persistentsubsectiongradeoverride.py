@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 from django.db import migrations, models
 
-from coursewarehistoryextended.fields import UnsignedBigIntOneToOneField
+from courseware.fields import UnsignedBigIntOneToOneField
 
 
 class Migration(migrations.Migration):

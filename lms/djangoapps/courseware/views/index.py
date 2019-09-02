@@ -4,15 +4,21 @@ View for Courseware Index
 
 # pylint: disable=attribute-defined-outside-init
 
-import logging
-import urllib
+from __future__ import absolute_import
 
+import logging
+
+import six
+import six.moves.urllib as urllib  # pylint: disable=import-error
+import six.moves.urllib.error  # pylint: disable=import-error
+import six.moves.urllib.parse  # pylint: disable=import-error
+import six.moves.urllib.request  # pylint: disable=import-error
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.views import redirect_to_login
-from django.urls import reverse
 from django.http import Http404
 from django.template.context_processors import csrf
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
@@ -24,7 +30,6 @@ from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
 from edxmako.shortcuts import render_to_response, render_to_string
-
 from lms.djangoapps.courseware.courses import allow_public_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
@@ -37,17 +42,19 @@ from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import (
-    COURSE_OUTLINE_PAGE_FLAG, default_course_url_name, COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
+    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
+    COURSE_OUTLINE_PAGE_FLAG,
+    default_course_url_name
 )
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from shoppingcart.models import CourseRegistrationCode
 from student.views import is_course_blocked
 from util.views import ensure_valid_course_key
-from xmodule.modulestore.django import modulestore
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
+from xmodule.modulestore.django import modulestore
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
-from .views import CourseTabView
+
 from ..access import has_access
 from ..courses import check_course_access, get_course_with_access, get_current_child, get_studio_url
 from ..entrance_exams import (
@@ -56,12 +63,13 @@ from ..entrance_exams import (
     user_can_skip_entrance_exam,
     user_has_passed_entrance_exam
 )
-from ..masquerade import (
-    setup_masquerade,
-    check_content_start_date_for_masquerade_user
-)
+from ..masquerade import check_content_start_date_for_masquerade_user, setup_masquerade
 from ..model_data import FieldDataCache
 from ..module_render import get_module_for_descriptor, toc_for_course
+from ..permissions import MASQUERADE_AS_STUDENT
+
+from .views import CourseTabView
+
 
 log = logging.getLogger("edx.courseware.views.index")
 
@@ -147,6 +155,7 @@ class CoursewareIndex(View):
                         # If the user is considered enrolled show the default XBlock student_view.
                         pass
 
+                self.can_masquerade = request.user.has_perm(MASQUERADE_AS_STUDENT, self.course)
                 self.is_staff = has_access(request.user, 'staff', self.course)
                 self._setup_masquerade_for_effective_user()
 
@@ -163,7 +172,7 @@ class CoursewareIndex(View):
         self.masquerade, self.effective_user = setup_masquerade(
             self.request,
             self.course_key,
-            self.is_staff,
+            self.can_masquerade,
             reset_masquerade_data=True
         )
         # Set the user in the request to the effective user.
@@ -190,7 +199,7 @@ class CoursewareIndex(View):
                                                          self.course.start, self.chapter.start, self.section.start)
 
         if not request.user.is_authenticated:
-            qs = urllib.urlencode({
+            qs = six.moves.urllib.parse.urlencode({
                 'course_id': self.course_key,
                 'enrollment_action': 'enroll',
                 'email_opt_in': False,
@@ -231,7 +240,7 @@ class CoursewareIndex(View):
                 reverse(
                     'courseware_section',
                     kwargs={
-                        'course_id': unicode(self.course_key),
+                        'course_id': six.text_type(self.course_key),
                         'chapter': self.chapter.url_name,
                         'section': self.section.url_name,
                     },
@@ -269,7 +278,7 @@ class CoursewareIndex(View):
             log.warning(
                 u'User %s cannot access the course %s because payment has not yet been received',
                 self.real_user,
-                unicode(self.course_key),
+                six.text_type(self.course_key),
             )
             raise CourseAccessRedirect(reverse('dashboard'))
 
@@ -399,7 +408,7 @@ class CoursewareIndex(View):
         Also returns the table of contents for the courseware.
         """
         course_url_name = default_course_url_name(self.course.id)
-        course_url = reverse(course_url_name, kwargs={'course_id': unicode(self.course.id)})
+        course_url = reverse(course_url_name, kwargs={'course_id': six.text_type(self.course.id)})
 
         courseware_context = {
             'csrf': csrf(self.request)['csrf_token'],
@@ -410,6 +419,7 @@ class CoursewareIndex(View):
             'init': '',
             'fragment': Fragment(),
             'staff_access': self.is_staff,
+            'can_masquerade': self.can_masquerade,
             'masquerade': self.masquerade,
             'supports_preview_menu': True,
             'studio_url': get_studio_url(self.course, 'course'),
@@ -511,7 +521,7 @@ class CoursewareIndex(View):
             return "{url}?child={requested_child}".format(
                 url=reverse(
                     'courseware_section',
-                    args=[unicode(self.course_key), section_info['chapter_url_name'], section_info['url_name']],
+                    args=[six.text_type(self.course_key), section_info['chapter_url_name'], section_info['url_name']],
                 ),
                 requested_child=requested_child,
             )
@@ -522,7 +532,7 @@ class CoursewareIndex(View):
         section_context = {
             'activate_block_id': self.request.GET.get('activate_block_id'),
             'requested_child': self.request.GET.get("child"),
-            'progress_url': reverse('progress', kwargs={'course_id': unicode(self.course_key)}),
+            'progress_url': reverse('progress', kwargs={'course_id': six.text_type(self.course_key)}),
             'user_authenticated': self.request.user.is_authenticated,
             'position': position,
         }
@@ -544,10 +554,10 @@ def render_accordion(request, course, table_of_contents):
     context = dict(
         [
             ('toc', table_of_contents),
-            ('course_id', unicode(course.id)),
+            ('course_id', six.text_type(course.id)),
             ('csrf', csrf(request)['csrf_token']),
             ('due_date_display_format', course.due_date_display_format),
-        ] + TEMPLATE_IMPORTS.items()
+        ] + list(TEMPLATE_IMPORTS.items())
     )
     return render_to_string('courseware/accordion.html', context)
 

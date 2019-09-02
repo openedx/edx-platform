@@ -1,19 +1,22 @@
 """
 Tests for the Split Testing Module
 """
+from __future__ import absolute_import
+
 import ddt
 import lxml
-from mock import Mock, patch
+import six
 from fs.memoryfs import MemoryFS
+from mock import Mock, patch
 
-from xmodule.partitions.tests.test_partitions import MockPartitionService, PartitionTestCase, MockUserPartitionScheme
-from xmodule.tests.xml import factories as xml
-from xmodule.tests.xml import XModuleXmlImportTest
-from xmodule.tests import get_test_system
-from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
-from xmodule.validation import StudioValidationMessage
+from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, Group, UserPartition
+from xmodule.partitions.tests.test_partitions import MockPartitionService, MockUserPartitionScheme, PartitionTestCase
 from xmodule.split_test_module import SplitTestDescriptor, SplitTestFields, get_split_user_partitions
-from xmodule.partitions.partitions import Group, UserPartition, MINIMUM_STATIC_PARTITION_ID
+from xmodule.tests import get_test_system
+from xmodule.tests.xml import XModuleXmlImportTest
+from xmodule.tests.xml import factories as xml
+from xmodule.validation import StudioValidationMessage
+from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
 
 
 class SplitTestModuleFactory(xml.XmlImportFactory):
@@ -88,8 +91,8 @@ class SplitTestModuleTest(XModuleXmlImportTest, PartitionTestCase):
             UserPartition(
                 MINIMUM_STATIC_PARTITION_ID, 'second_partition', 'Second Partition',
                 [
-                    Group(unicode(MINIMUM_STATIC_PARTITION_ID + 1), 'abel'),
-                    Group(unicode(MINIMUM_STATIC_PARTITION_ID + 2), 'baker'), Group("103", 'charlie')
+                    Group(six.text_type(MINIMUM_STATIC_PARTITION_ID + 1), 'abel'),
+                    Group(six.text_type(MINIMUM_STATIC_PARTITION_ID + 2), 'baker'), Group("103", 'charlie')
                 ],
                 MockUserPartitionScheme()
             )
@@ -165,9 +168,9 @@ class SplitTestModuleLMSTest(SplitTestModuleTest):
         )
 
     # Patch the definition_to_xml for the html children.
-    @patch('xmodule.html_module.HtmlDescriptor.definition_to_xml')
+    @patch('xmodule.html_module.HtmlBlock.definition_to_xml')
     def test_export_import_round_trip(self, def_to_xml):
-        # The HtmlDescriptor definition_to_xml tries to write to the filesystem
+        # The HtmlBlock definition_to_xml tries to write to the filesystem
         # before returning an xml object. Patch this to just return the xml.
         def_to_xml.return_value = lxml.etree.Element('html')
 

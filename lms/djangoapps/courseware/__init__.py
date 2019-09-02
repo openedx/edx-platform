@@ -1,4 +1,6 @@
 #pylint: disable=missing-docstring
+from __future__ import absolute_import
+
 import warnings
 
 if __name__ == 'courseware':

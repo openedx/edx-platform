@@ -12,6 +12,7 @@ from django.conf import settings
 from django.urls import reverse
 from mock import patch
 
+from openedx.core.djangolib.js_utils import js_escaped_string
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -149,7 +150,7 @@ class LoginFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStoreTes
 
         # Verify that the parameters are sent on to the next page correctly
         post_login_handler = _finish_auth_url(params)
-        js_success_var = u'var nextUrl = "{}";'.format(post_login_handler)
+        js_success_var = u'var nextUrl = "{}";'.format(js_escaped_string(post_login_handler))
         self.assertContains(response, js_success_var)
 
         # Verify that the login link preserves the querystring params
@@ -225,7 +226,7 @@ class RegisterFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStore
 
         # Verify that the parameters are sent on to the next page correctly
         post_login_handler = _finish_auth_url(params)
-        js_success_var = u'var nextUrl = "{}";'.format(post_login_handler)
+        js_success_var = u'var nextUrl = "{}";'.format(js_escaped_string(post_login_handler))
         self.assertContains(response, js_success_var)
 
         # Verify that the login link preserves the querystring params

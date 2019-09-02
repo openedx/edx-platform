@@ -13,6 +13,8 @@ Main module which shows problems (of "capa" type).
 This is used by capa_module.
 """
 
+from __future__ import absolute_import
+
 import logging
 import os.path
 import re
@@ -21,6 +23,7 @@ from copy import deepcopy
 from datetime import datetime
 from xml.sax.saxutils import unescape
 
+import six
 from lxml import etree
 from pytz import UTC
 
@@ -208,7 +211,7 @@ class LoncapaProblem(object):
 
             # Run response late_transforms last (see MultipleChoiceResponse)
             # Sort the responses to be in *_1 *_2 ... order.
-            responses = self.responders.values()
+            responses = list(self.responders.values())
             responses = sorted(responses, key=lambda resp: int(resp.id[resp.id.rindex('_') + 1:]))
             for response in responses:
                 if hasattr(response, 'late_transforms'):
@@ -492,7 +495,7 @@ class LoncapaProblem(object):
         answer_ids = []
         for response in self.responders.keys():
             results = self.responder_answers[response]
-            answer_ids.append(results.keys())
+            answer_ids.append(list(results.keys()))
         return answer_ids
 
     def find_correct_answer_text(self, answer_id):
@@ -612,7 +615,7 @@ class LoncapaProblem(object):
                 self.find_answer_text(answer_id, answer) for answer in current_answer
             )
 
-        elif isinstance(current_answer, basestring) and current_answer.startswith('choice_'):
+        elif isinstance(current_answer, six.string_types) and current_answer.startswith('choice_'):
             # Many problem (e.g. checkbox) report "choice_0" "choice_1" etc.
             # Here we transform it
             elems = self.tree.xpath('//*[@id="{answer_id}"]//*[@name="{choice_number}"]'.format(
@@ -625,7 +628,7 @@ class LoncapaProblem(object):
             choices_map = dict(input_cls.extract_choices(choicegroup, self.capa_system.i18n, text_only=True))
             answer_text = choices_map[current_answer]
 
-        elif isinstance(current_answer, basestring):
+        elif isinstance(current_answer, six.string_types):
             # Already a string with the answer
             answer_text = current_answer
 
@@ -725,7 +728,10 @@ class LoncapaProblem(object):
         Main method called externally to get the HTML to be rendered for this capa Problem.
         """
         self.do_targeted_feedback(self.tree)
-        html = contextualize_text(etree.tostring(self._extract_html(self.tree)), self.context)
+        html = contextualize_text(
+            etree.tostring(self._extract_html(self.tree)).decode('utf-8'),
+            self.context
+        )
         return html
 
     def handle_input_ajax(self, data):
@@ -903,7 +909,7 @@ class LoncapaProblem(object):
 
         Used by get_html.
         """
-        if not isinstance(problemtree.tag, basestring):
+        if not isinstance(problemtree.tag, six.string_types):
             # Comment and ProcessingInstruction nodes are not Elements,
             # and we're ok leaving those behind.
             # BTW: etree gives us no good way to distinguish these things

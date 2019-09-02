@@ -43,7 +43,7 @@ CSS_CLASS_NAMES = {
     'video_container': '.video',
     'video_sources': '.video-player video source',
     'video_spinner': '.video-wrapper .spinner',
-    'video_xmodule': '.xmodule_VideoModule',
+    'video_xmodule': '.xmodule_VideoBlock',
     'video_init': '.is-initialized',
     'video_time': '.vidtime',
     'video_display_name': '.vert h3',

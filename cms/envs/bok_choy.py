@@ -11,10 +11,15 @@ support both generating static assets to a directory and also serving static
 from the same directory.
 """
 
+from __future__ import absolute_import
+
+# Silence noisy logs
+import logging
 import os
-from path import Path as path
 
 from django.utils.translation import ugettext_lazy
+from path import Path as path
+
 from openedx.core.release import RELEASE_LINE
 
 ########################## Prod-like settings ###################################
@@ -52,7 +57,7 @@ update_module_store_settings(
 )
 
 # Needed to enable licensing on video modules
-XBLOCK_SETTINGS.update({'VideoDescriptor': {'licensing_enabled': True}})
+XBLOCK_SETTINGS.update({'VideoBlock': {'licensing_enabled': True}})
 
 # Capture the console log via template includes, until webdriver supports log capture again
 CAPTURE_CONSOLE_LOG = True
@@ -82,8 +87,6 @@ MEDIA_ROOT = TEST_ROOT / "uploads"
 
 WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = TEST_ROOT / "staticfiles" / "cms" / "webpack-stats.json"
 
-# Silence noisy logs
-import logging
 LOG_OVERRIDES = [
     ('track.middleware', logging.CRITICAL),
     ('edx.discussion', logging.CRITICAL),
@@ -168,6 +171,8 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
     ),
     DIRECTORY_PREFIX='video-transcripts/',
 )
+
+INSTALLED_APPS.append('openedx.testing.coverage_context_listener')
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.

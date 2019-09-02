@@ -5,6 +5,8 @@ Actions manager for transcripts ajax calls.
 Module do not support rollback (pressing "Cancel" button in Studio)
 All user changes are saved immediately.
 """
+from __future__ import absolute_import
+
 import copy
 import json
 import logging
@@ -17,10 +19,12 @@ from django.core.exceptions import PermissionDenied
 from django.core.files.base import ContentFile
 from django.http import Http404, HttpResponse
 from django.utils.translation import ugettext as _
+from edxval.api import create_external_video, create_or_update_video_transcript
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 from six import text_type
-from edxval.api import create_or_update_video_transcript, create_external_video
+
+from cms.djangoapps.contentstore.views.videos import TranscriptProvider
 from student.auth import has_course_author_access
 from util.json_request import JsonResponse
 from xmodule.contentstore.content import StaticContent
@@ -29,20 +33,18 @@ from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.video_module.transcripts_utils import (
+    GetTranscriptsFromYouTubeException,
+    Transcript,
+    TranscriptsGenerationException,
+    TranscriptsRequestValidationException,
     clean_video_id,
     download_youtube_subs,
-    GetTranscriptsFromYouTubeException,
-    get_transcript_for_video,
-    get_transcripts_from_youtube,
-    Transcript,
-    TranscriptsRequestValidationException,
-    TranscriptsGenerationException,
-    youtube_video_transcript_name,
     get_transcript,
+    get_transcript_for_video,
     get_transcript_from_val,
+    get_transcripts_from_youtube,
+    youtube_video_transcript_name
 )
-
-from cms.djangoapps.contentstore.views.videos import TranscriptProvider
 
 __all__ = [
     'upload_transcripts',

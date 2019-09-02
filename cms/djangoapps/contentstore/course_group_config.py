@@ -1,9 +1,11 @@
 """
 Class for manipulating groups configuration on a course object.
 """
-from collections import defaultdict
+from __future__ import absolute_import
+
 import json
 import logging
+from collections import defaultdict
 
 from django.utils.translation import ugettext as _
 
@@ -58,7 +60,7 @@ class GroupConfiguration(object):
         Deserialize given json that represents group configuration.
         """
         try:
-            configuration = json.loads(json_string)
+            configuration = json.loads(json_string.decode("utf-8"))
         except ValueError:
             raise GroupConfigurationsValidationError(_("invalid JSON"))
         configuration["version"] = UserPartition.VERSION

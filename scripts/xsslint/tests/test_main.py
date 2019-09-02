@@ -2,15 +2,16 @@
 """
 Tests for main.py
 """
+from __future__ import absolute_import
+
 import re
-import textwrap
-from StringIO import StringIO
+from six import StringIO
 from unittest import TestCase
 
 import mock
 
 from xsslint.linters import JavaScriptLinter, MakoTemplateLinter, PythonLinter, UnderscoreTemplateLinter
-from xsslint.main import _lint, _build_ruleset
+from xsslint.main import _build_ruleset, _lint
 from xsslint.reporting import SummaryResults
 
 

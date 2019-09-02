@@ -3,9 +3,11 @@
 Admin site configurations for verify_student.
 """
 
+from __future__ import absolute_import
+
 from django.contrib import admin
 
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSOVerification, ManualVerification
+from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
 
 
 @admin.register(SoftwareSecurePhotoVerification)

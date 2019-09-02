@@ -35,7 +35,7 @@ class TestLongUsernameEmail(TestCase):
         # Status code should be 400.
         self.assertEqual(response.status_code, 400)
 
-        obj = json.loads(response.content)
+        obj = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             obj['value'],
             USERNAME_BAD_LENGTH_MSG,
@@ -63,7 +63,7 @@ class TestLongUsernameEmail(TestCase):
         # Status code should be 400.
         self.assertEqual(response.status_code, 400)
 
-        obj = json.loads(response.content)
+        obj = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             obj['value'],
             "Email cannot be more than 254 characters long",

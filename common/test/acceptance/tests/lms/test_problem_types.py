@@ -2,14 +2,17 @@
 Bok choy acceptance and a11y tests for problem types in the LMS
 """
 from __future__ import absolute_import
+
 import random
 import textwrap
 from abc import ABCMeta, abstractmethod
 
 import ddt
 import pytest
-from selenium.webdriver import ActionChains
+import six
 from bok_choy.promise import BrokenPromise
+from selenium.webdriver import ActionChains
+from six.moves import range
 
 from capa.tests.response_xml_factory import (
     AnnotationResponseXMLFactory,
@@ -31,8 +34,6 @@ from common.test.acceptance.pages.lms.problem import ProblemPage
 from common.test.acceptance.tests.helpers import EventsTestMixin, select_option_by_text
 from common.test.acceptance.tests.lms.test_lms_problems import ProblemsTest
 from openedx.core.lib.tests import attr
-import six
-from six.moves import range
 
 
 class ProblemTypeTestBaseMeta(ABCMeta):

@@ -7,7 +7,7 @@ from __future__ import absolute_import
 
 import itertools
 import json
-import StringIO
+from six import StringIO
 import unittest
 from copy import deepcopy
 
@@ -650,11 +650,11 @@ class TestRecommenderFileUploading(TestRecommender):
         happens or is rejected as expected.
         """
         if 'magic_number' in test_case:
-            f_handler = StringIO.StringIO(test_case['magic_number'].decode('hex'))
+            f_handler = StringIO(test_case['magic_number'].decode('hex'))
         elif content is not None:
-            f_handler = StringIO.StringIO(json.dumps(content, sort_keys=True))
+            f_handler = StringIO(json.dumps(content, sort_keys=True))
         else:
-            f_handler = StringIO.StringIO('')
+            f_handler = StringIO('')
 
         f_handler.content_type = test_case['mimetypes']
         f_handler.name = 'file' + test_case['suffixes']

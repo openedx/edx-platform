@@ -6,16 +6,19 @@ already been submitted, filtered either by running state or input
 arguments.
 
 """
+from __future__ import absolute_import
+
 import hashlib
 from collections import Counter
 
+import six
 from celery.states import READY_STATES
 
 from bulk_email.models import CourseEmail
 from lms.djangoapps.certificates.models import CertificateGenerationHistory
 from lms.djangoapps.instructor_task.api_helper import (
-    check_arguments_for_rescoring,
     check_arguments_for_overriding,
+    check_arguments_for_rescoring,
     check_entrance_exam_problems_for_rescoring,
     encode_entrance_exam_and_student_input,
     encode_problem_and_student_input,
@@ -23,7 +26,6 @@ from lms.djangoapps.instructor_task.api_helper import (
 )
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.tasks import (
-    override_problem_score,
     calculate_grades_csv,
     calculate_may_enroll_csv,
     calculate_problem_grade_report,
@@ -36,6 +38,7 @@ from lms.djangoapps.instructor_task.tasks import (
     exec_summary_report_csv,
     export_ora2_data,
     generate_certificates,
+    override_problem_score,
     proctored_exam_results_csv,
     rescore_problem,
     reset_problem_attempts,
@@ -309,7 +312,7 @@ def submit_bulk_course_email(request, course_key, email_id):
     targets = [
         target if count <= 1 else
         u"{} {}".format(count, target)
-        for target, count in targets.iteritems()
+        for target, count in six.iteritems(targets)
     ]
 
     task_type = 'bulk_course_email'
@@ -317,7 +320,7 @@ def submit_bulk_course_email(request, course_key, email_id):
     task_input = {'email_id': email_id, 'to_option': targets}
     task_key_stub = str(email_id)
     # create the key value by using MD5 hash:
-    task_key = hashlib.md5(task_key_stub).hexdigest()
+    task_key = hashlib.md5(task_key_stub.encode('utf-8')).hexdigest()
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 

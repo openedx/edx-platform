@@ -1,4 +1,8 @@
-from django.core.management.base import BaseCommand, CommandError
+"""Script to Empty the trashcan"""
+
+from __future__ import absolute_import
+
+from django.core.management.base import BaseCommand
 from opaque_keys.edx.keys import CourseKey
 
 from xmodule.contentstore.utils import empty_asset_trashcan
@@ -8,6 +12,9 @@ from .prompt import query_yes_no
 
 
 class Command(BaseCommand):
+    """
+        Command to Empty the trashcan.
+    """
     help = 'Empty the trashcan. Can pass an optional course_id to limit the damage.'
 
     def add_arguments(self, parser):

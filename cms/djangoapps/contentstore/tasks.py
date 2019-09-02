@@ -33,6 +33,7 @@ from organizations.models import OrganizationCourse
 from path import Path as path
 from pytz import UTC
 from six import iteritems, text_type
+from six.moves import range
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.tasks import UserTask
 
@@ -45,6 +46,7 @@ from models.settings.course_metadata import CourseMetadata
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
 from openedx.core.lib.extract_tar import safetar_extractall
 from student.auth import has_course_author_access
+from util.organizations_helpers import add_organization_course, get_organization_by_short_name
 from xmodule.contentstore.django import contentstore
 from xmodule.course_module import CourseFields
 from xmodule.exceptions import SerializationError
@@ -101,7 +103,7 @@ def enqueue_update_thumbnail_tasks(course_videos, videos_per_task, run):
     start = 0
     end = videos_per_task
     chunks_count = int(ceil(batch_size / float(videos_per_task)))
-    for __ in xrange(0, chunks_count):
+    for __ in range(0, chunks_count):  # pylint: disable=C7620
         course_videos_chunk = course_videos[start:end]
         tasks.append(task_scrape_youtube_thumbnail.s(
             course_videos_chunk, run
@@ -197,7 +199,7 @@ def enqueue_async_migrate_transcripts_tasks(course_keys,
         'command_run': command_run
     }
     group([
-        async_migrate_transcript.s(unicode(course_key), **kwargs)
+        async_migrate_transcript.s(text_type(course_key), **kwargs)
         for course_key in course_keys
     ])()
 
@@ -264,7 +266,7 @@ def async_migrate_transcript(self, course_key, **kwargs):   # pylint: disable=un
                 all_transcripts.update({'en': video.sub})
 
             sub_tasks = []
-            video_location = unicode(video.location)
+            video_location = text_type(video.location)
             for lang in all_transcripts:
                 sub_tasks.append(async_migrate_transcript_subtask.s(
                     video_location, revision, lang, force_update, **kwargs
@@ -484,6 +486,8 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
             for country_access_rule in country_access_rules:
                 clone_instance(country_access_rule, {'restricted_course': new_restricted_course})
 
+        org_data = get_organization_by_short_name(source_course_key.org)
+        add_organization_course(org_data, destination_course_key)
         return "succeeded"
 
     except DuplicateCourseError:
@@ -548,16 +552,6 @@ def update_library_index(library_id, triggered_time_isoformat):
         LOGGER.error(u'Search indexing error for library %s - %s', library_id, text_type(exc))
     else:
         LOGGER.debug(u'Search indexing successful for library %s', library_id)
-
-
-@task()
-def push_course_update_task(course_key_string, course_subscription_id, course_display_name):
-    """
-    Sends a push notification for a course update.
-    """
-    # TODO Use edx-notifications library instead (MA-638).
-    from .push_notification import send_push_course_update
-    send_push_course_update(course_key_string, course_subscription_id, course_display_name)
 
 
 class CourseExportTask(UserTask):  # pylint: disable=abstract-method

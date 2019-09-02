@@ -1,6 +1,8 @@
 """
 Middleware used for adjusting headers in a response before it is sent to the end user.
 """
+from __future__ import absolute_import
+
 import six
 
 

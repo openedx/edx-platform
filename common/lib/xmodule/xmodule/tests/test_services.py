@@ -2,15 +2,17 @@
 Tests for SettingsService
 """
 
-import ddt
-import mock
+from __future__ import absolute_import
+
 from unittest import TestCase
 
+import ddt
+import mock
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.test.utils import override_settings
-
 from xblock.runtime import Mixologist
+
 from xmodule.services import ConfigurationService, SettingsService
 
 

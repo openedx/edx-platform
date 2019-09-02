@@ -39,7 +39,7 @@ def load_serialized_data(response, key):
     """
     Extract and deserialize serialized data from the response.
     """
-    pattern = re.compile(ur'{key}: (?P<data>\[.*\])'.format(key=key))
+    pattern = re.compile(u'{key}: (?P<data>\\[.*\\])'.format(key=key))
     match = pattern.search(response.content)
     serialized = match.group('data')
 

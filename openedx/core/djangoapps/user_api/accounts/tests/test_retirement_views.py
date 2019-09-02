@@ -11,6 +11,7 @@ import unittest
 import ddt
 import mock
 import pytz
+import six
 from consent.models import DataSharingConsent
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -661,7 +662,7 @@ class TestAccountRetirementList(RetirementTestCase):
                     del retirement['created']
                     del retirement['modified']
 
-            self.assertItemsEqual(response_data, expected_data)
+            six.assertCountEqual(self, response_data, expected_data)
 
     def test_empty(self):
         """
@@ -834,7 +835,7 @@ class TestAccountRetirementsByStatusAndDate(RetirementTestCase):
                     except KeyError:
                         pass
 
-            self.assertItemsEqual(response_data, expected_data)
+            six.assertCountEqual(self, response_data, expected_data)
 
     def test_empty(self):
         """

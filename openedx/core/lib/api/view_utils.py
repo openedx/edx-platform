@@ -223,7 +223,7 @@ class LazySequence(Sequence):
     It is immutable, and accepts an estimated length in order to support __len__
     without exhausting the underlying sequence
     """
-    def __init__(self, iterable, est_len=None):  # pylint: disable=super-init-not-called
+    def __init__(self, iterable, est_len=None):
         self.iterable = iterable
         self.est_len = est_len
         self._data = []
@@ -337,12 +337,12 @@ class PaginatedAPIView(APIView):
             return None
         return self.paginator.paginate_queryset(queryset, self.request, view=self)
 
-    def get_paginated_response(self, data):
+    def get_paginated_response(self, data, *args, **kwargs):
         """
         Return a paginated style `Response` object for the given output data.
         """
         assert self.paginator is not None
-        return self.paginator.get_paginated_response(data)
+        return self.paginator.get_paginated_response(data, *args, **kwargs)
 
 
 def get_course_key(request, course_id=None):

@@ -5,6 +5,7 @@ from __future__ import absolute_import
 import base64
 import json
 import re
+import six
 
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -40,7 +41,7 @@ class ApiTestCase(TestCase):
         resp = self.request_with_auth("get", *args, **kwargs)
         self.assertHttpOK(resp)
         self.assertTrue(resp["Content-Type"].startswith("application/json"))
-        return json.loads(resp.content)
+        return json.loads(resp.content.decode('utf-8'))
 
     def assertAllowedMethods(self, uri, expected_methods):
         """Assert that the allowed methods for the given URI match the expected list"""
@@ -49,7 +50,7 @@ class ApiTestCase(TestCase):
         allow_header = resp.get("Allow")
         self.assertIsNotNone(allow_header)
         allowed_methods = re.split('[^A-Z]+', allow_header)
-        self.assertItemsEqual(allowed_methods, expected_methods)
+        six.assertCountEqual(self, allowed_methods, expected_methods)
 
     def assertSelfReferential(self, obj):
         """Assert that accessing the "url" entry in the given object returns the same object"""

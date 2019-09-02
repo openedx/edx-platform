@@ -3,6 +3,7 @@
 Bok choy acceptance tests for Entrance exams in the LMS
 """
 from __future__ import absolute_import
+
 from textwrap import dedent
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc

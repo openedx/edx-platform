@@ -1,9 +1,10 @@
+# coding=utf-8
 """
 Tests for instructor.basic
 """
-
 from __future__ import absolute_import
 
+import ddt
 import datetime
 import json
 
@@ -20,7 +21,7 @@ from six.moves import range, zip
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import InstructorFactory
-from instructor_analytics.basic import (
+from lms.djangoapps.instructor_analytics.basic import (
     AVAILABLE_FEATURES,
     PROFILE_FEATURES,
     STUDENT_FEATURES,
@@ -29,6 +30,7 @@ from instructor_analytics.basic import (
     course_registration_features,
     enrolled_students_features,
     get_proctored_exam_results,
+    get_response_state,
     list_may_enroll,
     list_problem_responses,
     sale_order_record_features,
@@ -52,6 +54,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
+@ddt.ddt
 class TestAnalyticsBasic(ModuleStoreTestCase):
     """ Test basic analytics functions. """
 
@@ -73,6 +76,26 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             CourseEnrollmentAllowed.objects.create(
                 email=student.email, course_id=self.course_key
             )
+
+    @ddt.data(
+        (u'あなた', u'スの中'),
+        (u"ГЂіи lіиэ ъэтшээи", u"Ђэаvэи аиↁ Ђэѓэ")
+    )
+    @ddt.unpack
+    def test_get_response_state_with_ora(self, files_descriptions, saved_response):
+        """
+        Tests that ORA response state is transformed expectedly when the problem
+        state contains unicode characters.
+        """
+        payload_state = json.dumps({
+            'saved_response': json.dumps({'parts': [{'text': saved_response}]}),
+            'saved_files_descriptions': json.dumps([files_descriptions]),
+        })
+        response = Mock(module_type='openassessment', student=Mock(username='staff'), state=payload_state)
+
+        transformed_state = json.loads(get_response_state(response))
+        self.assertEqual(transformed_state['saved_files_descriptions'][0], files_descriptions)
+        self.assertEqual(transformed_state['saved_response']['parts'][0]['text'], saved_response)
 
     def test_list_problem_responses(self):
         def result_factory(result_id):

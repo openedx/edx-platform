@@ -2,27 +2,32 @@
 """
 Acceptance tests for studio related to the outline page.
 """
+from __future__ import absolute_import
+
 import itertools
 import json
 from datetime import datetime, timedelta
 from unittest import skip
 
 from pytz import UTC
+import six
+from six.moves import range
 
-from base_studio_test import StudioCourseTest
 from common.test.acceptance.fixtures.config import ConfigModelFixture
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.progress import ProgressPage
+from common.test.acceptance.pages.studio.checklists import CourseChecklistsPage
 from common.test.acceptance.pages.studio.overview import ContainerPage, CourseOutlinePage, ExpandCollapseLinkState
 from common.test.acceptance.pages.studio.settings import SettingsPage
-from common.test.acceptance.pages.studio.checklists import CourseChecklistsPage
 from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettingsPage
 from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
 from common.test.acceptance.pages.studio.utils import add_discussion, drag, verify_ordering
 from common.test.acceptance.tests.helpers import disable_animations, load_data_str
 from openedx.core.lib.tests import attr
+
+from .base_studio_test import StudioCourseTest
 
 SECTION_NAME = 'Test Section'
 SUBSECTION_NAME = 'Test Subsection'
@@ -1628,7 +1633,7 @@ class PublishSectionTest(CourseOutlineTest):
         """
         Adds unpublished HTML content to first three units in the course.
         """
-        for index in xrange(3):
+        for index in range(3):
             self.course_fixture.create_xblock(
                 self.course_fixture.get_nested_xblocks(category="vertical")[index].locator,
                 XBlockFixtureDesc('html', 'Unpublished HTML Component ' + str(index)),
@@ -1709,7 +1714,7 @@ class DeprecationWarningMessageTest(CourseOutlineTest):
         self.assertEqual(self.course_outline_page.components_visible, components_present)
         if components_present:
             self.assertEqual(self.course_outline_page.components_list_heading, self.COMPONENT_LIST_HEADING)
-            self.assertItemsEqual(self.course_outline_page.components_display_names, components_display_name_list)
+            six.assertCountEqual(self, self.course_outline_page.components_display_names, components_display_name_list)
 
     def test_no_deprecation_warning_message_present(self):
         """

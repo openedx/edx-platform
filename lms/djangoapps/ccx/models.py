@@ -1,12 +1,13 @@
 """
 Models for the custom course feature
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import json
 import logging
 from datetime import datetime
 
+import six
 from ccx_keys.locator import CCXLocator
 from django.contrib.auth.models import User
 from django.db import models
@@ -102,7 +103,7 @@ class CustomCourseForEdX(models.Model):
         Returns:
             The CCXLocator corresponding to this CCX.
         """
-        return CCXLocator.from_course_locator(self.course_id, unicode(self.id))
+        return CCXLocator.from_course_locator(self.course_id, six.text_type(self.id))
 
 
 class CcxFieldOverride(models.Model):

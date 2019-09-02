@@ -1,12 +1,15 @@
 """Unit tests for the Paver asset tasks."""
 
+from __future__ import absolute_import
+
 import os
 from unittest import TestCase
 
 import ddt
+import paver.tasks
+import six
 from mock import patch
 from paver.easy import call_task, path
-import paver.tasks
 from watchdog.observers import Observer
 
 from pavelib.assets import COLLECTSTATIC_LOG_DIR_ARG, collect_assets
@@ -76,7 +79,7 @@ class TestPaverAssetTasks(PaverTestCase):
                 u'rtlcss cms/static/css/bootstrap/studio-main.css cms/static/css/bootstrap/studio-main-rtl.css'
             )
 
-        self.assertItemsEqual(self.task_messages, expected_messages)
+        six.assertCountEqual(self, self.task_messages, expected_messages)
 
 
 @ddt.ddt
@@ -193,7 +196,7 @@ class TestPaverThemeAssetTasks(PaverTestCase):
                 u'rtlcss cms/static/css/bootstrap/studio-main.css cms/static/css/bootstrap/studio-main-rtl.css'
             )
 
-        self.assertItemsEqual(self.task_messages, expected_messages)
+        six.assertCountEqual(self, self.task_messages, expected_messages)
 
 
 class TestPaverWatchAssetTasks(TestCase):
@@ -243,7 +246,7 @@ class TestPaverWatchAssetTasks(TestCase):
 
                     self.assertIsInstance(sass_watcher_args[0], Observer)
                     self.assertIsInstance(sass_watcher_args[1], list)
-                    self.assertItemsEqual(sass_watcher_args[1], self.expected_sass_directories)
+                    six.assertCountEqual(self, sass_watcher_args[1], self.expected_sass_directories)
 
     def test_watch_theme_assets(self):
         """
@@ -273,7 +276,7 @@ class TestPaverWatchAssetTasks(TestCase):
                     sass_watcher_args = mock_register.call_args_list[0][0]
                     self.assertIsInstance(sass_watcher_args[0], Observer)
                     self.assertIsInstance(sass_watcher_args[1], list)
-                    self.assertItemsEqual(sass_watcher_args[1], self.expected_sass_directories)
+                    six.assertCountEqual(self, sass_watcher_args[1], self.expected_sass_directories)
 
 
 @ddt.ddt

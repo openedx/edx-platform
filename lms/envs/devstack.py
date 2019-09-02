@@ -1,9 +1,18 @@
 """
 Specific overrides to the base prod settings to make development easier.
 """
+from __future__ import absolute_import
+
+# Silence noisy logs
+import logging
 from os.path import abspath, dirname, join
 
 from corsheaders.defaults import default_headers as corsheaders_default_headers
+
+# pylint: enable=unicode-format-string
+#####################################################################
+from openedx.core.djangoapps.plugins import constants as plugin_constants
+from openedx.core.djangoapps.plugins import plugin_settings
 
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
@@ -27,12 +36,11 @@ ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
 IDA_LOGOUT_URI_LIST = [
     'http://localhost:18130/logout/',  # ecommerce
     'http://localhost:18150/logout/',  # credentials
+    'http://localhost:18381/logout/',  # discovery
 ]
 
 ################################ LOGGERS ######################################
 
-# Silence noisy logs
-import logging
 LOG_OVERRIDES = [
     ('track.contexts', logging.CRITICAL),
     ('track.middleware', logging.CRITICAL),
@@ -214,6 +222,9 @@ FEATURES['STORE_BILLING_INFO'] = True
 FEATURES['ENABLE_PAID_COURSE_REGISTRATION'] = True
 FEATURES['ENABLE_COSMETIC_DISPLAY_PRICE'] = True
 
+######################### Program Enrollments #####################
+FEATURES['ENABLE_ENROLLMENT_RESET'] = True
+
 ########################## Third Party Auth #######################
 
 if FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and 'third_party_auth.dummy.DummyBackend' not in AUTHENTICATION_BACKENDS:
@@ -221,6 +232,9 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and 'third_party_auth.dummy.DummyBack
 
 ############## ECOMMERCE API CONFIGURATION SETTINGS ###############
 ECOMMERCE_PUBLIC_URL_ROOT = "http://localhost:8002"
+
+############################### BLOCKSTORE #####################################
+BLOCKSTORE_API_URL = "http://edx.devstack.blockstore:18250/api/v1/"
 
 ###################### Cross-domain requests ######################
 FEATURES['ENABLE_CORS_HEADERS'] = True
@@ -260,9 +274,6 @@ JWT_AUTH.update({
         'y5ZLcTUomo4rZLjghVpq6KZxfS6I1Vz79ZsMVUWEdXOYePCKKsrQG20ogQEkmTf9FT_SouC6jPcHLXw"}]}'
     ),
 })
-# pylint: enable=unicode-format-string
-#####################################################################
-from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_constants.SettingsType.DEVSTACK)
 
 

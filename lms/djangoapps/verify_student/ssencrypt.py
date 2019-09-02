@@ -15,7 +15,7 @@ An RSA private key can be in any of the following formats:
 * PKCS#1 RSAPrivateKey DER SEQUENCE (binary or PEM encoding)
 * PKCS#8 PrivateKeyInfo DER SEQUENCE (binary or PEM encoding)
 """
-from __future__ import division
+from __future__ import absolute_import, division
 
 import base64
 import binascii
@@ -23,8 +23,8 @@ import hmac
 import logging
 import os
 from hashlib import md5, sha256
-from six import text_type
 
+import six
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.padding import MGF1, OAEP
@@ -33,6 +33,7 @@ from cryptography.hazmat.primitives.ciphers.algorithms import AES
 from cryptography.hazmat.primitives.ciphers.modes import CBC
 from cryptography.hazmat.primitives.hashes import SHA1
 from cryptography.hazmat.primitives.padding import PKCS7
+from six import text_type
 
 log = logging.getLogger(__name__)
 
@@ -83,7 +84,10 @@ def generate_aes_iv(key):
     Return the initialization vector Software Secure expects for a given AES
     key (they hash it a couple of times and take a substring).
     """
-    return md5(key + md5(key).hexdigest()).hexdigest()[:AES_BLOCK_SIZE_BYTES]
+    if six.PY3:
+        return md5(key + md5(key).hexdigest().encode('utf-8')).hexdigest()[:AES_BLOCK_SIZE_BYTES].encode('utf-8')
+    else:
+        return md5(key + md5(key).hexdigest()).hexdigest()[:AES_BLOCK_SIZE_BYTES]
 
 
 def random_aes_key():
@@ -92,6 +96,10 @@ def random_aes_key():
 
 def pad(data):
     """ Pad the given `data` such that it fits into the proper AES block size """
+
+    if six.PY3:
+        data = six.b(data)
+
     padder = PKCS7(AES.block_size).padder()
     return padder.update(data) + padder.finalize()
 

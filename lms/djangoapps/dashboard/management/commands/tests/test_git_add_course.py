@@ -6,7 +6,8 @@ from __future__ import absolute_import
 import logging
 import os
 import shutil
-import StringIO
+import six
+from six import StringIO
 import subprocess
 import unittest
 from uuid import uuid4
@@ -66,14 +67,17 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
         Convenience function for testing command failures
         """
         with self.assertRaisesRegexp(CommandError, regex):
-            call_command('git_add_course', *args, stderr=StringIO.StringIO())
+            call_command('git_add_course', *args, stderr=StringIO())
 
     def test_command_args(self):
         """
         Validate argument checking
         """
         # No argument given.
-        self.assertCommandFailureRegexp('Error: too few arguments')
+        if six.PY2:
+            self.assertCommandFailureRegexp('Error: too few arguments')
+        else:
+            self.assertCommandFailureRegexp('Error: the following arguments are required: repository_url')
         # Extra/Un-named arguments given.
         self.assertCommandFailureRegexp(
             'Error: unrecognized arguments: blah blah blah',
@@ -203,7 +207,7 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
             git_import.add_repo('file://{0}'.format(bare_repo), None, None)
 
         # Get logger for checking strings in logs
-        output = StringIO.StringIO()
+        output = StringIO()
         test_log_handler = logging.StreamHandler(output)
         test_log_handler.setLevel(logging.DEBUG)
         glog = git_import.log

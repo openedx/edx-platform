@@ -1,18 +1,24 @@
 # pylint: disable=missing-docstring,consider-iterating-dictionary
+from __future__ import absolute_import
+
 import json
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
-from django.urls import reverse
 from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import patch
 
 from lms.djangoapps.discussion.notification_prefs import NOTIFICATION_PREF_KEY
 from lms.djangoapps.discussion.notification_prefs.views import (
-    UsernameCipher, ajax_disable, ajax_enable, ajax_status, set_subscription,
+    UsernameCipher,
+    ajax_disable,
+    ajax_enable,
+    ajax_status,
+    set_subscription
 )
 from openedx.core.djangoapps.user_api.models import UserPreference
 from student.tests.factories import UserFactory
@@ -70,7 +76,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):
         request.user = self.user
         response = ajax_status(request)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content), {"status": 0})
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {"status": 0})
 
     def test_ajax_status_get_1(self):
         self.create_prefs()
@@ -78,7 +84,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):
         request.user = self.user
         response = ajax_status(request)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content), {"status": 1})
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {"status": 1})
 
     def test_ajax_status_post(self):
         request = self.request_factory.post("dummy")

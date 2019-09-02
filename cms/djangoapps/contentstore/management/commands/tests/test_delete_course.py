@@ -1,3 +1,8 @@
+"""
+Delete course tests.
+"""
+from __future__ import absolute_import
+
 import mock
 from django.core.management import CommandError, call_command
 
@@ -6,7 +11,7 @@ from student.tests.factories import UserFactory
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 

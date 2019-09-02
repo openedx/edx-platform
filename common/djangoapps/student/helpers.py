@@ -37,6 +37,7 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.theming.helpers import get_themes
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
 from student.models import (
+    CourseEnrollment,
     LinkedInAddToProfileConfiguration,
     Registration,
     UserAttribute,
@@ -118,9 +119,9 @@ def check_verify_status_by_course(user, course_enrollments):
     verification_expiring_soon = is_verification_expiring_soon(expiration_datetime)
 
     # Retrieve verification deadlines for the enrolled courses
-    enrolled_course_keys = [enrollment.course_id for enrollment in course_enrollments]
-    course_deadlines = VerificationDeadline.deadlines_for_courses(enrolled_course_keys)
-
+    course_deadlines = VerificationDeadline.deadlines_for_enrollments(
+        CourseEnrollment.enrollments_for_user(user)
+    )
     recent_verification_datetime = None
 
     for enrollment in course_enrollments:
@@ -387,7 +388,7 @@ def generate_activation_email_context(user, registration):
 
 def create_or_set_user_attribute_created_on_site(user, site):
     """
-    Create or Set UserAttribute indicating the microsite site the user account was created on.
+    Create or Set UserAttribute indicating the site the user account was created on.
     User maybe created on 'courses.edx.org', or a white-label site. Due to the very high
     traffic on this table we now ignore the default site (eg. 'courses.edx.org') and
     code which comsumes this attribute should assume a 'created_on_site' which doesn't exist

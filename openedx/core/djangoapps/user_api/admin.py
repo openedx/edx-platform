@@ -1,6 +1,8 @@
 """
 Django admin configuration pages for the user_api app
 """
+from __future__ import absolute_import
+
 from django.conf.urls import url
 from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
@@ -11,7 +13,8 @@ from django.utils.html import format_html
 from django.utils.translation import ugettext as _
 
 from openedx.core.djangoapps.user_api.accounts.forms import RetirementQueueDeletionForm
-from .models import UserRetirementPartnerReportingStatus, RetirementState, UserRetirementStatus, UserRetirementRequest
+
+from .models import RetirementState, UserRetirementPartnerReportingStatus, UserRetirementRequest, UserRetirementStatus
 
 
 @admin.register(RetirementState)

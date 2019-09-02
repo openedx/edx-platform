@@ -44,6 +44,7 @@ from lms.djangoapps.certificates.models import (
     CertificateStatuses,
     GeneratedCertificate
 )
+from lms.djangoapps.certificates.permissions import PREVIEW_CERTIFICATES
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course, display_date_for_certificate
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
@@ -342,7 +343,7 @@ def _get_user_certificate(request, user, course_key, course, preview_mode=None):
     user_certificate = None
     if preview_mode:
         # certificate is being previewed from studio
-        if has_access(request.user, 'instructor', course) or has_access(request.user, 'staff', course):
+        if request.user.has_perm(PREVIEW_CERTIFICATES, course):
             if course.certificate_available_date and not course.self_paced:
                 modified_date = course.certificate_available_date
             else:
@@ -481,7 +482,7 @@ def render_html_view(request, user_id, course_id):
 
     # Kick the user back to the "Invalid" screen if the feature is disabled globally
     if not settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
-        return _render_invalid_certificate(course_id, platform_name, configuration)
+        return _render_invalid_certificate(request, course_id, platform_name, configuration)
 
     # Load the course and user objects
     try:
@@ -496,7 +497,7 @@ def render_html_view(request, user_id, course_id):
             u"%d. Specific error: %s"
         )
         log.info(error_str, course_id, user_id, str(exception))
-        return _render_invalid_certificate(course_id, platform_name, configuration)
+        return _render_invalid_certificate(request, course_id, platform_name, configuration)
 
     # Kick the user back to the "Invalid" screen if the feature is disabled for the course
     if not course.cert_html_view_enabled:
@@ -505,7 +506,7 @@ def render_html_view(request, user_id, course_id):
             course_id,
             user_id,
         )
-        return _render_invalid_certificate(course_id, platform_name, configuration)
+        return _render_invalid_certificate(request, course_id, platform_name, configuration)
 
     # Load user's certificate
     user_certificate = _get_user_certificate(request, user, course_key, course, preview_mode)
@@ -515,7 +516,7 @@ def render_html_view(request, user_id, course_id):
             user_id,
             course_id,
         )
-        return _render_invalid_certificate(course_id, platform_name, configuration)
+        return _render_invalid_certificate(request, course_id, platform_name, configuration)
 
     # Get the active certificate configuration for this course
     # If we do not have an active certificate, we'll need to send the user to the "Invalid" screen
@@ -527,7 +528,7 @@ def render_html_view(request, user_id, course_id):
             course_id,
             user_id,
         )
-        return _render_invalid_certificate(course_id, platform_name, configuration)
+        return _render_invalid_certificate(request, course_id, platform_name, configuration)
 
     # Get data from Discovery service that will be necessary for rendering this Certificate.
     catalog_data = _get_catalog_data_for_course(course_key)
@@ -657,9 +658,15 @@ def _get_custom_template_and_language(course_id, course_mode, course_language):
         return (None, None)
 
 
-def _render_invalid_certificate(course_id, platform_name, configuration):
+def _render_invalid_certificate(request, course_id, platform_name, configuration):
+    """
+    Renders the invalid certificate view with default header and footer.
+    """
     context = {}
     _update_context_with_basic_info(context, course_id, platform_name, configuration)
+    # Add certificate header/footer data to current context
+    context.update(get_certificate_header_context(is_secure=request.is_secure()))
+    context.update(get_certificate_footer_context())
     return render_to_response(INVALID_CERTIFICATE_TEMPLATE_PATH, context)
 
 

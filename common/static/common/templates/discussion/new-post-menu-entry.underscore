@@ -1,1 +1,0 @@
-<option class="topic-title" data-discussion-id="<%- id %>" data-divided="<%- is_divided %>"><%- text %></option>

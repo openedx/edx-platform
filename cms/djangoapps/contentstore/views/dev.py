@@ -4,6 +4,8 @@ These views will NOT be shown on production: trying to access them will result
 in a 404 error.
 """
 # pylint: disable=unused-argument
+from __future__ import absolute_import
+
 from edxmako.shortcuts import render_to_response
 
 

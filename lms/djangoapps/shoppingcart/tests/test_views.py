@@ -306,7 +306,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         item = self.add_course_to_user_cart(self.course_key)
         resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty})
         self.assertEqual(resp.status_code, 200)
-        data = json.loads(resp.content)
+        data = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(data['total_cost'], item.unit_cost * qty)
         cart = Order.get_cart_for_user(self.user)
         self.assertEqual(cart.order_type, 'business')
@@ -336,19 +336,19 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.login_user()
         resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item_id, 'qty': qty})
         self.assertEqual(resp.status_code, 404)
-        self.assertEqual('Order item does not exist.', resp.content)
+        self.assertEqual('Order item does not exist.', resp.content.decode('utf-8'))
 
         # now testing the case if item id not found in request,
         resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'qty': qty})
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual('Order item not found in request.', resp.content)
+        self.assertEqual('Order item not found in request.', resp.content.decode('utf-8'))
 
     def test_purchase_type_should_be_personal_when_qty_is_one(self):
         qty = 1
         item = self.add_course_to_user_cart(self.course_key)
         resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty})
         self.assertEqual(resp.status_code, 200)
-        data = json.loads(resp.content)
+        data = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(data['total_cost'], item.unit_cost * 1)
         cart = Order.get_cart_for_user(self.user)
         self.assertEqual(cart.order_type, 'personal')
@@ -406,7 +406,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         item = self.add_course_to_user_cart(self.course_key)
         resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty})
         self.assertEqual(resp.status_code, 200)
-        data = json.loads(resp.content)
+        data = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(data['total_cost'], item.unit_cost * qty)
 
         # use coupon code
@@ -919,7 +919,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.assertEqual(resp.status_code, 200)
 
         # Parse the response as JSON and check the contents
-        json_resp = json.loads(resp.content)
+        json_resp = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(json_resp.get('currency'), self.cart.currency)
         self.assertEqual(json_resp.get('purchase_datetime'), get_default_time_display(self.cart.purchase_time))
         self.assertEqual(json_resp.get('total_cost'), self.cart.total_cost)
@@ -993,7 +993,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.assertEqual(resp.status_code, 200)
 
         # Parse the response as JSON and check the contents
-        json_resp = json.loads(resp.content)
+        json_resp = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(json_resp.get('total_cost'), self.cart.total_cost)
 
         items = json_resp.get('items')
@@ -1035,7 +1035,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         resp = self.client.get(url, HTTP_ACCEPT="application/json")
         self.assertEqual(resp.status_code, 200)
 
-        json_resp = json.loads(resp.content)
+        json_resp = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(json_resp.get('status'), 'refunded')
 
     def test_show_receipt_404s(self):
@@ -1659,7 +1659,7 @@ class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
         # so we delete that item from the cart and display the message in the cart
         resp = self.client.get(reverse('shoppingcart.views.verify_cart'))
         self.assertEqual(resp.status_code, 200)
-        self.assertTrue(json.loads(resp.content)['is_course_enrollment_closed'])
+        self.assertTrue(json.loads(resp.content.decode('utf-8'))['is_course_enrollment_closed'])
 
         resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
         self.assertEqual(resp.status_code, 200)
@@ -1685,7 +1685,7 @@ class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
 
         resp = self.client.post(reverse('billing_details'))
         self.assertEqual(resp.status_code, 200)
-        self.assertTrue(json.loads(resp.content)['is_course_enrollment_closed'])
+        self.assertTrue(json.loads(resp.content.decode('utf-8'))['is_course_enrollment_closed'])
 
         # testing_course enrollment is closed but the course is in the cart
         # so we delete that item from the cart and display the message in the cart
@@ -1749,8 +1749,8 @@ class RegistrationCodeRedemptionCourseEnrollment(SharedModuleStoreTestCase):
         response = self.client.post(url)
         self.assertEquals(response.status_code, 403)
 
-        # now reset the time to 5 mins from now in future in order to unblock
-        reset_time = datetime.now(UTC) + timedelta(seconds=300)
+        # now reset the time to 6 mins from now in future in order to unblock
+        reset_time = datetime.now(UTC) + timedelta(seconds=361)
         with freeze_time(reset_time):
             response = self.client.post(url)
             self.assertEquals(response.status_code, 404)
@@ -1773,8 +1773,8 @@ class RegistrationCodeRedemptionCourseEnrollment(SharedModuleStoreTestCase):
         response = self.client.get(url)
         self.assertEquals(response.status_code, 403)
 
-        # now reset the time to 5 mins from now in future in order to unblock
-        reset_time = datetime.now(UTC) + timedelta(seconds=300)
+        # now reset the time to 6 mins from now in future in order to unblock
+        reset_time = datetime.now(UTC) + timedelta(seconds=361)
         with freeze_time(reset_time):
             response = self.client.get(url)
             self.assertEquals(response.status_code, 404)
@@ -1824,11 +1824,11 @@ class RegistrationCodeRedemptionCourseEnrollment(SharedModuleStoreTestCase):
         RegistrationCodeRedemption.objects.filter(registration_code__code=registration_code)
         response = self.client.get(redeem_url)
         self.assertEquals(len(RegistrationCodeRedemption.objects.filter(registration_code__code=registration_code)), 1)
-        self.assertIn("You've clicked a link for an enrollment code that has already been used.", response.content)
+        self.assertIn("You&#39;ve clicked a link for an enrollment code that has already been used.", response.content)
 
         #now check that the registration code has already been redeemed
         response = self.client.post(redeem_url)
-        self.assertIn("You've clicked a link for an enrollment code that has already been used.", response.content)
+        self.assertIn("You&#39;ve clicked a link for an enrollment code that has already been used.", response.content)
 
         #now check the response of the dashboard page
         dashboard_url = reverse('dashboard')
@@ -2006,7 +2006,7 @@ class DonationViewTest(SharedModuleStoreTestCase):
 
         # Use the fake payment implementation to simulate the parameters
         # we would receive from the payment processor.
-        payment_info = json.loads(response.content)
+        payment_info = json.loads(response.content.decode('utf-8'))
         self.assertEqual(payment_info["payment_url"], "/shoppingcart/payment_fake")
 
         # If this is a per-course donation, verify that we're sending

@@ -9,7 +9,7 @@ from django.conf import settings
 from six import text_type
 from edxmako.shortcuts import marketing_link
 from openedx.core.djangolib.js_utils import js_escaped_string
-from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangolib.markup import clean_dangerous_html, HTML, Text
 from openedx.core.lib.courses import course_image_url
 
 from six import string_types
@@ -207,7 +207,7 @@ from six import string_types
       % endif
 
       <div class="inner-wrapper">
-        ${HTML(get_course_about_section(request, course, "overview"))}
+        ${clean_dangerous_html(get_course_about_section(request, course, "overview"))}
       </div>
     </div>
     </%block>
@@ -273,7 +273,7 @@ from six import string_types
           %endif
 
           % if pre_requisite_courses:
-          <% prc_target = reverse('about_course', args=[unicode(pre_requisite_courses[0]['key'])]) %>
+          <% prc_target = reverse('about_course', args=[text_type(pre_requisite_courses[0]['key'])]) %>
           <li class="prerequisite-course important-dates-item">
             <span class="icon fa fa-list-ul" aria-hidden="true"></span>
             <p class="important-dates-item-title">${_("Prerequisites")}</p>

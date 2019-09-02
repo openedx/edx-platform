@@ -3,13 +3,15 @@
 Tests for the pytest paver commands themselves.
 Run just this test with: paver test_lib -t pavelib/paver_tests/test_paver_pytest_cmds.py
 """
-import unittest
+from __future__ import absolute_import
+
 import os
+import unittest
+
 import ddt
 
-from pavelib.utils.test.suites import SystemTestSuite, LibTestSuite
 from pavelib.utils.envs import Env
-
+from pavelib.utils.test.suites import LibTestSuite, SystemTestSuite
 
 XDIST_TESTING_IP_ADDRESS_LIST = '0.0.0.1,0.0.0.2,0.0.0.3'
 
@@ -57,9 +59,9 @@ class TestPaverPytestCmd(unittest.TestCase):
 
                 env_var_cmd = "{} DISABLE_COURSEENROLLMENT_HISTORY=1".format(django_env_var_cmd)
 
-                xdist_string = u'--tx {}*ssh="ubuntu@{} -o StrictHostKeyChecking=no"' \
-                               '//python="source /edx/app/edxapp/edxapp_env; {}; python"' \
-                               '//chdir="/edx/app/edxapp/edx-platform"' \
+                xdist_string = u'--tx {}*ssh="jenkins@{} -o StrictHostKeyChecking=no"' \
+                               '//python="source edx-venv/bin/activate; {}; python"' \
+                               '//chdir="edx-platform"' \
                                .format(processes, ip, env_var_cmd)
                 expected_statement.append(xdist_string)
             for rsync_dir in Env.rsync_dirs():

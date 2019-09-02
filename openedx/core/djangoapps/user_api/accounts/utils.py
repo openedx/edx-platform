@@ -180,7 +180,7 @@ def retrieve_last_sitewide_block_completed(user):
     )
 
 
-def generate_password(length=12, chars=string.letters + string.digits):
+def generate_password(length=12, chars=string.ascii_letters + string.digits):
     """Generate a valid random password"""
     if length < 8:
         raise ValueError("password must be at least 8 characters")

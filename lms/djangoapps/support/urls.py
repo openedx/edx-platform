@@ -1,6 +1,8 @@
 """
 URLs for the student support app.
 """
+from __future__ import absolute_import
+
 from django.conf.urls import url
 
 from lms.djangoapps.support.views.contact_us import ContactUsView

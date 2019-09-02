@@ -1,6 +1,8 @@
 """
 E-commerce Tab Instructor Dashboard Coupons Operations views
 """
+from __future__ import absolute_import
+
 import datetime
 import logging
 

@@ -9,7 +9,8 @@ from contextlib import contextmanager
 from functools import wraps
 
 import six
-from django.db.models import Q
+from django.core.cache import cache
+from django.db.models import Case, Exists, F, OuterRef, When, Q
 from django.urls import reverse
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -25,6 +26,7 @@ from lms.djangoapps.grades.api import constants as grades_constants
 from lms.djangoapps.grades.api import context as grades_context
 from lms.djangoapps.grades.api import events as grades_events
 from lms.djangoapps.grades.api import is_writable_gradebook_enabled, prefetch_course_and_subsection_grades
+from lms.djangoapps.grades.api import gradebook_can_see_bulk_management as can_see_bulk_management
 from lms.djangoapps.grades.course_data import CourseData
 from lms.djangoapps.grades.grade_utils import are_grades_frozen
 # TODO these imports break abstraction of the core Grades layer. This code needs
@@ -32,7 +34,7 @@ from lms.djangoapps.grades.grade_utils import are_grades_frozen
 from lms.djangoapps.grades.models import (
     PersistentSubsectionGrade,
     PersistentSubsectionGradeOverride,
-    PersistentSubsectionGradeOverrideHistory
+    PersistentCourseGrade,
 )
 from lms.djangoapps.grades.rest_api.serializers import (
     StudentGradebookEntrySerializer,
@@ -275,6 +277,7 @@ class CourseGradingView(BaseCourseView):
                 'assignment_types': self._get_assignment_types(course),
                 'subsections': self._get_subsections(course, graded_only),
                 'grades_frozen': are_grades_frozen(course_key),
+                'can_see_bulk_management': can_see_bulk_management(course_key),
             }
             return Response(results)
 
@@ -333,6 +336,8 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
     **Example Request**
         GET /api/grades/v1/gradebook/{course_id}/                       - Get gradebook entries for all users in course
         GET /api/grades/v1/gradebook/{course_id}/?username={username}   - Get grades for specific user in course
+        GET /api/grades/v1/gradebook/{course_id}/?username={username}?history_record_limit={number}
+            - Get grades for specific user in course, only show {number} latest records
         GET /api/grades/v1/gradebook/{course_id}/?user_contains={user_contains}
         GET /api/grades/v1/gradebook/{course_id}/?username_contains={username_contains}
         GET /api/grades/v1/gradebook/{course_id}/?cohort_id={cohort_id}
@@ -404,10 +409,12 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
         }
     **Paginated GET response**
         When requesting gradebook entries for all users, the response is paginated and contains the following values:
-        * count: The total number of user gradebook entries for this course.
         * next: The URL containing the next page of data.
         * previous: The URL containing the previous page of data.
         * results: A list of user gradebook entries, structured as above.
+        * total_users_count: The total number of active users in the course.
+        * filtered_users_count: The total number of active users that match
+            the filter associated with the provided query parameters.
 
     Note: It's important that `GradeViewMixin` is the first inherited class here, so that
     self.api_error returns error responses as expected.
@@ -529,6 +536,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             return Response(serializer.data)
         else:
             q_objects = []
+            annotations = {}
             if request.GET.get('user_contains'):
                 search_term = request.GET.get('user_contains')
                 q_objects.append(
@@ -546,20 +554,141 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
                     q_objects.append(Q(user__in=[]))
             if request.GET.get('enrollment_mode'):
                 q_objects.append(Q(mode=request.GET.get('enrollment_mode')))
+            if request.GET.get('assignment') and (
+                    request.GET.get('assignment_grade_max')
+                    or request.GET.get('assignment_grade_min')):
+                subqueryset = PersistentSubsectionGrade.objects.annotate(
+                    effective_grade_percentage=Case(
+                        When(override__isnull=False,
+                             then=(
+                                 F('override__earned_graded_override')
+                                 / F('override__possible_graded_override')
+                             ) * 100),
+                        default=(F('earned_graded') / F('possible_graded')) * 100
+                    )
+                )
+                grade_conditions = {
+                    'effective_grade_percentage__range': (
+                        request.GET.get('assignment_grade_min', 0),
+                        request.GET.get('assignment_grade_max', 100)
+                    )
+                }
+                annotations['selected_assignment_grade_in_range'] = Exists(
+                    subqueryset.filter(
+                        course_id=OuterRef('course'),
+                        user_id=OuterRef('user'),
+                        usage_key=UsageKey.from_string(request.GET.get('assignment')),
+                        **grade_conditions
+                    )
+                )
+                q_objects.append(Q(selected_assignment_grade_in_range=True))
+            if request.GET.get('course_grade_min') or request.GET.get('course_grade_max'):
+                grade_conditions = {}
+                q_object = Q()
+                course_grade_min = request.GET.get('course_grade_min')
+                if course_grade_min:
+                    course_grade_min = float(request.GET.get('course_grade_min')) / 100
+                    grade_conditions['percent_grade__gte'] = course_grade_min
+
+                if request.GET.get('course_grade_max'):
+                    course_grade_max = float(request.GET.get('course_grade_max')) / 100
+                    grade_conditions['percent_grade__lte'] = course_grade_max
+
+                if not course_grade_min or course_grade_min == 0:
+                    subquery_grade_absent = ~Exists(
+                        PersistentCourseGrade.objects.filter(
+                            course_id=OuterRef('course'),
+                            user_id=OuterRef('user_id'),
+                        )
+                    )
+
+                    annotations['course_grade_absent'] = subquery_grade_absent
+                    q_object |= Q(course_grade_absent=True)
+
+                subquery_grade_in_range = Exists(
+                    PersistentCourseGrade.objects.filter(
+                        course_id=OuterRef('course'),
+                        user_id=OuterRef('user_id'),
+                        **grade_conditions
+                    )
+                )
+                annotations['course_grade_in_range'] = subquery_grade_in_range
+                q_object |= Q(course_grade_in_range=True)
+
+                q_objects.append(q_object)
 
             entries = []
             related_models = ['user']
-            users = self._paginate_users(course_key, q_objects, related_models)
+            users = self._paginate_users(course_key, q_objects, related_models, annotations=annotations)
+
+            users_counts = self._get_users_counts(course_key, q_objects, annotations=annotations)
 
             with bulk_gradebook_view_context(course_key, users):
                 for user, course_grade, exc in CourseGradeFactory().iter(
                     users, course_key=course_key, collected_block_structure=course_data.collected_structure
                 ):
                     if not exc:
-                        entries.append(self._gradebook_entry(user, course, graded_subsections, course_grade))
+                        entry = self._gradebook_entry(user, course, graded_subsections, course_grade)
+                        entries.append(entry)
 
             serializer = StudentGradebookEntrySerializer(entries, many=True)
-            return self.get_paginated_response(serializer.data)
+            return self.get_paginated_response(serializer.data, **users_counts)
+
+    def _get_user_count(self, query_args, cache_time=3600, annotations=None):
+        """
+        Return the user count for the given query arguments to CourseEnrollment.
+
+        caches the count for cache_time seconds.
+        """
+        queryset = CourseEnrollment.objects
+        if annotations:
+            queryset = queryset.annotate(**annotations)
+        queryset = queryset.filter(*query_args)
+
+        cache_key = 'usercount.%s' % queryset.query
+        user_count = cache.get(cache_key, None)
+        if user_count is None:
+            user_count = queryset.count()
+            cache.set(cache_key, user_count, cache_time)
+
+        return user_count
+
+    def _get_users_counts(self, course_key, course_enrollment_filters, annotations=None):
+        """
+        Return a dictionary containing data about the total number of users and total number
+        of users matching a given filter in a given course.
+
+        Arguments:
+            course_key: the opaque key for the course
+            course_enrollment_filters: a list of Q objects representing filters to be applied to CourseEnrollments
+            annotations: Optional dict of fields to add to the queryset via annotation
+
+        Returns:
+            dict:
+                total_users_count: the number of total active users in the course
+                filtered_users_count: the number of active users in the course that match
+                    the given course_enrollment_filters
+        """
+
+        filter_args = [
+            Q(course_id=course_key) & Q(is_active=True)
+        ]
+
+        total_users_count = self._get_user_count(filter_args)
+
+        filter_args.extend(course_enrollment_filters or [])
+
+        # if course_enrollment_filters is empty, then the number of filtered users will equal the total number of users
+        filtered_users_count = (
+            total_users_count
+            if not course_enrollment_filters
+            else self._get_user_count(filter_args, annotations=annotations)
+        )
+
+        return {
+            'total_users_count': total_users_count,
+            'filtered_users_count': filtered_users_count,
+        }
 
 
 GradebookUpdateResponseItem = namedtuple('GradebookUpdateResponseItem', ['user_id', 'usage_id', 'success', 'reason'])
@@ -588,7 +717,8 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
               "earned_all_override": 11,
               "possible_all_override": 11,
               "earned_graded_override": 11,
-              "possible_graded_override": 11
+              "possible_graded_override": 11,
+              "comment": "reason for override"
             }
           },
           {
@@ -598,7 +728,8 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
               "earned_all_override": 10,
               "possible_all_override": 15,
               "earned_graded_override": 9,
-              "possible_graded_override": 12
+              "possible_graded_override": 12,
+              "comment": "reason for override"
             }
           }
         ]
@@ -692,6 +823,11 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
                 subsection = course.get_child(usage_key)
                 if subsection:
                     subsection_grade_model = self._create_subsection_grade(user, course, subsection)
+                    # TODO: Remove as part of EDUCATOR-4602.
+                    if str(course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+                        log.info(u'PersistentSubsectionGrade ***{}*** created for'
+                                 u' subsection ***{}*** in course ***{}*** for user ***{}***.'
+                                 .format(subsection_grade_model, subsection.location, course, user.id))
                 else:
                     self._log_update_result(request.user, requested_user_id, requested_usage_id, success=False)
                     result.append(GradebookUpdateResponseItem(
@@ -735,6 +871,7 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
         Helper method to create a `PersistentSubsectionGradeOverride` object
         and send a `SUBSECTION_OVERRIDE_CHANGED` signal.
         """
+        override_data['system'] = grades_constants.GradeOverrideFeatureEnum.gradebook
         override = PersistentSubsectionGradeOverride.update_or_create_override(
             requesting_user=request_user,
             subsection_grade_model=subsection_grade_model,
@@ -922,9 +1059,19 @@ class SubsectionGradeView(GradeViewMixin, APIView):
 
             return Response(results.data)
 
+        limit_history_request_value = request.GET.get('history_record_limit')
+        if limit_history_request_value is not None:
+            try:
+                history_record_limit = int(limit_history_request_value)
+            except ValueError:
+                history_record_limit = 0
+
         try:
             override = original_grade.override
-            history = PersistentSubsectionGradeOverrideHistory.objects.filter(override_id=override.id)
+            if limit_history_request_value is not None:
+                history = reversed(list(override.history.all().order_by('-history_date')[:history_record_limit]))
+            else:
+                history = override.history.all().order_by('history_date')
         except PersistentSubsectionGradeOverride.DoesNotExist:
             override = None
             history = []
@@ -937,5 +1084,4 @@ class SubsectionGradeView(GradeViewMixin, APIView):
             'user_id': original_grade.user_id,
             'course_id': original_grade.course_id,
         })
-
         return Response(results.data)

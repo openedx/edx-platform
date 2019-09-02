@@ -1,21 +1,23 @@
 """
 Views related to the video upload feature
 """
+from __future__ import absolute_import
+
 import csv
 import json
 import logging
 from contextlib import closing
 from datetime import datetime, timedelta
-from pytz import UTC
 from uuid import uuid4
 
 import rfc6266_parser
+import six
 from boto import s3
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.urls import reverse
 from django.http import HttpResponse, HttpResponseNotFound
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
@@ -25,26 +27,27 @@ from edxval.api import (
     create_or_update_transcript_preferences,
     create_video,
     get_3rd_party_transcription_plans,
+    get_available_transcript_languages,
     get_transcript_credentials_state_for_org,
     get_transcript_preferences,
     get_videos_for_course,
     remove_transcript_preferences,
     remove_video_for_course,
     update_video_image,
-    update_video_status,
-    get_available_transcript_languages
+    update_video_status
 )
 from opaque_keys.edx.keys import CourseKey
-from xmodule.video_module.transcripts_utils import Transcript
+from pytz import UTC
 
 from contentstore.models import VideoUploadConfig
 from contentstore.utils import reverse_course_url
 from contentstore.video_utils import validate_video_image
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
-from openedx.core.djangoapps.video_pipeline.config.waffle import waffle_flags, DEPRECATE_YOUTUBE
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleSwitchNamespace, WaffleFlagNamespace
+from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE, waffle_flags
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace, WaffleSwitchNamespace
 from util.json_request import JsonResponse, expect_json
+from xmodule.video_module.transcripts_utils import Transcript
 
 from .course import get_course_and_check_access
 
@@ -156,6 +159,7 @@ class StatusDisplayStrings(object):
     @staticmethod
     def get(val_status):
         """Map a VAL status string to a localized display string"""
+        # pylint: disable=translation-of-non-string
         return _(StatusDisplayStrings._STATUS_MAP.get(val_status, StatusDisplayStrings._UNKNOWN))
 
 
@@ -204,6 +208,7 @@ def videos_handler(request, course_key_string, edx_video_id=None):
 @login_required
 @require_POST
 def video_images_handler(request, course_key_string, edx_video_id=None):
+    """Function to handle image files"""
 
     # respond with a 404 if image upload is not enabled.
     if not WAFFLE_SWITCHES.is_enabled(VIDEO_IMAGE_UPLOAD_ENABLED):
@@ -246,7 +251,7 @@ def validate_transcript_preferences(provider, cielo24_fidelity, cielo24_turnarou
 
     # validate transcription providers
     transcription_plans = get_3rd_party_transcription_plans()
-    if provider in transcription_plans.keys():
+    if provider in list(transcription_plans.keys()):
 
         # Further validations for providers
         if provider == TranscriptProvider.CIELO24:
@@ -265,7 +270,7 @@ def validate_transcript_preferences(provider, cielo24_fidelity, cielo24_turnarou
                     error = u'Unsupported source language {}.'.format(video_source_language)
                     return error, preferences
 
-                if not len(preferred_languages) or not (set(preferred_languages) <= set(supported_languages.keys())):
+                if not preferred_languages or not set(preferred_languages) <= set(supported_languages.keys()):
                     error = u'Invalid languages {}.'.format(preferred_languages)
                     return error, preferences
 
@@ -287,12 +292,12 @@ def validate_transcript_preferences(provider, cielo24_fidelity, cielo24_turnarou
 
             # Validate transcription languages
             valid_translations_map = transcription_plans[provider]['translations']
-            if video_source_language not in valid_translations_map.keys():
+            if video_source_language not in list(valid_translations_map.keys()):
                 error = u'Unsupported source language {}.'.format(video_source_language)
                 return error, preferences
 
             valid_target_languages = valid_translations_map[video_source_language]
-            if not len(preferred_languages) or not (set(preferred_languages) <= set(valid_target_languages)):
+            if not preferred_languages or not set(preferred_languages) <= set(valid_target_languages):
                 error = u'Invalid languages {}.'.format(preferred_languages)
                 return error, preferences
 
@@ -448,10 +453,10 @@ def _get_and_validate_course(course_key_string, user):
     course = get_course_and_check_access(course_key, user)
 
     if (
-            settings.FEATURES["ENABLE_VIDEO_UPLOAD_PIPELINE"] and
-            getattr(settings, "VIDEO_UPLOAD_PIPELINE", None) and
-            course and
-            course.video_pipeline_configured
+        settings.FEATURES["ENABLE_VIDEO_UPLOAD_PIPELINE"] and
+        getattr(settings, "VIDEO_UPLOAD_PIPELINE", None) and
+        course and
+        course.video_pipeline_configured
     ):
         return course
     else:
@@ -496,7 +501,7 @@ def _get_videos(course, pagination_conf=None):
     Retrieves the list of videos from VAL corresponding to this course.
     """
     videos, pagination_context = get_videos_for_course(
-        unicode(course.id),
+        six.text_type(course.id),
         VideoSortField.created,
         SortDirection.desc,
         pagination_conf
@@ -538,7 +543,7 @@ def _get_index_videos(course, pagination_conf=None):
     """
     Returns the information about each video upload required for the video list
     """
-    course_id = unicode(course.id)
+    course_id = six.text_type(course.id)
     attrs = [
         'edx_video_id', 'client_video_id', 'created', 'duration',
         'status', 'courses', 'transcripts', 'transcription_status',
@@ -551,16 +556,15 @@ def _get_index_videos(course, pagination_conf=None):
         values = {}
         for attr in attrs:
             if attr == 'courses':
-                course = filter(lambda c: course_id in c, video['courses'])
-                (__, values['course_video_image_url']), = course[0].items()
+                course = [c for c in video['courses'] if course_id in c]
+                (__, values['course_video_image_url']), = list(course[0].items())
             else:
                 values[attr] = video[attr]
 
         return values
+
     videos, pagination_context = _get_videos(course, pagination_conf)
-    return [
-        _get_values(video) for video in videos
-    ], pagination_context
+    return [_get_values(video) for video in videos], pagination_context
 
 
 def get_all_transcript_languages():
@@ -580,7 +584,7 @@ def get_all_transcript_languages():
     all_languages_dict = dict(settings.ALL_LANGUAGES, **third_party_transcription_languages)
     # Return combined system settings and 3rd party transcript languages.
     all_languages = []
-    for key, value in sorted(all_languages_dict.iteritems(), key=lambda k_v: k_v[1]):
+    for key, value in sorted(six.iteritems(all_languages_dict), key=lambda k_v: k_v[1]):
         all_languages.append({
             'language_code': key,
             'language_text': value
@@ -596,13 +600,13 @@ def videos_index_html(course, pagination_conf=None):
     previous_uploads, pagination_context = _get_index_videos(course, pagination_conf)
     context = {
         'context_course': course,
-        'image_upload_url': reverse_course_url('video_images_handler', unicode(course.id)),
-        'video_handler_url': reverse_course_url('videos_handler', unicode(course.id)),
-        'encodings_download_url': reverse_course_url('video_encodings_download', unicode(course.id)),
+        'image_upload_url': reverse_course_url('video_images_handler', six.text_type(course.id)),
+        'video_handler_url': reverse_course_url('videos_handler', six.text_type(course.id)),
+        'encodings_download_url': reverse_course_url('video_encodings_download', six.text_type(course.id)),
         'default_video_image_url': _get_default_video_image_url(),
         'previous_uploads': previous_uploads,
         'concurrent_upload_limit': settings.VIDEO_UPLOAD_PIPELINE.get('CONCURRENT_UPLOAD_LIMIT', 0),
-        'video_supported_file_formats': VIDEO_SUPPORTED_FILE_FORMATS.keys(),
+        'video_supported_file_formats': list(VIDEO_SUPPORTED_FILE_FORMATS.keys()),
         'video_upload_max_file_size': VIDEO_UPLOAD_MAX_FILE_SIZE_GB,
         'video_image_settings': {
             'video_image_upload_enabled': WAFFLE_SWITCHES.is_enabled(VIDEO_IMAGE_UPLOAD_ENABLED),
@@ -619,7 +623,7 @@ def videos_index_html(course, pagination_conf=None):
         'video_transcript_settings': {
             'transcript_download_handler_url': reverse('transcript_download_handler'),
             'transcript_upload_handler_url': reverse('transcript_upload_handler'),
-            'transcript_delete_handler_url': reverse_course_url('transcript_delete_handler', unicode(course.id)),
+            'transcript_delete_handler_url': reverse_course_url('transcript_delete_handler', six.text_type(course.id)),
             'trancript_download_file_format': Transcript.SRT
         },
         'pagination_context': pagination_context
@@ -629,15 +633,15 @@ def videos_index_html(course, pagination_conf=None):
         context['video_transcript_settings'].update({
             'transcript_preferences_handler_url': reverse_course_url(
                 'transcript_preferences_handler',
-                unicode(course.id)
+                six.text_type(course.id)
             ),
             'transcript_credentials_handler_url': reverse_course_url(
                 'transcript_credentials_handler',
-                unicode(course.id)
+                six.text_type(course.id)
             ),
             'transcription_plans': get_3rd_party_transcription_plans(),
         })
-        context['active_transcript_preferences'] = get_transcript_preferences(unicode(course.id))
+        context['active_transcript_preferences'] = get_transcript_preferences(six.text_type(course.id))
         # Cached state for transcript providers' credentials (org-specific)
         context['transcript_credentials'] = get_transcript_credentials_state_for_org(course.id.org)
 
@@ -687,13 +691,13 @@ def videos_post(course, request):
     if 'files' not in data:
         error = "Request object is not JSON or does not contain 'files'"
     elif any(
-            'file_name' not in file or 'content_type' not in file
-            for file in data['files']
+        'file_name' not in file or 'content_type' not in file
+        for file in data['files']
     ):
         error = "Request 'files' entry does not contain 'file_name' and 'content_type'"
     elif any(
-            file['content_type'] not in VIDEO_SUPPORTED_FILE_FORMATS.values()
-            for file in data['files']
+        file['content_type'] not in list(VIDEO_SUPPORTED_FILE_FORMATS.values())
+        for file in data['files']
     ):
         error = "Request 'files' entry contain unsupported content_type"
 
@@ -713,12 +717,12 @@ def videos_post(course, request):
             error_msg = u'The file name for %s must contain only ASCII characters.' % file_name
             return JsonResponse({'error': error_msg}, status=400)
 
-        edx_video_id = unicode(uuid4())
+        edx_video_id = six.text_type(uuid4())
         key = storage_service_key(bucket, file_name=edx_video_id)
 
         metadata_list = [
             ('client_video_id', file_name),
-            ('course_key', unicode(course.id)),
+            ('course_key', six.text_type(course.id)),
         ]
 
         deprecate_youtube = waffle_flags()[DEPRECATE_YOUTUBE]
@@ -731,7 +735,7 @@ def videos_post(course, request):
 
         is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course.id)
         if is_video_transcript_enabled:
-            transcript_preferences = get_transcript_preferences(unicode(course.id))
+            transcript_preferences = get_transcript_preferences(six.text_type(course.id))
             if transcript_preferences is not None:
                 metadata_list.append(('transcript_preferences', json.dumps(transcript_preferences)))
 
@@ -750,7 +754,7 @@ def videos_post(course, request):
             'client_video_id': file_name,
             'duration': 0,
             'encoded_videos': [],
-            'courses': [unicode(course.id)]
+            'courses': [six.text_type(course.id)]
         })
 
         resp_files.append({'file_name': file_name, 'upload_url': upload_url, 'edx_video_id': edx_video_id})

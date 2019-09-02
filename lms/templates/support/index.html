@@ -1,5 +1,7 @@
 ## mako
+<%page expression_filter="h"/>
 <%!
+import six
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 %>
@@ -16,7 +18,7 @@ ${_("Student Support")}
   <h1>${_("Student Support")}</h1>
   <ul>
     % for url in urls:
-    <li><a href="${url["url"]}">${unicode(url["name"])}</a>: ${unicode(url["description"])}</li>
+    <li><a href="${url["url"]}">${six.text_type(url["name"])}</a>: ${six.text_type(url["description"])}</li>
     % endfor
   </ul>
 </section>

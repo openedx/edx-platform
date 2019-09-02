@@ -2,6 +2,8 @@
 Module for code that should run during LMS startup (deprecated)
 """
 
+from __future__ import absolute_import
+
 import django
 from django.conf import settings
 

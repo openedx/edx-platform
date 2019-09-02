@@ -2,6 +2,8 @@
 This module contains various configuration settings via
 waffle switches for the contentstore app.
 """
+from __future__ import absolute_import
+
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace, WaffleSwitchNamespace
 
 # Namespace

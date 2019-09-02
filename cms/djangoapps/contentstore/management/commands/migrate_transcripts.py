@@ -2,19 +2,24 @@
 Command to migrate transcripts to django storage.
 """
 
+from __future__ import absolute_import
+
 import logging
+
 from django.core.management import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
+from six.moves import map
+
 from cms.djangoapps.contentstore.tasks import (
     DEFAULT_ALL_COURSES,
-    DEFAULT_FORCE_UPDATE,
     DEFAULT_COMMIT,
+    DEFAULT_FORCE_UPDATE,
     enqueue_async_migrate_transcripts_tasks
 )
+from openedx.core.djangoapps.video_config.models import MigrationEnqueuedCourse, TranscriptMigrationSetting
 from openedx.core.lib.command_utils import get_mutually_exclusive_required_option, parse_course_keys
-from openedx.core.djangoapps.video_config.models import TranscriptMigrationSetting, MigrationEnqueuedCourse
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
@@ -91,7 +96,7 @@ class Command(BaseCommand):
         if courses_mode == 'all_courses':
             course_keys = [course.id for course in modulestore().get_course_summaries()]
         elif courses_mode == 'course_ids':
-            course_keys = map(self._parse_course_key, options['course_ids'])
+            course_keys = list(map(self._parse_course_key, options['course_ids']))
         else:
             migration_settings = self._latest_settings()
             if migration_settings.all_courses:

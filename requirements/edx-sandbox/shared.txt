@@ -11,7 +11,7 @@ enum34==1.1.6             # via cryptography
 ipaddress==1.0.22         # via cryptography
 lxml==3.8.0
 networkx==1.7
-nltk==3.4.3
+nltk==3.4.5
 pycparser==2.19           # via cffi
 singledispatch==3.4.0.3   # via nltk
-six==1.11.0               # via cryptography, nltk, singledispatch
+six==1.12.0               # via cryptography, nltk, singledispatch

@@ -392,7 +392,7 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
         ajax_response = collections.namedtuple('AjaxResponse',
                                                ['data', 'status_code'])
         try:
-            ajax_response.data = json.loads(resp.content)
+            ajax_response.data = json.loads(resp.content.decode('utf-8'))
         except ValueError:
             print("Invalid JSON response")
             print("(Often a redirect if e.g. not logged in)")
@@ -429,7 +429,7 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
             usage_id = self.xblocks[block_urlname].scope_ids.usage_id
             encoded_id = usage_id.replace(";_", "/")
         Followed by:
-            page_xml = defusedxml.ElementTree.parse(StringIO.StringIO(response_content))
+            page_xml = defusedxml.ElementTree.parse(StringIO(response_content))
             page_xml.find("//[@data-usage-id={usage}]".format(usage=encoded_id))
         or
             soup_html = BeautifulSoup(response_content, 'html.parser')

@@ -309,7 +309,7 @@ class TestCohortApi(SharedModuleStoreTestCase):
         assert response.status_code == status
 
         if status == 200:
-            results = json.loads(response.content)['results']
+            results = json.loads(response.content.decode('utf-8'))['results']
             expected_results = [{
                 'username': user.username,
                 'email': user.email,
@@ -408,7 +408,7 @@ class TestCohortApi(SharedModuleStoreTestCase):
             "invalid": ["foo@bar"],
             "present": ["user2"]
         }
-        assert json.loads(response.content) == expected_response
+        assert json.loads(response.content.decode('utf-8')) == expected_response
 
     def test_remove_user_from_cohort_missing_username(self):
         """

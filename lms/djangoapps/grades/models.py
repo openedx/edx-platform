@@ -8,12 +8,15 @@ a student's score or the course grading policy changes. As they are
 persisted, course grades are also immune to changes in course content.
 """
 
+from __future__ import absolute_import
+
 import json
 import logging
 from base64 import b64encode
 from collections import defaultdict, namedtuple
 from hashlib import sha1
 
+import six
 from django.apps import apps
 from django.contrib.auth.models import User
 from django.db import models
@@ -22,12 +25,12 @@ from lazy import lazy
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from opaque_keys.edx.keys import CourseKey, UsageKey
-
-from coursewarehistoryextended.fields import UnsignedBigIntAutoField, UnsignedBigIntOneToOneField
-from lms.djangoapps.grades import events, constants
-from openedx.core.lib.cache_utils import get_cache
 from simple_history.models import HistoricalRecords
-from simple_history.utils import update_change_reason
+from six.moves import map
+
+from courseware.fields import UnsignedBigIntAutoField, UnsignedBigIntOneToOneField
+from lms.djangoapps.grades import constants, events
+from openedx.core.lib.cache_utils import get_cache
 
 log = logging.getLogger(__name__)
 
@@ -76,7 +79,7 @@ class BlockRecordList(object):
         supported by adding a label indicated which algorithm was used, e.g.,
         "sha256$j0NDRmSPa5bfid2pAcUXaxCm2Dlh3TwayItZstwyeqQ=".
         """
-        return b64encode(sha1(self.json_value).digest())
+        return b64encode(sha1(self.json_value.encode('utf-8')).digest())
 
     @lazy
     def json_value(self):
@@ -86,10 +89,10 @@ class BlockRecordList(object):
         """
         list_of_block_dicts = [block._asdict() for block in self.blocks]
         for block_dict in list_of_block_dicts:
-            block_dict['locator'] = unicode(block_dict['locator'])  # BlockUsageLocator is not json-serializable
+            block_dict['locator'] = six.text_type(block_dict['locator'])  # BlockUsageLocator is not json-serializable
         data = {
             u'blocks': list_of_block_dicts,
-            u'course_key': unicode(self.course_key),
+            u'course_key': six.text_type(self.course_key),
             u'version': self.version,
         }
         return json.dumps(
@@ -433,6 +436,13 @@ class PersistentSubsectionGrade(TimeStampedModel):
             usage_key=usage_key,
             defaults=params,
         )
+
+        # TODO: Remove as part of EDUCATOR-4602.
+        if str(usage_key.course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+            log.info(u'Created/updated grade ***{}*** for user ***{}*** in course ***{}***'
+                     u'for subsection ***{}*** with default params ***{}***'
+                     .format(grade, user_id, usage_key.course_key, usage_key, params))
+
         grade.override = PersistentSubsectionGradeOverride.get_override(user_id, usage_key)
         if first_attempted is not None and grade.first_attempted is None:
             grade.first_attempted = first_attempted
@@ -451,11 +461,11 @@ class PersistentSubsectionGrade(TimeStampedModel):
 
         PersistentSubsectionGradeOverride.prefetch(user_id, course_key)
 
-        map(cls._prepare_params, grade_params_iter)
+        list(map(cls._prepare_params, grade_params_iter))
         VisibleBlocks.bulk_get_or_create(
             user_id, course_key, [params['visible_blocks'] for params in grade_params_iter]
         )
-        map(cls._prepare_params_visible_blocks_id, grade_params_iter)
+        list(map(cls._prepare_params_visible_blocks_id, grade_params_iter))
 
         grades = [PersistentSubsectionGrade(**params) for params in grade_params_iter]
         grades = cls.objects.bulk_create(grades)
@@ -652,6 +662,10 @@ class PersistentSubsectionGradeOverride(models.Model):
     possible_all_override = models.FloatField(null=True, blank=True)
     earned_graded_override = models.FloatField(null=True, blank=True)
     possible_graded_override = models.FloatField(null=True, blank=True)
+    # store the source of the system that caused the override
+    system = models.CharField(max_length=100, blank=True, null=True)
+    # store the reason for the override
+    override_reason = models.CharField(max_length=300, blank=True, null=True)
 
     _CACHE_NAMESPACE = u"grades.models.PersistentSubsectionGradeOverride"
 
@@ -707,11 +721,19 @@ class PersistentSubsectionGradeOverride(models.Model):
             subsection_grade_model: The PersistentSubsectionGrade object associated with this override.
             override_data: The parameters of score values used to create the override record.
         """
+        grade_defaults = cls._prepare_override_params(subsection_grade_model, override_data)
+        grade_defaults['override_reason'] = override_data['comment'] if 'comment' in override_data else None
+        grade_defaults['system'] = override_data['system'] if 'system' in override_data else None
+
+        # TODO: Remove as part of EDUCATOR-4602.
+        if str(subsection_grade_model.course_id) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+            log.info(u'Creating override for user ***{}*** for PersistentSubsectionGrade'
+                     u'***{}*** with override data ***{}*** and derived grade_defaults ***{}***.'
+                     .format(requesting_user, subsection_grade_model, override_data, grade_defaults))
         override, _ = PersistentSubsectionGradeOverride.objects.update_or_create(
             grade=subsection_grade_model,
-            defaults=cls._prepare_override_params(subsection_grade_model, override_data),
+            defaults=grade_defaults,
         )
-        update_change_reason(override, feature)
 
         action = action or PersistentSubsectionGradeOverrideHistory.CREATE_OR_UPDATE
 

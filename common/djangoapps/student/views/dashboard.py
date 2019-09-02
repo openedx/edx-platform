@@ -28,7 +28,7 @@ from courseware.access import has_access
 from edxmako.shortcuts import render_to_response, render_to_string
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
-from lms.djangoapps.experiments.utils import get_dashboard_course_info, get_experiment_dashboard_metadata_context
+from lms.djangoapps.experiments.utils import get_dashboard_course_info
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.utils import (
     get_programs,
@@ -45,7 +45,6 @@ from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_bann
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import get_dashboard_consent_notification
-from openedx.features.journals.api import journals_enabled
 from shoppingcart.api import order_history
 from shoppingcart.models import CourseRegistrationCode, DonationConfiguration
 from student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
@@ -61,12 +60,7 @@ from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.student")
 
-# TODO START: Delete waffle flag as part of REVEM-204
 experiments_namespace = WaffleFlagNamespace(name=u'student.experiments')
-DASHBOARD_METADATA_FLAG = WaffleFlag(experiments_namespace,
-                                     u'dashboard_metadata',
-                                     flag_undefined_default=True)
-# TODO END: REVEM-204
 
 
 def get_org_black_and_whitelist_for_site():
@@ -203,7 +197,7 @@ def _create_recent_enrollment_message(course_enrollments, course_modes):  # pyli
         )
 
 
-def get_course_enrollments(user, org_whitelist, org_blacklist):
+def get_course_enrollments(user, org_whitelist, org_blacklist, course_limit=None):
     """
     Given a user, return a filtered set of his or her course enrollments.
 
@@ -211,12 +205,13 @@ def get_course_enrollments(user, org_whitelist, org_blacklist):
         user (User): the user in question.
         org_whitelist (list[str]): If not None, ONLY courses of these orgs will be returned.
         org_blacklist (list[str]): Courses of these orgs will be excluded.
+        course_limit: Number courses to load in dashboard if set to None then all the courses would be load.
 
     Returns:
         generator[CourseEnrollment]: a sequence of enrollments to be displayed
         on the user's dashboard.
     """
-    for enrollment in CourseEnrollment.enrollments_for_user_with_overviews_preload(user):
+    for enrollment in CourseEnrollment.enrollments_for_user_with_overviews_preload(user, course_limit):
 
         # If the course is missing or broken, log an error and skip it.
         course_overview = enrollment.course_overview
@@ -531,6 +526,29 @@ def _credit_statuses(user, course_enrollments):
     return statuses
 
 
+def show_load_all_courses_link(user, course_limit, course_enrollments):
+    """
+    By default dashboard will show limited courses based on the course limit
+    set in configuration.
+
+    A link would be provided provided at the bottom to load all the courses if there are any courses.
+    """
+
+    if course_limit is None:
+        return False
+
+    total_enrollments = CourseEnrollment.enrollments_for_user(user).count()
+    return len(course_enrollments) < total_enrollments
+
+
+def get_dashboard_course_limit():
+    """
+    get course limit from configuration
+    """
+    course_limit = getattr(settings, 'DASHBOARD_COURSE_LIMIT', None)
+    return course_limit
+
+
 @login_required
 @ensure_csrf_cookie
 @add_maintenance_banner
@@ -539,7 +557,9 @@ def student_dashboard(request):
     Provides the LMS dashboard view
 
     TODO: This is lms specific and does not belong in common code.
-
+    Note:
+        To load the all courses set course_limit=None as parameter in GET. If its not None then default course
+        limit will be used  that is set in configuration
     Arguments:
         request: The request object.
 
@@ -572,9 +592,12 @@ def student_dashboard(request):
         'EMPTY_DASHBOARD_MESSAGE', None
     )
 
+    disable_course_limit = request and 'course_limit' in request.GET
+    course_limit = get_dashboard_course_limit() if not disable_course_limit else None
+
     # Get the org whitelist or the org blacklist for the current site
     site_org_whitelist, site_org_blacklist = get_org_black_and_whitelist_for_site()
-    course_enrollments = list(get_course_enrollments(user, site_org_whitelist, site_org_blacklist))
+    course_enrollments = list(get_course_enrollments(user, site_org_whitelist, site_org_blacklist, course_limit))
 
     # Get the entitlements for the user and a mapping to all available sessions for that entitlement
     # If an entitlement has no available sessions, pass through a mock course overview object
@@ -849,7 +872,6 @@ def student_dashboard(request):
         'nav_hidden': True,
         'inverted_programs': inverted_programs,
         'show_program_listing': ProgramsApiConfig.is_enabled(),
-        'show_journal_listing': journals_enabled(),  # TODO: Dashboard Plugin required
         'show_dashboard_tabs': True,
         'disable_courseware_js': True,
         'display_course_modes_on_dashboard': enable_verified_certificates and display_course_modes_on_dashboard,
@@ -859,10 +881,7 @@ def student_dashboard(request):
         'empty_dashboard_message': empty_dashboard_message,
         'recovery_email_message': recovery_email_message,
         'recovery_email_activation_message': recovery_email_activation_message,
-        # TODO START: Clean up REVEM-205 & REVEM-204.
-        # The below context is for experiments in dashboard_metadata
-        'course_prices': get_experiment_dashboard_metadata_context(course_enrollments) if DASHBOARD_METADATA_FLAG.is_enabled() else None,
-        # TODO END: Clean up REVEM-205 & REVEM-204.
+        'show_load_all_courses_link': show_load_all_courses_link(user, course_limit, course_enrollments),
         # TODO START: clean up as part of REVEM-199 (START)
         'course_info': get_dashboard_course_info(user, course_enrollments),
         # TODO START: clean up as part of REVEM-199 (END)
@@ -884,6 +903,4 @@ def student_dashboard(request):
         'resume_button_urls': resume_button_urls
     })
 
-    response = render_to_response('dashboard.html', context)
-    set_logged_in_cookies(request, response, user)
-    return response
+    return render_to_response('dashboard.html', context)

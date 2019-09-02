@@ -51,7 +51,7 @@ class PhotoVerificationStatusViewTests(TestCase):
             'expiration_datetime': '{}Z'.format(expected_expires.isoformat()),
             'is_verified': verified
         }
-        self.assertEqual(json.loads(response.content), expected)
+        self.assertEqual(json.loads(response.content.decode('utf-8')), expected)
 
     def test_non_existent_user(self):
         """ The endpoint should return HTTP 404 if the user does not exist. """

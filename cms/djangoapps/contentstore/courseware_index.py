@@ -11,7 +11,7 @@ from django.urls import resolve
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from search.search_engine_base import SearchEngine
-from six import add_metaclass
+from six import add_metaclass, string_types, text_type
 
 from contentstore.course_group_config import GroupConfiguration
 from course_modes.models import CourseMode
@@ -193,22 +193,22 @@ class SearchIndexerBase(object):
                 for split_test_child in item.get_children():
                     if split_partition:
                         for group in split_partition.groups:
-                            group_id = unicode(group.id)
+                            group_id = text_type(group.id)
                             child_location = item.group_id_to_child.get(group_id, None)
                             if child_location == split_test_child.location:
                                 groups_usage_info.update({
-                                    unicode(get_item_location(split_test_child)): [group_id],
+                                    text_type(get_item_location(split_test_child)): [group_id],
                                 })
                                 for component in split_test_child.get_children():
                                     groups_usage_info.update({
-                                        unicode(get_item_location(component)): [group_id]
+                                        text_type(get_item_location(component)): [group_id]
                                     })
 
             if groups_usage_info:
                 item_location = get_item_location(item)
-                item_content_groups = groups_usage_info.get(unicode(item_location), None)
+                item_content_groups = groups_usage_info.get(text_type(item_location), None)
 
-            item_id = unicode(cls._id_modifier(item.scope_ids.usage_id))
+            item_id = text_type(cls._id_modifier(item.scope_ids.usage_id))
             indexed_items.add(item_id)
             if item.has_children:
                 # determine if it's okay to skip adding the children herein based upon how recently any may have changed
@@ -367,7 +367,7 @@ class CoursewareSearchIndexer(SearchIndexerBase):
     @classmethod
     def _get_location_info(cls, normalized_structure_key):
         """ Builds location info dictionary """
-        return {"course": unicode(normalized_structure_key), "org": normalized_structure_key.org}
+        return {"course": text_type(normalized_structure_key), "org": normalized_structure_key.org}
 
     @classmethod
     def do_course_reindex(cls, modulestore, course_key):
@@ -389,7 +389,7 @@ class CoursewareSearchIndexer(SearchIndexerBase):
                 for name, group in groups.items():
                     for module in group:
                         view, args, kwargs = resolve(module['url'])  # pylint: disable=unused-variable
-                        usage_key_string = unicode(kwargs['usage_key_string'])
+                        usage_key_string = text_type(kwargs['usage_key_string'])
                         if groups_usage_dict.get(usage_key_string, None):
                             groups_usage_dict[usage_key_string].append(name)
                         else:
@@ -418,7 +418,7 @@ class CoursewareSearchIndexer(SearchIndexerBase):
         while parent is not None:
             path_component_name = parent.display_name
             if not path_component_name:
-                path_component_name = unicode(cls.UNNAMED_MODULE_NAME)
+                path_component_name = text_type(cls.UNNAMED_MODULE_NAME)
             location_path.append(path_component_name)
             parent = parent.get_parent()
         location_path.reverse()
@@ -454,7 +454,7 @@ class LibrarySearchIndexer(SearchIndexerBase):
     @classmethod
     def _get_location_info(cls, normalized_structure_key):
         """ Builds location info dictionary """
-        return {"library": unicode(normalized_structure_key)}
+        return {"library": text_type(normalized_structure_key)}
 
     @classmethod
     def _id_modifier(cls, usage_id):
@@ -586,7 +586,7 @@ class CourseAboutSearchIndexer(object):
         if not searcher:
             return
 
-        course_id = unicode(course.id)
+        course_id = text_type(course.id)
         course_info = {
             'id': course_id,
             'course': course_id,
@@ -621,7 +621,7 @@ class CourseAboutSearchIndexer(object):
             if section_content:
                 if about_information.index_flags & AboutInfo.ANALYSE:
                     analyse_content = section_content
-                    if isinstance(section_content, basestring):
+                    if isinstance(section_content, string_types):
                         analyse_content = strip_html_content_to_text(section_content)
                     course_info['content'][about_information.property_name] = analyse_content
                 if about_information.index_flags & AboutInfo.PROPERTY:
@@ -645,7 +645,7 @@ class CourseAboutSearchIndexer(object):
     @classmethod
     def _get_location_info(cls, normalized_structure_key):
         """ Builds location info dictionary """
-        return {"course": unicode(normalized_structure_key), "org": normalized_structure_key.org}
+        return {"course": text_type(normalized_structure_key), "org": normalized_structure_key.org}
 
     @classmethod
     def remove_deleted_items(cls, structure_key):
