@@ -145,7 +145,7 @@ def youtube_video_transcript_name(youtube_text_api):
     # http://video.google.com/timedtext?type=list&v={VideoId}
     youtube_response = requests.get('http://' + youtube_text_api['url'], params=transcripts_param)
     if youtube_response.status_code == 200 and youtube_response.text:
-        youtube_data = etree.fromstring(youtube_response.content, parser=utf8_parser)
+        youtube_data = etree.fromstring(youtube_response.content.encode('utf-8'), parser=utf8_parser)
         # iterate all transcripts information from youtube server
         for element in youtube_data:
             # search specific language code such as 'en' in transcripts info list
@@ -185,7 +185,7 @@ def get_transcripts_from_youtube(youtube_id, settings, i18n, youtube_transcript_
         raise GetTranscriptsFromYouTubeException(msg)
 
     sub_starts, sub_ends, sub_texts = [], [], []
-    xmltree = etree.fromstring(data.content, parser=utf8_parser)
+    xmltree = etree.fromstring(data.content.encode('utf-8'), parser=utf8_parser)
     for element in xmltree:
         if element.tag == "text":
             start = float(element.get("start"))

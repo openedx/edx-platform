@@ -1463,7 +1463,7 @@ class TestCourseSurveyReport(TestReportMixin, InstructorTaskCourseTestCase):
         with report_store.storage.open(report_path) as csv_file:
             csv_file_data = csv_file.read()
             # Removing unicode signature (BOM) from the beginning
-            csv_file_data = csv_file_data.decode("utf-8-sig").encode("utf-8")
+            csv_file_data = csv_file_data.decode("utf-8-sig")
             for data in expected_data:
                 self.assertIn(data, csv_file_data)
 
