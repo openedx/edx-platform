@@ -199,7 +199,7 @@ def enqueue_async_migrate_transcripts_tasks(course_keys,
         'command_run': command_run
     }
     group([
-        async_migrate_transcript.s(unicode(course_key), **kwargs)
+        async_migrate_transcript.s(text_type(course_key), **kwargs)
         for course_key in course_keys
     ])()
 
@@ -266,7 +266,7 @@ def async_migrate_transcript(self, course_key, **kwargs):   # pylint: disable=un
                 all_transcripts.update({'en': video.sub})
 
             sub_tasks = []
-            video_location = unicode(video.location)
+            video_location = text_type(video.location)
             for lang in all_transcripts:
                 sub_tasks.append(async_migrate_transcript_subtask.s(
                     video_location, revision, lang, force_update, **kwargs

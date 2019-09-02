@@ -1,6 +1,7 @@
 <%page expression_filter="h"/>
 <%!
 import third_party_auth
+import six
 from third_party_auth import pipeline, provider
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
@@ -169,7 +170,7 @@ from student.models import UserProfile
         <select id="country" name="country" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['country'] == 'required' else ''}>
           <option value="">--</option>
           %for code, country_name in countries:
-          <option value="${code}">${ unicode(country_name) }</option>
+          <option value="${code}">${ six.text_type(country_name) }</option>
           %endfor
         </select>
       </div>

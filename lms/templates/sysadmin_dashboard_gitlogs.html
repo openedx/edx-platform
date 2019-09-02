@@ -1,6 +1,7 @@
 <%page expression_filter="h"/>
 <%inherit file="/main.html" />
 <%!
+    import six
     from django.urls import reverse
     from django.utils.translation import ugettext as _
     from django.utils.timezone import utc as UTC
@@ -160,7 +161,7 @@ textarea {
                   <tr>
                     <td>${date}</td>
                     <td>
-                      <a href="${reverse('gitlogs_detail', kwargs={'course_id': unicode(cil.course_id)})}">
+                      <a href="${reverse('gitlogs_detail', kwargs={'course_id': six.text_type(cil.course_id)})}">
                         ${cil.course_id}
                       </a>
                     </td>
