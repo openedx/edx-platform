@@ -64,6 +64,17 @@ class SocialLinkSerializer(serializers.ModelSerializer):
         model = SocialLink
         fields = ("platform", "social_link")
 
+    def validate_platform(self, platform):
+        """
+        Validate that the platform value is one of (facebook, twitter or linkedin)
+        """
+        valid_platforms = ["facebook", "twitter", "linkedin"]
+        if platform not in valid_platforms:
+            raise serializers.ValidationError(
+                u"The social platform must be facebook, twitter or linkedin"
+            )
+        return platform
+
 
 class UserReadOnlySerializer(serializers.Serializer):
     """
