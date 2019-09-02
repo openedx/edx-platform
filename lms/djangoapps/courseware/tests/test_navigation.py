@@ -86,14 +86,14 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def assertTabActive(self, tabname, response):
         ''' Check if the progress tab is active in the tab set '''
-        for line in response.content.split('\n'):
+        for line in response.content.decode('utf-8').split('\n'):
             if tabname in line and 'active' in line:
                 return
         raise AssertionError(u"assertTabActive failed: {} not active".format(tabname))
 
     def assertTabInactive(self, tabname, response):
         ''' Check if the progress tab is active in the tab set '''
-        for line in response.content.split('\n'):
+        for line in response.content.decode('utf-8').split('\n'):
             if tabname in line and 'active' in line:
                 raise AssertionError("assertTabInactive failed: " + tabname + " active")
         return
@@ -123,8 +123,8 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
                 'chapter': 'Chrome',
                 'section': displayname,
             }))
-            self.assertEquals('course-tabs' in response.content, tabs)
-            self.assertEquals('course-navigation' in response.content, accordion)
+            self.assertEqual('course-tabs' in response.content.decode('utf-8'), tabs)
+            self.assertEqual('course-navigation' in response.content.decode('utf-8'), accordion)
 
         self.assertTabInactive('progress', response)
         self.assertTabActive('courseware', response)
@@ -149,7 +149,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
         # make sure we can access courseware immediately
         resp = self.client.get(reverse('dashboard'))
-        self.assertEquals(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
 
         # then wait a bit and see if we get timed out
         time.sleep(2)
@@ -243,7 +243,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             kwargs={'course_id': test_course_id}
         )
         response = self.assert_request_status_code(200, url)
-        self.assertIn("No content has been added to this course", response.content)
+        self.assertIn("No content has been added to this course", response.content.decode('utf-8'))
 
         section = ItemFactory.create(
             parent_location=self.test_course.location,
@@ -254,8 +254,8 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             kwargs={'course_id': test_course_id}
         )
         response = self.assert_request_status_code(200, url)
-        self.assertNotIn("No content has been added to this course", response.content)
-        self.assertIn("New Section", response.content)
+        self.assertNotIn("No content has been added to this course", response.content.decode('utf-8'))
+        self.assertIn("New Section", response.content.decode('utf-8'))
 
         subsection = ItemFactory.create(
             parent_location=section.location,
@@ -266,8 +266,8 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             kwargs={'course_id': test_course_id}
         )
         response = self.assert_request_status_code(200, url)
-        self.assertIn("New Subsection", response.content)
-        self.assertNotIn("sequence-nav", response.content)
+        self.assertIn("New Subsection", response.content.decode('utf-8'))
+        self.assertNotIn("sequence-nav", response.content.decode('utf-8'))
 
         ItemFactory.create(
             parent_location=subsection.location,
