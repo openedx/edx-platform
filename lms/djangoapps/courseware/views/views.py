@@ -365,6 +365,43 @@ def jump_to(_request, course_id, location):
 @ensure_csrf_cookie
 @ensure_valid_course_key
 @data_sharing_consent_required
+def course_root(request, course_id):
+    """
+    Renders the configured course home or redirects to the correct url. This
+    behaviour can be controlled by the following variables:
+
+    * UNIFIED_COURSE_TAB_FLAG WaffleFlag
+        redirects / to the unified course experience.
+    * COURSE_HOME_BEHAVIOUR SiteConfiguration:
+        can redirect from / to any course related page. Some possible redirects
+        are: 'info', 'about' and 'courseware'.
+        If this fails to find a reverse, it uses the course info page as a
+        default.
+
+    If none of those are set, this redirects to course_info (the previous
+    default behaviour).
+    """
+    course_key = CourseKey.from_string(course_id)
+
+    # If the unified course experience is enabled, redirect to the "Course" tab
+    if UNIFIED_COURSE_TAB_FLAG.is_enabled(course_key):
+        return redirect(reverse(course_home_url_name(course_key), args=[course_id]))
+
+    course_home_behaviour = configuration_helpers.get_value('COURSE_HOME_BEHAVIOUR')
+    if course_home_behaviour:
+        try:
+            course_home_url = reverse(course_home_behaviour, kwargs={'course_id': course_id})
+            return redirect(course_home_url)
+        except:
+            logging.warn(
+                'COURSE_HOME_BEHAVIOUR incorrectly configured. The request url doesn\'t exist: %s',
+                course_home_behaviour
+            )
+
+    # Default behaviour if variable isn't set
+    return course_info(request, course_id)
+
+
 def course_info(request, course_id):
     """
     Display the course's info.html, or 404 if there is no such course.
@@ -401,10 +438,6 @@ def course_info(request, course_id):
         return None
 
     course_key = CourseKey.from_string(course_id)
-
-    # If the unified course experience is enabled, redirect to the "Course" tab
-    if UNIFIED_COURSE_TAB_FLAG.is_enabled(course_key):
-        return redirect(reverse(course_home_url_name(course_key), args=[course_id]))
 
     with modulestore().bulk_operations(course_key):
         course = get_course_with_access(request.user, 'load', course_key)
