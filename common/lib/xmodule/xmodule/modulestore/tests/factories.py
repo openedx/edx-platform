@@ -472,7 +472,7 @@ class StackTraceCounter(object):
         """
         # pylint: disable=broad-except
 
-        stack = traceback.extract_stack()[:-2]
+        stack = [tuple(item) for item in traceback.extract_stack()[:-2]]
 
         if self._top_of_stack in stack:
             stack = stack[stack.index(self._top_of_stack):]
@@ -484,7 +484,6 @@ class StackTraceCounter(object):
                     safe_args.append(repr(arg))
                 except Exception as exc:
                     safe_args.append('<un-repr-able value: {}'.format(exc))
-
             safe_kwargs = {}
             for key, kwarg in kwargs.items():
                 try:
