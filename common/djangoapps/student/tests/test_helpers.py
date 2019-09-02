@@ -13,17 +13,7 @@ from django.utils import http
 from mock import patch
 from testfixtures import LogCapture
 
-from student.helpers import destroy_oauth_tokens, get_next_url_for_login_page
-from student.tests.factories import UserFactory
-from edx_oauth2_provider.models import TrustedClient
-from edx_oauth2_provider.tests.factories import (
-    TrustedClientFactory,
-    AccessTokenFactory,
-    ClientFactory,
-    RefreshTokenFactory,
-)
-from provider.oauth2.models import AccessToken, RefreshToken
-
+from student.helpers import get_next_url_for_login_page
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 
 LOGGER_NAME = "student.helpers"
@@ -120,35 +110,3 @@ class TestLoginHelper(TestCase):
 
         with with_site_configuration_context(configuration=dict(THIRD_PARTY_AUTH_HINT=tpa_hint)):
             validate_login()
-
-
-class TestDestroyOAuthTokensHelper(TestCase):
-    def setUp(self):
-        super(TestDestroyOAuthTokensHelper, self).setUp()
-        self.user = UserFactory.create()
-        self.client = ClientFactory(logout_uri='https://amc.example.com/logout/')
-        access_token = AccessTokenFactory.create(user=self.user, client=self.client)
-        RefreshTokenFactory.create(user=self.user, client=self.client, access_token=access_token)
-
-    def test_trusted_client(self):
-        """
-        Tokens that have a TurstedClient shouldn't be removed.
-        """
-        TrustedClientFactory.create(client=self.client)
-
-        assert AccessToken.objects.count()  # Sanity check
-        assert RefreshToken.objects.count()  # Sanity check
-        destroy_oauth_tokens(self.user)
-        assert AccessToken.objects.count(), 'Trusted access tokens should be kept'
-        assert RefreshToken.objects.count(), 'Trusted refresh tokens should be kept'
-
-    def test_no_trusted_client(self):
-        """
-        Only tokens that don't have a TurstedClient should be removed.
-        """
-        assert not TrustedClient.objects.count()  # 'Sanity check, there should not be a client'
-        assert AccessToken.objects.count()  # Sanity check
-        assert RefreshToken.objects.count()  # Sanity check
-        destroy_oauth_tokens(self.user)
-        assert not AccessToken.objects.count(), 'All access tokens should be deleted'
-        assert not RefreshToken.objects.count(), 'All refresh tokens should be deleted'

@@ -376,18 +376,8 @@ def destroy_oauth_tokens(user):
     """
     Destroys ALL OAuth access and refresh tokens for the given user.
     """
-    # Appsembler: Avoid deleting the trusted clients such as the Appsembler Management Console
-    from edx_oauth2_provider.models import TrustedClient
-    from provider.oauth2.models import Client
-    from django.db.models import Subquery
-
-    trusted_clients = Client.objects.filter(pk__in=Subquery(
-        TrustedClient.objects.all().values('id')
-    ))
-
-    dop_access_token.objects.filter(user=user.id).exclude(client__in=trusted_clients).delete()
-    dop_refresh_token.objects.filter(user=user.id).exclude(client__in=trusted_clients).delete()
-
+    dop_access_token.objects.filter(user=user.id).delete()
+    dop_refresh_token.objects.filter(user=user.id).delete()
     dot_access_token.objects.filter(user=user.id).delete()
     dot_refresh_token.objects.filter(user=user.id).delete()
 
