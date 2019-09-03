@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddIndex(
             model_name='courseenrollment',
-            index=models.Index(fields=[b'user', b'-created'], name='student_cou_user_id_b19dcd_idx'),
+            index=models.Index(fields=['user', '-created'], name='student_cou_user_id_b19dcd_idx'),
         ),
     ]
