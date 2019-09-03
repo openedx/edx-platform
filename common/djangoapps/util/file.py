@@ -168,7 +168,7 @@ class UniversalNewlineIterator(object):
                     line = char
                     yield self.sanitize(last_line)
                 else:
-                    line += char
+                    line += six.text_type(char) if isinstance(char, int) else char
             buf = self.original_file.read(self.buffer_size)
             if not buf and line:
                 yield self.sanitize(line)
