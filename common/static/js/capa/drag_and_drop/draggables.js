@@ -37,7 +37,7 @@
                 draggableObj.iconEl = $('<div></div>');
                 draggableObj.iconImgEl = $('<img />');
                 draggableObj.iconImgEl.attr('src', draggableObj.originalConfigObj.icon);
-                draggableObj.iconImgEl.load(function() {
+                draggableObj.iconImgEl.on('load', function() {
                     draggableObj.iconEl.css({
                         position: 'absolute',
                         width: draggableObj.iconWidthSmall,
@@ -196,7 +196,7 @@
 
                 draggableObj.iconImgEl = $('<img />');
                 draggableObj.iconImgEl.attr('src', obj.icon);
-                draggableObj.iconImgEl.load(function() {
+                draggableObj.iconImgEl.on('load', function() {
                     draggableObj.iconWidth = this.width;
                     draggableObj.iconHeight = this.height;
 

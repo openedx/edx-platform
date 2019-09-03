@@ -42,10 +42,10 @@ define([
                 });
 
                 // Avoid showing broken image on mistyped/nonexistent image
-                this.$el.find('img').error(function() {
+                this.$el.find('img').on('error', function() {
                     $(this).hide();
                 });
-                this.$el.find('img').load(function() {
+                this.$el.find('img').on('load', function() {
                     $(this).show();
                 });
             },

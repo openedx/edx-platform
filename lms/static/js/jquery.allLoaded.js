@@ -27,7 +27,7 @@
                 this.unbind(handler);
             };
 
-            return $elems.load(handler);
+            return $elems.on('load', handler);
         }
     });
 })(jQuery);

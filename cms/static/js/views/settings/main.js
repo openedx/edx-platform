@@ -36,10 +36,10 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    this.$el.find('.set-date').datepicker({dateFormat: 'm/d/yy'});
 
         // Avoid showing broken image on mistyped/nonexistent image
-                   this.$el.find('img').error(function() {
+                   this.$el.find('img').on('error', function() {
                        $(this).hide();
                    });
-                   this.$el.find('img').load(function() {
+                   this.$el.find('img').on('load', function() {
                        $(this).show();
                    });
 

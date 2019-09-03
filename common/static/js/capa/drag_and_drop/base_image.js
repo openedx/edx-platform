@@ -22,7 +22,7 @@
             });
 
             state.baseImageEl.attr('src', state.config.baseImage);
-            state.baseImageEl.load(function() {
+            state.baseImageEl.on('load', function() {
                 $baseImageElContainer.css({
                     width: this.width,
                     height: this.height
@@ -37,7 +37,7 @@
 
                 state.baseImageLoaded = true;
             });
-            state.baseImageEl.error(function() {
+            state.baseImageEl.on('error', function() {
                 console.log('ERROR: Image "' + state.config.baseImage + '" was not found!');
                 $baseImageElContainer.html(
                 '<span style="color: red;">' +

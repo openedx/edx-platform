@@ -12,7 +12,7 @@ export class CourseTalkReviews {  // eslint-disable-line import/prefer-default-e
     // Initialize page to the read reviews view
     self.currentSrc = options.readSrc;
     $.getScript(options.readSrc, () => { // eslint-disable-line func-names
-      $('iframe').load(() => {
+      $('iframe').on('load', () => {
         $(options.loadIcon).hide();
       });
     });
@@ -33,7 +33,7 @@ export class CourseTalkReviews {  // eslint-disable-line import/prefer-default-e
       // Toggle the new coursetalk script object
       self.currentSrc = switchToReadView ? options.readSrc : options.writeSrc;
       $.getScript(self.currentSrc, () => { // eslint-disable-line func-names
-        $('iframe').load(() => {
+        $('iframe').on('load', () => {
           $(options.loadIcon).hide();
         });
       });
