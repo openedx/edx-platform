@@ -43,6 +43,11 @@ SUPPORT_INDEX_URLS = [
         "name": _("Feature Based Enrollments"),
         "description": _("View feature based enrollment settings"),
     },
+    {
+        "url": reverse_lazy("support:link_program_enrollments"),
+        "name": _("Link Program Enrollments"),
+        "description": _("Link LMS users to program enrollments"),
+    },
 ]
 
 
@@ -52,4 +57,5 @@ def index(request):  # pylint: disable=unused-argument
     context = {
         "urls": SUPPORT_INDEX_URLS
     }
+    print(context)
     return render_to_response("support/index.html", context)
