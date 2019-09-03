@@ -18,7 +18,7 @@ from course_modes.models import CourseMode
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 from openedx.core.djangoapps.catalog.tests.factories import generate_course_run_key
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, NonExistentCourseError
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 
@@ -246,6 +246,23 @@ class ProgramCourseEnrollmentModelTests(TestCase):
         self.assertEqual(course_enrollment.course.id, self.course_key)
         self.assertEqual(course_enrollment.mode, CourseMode.MASTERS)
 
+    def test_enrollment_course_not_found(self):
+        nonexistent_key = 'course-v1:edX+Overview+DNE'
+        program_course_enrollment = ProgramCourseEnrollment.objects.create(
+            program_enrollment=self.program_enrollment,
+            course_key=nonexistent_key,
+            course_enrollment=None,
+            status="active"
+        )
+
+        with LogCapture() as capture:
+            with self.assertRaises(NonExistentCourseError):
+                program_course_enrollment.enroll(self.user)
+            expected = "User {} failed to enroll in non-existent course {}".format(self.user.id, nonexistent_key)
+            capture.check(
+                ('lms.djangoapps.program_enrollments.models', 'WARNING', expected)
+            )
+
     @ddt.data(
         (CourseMode.VERIFIED, CourseMode.VERIFIED),
         (CourseMode.AUDIT, CourseMode.MASTERS),
@@ -269,7 +286,7 @@ class ProgramCourseEnrollmentModelTests(TestCase):
 
     @mock.patch('student.models.CourseEnrollment.is_enrollment_closed', return_value=True)
     def test_closed_enrollments_ignored(self, _mock):
-        """ enrolling through program enrollments app should ignore permission checks on enroll """
+        """ enrolling through program enrollments should ignore checks on enrollment """
         program_course_enrollment = self._create_waiting_program_course_enrollment()
         program_course_enrollment.enroll(self.user)
 
