@@ -1020,7 +1020,7 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
                     # some max length and append an ellipsis
                     max_len = getattr(settings, 'NOTIFICATIONS_MAX_EXCERPT_LEN', 65)
                     if len(excerpt) > max_len:
-                        excerpt = "{}...".format(excerpt[:max_len])
+                        excerpt = "{}...".format(excerpt[:max_len].encode("utf-8"))
                     announcement_open_url = "https://{site_name}/courses/{course_id}/announcements/{date}/".format(
                         site_name=settings.LMS_BASE,
                         course_id=unicode(course_key),
