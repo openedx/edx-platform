@@ -6,8 +6,6 @@ from __future__ import absolute_import
 from uuid import uuid4
 from testfixtures import LogCapture
 
-from django.core.management import call_command
-from django.core.management.base import CommandError
 from django.test import TestCase
 
 from edx_django_utils.cache import RequestCache
@@ -125,7 +123,6 @@ class TestLinkProgramEnrollmentsMixin(object):
         )
 
 
-
 class TestLinkProgramEnrollments(TestLinkProgramEnrollmentsMixin, TestCase):
     """ Tests for link_program_enrollments behavior """
 
@@ -200,7 +197,7 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
         """
         with LogCapture() as logger:
             errors = link_program_enrollments_to_lms_users(
-                self.program, 
+                self.program,
                 {
                     '0001': self.user_1.username,
                     '0002': self.user_2.username,
@@ -310,7 +307,7 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
             )
             logger.check_present((LOG_PATH, 'ERROR', msg))
 
-        self.assertDictEqual(errors, {('0001', self.user_1.username): 'NonExistentCourseError: ' +msg})
+        self.assertDictEqual(errors, {('0001', self.user_1.username): 'NonExistentCourseError: ' + msg})
         self._assert_no_program_enrollment(self.user_1, self.program)
         self._assert_no_user(program_enrollment_1)
         course_enrollment_1.refresh_from_db()

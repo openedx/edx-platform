@@ -13,7 +13,7 @@ from support.views.feature_based_enrollments import FeatureBasedEnrollmentsSuppo
 from support.views.index import index
 from support.views.manage_user import ManageUserDetailView, ManageUserSupportView
 from support.views.refund import RefundSupportView
-from support.views.program_enrollments import LinkProgramEnrollmentSupportView 
+from support.views.program_enrollments import LinkProgramEnrollmentSupportView
 
 COURSE_ENTITLEMENTS_VIEW = EntitlementSupportView.as_view()
 

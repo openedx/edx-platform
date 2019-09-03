@@ -3,9 +3,6 @@ import logging
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
-from django.db import IntegrityError, transaction
-from lms.djangoapps.program_enrollments.models import ProgramEnrollment
-from student.models import CourseEnrollmentException
 from lms.djangoapps.program_enrollments.link_program_enrollments import link_program_enrollments_to_lms_users
 
 logger = logging.getLogger(__name__)
@@ -13,12 +10,6 @@ User = get_user_model()
 
 INCORRECT_PARAMETER_TPL = u'incorrectly formatted argument {}, must be in form <external user key>:<lms username>'
 DUPLICATE_KEY_TPL = u'external user key {} provided multiple times'
-NO_PROGRAM_ENROLLMENT_TPL = (u'No program enrollment found for program uuid={program_uuid} and external student '
-                             'key={external_student_key}')
-NO_LMS_USER_TPL = u'No user found with username {}'
-COURSE_ENROLLMENT_ERR_TPL = u'Failed to enroll user {user} with waiting program course enrollment for course {course}'
-EXISTING_USER_TPL = (u'Program enrollment with external_student_key={external_student_key} is already linked to '
-                     u'{account_relation} account username={username}')
 
 
 class Command(BaseCommand):
@@ -93,5 +84,3 @@ class Command(BaseCommand):
 
             result[external_user_key] = lms_username
         return result
-
-
