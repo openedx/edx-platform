@@ -27,7 +27,6 @@ from lms.djangoapps.instructor.views import coupons as instructor_coupons_views
 from lms.djangoapps.instructor.views import instructor_dashboard as instructor_dashboard_views
 from lms.djangoapps.instructor.views import registration_codes as instructor_registration_codes_views
 from lms.djangoapps.instructor_task import views as instructor_task_views
-from notes import views as notes_views
 from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.common_views.xblock import xblock_resource
@@ -576,19 +575,6 @@ urlpatterns += [
         ),
         verified_track_content_views.cohorting_settings,
         name='verified_track_cohorting',
-    ),
-    url(
-        r'^courses/{}/notes$'.format(
-            settings.COURSE_ID_PATTERN,
-        ),
-        notes_views.notes,
-        name='notes',
-    ),
-    url(
-        r'^courses/{}/notes/'.format(
-            settings.COURSE_ID_PATTERN,
-        ),
-        include('notes.urls')
     ),
 
     # LTI endpoints listing
