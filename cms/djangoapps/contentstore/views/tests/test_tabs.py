@@ -71,7 +71,7 @@ class TabsPageTests(CourseTestCase):
 
         resp = self.client.get_html(self.url)
         self.assertEqual(resp.status_code, 200)
-        self.assertIn('course-nav-list', resp.content)
+        self.assertIn('course-nav-list', resp.content.decode('utf-8'))
 
     def test_reorder_tabs(self):
         """Test re-ordering of tabs"""
