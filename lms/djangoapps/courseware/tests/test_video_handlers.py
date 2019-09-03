@@ -1025,7 +1025,7 @@ class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):
         """
         Verify that DELETE dispatch works as expected when required args are missing from request
         """
-        request = Request(self.REQUEST_META, body=json.dumps(params))
+        request = Request(self.REQUEST_META, body=json.dumps(params).encode('utf-8'))
         response = self.item_descriptor.studio_transcript(request=request, dispatch='translation')
         self.assertEqual(response.status_code, 400)
 
@@ -1052,7 +1052,7 @@ class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):
         # verify that a video transcript exists for expected data
         self.assertTrue(api.get_video_transcript_data(video_id=self.EDX_VIDEO_ID, language_code=self.LANGUAGE_CODE_UK))
 
-        request = Request(self.REQUEST_META, body=request_body)
+        request = Request(self.REQUEST_META, body=request_body.encode('utf-8'))
         self.item_descriptor.edx_video_id = self.EDX_VIDEO_ID
         response = self.item_descriptor.studio_transcript(request=request, dispatch='translation')
         self.assertEqual(response.status_code, 200)
@@ -1066,7 +1066,7 @@ class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):
         """
         request_body = json.dumps({'lang': self.LANGUAGE_CODE_UK, 'edx_video_id': ''})
         srt_file_name_uk = subs_filename('ukrainian_translation.srt', lang=self.LANGUAGE_CODE_UK)
-        request = Request(self.REQUEST_META, body=request_body)
+        request = Request(self.REQUEST_META, body=request_body.encode('utf-8'))
 
         # upload and verify that srt file exists in assets
         _upload_file(self.SRT_FILE, self.item_descriptor.location, srt_file_name_uk)
@@ -1091,7 +1091,7 @@ class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):
         request_body = json.dumps({'lang': self.LANGUAGE_CODE_EN, 'edx_video_id': ''})
         srt_file_name_en = subs_filename('english_translation.srt', lang=self.LANGUAGE_CODE_EN)
         self.item_descriptor.transcripts['en'] = 'english_translation.srt'
-        request = Request(self.REQUEST_META, body=request_body)
+        request = Request(self.REQUEST_META, body=request_body.encode('utf-8'))
 
         # upload and verify that srt file exists in assets
         _upload_file(self.SRT_FILE, self.item_descriptor.location, srt_file_name_en)
@@ -1111,7 +1111,7 @@ class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):
         """
         request_body = json.dumps({'lang': self.LANGUAGE_CODE_EN, 'edx_video_id': ''})
         sub_file_name = subs_filename(self.item_descriptor.sub, lang=self.LANGUAGE_CODE_EN)
-        request = Request(self.REQUEST_META, body=request_body)
+        request = Request(self.REQUEST_META, body=request_body.encode('utf-8'))
 
         # sub should not be empy
         self.assertFalse(self.item_descriptor.sub == u'')
