@@ -344,7 +344,7 @@ def get_notes(request, course, page=DEFAULT_PAGE, page_size=DEFAULT_PAGE_SIZE, t
     response = send_request(request.user, course.id, page, page_size, path, text)
 
     try:
-        collection = json.loads(response.content.decode('utf-8'))
+        collection = json.loads(response.content)
     except ValueError:
         log.error(u"Invalid JSON response received from notes api: response_content=%s", response.content)
         raise EdxNotesParseError(_("Invalid JSON response received from notes api."))
