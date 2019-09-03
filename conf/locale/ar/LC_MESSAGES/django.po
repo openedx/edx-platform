@@ -9942,7 +9942,7 @@ msgstr "لقد قمت بتسجيل خروجك."
 msgid ""
 "If you are not redirected within 5 seconds, {start_anchor}click here to go "
 "to the home page{end_anchor}."
-msgstr ""
+msgstr "إذا لم تتم إعادة توجيهك خلال 5 ثوانٍ ، {start_anchor} انقر هنا للانتقال إلى الصفحة الرئيسية {end_anchor}."
 
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html themes/st-lutherx/lms/templates/main.html
@@ -9993,7 +9993,7 @@ msgstr "حدث خطأ"
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
 msgid "Expired ID Verification"
-msgstr ""
+msgstr "التحقق من الهوية منتهية الصلاحية"
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
@@ -10051,17 +10051,17 @@ msgstr "شكرًا لك!"
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
 msgid "The %(platform_name)s Team "
-msgstr ""
+msgstr "الفريق %(platform_name)s"
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
 msgid "Hello %(full_name)s, "
-msgstr ""
+msgstr "مرحبا %(full_name)s،"
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/subject.txt
 #, python-format
 msgid "Your %(platform_name)s Verification has Expired"
-msgstr ""
+msgstr "انتهت صلاحية التحقق من %(platform_name)s الخاص بك"
 
 #: lms/templates/wiki/article.html
 msgid "Last modified:"
@@ -10379,7 +10379,7 @@ msgstr "اقتباسات"
 msgid ""
 "Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for"
 " help."
-msgstr ""
+msgstr "بناء الجملة المسموح به مسموح به. انظر %(start_link)scheatsheet%(end_link)s للحصول على المساعدة."
 
 #: lms/templates/wiki/plugins/attachments/index.html
 #: wiki/plugins/attachments/wiki_plugin.py
@@ -16811,7 +16811,7 @@ msgstr "استعراض عملية التقييم في استوديو"
 
 #: lms/templates/courseware/progress.html
 msgid "Course Progress for Student '{username}' ({email})"
-msgstr ""
+msgstr "تقدم الدورة التدريبية للطالب '{username}' ({email})"
 
 #: lms/templates/courseware/progress.html
 msgid "View Certificate"
@@ -18840,11 +18840,11 @@ msgid ""
 "Select a problem to generate a CSV file that lists all student answers to "
 "the problem. You also select a section or chapter to include results of all "
 "problems in that section or chapter."
-msgstr ""
+msgstr "حدد مشكلة لإنشاء ملف CSV يسرد جميع إجابات الطلاب على المشكلة. يمكنك أيضًا تحديد قسم أو فصل لتضمين نتائج جميع المشكلات في هذا القسم أو الفصل."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "NOTE"
-msgstr ""
+msgstr "ملحوظة"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -18852,7 +18852,7 @@ msgid ""
 "more than {max_entries} responses, try generating the report on a chapter-"
 "by-chapter, or problem-by-problem basis, or contact your site administrator "
 "to increase the limit."
-msgstr ""
+msgstr "يقتصر التقرير الذي تم إنشاؤه على استجابات {max_entries}. إذا كنت تتوقع أكثر من {max_entries} من الاستجابات ، فحاول إنشاء التقرير على أساس فصل تلو الآخر أو على أساس كل مشكلة على حدة ، أو اتصل بمسؤول الموقع لزيادة الحد."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Download a CSV of problem responses"
@@ -19540,7 +19540,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Role of the users being enrolled."
-msgstr ""
+msgstr "دور المستخدمين المسجلين"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -20023,7 +20023,7 @@ msgstr "عرض سجل الدرجات"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View a specific learner's enrollment status"
-msgstr ""
+msgstr "عرض حالة التحاق متعلم معين"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Learner's {platform_name} email address or username *"
@@ -20036,7 +20036,7 @@ msgstr "عنوان البريد الإلكتروني أو اسم المستخد�
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View Enrollment Status"
-msgstr ""
+msgstr "عرض حالة التسجيل"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View a specific learner's grades and progress"
