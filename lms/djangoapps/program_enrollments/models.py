@@ -13,11 +13,13 @@ from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 from simple_history.models import HistoricalRecords
+from six import text_type
 
 from course_modes.models import CourseMode
 from lms.djangoapps.program_enrollments.api.v1.constants import \
     CourseEnrollmentResponseStatuses as ProgramCourseEnrollmentResponseStatuses
-from student.models import AlreadyEnrolledError, CourseEnrollment
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from student.models import CourseEnrollment, NonExistentCourseError
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -207,13 +209,12 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
         Create a CourseEnrollment to enroll user in course
         """
         try:
-            self.course_enrollment = CourseEnrollment.enroll(
-                user,
-                self.course_key,
-                mode=CourseMode.MASTERS,
-                check_access=True,
-            )
-        except AlreadyEnrolledError:
+            CourseOverview.get_from_id(self.course_key)
+        except CourseOverview.DoesNotExist:
+            logger.warning(u"User %s failed to enroll in non-existent course %s", user.id, text_type(self.course_key))
+            raise NonExistentCourseError
+
+        if CourseEnrollment.is_enrolled(user, self.course_key):
             course_enrollment = CourseEnrollment.objects.get(
                 user=user,
                 course_id=self.course_key,
@@ -225,6 +226,13 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
             message = ("Attempted to create course enrollment for user={user} and course={course}"
                        " but an enrollment already exists. Existing enrollment will be used instead")
             logger.info(message.format(user=user.id, course=self.course_key))
+        else:
+            self.course_enrollment = CourseEnrollment.enroll(
+                user,
+                self.course_key,
+                mode=CourseMode.MASTERS,
+                check_access=False,
+            )
         if self.status == ProgramCourseEnrollmentResponseStatuses.INACTIVE:
             self.course_enrollment.deactivate()
         self.save()
