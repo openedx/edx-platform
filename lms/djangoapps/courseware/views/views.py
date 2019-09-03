@@ -402,6 +402,9 @@ def course_root(request, course_id):
     return course_info(request, course_id)
 
 
+@ensure_csrf_cookie
+@ensure_valid_course_key
+@data_sharing_consent_required
 def course_info(request, course_id):
     """
     Display the course's info.html, or 404 if there is no such course.
@@ -438,6 +441,10 @@ def course_info(request, course_id):
         return None
 
     course_key = CourseKey.from_string(course_id)
+
+    # If the unified course experience is enabled, redirect to the "Course" tab
+    if UNIFIED_COURSE_TAB_FLAG.is_enabled(course_key):
+        return redirect(reverse(course_home_url_name(course_key), args=[course_id]))
 
     with modulestore().bulk_operations(course_key):
         course = get_course_with_access(request.user, 'load', course_key)
