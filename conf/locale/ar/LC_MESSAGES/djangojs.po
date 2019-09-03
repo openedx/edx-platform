@@ -6531,7 +6531,7 @@ msgstr "معلومات الحساب الأساسية"
 #: lms/static/js/student_account/views/account_settings_view.js
 #: themes/st-lutherx/lms/static/js/student_account/views/account_settings_view.js
 msgid "Order History"
-msgstr ""
+msgstr "تاريخ الطلب"
 
 #: lms/static/js/verify_student/views/image_input_view.js
 msgid "Image Upload Error"
@@ -8639,7 +8639,7 @@ msgstr "أشّر الامتحان بعلامة ’استُكمل‘"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "timed"
-msgstr ""
+msgstr "موقوت"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid ""
@@ -8655,7 +8655,7 @@ msgstr "أنهي امتحاني"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "Hide Timer"
-msgstr ""
+msgstr "إخفاء الموقت"
 
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
