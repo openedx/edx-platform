@@ -24,7 +24,7 @@ from django.db.models import Q, prefetch_related_objects
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect
 from django.template.context_processors import csrf
-from django.urls import reverse
+from django.urls import NoReverseMatch, reverse
 from django.utils.decorators import method_decorator
 from django.utils.http import urlquote_plus
 from django.utils.text import slugify
@@ -392,9 +392,9 @@ def course_root(request, course_id):
         try:
             course_home_url = reverse(course_home_behaviour, kwargs={'course_id': course_id})
             return redirect(course_home_url)
-        except:
+        except NoReverseMatch:
             logging.warn(
-                'COURSE_HOME_BEHAVIOUR incorrectly configured. The request url doesn\'t exist: %s',
+                u'COURSE_HOME_BEHAVIOUR incorrectly configured. The request url doesn\'t exist: %s',
                 course_home_behaviour
             )
 
