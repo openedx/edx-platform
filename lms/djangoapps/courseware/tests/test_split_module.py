@@ -131,7 +131,6 @@ class SplitTestBase(SharedModuleStoreTestCase):
             u'<button class="{} inactive nav-item tab"'.format(self.ICON_CLASSES[user_tag]),
             unicode_content
         )
-
         # And proper tooltips
         for tooltip in self.TOOLTIPS[user_tag]:
             self.assertIn(tooltip, unicode_content)
