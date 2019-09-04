@@ -793,21 +793,26 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             page=helpers.DEFAULT_PAGE,
             page_size=helpers.DEFAULT_PAGE_SIZE
         )
-        mock_get.assert_called_with(
-            "http://example.com/test/",
-            headers={
-                "x-annotator-auth-token": "test_token"
-            },
-            params={
-                "user": "anonymous_id",
-                "course_id": text_type(self.course.id),
-                "text": "text",
-                "highlight": True,
-                'page': 1,
-                'page_size': 25,
-            },
-            timeout=(settings.EDXNOTES_CONNECT_TIMEOUT, settings.EDXNOTES_READ_TIMEOUT)
+        called_args_str = str(mock_get.call_args_list)
+        params = {
+            'user': 'anonymous_id',
+            'course_id': six.b(str(self.course.id)),
+            'text': 'text',
+            'highlight': True,
+            'page': 1,
+            'page_size': 25,
+        }
+        self.assertIn("http://example.com/test/", called_args_str)
+        self.assertIn("headers={'x-annotator-auth-token': 'test_token'}", called_args_str)
+        for key, value in params.items():
+            self.assertIn(key, called_args_str)
+            self.assertIn(str(value), called_args_str)
+
+        self.assertIn(
+            "timeout=" + str((settings.EDXNOTES_CONNECT_TIMEOUT, settings.EDXNOTES_READ_TIMEOUT)),
+            called_args_str
         )
+
 
     @override_settings(EDXNOTES_PUBLIC_API="http://example.com")
     @override_settings(EDXNOTES_INTERNAL_API="http://example.com")
