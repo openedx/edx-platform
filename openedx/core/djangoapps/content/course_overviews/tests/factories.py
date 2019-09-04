@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from datetime import datetime, timedelta
 import json
 
 import factory
@@ -35,3 +36,11 @@ class CourseOverviewFactory(DjangoModelFactory):
     @factory.lazy_attribute
     def display_name(self):
         return "{} Course".format(self.id)
+
+    @factory.lazy_attribute
+    def start(self):
+        return datetime.now()
+
+    @factory.lazy_attribute
+    def end(self):
+        return datetime.now() + timedelta(30)
