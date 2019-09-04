@@ -220,6 +220,9 @@ FEATURES = {
     # in sync with the one in lms/envs/common.py
     'ENABLE_EDXNOTES': False,
 
+    # Toggle to enable coordination with the Publisher tool (keep in sync with lms/envs/common.py)
+    'ENABLE_PUBLISHER': False,
+
     # Show a new field in "Advanced settings" that can store custom data about a
     # course and that can be read from themes
     'ENABLE_OTHER_COURSE_SETTINGS': False,
