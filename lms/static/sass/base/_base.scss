@@ -88,8 +88,7 @@ ol + p {
 }
 
 p {
-  a:not(.btn),
-  a:visited:not(.btn) {
+  a, a:visited {
     color: $link-color;
     font: inherit;
     font-weight: inherit;
@@ -105,8 +104,7 @@ p {
   }
 }
 
-a:not(.btn),
-a:visited:not(.btn) {
+a, a:visited {
   color: $link-color;
   font: inherit;
   text-decoration: none;
