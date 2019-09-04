@@ -8,8 +8,6 @@ class ProgramEnrollmentStatuses(object):
     """
     Status that a user may have enrolled in a program.
 
-    Note: Changing the value of __ALL__ will trigger a migration.
-
     TODO: Define the semantics of each of these (EDUCATOR-4958)
     """
     ENROLLED = 'enrolled'
@@ -19,15 +17,25 @@ class ProgramEnrollmentStatuses(object):
     __ACTIVE__ = (ENROLLED, PENDING)
     __ALL__ = (ENROLLED, PENDING, SUSPENDED, CANCELED)
 
+    # Note: Any changes to this value will trigger a migration on
+    # ProgramEnrollment!
+    __MODEL_CHOICES__ = (
+        (status, status) for status in __ALL__
+    )
+
 
 class ProgramCourseEnrollmentStatuses(object):
     """
     Status that a user may have enrolled in a course.
-
-    Note: Changing the value of __ALL__ will trigger a migration.
 
     TODO: Consider whether we need these (EDUCATOR-4958)
     """
     ACTIVE = 'active'
     INACTIVE = 'inactive'
     __ALL__ = (ACTIVE, INACTIVE)
+
+    # Note: Any changes to this value will trigger a migration on
+    # ProgramCourseEnrollment!
+    __MODEL_CHOICES__ = (
+        (status, status) for status in __ALL__
+    )

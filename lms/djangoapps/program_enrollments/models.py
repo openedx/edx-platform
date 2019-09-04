@@ -32,9 +32,7 @@ class ProgramEnrollment(TimeStampedModel):  # pylint: disable=model-missing-unic
     .. pii_types: other
     .. pii_retirement: local_api
     """
-    STATUS_CHOICES = (
-        (status, status) for status in ProgramEnrollmentStatuses.__ALL__
-    )
+    STATUS_CHOICES = ProgramEnrollmentStatuses.__MODEL_CHOICES__
 
     class Meta(object):
         app_label = "program_enrollments"
@@ -118,9 +116,7 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
 
     .. no_pii:
     """
-    STATUS_CHOICES = (
-        (status, status) for status in ProgramCourseEnrollmentStatuses.__ALL__
-    )
+    STATUS_CHOICES = ProgramCourseEnrollmentStatuses.__MODEL_CHOICES__
 
     class Meta(object):
         app_label = "program_enrollments"
@@ -207,7 +203,10 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
         try:
             CourseOverview.get_from_id(self.course_key)
         except CourseOverview.DoesNotExist:
-            logger.warning(u"User %s failed to enroll in non-existent course %s", user.id, text_type(self.course_key))
+            logger.warning(
+                u"User %s failed to enroll in non-existent course %s", user.id,
+                text_type(self.course_key),
+            )
             raise NonExistentCourseError
 
         if CourseEnrollment.is_enrolled(user, self.course_key):
@@ -219,12 +218,12 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
                 course_enrollment.mode = CourseMode.MASTERS
                 course_enrollment.save()
             self.course_enrollment = course_enrollment
-            message_fmt = (
+            message_template = (
                 "Attempted to create course enrollment for user={user} "
                 "and course={course} but an enrollment already exists. "
                 "Existing enrollment will be used instead."
             )
-            logger.info(message_fmt.format(user=user.id, course=self.course_key))
+            logger.info(message_template.format(user=user.id, course=self.course_key))
         else:
             self.course_enrollment = CourseEnrollment.enroll(
                 user,

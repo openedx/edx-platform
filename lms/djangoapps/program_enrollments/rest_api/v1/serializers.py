@@ -47,7 +47,7 @@ class ProgramEnrollmentSerializer(serializers.Serializer):
 
 class ProgramCourseEnrollmentSerializer(serializers.Serializer):
     """
-    Serializer for display program-course enrollments.
+    Serializer for displaying program-course enrollments.
     """
     student_key = serializers.SerializerMethodField()
     status = serializers.CharField()
@@ -67,7 +67,7 @@ class ProgramCourseEnrollmentSerializer(serializers.Serializer):
         return text_type(obj.program_enrollment.curriculum_uuid)
 
 
-class ProgramEnrollmentRequestMixin(serializers.Serializer, InvalidStatusMixin):
+class ProgramEnrollmentRequestMixin(InvalidStatusMixin, serializers.Serializer):
     """
     Base fields for all program enrollment related serializers.
     """

@@ -121,7 +121,9 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
 
         for course_key in cls.course_keys:
             CourseOverviewFactory(id=course_key)
-        cls.provider_config = SAMLProviderConfigFactory.create(organization=cls.organization, slug=cls.provider_slug)
+        cls.provider_config = SAMLProviderConfigFactory.create(
+            organization=cls.organization, slug=cls.provider_slug
+        )
 
     def setUp(self):
         super(SocialAuthEnrollmentCompletionSignalTest, self).setUp()
@@ -247,7 +249,9 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
         self._assert_program_enrollment_user(program_enrollment, self.user)
 
         duplicate_program_course_enrollment = program_course_enrollments[0]
-        self._assert_program_course_enrollment(duplicate_program_course_enrollment, CourseMode.VERIFIED)
+        self._assert_program_course_enrollment(
+            duplicate_program_course_enrollment, CourseMode.VERIFIED
+        )
 
         program_course_enrollment = program_course_enrollments[1]
         self._assert_program_course_enrollment(program_course_enrollment)
@@ -325,7 +329,7 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
                 user=self.user,
                 uid='{0}:{1}'.format(self.provider_slug, self.external_id)
             )
-            error_tmpl = (
+            error_template = (
                 u'Failed to complete waiting enrollments for organization={}.'
                 u' No catalog programs with matching authoring_organization exist.'
             )
@@ -333,7 +337,7 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
                 (
                     logger.name,
                     'WARNING',
-                    error_tmpl.format('UoX')
+                    error_template.format('UoX')
                 )
             )
 
@@ -349,12 +353,14 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
                         user=self.user,
                         uid='{0}:{1}'.format(self.provider_slug, self.external_id)
                     )
-                error_tmpl = u'Failed to enroll user={} with waiting program_course_enrollment={}: {}'
+                error_template = u'Failed to enroll user={} with waiting program_course_enrollment={}: {}'
                 log.check_present(
                     (
                         logger.name,
                         'WARNING',
-                        error_tmpl.format(self.user.id, program_course_enrollments[0].id, 'something has gone wrong')
+                        error_template.format(
+                            self.user.id, program_course_enrollments[0].id, 'something has gone wrong'
+                        )
                     )
                 )
 
@@ -373,11 +379,11 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
                         user=self.user,
                         uid='{0}:{1}'.format(self.provider_slug, self.external_id),
                     )
-                error_tmpl = u'Unable to link waiting enrollments for user {}, social auth creation failed: {}'
+                error_template = u'Unable to link waiting enrollments for user {}, social auth creation failed: {}'
                 log.check_present(
                     (
                         logger.name,
                         'WARNING',
-                        error_tmpl.format(self.user.id, 'unexpected error')
+                        error_template.format(self.user.id, 'unexpected error')
                     )
                 )

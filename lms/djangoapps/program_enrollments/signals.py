@@ -64,7 +64,9 @@ def matriculate_learner(user, uid):
         logger.info(u'Ignoring non-saml social auth entry for user=%s', user.id)
         return
     except SAMLProviderConfig.DoesNotExist:
-        logger.warning(u'Got incoming social auth for provider=%s but no such provider exists', provider_slug)
+        logger.warning(
+            u'Got incoming social auth for provider=%s but no such provider exists', provider_slug
+        )
         return
     except SAMLProviderConfig.MultipleObjectsReturned:
         logger.warning(
