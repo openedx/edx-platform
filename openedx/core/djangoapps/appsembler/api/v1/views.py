@@ -3,7 +3,7 @@
 Only include view classes here. See the tests/test_permissions.py:get_api_classes()
 method.
 """
-from distutils.util import strtoobool
+from distutils.util import strtobool
 from functools import partial
 import logging
 import random
