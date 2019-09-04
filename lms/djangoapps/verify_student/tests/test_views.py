@@ -1538,7 +1538,7 @@ class TestSubmitPhotosForVerification(TestCase):
             full_name="",
             expected_status_code=400
         )
-        self.assertEqual(response.content, "Name must be at least 1 character long.")
+        self.assertEqual(response.content.decode('utf-8'), "Name must be at least 1 character long.")
 
     def test_missing_required_param(self):
         # Missing face image parameter
