@@ -113,9 +113,8 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         test_data = (
             ('tabs', False, True),
             ('none', False, False),
-            ('fullchrome', True, True),
             ('accordion', True, False),
-            ('fullchrome', True, True)
+            ('fullchrome', True, True),
         )
         for (displayname, accordion, tabs) in test_data:
             response = self.client.get(reverse('courseware_section', kwargs={
