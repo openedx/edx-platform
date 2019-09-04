@@ -1999,6 +1999,11 @@ FACEBOOK_APP_ID = 'FACEBOOK_APP_ID'
 FACEBOOK_APP_SECRET = 'FACEBOOK_APP_SECRET'
 FACEBOOK_API_VERSION = 'v2.1'
 
+############### Settings for django-fernet-fields ##################
+FERNET_KEYS = [
+    'DUMMY KEY CHANGE BEFORE GOING TO PRODUCTION',
+]
+
 ### Proctoring configuration (redirct URLs and keys shared between systems) ####
 PROCTORING_BACKENDS = {
     'DEFAULT': 'null',
