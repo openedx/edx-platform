@@ -137,7 +137,7 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
     """
     previous_state = EmailEnrollmentState(course_id, student_email)
     enrollment_obj = None
-    if previous_state.user:
+    if previous_state.user and User.objects.get(email=student_email).is_active:
         # if the student is currently unenrolled, don't enroll them in their
         # previous mode
 

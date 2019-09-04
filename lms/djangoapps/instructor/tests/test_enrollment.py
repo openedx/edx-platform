@@ -106,6 +106,7 @@ class TestEnrollmentChangeBase(six.with_metaclass(ABCMeta, CacheIsolationTestCas
         self.assertEqual(after, after_ideal)
 
 
+@ddt.ddt
 class TestInstructorEnrollDB(TestEnrollmentChangeBase):
     """ Test instructor.enrollment.enroll_email """
     def test_enroll(self):
@@ -221,6 +222,71 @@ class TestInstructorEnrollDB(TestEnrollmentChangeBase):
         action = lambda email: enroll_email(self.course_key, email, auto_enroll=False)
 
         return self._run_state_change_test(before_ideal, after_ideal, action)
+
+    @ddt.data(True, False)
+    def test_enroll_inactive_user(self, auto_enroll):
+        before_ideal = SettableEnrollmentState(
+            user=True,
+            enrollment=False,
+            allowed=False,
+            auto_enroll=False,
+        )
+        print("checking initialization...")
+        eobjs = before_ideal.create_user(self.course_key, is_active=False)
+        before = EmailEnrollmentState(self.course_key, eobjs.email)
+        self.assertEqual(before, before_ideal)
+
+        print('running action...')
+        enroll_email(self.course_key, eobjs.email, auto_enroll=auto_enroll)
+
+        print('checking effects...')
+
+        after_ideal = SettableEnrollmentState(
+            user=True,
+            enrollment=False,
+            allowed=True,
+            auto_enroll=auto_enroll,
+        )
+        after = EmailEnrollmentState(self.course_key, eobjs.email)
+        self.assertEqual(after, after_ideal)
+
+    @ddt.data(True, False)
+    def test_enroll_inactive_user_again(self, auto_enroll):
+        course_key = CourseLocator('Robot', 'fAKE', 'C--se--ID')
+        before_ideal = SettableEnrollmentState(
+            user=True,
+            enrollment=False,
+            allowed=True,
+            auto_enroll=auto_enroll,
+        )
+        print("checking initialization...")
+        user = UserFactory()
+        user.is_active = False
+        user.save()
+        eobjs = EnrollmentObjects(
+            user.email,
+            None,
+            None,
+            CourseEnrollmentAllowed.objects.create(
+                email=user.email, course_id=course_key, auto_enroll=auto_enroll
+            )
+        )
+        before = EmailEnrollmentState(course_key, eobjs.email)
+        self.assertEqual(before, before_ideal)
+
+        print('running action...')
+        enroll_email(self.course_key, eobjs.email, auto_enroll=auto_enroll)
+
+        print('checking effects...')
+
+        after_ideal = SettableEnrollmentState(
+            user=True,
+            enrollment=False,
+            allowed=True,
+            auto_enroll=auto_enroll,
+        )
+        after = EmailEnrollmentState(self.course_key, eobjs.email)
+        self.assertEqual(after, after_ideal)
 
 
 class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
@@ -756,7 +822,7 @@ class SettableEnrollmentState(EmailEnrollmentState):
     def __neq__(self, other):
         return not self == other
 
-    def create_user(self, course_id=None):
+    def create_user(self, course_id=None, is_active=True):
         """
         Utility method to possibly create and possibly enroll a user.
         Creates a state matching the SettableEnrollmentState properties.
@@ -770,7 +836,7 @@ class SettableEnrollmentState(EmailEnrollmentState):
         # if self.user=False, then this will just be used to generate an email.
         email = "robot_no_user_exists_with_this_email@edx.org"
         if self.user:
-            user = UserFactory()
+            user = UserFactory(is_active=is_active)
             email = user.email
             if self.enrollment:
                 cenr = CourseEnrollment.enroll(user, course_id)
