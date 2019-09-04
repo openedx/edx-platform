@@ -266,18 +266,11 @@ class RadioSelectNotNull(forms.RadioSelect):
     """
     A widget which removes the default '-----' option from RadioSelect
     """
-    def get_renderer(self, name, value, attrs=None, choices=()):
-        """
-        Returns an instance of the renderer.
-        """
-        if value is None: value = ''
-        # Normalize to string.
-        str_value = force_unicode(value)
-        final_attrs = self.build_attrs(attrs)
-        choices = list(chain(self.choices, choices))
-        if choices[0][0] == '':
-            choices.pop(0)
-        return self.renderer(name, str_value, final_attrs, choices)
+    def optgroups(self, name, value, attrs=None):
+        """Return a list of optgroups for this widget."""
+        if self.choices[0][0] == '':
+            self.choices.pop(0)
+        return super(RadioSelectNotNull, self).optgroups(name, value, attrs)
 
 
 class InterestsForm(BaseOnboardingForm):
