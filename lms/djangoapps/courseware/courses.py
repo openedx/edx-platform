@@ -622,7 +622,7 @@ def get_current_child(xmodule, min_depth=None, requested_child=None):
         children = xmodule.get_display_items()
         if len(children) > 0:
             if xmodule.position is not None and not requested_child:
-                pos = xmodule.position - 1  # position is 1-indexed
+                pos = int(xmodule.position) - 1  # position is 1-indexed
                 if 0 <= pos < len(children):
                     child = children[pos]
                     if min_depth is not None and (min_depth > 0 and not child.has_children_at_depth(min_depth - 1)):
