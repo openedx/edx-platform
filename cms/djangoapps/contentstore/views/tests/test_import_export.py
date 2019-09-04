@@ -573,8 +573,11 @@ class ExportTestCase(CourseTestCase):
         output_url = result['ExportOutput']
         resp = self.client.get(output_url)
         self._verify_export_succeeded(resp)
+        resp_content = b''
+        for item in resp.streaming_content:
+            resp_content += item
 
-        buff = StringIO("".join(resp.streaming_content))
+        buff = six.BytesIO(resp_content)
         return tarfile.open(fileobj=buff)
 
     def _verify_export_succeeded(self, resp):
