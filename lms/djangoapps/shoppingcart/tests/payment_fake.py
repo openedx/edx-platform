@@ -77,7 +77,7 @@ class PaymentFakeView(View):
         Accepts one POST param "status" that can be either "success"
         or "failure".
         """
-        new_status = request.body
+        new_status = request.body.decode('utf-8')
 
         if new_status not in ["success", "failure", "decline"]:
             return HttpResponseBadRequest()
