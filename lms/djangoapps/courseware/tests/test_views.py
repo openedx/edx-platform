@@ -599,7 +599,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         # TODO add a test for invalid location
         # TODO add a test for no data *
         response = self.client.get(reverse('jump_to', args=['foo/bar/baz', 'baz']))
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def verify_end_date(self, course_id, expected_end_text=None):
         """
@@ -1279,7 +1279,7 @@ class ProgressPageTests(ProgressPageBaseTests):
             resp = self.client.get(
                 reverse('student_progress', args=[six.text_type(self.course.id), invalid_id])
             )
-            self.assertEquals(resp.status_code, 404)
+            self.assertEqual(resp.status_code, 404)
 
         # Assert that valid 'student_id' returns 200 status
         self._get_student_progress_page()
@@ -2358,9 +2358,8 @@ class TestIndexView(ModuleStoreTestCase):
                 }
             )
         )
-
         # Trigger the assertions embedded in the ViewCheckerBlocks
-        self.assertEquals(response.content.count("ViewCheckerPassed"), 3)
+        self.assertEqual(response.content.decode('utf-8').count("ViewCheckerPassed"), 3)
 
     @XBlock.register_temp_plugin(ActivateIDCheckerBlock, 'id_checker')
     def test_activate_block_id(self):
@@ -2387,7 +2386,7 @@ class TestIndexView(ModuleStoreTestCase):
                 }
             ) + '?activate_block_id=test_block_id'
         )
-        self.assertIn("Activate Block ID: test_block_id", response.content)
+        self.assertIn("Activate Block ID: test_block_id", response.content.decode('utf-8'))
 
     @ddt.data(
         [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.ANONYMOUS, False],
@@ -2445,26 +2444,26 @@ class TestIndexView(ModuleStoreTestCase):
 
             response = self.client.get(url, follow=False)
             assert response.status_code == (200 if expected_course_content else 302)
-
+            unicode_content = response.content.decode('utf-8')
             if expected_course_content:
                 if user_type in (CourseUserType.ANONYMOUS, CourseUserType.UNENROLLED):
-                    self.assertIn('data-save-position="false"', response.content)
-                    self.assertIn('data-show-completion="false"', response.content)
-                    self.assertIn('xblock-public_view-sequential', response.content)
-                    self.assertIn('xblock-public_view-vertical', response.content)
-                    self.assertIn('xblock-public_view-html', response.content)
-                    self.assertIn('xblock-public_view-video', response.content)
+                    self.assertIn('data-save-position="false"', unicode_content)
+                    self.assertIn('data-show-completion="false"', unicode_content)
+                    self.assertIn('xblock-public_view-sequential', unicode_content)
+                    self.assertIn('xblock-public_view-vertical', unicode_content)
+                    self.assertIn('xblock-public_view-html', unicode_content)
+                    self.assertIn('xblock-public_view-video', unicode_content)
                     if user_type == CourseUserType.ANONYMOUS and course_visibility == COURSE_VISIBILITY_PRIVATE:
-                        self.assertIn('To see course content', response.content)
+                        self.assertIn('To see course content', unicode_content)
                     if user_type == CourseUserType.UNENROLLED and course_visibility == COURSE_VISIBILITY_PRIVATE:
-                        self.assertIn('You must be enrolled', response.content)
+                        self.assertIn('You must be enrolled', unicode_content)
                 else:
-                    self.assertIn('data-save-position="true"', response.content)
-                    self.assertIn('data-show-completion="true"', response.content)
-                    self.assertIn('xblock-student_view-sequential', response.content)
-                    self.assertIn('xblock-student_view-vertical', response.content)
-                    self.assertIn('xblock-student_view-html', response.content)
-                    self.assertIn('xblock-student_view-video', response.content)
+                    self.assertIn('data-save-position="true"', unicode_content)
+                    self.assertIn('data-show-completion="true"', unicode_content)
+                    self.assertIn('xblock-student_view-sequential', unicode_content)
+                    self.assertIn('xblock-student_view-vertical', unicode_content)
+                    self.assertIn('xblock-student_view-html', unicode_content)
+                    self.assertIn('xblock-student_view-video', unicode_content)
 
     @patch('courseware.views.views.CourseTabView.course_open_for_learner_enrollment')
     @patch('openedx.core.djangoapps.util.user_messages.PageLevelMessages.register_warning_message')
@@ -2645,7 +2644,7 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
 
         response = self.client.get(self.section_1_url)
         self.assertIn('data-mark-completed-on-view-after-delay', response.content)
-        self.assertEquals(response.content.count("data-mark-completed-on-view-after-delay"), 2)
+        self.assertEqual(response.content.count("data-mark-completed-on-view-after-delay"), 2)
 
         request = self.request_factory.post(
             '/',
@@ -2663,7 +2662,7 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
 
         response = self.client.get(self.section_1_url)
         self.assertIn('data-mark-completed-on-view-after-delay', response.content)
-        self.assertEquals(response.content.count("data-mark-completed-on-view-after-delay"), 1)
+        self.assertEqual(response.content.count("data-mark-completed-on-view-after-delay"), 1)
 
         request = self.request_factory.post(
             '/',
@@ -2798,7 +2797,7 @@ class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
                 }
             )
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertIn("Content Locked", response.content)
 
 
