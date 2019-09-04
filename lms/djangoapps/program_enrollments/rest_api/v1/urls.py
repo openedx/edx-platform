@@ -3,18 +3,19 @@ from __future__ import absolute_import
 
 from django.conf.urls import url
 
-from lms.djangoapps.program_enrollments.api.v1.constants import PROGRAM_UUID_PATTERN
-from lms.djangoapps.program_enrollments.api.v1.views import (
-    EnrollmentDataResetView,
-    ProgramEnrollmentsView,
-    ProgramCourseEnrollmentsView,
-    ProgramCourseGradesView,
-    ProgramCourseEnrollmentOverviewView,
-    UserProgramReadOnlyAccessView,
-)
 from openedx.core.constants import COURSE_ID_PATTERN
 
-app_name = 'lms.djangoapps.program_enrollments'
+from .constants import PROGRAM_UUID_PATTERN
+from .views import (
+    EnrollmentDataResetView,
+    ProgramCourseEnrollmentOverviewView,
+    ProgramCourseEnrollmentsView,
+    ProgramCourseGradesView,
+    ProgramEnrollmentsView,
+    UserProgramReadOnlyAccessView
+)
+
+app_name = 'v1'
 
 urlpatterns = [
     url(

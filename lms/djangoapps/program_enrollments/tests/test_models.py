@@ -44,7 +44,9 @@ class ProgramEnrollmentModelTests(TestCase):
         )
 
     def test_unique_external_key_program_curriculum(self):
-        """ A record with the same (external_user_key, program_uuid, curriculum_uuid) cannot be duplicated. """
+        """
+        A record with the same (external_user_key, program_uuid, curriculum_uuid) cannot be duplicated.
+        """
         with self.assertRaises(IntegrityError):
             _ = ProgramEnrollment.objects.create(
                 user=None,
@@ -55,7 +57,9 @@ class ProgramEnrollmentModelTests(TestCase):
             )
 
     def test_unique_user_program_curriculum(self):
-        """ A record with the same (user, program_uuid, curriculum_uuid) cannot be duplicated. """
+        """
+        A record with the same (user, program_uuid, curriculum_uuid) cannot be duplicated.
+        """
         with self.assertRaises(IntegrityError):
             _ = ProgramEnrollment.objects.create(
                 user=self.user,
@@ -108,7 +112,8 @@ class ProgramEnrollmentModelTests(TestCase):
 
     def test_user_retirement(self):
         """
-        Test that the external_user_key is successfully retired for a user's program enrollments and history.
+        Test that the external_user_key is successfully retired for a user's program enrollments
+        and history.
         """
         new_status = 'canceled'
 
@@ -258,7 +263,9 @@ class ProgramCourseEnrollmentModelTests(TestCase):
         with LogCapture() as capture:
             with self.assertRaises(NonExistentCourseError):
                 program_course_enrollment.enroll(self.user)
-            expected = "User {} failed to enroll in non-existent course {}".format(self.user.id, nonexistent_key)
+            expected = "User {} failed to enroll in non-existent course {}".format(
+                self.user.id, nonexistent_key
+            )
             capture.check(
                 ('lms.djangoapps.program_enrollments.models', 'WARNING', expected)
             )

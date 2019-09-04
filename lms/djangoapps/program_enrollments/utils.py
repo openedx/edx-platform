@@ -39,12 +39,14 @@ def get_user_by_program_id(external_user_id, program_uuid):
         program_uuid: a program this user is/will be enrolled in
 
     Returns:
-        A User object or None, if no user with the given external id for the given organization exists.
+        A User object or None, if no user with the given external id for the given organization
+        exists.
 
     Raises:
         ProgramDoesNotExistException if no such program exists.
         OrganizationDoesNotExistException if no organization exists.
-        ProviderDoesNotExistException if there is no SAML provider configured for the related organization.
+        ProviderDoesNotExistException if there is no SAML provider configured for the related
+        organization.
     """
     program = get_programs(uuid=program_uuid)
     if program is None:
@@ -55,7 +57,9 @@ def get_user_by_program_id(external_user_id, program_uuid):
         org_key = program['authoring_organizations'][0]['key']
         organization = Organization.objects.get(short_name=org_key)
     except (KeyError, IndexError):
-        log.error(u'Cannot determine authoring organization key for catalog program [%s]', program_uuid)
+        log.error(
+            u'Cannot determine authoring organization key for catalog program [%s]', program_uuid
+        )
         raise OrganizationDoesNotExistException
     except Organization.DoesNotExist:
         log.error(u'Unable to find organization for short_name [%s]', org_key)
@@ -76,10 +80,12 @@ def get_user_by_organization(external_user_id, organization):
         organization: organization providing saml authentication for this user
 
     Returns:
-        A User object or None, if no user with the given external id for the given organization exists.
+        A User object or None, if no user with the given external id for the given organization
+        exists.
 
     Raises:
-        ProviderDoesNotExistException if there is no SAML provider configured for the related organization.
+        ProviderDoesNotExistException if there is no SAML provider configured for the related
+        organization.
     """
     provider_slug = get_provider_slug(organization)
     try:
@@ -98,7 +104,7 @@ def get_provider_slug(organization):
         ProviderConfigurationException
     """
     try:
-        return organization.samlproviderconfig_set.current_set().get(enabled=True).provider_id.strip('saml-')
+        provider_config = organization.samlproviderconfig_set.current_set().get(enabled=True)
     except SAMLProviderConfig.DoesNotExist:
         log.error(u'No SAML provider found for organization id [%s]', organization.id)
         raise ProviderDoesNotExistException
@@ -108,3 +114,4 @@ def get_provider_slug(organization):
             organization.short_name,
         )
         raise ProviderConfigurationException
+    return provider_config.provider_id.strip('saml-')

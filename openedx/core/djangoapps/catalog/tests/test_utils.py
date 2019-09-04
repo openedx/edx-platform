@@ -39,6 +39,7 @@ from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.catalog.utils import (
     child_programs,
     course_run_keys_for_program,
+    is_course_run_in_program,
     get_course_run_details,
     get_course_runs,
     get_course_runs_for_course,
@@ -789,6 +790,11 @@ class TestProgramCourseRunCrawling(TestCase):
             'course-run-4',
         }
         self.assertEqual(expected_course_runs, course_run_keys_for_program(self.complex_program))
+
+    def test_is_course_run_in_program(self):
+        self.assertTrue(is_course_run_in_program('course-run-4', self.complex_program))
+        self.assertFalse(is_course_run_in_program('course-run-5', self.complex_program))
+        self.assertFalse(is_course_run_in_program('course-run-4', self.simple_program))
 
 
 @skip_unless_lms

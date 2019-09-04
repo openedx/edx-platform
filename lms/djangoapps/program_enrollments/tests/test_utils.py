@@ -141,11 +141,17 @@ class GetPlatformUserTests(CacheIsolationTestCase):
         self.create_social_auth_entry(self.user, provider, self.external_user_id)
 
         # create a second active config for the same organization
-        SAMLProviderConfigFactory.create(organization=organization, slug='foox', enabled=second_config_enabled)
+        SAMLProviderConfigFactory.create(
+            organization=organization, slug='foox', enabled=second_config_enabled
+        )
 
         try:
             get_user_by_program_id(self.external_user_id, self.program_uuid)
         except ProviderConfigurationException:
-            self.assertTrue(second_config_enabled, 'Unexpected error when second config is disabled')
+            self.assertTrue(
+                second_config_enabled, 'Unexpected error when second config is disabled'
+            )
         else:
-            self.assertFalse(second_config_enabled, 'Expected error was not raised when second config is enabled')
+            self.assertFalse(
+                second_config_enabled, 'Expected error was not raised when second config is enabled'
+            )

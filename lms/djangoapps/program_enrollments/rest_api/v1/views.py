@@ -12,7 +12,6 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.core.management import call_command
 from django.db import transaction
-from django.http import Http404
 from django.utils.functional import cached_property
 from edx_rest_framework_extensions import permissions
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -30,29 +29,6 @@ from course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import get_certificate_for_user
 from lms.djangoapps.grades.api import CourseGradeFactory, clear_prefetched_course_grades, prefetch_course_grades
 from lms.djangoapps.grades.rest_api.v1.utils import CourseEnrollmentPagination
-from lms.djangoapps.program_enrollments.api.api import (
-    get_course_run_status,
-    get_course_run_url,
-    get_due_dates,
-    get_emails_enabled
-)
-from lms.djangoapps.program_enrollments.api.v1.constants import (
-    ENABLE_ENROLLMENT_RESET_FLAG,
-    MAX_ENROLLMENT_RECORDS,
-    CourseEnrollmentResponseStatuses,
-    ProgramEnrollmentResponseStatuses,
-)
-from lms.djangoapps.program_enrollments.api.v1.serializers import (
-    CourseRunOverviewListSerializer,
-    ProgramCourseEnrollmentListSerializer,
-    ProgramCourseEnrollmentRequestSerializer,
-    ProgramCourseGradeErrorResult,
-    ProgramCourseGradeResult,
-    ProgramCourseGradeResultSerializer,
-    ProgramEnrollmentCreateRequestSerializer,
-    ProgramEnrollmentListSerializer,
-    ProgramEnrollmentModifyRequestSerializer
-)
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 from lms.djangoapps.program_enrollments.utils import (
     ProviderDoesNotExistException,
@@ -64,6 +40,7 @@ from openedx.core.djangoapps.catalog.utils import (
     get_programs,
     get_programs_by_type,
     get_programs_for_organization,
+    is_course_run_in_program,
     normalize_program_type
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -74,6 +51,25 @@ from student.models import CourseEnrollment
 from student.roles import CourseInstructorRole, CourseStaffRole, UserBasedRole
 from util.query import use_read_replica_if_available
 
+from .constants import (
+    ENABLE_ENROLLMENT_RESET_FLAG,
+    MAX_ENROLLMENT_RECORDS,
+    ProgramCourseResponseStatuses,
+    ProgramResponseStatuses
+)
+from .serializers import (
+    CourseRunOverviewListSerializer,
+    ProgramCourseEnrollmentRequestSerializer,
+    ProgramCourseEnrollmentSerializer,
+    ProgramCourseGradeError,
+    ProgramCourseGradeOk,
+    ProgramCourseGradeSerializer,
+    ProgramEnrollmentCreateRequestSerializer,
+    ProgramEnrollmentModifyRequestSerializer,
+    ProgramEnrollmentSerializer
+)
+from .utils import get_course_run_status, get_course_run_url, get_due_dates, get_emails_enabled
+
 logger = logging.getLogger(__name__)
 
 
@@ -82,15 +78,15 @@ def verify_program_exists(view_func):
     Raises:
         An API error if the `program_uuid` kwarg in the wrapped function
         does not exist in the catalog programs cache.
+
+    Expects to be used within a ProgramSpecificViewMixin subclass.
     """
     @wraps(view_func)
     def wrapped_function(self, request, **kwargs):
         """
         Wraps the given view_function.
         """
-        program_uuid = kwargs['program_uuid']
-        program = get_programs(uuid=program_uuid)
-        if not program:
+        if self.program is None:
             raise self.api_error(
                 status_code=status.HTTP_404_NOT_FOUND,
                 developer_message='no program exists with given key',
@@ -103,45 +99,29 @@ def verify_program_exists(view_func):
 def verify_course_exists_and_in_program(view_func):
     """
     Raises:
-        An api error if the course run specified by the `course_key` kwarg
+        An api error if the course run specified by the `course_id` kwarg
         in the wrapped function is not part of the curriculum of the program
         specified by the `program_uuid` kwarg
 
-    Assumes that the program exists and that a program has exactly one active curriculum
+    This decorator guarantees existance of the program and course, so wrapping
+    alongside `verify_{program,course}_exists` is redundant.
+
+    Expects to be used within a subclass of ProgramCourseSpecificViewMixin.
     """
     @wraps(view_func)
+    @verify_program_exists
     @verify_course_exists
     def wrapped_function(self, request, **kwargs):
         """
         Wraps view function
         """
-        course_key = CourseKey.from_string(kwargs['course_id'])
-        program_uuid = kwargs['program_uuid']
-        program = get_programs(uuid=program_uuid)
-        active_curricula = [c for c in program['curricula'] if c['is_active']]
-        if not active_curricula:
-            raise self.api_error(
-                status_code=status.HTTP_404_NOT_FOUND,
-                developer_message="the program does not have an active curriculum",
-                error_code='no_active_curriculum'
-            )
-
-        curriculum = active_curricula[0]
-
-        if not is_course_in_curriculum(curriculum, course_key):
+        if not is_course_run_in_program(self.course_key, self.program):
             raise self.api_error(
                 status_code=status.HTTP_404_NOT_FOUND,
                 developer_message="the program's curriculum does not contain the given course",
                 error_code='course_not_in_program'
             )
         return view_func(self, request, **kwargs)
-
-    def is_course_in_curriculum(curriculum, course_key):
-        for course in curriculum['courses']:
-            for course_run in course['course_runs']:
-                if CourseKey.from_string(course_run["key"]) == course_key:
-                    return True
-
     return wrapped_function
 
 
@@ -152,7 +132,44 @@ class ProgramEnrollmentPagination(CourseEnrollmentPagination):
     page_size = 100
 
 
-class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
+class ProgramSpecificViewMixin(object):
+    """
+    A mixin for views that operate on or within a specific program.
+
+    Requires `program_uuid` to be one of the kwargs to the view.
+    """
+
+    @cached_property
+    def program(self):
+        """
+        The program specified by the `program_uuid` URL parameter.
+        """
+        return get_programs(uuid=self.program_uuid)
+
+    @property
+    def program_uuid(self):
+        """
+        The program specified by the `program_uuid` URL parameter.
+        """
+        return self.kwargs['program_uuid']
+
+
+class ProgramCourseSpecificViewMixin(ProgramSpecificViewMixin):
+    """
+    A mixin for views that operate on or within a specific course run in a program
+
+    Requires `course_id` to be one of the kwargs to the view.
+    """
+
+    @cached_property
+    def course_key(self):
+        """
+        The course key for the course run specified by the `course_id` URL parameter.
+        """
+        return CourseKey.from_string(self.kwargs['course_id'])
+
+
+class ProgramEnrollmentsView(ProgramSpecificViewMixin, DeveloperErrorViewMixin, PaginatedAPIView):
     """
     A view for Create/Read/Update methods on Program Enrollment data.
 
@@ -345,7 +362,7 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
             ProgramEnrollment.objects.filter(program_uuid=program_uuid)
         )
         paginated_enrollments = self.paginate_queryset(enrollments)
-        serializer = ProgramEnrollmentListSerializer(paginated_enrollments, many=True)
+        serializer = ProgramEnrollmentSerializer(paginated_enrollments, many=True)
         return self.get_paginated_response(serializer.data)
 
     @verify_program_exists
@@ -393,16 +410,16 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
         """
         student_key = enrollment['student_key']
         if student_key in seen_student_keys:
-            return CourseEnrollmentResponseStatuses.DUPLICATED
+            return ProgramResponseStatuses.DUPLICATED
         seen_student_keys.add(student_key)
         enrollment_serializer = serializer_class(data=enrollment)
         try:
             enrollment_serializer.is_valid(raise_exception=True)
-        except ValidationError as e:
+        except ValidationError:
             if enrollment_serializer.has_invalid_status():
-                return CourseEnrollmentResponseStatuses.INVALID_STATUS
+                return ProgramResponseStatuses.INVALID_STATUS
             else:
-                raise e
+                raise
 
     def create_or_modify_enrollments(self, request, program_uuid, serializer_class, operation, success_status):
         """
@@ -438,7 +455,7 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
         program_enrollments = self.get_existing_program_enrollments(program_uuid, enrollments)
         for enrollment in enrollments:
             student_key = enrollment["student_key"]
-            if student_key in results and results[student_key] == ProgramEnrollmentResponseStatuses.DUPLICATED:
+            if student_key in results and results[student_key] == ProgramResponseStatuses.DUPLICATED:
                 continue
             try:
                 program_enrollment = program_enrollments[student_key]
@@ -453,7 +470,7 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
         Create new ProgramEnrollment, unless the learner is already enrolled in the program
         """
         if program_enrollment:
-            return ProgramEnrollmentResponseStatuses.CONFLICT
+            return ProgramResponseStatuses.CONFLICT
 
         student_key = request_data.get('student_key')
         try:
@@ -477,7 +494,7 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
         Change the status of an existing program enrollment
         """
         if not program_enrollment:
-            return ProgramEnrollmentResponseStatuses.NOT_IN_PROGRAM
+            return ProgramResponseStatuses.NOT_IN_PROGRAM
 
         program_enrollment.status = request_data.get('status')
         program_enrollment.save()
@@ -504,7 +521,7 @@ class ProgramEnrollmentsView(DeveloperErrorViewMixin, PaginatedAPIView):
         response_status = default_status
         good_count = len([
             v for v in response_data.values()
-            if v not in CourseEnrollmentResponseStatuses.ERROR_STATUSES
+            if v in ProgramResponseStatuses.__OK__
         ])
         if not good_count:
             response_status = status.HTTP_422_UNPROCESSABLE_ENTITY
@@ -637,37 +654,8 @@ class UserProgramReadOnlyAccessView(DeveloperErrorViewMixin, PaginatedAPIView):
         return program_list
 
 
-class ProgramSpecificViewMixin(object):
-    """
-    A mixin for views that operate on or within a specific program.
-    """
-
-    @cached_property
-    def program(self):
-        """
-        The program specified by the `program_uuid` URL parameter.
-        """
-        program = get_programs(uuid=self.kwargs['program_uuid'])
-        if program is None:
-            raise Http404()
-        return program
-
-
-class ProgramCourseRunSpecificViewMixin(ProgramSpecificViewMixin):
-    """
-    A mixin for views that operate on or within a specific course run in a program
-    """
-
-    @property
-    def course_key(self):
-        """
-        The course key for the course run specified by the `course_id` URL parameter.
-        """
-        return CourseKey.from_string(self.kwargs['course_id'])
-
-
 # pylint: disable=line-too-long
-class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpecificViewMixin, PaginatedAPIView):
+class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseSpecificViewMixin, PaginatedAPIView):
     """
     A view for enrolling students in a course through a program,
     modifying program course enrollments, and listing program course
@@ -748,23 +736,23 @@ class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpec
     permission_classes = (permissions.JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS,)
     pagination_class = ProgramEnrollmentPagination
 
-    @verify_course_exists
-    @verify_program_exists
+    @verify_course_exists_and_in_program
     def get(self, request, program_uuid=None, course_id=None):
-        """ Defines the GET list endpoint for ProgramCourseEnrollment objects. """
-        course_key = CourseKey.from_string(course_id)
+        """
+        Get a list of students enrolled in a course within a program.
+        """
         enrollments = use_read_replica_if_available(
             ProgramCourseEnrollment.objects.filter(
-                program_enrollment__program_uuid=program_uuid, course_key=course_key
+                program_enrollment__program_uuid=program_uuid,
+                course_key=self.course_key
             ).select_related(
                 'program_enrollment'
             )
         )
         paginated_enrollments = self.paginate_queryset(enrollments)
-        serializer = ProgramCourseEnrollmentListSerializer(paginated_enrollments, many=True)
+        serializer = ProgramCourseEnrollmentSerializer(paginated_enrollments, many=True)
         return self.get_paginated_response(serializer.data)
 
-    @verify_program_exists
     @verify_course_exists_and_in_program
     def post(self, request, program_uuid=None, course_id=None):
         """
@@ -776,7 +764,6 @@ class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpec
             self.enroll_learner_in_course
         )
 
-    @verify_program_exists
     @verify_course_exists_and_in_program
     # pylint: disable=unused-argument
     def patch(self, request, program_uuid=None, course_id=None):
@@ -789,7 +776,6 @@ class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpec
             self.modify_learner_enrollment_status
         )
 
-    @verify_program_exists
     @verify_course_exists_and_in_program
     # pylint: disable=unused-argument
     def put(self, request, program_uuid=None, course_id=None):
@@ -835,17 +821,20 @@ class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpec
         program_enrollments = self.get_existing_program_enrollments(program_uuid, enrollments)
         for enrollment in enrollments:
             student_key = enrollment["student_key"]
-            if student_key in results and results[student_key] == CourseEnrollmentResponseStatuses.DUPLICATED:
+            if student_key in results and results[student_key] == ProgramCourseResponseStatuses.DUPLICATED:
                 continue
             try:
                 program_enrollment = program_enrollments[student_key]
             except KeyError:
-                results[student_key] = CourseEnrollmentResponseStatuses.NOT_IN_PROGRAM
+                results[student_key] = ProgramCourseResponseStatuses.NOT_IN_PROGRAM
             else:
                 program_course_enrollment = program_enrollment.get_program_course_enrollment(self.course_key)
                 results[student_key] = operation(enrollment, program_enrollment, program_course_enrollment)
 
-        good_count = sum(1 for _, v in results.items() if v not in CourseEnrollmentResponseStatuses.ERROR_STATUSES)
+        good_count = sum(
+            1 for _, v in results.items()
+            if v in ProgramCourseResponseStatuses.__OK__
+        )
         if not good_count:
             return Response(results, status.HTTP_422_UNPROCESSABLE_ENTITY)
         if good_count != len(results):
@@ -859,14 +848,14 @@ class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpec
         """
         student_key = enrollment['student_key']
         if student_key in seen_student_keys:
-            return CourseEnrollmentResponseStatuses.DUPLICATED
+            return ProgramCourseResponseStatuses.DUPLICATED
         seen_student_keys.add(student_key)
         enrollment_serializer = ProgramCourseEnrollmentRequestSerializer(data=enrollment)
         try:
             enrollment_serializer.is_valid(raise_exception=True)
         except ValidationError as e:
             if enrollment_serializer.has_invalid_status():
-                return CourseEnrollmentResponseStatuses.INVALID_STATUS
+                return ProgramCourseResponseStatuses.INVALID_STATUS
             else:
                 raise e
 
@@ -894,7 +883,7 @@ class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpec
         Returns the actual status
         """
         if program_course_enrollment:
-            return CourseEnrollmentResponseStatuses.CONFLICT
+            return ProgramCourseResponseStatuses.CONFLICT
 
         return ProgramCourseEnrollment.create_program_course_enrollment(
             program_enrollment,
@@ -909,7 +898,7 @@ class ProgramCourseEnrollmentsView(DeveloperErrorViewMixin, ProgramCourseRunSpec
         in the given program
         """
         if program_course_enrollment is None:
-            return CourseEnrollmentResponseStatuses.NOT_FOUND
+            return ProgramCourseResponseStatuses.NOT_FOUND
         return program_course_enrollment.change_status(enrollment_request['status'])
 
     def create_or_update_learner_enrollment(self, enrollment_request, program_enrollment, program_course_enrollment):
@@ -1034,8 +1023,10 @@ class ProgramCourseEnrollmentOverviewView(DeveloperErrorViewMixin, ProgramSpecif
         user = request.user
         self._check_program_enrollment_exists(user, program_uuid)
 
-        program = get_programs(uuid=program_uuid)
-        course_run_keys = [CourseKey.from_string(key) for key in course_run_keys_for_program(program)]
+        course_run_keys = [
+            CourseKey.from_string(key)
+            for key in course_run_keys_for_program(self.program)
+        ]
 
         course_enrollments = CourseEnrollment.objects.filter(
             user=user,
@@ -1106,7 +1097,7 @@ class ProgramCourseEnrollmentOverviewView(DeveloperErrorViewMixin, ProgramSpecif
 
 class ProgramCourseGradesView(
         DeveloperErrorViewMixin,
-        ProgramCourseRunSpecificViewMixin,
+        ProgramCourseSpecificViewMixin,
         PaginatedAPIView,
 ):
     """
@@ -1178,15 +1169,14 @@ class ProgramCourseGradesView(
     permission_classes = (permissions.JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS,)
     pagination_class = ProgramEnrollmentPagination
 
-    @verify_course_exists
-    @verify_program_exists
+    @verify_course_exists_and_in_program
     def get(self, request, program_uuid=None, course_id=None):
         """
         Defines the GET list endpoint for ProgramCourseGrade objects.
         """
         course_key = CourseKey.from_string(course_id)
         grade_results = self._load_grade_results(program_uuid, course_key)
-        serializer = ProgramCourseGradeResultSerializer(grade_results, many=True)
+        serializer = ProgramCourseGradeSerializer(grade_results, many=True)
         response_code = self._calc_response_code(grade_results)
         return self.get_paginated_response(serializer.data, status_code=response_code)
 
@@ -1198,7 +1188,7 @@ class ProgramCourseGradesView(
             program_uuid (str)
             course_key (CourseKey)
 
-        Returns: list[ProgramCourseGradeResult|ProgramCourseGradeErrorResult]
+        Returns: list[BaseProgramCourseGrade]
         """
         enrollments_qs = use_read_replica_if_available(
             ProgramCourseEnrollment.objects.filter(
@@ -1224,9 +1214,9 @@ class ProgramCourseGradesView(
         )
         grade_results = [
             (
-                ProgramCourseGradeResult(enrollment, grade)
+                ProgramCourseGradeOk(enrollment, grade)
                 if grade
-                else ProgramCourseGradeErrorResult(enrollment, exception)
+                else ProgramCourseGradeError(enrollment, exception)
             )
             for enrollment, (grade, exception) in enrollment_grade_pairs
         ]
@@ -1270,7 +1260,7 @@ class ProgramCourseGradesView(
         which may be grades or errors.
 
         Arguments:
-            enrollment_grade_results: list[ProgramCourseGradeResult]
+            enrollment_grade_results: list[BaseProgramCourseGrade]
 
         Returns: int
           * 200 for all success
