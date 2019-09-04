@@ -271,7 +271,7 @@ def validate_transcript_preferences(provider, cielo24_fidelity, cielo24_turnarou
                     return error, preferences
 
                 if not preferred_languages or not set(preferred_languages) <= set(supported_languages.keys()):
-                    error = u'Invalid languages {}.'.format(preferred_languages)
+                    error = 'Invalid languages {}.'.format(preferred_languages)  # pylint: disable=unicode-format-string
                     return error, preferences
 
                 # Validated Cielo24 preferences
@@ -330,7 +330,6 @@ def transcript_preferences_handler(request, course_key_string):
     is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course_key)
     if not is_video_transcript_enabled:
         return HttpResponseNotFound()
-
     if request.method == 'POST':
         data = request.json
         provider = data.get('provider')
@@ -340,7 +339,7 @@ def transcript_preferences_handler(request, course_key_string):
             cielo24_turnaround=data.get('cielo24_turnaround', ''),
             three_play_turnaround=data.get('three_play_turnaround', ''),
             video_source_language=data.get('video_source_language'),
-            preferred_languages=data.get('preferred_languages', [])
+            preferred_languages=list(map(str, data.get('preferred_languages', [])))
         )
         if error:
             response = JsonResponse({'error': error}, status=400)

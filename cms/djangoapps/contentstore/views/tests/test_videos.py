@@ -1182,7 +1182,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 'preferred_languages': ['es', 'ur']
             },
             True,
-            u"Invalid languages [u'es', u'ur'].",
+            "Invalid languages ['es', 'ur'].",
             400
         ),
         (
@@ -1211,7 +1211,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 'preferred_languages': ['es', 'ur']
             },
             True,
-            u"Invalid languages [u'es', u'ur'].",
+            "Invalid languages ['es', 'ur'].",
             400
         ),
         (
@@ -1222,7 +1222,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 'preferred_languages': ['es', 'ur']
             },
             True,
-            u"Invalid languages [u'es', u'ur'].",
+            "Invalid languages ['es', 'ur'].",
             400
         ),
         # Success
