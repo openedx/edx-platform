@@ -24,6 +24,9 @@ fi
 
 # Reset the jenkins worker's virtualenv back to the
 # state it was in when the instance was spun up.
+echo "DEBUG:"
+echo ${PYTHON_VERSION}
+echo "DEBUG END"
 if [ -z ${PYTHON_VERSION+x} ] || [[ ${PYTHON_VERSION} == 'null' ]]; then
     ARCHIVED_VENV="edx-venv_clean.tar.gz"
 else
