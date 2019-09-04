@@ -160,7 +160,7 @@ class TestUploadTranscripts(BaseTranscripts):
         super(TestUploadTranscripts, self).setUp()
         self.contents = {
             'good': SRT_TRANSCRIPT_CONTENT,
-            'bad': 'Some BAD data',
+            'bad': b'Some BAD data',
         }
         # Create temporary transcript files
         self.good_srt_file = self.create_transcript_file(content=self.contents['good'], suffix='.srt')
@@ -186,13 +186,14 @@ class TestUploadTranscripts(BaseTranscripts):
         Setup a transcript file with suffix and content.
         """
         transcript_file = tempfile.NamedTemporaryFile(suffix=suffix)
-        wrapped_content = textwrap.dedent(content)
+        wrapped_content = textwrap.dedent(content.decode('utf-8'))
         if include_bom:
             wrapped_content = wrapped_content.encode('utf-8-sig')
             # Verify that ufeff(BOM) character is in content.
             self.assertIn(BOM_UTF8, wrapped_content)
-
-        transcript_file.write(wrapped_content)
+            transcript_file.write(wrapped_content)
+        else:
+            transcript_file.write(wrapped_content.encode('utf-8'))
         transcript_file.seek(0)
 
         return transcript_file
