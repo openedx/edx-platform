@@ -10,7 +10,7 @@ from django.views.generic import View
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.support.decorators import require_support_permission
 
-from lms.djangoapps.program_enrollments.link_program_enrollments import link_program_enrollments_to_lms_users
+from lms.djangoapps.program_enrollments.api import link_program_enrollments_to_lms_users
 
 TEMPLATE_PATH = 'support/link_program_enrollments.html'
 

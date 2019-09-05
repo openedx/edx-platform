@@ -14,10 +14,10 @@ from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.test import override_settings
 from django.urls import reverse
+from django.utils import timezone
 from freezegun import freeze_time
 from opaque_keys.edx.keys import CourseKey
 from organizations.tests.factories import OrganizationFactory as LMSOrganizationFactory
-from pytz import UTC
 from rest_framework import status
 from rest_framework.test import APITestCase
 from six import text_type
@@ -1367,7 +1367,7 @@ class UserProgramReadOnlyAccessGetTests(EnrollmentsDataMixin, APITestCase):
         ]
 
         cls.course_staff = InstructorFactory.create(password=cls.password, course_key=cls.course_id)
-        cls.date = datetime(2013, 1, 22, tzinfo=UTC)
+        cls.date = timezone.make_aware(datetime(2013, 1, 22))
         CourseEnrollmentFactory(
             course_id=cls.course_id,
             user=cls.course_staff,
@@ -1493,8 +1493,8 @@ class ProgramCourseEnrollmentOverviewGetTests(
         # only freeze time when defining these values and not on the whole test case
         # as test_multiple_enrollments_all_enrolled relies on actual differences in modified datetimes
         with freeze_time('2019-01-01'):
-            cls.yesterday = datetime.utcnow() - timedelta(1)
-            cls.tomorrow = datetime.utcnow() + timedelta(1)
+            cls.yesterday = timezone.now() - timedelta(1)
+            cls.tomorrow = timezone.now() + timedelta(1)
 
         cls.relative_certificate_download_url = '/download-the-certificates'
         cls.absolute_certificate_download_url = 'http://www.certificates.com/'
@@ -1825,7 +1825,7 @@ class ProgramCourseEnrollmentOverviewGetTests(
 
         # course run has not ended and user has earned a passing certificate more than 30 days ago
         certificate = self.create_generated_certificate()
-        certificate.created_date = datetime.utcnow() - timedelta(30)
+        certificate.created_date = timezone.now() - timedelta(30)
         certificate.save()
         mock_has_ended.return_value = False
 
@@ -1859,7 +1859,7 @@ class ProgramCourseEnrollmentOverviewGetTests(
 
         # course run has not ended and user has earned a passing certificate fewer than 30 days ago
         certificate = self.create_generated_certificate()
-        certificate.created_date = datetime.utcnow() - timedelta(5)
+        certificate.created_date = timezone.now() - timedelta(5)
         certificate.save()
 
         response = self.client.get(self.get_url(self.program_uuid))
