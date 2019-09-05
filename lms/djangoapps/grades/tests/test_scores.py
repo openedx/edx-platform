@@ -77,7 +77,8 @@ class TestGetScore(TestCase):
     Tests for get_score
     """
     display_name = 'test_name'
-    location = 'test_location'
+    course_key = CourseLocator(u'org', u'course', u'run')
+    location = BlockUsageLocator(course_key, 'problem', 'mock_block_id')
 
     SubmissionValue = namedtuple('SubmissionValue', 'exists, points_earned, points_possible, created_at')
     SubmissionValue.__repr__ = submission_value_repr
@@ -96,7 +97,7 @@ class TestGetScore(TestCase):
         Creates a stub result from the submissions API for the given values.
         """
         if submission_value.exists:
-            return {self.location: submission_value._asdict()}
+            return {str(self.location): submission_value._asdict()}
         else:
             return {}
 
@@ -309,13 +310,15 @@ class TestInternalGetScoreFromBlock(TestCase):
     """
     Tests the internal helper method: _get_score_from_persisted_or_latest_block
     """
+    course_key = CourseLocator(u'org', u'course', u'run')
+    location = BlockUsageLocator(course_key, 'problem', 'mock_block_id')
 
     def _create_block(self, raw_possible):
         """
         Creates and returns a minimal BlockData object with the give value
         for raw_possible.
         """
-        block = BlockData('any_key')
+        block = BlockData(self.location)
         block.transformer_data.get_or_create(GradesTransformer).max_score = raw_possible
         return block
 
