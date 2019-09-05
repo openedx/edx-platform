@@ -350,7 +350,10 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
             'cohorts': "cohort1,cohort2"
         })
         self.assertEqual(response.status_code, 400)
-        self.assertIn('If provided, the cohorts and courses should have equal number of items.', response.content.decode('utf-8'))
+        self.assertIn(
+            'If provided, the cohorts and courses should have equal number of items.',
+            response.content.decode('utf-8')
+        )
 
     def test_fail_on_missing_cohorts(self):
         """
