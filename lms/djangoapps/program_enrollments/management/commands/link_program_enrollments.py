@@ -61,7 +61,10 @@ class Command(BaseCommand):
     # pylint: disable=arguments-differ
     def handle(self, program_uuid, user_items, *args, **options):
         ext_keys_to_usernames = self.parse_user_items(user_items)
-        link_program_enrollments_to_lms_users(program_uuid, ext_keys_to_usernames)
+        try:
+            link_program_enrollments_to_lms_users(program_uuid, ext_keys_to_usernames)
+        except Exception as e:
+            raise CommandError(e)
 
     def parse_user_items(self, user_items):
         """

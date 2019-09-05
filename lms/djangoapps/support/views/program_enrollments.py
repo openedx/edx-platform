@@ -6,7 +6,6 @@ from __future__ import absolute_import
 import csv
 from django.utils.decorators import method_decorator
 from django.views.generic import View
-from django.core.exceptions import ValidationError
 
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.support.decorators import require_support_permission
@@ -52,11 +51,14 @@ class LinkProgramEnrollmentSupportView(View):
             errors = [error]
         else:
             reader = csv.DictReader(text.splitlines(), fieldnames=('external_key', 'username'))
-            ext_key_to_lms_username = {item['external_key'].strip(): item['username'].strip() for item in reader}
+            ext_key_to_lms_username = {
+                (item['external_key'] or '').strip(): (item['username'] or '').strip()
+                for item in reader
+            }
             try:
                 link_errors = link_program_enrollments_to_lms_users(program_uuid, ext_key_to_lms_username)
-            except ValidationError:
-                errors = [u'{} is not a valid UUID'.format(program_uuid)]
+            except ValueError as e:
+                errors = [str(e)]
             else:
                 successes = [str(item) for item in ext_key_to_lms_username.items() if item not in link_errors]
                 errors = [message for message in link_errors.values()]

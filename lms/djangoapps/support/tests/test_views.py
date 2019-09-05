@@ -9,6 +9,7 @@ import itertools
 import json
 import re
 from datetime import datetime, timedelta
+from uuid import uuid4
 
 import ddt
 import six
@@ -21,6 +22,7 @@ from pytz import UTC
 from common.test.utils import disable_signal
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from lms.djangoapps.program_enrollments.link_program_enrollments import NO_PROGRAM_ENROLLMENT_TPL
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAttribute, ManualEnrollmentAudit
 from student.roles import GlobalStaff, SupportStaffRole
@@ -109,6 +111,7 @@ class SupportViewAccessTests(SupportViewTestCase):
             'support:enrollment_list',
             'support:manage_user',
             'support:manage_user_detail',
+            'support:link_program_enrollments',
         ), (
             (GlobalStaff, True),
             (SupportStaffRole, True),
@@ -136,6 +139,7 @@ class SupportViewAccessTests(SupportViewTestCase):
         "support:enrollment_list",
         "support:manage_user",
         "support:manage_user_detail",
+        "support:link_program_enrollments",
     )
     def test_require_login(self, url_name):
         url = reverse(url_name)
@@ -160,6 +164,7 @@ class SupportViewIndexTests(SupportViewTestCase):
     EXPECTED_URL_NAMES = [
         "support:certificates",
         "support:refund",
+        "support:link_program_enrollments",
     ]
 
     def setUp(self):
@@ -434,3 +439,87 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         )
         verified_mode.expiration_datetime = datetime(year=1970, month=1, day=9, tzinfo=UTC)
         verified_mode.save()
+
+
+@ddt.ddt
+class SupportViewLinkProgramEnrollmentsTests(SupportViewTestCase):
+    """
+    Tests for the link_program_enrollments support view.
+    """
+    def setUp(self):
+        """Make the user support staff. """
+        super(SupportViewLinkProgramEnrollmentsTests, self).setUp()
+        self.url = reverse("support:link_program_enrollments")
+        SupportStaffRole().add_users(self.user)
+        self.program_uuid = str(uuid4())
+        self.text = '0001,user-0001\n0002,user-02'
+
+    def _assert_props(self, field_name, value, response):
+        self.assertIn('"{}": "{}"'.format(field_name, value), unicode(response.content, encoding='utf-8'))
+
+    def _assert_props_list(self, field_name, values, response):
+        """
+        Assert that that page is being rendered with a specific list of props
+        """
+        values_str = ''
+        if values:
+            values_str = '", "'.join(values)
+            values_str = '"{}"'.format(values_str)
+        self.assertIn(u'"{}": [{}]'.format(field_name, values_str), unicode(response.content, encoding='utf-8'))
+
+    def test_get(self):
+        response = self.client.get(self.url)
+        self._assert_props_list('successes', [], response)
+        self._assert_props_list('errors', [], response)
+        self._assert_props('programUUID', '', response)
+        self._assert_props('text', '', response)
+
+    def test_invalid_uuid(self):
+        response = self.client.post(self.url, data={
+            'program_uuid': 'notauuid',
+            'text': self.text,
+        })
+        self._assert_props_list('errors', [u'badly formed hexadecimal UUID string'], response)
+
+    @ddt.unpack
+    @ddt.data(
+        ('program_uuid', ''),
+        ('', 'text'),
+        ('', ''),
+    )
+    def test_missing_parameter(self, program_uuid, text):
+        msg = u'You must provide both a program uuid and a comma separated list of external_student_key, username'
+        response = self.client.post(self.url, data={
+            'program_uuid': program_uuid,
+            'text': text,
+        })
+        self._assert_props_list('errors', [msg], response)
+
+    @ddt.data(
+        '0001,learner-01\n0002,learner-02',                                 # normal
+        '0001,learner-01,apple,orange\n0002,learner-02,purple',             # extra fields
+        '\t0001        ,    \t  learner-01    \n   0002 , learner-02    ',  # whitespace
+    )
+    @patch('support.views.program_enrollments.link_program_enrollments_to_lms_users')
+    def test_text(self, text, mocked_link):
+        self.client.post(self.url, data={
+            'program_uuid': self.program_uuid,
+            'text': text,
+        })
+        mocked_link.assert_called_once()
+        mocked_link.assert_called_with(
+            self.program_uuid,
+            {
+                '0001': 'learner-01',
+                '0002': 'learner-02',
+            }
+        )
+
+    def test_junk_text(self):
+        text = 'alsdjflajsdflakjs'
+        response = self.client.post(self.url, data={
+            'program_uuid': self.program_uuid,
+            'text': text,
+        })
+        msg = NO_PROGRAM_ENROLLMENT_TPL.format(program_uuid=self.program_uuid, external_student_key=text)
+        self._assert_props_list('errors', [msg], response)

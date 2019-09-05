@@ -340,3 +340,31 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
         self.assertIn('UNIQUE constraint failed', errors[('0001', self.user_1.username)])
         self._assert_no_user(program_enrollment_1)
         self._assert_program_enrollment(self.user_2, self.program, '0002')
+
+    def test_invalid_uuid(self):
+        self._create_waiting_enrollment(self.program, 'learner-0')
+        with self.assertRaisesMessage(ValueError, 'badly formed hexadecimal UUID string'):
+            link_program_enrollments_to_lms_users(
+                'notauuid::thisisntauuid',
+                {
+                    'learner-0': self.user_1.username,
+                }
+            )
+
+    def test_None(self):
+        self._create_waiting_enrollment(self.program, 'learner-0')
+        msg = 'external_user_key or username cannot be None'
+        with self.assertRaisesMessage(ValueError, msg):
+            link_program_enrollments_to_lms_users(
+                self.program,
+                {
+                    None: self.user_1.username,
+                }
+            )
+        with self.assertRaisesMessage(ValueError, msg):
+            link_program_enrollments_to_lms_users(
+                'notauuid::thisisntauuid',
+                {
+                    'learner-0': None,
+                }
+            )

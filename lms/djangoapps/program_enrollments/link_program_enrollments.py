@@ -1,5 +1,6 @@
-""" Management command to link program enrollments and external student_keys to an LMS user """
+""" Function to link program enrollments and external_student_keys to an LMS user """
 import logging
+from uuid import UUID
 
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
@@ -31,6 +32,8 @@ def link_program_enrollments_to_lms_users(program_uuid, external_keys_to_usernam
                 (external_key, username): Error message if there was an error
             }
 
+        Raises: ValueError if None is included in external_keys_to_usernames
+
         This function will look up program enrollments and users, and update the program enrollments
         with the matching user. If the program enrollment has course enrollments, we will enroll the user into their
         waiting program courses.
@@ -49,6 +52,7 @@ def link_program_enrollments_to_lms_users(program_uuid, external_keys_to_usernam
         to be in a state where they have an LMS user but still have waiting course enrollments. All other inputs will
         be processed normally.
     """
+    _validate_inputs(program_uuid, external_keys_to_usernames)
     errors = {}
     program_enrollments = get_program_enrollments(program_uuid, external_keys_to_usernames.keys())
     users = get_lms_users(external_keys_to_usernames.values())
@@ -78,7 +82,6 @@ def link_program_enrollments_to_lms_users(program_uuid, external_keys_to_usernam
             with transaction.atomic():
                 link_program_enrollment_to_lms_user(program_enrollment, user)
         except (CourseEnrollmentException, IntegrityError) as e:
-            # pdb.set_trace()
             logger.exception(u"Rolling back all operations for {}:{}".format(
                 external_student_key,
                 username,
@@ -88,9 +91,13 @@ def link_program_enrollments_to_lms_users(program_uuid, external_keys_to_usernam
                 error_message += ': '
                 error_message += str(e)
             errors[item] = error_message
-
-            continue  # transaction rolled back
     return errors
+
+
+def _validate_inputs(program_uuid, external_keys_to_usernames):
+    if None in external_keys_to_usernames or None in external_keys_to_usernames.values():
+        raise ValueError('external_user_key or username cannot be None')
+    UUID(str(program_uuid))  # raises ValueError if invalid
 
 
 def get_program_enrollments(program_uuid, external_student_keys):
