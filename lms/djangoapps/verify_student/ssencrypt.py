@@ -97,7 +97,7 @@ def random_aes_key():
 def pad(data):
     """ Pad the given `data` such that it fits into the proper AES block size """
 
-    if six.PY3:
+    if six.PY3 and not isinstance(data, (bytes, bytearray)):
         data = six.b(data)
 
     padder = PKCS7(AES.block_size).padder()
