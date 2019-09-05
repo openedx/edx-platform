@@ -505,7 +505,7 @@ class CcxListTest(CcxRestApiTest):
         self.mstore.update_item(self.course, self.coach.id)
 
         # case with deprecated  master_course_id
-        with mock.patch('courseware.courses.get_course_by_id', autospec=True) as mocked:
+        with mock.patch('lms.djangoapps.courseware.courses.get_course_by_id', autospec=True) as mocked:
             mocked.return_value.id.deprecated = True
             resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
 

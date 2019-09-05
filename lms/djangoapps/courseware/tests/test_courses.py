@@ -315,7 +315,7 @@ class CoursesRenderTest(ModuleStoreTestCase):
         self.assertEqual(course_info, u"<a href='/c4x/edX/toy/asset/handouts_sample_handout.txt'>Sample</a>")
 
         # Test when render raises an exception
-        with mock.patch('courseware.courses.get_module') as mock_module_render:
+        with mock.patch('lms.djangoapps.courseware.courses.get_module') as mock_module_render:
             mock_module_render.return_value = mock.MagicMock(
                 render=mock.Mock(side_effect=Exception('Render failed!'))
             )
@@ -329,7 +329,7 @@ class CoursesRenderTest(ModuleStoreTestCase):
         self.assertEqual(course_about, "A course about toys.")
 
         # Test when render raises an exception
-        with mock.patch('courseware.courses.get_module') as mock_module_render:
+        with mock.patch('lms.djangoapps.courseware.courses.get_module') as mock_module_render:
             mock_module_render.return_value = mock.MagicMock(
                 render=mock.Mock(side_effect=Exception('Render failed!'))
             )

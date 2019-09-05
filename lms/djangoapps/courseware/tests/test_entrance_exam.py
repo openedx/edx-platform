@@ -471,7 +471,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         exam_url = response.get('Location')
         self.assertRedirects(response, exam_url)
 
-    @patch('courseware.entrance_exams.get_entrance_exam_content', Mock(return_value=None))
+    @patch('lms.djangoapps.courseware.entrance_exams.get_entrance_exam_content', Mock(return_value=None))
     def test_courseware_page_access_after_passing_entrance_exam(self):
         """
         Test courseware access page after passing entrance exam

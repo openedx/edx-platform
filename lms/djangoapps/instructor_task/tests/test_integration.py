@@ -488,7 +488,7 @@ class TestResetAttemptsTask(TestIntegrationTask):
         self.submit_student_answer('u1', problem_url_name, [OPTION_1, OPTION_1])
 
         expected_message = "bad things happened"
-        with patch('courseware.models.StudentModule.save') as mock_save:
+        with patch('lms.djangoapps.courseware.models.StudentModule.save') as mock_save:
             mock_save.side_effect = ZeroDivisionError(expected_message)
             instructor_task = self.reset_problem_attempts('instructor', location)
         self._assert_task_failure(instructor_task.id, 'reset_problem_attempts', problem_url_name, expected_message)
@@ -550,7 +550,7 @@ class TestDeleteProblemTask(TestIntegrationTask):
         self.submit_student_answer('u1', problem_url_name, [OPTION_1, OPTION_1])
 
         expected_message = "bad things happened"
-        with patch('courseware.models.StudentModule.delete') as mock_delete:
+        with patch('lms.djangoapps.courseware.models.StudentModule.delete') as mock_delete:
             mock_delete.side_effect = ZeroDivisionError(expected_message)
             instructor_task = self.delete_problem_state('instructor', location)
         self._assert_task_failure(instructor_task.id, 'delete_problem_state', problem_url_name, expected_message)

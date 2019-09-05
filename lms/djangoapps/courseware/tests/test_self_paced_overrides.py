@@ -85,7 +85,7 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
         __, sp_section = self.setup_course(display_name="Self-Paced Course", self_paced=True)
         self.assertIsNone(sp_section.due)
 
-    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('lms.djangoapps.courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_course_access_to_beta_users(self):
         """
         Test that beta testers can access `self_paced` course prior to start date.
@@ -113,7 +113,7 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
         self.assertTrue(has_access(beta_tester, 'load', self_paced_course))
         self.assertTrue(has_access(beta_tester, 'load', self_paced_section, self_paced_course.id))
 
-    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('lms.djangoapps.courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_instructor_paced_discussion_xblock_visibility(self):
         """
         Verify that discussion xblocks scheduled for release in the future are
@@ -128,7 +128,7 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
             all(xblock.display_name == 'released' for xblock in xblocks)
         )
 
-    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('lms.djangoapps.courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_self_paced_discussion_xblock_visibility(self):
         """
         Regression test. Verify that discussion xblocks scheduled for release

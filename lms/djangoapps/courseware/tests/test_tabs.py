@@ -282,7 +282,7 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         self.assertIn('static_tab', tab_content)
 
         # Test when render raises an exception
-        with patch('courseware.views.views.get_module') as mock_module_render:
+        with patch('lms.djangoapps.courseware.views.views.get_module') as mock_module_render:
             mock_module_render.return_value = MagicMock(
                 render=Mock(side_effect=Exception('Render failed!'))
             )
