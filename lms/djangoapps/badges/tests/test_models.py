@@ -31,7 +31,7 @@ def get_image(name):
     """
     Get one of the test images from the test data directory.
     """
-    return ImageFile(open(TEST_DATA_ROOT / 'badges' / name + '.png'))
+    return ImageFile(open(TEST_DATA_ROOT / 'badges' / name + '.png', mode='rb'))  # pylint: disable=open-builtin
 
 
 @override_settings(MEDIA_ROOT=TEST_DATA_ROOT)
