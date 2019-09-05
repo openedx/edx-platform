@@ -6,7 +6,7 @@ from __future__ import absolute_import
 
 import os
 import unittest
-from test.test_support import EnvironmentVarGuard
+from test.support import EnvironmentVarGuard
 
 from pavelib.utils.test.suites import BokChoyTestSuite
 
