@@ -18,6 +18,16 @@ from xsslint.linters import (
 from xsslint.reporting import FileResults
 from xsslint.utils import ParseString
 
+UNDERSCORE_LINTER_RULESET = UnderscoreTemplateLinter.ruleset
+JAVASCRIPT_LINTER_RULESET = JavaScriptLinter.ruleset + UnderscoreTemplateLinter.ruleset
+PYTHON_LINTER_RULESET = PythonLinter.ruleset
+MAKO_LINTER_RULESET = (
+    MakoTemplateLinter.ruleset + PythonLinter.ruleset + JavaScriptLinter.ruleset + UnderscoreTemplateLinter.ruleset
+)
+DJANGO_LINTER_RULESET = (
+    DjangoTemplateLinter.ruleset
+)
+
 
 def _build_javascript_linter():
     return JavaScriptLinter(
@@ -72,8 +82,6 @@ class TestUnderscoreTemplateLinter(TestLinter):
     Test UnderscoreTemplateLinter
     """
 
-    ruleset = UnderscoreTemplateLinter.ruleset
-
     def test_check_underscore_file_is_safe(self):
         """
         Test check_underscore_file_is_safe with safe template
@@ -111,8 +119,8 @@ class TestUnderscoreTemplateLinter(TestLinter):
         linter.check_underscore_file_is_safe(template, results)
 
         self.assertEqual(len(results.violations), 2)
-        self.assertEqual(results.violations[0].rule, self.ruleset.underscore_not_escaped)
-        self.assertEqual(results.violations[1].rule, self.ruleset.underscore_not_escaped)
+        self.assertEqual(results.violations[0].rule, UNDERSCORE_LINTER_RULESET.underscore_not_escaped)
+        self.assertEqual(results.violations[1].rule, UNDERSCORE_LINTER_RULESET.underscore_not_escaped)
 
     @data(
         {
@@ -222,8 +230,6 @@ class TestJavaScriptLinter(TestLinter):
     Test JavaScriptLinter
     """
 
-    ruleset = JavaScriptLinter.ruleset + UnderscoreTemplateLinter.ruleset
-
     @data(
         {'template': 'var m = "Plain text " + message + "plain text"', 'rule': None},
         {'template': 'var m = "檌檒濦 " + message + "plain text"', 'rule': None},
@@ -233,14 +239,14 @@ class TestJavaScriptLinter(TestLinter):
                  """ value: gettext("Copy Email To Editor"), id: 'copy_email_' + email_id))"""),
             'rule': None
         },
-        {'template': 'var m = "<p>" + message + "</p>"', 'rule': ruleset.javascript_concat_html},
+        {'template': 'var m = "<p>" + message + "</p>"', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_concat_html},
         {
             'template': r'var m = "<p>\"escaped quote\"" + message + "\"escaped quote\"</p>"',
-            'rule': ruleset.javascript_concat_html
+            'rule': JAVASCRIPT_LINTER_RULESET.javascript_concat_html
         },
         {'template': '  // var m = "<p>" + commentedOutMessage + "</p>"', 'rule': None},
-        {'template': 'var m = " <p> " + message + " </p> "', 'rule': ruleset.javascript_concat_html},
-        {'template': 'var m = " <p> " + message + " broken string', 'rule': ruleset.javascript_concat_html},
+        {'template': 'var m = " <p> " + message + " </p> "', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_concat_html},
+        {'template': 'var m = " <p> " + message + " broken string', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_concat_html},
     )
     def test_concat_with_html(self, data):
         """
@@ -261,16 +267,16 @@ class TestJavaScriptLinter(TestLinter):
         # plain text is ok because any & will be escaped, and it stops false
         # negatives on some other objects with an append() method
         {'template': 'test.append("plain text")', 'rule': None},
-        {'template': 'test.append("<div/>")', 'rule': ruleset.javascript_jquery_append},
+        {'template': 'test.append("<div/>")', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_jquery_append},
         {'template': 'graph.svg.append("g")', 'rule': None},
         {'template': 'test.append( $( "<div>" ) )', 'rule': None},
         {'template': 'test.append($("<div>"))', 'rule': None},
         {'template': 'test.append($("<div/>"))', 'rule': None},
         {'template': 'test.append(HtmlUtils.ensureHtml(htmlSnippet).toString())', 'rule': None},
         {'template': 'HtmlUtils.append($el, someHtml)', 'rule': None},
-        {'template': 'test.append("fail on concat" + test.render().el)', 'rule': ruleset.javascript_jquery_append},
-        {'template': 'test.append("fail on concat" + testEl)', 'rule': ruleset.javascript_jquery_append},
-        {'template': 'test.append(message)', 'rule': ruleset.javascript_jquery_append},
+        {'template': 'test.append("fail on concat" + test.render().el)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_jquery_append},
+        {'template': 'test.append("fail on concat" + testEl)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_jquery_append},
+        {'template': 'test.append(message)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_jquery_append},
     )
     def test_jquery_append(self, data):
         """
@@ -295,10 +301,10 @@ class TestJavaScriptLinter(TestLinter):
         {'template': 'test.prepend($("<div/>"))', 'rule': None},
         {'template': 'test.prepend(HtmlUtils.ensureHtml(htmlSnippet).toString())', 'rule': None},
         {'template': 'HtmlUtils.prepend($el, someHtml)', 'rule': None},
-        {'template': 'test.prepend("broken string)', 'rule': ruleset.javascript_jquery_prepend},
-        {'template': 'test.prepend("fail on concat" + test.render().el)', 'rule': ruleset.javascript_jquery_prepend},
-        {'template': 'test.prepend("fail on concat" + testEl)', 'rule': ruleset.javascript_jquery_prepend},
-        {'template': 'test.prepend(message)', 'rule': ruleset.javascript_jquery_prepend},
+        {'template': 'test.prepend("broken string)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_jquery_prepend},
+        {'template': 'test.prepend("fail on concat" + test.render().el)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_jquery_prepend},
+        {'template': 'test.prepend("fail on concat" + testEl)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_jquery_prepend},
+        {'template': 'test.prepend(message)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_jquery_prepend},
     )
     def test_jquery_prepend(self, data):
         """
@@ -321,14 +327,14 @@ class TestJavaScriptLinter(TestLinter):
         {'template': 'test.replaceAll(HtmlUtils.ensureHtml(htmlSnippet).toString())', 'rule': None},
         {'template': 'test.replaceWith(HtmlUtils.ensureHtml(htmlSnippet).toString())', 'rule': None},
         {'template': 'test.replaceWith(edx.HtmlUtils.HTML(htmlString).toString())', 'rule': None},
-        {'template': 'test.unwrap(anything)', 'rule': ruleset.javascript_jquery_insertion},
-        {'template': 'test.wrap(anything)', 'rule': ruleset.javascript_jquery_insertion},
-        {'template': 'test.wrapAll(anything)', 'rule': ruleset.javascript_jquery_insertion},
-        {'template': 'test.wrapInner(anything)', 'rule': ruleset.javascript_jquery_insertion},
-        {'template': 'test.after(anything)', 'rule': ruleset.javascript_jquery_insertion},
-        {'template': 'test.before(anything)', 'rule': ruleset.javascript_jquery_insertion},
-        {'template': 'test.replaceAll(anything)', 'rule': ruleset.javascript_jquery_insertion},
-        {'template': 'test.replaceWith(anything)', 'rule': ruleset.javascript_jquery_insertion},
+        {'template': 'test.unwrap(anything)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_jquery_insertion},
+        {'template': 'test.wrap(anything)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_jquery_insertion},
+        {'template': 'test.wrapAll(anything)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_jquery_insertion},
+        {'template': 'test.wrapInner(anything)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_jquery_insertion},
+        {'template': 'test.after(anything)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_jquery_insertion},
+        {'template': 'test.before(anything)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_jquery_insertion},
+        {'template': 'test.replaceAll(anything)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_jquery_insertion},
+        {'template': 'test.replaceWith(anything)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_jquery_insertion},
     )
     def test_jquery_insertion(self, data):
         """
@@ -355,11 +361,11 @@ class TestJavaScriptLinter(TestLinter):
         {'template': 'testEl.prependTo(target);', 'rule': None},
         {'template': 'testEl.insertAfter(target);', 'rule': None},
         {'template': 'testEl.insertBefore(target);', 'rule': None},
-        {'template': 'anycall().appendTo(target)', 'rule': ruleset.javascript_jquery_insert_into_target},
-        {'template': 'anything.appendTo(target)', 'rule': ruleset.javascript_jquery_insert_into_target},
-        {'template': 'anything.prependTo(target)', 'rule': ruleset.javascript_jquery_insert_into_target},
-        {'template': 'anything.insertAfter(target)', 'rule': ruleset.javascript_jquery_insert_into_target},
-        {'template': 'anything.insertBefore(target)', 'rule': ruleset.javascript_jquery_insert_into_target},
+        {'template': 'anycall().appendTo(target)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_jquery_insert_into_target},
+        {'template': 'anything.appendTo(target)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_jquery_insert_into_target},
+        {'template': 'anything.prependTo(target)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_jquery_insert_into_target},
+        {'template': 'anything.insertAfter(target)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_jquery_insert_into_target},
+        {'template': 'anything.insertBefore(target)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_jquery_insert_into_target},
     )
     def test_jquery_insert_to_target(self, data):
         """
@@ -382,10 +388,10 @@ class TestJavaScriptLinter(TestLinter):
         {'template': 'test.html("")', 'rule': None},
         {'template': 'test.html(HtmlUtils.ensureHtml(htmlSnippet).toString())', 'rule': None},
         {'template': 'HtmlUtils.setHtml($el, someHtml)', 'rule': None},
-        {'template': 'test.html("any string")', 'rule': ruleset.javascript_jquery_html},
-        {'template': 'test.html("broken string)', 'rule': ruleset.javascript_jquery_html},
-        {'template': 'test.html("檌檒濦")', 'rule': ruleset.javascript_jquery_html},
-        {'template': 'test.html(anything)', 'rule': ruleset.javascript_jquery_html},
+        {'template': 'test.html("any string")', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_jquery_html},
+        {'template': 'test.html("broken string)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_jquery_html},
+        {'template': 'test.html("檌檒濦")', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_jquery_html},
+        {'template': 'test.html(anything)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_jquery_html},
     )
     def test_jquery_html(self, data):
         """
@@ -400,7 +406,7 @@ class TestJavaScriptLinter(TestLinter):
     @data(
         {'template': 'StringUtils.interpolate()', 'rule': None},
         {'template': 'HtmlUtils.interpolateHtml()', 'rule': None},
-        {'template': 'interpolate(anything)', 'rule': ruleset.javascript_interpolate},
+        {'template': 'interpolate(anything)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_interpolate},
     )
     def test_javascript_interpolate(self, data):
         """
@@ -415,7 +421,7 @@ class TestJavaScriptLinter(TestLinter):
 
     @data(
         {'template': '_.escape(message)', 'rule': None},
-        {'template': 'anything.escape(message)', 'rule': ruleset.javascript_escape},
+        {'template': 'anything.escape(message)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_escape},
     )
     def test_javascript_interpolate(self, data):
         """
@@ -435,15 +441,13 @@ class TestPythonLinter(TestLinter):
     Test PythonLinter
     """
 
-    ruleset = PythonLinter.ruleset
-
     @data(
         {'template': 'm = "Plain text " + message + "plain text"', 'rule': None},
         {'template': 'm = "檌檒濦 " + message + "plain text"', 'rule': None},
         {'template': '  # m = "<p>" + commentedOutMessage + "</p>"', 'rule': None},
-        {'template': 'm = "<p>" + message + "</p>"', 'rule': [ruleset.python_concat_html, ruleset.python_concat_html]},
-        {'template': 'm = " <p> " + message + " </p> "', 'rule': [ruleset.python_concat_html, ruleset.python_concat_html]},
-        {'template': 'm = " <p> " + message + " broken string', 'rule': ruleset.python_parse_error},
+        {'template': 'm = "<p>" + message + "</p>"', 'rule': [PYTHON_LINTER_RULESET.python_concat_html, PYTHON_LINTER_RULESET.python_concat_html]},
+        {'template': 'm = " <p> " + message + " </p> "', 'rule': [PYTHON_LINTER_RULESET.python_concat_html, PYTHON_LINTER_RULESET.python_concat_html]},
+        {'template': 'm = " <p> " + message + " broken string', 'rule': PYTHON_LINTER_RULESET.python_parse_error},
     )
     def test_concat_with_html(self, data):
         """
@@ -473,7 +477,7 @@ class TestPythonLinter(TestLinter):
         linter.check_python_file_is_safe(python_file, results)
 
         self.assertEqual(len(results.violations), 1)
-        self.assertEqual(results.violations[0].rule, self.ruleset.python_deprecated_display_name)
+        self.assertEqual(results.violations[0].rule, PYTHON_LINTER_RULESET.python_deprecated_display_name)
 
     def test_check_custom_escaping(self):
         """
@@ -489,7 +493,7 @@ class TestPythonLinter(TestLinter):
         linter.check_python_file_is_safe(python_file, results)
 
         self.assertEqual(len(results.violations), 1)
-        self.assertEqual(results.violations[0].rule, self.ruleset.python_custom_escape)
+        self.assertEqual(results.violations[0].rule, PYTHON_LINTER_RULESET.python_custom_escape)
 
     @data(
         {
@@ -510,7 +514,7 @@ class TestPythonLinter(TestLinter):
                         span_end=HTML("</span>"),
                     )
                 """),
-            'rule': ruleset.python_requires_html_or_text
+            'rule': PYTHON_LINTER_RULESET.python_requires_html_or_text
         },
         {
             'python':
@@ -521,7 +525,7 @@ class TestPythonLinter(TestLinter):
                         span_end=HTML("</span>"),
                     )
                 """),
-            'rule': ruleset.python_requires_html_or_text
+            'rule': PYTHON_LINTER_RULESET.python_requires_html_or_text
         },
         {
             'python':
@@ -531,7 +535,7 @@ class TestPythonLinter(TestLinter):
                         link_end=HTML("</a>"),
                     ))
                 """),
-            'rule': [ruleset.python_close_before_format, ruleset.python_requires_html_or_text]
+            'rule': [PYTHON_LINTER_RULESET.python_close_before_format, PYTHON_LINTER_RULESET.python_requires_html_or_text]
         },
         {
             'python':
@@ -541,7 +545,7 @@ class TestPythonLinter(TestLinter):
                         link_end=HTML("</a>"),
                     )
                 """),
-            'rule': ruleset.python_close_before_format
+            'rule': PYTHON_LINTER_RULESET.python_close_before_format
         },
         {
             'python':
@@ -553,10 +557,10 @@ class TestPythonLinter(TestLinter):
                 """),
             'rule':
                 [
-                    ruleset.python_close_before_format,
-                    ruleset.python_requires_html_or_text,
-                    ruleset.python_close_before_format,
-                    ruleset.python_requires_html_or_text
+                    PYTHON_LINTER_RULESET.python_close_before_format,
+                    PYTHON_LINTER_RULESET.python_requires_html_or_text,
+                    PYTHON_LINTER_RULESET.python_close_before_format,
+                    PYTHON_LINTER_RULESET.python_requires_html_or_text
                 ]
         },
         {
@@ -567,7 +571,7 @@ class TestPythonLinter(TestLinter):
                         span_end="</span>",
                     )
                 """),
-            'rule': [ruleset.python_wrap_html, ruleset.python_wrap_html]
+            'rule': [PYTHON_LINTER_RULESET.python_wrap_html, PYTHON_LINTER_RULESET.python_wrap_html]
         },
         {
             'python':
@@ -598,11 +602,11 @@ class TestPythonLinter(TestLinter):
         },
         {
             'python': r"""msg = '<a href="{}"'.format(url)""",
-            'rule': ruleset.python_wrap_html
+            'rule': PYTHON_LINTER_RULESET.python_wrap_html
         },
         {
             'python': r"""msg = '{}</p>'.format(message)""",
-            'rule': ruleset.python_wrap_html
+            'rule': PYTHON_LINTER_RULESET.python_wrap_html
         },
         {
             'python': r"""r'regex with {} and named group(?P<id>\d+)?$'.format(test)""",
@@ -610,7 +614,7 @@ class TestPythonLinter(TestLinter):
         },
         {
             'python': r"""msg = '<a href="%s"' % url""",
-            'rule': ruleset.python_interpolate_html
+            'rule': PYTHON_LINTER_RULESET.python_interpolate_html
         },
         {
             'python':
@@ -623,11 +627,11 @@ class TestPythonLinter(TestLinter):
         },
         {
             'python': r"""msg = '%s</p>' % message""",
-            'rule': ruleset.python_interpolate_html
+            'rule': PYTHON_LINTER_RULESET.python_interpolate_html
         },
         {
             'python': "msg = HTML('<span></span>'",
-            'rule': ruleset.python_parse_error
+            'rule': PYTHON_LINTER_RULESET.python_parse_error
         },
     )
     def test_check_python_with_text_and_html(self, data):
@@ -668,11 +672,11 @@ class TestPythonLinter(TestLinter):
         results.violations.sort(key=lambda violation: violation.sort_key())
 
         self.assertEqual(len(results.violations), 5)
-        self.assertEqual(results.violations[0].rule, self.ruleset.python_wrap_html)
-        self.assertEqual(results.violations[1].rule, self.ruleset.python_requires_html_or_text)
-        self.assertEqual(results.violations[2].rule, self.ruleset.python_close_before_format)
-        self.assertEqual(results.violations[3].rule, self.ruleset.python_wrap_html)
-        self.assertEqual(results.violations[4].rule, self.ruleset.python_interpolate_html)
+        self.assertEqual(results.violations[0].rule, PYTHON_LINTER_RULESET.python_wrap_html)
+        self.assertEqual(results.violations[1].rule, PYTHON_LINTER_RULESET.python_requires_html_or_text)
+        self.assertEqual(results.violations[2].rule, PYTHON_LINTER_RULESET.python_close_before_format)
+        self.assertEqual(results.violations[3].rule, PYTHON_LINTER_RULESET.python_wrap_html)
+        self.assertEqual(results.violations[4].rule, PYTHON_LINTER_RULESET.python_interpolate_html)
 
     @data(
         {
@@ -684,7 +688,7 @@ class TestPythonLinter(TestLinter):
                         </div>
                     ''').format(response=response_text)
                 """,
-            'rule': ruleset.python_wrap_html,
+            'rule': PYTHON_LINTER_RULESET.python_wrap_html,
             'start_line': 2,
         },
         {
@@ -700,7 +704,7 @@ class TestPythonLinter(TestLinter):
                         </div>
                     ''').format(response=response_text)
                 """,
-            'rule': ruleset.python_wrap_html,
+            'rule': PYTHON_LINTER_RULESET.python_wrap_html,
             'start_line': 6,
         },
         {
@@ -712,7 +716,7 @@ class TestPythonLinter(TestLinter):
                     '''
                     response_str = '''<h3 class="result">{response}</h3>'''.format(response=response_text)
                 """,
-            'rule': ruleset.python_wrap_html,
+            'rule': PYTHON_LINTER_RULESET.python_wrap_html,
             'start_line': 6,
         },
         {
@@ -729,7 +733,7 @@ class TestPythonLinter(TestLinter):
                         </div>
                     ''').format(response=response_text)
                 """,
-            'rule': ruleset.python_wrap_html,
+            'rule': PYTHON_LINTER_RULESET.python_wrap_html,
             'start_line': 6,
         },
     )
@@ -754,10 +758,6 @@ class TestMakoTemplateLinter(TestLinter):
     """
     Test MakoTemplateLinter
     """
-
-    ruleset = (
-        MakoTemplateLinter.ruleset + PythonLinter.ruleset + JavaScriptLinter.ruleset + UnderscoreTemplateLinter.ruleset
-    )
 
     @data(
         {'directory': 'lms/templates', 'expected': True},
@@ -788,13 +788,13 @@ class TestMakoTemplateLinter(TestLinter):
         },
         {
             'template': '\n ## <%page expression_filter="h"/>',
-            'rule': ruleset.mako_missing_default
+            'rule': MAKO_LINTER_RULESET.mako_missing_default
         },
         {
             'template':
                 '\n <%page expression_filter="h" /> '
                 '\n <%page args="section_data"/>',
-            'rule': ruleset.mako_multiple_page_tags
+            'rule': MAKO_LINTER_RULESET.mako_multiple_page_tags
         },
         {
             'template':
@@ -804,16 +804,16 @@ class TestMakoTemplateLinter(TestLinter):
         },
         {
             'template': '\n <%page args="section_data" /> ',
-            'rule': ruleset.mako_missing_default
+            'rule': MAKO_LINTER_RULESET.mako_missing_default
         },
         {
             'template':
                 '\n <%page args="section_data"/> <some-other-tag expression_filter="h" /> ',
-            'rule': ruleset.mako_missing_default
+            'rule': MAKO_LINTER_RULESET.mako_missing_default
         },
         {
             'template': '\n',
-            'rule': ruleset.mako_missing_default
+            'rule': MAKO_LINTER_RULESET.mako_missing_default
         },
     )
     def test_check_page_default(self, data):
@@ -832,12 +832,12 @@ class TestMakoTemplateLinter(TestLinter):
 
     @data(
         {'expression': '${x}', 'rule': None},
-        {'expression': '${{unbalanced}', 'rule': ruleset.mako_unparseable_expression},
-        {'expression': '${x | n}', 'rule': ruleset.mako_invalid_html_filter},
+        {'expression': '${{unbalanced}', 'rule': MAKO_LINTER_RULESET.mako_unparseable_expression},
+        {'expression': '${x | n}', 'rule': MAKO_LINTER_RULESET.mako_invalid_html_filter},
         {'expression': '${x | n, decode.utf8}', 'rule': None},
-        {'expression': '${x | h}', 'rule': ruleset.mako_unwanted_html_filter},
+        {'expression': '${x | h}', 'rule': MAKO_LINTER_RULESET.mako_unwanted_html_filter},
         {'expression': '  ## ${commented_out | h}', 'rule': None},
-        {'expression': '${x | n, dump_js_escaped_json}', 'rule': ruleset.mako_invalid_html_filter},
+        {'expression': '${x | n, dump_js_escaped_json}', 'rule': MAKO_LINTER_RULESET.mako_invalid_html_filter},
     )
     def test_check_mako_expressions_in_html(self, data):
         """
@@ -871,7 +871,7 @@ class TestMakoTemplateLinter(TestLinter):
         linter._check_mako_file_is_safe(mako_template, results)
 
         self.assertEqual(len(results.violations), 1)
-        self.assertEqual(results.violations[0].rule, self.ruleset.python_deprecated_display_name)
+        self.assertEqual(results.violations[0].rule, MAKO_LINTER_RULESET.python_deprecated_display_name)
 
     @data(
         {
@@ -888,7 +888,7 @@ class TestMakoTemplateLinter(TestLinter):
                         text = _("Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)") % a_link
                     %>
                 """),
-            'rule': [ruleset.python_wrap_html, ruleset.python_concat_html, ruleset.python_wrap_html]
+            'rule': [MAKO_LINTER_RULESET.python_wrap_html, MAKO_LINTER_RULESET.python_concat_html, MAKO_LINTER_RULESET.python_wrap_html]
         },
         {
             'expression':
@@ -898,7 +898,7 @@ class TestMakoTemplateLinter(TestLinter):
                         span_end=HTML("</span>"),
                     )}
                 """),
-            'rule': ruleset.python_requires_html_or_text
+            'rule': MAKO_LINTER_RULESET.python_requires_html_or_text
         },
         {
             'expression':
@@ -919,7 +919,7 @@ class TestMakoTemplateLinter(TestLinter):
                         span_end=HTML("</span>"),
                     )}
                 """),
-            'rule': ruleset.python_requires_html_or_text
+            'rule': MAKO_LINTER_RULESET.python_requires_html_or_text
         },
         {
             'expression':
@@ -929,7 +929,7 @@ class TestMakoTemplateLinter(TestLinter):
                         link_end=HTML("</a>"),
                     ))}
                 """),
-            'rule': [ruleset.python_close_before_format, ruleset.python_requires_html_or_text]
+            'rule': [MAKO_LINTER_RULESET.python_close_before_format, MAKO_LINTER_RULESET.python_requires_html_or_text]
         },
         {
             'expression':
@@ -939,7 +939,7 @@ class TestMakoTemplateLinter(TestLinter):
                         link_end=HTML("</a>"),
                     )}
                 """),
-            'rule': ruleset.python_close_before_format
+            'rule': MAKO_LINTER_RULESET.python_close_before_format
         },
         {
             'expression':
@@ -949,7 +949,7 @@ class TestMakoTemplateLinter(TestLinter):
                         span_end="</span>",
                     )}
                 """),
-            'rule': [ruleset.python_wrap_html, ruleset.python_wrap_html]
+            'rule': [MAKO_LINTER_RULESET.python_wrap_html, MAKO_LINTER_RULESET.python_wrap_html]
         },
         {
             'expression':
@@ -971,11 +971,11 @@ class TestMakoTemplateLinter(TestLinter):
         },
         {
             'expression': "${'<span></span>'}",
-            'rule': ruleset.python_wrap_html
+            'rule': MAKO_LINTER_RULESET.python_wrap_html
         },
         {
             'expression': "${'Embedded HTML <strong></strong>'}",
-            'rule': ruleset.python_wrap_html
+            'rule': MAKO_LINTER_RULESET.python_wrap_html
         },
         {
             'expression': "${ HTML('<span></span>') }",
@@ -987,19 +987,19 @@ class TestMakoTemplateLinter(TestLinter):
         },
         {
             'expression': "${ '<span></span>' + 'some other text' }",
-            'rule': [ruleset.python_concat_html, ruleset.python_wrap_html]
+            'rule': [MAKO_LINTER_RULESET.python_concat_html, MAKO_LINTER_RULESET.python_wrap_html]
         },
         {
             'expression': "${ HTML('<span>missing closing parentheses.</span>' }",
-            'rule': ruleset.python_parse_error
+            'rule': MAKO_LINTER_RULESET.python_parse_error
         },
         {
             'expression': "${'Rock &amp; Roll'}",
-            'rule': ruleset.mako_html_entities
+            'rule': MAKO_LINTER_RULESET.mako_html_entities
         },
         {
             'expression': "${'Rock &#38; Roll'}",
-            'rule': ruleset.mako_html_entities
+            'rule': MAKO_LINTER_RULESET.mako_html_entities
         },
     )
     def test_check_mako_with_text_and_html(self, data):
@@ -1031,7 +1031,7 @@ class TestMakoTemplateLinter(TestLinter):
         linter._check_mako_file_is_safe(mako_template, results)
 
         self.assertEqual(len(results.violations), 1)
-        self.assertEqual(results.violations[0].rule, self.ruleset.mako_missing_default)
+        self.assertEqual(results.violations[0].rule, MAKO_LINTER_RULESET.mako_missing_default)
 
     def test_check_mako_expression_default_disabled(self):
         """
@@ -1120,13 +1120,13 @@ class TestMakoTemplateLinter(TestLinter):
         linter._check_mako_file_is_safe(mako_template, results)
 
         self.assertEqual(len(results.violations), 1)
-        self.assertEqual(results.violations[0].rule, self.ruleset.mako_missing_default)
+        self.assertEqual(results.violations[0].rule, MAKO_LINTER_RULESET.mako_missing_default)
 
     @data(
-        {'expression': '${x}', 'rule': ruleset.mako_invalid_js_filter},
-        {'expression': '${{unbalanced}', 'rule': ruleset.mako_unparseable_expression},
-        {'expression': '${x | n}', 'rule': ruleset.mako_invalid_js_filter},
-        {'expression': '${x | h}', 'rule': ruleset.mako_invalid_js_filter},
+        {'expression': '${x}', 'rule': MAKO_LINTER_RULESET.mako_invalid_js_filter},
+        {'expression': '${{unbalanced}', 'rule': MAKO_LINTER_RULESET.mako_unparseable_expression},
+        {'expression': '${x | n}', 'rule': MAKO_LINTER_RULESET.mako_invalid_js_filter},
+        {'expression': '${x | h}', 'rule': MAKO_LINTER_RULESET.mako_invalid_js_filter},
         {'expression': '${x | n, dump_js_escaped_json}', 'rule': None},
         {'expression': '${x | n, decode.utf8}', 'rule': None},
     )
@@ -1153,7 +1153,7 @@ class TestMakoTemplateLinter(TestLinter):
         self._validate_data_rules(data, results)
 
     @data(
-        {'expression': '${x}', 'rule': ruleset.mako_invalid_js_filter},
+        {'expression': '${x}', 'rule': MAKO_LINTER_RULESET.mako_invalid_js_filter},
         {'expression': '"${x | n, js_escaped_string}"', 'rule': None},
     )
     def test_check_mako_expressions_in_require_module(self, data):
@@ -1179,7 +1179,7 @@ class TestMakoTemplateLinter(TestLinter):
         self._validate_data_rules(data, results)
 
     @data(
-        {'expression': '${x}', 'rule': ruleset.mako_invalid_js_filter},
+        {'expression': '${x}', 'rule': MAKO_LINTER_RULESET.mako_invalid_js_filter},
         {'expression': '"${x | n, js_escaped_string}"', 'rule': None},
     )
     def test_check_mako_expressions_in_require_js(self, data):
@@ -1211,8 +1211,8 @@ class TestMakoTemplateLinter(TestLinter):
         {'media_type': 'application/javascript', 'rule': None},
         {'media_type': 'text/x-mathjax-config', 'rule': None},
         {'media_type': 'json/xblock-args', 'rule': None},
-        {'media_type': 'text/template', 'rule': ruleset.mako_invalid_html_filter},
-        {'media_type': 'unknown/type', 'rule': ruleset.mako_unknown_context},
+        {'media_type': 'text/template', 'rule': MAKO_LINTER_RULESET.mako_invalid_html_filter},
+        {'media_type': 'unknown/type', 'rule': MAKO_LINTER_RULESET.mako_unknown_context},
     )
     def test_check_mako_expressions_in_script_type(self, data):
         """
@@ -1263,13 +1263,13 @@ class TestMakoTemplateLinter(TestLinter):
         linter._check_mako_file_is_safe(mako_template, results)
 
         self.assertEqual(len(results.violations), 7)
-        self.assertEqual(results.violations[0].rule, self.ruleset.mako_unwanted_html_filter)
-        self.assertEqual(results.violations[1].rule, self.ruleset.mako_invalid_js_filter)
-        self.assertEqual(results.violations[2].rule, self.ruleset.mako_unwanted_html_filter)
-        self.assertEqual(results.violations[3].rule, self.ruleset.mako_invalid_js_filter)
-        self.assertEqual(results.violations[4].rule, self.ruleset.mako_unwanted_html_filter)
-        self.assertEqual(results.violations[5].rule, self.ruleset.mako_invalid_js_filter)
-        self.assertEqual(results.violations[6].rule, self.ruleset.mako_unwanted_html_filter)
+        self.assertEqual(results.violations[0].rule, MAKO_LINTER_RULESET.mako_unwanted_html_filter)
+        self.assertEqual(results.violations[1].rule, MAKO_LINTER_RULESET.mako_invalid_js_filter)
+        self.assertEqual(results.violations[2].rule, MAKO_LINTER_RULESET.mako_unwanted_html_filter)
+        self.assertEqual(results.violations[3].rule, MAKO_LINTER_RULESET.mako_invalid_js_filter)
+        self.assertEqual(results.violations[4].rule, MAKO_LINTER_RULESET.mako_unwanted_html_filter)
+        self.assertEqual(results.violations[5].rule, MAKO_LINTER_RULESET.mako_invalid_js_filter)
+        self.assertEqual(results.violations[6].rule, MAKO_LINTER_RULESET.mako_unwanted_html_filter)
 
     def test_check_mako_expressions_javascript_strings(self):
         """
@@ -1303,9 +1303,9 @@ class TestMakoTemplateLinter(TestLinter):
         linter._check_mako_file_is_safe(mako_template, results)
 
         self.assertEqual(len(results.violations), 3)
-        self.assertEqual(results.violations[0].rule, self.ruleset.mako_js_missing_quotes)
-        self.assertEqual(results.violations[1].rule, self.ruleset.mako_js_html_string)
-        self.assertEqual(results.violations[2].rule, self.ruleset.mako_js_html_string)
+        self.assertEqual(results.violations[0].rule, MAKO_LINTER_RULESET.mako_js_missing_quotes)
+        self.assertEqual(results.violations[1].rule, MAKO_LINTER_RULESET.mako_js_html_string)
+        self.assertEqual(results.violations[2].rule, MAKO_LINTER_RULESET.mako_js_html_string)
 
     def test_check_javascript_in_mako_javascript_context(self):
         """
@@ -1325,7 +1325,7 @@ class TestMakoTemplateLinter(TestLinter):
         linter._check_mako_file_is_safe(mako_template, results)
 
         self.assertEqual(len(results.violations), 1)
-        self.assertEqual(results.violations[0].rule, self.ruleset.javascript_concat_html)
+        self.assertEqual(results.violations[0].rule, MAKO_LINTER_RULESET.javascript_concat_html)
         self.assertEqual(results.violations[0].start_line, 4)
 
     @data(
@@ -1352,7 +1352,7 @@ class TestMakoTemplateLinter(TestLinter):
         linter._check_mako_file_is_safe(data['template'], results)
 
         self.assertEqual(len(results.violations), 2)
-        self.assertEqual(results.violations[0].rule, self.ruleset.mako_missing_default)
+        self.assertEqual(results.violations[0].rule, MAKO_LINTER_RULESET.mako_missing_default)
 
         violation = results.violations[1]
         lines = list(data['template'].splitlines())
@@ -1459,31 +1459,28 @@ class TestDjangoTemplateLinter(TestLinter):
     Test DjangoTemplateLinter
     """
 
-    ruleset = (
-        DjangoTemplateLinter.ruleset
-    )
     @data(
 
         {'expression': '{% trans "whatever" as tmsg %}{{tmsg|force_escape}}',
          'rule': None},
 
         {'expression': '{% trans "whatever" as tmsgx %}{{tmsg|force_escape}}',
-         'rule': ruleset.django_trans_escape_variable_mismatch},
+         'rule': DJANGO_LINTER_RULESET.django_trans_escape_variable_mismatch},
 
         {'expression': '{% trans "whatever" as tmsgx %}{{tmsgx|force_escap}}',
-         'rule': ruleset.django_trans_invalid_escape_filter},
+         'rule': DJANGO_LINTER_RULESET.django_trans_invalid_escape_filter},
 
         {'expression': '{% trans "whatever" as tmsg %}',
-         'rule': ruleset.django_trans_missing_escape},
+         'rule': DJANGO_LINTER_RULESET.django_trans_missing_escape},
 
         {'expression': '{% trans "whatever" %}',
-         'rule': ruleset.django_trans_missing_escape},
+         'rule': DJANGO_LINTER_RULESET.django_trans_missing_escape},
 
         {'expression': '{% trans "{span_start} whatever {span_end}" as tmsg %}',
-         'rule': ruleset.django_html_interpolation_missing},
+         'rule': DJANGO_LINTER_RULESET.django_html_interpolation_missing},
 
         {'expression': '{% trans "{span_start} whatever {span_end}" as tmsg %}{{tmsg|force_filter}}',
-         'rule': ruleset.django_html_interpolation_missing},
+         'rule': DJANGO_LINTER_RULESET.django_html_interpolation_missing},
 
         {'expression': """
         {% trans "{span_start} whatever {span_end}" as tmsg %}
@@ -1493,25 +1490,25 @@ class TestDjangoTemplateLinter(TestLinter):
         {'expression': """
             {% trans "{span_start} whatever {span_end}" as tmsg %}
             {% interpolate_html %}
-            """, 'rule': [ruleset.django_html_interpolation_missing, ruleset.django_html_interpolation_invalid_tag]},
+            """, 'rule': [DJANGO_LINTER_RULESET.django_html_interpolation_missing, DJANGO_LINTER_RULESET.django_html_interpolation_invalid_tag]},
 
         {'expression': """
             {% trans "{span_start} whatever {span_end}" as tmsg %}
             {% interpolate_html t start_span='<span class="a">'|safe end_span='</span>'|safe %}
-            """, 'rule': ruleset.django_html_interpolation_missing},
+            """, 'rule': DJANGO_LINTER_RULESET.django_html_interpolation_missing},
 
         {'expression': """
         {% trans "{span_start} whatever {span_end}" as tmsg %}
         {% interpolate_html tmsg start_span='<span class="a">'|unknown end_span='</span>'|safe %}
-        """, 'rule': ruleset.django_html_interpolation_missing_safe_filter},
+        """, 'rule': DJANGO_LINTER_RULESET.django_html_interpolation_missing_safe_filter},
 
         {'expression': """
                     {% trans "<span 'a'='b' 'c'='d'> whatever </span>" as tmsg %}
-        """, 'rule': ruleset.django_html_interpolation_missing},
+        """, 'rule': DJANGO_LINTER_RULESET.django_html_interpolation_missing},
 
         {'expression': """
                         {% trans "<span 'a'='b' 'c'='d'> whatever </span>" %}
-            """, 'rule': ruleset.django_html_interpolation_missing},
+            """, 'rule': DJANGO_LINTER_RULESET.django_html_interpolation_missing},
 
         {'expression': """
                 {% filter force_escape %}
@@ -1527,7 +1524,7 @@ class TestDjangoTemplateLinter(TestLinter):
                 Some translation string
                 {% endblocktrans %}
                 {% endfilter %}
-                """, 'rule': ruleset.django_blocktrans_escape_filter_parse_error},
+                """, 'rule': DJANGO_LINTER_RULESET.django_blocktrans_escape_filter_parse_error},
 
         {'expression': """
                 {% filter someother_filter %}
@@ -1535,7 +1532,7 @@ class TestDjangoTemplateLinter(TestLinter):
                 Some translation strubg
                 {% endblocktrans %}
                 {% endfilter %}
-                """, 'rule': ruleset.django_blocktrans_missing_escape_filter},
+                """, 'rule': DJANGO_LINTER_RULESET.django_blocktrans_missing_escape_filter},
 
         {'expression': """
                 {% filter force_escape xyz %}
@@ -1543,19 +1540,19 @@ class TestDjangoTemplateLinter(TestLinter):
                 Some translation string
                 {% endblocktrans %}
                 {% endfilter %}
-                """, 'rule': ruleset.django_blocktrans_missing_escape_filter},
+                """, 'rule': DJANGO_LINTER_RULESET.django_blocktrans_missing_escape_filter},
 
         {'expression': """
                 {% blocktrans %}
                 Some translation string
                 {% endblocktrans %}
-                """, 'rule': ruleset.django_blocktrans_missing_escape_filter},
+                """, 'rule': DJANGO_LINTER_RULESET.django_blocktrans_missing_escape_filter},
 
         {'expression': """
                 {% blocktrans %}
                 Some translation <span 'a'='b' 'c'='d'> whatever </span>
                 {% endblocktrans %}
-                """, 'rule': ruleset.django_html_interpolation_missing},
+                """, 'rule': DJANGO_LINTER_RULESET.django_html_interpolation_missing},
 
     )
     def test_check_django_expressions_in_html(self, data):
