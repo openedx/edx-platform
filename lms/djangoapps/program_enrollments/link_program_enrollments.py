@@ -10,12 +10,18 @@ from student.models import CourseEnrollmentException
 logger = logging.getLogger(__name__)
 User = get_user_model()
 
-NO_PROGRAM_ENROLLMENT_TPL = (u'No program enrollment found for program uuid={program_uuid} and external student '
-                             'key={external_student_key}')
+NO_PROGRAM_ENROLLMENT_TPL = (
+    u'No program enrollment found for program uuid={program_uuid} and external student '
+    'key={external_student_key}'
+)
 NO_LMS_USER_TPL = u'No user found with username {}'
-COURSE_ENROLLMENT_ERR_TPL = u'Failed to enroll user {user} with waiting program course enrollment for course {course}'
-EXISTING_USER_TPL = (u'Program enrollment with external_student_key={external_student_key} is already linked to '
-                     u'{account_relation} account username={username}')
+COURSE_ENROLLMENT_ERR_TPL = (
+    u'Failed to enroll user {user} with waiting program course enrollment for course {course}'
+)
+EXISTING_USER_TPL = (
+    u'Program enrollment with external_student_key={external_student_key} is already linked to '
+    u'{account_relation} account username={username}'
+)
 
 
 @transaction.atomic
@@ -34,23 +40,24 @@ def link_program_enrollments_to_lms_users(program_uuid, external_keys_to_usernam
 
         Raises: ValueError if None is included in external_keys_to_usernames
 
-        This function will look up program enrollments and users, and update the program enrollments
-        with the matching user. If the program enrollment has course enrollments, we will enroll the user into their
-        waiting program courses.
+        This function will look up program enrollments and users, and update the program
+        enrollments with the matching user. If the program enrollment has course enrollments, we
+        will enroll the user into their waiting program courses.
 
         For each external_user_key:lms_username, if:
             - The user is not found
             - No enrollment is found for the given program and external_user_key
             - The enrollment already has a user
-        An error message will be logged, and added to a dictionary of error messages keyed by (external_key, username).
-        The input will be skipped. All other inputs will be processed and enrollments updated, and then the function
-        will return the dictionary of error messages.
+        An error message will be logged, and added to a dictionary of error messages keyed by
+        (external_key, username). The input will be skipped. All other inputs will be processed and
+        enrollments updated, and then the function will return the dictionary of error messages.
 
-        If there is an error while enrolling a user in a waiting program course enrollment, the error will be
-        logged, and added to the returned error dictionary, and we will roll back all transactions for that user so
-        that their db state will be the same as it was before this function was called, to prevent program enrollments
-        to be in a state where they have an LMS user but still have waiting course enrollments. All other inputs will
-        be processed normally.
+        If there is an error while enrolling a user in a waiting program course enrollment, the
+        error will be logged, and added to the returned error dictionary, and we will roll back all
+        transactions for that user so that their db state will be the same as it was before this
+        function was called, to prevent program enrollments to be in a state where they have an LMS
+        user but still have waiting course enrollments. All other inputs will be processed
+        normally.
     """
     _validate_inputs(program_uuid, external_keys_to_usernames)
     errors = {}
