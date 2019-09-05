@@ -79,7 +79,7 @@ def compute_fingerprint(path_list):
             for dirname in sorted(os.listdir(path_item)):
                 path_name = os.path.join(path_item, dirname)
                 if os.path.isdir(path_name):
-                    hasher.update(str(os.stat(path_name).st_mtime))
+                    hasher.update(str(os.stat(path_name).st_mtime).encode('utf-8'))
 
         # For files, hash the contents of the file
         if os.path.isfile(path_item):
@@ -120,7 +120,7 @@ def prereq_cache(cache_name, paths, install_func):
             # Since the pip requirement files are modified during the install
             # process, we need to store the hash generated AFTER the installation
             post_install_hash = compute_fingerprint(paths)
-            cache_file.write(post_install_hash)
+            cache_file.write(post_install_hash.encode('utf-8'))
     else:
         print(u'{cache} unchanged, skipping...'.format(cache=cache_name))
 
