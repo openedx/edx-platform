@@ -1350,6 +1350,8 @@ def validate_textbooks_json(text):
     """
     Validate the given text as representing a single PDF textbook
     """
+    if isinstance(text, (bytes, bytearray)):  # data appears as bytes
+        text = text.decode('utf-8')
     try:
         textbooks = json.loads(text)
     except ValueError:
@@ -1370,6 +1372,8 @@ def validate_textbook_json(textbook):
     """
     Validate the given text as representing a list of PDF textbooks
     """
+    if isinstance(textbook, (bytes, bytearray)):  # data appears as bytes
+        textbook = textbook.decode('utf-8')
     if isinstance(textbook, six.string_types):
         try:
             textbook = json.loads(textbook)
