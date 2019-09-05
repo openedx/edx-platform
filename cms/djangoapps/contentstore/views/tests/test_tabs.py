@@ -89,7 +89,7 @@ class TabsPageTests(CourseTestCase):
 
         # remove the middle tab
         # (the code needs to handle the case where tabs requested for re-ordering is a subset of the tabs in the course)
-        removed_tab = tab_ids.pop(num_orig_tabs / 2)
+        removed_tab = tab_ids.pop(num_orig_tabs // 2)
         self.assertEqual(len(tab_ids), num_orig_tabs - 1)
 
         # post the request
