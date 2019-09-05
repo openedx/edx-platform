@@ -1997,13 +1997,6 @@ class RerunCourseTest(ContentStoreTestCase):
         new_course = self.store.get_course(destination_course_key)
         self.assertEqual(new_course.video_upload_pipeline, {})
 
-    def test_rerun_course_resets_advertised_date(self):
-        source_course = CourseFactory.create(advertised_start="01-12-2015")
-        destination_course_key = self.post_rerun_request(source_course.id)
-        destination_course = self.store.get_course(destination_course_key)
-
-        self.assertEqual(None, destination_course.advertised_start)
-
     def test_rerun_of_rerun(self):
         source_course = CourseFactory.create()
         rerun_course_key = self.post_rerun_request(source_course.id)

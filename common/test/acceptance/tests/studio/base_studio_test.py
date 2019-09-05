@@ -40,7 +40,6 @@ class StudioCourseTest(UniqueCourseTest):
             xss_injected_unique_id = XSS_INJECTION + self.unique_id
             test_improper_escaping = {u"value": xss_injected_unique_id}
             self.course_fixture.add_advanced_settings({
-                "advertised_start": test_improper_escaping,
                 "info_sidebar_name": test_improper_escaping,
                 "cert_name_short": test_improper_escaping,
                 "cert_name_long": test_improper_escaping,

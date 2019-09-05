@@ -858,7 +858,6 @@ class TestProgramDataExtender(ModuleStoreTestCase):
                     'is_enrolled': False,
                     'is_enrollment_open': True,
                     'upgrade_url': None,
-                    'advertised_start': None,
                 },
                 **kwargs
             )

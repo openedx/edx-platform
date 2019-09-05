@@ -114,17 +114,6 @@ describe('Course Card View', () => {
     validateCourseInfoDisplay();
   });
 
-  it('should show the course advertised start date', () => {
-    const advertisedStart = 'A long time ago...';
-    course.course_runs[0].advertised_start = advertisedStart;
-
-    setupView(course, false);
-
-    expect(view.$('.course-details .course-text .run-period').html()).toEqual(
-          `${advertisedStart} - ${endDate}`,
-      );
-  });
-
   it('should only show certificate status section if a certificate has been earned', () => {
     const certUrl = 'sample-certificate';
 
@@ -168,11 +157,9 @@ describe('Course Card View', () => {
   it('should allow enrollment in future runs when the user has an expired enrollment', () => {
     const newRun = $.extend({}, course.course_runs[0]);
     const newRunKey = 'course-v1:foo+bar+baz';
-    const advertisedStart = 'Summer';
 
     newRun.key = newRunKey;
     newRun.is_enrolled = false;
-    newRun.advertised_start = advertisedStart;
     course.course_runs.push(newRun);
 
     course.expired = true;
@@ -181,7 +168,7 @@ describe('Course Card View', () => {
 
     expect(courseCardModel.get('course_run_key')).toEqual(newRunKey);
     expect(view.$('.course-details .course-text .run-period').html()).toEqual(
-          `${advertisedStart} - ${endDate}`,
+          `${startDate} - ${endDate}`,
       );
   });
 

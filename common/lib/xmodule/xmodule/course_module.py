@@ -303,15 +303,6 @@ class CourseFields(object):
         default=0,
         scope=Scope.settings,
     )
-    advertised_start = String(
-        display_name=_("Course Advertised Start"),
-        help=_(
-            "Enter the text that you want to use as the advertised starting time frame for the course, "
-            "such as \"Winter 2018\". If you enter null for this value, the start date that you have set "
-            "for this course is used."
-        ),
-        scope=Scope.settings
-    )
     pre_requisite_courses = List(
         display_name=_("Pre-Requisite Courses"),
         help=_("Pre-Requisite Course key if this course has a pre-requisite course"),
@@ -1325,9 +1316,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         flag = self.is_new
         if flag is None:
             # Use a heuristic if the course has not been flagged
-            announcement, start, now = course_metadata_utils.sorting_dates(
-                self.start, self.advertised_start, self.announcement
-            )
+            announcement, start, now = course_metadata_utils.sorting_dates(self.start, self.announcement)
             if announcement and (now - announcement).days < 30:
                 # The course has been announced for less that month
                 return True
@@ -1347,11 +1336,11 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         Returns a tuple that can be used to sort the courses according
         the how "new" they are. The "newness" score is computed using a
         heuristic that takes into account the announcement and
-        (advertised) start dates of the course if available.
+        start dates of the course if available.
 
         The lower the number the "newer" the course.
         """
-        return course_metadata_utils.sorting_score(self.start, self.advertised_start, self.announcement)
+        return course_metadata_utils.sorting_score(self.start, self.announcement)
 
     @staticmethod
     def make_id(org, course, url_name):
@@ -1365,13 +1354,9 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
     @property
     def start_date_is_still_default(self):
         """
-        Checks if the start date set for the course is still default, i.e. .start has not been modified,
-        and .advertised_start has not been set.
+        Checks if the start date set for the course is still default, i.e. .start has not been modified
         """
-        return course_metadata_utils.course_start_date_is_default(
-            self.start,
-            self.advertised_start
-        )
+        return course_metadata_utils.course_start_date_is_default(self.start)
 
     def get_discussion_blackout_datetimes(self):
         """

@@ -152,12 +152,9 @@ class CourseCardModel extends Backbone.Model {
   formatDateString(run) {
     const pacingType = run.pacing_type;
     let dateString;
-    let start = CourseCardModel.valueIsDefined(run.start_date) ?
-      run.advertised_start || run.start_date :
-      this.get('start_date');
+    let start = CourseCardModel.valueIsDefined(run.start_date) ? run.start_date : this.get('start_date');
     if (start === undefined) {
-      start = CourseCardModel.valueIsDefined(run.start) ?
-        run.advertised_start || CourseCardModel.formatDate(run.start) : undefined;
+      start = CourseCardModel.valueIsDefined(run.start) ? CourseCardModel.formatDate(run.start) : undefined;
     }
     let end = CourseCardModel.valueIsDefined(run.end_date) ? run.end_date : this.get('end_date');
     if (end === undefined) {
@@ -195,15 +192,9 @@ class CourseCardModel extends Backbone.Model {
   }
 
   setActiveCourseRun(courseRun, userPreferences) {
-    let startDateString;
     let courseTitleLink = '';
     const isEnrolled = this.isEnrolledInSession() && courseRun.key;
     if (courseRun) {
-      if (CourseCardModel.valueIsDefined(courseRun.advertised_start)) {
-        startDateString = courseRun.advertised_start;
-      } else {
-        startDateString = CourseCardModel.formatDate(courseRun.start, userPreferences);
-      }
       if (isEnrolled && courseRun.course_url) {
         courseTitleLink = courseRun.course_url;
       } else if (!isEnrolled && courseRun.marketing_url) {
@@ -224,7 +215,7 @@ class CourseCardModel extends Backbone.Model {
         is_unfulfilled_entitlement: this.context.user_entitlement && !isEnrolled,
         marketing_url: courseRun.marketing_url,
         mode_slug: courseRun.type,
-        start_date: startDateString,
+        start_date: CourseCardModel.formatDate(courseRun.start, userPreferences),
         upcoming_course_runs: this.getUpcomingCourseRuns(),
         upgrade_url: courseRun.upgrade_url,
         price: CourseCardModel.getCertificatePriceString(courseRun),

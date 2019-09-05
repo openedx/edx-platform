@@ -258,7 +258,6 @@ class SplitModuleTest(unittest.TestCase):
                             },
                             "enrollment_start": _date_field.from_json("2013-01-01T05:00"),
                             "enrollment_end": _date_field.from_json("2013-03-02T05:00"),
-                            "advertised_start": "Fall 2013",
                         }
                     },
                     "create": [
@@ -630,10 +629,6 @@ class SplitModuleCourseTests(SplitModuleTest):
             course.display_name, "The Ancient Greek Hero",
             "wrong display name"
         )
-        self.assertEqual(
-            course.advertised_start, "Fall 2013",
-            "advertised_start"
-        )
         self.assertEqual(len(course.children), 4, "children")
         # check dates and graders--forces loading of descriptor
         self.assertEqual(course.edited_by, "testassist@edx.org")
@@ -691,7 +686,6 @@ class SplitModuleCourseTests(SplitModuleTest):
             self.assertEqual(len(course.tabs), 4, "wrong number of tabs")
             self.assertEqual(course.display_name, "The most wonderful course",
                              course.display_name)
-            self.assertIsNone(course.advertised_start)
             self.assertEqual(len(course.children), 0,
                              "children")
 
@@ -724,7 +718,6 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(len(course.tabs), 6)
         self.assertEqual(course.display_name, "The Ancient Greek Hero")
         self.assertEqual(course.graceperiod, datetime.timedelta(hours=2))
-        self.assertIsNone(course.advertised_start)
         self.assertEqual(len(course.children), 0)
         self.assertNotEqual(course.definition_locator.definition_id, head_course.definition_locator.definition_id)
         # check dates and graders--forces loading of descriptor
@@ -739,7 +732,6 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(course.category, 'course')
         self.assertEqual(len(course.tabs), 6)
         self.assertEqual(course.display_name, "The Ancient Greek Hero")
-        self.assertEqual(course.advertised_start, "Fall 2013")
         self.assertEqual(len(course.children), 4)
         # check dates and graders--forces loading of descriptor
         self.assertEqual(course.edited_by, "testassist@edx.org")
@@ -1107,7 +1099,6 @@ class SplitModuleItemTests(SplitModuleTest):
             self.assertEqual(block.location.run, "run")
             self.assertEqual(len(block.tabs), 6, "wrong number of tabs")
             self.assertEqual(block.display_name, "The Ancient Greek Hero")
-            self.assertEqual(block.advertised_start, "Fall 2013")
             self.assertEqual(len(block.children), 4)
             # check dates and graders--forces loading of descriptor
             self.assertEqual(block.edited_by, "testassist@edx.org")
@@ -1658,7 +1649,6 @@ class TestItemCrud(SplitModuleTest):
         self.assertNotEqual(block.grading_policy['GRADER'][0]['min_count'], 13)
         block.grading_policy['GRADER'][0]['min_count'] = 13
         block.children = block.children[1:] + [block.children[0]]
-        block.advertised_start = "Soon"
 
         block.save()  # decache model changes
         updated_block = modulestore().update_item(block, self.user_id)
@@ -1666,7 +1656,6 @@ class TestItemCrud(SplitModuleTest):
         self.assertNotEqual(updated_block.location.version_guid, pre_version_guid)
         self.assertEqual(updated_block.grading_policy['GRADER'][0]['min_count'], 13)
         self.assertEqual(updated_block.children[0].version_agnostic(), block.children[0].version_agnostic())
-        self.assertEqual(updated_block.advertised_start, "Soon")
 
     def test_delete_item(self):
         course = self.create_course_for_deletion()
@@ -1947,7 +1936,7 @@ class TestCourseCreation(SplitModuleTest):
             modified_course_loc = CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT)
             with split_store.bulk_operations(modified_course_loc):
                 modified_course = modulestore().get_course(modified_course_loc)
-                modified_course.advertised_start = 'coming soon to a theater near you'
+                modified_course.display_name = 'Modified Course'
                 split_store.update_item(modified_course, user)
 
                 to_be_deleted = split_store.make_course_key("guestx", "contender", "run")
@@ -1962,7 +1951,7 @@ class TestCourseCreation(SplitModuleTest):
                     self.assertNotIn(to_be_deleted, course_ids)
                     self.assertIn(to_be_created, course_ids)
                     fetched_modified = [course for course in courses if course.id == modified_course_loc][0]
-                    self.assertEqual(fetched_modified.advertised_start, modified_course.advertised_start)
+                    self.assertEqual(fetched_modified.display_name, modified_course.display_name)
 
 
 class TestInheritance(SplitModuleTest):

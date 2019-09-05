@@ -109,17 +109,6 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
         result = self._get_result(course)
         self.assertEqual(result['hidden'], True)
 
-    def test_advertised_start(self):
-        course = self.create_course(
-            course=u'custom',
-            start=datetime(2015, 3, 15),
-            advertised_start=u'The Ides of March'
-        )
-        result = self._get_result(course)
-        self.assertEqual(result['course_id'], u'edX/custom/2012_Fall')
-        self.assertEqual(result['start_type'], u'string')
-        self.assertEqual(result['start_display'], u'The Ides of March')
-
     def test_empty_start(self):
         course = self.create_course(start=DEFAULT_START_DATE, course=u'custom')
         result = self._get_result(course)

@@ -110,7 +110,6 @@ class CourseMetadataUtilsTestCase(TestCase):
             return text
 
         test_datetime = datetime(1945, 2, 6, 4, 20, 00, tzinfo=utc)
-        advertised_start_parsable = "2038-01-19 03:14:07"
 
         FunctionTest = namedtuple('FunctionTest', 'function scenarios')  # pylint: disable=invalid-name
         TestScenario = namedtuple('TestScenario', 'arguments expected_return')  # pylint: disable=invalid-name
@@ -157,10 +156,8 @@ class CourseMetadataUtilsTestCase(TestCase):
                 TestScenario((self.html_course.end,), False),
             ]),
             FunctionTest(course_start_date_is_default, [
-                TestScenario((test_datetime, advertised_start_parsable), False),
-                TestScenario((test_datetime, None), False),
-                TestScenario((DEFAULT_START_DATE, advertised_start_parsable), False),
-                TestScenario((DEFAULT_START_DATE, None), True),
+                TestScenario((test_datetime,), False),
+                TestScenario((DEFAULT_START_DATE,), True),
             ]),
             FunctionTest(may_certify_for_course, [
                 TestScenario(('early_with_info', True, True, test_datetime, False), True),

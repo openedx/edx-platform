@@ -992,7 +992,6 @@ class CourseMetadataEditingTest(CourseTestCase):
         is_valid, errors, test_model = CourseMetadata.validate_and_update_from_json(
             self.course,
             {
-                "advertised_start": {"value": "start A"},
                 "days_early_for_beta": {"value": 2},
                 "advanced_modules": {"value": ['notes']},
             },
@@ -1011,7 +1010,6 @@ class CourseMetadataEditingTest(CourseTestCase):
         is_valid, errors, test_model = CourseMetadata.validate_and_update_from_json(
             self.course,
             {
-                "advertised_start": {"value": 1, "display_name": "Course Advertised Start Date", },
                 "days_early_for_beta": {"value": "supposed to be an integer",
                                         "display_name": "Days Early for Beta Users", },
                 "advanced_modules": {"value": 1, "display_name": "Advanced Module List", },
@@ -1025,20 +1023,20 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertFalse(test_model)
 
         error_keys = set([error_obj['model']['display_name'] for error_obj in errors])
-        test_keys = set(['Advanced Module List', 'Course Advertised Start Date', 'Days Early for Beta Users'])
+        test_keys = set(['Advanced Module List', 'Days Early for Beta Users'])
         self.assertEqual(error_keys, test_keys)
 
         # try fresh fetch to ensure no update happened
         fresh = modulestore().get_course(self.course.id)
         test_model = CourseMetadata.fetch(fresh)
 
-        self.assertNotEqual(test_model['advertised_start']['value'], 1, 'advertised_start should not be updated to a wrong value')  # pylint: disable=line-too-long
+        self.assertNotEqual(test_model['advanced_modules']['value'], 1,
+                            'advanced_modules should not be updated to a wrong value')
         self.assertNotEqual(test_model['days_early_for_beta']['value'], "supposed to be an integer",
-                            'days_early_for beta should not be updated to a wrong value')
+                            'days_early_for_beta should not be updated to a wrong value')
 
     def test_correct_http_status(self):
         json_data = json.dumps({
-            "advertised_start": {"value": 1, "display_name": "Course Advertised Start Date", },
             "days_early_for_beta": {
                 "value": "supposed to be an integer",
                 "display_name": "Days Early for Beta Users",
@@ -1052,7 +1050,6 @@ class CourseMetadataEditingTest(CourseTestCase):
         test_model = CourseMetadata.update_from_json(
             self.course,
             {
-                "advertised_start": {"value": "start A"},
                 "days_early_for_beta": {"value": 2},
             },
             user=self.user
@@ -1066,15 +1063,12 @@ class CourseMetadataEditingTest(CourseTestCase):
         test_model = CourseMetadata.update_from_json(
             fresh,
             {
-                "advertised_start": {"value": "start B"},
                 "display_name": {"value": "jolly roger"},
             },
             user=self.user
         )
         self.assertIn('display_name', test_model, 'Missing editable metadata field')
         self.assertEqual(test_model['display_name']['value'], 'jolly roger', "not expected value")
-        self.assertIn('advertised_start', test_model, 'Missing revised advertised_start metadata field')
-        self.assertEqual(test_model['advertised_start']['value'], 'start B', "advertised_start not expected value")
 
     def update_check(self, test_model):
         """
@@ -1082,8 +1076,6 @@ class CourseMetadataEditingTest(CourseTestCase):
         """
         self.assertIn('display_name', test_model, 'Missing editable metadata field')
         self.assertEqual(test_model['display_name']['value'], self.course.display_name)
-        self.assertIn('advertised_start', test_model, 'Missing new advertised_start metadata field')
-        self.assertEqual(test_model['advertised_start']['value'], 'start A', "advertised_start not expected value")
         self.assertIn('days_early_for_beta', test_model, 'Missing days_early_for_beta metadata field')
         self.assertEqual(test_model['days_early_for_beta']['value'], 2, "days_early_for_beta not expected value")
 
@@ -1104,7 +1096,6 @@ class CourseMetadataEditingTest(CourseTestCase):
 
     def test_http_update_from_json(self):
         response = self.client.ajax_post(self.course_setting_url, {
-            "advertised_start": {"value": "start A"},
             "days_early_for_beta": {"value": 2},
         })
         test_model = json.loads(response.content.decode('utf-8'))
@@ -1115,14 +1106,11 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.update_check(test_model)
         # now change some of the existing metadata
         response = self.client.ajax_post(self.course_setting_url, {
-            "advertised_start": {"value": "start B"},
             "display_name": {"value": "jolly roger"}
         })
         test_model = json.loads(response.content.decode('utf-8'))
         self.assertIn('display_name', test_model, 'Missing editable metadata field')
         self.assertEqual(test_model['display_name']['value'], 'jolly roger', "not expected value")
-        self.assertIn('advertised_start', test_model, 'Missing revised advertised_start metadata field')
-        self.assertEqual(test_model['advertised_start']['value'], 'start B', "advertised_start not expected value")
 
     @patch.dict(settings.FEATURES, {'ENABLE_EDXNOTES': True})
     @patch('xmodule.util.xmodule_django.get_current_request')

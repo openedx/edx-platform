@@ -67,7 +67,7 @@ class CourseOverview(TimeStampedModel):
     # Start/end dates
     start = DateTimeField(null=True)
     end = DateTimeField(null=True)
-    advertised_start = TextField(null=True)
+    advertised_start = TextField(null=True)  # TODO: delete this deprecated & unused field
     announcement = DateTimeField(null=True)
 
     # URLs
@@ -170,7 +170,6 @@ class CourseOverview(TimeStampedModel):
 
         course_overview.start = start
         course_overview.end = end
-        course_overview.advertised_start = course.advertised_start
         course_overview.announcement = course.announcement
 
         course_overview.course_image_url = course_image_url(course)
@@ -419,13 +418,6 @@ class CourseOverview(TimeStampedModel):
         # pylint: disable=line-too-long
         return block_metadata_utils.display_name_with_default_escaped(self)  # xss-lint: disable=python-deprecated-display-name
 
-    @property
-    def dashboard_start_display(self):
-        """
-         Return start date to diplay on learner's dashboard, preferably `Course Advertised Start`
-        """
-        return self.advertised_start or self.start
-
     def has_started(self):
         """
         Returns whether the the course has started.
@@ -460,13 +452,9 @@ class CourseOverview(TimeStampedModel):
     @property
     def start_date_is_still_default(self):
         """
-        Checks if the start date set for the course is still default, i.e.
-        .start has not been modified, and .advertised_start has not been set.
+        Checks if the start date set for the course is still default, i.e. .start has not been modified
         """
-        return course_metadata_utils.course_start_date_is_default(
-            self.start,
-            self.advertised_start,
-        )
+        return course_metadata_utils.course_start_date_is_default(self.start)
 
     @property
     def sorting_score(self):
@@ -474,20 +462,18 @@ class CourseOverview(TimeStampedModel):
         Returns a tuple that can be used to sort the courses according
         the how "new" they are. The "newness" score is computed using a
         heuristic that takes into account the announcement and
-        (advertised) start dates of the course if available.
+        start dates of the course if available.
 
         The lower the number the "newer" the course.
         """
-        return course_metadata_utils.sorting_score(self.start, self.advertised_start, self.announcement)
+        return course_metadata_utils.sorting_score(self.start, self.announcement)
 
     @property
     def start_type(self):
         """
         Returns the type of the course's 'start' field.
         """
-        if self.advertised_start:
-            return u'string'
-        elif self.start != DEFAULT_START_DATE:
+        if self.start != DEFAULT_START_DATE:
             return u'timestamp'
         else:
             return u'empty'
@@ -497,9 +483,7 @@ class CourseOverview(TimeStampedModel):
         """
         Returns the display value for the course's start date.
         """
-        if self.advertised_start:
-            return self.advertised_start
-        elif self.start != DEFAULT_START_DATE:
+        if self.start != DEFAULT_START_DATE:
             return defaultfilters.date(self.start, "DATE_FORMAT")
         else:
             return None

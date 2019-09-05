@@ -924,7 +924,6 @@ def rerun_course(user, source_course_key, org, number, run, fields, background=T
     CourseRerunState.objects.initiated(source_course_key, destination_course_key, user, fields['display_name'])
 
     # Clear the fields that must be reset for the rerun
-    fields['advertised_start'] = None
     fields['enrollment_start'] = None
     fields['enrollment_end'] = None
     fields['video_upload_pipeline'] = {}

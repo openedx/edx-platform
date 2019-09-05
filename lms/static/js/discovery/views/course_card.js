@@ -37,15 +37,11 @@
                     userLanguage = this.model.userPreferences.userLanguage;
                     userTimezone = this.model.userPreferences.userTimezone;
                 }
-                if (data.advertised_start !== undefined) {
-                    data.start = data.advertised_start;
-                } else {
-                    data.start = formatDate(
-                        new Date(data.start),
-                        userLanguage,
-                        userTimezone
-                    );
-                }
+                data.start = formatDate(
+                    new Date(data.start),
+                    userLanguage,
+                    userTimezone
+                );
                 data.enrollment_start = formatDate(
                     new Date(data.enrollment_start),
                     userLanguage,

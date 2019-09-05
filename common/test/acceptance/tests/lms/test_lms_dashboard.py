@@ -316,39 +316,6 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         # and course starts within 5 days
         self.assertEqual(course_date, expected_course_date)
 
-    def test_advertised_start_date(self):
-
-        """
-        Scenario:
-            Course Date should be advertised start date
-            if the course on student dashboard has `Course Advertised Start` set.
-
-        As a Student,
-        Given that I have enrolled to a course
-        And the course has `Course Advertised Start` set.
-        When I visit dashboard page
-        Then the advertised start date should be displayed rather course start date"
-        """
-        course_start_date = self.now + datetime.timedelta(days=2)
-        course_advertised_start = "Winter 2018"
-
-        self.course_fixture.add_course_details({
-            'start_date': course_start_date,
-        })
-        self.course_fixture.configure_course()
-
-        self.course_fixture.add_advanced_settings({
-            u"advertised_start": {u"value": course_advertised_start}
-        })
-        self.course_fixture._add_advanced_settings()
-
-        expected_course_date = u"Starts - {start_date}".format(start_date=course_advertised_start)
-
-        self.dashboard_page.visit()
-        course_date = self.dashboard_page.get_course_date()
-
-        self.assertEqual(course_date, expected_course_date)
-
     def test_profile_img_alt_empty(self):
         """
         Validate value of profile image alt attribue is null

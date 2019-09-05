@@ -390,7 +390,6 @@ class CourseEntitlementView extends Backbone.View {
         enrollment_end: CourseEntitlementView.formatDate(session.enrollment_end, dateFormat),
         session_dates: this.courseCardModel.formatDateString({
           start_date: CourseEntitlementView.formatDate(session.start, dateFormat),
-          advertised_start: session.advertised_start,
           end_date: CourseEntitlementView.formatDate(session.end, dateFormat),
           pacing_type: session.pacing_type,
         }),

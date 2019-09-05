@@ -57,7 +57,7 @@ class DummySystem(ImportSystem):
         )
 
 
-def get_dummy_course(start, announcement=None, is_new=None, advertised_start=None, end=None, certs='end'):
+def get_dummy_course(start, announcement=None, is_new=None, end=None, certs='end'):
     """Get a dummy course"""
 
     system = DummySystem(load_error_modules=True)
@@ -67,7 +67,6 @@ def get_dummy_course(start, announcement=None, is_new=None, advertised_start=Non
 
     is_new = to_attrb('is_new', is_new)
     announcement = to_attrb('announcement', announcement)
-    advertised_start = to_attrb('advertised_start', advertised_start)
     end = to_attrb('end', end)
 
     start_xml = '''
@@ -76,7 +75,6 @@ def get_dummy_course(start, announcement=None, is_new=None, advertised_start=Non
                 start="{start}"
                 {announcement}
                 {is_new}
-                {advertised_start}
                 {end}
                 certificates_display_behavior="{certs}">
             <chapter url="hi" url_name="ch" display_name="CH">
@@ -89,7 +87,6 @@ def get_dummy_course(start, announcement=None, is_new=None, advertised_start=Non
         start=start,
         is_new=is_new,
         announcement=announcement,
-        advertised_start=advertised_start,
         end=end,
         certs=certs,
     )
@@ -184,50 +181,30 @@ class IsNewCourseTestCase(unittest.TestCase):
             # Announce date takes priority over actual start
             # and courses announced on a later date are newer
             # than courses announced for an earlier date
-            ((day1, day2, None), (day1, day1, None), self.assertLess),
-            ((day1, day1, None), (day2, day1, None), self.assertEqual),
-
-            # Announce dates take priority over advertised starts
-            ((day1, day2, day1), (day1, day1, day1), self.assertLess),
-            ((day1, day1, day2), (day2, day1, day2), self.assertEqual),
+            ((day1, day2), (day1, day1), self.assertLess),
+            ((day1, day1), (day2, day1), self.assertEqual),
 
             # Later start == newer course
-            ((day2, None, None), (day1, None, None), self.assertLess),
-            ((day1, None, None), (day1, None, None), self.assertEqual),
-
-            # Non-parseable advertised starts are ignored in preference to actual starts
-            ((day2, None, "Spring"), (day1, None, "Fall"), self.assertLess),
-            ((day1, None, "Spring"), (day1, None, "Fall"), self.assertEqual),
-
-            # Partially parsable advertised starts should take priority over start dates
-            ((day2, None, "October 2013"), (day2, None, "October 2012"), self.assertLess),
-            ((day2, None, "October 2013"), (day1, None, "October 2013"), self.assertEqual),
-
-            # Parseable advertised starts take priority over start dates
-            ((day1, None, day2), (day1, None, day1), self.assertLess),
-            ((day2, None, day2), (day1, None, day2), self.assertEqual),
+            ((day2, None), (day1, None), self.assertLess),
+            ((day1, None), (day1, None), self.assertEqual),
         ]
 
         for a, b, assertion in dates:
-            a_score = get_dummy_course(start=a[0], announcement=a[1], advertised_start=a[2]).sorting_score
-            b_score = get_dummy_course(start=b[0], announcement=b[1], advertised_start=b[2]).sorting_score
+            a_score = get_dummy_course(start=a[0], announcement=a[1]).sorting_score
+            b_score = get_dummy_course(start=b[0], announcement=b[1]).sorting_score
             print("Comparing %s to %s" % (a, b))
             assertion(a_score, b_score)
 
-    start_advertised_settings = [
-        # start, advertised, result, is_still_default, date_time_result
-        ('2012-12-02T12:00', None, 'Dec 02, 2012', False, u'Dec 02, 2012 at 12:00 UTC'),
-        ('2012-12-02T12:00', '2011-11-01T12:00', 'Nov 01, 2011', False, u'Nov 01, 2011 at 12:00 UTC'),
-        ('2012-12-02T12:00', 'Spring 2012', 'Spring 2012', False, 'Spring 2012'),
-        ('2012-12-02T12:00', 'November, 2011', 'November, 2011', False, 'November, 2011'),
-        (xmodule.course_module.CourseFields.start.default, None, 'TBD', True, 'TBD'),
-        (xmodule.course_module.CourseFields.start.default, 'January 2014', 'January 2014', False, 'January 2014'),
+    start_default_settings = [
+        # start, is_still_default
+        ('2012-12-02T12:00', False),
+        (xmodule.course_module.CourseFields.start.default, True),
     ]
 
     def test_start_date_is_default(self):
-        for s in self.start_advertised_settings:
-            d = get_dummy_course(start=s[0], advertised_start=s[1])
-            self.assertEqual(d.start_date_is_still_default, s[3])
+        for s in self.start_default_settings:
+            d = get_dummy_course(start=s[0])
+            self.assertEqual(d.start_date_is_still_default, s[1])
 
     def test_display_organization(self):
         descriptor = get_dummy_course(start='2012-12-02T12:00', is_new=True)

@@ -92,7 +92,6 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
     NEXT_WEEK = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=7)
     LAST_WEEK = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=7)
     THREE_YEARS_AGO = now() - datetime.timedelta(days=(365 * 3))
-    ADVERTISED_START = "Spring 2016"
     ENABLED_SIGNALS = ['course_published']
     DATES = {
         'next_week': NEXT_WEEK,
@@ -191,28 +190,20 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
                 self.assertFalse(result['has_access'])
 
     @ddt.data(
-        ('next_week', ADVERTISED_START, ADVERTISED_START, "string", API_V05),
-        ('next_week', ADVERTISED_START, ADVERTISED_START, "string", API_V1),
-        ('next_week', None, defaultfilters.date(NEXT_WEEK, "DATE_FORMAT"), "timestamp", API_V05),
-        ('next_week', None, defaultfilters.date(NEXT_WEEK, "DATE_FORMAT"), "timestamp", API_V1),
-        ('next_week', '', defaultfilters.date(NEXT_WEEK, "DATE_FORMAT"), "timestamp", API_V05),
-        ('next_week', '', defaultfilters.date(NEXT_WEEK, "DATE_FORMAT"), "timestamp", API_V1),
-        ('default_start_date', ADVERTISED_START, ADVERTISED_START, "string", API_V05),
-        ('default_start_date', ADVERTISED_START, ADVERTISED_START, "string", API_V1),
-        ('default_start_date', '', None, "empty", API_V05),
-        ('default_start_date', '', None, "empty", API_V1),
-        ('default_start_date', None, None, "empty", API_V05),
-        ('default_start_date', None, None, "empty", API_V1),
+        ('next_week', defaultfilters.date(NEXT_WEEK, "DATE_FORMAT"), "timestamp", API_V05),
+        ('next_week', defaultfilters.date(NEXT_WEEK, "DATE_FORMAT"), "timestamp", API_V1),
+        ('default_start_date', None, "empty", API_V05),
+        ('default_start_date', None, "empty", API_V1),
     )
     @ddt.unpack
     @patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False, 'ENABLE_MKTG_SITE': True})
-    def test_start_type_and_display(self, start, advertised_start, expected_display, expected_type, api_version):
+    def test_start_type_and_display(self, start, expected_display, expected_type, api_version):
         """
         Tests that the correct start_type and start_display are returned in the
         case the course has not started
         """
         self.login()
-        course = CourseFactory.create(start=self.DATES[start], advertised_start=advertised_start, mobile_available=True)
+        course = CourseFactory.create(start=self.DATES[start], mobile_available=True)
         self.enroll(course.id)
 
         response = self.api_response(api_version=api_version)

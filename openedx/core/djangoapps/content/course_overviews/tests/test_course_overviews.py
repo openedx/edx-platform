@@ -108,7 +108,6 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
             'display_name',
             'display_number_with_default',
             'display_org_with_default',
-            'advertised_start',
             'social_sharing_url',
             'certificates_display_behavior',
             'certificates_show_before_end',
@@ -212,7 +211,6 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
                 "start": LAST_WEEK,                         # In the middle of the course
                 "end": NEXT_WEEK,
                 "announcement": LAST_MONTH,                 # Announcement date provided
-                "advertised_start": "2015-01-01 11:22:33",  # Parse-able advertised_start
                 "pre_requisite_courses": [                  # Has pre-requisites
                     'course-v1://edX+test1+run1',
                     'course-v1://edX+test2+run1'
@@ -224,7 +222,6 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
                 "display_name": "",                         # Empty display name
                 "start": NEXT_WEEK,                         # Course hasn't started yet
                 "end": NEXT_MONTH,
-                "advertised_start": "Very Soon!",           # Not parse-able advertised_start
                 "pre_requisite_courses": [],                # No pre-requisites
                 "static_asset_path": "my/relative/path",    # Relative asset path
                 "certificates_show_before_end": False,
@@ -234,7 +231,6 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
                 "display_name": "",                         # Empty display name
                 "start": LAST_MONTH,                        # Course already ended
                 "end": LAST_WEEK,
-                "advertised_start": None,                   # No advertised start
                 "pre_requisite_courses": [],                # No pre-requisites
                 "static_asset_path": "",                    # Empty asset path
                 "certificates_show_before_end": False,
@@ -244,7 +240,6 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
                 #                                           # Don't set display name
                 "start": 'default_start_date',              # Default start and end dates
                 "end": None,
-                "advertised_start": None,                   # No advertised start
                 "pre_requisite_courses": [],                # No pre-requisites
                 "static_asset_path": None,                  # No asset path
                 "certificates_show_before_end": False,

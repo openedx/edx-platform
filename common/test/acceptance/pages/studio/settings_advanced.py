@@ -227,7 +227,6 @@ class AdvancedSettingsPage(CoursePage):
             'banner_image',
             'video_thumbnail_image',
             'cosmetic_display_price',
-            'advertised_start',
             'announcement',
             'display_name',
             'is_new',

@@ -541,15 +541,6 @@ class ProgramDataExtender(object):
         enrollment_end = self.course_overview.enrollment_end or datetime.datetime.max.replace(tzinfo=utc)
         run_mode['is_enrollment_open'] = self.enrollment_start <= datetime.datetime.now(utc) < enrollment_end
 
-    def _attach_course_run_advertised_start(self, run_mode):
-        """
-        The advertised_start is text a course author can provide to be displayed
-        instead of their course's start date. For example, if a course run were
-        to start on December 1, 2016, the author might provide 'Winter 2016' as
-        the advertised start.
-        """
-        run_mode['advertised_start'] = self.course_overview.advertised_start
-
     def _attach_course_run_upgrade_url(self, run_mode):
         required_mode_slug = run_mode['type']
         enrolled_mode_slug, _ = CourseEnrollment.enrollment_mode_for_user(self.user, self.course_run_key)

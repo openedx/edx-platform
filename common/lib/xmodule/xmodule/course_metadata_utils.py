@@ -123,16 +123,14 @@ def course_starts_within(start_date, look_ahead_days):
     return datetime.now(utc) + timedelta(days=look_ahead_days) > start_date
 
 
-def course_start_date_is_default(start, advertised_start):
+def course_start_date_is_default(start):
     """
     Returns whether a course's start date hasn't yet been set.
 
     Arguments:
         start (datetime): The start datetime of the course in question.
-        advertised_start (str): The advertised start date of the course
-            in question.
     """
-    return advertised_start is None and start == DEFAULT_START_DATE
+    return start == DEFAULT_START_DATE
 
 
 def may_certify_for_course(
@@ -169,19 +167,19 @@ def may_certify_for_course(
     return any((self_paced, show_early, past_available_date, ended_without_available_date))
 
 
-def sorting_score(start, advertised_start, announcement):
+def sorting_score(start, announcement):
     """
     Returns a tuple that can be used to sort the courses according
     to how "new" they are. The "newness" score is computed using a
     heuristic that takes into account the announcement and
-    (advertised) start dates of the course if available.
+    start dates of the course if available.
 
     The lower the number the "newer" the course.
     """
     # Make courses that have an announcement date have a lower
     # score than courses than don't, older courses should have a
     # higher score.
-    announcement, start, now = sorting_dates(start, advertised_start, announcement)
+    announcement, start, now = sorting_dates(start, announcement)
     scale = 300.0  # about a year
     if announcement:
         days = (now - announcement).days
@@ -192,18 +190,9 @@ def sorting_score(start, advertised_start, announcement):
     return score
 
 
-def sorting_dates(start, advertised_start, announcement):
+def sorting_dates(start, announcement):
     """
     Utility function to get datetime objects for dates used to
     compute the is_new flag and the sorting_score.
     """
-    try:
-        start = dateutil.parser.parse(advertised_start)
-        if start.tzinfo is None:
-            start = start.replace(tzinfo=utc)
-    except (ValueError, AttributeError):
-        start = start
-
-    now = datetime.now(utc)
-
-    return announcement, start, now
+    return announcement, start, datetime.now(utc)

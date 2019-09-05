@@ -257,7 +257,6 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
           * org: The organization that created the course.
           * start: The date and time when the course starts.
           * start_display:
-            If start_type is a string, then the advertised_start date for the course.
             If start_type is a timestamp, then a formatted date for the start of the course.
             If start_type is empty, then the value is None and it indicates that the course has not yet started.
           * start_type: One of either "string", "timestamp", or "empty"

@@ -118,14 +118,14 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                     course_date = course_overview.end
                 elif course_overview.has_started():
                     container_string = _("Started - {date}")
-                    course_date = course_overview.dashboard_start_display
+                    course_date = course_overview.start
                 elif course_overview.starts_within(days=5):
                     container_string = _("Starts - {date}")
-                    course_date = course_overview.dashboard_start_display
+                    course_date = course_overview.start
                     format = 'defaultFormat'
                 else: ## hasn't started yet
                     container_string = _("Starts - {date}")
-                    course_date = course_overview.dashboard_start_display
+                    course_date = course_overview.start
                 endif
             endif
           %>
