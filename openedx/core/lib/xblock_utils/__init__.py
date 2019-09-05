@@ -434,7 +434,7 @@ def get_course_update_items(course_updates, provided_index=0):
             content = html_parsed[0].tail
         else:
             content = html_parsed[0].tail if html_parsed[0].tail is not None else ""
-            content += "\n".join([html.tostring(ele) for ele in html_parsed[1:]])
+            content += "\n".join([html.tostring(ele).decode('utf-8') for ele in html_parsed[1:]])
         return content
 
     if course_updates and getattr(course_updates, "items", None):
