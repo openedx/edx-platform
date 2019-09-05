@@ -1,31 +1,32 @@
 """
-Tests for link_program_enrollments.
+Tests for account linking Python API.
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from uuid import uuid4
-from testfixtures import LogCapture
 
 from django.test import TestCase
-
 from edx_django_utils.cache import RequestCache
-from lms.djangoapps.program_enrollments.link_program_enrollments import (
-    link_program_enrollments_to_lms_users,
-    NO_PROGRAM_ENROLLMENT_TPL,
-    NO_LMS_USER_TPL,
-    COURSE_ENROLLMENT_ERR_TPL,
-    get_existing_user_message,
-)
-from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
 from opaque_keys.edx.keys import CourseKey
+from testfixtures import LogCapture
+
+from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from student.tests.factories import UserFactory
 
-LOG_PATH = 'lms.djangoapps.program_enrollments.link_program_enrollments'
+from ..linking import (
+    COURSE_ENROLLMENT_ERR_TEMPLATE,
+    NO_LMS_USER_TEMPLATE,
+    NO_PROGRAM_ENROLLMENT_TEMPLATE,
+    link_program_enrollments_to_lms_users,
+    user_already_linked_message
+)
+
+LOG_PATH = 'lms.djangoapps.program_enrollments.api.linking'
 
 
 class TestLinkProgramEnrollmentsMixin(object):
-    """ Utility methods and test data for testing link_program_enrollments """
+    """ Utility methods and test data for testing linking """
 
     @classmethod
     def setUpTestData(cls):  # pylint: disable=missing-docstring
@@ -57,7 +58,8 @@ class TestLinkProgramEnrollmentsMixin(object):
 
     def _create_waiting_course_enrollment(self, program_enrollment, course_key, status='active'):
         """
-        Create a waiting program course enrollment for the given program enrollment, course key, and optionally status
+        Create a waiting program course enrollment for the given program enrollment,
+        course key, and optionally status.
         """
         return ProgramCourseEnrollmentFactory.create(
             program_enrollment=program_enrollment,
@@ -84,19 +86,25 @@ class TestLinkProgramEnrollmentsMixin(object):
 
     def _assert_program_enrollment(self, user, program_uuid, external_user_key, refresh=True):
         """
-        Assert that the given user is enrolled in the given program with the given external user key
+        Assert that the given user is enrolled in the given program with the
+        given external user key.
         """
         if refresh:
             user.refresh_from_db()
-        enrollment = user.programenrollment_set.get(program_uuid=program_uuid, external_user_key=external_user_key)
+        enrollment = user.programenrollment_set.get(
+            program_uuid=program_uuid, external_user_key=external_user_key
+        )
         self.assertIsNotNone(enrollment)
 
     def _assert_user_enrolled_in_program_courses(self, user, program_uuid, *course_keys):
         """
-        Assert that the given user is has active enrollments in the given courses through the given program
+        Assert that the given user is has active enrollments in the given courses
+        through the given program.
         """
         user.refresh_from_db()
-        program_enrollment = user.programenrollment_set.get(user=user, program_uuid=program_uuid)
+        program_enrollment = user.programenrollment_set.get(
+            user=user, program_uuid=program_uuid
+        )
         all_course_enrollments = program_enrollment.program_course_enrollments
         program_course_enrollments = all_course_enrollments.select_related(
             'course_enrollment__course'
@@ -107,7 +115,9 @@ class TestLinkProgramEnrollmentsMixin(object):
             program_course_enrollment.course_enrollment
             for program_course_enrollment in program_course_enrollments
         ]
-        self.assertTrue(all(course_enrollment.is_active for course_enrollment in course_enrollments))
+        self.assertTrue(
+            all(course_enrollment.is_active for course_enrollment in course_enrollments)
+        )
         self.assertCountEqual(
             course_keys,
             [course_enrollment.course.id for course_enrollment in course_enrollments]
@@ -124,7 +134,7 @@ class TestLinkProgramEnrollmentsMixin(object):
 
 
 class TestLinkProgramEnrollments(TestLinkProgramEnrollmentsMixin, TestCase):
-    """ Tests for link_program_enrollments behavior """
+    """ Tests for linking behavior """
 
     def test_link_only_specified_program(self):
         """
@@ -142,14 +152,17 @@ class TestLinkProgramEnrollments(TestLinkProgramEnrollmentsMixin, TestCase):
         link_program_enrollments_to_lms_users(self.program, {'0001': self.user_1.username})
 
         self._assert_program_enrollment(self.user_1, self.program, '0001')
-        self._assert_user_enrolled_in_program_courses(self.user_1, self.program, self.fruit_course, self.animal_course)
+        self._assert_user_enrolled_in_program_courses(
+            self.user_1, self.program, self.fruit_course, self.animal_course
+        )
 
         self._assert_no_user(another_program_enrollment)
 
     def test_inactive_waiting_course_enrollment(self):
         """
-        Test that when a waiting program enrollment has waiting program course enrollments with a status of 'inactive'
-        the course enrollment created after calling link_program_enrollments will be inactive
+        Test that when a waiting program enrollment has waiting program course enrollments with a
+        status of 'inactive' the course enrollment created after calling link_program_enrollments
+        will be inactive.
         """
         program_enrollment = self._create_waiting_enrollment(self.program, '0001')
         active_enrollment = self._create_waiting_course_enrollment(
@@ -178,7 +191,7 @@ class TestLinkProgramEnrollments(TestLinkProgramEnrollmentsMixin, TestCase):
 
 
 class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase):
-    """ Tests for link_program_enrollments error behavior """
+    """ Tests for linking error behavior """
 
     def test_program_enrollment_not_found__nonexistant(self):
         self._create_waiting_enrollment(self.program, '0001')
@@ -203,7 +216,7 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
                     '0002': self.user_2.username,
                 }
             )
-            expected_error_msg = NO_PROGRAM_ENROLLMENT_TPL.format(
+            expected_error_msg = NO_PROGRAM_ENROLLMENT_TEMPLATE.format(
                 program_uuid=self.program,
                 external_student_key='0002'
             )
@@ -225,7 +238,7 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
                     '0002': 'nonexistant-user',
                 }
             )
-            expected_error_msg = NO_LMS_USER_TPL.format('nonexistant-user')
+            expected_error_msg = NO_LMS_USER_TEMPLATE.format('nonexistant-user')
             logger.check_present((LOG_PATH, 'WARNING', expected_error_msg))
 
         self.assertDictEqual(errors, {('0002', 'nonexistant-user'): expected_error_msg})
@@ -250,7 +263,7 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
                     '0002': self.user_2.username
                 }
             )
-            expected_error_msg = get_existing_user_message(program_enrollment, self.user_2)
+            expected_error_msg = user_already_linked_message(program_enrollment, self.user_2)
             logger.check_present((LOG_PATH, 'WARNING', expected_error_msg))
 
         self.assertDictEqual(errors, {('0002', self.user_2.username): expected_error_msg})
@@ -277,7 +290,7 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
                     '0003': self.user_2.username,
                 }
             )
-            expected_error_msg = get_existing_user_message(enrollment, self.user_2)
+            expected_error_msg = user_already_linked_message(enrollment, self.user_2)
             logger.check_present((LOG_PATH, 'WARNING', expected_error_msg))
 
         self.assertDictEqual(errors, {('0003', self.user_2.username): expected_error_msg})
@@ -289,14 +302,20 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
         nonexistant_course = CourseKey.from_string('course-v1:edX+Zilch+Bupkis')
 
         program_enrollment_1 = self._create_waiting_enrollment(self.program, '0001')
-        course_enrollment_1 = self._create_waiting_course_enrollment(program_enrollment_1, nonexistant_course)
-        course_enrollment_2 = self._create_waiting_course_enrollment(program_enrollment_1, self.animal_course)
+        course_enrollment_1 = self._create_waiting_course_enrollment(
+            program_enrollment_1, nonexistant_course
+        )
+        course_enrollment_2 = self._create_waiting_course_enrollment(
+            program_enrollment_1, self.animal_course
+        )
 
         program_enrollment_2 = self._create_waiting_enrollment(self.program, '0002')
         self._create_waiting_course_enrollment(program_enrollment_2, self.fruit_course)
         self._create_waiting_course_enrollment(program_enrollment_2, self.animal_course)
 
-        msg = COURSE_ENROLLMENT_ERR_TPL.format(user=self.user_1.username, course=nonexistant_course)
+        msg = COURSE_ENROLLMENT_ERR_TEMPLATE.format(
+            user=self.user_1.username, course=nonexistant_course
+        )
         with LogCapture() as logger:
             errors = link_program_enrollments_to_lms_users(
                 self.program,
@@ -307,7 +326,9 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
             )
             logger.check_present((LOG_PATH, 'ERROR', msg))
 
-        self.assertDictEqual(errors, {('0001', self.user_1.username): 'NonExistentCourseError: ' + msg})
+        self.assertDictEqual(
+            errors, {('0001', self.user_1.username): 'NonExistentCourseError: ' + msg}
+        )
         self._assert_no_program_enrollment(self.user_1, self.program)
         self._assert_no_user(program_enrollment_1)
         course_enrollment_1.refresh_from_db()
@@ -315,7 +336,9 @@ class TestLinkProgramEnrollmentsErrors(TestLinkProgramEnrollmentsMixin, TestCase
         course_enrollment_2.refresh_from_db()
         self.assertIsNone(course_enrollment_2.course_enrollment)
 
-        self._assert_user_enrolled_in_program_courses(self.user_2, self.program, self.animal_course, self.fruit_course)
+        self._assert_user_enrolled_in_program_courses(
+            self.user_2, self.program, self.animal_course, self.fruit_course
+        )
 
     def test_integrity_error(self):
         existing_program_enrollment = self._create_waiting_enrollment(self.program, 'learner-0')

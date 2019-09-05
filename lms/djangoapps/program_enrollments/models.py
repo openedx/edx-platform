@@ -64,18 +64,6 @@ class ProgramEnrollment(TimeStampedModel):  # pylint: disable=model-missing-unic
             raise ValidationError(_('One of user or external_user_key must not be null.'))
 
     @classmethod
-    def bulk_read_by_student_key(cls, program_uuid, student_keys):
-        """
-        args:
-            program_uuid - The UUID of the program to read enrollment data of.
-            student_keys - list of student keys
-        """
-        return cls.objects.filter(
-            program_uuid=program_uuid,
-            external_user_key__in=student_keys,
-        )
-
-    @classmethod
     def retire_user(cls, user_id):
         """
         With the parameter user_id, retire the external_user_key field
@@ -204,7 +192,7 @@ class ProgramCourseEnrollment(TimeStampedModel):  # pylint: disable=model-missin
             CourseOverview.get_from_id(self.course_key)
         except CourseOverview.DoesNotExist:
             logger.warning(
-                u"User %s failed to enroll in non-existent course %s", user.id,
+                "User %s failed to enroll in non-existent course %s", user.id,
                 text_type(self.course_key),
             )
             raise NonExistentCourseError

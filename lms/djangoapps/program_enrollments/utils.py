@@ -1,7 +1,7 @@
 """
 utility functions for program enrollments
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import logging
 
@@ -106,11 +106,11 @@ def get_provider_slug(organization):
     try:
         provider_config = organization.samlproviderconfig_set.current_set().get(enabled=True)
     except SAMLProviderConfig.DoesNotExist:
-        log.error(u'No SAML provider found for organization id [%s]', organization.id)
+        log.error('No SAML provider found for organization id [%s]', organization.id)
         raise ProviderDoesNotExistException
     except SAMLProviderConfig.MultipleObjectsReturned:
         log.error(
-            u'Multiple active SAML configurations found for organization=%s. Expected one.',
+            'Multiple active SAML configurations found for organization=%s. Expected one.',
             organization.short_name,
         )
         raise ProviderConfigurationException

@@ -1,7 +1,7 @@
 """
 API Serializers
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from rest_framework import serializers
 from six import text_type
@@ -216,4 +216,4 @@ class ProgramCourseGradeError(BaseProgramCourseGrade):
         super(ProgramCourseGradeError, self).__init__(
             program_course_enrollment
         )
-        self.error = text_type(exception) if exception else u"Unknown error"
+        self.error = text_type(exception) if exception else "Unknown error"

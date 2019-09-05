@@ -2,7 +2,7 @@
 Test signal handlers for program_enrollments
 """
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import mock
 import pytest
@@ -312,7 +312,7 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
                 (
                     logger.name,
                     'WARNING',
-                    u'Got incoming social auth for provider={} but no such provider exists'.format('abc')
+                    'Got incoming social auth for provider={} but no such provider exists'.format('abc')
                 )
             )
 
@@ -330,8 +330,8 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
                 uid='{0}:{1}'.format(self.provider_slug, self.external_id)
             )
             error_template = (
-                u'Failed to complete waiting enrollments for organization={}.'
-                u' No catalog programs with matching authoring_organization exist.'
+                'Failed to complete waiting enrollments for organization={}.'
+                ' No catalog programs with matching authoring_organization exist.'
             )
             log.check_present(
                 (
@@ -353,7 +353,7 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
                         user=self.user,
                         uid='{0}:{1}'.format(self.provider_slug, self.external_id)
                     )
-                error_template = u'Failed to enroll user={} with waiting program_course_enrollment={}: {}'
+                error_template = 'Failed to enroll user={} with waiting program_course_enrollment={}: {}'
                 log.check_present(
                     (
                         logger.name,
@@ -379,7 +379,7 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
                         user=self.user,
                         uid='{0}:{1}'.format(self.provider_slug, self.external_id),
                     )
-                error_template = u'Unable to link waiting enrollments for user {}, social auth creation failed: {}'
+                error_template = 'Unable to link waiting enrollments for user {}, social auth creation failed: {}'
                 log.check_present(
                     (
                         logger.name,

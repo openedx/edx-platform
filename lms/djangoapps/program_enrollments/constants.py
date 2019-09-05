@@ -2,6 +2,7 @@
 Constants used throughout the program_enrollments app and exposed to other
 in-process apps through api.py.
 """
+from __future__ import absolute_import, unicode_literals
 
 
 class ProgramEnrollmentStatuses(object):

@@ -2,17 +2,17 @@
 """
 ProgramEnrollment internal API intended for Enterprise API.
 
+This is not part of the program_enrollments Python API.
+
 The Enterprise API currently depends on this module being present with these
 functions, as implemented in ./utils.py. This module will be refactored
 away in https://openedx.atlassian.net/browse/ENT-2294
 """
 from __future__ import absolute_import, unicode_literals
 
-from lms.djangoapps.program_enrollments.rest_api.v1.utils import (
-    get_due_dates as get_due_dates_util,
-    get_course_run_url as get_course_run_url_util,
-    get_emails_enabled as get_emails_enabled_util,
-)
+from lms.djangoapps.program_enrollments.rest_api.v1.utils import get_course_run_url as get_course_run_url_util
+from lms.djangoapps.program_enrollments.rest_api.v1.utils import get_due_dates as get_due_dates_util
+from lms.djangoapps.program_enrollments.rest_api.v1.utils import get_emails_enabled as get_emails_enabled_util
 
 
 def get_due_dates(request, course_key, user):
