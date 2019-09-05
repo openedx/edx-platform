@@ -6,7 +6,7 @@ from django.db import migrations, connection
 #TODO: find a more better way of handling history of builtin packages
 class Migration(migrations.Migration):
     dependencies = [
-        ('enterprise', '0001_initial'),
+        ('philu_overrides', '0001_initial'),
     ]
 
     def add_history_columns(apps, schema_editor):
