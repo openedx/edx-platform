@@ -26,6 +26,12 @@ from six import text_type
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import get_certificate_for_user
 from lms.djangoapps.grades.api import CourseGradeFactory, clear_prefetched_course_grades, prefetch_course_grades
+from lms.djangoapps.program_enrollments.api import (
+    fetch_program_course_enrollments,
+    fetch_program_enrollments,
+    fetch_program_enrollments_by_student
+)
+from lms.djangoapps.program_enrollments.constants import ProgramEnrollmentStatuses
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 from lms.djangoapps.program_enrollments.utils import (
     ProviderDoesNotExistException,
@@ -45,7 +51,7 @@ from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, PaginatedAP
 from student.helpers import get_resume_urls_for_enrollments
 from student.models import CourseEnrollment
 from student.roles import CourseInstructorRole, CourseStaffRole, UserBasedRole
-from util.query import use_read_replica_if_available
+from util.query import read_replica_or_default
 
 from .constants import (
     ENABLE_ENROLLMENT_RESET_FLAG,
@@ -272,9 +278,9 @@ class ProgramEnrollmentsView(
     @verify_program_exists
     def get(self, request, program_uuid=None):
         """ Defines the GET list endpoint for ProgramEnrollment objects. """
-        enrollments = use_read_replica_if_available(
-            ProgramEnrollment.objects.filter(program_uuid=program_uuid)
-        )
+        enrollments = fetch_program_enrollments(
+            program_uuid
+        ).using(read_replica_or_default())
         paginated_enrollments = self.paginate_queryset(enrollments)
         serializer = ProgramEnrollmentSerializer(paginated_enrollments, many=True)
         return self.get_paginated_response(serializer.data)
@@ -423,10 +429,10 @@ class ProgramEnrollmentsView(
     def get_existing_program_enrollments(self, program_uuid, student_data):
         """ Returns the existing program enrollments for the given students and program """
         student_keys = [data['student_key'] for data in student_data]
-        return {
-            e.external_user_key: e
-            for e in ProgramEnrollment.bulk_read_by_student_key(program_uuid, student_keys)
-        }
+        program_enrollments_qs = fetch_program_enrollments(
+            program_uuid=program_uuid, external_user_keys=student_keys
+        )
+        return {e.external_user_key: e for e in program_enrollments_qs}
 
     def _get_created_or_updated_response(self, response_data, default_status=status.HTTP_201_CREATED):
         """
@@ -540,14 +546,11 @@ class ProgramCourseEnrollmentsView(
         """
         Get a list of students enrolled in a course within a program.
         """
-        enrollments = use_read_replica_if_available(
-            ProgramCourseEnrollment.objects.filter(
-                program_enrollment__program_uuid=program_uuid,
-                course_key=self.course_key
-            ).select_related(
-                'program_enrollment'
-            )
-        )
+        enrollments = fetch_program_course_enrollments(
+            program_uuid, course_id
+        ).select_related(
+            'program_enrollment'
+        ).using(read_replica_or_default())
         paginated_enrollments = self.paginate_queryset(enrollments)
         serializer = ProgramCourseEnrollmentSerializer(paginated_enrollments, many=True)
         return self.get_paginated_response(serializer.data)
@@ -667,11 +670,10 @@ class ProgramCourseEnrollmentsView(
               to that user's existing program enrollment in <self.program>
         """
         external_user_keys = [e["student_key"] for e in enrollments]
-        existing_enrollments = ProgramEnrollment.objects.filter(
-            external_user_key__in=external_user_keys,
+        existing_enrollments = fetch_program_enrollments(
             program_uuid=program_uuid,
-        )
-        existing_enrollments = existing_enrollments.prefetch_related('program_course_enrollments')
+            external_user_keys=external_user_keys,
+        ).prefetch_related('program_course_enrollments')
         return {enrollment.external_user_key: enrollment for enrollment in existing_enrollments}
 
     def enroll_learner_in_course(self, enrollment_request, program_enrollment, program_course_enrollment):
@@ -813,16 +815,14 @@ class ProgramCourseGradesView(
 
         Returns: list[BaseProgramCourseGrade]
         """
-        enrollments_qs = use_read_replica_if_available(
-            ProgramCourseEnrollment.objects.filter(
-                program_enrollment__program_uuid=program_uuid,
-                program_enrollment__user__isnull=False,
-                course_key=course_key,
-            ).select_related(
-                'program_enrollment',
-                'program_enrollment__user',
-            )
-        )
+        enrollments_qs = fetch_program_course_enrollments(
+            program_uuid=program_uuid,
+            course_key=course_key,
+            realized_only=True,
+        ).select_related(
+            'program_enrollment',
+            'program_enrollment__user',
+        ).using(read_replica_or_default())
         paginated_enrollments = self.paginate_queryset(enrollments_qs)
         if not paginated_enrollments:
             return []
@@ -961,13 +961,11 @@ class UserProgramReadOnlyAccessView(DeveloperErrorViewMixin, PaginatedAPIView):
         elif self.is_course_staff(request_user):
             programs = self.get_programs_user_is_course_staff_for(request_user, requested_program_type)
         else:
-            program_enrollments = ProgramEnrollment.objects.filter(
+            program_enrollments = fetch_program_enrollments_by_student(
                 user=request.user,
-                status__in=('enrolled', 'pending')
+                program_enrollment_statuses=ProgramEnrollmentStatuses.__ACTIVE__,
             )
-
             uuids = [enrollment.program_uuid for enrollment in program_enrollments]
-
             programs = get_programs(uuids=uuids) or []
 
         programs_in_which_user_has_access = [
@@ -1197,12 +1195,12 @@ class ProgramCourseEnrollmentOverviewView(
         """
         Raises ``PermissionDenied`` if the user is not enrolled in the program with the given UUID.
         """
-        program_enrollments = ProgramEnrollment.objects.filter(
+        user_enrollment_qs = fetch_program_enrollments(
             program_uuid=program_uuid,
-            user=user,
-            status='enrolled',
+            users={user},
+            program_enrollment_statuses={ProgramEnrollmentStatuses.ENROLLED},
         )
-        if not program_enrollments:
+        if not user_enrollment_qs.exists():
             raise PermissionDenied
 
 

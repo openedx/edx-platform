@@ -4,7 +4,7 @@ a side effect of enrolling students.
 
 Intented for use in integration sandbox environments
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import logging
 from textwrap import dedent
@@ -52,7 +52,7 @@ class Command(BaseCommand):
         ).delete()
 
         log.info(
-            u'The following records will be deleted:\n%s\n%s\n',
+            'The following records will be deleted:\n%s\n%s\n',
             deleted_course_enrollment_models,
             deleted_program_enrollment_models,
         )
@@ -62,4 +62,4 @@ class Command(BaseCommand):
             if confirmation != 'confirm':
                 raise CommandError('User confirmation required.  No records have been modified')
 
-        log.info(u'Deleting %s records...', q1_count + q2_count)
+        log.info('Deleting %s records...', q1_count + q2_count)

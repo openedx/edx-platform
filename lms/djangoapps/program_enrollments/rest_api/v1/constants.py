@@ -1,6 +1,7 @@
 """
 Constants used throughout the program_enrollments V1 API.
 """
+from __future__ import absolute_import, unicode_literals
 
 from lms.djangoapps.program_enrollments.constants import ProgramCourseEnrollmentStatuses, ProgramEnrollmentStatuses
 
