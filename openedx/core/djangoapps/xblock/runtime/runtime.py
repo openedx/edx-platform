@@ -18,7 +18,7 @@ from xblock.fields import Scope
 from xblock.runtime import DictKeyValueStore, KvsFieldData, NullI18nService, MemoryIdManager, Runtime
 from web_fragments.fragment import Fragment
 
-from courseware.model_data import DjangoKeyValueStore, FieldDataCache
+from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from lms.djangoapps.grades.api import signals as grades_signals
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 from openedx.core.djangoapps.xblock.runtime.blockstore_field_data import BlockstoreFieldData

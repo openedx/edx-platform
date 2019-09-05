@@ -12,8 +12,8 @@ from mock import patch
 from six import text_type
 from six.moves import range
 
-from courseware.access import has_access
-from courseware.tests.factories import (
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
     GlobalStaffFactory,
     InstructorFactory,
@@ -21,7 +21,7 @@ from courseware.tests.factories import (
     OrgStaffFactory,
     StaffFactory
 )
-from courseware.tests.helpers import CourseAccessTestMixin, LoginEnrollmentTestCase
+from lms.djangoapps.courseware.tests.helpers import CourseAccessTestMixin, LoginEnrollmentTestCase
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.django import modulestore

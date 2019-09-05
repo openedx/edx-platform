@@ -669,7 +669,7 @@ CONTEXT_PROCESSORS = [
     'shoppingcart.context_processor.user_has_cart_context_processor',
 
     # Timezone processor (sends language and time_zone preference)
-    'courseware.context_processor.user_timezone_locale_prefs',
+    'lms.djangoapps.courseware.context_processor.user_timezone_locale_prefs',
 
     # Online contextual help
     'help_tokens.context_processor',
@@ -1498,8 +1498,8 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     # to redirected unenrolled students to the course info page
-    'courseware.middleware.CacheCourseIdMiddleware',
-    'courseware.middleware.RedirectMiddleware',
+    'lms.djangoapps.courseware.middleware.CacheCourseIdMiddleware',
+    'lms.djangoapps.courseware.middleware.RedirectMiddleware',
 
     'course_wiki.middleware.WikiAccessMiddleware',
 
@@ -2272,7 +2272,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.video_pipeline',
 
     # Our courseware
-    'courseware',
+    'lms.djangoapps.courseware',
     'coursewarehistoryextended',
     'student.apps.StudentConfig',
 

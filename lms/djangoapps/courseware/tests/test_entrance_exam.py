@@ -10,16 +10,16 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from courseware.entrance_exams import (
+from lms.djangoapps.courseware.entrance_exams import (
     course_has_entrance_exam,
     get_entrance_exam_content,
     user_can_skip_entrance_exam,
     user_has_passed_entrance_exam
 )
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module, handle_xblock_callback, toc_for_course
-from courseware.tests.factories import InstructorFactory, RequestFactoryNoCsrf, StaffFactory, UserFactory
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.module_render import get_module, handle_xblock_callback, toc_for_course
+from lms.djangoapps.courseware.tests.factories import InstructorFactory, RequestFactoryNoCsrf, StaffFactory, UserFactory
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG, UNIFIED_COURSE_TAB_FLAG

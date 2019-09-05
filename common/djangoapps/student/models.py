@@ -56,7 +56,7 @@ from slumber.exceptions import HttpClientError, HttpServerError
 from user_util import user_util
 
 from course_modes.models import CourseMode, get_cosmetic_verified_display_price
-from courseware.models import (
+from lms.djangoapps.courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
     DynamicUpgradeDeadlineConfiguration,
     OrgDynamicUpgradeDeadlineConfiguration

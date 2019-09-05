@@ -20,8 +20,8 @@ from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from django.utils.encoding import python_2_unicode_compatible
 
-from courseware.models import BaseStudentModuleHistory, StudentModule
-from courseware.fields import UnsignedBigIntAutoField
+from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
+from lms.djangoapps.courseware.fields import UnsignedBigIntAutoField
 
 
 @python_2_unicode_compatible

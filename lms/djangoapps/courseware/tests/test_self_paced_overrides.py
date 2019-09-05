@@ -8,8 +8,8 @@ import pytz
 from django.test.utils import override_settings
 from mock import patch
 
-from courseware.access import has_access
-from courseware.tests.factories import BetaTesterFactory
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.tests.factories import BetaTesterFactory
 from lms.djangoapps.ccx.tests.test_overrides import inject_field_overrides
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData, OverrideModulestoreFieldData
 from lms.djangoapps.discussion.django_comment_client.utils import get_accessible_discussion_xblocks
@@ -19,7 +19,9 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 @override_settings(
     XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
-    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['courseware.self_paced_overrides.SelfPacedDateOverrideProvider'],
+    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=[
+        'lms.djangoapps.courseware.self_paced_overrides.SelfPacedDateOverrideProvider'
+    ],
 )
 class SelfPacedDateOverrideTest(ModuleStoreTestCase):
     """

@@ -14,8 +14,8 @@ from django.conf import settings
 from django.urls import reverse
 from six import text_type
 
-from courseware.tests.helpers import BaseTestXmodule
-from courseware.views.views import get_course_lti_endpoints
+from lms.djangoapps.courseware.tests.helpers import BaseTestXmodule
+from lms.djangoapps.courseware.views.views import get_course_lti_endpoints
 from openedx.core.lib.url_utils import quote_slashes
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

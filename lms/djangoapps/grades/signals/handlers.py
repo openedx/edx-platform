@@ -12,7 +12,7 @@ from opaque_keys.edx.keys import LearningContextKey
 from submissions.models import score_reset, score_set
 from xblock.scorable import ScorableXBlockMixin, Score
 
-from courseware.model_data import get_score, set_score
+from lms.djangoapps.courseware.model_data import get_score, set_score
 from openedx.core.djangoapps.course_groups.signals.signals import COHORT_MEMBERSHIP_UPDATED
 from openedx.core.lib.grade_utils import is_score_higher_or_equal
 from student.models import user_by_anonymous_id

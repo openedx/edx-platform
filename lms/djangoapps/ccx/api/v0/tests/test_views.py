@@ -27,7 +27,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from six.moves import range, zip
 
-from courseware import courses
+from lms.djangoapps.courseware import courses
 from lms.djangoapps.ccx.api.v0 import views
 from lms.djangoapps.ccx.models import CcxFieldOverride, CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import override_field_for_ccx

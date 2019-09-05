@@ -859,7 +859,7 @@ XBLOCK_FIELD_DATA_WRAPPERS += (
 )
 
 MODULESTORE_FIELD_OVERRIDE_PROVIDERS += (
-    'courseware.self_paced_overrides.SelfPacedDateOverrideProvider',
+    'lms.djangoapps.courseware.self_paced_overrides.SelfPacedDateOverrideProvider',
 )
 
 # PROFILE IMAGE CONFIG

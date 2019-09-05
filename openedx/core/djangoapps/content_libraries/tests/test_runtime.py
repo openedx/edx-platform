@@ -13,7 +13,7 @@ from rest_framework.test import APIClient
 from xblock.core import XBlock, Scope
 from xblock import fields
 
-from courseware.model_data import get_score
+from lms.djangoapps.courseware.model_data import get_score
 from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangoapps.content_libraries.tests.test_content_libraries import (
     URL_BLOCK_RENDER_VIEW,

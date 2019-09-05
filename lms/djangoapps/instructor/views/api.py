@@ -50,9 +50,9 @@ import instructor_analytics.csvs
 import instructor_analytics.distributions
 from bulk_email.api import is_bulk_email_feature_enabled
 from bulk_email.models import CourseEmail
-from courseware.access import has_access
-from courseware.courses import get_course_by_id, get_course_with_access
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_by_id, get_course_with_access
+from lms.djangoapps.courseware.models import StudentModule
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
