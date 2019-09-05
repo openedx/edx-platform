@@ -260,7 +260,10 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
         attempt.status = 'denied'
         attempt.error_msg = '[{"userPhotoReasons": ["Face out of view"]}, {"photoIdReasons": ["Photo hidden/No photo", "ID name not provided"]}]'
         parsed_error_msg = attempt.parsed_error_msg()
-        self.assertEquals(parsed_error_msg, ['id_image_missing_name', 'user_image_not_clear', 'id_image_not_clear'])
+        self.assertEqual(
+            sorted(parsed_error_msg),
+            sorted(['id_image_missing_name', 'user_image_not_clear', 'id_image_not_clear'])
+        )
 
     @ddt.data(
         'Not Provided',
