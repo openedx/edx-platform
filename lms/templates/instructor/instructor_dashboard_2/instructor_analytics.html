@@ -11,7 +11,7 @@ from openedx.core.djangolib.markup import HTML, Text
     <p>
         <em>
             ${Text(_("For analytics about your course, go to {link_start}{analytics_dashboard_name}{link_end}.")).format(
-                link_start=HTML('<a href="{dashboard_url}" target="_blank">').format(
+                link_start=HTML('<a href="{dashboard_url}" rel="noopener" target="_blank">').format(
                     dashboard_url=escape_uri_path('{base_url}/courses/{course_id}'.format(
                         base_url=settings.ANALYTICS_DASHBOARD_URL,
                         course_id=section_data['course_id'],

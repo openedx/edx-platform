@@ -144,7 +144,7 @@ from openedx.core.djangolib.markup import HTML, Text
                         <p>${_("Confirm that you have properly configured content in each of your experiment groups.")}</p>
                     </div>
                     <div class="bit external-help">
-                        <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about component containers")}</a>
+                        <a href="${get_online_help_info(online_help_token())['doc_url']}" rel="noopener" target="_blank" class="button external-help-button">${_("Learn more about component containers")}</a>
                     </div>
                 % elif is_unit_page:
                     <div id="publish-unit"></div>

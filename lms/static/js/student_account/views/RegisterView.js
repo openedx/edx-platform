@@ -262,7 +262,7 @@
                     $('label a').click(function(ev) {
                         ev.stopPropagation();
                         ev.preventDefault();
-                        window.open($(this).attr('href'), $(this).attr('target'));
+                        window.open($(this).attr('href'), $(this).attr('target'), 'noopener');
                     });
                     $('.form-field').each(function() {
                         $(this).find('option:first').html('');
