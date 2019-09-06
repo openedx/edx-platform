@@ -2471,7 +2471,7 @@ class CustomResponse(LoncapaResponse):
             msg = msg.replace('&#60;', '&lt;')
 
             # Use etree to prettify the HTML
-            msg = etree.tostring(fromstring_bs(msg), pretty_print=True)
+            msg = etree.tostring(fromstring_bs(msg), pretty_print=True).decode('utf-8')
 
             msg = msg.replace('&#13;', '')
 
