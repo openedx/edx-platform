@@ -227,7 +227,7 @@ def organization(request):
     initial = {
         'country': COUNTRIES.get(_organization.country),
         'is_org_url_exist': '1' if _organization.url else '0',
-        'partner_networks': _organization.get_active_partners(),
+        'partner_networks': list(_organization.get_active_partners()),
     }
 
     if request.method == 'POST':
