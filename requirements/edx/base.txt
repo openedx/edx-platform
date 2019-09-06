@@ -84,10 +84,10 @@ django-simple-history==2.7.3
 django-splash==0.2.2
 django-statici18n==1.4.0
 django-storages==1.4.1
-django-user-tasks==0.1.9
+django-user-tasks==0.2.0
 django-waffle==0.12.0
 django-webpack-loader==0.6.0
-django==1.11.23
+django==1.11.24
 djangorestframework-jwt==1.11.0
 git+https://github.com/edx/django-rest-framework-oauth.git@0a43e8525f1e3048efe4bc70c03de308a277197c#egg=djangorestframework-oauth==1.1.1
 djangorestframework-xml==1.4.0  # via edx-enterprise
@@ -97,7 +97,7 @@ docutils==0.15.2          # via botocore
 drf-yasg==1.16
 edx-ace==0.1.10
 edx-analytics-data-api-client==0.15.3
-edx-bulk-grades==0.5.9
+edx-bulk-grades==0.5.10
 edx-ccx-keys==0.2.2
 edx-celeryutils==0.3.0
 edx-completion==2.0.0
@@ -106,7 +106,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==2.0.0
 edx-drf-extensions==2.4.0
-edx-enterprise==1.9.10
+edx-enterprise==1.9.12
 edx-i18n-tools==0.4.8
 edx-milestones==0.2.3
 edx-oauth2-provider==1.3.0
@@ -175,7 +175,7 @@ git+https://github.com/edx/edx-ora2.git@2.2.7#egg=ora2==2.2.7
 path.py==8.2.1
 pathtools==0.1.2
 paver==1.3.4
-pbr==5.4.2
+pbr==5.4.3
 pdfminer.six==20181108
 piexif==1.0.2
 pillow==6.1.0
@@ -220,7 +220,7 @@ rules==2.1
 s3transfer==0.1.13        # via boto3
 sailthru-client==2.2.3
 scipy==1.2.1
-semantic-version==2.8.1   # via edx-drf-extensions
+semantic-version==2.8.2   # via edx-drf-extensions
 shapely==1.6.4.post2
 shortuuid==0.5.0          # via edx-django-oauth2-provider
 simplejson==3.16.0        # via mailsnake, sailthru-client
@@ -234,7 +234,7 @@ sortedcontainers==2.1.0
 soupsieve==1.9.3          # via beautifulsoup4
 sqlparse==0.3.0
 staff-graded-xblock==0.5
-stevedore==1.30.1
+stevedore==1.31.0
 super-csv==0.9.1
 sympy==1.4
 testfixtures==6.10.0      # via edx-enterprise
