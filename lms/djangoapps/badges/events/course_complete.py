@@ -32,7 +32,9 @@ def course_slug(course_key, mode):
     Badgr's max slug length is 255.
     """
     # Seven digits should be enough to realistically avoid collisions. That's what git services use.
-    digest = hashlib.sha256(u"{}{}".format(six.text_type(course_key), six.text_type(mode))).hexdigest()[:7]
+    digest = hashlib.sha256(
+        u"{}{}".format(six.text_type(course_key), six.text_type(mode)).encode('utf-8')
+    ).hexdigest()[:7]
     base_slug = slugify(six.text_type(course_key) + u'_{}_'.format(mode))[:248]
     return base_slug + digest
 
