@@ -108,7 +108,7 @@ def export_to_git(course_id, repo, user='', rdir=None):
         # Get current branch
         cmd = ['git', 'symbolic-ref', '--short', 'HEAD']
         try:
-            branch = cmd_log(cmd, cwd).strip('\n')
+            branch = cmd_log(cmd, cwd).decode('utf-8').strip('\n')
         except subprocess.CalledProcessError as ex:
             log.exception(u'Failed to get branch: %r', ex.output)
             raise GitExportError(GitExportError.DETACHED_HEAD)
@@ -146,7 +146,7 @@ def export_to_git(course_id, repo, user='', rdir=None):
     if not branch:
         cmd = ['git', 'symbolic-ref', '--short', 'HEAD']
         try:
-            branch = cmd_log(cmd, os.path.abspath(rdirp)).strip('\n')
+            branch = cmd_log(cmd, os.path.abspath(rdirp)).decode('utf-8').strip('\n')
         except subprocess.CalledProcessError as ex:
             log.exception(u'Failed to get branch from freshly cloned repo: %r',
                           ex.output)

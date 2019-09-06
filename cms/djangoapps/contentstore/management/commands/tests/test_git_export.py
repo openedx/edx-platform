@@ -162,7 +162,7 @@ class TestGitExport(CourseTestCase):
         )
         cwd = os.path.abspath(git_export_utils.GIT_REPO_EXPORT_DIR / 'test_bare')
         git_log = subprocess.check_output(['git', 'log', '-1',
-                                           '--format=%an|%ae'], cwd=cwd)
+                                           '--format=%an|%ae'], cwd=cwd).decode('utf-8')
         self.assertEqual(expect_string, git_log)
 
         # Make changes to course so there is something to commit
@@ -177,7 +177,7 @@ class TestGitExport(CourseTestCase):
             self.user.email,
         )
         git_log = subprocess.check_output(
-            ['git', 'log', '-1', '--format=%an|%ae'], cwd=cwd)
+            ['git', 'log', '-1', '--format=%an|%ae'], cwd=cwd).decode('utf-8')
         self.assertEqual(expect_string, git_log)
 
     def test_no_change(self):
