@@ -33,7 +33,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_j
       // new window/tab opening
       $('a[rel="external"], a[class="new-vp"]')
       .click( function() {
-        window.open( $(this).attr('href') );
+        window.open( $(this).attr('href'), '', 'noopener' );
         return false;
       });
 

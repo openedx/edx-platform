@@ -80,9 +80,9 @@ username = get_enterprise_learner_generic_name(request) or student.username
                                 </div>
                                 <div class="msg-actions">
                                     %if certificate_data.cert_web_view_url:
-                                    <a class="btn" href="${certificate_data.cert_web_view_url}" target="_blank">${_("View Certificate")} <span class="sr">${_("Opens in a new browser window")}</span></a>
+                                    <a class="btn" href="${certificate_data.cert_web_view_url}" rel="noopener" target="_blank">${_("View Certificate")} <span class="sr">${_("Opens in a new browser window")}</span></a>
                                     %elif certificate_data.cert_status == CertificateStatuses.downloadable and certificate_data.download_url:
-                                    <a class="btn" href="${certificate_data.download_url}" target="_blank">${_("Download Your Certificate")} <span class="sr">${_("Opens in a new browser window")}</span></a>
+                                    <a class="btn" href="${certificate_data.download_url}" rel="noopener" target="_blank">${_("Download Your Certificate")} <span class="sr">${_("Opens in a new browser window")}</span></a>
                                     %elif certificate_data.cert_status == CertificateStatuses.requesting:
                                     <button class="btn generate_certs" data-endpoint="${post_url}" id="btn_generate_cert">${_('Request Certificate')}</button>
                                     %endif

@@ -3,7 +3,7 @@
         <%- gettext("License Type") %>
     </h3>
     <ul class="license-types">
-        <% var link_start_tpl = '<a href="{url}" target="_blank">'; %>
+        <% var link_start_tpl = '<a href="{url}" rel="noopener" target="_blank">'; %>
         <% _.each(licenseInfo, function(license, licenseType) { %>
             <li class="license-type" data-license="<%- licenseType %>">
                 <button name="license-<%- licenseType %>"
