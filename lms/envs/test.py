@@ -594,3 +594,5 @@ ACCOUNT_MICROFRONTEND_URL = "http://account-mfe/"
 ########################## limiting dashboard courses ######################
 
 DASHBOARD_COURSE_LIMIT = 250
+
+PROCTORING_SETTINGS = {}
