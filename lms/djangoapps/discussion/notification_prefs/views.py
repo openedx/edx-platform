@@ -8,6 +8,7 @@ from __future__ import absolute_import, division
 import json
 import os
 from base64 import urlsafe_b64decode, urlsafe_b64encode
+from binascii import Error
 from hashlib import sha256
 
 from cryptography.hazmat.backends import default_backend
@@ -20,6 +21,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse
 from django.views.decorators.http import require_GET, require_POST
+import six
 from six import text_type
 
 from edxmako.shortcuts import render_to_response
@@ -56,7 +58,7 @@ class UsernameCipher(object):
     @staticmethod
     def _get_aes_cipher(initialization_vector):
         hash_ = sha256()
-        hash_.update(settings.SECRET_KEY)
+        hash_.update(six.b(settings.SECRET_KEY))
         return Cipher(AES(hash_.digest()), CBC(initialization_vector), backend=default_backend())
 
     @staticmethod
@@ -72,7 +74,7 @@ class UsernameCipher(object):
     def decrypt(token):
         try:
             base64_decoded = urlsafe_b64decode(token)
-        except TypeError:
+        except (TypeError, Error):
             raise UsernameDecryptionException("base64url")
 
         if len(base64_decoded) < AES_BLOCK_SIZE_BYTES:
