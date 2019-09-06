@@ -23,7 +23,20 @@ def get_program_enrollment(
         curriculum_uuid=None,
 ):
     """
-    TODO
+    Get a single program enrollment.
+
+    Required arguments:
+        * program_uuid (UUID|str)
+        * At least one of:
+            * user (User)
+            * external_user_key (str)
+
+    Optional arguments:
+        * curriculum_uuid (UUID|str) [optional]
+
+    Returns: ProgramEnrollment
+
+    Raises: ProgramEnrollment.DoesNotExist, ProgramEnrollment.MultipleObjectsReturned
     """
     if not (user or external_user_key):
         raise ValueError(_STUDENT_ARG_ERROR_MESSAGE)
@@ -48,7 +61,23 @@ def fetch_program_enrollments(
         waiting_only=False,
 ):
     """
-    TODO
+    Fetch program enrollments for a specific program.
+
+    Required argument:
+        * program_uuid (UUID|str)
+
+    Optional arguments:
+        * curriculum_uuids (iterable[UUID|str])
+        * users (iterable[User])
+        * external_user_keys (iterable[str])
+        * program_enrollment_statuses (iterable[str])
+        * realized_only (bool)
+        * waiting_only (bool)
+
+    Optional arguments are used as filtersets if they are not None.
+    At most one of (realized_only, waiting_only) may be provided.
+
+    Returns: queryset[ProgramEnrollment]
     """
     if realized_only and waiting_only:
         raise ValueError(
@@ -79,7 +108,23 @@ def fetch_program_enrollments_by_student(
         waiting_only=False,
 ):
     """
-    TODO
+    Fetch program enrollments for a specific student.
+
+    Required arguments (at least one must be provided):
+        * user (User)
+        * external_user_key (str)
+
+    Optional arguments:
+        * provided_uuids (iterable[UUID|str])
+        * curriculum_uuids (iterable[UUID|str])
+        * program_enrollment_statuses (iterable[str])
+        * realized_only (bool)
+        * waiting_only (bool)
+
+    Optional arguments are used as filtersets if they are not None.
+    At most one of (realized_only, waiting_only) may be provided.
+
+    Returns: queryset[ProgramEnrollment]
     """
     if not (user or external_user_key):
         raise ValueError(_STUDENT_ARG_ERROR_MESSAGE)
@@ -107,27 +152,33 @@ def get_program_course_enrollment(
         user=None,
         external_user_key=None,
         curriculum_uuid=None,
-        realized_only=False,
-        waiting_only=False,
 ):
     """
-    TODO
+    Get a single program-course enrollment.
+
+    Required arguments:
+        * program_uuid (UUID|str)
+        * course_key (CourseKey|str)
+        * At least one of:
+            * user (User)
+            * external_user_key (str)
+
+    Optional arguments:
+        * curriculum_uuid (UUID|str) [optional]
+
+    Returns: ProgramCourseEnrollment
+
+    Raises:
+        * ProgramCourseEnrollment.DoesNotExist
+        * ProgramCourseEnrollment.MultipleObjectsReturned
     """
     if not (user or external_user_key):
         raise ValueError(_STUDENT_ARG_ERROR_MESSAGE)
-    if realized_only and waiting_only:
-        raise ValueError(
-            _REALIZED_FILTER_ERROR_TEMPLATE.format("realized_only", "waiting_only")
-        )
     filters = {
         "program_enrollment__user": user,
         "program_enrollment__external_user_key": external_user_key,
         "program_enrollment__curriculum_uuid": curriculum_uuid,
     }
-    if realized_only:
-        filters["program_enrollment__user__isnull"] = False
-    if waiting_only:
-        filters["program_enrollment__user__isnull"] = True
     return ProgramCourseEnrollment.objects.get(
         program_enrollment__program_uuid=program_uuid,
         course_key=course_key,
@@ -148,7 +199,27 @@ def fetch_program_course_enrollments(
         waiting_only=False,
 ):
     """
-    TODO
+    Fetch program-course enrollments for a specific program and course run.
+
+    Required argument:
+        * program_uuid (UUID|str)
+        * course_key (CourseKey|str)
+
+    Optional arguments:
+        * curriculum_uuids (iterable[UUID|str])
+        * users (iterable[User])
+        * external_user_keys (iterable[str])
+        * program_enrollment_statuses (iterable[str])
+        * active_only (bool)
+        * inactive_only (bool)
+        * realized_only (bool)
+        * waiting_only (bool)
+
+    Optional arguments are used as filtersets if they are not None.
+    At most one of (realized_only, waiting_only) may be provided.
+    At most one of (active_only, inactive_only) may be provided.
+
+    Returns: queryset[ProgramCourseEnrollment]
     """
     if active_only and inactive_only:
         raise ValueError(
@@ -188,15 +259,39 @@ def fetch_program_course_enrollments_by_student(
         program_enrollment_statuses=None,
         active_only=False,
         inactive_only=False,
+        realized_only=False,
+        waiting_only=False,
 ):
     """
-    TODO
+    Fetch program-course enrollments for a specific student.
+
+    Required arguments (at least one must be provided):
+        * user (User)
+        * external_user_key (str)
+
+    Optional arguments:
+        * provided_uuids (iterable[UUID|str])
+        * curriculum_uuids (iterable[UUID|str])
+        * course_keys (iterable[CourseKey|str])
+        * program_enrollment_statuses (iterable[str])
+        * realized_only (bool)
+        * waiting_only (bool)
+
+    Optional arguments are used as filtersets if they are not None.
+    At most one of (realized_only, waiting_only) may be provided.
+    At most one of (active_only, inactive_only) may be provided.
+
+    Returns: queryset[ProgramCourseEnrollment]
     """
     if not (user or external_user_key):
         raise ValueError(_STUDENT_ARG_ERROR_MESSAGE)
     if active_only and inactive_only:
         raise ValueError(
             _REALIZED_FILTER_ERROR_TEMPLATE.format("active_only", "inactive_only")
+        )
+    if realized_only and waiting_only:
+        raise ValueError(
+            _REALIZED_FILTER_ERROR_TEMPLATE.format("realized_only", "waiting_only")
         )
     filters = {
         "program_enrollment__user": user,
@@ -210,6 +305,10 @@ def fetch_program_course_enrollments_by_student(
         filters["status"] = "active"
     if inactive_only:
         filters["status"] = "inactive"
+    if realized_only:
+        filters["program_enrollment__user__isnull"] = False
+    if waiting_only:
+        filters["program_enrollment__user__isnull"] = True
     return ProgramCourseEnrollment.objects.filter(**_remove_none_values(filters))
 
 
