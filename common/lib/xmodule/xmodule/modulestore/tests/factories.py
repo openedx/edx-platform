@@ -372,6 +372,9 @@ class ItemFactory(XModuleFactory):
         # This code was based off that in cms/djangoapps/contentstore/views.py
         parent = kwargs.pop('parent', None) or store.get_item(parent_location)
 
+        if isinstance(data, (bytes, bytearray)):  # data appears as bytes and
+            data = data.decode('utf-8')
+
         with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
 
             if 'boilerplate' in kwargs:
