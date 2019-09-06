@@ -16,17 +16,16 @@ from rest_framework.views import APIView
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
+from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermissionIsAuthenticated
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 
-from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
-
-from lms.djangoapps.experiments.utils import get_base_experiment_metadata_context
-from student.models import CourseEnrollment
 from course_modes.models import CourseMode
-
-
+from lms.djangoapps.experiments.utils import get_base_experiment_metadata_context
+from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
+from student.models import CourseEnrollment
+from track import segment
 
 
 # .. feature_toggle_name: experiments.mobile_upsell_rev934
@@ -45,38 +44,42 @@ MOBILE_UPSELL_FLAG = WaffleFlag(
     flag_name=u'mobile_upsell_rev934',
     flag_undefined_default=False
 )
-
+MOBILE_UPSELL_EXPERIMENT = 'mobile_upsell_experiment'
 
 
 class Rev934(DeveloperErrorViewMixin, APIView):
     """
     **Use Cases**
 
-        Request discount information for a user and course
+        Request upsell information for mobile app users
 
     **Example Requests**
 
-        GET /api/discounts/v1/course/{course_key_string}
+        GET /api/experiments/v0/custom/REV-934/?course_id={course_key_string}
 
     **Response Values**
 
         Body consists of the following fields:
-            discount_applicable:
-                whether the user can receive a discount for this course
-            jwt:
-                the jwt with user information and discount information
+            show_upsell:
+                whether to show upsell in the moble app in this case
+            price:
+                (optional) the price to show if show_upsell is true
+            basket_url:
+                (optional) the url to the checkout page with the course's sku if show_upsell is true
+            upsell_flag:
+                (optional) false if the upsell flag is off, not present otherwise
 
         Response:
             {
             "show_upsell": true,
-            "price": 49.00,
-            "basket_url": "[https://ecommerce.edx.org/basket/add?sku=abcdef|https://ecommerce.edx.org/basket/add?sku=abcdef]"
+            "price": "$199",
+            "basket_url": "https://ecommerce.edx.org/basket/add?sku=abcdef"
             }
 
     **Parameters:**
 
         course_key_string:
-            The course key for the which the discount should be applied
+            The course key that may be upsold
 
     **Returns**
 
@@ -85,33 +88,40 @@ class Rev934(DeveloperErrorViewMixin, APIView):
 
         Example response:
         {
-            "discount_applicable": false,
-            "jwt": xxxxxxxx.xxxxxxxx.xxxxxxx
+            "show_upsell": true,
+            "price": "$199",
+            "basket_url": "https://ecommerce.edx.org/basket/add?sku=abcdef"
         }
     """
-    authentication_classes = (JwtAuthentication, OAuth2AuthenticationAllowInactiveUser,
-                              SessionAuthenticationAllowInactiveUser,)
+    # http://localhost:18000/api/experiments/v0/custom/REV-934/?course_id=course-v1:edX+DemoX+Demo_Course
+
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
     permission_classes = (ApiKeyHeaderPermissionIsAuthenticated,)
 
-    # Since the course about page on the marketing site uses this API to auto-enroll users,
-    # we need to support cross-domain CSRF.
     @method_decorator(ensure_csrf_cookie_cross_domain)
     def get(self, request):
         """
-        Return the discount percent, if the user has appropriate permissions.
+        Return the if the course should be upsold in the mobile app, if the user has appropriate permissions.
         """
         if not MOBILE_UPSELL_FLAG.is_enabled():
-            return Response(
-                {'show_upsell': False, 
-                 'upsell_flag': False,
-                }
-            )
+            return Response({
+                'show_upsell': False,
+                'upsell_flag': False,
+            })
 
-        course_id = request.GET.get('course_id').replace(' ', '+')
+        if not 'course_id' in request.GET:
+            return Response({
+                'show_upsell': False,
+            })
+
+        course_id = request.GET.get('course_id').replace(' ', '+')  # HACK: the url decoding converts plus to space; put them back
         course_key = CourseKey.from_string(course_id)
         course = CourseOverview.get_from_id(course_key)
         user = request.user
-
 
         enrollment = None
         user_enrollments = None
@@ -127,10 +137,30 @@ class Rev934(DeveloperErrorViewMixin, APIView):
             pass  # Not enrolled, use the default values
 
         context = get_base_experiment_metadata_context(course, user, enrollment, user_enrollments)
-        
-        return Response(
-            {'show_upsell': True,
-             'price': context.get('upgrade_price'),
-             'basket_url': context.get('upgrade_link'),
+
+        bucket = stable_bucketing_hash_group(MOBILE_UPSELL_EXPERIMENT, 2, user.username)
+        if hasattr(request, 'session') and MOBILE_UPSELL_EXPERIMENT not in request.session:
+            properties = {
+                'site': request.site.domain,
+                'app_label': 'experiments',
+                'bucket': bucket,
+                'experiment': 'REV-934',
             }
-        )
+            segment.track(
+                user_id=user.id,
+                event_name='edx.bi.experiment.user.bucketed',
+                properties=properties,
+            )
+
+            # Mark that we've recorded this bucketing, so that we don't do it again this session
+            request.session[MOBILE_UPSELL_EXPERIMENT] = True
+
+        show_upsell = bucket != 0 and not has_non_audit_enrollments
+        if show_upsell:
+            return Response({
+                'show_upsell': show_upsell,
+                'price': context.get('upgrade_price'),
+                'basket_url': context.get('upgrade_link'),
+            })
+        else:
+            return Response({'show_upsell': show_upsell})
