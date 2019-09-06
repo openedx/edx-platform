@@ -1,13 +1,9 @@
 from django.core.management.base import BaseCommand
-from lms.djangoapps.oef.models import OrganizationOefUpdatePrompt
 from lms.djangoapps.onboarding.helpers import get_current_utc_date, its_been_year
-
+from oef.models import OrganizationOefUpdatePrompt
 
 from logging import getLogger
 log = getLogger(__name__)
-
-
-
 
 
 class Command(BaseCommand):
