@@ -1,6 +1,7 @@
 """
 Tests for ContentLibraryTransformer.
 """
+
 import mock
 
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
@@ -166,22 +167,6 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
                 ),
                 "Expected 'selected' equality failed in iteration {}.".format(i)
             )
-
-    def test_staff_access_to_library_content(self):
-        """
-        To verify that staff member has access to all the library content blocks.
-
-        Scenario: Given a staff member in a course with library content
-        when data is transformed by LibraryContentTransformer
-        none of the unassigned block is removed from the access list
-        and staff member will have access to all the blocks
-        """
-        transformed_blocks = get_course_blocks(
-            self.staff,
-            self.course.location,
-            transformers=self.transformers
-        )
-        self.assertEqual(len(list(transformed_blocks.get_block_keys())), len(self.blocks))
 
 
 class ContentLibraryOrderTransformerTestCase(CourseStructureTestCase):
