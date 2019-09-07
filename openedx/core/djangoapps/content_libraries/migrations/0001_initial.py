@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
             name='ContentLibrary',
             fields=[
                 ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('slug', models.SlugField()),
+                ('slug', models.SlugField(allow_unicode=True)),
                 ('bundle_uuid', models.UUIDField(unique=True)),
                 ('allow_public_learning', models.BooleanField(default=False, help_text='\n            Allow any user (even unregistered users) to view and interact with\n            content in this library (in the LMS; not in Studio). If this is not\n            enabled, then the content in this library is not directly accessible\n            in the LMS, and learners will only ever see this content if it is\n            explicitly added to a course. If in doubt, leave this unchecked.\n        ')),
                 ('allow_public_read', models.BooleanField(default=False, help_text="\n            Allow any user with Studio access to view this library's content in\n            Studio, use it in their courses, and copy content out of this\n            library. If in doubt, leave this unchecked.\n        ")),

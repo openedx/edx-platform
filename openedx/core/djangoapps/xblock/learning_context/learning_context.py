@@ -31,7 +31,7 @@ class LearningContext(object):
 
         user: a Django User object (may be an AnonymousUser)
 
-        usage_key: the BlockUsageKeyV2 subclass used for this learning context
+        usage_key: the UsageKeyV2 subclass used for this learning context
 
         Must return a boolean.
         """
@@ -45,7 +45,7 @@ class LearningContext(object):
 
         user: a Django User object (may be an AnonymousUser)
 
-        usage_key: the BlockUsageKeyV2 subclass used for this learning context
+        usage_key: the UsageKeyV2 subclass used for this learning context
 
         Must return a boolean.
         """
@@ -57,7 +57,7 @@ class LearningContext(object):
         BundleDefinitionLocator which specifies the actual XBlock definition
         (as a path to an OLX in a specific blockstore bundle).
 
-        usage_key: the BlockUsageKeyV2 subclass used for this learning context
+        usage_key: the UsageKeyV2 subclass used for this learning context
 
         Must return a BundleDefinitionLocator if the XBlock exists in this
         context, or None otherwise.
@@ -71,7 +71,7 @@ class LearningContext(object):
 
         The child is always from an <xblock-include /> element.
 
-        parent_usage: the BlockUsageKeyV2 subclass key of the parent
+        parent_usage: the UsageKeyV2 subclass key of the parent
 
         parent_definition: the BundleDefinitionLocator key of the parent (same
             as returned by definition_for_usage(parent_usage) but included here
@@ -80,7 +80,7 @@ class LearningContext(object):
         parsed_include: the XBlockInclude tuple containing the data from the
             parsed <xblock-include /> element. See xblock.runtime.olx_parsing.
 
-        Must return a BlockUsageKeyV2 subclass
+        Must return a UsageKeyV2 subclass
         """
         raise NotImplementedError
 

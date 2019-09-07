@@ -5,6 +5,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from functools import wraps
 import logging
 
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 from organizations.models import Organization
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.views import APIView
@@ -13,7 +14,6 @@ from rest_framework.response import Response
 
 from openedx.core.lib.api.view_utils import view_auth_classes
 from . import api
-from .keys import LibraryLocatorV2, LibraryUsageLocatorV2
 from .serializers import (
     ContentLibraryMetadataSerializer,
     ContentLibraryUpdateSerializer,
@@ -155,7 +155,7 @@ class LibraryCommitView(APIView):
     @convert_exceptions
     def delete(self, request, lib_key_str):  # pylint: disable=unused-argument
         """
-        Revent the draft changes made to the specified block and its
+        Revert the draft changes made to the specified block and its
         descendants. Restore it to the last published version
         """
         key = LibraryLocatorV2.from_string(lib_key_str)
