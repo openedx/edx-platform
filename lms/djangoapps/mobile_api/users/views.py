@@ -3,6 +3,8 @@ Views for user API
 """
 
 import json
+
+from django.contrib.auth.signals import user_logged_in
 from django.shortcuts import redirect
 from django.utils import dateparse
 from opaque_keys import InvalidKeyError
@@ -12,6 +14,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from xblock.fields import Scope
 from xblock.runtime import KeyValueStore
+from django.contrib.auth.models import User
 
 from courseware.access import is_mobile_available_for_user
 from courseware.courses import get_current_child
@@ -377,4 +380,7 @@ def my_user_info(request, api_version):
     """
     Redirect to the currently-logged-in user's info page
     """
+    # update user's last logged in from here because
+    # updating it from the oauth2 related code is too complex
+    user_logged_in.send(sender=User, user=request.user, request=request)
     return redirect("user-detail", api_version=api_version, username=request.user.username)
