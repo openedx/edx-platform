@@ -2410,7 +2410,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=584 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=586 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2925,6 +2925,7 @@ CREATE TABLE `enterprise_enterprisecourseenrollment` (
   `modified` datetime(6) NOT NULL,
   `course_id` varchar(255) NOT NULL,
   `enterprise_customer_user_id` int(11) NOT NULL,
+  `marked_done` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `enterprise_enterprisecou_enterprise_customer_user_71fe301a_uniq` (`enterprise_customer_user_id`,`course_id`),
   CONSTRAINT `enterprise_enterpris_enterprise_customer__cf423e59_fk_enterpris` FOREIGN KEY (`enterprise_customer_user_id`) REFERENCES `enterprise_enterprisecustomeruser` (`id`)
@@ -3160,6 +3161,7 @@ CREATE TABLE `enterprise_historicalenterprisecourseenrollment` (
   `enterprise_customer_user_id` int(11) DEFAULT NULL,
   `history_user_id` int(11) DEFAULT NULL,
   `history_change_reason` varchar(100) DEFAULT NULL,
+  `marked_done` tinyint(1) NOT NULL,
   PRIMARY KEY (`history_id`),
   KEY `enterprise_historica_history_user_id_a7d84786_fk_auth_user` (`history_user_id`),
   KEY `enterprise_historicalenterprisecourseenrollment_id_452a4b04` (`id`),
@@ -7066,7 +7068,7 @@ CREATE TABLE `xapi_xapilearnerdatatransmissionaudit` (
   `completed_timestamp` datetime(6) DEFAULT NULL,
   `grade` varchar(255) DEFAULT NULL,
   `status` varchar(100) NOT NULL,
-  `error_message` longtext NOT NULL,
+  `error_message` longtext,
   `user_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `xapi_xapilearnerdatatran_user_id_course_id_557488b4_uniq` (`user_id`,`course_id`),
