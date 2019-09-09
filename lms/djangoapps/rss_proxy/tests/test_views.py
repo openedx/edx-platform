@@ -62,7 +62,7 @@ class RssProxyViewTests(TestCase):
         print(resp['Content-Type'])
         self.assertEqual(resp.status_code, 404)
         self.assertEqual(resp['Content-Type'], 'application/xml')
-        self.assertEqual(resp.content, '')
+        self.assertEqual(resp.content.decode('utf-8'), '')
 
     def test_proxy_with_non_whitelisted_url(self):
         """
