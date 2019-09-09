@@ -57,7 +57,7 @@ click-log==0.3.2          # via edx-lint
 click==7.0
 code-annotations==0.3.2
 colorama==0.4.1           # via radon
-configparser==3.8.1       # via entrypoints, flake8, importlib-metadata, pylint
+configparser==4.0.1       # via entrypoints, flake8, importlib-metadata, pylint
 contextlib2==0.5.5
 cookies==2.2.1            # via moto
 coreapi==2.3.3
@@ -214,7 +214,7 @@ nodeenv==1.1.1
 numpy==1.16.5
 git+https://github.com/joestump/python-oauth2.git@b94f69b1ad195513547924e380d9265133e995fa#egg=oauth2
 oauthlib==2.1.0
-git+https://github.com/edx/edx-ora2.git@2.2.7#egg=ora2==2.2.7
+git+https://github.com/edx/edx-ora2.git@2.3.0#egg=ora2==2.3.0
 packaging==19.1           # via caniusepython3, tox
 path.py==8.2.1
 pathlib2==2.3.4           # via importlib-metadata, pytest, pytest-django
