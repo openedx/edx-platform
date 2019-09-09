@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-ProgramEnrollment internal api.
+ProgramEnrollment internal API intended for Enterprise API.
+
+The Enterprise API currently depends on this module being present with these
+functions, as implemented in ./utils.py. This module will be refactored
+away in https://openedx.atlassian.net/browse/ENT-2294
 """
 from __future__ import absolute_import, unicode_literals
 
