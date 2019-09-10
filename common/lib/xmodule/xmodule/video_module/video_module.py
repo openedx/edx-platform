@@ -23,6 +23,7 @@ from operator import itemgetter
 import six
 from django.conf import settings
 from lxml import etree
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import AssetLocator
 from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
@@ -200,6 +201,8 @@ class VideoBlock(
         return waffle_flags()[DEPRECATE_YOUTUBE].is_enabled(self.location.course_key)
 
     def youtube_disabled_for_course(self):
+        if not isinstance(self.location.course_key, CourseKey):
+            return False  # Only courses have this flag
         if CourseYoutubeBlockedFlag.feature_enabled(self.location.course_key):
             return True
         else:

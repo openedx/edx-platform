@@ -27,6 +27,7 @@ User = get_user_model()
 
 
 @api_view(['GET'])
+@view_auth_classes(is_authenticated=False)
 @permission_classes((permissions.AllowAny, ))  # Permissions are handled at a lower level, by the learning context
 def block_metadata(request, usage_key_str):
     """
@@ -39,6 +40,7 @@ def block_metadata(request, usage_key_str):
 
 
 @api_view(['GET'])
+@view_auth_classes(is_authenticated=True)
 @permission_classes((permissions.AllowAny, ))  # Permissions are handled at a lower level, by the learning context
 def render_block_view(request, usage_key_str, view_name):
     """
