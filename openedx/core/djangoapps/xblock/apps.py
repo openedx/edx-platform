@@ -59,8 +59,7 @@ class LmsXBlockAppConfig(XBlockAppConfig):
         editing XBlock content in the LMS
         """
         return dict(
-            authored_data_store=BlockstoreFieldData(),
-            student_data_store=KvsFieldData(kvs=DictKeyValueStore()),
+            student_data_mode='persisted',
         )
 
     def get_site_root_url(self):
@@ -86,8 +85,7 @@ class StudioXBlockAppConfig(XBlockAppConfig):
         editing XBlock content in Studio
         """
         return dict(
-            authored_data_store=BlockstoreFieldData(),
-            student_data_store=KvsFieldData(kvs=DictKeyValueStore()),
+            student_data_mode='ephemeral',
         )
 
     def get_site_root_url(self):

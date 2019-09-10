@@ -51,13 +51,15 @@ class LearningContext(object):
         """
         return False
 
-    def definition_for_usage(self, usage_key):
+    def definition_for_usage(self, usage_key, **kwargs):
         """
         Given a usage key for an XBlock in this context, return the
         BundleDefinitionLocator which specifies the actual XBlock definition
         (as a path to an OLX in a specific blockstore bundle).
 
         usage_key: the UsageKeyV2 subclass used for this learning context
+
+        kwargs: optional additional parameters unique to the learning context
 
         Must return a BundleDefinitionLocator if the XBlock exists in this
         context, or None otherwise.

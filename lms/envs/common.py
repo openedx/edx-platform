@@ -499,6 +499,13 @@ DATABASE_ROUTERS = [
 ############################ Cache Configuration ###############################
 
 CACHES = {
+    'blockstore': {
+        'KEY_PREFIX': 'blockstore',
+        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'LOCATION': ['localhost:11211'],
+        'TIMEOUT': '86400',  # This data should be long-lived for performance, BundleCache handles invalidation
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+    },
     'course_structure_cache': {
         'KEY_PREFIX': 'course_structure',
         'KEY_FUNCTION': 'util.memcache.safe_key',

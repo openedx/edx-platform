@@ -15,7 +15,6 @@ import six
 from xblock.core import XBlock
 from xblock.exceptions import XBlockNotFoundError
 
-from cms.djangoapps.contentstore.views.helpers import xblock_type_display_name
 from openedx.core.djangoapps.content_libraries.library_bundle import LibraryBundle
 from openedx.core.djangoapps.xblock.api import get_block_display_name, load_block
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
@@ -271,7 +270,7 @@ def get_library_block(usage_key):
     """
     assert isinstance(usage_key, LibraryUsageLocatorV2)
     lib_context = get_learning_context_impl(usage_key)
-    def_key = lib_context.definition_for_usage(usage_key)
+    def_key = lib_context.definition_for_usage(usage_key, force_draft=DRAFT_NAME)
     if def_key is None:
         raise ContentLibraryBlockNotFound(usage_key)
     lib_bundle = LibraryBundle(usage_key.lib_key, def_key.bundle_uuid, draft_name=DRAFT_NAME)
@@ -441,6 +440,10 @@ def get_allowed_block_types(library_key):  # pylint: disable=unused-argument
     library. For now, the result is the same regardless of which library is
     specified, but that may change in the future.
     """
+    # This import breaks in the LMS so keep it here. The LMS doesn't generally
+    # use content libraries APIs directly but some tests may want to use them to
+    # create libraries and then test library learning or course-library integration.
+    from cms.djangoapps.contentstore.views.helpers import xblock_type_display_name
     # TODO: return support status and template options
     # See cms/djangoapps/contentstore/views/component.py
     block_types = sorted(name for name, class_ in XBlock.load_classes())

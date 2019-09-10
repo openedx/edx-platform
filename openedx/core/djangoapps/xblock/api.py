@@ -79,7 +79,7 @@ def load_block(usage_key, user):
     # set to 3.
     # field_overrides = context_impl.get_field_overrides(usage_key)
 
-    runtime = get_runtime_system().get_runtime(user_id=user.id if user else None)
+    runtime = get_runtime_system().get_runtime(user=user)
 
     return runtime.get_block(usage_key)
 
