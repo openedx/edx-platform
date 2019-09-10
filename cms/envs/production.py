@@ -375,6 +375,18 @@ USER_TASKS_ARTIFACT_STORAGE = COURSE_IMPORT_EXPORT_STORAGE
 
 DATABASES = AUTH_TOKENS['DATABASES']
 
+# If DB_CONFIG_OVERRIDE_DEFAULT is set, use the named config instead of default
+# Useful for overriding the config for the celery workers
+DB_CONFIG_OVERRIDE_DEFAULT = os.environ.get('DB_CONFIG_OVERRIDE_DEFAULT', None)
+if DB_CONFIG_OVERRIDE_DEFAULT:
+    DATABASES['default'] = DATABASES[DB_CONFIG_OVERRIDE_DEFAULT]
+
+# If DB_CONFIG_OVERRIDE_STUDENT_MODULE_HISTORY is set, use the named config instead of student_module_history
+# Useful for overriding the config for the celery workers
+DB_CONFIG_OVERRIDE_STUDENT_MODULE_HISTORY = os.environ.get('DB_CONFIG_OVERRIDE_STUDENT_MODULE_HISTORY', None)
+if DB_CONFIG_OVERRIDE_STUDENT_MODULE_HISTORY:
+    DATABASES['student_module_history'] = DATABASES[DB_CONFIG_OVERRIDE_STUDENT_MODULE_HISTORY]
+
 # The normal database user does not have enough permissions to run migrations.
 # Migrations are run with separate credentials, given as DB_MIGRATION_*
 # environment variables

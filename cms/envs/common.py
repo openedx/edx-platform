@@ -719,6 +719,17 @@ DATABASES = {
         'PORT': '3306',
         'USER': 'edxapp001'
     },
+    'celery_worker': {
+        'ATOMIC_REQUESTS': True,
+        'CONN_MAX_AGE': 0,
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': 'localhost',
+        'NAME': 'edxapp',
+        'OPTIONS': {},
+        'PASSWORD': 'password',
+        'PORT': '3306',
+        'USER': 'edxapp001'
+    },
     'read_replica': {
         'CONN_MAX_AGE': 0,
         'ENGINE': 'django.db.backends.mysql',
