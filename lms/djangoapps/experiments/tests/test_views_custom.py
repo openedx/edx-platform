@@ -41,5 +41,3 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['show_upsell'], False)
-
-

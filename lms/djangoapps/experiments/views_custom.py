@@ -113,7 +113,7 @@ class Rev934(DeveloperErrorViewMixin, APIView):
                 'upsell_flag': False,
             })
 
-        if not 'course_id' in request.GET:
+        if 'course_id' not in request.GET:
             return Response({
                 'show_upsell': False,
             })
