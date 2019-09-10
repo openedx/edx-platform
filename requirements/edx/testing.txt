@@ -117,7 +117,7 @@ docutils==0.15.2
 drf-yasg==1.16
 edx-ace==0.1.10
 edx-analytics-data-api-client==0.15.3
-edx-bulk-grades==0.5.11
+edx-bulk-grades==0.6.0
 edx-ccx-keys==0.2.2
 edx-celeryutils==0.3.0
 edx-completion==2.0.0
@@ -170,7 +170,7 @@ html5lib==1.0.1
 httplib2==0.13.1
 httpretty==0.9.6
 idna==2.8
-importlib-metadata==0.20  # via pluggy, tox
+importlib-metadata==0.21  # via pluggy, tox
 inflect==2.1.0
 inflection==0.3.1
 ipaddress==1.0.22
