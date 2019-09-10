@@ -284,4 +284,4 @@ def hash_grading_policy(grading_policy):
         separators=(',', ':'),  # Remove spaces from separators for more compact representation
         sort_keys=True,
     )
-    return b64encode(sha1(ordered_policy.encode("utf-8")).digest())
+    return b64encode(sha1(ordered_policy.encode("utf-8")).digest()).decode('utf-8')
