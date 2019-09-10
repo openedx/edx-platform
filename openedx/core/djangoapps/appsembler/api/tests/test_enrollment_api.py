@@ -82,10 +82,12 @@ class BaseEnrollmentApiTestCase(ModuleStoreTestCase):
         request.META['HTTP_HOST'] = site.domain
         force_authenticate(request, user=caller)
 
-        view = resolve(url).func
-        response = view(request)
-        response.render()
-        return response
+        with mock.patch('lms.djangoapps.instructor.sites.get_current_site', return_value=site):
+            with mock.patch('student.models.get_current_site', return_value=site):
+                view = resolve(url).func
+                response = view(request)
+                response.render()
+                return response
 
 
 @ddt.ddt
@@ -204,6 +206,8 @@ class EnrollmentApiPostTest(BaseEnrollmentApiTestCase):
         reg_users = [UserFactory.create(), UserFactory.create()]
 
         for reg_user in reg_users:
+            # add the users to the site, otherwise they won't have new enrollments
+            UserOrganizationMappingFactory(user=reg_user, organization=self.my_site_org)
             # make sure that the registered users are not in the enrollments
             mode, is_active = CourseEnrollment.enrollment_mode_for_user(reg_user, co.id)
             assert mode is None and is_active is None, "email: {}".format(reg_user.email)
