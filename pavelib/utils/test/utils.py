@@ -131,7 +131,7 @@ def check_firefox_version():
 
     # Firefox will be run as a local process
     expected_firefox_ver = "Mozilla Firefox " + str(MINIMUM_FIREFOX_VERSION)
-    firefox_ver_string = subprocess.check_output("firefox --version", shell=True).strip()
+    firefox_ver_string = subprocess.check_output("firefox --version", shell=True).strip().decode('utf-8')
     firefox_version_regex = re.compile(r"Mozilla Firefox (\d+.\d+)")
     try:
         firefox_ver = float(firefox_version_regex.search(firefox_ver_string).group(1))
