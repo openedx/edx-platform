@@ -214,7 +214,7 @@ nodeenv==1.1.1
 numpy==1.16.5
 git+https://github.com/joestump/python-oauth2.git@b94f69b1ad195513547924e380d9265133e995fa#egg=oauth2
 oauthlib==2.1.0
-git+https://github.com/edx/edx-ora2.git@2.3.0#egg=ora2==2.3.0
+git+https://github.com/edx/edx-ora2.git@2.3.1#egg=ora2==2.3.1
 packaging==19.1           # via caniusepython3, tox
 path.py==8.2.1
 pathlib2==2.3.4           # via importlib-metadata, pytest, pytest-django
