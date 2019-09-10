@@ -15,7 +15,6 @@ from rest_framework.views import APIView
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
-from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermissionIsAuthenticated
@@ -118,14 +117,14 @@ class Rev934(DeveloperErrorViewMixin, APIView):
                 'show_upsell': False,
             })
 
-        course_id = request.GET.get('course_id').replace(' ', '+')  # HACK: the url decoding converts plus to space; put them back
+        # HACK: the url decoding converts plus to space; put them back
+        course_id = request.GET.get('course_id').replace(' ', '+')
         course_key = CourseKey.from_string(course_id)
         course = CourseOverview.get_from_id(course_key)
         user = request.user
 
         enrollment = None
         user_enrollments = None
-        audit_enrollments = None
         has_non_audit_enrollments = False
         try:
             user_enrollments = CourseEnrollment.objects.select_related('course').filter(user_id=user.id)
@@ -163,4 +162,8 @@ class Rev934(DeveloperErrorViewMixin, APIView):
                 'basket_url': context.get('upgrade_link'),
             })
         else:
-            return Response({'show_upsell': show_upsell})
+            return Response({
+                'show_upsell': show_upsell,
+                'upsell_flag': MOBILE_UPSELL_FLAG.is_enabled(),
+                'experiment_bucket': bucket,
+            })
