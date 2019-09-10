@@ -25,7 +25,7 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
         # No-course-id returns show_upsell false
         self.client.login(
             username=user.username,
-            password=UserFactory._DEFAULT_PASSWORD,  #pylint: disable=protected-access
+            password=UserFactory._DEFAULT_PASSWORD,  # pylint: disable=protected-access
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
