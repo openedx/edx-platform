@@ -1703,43 +1703,6 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
             )
             self.assertEqual(response.status_code, status_code)
 
-    @ddt.data(*ddt_permissions_args)
-    @ddt.unpack
-    def test_create_thread(self, user, commentable_id, status_code, __):
-        """
-        Verify that creation of threads is limited to members of the team or users with 'edit_content' permission.
-        """
-        commentable_id = getattr(self, commentable_id)
-        # mock_request is not used because Commentables don't exist in comment service.
-        self.client.login(username=getattr(self, user).username, password=self.password)
-        response = self.client.post(
-            reverse(
-                "create_thread",
-                kwargs={"course_id": six.text_type(self.course.id), "commentable_id": commentable_id}
-            ),
-            data={"body": "foo", "title": "foo", "thread_type": "discussion"}
-        )
-        self.assertEqual(response.status_code, status_code)
-
-    @ddt.data(*ddt_permissions_args)
-    @ddt.unpack
-    def test_commentable_actions(self, user, commentable_id, status_code, __):
-        """
-        Verify that following of commentables is limited to members of the team or users with
-        'edit_content' permission.
-        """
-        commentable_id = getattr(self, commentable_id)
-        # mock_request is not used because Commentables don't exist in comment service.
-        self.client.login(username=getattr(self, user).username, password=self.password)
-        for action in ["follow_commentable", "unfollow_commentable"]:
-            response = self.client.post(
-                reverse(
-                    action,
-                    kwargs={"course_id": six.text_type(self.course.id), "commentable_id": commentable_id}
-                )
-            )
-            self.assertEqual(response.status_code, status_code)
-
 
 TEAM_COMMENTABLE_ID = 'test-team-discussion'
 
