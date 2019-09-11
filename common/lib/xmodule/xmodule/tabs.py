@@ -172,6 +172,10 @@ class CourseTab(six.with_metaclass(ABCMeta, object)):
         """
         return not self == other
 
+    def __hash__(self):
+        """ Return a hash representation of Tab Object. """
+        return hash(repr(self))
+
     @classmethod
     def validate(cls, tab_dict, raise_error=True):
         """
@@ -294,6 +298,10 @@ class TabFragmentViewMixin(object):
         """
         return self.fragment_view.render_to_fragment(request, course_id=six.text_type(course.id), **kwargs)
 
+    def __hash__(self):
+        """ Return a hash representation of Tab Object. """
+        return hash(repr(self))
+
 
 class StaticTab(CourseTab):
     """
@@ -358,6 +366,10 @@ class StaticTab(CourseTab):
         if not super(StaticTab, self).__eq__(other):
             return False
         return self.url_slug == other.get('url_slug')
+
+    def __hash__(self):
+        """ Return a hash representation of Tab Object. """
+        return hash(repr(self))
 
 
 class CourseTabList(List):
