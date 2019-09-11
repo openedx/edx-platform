@@ -1,6 +1,7 @@
 """ Django admin pages for student app """
 from config_models.admin import ConfigurationModelAdmin
 from django import forms
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.sites import NotRegistered
 from django.contrib.auth import get_user_model
@@ -277,13 +278,17 @@ class UserChangeForm(BaseUserChangeForm):
     Override the default UserChangeForm such that the password field
     does not contain a link to a 'change password' form.
     """
-    password = ReadOnlyPasswordHashField(
-        label=_("Password"),
-        help_text=_(
-            "Raw passwords are not stored, so there is no way to see this "
-            "user's password."
-        ),
-    )
+    def __init__(self, *args, **kwargs):
+        super(UserChangeForm, self).__init__(*args, **kwargs)
+
+        if not settings.FEATURES.get('ENABLE_CHANGE_USER_PASSWORD_ADMIN'):
+            self.fields["password"] = ReadOnlyPasswordHashField(
+                label=_("Password"),
+                help_text=_(
+                    "Raw passwords are not stored, so there is no way to see this "
+                    "user's password."
+                ),
+            )
 
 
 class UserAdmin(BaseUserAdmin):

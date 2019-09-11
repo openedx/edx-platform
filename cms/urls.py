@@ -208,8 +208,9 @@ if settings.FEATURES.get('AUTH_USE_CAS'):
     ]
 # The password pages in the admin tool are disabled so that all password
 # changes go through our user portal and follow complexity requirements.
+if not settings.FEATURES.get('ENABLE_CHANGE_USER_PASSWORD_ADMIN'):
+    urlpatterns.append(url(r'^admin/auth/user/\d+/password/$', handler404))
 urlpatterns.append(url(r'^admin/password_change/$', handler404))
-urlpatterns.append(url(r'^admin/auth/user/\d+/password/$', handler404))
 urlpatterns.append(url(r'^admin/', include(admin.site.urls)))
 
 # enable entrance exams
