@@ -618,7 +618,15 @@ def get_current_child(xmodule, min_depth=None, requested_child=None):
             return _get_child(content_children) if content_children else None
 
     child = None
-    if hasattr(xmodule, 'position'):
+
+    try:
+        # In python 3, hasattr() catches AttributeErrors only then returns False.
+        # All other exceptions bubble up the call stack.
+        has_position = hasattr(xmodule, 'position')  # This conditions returns AssertionError from xblock.fields lib.
+    except AssertionError:
+        return child
+
+    if has_position:
         children = xmodule.get_display_items()
         if len(children) > 0:
             if xmodule.position is not None and not requested_child:
