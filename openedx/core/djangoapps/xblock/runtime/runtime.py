@@ -4,9 +4,14 @@ Common base classes for all new XBlock runtimes.
 from __future__ import absolute_import, division, print_function, unicode_literals
 import logging
 
+from completion import waffle as completion_waffle
+import crum
 from django.contrib.auth import get_user_model
 from django.utils.lru_cache import lru_cache
+from eventtracking import tracker
 from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
+import track.contexts
+import track.views
 from xblock.exceptions import NoSuchServiceError
 from xblock.field_data import SplitFieldData
 from xblock.fields import Scope
@@ -14,6 +19,7 @@ from xblock.runtime import DictKeyValueStore, KvsFieldData, NullI18nService, Mem
 from web_fragments.fragment import Fragment
 
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
+from lms.djangoapps.grades.api import signals as grades_signals
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 from openedx.core.djangoapps.xblock.runtime.blockstore_field_data import BlockstoreFieldData
 from openedx.core.djangoapps.xblock.runtime.mixin import LmsBlockMixin
@@ -25,6 +31,17 @@ from .shims import RuntimeShim, XBlockShim
 
 log = logging.getLogger(__name__)
 User = get_user_model()
+
+
+def make_track_function():
+    """
+    Make a tracking function that logs what happened, for XBlock events.
+    """
+    current_request = crum.get_current_request()
+
+    def function(event_type, event):
+        return track.views.server_track(current_request, event_type, event, page='x_module')
+    return function
 
 
 class XBlockRuntime(RuntimeShim, Runtime):
@@ -94,8 +111,72 @@ class XBlockRuntime(RuntimeShim, Runtime):
         return absolute_url
 
     def publish(self, block, event_type, event_data):
-        # TODO: publish events properly
-        log.info("XBlock %s has published a '%s' event.", block.scope_ids.usage_id, event_type)
+        """ Handle XBlock events like grades and completion """
+        special_handler = self.get_event_handler(event_type)
+        if special_handler:
+            special_handler(block, event_data)
+        else:
+            self.log_event_to_tracking_log(block, event_type, event_data)
+
+    def get_event_handler(self, event_type):
+        """
+        Return an appropriate function to handle the event.
+
+        Returns None if no special processing is required.
+        """
+        if self.user_id is None:
+            # We don't/cannot currently record grades or completion for anonymous users.
+            return None
+        # In the future when/if we support masquerading, need to be careful here not to affect the user's grades
+        if event_type == 'grade':
+            return self.handle_grade_event
+        elif event_type == 'completion':
+            if completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+                return self.handle_completion_event
+        return None
+
+    def log_event_to_tracking_log(self, block, event_type, event_data):
+        """
+        Log this XBlock event to the tracking log
+        """
+        log_context = track.contexts.context_dict_for_learning_context(block.scope_ids.usage_id.context_key)
+        if self.user_id:
+            log_context['user_id'] = self.user_id
+        log_context['asides'] = {}
+        track_function = make_track_function()
+        with tracker.get_tracker().context(event_type, log_context):
+            track_function(event_type, event_data)
+
+    def handle_grade_event(self, block, event):
+        """
+        Submit a grade for the block.
+        """
+        if not self.user.is_anonymous():
+            grades_signals.SCORE_PUBLISHED.send(
+                sender=None,
+                block=block,
+                user=self.user,
+                raw_earned=event['value'],
+                raw_possible=event['max_value'],
+                only_if_higher=event.get('only_if_higher'),
+                score_deleted=event.get('score_deleted'),
+                grader_response=event.get('grader_response')
+            )
+
+    def handle_completion_event(self, block, event):
+        """
+        Submit a completion object for the block.
+        """
+        block_key = block.scope_ids.usage_id
+        # edx-completion needs to be updated to support learning contexts, which is coming soon in a separate PR.
+        # For now just log a debug statement to confirm this plumbing is ready to send those events through.
+        log.debug("Completion event for block {}: new completion = {}".format(block_key, event['completion']))
+        # BlockCompletion.objects.submit_completion(
+        #     user=self.user,
+        #     course_key=block_key.context_key,
+        #     block_key=block_key,
+        #     completion=event['completion'],
+        # )
 
     def applicable_aside_types(self, block):
         """ Disable XBlock asides in this runtime """
