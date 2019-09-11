@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 import json
 
+import six
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
@@ -61,7 +62,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):
         # now coerce username to utf-8 encoded str, since we test with non-ascii unicdoe above and
         # the unittest framework has hard time coercing to unicode.
         # decrypt also can't take a unicode input, so coerce its input to str
-        self.assertEqual(str(user.username.encode('utf-8')), UsernameCipher().decrypt(str(pref.value)))
+        self.assertEqual(six.binary_type(user.username.encode('utf-8')), UsernameCipher().decrypt(str(pref.value)))
 
     def assertNotPrefExists(self, user):
         """Ensure that the user does not have a persisted preference"""

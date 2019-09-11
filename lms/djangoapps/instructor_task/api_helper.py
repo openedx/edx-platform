@@ -413,7 +413,7 @@ def encode_entrance_exam_and_student_input(usage_key, student=None):
         task_key_stub = "_{entranceexam}".format(entranceexam=text_type(usage_key))
 
     # create the key value by using MD5 hash:
-    task_key = hashlib.md5(task_key_stub).hexdigest()
+    task_key = hashlib.md5(task_key_stub.encode('utf-8')).hexdigest()
 
     return task_input, task_key
 
