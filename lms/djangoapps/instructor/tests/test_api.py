@@ -5255,7 +5255,7 @@ class TestBulkCohorting(SharedModuleStoreTestCase):
         # this temporary file will be removed in `self.tearDown()`
         __, file_name = tempfile.mkstemp(suffix=suffix, dir=self.tempdir)
         with open(file_name, 'w') as file_pointer:
-            file_pointer.write(csv_data.encode('utf-8'))
+            file_pointer.write(csv_data)
         with open(file_name, 'r') as file_pointer:
             url = reverse('add_users_to_cohorts', kwargs={'course_id': text_type(self.course.id)})
             return self.client.post(url, {'uploaded-file': file_pointer})
