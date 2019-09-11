@@ -66,6 +66,7 @@
 # 刘知远 <liuliudong@163.com>, 2013
 # 张太红 <zth@xjau.edu.cn>, 2014
 # 亚仑 <fl_meng@163.com>, 2014
+# 健超 张 <jc.zhang@eliteu.com.cn>, 2019
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # 刘知远 <liuliudong@163.com>, 2013
 # 周歆荷 <zhxh401@126.com>, 2015
@@ -181,6 +182,7 @@
 # Zihui Cheng <z7cheng@ucsd.edu>, 2015
 # 代 兴旺 <525224259@qq.com>, 2016
 # 伟波 黄 <inactive+gtc_ZjEzMTJ@transifex.com>, 2016
+# 健超 张 <jc.zhang@eliteu.com.cn>, 2019
 # 张逸涵 <jeanzhang970128@gmail.com>, 2014
 # 微 李 <w.li@eliteu.com.cn>, 2018
 # 成羽丰 <onetwogoo@gmail.com>, 2015
@@ -223,7 +225,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-01 20:42+0000\n"
+"POT-Creation-Date: 2019-09-08 20:42+0000\n"
 "PO-Revision-Date: 2019-07-28 20:42+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"

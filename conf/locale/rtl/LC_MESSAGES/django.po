@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-02 09:05+0000\n"
-"PO-Revision-Date: 2019-09-02 09:05:28.849914\n"
+"POT-Creation-Date: 2019-09-11 13:30+0000\n"
+"PO-Revision-Date: 2019-09-11 13:30:55.805705\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -8261,10 +8261,6 @@ msgstr ""
 "فاث زمخذن هس ذخرسهيثقثي دهسهزمث فخ شمم. رخفث فاشف فاهس بهثمي هس هلرخقثي هب "
 "فاث زمخذن هس دهسهزمث_فخ_سفشبب_خرمغ."
 
-#: lms/djangoapps/notes/views.py lms/templates/notes.html
-msgid "My Notes"
-msgstr "وغ رخفثس"
-
 #: lms/djangoapps/program_enrollments/models.py
 msgid "One of user or external_user_key must not be null."
 msgstr "خرث خب عسثق خق ثطفثقرشم_عسثق_نثغ وعسف رخف زث رعمم."
@@ -9180,6 +9176,15 @@ msgstr "بثشفعقث زشسثي ثرقخمموثرفس"
 #: lms/djangoapps/support/views/index.py
 msgid "View feature based enrollment settings"
 msgstr "دهثص بثشفعقث زشسثي ثرقخمموثرف سثففهرلس"
+
+#: lms/djangoapps/support/views/index.py
+#: lms/templates/support/link_program_enrollments.html
+msgid "Link Program Enrollments"
+msgstr "مهرن حقخلقشو ثرقخمموثرفس"
+
+#: lms/djangoapps/support/views/index.py
+msgid "Link LMS users to program enrollments"
+msgstr "مهرن موس عسثقس فخ حقخلقشو ثرقخمموثرفس"
 
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
@@ -14075,10 +14080,6 @@ msgstr ""
 msgid "Raw data:"
 msgstr "قشص يشفش:"
 
-#: lms/templates/notes.html
-msgid "You do not have any notes."
-msgstr "غخع يخ رخف اشدث شرغ رخفثس."
-
 #: lms/templates/preview_menu.html
 msgid "Course View"
 msgstr "ذخعقسث دهثص"
@@ -14456,6 +14457,11 @@ msgstr "رثطف"
 #: lms/templates/seq_module.html
 msgid "Sequence"
 msgstr "سثضعثرذث"
+
+#: lms/templates/seq_module.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "Completed"
+msgstr "ذخوحمثفثي"
 
 #: lms/templates/signup_modal.html
 msgid "Sign Up for {platform_name}"

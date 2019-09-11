@@ -60,7 +60,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-01 20:42+0000\n"
+"POT-Creation-Date: 2019-09-08 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Georgian (https://www.transifex.com/open-edx/teams/6205/ka/)\n"
@@ -8198,10 +8198,6 @@ msgstr ""
 "გაითვალისწინეთ, ეს ველი უგულვებელყოფილია, თუ ბლოკი არის "
 "visible_to_staff_only. "
 
-#: lms/djangoapps/notes/views.py lms/templates/notes.html
-msgid "My Notes"
-msgstr "ჩემი ჩანაწერები"
-
 #: lms/djangoapps/program_enrollments/models.py
 msgid "One of user or external_user_key must not be null."
 msgstr ""
@@ -9104,6 +9100,15 @@ msgstr ""
 
 #: lms/djangoapps/support/views/index.py
 msgid "View feature based enrollment settings"
+msgstr ""
+
+#: lms/djangoapps/support/views/index.py
+#: lms/templates/support/link_program_enrollments.html
+msgid "Link Program Enrollments"
+msgstr ""
+
+#: lms/djangoapps/support/views/index.py
+msgid "Link LMS users to program enrollments"
 msgstr ""
 
 #: lms/djangoapps/support/views/manage_user.py
@@ -13681,10 +13686,6 @@ msgstr ""
 #: lms/templates/module-error.html
 msgid "Raw data:"
 msgstr "დაუმუშავებელი მონაცემები:"
-
-#: lms/templates/notes.html
-msgid "You do not have any notes."
-msgstr "თქვენ არ გაქვთ ჩანაწერები."
 
 #: lms/templates/preview_menu.html
 msgid "Course View"
