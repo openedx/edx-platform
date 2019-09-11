@@ -134,6 +134,7 @@
             'draggabilly': 'js/vendor/draggabilly',
             'hls': 'common/js/vendor/hls',
             'lang_edx': 'js/src/lang_edx',
+            'jquery_extend_patch': 'js/src/jquery_extend_patch',
 
             // externally hosted files
             mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML&delayStartupUntil=configured',  // eslint-disable-line max-len
@@ -345,8 +346,13 @@
                     'rangeslider', 'share-annotator', 'richText-annotator', 'reply-annotator',
                     'tags-annotator', 'flagging-annotator', 'grouping-annotator', 'diacritic-annotator',
                     'openseadragon', 'jquery-Watch', 'catch', 'handlebars', 'URI']
-            }
+            },
             // end of annotation tool files
+
+            // patch for jquery's extend
+            'jquery_extend_patch': {
+                deps: ['jquery']
+            }
         }
     });
 }).call(this, require, define);
