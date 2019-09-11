@@ -194,11 +194,11 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         # Make sure we don't have any git hashes on the page
         response = self.client.get(reverse('sysadmin_courses'))
-        self.assertNotRegexpMatches(response.content, table_re)
+        self.assertNotRegexpMatches(response.content.decode('utf-8'), table_re)
 
         # Now add the course and make sure it does match
         response = self._add_edx4edx()
-        self.assertRegexpMatches(response.content, table_re)
+        self.assertRegexpMatches(response.content.decode('utf-8'), table_re)
 
     def test_gitlogs(self):
         """
