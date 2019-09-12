@@ -166,16 +166,21 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
     """
     TOMORROW = 'tomorrow'
     YESTERDAY = 'yesterday'
+    TOMORROW_RELATIVE = 'tomorrow_relative'
+    YESTERDAY_RELATIVE = 'yesterday_relative'
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+    COURSE_START = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=30)
     DATES = {
         TOMORROW: datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1),
         YESTERDAY: datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1),
+        TOMORROW_RELATIVE: datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1) - COURSE_START,
+        YESTERDAY_RELATIVE: datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1) - COURSE_START,
         None: None,
     }
 
     def setUp(self):
         super(AccessTestCase, self).setUp()
-        self.course = CourseFactory.create(org='edX', course='toy', run='test_run')
+        self.course = CourseFactory.create(org='edX', course='toy', run='test_run', start=self.COURSE_START)
         self.anonymous_user = AnonymousUserFactory()
         self.beta_user = BetaTesterFactory(course_key=self.course.id)
         self.student = UserFactory()
@@ -434,7 +439,11 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         (True, YESTERDAY, access_response.VisibilityError),
         (False, YESTERDAY),
         (True, TOMORROW, access_response.VisibilityError),
-        (False, TOMORROW, access_response.StartDateError)
+        (False, TOMORROW, access_response.StartDateError),
+        (True, YESTERDAY_RELATIVE, access_response.VisibilityError),
+        (False, YESTERDAY_RELATIVE),
+        (True, TOMORROW_RELATIVE, access_response.VisibilityError),
+        (False, TOMORROW_RELATIVE, access_response.StartDateError),
     )
     @ddt.unpack
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
@@ -462,7 +471,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         self.assertTrue(bool(access._has_access_descriptor(
             self.beta_user, 'load', mock_unit, course_key=self.course.id)))
 
-    @ddt.data(None, YESTERDAY, TOMORROW)
+    @ddt.data(None, YESTERDAY, TOMORROW, YESTERDAY_RELATIVE, TOMORROW_RELATIVE)
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     @patch(
         'lms.djangoapps.courseware.access_utils.get_current_request_hostname',
@@ -483,7 +492,9 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
     @ddt.data(
         (TOMORROW, access_response.StartDateError),
         (None, None),
-        (YESTERDAY, None)
+        (YESTERDAY, None),
+        (TOMORROW_RELATIVE, access_response.StartDateError),
+        (YESTERDAY_RELATIVE, None)
     )  # ddt throws an error if I don't put the None argument there
     @ddt.unpack
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})

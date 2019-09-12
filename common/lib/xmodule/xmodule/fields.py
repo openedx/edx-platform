@@ -65,6 +65,8 @@ class Date(JSONField):
             return datetime.datetime.fromtimestamp(time.mktime(field), UTC)
         elif isinstance(field, datetime.datetime):
             return field
+        elif isinstance(field, datetime.timedelta):
+            return field
         else:
             msg = "Field {0} has bad value '{1}'".format(
                 self.name, field)
