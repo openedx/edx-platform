@@ -27,7 +27,7 @@ from third_party_auth import provider, pipeline
       // new window/tab opening
       $('a[rel="external"], a[class="new-vp"]')
       .click( function() {
-        window.open( $(this).attr('href') );
+        window.open( $(this).attr('href'), '', 'noopener' );
         return false;
       });
 

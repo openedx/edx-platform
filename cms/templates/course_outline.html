@@ -164,7 +164,7 @@ from django.core.urlresolvers import reverse
                     <div style="width: 50%" class="status-studio-frontend">
                 % endif
                     <%static:studiofrontend entry="courseOutlineHealthCheck">
-                        <% 
+                        <%
                             course_key = context_course.id
                         %>
                         {
@@ -188,7 +188,7 @@ from django.core.urlresolvers import reverse
                                 "settings": ${reverse('settings_handler', kwargs={'course_key_string': unicode(course_key)})| n, dump_js_escaped_json}
                             }
                         }
-                    </%static:studiofrontend> 
+                    </%static:studiofrontend>
                 </div>
                 <div class="status-highlights-enabled"></div>
             </div>
@@ -218,14 +218,14 @@ from django.core.urlresolvers import reverse
                 <h3 class="title-3">${_("Reorganizing your course")}</h3>
                 <p>${_("Drag sections, subsections, and units to new locations in the outline.")}</p>
                 <div class="external-help">
-                    <a href="${get_online_help_info('outline')['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about the course outline")}</a>
+                    <a href="${get_online_help_info('outline')['doc_url']}" rel="noopener" target="_blank" class="button external-help-button">${_("Learn more about the course outline")}</a>
                 </div>
             </div>
             <div class="bit">
                 <h3 class="title-3">${_("Setting release dates and grading policies")}</h3>
                 <p>${_("Select the Configure icon for a section or subsection to set its release date. When you configure a subsection, you can also set the grading policy and due date.")}</p>
                 <div class="external-help">
-                    <a href="${get_online_help_info('grading')['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about grading policy settings")}</a>
+                    <a href="${get_online_help_info('grading')['doc_url']}" rel="noopener" target="_blank" class="button external-help-button">${_("Learn more about grading policy settings")}</a>
                 </div>
             </div>
             <div class="bit">
@@ -234,7 +234,7 @@ from django.core.urlresolvers import reverse
                 <p>${Text(_("To make a section, subsection, or unit unavailable to learners, select the Configure icon for that level, then select the appropriate {em_start}Hide{em_end} option. Grades for hidden sections, subsections, and units are not included in grade calculations.")).format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
                 <p>${Text(_("To hide the content of a subsection from learners after the subsection due date has passed, select the Configure icon for a subsection, then select {em_start}Hide content after due date{em_end}. Grades for the subsection remain included in grade calculations.")).format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
                 <div class="external-help">
-                    <a href="${get_online_help_info('visibility')['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about content visibility settings")}</a>
+                    <a href="${get_online_help_info('visibility')['doc_url']}" rel="noopener" target="_blank" class="button external-help-button">${_("Learn more about content visibility settings")}</a>
                 </div>
             </div>
 

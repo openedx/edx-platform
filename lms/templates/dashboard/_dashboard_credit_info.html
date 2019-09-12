@@ -7,7 +7,7 @@
 
 % if credit_status["eligible"]:
     <%
-        provider_link = '<a href="{href}" target="_blank">{name}</a>'.format(
+        provider_link = '<a href="{href}" rel="noopener" target="_blank">{name}</a>'.format(
             href=credit_status["provider_status_url"],
             name=credit_status["provider_name"])
 
@@ -78,7 +78,7 @@
         </p>
         <div class="credit-action">
             % if credit_btn_label:
-                <a class="btn credit-btn ${credit_btn_class}" href="${credit_btn_href | h}" target="_blank" data-course-key="${credit_status['course_key'] | h}" data-user="${user.username | h}" data-provider="${credit_status['provider_id'] | h}">
+                <a class="btn credit-btn ${credit_btn_class}" href="${credit_btn_href | h}" rel="noopener" target="_blank" data-course-key="${credit_status['course_key'] | h}" data-user="${user.username | h}" data-provider="${credit_status['provider_id'] | h}">
                     ${credit_btn_label}
                 </a>
             % endif

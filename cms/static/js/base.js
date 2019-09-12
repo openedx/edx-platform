@@ -97,7 +97,10 @@ define([
             // general link management - new window/tab
             $('a[rel="external"]:not([title])')
                 .attr('title', gettext('This link will open in a new browser window/tab'));
-            $('a[rel="external"]').attr('target', '_blank');
+            $('a[rel="external"]').attr({
+                rel: 'noopener external',
+                target: '_blank'
+            });
 
             // general link management - lean modal window
             $('a[rel="modal"]').attr('title', gettext('This link will open in a modal window')).leanModal({
