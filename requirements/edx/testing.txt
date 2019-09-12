@@ -57,7 +57,7 @@ click-log==0.3.2          # via edx-lint
 click==7.0
 code-annotations==0.3.2
 colorama==0.4.1           # via radon
-git+https://github.com/jaraco/configparser.git@v4.0.1#egg=configparser==4.0.1       # via entrypoints, flake8, importlib-metadata, pylint
+configparser==4.0.2       # via entrypoints, flake8, importlib-metadata, pylint
 contextlib2==0.5.5
 cookies==2.2.1            # via moto
 coreapi==2.3.3
