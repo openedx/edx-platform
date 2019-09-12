@@ -66,7 +66,7 @@ DJFS = {
 
 ################################ DEBUG TOOLBAR ################################
 
-INSTALLED_APPS += ['debug_toolbar', 'debug_toolbar_mongo']
+INSTALLED_APPS += ['debug_toolbar']
 MIDDLEWARE_CLASSES += [
     'lms.djangoapps.discussion.django_comment_client.utils.QueryCountDebugMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
@@ -83,7 +83,6 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.sql.SQLPanel',
     'debug_toolbar.panels.signals.SignalsPanel',
     'debug_toolbar.panels.logging.LoggingPanel',
-    'debug_toolbar_mongo.panel.MongoDebugPanel',
     # ProfilingPanel has been intentionally removed for default devstack.py
     # runtimes for performance reasons. If you wish to re-enable it in your
     # local development environment, please create a new settings file

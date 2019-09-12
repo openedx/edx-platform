@@ -71,7 +71,7 @@ CELERY_ALWAYS_EAGER = True
 
 ################################ DEBUG TOOLBAR ################################
 
-INSTALLED_APPS += ['debug_toolbar', 'debug_toolbar_mongo']
+INSTALLED_APPS += ['debug_toolbar']
 
 MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 INTERNAL_IPS = ('127.0.0.1',)
@@ -103,11 +103,6 @@ def should_show_debug_toolbar(request):
     if request.get_host().startswith('edx.devstack.studio:'):
         return False
     return True
-
-
-# To see stacktraces for MongoDB queries, set this to True.
-# Stacktraces slow down page loads drastically (for pages with lots of queries).
-DEBUG_TOOLBAR_MONGO_STACKTRACES = False
 
 
 ########################### API DOCS #################################

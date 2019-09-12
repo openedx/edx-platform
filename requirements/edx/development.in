@@ -20,6 +20,3 @@ pyinotify                           # More efficient checking for runserver relo
 sphinx==1.8.5                       # Pinned because 2.0.0 release requires Python '>=3.5' but current Python is 2.7.12
 vulture                             # Detects possible dead/unused code, used in scripts/find-dead-code.sh
 modernize                           # Used to make Python 2 code more modern with the intention of eventually porting it over to Python 3.
-
-# The officially released version of django-debug-toolbar-mongo doesn't support DJDT 1.x. This commit does.
--e git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c4aee6e76b9abe61cc808#egg=django-debug-toolbar-mongo==0.1.10
