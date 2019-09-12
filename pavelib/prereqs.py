@@ -224,7 +224,7 @@ def uninstall_python_packages():
     # So that we don't constantly uninstall things, use a hash of the packages
     # to be uninstalled.  Check it, and skip this if we're up to date.
     hasher = hashlib.sha1()
-    hasher.update(repr(PACKAGES_TO_UNINSTALL))
+    hasher.update(repr(PACKAGES_TO_UNINSTALL).encode('utf-8'))
     expected_version = hasher.hexdigest()
     state_file_path = os.path.join(PREREQS_STATE_DIR, "Python_uninstall.sha1")
     create_prereqs_cache_dir()
@@ -257,7 +257,7 @@ def uninstall_python_packages():
 
     # Write our version.
     with io.open(state_file_path, "wb") as state_file:
-        state_file.write(expected_version)
+        state_file.write(expected_version.encode('utf-8'))
 
 
 def package_in_frozen(package_name, frozen_output):
