@@ -625,7 +625,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 ),
                 'is_practice_exam': self.is_practice_exam,
                 'allow_proctoring_opt_out': self.allow_proctoring_opt_out,
-                'due_date': self.due
+                'due_date': self.due,
+                'grace_period': self.graceperiod,
             }
 
             # inject the user's credit requirements and fulfillments

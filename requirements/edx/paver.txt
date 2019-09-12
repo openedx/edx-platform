@@ -5,7 +5,7 @@
 #    make upgrade
 #
 argh==0.26.2              # via watchdog
-certifi==2019.6.16        # via requests
+certifi==2019.9.11        # via requests
 chardet==3.0.4            # via requests
 edx-opaque-keys==1.0.1
 idna==2.8                 # via requests
