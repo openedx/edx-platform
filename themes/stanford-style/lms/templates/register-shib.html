@@ -1,8 +1,11 @@
+<%page expression_filter="h" />
 <%inherit file="main.html" />
 <%!
 from django.utils.translation import ugettext as _
 from django.urls import reverse
 from openedx.core.djangolib.js_utils import js_escaped_string
+from openedx.core.djangolib.markup import HTML, Text
+
 %>
 
 <%block name="pagetitle">${_("Preferences for {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</%block>
@@ -19,7 +22,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string
       // new window/tab opening
       $('a[rel="external"], a[class="new-vp"]')
       .click( function() {
-      window.open( $(this).attr('href') );
+      window.open( $(this).attr('href'), '', 'noopener' );
       return false;
       });
 
@@ -51,8 +54,10 @@ from openedx.core.djangolib.js_utils import js_escaped_string
       $('#register-form').on('ajax:error', function(event, jqXHR, textStatus) {
         toggleSubmitButton(true);
         json = $.parseJSON(jqXHR.responseText);
+        var submission_message = $('.status.message.submission-error .message-copy');
         $('.status.message.submission-error').addClass('is-shown').focus();
-        $('.status.message.submission-error .message-copy').html(json.value).stop().css("display", "block");
+        edx.HtmlUtils.setHtml(submission_message, edx.HtmlUtils.ensureHtml(json.value));
+        submission_message.stop().css("display", "block");
         $(".field-error").removeClass('field-error');
         $("[data-field='"+json.field+"']").addClass('field-error')
       });
@@ -102,7 +107,10 @@ from openedx.core.djangolib.js_utils import js_escaped_string
       </div>
 
       <p class="instructions">
-        ${_('Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.')}
+        ${Text(_('Required fields are noted by {strong_indicator}bold text and an asterisk (*).{strong_close}')).format(
+          strong_indicator=HTML('<strong class="indicator">'),
+          strong_close=HTML('</strong>')
+        )}
       </p>
 
       <fieldset class="group group-form group-form-requiredinformation">
@@ -153,9 +161,9 @@ from openedx.core.djangolib.js_utils import js_escaped_string
 
             <div class="field required checkbox" id="field-tos">
               <input id="tos-yes" type="checkbox" name="terms_of_service" value="true" required aria-required="true" />
-              <label for="tos-yes">${_('I agree to the {link_start}Terms of Service{link_end}').format(
-                link_start='<a href="{url}" class="new-vp">'.format(url=marketing_link('TOS')),
-                link_end='</a>')}</label>
+            <label for="tos-yes">${Text(_('I agree to the {link_start}Terms of Service{link_end}')).format(
+              link_start=HTML('<a href="{url}" class="new-vp">').format(url=marketing_link('TOS')),
+              link_end=HTML('</a>'))}</label>
             </div>
 
             % endif
@@ -165,17 +173,17 @@ from openedx.core.djangolib.js_utils import js_escaped_string
               <%
                 honor_code_path = marketing_link('TOS') + "#honor"
               %>
-              <label for="honorcode-yes">${_('I agree to the {link_start}Honor Code{link_end}').format(
-                link_start='<a href="{url}" class="new-vp">'.format(url=honor_code_path),
-                link_end='</a>')}</label>
+              <label for="honorcode-yes">${Text(_('I agree to the {link_start}Honor Code{link_end}')).format(
+                link_start=HTML('<a href="{url}" class="new-vp">').format(url=honor_code_path),
+                link_end=HTML('</a>'))}</label>
             </div>
           </li>
         </ol>
       </fieldset>
 
 % if course_id and enrollment_action:
-      <input type="hidden" name="enrollment_action" value="${enrollment_action | h}" />
-      <input type="hidden" name="course_id" value="${course_id | h}" />
+      <input type="hidden" name="enrollment_action" value="${enrollment_action}" />
+      <input type="hidden" name="course_id" value="${course_id}" />
 % endif
 
       <div class="form-actions">

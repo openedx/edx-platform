@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
 
@@ -6,6 +7,8 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 import third_party_auth
 from third_party_auth import provider, pipeline
+from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_json
 %>
 
 <%block name="pagetitle">${_("Log into your {platform_name} Account").format(platform_name=platform_name)}</%block>
@@ -27,7 +30,7 @@ from third_party_auth import provider, pipeline
       // new window/tab opening
       $('a[rel="external"], a[class="new-vp"]')
       .click( function() {
-        window.open( $(this).attr('href') );
+        window.open( $(this).attr('href'), '', 'noopener' );
         return false;
       });
 
@@ -54,24 +57,24 @@ from third_party_auth import provider, pipeline
         if (request.status === 403) {
           $('.message.submission-error').removeClass('is-shown');
           $('.third-party-signin.message').addClass('is-shown').focus();
-          $('.third-party-signin.message .instructions').html(request.responseText);
+          $('.third-party-signin.message .instructions').text(request.responseText);
         } else {
           $('.third-party-signin.message').removeClass('is-shown');
           $('.message.submission-error').addClass('is-shown').focus();
-          $('.message.submission-error').html(gettext("Your request could not be completed.  Please try again."));
+          $('.message.submission-error').text(gettext("Your request could not be completed.  Please try again."));
         }
       });
 
-      $('#login-form').on('ajax:success', function(event, json, xhr) {
-        if(json.success) {
-          var nextUrl = "${login_redirect_url}";
+      $('#login-form').on('ajax:success', function (event, json, xhr) {
+        if (json.success) {
+          var nextUrl = "${login_redirect_url | n, js_escaped_string}";
           if (json.redirect_url) {
             nextUrl = json.redirect_url; // Most likely third party auth completion. This trumps 'nextUrl' above.
           }
           if (!isExternal(nextUrl)) {
             location.href=nextUrl;
           } else {
-            location.href="${reverse('dashboard')}";
+            location.href="${reverse('dashboard') | n, js_escaped_string}";
           }
         } else if(json.hasOwnProperty('redirect')) {
           // Shibboleth authentication redirect requested by the server:
@@ -83,7 +86,7 @@ from third_party_auth import provider, pipeline
         } else {
           toggleSubmitButton(true);
           $('.message.submission-error').addClass('is-shown').focus();
-          $('.message.submission-error .message-copy').html(json.value);
+          $('.message.submission-error .message-copy').text(json.value);
         }
       });
       $("#forgot-password-link").click(function() {
@@ -97,17 +100,27 @@ from third_party_auth import provider, pipeline
       var $submitButton = $('form .form-actions #submit');
 
       if(enable) {
-        $submitButton.
-          removeClass('is-disabled').
-          attr('aria-disabled', false).
-          prop('disabled', false).
-          html("${_('Log into My {platform_name} Account').format(platform_name=platform_name)} <span class='orn-plus'>+</span> ${_('Access My Courses')}");
+
+        var platform = "${_('Log into My {platform_name} Account').format(platform_name=platform_name) | n, js_escaped_string}";
+        var msg = "${_('Access My Courses') | n, js_escaped_string}";
+        var content  = edx.HtmlUtils.interpolateHtml(
+          edx.HtmlUtils.HTML("{platform}<span class='orn-plus'>+</span>{msg}"),
+          {
+            platform:platform,
+            msg:msg
+          }
+        );
+          $submitButton.
+            removeClass('is-disabled').
+            attr('aria-disabled', false).
+            prop('disabled', false).
+            html(HtmlUtils.ensureHtml(content).toString());
       }
       else {
         $submitButton.
           addClass('is-disabled').
           prop('disabled', true).
-          text("${_(u'Processing your account information')}");
+          text("${_(u'Processing your account information') | n, js_escaped_string}");
       }
     }
 
@@ -117,15 +130,15 @@ from third_party_auth import provider, pipeline
     }
 
     (function post_form_if_pipeline_running(pipeline_running) {
-       // If the pipeline is running, the user has already authenticated via a
-       // third-party provider. We want to invoke /login_ajax to loop in the
-       // code that does logging and sets cookies on the request. It is most
-       // consistent to do that by using the same mechanism that is used when
-       // the use does first-party sign-in: POSTing the sign-in form.
-       if (pipeline_running) {
-         $('#login-form').submit();
-       }
-    })(${pipeline_running})
+      // If the pipeline is running, the user has already authenticated via a
+      // third-party provider. We want to invoke /login_ajax to loop in the
+      // code that does logging and sets cookies on the request. It is most
+      // consistent to do that by using the same mechanism that is used when
+      // the use does first-party sign-in: POSTing the sign-in form.
+      if (pipeline_running) {
+        $('#login-form').submit();
+      }
+    })(${pipeline_running | n, dump_js_escaped_json})
   </script>
 </%block>
 
@@ -170,7 +183,11 @@ from third_party_auth import provider, pipeline
       % endif
 
       <p class="instructions sr">
-        ${_('Please provide the following information to log into your {platform_name} account. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.').format(platform_name=platform_name)}
+        ${Text(_('Please provide the following information to log into your {platform_name} account. Required fields are noted by {strong_start}bold text and an asterisk (*){strong_end}.')).format(
+          platform_name=platform_name,
+          strong_start = HTML('<strong class="indicator">'),
+          strong_end=HTML('</strong>')
+        )}
       </p>
 
       <div class="group group-form group-form-requiredinformation">
@@ -220,7 +237,7 @@ from third_party_auth import provider, pipeline
 
     % for enabled in provider.Registry.displayed_for_login():
       ## Translators: provider_name is the name of an external, third-party user authentication provider (like Google or LinkedIn).
-      <button type="submit" class="button button-primary button-${enabled.provider_id} login-${enabled.provider_id}" onclick="thirdPartySignin(event, '${pipeline_url[enabled.provider_id]}');">
+      <button type="submit" class="button button-primary button-${enabled.provider_id} login-${enabled.provider_id}" onclick="thirdPartySignin(event, '${pipeline_url[enabled.provider_id]| n, decode.utf8}');">
         % if enabled.icon_class:
         <span class="icon fa ${enabled.icon_class}" aria-hidden="true"></span>
         % else:
