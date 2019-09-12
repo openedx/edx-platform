@@ -1251,7 +1251,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         """
         resp = self._get_student_progress_page()
         # Test that malicious code does not appear in html
-        self.assertNotIn(malicious_code, resp.content)
+        self.assertNotIn(malicious_code, resp.content.decode('utf-8'))
 
     def test_pure_ungraded_xblock(self):
         ItemFactory.create(category='acid', parent_location=self.vertical.location)
@@ -1534,7 +1534,7 @@ class ProgressPageTests(ProgressPageBaseTests):
 
                 self.assertEqual(
                     cert_button_hidden,
-                    'Request Certificate' not in resp.content
+                    'Request Certificate' not in resp.content.decode('utf-8')
                 )
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
