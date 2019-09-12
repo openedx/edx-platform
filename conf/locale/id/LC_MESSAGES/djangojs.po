@@ -78,8 +78,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-01 20:42+0000\n"
-"PO-Revision-Date: 2019-08-01 08:19+0000\n"
+"POT-Creation-Date: 2019-09-08 20:42+0000\n"
+"PO-Revision-Date: 2019-09-12 08:05+0000\n"
 "Last-Translator: Aprisa Chrysantina <aprisa.chrysantina@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/)\n"
 "Language: id\n"
@@ -4371,7 +4371,7 @@ msgstr "Status Tugas"
 #. sending email
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Task Progress"
-msgstr "Perkembangan Tugas"
+msgstr "Kemajuan Tugas"
 
 #: lms/static/js/instructor_dashboard/util.js
 msgid ""
@@ -9903,7 +9903,7 @@ msgstr "Konten kreatif  lisensi umum, dengan istilah sebagai berikut:"
 
 #: cms/templates/js/license-selector.underscore
 msgid "Some Rights Reserved"
-msgstr "Beberapa Hak Cipta"
+msgstr "Hak Cipta Dilindungi"
 
 #: cms/templates/js/list.underscore
 #, python-format

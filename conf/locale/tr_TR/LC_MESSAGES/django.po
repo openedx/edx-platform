@@ -128,7 +128,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-01 20:42+0000\n"
+"POT-Creation-Date: 2019-09-08 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2019\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -8299,10 +8299,6 @@ msgstr ""
 "kimlikleri boşsa blok herkese görülür olarak değerlendirilir. Blok "
 "sadece_personele_görünür ise bu alanın yok sayılacağına dikkat edin."
 
-#: lms/djangoapps/notes/views.py lms/templates/notes.html
-msgid "My Notes"
-msgstr "Notlarım"
-
 #: lms/djangoapps/program_enrollments/models.py
 msgid "One of user or external_user_key must not be null."
 msgstr ""
@@ -9215,6 +9211,15 @@ msgstr "Bedava Tur Kayıtlanmaları"
 #: lms/djangoapps/support/views/index.py
 msgid "View feature based enrollment settings"
 msgstr "Bedava tur kayıtlanma ayarlarını görüntüle"
+
+#: lms/djangoapps/support/views/index.py
+#: lms/templates/support/link_program_enrollments.html
+msgid "Link Program Enrollments"
+msgstr ""
+
+#: lms/djangoapps/support/views/index.py
+msgid "Link LMS users to program enrollments"
+msgstr ""
 
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
@@ -13957,10 +13962,6 @@ msgstr ""
 #: lms/templates/module-error.html
 msgid "Raw data:"
 msgstr "Ham veri:"
-
-#: lms/templates/notes.html
-msgid "You do not have any notes."
-msgstr "Notunuz yok."
 
 #: lms/templates/preview_menu.html
 msgid "Course View"
