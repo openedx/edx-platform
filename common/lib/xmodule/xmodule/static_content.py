@@ -230,6 +230,12 @@ def _write_files(output_root, contents, generated_suffix_map=None):
 
         not_file = not output_file.isfile()
 
+        # Sometimes content is already unicode and sometimes it's not
+        # so we add this conditional here to make sure that below we're
+        # always working with streams of bytes.
+        if not isinstance(file_content, six.binary_type):
+            file_content = file_content.encode('utf-8')
+
         # not_file is included to short-circuit this check, because
         # read_md5 depends on the file already existing
         write_file = not_file or output_file.read_md5() != hashlib.md5(file_content).digest()
