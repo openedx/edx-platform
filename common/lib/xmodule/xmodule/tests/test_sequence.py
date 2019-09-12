@@ -22,9 +22,11 @@ from xmodule.tests.xml import factories as xml
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
 TODAY = now()
-DUE_DATE = TODAY + timedelta(days=7)
-PAST_DUE_BEFORE_END_DATE = TODAY + timedelta(days=14)
 COURSE_END_DATE = TODAY + timedelta(days=21)
+COURSE_START_DATE = TODAY - timedelta(days=7)
+DUE_DATE = TODAY + timedelta(days=7)
+DUE_DATE_RELATIVE = DUE_DATE - COURSE_START_DATE
+PAST_DUE_BEFORE_END_DATE = TODAY + timedelta(days=14)
 
 
 @ddt.ddt
@@ -53,7 +55,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         """
         Sets up and returns XML course structure.
         """
-        course = xml.CourseFactory.build(end=str(COURSE_END_DATE))
+        course = xml.CourseFactory.build(end=str(COURSE_END_DATE), start=str(COURSE_START_DATE))
 
         chapter_1 = xml.ChapterFactory.build(parent=course)  # has 2 child sequences
         xml.ChapterFactory.build(parent=course)  # has 0 child sequences
@@ -67,6 +69,11 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
             parent=chapter_4,
             hide_after_due=str(True),
             due=str(DUE_DATE),
+        )
+        xml.SequenceFactory.build(  # sequence_4_2
+            parent=chapter_4,
+            hide_after_due=str(True),
+            due=str(DUE_DATE_RELATIVE.total_seconds()),
         )
 
         for _ in range(3):
@@ -178,20 +185,22 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         self.assertIn("seq_module.html", html)
         self.assertIn("'banner_text': None", html)
 
-    def test_hidden_content_past_due(self):
+    @ddt.data('sequence_4_1', 'sequence_4_2')
+    def test_hidden_content_past_due(self, sequence_to_test):
         with freeze_time(COURSE_END_DATE):
             progress_url = 'http://test_progress_link'
             html = self._get_rendered_view(
-                self.sequence_4_1,
+                getattr(self, sequence_to_test),
                 extra_context=dict(progress_url=progress_url),
             )
             self.assertIn("hidden_content.html", html)
             self.assertIn(progress_url, html)
 
-    def test_masquerade_hidden_content_past_due(self):
+    @ddt.data('sequence_4_1', 'sequence_4_2')
+    def test_masquerade_hidden_content_past_due(self, sequence_to_test):
         with freeze_time(COURSE_END_DATE):
             html = self._get_rendered_view(
-                self.sequence_4_1,
+                getattr(self, sequence_to_test),
                 extra_context=dict(specific_masquerade=True),
             )
             self.assertIn("seq_module.html", html)
@@ -201,9 +210,10 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
                 html
             )
 
-    def test_hidden_content_self_paced_past_due_before_end(self):
+    @ddt.data('sequence_4_1', 'sequence_4_2')
+    def test_hidden_content_self_paced_past_due_before_end(self, sequence_to_test):
         with freeze_time(PAST_DUE_BEFORE_END_DATE):
-            html = self._get_rendered_view(self.sequence_4_1, self_paced=True)
+            html = self._get_rendered_view(getattr(self, sequence_to_test), self_paced=True)
             self.assertIn("seq_module.html", html)
             self.assertIn("'banner_text': None", html)
 

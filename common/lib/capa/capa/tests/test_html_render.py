@@ -306,7 +306,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         # Render the HTML
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div>\s*</div>")
+        self.assertRegexpMatches(the_html, r"<div>\s*</div>|<div/>")
 
     def _create_test_file(self, path, content_str):
         test_fp = self.capa_system.filestore.open(path, "w")

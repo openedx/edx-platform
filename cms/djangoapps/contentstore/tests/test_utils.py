@@ -4,6 +4,7 @@ from __future__ import absolute_import
 import collections
 from datetime import datetime, timedelta
 
+import ddt
 import six
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
@@ -92,6 +93,7 @@ class ExtraPanelTabTestCase(TestCase):
         return course
 
 
+@ddt.ddt
 class XBlockVisibilityTestCase(SharedModuleStoreTestCase):
     """Tests for xblock visibility for students."""
 
@@ -103,30 +105,31 @@ class XBlockVisibilityTestCase(SharedModuleStoreTestCase):
         cls.past = datetime(1970, 1, 1, tzinfo=UTC)
         cls.future = datetime.now(UTC) + timedelta(days=1)
         cls.course = CourseFactory.create()
+        cls.past_relative = cls.past - cls.course.start
+        cls.future_relative = cls.future - cls.course.start
 
-    def test_private_unreleased_xblock(self):
-        """Verifies that a private unreleased xblock is not visible"""
-        self._test_visible_to_students(False, 'private_unreleased', self.future)
+    @ddt.data(
+        dict(private=True, start='future', relative_date=True, visible=False),
+        dict(private=True, start='future', relative_date=False, visible=False),
+        dict(private=True, start='past', relative_date=True, visible=False),
+        dict(private=True, start='past', relative_date=False, visible=False),
+        dict(private=False, start='future', relative_date=True, visible=False),
+        dict(private=False, start='future', relative_date=False, visible=False),
+        dict(private=False, start='past', relative_date=True, visible=True),
+        dict(private=False, start='past', relative_date=False, visible=True),
+        dict(private=True, start=None, visible=False),
+        dict(private=False, start=None, visible=True),
+    )
+    @ddt.unpack
+    def test_block_visibility(self, private, start, visible, relative_date=None):
+        block_name = "{}_{}".format(
+            "private" if private else "public",
+            start
+        )
+        if start:
+            start = getattr(self, "{}_relative".format(start) if relative_date else start)
 
-    def test_private_released_xblock(self):
-        """Verifies that a private released xblock is not visible"""
-        self._test_visible_to_students(False, 'private_released', self.past)
-
-    def test_public_unreleased_xblock(self):
-        """Verifies that a public (published) unreleased xblock is not visible"""
-        self._test_visible_to_students(False, 'public_unreleased', self.future, publish=True)
-
-    def test_public_released_xblock(self):
-        """Verifies that public (published) released xblock is visible if staff lock is not enabled."""
-        self._test_visible_to_students(True, 'public_released', self.past, publish=True)
-
-    def test_private_no_start_xblock(self):
-        """Verifies that a private xblock with no start date is not visible"""
-        self._test_visible_to_students(False, 'private_no_start', None)
-
-    def test_public_no_start_xblock(self):
-        """Verifies that a public (published) xblock with no start date is visible unless staff lock is enabled"""
-        self._test_visible_to_students(True, 'public_no_start', None, publish=True)
+        self._test_visible_to_students(visible, block_name, start, publish=visible)
 
     def test_draft_released_xblock(self):
         """Verifies that a xblock with an unreleased draft and a released published version is visible"""

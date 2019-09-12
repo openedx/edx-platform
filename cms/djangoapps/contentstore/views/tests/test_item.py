@@ -87,6 +87,8 @@ class ItemTest(CourseTestCase):
 
         self.course_key = self.course.id
         self.usage_key = self.course.location
+        self.course.start = datetime.now(UTC) - timedelta(days=30)
+        self.store.update_item(self.course, self.user.id)
 
     def get_item_from_modulestore(self, usage_key, verify_is_draft=False):
         """
@@ -182,9 +184,9 @@ class GetItemTest(ItemTest):
             self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['problem'][-1]))
 
     @ddt.data(
-        (1, 30),
-        (2, 32),
-        (3, 34),
+        (1, 32),
+        (2, 34),
+        (3, 36),
     )
     @ddt.unpack
     def test_container_get_query_count(self, branching_factor, unit_queries,):
@@ -544,6 +546,8 @@ class TestCreateItem(ItemTest):
         self.assertEqual(resp.status_code, 200)
 
     def test_create_with_future_date(self):
+        self.course.start = datetime(2030, 1, 1, tzinfo=UTC)
+        self.store.update_item(self.course, self.user.id)
         self.assertEqual(self.course.start, datetime(2030, 1, 1, tzinfo=UTC))
         resp = self.create_xblock(category='chapter')
         usage_key = self.response_usage_key(resp)
@@ -2693,7 +2697,7 @@ class TestXBlockInfo(ItemTest):
         self.assertTrue(xblock_info['published'])
         self.assertIsNone(xblock_info.get('edited_by', None))
         self.assertEqual(xblock_info['course_graders'], ['Homework', 'Lab', 'Midterm Exam', 'Final Exam'])
-        self.assertEqual(xblock_info['start'], '2030-01-01T00:00:00Z')
+        self.assertEqual(xblock_info['start'], self.course.start.strftime('%Y-%m-%dT%H:%M:%SZ'))
         self.assertEqual(xblock_info['graded'], False)
         self.assertEqual(xblock_info['due'], None)
         self.assertEqual(xblock_info['format'], None)
@@ -2876,6 +2880,7 @@ class TestLibraryXBlockInfo(ModuleStoreTestCase):
         self.assertIsNone(xblock_info.get('graders', None))
 
 
+@ddt.ddt
 class TestLibraryXBlockCreation(ItemTest):
     """
     Tests the adding of XBlocks to Library
@@ -2921,13 +2926,16 @@ class TestXBlockPublishingInfo(ItemTest):
     FIRST_UNIT_PATH = [0, 0]
     SECOND_UNIT_PATH = [0, 1]
 
-    def _create_child(self, parent, category, display_name, publish_item=False, staff_only=False):
+    def _create_child(self, parent, category, display_name, publish_item=False, staff_only=False, start=None):
         """
         Creates a child xblock for the given parent.
         """
+        kwargs = {}
+        if start:
+            kwargs['start'] = start
         child = ItemFactory.create(
             parent_location=parent.location, category=category, display_name=display_name,
-            user_id=self.user.id, publish_item=publish_item
+            user_id=self.user.id, publish_item=publish_item, **kwargs
         )
         if staff_only:
             self._enable_staff_only(child.location)
@@ -2963,12 +2971,15 @@ class TestXBlockPublishingInfo(ItemTest):
             course_outline=True
         )
 
-    def _set_release_date(self, location, start):
+    def _set_release_date(self, location, start, relative):
         """
         Sets the release date for the specified xblock.
         """
         xblock = modulestore().get_item(location)
-        xblock.start = start
+        if relative:
+            xblock.start = start - self.course.start
+        else:
+            xblock.start = start
         self.store.update_item(xblock, self.user.id)
 
     def _enable_staff_only(self, location):
@@ -3025,16 +3036,17 @@ class TestXBlockPublishingInfo(ItemTest):
     def test_empty_chapter(self):
         empty_chapter = self._create_child(self.course, 'chapter', "Empty Chapter")
         xblock_info = self._get_xblock_info(empty_chapter.location)
-        self._verify_visibility_state(xblock_info, VisibilityState.unscheduled)
+        self._verify_visibility_state(xblock_info, VisibilityState.live)
 
     def test_empty_sequential(self):
         chapter = self._create_child(self.course, 'chapter', "Test Chapter")
         self._create_child(chapter, 'sequential', "Empty Sequential")
         xblock_info = self._get_xblock_info(chapter.location)
-        self._verify_visibility_state(xblock_info, VisibilityState.unscheduled)
-        self._verify_visibility_state(xblock_info, VisibilityState.unscheduled, path=self.FIRST_SUBSECTION_PATH)
+        self._verify_visibility_state(xblock_info, VisibilityState.live)
+        self._verify_visibility_state(xblock_info, VisibilityState.live, path=self.FIRST_SUBSECTION_PATH)
 
-    def test_published_unit(self):
+    @ddt.data(True, False)
+    def test_published_unit(self, relative_date):
         """
         Tests the visibility state of a published unit with release date in the future.
         """
@@ -3042,14 +3054,15 @@ class TestXBlockPublishingInfo(ItemTest):
         sequential = self._create_child(chapter, 'sequential', "Test Sequential")
         self._create_child(sequential, 'vertical', "Published Unit", publish_item=True)
         self._create_child(sequential, 'vertical', "Staff Only Unit", staff_only=True)
-        self._set_release_date(chapter.location, datetime.now(UTC) + timedelta(days=1))
+        self._set_release_date(chapter.location, datetime.now(UTC) + timedelta(days=1), relative_date)
         xblock_info = self._get_xblock_info(chapter.location)
         self._verify_visibility_state(xblock_info, VisibilityState.ready)
         self._verify_visibility_state(xblock_info, VisibilityState.ready, path=self.FIRST_SUBSECTION_PATH)
         self._verify_visibility_state(xblock_info, VisibilityState.ready, path=self.FIRST_UNIT_PATH)
         self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=self.SECOND_UNIT_PATH)
 
-    def test_released_unit(self):
+    @ddt.data(True, False)
+    def test_released_unit(self, relative_date):
         """
         Tests the visibility state of a published unit with release date in the past.
         """
@@ -3057,7 +3070,7 @@ class TestXBlockPublishingInfo(ItemTest):
         sequential = self._create_child(chapter, 'sequential', "Test Sequential")
         self._create_child(sequential, 'vertical', "Published Unit", publish_item=True)
         self._create_child(sequential, 'vertical', "Staff Only Unit", staff_only=True)
-        self._set_release_date(chapter.location, datetime.now(UTC) - timedelta(days=1))
+        self._set_release_date(chapter.location, datetime.now(UTC) - timedelta(days=1), relative_date)
         xblock_info = self._get_xblock_info(chapter.location)
         self._verify_visibility_state(xblock_info, VisibilityState.live)
         self._verify_visibility_state(xblock_info, VisibilityState.live, path=self.FIRST_SUBSECTION_PATH)
@@ -3080,16 +3093,17 @@ class TestXBlockPublishingInfo(ItemTest):
         self._verify_visibility_state(xblock_info, VisibilityState.needs_attention, path=self.FIRST_UNIT_PATH)
         self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=self.SECOND_UNIT_PATH)
 
-    def test_partially_released_section(self):
+    @ddt.data(True, False)
+    def test_partially_released_section(self, relative_date):
         chapter = self._create_child(self.course, 'chapter', "Test Chapter")
         released_sequential = self._create_child(chapter, 'sequential', "Released Sequential")
         self._create_child(released_sequential, 'vertical', "Released Unit", publish_item=True)
         self._create_child(released_sequential, 'vertical', "Staff Only Unit", staff_only=True)
-        self._set_release_date(chapter.location, datetime.now(UTC) - timedelta(days=1))
+        self._set_release_date(chapter.location, datetime.now(UTC) - timedelta(days=1), relative_date)
         published_sequential = self._create_child(chapter, 'sequential', "Published Sequential")
         self._create_child(published_sequential, 'vertical', "Published Unit", publish_item=True)
         self._create_child(published_sequential, 'vertical', "Staff Only Unit", staff_only=True)
-        self._set_release_date(published_sequential.location, datetime.now(UTC) + timedelta(days=1))
+        self._set_release_date(published_sequential.location, datetime.now(UTC) + timedelta(days=1), relative_date)
         xblock_info = self._get_xblock_info(chapter.location)
 
         # Verify the state of the released sequential
@@ -3189,25 +3203,27 @@ class TestXBlockPublishingInfo(ItemTest):
         add_container_page_publishing_info(self.course, vertical, vertical_info)
         self.assertEqual(_xblock_type_and_display_name(vertical), vertical_info["staff_lock_from"])
 
-    def test_unscheduled_section_with_live_subsection(self):
-        chapter = self._create_child(self.course, 'chapter', "Test Chapter")
+    @ddt.data(True, False)
+    def test_unscheduled_section_with_live_subsection(self, relative_date):
+        chapter = self._create_child(self.course, 'chapter', "Test Chapter", start=DEFAULT_START_DATE)
         sequential = self._create_child(chapter, 'sequential', "Test Sequential")
         self._create_child(sequential, 'vertical', "Published Unit", publish_item=True)
         self._create_child(sequential, 'vertical', "Staff Only Unit", staff_only=True)
-        self._set_release_date(sequential.location, datetime.now(UTC) - timedelta(days=1))
+        self._set_release_date(sequential.location, datetime.now(UTC) - timedelta(days=1), relative_date)
         xblock_info = self._get_xblock_info(chapter.location)
         self._verify_visibility_state(xblock_info, VisibilityState.needs_attention)
         self._verify_visibility_state(xblock_info, VisibilityState.live, path=self.FIRST_SUBSECTION_PATH)
         self._verify_visibility_state(xblock_info, VisibilityState.live, path=self.FIRST_UNIT_PATH)
         self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=self.SECOND_UNIT_PATH)
 
-    def test_unreleased_section_with_live_subsection(self):
+    @ddt.data(True, False)
+    def test_unreleased_section_with_live_subsection(self, relative_date):
         chapter = self._create_child(self.course, 'chapter', "Test Chapter")
         sequential = self._create_child(chapter, 'sequential', "Test Sequential")
         self._create_child(sequential, 'vertical', "Published Unit", publish_item=True)
         self._create_child(sequential, 'vertical', "Staff Only Unit", staff_only=True)
-        self._set_release_date(chapter.location, datetime.now(UTC) + timedelta(days=1))
-        self._set_release_date(sequential.location, datetime.now(UTC) - timedelta(days=1))
+        self._set_release_date(chapter.location, datetime.now(UTC) + timedelta(days=1), relative_date)
+        self._set_release_date(sequential.location, datetime.now(UTC) - timedelta(days=1), relative_date)
         xblock_info = self._get_xblock_info(chapter.location)
         self._verify_visibility_state(xblock_info, VisibilityState.needs_attention)
         self._verify_visibility_state(xblock_info, VisibilityState.live, path=self.FIRST_SUBSECTION_PATH)
@@ -3238,8 +3254,14 @@ class TestXBlockPublishingInfo(ItemTest):
         self._verify_has_staff_only_message(xblock_info, True, path=self.FIRST_SUBSECTION_PATH)
         self._verify_has_staff_only_message(xblock_info, True, path=self.FIRST_UNIT_PATH)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_self_paced_item_visibility_state(self, store_type):
+    @ddt.data(
+        dict(store_type=ModuleStoreEnum.Type.mongo, relative_date=True),
+        dict(store_type=ModuleStoreEnum.Type.split, relative_date=True),
+        dict(store_type=ModuleStoreEnum.Type.mongo, relative_date=False),
+        dict(store_type=ModuleStoreEnum.Type.split, relative_date=False),
+    )
+    @ddt.unpack
+    def test_self_paced_item_visibility_state(self, store_type, relative_date):
         """
         Test that in self-paced course, item has `live` visibility state.
         Test that when item was initially in `scheduled` state in instructor mode, change course pacing to self-paced,
@@ -3249,7 +3271,7 @@ class TestXBlockPublishingInfo(ItemTest):
         # Create course, chapter and setup future release date to make chapter in scheduled state
         course = CourseFactory.create(default_store=store_type)
         chapter = self._create_child(course, 'chapter', "Test Chapter")
-        self._set_release_date(chapter.location, datetime.now(UTC) + timedelta(days=1))
+        self._set_release_date(chapter.location, datetime.now(UTC) + timedelta(days=1), relative_date)
 
         # Check that chapter has scheduled state
         xblock_info = self._get_xblock_info(chapter.location)

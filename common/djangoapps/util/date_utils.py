@@ -37,10 +37,13 @@ def user_absolute_time(user, course_key, date_field_value):
 
     from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
     if isinstance(date_field_value, timedelta):
-        try:
-            course_start = user.courseenrollment_set.get(course_id=course_key).schedule.start
-        except Schedule.DoesNotExist:
-            course_start = user.courseenrollment_set.get(course_id=course_key).course.start
+        if user.is_authenticated:
+            try:
+                course_start = user.courseenrollment_set.get(course_id=course_key).schedule.start
+            except Schedule.DoesNotExist:
+                course_start = user.courseenrollment_set.get(course_id=course_key).course.start
+        else:
+            course_start = CourseOverview.get_from_id(course_key).start
         return course_start + date_field_value
     else:
         return date_field_value

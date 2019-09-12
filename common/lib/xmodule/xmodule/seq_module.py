@@ -8,7 +8,7 @@ from __future__ import absolute_import
 import collections
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import reduce
 
 from pkg_resources import resource_string
@@ -240,17 +240,21 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         raise NotFoundError('Unexpected dispatch type')
 
     @classmethod
-    def verify_current_content_visibility(cls, date, hide_after_date):
+    def verify_current_content_visibility(cls, course_start, date_or_timedelta, hide_after_date):
         """
         Returns whether the content visibility policy passes
         for the given date and hide_after_date values and
         the current date-time.
         """
-        return (
-            not date or
-            not hide_after_date or
-            datetime.now(UTC) < date
-        )
+        if not date_or_timedelta or not hide_after_date:
+            return True
+
+        if isinstance(date_or_timedelta, timedelta):
+            date = course_start + date_or_timedelta
+        else:
+            date = date_or_timedelta
+
+        return datetime.now(UTC) < date
 
     def student_view(self, context):
         _ = self.runtime.service(self, "i18n").ugettext
@@ -331,7 +335,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         hidden_date = course.end if course.self_paced else self.due
         return (
             self.runtime.user_is_staff or
-            self.verify_current_content_visibility(hidden_date, self.hide_after_due)
+            self.verify_current_content_visibility(course.start, hidden_date, self.hide_after_due)
         )
 
     def is_user_authenticated(self, context):

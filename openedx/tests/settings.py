@@ -11,7 +11,8 @@ import tempfile
 from path import Path
 
 # TODO: Remove the rest of the sys.path modification here and in (cms|lms)/envs/common.py
-REPO_ROOT = Path(__file__).abspath().dirname().dirname().dirname()  # /edx-platform/
+REPO_ROOT = Path(__file__).abspath().parent.parent.parent  # /edx-platform/
+ENV_ROOT = REPO_ROOT.parent  # virtualenv dir /edx-platform is in
 sys.path.append(REPO_ROOT / 'common' / 'djangoapps')
 sys.path.append(REPO_ROOT / 'lms' / 'djangoapps')
 
@@ -57,6 +58,11 @@ PROCTORING_BACKENDS = {
     'mock_proctoring_without_rules': {},
 }
 
+PROCTORING_SETTINGS = {}
+
+SITE_NAME = 'Test Site'
+PLATFORM_NAME = 'Test Platform'
+
 FEATURES = {}
 
 INSTALLED_APPS = (
@@ -82,7 +88,9 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig',
     'openedx.core.djangoapps.content.block_structure.apps.BlockStructureConfig',
     'openedx.core.djangoapps.catalog',
+    'openedx.core.djangoapps.schedules',
     'openedx.core.djangoapps.self_paced',
+    'openedx.core.djangoapps.theming',
     'experiments',
     'openedx.features.content_type_gating',
     'openedx.features.course_duration_limits',
@@ -95,6 +103,9 @@ INSTALLED_APPS = (
     # Django 1.11 demands to have imported models supported by installed apps.
     'completion',
     'entitlements',
+    'edx_proctoring',
+    'oauth2_provider',
+    'oauth_provider',
 )
 
 LMS_ROOT_URL = "http://localhost:8000"
@@ -116,4 +127,11 @@ USE_TZ = True
 RETIREMENT_SERVICE_WORKER_USERNAME = 'RETIREMENT_SERVICE_USER'
 RETIRED_USERNAME_PREFIX = 'retired__user_'
 
-PROCTORING_SETTINGS = {}
+XQUEUE_INTERFACE = {
+    'url': 'http://localhost:18040',
+    'basic_auth': ['edx', 'edx'],
+    'django_auth': {
+        'username': 'lms',
+        'password': 'password'
+    }
+}
