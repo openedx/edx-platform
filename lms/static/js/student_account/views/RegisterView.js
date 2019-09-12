@@ -133,12 +133,11 @@
 
                 render: function(html) {
                     var fields = html || '',
-                        formErrorsTitle = gettext('An error occurred.');
-
-                    $(this.el).html(_.template(this.tpl)({
-                    /* We pass the context object to the template so that
-                     * we can perform variable interpolation using sprintf
-                     */
+                        formErrorsTitle = gettext('An error occurred.'),
+                        renderHtml = _.template(this.tpl)({
+                          /* We pass the context object to the template so that
+                           * we can perform variable interpolation using sprintf
+                           */
                         context: {
                             fields: fields,
                             currentProvider: this.currentProvider,
@@ -149,7 +148,8 @@
                             autoRegisterWelcomeMessage: this.autoRegisterWelcomeMessage,
                             registerFormSubmitButtonText: this.registerFormSubmitButtonText
                         }
-                    }));
+                        });
+                    HtmlUtils.setHtml($(this.el), HtmlUtils.HTML(renderHtml));
 
                     this.postRender();
 
@@ -261,7 +261,7 @@
                     $('label a').click(function(ev) {
                         ev.stopPropagation();
                         ev.preventDefault();
-                        window.open($(this).attr('href'), $(this).attr('target'));
+                        window.open($(this).attr('href'), $(this).attr('target'), 'noopener');
                     });
                     $('.form-field').each(function() {
                         $(this).find('option:first').html('');

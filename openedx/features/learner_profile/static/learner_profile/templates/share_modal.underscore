@@ -7,21 +7,31 @@
     <hr class="modal-hr"/>
     <img class="backpack-logo" src="<%- badgeMeta.badges_logo %>" alt="">
     <ol class="badges-steps">
-        <li class="step"><%=
-        interpolate(
-          gettext("Create a %(link_start)sMozilla Backpack%(link_end)s account, or log in to your existing account"),
-          {link_start: '<a href="https://backpack.openbadges.org/" target="_blank">', link_end: '</a>'},
-          true
-        )%>
+        <li class="step">
+        <%- edx.HtmlUtils.interpolateHtml(
+            gettext("Create a {link_start}Mozilla Backpack{link_end} account, or log in to your existing account"),
+            {
+              link_start: edx.HtmlUtils.HTML('<a href="https://backpack.openbadges.org/" rel="noopener" target="_blank">'),
+              link_end: edx.HtmlUtils.HTML('</a>')
+            }
+          )
+        %>
         </li>
-        <li class="step"><%=
-        interpolate(
-          gettext("%(download_link_start)sDownload this image (right-click or option-click, save as)%(link_end)s and then %(upload_link_start)supload%(link_end)s it to your backpack.</li>"), {
-            download_link_start: '<a class="badge-link" href="' + image_url + '" target="_blank">',
-            link_end: '</a>', upload_link_start: '<a href="https://backpack.openbadges.org/backpack/add" target="_blank">'
-          },
-          true
-        )%>
+        <li class="step">
+        <%- edx.HtmlUtils.interpolateHtml(
+            gettext("{download_link_start}Download this image (right-click or option-click, save as){link_end} and then {upload_link_start}upload{link_end} it to your backpack."),
+            {
+              download_link_start: edx.HtmlUtils.joinHtml(
+                edx.HtmlUtils.HTML('<a class="badge-link" href="'),
+                image_url,
+                edx.HtmlUtils.HTML('" rel="noopener" target="_blank">'),
+              ),
+              link_end: edx.HtmlUtils.HTML('</a>'),
+              upload_link_start: edx.HtmlUtils.HTML('<a href="https://backpack.openbadges.org/backpack/add" rel="noopener" target="_blank">')
+            }
+        )
+        %>
+        </li>
     </ol>
     <div class="image-container">
         <img class="badges-backpack-example" src="<%- badgeMeta.backpack_ui_img %>" alt="">
