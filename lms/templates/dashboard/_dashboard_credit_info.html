@@ -74,7 +74,7 @@
                 credit_btn_label = None
     %>
 
-    <div class="message message-status is-shown credit-message">
+<div class="message message-status is-shown credit-message">
 
         <p class="message-copy is-hidden credit-error-msg" data-credit-error="${credit_status['error']}">
             ${Text(_("An error occurred with this transaction. For help, contact {support_email}.")).format(
@@ -92,4 +92,5 @@
             <div class="message-copy credit-msg ${credit_msg_class}">${credit_msg}</div>
         </div>
     </div>
+</div>
 % endif

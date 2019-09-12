@@ -79,6 +79,8 @@ from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.lti_2_util import LTI20ModuleMixin, LTIError
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.x_module import XModule, module_attr
+from openedx.core.djangolib.markup import HTML, Text
+
 
 log = logging.getLogger(__name__)
 
