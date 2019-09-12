@@ -96,7 +96,7 @@ $(function () {
   ## ----------------------------- Grade overview bar ------------------------- ##
   tickIndex += sectionSpacer
   
-  series = categories.values()
+  series = list(categories.values())
   overviewBarX = tickIndex
   extraColorIndex = len(categories) #Keeping track of the next color to use for categories not in categories[]
   

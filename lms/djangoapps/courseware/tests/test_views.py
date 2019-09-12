@@ -2025,7 +2025,7 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
         resp = self._get_progress_page()
 
         # Test that no problem scores are present
-        self.assertIn('No problem scores in this section', resp.content)
+        self.assertIn('No problem scores in this section', resp.content.decode('utf-8'))
 
     @ddt.data(
         ('', None, False, True),
