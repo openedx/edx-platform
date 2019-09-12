@@ -2,10 +2,10 @@
 {% load i18n staticfiles %}
 {% load django_markup %}
 
-{% block title %}{% trans "Signed Out" as tmsg %} | {{ tmsg | force_escape }} | {{ block.super }}{% endblock %}
+{% block title %}{% trans "Signed Out" as tmsg %}{{ tmsg | force_escape }} | {{ block.super }}{% endblock %}
 
 {% block body %}
-    <h1>{% trans "You have signed out." as tmsg %} | {{ tmsg | force_escape }}</h1>
+    <h1>{% trans "You have signed out." as tmsg %}{{ tmsg | force_escape }}</h1>
 
     <p style="text-align: center; margin-bottom: 20px;">
         {% blocktrans trimmed asvar signout_msg1 %}
