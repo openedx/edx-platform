@@ -9,12 +9,12 @@
     <ol class="badges-steps">
         <li class="step">
         <%= edx.HtmlUtils.interpolateHtml(
-              gettext("Create a {link_start}Mozilla Backpack{link_end} account, or log in to your existing account"),
-              {
-                link_start: edx.HtmlUtils.HTML('<a href="https://backpack.openbadges.org/" rel="noopener" target="_blank">'),
-                link_end: edx.HtmlUtils.HTML('</a>')
-              }
-            )
+            gettext("Create a {link_start}Mozilla Backpack{link_end} account, or log in to your existing account"),
+            {
+              link_start: edx.HtmlUtils.HTML('<a href="https://backpack.openbadges.org/" rel="noopener" target="_blank">'),
+              link_end: edx.HtmlUtils.HTML('</a>')
+            }
+          )
         %>
         </li>
         <li class="step">
@@ -29,7 +29,7 @@
               link_end: edx.HtmlUtils.HTML('</a>'),
               upload_link_start: edx.HtmlUtils.HTML('<a href="https://backpack.openbadges.org/backpack/add" rel="noopener" target="_blank">')
             }
-          )
+        )
         %>
         </li>
     </ol>
