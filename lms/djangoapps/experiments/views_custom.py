@@ -5,10 +5,13 @@ The Discount API Views should return information about discounts that apply to t
 # -*- coding: utf-8 -*-
 
 from __future__ import absolute_import
+import six
 
 from django.utils.decorators import method_decorator
+from django.http import HttpResponse, HttpResponseBadRequest
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -20,8 +23,8 @@ from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiv
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermissionIsAuthenticated
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 
-from course_modes.models import CourseMode
-from lms.djangoapps.experiments.utils import get_base_experiment_metadata_context
+from course_modes.models import get_cosmetic_verified_display_price, CourseMode
+from lms.djangoapps.experiments.utils import check_and_get_upgrade_link_and_date  # get_base_experiment_metadata_context
 from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
 from student.models import CourseEnrollment
 from track import segment
@@ -92,7 +95,7 @@ class Rev934(DeveloperErrorViewMixin, APIView):
             "basket_url": "https://ecommerce.edx.org/basket/add?sku=abcdef"
         }
     """
-    # http://localhost:18000/api/experiments/v0/custom/REV-934/?course_id=course-v1:edX+DemoX+Demo_Course
+    # https://courses.stage.edx.org/api/experiments/v0/custom/REV-934/?course_id=course-v1%3AedX%2BDemoX%2BDemo_Course
 
     authentication_classes = (
         JwtAuthentication,
@@ -112,30 +115,28 @@ class Rev934(DeveloperErrorViewMixin, APIView):
                 'upsell_flag': False,
             })
 
-        if 'course_id' not in request.GET:
-            return Response({
-                'show_upsell': False,
-            })
+        course_id = request.GET.get('course_id')
+        try:
+            course_key = CourseKey.from_string(course_id)  # if course_id else None
+        except InvalidKeyError:
+            return HttpResponseBadRequest("Missing or invalid course_id")
 
-        # HACK: the url decoding converts plus to space; put them back
-        course_id = request.GET.get('course_id').replace(' ', '+')
-        course_key = CourseKey.from_string(course_id)
         course = CourseOverview.get_from_id(course_key)
         user = request.user
 
         enrollment = None
         user_enrollments = None
-        has_non_audit_enrollments = False
+        should_upsell = True
         try:
-            user_enrollments = CourseEnrollment.objects.select_related('course').filter(user_id=user.id)
-            has_non_audit_enrollments = user_enrollments.exclude(mode__in=CourseMode.UPSELL_TO_VERIFIED_MODES).exists()
             enrollment = CourseEnrollment.objects.select_related(
                 'course'
             ).get(user_id=user.id, course_id=course.id)
+            should_upsell = enrollment.mode in CourseMode.UPSELL_TO_VERIFIED_MODES
         except CourseEnrollment.DoesNotExist:
             pass  # Not enrolled, use the default values
 
-        context = get_base_experiment_metadata_context(course, user, enrollment, user_enrollments)
+        upgrade_link, upgrade_date = check_and_get_upgrade_link_and_date(user, enrollment, course)
+        upgrade_price = six.text_type(get_cosmetic_verified_display_price(course))
 
         bucket = stable_bucketing_hash_group(MOBILE_UPSELL_EXPERIMENT, 2, user.username)
         if hasattr(request, 'session') and MOBILE_UPSELL_EXPERIMENT not in request.session:
@@ -154,12 +155,12 @@ class Rev934(DeveloperErrorViewMixin, APIView):
             # Mark that we've recorded this bucketing, so that we don't do it again this session
             request.session[MOBILE_UPSELL_EXPERIMENT] = True
 
-        show_upsell = bucket != 0 and not has_non_audit_enrollments
+        show_upsell = bucket != 0 and should_upsell
         if show_upsell:
             return Response({
                 'show_upsell': show_upsell,
-                'price': context.get('upgrade_price'),
-                'basket_url': context.get('upgrade_link'),
+                'price': upgrade_price,
+                'basket_url': upgrade_link,
             })
         else:
             return Response({
