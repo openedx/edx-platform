@@ -1357,6 +1357,8 @@ INSTALLED_APPS = [
     'openedx.features.discounts',
     'experiments',
 
+    # so sample_task is available to celery workers
+    'openedx.core.djangoapps.heartbeat',
 ]
 
 
