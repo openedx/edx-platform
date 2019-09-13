@@ -1311,7 +1311,8 @@ def append_data_to_webob_response(response, data):
 
     """
     if getattr(response, 'content_type', None) == 'application/json':
-        response_data = json.loads(response.body)
+        json_input = response.body.decode('utf-8') if isinstance(response.body, bytes) else response.body
+        response_data = json.loads(json_input)
         response_data.update(data)
-        response.body = json.dumps(response_data)
+        response.body = json.dumps(response_data).encode('utf-8')
     return response
