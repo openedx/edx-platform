@@ -99,7 +99,7 @@ class AccessTokenView(RatelimitMixin, _DispatchingView):
     def dispatch(self, request, *args, **kwargs):
         response = super(AccessTokenView, self).dispatch(request, *args, **kwargs)
 
-        token_type = request.POST.get('token_type', 'no_token_type_supplied').lower()
+        token_type = request.POST.get('token_type', request.META.get('X-Token-Type', 'no_token_type_supplied')).lower()
         monitoring_utils.set_custom_metric('oauth_token_type', token_type)
         monitoring_utils.set_custom_metric('oauth_grant_type', request.POST.get('grant_type', ''))
 
