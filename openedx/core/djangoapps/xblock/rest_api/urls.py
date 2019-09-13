@@ -20,7 +20,7 @@ urlpatterns = [
             url(r'^handler_url/(?P<handler_name>[\w\-]+)/$', views.get_handler_url),
             # call one of this block's handlers
             url(
-                r'^handler/(?P<user_id>\d+)-(?P<secure_token>\w+)/(?P<handler_name>[\w\-]+)/(?P<suffix>.+)?$',
+                r'^handler/(?P<user_id>\w+)-(?P<secure_token>\w+)/(?P<handler_name>[\w\-]+)/(?P<suffix>.+)?$',
                 views.xblock_handler,
                 name='xblock_handler',
             ),

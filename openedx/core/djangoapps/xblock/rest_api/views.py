@@ -42,7 +42,7 @@ def block_metadata(request, usage_key_str):
 
 
 @api_view(['GET'])
-@view_auth_classes(is_authenticated=True)
+@view_auth_classes(is_authenticated=False)
 @permission_classes((permissions.AllowAny, ))  # Permissions are handled at a lower level, by the learning context
 def render_block_view(request, usage_key_str, view_name):
     """
@@ -57,7 +57,7 @@ def render_block_view(request, usage_key_str, view_name):
 
 
 @api_view(['GET'])
-@view_auth_classes(is_authenticated=True)
+@view_auth_classes(is_authenticated=False)
 def get_handler_url(request, usage_key_str, handler_name):
     """
     Get an absolute URL which can be used (without any authentication) to call
@@ -66,7 +66,7 @@ def get_handler_url(request, usage_key_str, handler_name):
     The URL will expire but is guaranteed to be valid for a minimum of 2 days.
     """
     usage_key = UsageKey.from_string(usage_key_str)
-    handler_url = _get_handler_url(usage_key, handler_name, request.user.id)
+    handler_url = _get_handler_url(usage_key, handler_name, request.user)
     return Response({"handler_url": handler_url})
 
 
@@ -84,7 +84,6 @@ def xblock_handler(request, user_id, secure_token, usage_key_str, handler_name, 
     auth token included in the URL (see below). As a result it can be exempt
     from CSRF, session auth, and JWT/OAuth.
     """
-    user_id = int(user_id)  # User ID comes from the URL, not session auth
     usage_key = UsageKey.from_string(usage_key_str)
 
     # To support sandboxed XBlocks, custom frontends, and other use cases, we
@@ -94,13 +93,31 @@ def xblock_handler(request, user_id, secure_token, usage_key_str, handler_name, 
     if not validate_secure_token_for_xblock_handler(user_id, usage_key_str, secure_token):
         raise PermissionDenied("Invalid/expired auth token.")
     if request.user.is_authenticated:
-        # The user authenticated twice, e.g. with session auth and the token
-        # So just make sure the session auth matches the token
-        if request.user.id != user_id:
+        # The user authenticated twice, e.g. with session auth and the token.
+        # This can happen if not running the XBlock in a sandboxed iframe.
+        # Just make sure the session auth matches the token:
+        if request.user.id != int(user_id):
             raise AuthenticationFailed("Authentication conflict.")
         user = request.user
+    elif user_id.isdigit():
+        # This is a normal (integer) user ID for a registered user.
+        # This is the "normal" way this view gets used, with a sandboxed iframe.
+        user = User.objects.get(pk=int(user_id))
+    elif user_id.startswith("anon"):
+        # This is a non-registered (anonymous) user:
+        assert request.user.is_anonymous
+        assert not hasattr(request.user, 'xblock_id_for_anonymous_user')
+        user = request.user  # An AnonymousUser
+        # Since this particular view usually gets called from a sandboxed iframe
+        # we won't have access to the LMS session data for this user (the iframe
+        # has a new, empty session). So we need to save the identifier for this
+        # anonymous user (from the URL) on the user object, so that the runtime
+        # can get it (instead of generating a new one and saving it into this
+        # new empty session)
+        # See djangoapps.xblock.utils.get_xblock_id_for_anonymous_user()
+        user.xblock_id_for_anonymous_user = user_id
     else:
-        user = User.objects.get(pk=user_id)
+        raise AuthenticationFailed("Invalid user ID format.")
 
     request_webob = DjangoWebobRequest(request)  # Convert from django request to the webob format that XBlocks expect
     block = load_block(usage_key, user)
