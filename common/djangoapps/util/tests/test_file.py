@@ -231,55 +231,56 @@ class TestUniversalNewlineIterator(TestCase):
     @ddt.data(1, 2, 999)
     def test_line_feeds(self, buffer_size):
         self.assertEqual(
-            [thing for thing in UniversalNewlineIterator(StringIO(u'foo\nbar\n'), buffer_size=buffer_size)],
+            [thing.decode('utf-8') for thing in UniversalNewlineIterator(StringIO(u'foo\nbar\n'), buffer_size=buffer_size)],
             ['foo\n', 'bar\n']
         )
 
     @ddt.data(1, 2, 999)
     def test_carriage_returns(self, buffer_size):
+        import pdb; pdb.set_trace()
         self.assertEqual(
-            [thing for thing in UniversalNewlineIterator(StringIO(u'foo\rbar\r'), buffer_size=buffer_size)],
+            [thing.decode('utf-8') for thing in UniversalNewlineIterator(StringIO(u'foo\rbar\r'), buffer_size=buffer_size)],
             ['foo\n', 'bar\n']
         )
 
     @ddt.data(1, 2, 999)
     def test_carriage_returns_and_line_feeds(self, buffer_size):
         self.assertEqual(
-            [thing for thing in UniversalNewlineIterator(StringIO(u'foo\r\nbar\r\n'), buffer_size=buffer_size)],
+            [thing.decode('utf-8') for thing in UniversalNewlineIterator(StringIO(u'foo\r\nbar\r\n'), buffer_size=buffer_size)],
             ['foo\n', 'bar\n']
         )
 
     @ddt.data(1, 2, 999)
     def test_no_trailing_newline(self, buffer_size):
         self.assertEqual(
-            [thing for thing in UniversalNewlineIterator(StringIO(u'foo\nbar'), buffer_size=buffer_size)],
+            [thing.decode('utf-8') for thing in UniversalNewlineIterator(StringIO(u'foo\nbar'), buffer_size=buffer_size)],
             ['foo\n', 'bar']
         )
 
     @ddt.data(1, 2, 999)
     def test_only_one_line(self, buffer_size):
         self.assertEqual(
-            [thing for thing in UniversalNewlineIterator(StringIO(u'foo\n'), buffer_size=buffer_size)],
+            [thing.decode('utf-8') for thing in UniversalNewlineIterator(StringIO(u'foo\n'), buffer_size=buffer_size)],
             ['foo\n']
         )
 
     @ddt.data(1, 2, 999)
     def test_only_one_line_no_trailing_newline(self, buffer_size):
         self.assertEqual(
-            [thing for thing in UniversalNewlineIterator(StringIO(u'foo'), buffer_size=buffer_size)],
+            [thing.decode('utf-8') for thing in UniversalNewlineIterator(StringIO(u'foo'), buffer_size=buffer_size)],
             ['foo']
         )
 
     @ddt.data(1, 2, 999)
     def test_empty_file(self, buffer_size):
         self.assertEqual(
-            [thing for thing in UniversalNewlineIterator(StringIO(u''), buffer_size=buffer_size)],
+            [thing.decode('utf-8') for thing in UniversalNewlineIterator(StringIO(u''), buffer_size=buffer_size)],
             []
         )
 
     @ddt.data(1, 2, 999)
     def test_unicode_data(self, buffer_size):
         self.assertEqual(
-            [thing for thing in UniversalNewlineIterator(StringIO(u'héllø wo®ld'), buffer_size=buffer_size)],
+            [thing.decode('utf-8') for thing in UniversalNewlineIterator(StringIO(u'héllø wo®ld'), buffer_size=buffer_size)],
             [u'héllø wo®ld']
         )
