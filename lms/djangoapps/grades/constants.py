@@ -15,3 +15,4 @@ class ScoreDatabaseTableEnum(object):
 class GradeOverrideFeatureEnum(object):
     proctoring = 'PROCTORING'
     gradebook = 'GRADEBOOK'
+    grade_import = 'grade-import'

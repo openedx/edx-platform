@@ -65,6 +65,7 @@ def override_subsection_grade(
         requesting_user=overrider,
         subsection_grade_model=grade,
         feature=feature,
+        system=feature,
         earned_all_override=earned_all,
         earned_graded_override=earned_graded,
     )
@@ -93,6 +94,10 @@ def undo_override_subsection_grade(user_id, course_key_or_id, usage_key_or_id, f
 
     Fires off a recalculate_subsection_grade async task to update the PersistentSubsectionGrade table. If the
     override does not exist, no error is raised, it just triggers the recalculation.
+
+    feature: if specified, the deletion will only occur if the
+             override to be deleted was created by the corresponding
+             subsystem
     """
     course_key = _get_key(course_key_or_id, CourseKey)
     usage_key = _get_key(usage_key_or_id, UsageKey)
@@ -102,8 +107,8 @@ def undo_override_subsection_grade(user_id, course_key_or_id, usage_key_or_id, f
     except ObjectDoesNotExist:
         return
 
-    # Older rejected exam attempts that transition to verified might not have an override created
-    if override is not None:
+    if override is not None and (
+            not feature or feature == override.system):
         override.delete(feature=feature)
 
     # Cache a new event id and event type which the signal handler will use to emit a tracking log event.
