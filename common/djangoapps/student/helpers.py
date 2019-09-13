@@ -568,8 +568,9 @@ def _cert_info(user, course_overview, cert_status):
             # who need to be regraded (we weren't tracking 'notpassing' at first).
             # We can add a log.warning here once we think it shouldn't happen.
             return default_info
-
-        status_dict['grade'] = text_type(max(cert_grade_percent, persisted_grade_percent))
+        grades_input = [cert_grade_percent, persisted_grade_percent]
+        max_grade = None if all(grade is None for grade in grades_input) else max(filter(lambda x: x is not None, grades_input))
+        status_dict['grade'] = text_type(max_grade)
 
     return status_dict
 
