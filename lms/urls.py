@@ -830,11 +830,6 @@ if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
         ),
     ]
 
-if settings.FEATURES.get('RUN_AS_ANALYTICS_SERVER_ENABLED'):
-    urlpatterns += [
-        url(r'^edinsights_service/', include('edinsights.core.urls')),
-    ]
-
 if settings.FEATURES.get('ENABLE_DEBUG_RUN_PYTHON'):
     urlpatterns += [
         url(r'^debug/run_python$', debug_views.run_python),

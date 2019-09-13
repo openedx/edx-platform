@@ -158,12 +158,6 @@ FEATURES = {
     # Set to hide the courses list on the Learner Dashboard if they are not enrolled in any courses yet.
     'HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED': False,
 
-    # enable analytics server.
-    # WARNING: THIS SHOULD ALWAYS BE SET TO FALSE UNDER NORMAL
-    # LMS OPERATION. See analytics.py for details about what
-    # this does.
-    'RUN_AS_ANALYTICS_SERVER_ENABLED': False,
-
     # Give a UI to show a student's submission history in a problem by the
     # Staff Debug tool.
     'ENABLE_STUDENT_HISTORY_VIEW': True,
