@@ -18,18 +18,23 @@ RETRY_DELAY = settings.NODEBB_RETRY_DELAY  # seconds
 # RETRY_DELAY = 20
 
 
-def handle_response(caller, task_name, status_code, response, username):
+def handle_response(caller, task_name, status_code, response, username=None):
     """
     Logs the response of the specific NodeBB API call
     """
+    user_message = ''
+
+    if username:
+        user_message = ' task for user: {}'.format(username)
+
     if status_code >= 500:
-        print('Retrying: {} task for user: {}'.format(task_name, username))
+        print('Retrying: {}{}'.format(task_name, user_message))
         caller.retry()
     elif status_code >= 400:
-        print('Failure: {} task for user: {}, status_code: {}, response: {}'
-              .format(task_name, username, status_code, response))
-    elif status_code >= 200 and status_code < 300:
-        print('Success: {} task for user: {}'.format(task_name, username))
+        print('Failure: {}{}, status_code: {}, response: {}'
+              .format(task_name, user_message, status_code, response))
+    elif 200 <= status_code < 300:
+        print('Success: {}{}'.format(task_name, user_message))
 
 
 @task(default_retry_delay=RETRY_DELAY, max_retries=None, routing_key=settings.HIGH_PRIORITY_QUEUE)
@@ -97,8 +102,6 @@ def task_un_join_group_on_nodebb(category_id, username):
     handle_response(task_un_join_group_on_nodebb, 'Removed user from category with id {}'.format(category_id), status_code, response, username)
 
 
-
-
 @task(default_retry_delay=RETRY_DELAY, max_retries=None)
 def task_update_onboarding_surveys_status(username):
     """
@@ -106,3 +109,12 @@ def task_update_onboarding_surveys_status(username):
     """
     status_code, response = NodeBBClient().users.update_onboarding_surveys_status(username=username)
     handle_response(task_update_onboarding_surveys_status, 'Update Onboarding Survery', status_code, response, username)
+
+@task(default_retry_delay=RETRY_DELAY, max_retries=None)
+def task_archive_community_on_nodebb(category_id):
+    """
+    Celery task to archive a community on NodeBB
+    """
+    status_code, response = NodeBBClient().categories.archive(category_id=category_id)
+    handle_response(task_archive_community_on_nodebb, 'Archive category with id {}'.format(category_id),
+                    status_code, response)
