@@ -243,7 +243,7 @@ class StudentViewShimTest(TestCase):
         )
         response = view(HttpRequest())
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, "")
+        self.assertEqual(response.content.decode('utf-8'), "")
 
     def test_error_from_json(self):
         view = self._shimmed_view(

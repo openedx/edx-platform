@@ -20,14 +20,14 @@ class JsonResponseTestCase(unittest.TestCase):
     def test_empty(self):
         resp = JsonResponse()
         self.assertIsInstance(resp, HttpResponse)
-        self.assertEqual(resp.content, "")
+        self.assertEqual(resp.content.decode('utf-8'), "")
         self.assertEqual(resp.status_code, 204)
         self.assertEqual(resp["content-type"], "application/json")
 
     def test_empty_string(self):
         resp = JsonResponse("")
         self.assertIsInstance(resp, HttpResponse)
-        self.assertEqual(resp.content, "")
+        self.assertEqual(resp.content.decode('utf-8'), "")
         self.assertEqual(resp.status_code, 204)
         self.assertEqual(resp["content-type"], "application/json")
 
@@ -82,14 +82,14 @@ class JsonResponseBadRequestTestCase(unittest.TestCase):
     def test_empty(self):
         resp = JsonResponseBadRequest()
         self.assertIsInstance(resp, HttpResponseBadRequest)
-        self.assertEqual(resp.content, "")
+        self.assertEqual(resp.content.decode("utf-8"), "")
         self.assertEqual(resp.status_code, 400)
         self.assertEqual(resp["content-type"], "application/json")
 
     def test_empty_string(self):
         resp = JsonResponseBadRequest("")
         self.assertIsInstance(resp, HttpResponse)
-        self.assertEqual(resp.content, "")
+        self.assertEqual(resp.content.decode('utf-8'), "")
         self.assertEqual(resp.status_code, 400)
         self.assertEqual(resp["content-type"], "application/json")
 
