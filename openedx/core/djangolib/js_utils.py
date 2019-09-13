@@ -69,12 +69,8 @@ def dump_js_escaped_json(obj, cls=EdxJSONEncoder):
         (string) Escaped encoded JSON.
 
     """
-    try:
-        json_string = json.dumps(obj, ensure_ascii=True, cls=cls)
-    except:  # pylint: disable=bare-except
-        # in some cases dict_values appear here.
-        json_string = json.dumps(list(obj), ensure_ascii=True, cls=cls)
-
+    obj = list(obj) if isinstance(obj, type({}.values())) else obj
+    json_string = json.dumps(obj, ensure_ascii=True, cls=cls)
     json_string = _escape_json_for_js(json_string)
     return json_string
 
