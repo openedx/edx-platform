@@ -2597,7 +2597,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 block_key.id,
                 new_parent_block_key.id,
             )
-            new_block_id = hashlib.sha1(unique_data).hexdigest()[:20]
+            new_block_id = hashlib.sha1(unique_data.encode('utf-8')).hexdigest()[:20]
             new_block_key = BlockKey(block_key.type, new_block_id)
 
             # Now clone block_key to new_block_key:

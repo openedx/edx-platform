@@ -92,7 +92,7 @@ def hash_resource(resource):
     Hash a :class:`web_fragments.fragment.FragmentResource`.
     """
     md5 = hashlib.md5()
-    md5.update(repr(resource))
+    md5.update(repr(resource).encode('utf-8'))
     return md5.hexdigest()
 
 

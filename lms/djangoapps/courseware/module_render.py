@@ -1225,7 +1225,7 @@ def hash_resource(resource):
     """
     md5 = hashlib.md5()
     for data in resource:
-        md5.update(repr(data))
+        md5.update(repr(data).encode('utf-8'))
     return md5.hexdigest()
 
 
