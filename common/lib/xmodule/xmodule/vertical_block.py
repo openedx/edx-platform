@@ -20,6 +20,8 @@ from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import STUDENT_VIEW, PUBLIC_VIEW, XModuleFields
 from xmodule.xml_module import XmlParserMixin
 
+from openedx.features.xmodules.helpers import get_due_date_for_problem_xblock
+
 log = logging.getLogger(__name__)
 
 # HACK: This shouldn't be hard-coded to two types
@@ -74,9 +76,13 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
 
         child_context['child_of_vertical'] = True
         is_child_of_vertical = context.get('child_of_vertical', False)
+        due_date_to_display = None
 
         # pylint: disable=no-member
         for child in child_blocks:
+            if not due_date_to_display:
+                due_date_to_display = get_due_date_for_problem_xblock(self.due, child.category)
+
             child_block_context = copy(child_context)
             if child in child_blocks_to_complete_on_view:
                 child_block_context['wrap_xblock_data'] = {
@@ -91,6 +97,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
             })
 
         fragment_context = {
+            'due_date_to_display': due_date_to_display,
             'items': contents,
             'xblock_context': context,
             'unit_title': self.display_name_with_default if not is_child_of_vertical else None,
