@@ -4,14 +4,15 @@ Helpful methods to use when parsing OLX (XBlock XML)
 from __future__ import absolute_import, division, print_function, unicode_literals
 from collections import namedtuple
 
-from openedx.core.djangoapps.xblock.learning_context.keys import BundleDefinitionLocator
+from opaque_keys.edx.locator import BundleDefinitionLocator
+
 from openedx.core.djangolib.blockstore_cache import get_bundle_direct_links_with_cache
 
 
 class BundleFormatException(Exception):
     """
     Raised when certain errors are found when parsing the OLX in a content
-    libary bundle.
+    library bundle.
     """
 
 

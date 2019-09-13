@@ -7,7 +7,7 @@
 argh==0.26.2              # via watchdog
 certifi==2019.9.11        # via requests
 chardet==3.0.4            # via requests
-edx-opaque-keys==1.0.1
+edx-opaque-keys==2.0.0
 idna==2.8                 # via requests
 lazy==1.1
 libsass==0.10.0

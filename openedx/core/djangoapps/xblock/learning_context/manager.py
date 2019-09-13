@@ -3,9 +3,10 @@ Helper methods for working with learning contexts
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from opaque_keys.edx.keys import LearningContextKey, UsageKeyV2
+
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 from openedx.core.lib.plugins import PluginManager
-from .keys import LearningContextKey, BlockUsageKeyV2
 
 
 class LearningContextPluginManager(PluginManager):
@@ -35,7 +36,7 @@ def get_learning_context_impl(key):
     """
     if isinstance(key, LearningContextKey):
         context_type = key.CANONICAL_NAMESPACE  # e.g. 'lib'
-    elif isinstance(key, BlockUsageKeyV2):
+    elif isinstance(key, UsageKeyV2):
         context_type = key.context_key.CANONICAL_NAMESPACE
     else:
         # Maybe this is an older modulestore key etc.

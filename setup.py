@@ -103,15 +103,6 @@ setup(
             "user_authn = openedx.core.djangoapps.user_authn.apps:UserAuthnConfig",
             "instructor = lms.djangoapps.instructor.apps:InstructorConfig",
         ],
-        'definition_key': [
-            'bundle-olx = openedx.core.djangoapps.xblock.learning_context.keys:BundleDefinitionLocator',
-        ],
-        'context_key': [
-            'lib = openedx.core.djangoapps.content_libraries.keys:LibraryLocatorV2',
-        ],
-        'usage_key': [
-            'lb = openedx.core.djangoapps.content_libraries.keys:LibraryUsageLocatorV2',
-        ],
         'openedx.learning_context': [
             'lib = openedx.core.djangoapps.content_libraries.library_context:LibraryContextImpl',
         ],

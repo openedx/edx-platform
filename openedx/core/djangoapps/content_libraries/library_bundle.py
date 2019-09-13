@@ -5,12 +5,11 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import logging
 
 from django.utils.lru_cache import lru_cache
+from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryUsageLocatorV2
 from xblock.core import XBlock
 from xblock.plugin import PluginMissingError
 
-from openedx.core.djangoapps.content_libraries.keys import LibraryUsageLocatorV2
 from openedx.core.djangoapps.content_libraries.models import ContentLibrary
-from openedx.core.djangoapps.xblock.learning_context.keys import BundleDefinitionLocator
 from openedx.core.djangoapps.xblock.runtime.blockstore_runtime import xml_for_definition
 from openedx.core.djangoapps.xblock.runtime.olx_parsing import (
     BundleFormatException,
@@ -85,8 +84,7 @@ def usage_for_child_include(parent_usage, parent_definition, parsed_include):
         # <xblock-include> but that requires much more complex logic.)
         usage_id = parent_usage.usage_id + "-" + usage_id
     return LibraryUsageLocatorV2(
-        library_org=parent_usage.library_org,
-        library_slug=parent_usage.library_slug,
+        lib_key=parent_usage.lib_key,
         block_type=parsed_include.block_type,
         usage_id=usage_id,
     )
@@ -169,7 +167,7 @@ class LibraryBundle(object):
         own_usage_keys = []
         for olx_file_path in self.get_olx_files():
             block_type, usage_id, _unused = olx_file_path.split('/')
-            usage_key = LibraryUsageLocatorV2(self.library_key.org, self.library_key.slug, block_type, usage_id)
+            usage_key = LibraryUsageLocatorV2(self.library_key, block_type, usage_id)
             own_usage_keys.append(usage_key)
 
         usage_keys_with_parents = self.get_bundle_includes().keys()
@@ -234,7 +232,7 @@ class LibraryBundle(object):
                 olx_path=bfile.path,
                 **version_arg
             )
-            usage_key = LibraryUsageLocatorV2(self.library_key.org, self.library_key.slug, block_type, usage_id)
+            usage_key = LibraryUsageLocatorV2(self.library_key, block_type, usage_id)
             add_definitions_children(usage_key, def_key)
 
         self.cache.set(cache_key, usages_found)
