@@ -810,18 +810,19 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         faces.
         """
         face_aes_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["FACE_IMAGE_AES_KEY"]
-        if six.PY3:
-            face_aes_key = codecs.decode(face_aes_key_str, "hex")
-        else:
+
+        if six.PY2:
             face_aes_key = face_aes_key_str.decode("hex")
+        else:
+            face_aes_key = codecs.decode(face_aes_key_str, "hex")
 
         rsa_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["RSA_PUBLIC_KEY"]
         rsa_encrypted_face_aes_key = rsa_encrypt(face_aes_key, rsa_key_str)
 
-        if six.PY3:
-            return codecs.encode(rsa_encrypted_face_aes_key, "base64").decode("utf-8")
-        else:
+        if six.PY2:
             return rsa_encrypted_face_aes_key.encode("base64")
+        else:
+            return codecs.encode(rsa_encrypted_face_aes_key, "base64").decode("utf-8")
 
     def create_request(self, copy_id_photo_from=None):
         """
