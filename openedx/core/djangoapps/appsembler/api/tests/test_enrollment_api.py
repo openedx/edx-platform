@@ -38,12 +38,9 @@ from openedx.core.djangoapps.appsembler.api.tests.factories import (
 APPSEMBLER_API_VIEWS_MODULE = 'openedx.core.djangoapps.appsembler.api.v1.views'
 
 
-@ddt.ddt
-@mock.patch(APPSEMBLER_API_VIEWS_MODULE + '.EnrollmentViewSet.throttle_classes', [])
-class EnrollmentApiGetTest(ModuleStoreTestCase):
-
+class BaseEnrollmentApiTestCase(ModuleStoreTestCase):
     def setUp(self):
-        super(EnrollmentApiGetTest, self).setUp()
+        super(BaseEnrollmentApiTestCase, self).setUp()
         self.my_site = SiteFactory(domain='my-site.test')
         self.other_site = SiteFactory(domain='other-site.test')
         self.other_site_org = OrganizationFactory(sites=[self.other_site])
@@ -77,17 +74,28 @@ class EnrollmentApiGetTest(ModuleStoreTestCase):
                                        organization=self.my_site_org,
                                        is_amc_admin=True)
 
-    def test_get_all(self):
+    def call_enrollment_api(self, method, site, caller, req_extra=None):
+        req_extra = req_extra or {}
         url = reverse('tahoe-api:v1:enrollments-list')
-        request = APIRequestFactory().get(url)
-        request.META['HTTP_HOST'] = self.my_site.domain
-        force_authenticate(request, user=self.caller)
+        method = getattr(APIRequestFactory(), method)
+        request = method(url, **req_extra)
+        request.META['HTTP_HOST'] = site.domain
+        force_authenticate(request, user=caller)
 
-        view = resolve(url).func
-        response = view(request)
-        response.render()
+        with mock.patch('lms.djangoapps.instructor.sites.get_current_site', return_value=site):
+            with mock.patch('student.models.get_current_site', return_value=site):
+                view = resolve(url).func
+                response = view(request)
+                response.render()
+                return response
+
+
+@ddt.ddt
+@mock.patch(APPSEMBLER_API_VIEWS_MODULE + '.EnrollmentViewSet.throttle_classes', [])
+class EnrollmentApiGetTest(BaseEnrollmentApiTestCase):
+    def test_get_all(self):
+        response = self.call_enrollment_api('get', self.my_site, self.caller)
         results = response.data['results']
-
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(results), len(self.my_enrollments))
         # TODO: Validate each record
@@ -103,16 +111,11 @@ class EnrollmentApiGetTest(ModuleStoreTestCase):
             UserOrganizationMappingFactory(user=enrollment.user,
                                            organization=self.my_site_org)
         expected_enrollments.append(self.my_enrollments[0])
-        url = reverse('tahoe-api:v1:enrollments-list')
-
-        # Need to resolve without the query parameters
-        view = resolve(url).func
-        url += '?course_id={}'.format(str(selected_course.id))
-        request = APIRequestFactory().get(url)
-        request.META['HTTP_HOST'] = self.my_site.domain
-        force_authenticate(request, user=self.caller)
-        response = view(request)
-        response.render()
+        response = self.call_enrollment_api('get', self.my_site, self.caller, {
+            'data': {
+                'course_id': str(selected_course.id),
+            }
+        })
         results = response.data['results']
 
         self.assertEqual(response.status_code, 200)
@@ -142,16 +145,11 @@ class EnrollmentApiGetTest(ModuleStoreTestCase):
             course_overviews.append(course_overview)
             course_enrollments.append(course_enrollment)
 
-        # Set up our request
-        url = reverse('tahoe-api:v1:enrollments-list')
-        # Need to resolve without the query parameters
-        view = resolve(url).func
-        url += '?{}={}'.format(query_param, getattr(user, attr_name))
-        request = APIRequestFactory().get(url)
-        request.META['HTTP_HOST'] = self.my_site.domain
-        force_authenticate(request, user=self.caller)
-        response = view(request)
-        response.render()
+        response = self.call_enrollment_api('get', self.my_site, self.caller, {
+            'data': {
+                query_param: str(getattr(user, attr_name)),
+            }
+        })
         results = response.data['results']
 
         expected_course_ids = [str(co.id) for co in course_overviews]
@@ -164,87 +162,39 @@ class EnrollmentApiGetTest(ModuleStoreTestCase):
         """
         This does a partial test
         """
-        url = reverse('tahoe-api:v1:enrollments-list')
         co = self.my_course_overviews[0]
-        payload = {
-            'action': 'enroll',
-            'auto_enroll': True,
-            'identifiers': [],
-            'email_learners': True,
-            'courses': [
-                str(co.id)
-            ],
-        }
-
-        request = APIRequestFactory().post(url, payload)
-        request.META['HTTP_HOST'] = self.my_site.domain
-        force_authenticate(request, user=self.caller)
-        view = resolve(url).func
-        response = view(request)
-        response.render()
+        response = self.call_enrollment_api('post', self.my_site, self.caller, {
+            'data': {
+                'action': 'enroll',
+                'auto_enroll': True,
+                'identifiers': [],
+                'email_learners': True,
+                'courses': [
+                    str(co.id)
+                ],
+            }
+        })
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_invalid_enroll_data_no_courses(self):
         """
         This does a partial test
         """
-        url = reverse('tahoe-api:v1:enrollments-list')
-        payload = {
-            'action': 'enroll',
-            'auto_enroll': True,
-            'identifiers': ['alpha@example.com', 'bravo@example.com'],
-            'email_learners': True,
-            'courses': [],
-        }
-        request = APIRequestFactory().post(url, payload)
-        request.META['HTTP_HOST'] = self.my_site.domain
-        force_authenticate(request, user=self.caller)
-        view = resolve(url).func
-        response = view(request)
-        response.render()
-
+        response = self.call_enrollment_api('post', self.my_site, self.caller, {
+            'data': {
+                'action': 'enroll',
+                'auto_enroll': True,
+                'identifiers': ['alpha@example.com', 'bravo@example.com'],
+                'email_learners': True,
+                'courses': [],
+            }
+        })
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 @ddt.ddt
 @mock.patch(APPSEMBLER_API_VIEWS_MODULE + '.EnrollmentViewSet.throttle_classes', [])
-class EnrollmentApiPostTest(ModuleStoreTestCase):
-
-    def setUp(self):
-        super(EnrollmentApiPostTest, self).setUp()
-        self.my_site = SiteFactory(domain='my-site.test')
-        self.other_site = SiteFactory(domain='other-site.test')
-        self.other_site_org = OrganizationFactory(sites=[self.other_site])
-        self.my_site_org = OrganizationFactory(sites=[self.my_site])
-
-        self.my_courses = [CourseFactory.create() for i in range(0, 2)]
-        self.my_course_overviews = [
-            CourseOverviewFactory(id=course.id) for course in self.my_courses
-        ]
-
-        for co in self.my_course_overviews:
-            OrganizationCourseFactory(organization=self.my_site_org,
-                                      course_id=str(co.id))
-
-        self.my_enrollments = [
-            CourseEnrollmentFactory(course=self.my_course_overviews[0]),
-            CourseEnrollmentFactory(course=self.my_course_overviews[1]),
-        ]
-
-        for enrollment in self.my_enrollments:
-            UserOrganizationMappingFactory(user=enrollment.user,
-                                           organization=self.my_site_org)
-
-        self.other_enrollments = [CourseEnrollmentFactory()]
-        OrganizationCourseFactory(organization=self.other_site_org,
-                                  course_id=str(
-                                      self.other_enrollments[0].course_overview.id))
-
-        self.caller = UserFactory()
-        UserOrganizationMappingFactory(user=self.caller,
-                                       organization=self.my_site_org,
-                                       is_amc_admin=True)
-
+class EnrollmentApiPostTest(BaseEnrollmentApiTestCase):
     def test_enroll_learners_single_course(self):
         """
         The payload structure is subject to change
@@ -253,34 +203,20 @@ class EnrollmentApiPostTest(ModuleStoreTestCase):
         any new 'CourseEnrollmentAllowed' records
         """
         co = self.my_course_overviews[0]
-        reg_users = [UserFactory(), UserFactory()]
+        reg_users = [UserFactory.create(), UserFactory.create()]
 
-        # make sure that the registered users are not in the enrollments
-        for user in reg_users:
-            mode, is_active = CourseEnrollment.enrollment_mode_for_user(user, co.id)
-            assert mode is None and is_active is None, "email: {}".format(user.email)
+        for reg_user in reg_users:
+            # add the users to the site, otherwise they won't have new enrollments
+            UserOrganizationMappingFactory(user=reg_user, organization=self.my_site_org)
+            # make sure that the registered users are not in the enrollments
+            mode, is_active = CourseEnrollment.enrollment_mode_for_user(reg_user, co.id)
+            assert mode is None and is_active is None, "email: {}".format(reg_user.email)
 
-        new_users = ['alpha@example.com', 'bravo@example.com']
+        new_users_emails = ['alpha@example.com', 'bravo@example.com']
         # TODO: make sure these emails don't exist
-        learner_emails = [obj.email for obj in reg_users]
-        learner_emails.extend(new_users)
-        payload = {
-            'action': 'enroll',
-            'auto_enroll': True,
-            'identifiers': learner_emails,
-            'email_learners': True,
-            'courses': [
-                str(co.id)
-            ],
-        }
+        for new_user_email in new_users_emails:
+            assert not CourseEnrollmentAllowed.objects.filter(email=new_user_email).exists()
 
-        for user_email in new_users:
-            assert not CourseEnrollmentAllowed.objects.filter(email=user_email).exists()
-
-        url = reverse('tahoe-api:v1:enrollments-list')
-        request = APIRequestFactory().post(url, payload)
-        request.META['HTTP_HOST'] = self.my_site.domain
-        force_authenticate(request, user=self.caller)
         before_my_site_ce_count = get_enrollments_for_site(self.my_site).count()
         before_my_site_user_count = UserOrganizationMapping.objects.filter(
             organization=self.my_site_org).count()
@@ -289,10 +225,19 @@ class EnrollmentApiPostTest(ModuleStoreTestCase):
         before_other_site_user_count = UserOrganizationMapping.objects.filter(
             organization=self.other_site_org).count()
 
-        view = resolve(url).func
-        response = view(request)
-        response.render()
-
+        payload = {
+            'action': 'enroll',
+            'auto_enroll': True,
+            # Enroll both of the registered users and new ones
+            'identifiers': [obj.email for obj in reg_users] + new_users_emails,
+            'email_learners': True,
+            'courses': [
+                str(co.id)
+            ],
+        }
+        response = self.call_enrollment_api('post', self.my_site, self.caller, {
+            'data': payload,
+        })
         results = response.data['results']
         after_my_site_ce_count = get_enrollments_for_site(self.my_site).count()
         after_my_site_user_count = UserOrganizationMapping.objects.filter(
@@ -312,11 +257,11 @@ class EnrollmentApiPostTest(ModuleStoreTestCase):
         # number of new users, we verify that CourseEnrollmentAllowed records
         # are not created for the other site. However, this is a hack and brittle.
         # Therefore we want to test this in a more robust way
-        assert CourseEnrollmentAllowed.objects.count() == len(new_users)
+        assert CourseEnrollmentAllowed.objects.count() == len(new_users_emails)
 
         for rec in results:
             assert 'error' not in rec
-            if rec['identifier'] in new_users:
+            if rec['identifier'] in new_users_emails:
                 assert CourseEnrollmentAllowed.objects.filter(
                     email=rec['identifier']).exists()
 
@@ -348,22 +293,15 @@ class EnrollmentApiPostTest(ModuleStoreTestCase):
         course_ids = [str(co.id) for co in self.my_course_overviews]
         invalid_course_ids = [str(ce.course.id) for ce in self.other_enrollments]
         course_ids.extend(invalid_course_ids)
-        payload = {
-            'action': 'enroll',
-            'auto_enroll': True,
-            'identifiers': learner_emails,
-            'email_learners': True,
-            'courses': course_ids,
-        }
-
-        url = reverse('tahoe-api:v1:enrollments-list')
-        request = APIRequestFactory().post(url, payload)
-        request.META['HTTP_HOST'] = self.my_site.domain
-        force_authenticate(request, user=self.caller)
-
-        view = resolve(url).func
-        response = view(request)
-        response.render()
+        response = self.call_enrollment_api('post', self.my_site, self.caller, {
+            'data': {
+                'action': 'enroll',
+                'auto_enroll': True,
+                'identifiers': learner_emails,
+                'email_learners': True,
+                'courses': course_ids,
+            }
+        })
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data['error'] == 'invalid-course-ids'
         assert set(response.data['invalid_course_ids']) == set(invalid_course_ids)
@@ -373,22 +311,15 @@ class EnrollmentApiPostTest(ModuleStoreTestCase):
         # TODO: Improvement - make sure these emails don't exist
         learner_emails = [obj.email for obj in reg_users]
         course_ids = [str(co.id) for co in self.my_course_overviews]
-        payload = {
-            'action': 'unenroll',
-            'auto_enroll': True,
-            'identifiers': learner_emails,
-            'email_learners': True,
-            'courses': course_ids,
-        }
-
-        url = reverse('tahoe-api:v1:enrollments-list')
-        request = APIRequestFactory().post(url, payload)
-        request.META['HTTP_HOST'] = self.my_site.domain
-        force_authenticate(request, user=self.caller)
-
-        view = resolve(url).func
-        response = view(request)
-        response.render()
+        response = self.call_enrollment_api('post', self.my_site, self.caller, {
+            'data': {
+                'action': 'unenroll',
+                'auto_enroll': True,
+                'identifiers': learner_emails,
+                'email_learners': True,
+                'courses': course_ids,
+            },
+        })
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data['error'] == 'action-not-supported'
         assert response.data['action_not_supported'] == 'unenroll'
@@ -399,22 +330,15 @@ class EnrollmentApiPostTest(ModuleStoreTestCase):
         # TODO: Improvement - make sure these emails don't exist
         learner_emails = [obj.email for obj in reg_users]
         course_ids = [str(co.id) for co in self.my_course_overviews]
-        payload = {
-            'action': action,
-            'auto_enroll': True,
-            'identifiers': learner_emails,
-            'email_learners': True,
-            'courses': course_ids,
-        }
-
-        url = reverse('tahoe-api:v1:enrollments-list')
-        request = APIRequestFactory().post(url, payload)
-        request.META['HTTP_HOST'] = self.my_site.domain
-        force_authenticate(request, user=self.caller)
-
-        view = resolve(url).func
-        response = view(request)
-        response.render()
+        response = self.call_enrollment_api('post', self.my_site, self.caller, {
+            'data': {
+                'action': action,
+                'auto_enroll': True,
+                'identifiers': learner_emails,
+                'email_learners': True,
+                'courses': course_ids,
+            },
+        })
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data['action'] == [u'"{}" is not a valid choice.'.format(
             'None' if not action else action)]
