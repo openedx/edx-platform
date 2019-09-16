@@ -198,13 +198,13 @@ def preprocess_collection(user, course, collection):
             if unit is None:
                 log.debug(u"Unit not found: %s", usage_key)
                 continue
-
+            from pdb import set_trace; set_trace()
             if include_path_info:
                 section = unit.get_parent()
                 if not section:
                     log.debug(u"Section not found: %s", usage_key)
                     continue
-                if section in cache:
+                if section in list(cache):
                     usage_context = cache[section]
                     usage_context.update({
                         "unit": get_module_context(course, unit),
@@ -218,7 +218,7 @@ def preprocess_collection(user, course, collection):
                 if not chapter:
                     log.debug(u"Chapter not found: %s", usage_key)
                     continue
-                if chapter in cache:
+                if chapter in list(cache):
                     usage_context = cache[chapter]
                     usage_context.update({
                         "unit": get_module_context(course, unit),
