@@ -389,7 +389,7 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
         try:
             upload_file = request.FILES.get('students_list')
             if upload_file.name.endswith('.csv'):
-                students = [row for row in csv.reader(upload_file.read().splitlines())]
+                students = [row for row in csv.reader(upload_file.read().decode('utf-8').splitlines())]
                 course = get_course_by_id(course_id)
             else:
                 general_errors.append({
@@ -1405,7 +1405,11 @@ def _cohorts_csv_validator(file_storage, file_to_validate):
     Verifies that the expected columns are present in the CSV used to add users to cohorts.
     """
     with file_storage.open(file_to_validate) as f:
-        reader = unicodecsv.reader(UniversalNewlineIterator(f), encoding='utf-8')
+        if six.PY2:
+            reader = unicodecsv.reader(UniversalNewlineIterator(f), encoding='utf-8')
+        else:
+            reader = csv.reader(f.read().decode('utf-8').splitlines())
+
         try:
             fieldnames = next(reader)
         except StopIteration:
@@ -1954,10 +1958,10 @@ def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
         writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
         # In practice, there should not be non-ascii data in this query,
         # but trying to do the right thing anyway.
-        encoded = [text_type(s).encode('utf-8') for s in header]
+        encoded = [text_type(s) for s in header]
         writer.writerow(encoded)
         for row in rows:
-            encoded = [text_type(s).encode('utf-8') for s in row]
+            encoded = [text_type(s) for s in row]
             writer.writerow(encoded)
         return response
 
