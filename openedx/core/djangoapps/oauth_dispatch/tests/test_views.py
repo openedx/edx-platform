@@ -217,7 +217,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
             )
 
     @ddt.data('dop_app', 'dot_app')
-    def test_jwt_access_token(self, client_attr):
+    def test_jwt_access_token_from_parameter(self, client_attr):
         client = getattr(self, client_attr)
         response = self._post_request(self.user, client, token_type='jwt')
         self.assertEqual(response.status_code, 200)
@@ -231,6 +231,36 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
             should_be_restricted=False,
         )
 
+    @ddt.data('dop_app', 'dot_app')
+    def test_jwt_access_token_from_header(self, client_attr):
+        client = getattr(self, client_attr)
+        response = self._post_request(self.user, client, HTTP_X_TOKEN_TYPE='jwt')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertIn('expires_in', data)
+        self.assertEqual(data['token_type'], 'JWT')
+        self.assert_valid_jwt_access_token(
+            data['access_token'],
+            self.user,
+            data['scope'].split(' '),
+            should_be_restricted=False,
+        )
+        
+    @ddt.data('dop_app', 'dot_app')
+    def test_jwt_access_token_from_header_not_parameter(self, client_attr):
+        client = getattr(self, client_attr)
+        response = self._post_request(self.user, client, HTTP_X_TOKEN_TYPE='jwt', token_type='invalid')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertIn('expires_in', data)
+        self.assertEqual(data['token_type'], 'JWT')
+        self.assert_valid_jwt_access_token(
+            data['access_token'],
+            self.user,
+            data['scope'].split(' '),
+            should_be_restricted=False,
+        )
+        
     @ddt.data(
         ('jwt', 'jwt'),
         (None, 'no_token_type_supplied'),
