@@ -38,37 +38,37 @@ EXISTING_USER_TEMPLATE = (
 @transaction.atomic
 def link_program_enrollments_to_lms_users(program_uuid, external_keys_to_usernames):
     """
-        Utility function to link ProgramEnrollments to LMS Users
+    Utility function to link ProgramEnrollments to LMS Users
 
-        Arguments:
-            -program_uuid: the program for which we are linking program enrollments
-            -external_keys_to_usernames: dict mapping `external_user_keys` to LMS usernames.
+    Arguments:
+        -program_uuid: the program for which we are linking program enrollments
+        -external_keys_to_usernames: dict mapping `external_user_keys` to LMS usernames.
 
-        Returns:
-            {
-                (external_key, username): Error message if there was an error
-            }
+    Returns:
+        {
+            (external_key, username): Error message if there was an error
+        }
 
-        Raises: ValueError if None is included in external_keys_to_usernames
+    Raises: ValueError if None is included in external_keys_to_usernames
 
-        This function will look up program enrollments and users, and update the program
-        enrollments with the matching user. If the program enrollment has course enrollments, we
-        will enroll the user into their waiting program courses.
+    This function will look up program enrollments and users, and update the program
+    enrollments with the matching user. If the program enrollment has course enrollments, we
+    will enroll the user into their waiting program courses.
 
-        For each external_user_key:lms_username, if:
-            - The user is not found
-            - No enrollment is found for the given program and external_user_key
-            - The enrollment already has a user
-        An error message will be logged, and added to a dictionary of error messages keyed by
-        (external_key, username). The input will be skipped. All other inputs will be processed and
-        enrollments updated, and then the function will return the dictionary of error messages.
+    For each external_user_key:lms_username, if:
+        - The user is not found
+        - No enrollment is found for the given program and external_user_key
+        - The enrollment already has a user
+    An error message will be logged, and added to a dictionary of error messages keyed by
+    (external_key, username). The input will be skipped. All other inputs will be processed and
+    enrollments updated, and then the function will return the dictionary of error messages.
 
-        If there is an error while enrolling a user in a waiting program course enrollment, the
-        error will be logged, and added to the returned error dictionary, and we will roll back all
-        transactions for that user so that their db state will be the same as it was before this
-        function was called, to prevent program enrollments to be in a state where they have an LMS
-        user but still have waiting course enrollments. All other inputs will be processed
-        normally.
+    If there is an error while enrolling a user in a waiting program course enrollment, the
+    error will be logged, and added to the returned error dictionary, and we will roll back all
+    transactions for that user so that their db state will be the same as it was before this
+    function was called, to prevent program enrollments to be in a state where they have an LMS
+    user but still have waiting course enrollments. All other inputs will be processed
+    normally.
     """
     _validate_inputs(program_uuid, external_keys_to_usernames)
     errors = {}
