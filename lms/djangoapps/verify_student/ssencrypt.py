@@ -179,7 +179,7 @@ def generate_signed_message(method, headers_dict, body_dict, access_key, secret_
     signature = binascii.b2a_base64(hashed.digest()).rstrip(b'\n')
     authorization_header = u"SSI {}:{}".format(access_key, signature)
 
-    message += '\n'
+    message += b'\n'
     return message, signature, authorization_header
 
 
@@ -191,7 +191,7 @@ def signing_format_message(method, headers_dict, body_dict):
     """
     headers_str = "{}\n\n{}".format(method, header_string(headers_dict))
     body_str = body_string(body_dict)
-    message = headers_str + body_str
+    message = six.b(headers_str) + body_str
 
     return message
 
@@ -231,4 +231,4 @@ def body_string(body_dict, prefix=""):
                 value = "null"
             body_list.append(u"{}{}:{}\n".format(prefix, key, value))
 
-    return "".join(body_list)  # Note that trailing \n's are important
+    return b"".join(body_list)  # Note that trailing \n's are important

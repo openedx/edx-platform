@@ -10,11 +10,13 @@ photo verification process as generic as possible.
 """
 from __future__ import absolute_import, unicode_literals
 
+import base64
 import codecs
 import functools
 import json
 import logging
 import os.path
+import simplejson
 import uuid
 from datetime import timedelta
 from email.utils import formatdate
@@ -810,11 +812,10 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         faces.
         """
         face_aes_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["FACE_IMAGE_AES_KEY"]
-        face_aes_key = face_aes_key_str.decode("hex")
+        face_aes_key = codecs.decode(face_aes_key_str, 'hex')
         rsa_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["RSA_PUBLIC_KEY"]
         rsa_encrypted_face_aes_key = rsa_encrypt(face_aes_key, rsa_key_str)
-
-        return rsa_encrypted_face_aes_key.encode("base64")
+        return base64.b64encode(rsa_encrypted_face_aes_key)
 
     def create_request(self, copy_id_photo_from=None):
         """
@@ -884,7 +885,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         header_txt = "\n".join(
             u"{}: {}".format(h, v) for h, v in sorted(headers.items())
         )
-        body_txt = json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False).encode('utf-8')
+        body_txt = json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False)
 
         return header_txt + "\n\n" + body_txt
 
@@ -912,10 +913,11 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
             return fake_response
 
         headers, body = self.create_request(copy_id_photo_from=copy_id_photo_from)
+
         response = requests.post(
             settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["API_URL"],
             headers=headers,
-            data=json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False).encode('utf-8'),
+            data=simplejson.dumps(body, indent=2, sort_keys=True, ensure_ascii=False).encode('utf-8'),
             verify=False
         )
 
