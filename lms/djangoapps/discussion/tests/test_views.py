@@ -561,7 +561,7 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
 
         self.assertEquals(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
-        html = response.content
+        html = response.content.decode('utf-8')
 
         # Verify that the group name is correctly included in the HTML
         self.assertRegexpMatches(html, r'"group_name": "student_cohort"')
@@ -1319,7 +1319,7 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
         response = self.get_response(mock_request, params)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
-        html = response.content
+        html = response.content.decode('utf-8')
         self.assertRegexpMatches(html, r'data-page="1"')
         self.assertRegexpMatches(html, r'data-num-pages="1"')
         self.assertRegexpMatches(html, r'<span class="discussion-count">1</span> discussion started')
@@ -1327,7 +1327,10 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
         self.assertRegexpMatches(html, u'&#39;id&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_ID))
         self.assertRegexpMatches(html, u'&#39;title&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_TEXT))
         self.assertRegexpMatches(html, u'&#39;body&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_TEXT))
-        self.assertRegexpMatches(html, u'&#39;username&#39;: u&#39;{}&#39;'.format(self.student.username))
+        if six.PY2:
+            self.assertRegexpMatches(html, u'&#39;username&#39;: u&#39;{}&#39;'.format(self.student.username))
+        else:
+            self.assertRegexpMatches(html, u'&#39;username&#39;: &#39;{}&#39;'.format(self.student.username))
 
     def check_ajax(self, mock_request, **params):
         response = self.get_response(mock_request, params, HTTP_X_REQUESTED_WITH="XMLHttpRequest")
@@ -1549,6 +1552,7 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         Test that XSS attack is prevented
         """
         mock_user.return_value.to_dict.return_value = {}
+        mock_req.return_value.status_code = 200
         reverse_url = "%s%s" % (reverse(
             "forum_form_discussion",
             kwargs={"course_id": six.text_type(self.course.id)}), '/forum_form_discussion')
@@ -1556,7 +1560,7 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         url = "%s?%s=%s" % (reverse_url, 'sort_key', malicious_code)
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
-        self.assertNotIn(malicious_code, resp.content)
+        self.assertNotIn(malicious_code, resp.content.decode('utf-8'))
 
     @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
     @patch('student.models.cc.User.from_django_user')
@@ -1579,7 +1583,7 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         url_string = "%s?%s=%s" % (url, 'page', malicious_code)
         resp = self.client.get(url_string)
         self.assertEqual(resp.status_code, 200)
-        self.assertNotIn(malicious_code, resp.content)
+        self.assertNotIn(malicious_code, resp.content.decode('utf-8'))
 
 
 class ForumDiscussionSearchUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):
