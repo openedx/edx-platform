@@ -9,6 +9,7 @@ from datetime import datetime
 from io import StringIO
 
 import ddt
+import six
 from django.core import exceptions
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpRequest
@@ -279,7 +280,5 @@ class TestUniversalNewlineIterator(TestCase):
 
     @ddt.data(1, 2, 999)
     def test_unicode_data(self, buffer_size):
-        self.assertEqual(
-            [thing.decode('utf-8') for thing in UniversalNewlineIterator(StringIO(u'héllø wo®ld'), buffer_size=buffer_size)],
-            [u'héllø wo®ld']
-        )
+        self.assertEqual([thing.decode('utf-8') if six.PY3 else thing for thing in
+                          UniversalNewlineIterator(StringIO(u'héllø wo®ld'),buffer_size=buffer_size)],[u'héllø wo®ld'])
