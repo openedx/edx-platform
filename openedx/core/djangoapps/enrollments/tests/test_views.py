@@ -1397,7 +1397,7 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         response = self._submit_unenroll(self.superuser, self.user.username)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(response.content, "")
+        self.assertEqual(response.content.decode('utf-8'), "")
         self._assert_inactive()
 
     def _assert_active(self):
