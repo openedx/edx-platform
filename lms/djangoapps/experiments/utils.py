@@ -35,10 +35,12 @@ logger = logging.getLogger(__name__)
 experiments_namespace = WaffleFlagNamespace(name=u'experiments')
 
 # .. toggle_name: experiments.add_programs
-# .. toggle_type: feature_flag
+# .. toggle_type: waffle_flag
 # .. toggle_default: False
 # .. toggle_description: Toggle for adding the current course's program information to user metadata
 # .. toggle_category: experiments
+# .. toggle_use_cases: monitored_rollout
+# .. toggle_creation_date: 2019-2-25
 # .. toggle_expiration_date: None
 # .. toggle_warnings: None
 # .. toggle_tickets: REVEM-63, REVEM-198
@@ -50,10 +52,12 @@ PROGRAM_INFO_FLAG = WaffleFlag(
 )
 
 # .. toggle_name: experiments.add_dashboard_info
-# .. toggle_type: feature_flag
+# .. toggle_type: waffle_flag
 # .. toggle_default: False
 # .. toggle_description: Toggle for adding info about each course to the dashboard metadata
 # .. toggle_category: experiments
+# .. toggle_use_cases: monitored_rollout
+# .. toggle_creation_date: 2019-3-28
 # .. toggle_expiration_date: None
 # .. toggle_warnings: None
 # .. toggle_tickets: REVEM-118
