@@ -237,7 +237,6 @@ class TestUniversalNewlineIterator(TestCase):
 
     @ddt.data(1, 2, 999)
     def test_carriage_returns(self, buffer_size):
-        import pdb; pdb.set_trace()
         self.assertEqual(
             [thing.decode('utf-8') for thing in UniversalNewlineIterator(StringIO(u'foo\rbar\r'), buffer_size=buffer_size)],
             ['foo\n', 'bar\n']
