@@ -281,4 +281,4 @@ class TestUniversalNewlineIterator(TestCase):
     @ddt.data(1, 2, 999)
     def test_unicode_data(self, buffer_size):
         self.assertEqual([thing.decode('utf-8') if six.PY3 else thing for thing in
-                          UniversalNewlineIterator(StringIO(u'héllø wo®ld'),buffer_size=buffer_size)],[u'héllø wo®ld'])
+                          UniversalNewlineIterator(StringIO(u'héllø wo®ld'), buffer_size=buffer_size)], [u'héllø wo®ld'])
