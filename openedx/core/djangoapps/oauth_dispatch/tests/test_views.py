@@ -247,9 +247,9 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         )
         
     @ddt.data('dop_app', 'dot_app')
-    def test_jwt_access_token_from_header_not_parameter(self, client_attr):
+    def test_jwt_access_token_from_parameter_not_header(self, client_attr):
         client = getattr(self, client_attr)
-        response = self._post_request(self.user, client, HTTP_X_TOKEN_TYPE='jwt', token_type='invalid')
+        response = self._post_request(self.user, client, HTTP_X_TOKEN_TYPE='invalid', token_type='jwt')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
         self.assertIn('expires_in', data)
