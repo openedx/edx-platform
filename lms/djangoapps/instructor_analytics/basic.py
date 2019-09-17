@@ -497,7 +497,7 @@ def get_response_state(response):
     state = json.loads(problem_state)
     try:
         transformed_state = problem_state_transformer(state)
-        return json.dumps(transformed_state, encoding='utf8', ensure_ascii=False)
+        return json.dumps(transformed_state, ensure_ascii=False)
     except TypeError:
         username = response.student.username
         err_msg = (
