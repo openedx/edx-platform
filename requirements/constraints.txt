@@ -14,11 +14,6 @@ futures ; python_version == "2.7"
 python-openid ; python_version == "2.7"
 pysqlite ; python_version == "2.7"
 
-# pip-tools 3.9.0 has a few problems:
-#   https://github.com/jazzband/pip-tools/issues/851
-#   https://github.com/jazzband/pip-tools/issues/852
-pip-tools==3.8.0
-
 # Convert text markup to HTML; used in capa problems, forums, and course wikis; pin Markdown version as tests failed for its upgrade to latest release
 Markdown==2.6.11
 
