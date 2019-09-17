@@ -39,7 +39,8 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
         SettingsFactory(
             "${details_url | n, js_escaped_string}",
             ${show_min_grade_warning | n, dump_js_escaped_json},
-            ${can_show_certificate_available_date_field(context_course) | n, dump_js_escaped_json}
+            ${can_show_certificate_available_date_field(context_course) | n, dump_js_escaped_json},
+            "${upgrade_deadline | n, js_escaped_string}"
         );
     });
 </%block>
@@ -203,9 +204,9 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
             </ol>
           </fieldset>
         </div>
-        
+
         <hr class="divide" />
-        
+
         <div id="schedule" class="group-settings schedule">
           <header>
             <h2 class="title-2">${_('Course Schedule')}</h2>
@@ -291,6 +292,27 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
               </div>
             </li>
           </ol>
+
+          % if upgrade_deadline:
+          <ol class="list-input">
+            <li class="field-group field-group-upgrade-deadline" id="upgrade-deadline">
+              <div class="field date is-not-editable" id="field-upgrade-deadline-date">
+                <label for="course-upgrade-deadline-date">${_("Upgrade Deadline Date")}</label>
+                <input type="text" class="date upgrade-deadline" id="course-upgrade-deadline-date" placeholder="MM/DD/YYYY" autocomplete="off" readonly aria-readonly="true" />
+                <span class="tip tip-stacked">
+                  ${_("Last day students can upgrade to a verified enrollment.")}
+                  ${_("Contact your edX partner manager to update these settings.")}
+                </span>
+              </div>
+
+              <div class="field time is-not-editable" id="field-upgrade-deadline-time">
+                <label for="course-upgrade-deadline-time">${_("Upgrade Deadline Time")}</label>
+                <input type="text" class="time upgrade-deadline" id="course-upgrade-deadline-time" placeholder="HH:MM" autocomplete="off" readonly aria-readonly="true" />
+                <span class="tip tip-stacked timezone">${_("(UTC)")}</span>
+              </div>
+            </li>
+          </ol>
+          % endif
         </div>
 
         % if about_page_editable:
