@@ -22,6 +22,7 @@ from pytz import UTC
 
 from contentstore.config.waffle import ENABLE_PROCTORING_PROVIDER_OVERRIDES
 from contentstore.utils import reverse_course_url, reverse_usage_url
+from course_modes.models import CourseMode
 from models.settings.course_grading import GRADING_POLICY_CHANGED_EVENT_TYPE, CourseGradingModel, hash_grading_policy
 from models.settings.course_metadata import CourseMetadata
 from models.settings.encoder import CourseSettingsEncoder
@@ -178,6 +179,29 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
                 self.fail(field + " missing from encoded but in details at " + context)
         elif field in encoded and encoded[field] is not None:
             self.fail(field + " included in encoding but missing from details at " + context)
+
+    @ddt.data(
+        (False, False),
+        (True, False),
+        (True, True),
+    )
+    @ddt.unpack
+    def test_upgrade_deadline(self, has_verified_mode, has_expiration_date):
+        if has_verified_mode:
+            deadline = None
+            if has_expiration_date:
+                deadline = self.course.start + datetime.timedelta(days=2)
+            CourseMode.objects.get_or_create(
+                course_id=self.course.id,
+                mode_display_name="Verified",
+                mode_slug="verified",
+                min_price=1,
+                _expiration_datetime=deadline,
+            )
+
+        settings_details_url = get_url(self.course.id)
+        response = self.client.get_html(settings_details_url)
+        self.assertEqual("Upgrade Deadline Date" in response.content, has_expiration_date and has_verified_mode)
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
     def test_pre_requisite_course_list_present(self):

@@ -54,6 +54,7 @@ from contentstore.views.entrance_exam import create_entrance_exam, delete_entran
 from course_action_state.managers import CourseActionStateItemNotFoundError
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from course_creators.views import add_user_with_status_unrequested, get_course_creator_status
+from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
@@ -1066,6 +1067,10 @@ def settings_handler(request, course_key_string):
             sidebar_html_enabled = course_experience_waffle().is_enabled(ENABLE_COURSE_ABOUT_SIDEBAR_HTML)
             # self_paced_enabled = SelfPacedConfiguration.current().enabled
 
+            verified_mode = CourseMode.verified_mode_for_course(course_key)
+            upgrade_deadline = (verified_mode and verified_mode.expiration_datetime and
+                                verified_mode.expiration_datetime.isoformat())
+
             settings_context = {
                 'context_course': course_module,
                 'course_locator': course_key,
@@ -1086,7 +1091,8 @@ def settings_handler(request, course_key_string):
                 'enrollment_end_editable': enrollment_end_editable,
                 'is_prerequisite_courses_enabled': is_prerequisite_courses_enabled(),
                 'is_entrance_exams_enabled': is_entrance_exams_enabled(),
-                'enable_extended_course_details': enable_extended_course_details
+                'enable_extended_course_details': enable_extended_course_details,
+                'upgrade_deadline': upgrade_deadline,
             }
             if is_prerequisite_courses_enabled():
                 courses, in_process_course_actions = get_courses_accessible_to_user(request)
