@@ -14336,6 +14336,11 @@ msgstr ""
 msgid "Sequence"
 msgstr "Sekwencja"
 
+#: lms/templates/seq_module.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "Completed"
+msgstr ""
+
 #: lms/templates/signup_modal.html
 msgid "Sign Up for {platform_name}"
 msgstr "Zarejestruj się w {platform_name}"

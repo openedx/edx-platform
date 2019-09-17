@@ -158,7 +158,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-08 20:42+0000\n"
+"POT-Creation-Date: 2019-09-15 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019\n"
 "Language-Team: German (Germany) (https://www.transifex.com/open-edx/teams/6205/de_DE/)\n"
@@ -13922,6 +13922,11 @@ msgstr ""
 
 #: lms/templates/seq_module.html
 msgid "Sequence"
+msgstr ""
+
+#: lms/templates/seq_module.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "Completed"
 msgstr ""
 
 #: lms/templates/signup_modal.html

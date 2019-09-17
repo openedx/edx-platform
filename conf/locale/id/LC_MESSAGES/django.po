@@ -15,6 +15,7 @@
 # Muhammad Herdiansyah <herdiansyah@openmailbox.org>, 2016
 # Rizky Ariestiyansyah <ariestiyansyah.rizky@gmail.com>, 2015,2018
 # Sari Rahmawati <kusuma.rahmawati@gmail.com>, 2018
+# Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019
 # Untag Pranata <untag@unzypsoft.com>, 2018
 # Waheed Ahmed <waheed@edx.org>, 2019
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
@@ -59,6 +60,7 @@
 # Nanang Riyadi, 2015
 # Rizky Ariestiyansyah <ariestiyansyah.rizky@gmail.com>, 2014-2015
 # Sari Rahmawati <kusuma.rahmawati@gmail.com>, 2018
+# Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019
 # Waheed Ahmed <waheed@edx.org>, 2019
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/)
@@ -82,6 +84,7 @@
 # Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2018-2019
 # lusiana <lusiana.rumintang@gmail.com>, 2014
 # Muhammad Redho Ayassa <redhoyasa@gmail.com>, 2016
+# Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Indonesian (https://www.transifex.com/open-edx/teams/6205/id/)
 # Copyright (C) 2019 edX
@@ -96,7 +99,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-08 20:42+0000\n"
+"POT-Creation-Date: 2019-09-15 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019\n"
 "Language-Team: Indonesian (https://www.transifex.com/open-edx/teams/6205/id/)\n"
@@ -1803,7 +1806,7 @@ msgstr "memproses"
 #. question
 #: common/lib/capa/capa/inputtypes.py
 msgid "This answer is correct."
-msgstr "Jawaban betul."
+msgstr "Jawaban benar."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "This answer is incorrect."
@@ -1811,7 +1814,7 @@ msgstr "Jawaban salah."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "This answer is partially correct."
-msgstr "Jawaban sebagian betul."
+msgstr "Jawaban sebagian benar."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "This answer is being processed."
@@ -1823,7 +1826,7 @@ msgstr "Belum dijawab"
 
 #: common/lib/capa/capa/inputtypes.py wiki/forms.py
 msgid "Select an option"
-msgstr "Pilih opsi"
+msgstr "Pilihlah salah satu jawaban"
 
 #. Translators: 'ChoiceGroup' is an input type and should not be translated.
 #: common/lib/capa/capa/inputtypes.py
@@ -2318,7 +2321,7 @@ msgstr "Setelah Beberapa Kali Percobaan"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Show Answer: Number of Attempts"
-msgstr "Tunjukkan Jawaban: Jumlah Percobaan"
+msgstr "Tampilkan jawaban: Jumlah Percobaan"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
@@ -2476,7 +2479,7 @@ msgstr ""
 #: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Submit"
-msgstr "Ajukan"
+msgstr "Kirim"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Submitting"
@@ -2546,7 +2549,7 @@ msgstr[0] "Benar sebagian ({progress} poin)"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Partially Correct"
-msgstr "Sebagian Betul"
+msgstr "Sebagian Benar"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Answer submitted."
@@ -4945,7 +4948,7 @@ msgid ""
 "Specify whether to advance automatically to the next unit when the video "
 "ends."
 msgstr ""
-"Tentukan apakah akan melanjutkan secara otomatis ke unit berikutnya ketika "
+"Tentukan apakah akan melanjutkan secara otomatis ke unit Selanjutnya ketika "
 "video berakhir."
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
@@ -13034,7 +13037,7 @@ msgstr "Sebelumnya"
 #: cms/templates/maintenance/_announcement_index.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "next"
-msgstr "Berikutnya"
+msgstr "Selanjutnya"
 
 #: cms/templates/maintenance/_force_publish_course.html
 #: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
@@ -13497,7 +13500,7 @@ msgstr "Ganti Sandi Saya"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Email is incorrect."
-msgstr "Email tidak tepat."
+msgstr "Email salah."
 
 #: lms/templates/hidden_content.html
 msgid "The course has ended."
@@ -13680,7 +13683,7 @@ msgstr "{points} / {total_points} poin"
 #. this LTI unit
 #: lms/templates/lti.html
 msgid "{total_points} points possible"
-msgstr "{total_points} kemungkinan poin"
+msgstr "{total_points} poin yang diperoleh "
 
 #: lms/templates/lti.html
 msgid "View resource in a new window"
@@ -14145,11 +14148,16 @@ msgstr ""
 #: lms/templates/seq_module.html
 msgctxt "unit"
 msgid "Next"
-msgstr ""
+msgstr "Selanjutnya"
 
 #: lms/templates/seq_module.html
 msgid "Sequence"
 msgstr "Urutan"
+
+#: lms/templates/seq_module.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "Completed"
+msgstr ""
 
 #: lms/templates/signup_modal.html
 msgid "Sign Up for {platform_name}"
@@ -16460,7 +16468,7 @@ msgstr "dari"
 
 #: lms/templates/courseware/gradebook.html
 msgid "next page"
-msgstr "halaman berikutnya"
+msgstr "halaman Selanjutnya"
 
 #: lms/templates/courseware/info.html
 msgid "{course_number} Course Info"
@@ -17483,7 +17491,7 @@ msgstr "Topik:"
 
 #: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"
-msgstr "Tampilkan Diskusi"
+msgstr "Tampilkan diskusi"
 
 #: lms/templates/discussion/_discussion_inline_studio.html
 msgid "To view live discussions, click Preview or View Live in Unit Settings."

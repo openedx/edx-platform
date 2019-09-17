@@ -27,6 +27,7 @@
 # Sarina Canelake <sarina@edx.org>, 2014
 # Sari Rahmawati <kusuma.rahmawati@gmail.com>, 2018
 # Sony Wiliyanto <sonywiliyanto@hotmail.com>, 2015
+# Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019
 # stefanny tan <stefannysik@me.com>, 2016
 # Waheed Ahmed <waheed@edx.org>, 2019
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
@@ -62,6 +63,7 @@
 # Eka Y Saputra <ekajogja@ymail.com>, 2014
 # erdi tama <erditama@gmail.com>, 2016
 # Lucki Haryadi <suryaharyadi@gmail.com>, 2016
+# Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019
 # Zainab Amir <zamir@edx.org>, 2019
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/)
@@ -78,7 +80,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-08 20:42+0000\n"
+"POT-Creation-Date: 2019-09-15 20:42+0000\n"
 "PO-Revision-Date: 2019-09-12 08:05+0000\n"
 "Last-Translator: Aprisa Chrysantina <aprisa.chrysantina@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/)\n"
@@ -356,55 +358,51 @@ msgstr "Komentar"
 msgid "Reply to Annotation"
 msgstr "Balas Catatan"
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (graded, results hidden)"
-msgid_plural "%(num_points)s points possible (graded, results hidden)"
+msgid "{num_points} point possible (graded, results hidden)"
+msgid_plural "{num_points} points possible (graded, results hidden)"
 msgstr[0] ""
-"nilai yang mungkin didapatkan %(num_points)s (telah dinilai, hasil "
-"disembunyikan)"
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (ungraded, results hidden)"
-msgid_plural "%(num_points)s points possible (ungraded, results hidden)"
+msgid "{num_points} point possible (ungraded, results hidden)"
+msgid_plural "{num_points} points possible (ungraded, results hidden)"
+msgstr[0] "{num_points} poin yang diperoleh (tidak dinilai)"
+
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "{num_points} point possible (graded)"
+msgid_plural "{num_points} points possible (graded)"
 msgstr[0] ""
-"nilai yang mungkin didapatkan %(num_points)s (belum dinilai, hasil "
-"disembunyikan)"
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (graded)"
-msgid_plural "%(num_points)s points possible (graded)"
-msgstr[0] "nilai yang mungkin didapatkan %(num_points)s (telah dinilai)"
+msgid "{num_points} point possible (ungraded)"
+msgid_plural "{num_points} points possible (ungraded)"
+msgstr[0] "{num_points} poin yang diperoleh (tidak dinilai)"
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (ungraded)"
-msgid_plural "%(num_points)s points possible (ungraded)"
-msgstr[0] "nilai yang mungkin didapatkan %(num_points)s (belum dinilai)"
-
-#. Translators: %(earned)s is the number of points earned. %(possible)s is the
+#. Translators: {earned} is the number of points earned. {possible} is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
 #. points will always be at least 1. We pluralize based on the total number of
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(earned)s/%(possible)s point (graded)"
-msgid_plural "%(earned)s/%(possible)s points (graded)"
-msgstr[0] "nilai %(earned)s/%(possible)s (telah dinilai)"
+msgid "{earned}/{possible} point (graded)"
+msgid_plural "{earned}/{possible} points (graded)"
+msgstr[0] ""
 
-#. Translators: %(earned)s is the number of points earned. %(possible)s is the
+#. Translators: {earned} is the number of points earned. {possible} is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
 #. points will always be at least 1. We pluralize based on the total number of
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(earned)s/%(possible)s point (ungraded)"
-msgid_plural "%(earned)s/%(possible)s points (ungraded)"
-msgstr[0] "nilai %(earned)s/%(possible)s (belum dinilai)"
+msgid "{earned}/{possible} point (ungraded)"
+msgid_plural "{earned}/{possible} points (ungraded)"
+msgstr[0] ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "The grading process is still running. Refresh the page to see updates."
@@ -861,7 +859,7 @@ msgstr "Cari dan ganti"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Find next"
-msgstr "Cari berikutnya"
+msgstr "Cari Selanjutnya"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1227,7 +1225,7 @@ msgstr "Window baru"
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 msgid "Next"
-msgstr "Berikutnya"
+msgstr "Selanjutnya"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -2152,7 +2150,7 @@ msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "Hide Discussion"
-msgstr "Sembunyikan Diskusi"
+msgstr "Lihat diskusi"
 
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "This discussion could not be loaded. Refresh the page and try again."
@@ -2160,7 +2158,7 @@ msgstr "Diskusi ini tidak dapat dimuat. Refresh halaman ini dan coba lagi."
 
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "Show Discussion"
-msgstr "Tampilkan Diskusi"
+msgstr "Tampilkan diskusi"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "There are no posts in this topic yet."
@@ -2237,7 +2235,7 @@ msgstr "Memuat semua tanggapan"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Load next {numResponses} responses"
-msgstr "Memuat {numResponses} respon berikutnya"
+msgstr "Memuat {numResponses} respon Selanjutnya"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Are you sure you want to delete this post?"
@@ -2509,7 +2507,7 @@ msgstr "Semakin lengkap informasimu, semakin cepat dan tepat respon kami!"
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Submit"
-msgstr "Kirimkan"
+msgstr "Kirim"
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
@@ -7615,7 +7613,7 @@ msgstr "Kembali ke FAQ {platform}"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Submit Application"
-msgstr "Kirimkan Aplikasi"
+msgstr "Kirim Aplikasi"
 
 #: lms/templates/financial-assistance/financial_assessment_submitted.underscore
 msgid ""
@@ -8769,7 +8767,7 @@ msgstr ""
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Next Step: Confirm your identity"
-msgstr "Langkah berikutnya: konfirmasi identitas anda"
+msgstr "Langkah Selanjutnya: konfirmasi identitas anda"
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Check your email"
