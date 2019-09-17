@@ -82,3 +82,7 @@ numpy<1.17.0
 #  jsondiff==1.2.0 (from -r requirements/edx/base.txt (line 146))
 jsondiff==1.1.1
 
+# faker 2.0.2 pinned text-unidecode==1.3 because 1.2 had a license that was incompatible.
+# but python-slugify pinned text-unidecode==1.2.  So pin faker to an earlier versions so
+# we can agree on text-unidecode.
+faker==2.0.1
