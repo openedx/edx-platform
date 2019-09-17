@@ -33,7 +33,7 @@ class JsonResponseTestCase(unittest.TestCase):
 
     def test_string(self):
         resp = JsonResponse("foo")
-        self.assertEqual(resp.content, '"foo"')
+        self.assertEqual(resp.content.decode('utf-8'), '"foo"')
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp["content-type"], "application/json")
 
