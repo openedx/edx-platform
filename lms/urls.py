@@ -949,12 +949,19 @@ if settings.BRANCH_IO_KEY:
         url(r'^text-me-the-app', student_views.text_me_the_app, name='text_me_the_app'),
     ]
 
-if settings.FEATURES.get('ENABLE_API_DOCS'):
-    urlpatterns += [
-        url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-        url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-        url(r'^api-docs/$', schema_view.with_ui('swagger', cache_timeout=0)),
-    ]
+# API docs.
+urlpatterns += [
+    url(
+        r'^swagger(?P<format>\.json|\.yaml)$',
+        schema_view.without_ui(cache_timeout=settings.OPENAPI_CACHE_TIMEOUT), name='schema-json',
+    ),
+    url(
+        r'^swagger/$',
+        schema_view.with_ui('swagger', cache_timeout=settings.OPENAPI_CACHE_TIMEOUT),
+        name='schema-swagger-ui',
+    ),
+    url(r'^api-docs/$', schema_view.with_ui('swagger', cache_timeout=settings.OPENAPI_CACHE_TIMEOUT)),
+]
 
 # edx-drf-extensions csrf app
 urlpatterns += [

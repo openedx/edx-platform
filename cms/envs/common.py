@@ -305,9 +305,6 @@ FEATURES = {
 
     # Prevent auto auth from creating superusers or modifying existing users
     'RESTRICT_AUTOMATIC_AUTH': True,
-
-    # Set this to true to make API docs available at /api-docs/.
-    'ENABLE_API_DOCS': False,
 }
 
 ENABLE_JASMINE = False
@@ -1801,6 +1798,10 @@ COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
 
 DEFAULT_COURSE_VISIBILITY_IN_CATALOG = "both"
 DEFAULT_MOBILE_AVAILABLE = False
+
+
+# How long to cache OpenAPI schemas and UI, in seconds.
+OPENAPI_CACHE_TIMEOUT = 0
 
 ################# Mobile URLS ##########################
 

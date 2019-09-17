@@ -105,10 +105,6 @@ def should_show_debug_toolbar(request):
     return True
 
 
-########################### API DOCS #################################
-
-FEATURES['ENABLE_API_DOCS'] = True
-
 ################################ MILESTONES ################################
 FEATURES['MILESTONES_APP'] = True
 
@@ -185,6 +181,9 @@ BLOCKSTORE_API_URL = "http://edx.devstack.blockstore:18250/api/v1/"
 from openedx.core.djangoapps.plugins import constants as plugin_constants, plugin_settings
 
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_constants.SettingsType.DEVSTACK)
+
+
+OPENAPI_CACHE_TIMEOUT = 0
 
 ###############################################################################
 # See if the developer has any local overrides.
