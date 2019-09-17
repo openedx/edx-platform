@@ -88,14 +88,10 @@ class GradingPage(SettingsPage):
         Drag and drop grade range.
         """
         self.wait_for_element_visibility(self.grade_ranges, "Grades ranges are visible")
-        # We have used jquery here to adjust the width of slider to
-        # desired range because drag and drop has behaved very inconsistently.
-        # This does not updates the text of range on the slider.
-        # So as a work around, we have used drag_and_drop without any offset
-        self.browser.execute_script('$(".ui-resizable").css("width","10")')
         action = ActionChains(self.browser)
         moveable_css = self.q(css='.ui-resizable-e').results[0]
-        action.drag_and_drop_by_offset(moveable_css, 0, 0).perform()
+        action.drag_and_drop_by_offset(moveable_css, -280, 0)
+        action.perform()
 
     @property
     def get_assignment_names(self):

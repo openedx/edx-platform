@@ -98,7 +98,7 @@
     // layout with breadcrumb navigation
     &.has-navigation {
       .nav-actions {
-        bottom: -($baseline*1.5);
+        bottom: $baseline;
       }
 
       .navigation-item {

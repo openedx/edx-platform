@@ -72,7 +72,7 @@ from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundErr
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.services import ConfigurationService, SettingsService
 from xmodule.tabs import CourseTabList
-from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW
+from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW
 from edx_proctoring.api import get_exam_configuration_dashboard_url, does_backend_support_onboarding
 from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
 
@@ -273,6 +273,7 @@ class StudioEditModuleRuntime(object):
     (i.e. whenever we're not using PreviewModuleSystem.) This is required to make information
     about the current user (especially permissions) available via services as needed.
     """
+
     def __init__(self, user):
         self._user = user
 
@@ -381,16 +382,18 @@ def xblock_view_handler(request, usage_key_string, view_name):
             force_render = request.GET.get('force_render', None)
 
             # Set up the context to be passed to each XBlock's render method.
-            context = {
-                'is_pages_view': is_pages_view,     # This setting disables the recursive wrapping of xblocks
+            context = request.GET.dict()
+            context.update({
+                # This setting disables the recursive wrapping of xblocks
+                'is_pages_view': is_pages_view or view_name == AUTHOR_VIEW,
                 'is_unit_page': is_unit(xblock),
                 'can_edit': can_edit,
                 'root_xblock': xblock if (view_name == 'container_preview') else None,
                 'reorderable_items': reorderable_items,
                 'paging': paging,
                 'force_render': force_render,
-            }
-
+                'item_url': '/container/{usage_key}',
+            })
             fragment = get_preview_fragment(request, xblock, context)
 
             # Note that the container view recursively adds headers into the preview fragment,
@@ -998,7 +1001,11 @@ def _get_xblock(usage_key, user):
         except ItemNotFoundError:
             if usage_key.block_type in CREATE_IF_NOT_FOUND:
                 # Create a new one for certain categories only. Used for course info handouts.
-                return store.create_item(user.id, usage_key.course_key, usage_key.block_type, block_id=usage_key.block_id)
+                return store.create_item(
+                    user.id,
+                    usage_key.course_key,
+                    usage_key.block_type,
+                    block_id=usage_key.block_id)
             else:
                 raise
         except InvalidLocationError:
@@ -1052,7 +1059,7 @@ def _get_gating_info(course, xblock):
         if not hasattr(course, 'gating_prerequisites'):
             # Cache gating prerequisites on course module so that we are not
             # hitting the database for every xblock in the course
-            setattr(course, 'gating_prerequisites', gating_api.get_prerequisites(course.id))
+            course.gating_prerequisites = gating_api.get_prerequisites(course.id)
         info["is_prereq"] = gating_api.is_prerequisite(course.id, xblock.location)
         info["prereqs"] = [
             p for p in course.gating_prerequisites if text_type(xblock.location) not in p['namespace']
@@ -1163,7 +1170,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         'has_children': xblock.has_children
     }
     if is_concise:
-        if child_info and len(child_info.get('children', [])) > 0:
+        if child_info and child_info.get('children', []):
             xblock_info['child_info'] = child_info
         # Groups are labelled with their internal ids, rather than with the group name. Replace id with display name.
         group_display_name = get_split_group_display_name(xblock, course)
@@ -1334,7 +1341,8 @@ class VisibilityState(object):
       unscheduled - the block and all of its descendants have no release date (excluding staff only items)
         Note: it is valid for items to be published with no release date in which case they are still unscheduled.
 
-      needs_attention - the block or its descendants are not fully live, ready or unscheduled (excluding staff only items)
+      needs_attention - the block or its descendants are not fully live, ready or unscheduled
+        (excluding staff only items)
         For example: one subsection has draft content, or there's both unreleased and released content in one section.
 
       staff_only - all of the block's content is to be shown to staff only

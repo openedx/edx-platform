@@ -33,7 +33,7 @@ class CourseOutlineItem(object):
     NAME_SELECTOR = '.item-title'
     NAME_INPUT_SELECTOR = '.xblock-field-input'
     NAME_FIELD_WRAPPER_SELECTOR = '.xblock-title .wrapper-xblock-field'
-    STATUS_MESSAGE_SELECTOR = '> div[class$="status"] .status-message'
+    STATUS_MESSAGE_SELECTOR = '> div[class$="-status"] .status-messages'
     CONFIGURATION_BUTTON_SELECTOR = '.action-item .configure-button'
 
     def __repr__(self):
@@ -84,7 +84,8 @@ class CourseOutlineItem(object):
         """
         Returns the status message of this item.
         """
-        return self.q(css=self._bounded_selector(self.STATUS_MESSAGE_SELECTOR)).text[0]  # pylint: disable=no-member
+        selector = self._bounded_selector(self.STATUS_MESSAGE_SELECTOR)
+        return self.q(css=selector).text[0]  # pylint: disable=no-member
 
     @property
     def has_staff_lock_warning(self):

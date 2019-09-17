@@ -518,3 +518,49 @@ def is_self_paced(course):
     Returns True if course is self-paced, False otherwise.
     """
     return course and course.self_paced
+
+
+def get_sibling_urls(subsection):
+    """
+    Given a subsection, returns the urls for the next and previous units.
+
+    (the first unit of the next subsection or section, and
+    the last unit of the previous subsection/section)
+    """
+    section = subsection.get_parent()
+    prev_url = next_url = ''
+    prev_loc = next_loc = None
+    last_block = None
+    siblings = list(section.get_children())
+    for i, block in enumerate(siblings):
+        if block.location == subsection.location:
+            if last_block:
+                try:
+                    prev_loc = last_block.get_children()[0].location
+                except IndexError:
+                    pass
+            try:
+                next_loc = siblings[i + 1].get_children()[0].location
+            except IndexError:
+                pass
+            break
+        last_block = block
+    if not prev_loc:
+        sections = section.get_parent().get_children()
+        try:
+            prev_section = sections[sections.index(section) - 1]
+            prev_loc = prev_section.get_children()[-1].get_children()[-1].location
+        except IndexError:
+            pass
+    if not next_loc:
+        sections = section.get_parent().get_children()
+        try:
+            next_section = sections[sections.index(section) + 1]
+            next_loc = next_section.get_children()[0].get_children()[0].location
+        except IndexError:
+            pass
+    if prev_loc:
+        prev_url = reverse_usage_url('container_handler', prev_loc)
+    if next_loc:
+        next_url = reverse_usage_url('container_handler', next_loc)
+    return prev_url, next_url
