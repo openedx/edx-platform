@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 import courseware.fields
+from django.conf import settings
 from django.db import migrations
 from django.db.migrations import AlterField
 
@@ -15,7 +16,8 @@ class CsmBigInt(AlterField):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         to_model = to_state.apps.get_model(app_label, self.model_name)
         if schema_editor.connection.alias == 'student_module_history':
-            schema_editor.execute("ALTER TABLE `coursewarehistoryextended_studentmodulehistoryextended` MODIFY `student_module_id` bigint UNSIGNED NOT NULL;")
+            if settings.FEATURES["ENABLE_CSMH_EXTENDED"]:
+              schema_editor.execute("ALTER TABLE `coursewarehistoryextended_studentmodulehistoryextended` MODIFY `student_module_id` bigint UNSIGNED NOT NULL;")
         elif self.allow_migrate_model(schema_editor.connection.alias, to_model):
             schema_editor.execute("ALTER TABLE `courseware_studentmodule` MODIFY `id` bigint UNSIGNED AUTO_INCREMENT NOT NULL;")
 
