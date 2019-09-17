@@ -126,20 +126,22 @@ class Rev934(DeveloperErrorViewMixin, APIView):
 
         enrollment = None
         user_enrollments = None
-        should_upsell = True
+        upsell_mode = True
         try:
             enrollment = CourseEnrollment.objects.select_related(
                 'course'
             ).get(user_id=user.id, course_id=course.id)
-            should_upsell = enrollment.mode in CourseMode.UPSELL_TO_VERIFIED_MODES
+            upsell_mode = enrollment.mode in CourseMode.UPSELL_TO_VERIFIED_MODES
         except CourseEnrollment.DoesNotExist:
             pass  # Not enrolled, use the default values
 
         upgrade_link, upgrade_date = check_and_get_upgrade_link_and_date(user, enrollment, course)
         upgrade_price = six.text_type(get_cosmetic_verified_display_price(course))
+        could_upsell = bool(upsell_mode and upgrade_link)
 
         bucket = stable_bucketing_hash_group(MOBILE_UPSELL_EXPERIMENT, 2, user.username)
-        if hasattr(request, 'session') and MOBILE_UPSELL_EXPERIMENT not in request.session:
+
+        if could_upsell and hasattr(request, 'session') and MOBILE_UPSELL_EXPERIMENT not in request.session:
             properties = {
                 'site': request.site.domain,
                 'app_label': 'experiments',
@@ -155,7 +157,7 @@ class Rev934(DeveloperErrorViewMixin, APIView):
             # Mark that we've recorded this bucketing, so that we don't do it again this session
             request.session[MOBILE_UPSELL_EXPERIMENT] = True
 
-        show_upsell = bucket != 0 and should_upsell
+        show_upsell = bool(bucket != 0) # and could_upsell)
         if show_upsell:
             return Response({
                 'show_upsell': show_upsell,
@@ -167,4 +169,5 @@ class Rev934(DeveloperErrorViewMixin, APIView):
                 'show_upsell': show_upsell,
                 'upsell_flag': MOBILE_UPSELL_FLAG.is_enabled(),
                 'experiment_bucket': bucket,
+                'could_upsell': could_upsell,
             })
