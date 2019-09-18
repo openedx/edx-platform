@@ -341,10 +341,14 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
 
         <hr class="divide" />
             <div class="group-settings marketing">
+
+              % if about_page_editable:
               <header>
                 <h2 class="title-2">${_("Introducing Your Course")}</h2>
                 <span class="tip">${_("Information for prospective students")}</span>
               </header>
+              % endif
+
               <ol class="list-input">
 
                 % if enable_extended_course_details:
@@ -405,6 +409,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
                   % endif
                 % endif
 
+                % if about_page_editable:
                 <li class="field image" id="field-course-image">
                   <label for="course-image-url">${_("Course Card Image")}</label>
                   <div class="current current-course-image">
@@ -437,6 +442,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
                     <button type="button" class="action action-upload-image" id="upload-course-image">${_("Upload Course Card Image")}</button>
                   </div>
                 </li>
+                % endif
 
                 % if enable_extended_course_details:
                 <li class="field image" id="field-banner-image">
