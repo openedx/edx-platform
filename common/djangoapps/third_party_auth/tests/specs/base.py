@@ -935,7 +935,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
             strategy.request.POST['password'] = 'bad_' + password if success is False else password
 
         self.assert_pipeline_running(strategy.request)
-        payload = json.loads(login_user(strategy.request).content)
+        payload = json.loads(login_user(strategy.request).content.decode('utf-8'))
 
         if success is None:
             # Request malformed -- just one of email/password given.
