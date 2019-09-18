@@ -29,6 +29,7 @@ URL_BLOCK_GET_HANDLER_URL = '/api/xblock/v2/xblocks/{block_key}/handler_url/{han
 
 
 @unittest.skipUnless(settings.RUN_BLOCKSTORE_TESTS, "Requires a running Blockstore server")
+@unittest.skipUnless(settings.ROOT_URLCONF == "cms.urls", "Content Libraries REST API is only available in Studio")
 class ContentLibrariesTest(APITestCase):
     """
     Test for Blockstore-based Content Libraries

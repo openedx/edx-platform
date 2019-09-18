@@ -25,7 +25,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
-from opaque_keys.edx.django.models import BlockTypeKeyField, CourseKeyField, UsageKeyField
+from opaque_keys.edx.django.models import BlockTypeKeyField, CourseKeyField, LearningContextKeyField, UsageKeyField
 from courseware.fields import UnsignedBigIntAutoField
 from six import text_type
 from six.moves import range
@@ -79,33 +79,25 @@ class ChunkingManager(models.Manager):
 
 class StudentModule(models.Model):
     """
-    Keeps student state for a particular module in a particular course.
+    Keeps student state for a particular XBlock usage and particular student.
+
+    Called Module since it was originally used for XModule state.
 
     .. no_pii:
     """
     objects = ChunkingManager()
-    MODEL_TAGS = ['course_id', 'module_type']
-
-    # For a homework problem, contains a JSON
-    # object consisting of state
-    MODULE_TYPES = (('problem', 'problem'),
-                    ('video', 'video'),
-                    ('html', 'html'),
-                    ('course', 'course'),
-                    ('chapter', 'Section'),
-                    ('sequential', 'Subsection'),
-                    ('library_content', 'Library Content'))
 
     id = UnsignedBigIntAutoField(primary_key=True)  # pylint: disable=invalid-name
 
-    ## These three are the key for the object
-    module_type = models.CharField(max_length=32, choices=MODULE_TYPES, default='problem', db_index=True)
+    ## The XBlock/XModule type (e.g. "problem")
+    module_type = models.CharField(max_length=32, db_index=True)
 
     # Key used to share state. This is the XBlock usage_id
     module_state_key = UsageKeyField(max_length=255, db_column='module_id')
     student = models.ForeignKey(User, db_index=True, db_constraint=False, on_delete=models.CASCADE)
 
-    course_id = CourseKeyField(max_length=255, db_index=True)
+    # The learning context of the usage_key (usually a course ID, but may be a library or something else)
+    course_id = LearningContextKeyField(max_length=255, db_index=True)
 
     class Meta(object):
         app_label = "courseware"

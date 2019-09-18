@@ -55,7 +55,7 @@ class LibraryContextImpl(LearningContext):
         # TODO: implement permissions
         return True
 
-    def definition_for_usage(self, usage_key):
+    def definition_for_usage(self, usage_key, **kwargs):
         """
         Given a usage key for an XBlock in this context, return the
         BundleDefinitionLocator which specifies the actual XBlock definition
@@ -69,7 +69,11 @@ class LibraryContextImpl(LearningContext):
             bundle_uuid = bundle_uuid_for_library_key(library_key)
         except ContentLibrary.DoesNotExist:
             return None
-        bundle = LibraryBundle(library_key, bundle_uuid, self.use_draft)
+        if 'force_draft' in kwargs:
+            use_draft = kwargs['force_draft']
+        else:
+            use_draft = self.use_draft
+        bundle = LibraryBundle(library_key, bundle_uuid, use_draft)
         return bundle.definition_for_usage(usage_key)
 
     def usage_for_child_include(self, parent_usage, parent_definition, parsed_include):
