@@ -39,7 +39,7 @@ sys.path.append(root / "openedx/features")
 # without errors.  If running sphinx-apidoc, we already set a different
 # settings module to use in the on_init() hook of the parent process
 if 'DJANGO_SETTINGS_MODULE' not in os.environ:
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'docs_settings'
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'docs.docs_settings'
 
 django.setup()
 

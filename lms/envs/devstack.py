@@ -100,10 +100,6 @@ def should_show_debug_toolbar(request):
         return False
     return True
 
-########################### API DOCS #################################
-
-FEATURES['ENABLE_API_DOCS'] = True
-
 ########################### PIPELINE #################################
 
 PIPELINE['PIPELINE_ENABLED'] = False
@@ -281,6 +277,8 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_c
 REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'] += (
     'rest_framework.renderers.BrowsableAPIRenderer',
 )
+
+OPENAPI_CACHE_TIMEOUT = 0
 
 #####################################################################
 # See if the developer has any local overrides.

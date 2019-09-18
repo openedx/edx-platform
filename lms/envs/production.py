@@ -1051,6 +1051,9 @@ ICP_LICENSE_INFO = ENV_TOKENS.get('ICP_LICENSE_INFO', {})
 ############## Settings for CourseGraph ############################
 COURSEGRAPH_JOB_QUEUE = ENV_TOKENS.get('COURSEGRAPH_JOB_QUEUE', DEFAULT_PRIORITY_QUEUE)
 
+# How long to cache OpenAPI schemas and UI, in seconds.
+OPENAPI_CACHE_TIMEOUT = ENV_TOKENS.get('OPENAPI_CACHE_TIMEOUT', 60 * 60)
+
 ########################## Parental controls config  #######################
 
 # The age at which a learner no longer requires parental consent, or None

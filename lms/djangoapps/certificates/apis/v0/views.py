@@ -5,6 +5,7 @@ import logging
 
 import six
 from django.contrib.auth import get_user_model
+from django.utils.decorators import method_decorator
 from edx_rest_framework_extensions import permissions
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -20,6 +21,8 @@ from openedx.core.djangoapps.certificates.api import certificates_viewable_for_c
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.user_api.accounts.api import visible_fields
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.openapi import swagger_auto_schema, openapi
+
 
 log = logging.getLogger(__name__)
 User = get_user_model()
@@ -131,21 +134,16 @@ class CertificatesDetailView(GenericAPIView):
         )
 
 
-class CertificatesListView(GenericAPIView):
-    """
+@method_decorator(name='get', decorator=swagger_auto_schema(
+    operation_summary="Get a paginated list of bookmarks for a user.",
+    operation_description=u"""\
         **Use Case**
 
-            * Get the list of viewable course certificates for a specific user.
+        Get the list of viewable course certificates for a specific user.
 
         **Example Request**
 
-            GET /api/certificates/v0/certificates/{username}
-
-        **GET Parameters**
-
-            A GET request must include the following parameters.
-
-            * username: A string representation of an user's username.
+        GET /api/certificates/v0/certificates/{username}
 
         **GET Response Values**
 
@@ -187,8 +185,18 @@ class CertificatesListView(GenericAPIView):
                 "download_url": "http://www.example.com/cert.pdf",
                 "grade": "0.98"
             }]
-    """
-
+        """,
+    manual_parameters=[
+        openapi.Parameter(
+            'username',
+            openapi.IN_PATH,
+            type=openapi.TYPE_STRING,
+            description="The users to get certificates for",
+        ),
+    ],
+))
+class CertificatesListView(GenericAPIView):
+    """REST API endpoints for listing certificates."""
     authentication_classes = (
         JwtAuthentication,
         OAuth2AuthenticationAllowInactiveUser,
@@ -209,16 +217,6 @@ class CertificatesListView(GenericAPIView):
     required_scopes = ['certificates:read']
 
     def get(self, request, username):
-        """
-        Gets the list of viewable course certificates for a specific user.
-
-        Args:
-            request (Request): Django request object.
-            username (string): URI element specifying the user's username.
-
-        Return:
-            A JSON serialized representation of the list of certificates.
-        """
         user_certs = []
         if self._viewable_by_requestor(request, username):
             for user_cert in self._get_certificates_for_user(username):
