@@ -38,20 +38,20 @@ class TestLoginHelper(TestCase):
 
     @ddt.data(
         (logging.WARNING, "WARNING", "https://www.amazon.com", "text/html", None,
-         "Unsafe redirect parameter detected after login page: u'https://www.amazon.com'"),
+         "Unsafe redirect parameter detected after login page: 'https://www.amazon.com'"),
         (logging.WARNING, "WARNING", "testserver/edx.org/images/logo", "text/html", None,
-         "Redirect to theme content detected after login page: u'testserver/edx.org/images/logo'"),
+         "Redirect to theme content detected after login page: 'testserver/edx.org/images/logo'"),
         (logging.INFO, "INFO", "favicon.ico", "image/*", "test/agent",
-         "Redirect to non html content 'image/*' detected from 'test/agent' after login page: u'favicon.ico'"),
+         "Redirect to non html content 'image/*' detected from 'test/agent' after login page: 'favicon.ico'"),
         (logging.WARNING, "WARNING", "https://www.test.com/test.jpg", "image/*", None,
-         "Unsafe redirect parameter detected after login page: u'https://www.test.com/test.jpg'"),
+         "Unsafe redirect parameter detected after login page: 'https://www.test.com/test.jpg'"),
         (logging.INFO, "INFO", static_url + "dummy.png", "image/*", "test/agent",
-         "Redirect to non html content 'image/*' detected from 'test/agent' after login page: u'" + static_url +
+         "Redirect to non html content 'image/*' detected from 'test/agent' after login page: '" + static_url +
          "dummy.png" + "'"),
         (logging.WARNING, "WARNING", "test.png", "text/html", None,
-         "Redirect to url path with specified filed type 'image/png' not allowed: u'test.png'"),
+         "Redirect to url path with specified filed type 'image/png' not allowed: 'test.png'"),
         (logging.WARNING, "WARNING", static_url + "dummy.png", "text/html", None,
-         "Redirect to url path with specified filed type 'image/png' not allowed: u'" + static_url + "dummy.png" + "'"),
+         "Redirect to url path with specified filed type 'image/png' not allowed: '" + static_url + "dummy.png" + "'"),
     )
     @ddt.unpack
     def test_next_failures(self, log_level, log_name, unsafe_url, http_accept, user_agent, expected_log):
