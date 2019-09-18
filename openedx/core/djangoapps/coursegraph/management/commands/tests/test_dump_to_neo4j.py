@@ -10,7 +10,6 @@ import ddt
 import mock
 import six
 from django.core.management import call_command
-from django.utils import six
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -230,6 +229,12 @@ class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
         )
 
 
+class SomeThing(object):
+    """Just to test the stringification of an object."""
+    def __str__(self):
+        return "<SomeThing>"
+
+
 @skip_unless_lms
 @ddt.ddt
 class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
@@ -379,7 +384,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
 
     @ddt.data(
         (1, 1),
-        (object, "<type 'object'>"),
+        (SomeThing(), "<SomeThing>"),
         (1.5, 1.5),
         ("úñîçø∂é", "úñîçø∂é"),
         (b"plain string", b"plain string"),
@@ -388,7 +393,8 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         ((1,), "(1,)"),
         # list of elements should be coerced into a list of the
         # string representations of those elements
-        ([object, object], ["<type 'object'>", "<type 'object'>"])
+        ([SomeThing(), SomeThing()], ["<SomeThing>", "<SomeThing>"]),
+        ([1, 2], ["1", "2"]),
     )
     @ddt.unpack
     def test_coerce_types(self, original_value, coerced_expected):
