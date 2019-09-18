@@ -272,6 +272,25 @@ class CourseOverview(TimeStampedModel):
                 raise cls.DoesNotExist()
 
     @classmethod
+    def course_exists(cls, course_id):
+        """
+        Check whether a course run exists (in CourseOverviews _or_ modulestore).
+
+        Checks the CourseOverview table first.
+        If it is not there, check the modulestore.
+        Equivalent to, but more efficient than:
+            bool(CourseOverview.get_from_id(course_id))
+
+        Arguments:
+            course_id (CourseKey)
+
+        Returns: bool
+        """
+        if cls.objects.filter(id=course_id).exists():
+            return True
+        return modulestore().has_course(course_id)
+
+    @classmethod
     def get_from_id(cls, course_id):
         """
         Load a CourseOverview object for a given course ID.
