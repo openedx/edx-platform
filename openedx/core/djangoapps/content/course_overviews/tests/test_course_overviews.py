@@ -322,6 +322,37 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         with self.assertRaises(CourseOverview.DoesNotExist):
             CourseOverview.get_from_id(store.make_course_key('Non', 'Existent', 'Course'))
 
+    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    def test_course_with_course_overview_exists(self, modulestore_type):
+        """
+        Tests that calling course_exists on an existent course
+        that is cached in CourseOverview table returns True.
+        """
+        course = CourseFactory.create(default_store=modulestore_type)
+        CourseOverview.get_from_id(course.id)  # Ensure course in cached in CourseOverviews
+        self.assertTrue(CourseOverview.objects.filter(id=course.id).exists())
+        self.assertTrue(CourseOverview.course_exists(course.id))
+
+    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    def test_course_without_overview_exists(self, modulestore_type):
+        """
+        Tests that calling course_exists on an existent course
+        that is NOT cached in CourseOverview table returns True.
+        """
+        course = CourseFactory.create(default_store=modulestore_type)
+        CourseOverview.objects.filter(id=course.id).delete()
+        self.assertTrue(CourseOverview.course_exists(course.id))
+        self.assertFalse(CourseOverview.objects.filter(id=course.id).exists())
+
+    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    def test_nonexistent_course_does_not_exists(self, modulestore_type):
+        """
+        Tests that calling course_exists on an non-existent course returns False.
+        """
+        store = modulestore()._get_modulestore_by_type(modulestore_type)  # pylint: disable=protected-access
+        course_id = store.make_course_key('Non', 'Existent', 'Course')
+        self.assertFalse(CourseOverview.course_exists(course_id))
+
     def test_get_errored_course(self):
         """
         Test that getting an ErrorDescriptor back from the module store causes
