@@ -208,7 +208,7 @@ pyuca==1.1
 pyyaml==5.1.2
 git+https://github.com/edx/RecommenderXBlock.git@1.4.1#egg=recommender-xblock==1.4.1
 redis==2.10.6
-reportlab==3.5.23
+reportlab==3.5.26
 requests-oauthlib==1.1.0
 requests==2.22.0
 rest-condition==1.0.3

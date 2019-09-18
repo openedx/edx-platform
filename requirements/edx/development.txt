@@ -230,7 +230,7 @@ pbr==5.4.3
 pdfminer.six==20181108
 piexif==1.0.2
 pillow==6.1.0
-pip-tools==3.8.0
+pip-tools==4.1.0
 pkgconfig==1.5.1
 pluggy==0.13.0
 polib==1.1.0
@@ -281,7 +281,7 @@ pyyaml==5.1.2
 radon==3.0.3
 git+https://github.com/edx/RecommenderXBlock.git@1.4.1#egg=recommender-xblock==1.4.1
 redis==2.10.6
-reportlab==3.5.23
+reportlab==3.5.26
 requests-oauthlib==1.1.0
 requests==2.22.0
 rest-condition==1.0.3
