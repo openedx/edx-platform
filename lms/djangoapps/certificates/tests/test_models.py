@@ -180,17 +180,17 @@ class CertificateTemplateAssetTest(TestCase):
         """
         CertificateTemplateAsset(description='test description', asset=SimpleUploadedFile(
             'picture1.jpg',
-            'these are the file contents!')).save()
+            b'these are the file contents!')).save()
         certificate_template_asset = CertificateTemplateAsset.objects.get(id=1)
         self.assertEqual(certificate_template_asset.asset, 'certificate_template_assets/1/picture1.jpg')
 
         # Now save asset with same file again, New file will be uploaded after deleting the old one with the same name.
-        certificate_template_asset.asset = SimpleUploadedFile('picture1.jpg', 'file contents')
+        certificate_template_asset.asset = SimpleUploadedFile('picture1.jpg', b'file contents')
         certificate_template_asset.save()
         self.assertEqual(certificate_template_asset.asset, 'certificate_template_assets/1/picture1.jpg')
 
         # Now replace the asset with another file
-        certificate_template_asset.asset = SimpleUploadedFile('picture2.jpg', 'file contents')
+        certificate_template_asset.asset = SimpleUploadedFile('picture2.jpg', b'file contents')
         certificate_template_asset.save()
 
         certificate_template_asset = CertificateTemplateAsset.objects.get(id=1)
