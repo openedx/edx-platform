@@ -172,6 +172,13 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
         self.problem.system.is_author_mode = True
         self.assertEqual("original_get_html", self.problem.get_html())
 
+    def test_edxnotes_blockstore_runtime(self):
+        """
+        Tests that get_html is not wrapped when problem is rendered by Blockstore runtime.
+        """
+        del self.problem.descriptor.runtime.modulestore
+        self.assertEqual("original_get_html", self.problem.get_html())
+
     def test_edxnotes_harvard_notes_enabled(self):
         """
         Tests that get_html is not wrapped when Harvard Annotation Tool is enabled.
