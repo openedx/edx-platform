@@ -6,8 +6,12 @@ import logging
 import ddt
 from django.test import TestCase
 from mock import patch
-from student.tests.factories import UserFactory
+
 from edx_django_utils.cache import TieredCache
+from opaque_keys.edx.keys import CourseKey
+
+from student.tests.factories import UserFactory
+from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED
 from openedx.features.enterprise_support.tests.factories import (
     EnterpriseCourseEnrollmentFactory,
     EnterpriseCustomerFactory,
@@ -104,3 +108,20 @@ class EnterpriseSupportSignals(TestCase):
         enterprise_customer.save()
 
         self.assertFalse(self._is_dsc_cache_found(self.user.id, self.course_id))
+
+    def test_handle_enterprise_learner_passing_grade(self):
+        """
+        Test to assert transmit_single_learner_data is called when COURSE_GRADE_NOW_PASSED signal is fired
+        """
+        with patch(
+            'integrated_channels.integrated_channel.tasks.transmit_single_learner_data.apply_async',
+            return_value=None
+        ) as mock_task_apply:
+            course_key = CourseKey.from_string(self.course_id)
+            COURSE_GRADE_NOW_PASSED.disconnect(dispatch_uid='new_passing_learner')
+            COURSE_GRADE_NOW_PASSED.send(sender=None, user=self.user, course_id=course_key)
+            task_kwargs = {
+                'username': self.user.username,
+                'course_run_id': self.course_id
+            }
+            mock_task_apply.assert_called_once_with(kwargs=task_kwargs)
