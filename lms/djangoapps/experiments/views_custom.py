@@ -24,6 +24,7 @@ from openedx.core.lib.api.permissions import ApiKeyHeaderPermissionIsAuthenticat
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 
 from course_modes.models import get_cosmetic_verified_display_price, CourseMode
+from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.experiments.utils import check_and_get_upgrade_link_and_date  # get_base_experiment_metadata_context
 from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
 from student.models import CourseEnrollment
@@ -135,9 +136,9 @@ class Rev934(DeveloperErrorViewMixin, APIView):
         except CourseEnrollment.DoesNotExist:
             pass  # Not enrolled, use the default values
 
-        upgrade_link, upgrade_date = check_and_get_upgrade_link_and_date(user, enrollment, course)
+        basket_link = EcommerceService().upgrade_url(user, course.id)
         upgrade_price = six.text_type(get_cosmetic_verified_display_price(course))
-        could_upsell = bool(upsell_mode and upgrade_link)
+        could_upsell = bool(upsell_mode and basket_link)
 
         bucket = stable_bucketing_hash_group(MOBILE_UPSELL_EXPERIMENT, 2, user.username)
 
@@ -157,17 +158,18 @@ class Rev934(DeveloperErrorViewMixin, APIView):
             # Mark that we've recorded this bucketing, so that we don't do it again this session
             request.session[MOBILE_UPSELL_EXPERIMENT] = True
 
-        show_upsell = bool(bucket != 0) # and could_upsell)
+        show_upsell = bool(bucket != 0 and could_upsell)
         if show_upsell:
             return Response({
                 'show_upsell': show_upsell,
                 'price': upgrade_price,
-                'basket_url': upgrade_link,
+                'basket_url': basket_link,
             })
         else:
             return Response({
                 'show_upsell': show_upsell,
                 'upsell_flag': MOBILE_UPSELL_FLAG.is_enabled(),
                 'experiment_bucket': bucket,
-                'could_upsell': could_upsell,
+                'upsell_mode': upsell_mode,
+                'basket_link': basket_link,
             })

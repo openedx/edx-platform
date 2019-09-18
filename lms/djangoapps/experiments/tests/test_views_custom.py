@@ -3,6 +3,9 @@ Tests for experimentation views
 """
 from __future__ import absolute_import
 
+from uuid import uuid4
+import six
+
 from django.urls import reverse
 from mock import Mock, patch
 from rest_framework.test import APITestCase
@@ -70,41 +73,30 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
         response = self.client.get(self.url, {'course_id': 'junk'})
         self.assertEqual(response.status_code, 400)
 
-    # @override_waffle_flag(MOBILE_UPSELL_FLAG, active=True)
-    # def test_simple_course(self):
-    #     course = CourseFactory.create()
-    #     response = self.client.get(self.url, {'course_id': course.id})
-    #     self.assertEqual(response.status_code, 200)
-    #     expected = {
-    #         'show_upsell': False,
-    #         'upsell_flag': True,
-    #         'experiment_bucket': 1,
-    #         'could_upsell': False,
-    #     }
-    #     self.assertEqual(response.data, expected)
+    @override_waffle_flag(MOBILE_UPSELL_FLAG, active=True)
+    def test_simple_course(self):
+        course = CourseFactory.create()
+        response = self.client.get(self.url, {'course_id': course.id})
+        self.assertEqual(response.status_code, 200)
+        expected = {
+            'show_upsell': False,
+            'upsell_flag': True,
+            'experiment_bucket': 1,
+            'upsell_mode': True,
+            'basket_link': None,  # No sku means no basket link so no upsell
+        }
+        self.assertEqual(response.data, expected)
 
     @override_waffle_flag(MOBILE_UPSELL_FLAG, active=True)
     def test_course(self):
-        course_run = {
-            'status': 'published', 
-            'seats': [
-                {
-                    'type': 'verified', 
-                    'price': '86.00', 
-                    'sku': 'B9B6D0B'
-                }
-            ]
-        }
-
         course = CourseFactory.create(run='test', display_name='test')
-        CourseModeFactory.create(course_id=course.id, mode_slug='verified')
-        import pdb;pdb.set_trace()  # BJH: DELETEME    
+        CourseModeFactory.create(mode_slug="verified", course_id=course.id, min_price=10, sku=six.text_type(uuid4().hex))
 
         response = self.client.get(self.url, {'course_id': course.id})
         self.assertEqual(response.status_code, 200)
         expected = {
             'show_upsell': True,
-            'price': u'Free',
-            'basket_url': None,
+            'price': u'$10',
+            'basket_url': u'/verify_student/upgrade/org.0/course_0/test/',
         }
         self.assertEqual(response.data, expected)
