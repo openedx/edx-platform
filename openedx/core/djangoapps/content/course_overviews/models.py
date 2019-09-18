@@ -896,3 +896,25 @@ class CourseOverviewImageConfig(ConfigurationModel):
         return u"CourseOverviewImageConfig(enabled={}, small={}, large={})".format(
             self.enabled, self.small, self.large
         )
+
+
+class SimulateCoursePublishConfig(ConfigurationModel):
+    """
+    Manages configuration for a run of the simulate_publish management command.
+
+    .. no_pii:
+    """
+
+    class Meta(object):
+        app_label = 'course_overviews'
+        verbose_name = 'simulate_publish argument'
+
+    arguments = models.TextField(
+        blank=True,
+        help_text='Useful for manually running a Jenkins job. Specify like "--delay 10 --receivers A B C \
+        --courses X Y Z".',
+        default='',
+    )
+
+    def __unicode__(self):
+        return six.text_type(self.arguments)
