@@ -8,7 +8,7 @@ from __future__ import absolute_import
 import six
 
 from django.utils.decorators import method_decorator
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponseBadRequest
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
@@ -24,8 +24,7 @@ from openedx.core.lib.api.permissions import ApiKeyHeaderPermissionIsAuthenticat
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 
 from course_modes.models import get_cosmetic_verified_display_price, CourseMode
-from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
-from lms.djangoapps.experiments.utils import check_and_get_upgrade_link_and_date  # get_base_experiment_metadata_context
+from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
 from student.models import CourseEnrollment
 from track import segment
@@ -126,7 +125,6 @@ class Rev934(DeveloperErrorViewMixin, APIView):
         user = request.user
 
         enrollment = None
-        user_enrollments = None
         upsell_mode = True
         try:
             enrollment = CourseEnrollment.objects.select_related(
