@@ -333,6 +333,16 @@ class LoginFailuresAdminTest(TestCase):
         super(LoginFailuresAdminTest, self).tearDown()
         LoginFailures.objects.all().delete()
 
+    def test_unicode_username(self):
+        """
+        Test if `__str__` method behaves correctly for unicode username.
+        It shouldn't raise `TypeError`.
+        """
+        try:
+            map(str, LoginFailures.objects.all())
+        except TypeError, e:
+            self.fail("Failed executing `__str__` with unicode: {0}".format(e))
+
     @ddt.data(
         reverse('admin:student_loginfailures_changelist'),
         reverse('admin:student_loginfailures_add'),
