@@ -33,7 +33,7 @@ class TestDashboardError(unittest.TestCase):
     """
     def test_response(self):
         error = tools.DashboardError(u'Oh noes!')
-        response = json.loads(error.response().content)
+        response = json.loads(error.response().content.decode('utf-8'))
         self.assertEqual(response, {'error': 'Oh noes!'})
 
 
@@ -50,7 +50,7 @@ class TestHandleDashboardError(unittest.TestCase):
             """
             raise tools.DashboardError("Oh noes!")
 
-        response = json.loads(view(None, None).content)
+        response = json.loads(view(None, None).content.decode('utf-8'))
         self.assertEqual(response, {'error': 'Oh noes!'})
 
     def test_no_error(self):
