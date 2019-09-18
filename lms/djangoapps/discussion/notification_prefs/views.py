@@ -64,6 +64,10 @@ class UsernameCipher(object):
     @staticmethod
     def encrypt(username):
         initialization_vector = os.urandom(AES_BLOCK_SIZE_BYTES)
+
+        if not isinstance(initialization_vector, (bytes, bytearray)):
+            initialization_vector = initialization_vector.encode('utf-8')
+
         aes_cipher = UsernameCipher._get_aes_cipher(initialization_vector)
         encryptor = aes_cipher.encryptor()
         padder = PKCS7(AES.block_size).padder()
