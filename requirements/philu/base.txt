@@ -1,3 +1,5 @@
+# TODO: Find replace of add_or_replace_params method with urllib or some some django builtin package and remove this dependency
+w3lib==1.21.0
 -e git+https://github.com/philanthropy-u/pynodebb.git#egg=pynodebb
 SurveyGizmo==1.2.3
 mandrill==1.0.57
