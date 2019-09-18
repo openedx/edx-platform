@@ -99,6 +99,7 @@ class MongoContentStore(ContentStore):
                               import_path=content.import_path,
                               # getattr b/c caching may mean some pickled instances don't have attr
                               locked=getattr(content, 'locked', False)) as fp:
+
             # It seems that this code thought that only some specific object would have the `__iter__` attribute
             # but the bytes object in python 3 has one and should not use the chunking logic.
             if hasattr(content.data, '__iter__') and not isinstance(content.data, six.binary_type):

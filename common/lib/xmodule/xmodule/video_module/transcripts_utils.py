@@ -126,7 +126,7 @@ def save_subs_to_store(subs, subs_id, item, language='en'):
 
     Returns: location of saved subtitles.
     """
-    filedata = json.dumps(subs, indent=2)
+    filedata = json.dumps(subs, indent=2).encode('utf-8')
     filename = subs_filename(subs_id, language)
     return save_to_store(filedata, filename, 'application/json', item.location)
 
