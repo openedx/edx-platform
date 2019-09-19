@@ -252,7 +252,6 @@ class Command(BaseCommand):
             else:
                 pref_set_datetime = self.DEFAULT_DATETIME_STR
 
-
             if not full_name:
                 full_name = ""
 
