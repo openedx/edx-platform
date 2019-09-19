@@ -5,6 +5,7 @@ The Discount API Views should return information about discounts that apply to t
 # -*- coding: utf-8 -*-
 
 from __future__ import absolute_import
+from datetime import datetime
 import six
 
 from django.utils.decorators import method_decorator
@@ -124,19 +125,18 @@ class Rev934(DeveloperErrorViewMixin, APIView):
         course = CourseOverview.get_from_id(course_key)
         user = request.user
 
-        enrollment = None
-        upsell_mode = True
         try:
             enrollment = CourseEnrollment.objects.select_related(
                 'course'
             ).get(user_id=user.id, course_id=course.id)
-            upsell_mode = enrollment.mode in CourseMode.UPSELL_TO_VERIFIED_MODES
+            upgrade_valid = datetime.now(utc).date() <= enrollment.upgrade_deadline.date()
+            user_upsell = upgrade_valid and enrollment.mode in CourseMode.UPSELL_TO_VERIFIED_MODES
         except CourseEnrollment.DoesNotExist:
-            pass  # Not enrolled, use the default values
+            user_upsell = True
 
         basket_link = EcommerceService().upgrade_url(user, course.id)
         upgrade_price = six.text_type(get_cosmetic_verified_display_price(course))
-        could_upsell = bool(upsell_mode and basket_link)
+        could_upsell = bool(user_upsell and basket_link)
 
         bucket = stable_bucketing_hash_group(MOBILE_UPSELL_EXPERIMENT, 2, user.username)
 
@@ -168,6 +168,6 @@ class Rev934(DeveloperErrorViewMixin, APIView):
                 'show_upsell': show_upsell,
                 'upsell_flag': MOBILE_UPSELL_FLAG.is_enabled(),
                 'experiment_bucket': bucket,
-                'upsell_mode': upsell_mode,
+                'user_upsell': user_upsell,
                 'basket_link': basket_link,
             })
