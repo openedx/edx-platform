@@ -176,7 +176,7 @@ def mock_render_template(*args, **kwargs):
     Allows us to not depend on any actual template rendering mechanism,
     while still returning a unicode object
     """
-    return pprint.pformat((args, kwargs)).decode()
+    return pprint.pformat((args, kwargs)).encode().decode()
 
 
 class ModelsTest(unittest.TestCase):
