@@ -92,7 +92,7 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         Retrieve the content of the request.
         """
         try:
-            length = int(self.headers.getheader('content-length'))
+            length = int(self.headers.get('content-length'))
 
         except (TypeError, ValueError):
             return ""
