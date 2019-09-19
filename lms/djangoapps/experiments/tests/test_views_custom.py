@@ -40,7 +40,7 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
 
     def setUp(self):
         super(Rev934Tests, self).setUp()
-        user = UserFactory(username='robot-mue-1-6pnjv')  # robot-mue-0-l23fi
+        user = UserFactory(username='robot-mue-1-6pnjv')  # Username that hashes to bucket 1
         self.client.login(
             username=user.username,
             password=UserFactory._DEFAULT_PASSWORD,  # pylint: disable=protected-access
@@ -95,7 +95,7 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
         expected = {
             'show_upsell': True,
             'price': u'$10',
-            # 'basket_url': u'/verify_student/upgrade/org.0/course_0/test/',
             'basket_url': result['basket_url'],
+            # Example basket_url: u'/verify_student/upgrade/org.0/course_0/test/'
         }
         self.assertEqual(response.data, expected)

@@ -117,7 +117,7 @@ class Rev934(DeveloperErrorViewMixin, APIView):
 
         course_id = request.GET.get('course_id')
         try:
-            course_key = CourseKey.from_string(course_id)  # if course_id else None
+            course_key = CourseKey.from_string(course_id)
         except InvalidKeyError:
             return HttpResponseBadRequest("Missing or invalid course_id")
 
