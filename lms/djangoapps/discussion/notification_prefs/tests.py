@@ -28,7 +28,7 @@ from util.testing import UrlResetMixin
 
 @override_settings(SECRET_KEY="test secret key")
 class NotificationPrefViewTest(UrlResetMixin, TestCase):
-    INITIALIZATION_VECTOR = "\x00" * 16
+    INITIALIZATION_VECTOR = b"\x00" * 16
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
