@@ -62,7 +62,7 @@ class Command(BaseCommand):
             )
             return
 
-        for batch_num in range(num_batches):
+        for batch_num in range(int(num_batches)):
             start = batch_num * batch_size + 1  # ids are 1-based, so add 1
             end = min(start + batch_size, total + 1)
             expire_old_entitlements.delay(start, end, logid=str(batch_num))
