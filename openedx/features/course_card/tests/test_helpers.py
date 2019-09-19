@@ -106,21 +106,3 @@ class CourseCardHelperBaseClass(CourseCardBaseClass):
         # For Staff User
         # Desired output is a list of all course overview objects
         self.assertEqual({c.id for c in get_course_cards_list()}, {course.id for course in self.courses})
-
-    def test_initialize_course_settings(self):
-        parent_course_id = self.rerun_parent_course.id
-        re_run_course_id = self.re_run_course.id
-
-        custom_tags = '{"test_key": "test_value"}'
-        custom_settings = CustomSettings.objects.get(id=parent_course_id)
-
-        custom_settings.tags = custom_tags
-        custom_settings.save()
-
-        initialize_course_settings(parent_course_id, re_run_course_id)
-
-        # Desired output is that the tags have been set in the rerun course custom settings as per the parent course
-        self.assertEqual(CustomSettings.objects.get(id=re_run_course_id).tags, custom_tags)
-
-        # If parent course id is not provided or is none method returns none
-        self.assertIsNone(initialize_course_settings(None, re_run_course_id))
