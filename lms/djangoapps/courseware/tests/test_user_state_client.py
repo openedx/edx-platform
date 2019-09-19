@@ -9,8 +9,8 @@ from collections import defaultdict
 
 from edx_user_state_client.tests import UserStateClientTestBase
 
-from courseware.tests.factories import UserFactory
-from courseware.user_state_client import DjangoXBlockUserStateClient
+from lms.djangoapps.courseware.tests.factories import UserFactory
+from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 

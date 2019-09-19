@@ -9,7 +9,7 @@ from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sites.models import Site
 from django.test import TestCase
 
-from courseware.tests.factories import GlobalStaffFactory
+from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from openedx.core.djangoapps.theming.middleware import CurrentSiteThemeMiddleware
 from student.tests.factories import UserFactory
 

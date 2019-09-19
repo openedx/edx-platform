@@ -18,7 +18,7 @@ from django.views.generic import View
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
-from courseware.courses import get_course_with_access
+from lms.djangoapps.courseware.courses import get_course_with_access
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.features.course_experience import default_course_url_name

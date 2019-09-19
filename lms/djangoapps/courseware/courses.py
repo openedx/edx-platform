@@ -22,9 +22,9 @@ from six import text_type
 
 import branding
 from course_modes.models import CourseMode
-from courseware.access import has_access
-from courseware.access_response import MilestoneAccessError, StartDateError
-from courseware.date_summary import (
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.access_response import MilestoneAccessError, StartDateError
+from lms.djangoapps.courseware.date_summary import (
     CertificateAvailableDate,
     CourseEndDate,
     CourseStartDate,
@@ -32,9 +32,9 @@ from courseware.date_summary import (
     VerificationDeadlineDate,
     VerifiedUpgradeDeadlineDate
 )
-from courseware.masquerade import check_content_start_date_for_masquerade_user
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module
+from lms.djangoapps.courseware.masquerade import check_content_start_date_for_masquerade_user
+from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.module_render import get_module
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException

@@ -17,7 +17,7 @@ from mock import Mock, patch
 from pytz import UTC
 
 from branding.views import index
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from util.milestones_helpers import set_prerequisite_courses

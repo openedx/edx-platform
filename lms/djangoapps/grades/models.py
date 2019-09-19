@@ -29,7 +29,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from simple_history.models import HistoricalRecords
 from six.moves import map
 
-from courseware.fields import UnsignedBigIntAutoField, UnsignedBigIntOneToOneField
+from lms.djangoapps.courseware.fields import UnsignedBigIntAutoField, UnsignedBigIntOneToOneField
 from lms.djangoapps.grades import constants, events
 from openedx.core.lib.cache_utils import get_cache
 

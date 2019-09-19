@@ -8,7 +8,7 @@ from __future__ import absolute_import
 from django.conf import settings
 from django.utils.translation import ugettext_noop
 
-from courseware.tabs import EnrolledTab
+from lms.djangoapps.courseware.tabs import EnrolledTab
 
 
 class WikiTab(EnrolledTab):

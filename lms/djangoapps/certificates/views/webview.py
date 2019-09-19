@@ -25,8 +25,8 @@ from opaque_keys.edx.keys import CourseKey
 
 from badges.events.course_complete import get_completion_badge
 from badges.utils import badges_enabled
-from courseware.access import has_access
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_response
 from edxmako.template import Template
 from lms.djangoapps.certificates.api import (

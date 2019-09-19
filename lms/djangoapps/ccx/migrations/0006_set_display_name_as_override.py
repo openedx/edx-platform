@@ -9,7 +9,7 @@ from ccx_keys.locator import CCXLocator
 from django.db import migrations
 from django.http import Http404
 
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 
 log = logging.getLogger(__name__)
 

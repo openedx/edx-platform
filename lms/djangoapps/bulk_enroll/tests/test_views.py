@@ -17,7 +17,7 @@ from rest_framework.test import APIRequestFactory, APITestCase, force_authentica
 
 from bulk_enroll.serializers import BulkEnrollmentSerializer
 from bulk_enroll.views import BulkEnrollView
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id
 from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
 from openedx.core.djangoapps.site_configuration.helpers import get_value as get_site_value

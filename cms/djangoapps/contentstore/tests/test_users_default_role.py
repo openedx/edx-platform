@@ -6,7 +6,7 @@ from __future__ import absolute_import
 
 from contentstore.tests.utils import AjaxEnabledTestClient
 from contentstore.utils import delete_course, reverse_url
-from courseware.tests.factories import UserFactory
+from lms.djangoapps.courseware.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 

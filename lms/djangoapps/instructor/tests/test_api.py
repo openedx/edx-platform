@@ -37,15 +37,15 @@ from testfixtures import LogCapture
 from bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.models import StudentModule
-from courseware.tests.factories import (
+from lms.djangoapps.courseware.models import StudentModule
+from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
     GlobalStaffFactory,
     InstructorFactory,
     StaffFactory,
     UserProfileFactory
 )
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory

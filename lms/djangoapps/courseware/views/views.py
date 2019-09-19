@@ -51,9 +51,9 @@ from web_fragments.fragment import Fragment
 import shoppingcart
 import survey.views
 from course_modes.models import CourseMode, get_course_prices
-from courseware.access import has_access, has_ccx_coach_role
-from courseware.access_utils import check_course_open_for_learner
-from courseware.courses import (
+from lms.djangoapps.courseware.access import has_access, has_ccx_coach_role
+from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
+from lms.djangoapps.courseware.courses import (
     can_self_enroll_in_course,
     course_open_for_self_enrollment,
     get_course,
@@ -66,12 +66,12 @@ from courseware.courses import (
     sort_by_announcement,
     sort_by_start_date
 )
-from courseware.masquerade import setup_masquerade
-from courseware.model_data import FieldDataCache
-from courseware.models import BaseStudentModuleHistory, StudentModule
-from courseware.permissions import MASQUERADE_AS_STUDENT, VIEW_COURSE_HOME, VIEW_COURSEWARE, VIEW_XQA_INTERFACE
-from courseware.url_helpers import get_redirect_url
-from courseware.user_state_client import DjangoXBlockUserStateClient
+from lms.djangoapps.courseware.masquerade import setup_masquerade
+from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
+from lms.djangoapps.courseware.permissions import MASQUERADE_AS_STUDENT, VIEW_COURSE_HOME, VIEW_COURSEWARE, VIEW_XQA_INTERFACE
+from lms.djangoapps.courseware.url_helpers import get_redirect_url
+from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.certificates import api as certs_api

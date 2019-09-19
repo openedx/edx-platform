@@ -9,7 +9,7 @@ import ddt
 from stevedore.extension import Extension, ExtensionManager
 
 import lms.djangoapps.courseware.access as access
-from courseware.tests.factories import StaffFactory, UserFactory
+from lms.djangoapps.courseware.tests.factories import StaffFactory, UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

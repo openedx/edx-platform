@@ -5,7 +5,7 @@ from __future__ import absolute_import
 
 import json
 
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.models import StudentModule
 
 
 def get_student_module_as_dict(user, course_key, block_key):
