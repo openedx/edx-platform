@@ -109,7 +109,8 @@ class AwardProgramCertificateTestCase(TestCase):
                 }
             ]
         }
-        self.assertEqual(json.loads(httpretty.last_request().body), expected_body)
+        last_request_body = httpretty.last_request().body.decode('utf-8')
+        self.assertEqual(json.loads(last_request_body), expected_body)
 
 
 @skip_unless_lms
@@ -471,7 +472,8 @@ class PostCourseCertificateTestCase(TestCase):
                 'value': visible_date.strftime('%Y-%m-%dT%H:%M:%SZ')  # text representation of date
             }]
         }
-        self.assertEqual(json.loads(httpretty.last_request().body), expected_body)
+        last_request_body = httpretty.last_request().body.decode('utf-8')
+        self.assertEqual(json.loads(last_request_body), expected_body)
 
 
 @skip_unless_lms
