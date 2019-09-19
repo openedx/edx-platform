@@ -346,7 +346,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         Then the cohort has 1 user
         And appropriate events have been emitted
         """
-        cohort_name = str(uuid.uuid4().get_hex()[0:20])
+        cohort_name = str(uuid.uuid4().hex[0:20])
         self._verify_cohort_settings(cohort_name=cohort_name, assignment_type=None)
 
     def test_add_new_cohort_with_manual_assignment_type(self):
@@ -361,7 +361,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         Then the cohort has 1 user
         And appropriate events have been emitted
         """
-        cohort_name = str(uuid.uuid4().get_hex()[0:20])
+        cohort_name = str(uuid.uuid4().hex[0:20])
         self._verify_cohort_settings(cohort_name=cohort_name, assignment_type='manual')
 
     def test_add_new_cohort_with_random_assignment_type(self):
@@ -376,7 +376,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         Then the cohort has 1 user
         And appropriate events have been emitted
         """
-        cohort_name = str(uuid.uuid4().get_hex()[0:20])
+        cohort_name = str(uuid.uuid4().hex[0:20])
         self._verify_cohort_settings(cohort_name=cohort_name, assignment_type='random')
 
     def test_update_existing_cohort_settings(self):
@@ -396,7 +396,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         And cohort with new name is present in cohorts dropdown list
         And cohort assignment type should be "manual"
         """
-        cohort_name = str(uuid.uuid4().get_hex()[0:20])
+        cohort_name = str(uuid.uuid4().hex[0:20])
         new_cohort_name = '{old}__NEW'.format(old=cohort_name)
         self._verify_cohort_settings(
             cohort_name=cohort_name,
@@ -422,7 +422,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         And I click on Save button
         Then I should see an error message
         """
-        cohort_name = str(uuid.uuid4().get_hex()[0:20])
+        cohort_name = str(uuid.uuid4().hex[0:20])
         new_cohort_name = ''
         self._verify_cohort_settings(
             cohort_name=cohort_name,
