@@ -156,6 +156,7 @@ class UniversalNewlineIterator(object):
         replacing CR and CRLF with LF.
         """
         buf = self.original_file.read(self.buffer_size)
+        buf = buf.decode('utf-8') if six.PY3 and isinstance(buf, bytes) else buf
         line = ''
         while buf:
             for char in buf:
