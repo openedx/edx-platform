@@ -114,7 +114,7 @@ class SiteConfiguration(models.Model):
         for example, to do filtering.
 
         Returns:
-            A list of all organizations present in site configuration.
+            A set of all organizations present in site configuration.
         """
         org_filter_set = set()
 

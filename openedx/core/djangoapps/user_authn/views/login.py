@@ -8,6 +8,7 @@ from __future__ import absolute_import
 
 import logging
 
+import six
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as django_login
@@ -110,11 +111,11 @@ def _enforce_password_policy_compliance(request, user):
         password_policy_compliance.enforce_compliance_on_login(user, request.POST.get('password'))
     except password_policy_compliance.NonCompliantPasswordWarning as e:
         # Allow login, but warn the user that they will be required to reset their password soon.
-        PageLevelMessages.register_warning_message(request, e.message)
+        PageLevelMessages.register_warning_message(request, six.text_type(e))
     except password_policy_compliance.NonCompliantPasswordException as e:
         send_password_reset_email_for_user(user, request)
         # Prevent the login attempt.
-        raise AuthFailedError(e.message)
+        raise AuthFailedError(six.text_type(e))
 
 
 def _generate_not_activated_message(user):

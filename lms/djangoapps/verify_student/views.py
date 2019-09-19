@@ -1113,7 +1113,7 @@ def results_callback(request):
     body = request.body
 
     try:
-        body_dict = json.loads(body)
+        body_dict = json.loads(body.decode('utf-8'))
     except ValueError:
         log.exception(u"Invalid JSON received from Software Secure:\n\n{}\n".format(body))
         return HttpResponseBadRequest(u"Invalid JSON. Received:\n\n{}".format(body))

@@ -1298,7 +1298,7 @@ class TestCheckoutWithEcommerceService(ModuleStoreTestCase):
             self.assertTrue(mock_audit_log.called)
 
         # Check the api call
-        self.assertEqual(json.loads(httpretty.last_request().body), {
+        self.assertEqual(json.loads(httpretty.last_request().body.decode('utf-8')), {
             'products': [{'sku': 'test-sku'}],
             'checkout': True,
             'payment_processor_name': 'test-processor',
@@ -1845,7 +1845,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertEqual(attempt.status, u'denied')
         self.assertEqual(attempt.error_code, u'Your photo doesn\'t meet standards.')
         self.assertEqual(attempt.error_msg, u'[{"photoIdReasons": ["Not provided"]}]')
-        self.assertEquals(response.content, 'OK!')
+        self.assertEquals(response.content.decode('utf-8'), 'OK!')
         self.assertEqual(len(mail.outbox), 1)
 
     @patch(

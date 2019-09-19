@@ -327,14 +327,14 @@ def _get_redirect_to(request):
         mime_type, _ = mimetypes.guess_type(redirect_to, strict=False)
         if not is_safe_login_or_logout_redirect(request, redirect_to):
             log.warning(
-                u'Unsafe redirect parameter detected after login page: %(redirect_to)r',
+                u"Unsafe redirect parameter detected after login page: '%(redirect_to)s'",
                 {"redirect_to": redirect_to}
             )
             redirect_to = None
         elif 'text/html' not in header_accept:
             log.info(
-                u'Redirect to non html content %(content_type)r detected from %(user_agent)r'
-                u' after login page: %(redirect_to)r',
+                u"Redirect to non html content '%(content_type)s' detected from '%(user_agent)s'"
+                u" after login page: '%(redirect_to)s'",
                 {
                     "redirect_to": redirect_to, "content_type": header_accept,
                     "user_agent": request.META.get('HTTP_USER_AGENT', '')
@@ -343,13 +343,13 @@ def _get_redirect_to(request):
             redirect_to = None
         elif mime_type:
             log.warning(
-                u'Redirect to url path with specified filed type %(mime_type)r not allowed: %(redirect_to)r',
+                u"Redirect to url path with specified filed type '%(mime_type)s' not allowed: '%(redirect_to)s'",
                 {"redirect_to": redirect_to, "mime_type": mime_type}
             )
             redirect_to = None
         elif settings.STATIC_URL in redirect_to:
             log.warning(
-                u'Redirect to static content detected after login page: %(redirect_to)r',
+                u"Redirect to static content detected after login page: '%(redirect_to)s'",
                 {"redirect_to": redirect_to}
             )
             redirect_to = None
@@ -359,7 +359,7 @@ def _get_redirect_to(request):
             for theme in themes:
                 if theme.theme_dir_name in next_path:
                     log.warning(
-                        u'Redirect to theme content detected after login page: %(redirect_to)r',
+                        u"Redirect to theme content detected after login page: '%(redirect_to)s'",
                         {"redirect_to": redirect_to}
                     )
                     redirect_to = None

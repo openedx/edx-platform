@@ -973,7 +973,7 @@ class TestStudioTranscriptTranslationPostDispatch(TestVideo):
         request = Request.blank('/translation', POST=post_data)
         response = self.item_descriptor.studio_transcript(request=request, dispatch='translation')
         self.assertEqual(response.status, '201 Created')
-        response = json.loads(response.body)
+        response = json.loads(response.text)
         self.assertTrue(response["language_code"], "uk")
         self.assertDictEqual(self.item_descriptor.transcripts, {})
         self.assertTrue(edxval_api.get_video_transcript_data(video_id=response["edx_video_id"], language_code="uk"))

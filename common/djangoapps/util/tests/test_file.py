@@ -85,7 +85,7 @@ class StoreUploadedFileTestCase(TestCase):
     def setUp(self):
         super(StoreUploadedFileTestCase, self).setUp()
         self.request = Mock(spec=HttpRequest)
-        self.file_content = "test file content"
+        self.file_content = b"test file content"
         self.stored_file_name = None
         self.file_storage = None
         self.default_max_size = 2000000
@@ -149,7 +149,7 @@ class StoreUploadedFileTestCase(TestCase):
         def exception_validator(storage, filename):
             """ Validation test function that throws an exception """
             self.assertEqual("error_file.csv", os.path.basename(filename))
-            with storage.open(filename, 'rU') as f:
+            with storage.open(filename, 'rb') as f:
                 self.assertEqual(self.file_content, f.read())
             store_file_data(storage, filename)
             raise FileValidationException("validation failed")
@@ -190,7 +190,7 @@ class StoreUploadedFileTestCase(TestCase):
         """
         Tests uploading a file with upper case extension. Verifies that the stored file contents are correct.
         """
-        file_content = "uppercase"
+        file_content = b"uppercase"
         self.request.FILES = {"uploaded_file": SimpleUploadedFile("tempfile.CSV", file_content)}
         file_storage, stored_file_name = store_uploaded_file(
             self.request, "uploaded_file", [".gif", ".csv"], "second_stored_file", self.default_max_size
@@ -202,7 +202,7 @@ class StoreUploadedFileTestCase(TestCase):
         Test that the file storage method will create a unique filename if the file already exists.
         """
         requested_file_name = "nonunique_store"
-        file_content = "copy"
+        file_content = b"copy"
 
         self.request.FILES = {"nonunique_file": SimpleUploadedFile("nonunique.txt", file_content)}
         _, first_stored_file_name = store_uploaded_file(
@@ -220,7 +220,7 @@ class StoreUploadedFileTestCase(TestCase):
     def _verify_successful_upload(self, storage, file_name, expected_content):
         """ Helper method that checks that the stored version of the uploaded file has the correct content """
         self.assertTrue(storage.exists(file_name))
-        with storage.open(file_name, 'r') as f:
+        with storage.open(file_name, 'rb') as f:
             self.assertEqual(expected_content, f.read())
 
 
