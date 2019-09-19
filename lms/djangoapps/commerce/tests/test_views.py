@@ -123,8 +123,14 @@ class ReceiptViewTests(UserMixin, ModuleStoreTestCase):
 
         user_message = "There was a problem with this transaction"
         system_message = "A system error occurred while processing your payment"
-        self.assertRegexpMatches(response.content.decode('utf-8'), user_message if is_user_message_expected else system_message)
-        self.assertNotRegexpMatches(response.content.decode('utf-8'), user_message if not is_user_message_expected else system_message)
+        self.assertRegexpMatches(
+            response.content.decode('utf-8'),
+            user_message if is_user_message_expected else system_message
+        )
+        self.assertNotRegexpMatches(
+            response.content.decode('utf-8'),
+            user_message if not is_user_message_expected else system_message
+        )
 
     @with_comprehensive_theme("edx.org")
     def test_hide_nav_header(self):

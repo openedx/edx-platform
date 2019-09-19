@@ -1310,7 +1310,7 @@ class TestEditorSavedMethod(BaseTestVideoXBlock):
         self.MODULESTORE = MODULESTORES[default_store]  # pylint: disable=invalid-name
         self.initialize_block(metadata=self.metadata)
         item = self.store.get_item(self.item_descriptor.location)
-        with open(self.file_path, "rb") as myfile:
+        with open(self.file_path, "rb") as myfile:  # pylint: disable=open-builtin
             save_to_store(myfile.read(), self.file_name, 'text/sjson', item.location)
         item.sub = "3_yD_cEKoCk"
         # subs_video.srt.sjson does not exist before calling editor_saved function
@@ -1330,7 +1330,7 @@ class TestEditorSavedMethod(BaseTestVideoXBlock):
         self.MODULESTORE = MODULESTORES[default_store]
         self.initialize_block(metadata=self.metadata)
         item = self.store.get_item(self.item_descriptor.location)
-        with open(self.file_path, "rb") as myfile:
+        with open(self.file_path, "rb") as myfile:  # pylint: disable=open-builtin
             save_to_store(myfile.read(), self.file_name, 'text/sjson', item.location)
             save_to_store(myfile.read(), 'subs_video.srt.sjson', 'text/sjson', item.location)
         item.sub = "3_yD_cEKoCk"
