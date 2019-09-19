@@ -24,6 +24,7 @@ from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiv
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermissionIsAuthenticated
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 
+from lms.djangoapps.courseware.date_summary import verified_upgrade_link_is_valid
 from course_modes.models import get_cosmetic_verified_display_price, CourseMode
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
@@ -129,8 +130,7 @@ class Rev934(DeveloperErrorViewMixin, APIView):
             enrollment = CourseEnrollment.objects.select_related(
                 'course'
             ).get(user_id=user.id, course_id=course.id)
-            upgrade_valid = datetime.now(utc).date() <= enrollment.upgrade_deadline.date()
-            user_upsell = upgrade_valid and enrollment.mode in CourseMode.UPSELL_TO_VERIFIED_MODES
+            user_upsell = verified_upgrade_link_is_valid(enrollment)
         except CourseEnrollment.DoesNotExist:
             user_upsell = True
 
