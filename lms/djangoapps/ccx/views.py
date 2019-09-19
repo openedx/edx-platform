@@ -539,7 +539,7 @@ def ccx_grades_csv(request, course, ccx=None):
                 if not header:
                     # Encode the header row in utf-8 encoding in case there are
                     # unicode characters
-                    header = [section['label'].encode('utf-8')
+                    header = [section['label'].encode('utf-8') if six.PY2 else section['label']
                               for section in course_grade.summary[u'section_breakdown']]
                     rows.append(["id", "email", "username", "grade"] + header)
 
