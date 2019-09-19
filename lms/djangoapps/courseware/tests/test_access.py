@@ -19,8 +19,8 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
 
-import courseware.access as access
-import courseware.access_response as access_response
+import lms.djangoapps.courseware.access as access
+import lms.djangoapps.courseware.access_response as access_response
 from courseware.masquerade import CourseMasquerade
 from courseware.tests.factories import (
     BetaTesterFactory,

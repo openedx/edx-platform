@@ -6,7 +6,7 @@ from __future__ import absolute_import
 
 from django.core.exceptions import ObjectDoesNotExist
 
-import courseware
+import lms.djangoapps.courseware
 from xmodule import modulestore
 
 

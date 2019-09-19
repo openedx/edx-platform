@@ -5,7 +5,7 @@ import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
 
-import courseware.models
+import lms.djangoapps.courseware.models
 
 
 class Migration(migrations.Migration):

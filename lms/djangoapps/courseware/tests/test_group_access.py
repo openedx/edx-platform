@@ -8,7 +8,7 @@ from __future__ import absolute_import
 import ddt
 from stevedore.extension import Extension, ExtensionManager
 
-import courseware.access as access
+import lms.djangoapps.courseware.access as access
 from courseware.tests.factories import StaffFactory, UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
