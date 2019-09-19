@@ -39,7 +39,7 @@ def get_cache_key(**kwargs):
     """
     key = '__'.join(['{}:{}'.format(item, value) for item, value in six.iteritems(kwargs)])
 
-    return hashlib.md5(key).hexdigest()
+    return hashlib.md5(key.encode('utf-8')).hexdigest()
 
 
 def get_data_consent_share_cache_key(user_id, course_id):
