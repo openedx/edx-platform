@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Test that the Blockstore-based XBlock runtime can store and retrieve student
-state for XBlocks when learners access blocks directly in a library context,
-if the library allows direct learning.
+Test the Blockstore-based XBlock runtime and content libraries together.
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 import unittest
@@ -17,6 +15,7 @@ from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.lib import blockstore_api
 from student.tests.factories import UserFactory
+from xmodule.unit_block import UnitBlock
 
 
 class UserStateTestBlock(XBlock):
@@ -24,7 +23,6 @@ class UserStateTestBlock(XBlock):
     Block for testing variously scoped XBlock fields.
     """
     BLOCK_TYPE = "user-state-test"
-    has_score = False
 
     display_name = fields.String(scope=Scope.content, name='User State Test Block')
     # User-specific fields:
@@ -34,20 +32,13 @@ class UserStateTestBlock(XBlock):
     user_info_str = fields.String(scope=Scope.user_info, default='default value')  # All blocks, one user
 
 
-@unittest.skipUnless(settings.RUN_BLOCKSTORE_TESTS, "Requires a running Blockstore server")
-# We can remove the line below to enable this in Studio once we implement a session-backed
-# field data store which we can use for both studio users and anonymous users
-@unittest.skipUnless(settings.ROOT_URLCONF == "lms.urls", "Student State is only saved in the LMS")
-class ContentLibraryXBlockUserStateTest(TestCase):
+class ContentLibraryContentTestMixin(object):
     """
-    Test that the Blockstore-based XBlock runtime can store and retrieve student
-    state for XBlocks when learners access blocks directly in a library context,
-    if the library allows direct learning.
+    Mixin for content library tests that creates two students and a library.
     """
-
     @classmethod
     def setUpClass(cls):
-        super(ContentLibraryXBlockUserStateTest, cls).setUpClass()
+        super(ContentLibraryContentTestMixin, cls).setUpClass()
         # Create a couple students that the tests can use
         cls.student_a = UserFactory.create(username="Alice", email="alice@example.com")
         cls.student_b = UserFactory.create(username="Bob", email="bob@example.com")
@@ -62,10 +53,46 @@ class ContentLibraryXBlockUserStateTest(TestCase):
         cls.library = library_api.create_library(
             collection_uuid=cls.collection.uuid,
             org=cls.organization,
-            slug="state-test-lib",
-            title="Student State Test Lib",
+            slug=cls.__name__,
+            title=(cls.__name__ + " Test Lib"),
             description="",
         )
+
+
+@unittest.skipUnless(settings.RUN_BLOCKSTORE_TESTS, "Requires a running Blockstore server")
+class ContentLibraryRuntimeTest(ContentLibraryContentTestMixin, TestCase):
+    """
+    Basic tests of the Blockstore-based XBlock runtime using XBlocks in a
+    content library.
+    """
+
+    def test_has_score(self):
+        """
+        Test that the LMS-specific 'has_score' attribute is getting added to
+        blocks.
+        """
+        unit_block_key = library_api.create_library_block(self.library.key, "unit", "u1").usage_key
+        problem_block_key = library_api.create_library_block(self.library.key, "problem", "p1").usage_key
+        library_api.publish_changes(self.library.key)
+        unit_block = xblock_api.load_block(unit_block_key, self.student_a)
+        problem_block = xblock_api.load_block(problem_block_key, self.student_a)
+
+        self.assertFalse(hasattr(UnitBlock, 'has_score'))  # The block class doesn't declare 'has_score'
+        self.assertEqual(unit_block.has_score, False)  # But it gets added by the runtime and defaults to False
+        # And problems do have has_score True:
+        self.assertEqual(problem_block.has_score, True)
+
+
+@unittest.skipUnless(settings.RUN_BLOCKSTORE_TESTS, "Requires a running Blockstore server")
+# We can remove the line below to enable this in Studio once we implement a session-backed
+# field data store which we can use for both studio users and anonymous users
+@unittest.skipUnless(settings.ROOT_URLCONF == "lms.urls", "Student State is only saved in the LMS")
+class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase):
+    """
+    Test that the Blockstore-based XBlock runtime can store and retrieve student
+    state for XBlocks when learners access blocks directly in a library context,
+    if the library allows direct learning.
+    """
 
     @XBlock.register_temp_plugin(UserStateTestBlock, UserStateTestBlock.BLOCK_TYPE)
     def test_default_values(self):
