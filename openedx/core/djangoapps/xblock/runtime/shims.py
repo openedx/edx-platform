@@ -393,3 +393,42 @@ class XBlockShim(object):
         if self.scope_ids.block_type != 'problem':
             raise AttributeError(".graded shim is only for capa")
         return False
+
+    # Attributes defined by XModuleMixin and sometimes used by the LMS
+    # Set sensible defaults.
+    # If any of these are meant to be used in new stuff (are not deprecated)
+    # they should be moved to xblock.runtime.mixin.LmsBlockMixin and documented
+    always_recalculate_grades = False
+    show_in_read_only_mode = False
+    icon_class = 'other'
+
+    def get_icon_class(self):
+        """
+        Return a css class identifying this module in the context of an icon
+        """
+        return self.icon_class
+
+    def has_dynamic_children(self):
+        """
+        Returns True if this XBlock has dynamic children for a given
+        student when the module is created. This is deprecated and discouraged.
+        """
+        return False
+
+    def get_display_items(self):
+        """
+        Returns a list of descendent XBlock instances that will display
+        immediately inside this module.
+        """
+        warnings.warn("get_display_items() is deprecated.", DeprecationWarning, stacklevel=2)
+        items = []
+        for child in self.get_children():
+            items.extend(child.displayable_items())
+        return items
+
+    def displayable_items(self):
+        """
+        Returns list of displayable modules contained by this XBlock. If this
+        module is visible, should return [self].
+        """
+        return [self]

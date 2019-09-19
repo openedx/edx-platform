@@ -16,6 +16,7 @@ from web_fragments.fragment import Fragment
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 from openedx.core.djangoapps.xblock.runtime.blockstore_field_data import BlockstoreFieldData
+from openedx.core.djangoapps.xblock.runtime.mixin import LmsBlockMixin
 from openedx.core.lib.xblock_utils import xblock_local_resource_url
 from xmodule.errortracker import make_error_tracker
 from .id_managers import OpaqueKeyReader
@@ -45,7 +46,8 @@ class XBlockRuntime(RuntimeShim, Runtime):
         super(XBlockRuntime, self).__init__(
             id_reader=system.id_reader,
             mixins=(
-                XBlockShim,
+                LmsBlockMixin,  # Adds Non-deprecated LMS/Studio functionality
+                XBlockShim,  # Adds deprecated LMS/Studio functionality / backwards compatibility
             ),
             services={
                 "i18n": NullI18nService(),
