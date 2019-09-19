@@ -90,7 +90,7 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
         response = self.client.get(self.url, {'course_id': course.id})
         self.assertEqual(response.status_code, 200)
         result = response.data
-        self.assertTrue('basket_url' in result)
+        self.assertIn('basket_url', result)
         self.assertTrue(bool(result['basket_url']))
         expected = {
             'show_upsell': True,
