@@ -737,6 +737,11 @@ class PersistentSubsectionGradeOverride(models.Model):
             defaults=grade_defaults,
         )
 
+        override_history_entry = override.history.first()
+        if not override_history_entry.history_user and requesting_user:
+            override_history_entry.history_user = requesting_user
+            override_history_entry.save()
+
         action = action or PersistentSubsectionGradeOverrideHistory.CREATE_OR_UPDATE
 
         PersistentSubsectionGradeOverrideHistory.objects.create(
