@@ -455,7 +455,7 @@ class SupportViewLinkProgramEnrollmentsTests(SupportViewTestCase):
         self.text = '0001,user-0001\n0002,user-02'
 
     def _assert_props(self, field_name, value, response):
-        self.assertIn('"{}": "{}"'.format(field_name, value), unicode(response.content, encoding='utf-8'))
+        self.assertIn('"{}": "{}"'.format(field_name, value), six.text_type(response.content, encoding='utf-8'))
 
     def _assert_props_list(self, field_name, values, response):
         """
@@ -465,7 +465,7 @@ class SupportViewLinkProgramEnrollmentsTests(SupportViewTestCase):
         if values:
             values_str = '", "'.join(values)
             values_str = '"{}"'.format(values_str)
-        self.assertIn(u'"{}": [{}]'.format(field_name, values_str), unicode(response.content, encoding='utf-8'))
+        self.assertIn(u'"{}": [{}]'.format(field_name, values_str), six.text_type(response.content, encoding='utf-8'))
 
     def test_get(self):
         response = self.client.get(self.url)
