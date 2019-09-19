@@ -108,8 +108,10 @@ def undo_override_subsection_grade(user_id, course_key_or_id, usage_key_or_id, f
         return
 
     if override is not None and (
-            not feature or feature == override.system):
+            not feature or not override.system or feature == override.system):
         override.delete(feature=feature)
+    else:
+        return
 
     # Cache a new event id and event type which the signal handler will use to emit a tracking log event.
     create_new_event_transaction_id()
