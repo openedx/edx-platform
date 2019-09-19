@@ -1305,11 +1305,18 @@ def advanced_settings_handler(request, course_key_string):
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user)
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
+            publisher_enabled = configuration_helpers.get_value_for_org(
+                course_module.location.org,
+                'ENABLE_PUBLISHER',
+                settings.FEATURES.get('ENABLE_PUBLISHER', False)
+            )
 
             return render_to_response('settings_advanced.html', {
                 'context_course': course_module,
                 'advanced_dict': CourseMetadata.fetch(course_module),
-                'advanced_settings_url': reverse_course_url('advanced_settings_handler', course_key)
+                'advanced_settings_url': reverse_course_url('advanced_settings_handler', course_key),
+                'publisher_enabled': publisher_enabled,
+
             })
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':
