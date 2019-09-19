@@ -40,7 +40,7 @@ class DeleteCourseTests(ModuleStoreTestCase):
 
         store = contentstore()
         asset_key = course_run.id.make_asset_key('asset', 'test.txt')
-        content = StaticContent(asset_key, 'test.txt', 'plain/text', 'test data')
+        content = StaticContent(asset_key, 'test.txt', 'plain/text', b'test data')
         store.save(content)
         __, asset_count = store.get_all_content_for_course(course_run.id)
         assert asset_count == 1
@@ -69,7 +69,7 @@ class DeleteCourseTests(ModuleStoreTestCase):
         store = contentstore()
 
         asset_key = course_run.id.make_asset_key('asset', 'test.txt')
-        content = StaticContent(asset_key, 'test.txt', 'plain/text', 'test data')
+        content = StaticContent(asset_key, 'test.txt', 'plain/text', b'test data')
         store.save(content)
         __, asset_count = store.get_all_content_for_course(course_run.id)
         assert asset_count == 1
