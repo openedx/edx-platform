@@ -331,7 +331,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             data['course_id'] = six.text_type(self.course.id)
         response = self.client.post(self.url, data)
         self.assertEqual(response.status_code, 400)
-        self.assertIsNotNone(re.match(error_message, response.content))
+        self.assertIsNotNone(re.match(error_message, response.content.decode('utf-8')))
         self.assert_enrollment(CourseMode.AUDIT)
         self.assertIsNone(ManualEnrollmentAudit.get_manual_enrollment_by_email(self.student.email))
 
