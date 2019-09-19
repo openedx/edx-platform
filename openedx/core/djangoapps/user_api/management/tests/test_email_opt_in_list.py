@@ -9,6 +9,7 @@ import tempfile
 from collections import defaultdict
 
 import ddt
+import six
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.core.management.base import CommandError
@@ -213,7 +214,15 @@ class EmailOptInListTest(ModuleStoreTestCase):
 
         # Execute the command, but exclude the second course from the list
         output = self._run_command(self.TEST_ORG, chunk_size=2)
-        course_ids = [row['course_id'].strip().decode('utf-8') for row in output]
+        course_ids = []
+        for row in output:
+            course_id = row['course_id'].strip()
+            # Python3 takes care of the decoding in the csv object
+            # but python 2 doesn't
+            if six.PY2:
+                course_id = course_id.decode('utf-8')
+            course_ids.append(course_id)
+
         for course in self.courses:
             assert text_type(course.id) in course_ids
 
