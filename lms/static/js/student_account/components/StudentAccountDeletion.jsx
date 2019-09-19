@@ -38,13 +38,6 @@ export class StudentAccountDeletion extends React.Component {
 
   render() {
     const { deletionModalOpen, socialAuthConnected, isActive } = this.state;
-    const appsemblerAccountRemovalText = StringUtils.interpolate(
-      gettext('If you require your account on this site to be deleted, please submit a request via email to {htmlStart}account.deletions@appsembler.com{htmlEnd}. Please submit your request from the email address linked to your user account, and in the email body, include any other profile details you wish to share to enable us to verify your identity, as well as clearly stating that you wish for your account to be deleted. We will endeavor to action your request within 30 days, and intend to further automate this process in the future for a more immediate response. There is no way to undo this request once it has been actioned, and should only be undertaken if absolutely necessary.'),
-      {
-        htmlStart: '<a href="mailto:account.deletions@appsembler.com">',
-        htmlEnd: '</a>',
-      },
-    )
     const loseAccessText = StringUtils.interpolate(
       gettext('You may also lose access to verified certificates and other program credentials like MicroMasters certificates. If you want to make a copy of these for your records before proceeding with deletion, follow the instructions for {htmlStart}printing or downloading a certificate{htmlEnd}.'),
       {
@@ -74,9 +67,20 @@ export class StudentAccountDeletion extends React.Component {
     return (
       <div className="account-deletion-details">
         <p className="account-settings-header-subtitle">{ gettext('We’re sorry to see you go!') }</p>
+        <p className="account-settings-header-subtitle">{ gettext('Please note: Deletion of your account and personal data is permanent and cannot be undone. We will not be able to recover your account or the data that is deleted.') }</p>
+        <p className="account-settings-header-subtitle">{ gettext('Once your account is deleted, you cannot use it to take courses on the app. This includes access to the app from your employer’s or university’s system and access to private sites offered.') }</p>
         <p
           className="account-settings-header-subtitle"
-          dangerouslySetInnerHTML={{ __html: appsemblerAccountRemovalText }}
+          dangerouslySetInnerHTML={{ __html: loseAccessText }}
+        />
+
+        <Button
+          id="delete-account-btn"
+          className={['btn-outline-primary']}
+          disabled={showError}
+          label={gettext('Delete My Account')}
+          inputRef={(input) => { this.modalTrigger = input; }}
+          onClick={this.loadDeletionModal}
         />
         {showError &&
           <StatusAlert
