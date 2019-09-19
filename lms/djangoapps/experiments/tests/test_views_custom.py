@@ -72,7 +72,7 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
             'show_upsell': False,
             'upsell_flag': True,
             'experiment_bucket': 1,
-            'upsell_mode': True,
+            'user_upsell': True,
             'basket_link': None,  # No sku means no basket link so no upsell
         }
         self.assertEqual(response.data, expected)

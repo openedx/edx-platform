@@ -5,7 +5,6 @@ The Discount API Views should return information about discounts that apply to t
 # -*- coding: utf-8 -*-
 
 from __future__ import absolute_import
-from datetime import datetime
 import six
 
 from django.utils.decorators import method_decorator
@@ -25,7 +24,7 @@ from openedx.core.lib.api.permissions import ApiKeyHeaderPermissionIsAuthenticat
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 
 from lms.djangoapps.courseware.date_summary import verified_upgrade_link_is_valid
-from course_modes.models import get_cosmetic_verified_display_price, CourseMode
+from course_modes.models import get_cosmetic_verified_display_price
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
 from student.models import CourseEnrollment
