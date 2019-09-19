@@ -285,6 +285,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
 
         with mock.patch.dict('django.conf.settings.FEATURES', {
             'ENABLE_PUBLISHER': True,
+            'ENABLE_MKTG_SITE': True,
             'ENTRANCE_EXAMS': False,
             'ENABLE_PREREQUISITE_COURSES': False
         }):

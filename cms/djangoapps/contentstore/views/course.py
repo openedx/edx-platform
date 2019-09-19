@@ -1051,6 +1051,11 @@ def settings_handler(request, course_key_string):
                 'ENABLE_PUBLISHER',
                 settings.FEATURES.get('ENABLE_PUBLISHER', False)
             )
+            marketing_enabled = configuration_helpers.get_value_for_org(
+                course_module.location.org,
+                'ENABLE_MKTG_SITE',
+                settings.FEATURES.get('ENABLE_MKTG_SITE', False)
+            )
             enable_extended_course_details = configuration_helpers.get_value_for_org(
                 course_module.location.org,
                 'ENABLE_EXTENDED_COURSE_DETAILS',
@@ -1080,6 +1085,7 @@ def settings_handler(request, course_key_string):
                 'video_thumbnail_image_url': course_image_url(course_module, 'video_thumbnail_image'),
                 'details_url': reverse_course_url('settings_handler', course_key),
                 'about_page_editable': about_page_editable,
+                'marketing_enabled': marketing_enabled,
                 'short_description_editable': short_description_editable,
                 'sidebar_html_enabled': sidebar_html_enabled,
                 'upload_asset_url': upload_asset_url,
