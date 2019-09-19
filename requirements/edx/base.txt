@@ -106,7 +106,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==2.0.0
 edx-drf-extensions==2.4.0
-edx-enterprise==1.10.2
+edx-enterprise==1.10.3
 edx-i18n-tools==0.4.8
 edx-milestones==0.2.3
 edx-oauth2-provider==1.3.1
@@ -242,7 +242,7 @@ text-unidecode==1.2       # via python-slugify
 tincan==0.0.5             # via edx-enterprise
 unicodecsv==0.14.1
 uritemplate==3.0.0        # via coreapi, drf-yasg
-urllib3==1.25.3
+urllib3==1.25.4
 user-util==0.1.5
 voluptuous==0.11.7
 watchdog==0.9.0
@@ -253,7 +253,7 @@ wrapt==1.10.5
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.4#egg=xblock-drag-and-drop-v2==2.2.4
 git+https://github.com/open-craft/xblock-poll@add89e14558c30f3c8dc7431e5cd6536fff6d941#egg=xblock-poll==1.5.1
 xblock-utils==1.2.2
-xblock==1.2.4
+xblock==1.2.5
 xmlsec==1.3.3             # via python3-saml
 xss-utils==0.1.1
 
