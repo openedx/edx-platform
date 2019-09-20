@@ -159,6 +159,12 @@ class NonZeroSubsectionGrade(six.with_metaclass(ABCMeta, SubsectionGradeBase)):
     def percent_graded(self):
         return compute_percent(self.graded_total.earned, self.graded_total.possible)
 
+    def get_model(self):
+        """
+        Get the PersistentSubsectionGrade that this object corresponds to
+        """
+        raise NotImplementedError
+
     @staticmethod
     def _compute_block_score(
             block_key,
@@ -268,6 +274,9 @@ class ReadSubsectionGrade(NonZeroSubsectionGrade):
                 problem_scores[block.locator] = problem_score
         return problem_scores
 
+    def get_model(self):
+        return self.model
+
 
 class CreateSubsectionGrade(NonZeroSubsectionGrade):
     """
@@ -298,6 +307,10 @@ class CreateSubsectionGrade(NonZeroSubsectionGrade):
                      .format(all_total, graded_total, subsection.location))
 
         super(CreateSubsectionGrade, self).__init__(subsection, all_total, graded_total)
+        self._persisted_model = None
+
+    def get_model(self):
+        return self._persisted_model
 
     def update_or_create_model(self, student, score_deleted=False, force_update_subsections=False):
         """
@@ -319,6 +332,7 @@ class CreateSubsectionGrade(NonZeroSubsectionGrade):
                 self.all_total = self._aggregated_score_from_model(model, is_graded=False)
                 self.graded_total = self._aggregated_score_from_model(model, is_graded=True)
 
+            self._persisted_model = model
             return model
 
     @classmethod

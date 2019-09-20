@@ -9,6 +9,7 @@ from contextlib import contextmanager
 from functools import wraps
 
 import six
+from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.db.models import Case, Exists, F, OuterRef, When, Q
 from django.urls import reverse
@@ -42,6 +43,7 @@ from lms.djangoapps.grades.rest_api.serializers import (
 )
 from lms.djangoapps.grades.rest_api.v1.utils import USER_MODEL, CourseEnrollmentPagination, GradeViewMixin
 from lms.djangoapps.grades.subsection_grade import CreateSubsectionGrade
+from lms.djangoapps.grades.subsection_grade_factory import SubsectionGradeFactory
 from lms.djangoapps.grades.tasks import recalculate_subsection_grade_v3
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.util.forms import to_bool
@@ -1048,16 +1050,13 @@ class SubsectionGradeView(GradeViewMixin, APIView):
         try:
             original_grade = PersistentSubsectionGrade.read_grade(user_id, usage_key)
         except PersistentSubsectionGrade.DoesNotExist:
-            results = SubsectionGradeResponseSerializer({
-                'original_grade': None,
-                'override': None,
-                'history': [],
-                'subsection_id': usage_key,
-                'user_id': user_id,
-                'course_id': None,
-            })
-
-            return Response(results.data)
+            student = get_user_model().objects.get(id=user_id) 
+            from lms.djangoapps.course_blocks.api import get_course_blocks
+            course_structure = get_course_blocks(student, usage_key)
+            course = modulestore().get_course(usage_key.course_key)
+            subsection_grade_factory = SubsectionGradeFactory(student, course=course, course_structure=course_structure)
+            grade = subsection_grade_factory.create(course_structure[usage_key], force_caclulate=True)
+            original_grade = grade.get_model()
 
         limit_history_request_value = request.GET.get('history_record_limit')
         if limit_history_request_value is not None:
@@ -1068,10 +1067,13 @@ class SubsectionGradeView(GradeViewMixin, APIView):
 
         try:
             override = original_grade.override
-            if limit_history_request_value is not None:
-                history = reversed(list(override.history.all().order_by('-history_date')[:history_record_limit]))
+            if not override:
+                history = []
             else:
-                history = override.history.all().order_by('history_date')
+                if limit_history_request_value is not None:
+                    history = reversed(list(override.history.all().order_by('-history_date')[:history_record_limit]))
+                else:
+                    history = override.history.all().order_by('history_date')
         except PersistentSubsectionGradeOverride.DoesNotExist:
             override = None
             history = []

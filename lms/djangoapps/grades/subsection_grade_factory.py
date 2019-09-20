@@ -34,7 +34,7 @@ class SubsectionGradeFactory(object):
         self._cached_subsection_grades = None
         self._unsaved_subsection_grades = OrderedDict()
 
-    def create(self, subsection, read_only=False):
+    def create(self, subsection, read_only=False, force_caclulate=False):
         """
         Returns the SubsectionGrade object for the student and subsection.
 
@@ -46,7 +46,7 @@ class SubsectionGradeFactory(object):
 
         subsection_grade = self._get_bulk_cached_grade(subsection)
         if not subsection_grade:
-            if assume_zero_if_absent(self.course_data.course_key):
+            if assume_zero_if_absent(self.course_data.course_key) and not force_caclulate:
                 subsection_grade = ZeroSubsectionGrade(subsection, self.course_data)
             else:
                 subsection_grade = CreateSubsectionGrade(
@@ -56,7 +56,7 @@ class SubsectionGradeFactory(object):
                     if read_only:
                         self._unsaved_subsection_grades[subsection_grade.location] = subsection_grade
                     else:
-                        grade_model = subsection_grade.update_or_create_model(self.student)
+                        grade_model = subsection_grade.update_or_create_model(self.student, force_update_subsections=force_caclulate)
                         self._update_saved_subsection_grade(subsection.location, grade_model)
         return subsection_grade
 
