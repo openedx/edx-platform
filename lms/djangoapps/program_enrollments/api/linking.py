@@ -8,6 +8,7 @@ from `lms.djangoapps.program_enrollments.api`.
 from __future__ import absolute_import, unicode_literals
 
 import logging
+from uuid import UUID
 
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
@@ -15,7 +16,6 @@ from django.db import IntegrityError, transaction
 from student.models import CourseEnrollmentException
 
 from .reading import fetch_program_enrollments
-from .writing import enroll_in_masters_track
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -26,6 +26,9 @@ NO_PROGRAM_ENROLLMENT_TEMPLATE = (
     'key={external_student_key}'
 )
 NO_LMS_USER_TEMPLATE = 'No user found with username {}'
+COURSE_ENROLLMENT_ERR_TEMPLATE = (
+    'Failed to enroll user {user} with waiting program course enrollment for course {course}'
+)
 EXISTING_USER_TEMPLATE = (
     'Program enrollment with external_student_key={external_student_key} is already linked to '
     '{account_relation} account username={username}'
@@ -33,7 +36,7 @@ EXISTING_USER_TEMPLATE = (
 
 
 @transaction.atomic
-def link_program_enrollments(program_uuid, external_keys_to_usernames):
+def link_program_enrollments_to_lms_users(program_uuid, external_keys_to_usernames):
     """
     Utility function to link ProgramEnrollments to LMS Users
 
@@ -41,9 +44,10 @@ def link_program_enrollments(program_uuid, external_keys_to_usernames):
         -program_uuid: the program for which we are linking program enrollments
         -external_keys_to_usernames: dict mapping `external_user_keys` to LMS usernames.
 
-    Returns: dict[str: str]
-        Map from external keys to errors, for the external keys of users whose
-        linking produced errors.
+    Returns:
+        {
+            (external_key, username): Error message if there was an error
+        }
 
     Raises: ValueError if None is included in external_keys_to_usernames
 
@@ -56,7 +60,7 @@ def link_program_enrollments(program_uuid, external_keys_to_usernames):
         - No enrollment is found for the given program and external_user_key
         - The enrollment already has a user
     An error message will be logged, and added to a dictionary of error messages keyed by
-    external_key. The input will be skipped. All other inputs will be processed and
+    (external_key, username). The input will be skipped. All other inputs will be processed and
     enrollments updated, and then the function will return the dictionary of error messages.
 
     If there is an error while enrolling a user in a waiting program course enrollment, the
@@ -66,29 +70,34 @@ def link_program_enrollments(program_uuid, external_keys_to_usernames):
     user but still have waiting course enrollments. All other inputs will be processed
     normally.
     """
+    _validate_inputs(program_uuid, external_keys_to_usernames)
     errors = {}
     program_enrollments = _get_program_enrollments_by_ext_key(
         program_uuid, external_keys_to_usernames.keys()
     )
-    users_by_username = _get_lms_users(external_keys_to_usernames.values())
-    for external_student_key, username in external_keys_to_usernames.items():
-        program_enrollment = program_enrollments.get(external_student_key)
-        user = users_by_username.get(username)
+    users = _get_lms_users(external_keys_to_usernames.values())
+    for item in external_keys_to_usernames.items():
+        external_student_key, username = item
+
+        user = users.get(username)
+        error_message = None
         if not user:
             error_message = NO_LMS_USER_TEMPLATE.format(username)
-        elif not program_enrollment:
+
+        program_enrollment = program_enrollments.get(external_student_key)
+        if not program_enrollment:
             error_message = NO_PROGRAM_ENROLLMENT_TEMPLATE.format(
                 program_uuid=program_uuid,
                 external_student_key=external_student_key
             )
         elif program_enrollment.user:
-            error_message = _user_already_linked_message(program_enrollment, user)
-        else:
-            error_message = None
+            error_message = user_already_linked_message(program_enrollment, user)
+
         if error_message:
             logger.warning(error_message)
-            errors[external_student_key] = error_message
+            errors[item] = error_message
             continue
+
         try:
             with transaction.atomic():
                 link_program_enrollment_to_lms_user(program_enrollment, user)
@@ -101,11 +110,28 @@ def link_program_enrollments(program_uuid, external_keys_to_usernames):
             if str(e):
                 error_message += ': '
                 error_message += str(e)
-            errors[external_student_key] = error_message
+            errors[item] = error_message
     return errors
 
 
-def _user_already_linked_message(program_enrollment, user):
+def link_program_enrollment_to_lms_user(program_enrollment, user):
+    """
+    Attempts to link the given program enrollment to the given user
+    If the enrollment has any program course enrollments, enroll the user in those courses as well
+
+    Raises: CourseEnrollmentException if there is an error enrolling user in a waiting
+            program course enrollment
+            IntegrityError if we try to create invalid records.
+    """
+    try:
+        _link_program_enrollment(program_enrollment, user)
+        _link_course_enrollments(program_enrollment, user)
+    except IntegrityError:
+        logger.exception("Integrity error while linking program enrollments")
+        raise
+
+
+def user_already_linked_message(program_enrollment, user):
     """
     Creates an error message that the specified program enrollment is already linked to an lms user
     """
@@ -116,6 +142,12 @@ def _user_already_linked_message(program_enrollment, user):
         account_relation='target' if program_enrollment.user.id == user.id else 'a different',
         username=existing_username,
     )
+
+
+def _validate_inputs(program_uuid, external_keys_to_usernames):
+    if None in external_keys_to_usernames or None in external_keys_to_usernames.values():
+        raise ValueError('external_user_key or username cannot be None')
+    UUID(str(program_uuid))  # raises ValueError if invalid
 
 
 def _get_program_enrollments_by_ext_key(program_uuid, external_student_keys):
@@ -145,37 +177,35 @@ def _get_lms_users(lms_usernames):
     }
 
 
-def link_program_enrollment_to_lms_user(program_enrollment, user):
+def _link_program_enrollment(program_enrollment, user):
     """
-    Attempts to link the given program enrollment to the given user
-    If the enrollment has any program course enrollments, enroll the user in those courses as well
+    Links program enrollment to user.
 
-    Raises: CourseEnrollmentException if there is an error enrolling user in a waiting
-            program course enrollment
-            IntegrityError if we try to create invalid records.
+    Raises IntegrityError if ProgramEnrollment is invalid
     """
-    link_log_info = 'user id={} with external_user_key={} for program uuid={}'.format(
-        user.id,
+    logger.info('Linking external student key {} and user {}'.format(
         program_enrollment.external_user_key,
-        program_enrollment.program_uuid,
-    )
-    logger.info("Linking " + link_log_info)
+        user.username
+    ))
     program_enrollment.user = user
+    program_enrollment.save()
+
+
+def _link_course_enrollments(program_enrollment, user):
+    """
+    Enrolls user in waiting program course enrollments
+
+    Raises:
+        IntegrityError if a constraint is violated
+        CourseEnrollmentException if there is an issue enrolling the user in a course
+    """
     try:
-        program_enrollment.save()
-        program_course_enrollments = program_enrollment.program_course_enrollments.all()
-        for pce in program_course_enrollments:
-            pce.course_enrollment = enroll_in_masters_track(
-                user, pce.course_key, pce.status
-            )
-            pce.save()
-    except IntegrityError:
-        logger.error("Integrity error while linking " + link_log_info)
-        raise
+        for program_course_enrollment in program_enrollment.program_course_enrollments.all():
+            program_course_enrollment.enroll(user)
     except CourseEnrollmentException as e:
-        logger.error(
-            "CourseEnrollmentException while linking {}: {}".format(
-                link_log_info, str(e)
-            )
+        error_message = COURSE_ENROLLMENT_ERR_TEMPLATE.format(
+            user=user.username,
+            course=program_course_enrollment.course_key
         )
-        raise
+        logger.exception(error_message)
+        raise type(e)(error_message)
