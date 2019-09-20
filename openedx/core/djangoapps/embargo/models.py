@@ -39,6 +39,7 @@ from .messages import COURSEWARE_MESSAGES, ENROLL_MESSAGES
 log = logging.getLogger(__name__)
 
 
+@python_2_unicode_compatible
 class EmbargoedCourse(models.Model):
     """
     Enable course embargo on a course-by-course basis.
@@ -68,7 +69,7 @@ class EmbargoedCourse(models.Model):
         except cls.DoesNotExist:
             return False
 
-    def __unicode__(self):
+    def __str__(self):
         not_em = "Not "
         if self.embargoed:
             not_em = ""
