@@ -171,7 +171,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
         with restrict_course(self.course.id) as redirect_url:
             response = self._change_enrollment('enroll')
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.content, redirect_url)
+            self.assertEqual(response.content.decode('utf-8'), redirect_url)
 
         # Verify that we weren't enrolled
         is_enrolled = CourseEnrollment.is_enrolled(self.user, self.course.id)
