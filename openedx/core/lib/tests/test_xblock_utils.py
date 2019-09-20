@@ -108,7 +108,7 @@ class TestXblockUtils(SharedModuleStoreTestCase):
             frag=fragment,
             context={"wrap_xblock_data": {"custom-attribute": "custom-value"}},
             usage_id_serializer=lambda usage_id: quote_slashes(six.text_type(usage_id)),
-            request_token=uuid.uuid1().get_hex()
+            request_token=uuid.uuid1().hex
         )
         self.assertIsInstance(test_wrap_output, Fragment)
         self.assertIn('xblock-baseview', test_wrap_output.content)

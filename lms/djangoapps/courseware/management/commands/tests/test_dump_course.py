@@ -88,7 +88,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
 
     def test_dump_course_ids(self):
         output = self.call_command('dump_course_ids')
-        dumped_courses = output.decode('utf-8').strip().split('\n')
+        dumped_courses = output.strip().split('\n')
         course_ids = {text_type(course_id) for course_id in self.loaded_courses}
         dumped_ids = set(dumped_courses)
         self.assertEqual(course_ids, dumped_ids)

@@ -675,7 +675,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         """
         Happy path test to create a single new user
         """
-        csv_content = "test_student@example.com,test_student_1,tester1,USA"
+        csv_content = b"test_student@example.com,test_student_1,tester1,USA"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
@@ -718,8 +718,8 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         If the email address and username already exists
         and the user is enrolled in the course, do nothing (including no email gets sent out)
         """
-        csv_content = "test_student@example.com,test_student_1,tester1,USA\n" \
-                      "test_student@example.com,test_student_1,tester2,US"
+        csv_content = b"test_student@example.com,test_student_1,tester1,USA\n" \
+                      b"test_student@example.com,test_student_1,tester2,US"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
@@ -771,7 +771,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         """
         Try uploading a CSV file which does not have the exact four columns of data
         """
-        csv_content = "test_student@example.com,test_student_1\n"
+        csv_content = b"test_student@example.com,test_student_1\n"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
@@ -788,8 +788,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         """
         Test failure case of a poorly formatted email field
         """
-        csv_content = "test_student.example.com,test_student_1,tester1,USA"
-
+        csv_content = b"test_student.example.com,test_student_1,tester1,USA"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
         data = json.loads(response.content.decode('utf-8'))
@@ -808,8 +807,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         If the email address and username already exists
         and the user is not enrolled in the course, enrolled him/her and iterate to next one.
         """
-        csv_content = "nonenrolled@test.com,NotEnrolledStudent,tester1,USA"
-
+        csv_content = b"nonenrolled@test.com,NotEnrolledStudent,tester1,USA"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
@@ -827,8 +825,8 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         If the email address already exists, but the username is different,
         assume it is the correct user and just register the user in the course.
         """
-        csv_content = "test_student@example.com,test_student_1,tester1,USA\n" \
-                      "test_student@example.com,test_student_2,tester2,US"
+        csv_content = b"test_student@example.com,test_student_1,tester1,USA\n" \
+                      b"test_student@example.com,test_student_2,tester2,US"
 
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
@@ -862,7 +860,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         user.is_active = False
         user.save()
 
-        csv_content = "{email},{username},tester,USA".format(email=conflicting_email, username='new_test_student')
+        csv_content = b"{email},{username},tester,USA".format(email=conflicting_email, username='new_test_student')
 
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
@@ -880,8 +878,8 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         If the username already exists (but not the email),
         assume it is a different user and fail to create the new account.
         """
-        csv_content = "test_student1@example.com,test_student_1,tester1,USA\n" \
-                      "test_student2@example.com,test_student_1,tester2,US"
+        csv_content = b"test_student1@example.com,test_student_1,tester1,USA\n" \
+                      b"test_student2@example.com,test_student_1,tester2,US"
 
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
 
@@ -895,8 +893,8 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         """
         Test when the user does not attach a file
         """
-        csv_content = "test_student1@example.com,test_student_1,tester1,USA\n" \
-                      "test_student2@example.com,test_student_1,tester2,US"
+        csv_content = b"test_student1@example.com,test_student_1,tester1,USA\n" \
+                      b"test_student2@example.com,test_student_1,tester2,US"
 
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
 
@@ -913,8 +911,8 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         """
         Test that exceptions are handled well
         """
-        csv_content = "test_student1@example.com,test_student_1,tester1,USA\n" \
-                      "test_student2@example.com,test_student_1,tester2,US"
+        csv_content = b"test_student1@example.com,test_student_1,tester1,USA\n" \
+                      b"test_student2@example.com,test_student_1,tester2,US"
 
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         with patch('lms.djangoapps.instructor.views.api.create_manual_course_enrollment') as mock:
@@ -947,10 +945,10 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         user.is_active = False
         user.save()
 
-        csv_content = "test_student1@example.com,test_student_1,tester1,USA\n" \
-                      "test_student3@example.com,test_student_1,tester3,CA\n" \
-                      "test_student4@example.com,test_student_4,tester4,USA\n" \
-                      "test_student2@example.com,test_student_2,tester2,USA"
+        csv_content = b"test_student1@example.com,test_student_1,tester1,USA\n" \
+                      b"test_student3@example.com,test_student_1,tester3,CA\n" \
+                      b"test_student4@example.com,test_student_4,tester4,USA\n" \
+                      b"test_student2@example.com,test_student_2,tester2,USA"
 
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
@@ -985,7 +983,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
 
     @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': False})
     def test_allow_automated_signups_flag_not_set(self):
-        csv_content = "test_student1@example.com,test_student_1,tester1,USA"
+        csv_content = b"test_student1@example.com,test_student_1,tester1,USA"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEquals(response.status_code, 403)
@@ -1001,7 +999,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         # Login Audit Course instructor
         self.client.login(username=self.audit_course_instructor.username, password='test')
 
-        csv_content = "test_student_wl@example.com,test_student_wl,Test Student,USA"
+        csv_content = b"test_student_wl@example.com,test_student_wl,Test Student,USA"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.audit_course_url, {'students_list': uploaded_file})
 
@@ -1032,7 +1030,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         # Login Audit Course instructor
         self.client.login(username=self.white_label_course_instructor.username, password='test')
 
-        csv_content = "test_student_wl@example.com,test_student_wl,Test Student,USA"
+        csv_content = b"test_student_wl@example.com,test_student_wl,Test Student,USA"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.white_label_course_url, {'students_list': uploaded_file})
 
@@ -1058,7 +1056,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         # Login white label course instructor
         self.client.login(username=self.white_label_course_instructor.username, password='test')
 
-        csv_content = "test_student_wl@example.com,test_student_wl,Test Student,USA"
+        csv_content = b"test_student_wl@example.com,test_student_wl,Test Student,USA"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.white_label_course_url, {'students_list': uploaded_file})
 

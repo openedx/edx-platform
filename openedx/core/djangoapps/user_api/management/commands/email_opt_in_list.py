@@ -33,6 +33,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import connections
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
+import six
 from six import text_type
 from six.moves import range
 
@@ -251,14 +252,18 @@ class Command(BaseCommand):
             else:
                 pref_set_datetime = self.DEFAULT_DATETIME_STR
 
+            if not full_name:
+                full_name = ""
+
+            # Only encode to utf-8 in python2 because python3's csv writer can handle unicode.
             writer.writerow({
                 "user_id": user_id,
-                "username": username.encode('utf-8'),
-                "email": email.encode('utf-8'),
+                "username": username.encode('utf-8') if six.PY2 else username,
+                "email": email.encode('utf-8') if six.PY2 else email,
                 # There should not be a case where users are without full_names. We only need this safe check because
                 # of ECOM-1995.
-                "full_name": full_name.encode('utf-8') if full_name else '',
-                "course_id": course_id.encode('utf-8'),
+                "full_name": full_name.encode('utf-8') if six.PY2 else full_name,
+                "course_id": course_id.encode('utf-8') if six.PY2 else course_id,
                 "is_opted_in_for_email": is_opted_in if is_opted_in else "True",
                 "preference_set_datetime": pref_set_datetime,
             })

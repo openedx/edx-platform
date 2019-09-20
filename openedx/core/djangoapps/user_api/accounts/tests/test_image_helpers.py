@@ -12,6 +12,7 @@ from pytz import UTC
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
+from six import text_type
 
 from ..image_helpers import get_profile_image_urls_for_user
 
@@ -73,7 +74,8 @@ class ProfileImageUrlTestCase(TestCase):
         """
         self.user.profile.profile_image_uploaded_at = TEST_PROFILE_IMAGE_UPLOAD_DT
         self.user.profile.save()
-        expected_name = hashlib.md5('secret' + self.user.username).hexdigest()
+        expected_name = hashlib.md5(
+            'secret' + text_type(self.user.username).encode('utf-8')).hexdigest()
         actual_urls = get_profile_image_urls_for_user(self.user)
         self.verify_urls(actual_urls, expected_name, is_default=False)
 

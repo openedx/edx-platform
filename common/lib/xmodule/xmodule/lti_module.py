@@ -657,7 +657,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         # so '='' becomes '%3D'.
         # We send form via browser, so browser will encode it again,
         # So we need to decode signature back:
-        params[u'oauth_signature'] = six.moves.urllib.parse.unquote(params[u'oauth_signature']).decode('utf8')
+        params[u'oauth_signature'] = six.moves.urllib.parse.unquote(params[u'oauth_signature']).encode('utf-8').decode('utf8')
 
         # Add LTI parameters to OAuth parameters for sending in form.
         params.update(body)

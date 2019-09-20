@@ -76,7 +76,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         bad_pwd_resp = password_reset(bad_pwd_req)
         # If they've got an unusable password, we return a successful response code
         self.assertEquals(bad_pwd_resp.status_code, 200)
-        obj = json.loads(bad_pwd_resp.content)
+        obj = json.loads(bad_pwd_resp.content.decode('utf-8'))
         self.assertEquals(obj, {
             'success': True,
             'value': "('registration/password_reset_done.html', [])",
@@ -95,7 +95,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         # This prevents someone potentially trying to "brute-force" find out which
         # emails are and aren't registered with edX
         self.assertEquals(bad_email_resp.status_code, 200)
-        obj = json.loads(bad_email_resp.content)
+        obj = json.loads(bad_email_resp.content.decode('utf-8'))
         self.assertEquals(obj, {
             'success': True,
             'value': "('registration/password_reset_done.html', [])",
@@ -145,7 +145,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         self.assertFalse(dop_models.RefreshToken.objects.filter(user=self.user).exists())
         self.assertFalse(dot_models.AccessToken.objects.filter(user=self.user).exists())
         self.assertFalse(dot_models.RefreshToken.objects.filter(user=self.user).exists())
-        obj = json.loads(good_resp.content)
+        obj = json.loads(good_resp.content.decode('utf-8'))
         self.assertTrue(obj['success'])
         self.assertIn('e-mailed you instructions for setting your password', obj['value'])
 

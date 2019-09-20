@@ -928,8 +928,8 @@ class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTest
         """
         Happy path test to create a single new white listed record
         """
-        csv_content = "test_student1@example.com,dummy_notes\n" \
-                      "test_student2@example.com,dummy_notes"
+        csv_content = b"test_student1@example.com,dummy_notes\n" \
+                      b"test_student2@example.com,dummy_notes"
         data = self.upload_file(csv_content=csv_content)
         self.assertEquals(len(data['general_errors']), 0)
         self.assertEquals(len(data['row_errors']['data_format_error']), 0)
@@ -943,8 +943,8 @@ class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTest
         """
         Try uploading a CSV file with invalid data formats and verify the errors.
         """
-        csv_content = "test_student1@example.com,test,1,USA\n" \
-                      "test_student2@example.com,test,1"
+        csv_content = b"test_student1@example.com,test,1,USA\n" \
+                      b"test_student2@example.com,test,1"
 
         data = self.upload_file(csv_content=csv_content)
         self.assertEquals(len(data['row_errors']['data_format_error']), 2)
@@ -979,7 +979,7 @@ class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTest
         """
         Test failure case of a poorly formatted email field
         """
-        csv_content = "test_student.example.com,dummy_notes"
+        csv_content = b"test_student.example.com,dummy_notes"
 
         data = self.upload_file(csv_content=csv_content)
         self.assertEquals(len(data['row_errors']['user_not_exist']), 1)
@@ -990,7 +990,7 @@ class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTest
         """
         If the user is not enrolled in the course then there should be a user_not_enrolled error.
         """
-        csv_content = "nonenrolled@test.com,dummy_notes"
+        csv_content = b"nonenrolled@test.com,dummy_notes"
 
         data = self.upload_file(csv_content=csv_content)
         self.assertEquals(len(data['row_errors']['user_not_enrolled']), 1)
@@ -1007,7 +1007,7 @@ class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTest
             whitelist=True,
             notes=''
         )
-        csv_content = "test_student1@example.com,dummy_notes"
+        csv_content = b"test_student1@example.com,dummy_notes"
         data = self.upload_file(csv_content=csv_content)
         self.assertEquals(len(data['row_errors']['user_already_white_listed']), 1)
         self.assertEquals(len(data['general_errors']), 0)
@@ -1018,8 +1018,8 @@ class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTest
         """
         Test when the user does not attach a file
         """
-        csv_content = "test_student1@example.com,dummy_notes\n" \
-                      "test_student2@example.com,dummy_notes"
+        csv_content = b"test_student1@example.com,dummy_notes\n" \
+                      b"test_student2@example.com,dummy_notes"
 
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
 

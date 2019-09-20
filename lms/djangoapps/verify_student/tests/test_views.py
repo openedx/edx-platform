@@ -1340,7 +1340,7 @@ class TestCreateOrderView(ModuleStoreTestCase):
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_invalid_amount(self):
         response = self._create_order('1.a', self.course_id, expect_status_code=400)
-        self.assertIn('Selected price is not valid number.', response.content)
+        self.assertIn('Selected price is not valid number.', response.content.decode('utf-8'))
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_invalid_mode(self):
@@ -1348,7 +1348,7 @@ class TestCreateOrderView(ModuleStoreTestCase):
         course_id = 'Fake/999/Test_Course'
         CourseFactory.create(org='Fake', number='999', display_name='Test Course')
         response = self._create_order('50', course_id, expect_status_code=400)
-        self.assertIn('This course doesn\'t support paid certificates', response.content)
+        self.assertIn('This course doesn\'t support paid certificates', response.content.decode('utf-8'))
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_create_order_fail_with_get(self):
@@ -1672,7 +1672,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
             HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB: testing',
             HTTP_DATE='testdate'
         )
-        self.assertIn('Invalid JSON', response.content)
+        self.assertIn('Invalid JSON', response.content.decode('utf-8'))
         self.assertEqual(response.status_code, 400)
 
     def test_invalid_dict(self):
@@ -1687,7 +1687,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
             HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing',
             HTTP_DATE='testdate'
         )
-        self.assertIn('JSON should be dict', response.content)
+        self.assertIn('JSON should be dict', response.content.decode('utf-8'))
         self.assertEqual(response.status_code, 400)
 
     @patch(
@@ -1712,7 +1712,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
             HTTP_AUTHORIZATION='test testing:testing',
             HTTP_DATE='testdate'
         )
-        self.assertIn('Access key invalid', response.content)
+        self.assertIn('Access key invalid', response.content.decode('utf-8'))
         self.assertEqual(response.status_code, 400)
 
     @patch(
@@ -1737,7 +1737,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
             HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing',
             HTTP_DATE='testdate'
         )
-        self.assertIn('edX ID Invalid-Id not found', response.content)
+        self.assertIn('edX ID Invalid-Id not found', response.content.decode('utf-8'))
         self.assertEqual(response.status_code, 400)
 
     @patch(
@@ -1780,7 +1780,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertEqual(attempt.expiry_date.date(), expiry_date.date())
         self.assertIsNone(old_verification.expiry_date)
         self.assertIsNone(old_verification.expiry_email_date)
-        self.assertEquals(response.content, 'OK!')
+        self.assertEquals(response.content.decode('utf-8'), 'OK!')
         self.assertEqual(len(mail.outbox), 1)
 
     @patch(
@@ -1814,7 +1814,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
         self.assertEqual(attempt.status, u'approved')
         self.assertEqual(attempt.expiry_date.date(), expiry_date.date())
-        self.assertEquals(response.content, 'OK!')
+        self.assertEquals(response.content.decode('utf-8'), 'OK!')
         self.assertEqual(len(mail.outbox), 1)
 
     @patch(
@@ -1872,7 +1872,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertEqual(attempt.status, u'must_retry')
         self.assertEqual(attempt.error_code, u'You must retry the verification.')
         self.assertEqual(attempt.error_msg, u'"Memory overflow"')
-        self.assertEquals(response.content, 'OK!')
+        self.assertEquals(response.content.decode('utf-8'), 'OK!')
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
@@ -1896,7 +1896,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
             HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing',
             HTTP_DATE='testdate'
         )
-        self.assertIn('Result Unknown not understood', response.content)
+        self.assertIn('Result Unknown not understood', response.content.decode('utf-8'))
 
 
 class TestReverifyView(TestCase):
