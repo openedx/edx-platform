@@ -265,13 +265,14 @@ class TestCsrfCrossDomainCookieMiddleware(TestCase):
             self.assertIn(self.COOKIE_NAME, response.cookies)
             cookie_header = str(response.cookies[self.COOKIE_NAME])
 
-            expected = b'Set-Cookie: {name}={value}; Domain={domain};'.format(
+            expected = 'Set-Cookie: {name}={value}; Domain={domain};'.format(  # pylint: disable=unicode-format-string
                 name=self.COOKIE_NAME,
                 value=self.COOKIE_VALUE,
                 domain=self.COOKIE_DOMAIN
             )
             self.assertIn(expected, cookie_header)
-            self.assertIn('Max-Age=31449600; Path=/; secure', cookie_header)
+            self.assertIn('Max-Age=31449600; Path=/;', cookie_header)
+            self.assertIn('secure', cookie_header.lower())
 
         else:
-            self.assertNotIn(self.COOKIE_NAME, response.cookies)
+            self.assertNotIn(self.COOKIE_NAME, str(response.cookies))
