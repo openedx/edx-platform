@@ -341,16 +341,27 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
                 )
             )
 
-    def test_exception_on_enrollment_failure(self):
+    def test_log_on_enrollment_failure(self):
         program_enrollment = self._create_waiting_program_enrollment()
-        self._create_waiting_course_enrollments(program_enrollment)
+        program_course_enrollments = self._create_waiting_course_enrollments(program_enrollment)
 
         with mock.patch('student.models.CourseEnrollment.enroll') as enrollMock:
             enrollMock.side_effect = CourseEnrollmentException('something has gone wrong')
-            with pytest.raises(CourseEnrollmentException):
-                UserSocialAuth.objects.create(
-                    user=self.user,
-                    uid='{0}:{1}'.format(self.provider_slug, self.external_id)
+            with LogCapture(logger.name) as log:
+                with pytest.raises(CourseEnrollmentException):
+                    UserSocialAuth.objects.create(
+                        user=self.user,
+                        uid='{0}:{1}'.format(self.provider_slug, self.external_id)
+                    )
+                error_template = 'Failed to enroll user={} with waiting program_course_enrollment={}: {}'
+                log.check_present(
+                    (
+                        logger.name,
+                        'WARNING',
+                        error_template.format(
+                            self.user.id, program_course_enrollments[0].id, 'something has gone wrong'
+                        )
+                    )
                 )
 
     def test_log_on_unexpected_exception(self):
@@ -360,7 +371,7 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
         program_enrollment = self._create_waiting_program_enrollment()
         self._create_waiting_course_enrollments(program_enrollment)
 
-        with mock.patch('lms.djangoapps.program_enrollments.api.linking.enroll_in_masters_track') as enrollMock:
+        with mock.patch('lms.djangoapps.program_enrollments.models.ProgramCourseEnrollment.enroll') as enrollMock:
             enrollMock.side_effect = Exception('unexpected error')
             with LogCapture(logger.name) as log:
                 with self.assertRaisesRegex(Exception, 'unexpected error'):

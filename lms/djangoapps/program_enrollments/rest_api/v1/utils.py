@@ -120,28 +120,6 @@ def verify_course_exists_and_in_program(view_func):
     return wrapped_function
 
 
-def get_enrollment_http_code(result_statuses, ok_statuses):
-    """
-    Given a set of enrollment create/update statuses,
-    return the appropriate HTTP status code.
-
-    Arguments:
-        result_statuses (sequence[str]): set of enrollment operation statuses
-            (for example, 'enrolled', 'not-in-program', etc.)
-        ok_statuses: sequence[str]: set of 'OK' (non-error) statuses
-    """
-    result_status_set = set(result_statuses)
-    ok_status_set = set(ok_statuses)
-    if not result_status_set:
-        return status.HTTP_204_NO_CONTENT
-    if result_status_set.issubset(ok_status_set):
-        return status.HTTP_200_OK
-    elif result_status_set & ok_status_set:
-        return status.HTTP_207_MULTI_STATUS
-    else:
-        return status.HTTP_422_UNPROCESSABLE_ENTITY
-
-
 def get_due_dates(request, course_key, user):
     """
     Get due date information for a user for blocks in a course.
