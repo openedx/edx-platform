@@ -211,7 +211,7 @@ class CourseMode(models.Model):
 
         mode_config = settings.COURSE_ENROLLMENT_MODES.get(self.mode_slug, {})
         min_price_for_mode = mode_config.get('min_price', 0)
-        if self.min_price < min_price_for_mode:
+        if int(self.min_price) < min_price_for_mode:
             mode_display_name = mode_config.get('display_name', self.mode_slug)
             raise ValidationError(
                 _(
