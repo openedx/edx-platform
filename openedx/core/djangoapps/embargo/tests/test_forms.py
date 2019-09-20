@@ -111,16 +111,15 @@ class IPFilterFormTest(TestCase):
     def test_add_invalid_ips(self):
         # test adding invalid ip addresses
         form_data = {
-            'whitelist': u'.0.0.1, :dead:beef:::, 1.0.0.0/55',
-            'blacklist': u'  18.244.*  ,  999999:c0a8:101::42, 1.0.0.0/'
+            'whitelist': '.0.0.1, :dead:beef:::, 1.0.0.0/55',
+            'blacklist': '  18.244.*  ,  999999:c0a8:101::42, 1.0.0.0/'
         }
         form = IPFilterForm(data=form_data)
         self.assertFalse(form.is_valid())
-
-        wmsg = "Invalid IP Address(es): [u'.0.0.1', u':dead:beef:::', u'1.0.0.0/55']" \
+        wmsg = "Invalid IP Address(es): ['.0.0.1', ':dead:beef:::', '1.0.0.0/55']" \
                " Please fix the error(s) and try again."
         self.assertEquals(wmsg, form._errors['whitelist'][0])  # pylint: disable=protected-access
-        bmsg = "Invalid IP Address(es): [u'18.244.*', u'999999:c0a8:101::42', u'1.0.0.0/']" \
+        bmsg = "Invalid IP Address(es): ['18.244.*', '999999:c0a8:101::42', '1.0.0.0/']" \
                " Please fix the error(s) and try again."
         self.assertEquals(bmsg, form._errors['blacklist'][0])  # pylint: disable=protected-access
 
