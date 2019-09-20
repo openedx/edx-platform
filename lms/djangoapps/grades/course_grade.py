@@ -9,6 +9,7 @@ from collections import OrderedDict, defaultdict
 import six
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
+from django.utils.encoding import python_2_unicode_compatible
 from lazy import lazy
 
 from xmodule import block_metadata_utils
@@ -19,6 +20,7 @@ from .subsection_grade import ZeroSubsectionGrade
 from .subsection_grade_factory import SubsectionGradeFactory
 
 
+@python_2_unicode_compatible
 class CourseGradeBase(object):
     """
     Base class for Course Grades.
@@ -34,7 +36,7 @@ class CourseGradeBase(object):
         self.letter_grade = letter_grade or None
         self.force_update_subsections = force_update_subsections
 
-    def __unicode__(self):
+    def __str__(self):
         return u'Course Grade: percent: {}, letter_grade: {}, passed: {}'.format(
             six.text_type(self.percent),
             self.letter_grade,

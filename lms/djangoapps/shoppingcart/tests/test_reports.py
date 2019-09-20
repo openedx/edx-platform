@@ -245,12 +245,12 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
 
     def test_paidcourseregistrationannotation_unicode(self):
         """
-        Fill in gap in test coverage.  __unicode__ method of PaidCourseRegistrationAnnotation
+        Fill in gap in test coverage.  __str__ method of PaidCourseRegistrationAnnotation
         """
         self.assertEqual(text_type(self.annotation), u'{} : {}'.format(text_type(self.course_key), self.TEST_ANNOTATION))
 
     def test_courseregcodeitemannotationannotation_unicode(self):
         """
-        Fill in gap in test coverage.  __unicode__ method of CourseRegCodeItemAnnotation
+        Fill in gap in test coverage.  __str__ method of CourseRegCodeItemAnnotation
         """
         self.assertEqual(text_type(self.course_reg_code_annotation), u'{} : {}'.format(text_type(self.course_key), self.TEST_ANNOTATION))

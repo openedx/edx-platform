@@ -58,6 +58,7 @@ from six import text_type
 
 from capa.xqueue_interface import XQUEUE_TIMEOUT
 from chem import chemcalc
+from django.utils.encoding import python_2_unicode_compatible
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib import edx_six
 from xmodule.stringify import stringify_children
@@ -74,6 +75,7 @@ log = logging.getLogger(__name__)
 registry = TagRegistry()  # pylint: disable=invalid-name
 
 
+@python_2_unicode_compatible
 class Status(object):
     """
     Problem status
@@ -118,9 +120,6 @@ class Status(object):
 
     def __str__(self):
         return self._status
-
-    def __unicode__(self):
-        return self._status.decode('utf8')
 
     def __repr__(self):
         return 'Status(%r)' % self._status

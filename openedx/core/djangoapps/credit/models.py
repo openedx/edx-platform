@@ -20,6 +20,7 @@ from django.core.cache import cache
 from django.core.validators import RegexValidator
 from django.db import IntegrityError, models, transaction
 from django.dispatch import receiver
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from edx_django_utils.cache import RequestCache
@@ -33,6 +34,7 @@ CREDIT_PROVIDER_ID_REGEX = r"[a-z,A-Z,0-9,\-]+"
 log = logging.getLogger(__name__)
 
 
+@python_2_unicode_compatible
 class CreditProvider(TimeStampedModel):
     """
     This model represents an institution that can grant credit for a course.
@@ -203,7 +205,7 @@ class CreditProvider(TimeStampedModel):
         except cls.DoesNotExist:
             return None
 
-    def __unicode__(self):
+    def __str__(self):
         """Unicode representation of the credit provider. """
         return self.provider_id
 
@@ -215,6 +217,7 @@ def invalidate_provider_cache(sender, **kwargs):  # pylint: disable=unused-argum
     cache.delete(CreditProvider.CREDIT_PROVIDERS_CACHE_KEY)
 
 
+@python_2_unicode_compatible
 class CreditCourse(models.Model):
     """
     Model for tracking a credit course.
@@ -265,7 +268,7 @@ class CreditCourse(models.Model):
         """
         return cls.objects.get(course_key=course_key, enabled=True)
 
-    def __unicode__(self):
+    def __str__(self):
         """Unicode representation of the credit course. """
         return six.text_type(self.course_key)
 
@@ -277,6 +280,7 @@ def invalidate_credit_courses_cache(sender, **kwargs):   # pylint: disable=unuse
     cache.delete(CreditCourse.CREDIT_COURSES_CACHE_KEY)
 
 
+@python_2_unicode_compatible
 class CreditRequirement(TimeStampedModel):
     """
     This model represents a credit requirement.
@@ -307,8 +311,8 @@ class CreditRequirement(TimeStampedModel):
         unique_together = ('namespace', 'name', 'course')
         ordering = ["order"]
 
-    def __unicode__(self):
-        return '{course_id} - {name}'.format(course_id=self.course.course_key, name=self.display_name)
+    def __str__(self):
+        return u'{course_id} - {name}'.format(course_id=self.course.course_key, name=self.display_name)
 
     @classmethod
     def add_or_update_course_requirement(cls, credit_course, requirement, order):
@@ -545,6 +549,7 @@ def default_deadline_for_credit_eligibility():
     )
 
 
+@python_2_unicode_compatible
 class CreditEligibility(TimeStampedModel):
     """
     A record of a user's eligibility for credit for a specific course.
@@ -643,7 +648,7 @@ class CreditEligibility(TimeStampedModel):
             deadline__gt=datetime.datetime.now(pytz.UTC),
         ).exists()
 
-    def __unicode__(self):
+    def __str__(self):
         """Unicode representation of the credit eligibility. """
         return u"{user}, {course}".format(
             user=self.username,
@@ -651,6 +656,7 @@ class CreditEligibility(TimeStampedModel):
         )
 
 
+@python_2_unicode_compatible
 class CreditRequest(TimeStampedModel):
     """
     A request for credit from a particular credit provider.
@@ -768,7 +774,7 @@ class CreditRequest(TimeStampedModel):
         except cls.DoesNotExist:
             return None
 
-    def __unicode__(self):
+    def __str__(self):
         """Unicode representation of a credit request."""
         return u"{course}, {provider}, {status}".format(
             course=self.course.course_key,
@@ -777,6 +783,7 @@ class CreditRequest(TimeStampedModel):
         )
 
 
+@python_2_unicode_compatible
 class CreditConfig(ConfigurationModel):
     """
     Manage credit configuration
@@ -798,6 +805,6 @@ class CreditConfig(ConfigurationModel):
         """Whether responses from the commerce API will be cached."""
         return self.enabled and self.cache_ttl > 0
 
-    def __unicode__(self):
+    def __str__(self):
         """Unicode representation of the config. """
         return 'Credit Configuration'

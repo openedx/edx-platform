@@ -10,11 +10,13 @@ from config_models.models import ConfigurationModel
 from django.contrib import admin
 from django.core.cache import cache
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 from opaque_keys.edx.django.models import CourseKeyField
 
 from openedx.core.djangolib.markup import HTML
 
 
+@python_2_unicode_compatible
 class GlobalStatusMessage(ConfigurationModel):
     """
     Model that represents the current status message.
@@ -51,10 +53,11 @@ class GlobalStatusMessage(ConfigurationModel):
         cache.set(cache_key, msg)
         return msg
 
-    def __unicode__(self):
+    def __str__(self):
         return "{} - {} - {}".format(self.change_date, self.enabled, self.message)
 
 
+@python_2_unicode_compatible
 class CourseMessage(models.Model):
     """
     Model that allows the administrator to specify banner messages for individual courses.
@@ -68,7 +71,7 @@ class CourseMessage(models.Model):
     course_key = CourseKeyField(max_length=255, blank=True, db_index=True)
     message = models.TextField(blank=True, null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return six.text_type(self.course_key)
 
 

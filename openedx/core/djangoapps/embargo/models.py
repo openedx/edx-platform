@@ -76,6 +76,7 @@ class EmbargoedCourse(models.Model):
         return u"Course '{}' is {}Embargoed".format(text_type(self.course_id), not_em)
 
 
+@python_2_unicode_compatible
 class EmbargoedState(ConfigurationModel):
     """
     Register countries to be embargoed.
@@ -99,7 +100,7 @@ class EmbargoedState(ConfigurationModel):
             return []
         return [country.strip().upper() for country in self.embargoed_countries.split(',')]
 
-    def __unicode__(self):
+    def __str__(self):
         return self.embargoed_countries
 
 
@@ -684,6 +685,7 @@ post_delete.connect(CourseAccessRuleHistory.snapshot_post_delete_receiver, sende
 post_delete.connect(CourseAccessRuleHistory.snapshot_post_delete_receiver, sender=CountryAccessRule)
 
 
+@python_2_unicode_compatible
 class IPFilter(ConfigurationModel):
     """
     Register specific IP addresses to explicitly block or unblock.
@@ -742,5 +744,5 @@ class IPFilter(ConfigurationModel):
             return []
         return self.IPFilterList([addr.strip() for addr in self.blacklist.split(',')])
 
-    def __unicode__(self):
+    def __str__(self):
         return "Whitelist: {} - Blacklist: {}".format(self.whitelist_ips, self.blacklist_ips)

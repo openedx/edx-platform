@@ -28,6 +28,7 @@ from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.db import models
 from django.urls import reverse
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy
@@ -144,6 +145,7 @@ class IDVerificationAttempt(StatusModel):
         )
 
 
+@python_2_unicode_compatible
 class ManualVerification(IDVerificationAttempt):
     """
     Each ManualVerification represents a user's verification that bypasses the need for
@@ -165,7 +167,7 @@ class ManualVerification(IDVerificationAttempt):
     class Meta(object):
         app_label = 'verify_student'
 
-    def __unicode__(self):
+    def __str__(self):
         return 'ManualIDVerification for {name}, status: {status}'.format(
             name=self.name,
             status=self.status,
@@ -178,6 +180,7 @@ class ManualVerification(IDVerificationAttempt):
         return False
 
 
+@python_2_unicode_compatible
 class SSOVerification(IDVerificationAttempt):
     """
     Each SSOVerification represents a Student's attempt to establish their identity
@@ -215,7 +218,7 @@ class SSOVerification(IDVerificationAttempt):
     class Meta(object):
         app_label = "verify_student"
 
-    def __unicode__(self):
+    def __str__(self):
         return 'SSOIDVerification for {name}, status: {status}'.format(
             name=self.name,
             status=self.status,

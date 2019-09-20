@@ -18,11 +18,13 @@ import six
 from django.db import models
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
+from django.utils.encoding import python_2_unicode_compatible
 
 from courseware.models import BaseStudentModuleHistory, StudentModule
 from courseware.fields import UnsignedBigIntAutoField
 
 
+@python_2_unicode_compatible
 class StudentModuleHistoryExtended(BaseStudentModuleHistory):
     """Keeps a complete history of state changes for a given XModule for a given
     Student. Right now, we restrict this to problems so that the table doesn't
@@ -64,5 +66,5 @@ class StudentModuleHistoryExtended(BaseStudentModuleHistory):
         """
         StudentModuleHistoryExtended.objects.filter(student_module=instance).all().delete()
 
-    def __unicode__(self):
+    def __str__(self):
         return six.text_type(repr(self))

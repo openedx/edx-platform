@@ -288,7 +288,7 @@ class CourseAuthorizationTest(TestCase):
         # Now, course should be authorized
         self.assertTrue(is_bulk_email_feature_enabled(course_id))
         self.assertEqual(
-            cauth.__unicode__(),
+            str(cauth),
             "Course 'abc/123/doremi': Instructor Email Enabled"
         )
 
@@ -298,7 +298,7 @@ class CourseAuthorizationTest(TestCase):
         # Test that course is now unauthorized
         self.assertFalse(is_bulk_email_feature_enabled(course_id))
         self.assertEqual(
-            cauth.__unicode__(),
+            str(cauth),
             "Course 'abc/123/doremi': Instructor Email Not Enabled"
         )
 
