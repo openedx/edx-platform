@@ -1685,6 +1685,38 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         'login_course_admin',
         'login_course_staff',
     )
+    def test_no_grade(self, login_method):
+        getattr(self, login_method)()
+        user_id_no_grade = 123456
+
+        with self.assertRaises(PersistentSubsectionGrade.DoesNotExist):
+            PersistentSubsectionGrade.objects.get(
+                user_id=user_id_no_grade,
+                course_id=self.usage_key.course_key,
+                usage_key=self.usage_key
+            )
+
+        resp = self.client.get(
+            self.get_url(subsection_id=self.usage_key, user_id=user_id_no_grade)
+        )
+
+        expected_data = {
+            'original_grade': None,
+            'user_id': user_id_no_grade,
+            'override': None,
+            'course_id': None,
+            'subsection_id': text_type(self.usage_key),
+            'history': []
+        }
+
+        self.assertEqual(expected_data, resp.data)
+
+
+    @ddt.data(
+        'login_staff',
+        'login_course_admin',
+        'login_course_staff',
+    )
     def test_no_override(self, login_method):
         getattr(self, login_method)()
 
