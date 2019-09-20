@@ -702,7 +702,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         # strip enclosing angle brackets from 'logo_image' cache 'Content-ID'
         image_id = email_image.get('Content-ID', '')[1:-1]
         self.assertIsNotNone(image_id)
-        self.assertIn(image_id, html_content_first.decode('utf-8'))
+        self.assertIn(image_id, html_content_first)
         self.assertIn(
             'credit from Hogwarts School of Witchcraft and Wizardry for',
             html_content_first
