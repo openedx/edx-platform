@@ -1349,7 +1349,8 @@ class MakoTemplateLinter(BaseLinter):
         while True:
             parse_string = ParseString(scrubbed_lines, start_index, len(scrubbed_lines))
             # check for validly parsed string
-            if 0 <= parse_string.start_index < parse_string.end_index:
+            if (parse_string.start_index is not None and parse_string.end_index is not None) \
+                    and (0 <= parse_string.start_index < parse_string.end_index):
                 # check if expression is contained in the given string
                 if parse_string.start_index < adjusted_start_index < parse_string.end_index:
                     return parse_string
