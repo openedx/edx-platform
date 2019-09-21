@@ -1090,7 +1090,7 @@ class MakoTemplateLinter(BaseLinter):
         javascript_start_index = None
         for context in contexts:
             if context['type'] == 'javascript':
-                if javascript_start_index < 0:
+                if javascript_start_index is None:
                     javascript_start_index = context['index']
             else:
                 if javascript_start_index is not None:
