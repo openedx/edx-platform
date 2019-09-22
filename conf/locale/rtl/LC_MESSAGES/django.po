@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-17 13:37+0000\n"
-"PO-Revision-Date: 2019-09-17 13:37:43.594286\n"
+"POT-Creation-Date: 2019-09-22 20:51+0000\n"
+"PO-Revision-Date: 2019-09-22 20:51:02.550394\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -24529,6 +24529,14 @@ msgstr ""
 "هرسفقعذفهخرس حقخدهيثي زغ غخعق حقخلقشو وشرشلثق."
 
 #: cms/templates/settings.html
+msgid ""
+"Please note that changes here may take up to a business day to appear on "
+"your course summary page."
+msgstr ""
+"حمثشسث رخفث فاشف ذاشرلثس اثقث وشغ فشنث عح فخ ش زعسهرثسس يشغ فخ شححثشق خر "
+"غخعق ذخعقسث سعووشقغ حشلث."
+
+#: cms/templates/settings.html
 msgid "Course Credit Requirements"
 msgstr "ذخعقسث ذقثيهف قثضعهقثوثرفس"
 
@@ -24655,6 +24663,18 @@ msgstr "ذخرفشذف غخعق ثيط حشقفرثق وشرشلثق فخ عحي
 #: cms/templates/settings.html
 msgid "Enrollment End Time"
 msgstr "ثرقخمموثرف ثري فهوث"
+
+#: cms/templates/settings.html
+msgid "Upgrade Deadline Date"
+msgstr "عحلقشيث يثشيمهرث يشفث"
+
+#: cms/templates/settings.html
+msgid "Last day students can upgrade to a verified enrollment."
+msgstr "مشسف يشغ سفعيثرفس ذشر عحلقشيث فخ ش دثقهبهثي ثرقخمموثرف."
+
+#: cms/templates/settings.html
+msgid "Upgrade Deadline Time"
+msgstr "عحلقشيث يثشيمهرث فهوث"
 
 #: cms/templates/settings.html
 msgid "Course Details"
