@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-17 13:37+0000\n"
-"PO-Revision-Date: 2019-09-17 13:37:43.594286\n"
+"POT-Creation-Date: 2019-09-22 20:51+0000\n"
+"PO-Revision-Date: 2019-09-22 20:51:02.550394\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -28283,6 +28283,14 @@ msgstr ""
 " ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρя#"
 
 #: cms/templates/settings.html
+msgid ""
+"Please note that changes here may take up to a business day to appear on "
+"your course summary page."
+msgstr ""
+"Pléäsé nöté thät çhängés héré mäý täké üp tö ä ßüsïnéss däý tö äppéär ön "
+"ýöür çöürsé sümmärý pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: cms/templates/settings.html
 msgid "Course Credit Requirements"
 msgstr "Çöürsé Çrédït Réqüïréménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
@@ -28428,6 +28436,20 @@ msgstr ""
 #: cms/templates/settings.html
 msgid "Enrollment End Time"
 msgstr "Énröllmént Énd Tïmé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: cms/templates/settings.html
+msgid "Upgrade Deadline Date"
+msgstr "Ûpgrädé Déädlïné Däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: cms/templates/settings.html
+msgid "Last day students can upgrade to a verified enrollment."
+msgstr ""
+"Läst däý stüdénts çän üpgrädé tö ä vérïfïéd énröllmént. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/templates/settings.html
+msgid "Upgrade Deadline Time"
+msgstr "Ûpgrädé Déädlïné Tïmé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: cms/templates/settings.html
 msgid "Course Details"

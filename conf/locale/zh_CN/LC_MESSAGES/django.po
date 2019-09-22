@@ -395,7 +395,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-15 20:42+0000\n"
+"POT-Creation-Date: 2019-09-22 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: ifLab <webmaster@iflab.org>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/open-edx/teams/6205/zh_CN/)\n"
@@ -22657,6 +22657,12 @@ msgid ""
 msgstr "您的课程概要页面在您的课程公开之后才对外可见。为了向该页面提供信息并预览该页面，请遵循您的项目经理提供的指导。"
 
 #: cms/templates/settings.html
+msgid ""
+"Please note that changes here may take up to a business day to appear on "
+"your course summary page."
+msgstr ""
+
+#: cms/templates/settings.html
 msgid "Course Credit Requirements"
 msgstr "课程学分要求"
 
@@ -22777,6 +22783,18 @@ msgstr "联系您的edX合作经理以更新这些设置项。"
 #: cms/templates/settings.html
 msgid "Enrollment End Time"
 msgstr "选课截止时间"
+
+#: cms/templates/settings.html
+msgid "Upgrade Deadline Date"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Last day students can upgrade to a verified enrollment."
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Upgrade Deadline Time"
+msgstr ""
 
 #: cms/templates/settings.html
 msgid "Course Details"

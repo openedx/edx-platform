@@ -10064,8 +10064,8 @@ msgid ""
 "Once you have registered and activated your account, you will see "
 "%(course_name)s listed on your dashboard."
 msgstr ""
-"Una vez te hayas registrado y hayas activado tu cuenta, verás que "
-"los%(course_name)s aparecen en tu panel del estudiante."
+"Una vez te hayas registrado y hayas activado tu cuenta, verás que el curso "
+"%(course_name)s aparece en tu panel del estudiante."
 
 #: lms/templates/instructor/edx_ace/allowedenroll/email/body.html
 msgid ""
