@@ -686,9 +686,6 @@ class PersistentSubsectionGradeOverride(models.Model):
             u"possible_graded_override: {}".format(self.possible_graded_override),
         ])
 
-    def get_history(self):
-        return PersistentSubsectionGradeOverrideHistory.get_override_history(self.id)
-
     @classmethod
     def prefetch(cls, user_id, course_key):
         get_cache(cls._CACHE_NAMESPACE)[(user_id, str(course_key))] = {
@@ -718,8 +715,7 @@ class PersistentSubsectionGradeOverride(models.Model):
         """
         Creates or updates an override object for the given PersistentSubsectionGrade.
         Args:
-            requesting_user: The user that is creating the override (so we can record this action in
-            a PersistentSubsectionGradeOverrideHistory record).
+            requesting_user: The user that is creating the override.
             subsection_grade_model: The PersistentSubsectionGrade object associated with this override.
             override_data: The parameters of score values used to create the override record.
         """
@@ -742,14 +738,6 @@ class PersistentSubsectionGradeOverride(models.Model):
             override_history_entry.history_user = requesting_user
             override_history_entry.save()
 
-        action = action or PersistentSubsectionGradeOverrideHistory.CREATE_OR_UPDATE
-
-        PersistentSubsectionGradeOverrideHistory.objects.create(
-            override_id=override.id,
-            user=requesting_user,
-            feature=feature,
-            action=action,
-        )
         return override
 
     @staticmethod
@@ -773,68 +761,3 @@ class PersistentSubsectionGradeOverride(models.Model):
                 getattr(subsection_grade_model, field_name)
             )
         return cleaned_data
-
-    def delete(self, **kwargs):  # pylint: disable=arguments-differ
-        # TODO: a proper history table
-        PersistentSubsectionGradeOverrideHistory.objects.create(
-            override_id=self.id,
-            feature=kwargs.pop('feature', ''),
-            action=PersistentSubsectionGradeOverrideHistory.DELETE
-        )
-        super(PersistentSubsectionGradeOverride, self).delete(**kwargs)
-
-
-class PersistentSubsectionGradeOverrideHistory(models.Model):
-    """
-    A django model tracking persistent grades override audit records.
-
-    .. no_pii:
-    """
-    OVERRIDE_FEATURES = (
-        (constants.GradeOverrideFeatureEnum.proctoring, 'proctoring'),
-        (constants.GradeOverrideFeatureEnum.gradebook, 'gradebook'),
-    )
-
-    CREATE_OR_UPDATE = 'CREATEORUPDATE'
-    DELETE = 'DELETE'
-    OVERRIDE_ACTIONS = (
-        (CREATE_OR_UPDATE, 'create_or_update'),
-        (DELETE, 'delete')
-    )
-
-    class Meta(object):
-        app_label = "grades"
-
-    override_id = models.IntegerField(db_index=True)
-    feature = models.CharField(
-        max_length=32,
-        choices=OVERRIDE_FEATURES,
-        default=constants.GradeOverrideFeatureEnum.proctoring,
-    )
-    action = models.CharField(
-        max_length=32,
-        choices=OVERRIDE_ACTIONS,
-        default=CREATE_OR_UPDATE
-    )
-    user = models.ForeignKey(User, blank=True, null=True)
-    comments = models.CharField(max_length=300, blank=True, null=True)
-    created = models.DateTimeField(auto_now_add=True, db_index=True)
-
-    def __unicode__(self):
-        """
-        String representation of this model.
-        """
-        return (
-            u"{} override_id: {}, user_id: {}, feature: {}, action: {}, created: {}"
-        ).format(
-            type(self).__name__,
-            self.override_id,
-            self.user,
-            self.feature,
-            self.action,
-            self.created
-        )
-
-    @classmethod
-    def get_override_history(cls, override_id):
-        return cls.objects.filter(override_id=override_id)

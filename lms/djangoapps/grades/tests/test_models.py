@@ -28,7 +28,6 @@ from lms.djangoapps.grades.models import (
     PersistentCourseGrade,
     PersistentSubsectionGrade,
     PersistentSubsectionGradeOverride,
-    PersistentSubsectionGradeOverrideHistory,
     VisibleBlocks
 )
 from student.tests.factories import UserFactory
@@ -326,9 +325,6 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
         self.assertEqual(0, override.earned_graded_override)
         self.assertEqual(grade.possible_all, override.possible_all_override)
         self.assertEqual(grade.possible_graded, override.possible_graded_override)
-
-        # An override history record should be created
-        self.assertEqual(1, PersistentSubsectionGradeOverrideHistory.objects.filter(override_id=override.id).count())
 
     def _assert_tracker_emitted_event(self, tracker_mock, grade):
         """

@@ -110,7 +110,7 @@ def undo_override_subsection_grade(user_id, course_key_or_id, usage_key_or_id, f
 
     if override is not None and (
             not feature or not override.system or feature == override.system):
-        override.delete(feature=feature)
+        override.delete()
     else:
         return
 
