@@ -78,6 +78,12 @@ def can_receive_discount(user, course):  # pylint: disable=unused-argument
     if CourseEntitlement.objects.filter(user=user).exists():
         return False
 
+    # We can't import this at Django load time within the openedx tests settings context
+    from openedx.features.enterprise_support.utils import is_enterprise_learner
+    # Don't give discount to enterprise users
+    if is_enterprise_learner(user):
+        return False
+
     # Excute holdback
     if _is_in_holdback(user):
         return False
