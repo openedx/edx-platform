@@ -7,6 +7,7 @@ import ast
 import os
 import re
 import textwrap
+import io
 
 from xsslint import visitors
 from xsslint.reporting import ExpressionRuleViolation, FileResults, RuleViolation
@@ -52,9 +53,9 @@ class BaseLinter(object):
             A string containing the files contents.
 
         """
-        with open(file_full_path, 'r') as input_file:
+        with io.open(file_full_path, 'r') as input_file:
             file_contents = input_file.read()
-            return file_contents.decode(encoding='utf-8')
+            return file_contents
 
     def _load_and_check_file_is_safe(self, file_full_path, lint_function, results):
         """
