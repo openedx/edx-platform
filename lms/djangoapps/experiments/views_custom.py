@@ -123,8 +123,14 @@ class Rev934(DeveloperErrorViewMixin, APIView):
             return HttpResponseBadRequest("Missing or invalid course_id")
 
         course = CourseOverview.get_from_id(course_key)
-        user = request.user
+        if not course.has_started() or course.has_ended():
+            return Response({
+                'show_upsell': False,
+                'upsell_flag': MOBILE_UPSELL_FLAG.is_enabled(),
+                'course_running': False,
+            })
 
+        user = request.user
         try:
             enrollment = CourseEnrollment.objects.select_related(
                 'course'
