@@ -29,7 +29,6 @@ from lms.djangoapps.grades.models import (
     BlockRecordList,
     PersistentSubsectionGrade,
     PersistentSubsectionGradeOverride,
-    PersistentSubsectionGradeOverrideHistory,
     PersistentCourseGrade,
 )
 from lms.djangoapps.grades.rest_api.v1.tests.mixins import GradeViewTestMixin
@@ -1580,14 +1579,6 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
                 for field_name in expected_grades._fields:
                     expected_value = getattr(expected_grades, field_name)
                     self.assertEqual(expected_value, getattr(grade, field_name))
-
-            update_records = PersistentSubsectionGradeOverrideHistory.objects.filter(user=request_user)
-            self.assertEqual(update_records.count(), 3)
-            for audit_item in update_records:
-                self.assertEqual(audit_item.user, request_user)
-                self.assertIsNotNone(audit_item.created)
-                self.assertEqual(audit_item.feature, GradeOverrideFeatureEnum.gradebook)
-                self.assertEqual(audit_item.action, PersistentSubsectionGradeOverrideHistory.CREATE_OR_UPDATE)
 
     def test_update_failing_grade(self):
         """
