@@ -39,7 +39,6 @@ from dashboard.models import CourseImportLog
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.user_api.accounts.utils import generate_password
-from openedx.core.djangolib.markup import HTML, Text
 from student.models import CourseEnrollment, Registration, UserProfile
 from student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.modulestore.django import modulestore
@@ -262,19 +261,13 @@ class Users(SysadminDashboardView):
         self.datatable['data'] = [[_('Total number of users'),
                                    User.objects.all().count()]]
 
-        self.msg += Text(u'{h2_start}{message}{h2_end}').format(
-            h2_start = HTML("<h2>"),
-            message = _("Courses loaded in the modulestore"),
-            h2_end = HTML("</h2>")
+        self.msg += u'<h2>{0}</h2>'.format(
+            _('Courses loaded in the modulestore')
         )
         self.msg += u'<ol>'
         for course in self.get_courses():
-            self.msg += Text(u'{li_start}{course_id} ({course_location}){li_end}').format(
-                li_start = HTML("<li>"),
-                course_id = escape(text_type(course.id)),
-                course_location = text_type(course.location),
-                li_end = HTML("</li>")
-            )
+            self.msg += u'<li>{0} ({1})</li>'.format(
+                escape(text_type(course.id)), text_type(course.location))
         self.msg += u'</ol>'
 
     def get(self, request):
@@ -310,43 +303,22 @@ class Users(SysadminDashboardView):
             return self.return_csv('users_{0}.csv'.format(
                 request.META['SERVER_NAME']), header, data)
         elif action == 'repair_eamap':
-            self.msg = Text(u'{h4_start}{repair_result}{h4_end}{pre_start}{auth_map}{pre_end}{msg}').format(
-                h4_start = HTML("<h4>"),
-                repair_result = _('Repair Results'),
-                h4_end = HTML("</h4>"),
-                pre_start = HTML("<pre>"),
-                auth_map = self.fix_external_auth_map_passwords(),
-                pre_end = HTML("</pre>"),
-                msg = self.msg
-            )
+            self.msg = u'<h4>{0}</h4><pre>{1}</pre>{2}'.format(
+                _('Repair Results'),
+                self.fix_external_auth_map_passwords(),
+                self.msg)
             self.datatable = {}
         elif action == 'create_user':
             uname = request.POST.get('student_uname', '').strip()
             name = request.POST.get('student_fullname', '').strip()
             password = request.POST.get('student_password', '').strip()
-            self.msg = Text(u'{h4_start}{create_results}{h4_end}{p_start}{create_user}{p_end}{hr_tag}{msg}').format(
-                h4_start = HTML("<h4>"),
-                create_results = _('Create User Results'),
-                h4_end = HTML("</h4>"),
-                p_start = HTML("<p>"),
-                create_user = self.create_user(uname, name, password),
-                p_end = HTML("</p>"),
-                hr_tag = HTML("<hr />"),
-                msg = self.msg
-            )
+            self.msg = u'<h4>{0}</h4><p>{1}</p><hr />{2}'.format(
+                _('Create User Results'),
+                self.create_user(uname, name, password), self.msg)
         elif action == 'del_user':
             uname = request.POST.get('student_uname', '').strip()
-            self.msg = Text(u'{h4_start}{delete_results}{h4_end}{p_start}{delete_user}{p_end}{hr_tag}{msg}').format(
-                h4_start = HTML("<h4>"),
-                delete_results = _('Delete User Results'),
-                h4_end = HTML("</h4>"),
-                p_start = HTML("<p>"),
-                delete_user = self.delete_user(uname),
-                p_end = HTML("</p>"),
-                hr_tag = HTML("<hr />"),
-                msg = self.msg
-            )
-
+            self.msg = u'<h4>{0}</h4><p>{1}</p><hr />{2}'.format(
+                _('Delete User Results'), self.delete_user(uname), self.msg)
 
         context = {
             'datatable': self.datatable,
@@ -448,19 +420,8 @@ class Courses(SysadminDashboardView):
             msg_header = _('Added Course')
             color = 'blue'
 
-        msg = Text(u"{style_html}{color}{h4_close}{msg_header}{h4_end}").format(
-            style_html = HTML("<h4 style='color:"),
-            color=color,
-            h4_close = HTML("'>"),
-            h4_end = HTML("</h4>"),
-            msg_header = msg_header
-        )
-        msg += Text(u"{pre_start}{ret}{pre_end}").format(
-            pre_start = HTML("<pre>"),
-            ret = escape(ret),
-            pre_end = HTML("</pre>"),
-        )
-
+        msg = u"<h4 style='color:{0}'>{1}</h4>".format(color, msg_header)
+        msg += u"<pre>{0}</pre>".format(escape(ret))
         return msg
 
     def make_datatable(self):
@@ -525,14 +486,11 @@ class Courses(SysadminDashboardView):
                     course = get_course_by_id(course_key)
                     course_found = True
                 except Exception as err:   # pylint: disable=broad-except
-                    self.msg += Text(_(
-                        'Error - cannot get course with ID {course_key}{break_tag}{pre_start}{err}{pre_end}'
-                    )).format(
-                        course_key=course_key,
-                        break_tag = HTML("<br/>"),
-                        pre_start = HTML("<pre>"),
-                        err = Text(escape(str(err))),
-                        pre_end = HTML("<pre>"),
+                    self.msg += _(
+                        'Error - cannot get course with ID {0}<br/><pre>{1}</pre>'
+                    ).format(
+                        course_key,
+                        escape(str(err))
                     )
 
             if course_found:
@@ -540,14 +498,8 @@ class Courses(SysadminDashboardView):
                 self.def_ms.delete_course(course.id, request.user.id)
                 # don't delete user permission groups, though
                 self.msg += \
-                        Text(u"{font_html}{delete} {course_location} = {course_id} ({display_name}){font_end}").format(
-                        font_html = HTML("<font color='red'>"),
-                        delete = _('Deleted'),
-                        course_location = text_type(course.location),
-                        course_id = text_type(course.id),
-                        display_name = course.display_name,
-                        font_end = HTML("</font>")
-                    )
+                    u"<font color='red'>{0} {1} = {2} ({3})</font>".format(
+                        _('Deleted'), text_type(course.location), text_type(course.id), course.display_name)
 
         context = {
             'datatable': self.make_datatable(),

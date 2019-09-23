@@ -21,7 +21,6 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 from django.utils.translation import ugettext_lazy as _
-from openedx.core.djangolib.markup import Text
 from model_utils.models import TimeStampedModel
 from six import text_type
 
@@ -284,7 +283,7 @@ class XBlockFieldBase(models.Model):
 
     def __unicode__(self):
         keys = [field.name for field in self._meta.get_fields() if field.name not in ('created', 'modified')]
-        return Text(u'{}<{!r}').format(self.__class__.__name__, {key: getattr(self, key) for key in keys})
+        return u'{}<{!r}'.format(self.__class__.__name__, {key: getattr(self, key) for key in keys})
 
 
 class XModuleUserStateSummaryField(XBlockFieldBase):
