@@ -24,7 +24,9 @@ from rest_framework.views import APIView
 from six import text_type
 
 from course_modes.models import CourseMode
+from lms.djangoapps.bulk_email.api import get_emails_enabled
 from lms.djangoapps.certificates.api import get_certificate_for_user
+from lms.djangoapps.course_api.api import get_course_run_url, get_due_dates
 from lms.djangoapps.grades.api import CourseGradeFactory, clear_prefetched_course_grades, prefetch_course_grades
 from lms.djangoapps.program_enrollments.api import (
     fetch_program_course_enrollments,
@@ -75,9 +77,6 @@ from .utils import (
     ProgramEnrollmentPagination,
     ProgramSpecificViewMixin,
     get_course_run_status,
-    get_course_run_url,
-    get_due_dates,
-    get_emails_enabled,
     verify_course_exists_and_in_program,
     verify_program_exists
 )
