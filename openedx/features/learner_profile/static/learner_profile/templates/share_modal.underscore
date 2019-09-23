@@ -8,7 +8,7 @@
     <img class="backpack-logo" src="<%- badgeMeta.badges_logo %>" alt="">
     <ol class="badges-steps">
         <li class="step">
-        <%= edx.HtmlUtils.interpolateHtml(
+        <%- edx.HtmlUtils.interpolateHtml(
             gettext("Create a {link_start}Mozilla Backpack{link_end} account, or log in to your existing account"),
             {
               link_start: edx.HtmlUtils.HTML('<a href="https://backpack.openbadges.org/" rel="noopener" target="_blank">'),
@@ -18,7 +18,7 @@
         %>
         </li>
         <li class="step">
-        <%= edx.HtmlUtils.interpolateHtml(
+        <%- edx.HtmlUtils.interpolateHtml(
             gettext("{download_link_start}Download this image (right-click or option-click, save as){link_end} and then {upload_link_start}upload{link_end} it to your backpack."),
             {
               download_link_start: edx.HtmlUtils.joinHtml(

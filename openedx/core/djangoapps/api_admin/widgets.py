@@ -36,7 +36,7 @@ class TermsOfServiceCheckboxInput(CheckboxInput):
             link_end=HTML("</a>"),
         )
 
-        html = u'<input{{}} /> <label class="tos-checkbox-label" for="{id}">{label}</label>'.format(
+        html = HTML(u'<input{{}} /> <label class="tos-checkbox-label" for="{id}">{label}</label>').format(
             id=final_attrs['id'],
             label=label
         )

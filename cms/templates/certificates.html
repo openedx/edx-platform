@@ -92,7 +92,6 @@ CMS.User.isGlobalStaff = '${is_global_staff | n, js_escaped_string}'=='True' ? t
             <p>${_("For verified certificates, specify between one and four signatories and upload the associated images.")}</p>
             <p>${Text(_("To edit or delete a certificate before it is activated, hover over the top right corner of the form and select {em_start}Edit{em_end} or the delete icon.")).format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
             <p>${Text(_("To view a sample certificate, choose a course mode and select {em_start}Preview Certificate{em_end}.")).format(em_start=HTML('<strong>'), em_end=HTML("</strong>"))}</p>
-            <p>${_("To view a sample certificate, choose a course mode and select {em_start}Preview Certificate{em_end}.").format(em_start='<strong>', em_end="</strong>")}</p>
 
             <h3 class="title-3">${_("Issuing Certificates to Learners")}</h3>
             <p>${Text(_("To begin issuing course certificates, a course team member with either the Staff or Admin role selects {em_start}Activate{em_end}. Only course team members with these roles can edit or delete an activated certificate.")).format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
