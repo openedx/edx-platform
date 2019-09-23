@@ -22,6 +22,7 @@ from collections import OrderedDict
 from copy import deepcopy
 from datetime import datetime
 from xml.sax.saxutils import unescape
+from openedx.core.lib.edx_six import get_gettext
 
 import six
 from lxml import etree
@@ -643,7 +644,7 @@ class LoncapaProblem(object):
         choice-level explanations shown to a student after submission.
         Does nothing if there is no targeted-feedback attribute.
         """
-        _ = self.capa_system.i18n.ugettext
+        _ = get_gettext(self.capa_system.i18n)
         # Note that the modifications has been done, avoiding problems if called twice.
         if hasattr(self, 'has_targeted'):
             return
@@ -759,7 +760,7 @@ class LoncapaProblem(object):
         """
         includes = self.tree.findall('.//include')
         for inc in includes:
-            filename = inc.get('file').decode('utf-8')
+            filename = inc.get('file') if six.PY3 else inc.get('file').decode('utf-8')
             if filename is not None:
                 try:
                     # open using LoncapaSystem OSFS filestore
