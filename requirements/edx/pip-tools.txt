@@ -5,5 +5,5 @@
 #    make upgrade
 #
 click==7.0                # via pip-tools
-pip-tools==3.8.0
-six==1.11.0
+pip-tools==4.1.0
+six==1.12.0

@@ -157,7 +157,7 @@ def transcript_download_handler(request):
     if transcript:
         name_and_extension = os.path.splitext(transcript['file_name'])
         basename, file_format = name_and_extension[0], name_and_extension[1][1:]
-        transcript_filename = '{base_name}.{ext}'.format(base_name=basename.encode('utf8'), ext=Transcript.SRT)
+        transcript_filename = '{base_name}.{ext}'.format(base_name=basename, ext=Transcript.SRT)
         transcript_content = Transcript.convert(
             content=transcript['content'],
             input_format=file_format,

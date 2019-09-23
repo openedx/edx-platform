@@ -56,7 +56,7 @@ class MobilePlatform(six.with_metaclass(abc.ABCMeta)):
 
 class IOS(MobilePlatform):
     """ iOS platform """
-    USER_AGENT_REGEX = (r'\((?P<version>[0-9]+.[0-9]+.[0-9]+(.[0-9a-zA-Z]*)?); OS Version [0-9.]+ '
+    USER_AGENT_REGEX = (r'\((?P<version>[0-9]+.[0-9]+.[0-9]+(\.[0-9a-zA-Z]*)?); OS Version [0-9.]+ '
                         r'\(Build [0-9a-zA-Z]*\)\)')
     NAME = "iOS"
 
@@ -64,7 +64,7 @@ class IOS(MobilePlatform):
 class Android(MobilePlatform):
     """ Android platform """
     USER_AGENT_REGEX = (r'Dalvik/[.0-9]+ \(Linux; U; Android [.0-9]+; (.*) Build/[0-9a-zA-Z]*\) '
-                        r'(.*)/(?P<version>[0-9]+.[0-9]+.[0-9]+(.[0-9a-zA-Z]*)?)')
+                        r'(.*)/(?P<version>[0-9]+.[0-9]+.[0-9]+(\.[0-9a-zA-Z]*)?)')
     NAME = "Android"
 
 

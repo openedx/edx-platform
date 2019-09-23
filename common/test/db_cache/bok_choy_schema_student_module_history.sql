@@ -19,7 +19,7 @@ CREATE TABLE `coursewarehistoryextended_studentmodulehistoryextended` (
   `grade` double DEFAULT NULL,
   `max_grade` double DEFAULT NULL,
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `student_module_id` int(11) NOT NULL,
+  `student_module_id` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `coursewarehistoryextended_s_version_d66288c3` (`version`),
   KEY `coursewarehistoryextended_s_created_2cf0c3be` (`created`),
@@ -36,7 +36,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=566 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=590 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

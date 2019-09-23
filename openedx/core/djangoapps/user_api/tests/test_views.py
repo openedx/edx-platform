@@ -93,8 +93,9 @@ class UserAPITestCase(ApiTestCase):
 
     def assertUserIsValid(self, user):
         """Assert that the given user result is valid"""
-        self.assertItemsEqual(list(user.keys()), ["email", "id", "name", "username", "preferences", "url"])
-        self.assertItemsEqual(
+        six.assertCountEqual(self, list(user.keys()), ["email", "id", "name", "username", "preferences", "url"])
+        six.assertCountEqual(
+            self,
             list(user["preferences"].items()),
             [(pref.key, pref.value) for pref in self.prefs if pref.user.id == user["id"]]
         )
@@ -104,7 +105,7 @@ class UserAPITestCase(ApiTestCase):
         """
         Assert that the given preference is acknowledged by the system
         """
-        self.assertItemsEqual(list(pref.keys()), ["user", "key", "value", "url"])
+        six.assertCountEqual(self, list(pref.keys()), ["user", "key", "value", "url"])
         self.assertSelfReferential(pref)
         self.assertUserIsValid(pref["user"])
 
@@ -603,7 +604,7 @@ class LoginSessionViewTest(UserAPITestCase):
         self.assertHttpOK(response)
 
         # Verify that the form description matches what we expect
-        form_desc = json.loads(response.content)
+        form_desc = json.loads(response.content.decode('utf-8'))
         self.assertEqual(form_desc["method"], "post")
         self.assertEqual(form_desc["submit_url"], self.url)
         self.assertEqual(form_desc["fields"], [
@@ -748,7 +749,7 @@ class PasswordResetViewTest(UserAPITestCase):
         self.assertHttpOK(response)
 
         # Verify that the form description matches what we expect
-        form_desc = json.loads(response.content)
+        form_desc = json.loads(response.content.decode('utf-8'))
         self.assertEqual(form_desc["method"], "post")
         self.assertEqual(form_desc["submit_url"], reverse("password_change_request"))
         self.assertEqual(form_desc["fields"], [
@@ -823,7 +824,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             "honor_code": "true",
         })
         self.assertEqual(response.status_code, 400)
-        response_json = json.loads(response.content)
+        response_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             response_json,
             {
@@ -865,7 +866,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             "honor_code": "true",
         })
         self.assertEqual(response.status_code, 409)
-        response_json = json.loads(response.content)
+        response_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             response_json,
             {
@@ -907,7 +908,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
                 "honor_code": "true",
             })
         self.assertEqual(response.status_code, 409)
-        response_json = json.loads(response.content)
+        response_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             response_json,
             {
@@ -944,7 +945,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             "honor_code": "true",
         })
         self.assertEqual(response.status_code, 400)
-        response_json = json.loads(response.content)
+        response_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             response_json,
             {
@@ -981,7 +982,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             "honor_code": "true",
         })
         self.assertEqual(response.status_code, 409)
-        response_json = json.loads(response.content)
+        response_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             response_json,
             {
@@ -1017,7 +1018,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             "honor_code": "true",
         })
         self.assertEqual(response.status_code, 400)
-        response_json = json.loads(response.content)
+        response_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             response_json,
             {
@@ -1096,7 +1097,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "default": False
         }
     ]
-    link_template = u"<a href='/honor' target='_blank'>{link_label}</a>"
+    link_template = u"<a href='/honor' rel='noopener' target='_blank'>{link_label}</a>"
 
     def setUp(self):
         super(RegistrationViewTest, self).setUp()
@@ -1667,8 +1668,8 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
     )
     @mock.patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": True})
     def test_registration_honor_code_mktg_site_enabled(self):
-        link_template = "<a href='https://www.test.com/honor' target='_blank'>{link_label}</a>"
-        link_template2 = u"<a href='#' target='_blank'>{link_label}</a>"
+        link_template = "<a href='https://www.test.com/honor' rel='noopener' target='_blank'>{link_label}</a>"
+        link_template2 = u"<a href='#' rel='noopener' target='_blank'>{link_label}</a>"
         link_label = "Terms of Service and Honor Code"
         link_label2 = "Privacy Policy"
         self._assert_reg_field(
@@ -1700,7 +1701,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
     @override_settings(MKTG_URLS_LINK_MAP={"HONOR": "honor"})
     @mock.patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": False})
     def test_registration_honor_code_mktg_site_disabled(self):
-        link_template = "<a href='/privacy' target='_blank'>{link_label}</a>"
+        link_template = "<a href='/privacy' rel='noopener' target='_blank'>{link_label}</a>"
         link_label = "Terms of Service and Honor Code"
         link_label2 = "Privacy Policy"
         self._assert_reg_field(
@@ -1739,7 +1740,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         # Honor code field should say ONLY honor code,
         # not "terms of service and honor code"
         link_label = 'Honor Code'
-        link_template = u"<a href='https://www.test.com/honor' target='_blank'>{link_label}</a>"
+        link_template = u"<a href='https://www.test.com/honor' rel='noopener' target='_blank'>{link_label}</a>"
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
@@ -1762,7 +1763,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
 
         # Terms of service field should also be present
         link_label = "Terms of Service"
-        link_template = u"<a href='https://www.test.com/tos' target='_blank'>{link_label}</a>"
+        link_template = u"<a href='https://www.test.com/tos' rel='noopener' target='_blank'>{link_label}</a>"
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
@@ -1810,7 +1811,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
 
         link_label = 'Terms of Service'
         # Terms of service field should also be present
-        link_template = u"<a href='/tos' target='_blank'>{link_label}</a>"
+        link_template = u"<a href='/tos' rel='noopener' target='_blank'>{link_label}</a>"
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
@@ -1850,7 +1851,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self.assertHttpOK(response)
 
         # Verify that all fields render in the correct order
-        form_desc = json.loads(response.content)
+        form_desc = json.loads(response.content.decode('utf-8'))
         field_names = [field["name"] for field in form_desc["fields"]]
         self.assertEqual(field_names, [
             "email",
@@ -1914,7 +1915,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self.assertHttpOK(response)
 
         # Verify that all fields render in the correct order
-        form_desc = json.loads(response.content)
+        form_desc = json.loads(response.content.decode('utf-8'))
         field_names = [field["name"] for field in form_desc["fields"]]
         self.assertEqual(field_names, [
             "name",
@@ -1969,7 +1970,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self.assertHttpOK(response)
 
         # Verify that all fields render in the correct order
-        form_desc = json.loads(response.content)
+        form_desc = json.loads(response.content.decode('utf-8'))
         field_names = [field["name"] for field in form_desc["fields"]]
         self.assertEqual(field_names, [
             "email",
@@ -2180,7 +2181,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "honor_code": "true",
         })
         self.assertEqual(response.status_code, 409)
-        response_json = json.loads(response.content)
+        response_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             response_json,
             {
@@ -2215,7 +2216,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "honor_code": "true",
         })
         self.assertEqual(response.status_code, 409)
-        response_json = json.loads(response.content)
+        response_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             response_json,
             {
@@ -2250,7 +2251,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "honor_code": "true",
         })
         self.assertEqual(response.status_code, 409)
-        response_json = json.loads(response.content)
+        response_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             response_json,
             {
@@ -2293,7 +2294,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             }
         )
         self.assertEqual(response.status_code, 400)
-        response_json = json.loads(response.content)
+        response_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             response_json,
             {
@@ -2382,7 +2383,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             self.assertHttpOK(response)
 
         # Verify that the form description matches what we'd expect
-        form_desc = json.loads(response.content)
+        form_desc = json.loads(response.content.decode('utf-8'))
 
         actual_field = None
         for field in form_desc["fields"]:
@@ -2444,7 +2445,7 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
     def _assert_existing_user_error(self, response):
         """Assert that the given response was an error with the given status_code and error code."""
         self.assertEqual(response.status_code, 409)
-        errors = json.loads(response.content)
+        errors = json.loads(response.content.decode('utf-8'))
         for conflict_attribute in ["username", "email"]:
             self.assertIn(conflict_attribute, errors)
             self.assertIn("belongs to an existing account", errors[conflict_attribute][0]["user_message"])
@@ -2452,7 +2453,7 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
     def _assert_access_token_error(self, response, expected_error_message):
         """Assert that the given response was an error for the access_token field with the given error message."""
         self.assertEqual(response.status_code, 400)
-        response_json = json.loads(response.content)
+        response_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             response_json,
             {"access_token": [{"user_message": expected_error_message}]}
@@ -2461,7 +2462,7 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
     def _assert_third_party_session_expired_error(self, response, expected_error_message):
         """Assert that given response is an error due to third party session expiry"""
         self.assertEqual(response.status_code, 400)
-        response_json = json.loads(response.content)
+        response_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             response_json,
             {"session_expired": [{"user_message": expected_error_message}]}

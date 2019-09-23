@@ -16,6 +16,7 @@ from django.utils.timezone import now
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
 from six.moves import range
+from six.moves.urllib.parse import parse_qs  # pylint: disable=import-error
 
 from course_modes.models import CourseMode
 from courseware.access_response import MilestoneAccessError, StartDateError, VisibilityError
@@ -599,11 +600,11 @@ class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin)
         self._expiration_in_response(serialized, api_version)
 
         # Assert utm parameters
-        expected_utm_parameters = {
-            'twitter': 'utm_campaign=social-sharing-db&utm_medium=social&utm_source=twitter',
-            'facebook': 'utm_campaign=social-sharing-db&utm_medium=social&utm_source=facebook'
-        }
-        self.assertEqual(serialized['course']['course_sharing_utm_parameters'], expected_utm_parameters)
+        qstwitter = parse_qs('utm_campaign=social-sharing-db&utm_medium=social&utm_source=twitter')
+        qsfacebook = parse_qs('utm_campaign=social-sharing-db&utm_medium=social&utm_source=facebook')
+
+        self.assertDictEqual(qsfacebook, parse_qs(serialized['course']['course_sharing_utm_parameters']['facebook']))
+        self.assertDictEqual(qstwitter, parse_qs(serialized['course']['course_sharing_utm_parameters']['twitter']))
 
     @ddt.data(API_V05, API_V1)
     def test_with_display_overrides(self, api_version):

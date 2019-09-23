@@ -261,7 +261,7 @@ class Courses(SysadminDashboardView):
         cmd = ['git', 'log', '-1',
                u'--format=format:{ "commit": "%H", "author": "%an %ae", "date": "%ad"}', ]
         try:
-            output_json = json.loads(subprocess.check_output(cmd, cwd=gdir))
+            output_json = json.loads(subprocess.check_output(cmd, cwd=gdir).decode('utf-8'))
             info = [output_json['commit'],
                     output_json['date'],
                     output_json['author'], ]

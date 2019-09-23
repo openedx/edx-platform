@@ -12,6 +12,7 @@ from copy import deepcopy
 import ddt
 import mock
 import pytz
+import six
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.testcases import TransactionTestCase
@@ -125,7 +126,7 @@ class UserAPITestCase(APITestCase):
         template = '{root}/{filename}_{{size}}.{extension}'
         if has_profile_image:
             url_root = 'http://example-storage.com/profile-images'
-            filename = hashlib.md5('secret' + self.user.username).hexdigest()
+            filename = hashlib.md5('secret' + self.user.username.encode('utf-8')).hexdigest()
             file_extension = 'jpg'
             template += '?v={}'.format(TEST_PROFILE_IMAGE_UPLOADED_AT.strftime("%s"))
         else:
@@ -790,7 +791,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         # than django model id.
         for proficiencies in ([{"code": "en"}, {"code": "fr"}, {"code": "es"}], [{"code": "fr"}], [{"code": "aa"}], []):
             response = self.send_patch(client, {"language_proficiencies": proficiencies})
-            self.assertItemsEqual(response.data["language_proficiencies"], proficiencies)
+            six.assertCountEqual(self, response.data["language_proficiencies"], proficiencies)
 
     @ddt.data(
         (

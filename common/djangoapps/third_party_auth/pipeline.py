@@ -503,17 +503,17 @@ def redirect_to_custom_form(request, auth_entry, details, kwargs):
     if isinstance(secret_key, six.text_type):
         secret_key = secret_key.encode('utf-8')
     custom_form_url = form_info['url']
-    data_str = json.dumps({
+    data_bytes = json.dumps({
         "auth_entry": auth_entry,
         "backend_name": backend_name,
         "provider_id": provider_id,
         "user_details": details,
-    })
-    digest = hmac.new(secret_key, msg=data_str, digestmod=hashlib.sha256).digest()
+    }).encode('utf-8')
+    digest = hmac.new(secret_key, msg=data_bytes, digestmod=hashlib.sha256).digest()
     # Store the data in the session temporarily, then redirect to a page that will POST it to
     # the custom login/register page.
     request.session['tpa_custom_auth_entry_data'] = {
-        'data': base64.b64encode(data_str),
+        'data': base64.b64encode(data_bytes),
         'hmac': base64.b64encode(digest),
         'post_url': custom_form_url,
     }

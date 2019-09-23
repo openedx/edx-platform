@@ -270,7 +270,7 @@ class StaticContent(object):
             if query_val.startswith("/static/"):
                 new_val = StaticContent.get_canonicalized_asset_path(
                     course_key, query_val, base_url, excluded_exts, encode=False)
-                updated_query_params.append((query_name, new_val))
+                updated_query_params.append((query_name, new_val.encode('utf-8')))
             else:
                 # Make sure we're encoding Unicode strings down to their byte string
                 # representation so that `urlencode` can handle it.
@@ -286,11 +286,11 @@ class StaticContent(object):
 
         # Only encode this if told to.  Important so that we don't double encode
         # when working with paths that are in query parameters.
-        asset_path = asset_path.encode('utf-8')
         if encode:
+            asset_path = asset_path.encode('utf-8')
             asset_path = quote_plus(asset_path, '/:+@')
 
-        return urlunparse((None, base_url.encode('utf-8'), asset_path, params, urlencode(updated_query_params), None))
+        return urlunparse(('', base_url, asset_path, params, urlencode(updated_query_params), ''))
 
     def stream_data(self):
         yield self._data

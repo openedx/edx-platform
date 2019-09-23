@@ -608,7 +608,7 @@ def get_current_child(xmodule, min_depth=None, requested_child=None):
 
     def _get_default_child_module(child_modules):
         """Returns the first child of xmodule, subject to min_depth."""
-        if min_depth <= 0:
+        if min_depth is None or min_depth <= 0:
             return _get_child(child_modules)
         else:
             content_children = [
@@ -618,14 +618,22 @@ def get_current_child(xmodule, min_depth=None, requested_child=None):
             return _get_child(content_children) if content_children else None
 
     child = None
-    if hasattr(xmodule, 'position'):
+
+    try:
+        # In python 3, hasattr() catches AttributeErrors only then returns False.
+        # All other exceptions bubble up the call stack.
+        has_position = hasattr(xmodule, 'position')  # This conditions returns AssertionError from xblock.fields lib.
+    except AssertionError:
+        return child
+
+    if has_position:
         children = xmodule.get_display_items()
         if len(children) > 0:
             if xmodule.position is not None and not requested_child:
-                pos = xmodule.position - 1  # position is 1-indexed
+                pos = int(xmodule.position) - 1  # position is 1-indexed
                 if 0 <= pos < len(children):
                     child = children[pos]
-                    if min_depth > 0 and not child.has_children_at_depth(min_depth - 1):
+                    if min_depth is not None and (min_depth > 0 and not child.has_children_at_depth(min_depth - 1)):
                         child = None
             if child is None:
                 child = _get_default_child_module(children)

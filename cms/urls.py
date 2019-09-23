@@ -56,6 +56,7 @@ urlpatterns = [
         contentstore.views.component_handler, name='component_handler'),
     url(r'^xblock/resource/(?P<block_type>[^/]*)/(?P<uri>.*)$',
         openedx.core.djangoapps.common_views.xblock.xblock_resource, name='xblock_resource_url'),
+    url(r'', include('openedx.core.djangoapps.xblock.rest_api.urls', namespace='xblock_api')),
     url(r'^not_found$', contentstore.views.not_found, name='not_found'),
     url(r'^server_error$', contentstore.views.server_error, name='server_error'),
     url(r'^organizations$', OrganizationListView.as_view(), name='organizations'),
@@ -269,12 +270,19 @@ urlpatterns += [
     url(r'^500$', handler500),
 ]
 
-if settings.FEATURES.get('ENABLE_API_DOCS'):
-    urlpatterns += [
-        url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-        url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-        url(r'^api-docs/$', schema_view.with_ui('swagger', cache_timeout=0)),
-    ]
+# API docs.
+urlpatterns += [
+    url(
+        r'^swagger(?P<format>\.json|\.yaml)$',
+        schema_view.without_ui(cache_timeout=settings.OPENAPI_CACHE_TIMEOUT), name='schema-json',
+    ),
+    url(
+        r'^swagger/$',
+        schema_view.with_ui('swagger', cache_timeout=settings.OPENAPI_CACHE_TIMEOUT),
+        name='schema-swagger-ui',
+    ),
+    url(r'^api-docs/$', schema_view.with_ui('swagger', cache_timeout=settings.OPENAPI_CACHE_TIMEOUT)),
+]
 
 if 'openedx.testing.coverage_context_listener' in settings.INSTALLED_APPS:
     urlpatterns += [

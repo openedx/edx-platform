@@ -8,6 +8,7 @@ from __future__ import absolute_import
 import datetime
 
 import ddt
+import six
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
@@ -297,13 +298,13 @@ class BaseGroupConfigurationsTest(ContainerBase):
         """
         Check that the expected partition scheme is selected.
         """
-        self.assertItemsEqual(expected_scheme, visibility_editor.selected_partition_scheme)
+        six.assertCountEqual(self, expected_scheme, visibility_editor.selected_partition_scheme)
 
     def verify_selected_groups(self, visibility_editor, expected_groups):
         """
         Check the expected partition groups.
         """
-        self.assertItemsEqual(expected_groups, [group.text for group in visibility_editor.selected_groups])
+        six.assertCountEqual(self, expected_groups, [group.text for group in visibility_editor.selected_groups])
 
     def select_and_verify_saved(self, component, partition_label, groups=[]):
         """

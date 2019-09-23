@@ -5,6 +5,7 @@
 <%!
 import json
 import pytz
+import six
 from courseware.context_processor import user_timezone_locale_prefs
 from datetime import datetime, timedelta
 from django.utils import timezone
@@ -196,7 +197,7 @@ from student.models import CourseEnrollment
             is_course_blocked = (session_id in block_courses)
             course_verification_status = verification_status_by_course.get(session_id, {})
             course_requirements = courses_requirements_not_met.get(session_id)
-            related_programs = inverted_programs.get(unicode(entitlement.course_uuid if is_unfulfilled_entitlement else session_id))
+            related_programs = inverted_programs.get(six.text_type(entitlement.course_uuid if is_unfulfilled_entitlement else session_id))
             show_consent_link = (session_id in consent_required_courses)
             course_overview = enrollment.course_overview
             resume_button_url = resume_button_urls[dashboard_index]
@@ -294,7 +295,7 @@ from student.models import CourseEnrollment
           <li class="order-history">
             <span class="title">${_("Order History")}</span>
             % for order_history_item in order_history_list:
-              <span><a href="${order_history_item['receipt_url']}" target="_blank" class="edit-name">${order_history_item['order_date']}</a></span>
+              <span><a href="${order_history_item['receipt_url']}" rel="noopener" target="_blank" class="edit-name">${order_history_item['order_date']}</a></span>
             % endfor
           </li>
           % endif

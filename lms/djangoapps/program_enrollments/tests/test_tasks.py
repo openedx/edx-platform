@@ -1,7 +1,7 @@
 """
 Unit tests for program_course_enrollments tasks
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from datetime import timedelta
 
@@ -9,36 +9,62 @@ from django.db.models.base import ObjectDoesNotExist
 from django.test import TestCase
 from django.utils import timezone
 from freezegun import freeze_time
+from opaque_keys.edx.keys import CourseKey
 from testfixtures import LogCapture
 
+from course_modes.models import CourseMode
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 from lms.djangoapps.program_enrollments.tasks import expire_waiting_enrollments, log
 from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
-from student.tests.factories import UserFactory
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 
 class ExpireWaitingEnrollmentsTest(TestCase):
     """ Test expire_waiting_enrollments task """
 
-    def _setup_enrollments(self, external_user_key, user, created_date):
+    @classmethod
+    def setUpClass(cls):
+        super(cls, ExpireWaitingEnrollmentsTest).setUpClass()
+        cls.timed_course_key = CourseKey.from_string('course-v1:edX+TestExpire+Timed')
+        cls.fresh_course_key = CourseKey.from_string('course-v1:edX+TestExpire+Fresh')
+        CourseOverviewFactory(id=cls.timed_course_key)
+        CourseOverviewFactory(id=cls.fresh_course_key)
+
+    def _set_up_course_enrollment(self, user, program_enrollment, course_key):
+        """ helper function to set up a program course enrollment """
+        if user:
+            ProgramCourseEnrollmentFactory(
+                program_enrollment=program_enrollment,
+                course_enrollment=CourseEnrollmentFactory(
+                    course_id=course_key, user=user, mode=CourseMode.MASTERS
+                )
+            )
+        else:
+            ProgramCourseEnrollmentFactory(
+                program_enrollment=program_enrollment,
+                course_key=course_key,
+            )
+
+    def _set_up_enrollments(self, external_user_key, user, created_date):
         """ helper function to setup enrollments """
         with freeze_time(created_date):
             program_enrollment = ProgramEnrollmentFactory(
                 user=user,
                 external_user_key=external_user_key,
             )
-            ProgramCourseEnrollmentFactory(
-                program_enrollment=program_enrollment
+            self._set_up_course_enrollment(
+                user, program_enrollment, self.timed_course_key
             )
         # additional course enrollment that is always fresh
-        ProgramCourseEnrollmentFactory(
-            program_enrollment=program_enrollment
+        self._set_up_course_enrollment(
+            user, program_enrollment, self.fresh_course_key
         )
 
     def test_expire(self):
-        self._setup_enrollments('student_expired_waiting', None, timezone.now() - timedelta(60))
-        self._setup_enrollments('student_waiting', None, timezone.now() - timedelta(59))
-        self._setup_enrollments('student_actualized', UserFactory(), timezone.now() - timedelta(90))
+        self._set_up_enrollments('student_expired_waiting', None, timezone.now() - timedelta(60))
+        self._set_up_enrollments('student_waiting', None, timezone.now() - timedelta(59))
+        self._set_up_enrollments('student_actualized', UserFactory(), timezone.now() - timedelta(90))
 
         expired_program_enrollment = ProgramEnrollment.objects.get(
             external_user_key='student_expired_waiting'
@@ -51,9 +77,9 @@ class ExpireWaitingEnrollmentsTest(TestCase):
         with LogCapture(log.name) as log_capture:
             expire_waiting_enrollments(60)
 
-            program_enrollment_message_tmpl = u'Found expired program_enrollment (id={}) for program_uuid={}'
+            program_enrollment_message_tmpl = 'Found expired program_enrollment (id={}) for program_uuid={}'
             course_enrollment_message_tmpl = (
-                u'Found expired program_course_enrollment (id={}) for program_uuid={}, course_key={}'
+                'Found expired program_course_enrollment (id={}) for program_uuid={}, course_key={}'
             )
 
             log_capture.check_present(
@@ -83,14 +109,11 @@ class ExpireWaitingEnrollmentsTest(TestCase):
                         expired_course_enrollments[1].course_key,
                     )
                 ),
-                (
-                    log.name,
-                    'INFO',
-                    u'Removed 3 expired records:'
-                    u' {u\'program_enrollments.ProgramCourseEnrollment\': 2,'
-                    u' u\'program_enrollments.ProgramEnrollment\': 1}'
-                ),
             )
+
+            self.assertIn('Removed 3 expired records:', log_capture.records[3].getMessage())
+            self.assertIn("program_enrollments.ProgramCourseEnrollment': 2", log_capture.records[3].getMessage())
+            self.assertIn("program_enrollments.ProgramEnrollment': 1", log_capture.records[3].getMessage())
 
         program_enrollments = ProgramEnrollment.objects.all()
         program_course_enrollments = ProgramCourseEnrollment.objects.all()

@@ -19,6 +19,7 @@ from pytz import utc
 from six import text_type
 from xblock.fields import Boolean, Dict, Float, Integer, List, Scope, String
 
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.video_pipeline.models import VideoUploadsEnabledByDefault
 from openedx.core.lib.license import LicenseMixin
 from xmodule import course_metadata_utils
@@ -332,7 +333,8 @@ class CourseFields(object):
         help=_("Enter the name of the course as it should appear in the edX.org course list."),
         default="Empty",
         display_name=_("Course Display Name"),
-        scope=Scope.settings
+        scope=Scope.settings,
+        hide_on_enabled_publisher=True
     )
     course_edit_method = String(
         display_name=_("Course Editor"),
@@ -550,7 +552,8 @@ class CourseFields(object):
         ),
         scope=Scope.settings,
         # Ensure that courses imported from XML keep their image
-        default="images_course_image.jpg"
+        default="images_course_image.jpg",
+        hide_on_enabled_publisher=True
     )
     banner_image = String(
         display_name=_("Course Banner Image"),
@@ -1106,7 +1109,9 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
 
         # bleh, have to parse the XML here to just pull out the url_name attribute
         # I don't think it's stored anywhere in the instance.
-        course_file = BytesIO(xml_data.encode('ascii', 'ignore'))
+        if isinstance(xml_data, six.text_type):
+            xml_data = xml_data.encode('ascii', 'ignore')
+        course_file = BytesIO(xml_data)
         xml_obj = etree.parse(course_file, parser=edx_xml_parser).getroot()
 
         policy_dir = None

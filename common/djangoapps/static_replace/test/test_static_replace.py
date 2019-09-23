@@ -3,7 +3,7 @@
 from __future__ import absolute_import, print_function
 
 import re
-from six import StringIO
+from six import BytesIO
 from six.moves.urllib.parse import parse_qsl, urlparse, urlunparse
 
 import ddt
@@ -331,7 +331,7 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
             StaticContent: the StaticContent object for the created image
         """
         new_image = Image.new('RGB', dimensions, color)
-        new_buf = StringIO()
+        new_buf = BytesIO()
         new_image.save(new_buf, format='png')
         new_buf.seek(0)
         new_name = name.format(prefix)
@@ -355,7 +355,7 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
             StaticContent: the StaticContent object for the created content
 
         """
-        new_buf = StringIO('testingggggggggggg')
+        new_buf = BytesIO(b'testingggggggggggg')
         new_name = name.format(prefix)
         new_key = StaticContent.compute_location(cls.courses[prefix].id, new_name)
         new_content = StaticContent(new_key, new_name, 'application/octet-stream', new_buf.getvalue(), locked=locked)
@@ -588,8 +588,6 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
 
         with check_mongo_calls(mongo_calls):
             asset_path = StaticContent.get_canonicalized_asset_path(self.courses[prefix].id, start, base_url, exts)
-            print(expected)
-            print(asset_path)
             self.assertIsNotNone(re.match(expected, asset_path))
 
     @ddt.data(
@@ -786,6 +784,4 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
 
         with check_mongo_calls(mongo_calls):
             asset_path = StaticContent.get_canonicalized_asset_path(self.courses[prefix].id, start, base_url, exts)
-            print(expected)
-            print(asset_path)
             self.assertIsNotNone(re.match(expected, asset_path))

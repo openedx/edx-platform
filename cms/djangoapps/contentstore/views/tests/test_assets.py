@@ -245,7 +245,7 @@ class PaginationTestCase(AssetsTestCase):
         Get from the url and ensure it contains the expected number of responses
         """
         resp = self.client.get(url, HTTP_ACCEPT='application/json')
-        json_response = json.loads(resp.content)
+        json_response = json.loads(resp.content.decode('utf-8'))
         assets_response = json_response['assets']
         self.assertEquals(json_response['start'], expected_start)
         self.assertEquals(len(assets_response), expected_length)
@@ -257,7 +257,7 @@ class PaginationTestCase(AssetsTestCase):
         """
         resp = self.client.get(
             url + '?sort=' + sort + '&direction=' + direction, HTTP_ACCEPT='application/json')
-        json_response = json.loads(resp.content)
+        json_response = json.loads(resp.content.decode('utf-8'))
         assets_response = json_response['assets']
         self.assertEquals(sort, json_response['sort'])
         self.assertEquals(direction, json_response['direction'])
@@ -293,7 +293,7 @@ class PaginationTestCase(AssetsTestCase):
 
         resp = self.client.get(
             url + '?' + filter_type + '=' + filter_value, HTTP_ACCEPT='application/json')
-        json_response = json.loads(resp.content)
+        json_response = json.loads(resp.content.decode('utf-8'))
         assets_response = json_response['assets']
         self.assertEquals(filter_value_split, json_response['assetTypes'])
 
@@ -325,7 +325,7 @@ class PaginationTestCase(AssetsTestCase):
         """
         resp = self.client.get(
             url + '?text_search=' + text_search, HTTP_ACCEPT='application/json')
-        json_response = json.loads(resp.content)
+        json_response = json.loads(resp.content.decode('utf-8'))
         assets_response = json_response['assets']
         self.assertEquals(text_search, json_response['textSearch'])
         self.assertEquals(len(assets_response), number_matches)
@@ -388,7 +388,7 @@ class DownloadTestCase(AssetsTestCase):
         self.asset_name = 'download_test'
         resp = self.upload_asset(self.asset_name)
         self.assertEquals(resp.status_code, 200)
-        self.uploaded_url = json.loads(resp.content)['asset']['url']
+        self.uploaded_url = json.loads(resp.content.decode('utf-8'))['asset']['url']
 
     def test_download(self):
         # Now, download it.
@@ -474,7 +474,7 @@ class LockAssetTestCase(AssetsTestCase):
             )
 
             self.assertEqual(resp.status_code, 201)
-            return json.loads(resp.content)
+            return json.loads(resp.content.decode('utf-8'))
 
         # Load the toy course.
         module_store = modulestore()
@@ -514,7 +514,7 @@ class DeleteAssetTestCase(AssetsTestCase):
 
         response = self.client.post(self.url, {"name": self.asset_name, "file": self.asset})
         self.assertEquals(response.status_code, 200)
-        self.uploaded_url = json.loads(response.content)['asset']['url']
+        self.uploaded_url = json.loads(response.content.decode('utf-8'))['asset']['url']
 
         self.asset_location = AssetKey.from_string(self.uploaded_url)
         self.content = contentstore().find(self.asset_location)
@@ -534,12 +534,12 @@ class DeleteAssetTestCase(AssetsTestCase):
         # upload image
         response = self.client.post(self.url, {"name": "delete_image_test", "file": image_asset})
         self.assertEquals(response.status_code, 200)
-        uploaded_image_url = json.loads(response.content)['asset']['url']
+        uploaded_image_url = json.loads(response.content.decode('utf-8'))['asset']['url']
 
         # upload image thumbnail
         response = self.client.post(self.url, {"name": "delete_image_thumb_test", "file": thumbnail_image_asset})
         self.assertEquals(response.status_code, 200)
-        thumbnail_url = json.loads(response.content)['asset']['url']
+        thumbnail_url = json.loads(response.content.decode('utf-8'))['asset']['url']
         thumbnail_location = StaticContent.get_location_from_path(thumbnail_url)
 
         image_asset_location = AssetKey.from_string(uploaded_image_url)

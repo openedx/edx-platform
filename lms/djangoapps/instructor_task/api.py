@@ -320,7 +320,7 @@ def submit_bulk_course_email(request, course_key, email_id):
     task_input = {'email_id': email_id, 'to_option': targets}
     task_key_stub = str(email_id)
     # create the key value by using MD5 hash:
-    task_key = hashlib.md5(task_key_stub).hexdigest()
+    task_key = hashlib.md5(task_key_stub.encode('utf-8')).hexdigest()
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 

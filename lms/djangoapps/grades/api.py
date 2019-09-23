@@ -15,7 +15,7 @@ from six import text_type
 from lms.djangoapps.grades import constants, context, course_data, events
 # Grades APIs that should NOT belong within the Grades subsystem
 # TODO move Gradebook to be an external feature outside of core Grades
-from lms.djangoapps.grades.config.waffle import is_writable_gradebook_enabled
+from lms.djangoapps.grades.config.waffle import is_writable_gradebook_enabled, gradebook_can_see_bulk_management
 # Public Grades Factories
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.models_api import *
@@ -40,7 +40,7 @@ def graded_subsections_for_course_id(course_id):
 
 def override_subsection_grade(
         user_id, course_key_or_id, usage_key_or_id, overrider=None, earned_all=None, earned_graded=None,
-        feature=constants.GradeOverrideFeatureEnum.proctoring
+        feature=constants.GradeOverrideFeatureEnum.proctoring, comment=None,
 ):
     """
     Creates a PersistentSubsectionGradeOverride corresponding to the given
@@ -65,8 +65,10 @@ def override_subsection_grade(
         requesting_user=overrider,
         subsection_grade_model=grade,
         feature=feature,
+        system=feature,
         earned_all_override=earned_all,
         earned_graded_override=earned_graded,
+        comment=comment,
     )
 
     # Cache a new event id and event type which the signal handler will use to emit a tracking log event.
@@ -93,6 +95,10 @@ def undo_override_subsection_grade(user_id, course_key_or_id, usage_key_or_id, f
 
     Fires off a recalculate_subsection_grade async task to update the PersistentSubsectionGrade table. If the
     override does not exist, no error is raised, it just triggers the recalculation.
+
+    feature: if specified, the deletion will only occur if the
+             override to be deleted was created by the corresponding
+             subsystem
     """
     course_key = _get_key(course_key_or_id, CourseKey)
     usage_key = _get_key(usage_key_or_id, UsageKey)
@@ -102,9 +108,11 @@ def undo_override_subsection_grade(user_id, course_key_or_id, usage_key_or_id, f
     except ObjectDoesNotExist:
         return
 
-    # Older rejected exam attempts that transition to verified might not have an override created
-    if override is not None:
+    if override is not None and (
+            not feature or not override.system or feature == override.system):
         override.delete(feature=feature)
+    else:
+        return
 
     # Cache a new event id and event type which the signal handler will use to emit a tracking log event.
     create_new_event_transaction_id()

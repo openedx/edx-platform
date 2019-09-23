@@ -206,9 +206,6 @@ FEATURES = {
     # based on their location.
     'EMBARGO': False,
 
-    # Turn on/off Microsites feature
-    'USE_MICROSITES': False,
-
     # Allow creating courses with non-ascii characters in the course id
     'ALLOW_UNICODE_COURSE_ID': False,
 
@@ -222,6 +219,9 @@ FEATURES = {
     # for consistency in user-experience, keep the value of this feature flag
     # in sync with the one in lms/envs/common.py
     'ENABLE_EDXNOTES': False,
+
+    # Toggle to enable coordination with the Publisher tool (keep in sync with lms/envs/common.py)
+    'ENABLE_PUBLISHER': False,
 
     # Show a new field in "Advanced settings" that can store custom data about a
     # course and that can be read from themes
@@ -305,9 +305,6 @@ FEATURES = {
 
     # Prevent auto auth from creating superusers or modifying existing users
     'RESTRICT_AUTOMATIC_AUTH': True,
-
-    # Set this to true to make API docs available at /api-docs/.
-    'ENABLE_API_DOCS': False,
 }
 
 ENABLE_JASMINE = False
@@ -1204,6 +1201,9 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
     'xblock_config.apps.XBlockConfig',
 
+    # New (Blockstore-based) XBlock runtime
+    'openedx.core.djangoapps.xblock.apps.StudioXBlockAppConfig',
+
     # Maintenance tools
     'maintenance',
     'openedx.core.djangoapps.util.apps.UtilConfig',
@@ -1298,9 +1298,6 @@ INSTALLED_APPS = [
 
     # System Wide Roles
     'openedx.core.djangoapps.system_wide_roles',
-
-    # Microsite configuration application
-    'microsite_configuration',
 
     # Static i18n support
     'statici18n',
@@ -1680,21 +1677,6 @@ DEFAULT_SITE_THEME = None
 
 ENABLE_COMPREHENSIVE_THEMING = False
 
-################################ Settings for Microsites ################################
-
-### Select an implementation for the microsite backend
-# for MICROSITE_BACKEND possible choices are
-# 1. microsite_configuration.backends.filebased.FilebasedMicrositeBackend
-# 2. microsite_configuration.backends.database.DatabaseMicrositeBackend
-MICROSITE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrositeBackend'
-# for MICROSITE_TEMPLATE_BACKEND possible choices are
-# 1. microsite_configuration.backends.filebased.FilebasedMicrositeTemplateBackend
-# 2. microsite_configuration.backends.database.DatabaseMicrositeTemplateBackend
-MICROSITE_TEMPLATE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrositeTemplateBackend'
-# TTL for microsite database template cache
-MICROSITE_DATABASE_TEMPLATE_CACHE_TTL = 5 * 60
-
-
 ############################ Global Database Configuration #####################
 
 DATABASE_ROUTERS = [
@@ -1704,6 +1686,13 @@ DATABASE_ROUTERS = [
 ############################ Cache Configuration ###############################
 
 CACHES = {
+    'blockstore': {
+        'KEY_PREFIX': 'blockstore',
+        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'LOCATION': ['localhost:11211'],
+        'TIMEOUT': '86400',  # This data should be long-lived for performance, BundleCache handles invalidation
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+    },
     'course_structure_cache': {
         'KEY_PREFIX': 'course_structure',
         'KEY_FUNCTION': 'util.memcache.safe_key',
@@ -1810,6 +1799,10 @@ COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
 DEFAULT_COURSE_VISIBILITY_IN_CATALOG = "both"
 DEFAULT_MOBILE_AVAILABLE = False
 
+
+# How long to cache OpenAPI schemas and UI, in seconds.
+OPENAPI_CACHE_TIMEOUT = 0
+
 ################# Mobile URLS ##########################
 
 # These are URLs to the app store for mobile.
@@ -1862,6 +1855,10 @@ ZENDESK_USER = None
 ZENDESK_API_KEY = None
 ZENDESK_CUSTOM_FIELDS = {}
 ZENDESK_OAUTH_ACCESS_TOKEN = ''
+# A mapping of string names to Zendesk Group IDs
+# To get the IDs of your groups you can go to
+# {zendesk_url}/api/v2/groups.json
+ZENDESK_GROUP_ID_MAPPING = {}
 
 ############## Settings for Completion API #########################
 
@@ -1890,9 +1887,6 @@ ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:8005'
 CREDENTIALS_PUBLIC_SERVICE_URL = None
-
-JOURNALS_URL_ROOT = 'https://journals-localhost:18000'
-JOURNALS_API_URL = 'https://journals-localhost:18000/api/v1/'
 
 ANALYTICS_DASHBOARD_URL = 'http://localhost:18110/courses'
 ANALYTICS_DASHBOARD_NAME = 'Your Platform Name Here Insights'
@@ -1970,10 +1964,6 @@ BULK_EMAIL_DEFAULT_FROM_EMAIL = 'no-reply@example.com'
 # a bulk email message.
 BULK_EMAIL_LOG_SENT_EMAILS = False
 
-################################ Settings for Microsites ################################
-MICROSITE_ROOT_DIR = '/edx/app/edxapp/edx-microsite'
-MICROSITE_CONFIGURATION = {}
-
 ############### Settings for django file storage ##################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
@@ -2012,6 +2002,11 @@ SOCIAL_AUTH_SAML_SP_PUBLIC_CERT_DICT = {}
 FACEBOOK_APP_ID = 'FACEBOOK_APP_ID'
 FACEBOOK_APP_SECRET = 'FACEBOOK_APP_SECRET'
 FACEBOOK_API_VERSION = 'v2.1'
+
+############### Settings for django-fernet-fields ##################
+FERNET_KEYS = [
+    'DUMMY KEY CHANGE BEFORE GOING TO PRODUCTION',
+]
 
 ### Proctoring configuration (redirct URLs and keys shared between systems) ####
 PROCTORING_BACKENDS = {

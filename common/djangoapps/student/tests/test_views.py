@@ -141,13 +141,13 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
         with patch('student.models.CourseEnrollment.refundable', return_value=True):
             response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
 
-        self.assertEquals(json.loads(response.content), {'course_refundable_status': True})
+        self.assertEquals(json.loads(response.content.decode('utf-8')), {'course_refundable_status': True})
         self.assertEqual(response.status_code, 200)
 
         with patch('student.models.CourseEnrollment.refundable', return_value=False):
             response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
 
-        self.assertEquals(json.loads(response.content), {'course_refundable_status': False})
+        self.assertEquals(json.loads(response.content.decode('utf-8')), {'course_refundable_status': False})
         self.assertEqual(response.status_code, 200)
 
     def test_course_run_refund_status_invalid_course_key(self):
@@ -157,7 +157,7 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
                                                         InvalidKeyError during look up.')
             response = self.client.get(reverse('course_run_refund_status', kwargs={'course_id': self.course.id}))
 
-        self.assertEquals(json.loads(response.content), {'course_refundable_status': ''})
+        self.assertEquals(json.loads(response.content.decode('utf-8')), {'course_refundable_status': ''})
         self.assertEqual(response.status_code, 406)
 
 
@@ -242,8 +242,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         # Assert course sharing icons
         response = self.client.get(reverse('dashboard'))
-        self.assertEqual('Share on Twitter' in response.content, set_marketing or set_social_sharing)
-        self.assertEqual('Share on Facebook' in response.content, set_marketing or set_social_sharing)
+        self.assertEqual('Share on Twitter' in response.content.decode('utf-8'), set_marketing or set_social_sharing)
+        self.assertEqual('Share on Facebook' in response.content.decode('utf-8'), set_marketing or set_social_sharing)
 
     @patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
     def test_pre_requisites_appear_on_dashboard(self):

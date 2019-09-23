@@ -305,7 +305,8 @@ def _sort_map_entries(category_map, sort_alpha):
     for title, category in category_map["subcategories"].items():
         things.append((title, category, TYPE_SUBCATEGORY))
         _sort_map_entries(category_map["subcategories"][title], sort_alpha)
-    category_map["children"] = [(x[0], x[2]) for x in sorted(things, key=lambda x: x[1]["sort_key"])]
+    key_method = lambda x: x[1]["sort_key"] if x[1]["sort_key"] is not None else ''
+    category_map["children"] = [(x[0], x[2]) for x in sorted(things, key=key_method)]
 
 
 def get_discussion_category_map(course, user, divided_only_if_explicit=False, exclude_unstarted=True):
@@ -906,7 +907,7 @@ def is_comment_too_deep(parent):
     return (
         MAX_COMMENT_DEPTH is not None and (
             MAX_COMMENT_DEPTH < 0 or
-            (parent and parent["depth"] >= MAX_COMMENT_DEPTH)
+            (parent and (parent["depth"] or 0) >= MAX_COMMENT_DEPTH)
         )
     )
 

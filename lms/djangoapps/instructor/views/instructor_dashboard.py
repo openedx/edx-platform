@@ -140,7 +140,7 @@ def instructor_dashboard_2(request, course_id):
     if show_analytics_dashboard_message(course_key):
         # Construct a URL to the external analytics dashboard
         analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, six.text_type(course_key))
-        link_start = HTML(u"<a href=\"{}\" target=\"_blank\">").format(analytics_dashboard_url)
+        link_start = HTML(u"<a href=\"{}\" rel=\"noopener\" target=\"_blank\">").format(analytics_dashboard_url)
         analytics_dashboard_message = _(
             u"To gain insights into student enrollment and participation {link_start}"
             u"visit {analytics_dashboard_name}, our new course analytics product{link_end}."
@@ -504,7 +504,7 @@ def _section_course_info(course, access):
 
     try:
         sorted_cutoffs = sorted(list(course.grade_cutoffs.items()), key=lambda i: i[1], reverse=True)
-        advance = lambda memo, (letter, score): u"{}: {}, ".format(letter, score) + memo
+        advance = lambda memo, letter_score_tuple: u"{}: {}, ".format(letter_score_tuple[0], letter_score_tuple[1]) + memo  # pylint: disable=line-too-long
         section_data['grade_cutoffs'] = reduce(advance, sorted_cutoffs, "")[:-2]
     except Exception:  # pylint: disable=broad-except
         section_data['grade_cutoffs'] = "Not Available"
@@ -739,7 +739,7 @@ def _section_send_email(course, access):
         usage_id_serializer=lambda usage_id: quote_slashes(six.text_type(usage_id)),
         # Generate a new request_token here at random, because this module isn't connected to any other
         # xblock rendering.
-        request_token=uuid.uuid1().get_hex()
+        request_token=uuid.uuid1().hex
     )
     cohorts = []
     if is_course_cohorted(course_key):
@@ -773,7 +773,7 @@ def _section_send_email(course, access):
 def _get_dashboard_link(course_key):
     """ Construct a URL to the external analytics dashboard """
     analytics_dashboard_url = u'{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, six.text_type(course_key))
-    link = HTML(u"<a href=\"{0}\" target=\"_blank\">{1}</a>").format(
+    link = HTML(u"<a href=\"{0}\" rel=\"noopener\" target=\"_blank\">{1}</a>").format(
         analytics_dashboard_url, settings.ANALYTICS_DASHBOARD_NAME
     )
     return link

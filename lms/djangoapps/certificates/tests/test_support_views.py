@@ -170,7 +170,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
         response = self._search(user_filter, course_filter)
         if expect_result:
             self.assertEqual(response.status_code, 200)
-            results = json.loads(response.content)
+            results = json.loads(response.content.decode('utf-8'))
             self.assertEqual(len(results), 1)
         else:
             self.assertEqual(response.status_code, 400)
@@ -184,7 +184,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
 
         response = self._search(self.student.email)
         self.assertEqual(response.status_code, 200)
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(len(results), 1)
         retrieved_data = results[0]
@@ -193,7 +193,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
     def test_results(self):
         response = self._search(self.STUDENT_USERNAME)
         self.assertEqual(response.status_code, 200)
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(len(results), 1)
         retrieved_cert = results[0]
@@ -216,7 +216,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
 
         response = self._search(self.STUDENT_USERNAME)
         self.assertEqual(response.status_code, 200)
-        results = json.loads(response.content)
+        results = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(len(results), 1)
         retrieved_cert = results[0]

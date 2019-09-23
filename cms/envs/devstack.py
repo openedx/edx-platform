@@ -71,7 +71,7 @@ CELERY_ALWAYS_EAGER = True
 
 ################################ DEBUG TOOLBAR ################################
 
-INSTALLED_APPS += ['debug_toolbar', 'debug_toolbar_mongo']
+INSTALLED_APPS += ['debug_toolbar']
 
 MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 INTERNAL_IPS = ('127.0.0.1',)
@@ -104,15 +104,6 @@ def should_show_debug_toolbar(request):
         return False
     return True
 
-
-# To see stacktraces for MongoDB queries, set this to True.
-# Stacktraces slow down page loads drastically (for pages with lots of queries).
-DEBUG_TOOLBAR_MONGO_STACKTRACES = False
-
-
-########################### API DOCS #################################
-
-FEATURES['ENABLE_API_DOCS'] = True
 
 ################################ MILESTONES ################################
 FEATURES['MILESTONES_APP'] = True
@@ -181,12 +172,18 @@ IDA_LOGOUT_URI_LIST = [
     'http://localhost:18150/logout/',  # credentials
 ]
 
+############################### BLOCKSTORE #####################################
+BLOCKSTORE_API_URL = "http://edx.devstack.blockstore:18250/api/v1/"
+
 #####################################################################
 
 # pylint: disable=wrong-import-order, wrong-import-position
 from openedx.core.djangoapps.plugins import constants as plugin_constants, plugin_settings
 
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_constants.SettingsType.DEVSTACK)
+
+
+OPENAPI_CACHE_TIMEOUT = 0
 
 ###############################################################################
 # See if the developer has any local overrides.

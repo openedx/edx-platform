@@ -3,6 +3,7 @@ Tests for helper function provided by site_configuration app.
 """
 from __future__ import absolute_import
 
+import six
 from django.test import TestCase
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -81,7 +82,8 @@ class TestHelpers(TestCase):
         Test that get_dict returns correct value for any given key.
         """
         # Make sure entry is saved and retrieved correctly
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             configuration_helpers.get_dict("REGISTRATION_EXTRA_FIELDS"),
             test_config['REGISTRATION_EXTRA_FIELDS'],
         )
@@ -91,7 +93,8 @@ class TestHelpers(TestCase):
         expected.update(test_config['REGISTRATION_EXTRA_FIELDS'])
 
         # Test that the default value is returned if the value for the given key is not found in the configuration
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             configuration_helpers.get_dict("REGISTRATION_EXTRA_FIELDS", default),
             expected,
         )
@@ -134,7 +137,8 @@ class TestHelpers(TestCase):
                 test_config['css_overrides_file']
             )
 
-            self.assertItemsEqual(
+            six.assertCountEqual(
+                self,
                 configuration_helpers.get_value_for_org(test_org, "REGISTRATION_EXTRA_FIELDS"),
                 test_config['REGISTRATION_EXTRA_FIELDS']
             )
@@ -177,7 +181,8 @@ class TestHelpers(TestCase):
         """
         test_orgs = [test_config['course_org_filter']]
         with with_site_configuration_context(configuration=test_config):
-            self.assertItemsEqual(
+            six.assertCountEqual(
+                self,
                 list(configuration_helpers.get_all_orgs()),
                 test_orgs,
             )
@@ -185,7 +190,8 @@ class TestHelpers(TestCase):
     @with_site_configuration(configuration=test_config_multi_org)
     def test_get_current_site_orgs(self):
         test_orgs = test_config_multi_org['course_org_filter']
-        self.assertItemsEqual(
+        six.assertCountEqual(
+            self,
             list(configuration_helpers.get_current_site_orgs()),
             test_orgs
         )

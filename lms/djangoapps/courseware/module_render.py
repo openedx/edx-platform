@@ -888,6 +888,7 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
         system,
         user.id,
         [
+            partial(DateLookupFieldData, course_id=course_id, user=user),
             partial(OverrideFieldData.wrap, user, course),
             partial(LmsFieldData, student_data=student_data),
         ],
@@ -1224,7 +1225,7 @@ def hash_resource(resource):
     """
     md5 = hashlib.md5()
     for data in resource:
-        md5.update(repr(data))
+        md5.update(repr(data).encode('utf-8'))
     return md5.hexdigest()
 
 
@@ -1310,7 +1311,8 @@ def append_data_to_webob_response(response, data):
 
     """
     if getattr(response, 'content_type', None) == 'application/json':
-        response_data = json.loads(response.body)
+        json_input = response.body.decode('utf-8') if isinstance(response.body, bytes) else response.body
+        response_data = json.loads(json_input)
         response_data.update(data)
-        response.body = json.dumps(response_data)
+        response.body = json.dumps(response_data).encode('utf-8')
     return response

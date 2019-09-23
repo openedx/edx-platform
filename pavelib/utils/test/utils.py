@@ -23,7 +23,7 @@ MINIMUM_FIREFOX_VERSION = 28.0
 
 COVERAGE_CACHE_BUCKET = "edx-tools-coverage-caches"
 COVERAGE_CACHE_BASEPATH = "test_root/who_tests_what"
-COVERAGE_CACHE_BASELINE = "who_tests_what.{}.baseline".format(os.environ.get('TEST_SUITE', 'all'))
+COVERAGE_CACHE_BASELINE = "who_tests_what.{}.baseline".format(os.environ.get('WTW_CONTEXT', 'all'))
 WHO_TESTS_WHAT_DIFF = "who_tests_what.diff"
 
 
@@ -131,7 +131,7 @@ def check_firefox_version():
 
     # Firefox will be run as a local process
     expected_firefox_ver = "Mozilla Firefox " + str(MINIMUM_FIREFOX_VERSION)
-    firefox_ver_string = subprocess.check_output("firefox --version", shell=True).strip()
+    firefox_ver_string = subprocess.check_output("firefox --version", shell=True).strip().decode('utf-8')
     firefox_version_regex = re.compile(r"Mozilla Firefox (\d+.\d+)")
     try:
         firefox_ver = float(firefox_version_regex.search(firefox_ver_string).group(1))

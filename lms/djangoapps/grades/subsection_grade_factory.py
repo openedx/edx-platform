@@ -88,10 +88,11 @@ class SubsectionGradeFactory(object):
                 else:
                     orig_subsection_grade = ReadSubsectionGrade(subsection, grade_model, self)
                     if not is_score_higher_or_equal(
-                            orig_subsection_grade.graded_total.earned,
-                            orig_subsection_grade.graded_total.possible,
-                            calculated_grade.graded_total.earned,
-                            calculated_grade.graded_total.possible,
+                        orig_subsection_grade.graded_total.earned,
+                        orig_subsection_grade.graded_total.possible,
+                        calculated_grade.graded_total.earned,
+                        calculated_grade.graded_total.possible,
+                        treat_undefined_as_zero=True,
                     ):
                         return orig_subsection_grade
 

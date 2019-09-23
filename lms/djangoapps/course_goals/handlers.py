@@ -3,9 +3,11 @@ Signal handlers for course goals.
 """
 from __future__ import absolute_import
 
+import six
 from django.db import models
 from django.dispatch import receiver
 
+import six
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment
 
@@ -20,7 +22,7 @@ def update_course_goal_on_enroll_change(sender, instance, **kwargs):  # pylint: 
     1) Set the course goal to 'certify' when the user enrolls as a verified user.
     2) Remove the course goal when the user's enrollment is no longer active.
     """
-    course_id = str(instance.course_id).decode('utf8', 'ignore')
+    course_id = six.text_type(instance.course_id)
     if not instance.is_active:
         remove_course_goal(instance.user, course_id)
     elif instance.mode == CourseMode.VERIFIED:

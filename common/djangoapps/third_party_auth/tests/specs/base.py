@@ -116,7 +116,7 @@ class HelperMixin(object):
     def assert_json_failure_response_is_inactive_account(self, response):
         """Asserts failure on /login for inactive account looks right."""
         self.assertEqual(200, response.status_code)  # Yes, it's a 200 even though it's a failure.
-        payload = json.loads(response.content)
+        payload = json.loads(response.content.decode('utf-8'))
         self.assertFalse(payload.get('success'))
         self.assertIn('In order to sign in, you need to activate your account.', payload.get('value'))
 
@@ -131,14 +131,14 @@ class HelperMixin(object):
     def assert_json_failure_response_is_username_collision(self, response):
         """Asserts the json response indicates a username collision."""
         self.assertEqual(400, response.status_code)
-        payload = json.loads(response.content)
+        payload = json.loads(response.content.decode('utf-8'))
         self.assertFalse(payload.get('success'))
         self.assertIn('belongs to an existing account', payload.get('value'))
 
     def assert_json_success_response_looks_correct(self, response):
         """Asserts the json response indicates success and redirection."""
         self.assertEqual(200, response.status_code)
-        payload = json.loads(response.content)
+        payload = json.loads(response.content.decode('utf-8'))
         self.assertTrue(payload.get('success'))
         self.assertEqual(pipeline.get_complete_url(self.provider.backend_name), payload.get('redirect_url'))
 
@@ -935,7 +935,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
             strategy.request.POST['password'] = 'bad_' + password if success is False else password
 
         self.assert_pipeline_running(strategy.request)
-        payload = json.loads(login_user(strategy.request).content)
+        payload = json.loads(login_user(strategy.request).content.decode('utf-8'))
 
         if success is None:
             # Request malformed -- just one of email/password given.

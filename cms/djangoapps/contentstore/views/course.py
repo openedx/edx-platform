@@ -54,6 +54,7 @@ from contentstore.views.entrance_exam import create_entrance_exam, delete_entran
 from course_action_state.managers import CourseActionStateItemNotFoundError
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from course_creators.views import add_user_with_status_unrequested, get_course_creator_status
+from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
@@ -1045,7 +1046,12 @@ def settings_handler(request, course_key_string):
 
             # see if the ORG of this course can be attributed to a defined configuration . In that case, the
             # course about page should be editable in Studio
-            marketing_site_enabled = configuration_helpers.get_value_for_org(
+            publisher_enabled = configuration_helpers.get_value_for_org(
+                course_module.location.org,
+                'ENABLE_PUBLISHER',
+                settings.FEATURES.get('ENABLE_PUBLISHER', False)
+            )
+            marketing_enabled = configuration_helpers.get_value_for_org(
                 course_module.location.org,
                 'ENABLE_MKTG_SITE',
                 settings.FEATURES.get('ENABLE_MKTG_SITE', False)
@@ -1056,8 +1062,8 @@ def settings_handler(request, course_key_string):
                 settings.FEATURES.get('ENABLE_EXTENDED_COURSE_DETAILS', False)
             )
 
-            about_page_editable = not marketing_site_enabled
-            enrollment_end_editable = GlobalStaff().has_user(request.user) or not marketing_site_enabled
+            about_page_editable = not publisher_enabled
+            enrollment_end_editable = GlobalStaff().has_user(request.user) or not publisher_enabled
             short_description_editable = configuration_helpers.get_value_for_org(
                 course_module.location.org,
                 'EDITABLE_SHORT_DESCRIPTION',
@@ -1065,6 +1071,10 @@ def settings_handler(request, course_key_string):
             )
             sidebar_html_enabled = course_experience_waffle().is_enabled(ENABLE_COURSE_ABOUT_SIDEBAR_HTML)
             # self_paced_enabled = SelfPacedConfiguration.current().enabled
+
+            verified_mode = CourseMode.verified_mode_for_course(course_key)
+            upgrade_deadline = (verified_mode and verified_mode.expiration_datetime and
+                                verified_mode.expiration_datetime.isoformat())
 
             settings_context = {
                 'context_course': course_module,
@@ -1075,6 +1085,7 @@ def settings_handler(request, course_key_string):
                 'video_thumbnail_image_url': course_image_url(course_module, 'video_thumbnail_image'),
                 'details_url': reverse_course_url('settings_handler', course_key),
                 'about_page_editable': about_page_editable,
+                'marketing_enabled': marketing_enabled,
                 'short_description_editable': short_description_editable,
                 'sidebar_html_enabled': sidebar_html_enabled,
                 'upload_asset_url': upload_asset_url,
@@ -1086,7 +1097,8 @@ def settings_handler(request, course_key_string):
                 'enrollment_end_editable': enrollment_end_editable,
                 'is_prerequisite_courses_enabled': is_prerequisite_courses_enabled(),
                 'is_entrance_exams_enabled': is_entrance_exams_enabled(),
-                'enable_extended_course_details': enable_extended_course_details
+                'enable_extended_course_details': enable_extended_course_details,
+                'upgrade_deadline': upgrade_deadline,
             }
             if is_prerequisite_courses_enabled():
                 courses, in_process_course_actions = get_courses_accessible_to_user(request)
@@ -1293,11 +1305,18 @@ def advanced_settings_handler(request, course_key_string):
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user)
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
+            publisher_enabled = configuration_helpers.get_value_for_org(
+                course_module.location.org,
+                'ENABLE_PUBLISHER',
+                settings.FEATURES.get('ENABLE_PUBLISHER', False)
+            )
 
             return render_to_response('settings_advanced.html', {
                 'context_course': course_module,
                 'advanced_dict': CourseMetadata.fetch(course_module),
-                'advanced_settings_url': reverse_course_url('advanced_settings_handler', course_key)
+                'advanced_settings_url': reverse_course_url('advanced_settings_handler', course_key),
+                'publisher_enabled': publisher_enabled,
+
             })
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':
@@ -1350,6 +1369,8 @@ def validate_textbooks_json(text):
     """
     Validate the given text as representing a single PDF textbook
     """
+    if isinstance(text, (bytes, bytearray)):  # data appears as bytes
+        text = text.decode('utf-8')
     try:
         textbooks = json.loads(text)
     except ValueError:
@@ -1370,6 +1391,8 @@ def validate_textbook_json(textbook):
     """
     Validate the given text as representing a list of PDF textbooks
     """
+    if isinstance(textbook, (bytes, bytearray)):  # data appears as bytes
+        textbook = textbook.decode('utf-8')
     if isinstance(textbook, six.string_types):
         try:
             textbook = json.loads(textbook)

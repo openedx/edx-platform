@@ -313,7 +313,7 @@ def save_ccx(request, course, ccx=None):
         return earliest, ccx_ids_to_delete
 
     graded = {}
-    earliest, ccx_ids_to_delete = override_fields(course, json.loads(request.body), graded, [])
+    earliest, ccx_ids_to_delete = override_fields(course, json.loads(request.body.decode('utf8')), graded, [])
     bulk_delete_ccx_override_fields(ccx, ccx_ids_to_delete)
     if earliest:
         override_field_for_ccx(ccx, course, 'start', earliest)
@@ -539,7 +539,7 @@ def ccx_grades_csv(request, course, ccx=None):
                 if not header:
                     # Encode the header row in utf-8 encoding in case there are
                     # unicode characters
-                    header = [section['label'].encode('utf-8')
+                    header = [section['label'].encode('utf-8') if six.PY2 else section['label']
                               for section in course_grade.summary[u'section_breakdown']]
                     rows.append(["id", "email", "username", "grade"] + header)
 

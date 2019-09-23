@@ -8,22 +8,22 @@ import traceback
 
 import laboratory
 import rules
-from bridgekeeper.rules import Rule, EMPTY
-from course_modes.models import CourseMode
+import six
+from bridgekeeper.rules import EMPTY, Rule
 from django.conf import settings
 from django.db.models import Q
 from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from student.models import CourseEnrollment, CourseAccessRole
 from xblock.core import XBlock
+
+from course_modes.models import CourseMode
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from student.models import CourseAccessRole, CourseEnrollment
 from xmodule.course_module import CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
 from xmodule.x_module import XModule
 
-
 from .access import has_access
-
 
 LOG = logging.getLogger(__name__)
 
@@ -112,7 +112,7 @@ class HasStaffAccessToContent(Rule):
             course_key = instance
         elif isinstance(instance, UsageKey):
             course_key = instance.course_key
-        elif isinstance(instance, basestring):
+        elif isinstance(instance, six.string_types):
             course_key = CourseKey.from_string(instance)
 
         return self.filter(user, CourseOverview.objects.filter(id=course_key)).exists()

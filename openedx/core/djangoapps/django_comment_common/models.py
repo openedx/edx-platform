@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_noop
 from jsonfield.fields import JSONField
 from opaque_keys.edx.django.models import CourseKeyField
@@ -126,6 +127,7 @@ class Role(models.Model):
         return Role.objects.filter(course_id=course_id, name__in=role_names, users=user).exists()
 
 
+@python_2_unicode_compatible
 class Permission(models.Model):
     """
     Permissions for django_comment_client
@@ -139,7 +141,7 @@ class Permission(models.Model):
         # use existing table that was originally created from lms.djangoapps.discussion.django_comment_client app
         db_table = 'django_comment_client_permission'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 

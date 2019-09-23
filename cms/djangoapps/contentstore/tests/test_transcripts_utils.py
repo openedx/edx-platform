@@ -873,7 +873,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         Verify that `get_transcript` function returns correct data when transcript is in content store.
         """
         base_filename = 'video_101.srt'
-        self.upload_file(self.create_srt_file(self.subs_srt), self.video.location, base_filename)
+        self.upload_file(self.create_srt_file(self.subs_srt.encode('utf-8')), self.video.location, base_filename)
         self.create_transcript(subs_id, language, base_filename, youtube_id_1_0, html5_sources)
         content, file_name, mimetype = transcripts_utils.get_transcript(
             self.video,
@@ -935,7 +935,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         """
         Verify that `get_transcript` function returns correct exception when transcript content is empty.
         """
-        self.upload_file(self.create_srt_file(''), self.video.location, 'ur_video_101.srt')
+        self.upload_file(self.create_srt_file(b''), self.video.location, 'ur_video_101.srt')
         self.create_transcript('', 'ur', 'ur_video_101.srt')
 
         with self.assertRaises(NotFoundError) as no_content_exception:

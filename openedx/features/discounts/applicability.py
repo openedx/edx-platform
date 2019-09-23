@@ -12,7 +12,7 @@ from __future__ import absolute_import
 
 from datetime import datetime
 
-import crum
+from crum import get_current_request, impersonate
 import pytz
 
 from course_modes.models import CourseMode
@@ -49,8 +49,9 @@ def can_receive_discount(user, course):  # pylint: disable=unused-argument
     can receive a discount.
     """
     # Always disable discounts until we are ready to enable this feature
-    if not DISCOUNT_APPLICABILITY_FLAG.is_enabled():
-        return False
+    with impersonate(user):
+        if not DISCOUNT_APPLICABILITY_FLAG.is_enabled():
+            return False
 
     # TODO: Add additional conditions to return False here
 
@@ -91,13 +92,10 @@ def _is_in_holdback(user):
     if datetime(2020, 8, 1, tzinfo=pytz.UTC) <= datetime.now(tz=pytz.UTC):
         return False
 
-    if not datetime(2019, 8, 1, tzinfo=pytz.UTC) <= user.date_joined <= datetime(2019, 11, 1, tzinfo=pytz.UTC):
-        return False
-
     # Holdback is 50/50
     bucket = stable_bucketing_hash_group(DISCOUNT_APPLICABILITY_HOLDBACK, 2, user.username)
 
-    request = crum.get_current_request()
+    request = get_current_request()
     if hasattr(request, 'session') and DISCOUNT_APPLICABILITY_HOLDBACK not in request.session:
 
         properties = {

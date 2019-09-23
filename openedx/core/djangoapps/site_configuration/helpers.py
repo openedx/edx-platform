@@ -210,7 +210,7 @@ def get_all_orgs():
     This can be used, for example, to do filtering.
 
     Returns:
-        A list of all organizations present in the site configuration.
+        A set of all organizations present in the site configuration.
     """
     # Import is placed here to avoid model import at project startup.
     from openedx.core.djangoapps.site_configuration.models import SiteConfiguration

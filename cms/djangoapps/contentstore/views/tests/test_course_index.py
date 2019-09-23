@@ -142,7 +142,7 @@ class TestCourseIndex(CourseTestCase):
         ItemFactory.create(parent_location=subsection.location, category="video", display_name="My Video")
 
         resp = self.client.get(outline_url, HTTP_ACCEPT='application/json')
-        json_response = json.loads(resp.content)
+        json_response = json.loads(resp.content.decode('utf-8'))
 
         # First spot check some values in the root response
         self.assertEqual(json_response['category'], 'course')
@@ -198,7 +198,7 @@ class TestCourseIndex(CourseTestCase):
         })
         resp = self.client.get(notification_url, HTTP_ACCEPT='application/json')
 
-        json_response = json.loads(resp.content)
+        json_response = json.loads(resp.content.decode('utf-8'))
 
         self.assertEquals(json_response['state'], state)
         self.assertEquals(json_response['action'], action)
@@ -464,7 +464,7 @@ class TestCourseOutline(CourseTestCase):
         outline_url = reverse_course_url('course_handler', self.course.id)
         outline_url = outline_url + '?format=concise' if is_concise else outline_url
         resp = self.client.get(outline_url, HTTP_ACCEPT='application/json')
-        json_response = json.loads(resp.content)
+        json_response = json.loads(resp.content.decode('utf-8'))
 
         # First spot check some values in the root response
         self.assertEqual(json_response['category'], 'course')
@@ -554,7 +554,7 @@ class TestCourseOutline(CourseTestCase):
             [component for component in advanced_modules if component in deprecated_block_types]
         )
 
-        self.assertItemsEqual(info['blocks'], expected_blocks)
+        six.assertCountEqual(self, info['blocks'], expected_blocks)
         self.assertEqual(
             info['advance_settings_url'],
             reverse_course_url('advanced_settings_handler', course_id)

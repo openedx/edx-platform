@@ -179,7 +179,7 @@ class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
 
     def _assert_response(self, response):
         """Check the response from the callback end-point. """
-        content = json.loads(response.content)
+        content = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(content['return_code'], 0)
 
@@ -289,9 +289,13 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
         )
         self._add_course_certificates(count=1, signatory_count=2)
         response = self.client.get(test_url)
-        self.assertIn('awarded this My Platform Site Honor Code Certificate of Completion', response.content)
-        self.assertIn('My Platform Site offers interactive online classes and MOOCs.', response.content)
-        self.assertIn('About My Platform Site', response.content)
+        self.assertIn(
+            'awarded this My Platform Site Honor Code Certificate of Completion', response.content.decode('utf-8')
+        )
+        self.assertIn(
+            'My Platform Site offers interactive online classes and MOOCs.', response.content.decode('utf-8')
+        )
+        self.assertIn('About My Platform Site', response.content.decode('utf-8'))
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_html_view_site_configuration_missing(self):
@@ -301,6 +305,8 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
         )
         self._add_course_certificates(count=1, signatory_count=2)
         response = self.client.get(test_url)
-        self.assertIn('edX', response.content)
-        self.assertNotIn('My Platform Site', response.content)
-        self.assertNotIn('This should not survive being overwritten by static content', response.content)
+        self.assertIn('edX', response.content.decode('utf-8'))
+        self.assertNotIn('My Platform Site', response.content.decode('utf-8'))
+        self.assertNotIn(
+            'This should not survive being overwritten by static content', response.content.decode('utf-8')
+        )

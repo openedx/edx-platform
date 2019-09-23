@@ -1,5 +1,7 @@
+## xss-lint: disable=mako-missing-default
 <%!
 import third_party_auth
+import six
 from third_party_auth import pipeline, provider
 from django.utils.translation import ugettext as _
 from django_countries import countries
@@ -46,6 +48,7 @@ from student.models import UserProfile
 
   <p class="instructions">
     ${_('Create your own {platform_name} account below').format(platform_name=platform_name)}
+    # xss-lint: disable=python-wrap-html
     <span class="note">${_('Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.')}</span>
   </p>
 
@@ -54,6 +57,7 @@ from student.models import UserProfile
 
   <p class="instructions">
     ## Translators: selected_provider is the name of an external, third-party user authentication service (like Google or LinkedIn).
+    # xss-lint: disable=python-wrap-html, python-interpolate-html
     ${_("You've successfully signed in with {selected_provider}.").format(selected_provider='<strong>%s</strong>' % selected_provider)}<br />
     ${_("We just need a little more information before you start learning with {platform_name}.").format(platform_name=settings.PLATFORM_NAME)}
   </p>
@@ -64,6 +68,7 @@ from student.models import UserProfile
 
 <p class="instructions">
   ${_("Please complete the following fields to register for an account. ")}<br />
+  # xss-lint: disable=python-wrap-html
   ${_('Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.')}
 </p>
 
@@ -164,7 +169,7 @@ from student.models import UserProfile
         <select id="country" name="country" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['country'] == 'required' else ''}>
           <option value="">--</option>
           %for code, country_name in countries:
-          <option value="${code}">${ unicode(country_name) }</option>
+          <option value="${code}">${ six.text_type(country_name) }</option>
           %endfor
         </select>
       </div>
@@ -240,7 +245,9 @@ from student.models import UserProfile
       <div class="field required checkbox" id="field-tos">
         <input id="tos-yes" type="checkbox" name="terms_of_service" value="true" required aria-required="true" />
         <label for="tos-yes">${_('I agree to the {link_start}Terms of Service{link_end}').format(
+          # xss-lint: disable=python-wrap-html
           link_start='<a href="{url}" class="new-vp" tabindex="-1">'.format(url=marketing_link('TOS')),
+          # xss-lint: disable=python-wrap-html
           link_end='</a>')}</label>
       </div>
       % endif
@@ -252,7 +259,9 @@ from student.models import UserProfile
           honor_code_path = marketing_link('TOS') + "#honor"
         %>
         <label for="honorcode-yes">${_('I agree to the {link_start}Honor Code{link_end}').format(
+          # xss-lint: disable=python-wrap-html
           link_start='<a href="{url}" class="new-vp" tabindex="-1">'.format(url=honor_code_path),
+          # xss-lint: disable=python-wrap-html
           link_end='</a>')}</label>
       </div>
       % endif

@@ -302,7 +302,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         ])
         self.assertIn(
             js_escaped_string(self.linkedin_url.format(params=urlencode(params))),
-            response.content
+            response.content.decode('utf-8')
         )
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
@@ -319,8 +319,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         test_url = get_certificate_url(course_id=self.cert.course_id, uuid=self.cert.verify_uuid)
         response = self.client.get(test_url, HTTP_HOST='test.localhost')
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Post on Facebook", response.content)
-        self.assertIn('test_facebook_my_site', response.content)
+        self.assertIn("Post on Facebook", response.content.decode('utf-8'))
+        self.assertIn('test_facebook_my_site', response.content.decode('utf-8'))
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     @ddt.data(
@@ -350,9 +350,9 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         ):
             response = self.client.get(test_url, HTTP_HOST='test.localhost')
             self.assertEqual(response.status_code, 200)
-            self.assertEqual("Post on Facebook" in response.content, facebook_sharing)
-            self.assertEqual("Share on Twitter" in response.content, twitter_sharing)
-            self.assertEqual("Add to LinkedIn Profile" in response.content, linkedin_sharing)
+            self.assertEqual("Post on Facebook" in response.content.decode('utf-8'), facebook_sharing)
+            self.assertEqual("Share on Twitter" in response.content.decode('utf-8'), twitter_sharing)
+            self.assertEqual("Add to LinkedIn Profile" in response.content.decode('utf-8'), linkedin_sharing)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_facebook_default_text_site(self):
@@ -500,35 +500,35 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         # Test an item from basic info
         self.assertIn(
             'Terms of Service &amp; Honor Code',
-            response.content
+            response.content.decode('utf-8')
         )
         self.assertIn(
             'Certificate ID Number',
-            response.content
+            response.content.decode('utf-8')
         )
         # Test an item from html cert configuration
         self.assertIn(
             '<a class="logo" href="http://test_site.localhost">',
-            response.content
+            response.content.decode('utf-8')
         )
         # Test an item from course info
         self.assertIn(
             'course_title_0',
-            response.content
+            response.content.decode('utf-8')
         )
         # Test an item from user info
         self.assertIn(
             u"{fullname}, you earned a certificate!".format(fullname=self.user.profile.name),
-            response.content
+            response.content.decode('utf-8')
         )
         # Test an item from social info
         self.assertIn(
             "Post on Facebook",
-            response.content
+            response.content.decode('utf-8')
         )
         self.assertIn(
             "Share on Twitter",
-            response.content
+            response.content.decode('utf-8')
         )
         # Test an item from certificate/org info
         self.assertIn(
@@ -538,22 +538,22 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
                 partner_short_name=short_org_name,
                 partner_long_name=long_org_name,
             ),
-            response.content
+            response.content.decode('utf-8')
         )
         # Test item from badge info
         self.assertIn(
             "Add to Mozilla Backpack",
-            response.content
+            response.content.decode('utf-8')
         )
         # Test item from site configuration
         self.assertIn(
             "http://www.test-site.org/about-us",
-            response.content
+            response.content.decode('utf-8')
         )
         # Test course overrides
         self.assertIn(
             "/static/certificates/images/course_override_logo.png",
-            response.content
+            response.content.decode('utf-8')
         )
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
@@ -564,19 +564,19 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             course_id=six.text_type(self.course.id)
         )
         response = self.client.get(test_url)
-        self.assertIn(str(self.cert.verify_uuid), response.content)
+        self.assertIn(str(self.cert.verify_uuid), response.content.decode('utf-8'))
 
         # Hit any "verified" mode-specific branches
         self.cert.mode = 'verified'
         self.cert.save()
         response = self.client.get(test_url)
-        self.assertIn(str(self.cert.verify_uuid), response.content)
+        self.assertIn(str(self.cert.verify_uuid), response.content.decode('utf-8'))
 
         # Hit any 'xseries' mode-specific branches
         self.cert.mode = 'xseries'
         self.cert.save()
         response = self.client.get(test_url)
-        self.assertIn(str(self.cert.verify_uuid), response.content)
+        self.assertIn(str(self.cert.verify_uuid), response.content.decode('utf-8'))
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_certificate_only_for_downloadable_status(self):
@@ -592,15 +592,15 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
 
         # Validate certificate
         response = self.client.get(test_url)
-        self.assertIn(str(self.cert.verify_uuid), response.content)
+        self.assertIn(str(self.cert.verify_uuid), response.content.decode('utf-8'))
 
         # Change status to 'generating' and validate that Certificate Web View returns "Invalid Certificate"
         self.cert.status = CertificateStatuses.generating
         self.cert.save()
         response = self.client.get(test_url)
-        self.assertIn("Invalid Certificate", response.content)
-        self.assertIn("Cannot Find Certificate", response.content)
-        self.assertIn("We cannot find a certificate with this URL or ID number.", response.content)
+        self.assertIn("Invalid Certificate", response.content.decode('utf-8'))
+        self.assertIn("Cannot Find Certificate", response.content.decode('utf-8'))
+        self.assertIn("We cannot find a certificate with this URL or ID number.", response.content.decode('utf-8'))
 
     @ddt.data(
         (CertificateStatuses.downloadable, True),
@@ -627,12 +627,12 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         response = self.client.get(test_url)
 
         if eligible_for_certificate:
-            self.assertIn(str(self.cert.verify_uuid), response.content)
+            self.assertIn(str(self.cert.verify_uuid), response.content.decode('utf-8'))
         else:
-            self.assertIn("Invalid Certificate", response.content)
-            self.assertIn("Cannot Find Certificate", response.content)
-            self.assertIn("We cannot find a certificate with this URL or ID number.", response.content)
-            self.assertNotIn(str(self.cert.verify_uuid), response.content)
+            self.assertIn("Invalid Certificate", response.content.decode('utf-8'))
+            self.assertIn("Cannot Find Certificate", response.content.decode('utf-8'))
+            self.assertIn("We cannot find a certificate with this URL or ID number.", response.content.decode('utf-8'))
+            self.assertNotIn(str(self.cert.verify_uuid), response.content.decode('utf-8'))
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_html_view_for_invalid_certificate(self):
@@ -647,14 +647,14 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
 
         # Validate certificate
         response = self.client.get(test_url)
-        self.assertIn(str(self.cert.verify_uuid), response.content)
+        self.assertIn(str(self.cert.verify_uuid), response.content.decode('utf-8'))
 
         # invalidate certificate and verify that "Cannot Find Certificate" is returned
         self.cert.invalidate()
         response = self.client.get(test_url)
-        self.assertIn("Invalid Certificate", response.content)
-        self.assertIn("Cannot Find Certificate", response.content)
-        self.assertIn("We cannot find a certificate with this URL or ID number.", response.content)
+        self.assertIn("Invalid Certificate", response.content.decode('utf-8'))
+        self.assertIn("Cannot Find Certificate", response.content.decode('utf-8'))
+        self.assertIn("We cannot find a certificate with this URL or ID number.", response.content.decode('utf-8'))
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_html_lang_attribute_is_dynamic_for_invalid_certificate_html_view(self):
@@ -672,12 +672,12 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         user_language = 'fr'
         self.client.cookies[settings.LANGUAGE_COOKIE] = user_language
         response = self.client.get(test_url)
-        self.assertIn('<html class="no-js" lang="fr">', response.content)
+        self.assertIn('<html class="no-js" lang="fr">', response.content.decode('utf-8'))
 
         user_language = 'ar'
         self.client.cookies[settings.LANGUAGE_COOKIE] = user_language
         response = self.client.get(test_url)
-        self.assertIn('<html class="no-js" lang="ar">', response.content)
+        self.assertIn('<html class="no-js" lang="ar">', response.content.decode('utf-8'))
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_html_lang_attribute_is_dynamic_for_certificate_html_view(self):
@@ -693,12 +693,12 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         user_language = 'fr'
         self.client.cookies[settings.LANGUAGE_COOKIE] = user_language
         response = self.client.get(test_url)
-        self.assertIn('<html class="no-js" lang="fr">', response.content)
+        self.assertIn('<html class="no-js" lang="fr">', response.content.decode('utf-8'))
 
         user_language = 'ar'
         self.client.cookies[settings.LANGUAGE_COOKIE] = user_language
         response = self.client.get(test_url)
-        self.assertIn('<html class="no-js" lang="ar">', response.content)
+        self.assertIn('<html class="no-js" lang="ar">', response.content.decode('utf-8'))
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_html_view_for_non_viewable_certificate_and_for_student_user(self):
@@ -725,9 +725,9 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             course_id=six.text_type(self.course.id)
         )
         response = self.client.get(test_url)
-        self.assertIn("Invalid Certificate", response.content)
-        self.assertIn("Cannot Find Certificate", response.content)
-        self.assertIn("We cannot find a certificate with this URL or ID number.", response.content)
+        self.assertIn("Invalid Certificate", response.content.decode('utf-8'))
+        self.assertIn("Cannot Find Certificate", response.content.decode('utf-8'))
+        self.assertIn("We cannot find a certificate with this URL or ID number.", response.content.decode('utf-8'))
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_with_valid_signatories(self):
@@ -738,11 +738,11 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         )
 
         response = self.client.get(test_url)
-        self.assertIn('course_title_0', response.content)
-        self.assertIn('Signatory_Name 0', response.content)
-        self.assertIn('Signatory_Title 0', response.content)
-        self.assertIn('Signatory_Organization 0', response.content)
-        self.assertIn('/static/certificates/images/demo-sig0.png', response.content)
+        self.assertIn('course_title_0', response.content.decode('utf-8'))
+        self.assertIn('Signatory_Name 0', response.content.decode('utf-8'))
+        self.assertIn('Signatory_Title 0', response.content.decode('utf-8'))
+        self.assertIn('Signatory_Organization 0', response.content.decode('utf-8'))
+        self.assertIn('/static/certificates/images/demo-sig0.png', response.content.decode('utf-8'))
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_course_display_name_not_override_with_course_title(self):
@@ -767,8 +767,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         )
 
         response = self.client.get(test_url)
-        self.assertNotIn('test_course_title_0', response.content)
-        self.assertIn('refundable course', response.content)
+        self.assertNotIn('test_course_title_0', response.content.decode('utf-8'))
+        self.assertIn('refundable course', response.content.decode('utf-8'))
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_course_display_overrides(self):
@@ -789,8 +789,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self.store.update_item(self.course, self.user.id)
 
         response = self.client.get(test_url)
-        self.assertIn('overridden_number', response.content)
-        self.assertIn('overridden_org', response.content)
+        self.assertIn('overridden_number', response.content.decode('utf-8'))
+        self.assertIn('overridden_org', response.content.decode('utf-8'))
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_certificate_view_without_org_logo(self):
@@ -824,8 +824,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             course_id=six.text_type(self.course.id)
         )
         response = self.client.get(test_url)
-        self.assertNotIn('Signatory_Name 0', response.content)
-        self.assertNotIn('Signatory_Title 0', response.content)
+        self.assertNotIn('Signatory_Name 0', response.content.decode('utf-8'))
+        self.assertNotIn('Signatory_Title 0', response.content.decode('utf-8'))
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_is_html_escaped(self):
@@ -852,8 +852,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             course_id=six.text_type(self.course.id)
         )
         response = self.client.get(test_url)
-        self.assertNotIn('<script>', response.content)
-        self.assertIn('&lt;script&gt;course_title&lt;/script&gt;', response.content)
+        self.assertNotIn('<script>', response.content.decode('utf-8'))
+        self.assertIn('&lt;script&gt;course_title&lt;/script&gt;', response.content.decode('utf-8'))
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_DISABLED)
     def test_render_html_view_disabled_feature_flag_returns_static_url(self):
@@ -870,7 +870,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             course_id="missing/course/key"
         )
         response = self.client.get(test_url)
-        self.assertIn('invalid', response.content)
+        self.assertIn('invalid', response.content.decode('utf-8'))
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_invalid_user(self):
@@ -880,7 +880,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             course_id=six.text_type(self.course.id)
         )
         response = self.client.get(test_url)
-        self.assertIn('invalid', response.content)
+        self.assertIn('invalid', response.content.decode('utf-8'))
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_non_int_user(self):
@@ -903,7 +903,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self.assertListEqual(list(GeneratedCertificate.eligible_certificates.all()), [])
 
         response = self.client.get(test_url)
-        self.assertIn('invalid', response.content)
+        self.assertIn('invalid', response.content.decode('utf-8'))
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED, PLATFORM_NAME=u'Űńíćődé Űńívéŕśítӳ')
     def test_render_html_view_with_unicode_platform_name(self):
@@ -932,21 +932,21 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         response = self.client.get(test_url + '?preview=honor')
         # accessing certificate web view in preview mode without
         # staff or instructor access should show invalid certificate
-        self.assertIn('Cannot Find Certificate', response.content)
+        self.assertIn('Cannot Find Certificate', response.content.decode('utf-8'))
 
         CourseStaffRole(self.course.id).add_users(self.user)
 
         response = self.client.get(test_url + '?preview=honor')
         self.assertNotIn(self.course.display_name.encode('utf-8'), response.content)
-        self.assertIn('course_title_0', response.content)
-        self.assertIn('Signatory_Title 0', response.content)
+        self.assertIn('course_title_0', response.content.decode('utf-8'))
+        self.assertIn('Signatory_Title 0', response.content.decode('utf-8'))
 
         # mark certificate inactive but accessing in preview mode.
         self._add_course_certificates(count=1, signatory_count=2, is_active=False)
         response = self.client.get(test_url + '?preview=honor')
         self.assertNotIn(self.course.display_name.encode('utf-8'), response.content)
-        self.assertIn('course_title_0', response.content)
-        self.assertIn('Signatory_Title 0', response.content)
+        self.assertIn('course_title_0', response.content.decode('utf-8'))
+        self.assertIn('Signatory_Title 0', response.content.decode('utf-8'))
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_with_preview_mode_when_user_already_has_cert(self):
@@ -966,8 +966,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         # so let's try to preview in 'verified' mode.
         response = self.client.get(test_url + '?preview=verified')
         self.assertNotIn(self.course.display_name.encode('utf-8'), response.content)
-        self.assertIn('course_title_0', response.content)
-        self.assertIn('Signatory_Title 0', response.content)
+        self.assertIn('course_title_0', response.content.decode('utf-8'))
+        self.assertIn('Signatory_Title 0', response.content.decode('utf-8'))
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     @ddt.data(
@@ -1014,7 +1014,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             course_id=six.text_type(self.course.id)
         )
         response = self.client.get(test_url)
-        self.assertIn("Invalid Certificate", response.content)
+        self.assertIn("Invalid Certificate", response.content.decode('utf-8'))
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_500_view_invalid_certificate_configuration(self):
@@ -1026,7 +1026,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             course_id=six.text_type(self.course.id)
         )
         response = self.client.get(test_url + "?preview=honor")
-        self.assertIn("Invalid Certificate Configuration", response.content)
+        self.assertIn("Invalid Certificate Configuration", response.content.decode('utf-8'))
 
         # Verify that Exception is raised when certificate is not in the preview mode
         with self.assertRaises(Exception):
@@ -1039,7 +1039,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         request_certificate_url = reverse('request_certificate')
         response = self.client.post(request_certificate_url, {'course_id': six.text_type(self.course.id)})
         self.assertEqual(response.status_code, 200)
-        response_json = json.loads(response.content)
+        response_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(CertificateStatuses.notpassing, response_json['add_status'])
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_DISABLED)
@@ -1053,7 +1053,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             with mock_passing_grade():
                 response = self.client.post(request_certificate_url, {'course_id': six.text_type(self.course.id)})
                 self.assertEqual(response.status_code, 200)
-                response_json = json.loads(response.content)
+                response_json = json.loads(response.content.decode('utf-8'))
                 self.assertEqual(CertificateStatuses.generating, response_json['add_status'])
 
     #TEMPLATES WITHOUT LANGUAGE TESTS
@@ -1524,9 +1524,9 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         response = self.client.get(test_url)
         self.assertEqual(response.status_code, 200)
         if include_effort:
-            self.assertIn('hours of effort: 40', response.content)
+            self.assertIn('hours of effort: 40', response.content.decode('utf-8'))
         else:
-            self.assertNotIn('hours of effort', response.content)
+            self.assertNotIn('hours of effort', response.content.decode('utf-8'))
 
     @ddt.data(True, False)
     @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')

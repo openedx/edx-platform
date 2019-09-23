@@ -29,6 +29,7 @@ from lms.djangoapps.certificates.models import (
     certificate_status_for_student
 )
 from lms.djangoapps.certificates.queue import XQueueCertInterface
+from lms.djangoapps.instructor.access import list_with_level
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from util.organizations_helpers import get_course_organization_id
 from xmodule.modulestore.django import modulestore
@@ -172,12 +173,20 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
         forced_grade - a string indicating to replace grade parameter. if present grading
                        will be skipped.
     """
-    xqueue = XQueueCertInterface()
-    if insecure:
-        xqueue.use_https = False
 
     if not course:
         course = modulestore().get_course(course_key, depth=0)
+
+    beta_testers_queryset = list_with_level(course, u'beta')
+
+    if beta_testers_queryset.filter(username=student.username):
+        message = u'Cancelling course certificate generation for user [{}] against course [{}], user is a Beta Tester.'
+        log.info(message.format(course_key, student.username))
+        return
+
+    xqueue = XQueueCertInterface()
+    if insecure:
+        xqueue.use_https = False
 
     generate_pdf = not has_html_certificates_enabled(course)
 

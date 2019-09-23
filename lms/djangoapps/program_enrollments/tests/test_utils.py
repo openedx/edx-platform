@@ -1,10 +1,11 @@
 """
 Unit tests for program_enrollments utils.
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from uuid import uuid4
 
+import ddt
 import pytest
 from django.core.cache import cache
 from organizations.tests.factories import OrganizationFactory
@@ -17,14 +18,15 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from program_enrollments.utils import (
     OrganizationDoesNotExistException,
     ProgramDoesNotExistException,
+    ProviderConfigurationException,
     ProviderDoesNotExistException,
-    UserLookupException,
     get_user_by_program_id
 )
 from student.tests.factories import UserFactory
 from third_party_auth.tests.factories import SAMLProviderConfigFactory
 
 
+@ddt.ddt
 class GetPlatformUserTests(CacheIsolationTestCase):
     """
     Tests for the get_platform_user function
@@ -127,7 +129,8 @@ class GetPlatformUserTests(CacheIsolationTestCase):
         with pytest.raises(ProviderDoesNotExistException):
             get_user_by_program_id(self.external_user_id, self.program_uuid)
 
-    def test_multiple_active_saml_providers(self):
+    @ddt.data(True, False)
+    def test_multiple_saml_providers(self, second_config_enabled):
         """
         If multiple samlprovider records exist with the same organization
         an exception is raised
@@ -138,7 +141,17 @@ class GetPlatformUserTests(CacheIsolationTestCase):
         self.create_social_auth_entry(self.user, provider, self.external_user_id)
 
         # create a second active config for the same organization
-        SAMLProviderConfigFactory.create(organization=organization, slug='foox')
+        SAMLProviderConfigFactory.create(
+            organization=organization, slug='foox', enabled=second_config_enabled
+        )
 
-        with pytest.raises(UserLookupException):
+        try:
             get_user_by_program_id(self.external_user_id, self.program_uuid)
+        except ProviderConfigurationException:
+            self.assertTrue(
+                second_config_enabled, 'Unexpected error when second config is disabled'
+            )
+        else:
+            self.assertFalse(
+                second_config_enabled, 'Expected error was not raised when second config is enabled'
+            )

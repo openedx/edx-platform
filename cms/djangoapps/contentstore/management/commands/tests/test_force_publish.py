@@ -29,7 +29,11 @@ class TestForcePublish(SharedModuleStoreTestCase):
         """
         Test 'force_publish' command with no arguments
         """
-        errstring = "Error: too few arguments"
+        if six.PY2:
+            errstring = "Error: too few arguments"
+        else:
+            errstring = "Error: the following arguments are required: course_key"
+
         with self.assertRaisesRegexp(CommandError, errstring):
             call_command('force_publish')
 

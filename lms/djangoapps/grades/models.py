@@ -20,6 +20,7 @@ import six
 from django.apps import apps
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from lazy import lazy
 from model_utils.models import TimeStampedModel
@@ -28,7 +29,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from simple_history.models import HistoricalRecords
 from six.moves import map
 
-from coursewarehistoryextended.fields import UnsignedBigIntAutoField, UnsignedBigIntOneToOneField
+from courseware.fields import UnsignedBigIntAutoField, UnsignedBigIntOneToOneField
 from lms.djangoapps.grades import constants, events
 from openedx.core.lib.cache_utils import get_cache
 
@@ -79,7 +80,7 @@ class BlockRecordList(object):
         supported by adding a label indicated which algorithm was used, e.g.,
         "sha256$j0NDRmSPa5bfid2pAcUXaxCm2Dlh3TwayItZstwyeqQ=".
         """
-        return b64encode(sha1(self.json_value).digest())
+        return b64encode(sha1(self.json_value.encode('utf-8')).digest()).decode('utf-8')
 
     @lazy
     def json_value(self):
@@ -128,6 +129,7 @@ class BlockRecordList(object):
         return cls(blocks, course_key)
 
 
+@python_2_unicode_compatible
 class VisibleBlocks(models.Model):
     """
     A django model used to track the state of a set of visible blocks under a
@@ -148,7 +150,7 @@ class VisibleBlocks(models.Model):
     class Meta(object):
         app_label = "grades"
 
-    def __unicode__(self):
+    def __str__(self):
         """
         String representation of this model.
         """
@@ -436,6 +438,13 @@ class PersistentSubsectionGrade(TimeStampedModel):
             usage_key=usage_key,
             defaults=params,
         )
+
+        # TODO: Remove as part of EDUCATOR-4602.
+        if str(usage_key.course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+            log.info(u'Created/updated grade ***{}*** for user ***{}*** in course ***{}***'
+                     u'for subsection ***{}*** with default params ***{}***'
+                     .format(grade, user_id, usage_key.course_key, usage_key, params))
+
         grade.override = PersistentSubsectionGradeOverride.get_override(user_id, usage_key)
         if first_attempted is not None and grade.first_attempted is None:
             grade.first_attempted = first_attempted
@@ -717,10 +726,21 @@ class PersistentSubsectionGradeOverride(models.Model):
         grade_defaults = cls._prepare_override_params(subsection_grade_model, override_data)
         grade_defaults['override_reason'] = override_data['comment'] if 'comment' in override_data else None
         grade_defaults['system'] = override_data['system'] if 'system' in override_data else None
+
+        # TODO: Remove as part of EDUCATOR-4602.
+        if str(subsection_grade_model.course_id) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+            log.info(u'Creating override for user ***{}*** for PersistentSubsectionGrade'
+                     u'***{}*** with override data ***{}*** and derived grade_defaults ***{}***.'
+                     .format(requesting_user, subsection_grade_model, override_data, grade_defaults))
         override, _ = PersistentSubsectionGradeOverride.objects.update_or_create(
             grade=subsection_grade_model,
             defaults=grade_defaults,
         )
+
+        override_history_entry = override.history.first()
+        if not override_history_entry.history_user and requesting_user:
+            override_history_entry.history_user = requesting_user
+            override_history_entry.save()
 
         action = action or PersistentSubsectionGradeOverrideHistory.CREATE_OR_UPDATE
 

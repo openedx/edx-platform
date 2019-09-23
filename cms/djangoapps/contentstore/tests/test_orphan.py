@@ -93,7 +93,7 @@ class TestOrphan(TestOrphanBase):
             self.client.get(
                 orphan_url,
                 HTTP_ACCEPT='application/json'
-            ).content
+            ).content.decode('utf-8')
         )
         self.assertEqual(len(orphans), 3, u"Wrong # {}".format(orphans))
         location = course.location.replace(category='chapter', name='OrphanChapter')
@@ -119,7 +119,7 @@ class TestOrphan(TestOrphanBase):
             self.client.delete(orphan_url)
 
         orphans = json.loads(
-            self.client.get(orphan_url, HTTP_ACCEPT='application/json').content
+            self.client.get(orphan_url, HTTP_ACCEPT='application/json').content.decode('utf-8')
         )
         self.assertEqual(len(orphans), 0, u"Orphans not deleted {}".format(orphans))
 

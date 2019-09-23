@@ -28,9 +28,9 @@ python-dateutil==2.8.0    # via matplotlib
 pytz==2019.2              # via matplotlib
 scipy==0.14.0
 singledispatch==3.4.0.3
-six==1.11.0
+six==1.12.0
 subprocess32==3.5.4       # via matplotlib
 sympy==0.7.1
 
 # The following packages are considered to be unsafe in a requirements file:
-# setuptools==41.0.1        # via kiwisolver
+# setuptools==41.2.0        # via kiwisolver

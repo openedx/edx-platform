@@ -57,7 +57,7 @@ class PaymentFakeViewTest(TestCase):
 
         # Expect that we were served the payment page
         # (not the error page)
-        self.assertIn("Payment Form", resp.content)
+        self.assertIn("Payment Form", resp.content.decode('utf-8'))
 
     def test_rejects_invalid_signature(self):
 
@@ -74,7 +74,7 @@ class PaymentFakeViewTest(TestCase):
         )
 
         # Expect that we got an error
-        self.assertIn("Error", resp.content)
+        self.assertIn("Error", resp.content.decode('utf-8'))
 
     def test_sends_valid_signature(self):
 
@@ -95,7 +95,6 @@ class PaymentFakeViewTest(TestCase):
 
         # Generate shoppingcart signatures
         post_params = sign(self.client_post_params)
-
         # Configure the view to declined payments
         resp = self.client.put(
             '/shoppingcart/payment_fake',

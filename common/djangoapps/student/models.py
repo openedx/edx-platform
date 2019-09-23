@@ -40,6 +40,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from django_countries.fields import CountryField
+from django.utils.encoding import python_2_unicode_compatible
 from edx_django_utils.cache import RequestCache
 from edx_rest_api_client.exceptions import SlumberBaseException
 from eventtracking import tracker
@@ -162,8 +163,8 @@ def anonymous_id_for_user(user, course_id, save=True):
 
     # include the secret key as a salt, and to make the ids unique across different LMS installs.
     hasher = hashlib.md5()
-    hasher.update(settings.SECRET_KEY)
-    hasher.update(text_type(user.id))
+    hasher.update(settings.SECRET_KEY.encode('utf8'))
+    hasher.update(text_type(user.id).encode('utf8'))
     if course_id:
         hasher.update(text_type(course_id).encode('utf-8'))
     digest = hasher.hexdigest()
@@ -2813,6 +2814,7 @@ class RegistrationCookieConfiguration(ConfigurationModel):
         )
 
 
+@python_2_unicode_compatible
 class UserAttribute(TimeStampedModel):
     """
     Record additional metadata about a user, stored as key/value pairs of text.
@@ -2828,12 +2830,11 @@ class UserAttribute(TimeStampedModel):
     name = models.CharField(max_length=255, help_text=_("Name of this user attribute."), db_index=True)
     value = models.CharField(max_length=255, help_text=_("Value of this user attribute."))
 
-    def __unicode__(self):
-        """Unicode representation of this attribute. """
-        return u"[{username}] {name}: {value}".format(
+    def __str__(self):
+        return "[{username}] {name}: {value}".format(
             name=self.name,
             value=self.value,
-            username=self.user.username,
+            username=self.user.username
         )
 
     @classmethod

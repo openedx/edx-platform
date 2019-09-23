@@ -18,6 +18,7 @@ import json
 import logging
 
 import six
+from django.utils.encoding import python_2_unicode_compatible
 from config_models.models import ConfigurationModel
 from django.core.cache import cache
 from django.db import models
@@ -101,6 +102,7 @@ class EmbargoedState(ConfigurationModel):
         return self.embargoed_countries
 
 
+@python_2_unicode_compatible
 class RestrictedCourse(models.Model):
     """
     Course with access restrictions.
@@ -267,7 +269,7 @@ class RestrictedCourse(models.Model):
         elif access_point == 'courseware':
             return self.access_msg_key
 
-    def __unicode__(self):
+    def __str__(self):
         return six.text_type(self.course_key)
 
     @classmethod

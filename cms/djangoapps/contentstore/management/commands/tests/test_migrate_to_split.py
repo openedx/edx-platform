@@ -3,6 +3,8 @@ Unittests for migrating a course to split mongo
 """
 from __future__ import absolute_import
 
+import six
+
 from django.core.management import CommandError, call_command
 from django.test import TestCase
 
@@ -24,7 +26,10 @@ class TestArgParsing(TestCase):
         """
         Test the arg length error
         """
-        errstring = "Error: too few arguments"
+        if six.PY2:
+            errstring = "Error: too few arguments"
+        else:
+            errstring = "Error: the following arguments are required: course_key, email"
         with self.assertRaisesRegexp(CommandError, errstring):
             call_command("migrate_to_split")
 

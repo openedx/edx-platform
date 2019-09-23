@@ -20,6 +20,7 @@ from six import text_type
 from six.moves import range, zip
 from six.moves.html_parser import HTMLParser  # pylint: disable=import-error
 
+from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
@@ -125,7 +126,7 @@ def save_subs_to_store(subs, subs_id, item, language='en'):
 
     Returns: location of saved subtitles.
     """
-    filedata = json.dumps(subs, indent=2)
+    filedata = json.dumps(subs, indent=2).encode('utf-8')
     filename = subs_filename(subs_id, language)
     return save_to_store(filedata, filename, 'application/json', item.location)
 
@@ -144,7 +145,7 @@ def youtube_video_transcript_name(youtube_text_api):
     # http://video.google.com/timedtext?type=list&v={VideoId}
     youtube_response = requests.get('http://' + youtube_text_api['url'], params=transcripts_param)
     if youtube_response.status_code == 200 and youtube_response.text:
-        youtube_data = etree.fromstring(youtube_response.content, parser=utf8_parser)
+        youtube_data = etree.fromstring(youtube_response.content.encode('utf-8'), parser=utf8_parser)
         # iterate all transcripts information from youtube server
         for element in youtube_data:
             # search specific language code such as 'en' in transcripts info list
@@ -184,7 +185,7 @@ def get_transcripts_from_youtube(youtube_id, settings, i18n, youtube_transcript_
         raise GetTranscriptsFromYouTubeException(msg)
 
     sub_starts, sub_ends, sub_texts = [], [], []
-    xmltree = etree.fromstring(data.content, parser=utf8_parser)
+    xmltree = etree.fromstring(data.content.encode('utf-8'), parser=utf8_parser)
     for element in xmltree:
         if element.tag == "text":
             start = float(element.get("start"))
@@ -624,13 +625,13 @@ class Transcript(object):
     """
     Container for transcript methods.
     """
-    SRT = 'srt'
-    TXT = 'txt'
-    SJSON = 'sjson'
+    SRT = u'srt'
+    TXT = u'txt'
+    SJSON = u'sjson'
     mime_types = {
-        SRT: 'application/x-subrip; charset=utf-8',
-        TXT: 'text/plain; charset=utf-8',
-        SJSON: 'application/json',
+        SRT: u'application/x-subrip; charset=utf-8',
+        TXT: u'text/plain; charset=utf-8',
+        SJSON: u'application/json',
     }
 
     @staticmethod
@@ -1016,6 +1017,12 @@ def get_transcript(video, lang=None, output_format=Transcript.SRT, youtube_id=No
             raise NotFoundError
         return get_transcript_from_val(edx_video_id, lang, output_format)
     except NotFoundError:
+        # If this is not in a modulestore course or library, don't try loading from contentstore:
+        if not isinstance(video.scope_ids.usage_id.course_key, (CourseLocator, LibraryLocator)):
+            raise NotFoundError(
+                u'Video transcripts cannot yet be loaded from Blockstore (block: {})'.format(video.scope_ids.usage_id),
+            )
+
         return get_transcript_from_contentstore(
             video,
             lang,

@@ -2,9 +2,12 @@
 Courseware views functions
 """
 from __future__ import absolute_import
+from __future__ import division
 
 import json
 import logging
+import requests
+from requests.exceptions import Timeout, ConnectionError
 from collections import OrderedDict, namedtuple
 from datetime import datetime
 
@@ -39,6 +42,9 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from pytz import UTC
 from rest_framework import status
+from rest_framework.decorators import api_view, throttle_classes
+from rest_framework.response import Response
+from rest_framework.throttling import UserRateThrottle
 from six import text_type
 from web_fragments.fragment import Fragment
 
@@ -94,6 +100,7 @@ from openedx.core.djangoapps.programs.utils import ProgramMarketingDataExtender
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
+from openedx.core.djangoapps.zendesk_proxy.utils import create_zendesk_ticket
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from openedx.features.course_experience import (
@@ -112,7 +119,7 @@ from track import segment
 from util.cache import cache, cache_if_anonymous
 from util.db import outer_atomic
 from util.milestones_helpers import get_prerequisite_courses_display
-from util.views import _record_feedback_in_zendesk, ensure_valid_course_key, ensure_valid_usage_key
+from util.views import ensure_valid_course_key, ensure_valid_usage_key
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
@@ -256,6 +263,55 @@ def courses(request):
     )
 
 
+class PerUserVideoMetadataThrottle(UserRateThrottle):
+    """
+    setting rate limit for  yt_video_metadata API
+    """
+    rate = settings.RATE_LIMIT_FOR_VIDEO_METADATA_API
+
+
+@ensure_csrf_cookie
+@login_required
+@api_view(['GET'])
+@throttle_classes([PerUserVideoMetadataThrottle])
+def yt_video_metadata(request):
+    """
+    Will hit the youtube API if the key is available in settings
+    :return: youtube video metadata
+    """
+    response = {}
+    status_code = 500
+    video_id = request.GET.get('id', None)
+    if settings.YOUTUBE_API_KEY and video_id:
+        yt_api_key = settings.YOUTUBE_API_KEY
+        yt_metadata_url = settings.YOUTUBE['METADATA_URL']
+        yt_timeout = settings.YOUTUBE.get('TEST_TIMEOUT', 1500) / 1000  # converting milli seconds to seconds
+        payload = {'id': video_id, 'part': 'contentDetails', 'key': yt_api_key}
+        try:
+            res = requests.get(yt_metadata_url, params=payload, timeout=yt_timeout)
+            status_code = res.status_code
+            if res.status_code == 200:
+                try:
+                    res = res.json()
+                    if res.get('items', []):
+                        response = res
+                    else:
+                        logging.warning(u'Unable to find the items in response. Following response '
+                                        u'was received: {res}'.format(res=res.text))
+                except ValueError:
+                    logging.warning(u'Unable to decode response to json. Following response '
+                                    u'was received: {res}'.format(res=res.text))
+            else:
+                logging.warning(u'YouTube API request failed with status code={status} - '
+                                u'Error message is={message}'.format(status=status_code, message=res.text))
+        except (Timeout, ConnectionError):
+            logging.warning(u'YouTube API request failed because of connection time out or connection error')
+    else:
+        logging.warning(u'YouTube API key or video id is None. Please make sure API key and video id is not None')
+
+    return Response(response, status=status_code, content_type='application/json')
+
+
 @ensure_csrf_cookie
 @ensure_valid_course_key
 def jump_to_id(request, course_id, module_id):
@@ -287,9 +343,7 @@ def jump_to_id(request, course_id, module_id):
 def jump_to(_request, course_id, location):
     """
     Show the page that contains a specific location.
-
     If the location is invalid or not in any class, return a 404.
-
     Otherwise, delegates to the index view to figure out whether this user
     has access, and what they should see.
     """
@@ -314,7 +368,6 @@ def jump_to(_request, course_id, location):
 def course_info(request, course_id):
     """
     Display the course's info.html, or 404 if there is no such course.
-
     Assumes the course_id is in a valid format.
     """
     # TODO: LEARNER-611: This can be deleted with Course Info removal.  The new
@@ -709,7 +762,6 @@ class CourseTabView(EdxFragmentView):
 def syllabus(request, course_id):
     """
     Display the course's syllabus.html, or 404 if there is no such course.
-
     Assumes the course_id is in a valid format.
     """
 
@@ -739,15 +791,12 @@ def registered_for_course(course, user):
 class EnrollStaffView(View):
     """
     Displays view for registering in the course to a global staff user.
-
     User can either choose to 'Enroll' or 'Don't Enroll' in the course.
       Enroll: Enrolls user in course and redirects to the courseware.
       Don't Enroll: Redirects user to course about page.
-
     Arguments:
      - request    : HTTP request
      - course_id  : course id
-
     Returns:
      - RedirectResponse
     """
@@ -978,9 +1027,7 @@ def progress(request, course_id, student_id=None):
 def _progress(request, course_key, student_id):
     """
     Unwrapped version of "progress".
-
     User progress. We show the grade bar and every problem score.
-
     Course staff are allowed to see the progress of students in their class.
     """
 
@@ -1109,13 +1156,11 @@ def _certificate_message(student, course, enrollment_mode):
 
 def _get_cert_data(student, course, enrollment_mode, course_grade=None):
     """Returns students course certificate related data.
-
     Arguments:
         student (User): Student for whom certificate to retrieve.
         course (Course): Course object for which certificate data to retrieve.
         enrollment_mode (String): Course mode in which student is enrolled.
         course_grade (CourseGrade): Student's course grade record.
-
     Returns:
         returns dict if course certificate is available else None.
     """
@@ -1134,14 +1179,11 @@ def _get_cert_data(student, course, enrollment_mode, course_grade=None):
 
 def _credit_course_requirements(course_key, student):
     """Return information about which credit requirements a user has satisfied.
-
     Arguments:
         course_key (CourseKey): Identifier for the course.
         student (User): Currently logged in user.
-
     Returns: dict if the credit eligibility enabled and it is a credit course
     and the user is enrolled in either verified or credit mode, and None otherwise.
-
     """
     # If credit eligibility is not enabled or this is not a credit course,
     # short-circuit and return `None`.  This indicates that credit requirements
@@ -1198,7 +1240,6 @@ def _course_home_redirect_enabled():
     """
     Return True value if user needs to be redirected to course home based on value of
     `ENABLE_MKTG_SITE` and `ENABLE_COURSE_HOME_REDIRECT feature` flags
-
     Returns: boolean True or False
     """
     if configuration_helpers.get_value(
@@ -1318,16 +1359,13 @@ def get_static_tab_fragment(request, course, tab):
 def get_course_lti_endpoints(request, course_id):
     """
     View that, given a course_id, returns the a JSON object that enumerates all of the LTI endpoints for that course.
-
     The LTI 2.0 result service spec at
     http://www.imsglobal.org/lti/ltiv2p0/uml/purl.imsglobal.org/vocab/lis/v2/outcomes/Result/service.html
     says "This specification document does not prescribe a method for discovering the endpoint URLs."  This view
     function implements one way of discovering these endpoints, returning a JSON array when accessed.
-
     Arguments:
         request (django request object):  the HTTP request object that triggered this view function
         course_id (unicode):  id associated with the course
-
     Returns:
         (django response object):  HTTP response.  404 if course is not found, otherwise 200 with JSON body.
     """
@@ -1404,12 +1442,10 @@ def course_survey(request, course_id):
 def is_course_passed(student, course, course_grade=None):
     """
     check user's course passing status. return True if passed
-
     Arguments:
         student : user object
         course : course object
         course_grade (CourseGrade) : contains student grade details.
-
     Returns:
         returns bool value
     """
@@ -1423,24 +1459,19 @@ def is_course_passed(student, course, course_grade=None):
 @require_POST
 def generate_user_cert(request, course_id):
     """Start generating a new certificate for the user.
-
     Certificate generation is allowed if:
     * The user has passed the course, and
     * The user does not already have a pending/completed certificate.
-
     Note that if an error occurs during certificate generation
     (for example, if the queue is down), then we simply mark the
     certificate generation task status as "error" and re-run
     the task with a management command.  To students, the certificate
     will appear to be "generating" until it is re-run.
-
     Args:
         request (HttpRequest): The POST request to this view.
         course_id (unicode): The identifier for the course.
-
     Returns:
         HttpResponse: 200 on success, 400 if a new certificate cannot be generated.
-
     """
 
     if not request.user.is_authenticated:
@@ -1491,13 +1522,11 @@ def generate_user_cert(request, course_id):
 def _track_successful_certificate_generation(user_id, course_id):
     """
     Track a successful certificate generation event.
-
     Arguments:
         user_id (str): The ID of the user generating the certificate.
         course_id (CourseKey): Identifier for the course.
     Returns:
         None
-
     """
     event_name = 'edx.bi.user.certificate.generate'
     segment.track(user_id, event_name, {
@@ -1604,7 +1633,7 @@ def financial_assistance(_request):
 def financial_assistance_request(request):
     """Submit a request for financial assistance to Zendesk."""
     try:
-        data = json.loads(request.body)
+        data = json.loads(request.body.decode('utf8'))
         # Simple sanity check that the session belongs to the user
         # submitting an FA request
         username = data['username']
@@ -1632,7 +1661,7 @@ def financial_assistance_request(request):
         # Thrown if fields are missing
         return HttpResponseBadRequest(u'The field {} is required.'.format(text_type(err)))
 
-    zendesk_submitted = _record_feedback_in_zendesk(
+    zendesk_submitted = create_zendesk_ticket(
         legal_name,
         email,
         u'Financial assistance request for learner {username} in course {course_name}'.format(
@@ -1640,12 +1669,12 @@ def financial_assistance_request(request):
             course_name=course.display_name
         ),
         u'Financial Assistance Request',
-        {'course_id': course_id},
+        tags={'course_id': course_id},
         # Send the application as additional info on the ticket so
         # that it is not shown when support replies. This uses
         # OrderedDict so that information is presented in the right
         # order.
-        OrderedDict((
+        additional_info=OrderedDict((
             ('Username', username),
             ('Full Name', legal_name),
             ('Course ID', course_id),
@@ -1657,11 +1686,9 @@ def financial_assistance_request(request):
             (FA_EFFORT_LABEL, '\n' + effort + '\n\n'),
             ('Client IP', ip_address),
         )),
-        group_name='Financial Assistance',
-        require_update=True
+        group='Financial Assistance',
     )
-
-    if not zendesk_submitted:
+    if not (zendesk_submitted == 200 or zendesk_submitted == 201):
         # The call to Zendesk failed. The frontend will display a
         # message to the user.
         return HttpResponse(status=status.HTTP_500_INTERNAL_SERVER_ERROR)

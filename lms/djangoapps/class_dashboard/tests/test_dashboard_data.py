@@ -176,8 +176,8 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
         request = self.request_factory.get(reverse('get_students_problem_grades') + attributes)
 
         response = get_students_problem_grades(request)
-        response_content = json.loads(response.content)['results']
-        response_max_exceeded = json.loads(response.content)['max_exceeded']
+        response_content = json.loads(response.content.decode('utf-8'))['results']
+        response_max_exceeded = json.loads(response.content.decode('utf-8'))['max_exceeded']
 
         self.assertEquals(USER_COUNT, len(response_content))
         self.assertEquals(False, response_max_exceeded)
@@ -194,8 +194,8 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
             request = self.request_factory.get(reverse('get_students_problem_grades') + attributes)
 
             response = get_students_problem_grades(request)
-            response_results = json.loads(response.content)['results']
-            response_max_exceeded = json.loads(response.content)['max_exceeded']
+            response_results = json.loads(response.content.decode('utf-8'))['results']
+            response_max_exceeded = json.loads(response.content.decode('utf-8'))['max_exceeded']
 
             # Only 2 students in the list and response_max_exceeded is True
             self.assertEquals(2, len(response_results))
@@ -228,8 +228,8 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
         request = self.request_factory.get(reverse('get_students_opened_subsection') + attributes)
 
         response = get_students_opened_subsection(request)
-        response_results = json.loads(response.content)['results']
-        response_max_exceeded = json.loads(response.content)['max_exceeded']
+        response_results = json.loads(response.content.decode('utf-8'))['results']
+        response_max_exceeded = json.loads(response.content.decode('utf-8'))['max_exceeded']
         self.assertEquals(USER_COUNT, len(response_results))
         self.assertEquals(False, response_max_exceeded)
 
@@ -241,8 +241,8 @@ class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
             request = self.request_factory.get(reverse('get_students_opened_subsection') + attributes)
 
             response = get_students_opened_subsection(request)
-            response_results = json.loads(response.content)['results']
-            response_max_exceeded = json.loads(response.content)['max_exceeded']
+            response_results = json.loads(response.content.decode('utf-8'))['results']
+            response_max_exceeded = json.loads(response.content.decode('utf-8'))['max_exceeded']
 
             # Only 2 students in the list and response_max_exceeded is True
             self.assertEquals(2, len(response_results))

@@ -273,7 +273,7 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
 
         self.assertEqual(response.status_code, 200)
 
-        schedule = json.loads(response.content)['schedule']
+        schedule = json.loads(response.content.decode('utf-8'))['schedule']
         self.assertEqual(schedule[0]['hidden'], False)
         self.assertEqual(schedule[0]['start'], start)
         self.assertEqual(schedule[0]['children'][0]['start'], start)
@@ -346,7 +346,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(re.search(
             '<form action=".+create_ccx"',
-            response.content))
+            response.content.decode('utf-8')))
 
     def test_create_ccx_with_ccx_connector_set(self):
         """
@@ -365,7 +365,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
             "A CCX can only be created on this course through an external service."
             " Contact a course admin to give you access."
         )
-        self.assertTrue(re.search(error_message, response.content))
+        self.assertTrue(re.search(error_message, response.content.decode('utf-8')))
 
     def test_create_ccx(self, ccx_name='New CCX'):
         """
@@ -392,7 +392,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         course_key = CourseKey.from_string(ccx_key)
 
         self.assertTrue(CourseEnrollment.is_enrolled(self.coach, course_key))
-        self.assertTrue(re.search('id="ccx-schedule"', response.content))
+        self.assertTrue(re.search('id="ccx-schedule"', response.content.decode('utf-8')))
 
         # check if the max amount of student that can be enrolled has been overridden
         ccx = CustomCourseForEdX.objects.get()
@@ -519,7 +519,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
             url, json.dumps(schedule), content_type='application/json'
         )
 
-        schedule = json.loads(response.content)['schedule']
+        schedule = json.loads(response.content.decode('utf-8'))['schedule']
         self.assertEqual(schedule[0]['hidden'], False)
         self.assertEqual(schedule[0]['start'], u'2014-11-20 00:00')
         self.assertEqual(
@@ -1104,9 +1104,8 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
             response['content-disposition'],
             'attachment'
         )
-        rows = response.content.strip().split('\r')
+        rows = response.content.decode('utf-8').strip().split('\r')
         headers = rows[0]
-
         # picking first student records
         data = dict(list(zip(headers.strip().split(','), rows[1].strip().split(','))))
         self.assertNotIn('HW 04', data)
@@ -1276,7 +1275,7 @@ class TestStudentViewsWithCCX(ModuleStoreTestCase):
         self.client.login(username=self.student.username, password=self.student_password)
         response = self.client.get(reverse('dashboard'))
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(re.search('Test CCX', response.content))
+        self.assertTrue(re.search('Test CCX', response.content.decode('utf-8')))
 
     def test_load_courseware(self):
         self.client.login(username=self.student.username, password=self.student_password)

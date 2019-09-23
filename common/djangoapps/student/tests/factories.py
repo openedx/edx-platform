@@ -135,7 +135,7 @@ class CourseEnrollmentFactory(DjangoModelFactory):
     def _create(cls, model_class, *args, **kwargs):
         manager = cls._get_manager(model_class)
         course_kwargs = {}
-        for key in kwargs.keys():
+        for key in list(kwargs):
             if key.startswith('course__'):
                 course_kwargs[key.split('__')[1]] = kwargs.pop(key)
 

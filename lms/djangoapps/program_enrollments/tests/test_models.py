@@ -6,18 +6,19 @@ from __future__ import absolute_import, unicode_literals
 from uuid import uuid4
 
 import ddt
+import mock
+from django.db.utils import IntegrityError
 from django.test import TestCase
+from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.keys import CourseKey
-from six.moves import range
 from testfixtures import LogCapture
 
 from course_modes.models import CourseMode
-from edx_django_utils.cache import RequestCache
-from lms.djangoapps.program_enrollments.models import ProgramEnrollment, ProgramCourseEnrollment
-from student.models import CourseEnrollment
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 from openedx.core.djangoapps.catalog.tests.factories import generate_course_run_key
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from student.models import CourseEnrollment, NonExistentCourseError
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 
 class ProgramEnrollmentModelTests(TestCase):
@@ -32,58 +33,45 @@ class ProgramEnrollmentModelTests(TestCase):
         self.user = UserFactory.create()
         self.program_uuid = uuid4()
         self.other_program_uuid = uuid4()
+        self.curriculum_uuid = uuid4()
         self.enrollment = ProgramEnrollment.objects.create(
             user=self.user,
             external_user_key='abc',
             program_uuid=self.program_uuid,
-            curriculum_uuid=uuid4(),
+            curriculum_uuid=self.curriculum_uuid,
             status='enrolled'
         )
 
-    def test_bulk_read_by_student_key(self):
-        curriculum_a = uuid4()
-        curriculum_b = uuid4()
-        enrollments = []
-        student_data = {}
-
-        for i in range(5):
-            # This will give us 4 program enrollments for self.program_uuid
-            # and 1 enrollment for self.other_program_uuid
-            user_curriculum = curriculum_b if i % 2 else curriculum_a
-            user_status = 'pending' if i % 2 else 'enrolled'
-            user_program = self.other_program_uuid if i == 4 else self.program_uuid
-            user_key = 'student-{}'.format(i)
-            enrollments.append(
-                ProgramEnrollment.objects.create(
-                    user=None,
-                    external_user_key=user_key,
-                    program_uuid=user_program,
-                    curriculum_uuid=user_curriculum,
-                    status=user_status,
-                )
+    def test_unique_external_key_program_curriculum(self):
+        """
+        A record with the same (external_user_key, program_uuid, curriculum_uuid) cannot be duplicated.
+        """
+        with self.assertRaises(IntegrityError):
+            _ = ProgramEnrollment.objects.create(
+                user=None,
+                external_user_key='abc',
+                program_uuid=self.program_uuid,
+                curriculum_uuid=self.curriculum_uuid,
+                status='pending',
             )
-            student_data[user_key] = {'curriculum_uuid': user_curriculum}
 
-        enrollment_records = ProgramEnrollment.bulk_read_by_student_key(self.program_uuid, student_data)
-
-        expected = {
-            'student-0': {'curriculum_uuid': curriculum_a, 'status': 'enrolled', 'program_uuid': self.program_uuid},
-            'student-1': {'curriculum_uuid': curriculum_b, 'status': 'pending', 'program_uuid': self.program_uuid},
-            'student-2': {'curriculum_uuid': curriculum_a, 'status': 'enrolled', 'program_uuid': self.program_uuid},
-            'student-3': {'curriculum_uuid': curriculum_b, 'status': 'pending', 'program_uuid': self.program_uuid},
-        }
-        assert expected == {
-            enrollment.external_user_key: {
-                'curriculum_uuid': enrollment.curriculum_uuid,
-                'status': enrollment.status,
-                'program_uuid': enrollment.program_uuid,
-            }
-            for enrollment in enrollment_records
-        }
+    def test_unique_user_program_curriculum(self):
+        """
+        A record with the same (user, program_uuid, curriculum_uuid) cannot be duplicated.
+        """
+        with self.assertRaises(IntegrityError):
+            _ = ProgramEnrollment.objects.create(
+                user=self.user,
+                external_user_key=None,
+                program_uuid=self.program_uuid,
+                curriculum_uuid=self.curriculum_uuid,
+                status='suspended',
+            )
 
     def test_user_retirement(self):
         """
-        Test that the external_user_key is successfully retired for a user's program enrollments and history.
+        Test that the external_user_key is successfully retired for a user's program enrollments
+        and history.
         """
         new_status = 'canceled'
 
@@ -130,6 +118,37 @@ class ProgramCourseEnrollmentModelTests(TestCase):
         )
         self.course_key = CourseKey.from_string(generate_course_run_key())
         CourseOverviewFactory(id=self.course_key)
+
+    def test_unique_completed_enrollment(self):
+        """
+        A record with the same (program_enrollment, course_enrollment)
+        cannot be created.
+        """
+        pce = self._create_completed_program_course_enrollment()
+        with self.assertRaises(IntegrityError):
+            # Purposefully mis-set the course_key in order to test
+            # that there is a constraint on
+            # (program_enrollment, course_enrollment) alone.
+            ProgramCourseEnrollment.objects.create(
+                program_enrollment=pce.program_enrollment,
+                course_key="course-v1:dummy+value+101",
+                course_enrollment=pce.course_enrollment,
+                status="inactive",
+            )
+
+    def test_unique_waiting_enrollment(self):
+        """
+        A record with the same (program_enrollment, course_key)
+        cannot be created.
+        """
+        pce = self._create_waiting_program_course_enrollment()
+        with self.assertRaises(IntegrityError):
+            ProgramCourseEnrollment.objects.create(
+                program_enrollment=pce.program_enrollment,
+                course_key=pce.course_key,
+                course_enrollment=None,
+                status="inactive",
+            )
 
     def _create_completed_program_course_enrollment(self):
         """ helper function create program course enrollment """
@@ -190,6 +209,25 @@ class ProgramCourseEnrollmentModelTests(TestCase):
         self.assertEqual(course_enrollment.course.id, self.course_key)
         self.assertEqual(course_enrollment.mode, CourseMode.MASTERS)
 
+    def test_enrollment_course_not_found(self):
+        nonexistent_key = 'course-v1:edX+Overview+DNE'
+        program_course_enrollment = ProgramCourseEnrollment.objects.create(
+            program_enrollment=self.program_enrollment,
+            course_key=nonexistent_key,
+            course_enrollment=None,
+            status="active"
+        )
+
+        with LogCapture() as capture:
+            with self.assertRaises(NonExistentCourseError):
+                program_course_enrollment.enroll(self.user)
+            expected = "User {} failed to enroll in non-existent course {}".format(
+                self.user.id, nonexistent_key
+            )
+            capture.check(
+                ('lms.djangoapps.program_enrollments.models', 'WARNING', expected)
+            )
+
     @ddt.data(
         (CourseMode.VERIFIED, CourseMode.VERIFIED),
         (CourseMode.AUDIT, CourseMode.MASTERS),
@@ -210,3 +248,14 @@ class ProgramCourseEnrollmentModelTests(TestCase):
         self.assertEqual(course_enrollment.user, self.user)
         self.assertEqual(course_enrollment.course.id, self.course_key)
         self.assertEqual(course_enrollment.mode, result_mode)
+
+    @mock.patch('student.models.CourseEnrollment.is_enrollment_closed', return_value=True)
+    def test_closed_enrollments_ignored(self, _mock):
+        """ enrolling through program enrollments should ignore checks on enrollment """
+        program_course_enrollment = self._create_waiting_program_course_enrollment()
+        program_course_enrollment.enroll(self.user)
+
+        course_enrollment = CourseEnrollment.objects.get(user=self.user, course_id=self.course_key)
+        self.assertEqual(course_enrollment.user, self.user)
+        self.assertEqual(course_enrollment.course.id, self.course_key)
+        self.assertEqual(course_enrollment.mode, CourseMode.MASTERS)

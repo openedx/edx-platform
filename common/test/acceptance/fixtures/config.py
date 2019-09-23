@@ -7,6 +7,7 @@ import json
 import re
 
 import requests
+import six
 from lazy import lazy
 
 from common.test.acceptance.fixtures import LMS_BASE_URL, STUDIO_BASE_URL
@@ -88,8 +89,9 @@ class ConfigModelFixture(object):
         if response.ok:
             # auto_auth returns information about the newly created user
             # capture this so it can be used by by the testcases.
-            user_pattern = re.compile(ur'Logged in user {0} \({1}\) with password {2} and user_id {3}'.format(
-                r'(?P<username>\S+)', r'(?P<email>[^\)]+)', r'(?P<password>\S+)', r'(?P<user_id>\d+)'))
+            user_pattern = re.compile(
+                six.text_type(r'Logged in user {0} \({1}\) with password {2} and user_id {3}').format(  # pylint: disable=unicode-format-string
+                    r'(?P<username>\S+)', r'(?P<email>[^\)]+)', r'(?P<password>\S+)', r'(?P<user_id>\d+)'))
             user_matches = re.match(user_pattern, response.text)
             if user_matches:
                 self.user = user_matches.groupdict()  # pylint: disable=attribute-defined-outside-init

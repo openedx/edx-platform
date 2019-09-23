@@ -149,7 +149,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
             }
         }
 
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
     def test_invalid_username(self):
@@ -181,7 +181,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
             }
         }
 
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
     def test_enroll_with_username(self):
@@ -226,7 +226,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 1)
         self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ENROLLED)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
     @ddt.data(False, True)
@@ -277,7 +277,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 1)
         self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ENROLLED)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
         # Check the outbox
@@ -332,7 +332,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 1)
         self.assertEqual(manual_enrollments[0].state_transition, ENROLLED_TO_UNENROLLED)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertEqual(res_json, expected)
 
         # Check the outbox
@@ -350,7 +350,10 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
             'cohorts': "cohort1,cohort2"
         })
         self.assertEqual(response.status_code, 400)
-        self.assertIn('If provided, the cohorts and courses should have equal number of items.', response.content)
+        self.assertIn(
+            'If provided, the cohorts and courses should have equal number of items.',
+            response.content.decode('utf-8')
+        )
 
     def test_fail_on_missing_cohorts(self):
         """
@@ -366,7 +369,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
         self.assertEqual(response.status_code, 400)
         self.assertIn(u'cohort {cohort_name} not found in course {course_id}.'.format(
             cohort_name='cohort1', course_id=self.course_key
-        ), response.content)
+        ), response.content.decode('utf-8'))
 
     def test_allow_cohorts_when_enrolling(self):
         """
@@ -381,7 +384,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
             'courses': self.course_key
         })
         self.assertEqual(response.status_code, 400)
-        self.assertIn('Cohorts can only be used for enrollments.', response.content)
+        self.assertIn('Cohorts can only be used for enrollments.', response.content.decode('utf-8'))
 
     def test_add_to_valid_cohort(self):
         config_course_cohorts(self.course, is_cohorted=True, manual_cohorts=["cohort1", "cohort2"])
@@ -429,7 +432,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 1)
         self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ENROLLED)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertIsNotNone(get_cohort_id(self.notenrolled_student, CourseKey.from_string(self.course_key)))
 
         self.assertEqual(res_json, expected)
@@ -480,7 +483,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 1)
         self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ENROLLED)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertIsNotNone(get_cohort_id(self.notenrolled_student, CourseKey.from_string(self.course_key)))
         self.assertEqual(res_json, expected)
 
@@ -525,7 +528,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
                 }
             }
         }
-        res2_json = json.loads(response2.content)
+        res2_json = json.loads(response2.content.decode('utf-8'))
         self.assertIsNotNone(get_cohort_id(self.notenrolled_student, CourseKey.from_string(self.course_key)))
         self.assertEqual(res2_json, expected2)
 
@@ -575,7 +578,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 1)
         self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ENROLLED)
-        res_json = json.loads(response.content)
+        res_json = json.loads(response.content.decode('utf-8'))
         self.assertIsNotNone(get_cohort_id(self.notenrolled_student, CourseKey.from_string(self.course_key)))
 
         self.assertEqual(res_json, expected)
@@ -621,6 +624,6 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
                 }
             }
         }
-        res2_json = json.loads(response2.content)
+        res2_json = json.loads(response2.content.decode('utf-8'))
         self.assertIsNotNone(get_cohort_id(self.notenrolled_student, CourseKey.from_string(self.course_key)))
         self.assertEqual(res2_json, expected2)

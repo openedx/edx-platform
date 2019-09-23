@@ -6,7 +6,7 @@ import model_utils.fields
 from django.db import migrations, models
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 
-import coursewarehistoryextended.fields
+from courseware.fields import UnsignedBigIntAutoField
 
 
 class Migration(migrations.Migration):
@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
-                ('id', coursewarehistoryextended.fields.UnsignedBigIntAutoField(serialize=False, primary_key=True)),
+                ('id', UnsignedBigIntAutoField(serialize=False, primary_key=True)),
                 ('user_id', models.IntegerField()),
                 ('course_id', CourseKeyField(max_length=255)),
                 ('usage_key', UsageKeyField(max_length=255)),

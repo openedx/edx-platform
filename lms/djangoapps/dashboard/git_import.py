@@ -117,7 +117,7 @@ def cmd_log(cmd, cwd):
     used along with the output. Will raise subprocess.CalledProcessError if
     command doesn't return 0, and returns the command's output.
     """
-    output = subprocess.check_output(cmd, cwd=cwd, stderr=subprocess.STDOUT)
+    output = subprocess.check_output(cmd, cwd=cwd, stderr=subprocess.STDOUT).decode('utf-8')
 
     log.debug(u'Command was: %r. Working directory was: %r', ' '.join(cmd), cwd)
     log.debug(u'Command output was: %r', output)

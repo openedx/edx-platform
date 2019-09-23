@@ -93,7 +93,7 @@ def send_request(user, course_id, page, page_size, path="", text=None):
     url = get_internal_endpoint(path)
     params = {
         "user": anonymous_id_for_user(user, None),
-        "course_id": six.text_type(course_id).encode("utf-8"),
+        "course_id": six.text_type(course_id),
         "page": page,
         "page_size": page_size,
     }

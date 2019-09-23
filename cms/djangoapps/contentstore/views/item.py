@@ -92,7 +92,7 @@ def hash_resource(resource):
     Hash a :class:`web_fragments.fragment.FragmentResource`.
     """
     md5 = hashlib.md5()
-    md5.update(repr(resource))
+    md5.update(repr(resource).encode('utf-8'))
     return md5.hexdigest()
 
 
@@ -225,7 +225,10 @@ def xblock_handler(request, usage_key_string):
                 request.user,
                 request.json.get('display_name'),
             )
-            return JsonResponse({'locator': unicode(dest_usage_key), 'courseKey': unicode(dest_usage_key.course_key)})
+            return JsonResponse({
+                'locator': text_type(dest_usage_key),
+                'courseKey': text_type(dest_usage_key.course_key)
+            })
         else:
             return _create_item(request)
     elif request.method == 'PATCH':
@@ -323,14 +326,14 @@ def xblock_view_handler(request, usage_key_string, view_name):
         xblock.runtime.wrappers.append(partial(
             wrap_xblock,
             'StudioRuntime',
-            usage_id_serializer=unicode,
+            usage_id_serializer=text_type,
             request_token=request_token(request),
         ))
 
         xblock.runtime.wrappers_asides.append(partial(
             wrap_xblock_aside,
             'StudioRuntime',
-            usage_id_serializer=unicode,
+            usage_id_serializer=text_type,
             request_token=request_token(request),
             extra_classes=['wrapper-comp-plugins']
         ))
@@ -413,7 +416,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
         return JsonResponse({
             'html': fragment.content,
-            'resources': hashed_resources.items()
+            'resources': list(hashed_resources.items())
         })
 
     else:
@@ -508,7 +511,7 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
             store.revert_to_published(xblock.location, user.id)
             # Returning the same sort of result that we do for other save operations. In the future,
             # we may want to return the full XBlockInfo.
-            return JsonResponse({'id': unicode(xblock.location)})
+            return JsonResponse({'id': text_type(xblock.location)})
 
         old_metadata = own_metadata(xblock)
         old_content = xblock.get_explicitly_set_fields_by_scope(Scope.content)
@@ -615,7 +618,7 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
                     store.update_item(course, user.id)
 
         result = {
-            'id': unicode(xblock.location),
+            'id': text_type(xblock.location),
             'data': data,
             'metadata': own_metadata(xblock)
         }
@@ -692,7 +695,7 @@ def _create_item(request):
     )
 
     return JsonResponse(
-        {'locator': unicode(created_block.location), 'courseKey': unicode(created_block.location.course_key)}
+        {'locator': text_type(created_block.location), 'courseKey': text_type(created_block.location.course_key)}
     )
 
 
@@ -724,7 +727,7 @@ def is_source_item_in_target_parents(source_item, target_parent):
     """
     target_ancestors = _create_xblock_ancestor_info(target_parent, is_concise=True)['ancestors']
     for target_ancestor in target_ancestors:
-        if unicode(source_item.location) == target_ancestor['id']:
+        if text_type(source_item.location) == target_ancestor['id']:
             return True
     return False
 
@@ -782,15 +785,15 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
             error = _('You can not move an item directly into content experiment.')
         elif source_index is None:
             error = _(u'{source_usage_key} not found in {parent_usage_key}.').format(
-                source_usage_key=unicode(source_usage_key),
-                parent_usage_key=unicode(source_parent.location)
+                source_usage_key=text_type(source_usage_key),
+                parent_usage_key=text_type(source_parent.location)
             )
         else:
             try:
                 target_index = int(target_index) if target_index is not None else None
-                if len(target_parent.children) < target_index:
+                if target_index is not None and len(target_parent.children) < target_index:
                     error = _(u'You can not move {source_usage_key} at an invalid index ({target_index}).').format(
-                        source_usage_key=unicode(source_usage_key),
+                        source_usage_key=text_type(source_usage_key),
                         target_index=target_index
                     )
             except ValueError:
@@ -813,15 +816,15 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
 
         log.info(
             u'MOVE: %s moved from %s to %s at %d index',
-            unicode(source_usage_key),
-            unicode(source_parent.location),
-            unicode(target_parent_usage_key),
+            text_type(source_usage_key),
+            text_type(source_parent.location),
+            text_type(target_parent_usage_key),
             insert_at
         )
 
         context = {
-            'move_source_locator': unicode(source_usage_key),
-            'parent_locator': unicode(target_parent_usage_key),
+            'move_source_locator': text_type(source_usage_key),
+            'parent_locator': text_type(target_parent_usage_key),
             'source_index': target_index if target_index is not None else source_index
         }
         return JsonResponse(context)
@@ -956,7 +959,7 @@ def orphan_handler(request, course_key_string):
     course_usage_key = CourseKey.from_string(course_key_string)
     if request.method == 'GET':
         if has_studio_read_access(request.user, course_usage_key):
-            return JsonResponse([unicode(item) for item in modulestore().get_orphans(course_usage_key)])
+            return JsonResponse([text_type(item) for item in modulestore().get_orphans(course_usage_key)])
         else:
             raise PermissionDenied()
     if request.method == 'DELETE':
@@ -984,7 +987,7 @@ def _delete_orphans(course_usage_key, user_id, commit=False):
                 if branch == ModuleStoreEnum.BranchName.published:
                     revision = ModuleStoreEnum.RevisionOption.published_only
                 store.delete_item(itemloc, user_id, revision=revision)
-    return [unicode(item) for item in items]
+    return [text_type(item) for item in items]
 
 
 def _get_xblock(usage_key, user):
@@ -1004,7 +1007,7 @@ def _get_xblock(usage_key, user):
                 raise
         except InvalidLocationError:
             log.error("Can't find item by location.")
-            return JsonResponse({"error": "Can't find item by location: " + unicode(usage_key)}, 404)
+            return JsonResponse({"error": "Can't find item by location: " + text_type(usage_key)}, 404)
 
 
 def _get_module_info(xblock, rewrite_static_links=True, include_ancestor_info=False, include_publishing_info=False):
@@ -1056,7 +1059,7 @@ def _get_gating_info(course, xblock):
             setattr(course, 'gating_prerequisites', gating_api.get_prerequisites(course.id))
         info["is_prereq"] = gating_api.is_prerequisite(course.id, xblock.location)
         info["prereqs"] = [
-            p for p in course.gating_prerequisites if unicode(xblock.location) not in p['namespace']
+            p for p in course.gating_prerequisites if text_type(xblock.location) not in p['namespace']
         ]
         prereq, prereq_min_score, prereq_min_completion = gating_api.get_required_content(
             course.id,
@@ -1158,7 +1161,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
             pct_sign=_('%'))
 
     xblock_info = {
-        'id': unicode(xblock.location),
+        'id': text_type(xblock.location),
         'display_name': xblock.display_name_with_default,
         'category': xblock.category,
         'has_children': xblock.has_children

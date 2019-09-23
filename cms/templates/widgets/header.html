@@ -1,6 +1,7 @@
 <%page expression_filter="h" args="online_help_token"/>
 <%namespace name='static' file='../static_content.html'/>
 <%!
+  import six
   from django.conf import settings
   from django.urls import reverse
   from django.utils.translation import ugettext as _
@@ -19,22 +20,22 @@
       % if context_course:
       <%
             course_key = context_course.id
-            index_url = reverse('course_handler', kwargs={'course_key_string': unicode(course_key)})
-            course_team_url = reverse('course_team_handler', kwargs={'course_key_string': unicode(course_key)})
-            assets_url = reverse('assets_handler', kwargs={'course_key_string': unicode(course_key)})
-            textbooks_url = reverse('textbooks_list_handler', kwargs={'course_key_string': unicode(course_key)})
-            videos_url = reverse('videos_handler', kwargs={'course_key_string': unicode(course_key)})
-            import_url = reverse('import_handler', kwargs={'course_key_string': unicode(course_key)})
-            course_info_url = reverse('course_info_handler', kwargs={'course_key_string': unicode(course_key)})
-            export_url = reverse('export_handler', kwargs={'course_key_string': unicode(course_key)})
-            settings_url = reverse('settings_handler', kwargs={'course_key_string': unicode(course_key)})
-            grading_url = reverse('grading_handler', kwargs={'course_key_string': unicode(course_key)})
-            advanced_settings_url = reverse('advanced_settings_handler', kwargs={'course_key_string': unicode(course_key)})
-            tabs_url = reverse('tabs_handler', kwargs={'course_key_string': unicode(course_key)})
+            index_url = reverse('course_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            course_team_url = reverse('course_team_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            assets_url = reverse('assets_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            textbooks_url = reverse('textbooks_list_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            videos_url = reverse('videos_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            import_url = reverse('import_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            course_info_url = reverse('course_info_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            export_url = reverse('export_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            settings_url = reverse('settings_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            grading_url = reverse('grading_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            advanced_settings_url = reverse('advanced_settings_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            tabs_url = reverse('tabs_handler', kwargs={'course_key_string': six.text_type(course_key)})
             certificates_url = ''
             if settings.FEATURES.get("CERTIFICATES_HTML_VIEW") and context_course.cert_html_view_enabled:
-                certificates_url = reverse('certificates_list_handler', kwargs={'course_key_string': unicode(course_key)})
-            checklists_url = reverse('checklists_handler', kwargs={'course_key_string': unicode(course_key)})
+                certificates_url = reverse('certificates_list_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            checklists_url = reverse('checklists_handler', kwargs={'course_key_string': six.text_type(course_key)})
 
       %>
       <h2 class="info-course">
@@ -95,7 +96,7 @@
                     <a href="${course_team_url}">${_("Course Team")}</a>
                   </li>
                   <li class="nav-item nav-course-settings-group-configurations">
-                    <a href="${reverse('group_configurations_list_handler', kwargs={'course_key_string': unicode(course_key)})}">${_("Group Configurations")}</a>
+                    <a href="${reverse('group_configurations_list_handler', kwargs={'course_key_string': six.text_type(course_key)})}">${_("Group Configurations")}</a>
                   </li>
                   <li class="nav-item nav-course-settings-advanced">
                     <a href="${advanced_settings_url}">${_("Advanced Settings")}</a>
@@ -123,7 +124,7 @@
                   </li>
                   % if settings.FEATURES.get('ENABLE_EXPORT_GIT') and context_course.giturl:
                   <li class="nav-item nav-course-tools-export-git">
-                    <a href="${reverse('export_git', kwargs=dict(course_key_string=unicode(course_key)))}">${_("Export to Git")}</a>
+                    <a href="${reverse('export_git', kwargs=dict(course_key_string=six.text_type(course_key)))}">${_("Export to Git")}</a>
                   </li>
                   % endif
                   <li class="nav-item nav-course-tools-checklists">
@@ -138,10 +139,10 @@
       % elif context_library:
        <%
             library_key = context_library.location.course_key
-            index_url = reverse('library_handler', kwargs={'library_key_string': unicode(library_key)})
-            import_url = reverse('import_handler', kwargs={'course_key_string': unicode(library_key)})
-            lib_users_url = reverse('manage_library_users', kwargs={'library_key_string': unicode(library_key)})
-            export_url = reverse('export_handler', kwargs={'course_key_string': unicode(library_key)})
+            index_url = reverse('library_handler', kwargs={'library_key_string': six.text_type(library_key)})
+            import_url = reverse('import_handler', kwargs={'course_key_string': six.text_type(library_key)})
+            lib_users_url = reverse('manage_library_users', kwargs={'library_key_string': six.text_type(library_key)})
+            export_url = reverse('export_handler', kwargs={'course_key_string': six.text_type(library_key)})
       %>
       <h2 class="info-course">
         <span class="sr">${_("Current Library:")}</span>
@@ -220,7 +221,7 @@
         <h2 class="sr-only">${_("Account Navigation")}</h2>
         <ol>
           <li class="nav-item nav-account-help">
-            <h3 class="title"><span class="label"><a href="${get_online_help_info(online_help_token)['doc_url']}" title="${_('Contextual Online Help')}" target="_blank">${_("Help")}</a></span></h3>
+            <h3 class="title"><span class="label"><a href="${get_online_help_info(online_help_token)['doc_url']}" title="${_('Contextual Online Help')}" rel="noopener" target="_blank">${_("Help")}</a></span></h3>
           </li>
           <li class="nav-item nav-account-user">
             <%include file="user_dropdown.html" args="online_help_token=online_help_token" />
@@ -236,7 +237,7 @@
         <h2 class="sr-only">${_("Account Navigation")}</h2>
         <ol>
           <li class="nav-item nav-not-signedin-help">
-            <a href="${get_online_help_info(online_help_token)['doc_url']}" title="${_('Contextual Online Help')}" target="_blank">${_("Help")}</a>
+            <a href="${get_online_help_info(online_help_token)['doc_url']}" title="${_('Contextual Online Help')}" rel="noopener" target="_blank">${_("Help")}</a>
           </li>
           % if static.get_value('ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION')):
               <li class="nav-item nav-not-signedin-signup">

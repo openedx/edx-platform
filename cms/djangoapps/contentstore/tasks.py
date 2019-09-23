@@ -12,6 +12,7 @@ from datetime import datetime
 from math import ceil
 from tempfile import NamedTemporaryFile, mkdtemp
 
+import six
 from celery import group
 from celery.task import task
 from celery.utils.log import get_task_logger
@@ -33,6 +34,7 @@ from organizations.models import OrganizationCourse
 from path import Path as path
 from pytz import UTC
 from six import iteritems, text_type
+from six.moves import range
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.tasks import UserTask
 
@@ -102,7 +104,7 @@ def enqueue_update_thumbnail_tasks(course_videos, videos_per_task, run):
     start = 0
     end = videos_per_task
     chunks_count = int(ceil(batch_size / float(videos_per_task)))
-    for __ in xrange(0, chunks_count):
+    for __ in range(0, chunks_count):  # pylint: disable=C7620
         course_videos_chunk = course_videos[start:end]
         tasks.append(task_scrape_youtube_thumbnail.s(
             course_videos_chunk, run
@@ -198,7 +200,7 @@ def enqueue_async_migrate_transcripts_tasks(course_keys,
         'command_run': command_run
     }
     group([
-        async_migrate_transcript.s(unicode(course_key), **kwargs)
+        async_migrate_transcript.s(text_type(course_key), **kwargs)
         for course_key in course_keys
     ])()
 
@@ -265,7 +267,7 @@ def async_migrate_transcript(self, course_key, **kwargs):   # pylint: disable=un
                 all_transcripts.update({'en': video.sub})
 
             sub_tasks = []
-            video_location = unicode(video.location)
+            video_location = text_type(video.location)
             for lang in all_transcripts:
                 sub_tasks.append(async_migrate_transcript_subtask.s(
                     video_location, revision, lang, force_update, **kwargs
@@ -748,8 +750,8 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
     # Locate the uploaded OLX archive (and download it from S3 if necessary)
     # Do everything in a try-except block to make sure everything is properly cleaned up.
     data_root = path(settings.GITHUB_REPO_ROOT)
-    subdir = base64.urlsafe_b64encode(repr(courselike_key))
-    course_dir = data_root / subdir
+    subdir = base64.urlsafe_b64encode(six.b(repr(courselike_key)))
+    course_dir = data_root / subdir.decode('utf-8')
     try:
         self.status.set_state(u'Unpacking')
 
@@ -810,7 +812,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
     try:
         tar_file = tarfile.open(temp_filepath)
         try:
-            safetar_extractall(tar_file, (course_dir + u'/').encode(u'utf-8'))
+            safetar_extractall(tar_file, (course_dir + u'/'))
         except SuspiciousOperation as exc:
             LOGGER.info(u'Course import %s: Unsafe tar file - %s', courselike_key, exc.args[0])
             with respect_language(language):

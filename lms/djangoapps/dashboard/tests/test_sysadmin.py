@@ -194,11 +194,11 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         # Make sure we don't have any git hashes on the page
         response = self.client.get(reverse('sysadmin_courses'))
-        self.assertNotRegexpMatches(response.content, table_re)
+        self.assertNotRegexpMatches(response.content.decode('utf-8'), table_re)
 
         # Now add the course and make sure it does match
         response = self._add_edx4edx()
-        self.assertRegexpMatches(response.content, table_re)
+        self.assertRegexpMatches(response.content.decode('utf-8'), table_re)
 
     def test_gitlogs(self):
         """
@@ -212,14 +212,13 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         response = self.client.get(reverse('gitlogs'))
 
         # Check that our earlier import has a log with a link to details
-        self.assertIn('/gitlogs/course-v1:MITx+edx4edx+edx4edx', response.content)
+        self.assertIn('/gitlogs/course-v1:MITx+edx4edx+edx4edx', response.content.decode('utf-8'))
 
         response = self.client.get(
             reverse('gitlogs_detail', kwargs={
                 'course_id': 'course-v1:MITx+edx4edx+edx4edx'}))
 
-        self.assertIn('======&gt; IMPORTING course',
-                      response.content)
+        self.assertIn('======&gt; IMPORTING course', response.content.decode('utf-8'))
 
         self._rm_edx4edx()
 
@@ -285,10 +284,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
                 'course_id': 'course-v1:MITx+edx4edx+edx4edx'
             })
         )
-        self.assertIn(
-            'No git import logs have been recorded for this course.',
-            response.content
-        )
+        self.assertIn('No git import logs have been recorded for this course.', response.content.decode('utf-8'))
 
         self._rm_edx4edx()
 
@@ -362,7 +358,6 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
             reverse('gitlogs_detail', kwargs={
                 'course_id': 'course-v1:MITx+edx4edx+edx4edx'
             }))
-        self.assertIn('======&gt; IMPORTING course',
-                      response.content)
+        self.assertIn('======&gt; IMPORTING course', response.content.decode('utf-8'))
 
         self._rm_edx4edx()

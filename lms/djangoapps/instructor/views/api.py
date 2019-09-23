@@ -185,7 +185,7 @@ def common_exceptions_400(func):
             message = _('User does not exist.')
         except MultipleObjectsReturned:
             message = _('Found a conflict with given identifier. Please try an alternative identifier')
-        except (AlreadyRunningError, QueueConnectionError) as err:
+        except (AlreadyRunningError, QueueConnectionError, AttributeError) as err:
             message = six.text_type(err)
 
         if use_json:
@@ -389,7 +389,7 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
         try:
             upload_file = request.FILES.get('students_list')
             if upload_file.name.endswith('.csv'):
-                students = [row for row in csv.reader(upload_file.read().splitlines())]
+                students = [row for row in csv.reader(upload_file.read().decode('utf-8').splitlines())]
                 course = get_course_by_id(course_id)
             else:
                 general_errors.append({
@@ -519,8 +519,7 @@ def generate_random_string(length):
         char for char in string.ascii_uppercase + string.digits + string.ascii_lowercase
         if char not in 'aAeEiIoOuU1l'
     ]
-
-    return string.join((random.choice(chars) for __ in range(length)), '')
+    return ''.join((random.choice(chars) for i in range(length)))
 
 
 def generate_unique_password(generated_passwords, password_length=12):
@@ -1406,7 +1405,11 @@ def _cohorts_csv_validator(file_storage, file_to_validate):
     Verifies that the expected columns are present in the CSV used to add users to cohorts.
     """
     with file_storage.open(file_to_validate) as f:
-        reader = unicodecsv.reader(UniversalNewlineIterator(f), encoding='utf-8')
+        if six.PY2:
+            reader = unicodecsv.reader(UniversalNewlineIterator(f), encoding='utf-8')
+        else:
+            reader = csv.reader(f.read().decode('utf-8').splitlines())
+
         try:
             fieldnames = next(reader)
         except StopIteration:
@@ -1955,10 +1958,10 @@ def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
         writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
         # In practice, there should not be non-ascii data in this query,
         # but trying to do the right thing anyway.
-        encoded = [text_type(s).encode('utf-8') for s in header]
+        encoded = [text_type(s) for s in header]
         writer.writerow(encoded)
         for row in rows:
-            encoded = [text_type(s).encode('utf-8') for s in row]
+            encoded = [text_type(s) for s in row]
             writer.writerow(encoded)
         return response
 
@@ -3273,7 +3276,7 @@ def parse_request_data(request):
     :return: dict object containing parsed json data.
     """
     try:
-        data = json.loads(request.body or '{}')
+        data = json.loads(request.body.decode('utf8') or u'{}')
     except ValueError:
         raise ValueError(_('The record is not in the correct format. Please add a valid username or email address.'))
 

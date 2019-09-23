@@ -8,7 +8,7 @@ from __future__ import absolute_import
 from config_models.admin import ConfigurationModelAdmin
 from django.contrib import admin
 
-from .models import CourseOverview, CourseOverviewImageConfig, CourseOverviewImageSet
+from .models import CourseOverview, CourseOverviewImageConfig, CourseOverviewImageSet, SimulateCoursePublishConfig
 
 
 class CourseOverviewAdmin(admin.ModelAdmin):
@@ -73,6 +73,11 @@ class CourseOverviewImageSetAdmin(admin.ModelAdmin):
     fields = ('course_overview_id', 'small_url', 'large_url')
 
 
+class SimulateCoursePublishConfigAdmin(ConfigurationModelAdmin):
+    pass
+
+
 admin.site.register(CourseOverview, CourseOverviewAdmin)
 admin.site.register(CourseOverviewImageConfig, CourseOverviewImageConfigAdmin)
 admin.site.register(CourseOverviewImageSet, CourseOverviewImageSetAdmin)
+admin.site.register(SimulateCoursePublishConfig, SimulateCoursePublishConfigAdmin)

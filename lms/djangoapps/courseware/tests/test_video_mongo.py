@@ -112,8 +112,7 @@ class TestVideoYouTube(TestVideo):
                 'transcriptLanguages': OrderedDict({'en': 'English', 'uk': u'Українська'}),
                 'ytTestTimeout': 1500,
                 'ytApiUrl': 'https://www.youtube.com/iframe_api',
-                'ytMetadataUrl': 'https://www.googleapis.com/youtube/v3/videos/',
-                'ytKey': None,
+                'lmsRootURL': settings.LMS_ROOT_URL,
                 'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
                 'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
                 'autohideHtml5': False,
@@ -194,8 +193,7 @@ class TestVideoNonYouTube(TestVideo):
                 'transcriptLanguages': OrderedDict({'en': 'English'}),
                 'ytTestTimeout': 1500,
                 'ytApiUrl': 'https://www.youtube.com/iframe_api',
-                'ytMetadataUrl': 'https://www.googleapis.com/youtube/v3/videos/',
-                'ytKey': None,
+                'lmsRootURL': settings.LMS_ROOT_URL,
                 'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
                 'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
                 'autohideHtml5': False,
@@ -253,8 +251,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'transcriptLanguages': OrderedDict({'en': 'English'}),
             'ytTestTimeout': 1500,
             'ytApiUrl': 'https://www.youtube.com/iframe_api',
-            'ytMetadataUrl': 'https://www.googleapis.com/youtube/v3/videos/',
-            'ytKey': None,
+            'lmsRootURL': settings.LMS_ROOT_URL,
             'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
             'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
             'autohideHtml5': False,
@@ -1313,7 +1310,7 @@ class TestEditorSavedMethod(BaseTestVideoXBlock):
         self.MODULESTORE = MODULESTORES[default_store]  # pylint: disable=invalid-name
         self.initialize_block(metadata=self.metadata)
         item = self.store.get_item(self.item_descriptor.location)
-        with open(self.file_path, "r") as myfile:
+        with open(self.file_path, "rb") as myfile:  # pylint: disable=open-builtin
             save_to_store(myfile.read(), self.file_name, 'text/sjson', item.location)
         item.sub = "3_yD_cEKoCk"
         # subs_video.srt.sjson does not exist before calling editor_saved function
@@ -1333,7 +1330,7 @@ class TestEditorSavedMethod(BaseTestVideoXBlock):
         self.MODULESTORE = MODULESTORES[default_store]
         self.initialize_block(metadata=self.metadata)
         item = self.store.get_item(self.item_descriptor.location)
-        with open(self.file_path, "r") as myfile:
+        with open(self.file_path, "rb") as myfile:  # pylint: disable=open-builtin
             save_to_store(myfile.read(), self.file_name, 'text/sjson', item.location)
             save_to_store(myfile.read(), 'subs_video.srt.sjson', 'text/sjson', item.location)
         item.sub = "3_yD_cEKoCk"
@@ -1579,7 +1576,7 @@ class TestVideoBlockStudentViewJson(BaseTestVideoXBlock, CacheIsolationTestCase)
         self.video.transcripts = transcripts
         self.video.sub = english_sub
         student_view_response = self.get_result()
-        self.assertItemsEqual(list(student_view_response['transcripts'].keys()), expected_transcripts)
+        six.assertCountEqual(self, list(student_view_response['transcripts'].keys()), expected_transcripts)
 
 
 @ddt.ddt
@@ -2212,8 +2209,7 @@ class TestVideoWithBumper(TestVideo):
                 'transcriptLanguages': OrderedDict({'en': 'English', 'uk': u'Українська'}),
                 'ytTestTimeout': 1500,
                 'ytApiUrl': 'https://www.youtube.com/iframe_api',
-                'ytMetadataUrl': 'https://www.googleapis.com/youtube/v3/videos/',
-                'ytKey': None,
+                'lmsRootURL': settings.LMS_ROOT_URL,
                 'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
                 'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
                 'autohideHtml5': False,
@@ -2286,8 +2282,7 @@ class TestAutoAdvanceVideo(TestVideo):
                 'transcriptLanguages': OrderedDict({'en': 'English', 'uk': u'Українська'}),
                 'ytTestTimeout': 1500,
                 'ytApiUrl': 'https://www.youtube.com/iframe_api',
-                'ytMetadataUrl': 'https://www.googleapis.com/youtube/v3/videos/',
-                'ytKey': None,
+                'lmsRootURL': settings.LMS_ROOT_URL,
                 'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
                     self.item_descriptor, 'transcript', 'translation/__lang__'
                 ).rstrip('/?'),

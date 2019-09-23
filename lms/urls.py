@@ -27,7 +27,6 @@ from lms.djangoapps.instructor.views import coupons as instructor_coupons_views
 from lms.djangoapps.instructor.views import instructor_dashboard as instructor_dashboard_views
 from lms.djangoapps.instructor.views import registration_codes as instructor_registration_codes_views
 from lms.djangoapps.instructor_task import views as instructor_task_views
-from notes import views as notes_views
 from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.common_views.xblock import xblock_resource
@@ -87,6 +86,7 @@ urlpatterns = [
     url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
 
     url(r'^notifier_api/', include('lms.djangoapps.discussion.notifier_api.urls')),
+    url(r'^/api/notifier/', include('lms.djangoapps.discussion.notifier_api.urls')),
 
     url(r'^i18n/', include('django.conf.urls.i18n')),
 
@@ -270,6 +270,9 @@ urlpatterns += [
         name='xblock_resource_url',
     ),
 
+    # New (Blockstore-based) XBlock REST API
+    url(r'', include('openedx.core.djangoapps.xblock.rest_api.urls', namespace='xblock_api')),
+
     url(
         r'^courses/{}/xqueue/(?P<userid>[^/]*)/(?P<mod_id>.*?)/(?P<dispatch>[^/]*)$'.format(
             settings.COURSE_ID_PATTERN,
@@ -291,7 +294,11 @@ urlpatterns += [
         courseware_views.course_about,
         name='about_course',
     ),
-
+    url(
+        r'^courses/yt_video_metadata$',
+        courseware_views.yt_video_metadata,
+        name='yt_video_metadata',
+    ),
     url(
         r'^courses/{}/enroll_staff$'.format(
             settings.COURSE_ID_PATTERN,
@@ -570,19 +577,6 @@ urlpatterns += [
         verified_track_content_views.cohorting_settings,
         name='verified_track_cohorting',
     ),
-    url(
-        r'^courses/{}/notes$'.format(
-            settings.COURSE_ID_PATTERN,
-        ),
-        notes_views.notes,
-        name='notes',
-    ),
-    url(
-        r'^courses/{}/notes/'.format(
-            settings.COURSE_ID_PATTERN,
-        ),
-        include('notes.urls')
-    ),
 
     # LTI endpoints listing
     url(
@@ -837,11 +831,6 @@ if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
         ),
     ]
 
-if settings.FEATURES.get('RUN_AS_ANALYTICS_SERVER_ENABLED'):
-    urlpatterns += [
-        url(r'^edinsights_service/', include('edinsights.core.urls')),
-    ]
-
 if settings.FEATURES.get('ENABLE_DEBUG_RUN_PYTHON'):
     urlpatterns += [
         url(r'^debug/run_python$', debug_views.run_python),
@@ -961,12 +950,19 @@ if settings.BRANCH_IO_KEY:
         url(r'^text-me-the-app', student_views.text_me_the_app, name='text_me_the_app'),
     ]
 
-if settings.FEATURES.get('ENABLE_API_DOCS'):
-    urlpatterns += [
-        url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-        url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-        url(r'^api-docs/$', schema_view.with_ui('swagger', cache_timeout=0)),
-    ]
+# API docs.
+urlpatterns += [
+    url(
+        r'^swagger(?P<format>\.json|\.yaml)$',
+        schema_view.without_ui(cache_timeout=settings.OPENAPI_CACHE_TIMEOUT), name='schema-json',
+    ),
+    url(
+        r'^swagger/$',
+        schema_view.with_ui('swagger', cache_timeout=settings.OPENAPI_CACHE_TIMEOUT),
+        name='schema-swagger-ui',
+    ),
+    url(r'^api-docs/$', schema_view.with_ui('swagger', cache_timeout=settings.OPENAPI_CACHE_TIMEOUT)),
+]
 
 # edx-drf-extensions csrf app
 urlpatterns += [

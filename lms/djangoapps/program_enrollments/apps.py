@@ -20,7 +20,7 @@ class ProgramEnrollmentsConfig(AppConfig):
             ProjectType.LMS: {
                 PluginURLs.NAMESPACE: 'programs_api',
                 PluginURLs.REGEX: 'api/program_enrollments/',
-                PluginURLs.RELATIVE_PATH: 'api.urls',
+                PluginURLs.RELATIVE_PATH: 'rest_api.urls',
             }
         },
     }

@@ -62,8 +62,15 @@ class TestGitExport(CourseTestCase):
         with self.assertRaisesRegexp(CommandError, 'Error: unrecognized arguments:*'):
             call_command('git_export', 'blah', 'blah', 'blah', stderr=StringIO())
 
-        with self.assertRaisesMessage(CommandError, 'Error: too few arguments'):
-            call_command('git_export', stderr=StringIO())
+        if six.PY2:
+            with self.assertRaisesMessage(CommandError, 'Error: too few arguments'):
+                call_command('git_export', stderr=StringIO())
+        else:
+            with self.assertRaisesMessage(
+                CommandError,
+                'Error: the following arguments are required: course_loc, git_url'
+            ):
+                call_command('git_export', stderr=StringIO())
 
         # Send bad url to get course not exported
         with self.assertRaisesRegexp(CommandError, six.text_type(GitExportError.URL_BAD)):
@@ -155,7 +162,7 @@ class TestGitExport(CourseTestCase):
         )
         cwd = os.path.abspath(git_export_utils.GIT_REPO_EXPORT_DIR / 'test_bare')
         git_log = subprocess.check_output(['git', 'log', '-1',
-                                           '--format=%an|%ae'], cwd=cwd)
+                                           '--format=%an|%ae'], cwd=cwd).decode('utf-8')
         self.assertEqual(expect_string, git_log)
 
         # Make changes to course so there is something to commit
@@ -170,7 +177,7 @@ class TestGitExport(CourseTestCase):
             self.user.email,
         )
         git_log = subprocess.check_output(
-            ['git', 'log', '-1', '--format=%an|%ae'], cwd=cwd)
+            ['git', 'log', '-1', '--format=%an|%ae'], cwd=cwd).decode('utf-8')
         self.assertEqual(expect_string, git_log)
 
     def test_no_change(self):

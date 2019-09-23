@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 import json
 
+import six
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
@@ -27,7 +28,7 @@ from util.testing import UrlResetMixin
 
 @override_settings(SECRET_KEY="test secret key")
 class NotificationPrefViewTest(UrlResetMixin, TestCase):
-    INITIALIZATION_VECTOR = "\x00" * 16
+    INITIALIZATION_VECTOR = b"\x00" * 16
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -61,7 +62,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):
         # now coerce username to utf-8 encoded str, since we test with non-ascii unicdoe above and
         # the unittest framework has hard time coercing to unicode.
         # decrypt also can't take a unicode input, so coerce its input to str
-        self.assertEqual(str(user.username.encode('utf-8')), UsernameCipher().decrypt(str(pref.value)))
+        self.assertEqual(six.binary_type(user.username.encode('utf-8')), UsernameCipher().decrypt(str(pref.value)))
 
     def assertNotPrefExists(self, user):
         """Ensure that the user does not have a persisted preference"""
@@ -76,7 +77,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):
         request.user = self.user
         response = ajax_status(request)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content), {"status": 0})
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {"status": 0})
 
     def test_ajax_status_get_1(self):
         self.create_prefs()
@@ -84,7 +85,7 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):
         request.user = self.user
         response = ajax_status(request)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content), {"status": 1})
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {"status": 1})
 
     def test_ajax_status_post(self):
         request = self.request_factory.post("dummy")

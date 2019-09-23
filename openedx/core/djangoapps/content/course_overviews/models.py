@@ -272,6 +272,25 @@ class CourseOverview(TimeStampedModel):
                 raise cls.DoesNotExist()
 
     @classmethod
+    def course_exists(cls, course_id):
+        """
+        Check whether a course run exists (in CourseOverviews _or_ modulestore).
+
+        Checks the CourseOverview table first.
+        If it is not there, check the modulestore.
+        Equivalent to, but more efficient than:
+            bool(CourseOverview.get_from_id(course_id))
+
+        Arguments:
+            course_id (CourseKey)
+
+        Returns: bool
+        """
+        if cls.objects.filter(id=course_id).exists():
+            return True
+        return modulestore().has_course(course_id)
+
+    @classmethod
     def get_from_id(cls, course_id):
         """
         Load a CourseOverview object for a given course ID.
@@ -584,7 +603,7 @@ class CourseOverview(TimeStampedModel):
             # In rare cases, courses belonging to the same org may be accidentally assigned
             # an org code with a different casing (e.g., Harvardx as opposed to HarvardX).
             # Case-insensitive matching allows us to deal with this kind of dirty data.
-            course_overviews = course_overviews.filter(org__iregex=r'(' + '|'.join(orgs) + ')')
+            course_overviews = course_overviews.filter(org__iregex=r'(^' + '$|^'.join(orgs) + '$)')
 
         if filter_:
             course_overviews = course_overviews.filter(**filter_)
@@ -896,3 +915,25 @@ class CourseOverviewImageConfig(ConfigurationModel):
         return u"CourseOverviewImageConfig(enabled={}, small={}, large={})".format(
             self.enabled, self.small, self.large
         )
+
+
+class SimulateCoursePublishConfig(ConfigurationModel):
+    """
+    Manages configuration for a run of the simulate_publish management command.
+
+    .. no_pii:
+    """
+
+    class Meta(object):
+        app_label = 'course_overviews'
+        verbose_name = 'simulate_publish argument'
+
+    arguments = models.TextField(
+        blank=True,
+        help_text='Useful for manually running a Jenkins job. Specify like "--delay 10 --receivers A B C \
+        --courses X Y Z".',
+        default='',
+    )
+
+    def __unicode__(self):
+        return six.text_type(self.arguments)

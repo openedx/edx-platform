@@ -34,7 +34,7 @@ class TestWordCloud(BaseTestXmodule):
 
         for user in self.users:
             response = self.clients[user.username].post(self.get_url('get_state'))
-            users_state[user.username] = json.loads(response.content)
+            users_state[user.username] = json.loads(response.content.decode('utf-8'))
 
         return users_state
 
@@ -51,7 +51,7 @@ class TestWordCloud(BaseTestXmodule):
                 {'student_words[]': words},
                 HTTP_X_REQUESTED_WITH='XMLHttpRequest'
             )
-            users_state[user.username] = json.loads(response.content)
+            users_state[user.username] = json.loads(response.content.decode('utf-8'))
 
         return users_state
 
@@ -243,7 +243,7 @@ class TestWordCloud(BaseTestXmodule):
 
         for user in self.users:
             self.assertDictEqual(
-                json.loads(responses[user.username].content),
+                json.loads(responses[user.username].content.decode('utf-8')),
                 {
                     'status': 'fail',
                     'error': 'Unknown Command!'
