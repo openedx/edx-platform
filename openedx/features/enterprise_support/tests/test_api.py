@@ -365,7 +365,6 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
         mock_get_consent_url.assert_called_once()
         mock_enterprise_enabled.assert_called_once()
-        mock_consent_necessary.assert_called_once()
 
     @httpretty.activate
     @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_uuid_for_request')

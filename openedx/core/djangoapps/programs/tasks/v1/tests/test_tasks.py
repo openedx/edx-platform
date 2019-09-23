@@ -145,7 +145,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         programs.
         """
         tasks.award_program_certificates.delay(self.student.username).get()
-        mock_get_completed_programs.assert_called(self.site, self.student)
+        mock_get_completed_programs.assert_any_call(self.site, self.student)
 
     @ddt.data(
         ([1], [2, 3]),

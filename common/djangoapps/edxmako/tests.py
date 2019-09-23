@@ -125,9 +125,11 @@ class MakoRequestContextTest(TestCase):
             self.assertIsNotNone(get_template_request_context())
 
         mock_get_current_request = Mock()
-        with patch('edxmako.request_context.get_current_request', mock_get_current_request):
-            # requestcontext should not be None, because the cache is filled
-            self.assertIsNotNone(get_template_request_context())
+        with patch('edxmako.request_context.get_current_request'):
+            with patch('edxmako.request_context.RequestContext.__init__') as mock_context_init:
+                # requestcontext should not be None, because the cache is filled
+                self.assertIsNotNone(get_template_request_context())
+                mock_context_init.assert_not_called()
         mock_get_current_request.assert_not_called()
 
         RequestCache.clear_all_namespaces()

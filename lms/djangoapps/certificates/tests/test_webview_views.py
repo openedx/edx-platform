@@ -431,23 +431,28 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
 
     @ddt.data(True, False)
     @patch('lms.djangoapps.certificates.views.webview.get_completion_badge')
-    @override_settings(FEATURES=FEATURES_WITH_BADGES_ENABLED)
     def test_fetch_badge_info(self, issue_badges, mock_get_completion_badge):
         """
         Test: Fetch badge class info if badges are enabled.
         """
-        badge_class = BadgeClassFactory(course_id=self.course_id, mode=self.cert.mode)
-        mock_get_completion_badge.return_value = badge_class
+        if issue_badges:
+            features = FEATURES_WITH_BADGES_ENABLED
+        else:
+            features = FEATURES_WITH_CERTS_ENABLED
+        with override_settings(FEATURES=features):
+            badge_class = BadgeClassFactory(course_id=self.course_id, mode=self.cert.mode)
+            mock_get_completion_badge.return_value = badge_class
 
-        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
-        test_url = get_certificate_url(course_id=self.cert.course_id, uuid=self.cert.verify_uuid)
-        response = self.client.get(test_url)
-        self.assertEqual(response.status_code, 200)
+            self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+            test_url = get_certificate_url(user_id=self.user.id, course_id=self.cert.course_id,
+                                           uuid=self.cert.verify_uuid)
+            response = self.client.get(test_url)
+            self.assertEqual(response.status_code, 200)
 
         if issue_badges:
-            mock_get_completion_badge.assertCalled()
+            mock_get_completion_badge.assert_called()
         else:
-            mock_get_completion_badge.assertNotCalled()
+            mock_get_completion_badge.assert_not_called()
 
     @override_settings(FEATURES=FEATURES_WITH_BADGES_ENABLED)
     @patch.dict("django.conf.settings.SOCIAL_SHARING_SETTINGS", {

@@ -467,8 +467,8 @@ def _certificate_download_url(user_id, course_id, user_certificate=None):
         except GeneratedCertificate.DoesNotExist:
             log.critical(
                 u'Unable to lookup certificate\n'
-                u'user id: %d\n'
-                u'course: %s', user_id, six.text_type(course_id)
+                u'user id: %s\n'
+                u'course: %s', six.text_type(user_id), six.text_type(course_id)
             )
 
     if user_certificate:
