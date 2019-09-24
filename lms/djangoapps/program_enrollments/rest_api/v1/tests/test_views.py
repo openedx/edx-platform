@@ -1717,7 +1717,7 @@ class ProgramCourseEnrollmentOverviewGetTests(
             display_name='unit_1'
         )
 
-        mock_path = _REST_API_MOCK_FMT.format('v1.utils.get_dates_for_course')
+        mock_path = 'lms.djangoapps.course_api.api.get_dates_for_course'
         with mock.patch(mock_path) as mock_get_dates:
             mock_get_dates.return_value = {
                 (section_1.location, 'due'): section_1.due,
