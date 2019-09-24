@@ -8,6 +8,7 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
+from django.utils.encoding import python_2_unicode_compatible
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 
@@ -149,6 +150,7 @@ class UserOrgTag(TimeStampedModel, DeletableByUserValue):  # pylint: disable=mod
         unique_together = ("user", "org", "key")
 
 
+@python_2_unicode_compatible
 class RetirementState(models.Model):
     """
     Stores the list and ordering of the steps of retirement, this should almost never change
@@ -161,8 +163,9 @@ class RetirementState(models.Model):
     is_dead_end_state = models.BooleanField(default=False, db_index=True)
     required = models.BooleanField(default=False)
 
-    def __unicode__(self):
-        return u'{} (step {})'.format(self.state_name, self.state_execution_order)
+    def __str__(self):
+        # pylint: disable=unicode-format-string
+        return '{} (step {})'.format(self.state_name, self.state_execution_order)
 
     class Meta(object):
         ordering = ('state_execution_order',)
