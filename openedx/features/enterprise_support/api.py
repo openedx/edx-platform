@@ -664,3 +664,15 @@ def insert_enterprise_pipeline_elements(pipeline):
     insert_point = pipeline.index('social_core.pipeline.social_auth.load_extra_data')
     for index, element in enumerate(additional_elements):
         pipeline.insert(insert_point + index, element)
+
+
+@enterprise_is_enabled()
+def get_enterprise_learner_portal_url(request):
+    """
+    Get the enterprise learner portal url for the Enterprise linked to this request.
+    """
+    enterprise_customer = enterprise_customer_for_request(request)
+    if enterprise_customer:
+        return enterprise_customer['enable_learner_portal'] and enterprise_customer['learner_portal_hostname']
+
+    return None

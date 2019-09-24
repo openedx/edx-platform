@@ -44,7 +44,9 @@ from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.features.enterprise_support.api import get_dashboard_consent_notification
+from openedx.features.enterprise_support.api import (
+    get_dashboard_consent_notification, get_enterprise_learner_portal_url
+)
 from shoppingcart.api import order_history
 from shoppingcart.models import CourseRegistrationCode, DonationConfiguration
 from student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
@@ -682,6 +684,20 @@ def student_dashboard(request):
     consent_required_courses = set()
     enterprise_customer_name = None
 
+    enterprise_learner_portal_message = None
+    enterprise_learner_portal_url = get_enterprise_learner_portal_url(request)
+    if enterprise_learner_portal_url:
+        enterprise_learner_portal_message = Text(
+            _(
+                "Visit your awesome edX for Business homepage to see all the courses your enterprise has sponsored. "
+                "Go to {link_start}your Learner Portal{link_end}.")
+        ).format(
+            link_start=HTML("<a href='{learner_portal}'>").format(
+                learner_portal=enterprise_learner_portal_url,
+            ),
+            link_end=HTML("</a>")
+        )
+
     # Account activation message
     account_activation_messages = [
         message for message in messages.get_messages(request) if 'account-activation' in message.tags
@@ -838,6 +854,7 @@ def student_dashboard(request):
         'enterprise_message': enterprise_message,
         'consent_required_courses': consent_required_courses,
         'enterprise_customer_name': enterprise_customer_name,
+        'enterprise_learner_portal_message': enterprise_learner_portal_message,
         'enrollment_message': enrollment_message,
         'redirect_message': Text(redirect_message),
         'account_activation_messages': account_activation_messages,
