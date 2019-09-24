@@ -12,7 +12,6 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from rest_framework import status
 
-from bulk_email.api import is_bulk_email_feature_enabled, is_user_opted_out_for_course
 from lms.djangoapps.grades.rest_api.v1.utils import CourseEnrollmentPagination
 from openedx.core.djangoapps.catalog.utils import get_programs, is_course_run_in_program
 from openedx.core.lib.api.view_utils import verify_course_exists
@@ -114,6 +113,28 @@ def verify_course_exists_and_in_program(view_func):
             )
         return view_func(self, request, **kwargs)
     return wrapped_function
+
+
+def get_enrollment_http_code(result_statuses, ok_statuses):
+    """
+    Given a set of enrollment create/update statuses,
+    return the appropriate HTTP status code.
+
+    Arguments:
+        result_statuses (sequence[str]): set of enrollment operation statuses
+            (for example, 'enrolled', 'not-in-program', etc.)
+        ok_statuses: sequence[str]: set of 'OK' (non-error) statuses
+    """
+    result_status_set = set(result_statuses)
+    ok_status_set = set(ok_statuses)
+    if not result_status_set:
+        return status.HTTP_204_NO_CONTENT
+    if result_status_set.issubset(ok_status_set):
+        return status.HTTP_200_OK
+    elif result_status_set & ok_status_set:
+        return status.HTTP_207_MULTI_STATUS
+    else:
+        return status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 def get_course_run_status(course_overview, certificate_info):

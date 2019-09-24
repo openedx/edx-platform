@@ -10,9 +10,9 @@ away in https://openedx.atlassian.net/browse/ENT-2294
 """
 from __future__ import absolute_import, unicode_literals
 
+from lms.djangoapps.bulk_email.api import get_emails_enabled as get_emails_enabled_util
 from lms.djangoapps.course_api.api import get_course_run_url as get_course_run_url_util
 from lms.djangoapps.course_api.api import get_due_dates as get_due_dates_util
-from lms.djangoapps.bulk_email.api import get_emails_enabled as get_emails_enabled_util
 
 
 def get_due_dates(request, course_key, user):

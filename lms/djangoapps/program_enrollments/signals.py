@@ -11,10 +11,9 @@ from social_django.models import UserSocialAuth
 
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_LMS_MISC
-from student.models import CourseEnrollmentException
 from third_party_auth.models import SAMLProviderConfig
 
-from .api import fetch_program_enrollments_by_student
+from .api import fetch_program_enrollments_by_student, link_program_enrollment_to_lms_user
 from .models import ProgramEnrollment
 
 logger = logging.getLogger(__name__)
@@ -95,17 +94,4 @@ def matriculate_learner(user, uid):
                 authorizing_org.short_name
             )
             continue
-
-        enrollment.user = user
-        enrollment.save()
-        for program_course_enrollment in enrollment.program_course_enrollments.all():
-            try:
-                program_course_enrollment.enroll(user)
-            except CourseEnrollmentException as e:
-                logger.warning(
-                    'Failed to enroll user=%s with waiting program_course_enrollment=%s: %s',
-                    user.id,
-                    program_course_enrollment.id,
-                    e,
-                )
-                raise e
+        link_program_enrollment_to_lms_user(enrollment, user)
