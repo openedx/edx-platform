@@ -43,9 +43,9 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
 
     def setUp(self):
         super(Rev934Tests, self).setUp()
-        user = UserFactory(username='robot-mue-1-6pnjv')  # Username that hashes to bucket 1
+        self.user = UserFactory(username='robot-mue-1-6pnjv')  # Username that hashes to bucket 1
         self.client.login(
-            username=user.username,
+            username=self.user.username,
             password=UserFactory._DEFAULT_PASSWORD,  # pylint: disable=protected-access
         )
 
@@ -79,7 +79,7 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
             'upsell_flag': True,
             'experiment_bucket': 1,
             'user_upsell': True,
-            'basket_link': None,  # No verified mode means no basket link
+            'basket_url': None,  # No verified mode means no basket link
         }
         self.assertEqual(response.data, expected)
 
@@ -159,7 +159,7 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
         self.assertEqual(response.data, expected)
 
     @override_waffle_flag(MOBILE_UPSELL_FLAG, active=True)
-    def test_already_upgraded(self):  # BJH: failing in ways I don't expect
+    def test_already_upgraded(self):
         course = CourseFactory.create(
             start=now() - timedelta(days=30),
             run='test',
@@ -184,7 +184,7 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
         self.assertIn('basket_url', result)
         self.assertTrue(bool(result['basket_url']))
         expected = {
-            'show_upsell': False,  # BJH: this is coming back true
+            'show_upsell': False,
             'upsell_flag': True,
             'experiment_bucket': 1,
             'user_upsell': False,
