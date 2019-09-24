@@ -47,18 +47,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 from .utils import mock_get_score
 
 
-class MockGradesService(GradesService):
-    """
-    A mock grades service.
-    """
-    def __init__(self, mocked_return_value=None):
-        super(MockGradesService, self).__init__()
-        self.mocked_return_value = mocked_return_value
-
-    def get_subsection_grade_override(self, user_id, course_key_or_id, usage_key_or_id):
-        return self.mocked_return_value
-
-
 class HasCourseWithProblemsMixin(object):
     """
     Mixin to provide tests with a sample course with graded subsections
@@ -651,16 +639,13 @@ class FreezeGradingAfterCourseEndTest(HasCourseWithProblemsMixin, ModuleStoreTes
 
         with override_waffle_flag(self.freeze_grade_flag, active=freeze_flag_value):
             modified_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=1)
-            with patch('lms.djangoapps.grades.api') as mock_grade_service:
-                mock_grade_service.get_subsection_grade_override = MagicMock(
-                    return_value=MagicMock(modified=modified_datetime)
-                )
+            with patch('lms.djangoapps.grades.tasks._has_db_updated_with_new_score') as mock_has_db_updated:
                 result = recalculate_subsection_grade_v3.apply_async(kwargs=self.recalculate_subsection_grade_kwargs)
                 self._assert_for_freeze_grade_flag(
                     result,
                     freeze_flag_value,
                     end_date_adjustment,
                     mock_log,
-                    mock_grade_service,
+                    mock_has_db_updated,
                     '_recalculate_subsection_grade'
                 )

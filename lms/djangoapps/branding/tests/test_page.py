@@ -295,7 +295,7 @@ class IndexPageProgramsTests(SiteMixin, ModuleStoreTestCase):
     """
     def test_get_programs_with_type_called(self):
         views = [
-            (reverse('root'), 'student.views.get_programs_with_type'),
+            (reverse('root'), 'student.views.management.get_programs_with_type'),
             (reverse('courses'), 'courseware.views.views.get_programs_with_type'),
         ]
         for url, dotted_path in views:

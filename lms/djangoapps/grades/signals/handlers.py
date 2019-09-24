@@ -39,7 +39,7 @@ from .signals import (
 log = getLogger(__name__)
 
 
-@receiver(score_set)
+@receiver(score_set, dispatch_uid='submissions_score_set_handler')
 def submissions_score_set_handler(sender, **kwargs):  # pylint: disable=unused-argument
     """
     Consume the score_set signal defined in the Submissions API, and convert it
@@ -79,7 +79,7 @@ def submissions_score_set_handler(sender, **kwargs):  # pylint: disable=unused-a
     )
 
 
-@receiver(score_reset)
+@receiver(score_reset, dispatch_uid='submissions_score_reset_handler')
 def submissions_score_reset_handler(sender, **kwargs):  # pylint: disable=unused-argument
     """
     Consume the score_reset signal defined in the Submissions API, and convert
@@ -120,16 +120,18 @@ def disconnect_submissions_signal_receiver(signal):
     """
     if signal == score_set:
         handler = submissions_score_set_handler
+        dispatch_uid = 'submissions_score_set_handler'
     else:
         if signal != score_reset:
             raise ValueError("This context manager only handles score_set and score_reset signals.")
         handler = submissions_score_reset_handler
+        dispatch_uid = 'submissions_score_reset_handler'
 
-    signal.disconnect(handler)
+    signal.disconnect(dispatch_uid=dispatch_uid)
     try:
         yield
     finally:
-        signal.connect(handler)
+        signal.connect(handler, dispatch_uid=dispatch_uid)
 
 
 @receiver(SCORE_PUBLISHED)

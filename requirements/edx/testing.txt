@@ -38,7 +38,6 @@ backports.ssl-match-hostname==3.7.0.1  # via docker
 backports.tempfile==1.0   # via moto
 backports.weakref==1.0.post1  # via backports.tempfile
 beautifulsoup4==4.8.0
-before-after==1.0.1
 billiard==3.3.0.23
 bleach==2.1.4
 bok-choy==1.0.0
@@ -158,7 +157,7 @@ flake8==3.7.8             # via flake8-polyfill
 freezegun==0.3.12
 fs-s3fs==0.1.8
 fs==2.0.18
-funcsigs==1.0.2           # via pytest
+funcsigs==1.0.2
 functools32==3.2.3.post2 ; python_version == "2.7"  # via flake8
 future==0.17.1
 futures==3.3.0 ; python_version == "2.7"
@@ -200,7 +199,7 @@ markey==0.8
 markupsafe==1.1.1
 maxminddb==1.4.1
 mccabe==0.6.1             # via flake8, pylint
-mock==1.0.1
+mock==3.0.5
 git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a#egg=MongoDBProxy==0.1.0+edx.2
 mongoengine==0.10.0
 more-itertools==5.0.0     # via pytest, zipp

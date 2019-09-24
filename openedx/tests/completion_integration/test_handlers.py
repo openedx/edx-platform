@@ -121,7 +121,7 @@ class ScorableCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
         self.assertFalse(completion.exists())
 
     def test_signal_calls_handler(self):
-        with patch('completion.handlers.scorable_block_completion') as mock_handler:
+        with patch('completion.handlers.BlockCompletion.objects.submit_completion') as mock_handler:
             grades_signals.PROBLEM_WEIGHTED_SCORE_CHANGED.send_robust(
                 sender=self,
                 user_id=self.user.id,

@@ -2785,12 +2785,6 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
                     self.store.publish(unit.location, self.user_id)
                     signal_handler.send.assert_not_called()
 
-                    self.store.unpublish(unit.location, self.user_id)
-                    signal_handler.send.assert_not_called()
-
-                    self.store.delete_item(unit.location, self.user_id)
-                    signal_handler.send.assert_not_called()
-
                 signal_handler.send.assert_called_with('course_published', course_key=course.id)
 
                 # Test editing draftable block type without publish

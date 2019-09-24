@@ -39,7 +39,6 @@ backports.ssl-match-hostname==3.7.0.1
 backports.tempfile==1.0
 backports.weakref==1.0.post1
 beautifulsoup4==4.8.0
-before-after==1.0.1
 billiard==3.3.0.23
 bleach==2.1.4
 bok-choy==1.0.0
@@ -206,7 +205,7 @@ markey==0.8
 markupsafe==1.1.1
 maxminddb==1.4.1
 mccabe==0.6.1
-mock==1.0.1
+mock==3.0.5
 modernize==0.7
 git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a#egg=MongoDBProxy==0.1.0+edx.2
 mongoengine==0.10.0

@@ -18,7 +18,6 @@
 -r coverage.txt           # Utilities for calculating test coverage
 
 beautifulsoup4            # Library for extracting data from HTML and XML files
-before_after              # Syntactic sugar for mock, only used in one test case, not Python 3 compatible
 bok-choy                  # Framework for browser automation tests, based on selenium
 caniusepython3            # Library for checking the ability to upgrade to python3
 code-annotations          # Perform code annotation checking, such as for PII annotations

@@ -391,4 +391,4 @@ class StaticContentImporterTest(unittest.TestCase):
                 base_dir=base_dir
             )
             mock_file.assert_called_with(full_file_path, 'rb')
-            self.mocked_content_store.assert_called_once()
+            self.mocked_content_store.generate_thumbnail.assert_called_once()

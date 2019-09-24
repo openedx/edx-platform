@@ -678,8 +678,10 @@ class TestOra2ResponsesInstructorTask(TestInstructorTasks):
 
         with patch('lms.djangoapps.instructor_task.tasks.run_main_task') as mock_main_task:
             export_ora2_data(task_entry.id, task_xmodule_args)
-
             action_name = ugettext_noop('generated')
-            task_fn = partial(upload_ora2_data, task_xmodule_args)
 
-            mock_main_task.assert_called_once_with_args(task_entry.id, task_fn, action_name)
+            assert mock_main_task.call_count == 1
+            args = mock_main_task.call_args[0]
+            assert args[0] == task_entry.id
+            assert callable(args[1])
+            assert args[2] == action_name
