@@ -364,7 +364,6 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         self.check_data_sharing_consent(consent_required=True, consent_url=consent_url)
 
         mock_get_consent_url.assert_called_once()
-        mock_enterprise_enabled.assert_called_once()
 
     @httpretty.activate
     @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_uuid_for_request')
