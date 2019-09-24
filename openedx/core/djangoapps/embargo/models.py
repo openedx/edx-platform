@@ -39,6 +39,7 @@ from .messages import COURSEWARE_MESSAGES, ENROLL_MESSAGES
 log = logging.getLogger(__name__)
 
 
+@python_2_unicode_compatible
 class EmbargoedCourse(models.Model):
     """
     Enable course embargo on a course-by-course basis.
@@ -68,7 +69,7 @@ class EmbargoedCourse(models.Model):
         except cls.DoesNotExist:
             return False
 
-    def __unicode__(self):
+    def __str__(self):
         not_em = "Not "
         if self.embargoed:
             not_em = ""
@@ -374,6 +375,7 @@ class RestrictedCourse(models.Model):
         log.info("Invalidated cached messaging URLs ")
 
 
+@python_2_unicode_compatible
 class Country(models.Model):
     """Representation of a country.
 
@@ -388,7 +390,7 @@ class Country(models.Model):
         help_text=ugettext_lazy(u"Two character ISO country code.")
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return u"{name} ({code})".format(
             name=six.text_type(self.country.name),
             code=six.text_type(self.country)
@@ -399,6 +401,7 @@ class Country(models.Model):
         ordering = ['country']
 
 
+@python_2_unicode_compatible
 class CountryAccessRule(models.Model):
     """Course access rule based on the user's country.
 
@@ -521,7 +524,7 @@ class CountryAccessRule(models.Model):
         # that have access to the course.
         return list(whitelist_countries - blacklist_countries)
 
-    def __unicode__(self):
+    def __str__(self):
         if self.rule_type == self.WHITELIST_RULE:
             return _(u"Whitelist {country} for {course}").format(
                 course=six.text_type(self.restricted_course.course_key),
