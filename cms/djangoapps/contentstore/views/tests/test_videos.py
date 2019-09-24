@@ -1417,7 +1417,7 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
             response["Content-Disposition"],
             u"attachment; filename={course}_video_urls.csv".format(course=self.course.id.course)
         )
-        response_reader = StringIO(response.content if six.PY2 else response.content.decode('utf-8'))
+        response_reader = StringIO(response.content.decode('utf-8') if six.PY3 else response.content)
         reader = csv.DictReader(response_reader, dialect=csv.excel)
         self.assertEqual(
             reader.fieldnames,
@@ -1435,13 +1435,16 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
             }
             # Videos should be returned by creation date descending
             original_video = self.previous_uploads[-(i + 1)]
-            self.assertEqual(response_video["Name"], original_video["client_video_id"])
+            client_video_id = original_video["client_video_id"].encode('utf-8') if six.PY2 \
+                else original_video["client_video_id"]
+            self.assertEqual(response_video["Name"].encode('utf-8') if six.PY2
+                             else response_video["Name"], client_video_id)
             self.assertEqual(response_video["Duration"], str(original_video["duration"]))
             dateutil.parser.parse(response_video["Date Added"])
             self.assertEqual(response_video["Video ID"], original_video["edx_video_id"])
             self.assertEqual(response_video["Status"], convert_video_status(original_video))
             for profile in expected_profiles:
-                response_profile_url = response_video[u"{} URL".format(profile)]
+                response_profile_url = response_video["{} URL".format(profile)]  # pylint: disable=unicode-format-string
                 original_encoded_for_profile = next(
                     (
                         original_encoded
@@ -1451,7 +1454,10 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
                     None
                 )
                 if original_encoded_for_profile:
-                    self.assertEqual(response_profile_url, original_encoded_for_profile["url"])
+                    original_encoded_for_profile_url = original_encoded_for_profile["url"].encode('utf-8') if six.PY2 \
+                        else original_encoded_for_profile["url"]
+                    self.assertEqual(response_profile_url.encode('utf-8') if six.PY2 else response_profile_url,
+                                     original_encoded_for_profile_url)
                 else:
                     self.assertEqual(response_profile_url, "")
 
