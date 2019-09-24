@@ -274,6 +274,7 @@ $(function () {
   };
   
   var $grade_detail_graph = $("#${graph_div_id | n, js_escaped_string}");
+  $grade_detail_graph.width($grade_detail_graph.parent().width());
   if ($grade_detail_graph.length > 0) {
     var plot = $.plot($grade_detail_graph, series, options);
     
