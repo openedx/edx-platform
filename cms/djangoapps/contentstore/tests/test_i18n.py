@@ -9,7 +9,7 @@ from unittest import skip
 
 import mock
 from django.contrib.auth.models import User
-from django.utils import translation
+from django.utils import six, translation
 from django.utils.translation import get_language
 
 from contentstore.tests.utils import AjaxEnabledTestClient
@@ -94,17 +94,21 @@ class TestModuleI18nService(ModuleStoreTestCase):
 
             def __init__(self, module):
                 self.module = module
-                self.old_ugettext = module.ugettext
+                gettext_variant = 'ugettext' if six.PY2 else 'gettext'
+                self.old_ugettext = getattr(module, gettext_variant)
 
             def __enter__(self):
                 def new_ugettext(*args, **kwargs):
                     """ custom function """
                     output = self.old_ugettext(*args, **kwargs)
                     return "XYZ " + output
-                self.module.ugettext = new_ugettext
+
+                gettext_variant = 'ugettext' if six.PY2 else 'gettext'
+                setattr(self.module, gettext_variant, new_ugettext)
 
             def __exit__(self, _type, _value, _traceback):
-                self.module.ugettext = self.old_ugettext
+                gettext_variant = 'ugettext' if six.PY2 else 'gettext'
+                setattr(self.module, gettext_variant, self.old_ugettext)
 
         i18n_service = self.get_module_i18n_service(self.descriptor)
 
