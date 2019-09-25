@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """Tests of email marketing signal handlers."""
 from __future__ import absolute_import
 
@@ -678,3 +680,14 @@ class SailthruTests(TestCase):
         switch.return_value = True
         update_sailthru(None, self.user, 'verified', self.course_id)
         self.assertFalse(mock_sailthru_purchase.called)
+
+    @patch('openedx.core.djangoapps.waffle_utils.WaffleSwitchNamespace.is_enabled')
+    @patch('sailthru.sailthru_client.SailthruClient.purchase')
+    def test_encoding_is_working_for_email_contains_unicode(self, mock_sailthru_purchase, switch):
+        """Make sure encoding is working for emails contains unicode characters
+        while sending it to sail through.
+        """
+        switch.return_value = True
+        self.user.email = u'tèst@edx.org'
+        update_sailthru(None, self.user, 'audit', self.course_id)
+        self.assertTrue(mock_sailthru_purchase.called)
