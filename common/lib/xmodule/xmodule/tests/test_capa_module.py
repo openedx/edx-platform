@@ -1978,7 +1978,7 @@ class ProblemBlockTest(unittest.TestCase):
             self.assertEqual(event_info['answers'][CapaFactory.answer_key()], 'choice_3')
             # 'permutation' key added to record how problem was shown
             self.assertEqual(event_info['permutation'][CapaFactory.answer_key()],
-                              ('shuffle', ['choice_3', 'choice_1', 'choice_2', 'choice_0']))
+                             ('shuffle', ['choice_3', 'choice_1', 'choice_2', 'choice_0']))
             self.assertEqual(event_info['success'], 'correct')
 
     @unittest.skip("masking temporarily disabled")
@@ -2046,7 +2046,7 @@ class ProblemBlockTest(unittest.TestCase):
             self.assertEqual(event_info['answers'][CapaFactory.answer_key()], 'choice_2')
             # 'permutation' key added to record how problem was shown
             self.assertEqual(event_info['permutation'][CapaFactory.answer_key()],
-                              ('answerpool', ['choice_1', 'choice_3', 'choice_2', 'choice_0']))
+                             ('answerpool', ['choice_1', 'choice_3', 'choice_2', 'choice_0']))
             self.assertEqual(event_info['success'], 'incorrect')
 
     @ddt.unpack
