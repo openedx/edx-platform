@@ -227,6 +227,13 @@ FEATURES = {
     # course and that can be read from themes
     'ENABLE_OTHER_COURSE_SETTINGS': False,
 
+    # Write new CSM history to the extended table.
+    # This will eventually default to True and may be
+    # removed since all installs should have the separate
+    # extended history table. This is needed in the LMS and CMS 
+    # for migration consistency.
+    'ENABLE_CSMH_EXTENDED': True,
+
     # Enable support for content libraries. Note that content libraries are
     # only supported in courses using split mongo.
     'ENABLE_CONTENT_LIBRARIES': True,
@@ -1292,6 +1299,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.oauth_dispatch.apps.OAuthDispatchAppConfig',
     'oauth_provider',
     'courseware',
+    'coursewarehistoryextended',
     'survey.apps.SurveyConfig',
     'lms.djangoapps.verify_student.apps.VerifyStudentConfig',
     'completion',
