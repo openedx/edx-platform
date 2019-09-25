@@ -10,6 +10,7 @@ from mock import patch
 from edx_django_utils.cache import TieredCache
 from opaque_keys.edx.keys import CourseKey
 
+from lms.djangoapps.certificates.signals import listen_for_passing_grade
 from student.tests.factories import UserFactory
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED
 from openedx.features.enterprise_support.tests.factories import (
@@ -125,3 +126,4 @@ class EnterpriseSupportSignals(TestCase):
                 'course_run_id': self.course_id
             }
             mock_task_apply.assert_called_once_with(kwargs=task_kwargs)
+            COURSE_GRADE_NOW_PASSED.connect(listen_for_passing_grade, dispatch_uid='new_passing_learner')
