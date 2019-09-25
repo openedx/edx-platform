@@ -3,15 +3,22 @@
 Test the Blockstore-based XBlock runtime and content libraries together.
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
+import json
 import unittest
 
 from django.conf import settings
 from django.test import TestCase
 from organizations.models import Organization
+from rest_framework.test import APIClient
 from xblock.core import XBlock, Scope
 from xblock import fields
 
+from courseware.model_data import get_score
 from openedx.core.djangoapps.content_libraries import api as library_api
+from openedx.core.djangoapps.content_libraries.tests.test_content_libraries import (
+    URL_BLOCK_RENDER_VIEW,
+    URL_BLOCK_GET_HANDLER_URL,
+)
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.lib import blockstore_api
 from student.tests.factories import UserFactory
@@ -40,8 +47,8 @@ class ContentLibraryContentTestMixin(object):
     def setUpClass(cls):
         super(ContentLibraryContentTestMixin, cls).setUpClass()
         # Create a couple students that the tests can use
-        cls.student_a = UserFactory.create(username="Alice", email="alice@example.com")
-        cls.student_b = UserFactory.create(username="Bob", email="bob@example.com")
+        cls.student_a = UserFactory.create(username="Alice", email="alice@example.com", password="edx")
+        cls.student_b = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
         # Create a collection using Blockstore API directly only because there
         # is not yet any Studio REST API for doing so:
         cls.collection = blockstore_api.create_collection("Content Library Test Collection")
@@ -187,3 +194,69 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
         block_instance2 = block_instance1.runtime.get_block(block_usage_key)
         # Now they should be equal, because we've saved and re-loaded instance2:
         self.assertEqual(block_instance1.user_str, block_instance2.user_str)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == "lms.urls", "Scores are only used in the LMS")
+    def test_scores_persisted(self):
+        """
+        Test that a block's emitted scores are cached in StudentModule
+
+        In the future if there is a REST API to retrieve individual block's
+        scores, that should be used instead of checking StudentModule directly.
+        """
+        block_id = library_api.create_library_block(self.library.key, "problem", "scored_problem").usage_key
+        new_olx = """
+        <problem display_name="New Multi Choice Question" max_attempts="5">
+            <multiplechoiceresponse>
+                <p>This is a normal capa problem. It has "maximum attempts" set to **5**.</p>
+                <label>Blockstore is designed to store.</label>
+                <choicegroup type="MultipleChoice">
+                    <choice correct="false">XBlock metadata only</choice>
+                    <choice correct="true">XBlock data/metadata and associated static asset files</choice>
+                    <choice correct="false">Static asset files for XBlocks and courseware</choice>
+                    <choice correct="false">XModule metadata only</choice>
+                </choicegroup>
+            </multiplechoiceresponse>
+        </problem>
+        """.strip()
+        library_api.set_library_block_olx(block_id, new_olx)
+        library_api.publish_changes(self.library.key)
+
+        # Now view the problem as Alice:
+        client = APIClient()
+        client.login(username=self.student_a.username, password='edx')
+        student_view_result = client.get(URL_BLOCK_RENDER_VIEW.format(block_key=block_id, view_name='student_view'))
+        problem_key = "input_{}_2_1".format(block_id)
+        self.assertIn(problem_key, student_view_result.data["content"])
+        # And submit a wrong answer:
+        result = client.get(URL_BLOCK_GET_HANDLER_URL.format(block_key=block_id, handler_name='xmodule_handler'))
+        problem_check_url = result.data["handler_url"] + 'problem_check'
+
+        submit_result = client.post(problem_check_url, data={problem_key: "choice_3"})
+        self.assertEqual(submit_result.status_code, 200)
+        submit_data = json.loads(submit_result.content)
+        self.assertDictContainsSubset({
+            "current_score": 0,
+            "total_possible": 1,
+            "attempts_used": 1,
+        }, submit_data)
+
+        # Now test that the score is also persisted in StudentModule:
+        # If we add a REST API to get an individual block's score, that should be checked instead of StudentModule.
+        sm = get_score(self.student_a, block_id)
+        self.assertEqual(sm.grade, 0)
+        self.assertEqual(sm.max_grade, 1)
+
+        # And submit a correct answer:
+        submit_result = client.post(problem_check_url, data={problem_key: "choice_1"})
+        self.assertEqual(submit_result.status_code, 200)
+        submit_data = json.loads(submit_result.content)
+        self.assertDictContainsSubset({
+            "current_score": 1,
+            "total_possible": 1,
+            "attempts_used": 2,
+        }, submit_data)
+        # Now test that the score is also updated in StudentModule:
+        # If we add a REST API to get an individual block's score, that should be checked instead of StudentModule.
+        sm = get_score(self.student_a, block_id)
+        self.assertEqual(sm.grade, 1)
+        self.assertEqual(sm.max_grade, 1)
