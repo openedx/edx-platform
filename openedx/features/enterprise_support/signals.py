@@ -13,6 +13,8 @@ from django.dispatch import receiver
 from email_marketing.tasks import update_user
 
 from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomer, EnterpriseCustomerUser
+from integrated_channels.integrated_channel.tasks import transmit_single_learner_data
+from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED
 from openedx.features.enterprise_support.tasks import clear_enterprise_customer_data_consent_share_cache
 from openedx.features.enterprise_support.utils import clear_data_consent_share_cache
 
@@ -64,3 +66,15 @@ def update_dsc_cache_on_enterprise_customer_update(sender, instance, **kwargs):
                 task_id=result.task_id,
                 kwargs=kwargs,
             ))
+
+
+@receiver(COURSE_GRADE_NOW_PASSED, dispatch_uid="new_passing_enterprise_learner")
+def handle_enterprise_learner_passing_grade(sender, user, course_id, **kwargs):  # pylint: disable=unused-argument
+    """
+    Listen for a learner passing a course, transmit data to relevant integrated channel
+    """
+    kwargs = {
+        'username': six.text_type(user.username),
+        'course_run_id': six.text_type(course_id)
+    }
+    transmit_single_learner_data.apply_async(kwargs=kwargs)
