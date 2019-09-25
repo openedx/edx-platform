@@ -111,6 +111,32 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
         self.assertEqual(result, expected)
 
     @override_waffle_flag(MOBILE_UPSELL_FLAG, active=True)
+    def test_expired_verified_mode(self):
+        course = CourseFactory.create(
+            start=now() - timedelta(days=30),
+            run='test',
+            display_name='test',
+        )
+        CourseModeFactory.create(
+            mode_slug=CourseMode.VERIFIED,
+            course_id=course.id,
+            min_price=10,
+            sku=six.text_type(uuid4().hex),
+            expiration_datetime=now() - timedelta(days=30),
+        )
+
+        response = self.client.get(self.url, {'course_id': course.id})
+        self.assertEqual(response.status_code, 200)
+        expected = {
+            'show_upsell': False,
+            'upsell_flag': True,
+            'experiment_bucket': 1,
+            'user_upsell': True,
+            'basket_url': None,  # Expired verified mode means no basket link
+        }
+        self.assertEqual(response.data, expected)
+
+    @override_waffle_flag(MOBILE_UPSELL_FLAG, active=True)
     def test_not_started_course(self):
         course = CourseFactory.create(
             start=now() + timedelta(days=30),
