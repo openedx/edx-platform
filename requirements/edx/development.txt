@@ -282,7 +282,6 @@ radon==4.0.0
 recommender-xblock==1.4.4
 recommonmark==0.6.0
 redis==2.10.6
-reportlab==3.5.26
 requests-oauthlib==1.1.0
 requests==2.22.0
 rest-condition==1.0.3
