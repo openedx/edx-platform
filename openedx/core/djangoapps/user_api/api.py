@@ -151,6 +151,9 @@ def get_login_session_form(request):
         label=email_label,
         placeholder=email_placeholder,
         instructions=email_instructions,
+        error_messages={
+            "required": _(u"Please enter your Email."),
+        },
         restrictions={
             "min_length": accounts.EMAIL_MIN_LENGTH,
             "max_length": accounts.EMAIL_MAX_LENGTH,
@@ -165,6 +168,9 @@ def get_login_session_form(request):
         "password",
         label=password_label,
         field_type="password",
+        error_messages={
+            "required": _(u"Please enter your Password."),
+        },
         restrictions={'max_length': DEFAULT_MAX_PASSWORD_LENGTH}
     )
 
