@@ -126,7 +126,7 @@ class TestLTI(BaseTestXmodule):
     def test_lti_preview_handler(self):
         generated_content = self.item_descriptor.preview_handler(None, None).body
         expected_content = self.runtime.render_template('lti_form.html', self.expected_context)
-        self.assertEqual(generated_content, expected_content)
+        self.assertEqual(generated_content.decode('utf-8'), expected_content)
 
 
 class TestLTIModuleListing(SharedModuleStoreTestCase):
