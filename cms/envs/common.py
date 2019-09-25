@@ -230,7 +230,7 @@ FEATURES = {
     # Write new CSM history to the extended table.
     # This will eventually default to True and may be
     # removed since all installs should have the separate
-    # extended history table. This is needed in the LMS and CMS 
+    # extended history table. This is needed in the LMS and CMS
     # for migration consistency.
     'ENABLE_CSMH_EXTENDED': True,
 
