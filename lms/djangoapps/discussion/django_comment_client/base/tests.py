@@ -1728,35 +1728,6 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
 
     @patch('eventtracking.tracker.emit')
     @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
-    def test_thread_created_event(self, __, mock_emit):
-        request = RequestFactory().post(
-            "dummy_url", {
-                "thread_type": "discussion",
-                "body": "Test text",
-                "title": "Test",
-                "auto_subscribe": True
-            }
-        )
-        request.user = self.student
-        request.view_name = "create_thread"
-
-        views.create_thread(request, course_id=six.text_type(self.course.id), commentable_id="test_commentable")
-
-        event_name, event = mock_emit.call_args[0]
-        self.assertEqual(event_name, 'edx.forum.thread.created')
-        self.assertEqual(event['body'], 'Test text')
-        self.assertEqual(event['title'], 'Test')
-        self.assertEqual(event['commentable_id'], 'test_commentable')
-        self.assertEqual(event['user_forums_roles'], ['Student'])
-        self.assertEqual(event['options']['followed'], True)
-        self.assertEqual(event['user_course_roles'], ['Wizard'])
-        self.assertEqual(event['anonymous'], False)
-        self.assertEqual(event['group_id'], None)
-        self.assertEqual(event['thread_type'], 'discussion')
-        self.assertEqual(event['anonymous_to_peers'], False)
-
-    @patch('eventtracking.tracker.emit')
-    @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
     def test_response_event(self, mock_request, mock_emit):
         """
         Check to make sure an event is fired when a user responds to a thread.
