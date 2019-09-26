@@ -747,17 +747,28 @@ class MatlabTest(unittest.TestCase):
     def test_get_html(self):
         # usual output
         output = self.the_input.get_html()
-        self.assertEqual(
-            etree.tostring(output),
-            textwrap.dedent("""
-            <div>{\'status\': Status(\'queued\'), \'button_enabled\': True, \'rows\': \'10\', \'queue_len\': \'3\',
-            \'mode\': \'\', \'tabsize\': 4, \'cols\': \'80\', \'STATIC_URL\': \'/dummy-static/\', \'linenumbers\':
-            \'true\', \'queue_msg\': \'\', \'value\': \'print "good evening"\',
+        if six.PY2:
+            expected_string = """
+            <div>{\'status\': Status(\'queued\'), \'button_enabled\': True, \'rows\': \'10\',
+            \'queue_len\': \'3\', \'mode\': \'\', \'tabsize\': 4, \'cols\': \'80\', \'STATIC_URL\': \'/dummy-static/\',
+            \'linenumbers\': \'true\', \'queue_msg\': \'\', \'value\': \'print "good evening"\',
             \'msg\': u\'Submitted. As soon as a response is returned, this message will be replaced by that feedback.\',
             \'matlab_editor_js\': \'/dummy-static/js/vendor/CodeMirror/octave.js\',
             \'hidden\': \'\', \'id\': \'prob_1_2\',
             \'describedby_html\': Markup(u\'aria-describedby="status_prob_1_2"\'), \'response_data\': {}}</div>
-            """).replace('\n', ' ').strip()
+            """
+        else:
+            expected_string = """
+            <div>{\'matlab_editor_js\': \'/dummy-static/js/vendor/CodeMirror/octave.js\',
+            \'value\': \'print "good evening"\', \'hidden\': \'\',
+            \'msg\': \'Submitted. As soon as a response is returned, this message will be replaced by that feedback.\',
+            \'status\': Status(\'queued\'), \'response_data\': {}, \'queue_msg\': \'\', \'mode\': \'\',
+            \'id\': \'prob_1_2\', \'queue_len\': \'3\', \'tabsize\': 4, \'STATIC_URL\': \'/dummy-static/\',
+            \'linenumbers\': \'true\', \'cols\': \'80\', \'button_enabled\': True, \'rows\': \'10\',
+            \'describedby_html\': Markup(\'aria-describedby="status_prob_1_2"\')}</div>"""
+        self.assertEqual(
+            etree.tostring(output).decode('utf-8'),
+            textwrap.dedent(expected_string).replace('\n', ' ').strip(),
         )
 
         # test html, that is correct HTML5 html, but is not parsable by XML parser.
@@ -768,15 +779,25 @@ class MatlabTest(unittest.TestCase):
                 <div>Right click <a href=https://endpoint.mss-mathworks.com/media/filename.wav>here</a> and click \"Save As\" to download the file</div></div>
                 <div style='white-space:pre' class='commandWindowOutput'></div><ul></ul></div>
             """).replace('\n', '')
+
         output = self.the_input.get_html()
-        self.assertEqual(
-            etree.tostring(output),
-            textwrap.dedent("""
+        if six.PY2:
+            expected_string = """
             <div class='matlabResponse'><div id='mwAudioPlaceHolder'>
             <audio src='data:audio/wav;base64=' autobuffer="" controls="" autoplay="">Audio is not supported on this browser.</audio>
             <div>Right click <a href="https://endpoint.mss-mathworks.com/media/filename.wav">here</a> and click \"Save As\" to download the file</div></div>
             <div style='white-space:pre' class='commandWindowOutput'/><ul/></div>
-            """).replace('\n', '').replace('\'', '\"')
+            """
+        else:
+            expected_string = """
+            <div class="matlabResponse"><div id="mwAudioPlaceHolder">
+            <audio autobuffer="" controls="" autoplay="" src="data:audio/wav;base64=">Audio is not supported on this browser.</audio>
+            <div>Right click <a href="https://endpoint.mss-mathworks.com/media/filename.wav">here</a> and click \"Save As\" to download the file</div></div>
+            <div style="white-space:pre" class="commandWindowOutput"/><ul/></div>
+            """
+        self.assertEqual(
+            etree.tostring(output).decode('utf-8'),
+            textwrap.dedent(expected_string).replace('\n', '').replace('\'', '\"')
         )
 
         # check that exception is raised during parsing for html.
