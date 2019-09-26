@@ -32,6 +32,7 @@ from .common import *
 from openedx.core.lib.derived import derive_settings  # pylint: disable=wrong-import-order
 from openedx.core.lib.logsettings import get_logger_config  # pylint: disable=wrong-import-order
 
+
 # SERVICE_VARIANT specifies name of the variant used, which decides what JSON
 # configuration files are read during startup.
 SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
@@ -45,6 +46,10 @@ CONFIG_ROOT = path(os.environ.get('CONFIG_ROOT', ENV_ROOT))
 # based on the service variant. If no variant is use, don't use a
 # prefix.
 CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
+
+# Authorizenet payment processor set a cookie for dashboard to show pending course purchased dashoard
+# notification. This cookie domain will be used to set and delete that cookie.
+ECOMMERCE_COOKIE_DOMAIN = os.environ.get('ECOMMERCE_COOKIE_DOMAIN', None)
 
 ################################ ALWAYS THE SAME ##############################
 
