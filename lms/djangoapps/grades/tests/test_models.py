@@ -319,7 +319,9 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
         grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
         self.assertEqual(self.params['earned_all'], grade.earned_all)
         self.assertEqual(self.params['earned_graded'], grade.earned_graded)
-
+        history = override.get_history()
+        self.assertEqual(1, len(list(history)))
+        self.assertEqual('+', list(history)[0].history_type)
         # Any score values that aren't specified should use the values from grade as defaults
         self.assertEqual(0, override.earned_all_override)
         self.assertEqual(0, override.earned_graded_override)

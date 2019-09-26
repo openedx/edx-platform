@@ -689,6 +689,9 @@ class PersistentSubsectionGradeOverride(models.Model):
             u"possible_graded_override: {}".format(self.possible_graded_override),
         ])
 
+    def get_history(self):
+        return self.history.all()  # pylint: disable=no-member
+
     @classmethod
     def prefetch(cls, user_id, course_key):
         get_cache(cls._CACHE_NAMESPACE)[(user_id, str(course_key))] = {
