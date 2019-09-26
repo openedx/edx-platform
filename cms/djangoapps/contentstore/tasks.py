@@ -12,7 +12,6 @@ from datetime import datetime
 from math import ceil
 from tempfile import NamedTemporaryFile, mkdtemp
 
-import six
 from celery import group
 from celery.task import task
 from celery.utils.log import get_task_logger
@@ -750,8 +749,8 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
     # Locate the uploaded OLX archive (and download it from S3 if necessary)
     # Do everything in a try-except block to make sure everything is properly cleaned up.
     data_root = path(settings.GITHUB_REPO_ROOT)
-    subdir = base64.urlsafe_b64encode(six.b(repr(courselike_key)))
-    course_dir = data_root / subdir.decode('utf-8')
+    subdir = base64.urlsafe_b64encode(repr(courselike_key))
+    course_dir = data_root / subdir
     try:
         self.status.set_state(u'Unpacking')
 
