@@ -8,7 +8,6 @@ import gettext
 from unittest import skip
 
 import mock
-import six
 from django.contrib.auth.models import User
 from django.utils import translation
 from django.utils.translation import get_language
