@@ -22,10 +22,11 @@ from six.moves import range
 # These imports refer to lms djangoapps.
 # Their testcases are only run under lms.
 from course_modes.tests.factories import CourseModeFactory
+
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.commerce.utils import ECOMMERCE_DATE_FORMAT
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, EnrollmentRefundConfiguration
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -168,6 +169,31 @@ class RefundableTest(SharedModuleStoreTestCase):
     def test_refund_cutoff_date_no_attributes(self):
         """ Assert that the None is returned when no order number attribute is found."""
         self.assertIsNone(self.enrollment.refund_cutoff_date())
+
+    @patch('openedx.core.djangoapps.commerce.utils.ecommerce_api_client')
+    def test_refund_cutoff_date_with_date_placed_attr(self, mock_ecommerce_api_client):
+        """
+        Assert that the refund_cutoff_date returns order placement date if order:date_placed
+        attribute exist without calling ecommerce.
+        """
+        now = datetime.now(pytz.UTC).replace(microsecond=0)
+        order_date = now + timedelta(days=2)
+        course_start = now + timedelta(days=1)
+
+        self.enrollment.course_overview.start = course_start
+        self.enrollment.attributes.create(
+            enrollment=self.enrollment,
+            namespace='order',
+            name='date_placed',
+            value=order_date.strftime(ECOMMERCE_DATE_FORMAT)
+        )
+
+        refund_config = EnrollmentRefundConfiguration.current()
+        self.assertEqual(
+            self.enrollment.refund_cutoff_date(),
+            order_date + refund_config.refund_window
+        )
+        mock_ecommerce_api_client.assert_not_called()
 
     @httpretty.activate
     @override_settings(ECOMMERCE_API_URL=TEST_API_URL)

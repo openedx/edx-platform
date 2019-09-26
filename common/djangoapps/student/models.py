@@ -1765,8 +1765,45 @@ class CourseEnrollment(models.Model):
         # NOTE: This is here to avoid circular references
         from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, ECOMMERCE_DATE_FORMAT
 
+        date_placed = self.get_order_attribute_value('date_placed')
+
+        if not date_placed:
+            order_number = self.get_order_attribute_value('order_number')
+            if not order_number:
+                return None
+
+            try:
+                order = ecommerce_api_client(self.user).orders(order_number).get()
+                date_placed = order['date_placed']
+            except HttpClientError:
+                log.warning(
+                    u"Encountered HttpClientError while getting order details from ecommerce. "
+                    u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
+                return None
+
+            except HttpServerError:
+                log.warning(
+                    u"Encountered HttpServerError while getting order details from ecommerce. "
+                    u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
+                return None
+
+            except SlumberBaseException:
+                log.warning(
+                    u"Encountered an error while getting order details from ecommerce. "
+                    u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
+                return None
+
+        refund_window_start_date = max(
+            datetime.strptime(date_placed, ECOMMERCE_DATE_FORMAT),
+            self.course_overview.start.replace(tzinfo=None)
+        )
+
+        return refund_window_start_date.replace(tzinfo=UTC) + EnrollmentRefundConfiguration.current().refund_window
+
+    def get_order_attribute_value(self, attr_name):
+        """ Get and return course enrollment order attribute's value."""
         try:
-            attribute = self.attributes.get(namespace='order', name='order_number')
+            attribute = self.attributes.get(namespace='order', name=attr_name)
         except ObjectDoesNotExist:
             return None
         except MultipleObjectsReturned:
@@ -1777,36 +1814,9 @@ class CourseEnrollment(models.Model):
                 self.user.id,
                 enrollment_id
             )
-            attribute = self.attributes.filter(namespace='order', name='order_number').last()
+            attribute = self.attributes.filter(namespace='order', name=attr_name).last()
 
-        order_number = attribute.value
-        try:
-            order = ecommerce_api_client(self.user).orders(order_number).get()
-
-        except HttpClientError:
-            log.warning(
-                u"Encountered HttpClientError while getting order details from ecommerce. "
-                u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
-            return None
-
-        except HttpServerError:
-            log.warning(
-                u"Encountered HttpServerError while getting order details from ecommerce. "
-                u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
-            return None
-
-        except SlumberBaseException:
-            log.warning(
-                u"Encountered an error while getting order details from ecommerce. "
-                u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
-            return None
-
-        refund_window_start_date = max(
-            datetime.strptime(order['date_placed'], ECOMMERCE_DATE_FORMAT),
-            self.course_overview.start.replace(tzinfo=None)
-        )
-
-        return refund_window_start_date.replace(tzinfo=UTC) + EnrollmentRefundConfiguration.current().refund_window
+        return attribute.value
 
     @property
     def username(self):
