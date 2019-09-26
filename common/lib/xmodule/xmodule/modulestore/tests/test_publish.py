@@ -218,7 +218,7 @@ class DraftPublishedOpTestCourseSetup(unittest.TestCase):
             parent_id = 'course'
             for idx in range(num_items):
                 if parent_type != 'course':
-                    parent_id = _make_block_id(parent_type, idx / 2)
+                    parent_id = _make_block_id(parent_type, idx // 2)
                 parent_item = getattr(self, parent_id)
                 block_id = _make_block_id(block_type, idx)
                 setattr(self, block_id, ItemFactory.create(
