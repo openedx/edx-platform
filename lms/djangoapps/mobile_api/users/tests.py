@@ -19,7 +19,7 @@ from six.moves import range
 from six.moves.urllib.parse import parse_qs  # pylint: disable=import-error
 
 from course_modes.models import CourseMode
-from courseware.access_response import MilestoneAccessError, StartDateError, VisibilityError
+from lms.djangoapps.courseware.access_response import MilestoneAccessError, StartDateError, VisibilityError
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory

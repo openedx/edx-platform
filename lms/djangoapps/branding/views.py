@@ -17,7 +17,7 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 import branding.api as branding_api
-import courseware.views.views
+import lms.djangoapps.courseware.views.views as courseware_views
 import student.views
 from edxmako.shortcuts import marketing_link, render_to_response
 from openedx.core.djangoapps.lang_pref.api import released_languages
@@ -90,7 +90,7 @@ def courses(request):
 
     #  we do not expect this case to be reached in cases where
     #  marketing is enabled or the courses are not browsable
-    return courseware.views.views.courses(request)
+    return courseware_views.courses(request)
 
 
 def _footer_static_url(request, name):

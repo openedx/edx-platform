@@ -13,8 +13,8 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import format_course_price, get_cosmetic_verified_display_price, CourseMode
-from courseware.access import has_staff_access_to_preview_mode
-from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
+from lms.djangoapps.courseware.access import has_staff_access_to_preview_mode
+from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.catalog.utils import get_programs

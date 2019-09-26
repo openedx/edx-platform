@@ -10,7 +10,7 @@ from logging import getLogger
 from lazy import lazy
 from submissions import api as submissions_api
 
-from courseware.model_data import ScoresClient
+from lms.djangoapps.courseware.model_data import ScoresClient
 from lms.djangoapps.grades.config import assume_zero_if_absent, should_persist_grades
 from lms.djangoapps.grades.models import PersistentSubsectionGrade
 from lms.djangoapps.grades.scores import possibly_scored

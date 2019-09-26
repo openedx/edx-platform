@@ -7,7 +7,7 @@ from __future__ import absolute_import
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
-from courseware.permissions import EDIT_BOOKMARK
+from lms.djangoapps.courseware.permissions import EDIT_BOOKMARK
 from openedx.features.course_experience.course_tools import CourseTool
 from student.models import CourseEnrollment
 

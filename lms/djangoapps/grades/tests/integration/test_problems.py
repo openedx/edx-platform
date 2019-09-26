@@ -10,7 +10,7 @@ from crum import set_current_request
 from six.moves import range
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
+from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from openedx.core.djangolib.testing.utils import get_mock_request
 from student.models import CourseEnrollment

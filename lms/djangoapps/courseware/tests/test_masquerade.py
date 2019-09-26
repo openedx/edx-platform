@@ -18,10 +18,12 @@ from pytz import UTC
 from xblock.runtime import DictKeyValueStore
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
-from courseware.masquerade import CourseMasquerade, MasqueradingKeyValueStore, get_masquerading_user_group
-from courseware.tests.factories import StaffFactory
-from courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_group_member
-from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
+from lms.djangoapps.courseware.masquerade import (
+    CourseMasquerade, MasqueradingKeyValueStore, get_masquerading_user_group,
+)
+from lms.djangoapps.courseware.tests.factories import StaffFactory
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_group_member
+from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference

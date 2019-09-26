@@ -4,7 +4,7 @@ Encapsulates permissions checks for Course Blocks API
 
 from __future__ import absolute_import
 
-from courseware.access import has_access
+from lms.djangoapps.courseware.access import has_access
 from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
 

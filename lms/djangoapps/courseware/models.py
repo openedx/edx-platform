@@ -27,7 +27,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import BlockTypeKeyField, CourseKeyField, LearningContextKeyField, UsageKeyField
-from courseware.fields import UnsignedBigIntAutoField
+from lms.djangoapps.courseware.fields import UnsignedBigIntAutoField
 from six import text_type
 from six.moves import range
 
@@ -447,6 +447,9 @@ class CourseDynamicUpgradeDeadlineConfiguration(OptOutDynamicUpgradeDeadlineMixi
 
     .. no_pii:
     """
+    class Meta(object):
+        app_label = "courseware"
+
     KEY_FIELDS = ('course_id',)
 
     course_id = CourseKeyField(max_length=255, db_index=True)
@@ -471,6 +474,9 @@ class OrgDynamicUpgradeDeadlineConfiguration(OptOutDynamicUpgradeDeadlineMixin, 
 
     .. no_pii:
     """
+    class Meta(object):
+        app_label = "courseware"
+
     KEY_FIELDS = ('org_id',)
 
     org_id = models.CharField(max_length=255, db_index=True)

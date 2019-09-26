@@ -31,7 +31,7 @@ from six import text_type
 
 import dashboard.git_import as git_import
 import track.views
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 from dashboard.git_import import GitImportError
 from dashboard.models import CourseImportLog
 from edxmako.shortcuts import render_to_response

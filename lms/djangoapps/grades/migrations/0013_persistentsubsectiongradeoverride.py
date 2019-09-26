@@ -3,7 +3,7 @@ from __future__ import absolute_import, unicode_literals
 
 from django.db import migrations, models
 
-from courseware.fields import UnsignedBigIntOneToOneField
+from lms.djangoapps.courseware.fields import UnsignedBigIntOneToOneField
 
 
 class Migration(migrations.Migration):

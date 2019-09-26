@@ -36,20 +36,20 @@ from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope, String
 
-import courseware.views.views as views
+import lms.djangoapps.courseware.views.views as views
 import shoppingcart
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.access_utils import check_course_open_for_learner
-from courseware.model_data import FieldDataCache, set_score
-from courseware.module_render import get_module, handle_xblock_callback
-from courseware.tests.factories import GlobalStaffFactory, RequestFactoryNoCsrf, StudentModuleFactory
-from courseware.tests.helpers import get_expiration_banner_text
-from courseware.testutils import RenderXBlockTestMixin
-from courseware.url_helpers import get_redirect_url
-from courseware.user_state_client import DjangoXBlockUserStateClient
+from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
+from lms.djangoapps.courseware.model_data import FieldDataCache, set_score
+from lms.djangoapps.courseware.module_render import get_module, handle_xblock_callback
+from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, RequestFactoryNoCsrf, StudentModuleFactory
+from lms.djangoapps.courseware.tests.helpers import get_expiration_banner_text
+from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
+from lms.djangoapps.courseware.url_helpers import get_redirect_url
+from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -347,7 +347,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         self._verify_index_response(expected_response_code=404, chapter_name='non-existent')
 
     def test_index_nonexistent_chapter_masquerade(self):
-        with patch('courseware.views.index.setup_masquerade') as patch_masquerade:
+        with patch('lms.djangoapps.courseware.views.index.setup_masquerade') as patch_masquerade:
             masquerade = MagicMock(role='student')
             patch_masquerade.return_value = (masquerade, self.user)
             self._verify_index_response(expected_response_code=302, chapter_name='non-existent')
@@ -356,7 +356,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         self._verify_index_response(expected_response_code=404, section_name='non-existent')
 
     def test_index_nonexistent_section_masquerade(self):
-        with patch('courseware.views.index.setup_masquerade') as patch_masquerade:
+        with patch('lms.djangoapps.courseware.views.index.setup_masquerade') as patch_masquerade:
             masquerade = MagicMock(role='student')
             patch_masquerade.return_value = (masquerade, self.user)
             self._verify_index_response(expected_response_code=302, section_name='non-existent')
@@ -1700,7 +1700,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         bannerText = get_expiration_banner_text(user, self.course)
         self.assertNotContains(response, bannerText, html=True)
 
-    @patch('courseware.views.views.is_course_passed', PropertyMock(return_value=True))
+    @patch('lms.djangoapps.courseware.views.views.is_course_passed', PropertyMock(return_value=True))
     @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     @override_settings(FEATURES=FEATURES_WITH_DISABLE_HONOR_CERTIFICATE)
     @ddt.data(CourseMode.AUDIT, CourseMode.HONOR)
@@ -2184,14 +2184,14 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
         self.assertIn("Your certificate will be available when you pass the course.", resp.content)
 
-    @patch('courseware.views.views.is_course_passed', return_value=True)
+    @patch('lms.djangoapps.courseware.views.views.is_course_passed', return_value=True)
     @override_settings(CERT_QUEUE='certificates', LMS_SEGMENT_KEY="foobar")
     def test_user_with_passing_grade(self, mock_is_course_passed):
         # If user has above passing grading then json will return cert generating message and
         # status valid code
         # mocking xqueue and Segment analytics
 
-        analytics_patcher = patch('courseware.views.views.segment')
+        analytics_patcher = patch('lms.djangoapps.courseware.views.views.segment')
         mock_tracker = analytics_patcher.start()
         self.addCleanup(analytics_patcher.stop)
 
@@ -2465,7 +2465,7 @@ class TestIndexView(ModuleStoreTestCase):
                     self.assertIn('xblock-student_view-html', unicode_content)
                     self.assertIn('xblock-student_view-video', unicode_content)
 
-    @patch('courseware.views.views.CourseTabView.course_open_for_learner_enrollment')
+    @patch('lms.djangoapps.courseware.views.views.CourseTabView.course_open_for_learner_enrollment')
     @patch('openedx.core.djangoapps.util.user_messages.PageLevelMessages.register_warning_message')
     def test_courseware_messages_differentiate_for_anonymous_users(
             self, patch_register_warning_message, patch_course_open_for_learner_enrollment
@@ -2496,7 +2496,7 @@ class TestIndexView(ModuleStoreTestCase):
     @patch('openedx.core.djangoapps.util.user_messages.PageLevelMessages.register_warning_message')
     def test_courseware_messages_masters_only(self, patch_register_warning_message):
         with patch(
-                'courseware.views.views.CourseTabView.course_open_for_learner_enrollment'
+                'lms.djangoapps.courseware.views.views.CourseTabView.course_open_for_learner_enrollment'
         ) as patch_course_open_for_learner_enrollment:
             course = CourseFactory()
 
@@ -2535,7 +2535,8 @@ class TestIndexView(ModuleStoreTestCase):
     @ddt.unpack
     def test_should_show_enroll_button(self, course_open_for_self_enrollment,
                                        invitation_only, is_masters_only, expected_should_show_enroll_button):
-        with patch('courseware.views.views.course_open_for_self_enrollment') as patch_course_open_for_self_enrollment, \
+        with patch('lms.djangoapps.courseware.views.views.course_open_for_self_enrollment') \
+                as patch_course_open_for_self_enrollment, \
                 patch('course_modes.models.CourseMode.is_masters_only') as patch_is_masters_only:
             course = CourseFactory()
 
@@ -2994,7 +2995,7 @@ class TestIndexViewCrawlerStudentStateWrites(SharedModuleStoreTestCase):
 
     def test_write_by_default(self):
         """By default, always write student state, regardless of user agent."""
-        with patch('courseware.model_data.UserStateCache.set_many') as patched_state_client_set_many:
+        with patch('lms.djangoapps.courseware.model_data.UserStateCache.set_many') as patched_state_client_set_many:
             # Simulate someone using Chrome
             self._load_courseware('Mozilla/5.0 AppleWebKit/537.36')
             self.assertTrue(patched_state_client_set_many.called)
@@ -3007,7 +3008,7 @@ class TestIndexViewCrawlerStudentStateWrites(SharedModuleStoreTestCase):
     def test_writes_with_config(self):
         """Test state writes (or lack thereof) based on config values."""
         CrawlersConfig.objects.create(known_user_agents='edX-downloader,crawler_foo', enabled=True)
-        with patch('courseware.model_data.UserStateCache.set_many') as patched_state_client_set_many:
+        with patch('lms.djangoapps.courseware.model_data.UserStateCache.set_many') as patched_state_client_set_many:
             # Exact matching of crawler user agent
             self._load_courseware('crawler_foo')
             self.assertFalse(patched_state_client_set_many.called)

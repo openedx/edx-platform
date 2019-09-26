@@ -26,9 +26,9 @@ from web_fragments.fragment import Fragment
 
 import lms.djangoapps.discussion.django_comment_client.utils as utils
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
-from courseware.access import has_access
-from courseware.courses import get_course_with_access
-from courseware.views.views import CourseTabView
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_with_access
+from lms.djangoapps.courseware.views.views import CourseTabView
 from lms.djangoapps.discussion.django_comment_client.base.views import track_thread_viewed_event
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY
 from lms.djangoapps.discussion.django_comment_client.permissions import get_team, has_permission

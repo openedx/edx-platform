@@ -6,8 +6,8 @@ from __future__ import absolute_import
 
 import logging
 
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module_for_descriptor
+from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.module_render import get_module_for_descriptor
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
 from openedx.core.lib.request_utils import get_request_or_stub

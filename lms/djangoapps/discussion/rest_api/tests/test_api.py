@@ -19,7 +19,7 @@ from six.moves import range
 from six.moves.urllib.parse import parse_qs, urlencode, urlparse, urlunparse  # pylint: disable=import-error
 
 from common.test.utils import MockSignalHandlerMixin, disable_signal
-from courseware.tests.factories import BetaTesterFactory, StaffFactory
+from lms.djangoapps.courseware.tests.factories import BetaTesterFactory, StaffFactory
 from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
 from lms.djangoapps.discussion.rest_api import api
 from lms.djangoapps.discussion.rest_api.api import (

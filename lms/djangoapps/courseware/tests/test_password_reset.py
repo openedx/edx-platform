@@ -11,7 +11,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.test.utils import override_settings
 from django.utils.http import int_to_base36
 
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from util.password_policy_validators import create_validator_config
 
 

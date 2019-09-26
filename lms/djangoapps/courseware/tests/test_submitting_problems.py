@@ -30,8 +30,8 @@ from capa.tests.response_xml_factory import (
     SchematicResponseXMLFactory
 )
 from course_modes.models import CourseMode
-from courseware.models import BaseStudentModuleHistory, StudentModule
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.grades.api import CourseGradeFactory, task_compute_all_grades_for_course
 from openedx.core.djangoapps.credit.api import get_credit_requirement_status, set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
@@ -791,7 +791,7 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
             self.addCleanup(fileobj.close)
 
         self.problem_setup("the_problem", filenames)
-        with patch('courseware.module_render.XQUEUE_INTERFACE.session') as mock_session:
+        with patch('lms.djangoapps.courseware.module_render.XQUEUE_INTERFACE.session') as mock_session:
             resp = self.submit_question_answer("the_problem", {'2_1': fileobjs})
 
         self.assertEqual(resp.status_code, 200)
