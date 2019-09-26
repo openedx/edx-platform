@@ -185,6 +185,9 @@ class LoncapaProblem(object):
         self.problem_text = problem_text
 
         # parse problem XML file into an element tree
+        if isinstance(problem_text, six.text_type):
+            # etree chokes on Unicode XML with an encoding declaration
+            problem_text = problem_text.encode('utf-8')
         self.tree = etree.XML(problem_text)
 
         self.make_xml_compatible(self.tree)
