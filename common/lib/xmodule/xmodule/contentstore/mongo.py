@@ -126,6 +126,10 @@ class MongoContentStore(ContentStore):
         try:
             if as_stream:
                 fp = self.fs.get(content_id)
+                # Need to replace dict IDs with SON for chunk lookup to work under Python 3
+                # because field order can be different and mongo cares about the order
+                if isinstance(fp._id, dict):
+                    fp._file['_id'] = content_id
                 thumbnail_location = getattr(fp, 'thumbnail_location', None)
                 if thumbnail_location:
                     thumbnail_location = location.course_key.make_asset_key(
@@ -141,6 +145,10 @@ class MongoContentStore(ContentStore):
                 )
             else:
                 with self.fs.get(content_id) as fp:
+                    # Need to replace dict IDs with SON for chunk lookup to work under Python 3
+                    # because field order can be different and mongo cares about the order
+                    if isinstance(fp._id, dict):
+                        fp._file['_id'] = content_id
                     thumbnail_location = getattr(fp, 'thumbnail_location', None)
                     if thumbnail_location:
                         thumbnail_location = location.course_key.make_asset_key(
@@ -398,6 +406,10 @@ class MongoContentStore(ContentStore):
             if isinstance(asset_key, six.string_types):
                 asset_key = AssetKey.from_string(asset_key)
                 __, asset_key = self.asset_db_key(asset_key)
+            # Need to replace dict IDs with SON for chunk lookup to work under Python 3
+            # because field order can be different and mongo cares about the order
+            if isinstance(source_content._id, dict):
+                source_content._file['_id'] = asset_key.copy()
             asset_key['org'] = dest_course_key.org
             asset_key['course'] = dest_course_key.course
             if getattr(dest_course_key, 'deprecated', False):  # remove the run if exists
