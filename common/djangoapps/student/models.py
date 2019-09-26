@@ -65,7 +65,11 @@ from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
-from openedx.core.djangoapps.enrollments.api import _default_course_mode
+from openedx.core.djangoapps.enrollments.api import (
+    _default_course_mode,
+    get_enrollment_attributes,
+    set_enrollment_attributes
+)
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
@@ -1775,6 +1779,17 @@ class CourseEnrollment(models.Model):
             try:
                 order = ecommerce_api_client(self.user).orders(order_number).get()
                 date_placed = order['date_placed']
+                # also save the attribute so that we don't need to call ecommerce again.
+                username = self.user.username
+                enrollment_attributes = get_enrollment_attributes(username, six.text_type(self.course_id))
+                enrollment_attributes.append(
+                    {
+                        "namespace": "order",
+                        "name": "date_placed",
+                        "value": date_placed,
+                    }
+                )
+                set_enrollment_attributes(username, six.text_type(self.course_id), enrollment_attributes)
             except HttpClientError:
                 log.warning(
                     u"Encountered HttpClientError while getting order details from ecommerce. "

@@ -22,11 +22,10 @@ from six.moves import range
 # These imports refer to lms djangoapps.
 # Their testcases are only run under lms.
 from course_modes.tests.factories import CourseModeFactory
-
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.commerce.utils import ECOMMERCE_DATE_FORMAT
-from student.models import CourseEnrollment, EnrollmentRefundConfiguration
+from student.models import CourseEnrollment, CourseEnrollmentAttribute, EnrollmentRefundConfiguration
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -141,7 +140,8 @@ class RefundableTest(SharedModuleStoreTestCase):
         course_start = now + course_start_delta
         expected_date = now + expected_date_delta
         refund_period = timedelta(days=days)
-        expected_content = '{{"date_placed": "{date}"}}'.format(date=order_date.strftime(ECOMMERCE_DATE_FORMAT))
+        date_placed = order_date.strftime(ECOMMERCE_DATE_FORMAT)
+        expected_content = '{{"date_placed": "{date}"}}'.format(date=date_placed)
 
         httpretty.register_uri(
             httpretty.GET,
@@ -164,6 +164,17 @@ class RefundableTest(SharedModuleStoreTestCase):
             self.assertEqual(
                 self.enrollment.refund_cutoff_date(),
                 expected_date + refund_period
+            )
+
+            expected_date_placed_attr = {
+                "namespace": "order",
+                "name": "date_placed",
+                "value": date_placed,
+            }
+
+            self.assertIn(
+                expected_date_placed_attr,
+                CourseEnrollmentAttribute.get_enrollment_attributes(self.enrollment)
             )
 
     def test_refund_cutoff_date_no_attributes(self):
