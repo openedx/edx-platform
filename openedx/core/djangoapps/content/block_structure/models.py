@@ -4,6 +4,7 @@ Models used by the block structure framework.
 
 from __future__ import absolute_import
 
+import errno
 from contextlib import contextmanager
 from datetime import datetime
 from logging import getLogger
@@ -117,7 +118,9 @@ def _storage_error_handling(bs_model, operation, is_read_operation=False):
         yield
     except Exception as error:  # pylint: disable=broad-except
         log.exception(u'BlockStructure: Exception %s on store %s; %s.', error.__class__, operation, bs_model)
-        if is_read_operation and isinstance(error, (IOError, SuspiciousOperation)):
+        if isinstance(error, OSError) and error.errno in (errno.EACCES, errno.EPERM):
+            raise
+        elif is_read_operation and isinstance(error, (IOError, SuspiciousOperation)):
             # May have been caused by one of the possible error
             # situations listed above.  Raise BlockStructureNotFound
             # so the block structure can be regenerated and restored.
