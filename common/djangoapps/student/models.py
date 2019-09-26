@@ -65,7 +65,11 @@ from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
-from openedx.core.djangoapps.enrollments.api import _default_course_mode
+from openedx.core.djangoapps.enrollments.api import (
+    _default_course_mode,
+    get_enrollment_attributes,
+    set_enrollment_attributes
+)
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
@@ -1766,8 +1770,56 @@ class CourseEnrollment(models.Model):
         # NOTE: This is here to avoid circular references
         from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, ECOMMERCE_DATE_FORMAT
 
+        date_placed = self.get_order_attribute_value('date_placed')
+
+        if not date_placed:
+            order_number = self.get_order_attribute_value('order_number')
+            if not order_number:
+                return None
+
+            try:
+                order = ecommerce_api_client(self.user).orders(order_number).get()
+                date_placed = order['date_placed']
+                # also save the attribute so that we don't need to call ecommerce again.
+                username = self.user.username
+                enrollment_attributes = get_enrollment_attributes(username, six.text_type(self.course_id))
+                enrollment_attributes.append(
+                    {
+                        "namespace": "order",
+                        "name": "date_placed",
+                        "value": date_placed,
+                    }
+                )
+                set_enrollment_attributes(username, six.text_type(self.course_id), enrollment_attributes)
+            except HttpClientError:
+                log.warning(
+                    u"Encountered HttpClientError while getting order details from ecommerce. "
+                    u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
+                return None
+
+            except HttpServerError:
+                log.warning(
+                    u"Encountered HttpServerError while getting order details from ecommerce. "
+                    u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
+                return None
+
+            except SlumberBaseException:
+                log.warning(
+                    u"Encountered an error while getting order details from ecommerce. "
+                    u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
+                return None
+
+        refund_window_start_date = max(
+            datetime.strptime(date_placed, ECOMMERCE_DATE_FORMAT),
+            self.course_overview.start.replace(tzinfo=None)
+        )
+
+        return refund_window_start_date.replace(tzinfo=UTC) + EnrollmentRefundConfiguration.current().refund_window
+
+    def get_order_attribute_value(self, attr_name):
+        """ Get and return course enrollment order attribute's value."""
         try:
-            attribute = self.attributes.get(namespace='order', name='order_number')
+            attribute = self.attributes.get(namespace='order', name=attr_name)
         except ObjectDoesNotExist:
             return None
         except MultipleObjectsReturned:
@@ -1778,36 +1830,9 @@ class CourseEnrollment(models.Model):
                 self.user.id,
                 enrollment_id
             )
-            attribute = self.attributes.filter(namespace='order', name='order_number').last()
+            attribute = self.attributes.filter(namespace='order', name=attr_name).last()
 
-        order_number = attribute.value
-        try:
-            order = ecommerce_api_client(self.user).orders(order_number).get()
-
-        except HttpClientError:
-            log.warning(
-                u"Encountered HttpClientError while getting order details from ecommerce. "
-                u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
-            return None
-
-        except HttpServerError:
-            log.warning(
-                u"Encountered HttpServerError while getting order details from ecommerce. "
-                u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
-            return None
-
-        except SlumberBaseException:
-            log.warning(
-                u"Encountered an error while getting order details from ecommerce. "
-                u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
-            return None
-
-        refund_window_start_date = max(
-            datetime.strptime(order['date_placed'], ECOMMERCE_DATE_FORMAT),
-            self.course_overview.start.replace(tzinfo=None)
-        )
-
-        return refund_window_start_date.replace(tzinfo=UTC) + EnrollmentRefundConfiguration.current().refund_window
+        return attribute.value
 
     @property
     def username(self):
