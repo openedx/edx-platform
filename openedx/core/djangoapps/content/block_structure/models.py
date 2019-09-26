@@ -118,7 +118,7 @@ def _storage_error_handling(bs_model, operation, is_read_operation=False):
         yield
     except Exception as error:  # pylint: disable=broad-except
         log.exception(u'BlockStructure: Exception %s on store %s; %s.', error.__class__, operation, bs_model)
-        if isinstance(error, OSError) and error.errno in (errno.EACCES, errno.EPERM):
+        if isinstance(error, OSError) and error.errno in (errno.EACCES, errno.EPERM):  # pylint: disable=no-member
             raise
         elif is_read_operation and isinstance(error, (IOError, SuspiciousOperation)):
             # May have been caused by one of the possible error
