@@ -5,6 +5,7 @@ from __future__ import absolute_import
 
 from config_models.models import ConfigurationModel
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 from . import utils
 from .mobile_platform import PLATFORM_CLASSES
@@ -35,6 +36,7 @@ class MobileApiConfig(ConfigurationModel):
         return [profile.strip() for profile in cls.current().video_profiles.split(",") if profile]
 
 
+@python_2_unicode_compatible
 class AppVersionConfig(models.Model):
     """
     Configuration for mobile app versions available.
@@ -64,7 +66,7 @@ class AppVersionConfig(models.Model):
         unique_together = ('platform', 'version',)
         ordering = ['-major_version', '-minor_version', '-patch_version']
 
-    def __unicode__(self):
+    def __str__(self):
         return "{}_{}".format(self.platform, self.version)
 
     @classmethod

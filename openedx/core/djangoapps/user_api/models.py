@@ -183,6 +183,7 @@ class RetirementState(models.Model):
         return cls.objects.all().values_list('state_name', flat=True)
 
 
+@python_2_unicode_compatible
 class UserRetirementPartnerReportingStatus(TimeStampedModel):
     """
     When a user has been retired from LMS it will still need to be reported out to
@@ -205,13 +206,14 @@ class UserRetirementPartnerReportingStatus(TimeStampedModel):
         verbose_name = 'User Retirement Reporting Status'
         verbose_name_plural = 'User Retirement Reporting Statuses'
 
-    def __unicode__(self):
+    def __str__(self):
         return u'UserRetirementPartnerReportingStatus: {} is being processed: {}'.format(
             self.user,
             self.is_being_processed
         )
 
 
+@python_2_unicode_compatible
 class UserRetirementRequest(TimeStampedModel):
     """
     Records and perists every user retirement request.
@@ -242,10 +244,11 @@ class UserRetirementRequest(TimeStampedModel):
         """
         return cls.objects.filter(user=user).exists()
 
-    def __unicode__(self):
+    def __str__(self):
         return u'User: {} Requested: {}'.format(self.user.id, self.created)
 
 
+@python_2_unicode_compatible
 class UserRetirementStatus(TimeStampedModel):
     """
     Tracks the progress of a user's retirement request
@@ -385,7 +388,7 @@ class UserRetirementStatus(TimeStampedModel):
 
         return retirement
 
-    def __unicode__(self):
+    def __str__(self):
         return u'User: {} State: {} Last Updated: {}'.format(self.user.id, self.current_state, self.modified)
 
 

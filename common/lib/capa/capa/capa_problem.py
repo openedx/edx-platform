@@ -34,6 +34,7 @@ import capa.xqueue_interface as xqueue_interface
 from capa.correctmap import CorrectMap
 from capa.safe_exec import safe_exec
 from capa.util import contextualize_text, convert_files_to_filenames
+from django.utils.encoding import python_2_unicode_compatible
 from openedx.core.djangolib.markup import HTML, Text
 from xmodule.stringify import stringify_children
 
@@ -126,6 +127,7 @@ class LoncapaSystem(object):
         self.matlab_api_key = matlab_api_key
 
 
+@python_2_unicode_compatible
 class LoncapaProblem(object):
     """
     Main class for capa Problems.
@@ -283,7 +285,7 @@ class LoncapaProblem(object):
 
         self.student_answers = initial_answers
 
-    def __unicode__(self):
+    def __str__(self):
         return u"LoncapaProblem ({0})".format(self.problem_id)
 
     def get_state(self):

@@ -265,6 +265,7 @@ class VisibleBlocks(models.Model):
         return u"visible_blocks_cache.{}.{}".format(course_key, user_id)
 
 
+@python_2_unicode_compatible
 class PersistentSubsectionGrade(TimeStampedModel):
     """
     A django model tracking persistent grades at the subsection level.
@@ -336,7 +337,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
         else:
             return self.usage_key
 
-    def __unicode__(self):
+    def __str__(self):
         """
         Returns a string representation of this model.
         """
@@ -507,6 +508,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
         return u"subsection_grades_cache.{}".format(course_id)
 
 
+@python_2_unicode_compatible
 class PersistentCourseGrade(TimeStampedModel):
     """
     A django model tracking persistent course grades.
@@ -550,7 +552,7 @@ class PersistentCourseGrade(TimeStampedModel):
 
     _CACHE_NAMESPACE = u"grades.models.PersistentCourseGrade"
 
-    def __unicode__(self):
+    def __str__(self):
         """
         Returns a string representation of this model.
         """
@@ -643,6 +645,7 @@ class PersistentCourseGrade(TimeStampedModel):
         events.course_grade_calculated(grade)
 
 
+@python_2_unicode_compatible
 class PersistentSubsectionGradeOverride(models.Model):
     """
     A django model tracking persistent grades overrides at the subsection level.
@@ -677,7 +680,7 @@ class PersistentSubsectionGradeOverride(models.Model):
     if 'grades' in apps.app_configs:
         history = HistoricalRecords()
 
-    def __unicode__(self):
+    def __str__(self):
         return u', '.join([
             u"{}".format(type(self).__name__),
             u"earned_all_override: {}".format(self.earned_all_override),
@@ -763,6 +766,7 @@ class PersistentSubsectionGradeOverride(models.Model):
         return cleaned_data
 
 
+@python_2_unicode_compatible
 class PersistentSubsectionGradeOverrideHistory(models.Model):
     """
     A django model tracking persistent grades override audit records.
@@ -799,7 +803,7 @@ class PersistentSubsectionGradeOverrideHistory(models.Model):
     comments = models.CharField(max_length=300, blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True, db_index=True)
 
-    def __unicode__(self):
+    def __str__(self):
         """
         String representation of this model.
         """

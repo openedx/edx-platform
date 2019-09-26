@@ -60,6 +60,7 @@ from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models import Count
 from django.dispatch import receiver
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
 from model_utils.fields import AutoCreatedField
@@ -404,6 +405,7 @@ class GeneratedCertificate(models.Model):
             )
 
 
+@python_2_unicode_compatible
 class CertificateGenerationHistory(TimeStampedModel):
     """
     Model for storing Certificate Generation History.
@@ -463,11 +465,12 @@ class CertificateGenerationHistory(TimeStampedModel):
     class Meta(object):
         app_label = "certificates"
 
-    def __unicode__(self):
+    def __str__(self):
         return u"certificates %s by %s on %s for %s" % \
                ("regenerated" if self.is_regeneration else "generated", self.generated_by, self.created, self.course_id)
 
 
+@python_2_unicode_compatible
 class CertificateInvalidation(TimeStampedModel):
     """
     Model for storing Certificate Invalidation.
@@ -482,7 +485,7 @@ class CertificateInvalidation(TimeStampedModel):
     class Meta(object):
         app_label = "certificates"
 
-    def __unicode__(self):
+    def __str__(self):
         return u"Certificate %s, invalidated by %s on %s." % \
                (self.generated_certificate, self.invalidated_by, self.created)
 
@@ -1067,6 +1070,7 @@ class CertificateHtmlViewConfiguration(ConfigurationModel):
         return json_data
 
 
+@python_2_unicode_compatible
 class CertificateTemplate(TimeStampedModel):
     """A set of custom web certificate templates.
 
@@ -1123,7 +1127,7 @@ class CertificateTemplate(TimeStampedModel):
                   u'Course language is determined by the first two letters of the language code.'
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return u'%s' % (self.name, )
 
     class Meta(object):
@@ -1147,6 +1151,7 @@ def template_assets_path(instance, filename):
     return name
 
 
+@python_2_unicode_compatible
 class CertificateTemplateAsset(TimeStampedModel):
     """A set of assets to be used in custom web certificate templates.
 
@@ -1183,7 +1188,7 @@ class CertificateTemplateAsset(TimeStampedModel):
 
         super(CertificateTemplateAsset, self).save(*args, **kwargs)
 
-    def __unicode__(self):
+    def __str__(self):
         return u'%s' % (self.asset.url, )
 
     class Meta(object):

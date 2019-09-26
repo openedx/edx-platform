@@ -858,7 +858,7 @@ EVENT_NAME_ENROLLMENT_DEACTIVATED = 'edx.course.enrollment.deactivated'
 EVENT_NAME_ENROLLMENT_MODE_CHANGED = 'edx.course.enrollment.mode_changed'
 
 
-@six.python_2_unicode_compatible
+@python_2_unicode_compatible
 class LoginFailures(models.Model):
     """
     This model will keep track of failed login attempts.
@@ -1084,6 +1084,7 @@ class CourseEnrollmentManager(models.Manager):
 CourseEnrollmentState = namedtuple('CourseEnrollmentState', 'mode, is_active')
 
 
+@python_2_unicode_compatible
 class CourseEnrollment(models.Model):
     """
     Represents a Student's Enrollment record for a single Course. You should
@@ -1160,7 +1161,7 @@ class CourseEnrollment(models.Model):
         # When the property .course_overview is accessed for the first time, this variable will be set.
         self._course_overview = None
 
-    def __unicode__(self):
+    def __str__(self):
         return (
             "[CourseEnrollment] {}: {} ({}); active: ({})"
         ).format(self.user, self.course_id, self.created, self.is_active)
@@ -2139,6 +2140,7 @@ class ManualEnrollmentAudit(models.Model):
         return cls.objects.filter(id__in=manual_enrollment_ids).update(reason="", enrolled_email=retired_email)
 
 
+@python_2_unicode_compatible
 class CourseEnrollmentAllowed(DeletableByUserValue, models.Model):
     """
     Table of users (specified by email address strings) who are allowed to enroll in a specified course.
@@ -2166,7 +2168,7 @@ class CourseEnrollmentAllowed(DeletableByUserValue, models.Model):
     class Meta(object):
         unique_together = (('email', 'course_id'),)
 
-    def __unicode__(self):
+    def __str__(self):
         return "[CourseEnrollmentAllowed] %s: %s (%s)" % (self.email, self.course_id, self.created)
 
     @classmethod
@@ -2199,6 +2201,7 @@ class CourseEnrollmentAllowed(DeletableByUserValue, models.Model):
 
 
 @total_ordering
+@python_2_unicode_compatible
 class CourseAccessRole(models.Model):
     """
     Maps users to org, courses, and roles. Used by student.roles.CourseRole and OrgRole.
@@ -2244,7 +2247,7 @@ class CourseAccessRole(models.Model):
         """
         return self._key < other._key  # pylint: disable=protected-access
 
-    def __unicode__(self):
+    def __str__(self):
         return "[CourseAccessRole] user: {}   role: {}   org: {}   course: {}".format(self.user.username, self.role, self.org, self.course_id)
 
 
@@ -2576,6 +2579,7 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
         )
 
 
+@python_2_unicode_compatible
 class EntranceExamConfiguration(models.Model):
     """
     Represents a Student's entrance exam specific data for a single Course
@@ -2595,7 +2599,7 @@ class EntranceExamConfiguration(models.Model):
     class Meta(object):
         unique_together = (('user', 'course_id'), )
 
-    def __unicode__(self):
+    def __str__(self):
         return "[EntranceExamConfiguration] %s: %s (%s) = %s" % (
             self.user, self.course_id, self.created, self.skip_entrance_exam
         )
@@ -2683,6 +2687,7 @@ class SocialLink(models.Model):  # pylint: disable=model-missing-unicode
     social_link = models.CharField(max_length=100, blank=True)
 
 
+@python_2_unicode_compatible
 class CourseEnrollmentAttribute(models.Model):
     """
     Provide additional information about the user's enrollment.
@@ -2703,7 +2708,7 @@ class CourseEnrollmentAttribute(models.Model):
         help_text=_("Value of the enrollment attribute")
     )
 
-    def __unicode__(self):
+    def __str__(self):
         """Unicode representation of the attribute. """
         return u"{namespace}:{name}, {value}".format(
             namespace=self.namespace,
@@ -2790,6 +2795,7 @@ class EnrollmentRefundConfiguration(ConfigurationModel):
         self.refund_window_microseconds = int(refund_window.total_seconds() * 1000000)
 
 
+@python_2_unicode_compatible
 class RegistrationCookieConfiguration(ConfigurationModel):
     """
     Configuration for registration cookies.
@@ -2806,7 +2812,7 @@ class RegistrationCookieConfiguration(ConfigurationModel):
         help_text=_("Name of the affiliate cookie")
     )
 
-    def __unicode__(self):
+    def __str__(self):
         """Unicode representation of this config. """
         return u"UTM: {utm_name}; AFFILIATE: {affiliate_name}".format(
             utm_name=self.utm_cookie_name,
@@ -2858,6 +2864,7 @@ class UserAttribute(TimeStampedModel):
             return None
 
 
+@python_2_unicode_compatible
 class LogoutViewConfiguration(ConfigurationModel):
     """
     DEPRECATED: Configuration for the logout view.
@@ -2865,7 +2872,7 @@ class LogoutViewConfiguration(ConfigurationModel):
     .. no_pii:
     """
 
-    def __unicode__(self):
+    def __str__(self):
         """
         Unicode representation of the instance.
         """

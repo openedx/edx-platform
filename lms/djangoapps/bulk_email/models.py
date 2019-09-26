@@ -10,6 +10,7 @@ import six
 from config_models.models import ConfigurationModel
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
 from six.moves import zip
@@ -60,6 +61,7 @@ EMAIL_TARGET_CHOICES = list(zip(
 EMAIL_TARGETS = {target[0] for target in EMAIL_TARGET_CHOICES}
 
 
+@python_2_unicode_compatible
 class Target(models.Model):
     """
     A way to refer to a particular group (within a course) as a "Send to:" target.
@@ -79,7 +81,7 @@ class Target(models.Model):
     class Meta(object):
         app_label = "bulk_email"
 
-    def __unicode__(self):
+    def __str__(self):
         return "CourseEmail Target: {}".format(self.short_display())
 
     def short_display(self):
@@ -143,6 +145,7 @@ class Target(models.Model):
             raise ValueError(u"Unrecognized target type {}".format(self.target_type))
 
 
+@python_2_unicode_compatible
 class CohortTarget(Target):
     """
     Subclass of Target, specifically referring to a cohort.
@@ -158,7 +161,7 @@ class CohortTarget(Target):
         kwargs['target_type'] = SEND_TO_COHORT
         super(CohortTarget, self).__init__(*args, **kwargs)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.short_display()
 
     def short_display(self):
@@ -188,6 +191,7 @@ class CohortTarget(Target):
         return cohort
 
 
+@python_2_unicode_compatible
 class CourseModeTarget(Target):
     """
     Subclass of Target, specifically for course modes.
@@ -203,7 +207,7 @@ class CourseModeTarget(Target):
         kwargs['target_type'] = SEND_TO_TRACK
         super(CourseModeTarget, self).__init__(*args, **kwargs)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.short_display()
 
     def short_display(self):
@@ -235,6 +239,7 @@ class CourseModeTarget(Target):
             )
 
 
+@python_2_unicode_compatible
 class CourseEmail(Email):
     """
     Stores information for an email to a course.
@@ -251,7 +256,7 @@ class CourseEmail(Email):
     template_name = models.CharField(null=True, max_length=255)
     from_addr = models.CharField(null=True, max_length=255)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.subject
 
     @classmethod
@@ -429,6 +434,7 @@ class CourseEmailTemplate(models.Model):
         return CourseEmailTemplate._render(self.html_template, htmltext, context)
 
 
+@python_2_unicode_compatible
 class CourseAuthorization(models.Model):
     """
     Enable the course email feature on a course-by-course basis.
@@ -455,7 +461,7 @@ class CourseAuthorization(models.Model):
         except cls.DoesNotExist:
             return False
 
-    def __unicode__(self):
+    def __str__(self):
         not_en = "Not "
         if self.email_enabled:
             not_en = ""
@@ -474,6 +480,7 @@ class CourseAuthorization(models.Model):
 # .. toggle_warnings: None
 # .. toggle_tickets: None
 # .. toggle_status: supported
+@python_2_unicode_compatible
 class BulkEmailFlag(ConfigurationModel):
     """
     Enables site-wide configuration for the bulk_email feature.
@@ -512,7 +519,7 @@ class BulkEmailFlag(ConfigurationModel):
     class Meta(object):
         app_label = "bulk_email"
 
-    def __unicode__(self):
+    def __str__(self):
         current_model = BulkEmailFlag.current()
         return u"BulkEmailFlag: enabled {}, require_course_email_auth: {}".format(
             current_model.is_enabled(),

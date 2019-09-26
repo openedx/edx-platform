@@ -26,6 +26,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 log = logging.getLogger(__name__)
 
 
+@python_2_unicode_compatible
 class ApiAccessRequest(TimeStampedModel):
     """
     Model to track API access for a user.
@@ -127,7 +128,7 @@ class ApiAccessRequest(TimeStampedModel):
         self.status = self.DENIED
         self.save()
 
-    def __unicode__(self):
+    def __str__(self):
         return u'ApiAccessRequest {website} [{status}]'.format(website=self.website, status=self.status)
 
 
@@ -223,6 +224,7 @@ def _send_decision_email(instance):
         log.exception(u'Error sending API user notification email for request [%s].', instance.id)
 
 
+@python_2_unicode_compatible
 class Catalog(models.Model):
     """
     A (non-Django-managed) model for Catalogs in the course discovery service.
@@ -265,5 +267,5 @@ class Catalog(models.Model):
             'viewers': self.viewers,
         }
 
-    def __unicode__(self):
+    def __str__(self):
         return u'Catalog {name} [{query}]'.format(name=self.name, query=self.query)

@@ -592,7 +592,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         coupon = Coupon(code='TestCode', description='testing', course_id=self.course_key,
                         percentage_discount=12, created_by=self.user, is_active=True)
         coupon.save()
-        self.assertEquals(coupon.__unicode__(), '[Coupon] code: TestCode course: MITx/999/Robot_Super_Course')
+        self.assertEquals(str(coupon), '[Coupon] code: TestCode course: MITx/999/Robot_Super_Course')
         admin = User.objects.create_user('Mark', 'admin+courses@edx.org', 'foo')
         admin.is_staff = True
         get_coupon = Coupon.objects.get(id=1)

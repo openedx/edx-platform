@@ -11,6 +11,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from jsonfield import JSONField
 from lazy import lazy
@@ -48,6 +49,7 @@ class CourseBadgesDisabledError(Exception):
     """
 
 
+@python_2_unicode_compatible
 class BadgeClass(models.Model):
     """
     Specifies a badge class to be registered with a backend.
@@ -64,7 +66,7 @@ class BadgeClass(models.Model):
     mode = models.CharField(max_length=100, default='', blank=True)
     image = models.ImageField(upload_to='badge_classes', validators=[validate_badge_image])
 
-    def __unicode__(self):
+    def __str__(self):
         return HTML(u"<Badge '{slug}' for '{issuing_component}'>").format(
             slug=HTML(self.slug), issuing_component=HTML(self.issuing_component)
         )
@@ -143,6 +145,7 @@ class BadgeClass(models.Model):
         verbose_name_plural = "Badge Classes"
 
 
+@python_2_unicode_compatible
 class BadgeAssertion(TimeStampedModel):
     """
     Tracks badges on our side of the badge baking transaction
@@ -156,7 +159,7 @@ class BadgeAssertion(TimeStampedModel):
     image_url = models.URLField()
     assertion_url = models.URLField()
 
-    def __unicode__(self):
+    def __str__(self):
         return HTML(u"<{username} Badge Assertion for {slug} for {issuing_component}").format(
             username=HTML(self.user.username),
             slug=HTML(self.badge_class.slug),
@@ -180,6 +183,7 @@ class BadgeAssertion(TimeStampedModel):
 BadgeAssertion._meta.get_field('created').db_index = True
 
 
+@python_2_unicode_compatible
 class CourseCompleteImageConfiguration(models.Model):
     """
     Contains the icon configuration for badges for a specific course mode.
@@ -207,7 +211,7 @@ class CourseCompleteImageConfiguration(models.Model):
         default=False,
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return HTML(u"<CourseCompleteImageConfiguration for '{mode}'{default}>").format(
             mode=HTML(self.mode),
             default=HTML(u" (default)") if self.default else HTML(u'')
@@ -235,6 +239,7 @@ class CourseCompleteImageConfiguration(models.Model):
         app_label = "badges"
 
 
+@python_2_unicode_compatible
 class CourseEventBadgesConfiguration(ConfigurationModel):
     """
     Determines the settings for meta course awards-- such as completing a certain
@@ -268,7 +273,7 @@ class CourseEventBadgesConfiguration(ConfigurationModel):
         )
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return HTML(u"<CourseEventBadgesConfiguration ({})>").format(
             Text(u"Enabled") if self.enabled else Text(u"Disabled")
         )

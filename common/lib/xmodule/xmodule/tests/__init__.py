@@ -21,6 +21,7 @@ from functools import wraps
 
 import six
 from django.test import TestCase
+from django.utils.encoding import python_2_unicode_compatible
 from mock import Mock
 from opaque_keys.edx.keys import CourseKey
 from path import Path as path
@@ -225,6 +226,7 @@ def map_references(value, field, actual_course_key):
     return value
 
 
+@python_2_unicode_compatible
 class LazyFormat(object):
     """
     An stringy object that delays formatting until it's put into a string context.
@@ -237,7 +239,7 @@ class LazyFormat(object):
         self.kwargs = kwargs
         self._message = None
 
-    def __unicode__(self):
+    def __str__(self):
         if self._message is None:
             self._message = self.template.format(*self.args, **self.kwargs)
         return self._message

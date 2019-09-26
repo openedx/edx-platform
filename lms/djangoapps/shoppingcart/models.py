@@ -25,6 +25,7 @@ from django.db.models import Count, F, Q, Sum
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from django.urls import reverse
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from model_utils.managers import InheritanceManager
@@ -786,6 +787,7 @@ class OrderItem(TimeStampedModel):
         self.save()
 
 
+@python_2_unicode_compatible
 class Invoice(TimeStampedModel):
     """
     This table capture all the information needed to support "invoicing"
@@ -892,7 +894,7 @@ class Invoice(TimeStampedModel):
             ],
         }
 
-    def __unicode__(self):
+    def __str__(self):
         label = (
             six.text_type(self.internal_reference)
             if self.internal_reference
@@ -1272,6 +1274,7 @@ class RegistrationCodeRedemption(models.Model):
         return code_redemption
 
 
+@python_2_unicode_compatible
 class Coupon(models.Model):
     """
     This table contains coupon codes
@@ -1291,7 +1294,7 @@ class Coupon(models.Model):
     is_active = models.BooleanField(default=True)
     expiration_date = models.DateTimeField(null=True, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return "[Coupon] code: {} course: {}".format(self.code, self.course_id)
 
     @property
@@ -1782,6 +1785,7 @@ class CourseRegCodeItem(OrderItem):
         return data
 
 
+@python_2_unicode_compatible
 class CourseRegCodeItemAnnotation(models.Model):
     """
     A model that maps course_id to an additional annotation.  This is specifically needed because when Stanford
@@ -1797,10 +1801,11 @@ class CourseRegCodeItemAnnotation(models.Model):
     course_id = CourseKeyField(unique=True, max_length=128, db_index=True)
     annotation = models.TextField(null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return u"{} : {}".format(text_type(self.course_id), self.annotation)
 
 
+@python_2_unicode_compatible
 class PaidCourseRegistrationAnnotation(models.Model):
     """
     A model that maps course_id to an additional annotation.  This is specifically needed because when Stanford
@@ -1816,7 +1821,7 @@ class PaidCourseRegistrationAnnotation(models.Model):
     course_id = CourseKeyField(unique=True, max_length=128, db_index=True)
     annotation = models.TextField(null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return u"{} : {}".format(text_type(self.course_id), self.annotation)
 
 
