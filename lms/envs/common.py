@@ -98,7 +98,7 @@ FEATURES = {
     'ENABLE_TEXTBOOK': True,
 
     # .. toggle_name: ENABLE_STUDENT_NOTES
-    # .. toggle_type: waffle_flag
+    # .. toggle_implementation: DjangoSetting
     # .. toggle_default: True
     # .. toggle_description: Enables the Student Notes API and UI.
     # .. toggle_category: ????
@@ -128,7 +128,7 @@ FEATURES = {
     'ENABLE_MASQUERADE': True,  # allow course staff to change to student view of courseware
 
     # .. toggle_name: ENABLE_SYSADMIN_DASHBOARD
-    # .. toggle_type: waffle_flag
+    # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: enables dashboard at /syadmin/ for django staff, for seeing overview of system status, for deleting and loading courses, for seeing log of git imports of courseware.
     # .. toggle_category: admin
@@ -193,7 +193,7 @@ FEATURES = {
     'ENABLE_VERIFIED_CERTIFICATES': False,
 
     # .. toggle_name: DISABLE_HONOR_CERTIFICATES
-    # .. toggle_type: waffle_flag
+    # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Set to True to disable honor certificates. Typically used when your installation only allows verified certificates, like courses.edx.org.
     # .. toggle_category: certificates
