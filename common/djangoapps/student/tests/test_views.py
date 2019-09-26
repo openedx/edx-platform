@@ -749,7 +749,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         schedule = ScheduleFactory(start=self.THREE_YEARS_AGO + timedelta(days=1), enrollment=enrollment)
 
         response = self.client.get(reverse('dashboard'))
-        dashboard_html = self._remove_whitespace_from_html_string(response.content)
+        dashboard_html = self._remove_whitespace_from_html_string(response.content.decode('utf-8'))
         access_expired_substring = 'Accessexpired'
         course_link_class = 'course-target-link'
 
