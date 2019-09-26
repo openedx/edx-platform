@@ -239,7 +239,10 @@ class CourseStructureCache(object):
             pickled_data = zlib.decompress(compressed_pickled_data)
             tagger.measure('uncompressed_size', len(pickled_data))
 
-            return pickle.loads(pickled_data, encoding='latin-1')
+            if six.PY2:
+                return pickle.loads(pickled_data)
+            else:
+                return pickle.loads(pickled_data, encoding='latin-1')
 
     def set(self, key, structure, course_context=None):
         """Given a structure, will pickle, compress, and write to cache."""
