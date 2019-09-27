@@ -258,7 +258,7 @@ class InputTypeBase(object):
             msg = u"Error in xml '{x}': {err} ".format(
                 x=etree.tostring(xml), err=text_type(err))
             msg = Exception(msg)
-            six.reraise(Exception, msg, sys.exc_info()[2])
+            six.reraise(Exception, Exception(msg), sys.exc_info()[2])
 
     @classmethod
     def get_attributes(cls):
