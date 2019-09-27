@@ -384,6 +384,10 @@ class ModuleI18nService(object):
                 pass
 
     def __getattr__(self, name):
+        # As py3 does not have ugettext, use gettext. 
+        if six.PY3 and name == 'ugettext':
+            return getattr(self.translator, 'gettext')
+
         return getattr(self.translator, name)
 
     def strftime(self, *args, **kwargs):
