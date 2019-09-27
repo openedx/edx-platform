@@ -702,7 +702,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         # strip enclosing angle brackets from 'logo_image' cache 'Content-ID'
         image_id = email_image.get('Content-ID', '')[1:-1]
         self.assertIsNotNone(image_id)
-        self.assertIn(image_id, html_content_first.decode('utf-8'))
+        self.assertIn(image_id, html_content_first)
         self.assertIn(
             'credit from Hogwarts School of Witchcraft and Wizardry for',
             html_content_first
@@ -732,7 +732,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         # logo image is used
         email_payload_second = mail.outbox[1].attachments[0]._payload  # pylint: disable=protected-access
         html_content_second = email_payload_second[0]._payload[1]._payload  # pylint: disable=protected-access
-        self.assertIn(image_id, html_content_second.decode('utf-8'))
+        self.assertIn(image_id, html_content_second)
 
         # The user should remain eligible even if the requirement status is later changed
         api.set_credit_requirement_status(
