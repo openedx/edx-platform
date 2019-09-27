@@ -20,7 +20,11 @@ class TestFixNotFound(ModuleStoreTestCase):
         """
         Test fix_not_found command with no arguments
         """
-        with self.assertRaisesRegexp(CommandError, "Error: too few arguments"):
+        if six.PY2:
+            errstring = 'Error: too few arguments'
+        else:
+            errstring = 'Error: the following arguments are required: course_id'
+        with self.assertRaisesRegexp(CommandError, errstring):
             call_command('fix_not_found')
 
     def test_fix_not_found_non_split(self):
