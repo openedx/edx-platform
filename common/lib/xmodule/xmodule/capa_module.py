@@ -190,7 +190,7 @@ class ProblemBlock(
                 self.scope_ids.user_id
             )
             _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
-            six.reraise(ProcessingError(not_found_error_message), None, traceback_obj)
+            six.reraise(ProcessingError, ProcessingError(not_found_error_message), traceback_obj)
 
         except Exception:
             log.exception(
