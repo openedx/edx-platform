@@ -52,7 +52,7 @@ class TransformerRegistry(PluginManager):
             hash_obj.update(transformer.name().encode('utf-8'))
             hash_obj.update(six.b(str(transformer.WRITE_VERSION)))
 
-        return b64encode(hash_obj.digest())
+        return b64encode(hash_obj.digest()).decode('utf-8')
 
     @classmethod
     def find_unregistered(cls, transformers):
