@@ -11,7 +11,6 @@ import logging
 import eventtracking
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
 from edx_rest_framework_extensions.paginators import DefaultPagination
@@ -97,9 +96,36 @@ class BookmarksViewMixin(object):
         )
 
 
-@method_decorator(name='get', decorator=swagger_auto_schema(
-    operation_summary="Get a paginated list of bookmarks for a user.",
-    operation_description=u"""
+class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
+    """REST endpoints for lists of bookmarks."""
+
+    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    pagination_class = BookmarksPagination
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = BookmarkSerializer
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                'course_id',
+                openapi.IN_QUERY,
+                type=openapi.TYPE_STRING,
+                description="The id of the course to limit the list",
+            ),
+            openapi.Parameter(
+                'fields',
+                openapi.IN_QUERY,
+                type=openapi.TYPE_STRING,
+                description="""
+                    The fields to return: display_name, path.
+                    """,
+            ),
+        ],
+    )
+    def get(self, request, *args, **kwargs):
+        """
+        Get a paginated list of bookmarks for a user.
+
         The list can be filtered by passing parameter "course_id=<course_id>"
         to only include bookmarks from a particular course.
 
@@ -117,31 +143,8 @@ class BookmarksViewMixin(object):
         # Example Requests
 
         GET /api/bookmarks/v1/bookmarks/?course_id={course_id1}&fields=display_name,path
-        """,
-    manual_parameters=[
-        openapi.Parameter(
-            'course_id',
-            openapi.IN_QUERY,
-            type=openapi.TYPE_STRING,
-            description="The id of the course to limit the list",
-        ),
-        openapi.Parameter(
-            'fields',
-            openapi.IN_QUERY,
-            type=openapi.TYPE_STRING,
-            description="""
-                The fields to return: display_name, path.
-                """,
-        ),
-    ],
-))
-class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
-    """REST endpoints for lists of bookmarks."""
-
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
-    pagination_class = BookmarksPagination
-    permission_classes = (permissions.IsAuthenticated,)
-    serializer_class = BookmarkSerializer
+        """
+        return super(BookmarksListView, self).get(request, *args, **kwargs)
 
     def get_serializer_context(self):
         """
