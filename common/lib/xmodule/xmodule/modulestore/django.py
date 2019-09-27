@@ -384,6 +384,7 @@ class ModuleI18nService(object):
                 pass
 
     def __getattr__(self, name):
+        name = 'gettext' if six.PY3 and name == 'ugettext' else name
         return getattr(self.translator, name)
 
     def strftime(self, *args, **kwargs):
