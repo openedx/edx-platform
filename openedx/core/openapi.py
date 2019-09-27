@@ -44,7 +44,7 @@ def dedent(text):
     return textwrap.dedent(text)
 
 
-def swagger_auto_schema(**kwargs):
+def swagger_auto_schema(*args, **kwargs):
     """
     Decorator for documenting an OpenAPI endpoint.
 
@@ -55,11 +55,27 @@ def swagger_auto_schema(**kwargs):
     __ https://drf-yasg.readthedocs.io/en/stable/drf_yasg.html#drf_yasg.utils.swagger_auto_schema
 
     """
-    if 'operation_description' in kwargs:
-        kwargs['operation_description'] = dedent(kwargs['operation_description'])
+    if args and callable(args[0]):
+        # decorator may be used with no argument
+        return swagger_auto_schema(*args[1:], **kwargs)(args[0])
+
     for param in kwargs.get('manual_parameters', ()):
         param.description = dedent(param.description)
-    return drf_swagger_auto_schema(**kwargs)
+
+    def decorator(view_func):
+        """
+        Final view decorator.
+        """
+        if view_func.__doc__ is not None:
+            doc_lines = view_func.__doc__.strip().split("\n")
+            if 'operation_summary' not in kwargs and doc_lines:
+                kwargs['operation_summary'] = doc_lines[0].strip()
+            if 'operation_description' not in kwargs and len(doc_lines) > 1:
+                kwargs['operation_description'] = "\n".join(doc_lines[1:])
+        if 'operation_description' in kwargs:
+            kwargs['operation_description'] = dedent(kwargs['operation_description'])
+        return drf_swagger_auto_schema(**kwargs)(view_func)
+    return decorator
 
 
 def is_schema_request(request):

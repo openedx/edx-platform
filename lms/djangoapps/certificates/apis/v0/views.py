@@ -5,7 +5,6 @@ import logging
 
 import six
 from django.contrib.auth import get_user_model
-from django.utils.decorators import method_decorator
 from edx_rest_framework_extensions import permissions
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -134,9 +133,38 @@ class CertificatesDetailView(GenericAPIView):
         )
 
 
-@method_decorator(name='get', decorator=swagger_auto_schema(
-    operation_summary="Get a paginated list of bookmarks for a user.",
-    operation_description=u"""\
+class CertificatesListView(GenericAPIView):
+    """REST API endpoints for listing certificates."""
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+
+    permission_classes = (
+        C(IsAuthenticated) & (
+            C(permissions.NotJwtRestrictedApplication) |
+            (
+                C(permissions.JwtRestrictedApplication) &
+                permissions.JwtHasScope &
+                permissions.JwtHasUserFilterForRequestedUser
+            )
+        ),
+    )
+
+    required_scopes = ['certificates:read']
+
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter(
+            'username',
+            openapi.IN_PATH,
+            type=openapi.TYPE_STRING,
+            description="The users to get certificates for",
+        )
+    ])
+    def get(self, request, username):
+        """Get a paginated list of bookmarks for a user.
+
         **Use Case**
 
         Get the list of viewable course certificates for a specific user.
@@ -185,38 +213,7 @@ class CertificatesDetailView(GenericAPIView):
                 "download_url": "http://www.example.com/cert.pdf",
                 "grade": "0.98"
             }]
-        """,
-    manual_parameters=[
-        openapi.Parameter(
-            'username',
-            openapi.IN_PATH,
-            type=openapi.TYPE_STRING,
-            description="The users to get certificates for",
-        ),
-    ],
-))
-class CertificatesListView(GenericAPIView):
-    """REST API endpoints for listing certificates."""
-    authentication_classes = (
-        JwtAuthentication,
-        OAuth2AuthenticationAllowInactiveUser,
-        SessionAuthenticationAllowInactiveUser,
-    )
-
-    permission_classes = (
-        C(IsAuthenticated) & (
-            C(permissions.NotJwtRestrictedApplication) |
-            (
-                C(permissions.JwtRestrictedApplication) &
-                permissions.JwtHasScope &
-                permissions.JwtHasUserFilterForRequestedUser
-            )
-        ),
-    )
-
-    required_scopes = ['certificates:read']
-
-    def get(self, request, username):
+        """
         user_certs = []
         if self._viewable_by_requestor(request, username):
             for user_cert in self._get_certificates_for_user(username):
