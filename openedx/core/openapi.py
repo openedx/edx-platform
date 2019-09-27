@@ -55,9 +55,11 @@ def swagger_auto_schema(*args, **kwargs):
     __ https://drf-yasg.readthedocs.io/en/stable/drf_yasg.html#drf_yasg.utils.swagger_auto_schema
 
     """
-    if args and callable(args[0]):
-        # decorator may be used with no argument
-        return swagger_auto_schema(*args[1:], **kwargs)(args[0])
+    if args:
+        if callable(args[0]):
+            # decorator may be used with no argument
+            return swagger_auto_schema(*args[1:], **kwargs)(args[0])
+        raise ValueError("Unsupported positional arguments")
 
     for param in kwargs.get('manual_parameters', ()):
         param.description = dedent(param.description)
