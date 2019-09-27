@@ -3,15 +3,18 @@ Tests for experimentation views
 """
 from __future__ import absolute_import
 
+from datetime import timedelta
 from uuid import uuid4
 import six
 
 from django.urls import reverse
+from django.utils.timezone import now
 from rest_framework.test import APITestCase
 
+from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.course_blocks.transformers.tests.helpers import ModuleStoreTestCase
-from student.tests.factories import UserFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -40,9 +43,9 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
 
     def setUp(self):
         super(Rev934Tests, self).setUp()
-        user = UserFactory(username='robot-mue-1-6pnjv')  # Username that hashes to bucket 1
+        self.user = UserFactory(username='robot-mue-1-6pnjv')  # Username that hashes to bucket 1
         self.client.login(
-            username=user.username,
+            username=self.user.username,
             password=UserFactory._DEFAULT_PASSWORD,  # pylint: disable=protected-access
         )
 
@@ -50,8 +53,11 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
     def test_flag_off(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['show_upsell'], False)
-        self.assertEqual(response.data['upsell_flag'], False)
+        expected = {
+            'show_upsell': False,
+            'upsell_flag': False,
+        }
+        self.assertEqual(response.data, expected)
 
     @override_waffle_flag(MOBILE_UPSELL_FLAG, active=True)
     def test_no_course_id(self):
@@ -65,7 +71,7 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
 
     @override_waffle_flag(MOBILE_UPSELL_FLAG, active=True)
     def test_simple_course(self):
-        course = CourseFactory.create()
+        course = CourseFactory.create(start=now() - timedelta(days=30))
         response = self.client.get(self.url, {'course_id': course.id})
         self.assertEqual(response.status_code, 200)
         expected = {
@@ -73,15 +79,19 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
             'upsell_flag': True,
             'experiment_bucket': 1,
             'user_upsell': True,
-            'basket_link': None,  # No sku means no basket link so no upsell
+            'basket_url': None,  # No verified mode means no basket link
         }
         self.assertEqual(response.data, expected)
 
     @override_waffle_flag(MOBILE_UPSELL_FLAG, active=True)
-    def test_course(self):
-        course = CourseFactory.create(run='test', display_name='test')
+    def test_verified_course(self):
+        course = CourseFactory.create(
+            start=now() - timedelta(days=30),
+            run='test',
+            display_name='test',
+        )
         CourseModeFactory.create(
-            mode_slug="verified",
+            mode_slug=CourseMode.VERIFIED,
             course_id=course.id,
             min_price=10,
             sku=six.text_type(uuid4().hex)
@@ -98,4 +108,113 @@ class Rev934Tests(APITestCase, ModuleStoreTestCase):
             'basket_url': result['basket_url'],
             # Example basket_url: u'/verify_student/upgrade/org.0/course_0/test/'
         }
+        self.assertEqual(result, expected)
+
+    @override_waffle_flag(MOBILE_UPSELL_FLAG, active=True)
+    def test_expired_verified_mode(self):
+        course = CourseFactory.create(
+            start=now() - timedelta(days=30),
+            run='test',
+            display_name='test',
+        )
+        CourseModeFactory.create(
+            mode_slug=CourseMode.VERIFIED,
+            course_id=course.id,
+            min_price=10,
+            sku=six.text_type(uuid4().hex),
+            expiration_datetime=now() - timedelta(days=30),
+        )
+
+        response = self.client.get(self.url, {'course_id': course.id})
+        self.assertEqual(response.status_code, 200)
+        expected = {
+            'show_upsell': False,
+            'upsell_flag': True,
+            'experiment_bucket': 1,
+            'user_upsell': True,
+            'basket_url': None,  # Expired verified mode means no basket link
+        }
         self.assertEqual(response.data, expected)
+
+    @override_waffle_flag(MOBILE_UPSELL_FLAG, active=True)
+    def test_not_started_course(self):
+        course = CourseFactory.create(
+            start=now() + timedelta(days=30),
+            end=now() + timedelta(days=60),
+            run='test',
+            display_name='test',
+        )
+        CourseModeFactory.create(
+            mode_slug=CourseMode.VERIFIED,
+            course_id=course.id,
+            min_price=10,
+            sku=six.text_type(uuid4().hex)
+        )
+
+        response = self.client.get(self.url, {'course_id': course.id})
+        self.assertEqual(response.status_code, 200)
+        expected = {
+            'show_upsell': False,
+            'upsell_flag': True,
+            'course_running': False,
+        }
+        self.assertEqual(response.data, expected)
+
+    @override_waffle_flag(MOBILE_UPSELL_FLAG, active=True)
+    def test_ended_course(self):
+        course = CourseFactory.create(
+            start=now() - timedelta(days=60),
+            end=now() - timedelta(days=30),
+            run='test',
+            display_name='test',
+        )
+        CourseModeFactory.create(
+            mode_slug=CourseMode.VERIFIED,
+            course_id=course.id,
+            min_price=10,
+            sku=six.text_type(uuid4().hex)
+        )
+
+        response = self.client.get(self.url, {'course_id': course.id})
+        self.assertEqual(response.status_code, 200)
+        expected = {
+            'show_upsell': False,
+            'upsell_flag': True,
+            'course_running': False,
+        }
+        self.assertEqual(response.data, expected)
+
+    @override_waffle_flag(MOBILE_UPSELL_FLAG, active=True)
+    def test_already_upgraded(self):
+        course = CourseFactory.create(
+            start=now() - timedelta(days=30),
+            run='test',
+            display_name='test',
+        )
+        course_mode = CourseModeFactory.create(
+            mode_slug=CourseMode.VERIFIED,
+            course_id=course.id,
+            min_price=10,
+            sku=six.text_type(uuid4().hex)
+        )
+        CourseEnrollmentFactory.create(
+            is_active=True,
+            mode=course_mode,
+            course_id=course.id,
+            user=self.user
+        )
+
+        response = self.client.get(self.url, {'course_id': course.id})
+        self.assertEqual(response.status_code, 200)
+        result = response.data
+        self.assertIn('basket_url', result)
+        self.assertTrue(bool(result['basket_url']))
+        expected = {
+            'show_upsell': False,
+            'upsell_flag': True,
+            'experiment_bucket': 1,
+            'user_upsell': False,
+            'basket_url': result['basket_url'],
+            # Example basket_url: u'/verify_student/upgrade/org.0/course_0/test/'
+        }
+        self.assertEqual(result, expected)
