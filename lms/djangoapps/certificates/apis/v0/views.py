@@ -20,7 +20,7 @@ from openedx.core.djangoapps.certificates.api import certificates_viewable_for_c
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.user_api.accounts.api import visible_fields
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
-from openedx.core.openapi import swagger_auto_schema, openapi
+from openedx.core.openapi import document_api_view, openapi
 
 
 log = logging.getLogger(__name__)
@@ -154,7 +154,7 @@ class CertificatesListView(GenericAPIView):
 
     required_scopes = ['certificates:read']
 
-    @swagger_auto_schema(manual_parameters=[
+    @document_api_view(manual_parameters=[
         openapi.Parameter(
             'username',
             openapi.IN_PATH,

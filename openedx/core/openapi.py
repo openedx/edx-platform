@@ -44,7 +44,7 @@ def dedent(text):
     return textwrap.dedent(text)
 
 
-def swagger_auto_schema(*args, **kwargs):
+def document_api_view(*args, **kwargs):
     """
     Decorator for documenting an OpenAPI endpoint.
 
@@ -58,7 +58,7 @@ def swagger_auto_schema(*args, **kwargs):
     if args:
         if callable(args[0]):
             # decorator may be used with no argument
-            return swagger_auto_schema(*args[1:], **kwargs)(args[0])
+            return document_api_view(*args[1:], **kwargs)(args[0])
         raise ValueError("Unsupported positional arguments")
 
     for param in kwargs.get('manual_parameters', ()):
