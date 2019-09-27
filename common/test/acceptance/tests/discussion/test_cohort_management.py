@@ -334,21 +334,6 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         unique_email = unique_username + "@example.com"
         return unique_username, unique_email
 
-    def test_add_new_cohort(self):
-        """
-        Scenario: A new manual cohort can be created, and a student assigned to it.
-
-        Given I have a course with a user in the course
-        When I add a new manual cohort to the course via the LMS instructor dashboard
-        Then the new cohort is displayed and has no users in it
-        And assignment type of displayed cohort to "manual" because this is the default
-        And when I add the user to the new cohort
-        Then the cohort has 1 user
-        And appropriate events have been emitted
-        """
-        cohort_name = str(uuid.uuid4().hex[0:20])
-        self._verify_cohort_settings(cohort_name=cohort_name, assignment_type=None)
-
     def test_add_new_cohort_with_manual_assignment_type(self):
         """
         Scenario: A new cohort with manual assignment type can be created, and a student assigned to it.
