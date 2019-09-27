@@ -479,7 +479,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
         response = confirm_email_change(self.request, self.key)
         self.assertEqual(response.status_code, 200)
         self.assertEquals(
-            mock_render_to_response(expected_template, expected_context).content,
+            mock_render_to_response(expected_template, expected_context).content.decode('utf-8'),
             response.content.decode('utf-8')
         )
 
