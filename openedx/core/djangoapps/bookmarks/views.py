@@ -26,7 +26,7 @@ from rest_framework_oauth.authentication import OAuth2Authentication
 from openedx.core.djangoapps.bookmarks.api import BookmarksLimitReachedError
 from openedx.core.lib.api.permissions import IsUserInUrl
 from openedx.core.lib.url_utils import unquote_slashes
-from openedx.core.openapi import swagger_auto_schema, openapi
+from openedx.core.openapi import api_parameter, swagger_auto_schema, openapi
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from . import DEFAULT_FIELDS, OPTIONAL_FIELDS, api
@@ -104,23 +104,18 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = BookmarkSerializer
 
-    @swagger_auto_schema(
-        manual_parameters=[
-            openapi.Parameter(
-                'course_id',
-                openapi.IN_QUERY,
-                type=openapi.TYPE_STRING,
-                description="The id of the course to limit the list",
-            ),
-            openapi.Parameter(
-                'fields',
-                openapi.IN_QUERY,
-                type=openapi.TYPE_STRING,
-                description="""
-                    The fields to return: display_name, path.
-                    """,
-            ),
-        ],
+    @swagger_auto_schema
+    @api_parameter(
+        'course_id',
+        openapi.IN_QUERY,
+        type=openapi.TYPE_STRING,
+        description="The id of the course to limit the list",
+    )
+    @api_parameter(
+        'fields',
+        openapi.IN_QUERY,
+        type=openapi.TYPE_STRING,
+        description="The fields to return: display_name, path.",
     )
     def get(self, request, *args, **kwargs):
         """Get a paginated list of bookmarks for a user.

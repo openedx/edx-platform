@@ -130,7 +130,7 @@ paths:
           type: string
         - name: fields
           in: query
-          description: "The fields to return: display_name, path.\n"
+          description: 'The fields to return: display_name, path.'
           type: string
       responses:
         '200':

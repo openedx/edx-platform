@@ -44,6 +44,9 @@ def dedent(text):
     return textwrap.dedent(text)
 
 
+_DECORATOR_DATA_FIELD = '_decorated_swagger_data'
+
+
 def swagger_auto_schema(*args, **kwargs):
     """
     Decorator for documenting an OpenAPI endpoint.
@@ -71,7 +74,22 @@ def swagger_auto_schema(*args, **kwargs):
                 kwargs['operation_description'] = "\n".join(doc_lines[1:])
         if 'operation_description' in kwargs:
             kwargs['operation_description'] = dedent(kwargs['operation_description'])
+        decorator_kwargs = getattr(view_func, _DECORATOR_DATA_FIELD, {})
+        kwargs.update(decorator_kwargs)
         return drf_swagger_auto_schema(**kwargs)(view_func)
+    return decorator
+
+
+def api_parameter(name, in_, **kwargs):
+    """
+    """
+    def decorator(view_func):
+        swagger_decorator_data = getattr(view_func, _DECORATOR_DATA_FIELD, {})
+        old_parameters = swagger_decorator_data.get('manual_parameters', [])
+        parameter = openapi.Parameter(name, in_, **kwargs)
+        swagger_decorator_data['manual_parameters'] = [parameter] + old_parameters
+        setattr(view_func, _DECORATOR_DATA_FIELD, swagger_decorator_data)
+        return view_func
     return decorator
 
 
