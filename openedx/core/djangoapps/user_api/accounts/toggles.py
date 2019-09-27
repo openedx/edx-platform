@@ -6,7 +6,7 @@ from __future__ import absolute_import
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.waffle_utils import WaffleFlag
 
-# .. toggle_name: REDIRECT_TO_ORDER_HISTORY_MICROFRONTEND
+# .. toggle_name: order_history.redirect_to_microfrontend
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Supports staged rollout of a new micro-frontend-based implementation of the order history page.
@@ -27,7 +27,7 @@ def should_redirect_to_order_history_microfrontend():
     )
 
 
-# .. toggle_name: REDIRECT_TO_ACCOUNT_MICROFRONTEND
+# .. toggle_name: account.redirect_to_microfrontend
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Supports staged rollout of a new micro-frontend-based implementation of the account page.
