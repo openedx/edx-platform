@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 experiments_namespace = WaffleFlagNamespace(name=u'experiments')
 
 # .. toggle_name: experiments.add_programs
-# .. toggle_type: waffle_flag
+# .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Toggle for adding the current course's program information to user metadata
 # .. toggle_category: experiments
@@ -52,7 +52,7 @@ PROGRAM_INFO_FLAG = WaffleFlag(
 )
 
 # .. toggle_name: experiments.add_dashboard_info
-# .. toggle_type: waffle_flag
+# .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Toggle for adding info about each course to the dashboard metadata
 # .. toggle_category: experiments
