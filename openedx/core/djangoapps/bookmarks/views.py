@@ -201,25 +201,21 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
 
         return page
 
-    @swagger_auto_schema(
-        operation_summary="Create a new bookmark for a user.",
-        operation_description=u"""
-            The POST request only needs to contain one parameter "usage_id".
-
-            Http400 is returned if the format of the request is not correct,
-            the usage_id is invalid or a block corresponding to the usage_id
-            could not be found.
-
-            # Example Requests
-
-            POST /api/bookmarks/v1/bookmarks/
-            Request data: {"usage_id": <usage-id>}
-
-            """,
-    )
+    @swagger_auto_schema
     def post(self, request, *unused_args, **unused_kwargs):
-        """Create a new bookmark for a user."""
+        """Create a new bookmark for a user.
 
+        The POST request only needs to contain one parameter "usage_id".
+
+        Http400 is returned if the format of the request is not correct,
+        the usage_id is invalid or a block corresponding to the usage_id
+        could not be found.
+
+        # Example Requests
+
+        POST /api/bookmarks/v1/bookmarks/
+        Request data: {"usage_id": <usage-id>}
+        """
         if not request.data:
             return self.error_response(ugettext_noop(u'No data provided.'), DEFAULT_USER_MESSAGE)
 
