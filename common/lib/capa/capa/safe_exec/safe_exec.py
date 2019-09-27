@@ -117,7 +117,7 @@ def safe_exec(
     if cache:
         safe_globals = json_safe(globals_dict)
         md5er = hashlib.md5()
-        md5er.update(six.b(repr(code)))
+        md5er.update(repr(code).encode('utf-8'))
         update_hash(md5er, safe_globals)
         key = "safe_exec.%r.%s" % (random_seed, md5er.hexdigest())
         cached = cache.get(key)
@@ -146,6 +146,8 @@ def safe_exec(
             python_path=python_path, extra_files=extra_files, slug=slug,
         )
     except SafeExecException as e:
+        # Saving SafeExecException e in exception to be used later.
+        exception = e
         emsg = text_type(e)
     else:
         emsg = None
@@ -158,4 +160,4 @@ def safe_exec(
 
     # If an exception happened, raise it now.
     if emsg:
-        raise e
+        raise exception
