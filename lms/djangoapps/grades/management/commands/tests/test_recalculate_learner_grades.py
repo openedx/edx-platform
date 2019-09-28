@@ -49,8 +49,11 @@ class TestRecalculateLearnerGrades(HasCourseWithProblemsMixin, ModuleStoreTestCa
     )
     def test_recalculate_grades(self, task_mock):
         with NamedTemporaryFile() as csv:
-            csv.write("course_id,user_id\n")
-            csv.writelines(course + "," + user + "\n" for user, course in self.user_course_pairs)
+            csv.write(b"course_id,user_id\n")
+            csv.writelines(
+                "{},{}\n".format(course, user).encode()
+                for user, course in self.user_course_pairs
+            )
             csv.seek(0)
 
             self.command.handle(csv=csv.name)
