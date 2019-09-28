@@ -725,7 +725,7 @@ class CourseOverview(TimeStampedModel):
         if netloc:
             return url
 
-        return urlunparse((None, base_url, path, params, query, fragment))
+        return urlunparse(('', base_url, path, params, query, fragment))
 
     def __str__(self):
         """Represent ourselves with the course key."""
