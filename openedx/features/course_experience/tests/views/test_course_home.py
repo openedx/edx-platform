@@ -966,10 +966,10 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
 
     def assert_upgrade_message_displayed(self):
         response = self.client.get(self.url)
-        self.assertIn('section-upgrade', response.content)
+        self.assertContains(response, 'section-upgrade')
         url = EcommerceService().get_checkout_page_url(self.verified_mode.sku)
-        self.assertIn('<a class="btn-brand btn-upgrade"', response.content)
-        self.assertIn(url, response.content)
+        self.assertContains(response, '<a class="btn-brand btn-upgrade"')
+        self.assertContains(response, url)
         self.assertIn(
             u"Upgrade (<span class='price'>${price}</span>)".format(price=self.verified_mode.min_price),
             response.content.decode(response.charset)

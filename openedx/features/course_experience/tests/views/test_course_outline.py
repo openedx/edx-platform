@@ -126,16 +126,16 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
 
             self.assertTrue(course.children)
             for chapter in course.children:
-                self.assertIn(chapter.display_name, response_content)
+                self.assertContains(response, chapter.display_name)
                 self.assertTrue(chapter.children)
                 for sequential in chapter.children:
-                    self.assertIn(sequential.display_name, response_content)
+                    self.assertContains(response, sequential.display_name)
                     if sequential.graded:
-                        self.assertIn(sequential.due.strftime(u'%Y-%m-%d %H:%M:%S'), response_content)
-                        self.assertIn(sequential.format, response_content)
+                        self.assertContains(response, sequential.due.strftime(u'%Y-%m-%d %H:%M:%S'))
+                        self.assertContains(response, sequential.format)
                     self.assertTrue(sequential.children)
                     for vertical in sequential.children:
-                        self.assertIn(vertical.display_name, response_content)
+                        self.assertContains(response, vertical.display_name)
 
 
 class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, MilestonesTestCaseMixin):

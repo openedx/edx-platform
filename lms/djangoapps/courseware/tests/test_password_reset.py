@@ -51,7 +51,7 @@ class TestPasswordReset(LoginEnrollmentTestCase):
         """
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context_data['validlink'], valid_link)
-        self.assertIn(error_message, response.content)
+        self.assertContains(response, error_message)
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
         create_validator_config('util.password_policy_validators.MinimumLengthValidator', {'min_length': 6})

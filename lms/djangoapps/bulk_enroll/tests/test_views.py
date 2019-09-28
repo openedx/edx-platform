@@ -383,8 +383,7 @@ class BulkEnrollmentTest(ModuleStoreTestCase, LoginEnrollmentTestCase, APITestCa
             'cohorts': 'cohort1',
             'courses': self.course_key
         })
-        self.assertEqual(response.status_code, 400)
-        self.assertIn('Cohorts can only be used for enrollments.', response.content.decode('utf-8'))
+        self.assertContains(response, 'Cohorts can only be used for enrollments.', status_code=400)
 
     def test_add_to_valid_cohort(self):
         config_course_cohorts(self.course, is_cohorted=True, manual_cohorts=["cohort1", "cohort2"])

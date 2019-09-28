@@ -163,7 +163,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
         response = self.client.get(path=view_path)
 
         for attribute in self.FIELDS:
-            self.assertIn(attribute, response.content)
+            self.assertContains(response, attribute)
 
     def test_header_with_programs_listing_enabled(self):
         """
@@ -256,7 +256,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
             # Test with waffle flag active and site setting disabled, does not redirect
             response = self.client.get(path=old_url_path)
             for attribute in self.FIELDS:
-                self.assertIn(attribute, response.content)
+                self.assertContains(response, attribute)
 
             # Test with waffle flag active and site setting enabled, redirects to microfrontend
             site_domain = 'othersite.example.com'

@@ -55,10 +55,10 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
         self.assertTrue(is_bulk_email_feature_enabled(self.course.id))
         # Assert that the URL for the email view is in the response
         response = self.client.get(self.url)
-        self.assertIn(self.email_link, response.content)
+        self.assertContains(response, self.email_link)
 
         send_to_label = '<div class="send_to_list">Send to:</div>'
-        self.assertIn(send_to_label, response.content)
+        self.assertContains(response, send_to_label)
         self.assertEqual(response.status_code, 200)
 
     # The course is Mongo-backed but the flag is disabled (should not work)
@@ -94,7 +94,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
         self.assertTrue(is_bulk_email_feature_enabled(self.course.id))
         # Assert that the URL for the email view is in the response
         response = self.client.get(self.url)
-        self.assertIn(self.email_link, response.content)
+        self.assertContains(response, self.email_link)
 
     # Flag is disabled, but course is authorized
     def test_course_authorized_feature_off(self):

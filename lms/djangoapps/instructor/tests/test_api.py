@@ -2684,22 +2684,23 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
         # Now re_validate the same active invoice number and expect an Bad request
         response = self.assert_request_status_code(400, url, method="POST", data=data)
-        self.assertIn("This invoice is already active.", response.content.decode('utf-8'))
+        self.assertContains(response, "This invoice is already active.", status_code=400)
 
         test_data_2 = {'invoice_number': self.sale_invoice_1.id}
         response = self.assert_request_status_code(400, url, method="POST", data=test_data_2)
-        self.assertIn("Missing required event_type parameter", response.content.decode('utf-8'))
+        self.assertContains(response, "Missing required event_type parameter", status_code=400)
 
         test_data_3 = {'event_type': "re_validate"}
         response = self.assert_request_status_code(400, url, method="POST", data=test_data_3)
-        self.assertIn("Missing required invoice_number parameter", response.content.decode('utf-8'))
+        self.assertContains(response, "Missing required invoice_number parameter", status_code=400)
 
         # submitting invalid invoice number
         data['invoice_number'] = 'testing'
         response = self.assert_request_status_code(400, url, method="POST", data=data)
-        self.assertIn(
+        self.assertContains(
+            response,
             u"invoice_number must be an integer, {value} provided".format(value=data['invoice_number']),
-            response.content.decode('utf-8')
+            status_code=400,
         )
 
     def test_get_sale_order_records_features_csv(self):
@@ -2991,8 +2992,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             submit_task_function.side_effect = error
             response = self.client.post(url, {})
 
-        self.assertEqual(response.status_code, 400)
-        self.assertIn(already_running_status, response.content.decode('utf-8'))
+        self.assertContains(response, already_running_status, status_code=400)
 
     def test_get_students_features(self):
         """
@@ -3070,8 +3070,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             error = AlreadyRunningError(already_running_status)
             submit_task_function.side_effect = error
             response = self.client.post(url, {})
-        self.assertEqual(response.status_code, 400)
-        self.assertIn(already_running_status, response.content.decode('utf-8'))
+        self.assertContains(response, already_running_status, status_code=400)
 
     def test_get_student_exam_results(self):
         """
@@ -3093,8 +3092,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             error = AlreadyRunningError(already_running_status)
             submit_task_function.side_effect = error
             response = self.client.post(url, {})
-            self.assertEqual(response.status_code, 400)
-            self.assertIn(already_running_status, response.content.decode('utf-8'))
+            self.assertContains(response, already_running_status, status_code=400)
 
     def test_access_course_finance_admin_with_invalid_course_key(self):
         """
@@ -3408,8 +3406,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             mock.side_effect = AlreadyRunningError(already_running_status)
             response = self.client.post(url, {})
 
-        self.assertEqual(response.status_code, 400)
-        self.assertIn(already_running_status, response.content.decode('utf-8'))
+        self.assertContains(response, already_running_status, status_code=400)
 
     def test_get_ora2_responses_success(self):
         url = reverse('export_ora2_data', kwargs={'course_id': text_type(self.course.id)})
@@ -3429,8 +3426,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             mock_submit_ora2_task.side_effect = AlreadyRunningError(already_running_status)
             response = self.client.post(url, {})
 
-        self.assertEqual(response.status_code, 400)
-        self.assertIn(already_running_status, response.content.decode('utf-8'))
+        self.assertContains(response, already_running_status, status_code=400)
 
     def test_get_student_progress_url(self):
         """ Test that progress_url is in the successful response. """
@@ -5176,7 +5172,7 @@ class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
 
         response = self.client.post(generate_code_url, data, **{'HTTP_HOST': 'localhost'})
         self.assertEqual(response.status_code, 400, response.content.decode('utf-8'))
-        self.assertIn('Could not parse amount as', response.content.decode('utf-8'))
+        self.assertContains(response, 'Could not parse amount as', status_code=400)
 
     def test_get_historical_coupon_codes(self):
         """

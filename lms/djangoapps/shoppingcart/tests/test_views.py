@@ -1847,28 +1847,28 @@ class RegistrationCodeRedemptionCourseEnrollment(SharedModuleStoreTestCase):
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content)
+        self.assertContains(response, 'Activate Course Enrollment')
 
         #now activate the user by enrolling him/her to the course
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
-        self.assertIn('View Dashboard', response.content)
+        self.assertContains(response, 'View Dashboard')
 
         #now check that the registration code has already been redeemed and user is already registered in the course
         RegistrationCodeRedemption.objects.filter(registration_code__code=registration_code)
         response = self.client.get(redeem_url)
         self.assertEquals(len(RegistrationCodeRedemption.objects.filter(registration_code__code=registration_code)), 1)
-        self.assertIn("You&#39;ve clicked a link for an enrollment code that has already been used.", response.content)
+        self.assertContains(response, "You&#39;ve clicked a link for an enrollment code that has already been used.")
 
         #now check that the registration code has already been redeemed
         response = self.client.post(redeem_url)
-        self.assertIn("You&#39;ve clicked a link for an enrollment code that has already been used.", response.content)
+        self.assertContains(response, "You&#39;ve clicked a link for an enrollment code that has already been used.")
 
         #now check the response of the dashboard page
         dashboard_url = reverse('dashboard')
         response = self.client.get(dashboard_url)
         self.assertEquals(response.status_code, 200)
-        self.assertIn(self.course.display_name.encode('utf-8'), response.content)
+        self.assertContains(response, self.course.display_name.encode('utf-8'))
 
 
 @ddt.ddt
@@ -2176,7 +2176,7 @@ class CSVReportViewsTest(SharedModuleStoreTestCase):
                                                                     'requested_report': report_type})
         self.assertEqual(response['Content-Type'], 'text/csv')
         report = initialize_report(report_type, start_date, end_date)
-        self.assertIn(",".join(report.header()), response.content)
+        self.assertContains(response, ",".join(report.header()))
         self.assertIn(
             ",1,purchased,1,40.00,40.00,usd,Registration for Course: Robot Super Course,",
             response.content
@@ -2197,7 +2197,7 @@ class CSVReportViewsTest(SharedModuleStoreTestCase):
                                                                     'requested_report': report_type})
         self.assertEqual(response['Content-Type'], 'text/csv')
         report = initialize_report(report_type, start_date, end_date, start_letter, end_letter)
-        self.assertIn(",".join(report.header()), response.content)
+        self.assertContains(response, ",".join(report.header()))
 
 
 class UtilFnsTest(TestCase):

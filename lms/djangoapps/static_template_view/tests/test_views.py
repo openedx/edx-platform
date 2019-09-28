@@ -45,8 +45,8 @@ class MarketingSiteViewTests(TestCase):
         configuration = {test_header_key: test_header, test_content_key: test_content}
         with with_site_configuration_context(configuration=configuration):
             response = self.client.get(reverse("about"))
-        self.assertIn(test_header.encode('utf-8'), response.content)
-        self.assertIn(test_content.encode('utf-8'), response.content)
+        self.assertContains(response, test_header)
+        self.assertContains(response, test_content)
 
     def test_about_with_site_configuration_and_html(self):
         """
@@ -60,8 +60,8 @@ class MarketingSiteViewTests(TestCase):
         configuration = {test_header_key: test_header, test_content_key: test_content}
         with with_site_configuration_context(configuration=configuration):
             response = self.client.get(reverse("about"))
-        self.assertIn(test_header.encode('utf-8'), response.content)
-        self.assertIn(test_content.encode('utf-8'), response.content)
+        self.assertContains(response, test_header)
+        self.assertContains(response, test_content)
 
     def test_404(self):
         """

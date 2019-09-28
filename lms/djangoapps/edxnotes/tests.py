@@ -1081,8 +1081,7 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         mock_search.side_effect = EdxNotesServiceUnavailable
         enable_edxnotes_for_the_course(self.course, self.user.id)
         response = self.client.get(self.notes_url, {"text": "test"})
-        self.assertEqual(response.status_code, 500)
-        self.assertIn("error", response.content)
+        self.assertContains(response, "error", status_code=500)
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
     @patch("edxnotes.views.get_notes", autospec=True)
@@ -1094,8 +1093,7 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         mock_search.side_effect = EdxNotesParseError
         enable_edxnotes_for_the_course(self.course, self.user.id)
         response = self.client.get(self.notes_url, {"text": "test"})
-        self.assertEqual(response.status_code, 500)
-        self.assertIn("error", response.content)
+        self.assertContains(response, "error", status_code=500)
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
     def test_get_id_token(self):

@@ -480,7 +480,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         shoppingcart.models.PaidCourseRegistration.add_to_order(cart, course.id)
         response = self.client.get(reverse('about_course', args=[six.text_type(course.id)]))
         self.assertEqual(response.status_code, 200)
-        self.assertIn(in_cart_span, response.content)
+        self.assertContains(response, in_cart_span)
 
     def assert_enrollment_link_present(self, is_anonymous):
         """
@@ -729,8 +729,8 @@ class ViewsTestCase(ModuleStoreTestCase):
                 response_content = HTMLParser().unescape(response.content)
                 expected_time = datetime.now() + timedelta(hours=hour_diff)
                 expected_tz = expected_time.strftime('%Z')
-                self.assertIn(expected_tz, response_content)
-                self.assertIn(str(expected_time), response_content)
+                self.assertContains(response, expected_tz)
+                self.assertContains(response, str(expected_time))
 
     def _email_opt_in_checkbox(self, response, org_name_string=None):
         """Check if the email opt-in checkbox appears in the response content."""
@@ -749,7 +749,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         response = self.client.get(url)
         # This is a static page, so just assert that it is returned correctly
         self.assertEqual(response.status_code, 200)
-        self.assertIn('Financial Assistance Application', response.content)
+        self.assertContains(response, 'Financial Assistance Application')
 
     @ddt.data(([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.AUDIT, True, YESTERDAY),
               ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.VERIFIED, True, None),
@@ -837,7 +837,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        self.assertIn(str(course), response.content)
+        self.assertContains(response, str(course))
 
     def _submit_financial_assistance_form(self, data):
         """Submit a financial assistance request."""
@@ -2644,7 +2644,7 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
         self.assertTrue(self.client.login(username=self.user.username, password='test'))
 
         response = self.client.get(self.section_1_url)
-        self.assertIn('data-mark-completed-on-view-after-delay', response.content)
+        self.assertContains(response, 'data-mark-completed-on-view-after-delay')
         self.assertEqual(response.content.count("data-mark-completed-on-view-after-delay"), 2)
 
         request = self.request_factory.post(
@@ -2662,7 +2662,7 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
         self.assertEqual(json.loads(response.content.decode('utf-8')), {'result': "ok"})
 
         response = self.client.get(self.section_1_url)
-        self.assertIn('data-mark-completed-on-view-after-delay', response.content)
+        self.assertContains(response, 'data-mark-completed-on-view-after-delay')
         self.assertEqual(response.content.count("data-mark-completed-on-view-after-delay"), 1)
 
         request = self.request_factory.post(
@@ -2735,7 +2735,7 @@ class TestIndexViewWithVerticalPositions(ModuleStoreTestCase):
         """
         Asserts that the expected position and the position in the response are the same
         """
-        self.assertIn('data-position="{}"'.format(expected_position), response.content)
+        self.assertContains(response, 'data-position="{}"'.format(expected_position))
 
     @ddt.data(("-1", 1), ("0", 1), ("-0", 1), ("2", 2), ("5", 1))
     @ddt.unpack
@@ -2799,7 +2799,7 @@ class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
             )
         )
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Content Locked", response.content)
+        self.assertContains(response, "Content Locked")
 
 
 class TestIndexViewWithCourseDurationLimits(ModuleStoreTestCase):
@@ -2885,8 +2885,7 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
         Test XBlockRendering with invalid usage key
         """
         response = self.get_response(usage_key='some_invalid_usage_key')
-        self.assertEqual(response.status_code, 404)
-        self.assertIn('Page not found', response.content)
+        self.assertContains(response, 'Page not found', status_code=404)
 
     def get_response(self, usage_key, url_encoded_params=None):
         """
@@ -2906,7 +2905,7 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
 
         response = self.get_response(usage_key=self.html_block.location)
         self.assertEqual(response.status_code, 200)
-        self.assertIn('data-enable-completion-on-view-service="false"', response.content)
+        self.assertContains(response, 'data-enable-completion-on-view-service="false"')
         self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
 
     def test_render_xblock_with_completion_service_enabled(self):
@@ -2920,8 +2919,8 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
 
         response = self.get_response(usage_key=self.html_block.location)
         self.assertEqual(response.status_code, 200)
-        self.assertIn('data-enable-completion-on-view-service="true"', response.content)
-        self.assertIn('data-mark-completed-on-view-after-delay', response.content)
+        self.assertContains(response, 'data-enable-completion-on-view-service="true"')
+        self.assertContains(response, 'data-mark-completed-on-view-after-delay')
 
         request = RequestFactoryNoCsrf().post(
             '/',
@@ -2940,12 +2939,12 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
 
         response = self.get_response(usage_key=self.html_block.location)
         self.assertEqual(response.status_code, 200)
-        self.assertIn('data-enable-completion-on-view-service="false"', response.content)
+        self.assertContains(response, 'data-enable-completion-on-view-service="false"')
         self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
 
         response = self.get_response(usage_key=self.problem_block.location)
         self.assertEqual(response.status_code, 200)
-        self.assertIn('data-enable-completion-on-view-service="false"', response.content)
+        self.assertContains(response, 'data-enable-completion-on-view-service="false"')
         self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
 
 

@@ -219,7 +219,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         six.assertCountEqual(self, response.redirect_chain, [])
         banner_text = 'You lose all access to this course, including your progress,'
         if show_expiration_banner:
-            self.assertIn(banner_text, response.content)
+            self.assertContains(response, banner_text)
         else:
             self.assertNotIn(banner_text, response.content)
 
@@ -319,7 +319,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         six.assertCountEqual(self, response.redirect_chain, [])
         banner_text = 'This learner does not have access to this course. Their access expired on'
-        self.assertIn(banner_text, response.content)
+        self.assertContains(response, banner_text)
 
     @mock.patch("openedx.features.course_duration_limits.access.get_course_run_details")
     @ddt.data(

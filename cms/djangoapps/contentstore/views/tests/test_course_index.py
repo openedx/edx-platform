@@ -311,7 +311,7 @@ class TestCourseIndex(CourseTestCase):
         self.assertEqual(response.status_code, 200)
 
         # Assert that 'display_course_number' is being set to "" (as display_coursenumber was None).
-        self.assertIn('display_course_number: ""', response.content)
+        self.assertContains(response, 'display_course_number: ""')
 
 
 @ddt.ddt
@@ -648,7 +648,7 @@ class TestCourseReIndex(CourseTestCase):
         response = self.client.get(index_url, {}, HTTP_ACCEPT='application/json')
 
         # A course with the default release date should display as "Unscheduled"
-        self.assertIn(self.SUCCESSFUL_RESPONSE, response.content)
+        self.assertContains(response, self.SUCCESSFUL_RESPONSE)
         self.assertEqual(response.status_code, 200)
 
         response = self.client.post(index_url, {}, HTTP_ACCEPT='application/json')
@@ -677,7 +677,7 @@ class TestCourseReIndex(CourseTestCase):
         response = self.client.get(index_url, {}, CONTENT_TYPE='')
 
         # A course with the default release date should display as "Unscheduled"
-        self.assertIn(self.SUCCESSFUL_RESPONSE, response.content)
+        self.assertContains(response, self.SUCCESSFUL_RESPONSE)
         self.assertEqual(response.status_code, 200)
 
     @mock.patch('xmodule.html_module.HtmlBlock.index_dictionary')

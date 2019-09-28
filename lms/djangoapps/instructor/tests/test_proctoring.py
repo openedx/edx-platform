@@ -148,7 +148,7 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
                 backend='test',
             )
             response = self.client.get(self.url)
-            self.assertIn('Review Dashboard', response.content)
+            self.assertContains(response, 'Review Dashboard')
 
     def _assert_proctoring_tab_available(self, available):
         """
