@@ -81,7 +81,7 @@ def main(args, env):
 
     # TODO: validate more of the arguments
     # HACK: currently not enforcing the naming rules:
-    # - Username must be between 2 and 30 characters long. 
+    # - Username must be between 2 and 30 characters long.
     # - Usernames can only contain letters (A-Z, a-z), numerals (0-9), underscores (_), and hyphens (-).)
     print("Generated names:")
     for i in bucket_list:
@@ -148,7 +148,8 @@ def abbreviate(exp):
 
 #####
 if __name__ == "__main__":
-    import os, sys
+    import os
+    import sys
     xit = main(sys.argv, os.environ)
     sys.exit(xit)
 #####
