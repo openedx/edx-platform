@@ -306,7 +306,7 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
         self._add_course_certificates(count=1, signatory_count=2)
         response = self.client.get(test_url)
         self.assertIn('edX', response.content.decode('utf-8'))
-        self.assertNotIn('My Platform Site', response.content.decode('utf-8'))
+        self.assertNotContains(response, 'My Platform Site')
         self.assertNotIn(
             'This should not survive being overwritten by static content', response.content.decode('utf-8')
         )

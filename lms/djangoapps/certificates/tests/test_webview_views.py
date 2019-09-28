@@ -637,7 +637,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             self.assertIn("Invalid Certificate", response.content.decode('utf-8'))
             self.assertIn("Cannot Find Certificate", response.content.decode('utf-8'))
             self.assertIn("We cannot find a certificate with this URL or ID number.", response.content.decode('utf-8'))
-            self.assertNotIn(str(self.cert.verify_uuid), response.content.decode('utf-8'))
+            self.assertNotContains(response, str(self.cert.verify_uuid))
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_html_view_for_invalid_certificate(self):
@@ -772,7 +772,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         )
 
         response = self.client.get(test_url)
-        self.assertNotIn('test_course_title_0', response.content.decode('utf-8'))
+        self.assertNotContains(response, 'test_course_title_0')
         self.assertIn('refundable course', response.content.decode('utf-8'))
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
@@ -829,8 +829,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             course_id=six.text_type(self.course.id)
         )
         response = self.client.get(test_url)
-        self.assertNotIn('Signatory_Name 0', response.content.decode('utf-8'))
-        self.assertNotIn('Signatory_Title 0', response.content.decode('utf-8'))
+        self.assertNotContains(response, 'Signatory_Name 0')
+        self.assertNotContains(response, 'Signatory_Title 0')
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_is_html_escaped(self):
@@ -857,7 +857,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             course_id=six.text_type(self.course.id)
         )
         response = self.client.get(test_url)
-        self.assertNotIn('<script>', response.content.decode('utf-8'))
+        self.assertNotContains(response, '<script>')
         self.assertIn('&lt;script&gt;course_title&lt;/script&gt;', response.content.decode('utf-8'))
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_DISABLED)
@@ -1531,7 +1531,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         if include_effort:
             self.assertIn('hours of effort: 40', response.content.decode('utf-8'))
         else:
-            self.assertNotIn('hours of effort', response.content.decode('utf-8'))
+            self.assertNotContains(response, 'hours of effort')
 
     @ddt.data(True, False)
     @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')

@@ -329,7 +329,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         # Crude check for presence of data in returned HTML
         for video in self.previous_uploads:
             self.assertIn(video["edx_video_id"], response.content.decode('utf-8'))
-        self.assertNotIn('video_upload_pagination', response.content.decode('utf-8'))
+        self.assertNotContains(response, 'video_upload_pagination')
 
     @override_waffle_flag(ENABLE_VIDEO_UPLOAD_PAGINATION, active=True)
     def test_get_html_paginated(self):

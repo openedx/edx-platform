@@ -98,7 +98,7 @@ class TestExportGit(CourseTestCase):
         modulestore().update_item(self.course_module, self.user.id)
 
         response = self.client.get('{}?action=push'.format(self.test_url))
-        self.assertNotIn('django.utils.functional.__proxy__', response.content.decode('utf-8'))
+        self.assertNotContains(response, 'django.utils.functional.__proxy__')
 
     def test_course_export_success(self):
         """

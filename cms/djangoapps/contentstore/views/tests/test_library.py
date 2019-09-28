@@ -328,7 +328,7 @@ class UnitTestLibraries(CourseTestCase):
         response = self.client.get(manage_users_url)
         self.assertEqual(response.status_code, 200)
         # extra_user has not been assigned to the library so should not show up in the list:
-        self.assertNotIn(extra_user.username, response.content.decode('utf-8'))
+        self.assertNotContains(response, extra_user.username)
 
         # Now add extra_user to the library:
         user_details_url = reverse_course_url(
