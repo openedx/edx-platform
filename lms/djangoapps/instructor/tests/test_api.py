@@ -2643,7 +2643,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content.decode('utf-8'))
+        self.assertContains(response, 'Activate Course Enrollment')
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
@@ -3176,7 +3176,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         self.client.login(username=self.instructor.username, password='test')
         url = reverse('get_enrollment_report', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, {})
-        self.assertIn('The detailed enrollment report is being created.', response.content.decode('utf-8'))
+        self.assertContains(response, 'The detailed enrollment report is being created.')
 
     def test_bulk_purchase_detailed_report(self):
         """
@@ -3231,7 +3231,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
         url = reverse('get_enrollment_report', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, {})
-        self.assertIn('The detailed enrollment report is being created.', response.content.decode('utf-8'))
+        self.assertContains(response, 'The detailed enrollment report is being created.')
 
     def test_create_registration_code_without_invoice_and_order(self):
         """
@@ -3253,7 +3253,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
         url = reverse('get_enrollment_report', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, {})
-        self.assertIn('The detailed enrollment report is being created.', response.content.decode('utf-8'))
+        self.assertContains(response, 'The detailed enrollment report is being created.')
 
     def test_invoice_payment_is_still_pending_for_registration_codes(self):
         """
@@ -3278,7 +3278,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
         url = reverse('get_enrollment_report', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, {})
-        self.assertIn('The detailed enrollment report is being created.', response.content.decode('utf-8'))
+        self.assertContains(response, 'The detailed enrollment report is being created.')
 
     @patch('lms.djangoapps.instructor.views.api.anonymous_id_for_user', Mock(return_value='42'))
     @patch('lms.djangoapps.instructor.views.api.unique_id_for_user', Mock(return_value='41'))
@@ -3358,11 +3358,11 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
             if report_type == 'problem responses':
                 response = self.client.post(url, {'problem_location': ''})
-                self.assertIn(success_status, response.content.decode('utf-8'))
+                self.assertContains(response, success_status)
             else:
                 CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
                 response = self.client.post(url, {})
-                self.assertIn(success_status, response.content.decode('utf-8'))
+                self.assertContains(response, success_status)
 
     @ddt.data(*EXECUTIVE_SUMMARY_DATA)
     @ddt.unpack
@@ -3384,7 +3384,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         success_status = u"The {report_type} report is being created." \
                          " To view the status of the report, see Pending" \
                          " Tasks below".format(report_type=report_type)
-        self.assertIn(success_status, response.content.decode('utf-8'))
+        self.assertContains(response, success_status)
 
     @ddt.data(*EXECUTIVE_SUMMARY_DATA)
     @ddt.unpack
@@ -3415,7 +3415,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             mock_submit_ora2_task.return_value = True
             response = self.client.post(url, {})
         success_status = "The ORA data report is being created."
-        self.assertIn(success_status, response.content.decode('utf-8'))
+        self.assertContains(response, success_status)
 
     def test_get_ora2_responses_already_running(self):
         url = reverse('export_ora2_data', kwargs={'course_id': text_type(self.course.id)})

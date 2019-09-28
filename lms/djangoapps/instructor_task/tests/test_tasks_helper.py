@@ -768,7 +768,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content.decode('utf-8'))
+        self.assertContains(response, 'Activate Course Enrollment')
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
@@ -802,7 +802,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content.decode('utf-8'))
+        self.assertContains(response, 'Activate Course Enrollment')
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
@@ -843,7 +843,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content.decode('utf-8'))
+        self.assertContains(response, 'Activate Course Enrollment')
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
@@ -1328,7 +1328,7 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content.decode('utf-8'))
+        self.assertContains(response, 'Activate Course Enrollment')
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)

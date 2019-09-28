@@ -341,4 +341,4 @@ class UnitTestLibraries(CourseTestCase):
         # Now extra_user should apear in the list:
         response = self.client.get(manage_users_url)
         self.assertEqual(response.status_code, 200)
-        self.assertIn(extra_user.username, response.content.decode('utf-8'))
+        self.assertContains(response, extra_user.username)

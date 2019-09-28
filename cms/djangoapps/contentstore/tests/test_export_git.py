@@ -88,7 +88,7 @@ class TestExportGit(CourseTestCase):
         modulestore().update_item(self.course_module, self.user.id)
 
         response = self.client.get('{}?action=push'.format(self.test_url))
-        self.assertIn('Export Failed:', response.content.decode('utf-8'))
+        self.assertContains(response, 'Export Failed:')
 
     def test_exception_translation(self):
         """
@@ -107,7 +107,7 @@ class TestExportGit(CourseTestCase):
 
         self.make_bare_repo_with_course('test_repo')
         response = self.client.get('{}?action=push'.format(self.test_url))
-        self.assertIn('Export Succeeded', response.content.decode('utf-8'))
+        self.assertContains(response, 'Export Succeeded')
 
     def test_repo_with_dots(self):
         """
@@ -115,7 +115,7 @@ class TestExportGit(CourseTestCase):
         """
         self.make_bare_repo_with_course('test.repo')
         response = self.client.get('{}?action=push'.format(self.test_url))
-        self.assertIn('Export Succeeded', response.content.decode('utf-8'))
+        self.assertContains(response, 'Export Succeeded')
 
     def test_dirty_repo(self):
         """

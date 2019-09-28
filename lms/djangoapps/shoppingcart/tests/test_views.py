@@ -631,7 +631,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content.decode('utf-8'))
+        self.assertContains(response, 'Activate Course Enrollment')
 
         #now activate the user by enrolling him/her to the course
         response = self.client.post(redeem_url)
@@ -662,7 +662,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content.decode('utf-8'))
+        self.assertContains(response, 'Activate Course Enrollment')
 
         #now activate the user by enrolling him/her to the course
         response = self.client.post(redeem_url)
@@ -1134,7 +1134,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content.decode('utf-8'))
+        self.assertContains(response, 'Activate Course Enrollment')
 
         #now activate the user by enrolling him/her to the course
         response = self.client.post(redeem_url)
@@ -1324,7 +1324,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         #now activate the user by enrolling him/her to the course
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
-        self.assertIn('View Dashboard', response.content.decode('utf-8'))
+        self.assertContains(response, 'View Dashboard')
 
         # now view the receipt page again to see if any registration codes
         # has been expired or not
@@ -2146,7 +2146,7 @@ class CSVReportViewsTest(SharedModuleStoreTestCase):
         self.assertEqual(template, 'shoppingcart/download_report.html')
         self.assertFalse(context['total_count_error'])
         self.assertFalse(context['date_fmt_error'])
-        self.assertIn("Download CSV Reports", response.content.decode('UTF-8'))
+        self.assertContains(response, "Download CSV Reports")
 
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_report_csv_bad_date(self):

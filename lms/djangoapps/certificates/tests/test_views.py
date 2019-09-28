@@ -295,7 +295,7 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
         self.assertIn(
             'My Platform Site offers interactive online classes and MOOCs.', response.content.decode('utf-8')
         )
-        self.assertIn('About My Platform Site', response.content.decode('utf-8'))
+        self.assertContains(response, 'About My Platform Site')
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_html_view_site_configuration_missing(self):
@@ -305,7 +305,7 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
         )
         self._add_course_certificates(count=1, signatory_count=2)
         response = self.client.get(test_url)
-        self.assertIn('edX', response.content.decode('utf-8'))
+        self.assertContains(response, 'edX')
         self.assertNotContains(response, 'My Platform Site')
         self.assertNotIn(
             'This should not survive being overwritten by static content', response.content.decode('utf-8')

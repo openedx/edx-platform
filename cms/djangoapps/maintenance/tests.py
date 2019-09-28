@@ -289,7 +289,7 @@ class TestAnnouncementsViews(MaintenanceViewTestCase):
         """
         url = reverse("maintenance:announcement_index")
         response = self.client.get(url)
-        self.assertIn('<div class="announcement-container">', response.content.decode('utf-8'))
+        self.assertContains(response, '<div class="announcement-container">')
 
     def test_create(self):
         """
@@ -308,7 +308,7 @@ class TestAnnouncementsViews(MaintenanceViewTestCase):
         announcement.save()
         url = reverse("maintenance:announcement_edit", kwargs={"pk": announcement.pk})
         response = self.client.get(url)
-        self.assertIn('<div class="wrapper-form announcement-container">', response.content.decode('utf-8'))
+        self.assertContains(response, '<div class="wrapper-form announcement-container">')
         self.client.post(url, {"content": "Test Edit Announcement", "active": True})
         announcement = Announcement.objects.get(pk=announcement.pk)
         self.assertEquals(announcement.content, "Test Edit Announcement")

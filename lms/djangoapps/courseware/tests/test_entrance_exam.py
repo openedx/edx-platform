@@ -552,7 +552,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             'problem_check',
         )
         self.assertEqual(response.status_code, 200)
-        self.assertIn('entrance_exam_passed', response.content.decode('utf-8'))
+        self.assertContains(response, 'entrance_exam_passed')
 
     def _assert_chapter_loaded(self, course, chapter):
         """

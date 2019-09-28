@@ -2386,7 +2386,7 @@ class TestIndexView(ModuleStoreTestCase):
                 }
             ) + '?activate_block_id=test_block_id'
         )
-        self.assertIn("Activate Block ID: test_block_id", response.content.decode('utf-8'))
+        self.assertContains(response, "Activate Block ID: test_block_id")
 
     @ddt.data(
         [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.ANONYMOUS, False],
