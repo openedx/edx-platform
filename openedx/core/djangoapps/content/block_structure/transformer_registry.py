@@ -49,7 +49,7 @@ class TransformerRegistry(PluginManager):
 
         sorted_transformers = sorted(cls.get_registered_transformers(), key=lambda t: t.name())
         for transformer in sorted_transformers:
-            hash_obj.update(transformer.name().encode('utf-8'))
+            hash_obj.update(six.b(transformer.name()))
             hash_obj.update(six.b(str(transformer.WRITE_VERSION)))
 
         return b64encode(hash_obj.digest()).decode('utf-8')
