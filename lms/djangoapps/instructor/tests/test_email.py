@@ -66,7 +66,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
         BulkEmailFlag.objects.create(enabled=False)
         # Assert that the URL for the email view is not in the response
         response = self.client.get(self.url)
-        self.assertNotIn(self.email_link, response.content)
+        self.assertNotContains(response, self.email_link)
 
     # Flag is enabled, but we require course auth and haven't turned it on for this course
     def test_course_not_authorized(self):
@@ -75,7 +75,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
         self.assertFalse(is_bulk_email_feature_enabled(self.course.id))
         # Assert that the URL for the email view is not in the response
         response = self.client.get(self.url)
-        self.assertNotIn(self.email_link, response.content)
+        self.assertNotContains(response, self.email_link)
 
     # Flag is enabled, we require course auth and turn it on for this course
     def test_course_authorized(self):
@@ -84,7 +84,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
         self.assertFalse(is_bulk_email_feature_enabled(self.course.id))
         # Assert that the URL for the email view is not in the response
         response = self.client.get(self.url)
-        self.assertNotIn(self.email_link, response.content)
+        self.assertNotContains(response, self.email_link)
 
         # Authorize the course to use email
         cauth = CourseAuthorization(course_id=self.course.id, email_enabled=True)
@@ -108,7 +108,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
         self.assertTrue(is_bulk_email_enabled_for_course(self.course.id))
         # Assert that the URL for the email view IS NOT in the response
         response = self.client.get(self.url)
-        self.assertNotIn(self.email_link, response.content)
+        self.assertNotContains(response, self.email_link)
 
 
 class TestNewInstructorDashboardEmailViewXMLBacked(SharedModuleStoreTestCase):
@@ -149,10 +149,10 @@ class TestNewInstructorDashboardEmailViewXMLBacked(SharedModuleStoreTestCase):
     def test_email_flag_true_mongo_false(self):
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=False)
         response = self.client.get(self.url)
-        self.assertNotIn(self.email_link, response.content)
+        self.assertNotContains(response, self.email_link, status_code=404)
 
     # The flag is disabled and the course is not Mongo-backed (should not work)
     def test_email_flag_false_mongo_false(self):
         BulkEmailFlag.objects.create(enabled=False, require_course_email_auth=False)
         response = self.client.get(self.url)
-        self.assertNotIn(self.email_link, response.content)
+        self.assertNotContains(response, self.email_link, status_code=404)

@@ -319,7 +319,7 @@ class AuthTestCase(ContentStoreTestCase):
         is turned off
         """
         response = self.client.get(reverse('homepage'))
-        self.assertNotIn('<a class="action action-signup" href="/signup">Sign Up</a>', response.content)
+        self.assertNotContains(response, '<a class="action action-signup" href="/signup">Sign Up</a>')
 
     @mock.patch.dict(settings.FEATURES, {"ALLOW_PUBLIC_ACCOUNT_CREATION": False})
     def test_signup_button_login_page(self):
@@ -328,7 +328,7 @@ class AuthTestCase(ContentStoreTestCase):
         is turned off
         """
         response = self.client.get(reverse('login'))
-        self.assertNotIn('<a class="action action-signup" href="/signup">Sign Up</a>', response.content)
+        self.assertNotContains(response, '<a class="action action-signup" href="/signup">Sign Up</a>')
 
     @mock.patch.dict(settings.FEATURES, {"ALLOW_PUBLIC_ACCOUNT_CREATION": False})
     def test_signup_link_login_page(self):

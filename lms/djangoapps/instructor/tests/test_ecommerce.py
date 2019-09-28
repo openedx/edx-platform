@@ -73,7 +73,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         """
         response = self.client.get(self.url)
         self.assertContains(response, self.ecommerce_link)
-        self.assertNotIn('Create Enrollment Report', response.content)
+        self.assertNotContains(response, 'Create Enrollment Report')
 
     def test_user_has_finance_admin_rights_in_e_commerce_tab(self):
         response = self.client.get(self.url)
@@ -90,7 +90,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         # Order/Invoice sales csv button text should not be visible in e-commerce page if the user is not finance admin
         url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url)
-        self.assertNotIn('Download All Invoices', response.content)
+        self.assertNotContains(response, 'Download All Invoices')
 
     def test_user_view_course_price(self):
         """
@@ -105,7 +105,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
 
         price = course_honor_mode.min_price
         self.assertContains(response, 'Course price per seat: <span>$' + str(price) + '</span>')
-        self.assertNotIn('+ Set Price</a></span>', response.content)
+        self.assertNotContains(response, '+ Set Price</a></span>')
 
         # removing the course finance_admin role of login user
         CourseFinanceAdminRole(self.course.id).remove_users(self.instructor)
@@ -113,7 +113,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         # total amount should not be visible in e-commerce page if the user is not finance admin
         url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.get(url)
-        self.assertNotIn('+ Set Price</a></span>', response.content)
+        self.assertNotContains(response, '+ Set Price</a></span>')
 
     def test_update_course_price_check(self):
         price = 200
@@ -214,7 +214,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         response = self.client.post(self.url)
         self.assertContains(response, '<td>ADSADASDSAD</td>')
         self.assertContains(response, '<td>A2314</td>')
-        self.assertNotIn('<td>111</td>', response.content)
+        self.assertNotContains(response, '<td>111</td>')
 
         data = {
             'code': 'A2345314', 'course_id': text_type(self.course.id),
@@ -376,7 +376,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         response = self.client.get(self.url)
         self.assertContains(response, self.ecommerce_link)
         # Coupons should show up for White Label sites with priced honor modes.
-        self.assertNotIn('Coupons List', response.content)
+        self.assertNotContains(response, 'Coupons List')
 
     def test_coupon_code_section_not_under_e_commerce_tab(self):
         """
@@ -388,7 +388,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
 
         response = self.client.get(self.url)
         self.assertContains(response, self.ecommerce_link)
-        self.assertNotIn('Coupon Code List', response.content)
+        self.assertNotContains(response, 'Coupon Code List')
 
     def test_enrollment_codes_section_not_under_e_commerce_tab(self):
         """
@@ -400,7 +400,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
 
         response = self.client.get(self.url)
         self.assertContains(response, self.ecommerce_link)
-        self.assertNotIn('<h3 class="hd hd-3">Enrollment Codes</h3>', response.content)
+        self.assertNotContains(response, '<h3 class="hd hd-3">Enrollment Codes</h3>')
 
     def test_enrollment_codes_section_visible_for_non_ecommerce_course(self):
         """

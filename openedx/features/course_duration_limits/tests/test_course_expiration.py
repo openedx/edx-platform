@@ -221,7 +221,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         if show_expiration_banner:
             self.assertContains(response, banner_text)
         else:
-            self.assertNotIn(banner_text, response.content)
+            self.assertNotContains(response, banner_text)
 
     def update_masquerade(self, role='student', group_id=None, username=None, user_partition_id=None):
         """
@@ -283,7 +283,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         six.assertCountEqual(self, response.redirect_chain, [])
         banner_text = 'You lose all access to this course, including your progress,'
-        self.assertNotIn(banner_text, response.content)
+        self.assertNotContains(response, banner_text)
 
     @mock.patch("openedx.features.course_duration_limits.access.get_course_run_details")
     def test_masquerade_expired(self, mock_get_course_run_details):
@@ -370,7 +370,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         six.assertCountEqual(self, response.redirect_chain, [])
         banner_text = 'This learner does not have access to this course. Their access expired on'
-        self.assertNotIn(banner_text, response.content)
+        self.assertNotContains(response, banner_text)
 
     @mock.patch("openedx.features.course_duration_limits.access.get_course_run_details")
     @ddt.data(
@@ -419,4 +419,4 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         six.assertCountEqual(self, response.redirect_chain, [])
         banner_text = 'This learner does not have access to this course. Their access expired on'
-        self.assertNotIn(banner_text, response.content)
+        self.assertNotContains(response, banner_text)

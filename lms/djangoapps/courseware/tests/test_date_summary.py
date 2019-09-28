@@ -61,7 +61,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.client.login(username=user.username, password=TEST_PASSWORD)
         url = reverse('info', args=(course.id,))
         response = self.client.get(url)
-        self.assertNotIn(b'date-summary', response.content)
+        self.assertNotContains(response, 'date-summary', status_code=302)
 
     def test_course_home_logged_out(self):
         course = create_course_run()

@@ -962,7 +962,7 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
 
     def assert_upgrade_message_not_displayed(self):
         response = self.client.get(self.url)
-        self.assertNotIn('section-upgrade', response.content)
+        self.assertNotContains(response, 'section-upgrade')
 
     def assert_upgrade_message_displayed(self):
         response = self.client.get(self.url)

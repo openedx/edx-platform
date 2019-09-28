@@ -202,15 +202,15 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
         # assert that the course discovery UI is not present
-        self.assertNotIn('Search for a course', response.content)
+        self.assertNotContains(response, 'Search for a course')
 
         # check the /courses view
         response = self.client.get(reverse('courses'))
         self.assertEqual(response.status_code, 200)
 
         # assert that the course discovery UI is not present
-        self.assertNotIn('Search for a course', response.content)
-        self.assertNotIn('<aside aria-label="Refine Your Search" class="search-facets phone-menu">', response.content)
+        self.assertNotContains(response, 'Search for a course')
+        self.assertNotContains(response, '<aside aria-label="Refine Your Search" class="search-facets phone-menu">')
 
         # make sure we have the special css class on the section
         self.assertContains(response, '<div class="courses no-course-discovery"')

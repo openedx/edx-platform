@@ -942,14 +942,14 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         CourseStaffRole(self.course.id).add_users(self.user)
 
         response = self.client.get(test_url + '?preview=honor')
-        self.assertNotIn(self.course.display_name.encode('utf-8'), response.content)
+        self.assertNotContains(response, self.course.display_name.encode('utf-8'))
         self.assertIn('course_title_0', response.content.decode('utf-8'))
         self.assertIn('Signatory_Title 0', response.content.decode('utf-8'))
 
         # mark certificate inactive but accessing in preview mode.
         self._add_course_certificates(count=1, signatory_count=2, is_active=False)
         response = self.client.get(test_url + '?preview=honor')
-        self.assertNotIn(self.course.display_name.encode('utf-8'), response.content)
+        self.assertNotContains(response, self.course.display_name.encode('utf-8'))
         self.assertIn('course_title_0', response.content.decode('utf-8'))
         self.assertIn('Signatory_Title 0', response.content.decode('utf-8'))
 
@@ -970,7 +970,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         # user has already has certificate generated for 'honor' mode
         # so let's try to preview in 'verified' mode.
         response = self.client.get(test_url + '?preview=verified')
-        self.assertNotIn(self.course.display_name.encode('utf-8'), response.content)
+        self.assertNotContains(response, self.course.display_name.encode('utf-8'))
         self.assertIn('course_title_0', response.content.decode('utf-8'))
         self.assertIn('Signatory_Title 0', response.content.decode('utf-8'))
 

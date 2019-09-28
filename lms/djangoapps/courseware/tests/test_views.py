@@ -395,8 +395,8 @@ class ViewsTestCase(ModuleStoreTestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertNotIn('Problem 1', response.content)
-        self.assertNotIn('Problem 2', response.content)
+        self.assertNotContains(response, 'Problem 1')
+        self.assertNotContains(response, 'Problem 2')
 
     def _create_global_staff_user(self):
         """
@@ -467,13 +467,13 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.client.logout()
         response = self.client.get(reverse('about_course', args=[six.text_type(course.id)]))
         self.assertEqual(response.status_code, 200)
-        self.assertNotIn(in_cart_span, response.content)
+        self.assertNotContains(response, in_cart_span)
 
         # authenticated user with nothing in cart
         self.assertTrue(self.client.login(username=self.user.username, password=TEST_PASSWORD))
         response = self.client.get(reverse('about_course', args=[six.text_type(course.id)]))
         self.assertEqual(response.status_code, 200)
-        self.assertNotIn(in_cart_span, response.content)
+        self.assertNotContains(response, in_cart_span)
 
         # now add the course to the cart
         cart = shoppingcart.models.Order.get_cart_for_user(self.user)
@@ -628,7 +628,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         })
         response = self.client.get(url)
         # Tests that we do not get an "Invalid x" response when passing correct arguments to view
-        self.assertNotIn('Invalid', response.content)
+        self.assertNotContains(response, 'Invalid')
 
     def test_submission_history_xss(self):
         # log into a staff account
@@ -643,7 +643,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             'location': '<script>alert("hello");</script>'
         })
         response = self.client.get(url)
-        self.assertNotIn('<script>', response.content)
+        self.assertNotContains(response, '<script>')
 
         # try it with a malicious user and a non-existent location
         url = reverse('submission_history', kwargs={
@@ -652,7 +652,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             'location': 'dummy'
         })
         response = self.client.get(url)
-        self.assertNotIn('<script>', response.content)
+        self.assertNotContains(response, '<script>')
 
     def test_submission_history_contents(self):
         # log into a staff account
@@ -786,7 +786,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        self.assertNotIn(str(course.id), response.content)
+        self.assertNotContains(response, str(course.id))
 
     @patch.object(CourseOverview, 'load_from_module_store', return_value=None)
     def test_financial_assistance_form_missing_course_overview(self, _mock_course_overview):
@@ -815,7 +815,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        self.assertNotIn(str(course), response.content)
+        self.assertNotContains(response, str(course))
 
     def test_financial_assistance_form(self):
         """Verify that learner can get the financial aid for the course in which
@@ -2630,10 +2630,10 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
         self.assertTrue(self.client.login(username=self.user.username, password='test'))
 
         response = self.client.get(self.section_1_url)
-        self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
+        self.assertNotContains(response, 'data-mark-completed-on-view-after-delay')
 
         response = self.client.get(self.section_2_url)
-        self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
+        self.assertNotContains(response, 'data-mark-completed-on-view-after-delay')
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_completion_service_enabled(self, default_store):
@@ -2680,10 +2680,10 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
         self.assertEqual(json.loads(response.content.decode('utf-8')), {'result': "ok"})
 
         response = self.client.get(self.section_1_url)
-        self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
+        self.assertNotContains(response, 'data-mark-completed-on-view-after-delay')
 
         response = self.client.get(self.section_2_url)
-        self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
+        self.assertNotContains(response, 'data-mark-completed-on-view-after-delay')
 
 
 @ddt.ddt
@@ -2906,7 +2906,7 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
         response = self.get_response(usage_key=self.html_block.location)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'data-enable-completion-on-view-service="false"')
-        self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
+        self.assertNotContains(response, 'data-mark-completed-on-view-after-delay')
 
     def test_render_xblock_with_completion_service_enabled(self):
         """
@@ -2940,12 +2940,12 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
         response = self.get_response(usage_key=self.html_block.location)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'data-enable-completion-on-view-service="false"')
-        self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
+        self.assertNotContains(response, 'data-mark-completed-on-view-after-delay')
 
         response = self.get_response(usage_key=self.problem_block.location)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'data-enable-completion-on-view-service="false"')
-        self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
+        self.assertNotContains(response, 'data-mark-completed-on-view-after-delay')
 
 
 class TestRenderXBlockSelfPaced(TestRenderXBlock):

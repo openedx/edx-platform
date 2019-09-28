@@ -215,7 +215,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         staff = StaffFactory(course_key=self.course.id)
         self.client.login(username=staff.username, password="test")
         response = self.client.get(self.url)
-        self.assertNotIn('<h4 class="hd hd-4">Adjust all enrolled learners', response.content)
+        self.assertNotContains(response, '<h4 class="hd hd-4">Adjust all enrolled learners')
         self.assertContains(response, '<h4 class="hd hd-4">View a specific learner&#39;s grades and progress')
 
     @patch(
@@ -305,7 +305,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         """
         response = self.client.get(self.url)
         # no enrollment information should be visible
-        self.assertNotIn('<h3 class="hd hd-3">Enrollment Information</h3>', response.content)
+        self.assertNotContains(response, '<h3 class="hd hd-3">Enrollment Information</h3>')
 
     @patch.dict(settings.FEATURES, {'DISPLAY_ANALYTICS_ENROLLMENTS': True})
     @override_settings(ANALYTICS_DASHBOARD_URL='')
@@ -349,10 +349,10 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(self.url)
 
         # enrollment information hidden
-        self.assertNotIn('<th scope="row">Verified</th>', response.content)
-        self.assertNotIn('<th scope="row">Audit</th>', response.content)
-        self.assertNotIn('<th scope="row">Honor</th>', response.content)
-        self.assertNotIn('<th scope="row">Professional</th>', response.content)
+        self.assertNotContains(response, '<th scope="row">Verified</th>')
+        self.assertNotContains(response, '<th scope="row">Audit</th>')
+        self.assertNotContains(response, '<th scope="row">Honor</th>')
+        self.assertNotContains(response, '<th scope="row">Professional</th>')
 
         # link to dashboard shown
         expected_message = self.get_dashboard_enrollment_message()
@@ -366,7 +366,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         """
         response = self.client.get(self.url)
         analytics_section = '<li class="nav-item"><a href="" data-section="instructor_analytics">Analytics</a></li>'
-        self.assertNotIn(analytics_section, response.content)
+        self.assertNotContains(response, analytics_section)
 
     @override_settings(ANALYTICS_DASHBOARD_URL='http://example.com')
     @override_settings(ANALYTICS_DASHBOARD_NAME='Example')
@@ -479,7 +479,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         )
 
         response = self.client.get(self.url)
-        self.assertNotIn(ora_section, response.content)
+        self.assertNotContains(response, ora_section)
 
         ItemFactory.create(parent_location=self.course.location, category="openassessment")
         response = self.client.get(self.url)
