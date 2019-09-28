@@ -135,7 +135,7 @@ def prepare_saml_response_from_xml(xml, relay_state='testshib'):
     Returns:
          (str): Base64 and URL encoded XML.
     """
-    b64encoded_xml = b64encode(xml)
+    b64encoded_xml = b64encode(xml.encode())
     return 'RelayState={relay_state}&SAMLResponse={saml_response}'.format(
         relay_state=OneLogin_Saml2_Utils.escape_url(relay_state),
         saml_response=OneLogin_Saml2_Utils.escape_url(b64encoded_xml)
