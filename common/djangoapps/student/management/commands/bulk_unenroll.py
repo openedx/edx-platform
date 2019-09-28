@@ -32,7 +32,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         csv_path = options['csv_path']
-        with open(csv_path) as csvfile:
+        with open(csv_path, 'rb') as csvfile:
             reader = unicodecsv.DictReader(csvfile)
             for row in reader:
                 username = row['username']

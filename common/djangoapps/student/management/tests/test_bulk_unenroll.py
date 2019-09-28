@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import six
 from tempfile import NamedTemporaryFile
 
 from django.core.management import call_command
@@ -38,17 +39,18 @@ class BulkUnenrollTests(SharedModuleStoreTestCase):
             self.users.append(user)
             self.enrollments.append(CourseEnrollment.enroll(user, self.course.id, mode='audit'))
 
-    def _write_test_csv(self, csv, lines=None):
-        """Write a test csv file with the lines procided"""
-        csv.write("user_id,username,email,course_id\n")
-        csv.writelines(lines)
+    def _write_test_csv(self, csv, lines):
+        """Write a test csv file with the lines provided"""
+        csv.write(b"user_id,username,email,course_id\n")
+        for line in lines:
+            csv.write(six.b(line))
         csv.seek(0)
         return csv
 
     def test_user_not_exist(self):
         """Verify that warning user not exist is logged for non existing user."""
         with NamedTemporaryFile() as csv:
-            csv = self._write_test_csv(csv, lines="111,test,test@example.com,course-v1:edX+DemoX+Demo_Course\n")
+            csv = self._write_test_csv(csv, lines=["111,test,test@example.com,course-v1:edX+DemoX+Demo_Course\n"])
 
             with LogCapture(LOGGER_NAME) as log:
                 call_command("bulk_unenroll", "--csv_path={}".format(csv.name))
@@ -63,7 +65,7 @@ class BulkUnenrollTests(SharedModuleStoreTestCase):
     def test_invalid_course_key(self):
         """Verify in case of invalid course key warning is logged."""
         with NamedTemporaryFile() as csv:
-            csv = self._write_test_csv(csv, lines="111,amy,amy@pond.com,test_course\n")
+            csv = self._write_test_csv(csv, lines=["111,amy,amy@pond.com,test_course\n"])
 
             with LogCapture(LOGGER_NAME) as log:
                 call_command("bulk_unenroll", "--csv_path={}".format(csv.name))
@@ -79,7 +81,7 @@ class BulkUnenrollTests(SharedModuleStoreTestCase):
     def test_user_not_enrolled(self):
         """Verify in case of user not enrolled in course warning is logged."""
         with NamedTemporaryFile() as csv:
-            csv = self._write_test_csv(csv, lines="111,amy,amy@pond.com,course-v1:edX+DemoX+Demo_Course\n")
+            csv = self._write_test_csv(csv, lines=["111,amy,amy@pond.com,course-v1:edX+DemoX+Demo_Course\n"])
 
             with LogCapture(LOGGER_NAME) as log:
                 call_command("bulk_unenroll", "--csv_path={}".format(csv.name))
@@ -94,11 +96,13 @@ class BulkUnenrollTests(SharedModuleStoreTestCase):
 
     def test_bulk_un_enroll(self):
         """Verify users are unenrolled using the command."""
-        lines = (str(enrollment.user.id) + "," + enrollment.user.username + "," +
-                 enrollment.user.email + "," + str(enrollment.course.id) + "\n"
-                 for enrollment in self.enrollments)
+        lines = [
+            str(enrollment.user.id) + "," + enrollment.user.username + "," +
+            enrollment.user.email + "," + str(enrollment.course.id) + "\n"
+            for enrollment in self.enrollments
+        ]
         with NamedTemporaryFile() as csv:
-            csv = self._write_test_csv(csv, lines=lines)\
+            csv = self._write_test_csv(csv, lines=lines)
 
             call_command("bulk_unenroll", "--csv_path={}".format(csv.name))
             for enrollment in CourseEnrollment.objects.all():
