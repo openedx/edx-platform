@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-22 20:50+0000\n"
-"PO-Revision-Date: 2019-09-22 20:51:02.363944\n"
+"POT-Creation-Date: 2019-09-29 20:50+0000\n"
+"PO-Revision-Date: 2019-09-29 20:50:57.281676\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -9416,6 +9416,10 @@ msgstr ""
 "فاهس سعزسثذفهخر زثذخوث شدشهمشزمث فخ مثشقرثقس عرمثسس فاثغ شقث ثطحمهذهفمغ "
 "اهييثر."
 
+#: cms/templates/js/copy-clipboard-button.underscore
+msgid "Copy Component Location"
+msgstr "ذخحغ ذخوحخرثرف مخذشفهخر"
+
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Weekly Highlight Emails"
 msgstr "صثثنمغ اهلامهلاف ثوشهمس"
@@ -9852,6 +9856,10 @@ msgstr "ذاشحفثق هربخقوشفهخر"
 msgid "Add a Chapter"
 msgstr "شيي ش ذاشحفثق"
 
+#: cms/templates/js/edit-title-button.underscore
+msgid "Edit Title"
+msgstr "ثيهف فهفمث"
+
 #: cms/templates/js/grading-editor.underscore
 msgid "Grading"
 msgstr "لقشيهرل"
@@ -10024,10 +10032,6 @@ msgstr "ذمثشق"
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear Value"
 msgstr "ذمثشق دشمعث"
-
-#: cms/templates/js/metadata-editor.underscore
-msgid "Component Location ID"
-msgstr "ذخوحخرثرف مخذشفهخر هي"
 
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video-transcripts.underscore

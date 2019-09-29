@@ -41,6 +41,7 @@
 # Marco Morales, 2018
 # Marcos Buccella <marcosfiore07@gmail.com>, 2018
 # Marcos Buccella <marcosfiore07@hotmail.com>, 2018
+# Maria Perez <mperez@edx.org>, 2019
 # Marina Pastor <mpastor@edx.org>, 2017-2018
 # Matías Olivera <MatiasOlivera@outlook.com>, 2015
 # Matthew Piatetsky <mpiatetsky@edx.org>, 2018
@@ -121,6 +122,7 @@
 # Antonio Pardo <apardo@alabs.org>, 2013
 # Ben Holt <bholt@edx.org>, 2019
 # Benjy Malca Bautista <bnmalcabis@gmail.com>, 2015
+# Carlos Rojas <carlos.rojas.dousdebes@gmail.com>, 2019
 # Cristian Salamea <ovnicraft@gmail.com>, 2013-2016
 # morsoinferno <cristobal.acosta@usach.cl>, 2014-2015
 # David Salazar <imdjsg@gmail.com>, 2014
@@ -249,7 +251,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-15 20:42+0000\n"
+"POT-Creation-Date: 2019-09-22 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -528,6 +530,8 @@ msgid ""
 "The {course_mode} course mode has a minimum price of {min_price}. You must "
 "set a price greater than or equal to {min_price}."
 msgstr ""
+"El  {course_mode} modo de curso tiene un precio mínimo de {min_price}. . "
+"Debe elegir un precio mayor o igual a {min_price}."
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This will look like '$50', where {currency_symbol} is a symbol
@@ -643,7 +647,7 @@ msgstr "Se requiere una dirección de correo electrónico válida."
 
 #: common/djangoapps/student/forms.py
 msgid "Your legal name must be a minimum of one character long"
-msgstr ""
+msgstr "Su nombre legal debe tener por lo menos un caracter"
 
 #: common/djangoapps/student/forms.py
 #, python-format
@@ -1226,6 +1230,8 @@ msgid ""
 "optional. If this provider is an Organization, this attribute can be used "
 "reference users in that Organization"
 msgstr ""
+"opcional. Si este proveedor es una Organización, este atributo puede ser "
+"utilizado como referencia para los usuarios en dicha organización"
 
 #: common/djangoapps/third_party_auth/models.py
 msgid "The Site that this provider configuration belongs to."
@@ -4250,6 +4256,11 @@ msgid ""
 "Settings page.{break_tag}See {docs_anchor_open}the edX LTI "
 "documentation{anchor_close} for more details on this setting."
 msgstr ""
+"Ingresa tu LTI ID para el proveedor externo de LTI . Este valor debe ser el "
+"mismo LTI ID que ingresaste en la configuración del password de LTI en la "
+"página de configuración avanzada. {break_tag} Consulta {docs_anchor_open} la"
+" documentación de edX LTI {anchor_close} para obtener más detalles sobre "
+"esta configuración."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "LTI URL"
@@ -5365,7 +5376,7 @@ msgstr ""
 
 #: common/templates/admin/student/loginfailures/change_form_template.html
 msgid "Unlock Account"
-msgstr ""
+msgstr "Desbloquee la cuenta"
 
 #. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a control to allow users to exit out of this modal
@@ -5463,9 +5474,10 @@ msgid ""
 "%(platform_name)s account from %(old_email)s to %(new_email)s. If this is "
 "correct, please confirm your new e-mail address by visiting:"
 msgstr ""
-"Recibimos una petiticón para cambiar el correo electrónico asociado con tu "
-"cuenta de%(platform_name)s de %(old_email)s a %(new_email)s. Si esto es "
-"correcto, por favor confirma tu nuevo correo electrónico visitando:"
+"Hemos recibido una solicitud para cambiar el correo electrónico asociado con"
+" su cuenta en el sitio %(platform_name)s de %(old_email)s a %(new_email)s. "
+"Si esto es correcto, por favor confirme su nueva dirección de correo "
+"electrónico visitando:"
 
 #: common/templates/student/edx_ace/emailchange/email/body.html
 msgid "Confirm Email Change"
@@ -5506,6 +5518,10 @@ msgid ""
 "this request, please contact us immediately. Contact information is listed "
 "at:"
 msgstr ""
+"Este correo es para confirmar que has  cambiado la dirección de correo "
+"asociada con %(platform_name)s de %(old_email)s a %(new_email)s. Si no "
+"hiciste esta solicitud, por favor contáctanos inmediatamente. La información"
+" de contacto se encuentra en: "
 
 #: common/templates/student/edx_ace/emailchangeconfirmation/email/body.html
 #: common/templates/student/edx_ace/emailchangeconfirmation/email/body.txt
@@ -5700,6 +5716,9 @@ msgid ""
 "© {org_name}.  All rights reserved except where noted.  edX, Open edX and "
 "their respective logos are registered trademarks of edX Inc."
 msgstr ""
+"© {org_name}.  Todos los derechos reservados, excepto donde se indique lo "
+"contrario. edX, Open edX y sus respectivos logos son marcas registradas de "
+"edX Inc."
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Open edX' is a trademark, please keep this untranslated.
@@ -6869,7 +6888,7 @@ msgstr "Para ver el contenido del curso, {sign_in_link} o {register_link}."
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
 msgid "{sign_in_link} or {register_link}."
-msgstr ""
+msgstr "{sign_in_link} o {register_link}."
 
 #: lms/djangoapps/courseware/views/views.py
 #: openedx/features/course_experience/views/course_home_messages.py
@@ -7031,7 +7050,7 @@ msgstr "Debe ingresar su nombre completo"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Password must be supplied"
-msgstr ""
+msgstr "La contraseña debe ser ingresada"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "email address required (not username)"
@@ -8261,7 +8280,7 @@ msgstr "No todos los problemas del examen de ingreso soportan re-evaluación."
 
 #: lms/djangoapps/instructor_task/models.py
 msgid "An error has occurred. Task was not created."
-msgstr ""
+msgstr "Ocurrió un error. La tarea no fue creada."
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
@@ -9612,9 +9631,8 @@ msgid "View feature based enrollment settings"
 msgstr "Ver configuración de Inscripción basada en características"
 
 #: lms/djangoapps/support/views/index.py
-#: lms/templates/support/link_program_enrollments.html
 msgid "Link Program Enrollments"
-msgstr ""
+msgstr "Enlace para inscripciones en el programa "
 
 #: lms/djangoapps/support/views/index.py
 msgid "Link LMS users to program enrollments"
@@ -9873,7 +9891,7 @@ msgstr "Por favor corrige los siguientes errores."
 #, python-format
 msgid "Are you sure you want to cancel retirement for user \"%(username)s\"? "
 msgstr ""
-"¿Estás seguro que quieres cancelar la eliminación del usuario "
+"¿Está seguro que quiere cancelar la eliminación del usuario "
 "\"%(username)s\"? "
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
@@ -9963,6 +9981,8 @@ msgid ""
 "Visit %(site_name)s\n"
 "                "
 msgstr ""
+"Visita %(site_name)s\n"
+"                "
 
 #: lms/templates/instructor/edx_ace/addbetatester/email/body.html
 #: lms/templates/instructor/edx_ace/addbetatester/email/body.txt
@@ -10386,7 +10406,7 @@ msgstr ""
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
 msgid "Hello %(full_name)s, "
-msgstr ""
+msgstr "Hola %(full_name)s, "
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/subject.txt
 #, python-format
@@ -11631,6 +11651,8 @@ msgid ""
 "We hope you're enjoying {start_strong}%(course_name)s{end_strong}! We want "
 "to let you know what you can look forward to in week %(week_num)s:"
 msgstr ""
+"¡Esperamos que te esté gustando {start_strong}%(course_name)s{end_strong}! "
+"Queremos informarte sobre lo que puedes esperar en la semana %(week_num)s:"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.txt
@@ -12549,6 +12571,8 @@ msgid ""
 "If the configuration is Enabled, then all enrollments created after this "
 "date and time (user local time) will be affected."
 msgstr ""
+"Si la configuración está habilitada, todas las inscripciones creadas después"
+" de esta fecha y hora (hora local del usuario) serán afectadas."
 
 #: openedx/features/content_type_gating/models.py
 msgid "Studio Override Enabled"
@@ -12780,7 +12804,7 @@ msgstr ""
 
 #: openedx/features/discounts/models.py
 msgid "Disabled"
-msgstr ""
+msgstr "Invalidar"
 
 #: openedx/features/discounts/utils.py
 #, python-brace-format
@@ -25187,6 +25211,12 @@ msgstr ""
 "previsualizarla, siga las instrucciones entregadas por su administrador."
 
 #: cms/templates/settings.html
+msgid ""
+"Please note that changes here may take up to a business day to appear on "
+"your course summary page."
+msgstr ""
+
+#: cms/templates/settings.html
 msgid "Course Credit Requirements"
 msgstr "Requerimientos de créditos para el curso"
 
@@ -25317,6 +25347,18 @@ msgstr ""
 #: cms/templates/settings.html
 msgid "Enrollment End Time"
 msgstr "Hora de finalización de inscripciones"
+
+#: cms/templates/settings.html
+msgid "Upgrade Deadline Date"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Last day students can upgrade to a verified enrollment."
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Upgrade Deadline Time"
+msgstr ""
 
 #: cms/templates/settings.html
 msgid "Course Details"

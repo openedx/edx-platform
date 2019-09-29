@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-22 20:51+0000\n"
-"PO-Revision-Date: 2019-09-22 20:51:02.550394\n"
+"POT-Creation-Date: 2019-09-29 20:50+0000\n"
+"PO-Revision-Date: 2019-09-29 20:50:57.221772\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -7013,7 +7013,7 @@ msgstr ""
 "À réfünd réqüést häs ßéén ïnïtïätéd för {username} ({email}). Tö pröçéss "
 "thïs réqüést, pléäsé vïsït thé lïnk(s) ßélöw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
-#: lms/djangoapps/commerce/views.py lms/djangoapps/shoppingcart/pdf.py
+#: lms/djangoapps/commerce/views.py
 msgid "Receipt"
 msgstr "Réçéïpt Ⱡ'σяєм ιρѕυм #"
 
@@ -8410,7 +8410,7 @@ msgstr "Çöürsé Ìd Ⱡ'σяєм ιρѕυм ∂σł#"
 msgid "% Discount"
 msgstr "% Dïsçöünt Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
-#: lms/djangoapps/instructor/views/api.py lms/djangoapps/shoppingcart/pdf.py
+#: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/shoppingcart/reports.py
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -8472,13 +8472,6 @@ msgid "Unable to generate redeem codes because of course misconfiguration."
 msgstr ""
 "Ûnäßlé tö généräté rédéém çödés ßéçäüsé öf çöürsé mïsçönfïgürätïön. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/shoppingcart/models.py
-msgid "pdf download unavailable right now, please contact support."
-msgstr ""
-"pdf döwnlöäd ünäväïläßlé rïght nöw, pléäsé çöntäçt süppört. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -9776,81 +9769,6 @@ msgstr "Dönätïön för {course} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α
 msgid "Donation for {platform_name}"
 msgstr "Dönätïön för {platform_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
-#: lms/djangoapps/shoppingcart/pdf.py
-#, python-brace-format
-msgid "Page {page_number} of {page_count}"
-msgstr "Pägé {page_number} öf {page_count} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/templates/shoppingcart/receipt.html
-msgid "Invoice"
-msgstr "Ìnvöïçé Ⱡ'σяєм ιρѕυм #"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Order"
-msgstr "Ördér Ⱡ'σяєм ιρѕ#"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-#, python-brace-format
-msgid "{id_label} # {item_id}"
-msgstr "{id_label} # {item_id} Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-#, python-brace-format
-msgid "Date: {date}"
-msgstr "Däté: {date} Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/djangoapps/shoppingcart/reports.py
-msgid "Quantity"
-msgstr "Qüäntïtý Ⱡ'σяєм ιρѕυм ∂#"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid ""
-"List Price\n"
-"per item"
-msgstr ""
-"Lïst Prïçé\n"
-"pér ïtém Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid ""
-"Discount\n"
-"per item"
-msgstr ""
-"Dïsçöünt\n"
-"pér ïtém Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Amount"
-msgstr "Àmöünt Ⱡ'σяєм ιρѕυ#"
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/templates/courseware/gradebook.html
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/shoppingcart/billing_details.html
-#: lms/templates/shoppingcart/receipt.html
-msgid "Total"
-msgstr "Tötäl Ⱡ'σяєм ιρѕ#"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Payment Received"
-msgstr "Päýmént Réçéïvéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Balance"
-msgstr "Bälänçé Ⱡ'σяєм ιρѕυм #"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Billing Address"
-msgstr "Bïllïng Àddréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Disclaimer"
-msgstr "Dïsçläïmér Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "TERMS AND CONDITIONS"
-msgstr "TÉRMS ÀND ÇÖNDÌTÌÖNS Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
 #. Translators: this text appears when an unfamiliar error code occurs during
 #. payment,
 #. for which we don't know a user-friendly message to display in advance.
@@ -10379,6 +10297,10 @@ msgstr "Pürçhäsé Tïmé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Order ID"
 msgstr "Ördér ÌD Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Quantity"
+msgstr "Qüäntïtý Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Unit Cost"
@@ -19165,6 +19087,13 @@ msgid "Search students"
 msgstr "Séärçh stüdénts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/courseware/gradebook.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/receipt.html
+msgid "Total"
+msgstr "Tötäl Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/courseware/gradebook.html
 msgid "previous page"
 msgstr "prévïöüs pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
@@ -20915,6 +20844,10 @@ msgstr ""
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "INVOICE"
 msgstr "ÌNVÖÌÇÉ Ⱡ'σяєм ιρѕυм #"
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Date: {date}"
+msgstr "Däté: {date} Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "Invoice No: {invoice_number}"
@@ -23903,6 +23836,10 @@ msgstr "Ûséd Ⱡ'σяєм ι#"
 #: lms/templates/shoppingcart/receipt.html
 msgid "Invalid"
 msgstr "Ìnvälïd Ⱡ'σяєм ιρѕυм #"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Invoice"
+msgstr "Ìnvöïçé Ⱡ'σяєм ιρѕυм #"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Date of purchase"
@@ -29504,8 +29441,8 @@ msgid "Advanced Editor"
 msgstr "Àdvänçéd Édïtör Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: cms/templates/widgets/problem-edit.html
-msgid "Toggle Cheatsheet"
-msgstr "Tögglé Çhéätshéét Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+msgid "Markdown Help"
+msgstr "Märkdöwn Hélp Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Label"
