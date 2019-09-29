@@ -243,6 +243,6 @@ def _user_friendly_size(size):
     units = [_('bytes'), _('KB'), _('MB')]
     i = 0
     while size >= 1024 and i < len(units):
-        size /= 1024
+        size //= 1024
         i += 1
     return u'{} {}'.format(size, units[i])
