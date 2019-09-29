@@ -330,17 +330,13 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         # Log in as staff, and check we can see the info page.
         self.login_staff()
         response = self.get_course_info_page()
-        self.assertEqual(response.status_code, 200)
-        content = response.content.decode('utf-8')
-        self.assertIn("OOGIE BLOOGIE", content)
+        self.assertContains(response, "OOGIE BLOOGIE")
 
         # Masquerade as the student,enable the self paced configuration, and check we can see the info page.
         SelfPacedConfiguration(enable_course_home_improvements=True).save()
         self.update_masquerade(role='student', user_name=self.student_user.username)
         response = self.get_course_info_page()
-        self.assertEqual(response.status_code, 200)
-        content = response.content.decode('utf-8')
-        self.assertIn("OOGIE BLOOGIE", content)
+        self.assertContains(response, "OOGIE BLOOGIE")
 
     @ddt.data(
         'john',  # Non-unicode username

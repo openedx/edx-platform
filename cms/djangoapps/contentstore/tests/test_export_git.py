@@ -65,19 +65,17 @@ class TestExportGit(CourseTestCase):
         if course hasn't set giturl.
         """
         response = self.client.get(self.test_url)
-        self.assertEqual(200, response.status_code)
-        self.assertIn(
+        self.assertContains(
+            response,
             ('giturl must be defined in your '
              'course settings before you can export to git.'),
-            response.content.decode('utf-8')
         )
 
         response = self.client.get('{}?action=push'.format(self.test_url))
-        self.assertEqual(200, response.status_code)
-        self.assertIn(
+        self.assertContains(
+            response,
             ('giturl must be defined in your '
              'course settings before you can export to git.'),
-            response.content.decode('utf-8')
         )
 
     def test_course_export_failures(self):

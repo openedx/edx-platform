@@ -781,10 +781,11 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         self.assertEqual(response.status_code, 200)
 
         # Verify that course video button is present in the response if videos transcript feature is enabled.
-        self.assertEqual(
-            '<button class="button course-video-settings-button">' in response.content.decode('utf-8'),
-            is_video_transcript_enabled
-        )
+        button_html = '<button class="button course-video-settings-button">'
+        if is_video_transcript_enabled:
+            self.assertContains(response, button_html)
+        else:
+            self.assertNotContains(response, button_html)
 
 
 @ddt.ddt

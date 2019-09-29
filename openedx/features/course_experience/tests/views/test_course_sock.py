@@ -103,8 +103,7 @@ class TestCourseSockView(SharedModuleStoreTestCase):
     )
     def test_upgrade_message_discount(self):
         response = self.client.get(course_home_url(self.verified_course))
-        content = response.content.decode(response.charset)
-        assert "<span>DISCOUNT_PRICE</span>" in content
+        self.assertContains(response, "<span>DISCOUNT_PRICE</span>")
 
     def assert_verified_sock_is_visible(self, course, response):
         return self.assertContains(response, TEST_VERIFICATION_SOCK_LOCATOR, html=False)

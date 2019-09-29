@@ -273,9 +273,9 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             ).encode('utf-8'),),
             ('pfCertificationUrl', self.request.build_absolute_uri(test_url),),
         ])
-        self.assertIn(
+        self.assertContains(
+            response,
             js_escaped_string(self.linkedin_url.format(params=urlencode(params))),
-            response.content.decode('utf-8')
         )
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
@@ -300,9 +300,9 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             ).encode('utf-8'),),
             ('pfCertificationUrl', 'http://test.localhost' + test_url,),
         ])
-        self.assertIn(
+        self.assertContains(
+            response,
             js_escaped_string(self.linkedin_url.format(params=urlencode(params))),
-            response.content.decode('utf-8')
         )
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
@@ -414,20 +414,13 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             course_id=six.text_type(self.course.id)
         )
         response = self.client.get(test_url)
-        content = response.content.decode(response.charset)
-        self.assertIn(
+        self.assertContains(
+            response,
             'a course of study offered by test_organization, an online learning initiative of test organization',
-            content
         )
-        self.assertNotIn(
-            'a course of study offered by testorg',
-            content
-        )
-        self.assertIn(
-            u'<title>test_organization {} Certificate |'.format(self.course.number, ),
-            content
-        )
-        self.assertIn('logo_test1.png', content)
+        self.assertNotContains(response, 'a course of study offered by testorg')
+        self.assertContains(response, u'<title>test_organization {} Certificate |'.format(self.course.number, ))
+        self.assertContains(response, 'logo_test1.png')
 
     @ddt.data(True, False)
     @patch('lms.djangoapps.certificates.views.webview.get_completion_badge')
@@ -503,63 +496,33 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         response = self.client.get(test_url, HTTP_HOST='test.localhost')
 
         # Test an item from basic info
-        self.assertIn(
-            'Terms of Service &amp; Honor Code',
-            response.content.decode('utf-8')
-        )
-        self.assertIn(
-            'Certificate ID Number',
-            response.content.decode('utf-8')
-        )
+        self.assertContains(response, 'Terms of Service &amp; Honor Code')
+        self.assertContains(response, 'Certificate ID Number')
         # Test an item from html cert configuration
-        self.assertIn(
-            '<a class="logo" href="http://test_site.localhost">',
-            response.content.decode('utf-8')
-        )
+        self.assertContains(response, '<a class="logo" href="http://test_site.localhost">')
         # Test an item from course info
-        self.assertIn(
-            'course_title_0',
-            response.content.decode('utf-8')
-        )
+        self.assertContains(response, 'course_title_0')
         # Test an item from user info
-        self.assertIn(
-            u"{fullname}, you earned a certificate!".format(fullname=self.user.profile.name),
-            response.content.decode('utf-8')
-        )
+        self.assertContains(response, u"{fullname}, you earned a certificate!".format(fullname=self.user.profile.name))
         # Test an item from social info
-        self.assertIn(
-            "Post on Facebook",
-            response.content.decode('utf-8')
-        )
-        self.assertIn(
-            "Share on Twitter",
-            response.content.decode('utf-8')
-        )
+        self.assertContains(response, "Post on Facebook")
+        self.assertContains(response, "Share on Twitter")
         # Test an item from certificate/org info
-        self.assertIn(
+        self.assertContains(
+            response,
             u"a course of study offered by {partner_short_name}, "
             "an online learning initiative of "
             "{partner_long_name}.".format(
                 partner_short_name=short_org_name,
                 partner_long_name=long_org_name,
             ),
-            response.content.decode('utf-8')
         )
         # Test item from badge info
-        self.assertIn(
-            "Add to Mozilla Backpack",
-            response.content.decode('utf-8')
-        )
+        self.assertContains(response, "Add to Mozilla Backpack")
         # Test item from site configuration
-        self.assertIn(
-            "http://www.test-site.org/about-us",
-            response.content.decode('utf-8')
-        )
+        self.assertContains(response, "http://www.test-site.org/about-us")
         # Test course overrides
-        self.assertIn(
-            "/static/certificates/images/course_override_logo.png",
-            response.content.decode('utf-8')
-        )
+        self.assertContains(response, "/static/certificates/images/course_override_logo.png")
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_valid_certificate(self):
@@ -1006,7 +969,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             day=expected_date.day,
             year=expected_date.year
         )
-        self.assertIn(date, response.content.decode(response.charset))
+        self.assertContains(response, date)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_invalid_certificate_configuration(self):

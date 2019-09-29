@@ -136,10 +136,10 @@ class TestLetterCutoffPolicy(TestGradebook):
 
     def test_styles(self):
 
-        self.assertIn(u"grade_A {color:green;}", self.response.content.decode(self.response.charset))
-        self.assertIn(u"grade_B {color:Chocolate;}", self.response.content.decode(self.response.charset))
-        self.assertIn(u"grade_C {color:DarkSlateGray;}", self.response.content.decode(self.response.charset))
-        self.assertIn(u"grade_D {color:DarkSlateGray;}", self.response.content.decode(self.response.charset))
+        self.assertContains(self.response, u"grade_A {color:green;}")
+        self.assertContains(self.response, u"grade_B {color:Chocolate;}")
+        self.assertContains(self.response, u"grade_C {color:DarkSlateGray;}")
+        self.assertContains(self.response, u"grade_D {color:DarkSlateGray;}")
 
     def test_assigned_grades(self):
         # Users 9-10 have >= 90% on Homeworks [2]

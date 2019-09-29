@@ -323,7 +323,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         self.assertContains(response, '<th scope="row">Professional</th>')
 
         # dashboard link hidden
-        self.assertNotIn(self.get_dashboard_enrollment_message(), response.content.decode(response.charset))
+        self.assertNotContains(response, self.get_dashboard_enrollment_message())
 
     @patch.dict(settings.FEATURES, {'DISPLAY_ANALYTICS_ENROLLMENTS': True})
     @override_settings(ANALYTICS_DASHBOARD_URL='')

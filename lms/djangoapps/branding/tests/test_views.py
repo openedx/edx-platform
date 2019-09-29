@@ -315,4 +315,4 @@ class TestIndex(SiteMixin, TestCase):
         self.use_site(self.site_other)
         self.client.login(username=self.user.username, password="password")
         response = self.client.get(reverse("dashboard"))
-        self.assertContains(response, self.site_configuration_other.values["MKTG_URLS"]["ROOT"])
+        self.assertIn(self.site_configuration_other.values["MKTG_URLS"]["ROOT"], response.content.decode('utf-8'))

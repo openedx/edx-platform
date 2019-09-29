@@ -121,9 +121,6 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
 
             url = course_home_url(course)
             response = self.client.get(url)
-            self.assertEqual(response.status_code, 200)
-            response_content = response.content.decode("utf-8")
-
             self.assertTrue(course.children)
             for chapter in course.children:
                 self.assertContains(response, chapter.display_name)

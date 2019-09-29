@@ -2160,8 +2160,7 @@ class CSVReportViewsTest(SharedModuleStoreTestCase):
         self.assertEqual(template, 'shoppingcart/download_report.html')
         self.assertFalse(context['total_count_error'])
         self.assertTrue(context['date_fmt_error'])
-        self.assertIn("There was an error in your date input.  It should be formatted as YYYY-MM-DD",
-                      response.content.decode('UTF-8'))
+        self.assertContains(response, "There was an error in your date input.  It should be formatted as YYYY-MM-DD")
 
     def test_report_csv_itemized(self):
         report_type = 'itemized_purchase_report'

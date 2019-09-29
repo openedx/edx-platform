@@ -289,11 +289,13 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
         )
         self._add_course_certificates(count=1, signatory_count=2)
         response = self.client.get(test_url)
-        self.assertIn(
-            'awarded this My Platform Site Honor Code Certificate of Completion', response.content.decode('utf-8')
+        self.assertContains(
+            response,
+            'awarded this My Platform Site Honor Code Certificate of Completion',
         )
-        self.assertIn(
-            'My Platform Site offers interactive online classes and MOOCs.', response.content.decode('utf-8')
+        self.assertContains(
+            response,
+            'My Platform Site offers interactive online classes and MOOCs.'
         )
         self.assertContains(response, 'About My Platform Site')
 
@@ -307,6 +309,7 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
         response = self.client.get(test_url)
         self.assertContains(response, 'edX')
         self.assertNotContains(response, 'My Platform Site')
-        self.assertNotIn(
-            'This should not survive being overwritten by static content', response.content.decode('utf-8')
+        self.assertNotContains(
+            response,
+            'This should not survive being overwritten by static content',
         )

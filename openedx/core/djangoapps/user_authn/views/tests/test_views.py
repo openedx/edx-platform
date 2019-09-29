@@ -872,5 +872,4 @@ class AccountCreationTestCaseWithSiteOverrides(SiteMixin, TestCase):
         ALLOW_PUBLIC_ACCOUNT_CREATION flag is turned off
         """
         response = self.client.get(reverse('signin_user'))
-        self.assertNotIn(u'<a class="btn-neutral" href="/register?next=%2Fdashboard">Register</a>',
-                         response.content.decode(response.charset))
+        self.assertNotContains(response, u'<a class="btn-neutral" href="/register?next=%2Fdashboard">Register</a>')

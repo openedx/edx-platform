@@ -153,8 +153,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         # Create git loaded course
         response = self._add_edx4edx()
-        self.assertIn(Text(text_type(GitImportErrorNoDir(settings.GIT_REPO_DIR))),
-                      response.content.decode('UTF-8'))
+        self.assertContains(response, Text(text_type(GitImportErrorNoDir(settings.GIT_REPO_DIR))))
 
     def test_mongo_course_add_delete(self):
         """
@@ -315,10 +314,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
                     page
                 )
             )
-            self.assertIn(
-                u'Page {} of 2'.format(expected),
-                response.content.decode(response.charset)
-            )
+            self.assertContains(response, u'Page {} of 2'.format(expected))
 
         CourseImportLog.objects.delete()
 

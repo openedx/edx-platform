@@ -333,15 +333,15 @@ class ViewsTestCase(ModuleStoreTestCase):
 
     def test_index_success(self):
         response = self._verify_index_response()
-        self.assertIn(six.text_type(self.problem2.location), response.content.decode("utf-8"))
+        self.assertContains(response, self.problem2.location)
 
         # re-access to the main course page redirects to last accessed view.
         url = reverse('courseware', kwargs={'course_id': six.text_type(self.course_key)})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
         response = self.client.get(response.url)
-        self.assertNotIn(six.text_type(self.problem.location), response.content.decode("utf-8"))
-        self.assertIn(six.text_type(self.problem2.location), response.content.decode("utf-8"))
+        self.assertNotContains(response, self.problem.location)
+        self.assertContains(response, self.problem2.location)
 
     def test_index_nonexistent_chapter(self):
         self._verify_index_response(expected_response_code=404, chapter_name='non-existent')
@@ -509,8 +509,7 @@ class ViewsTestCase(ModuleStoreTestCase):
 
         # Generate the course about page content
         response = self.client.get(reverse('about_course', args=[six.text_type(course.id)]))
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(href, response.content.decode(response.charset))
+        self.assertContains(response, href)
 
     @ddt.data(True, False)
     def test_ecommerce_checkout(self, is_anonymous):
@@ -1950,7 +1949,7 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
         # Test individual problem scores
         if show_grades:
             # If grades are shown, we should be able to see the current problem scores.
-            self.assertIn(expected_score, response.content.decode("utf-8"))
+            self.assertContains(response, expected_score)
 
             if graded:
                 expected_summary_text = u"Problem Scores:"
@@ -1959,7 +1958,7 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
 
         else:
             # If grades are hidden, we should not be able to see the current problem scores.
-            self.assertNotIn(expected_score, response.content.decode("utf-8"))
+            self.assertNotContains(response, expected_score)
 
             if graded:
                 expected_summary_text = u"Problem scores are hidden"
@@ -1972,7 +1971,7 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
                 expected_summary_text += u'.'
 
         # Ensure that expected text is present
-        self.assertIn(expected_summary_text, response.content.decode("utf-8"))
+        self.assertContains(response, expected_summary_text)
 
         # Test overall sequential score
         if graded and max_score > 0:
@@ -1983,9 +1982,9 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
                                                      percentageString)
 
             if show_grades:
-                self.assertIn(expected_grade_summary, response.content.decode("utf-8"))
+                self.assertContains(response, expected_grade_summary)
             else:
-                self.assertNotIn(expected_grade_summary, response.content.decode("utf-8"))
+                self.assertNotContains(response, expected_grade_summary)
 
     @ddt.data(
         ('', None, False),

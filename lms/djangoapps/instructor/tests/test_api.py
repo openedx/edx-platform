@@ -869,7 +869,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         user.is_active = False
         user.save()
 
-        csv_content = b"{email},{username},tester,USA".format(email=conflicting_email, username='new_test_student')
+        csv_content = "{email},{username},tester,USA".format(email=conflicting_email, username='new_test_student')
         uploaded_file = SimpleUploadedFile("temp.csv", six.b(csv_content))
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
@@ -2673,9 +2673,10 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
         # Now invalidate the same invoice number and expect an Bad request
         response = self.assert_request_status_code(400, url, method="POST", data=data)
-        self.assertIn(
+        self.assertContains(
+            response,
             "The sale associated with this invoice has already been invalidated.",
-            response.content.decode('utf-8')
+            status_code=400,
         )
 
         # now re_validate the invoice number
@@ -5171,7 +5172,6 @@ class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
         }
 
         response = self.client.post(generate_code_url, data, **{'HTTP_HOST': 'localhost'})
-        self.assertEqual(response.status_code, 400, response.content.decode('utf-8'))
         self.assertContains(response, 'Could not parse amount as', status_code=400)
 
     def test_get_historical_coupon_codes(self):
