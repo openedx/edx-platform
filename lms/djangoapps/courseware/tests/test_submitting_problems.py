@@ -30,8 +30,8 @@ from capa.tests.response_xml_factory import (
     SchematicResponseXMLFactory
 )
 from course_modes.models import CourseMode
-from courseware.models import BaseStudentModuleHistory, StudentModule
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.grades.api import CourseGradeFactory, task_compute_all_grades_for_course
 from openedx.core.djangoapps.credit.api import get_credit_requirement_status, set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
@@ -791,7 +791,7 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
             self.addCleanup(fileobj.close)
 
         self.problem_setup("the_problem", filenames)
-        with patch('courseware.module_render.XQUEUE_INTERFACE.session') as mock_session:
+        with patch('lms.djangoapps.courseware.module_render.XQUEUE_INTERFACE.session') as mock_session:
             resp = self.submit_question_answer("the_problem", {'2_1': fileobjs})
 
         self.assertEqual(resp.status_code, 200)
@@ -1187,10 +1187,11 @@ class TestConditionalContent(TestSubmittingProblems):
         self.assertEqual(self.score_for_hw('homework2'), [1.0, 2.0])
         self.assertEqual(self.earned_hw_scores(), [1.0, 3.0])
 
-        # Grade percent is .63. Here is the calculation
-        homework_1_score = 1.0 / 2
-        homework_2_score = (1.0 + 2.0) / 4
-        self.check_grade_percent(round((homework_1_score + homework_2_score) / 2, 2))
+        # Grade percent is .63. Here is the calculation:
+        #   homework_1_score = 1.0 / 2
+        #   homework_2_score = (1.0 + 2.0) / 4
+        #   round((homework_1_score + homework_2_score) / 2) == .63
+        self.check_grade_percent(.63)
 
     def test_split_different_problems_group_1(self):
         """
@@ -1205,10 +1206,11 @@ class TestConditionalContent(TestSubmittingProblems):
         self.assertEqual(self.score_for_hw('homework2'), [1.0])
         self.assertEqual(self.earned_hw_scores(), [1.0, 1.0])
 
-        # Grade percent is .75. Here is the calculation
-        homework_1_score = 1.0 / 2
-        homework_2_score = 1.0 / 1
-        self.check_grade_percent(round((homework_1_score + homework_2_score) / 2, 2))
+        # Grade percent is .75. Here is the calculation:
+        #   homework_1_score = 1.0 / 2
+        #   homework_2_score = 1.0 / 1
+        #   round((homework_1_score + homework_2_score) / 2) == .75
+        self.check_grade_percent(.75)
 
     def split_one_group_no_problems_setup(self, user_partition_group):
         """
@@ -1238,10 +1240,11 @@ class TestConditionalContent(TestSubmittingProblems):
         self.assertEqual(self.score_for_hw('homework2'), [])
         self.assertEqual(self.earned_hw_scores(), [1.0])
 
-        # Grade percent is .25. Here is the calculation.
-        homework_1_score = 1.0 / 2
-        homework_2_score = 0.0
-        self.check_grade_percent(round((homework_1_score + homework_2_score) / 2, 2))
+        # Grade percent is .25. Here is the calculation:
+        #   homework_1_score = 1.0 / 2
+        #   homework_2_score = 0.0
+        #   round((homework_1_score + homework_2_score) / 2) == .25
+        self.check_grade_percent(.25)
 
     def test_split_one_group_no_problems_group_1(self):
         """
@@ -1256,6 +1259,7 @@ class TestConditionalContent(TestSubmittingProblems):
         self.assertEqual(self.earned_hw_scores(), [1.0, 1.0])
 
         # Grade percent is .75. Here is the calculation.
-        homework_1_score = 1.0 / 2
-        homework_2_score = 1.0 / 1
-        self.check_grade_percent(round((homework_1_score + homework_2_score) / 2, 2))
+        #   homework_1_score = 1.0 / 2
+        #   homework_2_score = 1.0 / 1
+        #   round((homework_1_score + homework_2_score) / 2) == .75
+        self.check_grade_percent(.75)

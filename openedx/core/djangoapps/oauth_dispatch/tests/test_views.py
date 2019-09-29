@@ -63,7 +63,7 @@ class AccessTokenLoginMixin(object):
 
         return self.client.post(
             self.login_with_access_token_url,
-            HTTP_AUTHORIZATION=b"Bearer {0}".format(access_token if access_token else self.access_token)
+            HTTP_AUTHORIZATION=u"Bearer {0}".format(access_token if access_token else self.access_token).encode('utf-8')
         )
 
     def _assert_access_token_is_valid(self, access_token=None):

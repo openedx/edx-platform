@@ -222,52 +222,6 @@ div.problem {
     &::after {
       @include margin-left($baseline*0.75);
     }
-
-    &:hover {
-      border: 2px solid $blue;
-    }
-
-    &.choicegroup_correct {
-      @include status-icon($correct, $checkmark-icon);
-
-      border: 2px solid $correct;
-
-      // keep green for correct answers on hover.
-      &:hover {
-        border-color: $correct;
-      }
-    }
-
-    &.choicegroup_partially-correct {
-      @include status-icon($partially-correct, $asterisk-icon);
-
-      border: 2px solid $partially-correct;
-
-      // keep green for correct answers on hover.
-      &:hover {
-        border-color: $partially-correct;
-      }
-    }
-
-    &.choicegroup_incorrect {
-      @include status-icon($incorrect, $cross-icon);
-
-      border: 2px solid $incorrect;
-
-      // keep red for incorrect answers on hover.
-      &:hover {
-        border-color: $incorrect;
-      }
-    }
-
-    &.choicegroup_submitted {
-      border: 2px solid $submitted;
-
-      // keep blue for submitted answers on hover.
-      &:hover {
-        border-color: $submitted;
-      }
-    }
   }
 
   .indicator-container {
@@ -284,6 +238,41 @@ div.problem {
   input[type="checkbox"] {
     @include margin(($baseline/4) ($baseline/2) ($baseline/4) ($baseline/4));
   }
+
+  input {
+    &:focus,
+    &:hover {
+      & + label {
+        border: 2px solid $blue;
+      }
+    }
+
+    &,
+    &:focus,
+    &:hover {
+      & + label.choicegroup_correct {
+        @include status-icon($correct, $checkmark-icon);
+
+        border: 2px solid $correct;
+      }
+
+      & + label.choicegroup_partially-correct {
+        @include status-icon($partially-correct, $asterisk-icon);
+
+        border: 2px solid $partially-correct;
+      }
+
+      & + label.choicegroup_incorrect {
+        @include status-icon($incorrect, $cross-icon);
+
+        border: 2px solid $incorrect;
+      }
+
+      & + label.choicegroup_submitted {
+        border: 2px solid $submitted;
+      }
+    }
+  }
 }
 
 // +Problem - Choice Group
@@ -291,6 +280,10 @@ div.problem {
 div.problem {
   .choicegroup {
     @extend %choicegroup-base;
+
+    .field {
+      position: relative;
+    }
 
     label {
       @include padding($baseline/2);
@@ -308,6 +301,9 @@ div.problem {
 
       position: absolute;
       top: em(9);
+      width: $baseline*1.1;
+      height: $baseline*1.1;
+      z-index: 1;
     }
 
     legend {
@@ -1628,6 +1624,17 @@ div.problem .imageinput.capa_inputtype {
     top: 3px;
     width: 25px;
     height: 20px;
+
+    &.unsubmitted,
+    &.unanswered {
+      .status-icon {
+        content: '';
+      }
+
+      .status-message {
+        display: none;
+      }
+    }
   }
 
   .correct {
@@ -1658,6 +1665,17 @@ div.problem .annotation-input {
     top: 3px;
     width: 25px;
     height: 20px;
+
+    &.unsubmitted,
+    &.unanswered {
+      .status-icon {
+        content: '';
+      }
+
+      .status-message {
+        display: none;
+      }
+    }
   }
 
   .correct {

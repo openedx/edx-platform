@@ -113,7 +113,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-01 20:42+0000\n"
+"POT-Creation-Date: 2019-09-15 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Japanese (Japan) (https://www.transifex.com/open-edx/teams/6205/ja_JP/)\n"
@@ -7677,10 +7677,6 @@ msgid ""
 msgstr ""
 "どのグループにこのブロックを表示するかをマッピングするディクショナリ。キーはグループ設定IDで、値はグループIDのリストです。グループ設定のキーがない、またはグループID設定が空欄の場合、ブロックは全員に表示されると判断されます。ブロックがvisible_to_staff_onlyの場合、この欄は無視されることに注意してください。"
 
-#: lms/djangoapps/notes/views.py lms/templates/notes.html
-msgid "My Notes"
-msgstr "マイ・ノート"
-
 #: lms/djangoapps/program_enrollments/models.py
 msgid "One of user or external_user_key must not be null."
 msgstr ""
@@ -8526,6 +8522,15 @@ msgstr ""
 
 #: lms/djangoapps/support/views/index.py
 msgid "View feature based enrollment settings"
+msgstr ""
+
+#: lms/djangoapps/support/views/index.py
+#: lms/templates/support/link_program_enrollments.html
+msgid "Link Program Enrollments"
+msgstr ""
+
+#: lms/djangoapps/support/views/index.py
+msgid "Link LMS users to program enrollments"
 msgstr ""
 
 #: lms/djangoapps/support/views/manage_user.py
@@ -12976,10 +12981,6 @@ msgstr ""
 msgid "Raw data:"
 msgstr "生データ: "
 
-#: lms/templates/notes.html
-msgid "You do not have any notes."
-msgstr "ノートがありません。"
-
 #: lms/templates/preview_menu.html
 msgid "Course View"
 msgstr "講座ビュー"
@@ -13339,6 +13340,11 @@ msgstr ""
 #: lms/templates/seq_module.html
 msgid "Sequence"
 msgstr "順番"
+
+#: lms/templates/seq_module.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "Completed"
+msgstr ""
 
 #: lms/templates/signup_modal.html
 msgid "Sign Up for {platform_name}"

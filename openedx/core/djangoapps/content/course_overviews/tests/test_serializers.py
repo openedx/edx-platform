@@ -35,3 +35,6 @@ class TestCourseOverviewSerializer(TestCase):
         ]
         for field in fields:
             assert field in data
+
+        assert isinstance(data['has_started'], bool)
+        assert isinstance(data['has_ended'], bool)

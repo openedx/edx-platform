@@ -9,8 +9,8 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
 
-from courseware.access import has_access
-from courseware.entrance_exams import user_can_skip_entrance_exam
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, default_course_url_name
 from student.models import CourseEnrollment

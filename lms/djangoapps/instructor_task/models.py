@@ -28,6 +28,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.db import models, transaction
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
@@ -42,6 +43,7 @@ PROGRESS = 'PROGRESS'
 TASK_INPUT_LENGTH = 10000
 
 
+@python_2_unicode_compatible
 class InstructorTask(models.Model):
     """
     Stores information about background tasks that have been submitted to
@@ -91,7 +93,7 @@ class InstructorTask(models.Model):
             'task_output': self.task_output,
         },)
 
-    def __unicode__(self):
+    def __str__(self):
         return six.text_type(repr(self))
 
     @classmethod

@@ -22,9 +22,9 @@ from six import text_type
 
 import branding
 from course_modes.models import CourseMode
-from courseware.access import has_access
-from courseware.access_response import MilestoneAccessError, StartDateError
-from courseware.date_summary import (
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.access_response import MilestoneAccessError, StartDateError
+from lms.djangoapps.courseware.date_summary import (
     CertificateAvailableDate,
     CourseEndDate,
     CourseStartDate,
@@ -32,9 +32,9 @@ from courseware.date_summary import (
     VerificationDeadlineDate,
     VerifiedUpgradeDeadlineDate
 )
-from courseware.masquerade import check_content_start_date_for_masquerade_user
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module
+from lms.djangoapps.courseware.masquerade import check_content_start_date_for_masquerade_user
+from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.module_render import get_module
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
@@ -618,11 +618,19 @@ def get_current_child(xmodule, min_depth=None, requested_child=None):
             return _get_child(content_children) if content_children else None
 
     child = None
-    if hasattr(xmodule, 'position'):
+
+    try:
+        # In python 3, hasattr() catches AttributeErrors only then returns False.
+        # All other exceptions bubble up the call stack.
+        has_position = hasattr(xmodule, 'position')  # This conditions returns AssertionError from xblock.fields lib.
+    except AssertionError:
+        return child
+
+    if has_position:
         children = xmodule.get_display_items()
         if len(children) > 0:
             if xmodule.position is not None and not requested_child:
-                pos = xmodule.position - 1  # position is 1-indexed
+                pos = int(xmodule.position) - 1  # position is 1-indexed
                 if 0 <= pos < len(children):
                     child = children[pos]
                     if min_depth is not None and (min_depth > 0 and not child.has_children_at_depth(min_depth - 1)):

@@ -96,7 +96,7 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
     const loseAccessText = StringUtils.interpolate(
       gettext('You may also lose access to verified certificates and other program credentials like MicroMasters certificates. If you want to make a copy of these for your records before proceeding with deletion, follow the instructions for {htmlStart}printing or downloading a certificate{htmlEnd}.'),
       {
-        htmlStart: '<a href="https://edx.readthedocs.io/projects/edx-guide-for-students/en/latest/SFD_certificates.html#printing-a-certificate" target="_blank">',
+        htmlStart: '<a href="https://edx.readthedocs.io/projects/edx-guide-for-students/en/latest/SFD_certificates.html#printing-a-certificate" rel="noopener" target="_blank">',
         htmlEnd: '</a>',
       },
     );

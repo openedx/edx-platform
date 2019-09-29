@@ -334,13 +334,9 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         cls.courses['expired_upgrade_deadline'] = cls._create_course(
             run='expired_upgrade_deadline_run_1',
             display_name='Expired Upgrade Deadline Course Title',
-            modes=['audit'],
-            component_types=['problem', 'html']
-        )
-        CourseModeFactory.create(
-            course_id=cls.courses['expired_upgrade_deadline']['course'].scope_ids.usage_id.course_key,
-            mode_slug='verified',
-            expiration_datetime=datetime(2018, 1, 1)
+            modes=['audit', 'verified'],
+            component_types=['problem', 'html'],
+            expired_upgrade_deadline=True
         )
 
     def setUp(self):
@@ -382,7 +378,7 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
 
     @classmethod
-    def _create_course(cls, run, display_name, modes, component_types):
+    def _create_course(cls, run, display_name, modes, component_types, expired_upgrade_deadline=False):
         """
         Helper method to create a course
         Arguments:
@@ -403,7 +399,10 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         course = CourseFactory.create(run=run, display_name=display_name, start=start_date)
 
         for mode in modes:
-            CourseModeFactory.create(course_id=course.id, mode_slug=mode)
+            if expired_upgrade_deadline and mode == 'verified':
+                CourseModeFactory.create(course_id=course.id, mode_slug=mode, expiration_datetime=datetime(2020, 1, 1))
+            else:
+                CourseModeFactory.create(course_id=course.id, mode_slug=mode)
 
         with cls.store.bulk_operations(course.id):
             blocks_dict = {}
@@ -531,9 +530,9 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         the user will continue to see gated content, but the upgrade messaging will be removed.
         """
         _assert_block_is_gated(
-            block=self.courses['default']['blocks']['problem'],
+            block=self.courses['expired_upgrade_deadline']['blocks']['problem'],
             user=self.users['audit'],
-            course=self.courses['default']['course'],
+            course=self.courses['expired_upgrade_deadline']['course'],
             is_gated=True,
             request_factory=self.factory,
             has_upgrade_link=False

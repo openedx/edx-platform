@@ -637,7 +637,7 @@ class ModuleStoreAssetBase(object):
         if asset_type is None:
             # Add assets of all types to the sorted list.
             all_assets = SortedAssetList(iterable=[], key=key_func)
-            for asset_type, val in course_assets.iteritems():
+            for asset_type, val in six.iteritems(course_assets):
                 all_assets.update(val)
         else:
             # Add assets of a single type to the sorted list.
@@ -1298,7 +1298,8 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         result = defaultdict(dict)
         if fields is None:
             return result
-        cls = self.mixologist.mix(XBlock.load_class(category, select=prefer_xmodules))
+        classes = XBlock.load_class(category, select=prefer_xmodules)
+        cls = self.mixologist.mix(classes)
         for field_name, value in six.iteritems(fields):
             field = getattr(cls, field_name)
             result[field.scope][field_name] = value

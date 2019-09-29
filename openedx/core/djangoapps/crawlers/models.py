@@ -7,8 +7,10 @@ from __future__ import absolute_import
 import six
 from config_models.models import ConfigurationModel
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class CrawlersConfig(ConfigurationModel):
     """
     Configuration for the crawlers django app.
@@ -24,7 +26,7 @@ class CrawlersConfig(ConfigurationModel):
         default='edX-downloader',
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return u'CrawlersConfig("{}")'.format(self.known_user_agents)
 
     @classmethod

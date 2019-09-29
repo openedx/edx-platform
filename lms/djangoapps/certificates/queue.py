@@ -11,6 +11,7 @@ import six
 from django.conf import settings
 from django.test.client import RequestFactory
 from django.urls import reverse
+from django.utils.encoding import python_2_unicode_compatible
 from lxml.etree import ParserError, XMLSyntaxError
 from requests.auth import HTTPBasicAuth
 
@@ -31,6 +32,7 @@ from xmodule.modulestore.django import modulestore
 LOGGER = logging.getLogger(__name__)
 
 
+@python_2_unicode_compatible
 class XQueueAddToQueueError(Exception):
     """An error occurred when adding a certificate task to the queue. """
 
@@ -39,7 +41,7 @@ class XQueueAddToQueueError(Exception):
         self.error_msg = error_msg
         super(XQueueAddToQueueError, self).__init__(six.text_type(self))
 
-    def __unicode__(self):
+    def __str__(self):
         return (
             u"Could not add certificate to the XQueue.  "
             u"The error code was '{code}' and the message was '{msg}'."

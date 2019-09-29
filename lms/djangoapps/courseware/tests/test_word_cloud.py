@@ -243,7 +243,7 @@ class TestWordCloud(BaseTestXmodule):
 
         for user in self.users:
             self.assertDictEqual(
-                json.loads(responses[user.username].content),
+                json.loads(responses[user.username].content.decode('utf-8')),
                 {
                     'status': 'fail',
                     'error': 'Unknown Command!'

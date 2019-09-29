@@ -13,8 +13,8 @@ from mock import MagicMock, Mock, patch
 from six import text_type
 from six.moves import range
 
-from courseware.courses import get_course_by_id
-from courseware.tabs import (
+from lms.djangoapps.courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.tabs import (
     CourseInfoTab,
     CoursewareTab,
     ExternalDiscussionCourseTab,
@@ -22,9 +22,9 @@ from courseware.tabs import (
     ProgressTab,
     get_course_tab_list
 )
-from courseware.tests.factories import InstructorFactory, StaffFactory
-from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.views.views import StaticCourseTabView, get_static_tab_fragment
+from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.views.views import StaticCourseTabView, get_static_tab_fragment
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
@@ -282,7 +282,7 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         self.assertIn('static_tab', tab_content)
 
         # Test when render raises an exception
-        with patch('courseware.views.views.get_module') as mock_module_render:
+        with patch('lms.djangoapps.courseware.views.views.get_module') as mock_module_render:
             mock_module_render.return_value = MagicMock(
                 render=Mock(side_effect=Exception('Render failed!'))
             )

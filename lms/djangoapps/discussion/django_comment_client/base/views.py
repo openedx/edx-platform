@@ -25,8 +25,8 @@ from six import text_type
 
 import lms.djangoapps.discussion.django_comment_client.settings as cc_settings
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
-from courseware.access import has_access
-from courseware.courses import get_course_by_id, get_course_overview_with_access, get_course_with_access
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_by_id, get_course_overview_with_access, get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion.django_comment_client.permissions import (
     check_permissions_by_view,

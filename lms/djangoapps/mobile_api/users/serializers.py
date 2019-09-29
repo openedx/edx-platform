@@ -8,7 +8,7 @@ import six
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
-from courseware.access import has_access
+from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.certificates.api import certificate_downloadable_status
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig

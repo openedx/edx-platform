@@ -128,7 +128,9 @@ class CourseImportView(CourseImportExportViewMixin, GenericAPIView):
                     developer_message='Parameter in the wrong format',
                     error_code='internal_error',
                 )
-            course_dir = path(settings.GITHUB_REPO_ROOT) / base64.urlsafe_b64encode(repr(course_key))
+            course_dir = path(settings.GITHUB_REPO_ROOT) / base64.urlsafe_b64encode(
+                repr(course_key).encode('utf-8')
+            ).decode('utf-8')
             temp_filepath = course_dir / filename
             if not course_dir.isdir():
                 os.mkdir(course_dir)

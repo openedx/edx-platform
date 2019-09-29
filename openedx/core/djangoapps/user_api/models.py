@@ -8,6 +8,7 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
+from django.utils.encoding import python_2_unicode_compatible
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 
@@ -149,6 +150,7 @@ class UserOrgTag(TimeStampedModel, DeletableByUserValue):  # pylint: disable=mod
         unique_together = ("user", "org", "key")
 
 
+@python_2_unicode_compatible
 class RetirementState(models.Model):
     """
     Stores the list and ordering of the steps of retirement, this should almost never change
@@ -161,8 +163,9 @@ class RetirementState(models.Model):
     is_dead_end_state = models.BooleanField(default=False, db_index=True)
     required = models.BooleanField(default=False)
 
-    def __unicode__(self):
-        return u'{} (step {})'.format(self.state_name, self.state_execution_order)
+    def __str__(self):
+        # pylint: disable=unicode-format-string
+        return '{} (step {})'.format(self.state_name, self.state_execution_order)
 
     class Meta(object):
         ordering = ('state_execution_order',)
@@ -180,6 +183,7 @@ class RetirementState(models.Model):
         return cls.objects.all().values_list('state_name', flat=True)
 
 
+@python_2_unicode_compatible
 class UserRetirementPartnerReportingStatus(TimeStampedModel):
     """
     When a user has been retired from LMS it will still need to be reported out to
@@ -202,13 +206,14 @@ class UserRetirementPartnerReportingStatus(TimeStampedModel):
         verbose_name = 'User Retirement Reporting Status'
         verbose_name_plural = 'User Retirement Reporting Statuses'
 
-    def __unicode__(self):
+    def __str__(self):
         return u'UserRetirementPartnerReportingStatus: {} is being processed: {}'.format(
             self.user,
             self.is_being_processed
         )
 
 
+@python_2_unicode_compatible
 class UserRetirementRequest(TimeStampedModel):
     """
     Records and perists every user retirement request.
@@ -239,10 +244,11 @@ class UserRetirementRequest(TimeStampedModel):
         """
         return cls.objects.filter(user=user).exists()
 
-    def __unicode__(self):
+    def __str__(self):
         return u'User: {} Requested: {}'.format(self.user.id, self.created)
 
 
+@python_2_unicode_compatible
 class UserRetirementStatus(TimeStampedModel):
     """
     Tracks the progress of a user's retirement request
@@ -382,7 +388,7 @@ class UserRetirementStatus(TimeStampedModel):
 
         return retirement
 
-    def __unicode__(self):
+    def __str__(self):
         return u'User: {} State: {} Last Updated: {}'.format(self.user.id, self.current_state, self.modified)
 
 

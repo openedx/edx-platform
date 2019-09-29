@@ -10,12 +10,14 @@ from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils.encoding import python_2_unicode_compatible
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
 
 logger = getLogger(__name__)  # pylint: disable=invalid-name
 
 
+@python_2_unicode_compatible
 class SiteConfiguration(models.Model):
     """
     Model for storing site configuration. These configuration override OpenEdx configurations and settings.
@@ -35,11 +37,11 @@ class SiteConfiguration(models.Model):
         load_kwargs={'object_pairs_hook': collections.OrderedDict}
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return u"<SiteConfiguration: {site} >".format(site=self.site)  # xss-lint: disable=python-wrap-html
 
     def __repr__(self):
-        return self.__unicode__()
+        return self.__str__()
 
     def get_value(self, name, default=None):
         """
@@ -114,7 +116,7 @@ class SiteConfiguration(models.Model):
         for example, to do filtering.
 
         Returns:
-            A list of all organizations present in site configuration.
+            A set of all organizations present in site configuration.
         """
         org_filter_set = set()
 
@@ -136,6 +138,7 @@ class SiteConfiguration(models.Model):
         return org in cls.get_all_orgs()
 
 
+@python_2_unicode_compatible
 class SiteConfigurationHistory(TimeStampedModel):
     """
     This is an archive table for SiteConfiguration, so that we can maintain a history of
@@ -159,7 +162,7 @@ class SiteConfigurationHistory(TimeStampedModel):
         get_latest_by = 'modified'
         ordering = ('-modified', '-created',)
 
-    def __unicode__(self):
+    def __str__(self):
         # pylint: disable=line-too-long
         return u"<SiteConfigurationHistory: {site}, Last Modified: {modified} >".format(  # xss-lint: disable=python-wrap-html
             modified=self.modified,
@@ -167,7 +170,7 @@ class SiteConfigurationHistory(TimeStampedModel):
         )
 
     def __repr__(self):
-        return self.__unicode__()
+        return self.__str__()
 
 
 @receiver(post_save, sender=SiteConfiguration)

@@ -29,7 +29,6 @@ from lms.djangoapps.grades.models import (
     BlockRecordList,
     PersistentSubsectionGrade,
     PersistentSubsectionGradeOverride,
-    PersistentSubsectionGradeOverrideHistory,
     PersistentCourseGrade,
 )
 from lms.djangoapps.grades.rest_api.v1.tests.mixins import GradeViewTestMixin
@@ -1581,14 +1580,6 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
                     expected_value = getattr(expected_grades, field_name)
                     self.assertEqual(expected_value, getattr(grade, field_name))
 
-            update_records = PersistentSubsectionGradeOverrideHistory.objects.filter(user=request_user)
-            self.assertEqual(update_records.count(), 3)
-            for audit_item in update_records:
-                self.assertEqual(audit_item.user, request_user)
-                self.assertIsNotNone(audit_item.created)
-                self.assertEqual(audit_item.feature, GradeOverrideFeatureEnum.gradebook)
-                self.assertEqual(audit_item.action, PersistentSubsectionGradeOverrideHistory.CREATE_OR_UPDATE)
-
     def test_update_failing_grade(self):
         """
         Test that when we update a user's grade to failing, their certificate is marked notpassing
@@ -1812,8 +1803,8 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
                 ('system', None),
                 ('history_date', '2019-01-01T00:00:00Z'),
                 ('history_type', u'+'),
-                ('history_user', None),
-                ('history_user_id', None),
+                ('history_user', self.global_staff.username),
+                ('history_user_id', self.global_staff.id),
                 ('id', 1),
                 ('possible_all_override', 12.0),
                 ('possible_graded_override', 8.0),
@@ -1821,6 +1812,27 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         }
 
         assert expected_data == resp.data
+
+    def test_comment_appears(self):
+        """
+        Test that comments passed (e.g. from proctoring) appear in the history rows
+        """
+        proctoring_failure_fake_comment = "Failed Test Proctoring"
+        self.login_course_staff()
+        override = PersistentSubsectionGradeOverride.update_or_create_override(
+            requesting_user=self.global_staff,
+            subsection_grade_model=self.grade,
+            earned_all_override=0.0,
+            earned_graded_override=0.0,
+            feature=GradeOverrideFeatureEnum.proctoring,
+            comment=proctoring_failure_fake_comment
+        )
+
+        resp = self.client.get(
+            self.get_url(subsection_id=self.usage_key)
+        )
+
+        assert resp.data['history'][0]['override_reason'] == proctoring_failure_fake_comment
 
     @ddt.data(
         'login_staff',

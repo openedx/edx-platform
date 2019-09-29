@@ -50,7 +50,7 @@ class Oauth2ProviderConfigAdminTest(testutil.TestCase):
         provider1 = self.configure_dummy_provider(
             enabled=True,
             icon_class='',
-            icon_image=SimpleUploadedFile('icon.svg', '<svg><rect width="50" height="100"/></svg>'),
+            icon_image=SimpleUploadedFile('icon.svg', b'<svg><rect width="50" height="100"/></svg>'),
         )
 
         # Get the provider instance with active flag

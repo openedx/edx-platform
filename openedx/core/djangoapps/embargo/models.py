@@ -18,6 +18,7 @@ import json
 import logging
 
 import six
+from django.utils.encoding import python_2_unicode_compatible
 from config_models.models import ConfigurationModel
 from django.core.cache import cache
 from django.db import models
@@ -38,6 +39,7 @@ from .messages import COURSEWARE_MESSAGES, ENROLL_MESSAGES
 log = logging.getLogger(__name__)
 
 
+@python_2_unicode_compatible
 class EmbargoedCourse(models.Model):
     """
     Enable course embargo on a course-by-course basis.
@@ -67,13 +69,14 @@ class EmbargoedCourse(models.Model):
         except cls.DoesNotExist:
             return False
 
-    def __unicode__(self):
+    def __str__(self):
         not_em = "Not "
         if self.embargoed:
             not_em = ""
         return u"Course '{}' is {}Embargoed".format(text_type(self.course_id), not_em)
 
 
+@python_2_unicode_compatible
 class EmbargoedState(ConfigurationModel):
     """
     Register countries to be embargoed.
@@ -97,10 +100,11 @@ class EmbargoedState(ConfigurationModel):
             return []
         return [country.strip().upper() for country in self.embargoed_countries.split(',')]
 
-    def __unicode__(self):
+    def __str__(self):
         return self.embargoed_countries
 
 
+@python_2_unicode_compatible
 class RestrictedCourse(models.Model):
     """
     Course with access restrictions.
@@ -267,7 +271,7 @@ class RestrictedCourse(models.Model):
         elif access_point == 'courseware':
             return self.access_msg_key
 
-    def __unicode__(self):
+    def __str__(self):
         return six.text_type(self.course_key)
 
     @classmethod
@@ -372,6 +376,7 @@ class RestrictedCourse(models.Model):
         log.info("Invalidated cached messaging URLs ")
 
 
+@python_2_unicode_compatible
 class Country(models.Model):
     """Representation of a country.
 
@@ -386,7 +391,7 @@ class Country(models.Model):
         help_text=ugettext_lazy(u"Two character ISO country code.")
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return u"{name} ({code})".format(
             name=six.text_type(self.country.name),
             code=six.text_type(self.country)
@@ -397,6 +402,7 @@ class Country(models.Model):
         ordering = ['country']
 
 
+@python_2_unicode_compatible
 class CountryAccessRule(models.Model):
     """Course access rule based on the user's country.
 
@@ -519,7 +525,7 @@ class CountryAccessRule(models.Model):
         # that have access to the course.
         return list(whitelist_countries - blacklist_countries)
 
-    def __unicode__(self):
+    def __str__(self):
         if self.rule_type == self.WHITELIST_RULE:
             return _(u"Whitelist {country} for {course}").format(
                 course=six.text_type(self.restricted_course.course_key),
@@ -679,6 +685,7 @@ post_delete.connect(CourseAccessRuleHistory.snapshot_post_delete_receiver, sende
 post_delete.connect(CourseAccessRuleHistory.snapshot_post_delete_receiver, sender=CountryAccessRule)
 
 
+@python_2_unicode_compatible
 class IPFilter(ConfigurationModel):
     """
     Register specific IP addresses to explicitly block or unblock.
@@ -737,5 +744,5 @@ class IPFilter(ConfigurationModel):
             return []
         return self.IPFilterList([addr.strip() for addr in self.blacklist.split(',')])
 
-    def __unicode__(self):
+    def __str__(self):
         return "Whitelist: {} - Blacklist: {}".format(self.whitelist_ips, self.blacklist_ips)

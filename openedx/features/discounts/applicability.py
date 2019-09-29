@@ -12,7 +12,7 @@ from __future__ import absolute_import
 
 from datetime import datetime
 
-import crum
+from crum import get_current_request, impersonate
 import pytz
 
 from course_modes.models import CourseMode
@@ -49,8 +49,9 @@ def can_receive_discount(user, course):  # pylint: disable=unused-argument
     can receive a discount.
     """
     # Always disable discounts until we are ready to enable this feature
-    if not DISCOUNT_APPLICABILITY_FLAG.is_enabled():
-        return False
+    with impersonate(user):
+        if not DISCOUNT_APPLICABILITY_FLAG.is_enabled():
+            return False
 
     # TODO: Add additional conditions to return False here
 
@@ -77,6 +78,12 @@ def can_receive_discount(user, course):  # pylint: disable=unused-argument
     if CourseEntitlement.objects.filter(user=user).exists():
         return False
 
+    # We can't import this at Django load time within the openedx tests settings context
+    from openedx.features.enterprise_support.utils import is_enterprise_learner
+    # Don't give discount to enterprise users
+    if is_enterprise_learner(user):
+        return False
+
     # Excute holdback
     if _is_in_holdback(user):
         return False
@@ -94,7 +101,7 @@ def _is_in_holdback(user):
     # Holdback is 50/50
     bucket = stable_bucketing_hash_group(DISCOUNT_APPLICABILITY_HOLDBACK, 2, user.username)
 
-    request = crum.get_current_request()
+    request = get_current_request()
     if hasattr(request, 'session') and DISCOUNT_APPLICABILITY_HOLDBACK not in request.session:
 
         properties = {

@@ -170,7 +170,7 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
 
         # Create a second course to be filtered out of queries.
         alternate_course = self.create_course(
-            org=md5(self.course.org).hexdigest()
+            org=md5(self.course.org.encode('utf-8')).hexdigest()
         )
 
         self.assertNotEqual(alternate_course.org, self.course.org)
@@ -217,7 +217,7 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
         self.setup_user(self.staff_user)
 
         # Create a second course to be filtered out of queries.
-        alternate_course = self.create_course(org=md5(self.course.org).hexdigest())
+        alternate_course = self.create_course(org=md5(self.course.org.encode('utf-8')).hexdigest())
 
         # Request the courses as the staff user with the different roles specified.
         for roles in ('', 'staff', 'staff,instructor'):
@@ -247,7 +247,7 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
         add_users(self.global_admin, CourseStaffRole(self.course.id), course_staff_user)
 
         # Create a second course to be filtered out of queries, along with an instructor user for it.
-        alternate_course = self.create_course(org=md5(self.course.org).hexdigest())
+        alternate_course = self.create_course(org=md5(self.course.org.encode('utf-8')).hexdigest())
         course_instructor_user = self.create_user(username='course_instructor', is_staff=False)
         add_users(self.global_admin, CourseInstructorRole(alternate_course.id), course_instructor_user)
 

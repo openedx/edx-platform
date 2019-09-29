@@ -193,7 +193,7 @@ def grader_from_conf(conf):
             msg = ("Unable to parse grader configuration:\n    " +
                    str(subgraderconf) +
                    "\n    Error was:\n    " + str(error))
-            six.reraise(ValueError(msg), None, sys.exc_info()[2])
+            six.reraise(ValueError, ValueError(msg), sys.exc_info()[2])
 
     return WeightedSubsectionsGrader(subgraders)
 

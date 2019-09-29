@@ -10,16 +10,16 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from courseware.entrance_exams import (
+from lms.djangoapps.courseware.entrance_exams import (
     course_has_entrance_exam,
     get_entrance_exam_content,
     user_can_skip_entrance_exam,
     user_has_passed_entrance_exam
 )
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module, handle_xblock_callback, toc_for_course
-from courseware.tests.factories import InstructorFactory, RequestFactoryNoCsrf, StaffFactory, UserFactory
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.module_render import get_module, handle_xblock_callback, toc_for_course
+from lms.djangoapps.courseware.tests.factories import InstructorFactory, RequestFactoryNoCsrf, StaffFactory, UserFactory
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG, UNIFIED_COURSE_TAB_FLAG
@@ -471,7 +471,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         exam_url = response.get('Location')
         self.assertRedirects(response, exam_url)
 
-    @patch('courseware.entrance_exams.get_entrance_exam_content', Mock(return_value=None))
+    @patch('lms.djangoapps.courseware.entrance_exams.get_entrance_exam_content', Mock(return_value=None))
     def test_courseware_page_access_after_passing_entrance_exam(self):
         """
         Test courseware access page after passing entrance exam
@@ -552,7 +552,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             'problem_check',
         )
         self.assertEqual(response.status_code, 200)
-        self.assertIn('entrance_exam_passed', response.content)
+        self.assertIn('entrance_exam_passed', response.content.decode('utf-8'))
 
     def _assert_chapter_loaded(self, course, chapter):
         """

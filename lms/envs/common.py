@@ -98,7 +98,7 @@ FEATURES = {
     'ENABLE_TEXTBOOK': True,
 
     # .. toggle_name: ENABLE_STUDENT_NOTES
-    # .. toggle_type: feature_flag
+    # .. toggle_implementation: DjangoSetting
     # .. toggle_default: True
     # .. toggle_description: Enables the Student Notes API and UI.
     # .. toggle_category: ????
@@ -128,7 +128,7 @@ FEATURES = {
     'ENABLE_MASQUERADE': True,  # allow course staff to change to student view of courseware
 
     # .. toggle_name: ENABLE_SYSADMIN_DASHBOARD
-    # .. toggle_type: feature_flag
+    # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: enables dashboard at /syadmin/ for django staff, for seeing overview of system status, for deleting and loading courses, for seeing log of git imports of courseware.
     # .. toggle_category: admin
@@ -157,12 +157,6 @@ FEATURES = {
 
     # Set to hide the courses list on the Learner Dashboard if they are not enrolled in any courses yet.
     'HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED': False,
-
-    # enable analytics server.
-    # WARNING: THIS SHOULD ALWAYS BE SET TO FALSE UNDER NORMAL
-    # LMS OPERATION. See analytics.py for details about what
-    # this does.
-    'RUN_AS_ANALYTICS_SERVER_ENABLED': False,
 
     # Give a UI to show a student's submission history in a problem by the
     # Staff Debug tool.
@@ -199,7 +193,7 @@ FEATURES = {
     'ENABLE_VERIFIED_CERTIFICATES': False,
 
     # .. toggle_name: DISABLE_HONOR_CERTIFICATES
-    # .. toggle_type: feature_flag
+    # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Set to True to disable honor certificates. Typically used when your installation only allows verified certificates, like courses.edx.org.
     # .. toggle_category: certificates
@@ -208,6 +202,7 @@ FEATURES = {
     # .. toggle_expiration_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/PROD-269
     # .. toggle_status: supported
+    # .. toggle_warnings: ???
     'DISABLE_HONOR_CERTIFICATES': False,  # Toggle to disable honor certificates
 
     # for acceptance and load testing
@@ -293,6 +288,9 @@ FEATURES = {
     # Let students save and manage their annotations
     'ENABLE_EDXNOTES': False,
 
+    # Toggle to enable coordination with the Publisher tool (keep in sync with cms/envs/common.py)
+    'ENABLE_PUBLISHER': False,
+
     # Milestones application flag
     'MILESTONES_APP': False,
 
@@ -366,7 +364,7 @@ FEATURES = {
     # This will eventually default to True and may be
     # removed since all installs should have the separate
     # extended history table.
-    'ENABLE_CSMH_EXTENDED': False,
+    'ENABLE_CSMH_EXTENDED': True,
 
     # Read from both the CSMH and CSMHE history tables.
     # This is the default, but can be disabled if all history
@@ -412,9 +410,6 @@ FEATURES = {
 
     # Sets the default browser support. For more information go to http://browser-update.org/customize.html
     'UNSUPPORTED_BROWSER_ALERT_VERSIONS': "{i:10,f:-3,o:-3,s:-3,c:-3}",
-
-    # Set this to true to make API docs available at /api-docs/.
-    'ENABLE_API_DOCS': False,
 
     # Whether to display the account deletion section the account settings page
     'ENABLE_ACCOUNT_DELETION': True,
@@ -501,6 +496,13 @@ DATABASE_ROUTERS = [
 ############################ Cache Configuration ###############################
 
 CACHES = {
+    'blockstore': {
+        'KEY_PREFIX': 'blockstore',
+        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'LOCATION': ['localhost:11211'],
+        'TIMEOUT': '86400',  # This data should be long-lived for performance, BundleCache handles invalidation
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+    },
     'course_structure_cache': {
         'KEY_PREFIX': 'course_structure',
         'KEY_FUNCTION': 'util.memcache.safe_key',
@@ -667,7 +669,7 @@ CONTEXT_PROCESSORS = [
     'shoppingcart.context_processor.user_has_cart_context_processor',
 
     # Timezone processor (sends language and time_zone preference)
-    'courseware.context_processor.user_timezone_locale_prefs',
+    'lms.djangoapps.courseware.context_processor.user_timezone_locale_prefs',
 
     # Online contextual help
     'help_tokens.context_processor',
@@ -1496,8 +1498,8 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     # to redirected unenrolled students to the course info page
-    'courseware.middleware.CacheCourseIdMiddleware',
-    'courseware.middleware.RedirectMiddleware',
+    'lms.djangoapps.courseware.middleware.CacheCourseIdMiddleware',
+    'lms.djangoapps.courseware.middleware.RedirectMiddleware',
 
     'course_wiki.middleware.WikiAccessMiddleware',
 
@@ -2270,7 +2272,8 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.video_pipeline',
 
     # Our courseware
-    'courseware',
+    'lms.djangoapps.courseware',
+    'coursewarehistoryextended',
     'student.apps.StudentConfig',
 
     'static_template_view',
@@ -2498,7 +2501,10 @@ INSTALLED_APPS = [
 
     # edx-drf-extensions
     'csrf.apps.CsrfAppConfig',  # Enables frontend apps to retrieve CSRF tokens.
-    'xss_utils'
+    'xss_utils',
+
+    # so sample_task is available to celery workers
+    'openedx.core.djangoapps.heartbeat',
 ]
 
 ######################### CSRF #########################################
@@ -2531,6 +2537,9 @@ REST_FRAMEWORK = {
 SWAGGER_SETTINGS = {
     'DEFAULT_INFO': 'openedx.core.openapi.openapi_info',
 }
+
+# How long to cache OpenAPI schemas and UI, in seconds.
+OPENAPI_CACHE_TIMEOUT = 0
 
 ######################### MARKETING SITE ###############################
 EDXMKTG_LOGGED_IN_COOKIE_NAME = 'edxloggedin'

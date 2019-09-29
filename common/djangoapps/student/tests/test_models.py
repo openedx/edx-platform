@@ -17,7 +17,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.models import DynamicUpgradeDeadlineConfiguration
+from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
@@ -63,7 +63,7 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):
         self.assertIsNone(CourseEnrollment.generate_enrollment_status_hash(AnonymousUser()))
 
         # No enrollments
-        expected = hashlib.md5(self.user.username).hexdigest()
+        expected = hashlib.md5(self.user.username.encode('utf-8')).hexdigest()
         self.assertEqual(CourseEnrollment.generate_enrollment_status_hash(self.user), expected)
         self.assert_enrollment_status_hash_cached(self.user, expected)
 

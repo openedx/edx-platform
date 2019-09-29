@@ -242,8 +242,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         # Assert course sharing icons
         response = self.client.get(reverse('dashboard'))
-        self.assertEqual('Share on Twitter' in response.content, set_marketing or set_social_sharing)
-        self.assertEqual('Share on Facebook' in response.content, set_marketing or set_social_sharing)
+        self.assertEqual('Share on Twitter' in response.content.decode('utf-8'), set_marketing or set_social_sharing)
+        self.assertEqual('Share on Facebook' in response.content.decode('utf-8'), set_marketing or set_social_sharing)
 
     @patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
     def test_pre_requisites_appear_on_dashboard(self):
@@ -749,7 +749,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         schedule = ScheduleFactory(start=self.THREE_YEARS_AGO + timedelta(days=1), enrollment=enrollment)
 
         response = self.client.get(reverse('dashboard'))
-        dashboard_html = self._remove_whitespace_from_html_string(response.content)
+        dashboard_html = self._remove_whitespace_from_html_string(response.content.decode('utf-8'))
         access_expired_substring = 'Accessexpired'
         course_link_class = 'course-target-link'
 

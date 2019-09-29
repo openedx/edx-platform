@@ -93,8 +93,8 @@ from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_en
 <div class="ie-banner" aria-hidden="true">${Text(_('{begin_strong}Warning:{end_strong} Your browser is not fully supported. We strongly recommend using {chrome_link} or {ff_link}.')).format(
     begin_strong=HTML('<strong>'),
     end_strong=HTML('</strong>'),
-    chrome_link=HTML('<a href="https://www.google.com/chrome" target="_blank">Chrome</a>'),
-    ff_link=HTML('<a href="http://www.mozilla.org/firefox" target="_blank">Firefox</a>'),
+    chrome_link=HTML('<a href="https://www.google.com/chrome" rel="noopener" target="_blank">Chrome</a>'),
+    ff_link=HTML('<a href="http://www.mozilla.org/firefox" rel="noopener" target="_blank">Firefox</a>'),
 )}</div>
 <![endif]-->
 % endif

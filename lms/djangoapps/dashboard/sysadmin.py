@@ -31,7 +31,7 @@ from six import text_type
 
 import dashboard.git_import as git_import
 import track.views
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 from dashboard.git_import import GitImportError
 from dashboard.models import CourseImportLog
 from edxmako.shortcuts import render_to_response
@@ -261,7 +261,7 @@ class Courses(SysadminDashboardView):
         cmd = ['git', 'log', '-1',
                u'--format=format:{ "commit": "%H", "author": "%an %ae", "date": "%ad"}', ]
         try:
-            output_json = json.loads(subprocess.check_output(cmd, cwd=gdir))
+            output_json = json.loads(subprocess.check_output(cmd, cwd=gdir).decode('utf-8'))
             info = [output_json['commit'],
                     output_json['date'],
                     output_json['author'], ]

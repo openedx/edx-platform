@@ -14,6 +14,7 @@ import tempfile
 
 import ddt
 import pytest
+import six
 from boto.exception import BotoServerError
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -37,15 +38,15 @@ from testfixtures import LogCapture
 from bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.models import StudentModule
-from courseware.tests.factories import (
+from lms.djangoapps.courseware.models import StudentModule
+from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
     GlobalStaffFactory,
     InstructorFactory,
     StaffFactory,
     UserProfileFactory
 )
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
@@ -78,7 +79,6 @@ from shoppingcart.models import (
     PaidCourseRegistration,
     RegistrationCodeRedemption
 )
-from shoppingcart.pdf import PDFInvoice
 from student.models import (
     ALLOWEDTOENROLL_TO_ENROLLED,
     ALLOWEDTOENROLL_TO_UNENROLLED,
@@ -294,27 +294,30 @@ class TestCommonExceptions400(TestCase):
         self.request.is_ajax.return_value = False
         resp = view_user_doesnotexist(self.request)  # pylint: disable=assignment-from-no-return
         self.assertEqual(resp.status_code, 400)
-        self.assertIn("User does not exist", resp.content)
+        self.assertIn("User does not exist", resp.content.decode("utf-8"))
 
     def test_user_doesnotexist_ajax(self):
         self.request.is_ajax.return_value = True
         resp = view_user_doesnotexist(self.request)  # pylint: disable=assignment-from-no-return
         self.assertEqual(resp.status_code, 400)
-        self.assertIn("User does not exist", resp.content)
+        self.assertIn("User does not exist", resp.content.decode("utf-8"))
 
     @ddt.data(True, False)
     def test_alreadyrunningerror(self, is_ajax):
         self.request.is_ajax.return_value = is_ajax
         resp = view_alreadyrunningerror(self.request)  # pylint: disable=assignment-from-no-return
         self.assertEqual(resp.status_code, 400)
-        self.assertIn("Requested task is already running", resp.content)
+        self.assertIn("Requested task is already running", resp.content.decode("utf-8"))
 
     @ddt.data(True, False)
     def test_alreadyrunningerror_with_unicode(self, is_ajax):
         self.request.is_ajax.return_value = is_ajax
         resp = view_alreadyrunningerror_unicode(self.request)  # pylint: disable=assignment-from-no-return
         self.assertEqual(resp.status_code, 400)
-        self.assertIn('Text with unicode chárácters', resp.content)
+        self.assertIn(
+            u'Text with unicode chárácters',
+            resp.content.decode('utf-8')
+        )
 
     @ddt.data(True, False)
     def test_queue_connection_error(self, is_ajax):
@@ -324,7 +327,10 @@ class TestCommonExceptions400(TestCase):
         self.request.is_ajax.return_value = is_ajax
         resp = view_queue_connection_error(self.request)  # pylint: disable=assignment-from-no-return
         self.assertEqual(resp.status_code, 400)
-        self.assertIn('Error occured. Please try again later', resp.content)
+        self.assertIn(
+            'Error occured. Please try again later',
+            resp.content.decode('utf-8')
+        )
 
 
 @ddt.ddt
@@ -675,7 +681,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         """
         Happy path test to create a single new user
         """
-        csv_content = "test_student@example.com,test_student_1,tester1,USA"
+        csv_content = b"test_student@example.com,test_student_1,tester1,USA"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
@@ -696,7 +702,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         """
         Happy path test to create a single new user
         """
-        csv_content = "\ntest_student@example.com,test_student_1,tester1,USA\n\n"
+        csv_content = b"\ntest_student@example.com,test_student_1,tester1,USA\n\n"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
@@ -718,8 +724,8 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         If the email address and username already exists
         and the user is enrolled in the course, do nothing (including no email gets sent out)
         """
-        csv_content = "test_student@example.com,test_student_1,tester1,USA\n" \
-                      "test_student@example.com,test_student_1,tester2,US"
+        csv_content = b"test_student@example.com,test_student_1,tester1,USA\n" \
+                      b"test_student@example.com,test_student_1,tester2,US"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
@@ -748,7 +754,10 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
         self.assertNotEquals(len(data['general_errors']), 0)
-        self.assertEquals(data['general_errors'][0]['response'], 'Make sure that the file you upload is in CSV format with no extraneous characters or rows.')
+        self.assertEquals(
+            data['general_errors'][0]['response'],
+            'Make sure that the file you upload is in CSV format with no extraneous characters or rows.'
+        )
 
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 0)
@@ -771,7 +780,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         """
         Try uploading a CSV file which does not have the exact four columns of data
         """
-        csv_content = "test_student@example.com,test_student_1\n"
+        csv_content = b"test_student@example.com,test_student_1\n"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
@@ -788,8 +797,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         """
         Test failure case of a poorly formatted email field
         """
-        csv_content = "test_student.example.com,test_student_1,tester1,USA"
-
+        csv_content = b"test_student.example.com,test_student_1,tester1,USA"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
         data = json.loads(response.content.decode('utf-8'))
@@ -808,8 +816,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         If the email address and username already exists
         and the user is not enrolled in the course, enrolled him/her and iterate to next one.
         """
-        csv_content = "nonenrolled@test.com,NotEnrolledStudent,tester1,USA"
-
+        csv_content = b"nonenrolled@test.com,NotEnrolledStudent,tester1,USA"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
@@ -827,8 +834,8 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         If the email address already exists, but the username is different,
         assume it is the correct user and just register the user in the course.
         """
-        csv_content = "test_student@example.com,test_student_1,tester1,USA\n" \
-                      "test_student@example.com,test_student_2,tester2,US"
+        csv_content = b"test_student@example.com,test_student_1,tester1,USA\n" \
+                      b"test_student@example.com,test_student_2,tester2,US"
 
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
@@ -862,9 +869,8 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         user.is_active = False
         user.save()
 
-        csv_content = "{email},{username},tester,USA".format(email=conflicting_email, username='new_test_student')
-
-        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        csv_content = b"{email},{username},tester,USA".format(email=conflicting_email, username='new_test_student')
+        uploaded_file = SimpleUploadedFile("temp.csv", six.b(csv_content))
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode('utf-8'))
@@ -880,8 +886,8 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         If the username already exists (but not the email),
         assume it is a different user and fail to create the new account.
         """
-        csv_content = "test_student1@example.com,test_student_1,tester1,USA\n" \
-                      "test_student2@example.com,test_student_1,tester2,US"
+        csv_content = b"test_student1@example.com,test_student_1,tester1,USA\n" \
+                      b"test_student2@example.com,test_student_1,tester2,US"
 
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
 
@@ -895,8 +901,8 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         """
         Test when the user does not attach a file
         """
-        csv_content = "test_student1@example.com,test_student_1,tester1,USA\n" \
-                      "test_student2@example.com,test_student_1,tester2,US"
+        csv_content = b"test_student1@example.com,test_student_1,tester1,USA\n" \
+                      b"test_student2@example.com,test_student_1,tester2,US"
 
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
 
@@ -913,8 +919,8 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         """
         Test that exceptions are handled well
         """
-        csv_content = "test_student1@example.com,test_student_1,tester1,USA\n" \
-                      "test_student2@example.com,test_student_1,tester2,US"
+        csv_content = b"test_student1@example.com,test_student_1,tester1,USA\n" \
+                      b"test_student2@example.com,test_student_1,tester2,US"
 
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         with patch('lms.djangoapps.instructor.views.api.create_manual_course_enrollment') as mock:
@@ -947,10 +953,10 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         user.is_active = False
         user.save()
 
-        csv_content = "test_student1@example.com,test_student_1,tester1,USA\n" \
-                      "test_student3@example.com,test_student_1,tester3,CA\n" \
-                      "test_student4@example.com,test_student_4,tester4,USA\n" \
-                      "test_student2@example.com,test_student_2,tester2,USA"
+        csv_content = b"test_student1@example.com,test_student_1,tester1,USA\n" \
+                      b"test_student3@example.com,test_student_1,tester3,CA\n" \
+                      b"test_student4@example.com,test_student_4,tester4,USA\n" \
+                      b"test_student2@example.com,test_student_2,tester2,USA"
 
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
@@ -985,7 +991,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
 
     @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': False})
     def test_allow_automated_signups_flag_not_set(self):
-        csv_content = "test_student1@example.com,test_student_1,tester1,USA"
+        csv_content = b"test_student1@example.com,test_student_1,tester1,USA"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEquals(response.status_code, 403)
@@ -1001,7 +1007,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         # Login Audit Course instructor
         self.client.login(username=self.audit_course_instructor.username, password='test')
 
-        csv_content = "test_student_wl@example.com,test_student_wl,Test Student,USA"
+        csv_content = b"test_student_wl@example.com,test_student_wl,Test Student,USA"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.audit_course_url, {'students_list': uploaded_file})
 
@@ -1032,7 +1038,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         # Login Audit Course instructor
         self.client.login(username=self.white_label_course_instructor.username, password='test')
 
-        csv_content = "test_student_wl@example.com,test_student_wl,Test Student,USA"
+        csv_content = b"test_student_wl@example.com,test_student_wl,Test Student,USA"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.white_label_course_url, {'students_list': uploaded_file})
 
@@ -1058,7 +1064,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         # Login white label course instructor
         self.client.login(username=self.white_label_course_instructor.username, password='test')
 
-        csv_content = "test_student_wl@example.com,test_student_wl,Test Student,USA"
+        csv_content = b"test_student_wl@example.com,test_student_wl,Test Student,USA"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.white_label_course_url, {'students_list': uploaded_file})
 
@@ -2637,7 +2643,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content)
+        self.assertIn('Activate Course Enrollment', response.content.decode('utf-8'))
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
@@ -2667,7 +2673,10 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
         # Now invalidate the same invoice number and expect an Bad request
         response = self.assert_request_status_code(400, url, method="POST", data=data)
-        self.assertIn("The sale associated with this invoice has already been invalidated.", response.content)
+        self.assertIn(
+            "The sale associated with this invoice has already been invalidated.",
+            response.content.decode('utf-8')
+        )
 
         # now re_validate the invoice number
         data['event_type'] = "re_validate"
@@ -2675,20 +2684,23 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
         # Now re_validate the same active invoice number and expect an Bad request
         response = self.assert_request_status_code(400, url, method="POST", data=data)
-        self.assertIn("This invoice is already active.", response.content)
+        self.assertIn("This invoice is already active.", response.content.decode('utf-8'))
 
         test_data_2 = {'invoice_number': self.sale_invoice_1.id}
         response = self.assert_request_status_code(400, url, method="POST", data=test_data_2)
-        self.assertIn("Missing required event_type parameter", response.content)
+        self.assertIn("Missing required event_type parameter", response.content.decode('utf-8'))
 
         test_data_3 = {'event_type': "re_validate"}
         response = self.assert_request_status_code(400, url, method="POST", data=test_data_3)
-        self.assertIn("Missing required invoice_number parameter", response.content)
+        self.assertIn("Missing required invoice_number parameter", response.content.decode('utf-8'))
 
         # submitting invalid invoice number
         data['invoice_number'] = 'testing'
         response = self.assert_request_status_code(400, url, method="POST", data=data)
-        self.assertIn(u"invoice_number must be an integer, {value} provided".format(value=data['invoice_number']), response.content)
+        self.assertIn(
+            u"invoice_number must be an integer, {value} provided".format(value=data['invoice_number']),
+            response.content.decode('utf-8')
+        )
 
     def test_get_sale_order_records_features_csv(self):
         """
@@ -2732,11 +2744,11 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         sale_order_url = reverse('get_sale_order_records', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(sale_order_url)
         self.assertEqual(response['Content-Type'], 'text/csv')
-        self.assertIn('36', response.content.split('\r\n')[1])
-        self.assertIn(str(item.unit_cost), response.content.split('\r\n')[1],)
-        self.assertIn(str(item.list_price), response.content.split('\r\n')[1],)
-        self.assertIn(item.status, response.content.split('\r\n')[1],)
-        self.assertIn(coupon_redemption[0].coupon.code, response.content.split('\r\n')[1],)
+        self.assertIn('36', response.content.decode('utf-8').split('\r\n')[1])
+        self.assertIn(str(item.unit_cost), response.content.decode('utf-8').split('\r\n')[1],)
+        self.assertIn(str(item.list_price), response.content.decode('utf-8').split('\r\n')[1],)
+        self.assertIn(item.status, response.content.decode('utf-8').split('\r\n')[1],)
+        self.assertIn(coupon_redemption[0].coupon.code, response.content.decode('utf-8').split('\r\n')[1],)
 
     def test_coupon_redeem_count_in_ecommerce_section(self):
         """
@@ -2770,8 +2782,8 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         # check that the coupon redeem count should be 0
         resp = self.client.get(instructor_dashboard)
         self.assertEqual(resp.status_code, 200)
-        self.assertIn('Number Redeemed', resp.content)
-        self.assertIn('<td>0</td>', resp.content)
+        self.assertIn('Number Redeemed', resp.content.decode('utf-8'))
+        self.assertIn('<td>0</td>', resp.content.decode('utf-8'))
 
         # now make the payment of your cart items
         self.cart.purchase()
@@ -2780,8 +2792,8 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         resp = self.client.get(instructor_dashboard)
         self.assertEqual(resp.status_code, 200)
 
-        self.assertIn('Number Redeemed', resp.content)
-        self.assertIn('<td>1</td>', resp.content)
+        self.assertIn('Number Redeemed', resp.content.decode('utf-8'))
+        self.assertIn('<td>1</td>', resp.content.decode('utf-8'))
 
     def test_get_sale_records_features_csv(self):
         """
@@ -2980,7 +2992,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             response = self.client.post(url, {})
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn(already_running_status, response.content)
+        self.assertIn(already_running_status, response.content.decode('utf-8'))
 
     def test_get_students_features(self):
         """
@@ -3059,7 +3071,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             submit_task_function.side_effect = error
             response = self.client.post(url, {})
         self.assertEqual(response.status_code, 400)
-        self.assertIn(already_running_status, response.content)
+        self.assertIn(already_running_status, response.content.decode('utf-8'))
 
     def test_get_student_exam_results(self):
         """
@@ -3082,7 +3094,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             submit_task_function.side_effect = error
             response = self.client.post(url, {})
             self.assertEqual(response.status_code, 400)
-            self.assertIn(already_running_status, response.content)
+            self.assertIn(already_running_status, response.content.decode('utf-8'))
 
     def test_access_course_finance_admin_with_invalid_course_key(self):
         """
@@ -3166,7 +3178,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         self.client.login(username=self.instructor.username, password='test')
         url = reverse('get_enrollment_report', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, {})
-        self.assertIn('The detailed enrollment report is being created.', response.content)
+        self.assertIn('The detailed enrollment report is being created.', response.content.decode('utf-8'))
 
     def test_bulk_purchase_detailed_report(self):
         """
@@ -3221,7 +3233,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
         url = reverse('get_enrollment_report', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, {})
-        self.assertIn('The detailed enrollment report is being created.', response.content)
+        self.assertIn('The detailed enrollment report is being created.', response.content.decode('utf-8'))
 
     def test_create_registration_code_without_invoice_and_order(self):
         """
@@ -3243,7 +3255,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
         url = reverse('get_enrollment_report', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, {})
-        self.assertIn('The detailed enrollment report is being created.', response.content)
+        self.assertIn('The detailed enrollment report is being created.', response.content.decode('utf-8'))
 
     def test_invoice_payment_is_still_pending_for_registration_codes(self):
         """
@@ -3268,7 +3280,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
         url = reverse('get_enrollment_report', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, {})
-        self.assertIn('The detailed enrollment report is being created.', response.content)
+        self.assertIn('The detailed enrollment report is being created.', response.content.decode('utf-8'))
 
     @patch('lms.djangoapps.instructor.views.api.anonymous_id_for_user', Mock(return_value='42'))
     @patch('lms.djangoapps.instructor.views.api.unique_id_for_user', Mock(return_value='41'))
@@ -3279,7 +3291,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         url = reverse('get_anon_ids', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, {})
         self.assertEqual(response['Content-Type'], 'text/csv')
-        body = response.content.replace('\r', '')
+        body = response.content.decode("utf-8").replace('\r', '')
         self.assertTrue(body.startswith(
             '"User ID","Anonymized User ID","Course Specific Anonymized User ID"'
             '\n"{user_id}","41","42"\n'.format(user_id=self.students[0].id)
@@ -3348,11 +3360,11 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
             if report_type == 'problem responses':
                 response = self.client.post(url, {'problem_location': ''})
-                self.assertIn(success_status, response.content)
+                self.assertIn(success_status, response.content.decode('utf-8'))
             else:
                 CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
                 response = self.client.post(url, {})
-                self.assertIn(success_status, response.content)
+                self.assertIn(success_status, response.content.decode('utf-8'))
 
     @ddt.data(*EXECUTIVE_SUMMARY_DATA)
     @ddt.unpack
@@ -3374,7 +3386,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         success_status = u"The {report_type} report is being created." \
                          " To view the status of the report, see Pending" \
                          " Tasks below".format(report_type=report_type)
-        self.assertIn(success_status, response.content)
+        self.assertIn(success_status, response.content.decode('utf-8'))
 
     @ddt.data(*EXECUTIVE_SUMMARY_DATA)
     @ddt.unpack
@@ -3397,7 +3409,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             response = self.client.post(url, {})
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn(already_running_status, response.content)
+        self.assertIn(already_running_status, response.content.decode('utf-8'))
 
     def test_get_ora2_responses_success(self):
         url = reverse('export_ora2_data', kwargs={'course_id': text_type(self.course.id)})
@@ -3406,7 +3418,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             mock_submit_ora2_task.return_value = True
             response = self.client.post(url, {})
         success_status = "The ORA data report is being created."
-        self.assertIn(success_status, response.content)
+        self.assertIn(success_status, response.content.decode('utf-8'))
 
     def test_get_ora2_responses_already_running(self):
         url = reverse('export_ora2_data', kwargs={'course_id': text_type(self.course.id)})
@@ -3418,12 +3430,12 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             response = self.client.post(url, {})
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn(already_running_status, response.content)
+        self.assertIn(already_running_status, response.content.decode('utf-8'))
 
     def test_get_student_progress_url(self):
         """ Test that progress_url is in the successful response. """
         url = reverse('get_student_progress_url', kwargs={'course_id': text_type(self.course.id)})
-        data = {'unique_student_identifier': self.students[0].email.encode("utf-8")}
+        data = {'unique_student_identifier': self.students[0].email}
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content.decode('utf-8'))
@@ -3432,7 +3444,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
     def test_get_student_progress_url_from_uname(self):
         """ Test that progress_url is in the successful response. """
         url = reverse('get_student_progress_url', kwargs={'course_id': text_type(self.course.id)})
-        data = {'unique_student_identifier': self.students[0].username.encode("utf-8")}
+        data = {'unique_student_identifier': self.students[0].username}
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content.decode('utf-8'))
@@ -4902,7 +4914,7 @@ class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
         response = self.client.post(url, data, **{'HTTP_HOST': 'localhost'})
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
-        body = response.content.replace('\r', '')
+        body = response.content.decode('utf-8').replace('\r', '')
         self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 17)
 
@@ -4925,7 +4937,7 @@ class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
 
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
-        body = response.content.replace('\r', '')
+        body = response.content.decode('utf-8').replace('\r', '')
         self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 17)
         rows = body.split('\n')
@@ -4960,7 +4972,7 @@ class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
         response = self.client.post(url, data, **{'HTTP_HOST': 'localhost'})
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
-        body = response.content.replace('\r', '')
+        body = response.content.decode('utf-8').replace('\r', '')
         self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 5)  # 1 for headers, 1 for new line at the end and 3 for the actual data
 
@@ -4984,7 +4996,7 @@ class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
         response = self.client.post(url, data, **{'HTTP_HOST': 'localhost'})
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
-        body = response.content.replace('\r', '')
+        body = response.content.decode('utf-8').replace('\r', '')
         self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 4)
 
@@ -4999,7 +5011,7 @@ class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
-        body = response.content.replace('\r', '')
+        body = response.content.decode('utf-8').replace('\r', '')
 
         self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
 
@@ -5037,7 +5049,7 @@ class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
-        body = response.content.replace('\r', '')
+        body = response.content.decode('utf-8').replace('\r', '')
         self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 11)
 
@@ -5052,7 +5064,7 @@ class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
-        body = response.content.replace('\r', '')
+        body = response.content.decode('utf-8').replace('\r', '')
         self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 9)
 
@@ -5075,7 +5087,7 @@ class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
-        body = response.content.replace('\r', '')
+        body = response.content.decode('utf-8').replace('\r', '')
         self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 11)
 
@@ -5091,7 +5103,7 @@ class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
-        body = response.content.replace('\r', '')
+        body = response.content.decode('utf-8').replace('\r', '')
         self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 14)
 
@@ -5114,28 +5126,9 @@ class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
-        body = response.content.replace('\r', '')
+        body = response.content.decode('utf-8').replace('\r', '')
         self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 11)
-
-    def test_pdf_file_throws_exception(self):
-        """
-        test to mock the pdf file generation throws an exception
-        when generating registration codes.
-        """
-        generate_code_url = reverse(
-            'generate_registration_codes', kwargs={'course_id': text_type(self.course.id)}
-        )
-        data = {
-            'total_registration_codes': 9, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
-            'company_contact_email': 'Test@company.com', 'unit_price': 122.45, 'recipient_name': 'Test123',
-            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
-            'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
-            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
-        }
-        with patch.object(PDFInvoice, 'generate_pdf', side_effect=Exception):
-            response = self.client.post(generate_code_url, data)
-            self.assertEqual(response.status_code, 200, response.content)
 
     def test_get_codes_with_sale_invoice(self):
         """
@@ -5162,7 +5155,7 @@ class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
-        body = response.content.replace('\r', '')
+        body = response.content.decode('utf-8').replace('\r', '')
         self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
 
     def test_with_invalid_unit_price(self):
@@ -5182,8 +5175,8 @@ class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
         }
 
         response = self.client.post(generate_code_url, data, **{'HTTP_HOST': 'localhost'})
-        self.assertEqual(response.status_code, 400, response.content)
-        self.assertIn('Could not parse amount as', response.content)
+        self.assertEqual(response.status_code, 400, response.content.decode('utf-8'))
+        self.assertIn('Could not parse amount as', response.content.decode('utf-8'))
 
     def test_get_historical_coupon_codes(self):
         """
@@ -5224,11 +5217,11 @@ class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
                     code_redeemed_count="0",
                     total_discounted_seats="0",
                     total_discounted_amount="0",
-                ), response.content
+                ), response.content.decode("utf-8")
             )
 
         self.assertEqual(response['Content-Type'], 'text/csv')
-        body = response.content.replace('\r', '')
+        body = response.content.decode('utf-8').replace('\r', '')
         self.assertTrue(body.startswith(EXPECTED_COUPON_CSV_HEADER))
 
 
@@ -5255,7 +5248,7 @@ class TestBulkCohorting(SharedModuleStoreTestCase):
         # this temporary file will be removed in `self.tearDown()`
         __, file_name = tempfile.mkstemp(suffix=suffix, dir=self.tempdir)
         with open(file_name, 'w') as file_pointer:
-            file_pointer.write(csv_data.encode('utf-8'))
+            file_pointer.write(csv_data)
         with open(file_name, 'r') as file_pointer:
             url = reverse('add_users_to_cohorts', kwargs={'course_id': text_type(self.course.id)})
             return self.client.post(url, {'uploaded-file': file_pointer})

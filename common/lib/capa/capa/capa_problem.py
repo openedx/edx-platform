@@ -22,6 +22,7 @@ from collections import OrderedDict
 from copy import deepcopy
 from datetime import datetime
 from xml.sax.saxutils import unescape
+from openedx.core.lib.edx_six import get_gettext
 
 import six
 from lxml import etree
@@ -34,6 +35,7 @@ import capa.xqueue_interface as xqueue_interface
 from capa.correctmap import CorrectMap
 from capa.safe_exec import safe_exec
 from capa.util import contextualize_text, convert_files_to_filenames
+from django.utils.encoding import python_2_unicode_compatible
 from openedx.core.djangolib.markup import HTML, Text
 from xmodule.stringify import stringify_children
 
@@ -126,6 +128,7 @@ class LoncapaSystem(object):
         self.matlab_api_key = matlab_api_key
 
 
+@python_2_unicode_compatible
 class LoncapaProblem(object):
     """
     Main class for capa Problems.
@@ -182,6 +185,9 @@ class LoncapaProblem(object):
         self.problem_text = problem_text
 
         # parse problem XML file into an element tree
+        if isinstance(problem_text, six.text_type):
+            # etree chokes on Unicode XML with an encoding declaration
+            problem_text = problem_text.encode('utf-8')
         self.tree = etree.XML(problem_text)
 
         self.make_xml_compatible(self.tree)
@@ -283,7 +289,7 @@ class LoncapaProblem(object):
 
         self.student_answers = initial_answers
 
-    def __unicode__(self):
+    def __str__(self):
         return u"LoncapaProblem ({0})".format(self.problem_id)
 
     def get_state(self):
@@ -643,7 +649,7 @@ class LoncapaProblem(object):
         choice-level explanations shown to a student after submission.
         Does nothing if there is no targeted-feedback attribute.
         """
-        _ = self.capa_system.i18n.ugettext
+        _ = get_gettext(self.capa_system.i18n)
         # Note that the modifications has been done, avoiding problems if called twice.
         if hasattr(self, 'has_targeted'):
             return
@@ -759,7 +765,7 @@ class LoncapaProblem(object):
         """
         includes = self.tree.findall('.//include')
         for inc in includes:
-            filename = inc.get('file').decode('utf-8')
+            filename = inc.get('file') if six.PY3 else inc.get('file').decode('utf-8')
             if filename is not None:
                 try:
                     # open using LoncapaSystem OSFS filestore

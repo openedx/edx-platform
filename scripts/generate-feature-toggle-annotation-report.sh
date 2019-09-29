@@ -7,6 +7,6 @@
 
 pip install -r requirements/edx/paver.txt -r requirements/edx/testing.txt
 rm -Rf reports/*
-code_annotations static_find_annotations --config_file=../$CODE_ANNOTATION_CONFIG_PATH --no_lint
-mkdir -p ../$CODE_ANNOTATION_OUTPUT_PATH
-cp reports/* ../$CODE_ANNOTATION_OUTPUT_PATH/lms-annotations.yml
+code_annotations static_find_annotations --config_file=../$CODE_ANNOTATION_CONFIG_PATH
+mkdir -p ../$SCRIPT_OUTPUT_PATH
+cp reports/* ../$SCRIPT_OUTPUT_PATH/lms-annotations.yml

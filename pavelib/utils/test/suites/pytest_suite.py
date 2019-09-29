@@ -180,7 +180,7 @@ class SystemTestSuite(PytestSuite):
                 xdist_remote_processes = self.processes
             for ip in self.xdist_ip_addresses.split(','):
                 # Propogate necessary env vars to xdist containers
-                env_var_cmd = u'export DJANGO_SETTINGS_MODULE={} DISABLE_COURSEENROLLMENT_HISTORY={}'\
+                env_var_cmd = u'export DJANGO_SETTINGS_MODULE={} DISABLE_COURSEENROLLMENT_HISTORY={} PYTHONHASHSEED=0'\
                     .format('{}.envs.{}'.format(self.root, self.settings),
                             self.disable_courseenrollment_history)
                 xdist_string = u'--tx {}*ssh="jenkins@{} -o StrictHostKeyChecking=no"' \

@@ -5,6 +5,7 @@ Video xmodule tests in mongo.
 
 from __future__ import absolute_import
 
+import io
 import json
 import shutil
 from collections import OrderedDict
@@ -1310,7 +1311,7 @@ class TestEditorSavedMethod(BaseTestVideoXBlock):
         self.MODULESTORE = MODULESTORES[default_store]  # pylint: disable=invalid-name
         self.initialize_block(metadata=self.metadata)
         item = self.store.get_item(self.item_descriptor.location)
-        with open(self.file_path, "r") as myfile:
+        with open(self.file_path, "rb") as myfile:  # pylint: disable=open-builtin
             save_to_store(myfile.read(), self.file_name, 'text/sjson', item.location)
         item.sub = "3_yD_cEKoCk"
         # subs_video.srt.sjson does not exist before calling editor_saved function
@@ -1330,7 +1331,7 @@ class TestEditorSavedMethod(BaseTestVideoXBlock):
         self.MODULESTORE = MODULESTORES[default_store]
         self.initialize_block(metadata=self.metadata)
         item = self.store.get_item(self.item_descriptor.location)
-        with open(self.file_path, "r") as myfile:
+        with open(self.file_path, "rb") as myfile:  # pylint: disable=open-builtin
             save_to_store(myfile.read(), self.file_name, 'text/sjson', item.location)
             save_to_store(myfile.read(), 'subs_video.srt.sjson', 'text/sjson', item.location)
         item.sub = "3_yD_cEKoCk"
@@ -1687,9 +1688,10 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         self.assertEqual([transcript_file_name], self.file_system.listdir(EXPORT_IMPORT_STATIC_DIR))
 
         # Also verify the content of created transcript file.
-        expected_transcript_content = File(open(expected_transcript_path)).read()
+        expected_transcript_content = File(io.open(expected_transcript_path)).read()
         transcript = get_video_transcript_data(video_id=self.descriptor.edx_video_id, language_code=language_code)
-        self.assertEqual(transcript['content'], expected_transcript_content)
+
+        self.assertEqual(transcript['content'].decode('utf-8'), expected_transcript_content)
 
     @ddt.data(
         (['en', 'da'], 'test_sub', ''),
@@ -1747,9 +1749,10 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
                 combine(self.temp_dir, EXPORT_IMPORT_COURSE_DIR),
                 combine(EXPORT_IMPORT_STATIC_DIR, expected_transcripts[language])
             )
-            expected_transcript_content = File(open(expected_transcript_path)).read()
+            expected_transcript_content = File(io.open(expected_transcript_path)).read()
             transcript = get_video_transcript_data(video_id=self.descriptor.edx_video_id, language_code=language)
-            self.assertEqual(transcript['content'], expected_transcript_content)
+
+            self.assertEqual(transcript['content'].decode('utf-8'), expected_transcript_content)
 
     def test_export_val_data_not_found(self):
         """

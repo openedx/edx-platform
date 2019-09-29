@@ -1,17 +1,20 @@
 """
 Signal handlers for program enrollments
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import logging
+
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from social_django.models import UserSocialAuth
-from lms.djangoapps.program_enrollments.models import ProgramEnrollment
+
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_LMS_MISC
-from student.models import CourseEnrollmentException
 from third_party_auth.models import SAMLProviderConfig
+
+from .api import fetch_program_enrollments_by_student, link_program_enrollment_to_lms_user
+from .models import ProgramEnrollment
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +40,7 @@ def listen_for_social_auth_creation(sender, instance, created, **kwargs):  # pyl
         matriculate_learner(instance.user, instance.uid)
     except Exception as e:
         logger.warning(
-            u'Unable to link waiting enrollments for user %s, social auth creation failed: %s',
+            'Unable to link waiting enrollments for user %s, social auth creation failed: %s',
             instance.user.id,
             e,
         )
@@ -59,22 +62,24 @@ def matriculate_learner(user, uid):
         if not authorizing_org:
             return
     except (AttributeError, ValueError):
-        logger.info(u'Ignoring non-saml social auth entry for user=%s', user.id)
+        logger.info('Ignoring non-saml social auth entry for user=%s', user.id)
         return
     except SAMLProviderConfig.DoesNotExist:
-        logger.warning(u'Got incoming social auth for provider=%s but no such provider exists', provider_slug)
+        logger.warning(
+            'Got incoming social auth for provider=%s but no such provider exists', provider_slug
+        )
         return
     except SAMLProviderConfig.MultipleObjectsReturned:
         logger.warning(
-            u'Unable to activate waiting enrollments for user=%s.'
-            u'  Multiple active SAML configurations found for slug=%s. Expected one.',
+            'Unable to activate waiting enrollments for user=%s.'
+            '  Multiple active SAML configurations found for slug=%s. Expected one.',
             user.id,
             provider_slug)
         return
 
-    incomplete_enrollments = ProgramEnrollment.objects.filter(
+    incomplete_enrollments = fetch_program_enrollments_by_student(
         external_user_key=external_user_key,
-        user=None,
+        waiting_only=True,
     ).prefetch_related('program_course_enrollments')
 
     for enrollment in incomplete_enrollments:
@@ -84,22 +89,9 @@ def matriculate_learner(user, uid):
                 continue
         except (KeyError, TypeError):
             logger.warning(
-                u'Failed to complete waiting enrollments for organization=%s.'
-                u' No catalog programs with matching authoring_organization exist.',
+                'Failed to complete waiting enrollments for organization=%s.'
+                ' No catalog programs with matching authoring_organization exist.',
                 authorizing_org.short_name
             )
             continue
-
-        enrollment.user = user
-        enrollment.save()
-        for program_course_enrollment in enrollment.program_course_enrollments.all():
-            try:
-                program_course_enrollment.enroll(user)
-            except CourseEnrollmentException as e:
-                logger.warning(
-                    u'Failed to enroll user=%s with waiting program_course_enrollment=%s: %s',
-                    user.id,
-                    program_course_enrollment.id,
-                    e,
-                )
-                raise e
+        link_program_enrollment_to_lms_user(enrollment, user)

@@ -21,8 +21,8 @@ from oauth2_provider.models import Application
 from opaque_keys.edx.keys import UsageKey
 from requests.exceptions import RequestException
 
-from courseware.access import has_access
-from courseware.courses import get_current_child
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_current_child
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from edxnotes.plugins import EdxNotesTab
 from lms.lib.utils import get_parent_unit
@@ -93,7 +93,7 @@ def send_request(user, course_id, page, page_size, path="", text=None):
     url = get_internal_endpoint(path)
     params = {
         "user": anonymous_id_for_user(user, None),
-        "course_id": six.text_type(course_id).encode("utf-8"),
+        "course_id": six.text_type(course_id),
         "page": page,
         "page_size": page_size,
     }
@@ -344,7 +344,7 @@ def get_notes(request, course, page=DEFAULT_PAGE, page_size=DEFAULT_PAGE_SIZE, t
     response = send_request(request.user, course.id, page, page_size, path, text)
 
     try:
-        collection = json.loads(response.content.decode('utf-8'))
+        collection = json.loads(response.content)
     except ValueError:
         log.error(u"Invalid JSON response received from notes api: response_content=%s", response.content)
         raise EdxNotesParseError(_("Invalid JSON response received from notes api."))

@@ -8,8 +8,8 @@ from __future__ import absolute_import
 from opaque_keys.edx.keys import CourseKey
 from search.initializer import SearchInitializer
 
-from courseware.access import has_access
-from courseware.masquerade import setup_masquerade
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.masquerade import setup_masquerade
 
 
 class LmsSearchInitializer(SearchInitializer):

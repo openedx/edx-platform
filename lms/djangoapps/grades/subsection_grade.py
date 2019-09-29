@@ -167,21 +167,39 @@ class NonZeroSubsectionGrade(six.with_metaclass(ABCMeta, SubsectionGradeBase)):
             csm_scores,
             persisted_block=None,
     ):
+        # TODO: Remove as part of EDUCATOR-4602.
+        if str(block_key.course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+            log.info(u'Computing block score for block: ***{}*** in course: ***{}***.'.format(
+                str(block_key),
+                str(block_key.course_key),
+            ))
         try:
             block = course_structure[block_key]
         except KeyError:
+            # TODO: Remove as part of EDUCATOR-4602.
+            if str(block_key.course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+                log.info(u'User\'s access to block: ***{}*** in course: ***{}*** has changed. '
+                         u'No block score calculated.'.format(str(block_key), str(block_key.course_key)))
             # It's possible that the user's access to that
             # block has changed since the subsection grade
             # was last persisted.
-            pass
         else:
             if getattr(block, 'has_score', False):
+                # TODO: Remove as part of EDUCATOR-4602.
+                if str(block_key.course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+                    log.info(u'Block: ***{}*** in course: ***{}*** HAS has_score attribute. Continuing.'
+                             .format(str(block_key), str(block_key.course_key)))
                 return get_score(
                     submissions_scores,
                     csm_scores,
                     persisted_block,
                     block,
                 )
+            # TODO: Remove as part of EDUCATOR-4602.
+            if str(block_key.course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
+                log.info(u'Block: ***{}*** in course: ***{}*** DOES NOT HAVE has_score attribute. '
+                         u'No block score calculated.'
+                         .format(str(block_key), str(block_key.course_key)))
 
     @staticmethod
     def _aggregated_score_from_model(grade_model, is_graded):

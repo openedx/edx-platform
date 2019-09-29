@@ -70,7 +70,7 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.video_pipeline',
     'openedx.core.djangoapps.bookmarks.apps.BookmarksConfig',
     'edxval',
-    'courseware',
+    'lms.djangoapps.courseware',
     'student',
     'openedx.core.djangoapps.site_configuration',
     'lms.djangoapps.grades.apps.GradesConfig',
@@ -115,3 +115,5 @@ USE_TZ = True
 
 RETIREMENT_SERVICE_WORKER_USERNAME = 'RETIREMENT_SERVICE_USER'
 RETIRED_USERNAME_PREFIX = 'retired__user_'
+
+PROCTORING_SETTINGS = {}

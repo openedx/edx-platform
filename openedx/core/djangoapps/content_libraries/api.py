@@ -9,15 +9,14 @@ import attr
 from django.core.validators import validate_unicode_slug
 from django.db import IntegrityError
 from lxml import etree
+from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryLocatorV2, LibraryUsageLocatorV2
 from organizations.models import Organization
 import six
 from xblock.core import XBlock
 from xblock.exceptions import XBlockNotFoundError
 
-from cms.djangoapps.contentstore.views.helpers import xblock_type_display_name
 from openedx.core.djangoapps.content_libraries.library_bundle import LibraryBundle
 from openedx.core.djangoapps.xblock.api import get_block_display_name, load_block
-from openedx.core.djangoapps.xblock.learning_context.keys import BundleDefinitionLocator
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
 from openedx.core.djangoapps.xblock.runtime.olx_parsing import XBlockInclude
 from openedx.core.lib.blockstore_api import (
@@ -33,7 +32,6 @@ from openedx.core.lib.blockstore_api import (
     delete_draft,
 )
 from openedx.core.djangolib.blockstore_cache import BundleCache
-from .keys import LibraryLocatorV2, LibraryUsageLocatorV2
 from .models import ContentLibrary, ContentLibraryPermission
 
 log = logging.getLogger(__name__)
@@ -272,10 +270,10 @@ def get_library_block(usage_key):
     """
     assert isinstance(usage_key, LibraryUsageLocatorV2)
     lib_context = get_learning_context_impl(usage_key)
-    def_key = lib_context.definition_for_usage(usage_key)
+    def_key = lib_context.definition_for_usage(usage_key, force_draft=DRAFT_NAME)
     if def_key is None:
         raise ContentLibraryBlockNotFound(usage_key)
-    lib_bundle = LibraryBundle(usage_key.library_slug, def_key.bundle_uuid, draft_name=DRAFT_NAME)
+    lib_bundle = LibraryBundle(usage_key.lib_key, def_key.bundle_uuid, draft_name=DRAFT_NAME)
     return LibraryXBlockMetadata(
         usage_key=usage_key,
         def_key=def_key,
@@ -337,8 +335,7 @@ def create_library_block(library_key, block_type, definition_id):
     # Make sure the new ID is not taken already:
     new_usage_id = definition_id  # Since this is a top level XBlock, usage_id == definition_id
     usage_key = LibraryUsageLocatorV2(
-        library_org=library_key.org,
-        library_slug=library_key.slug,
+        lib_key=library_key,
         block_type=block_type,
         usage_id=new_usage_id,
     )
@@ -443,6 +440,10 @@ def get_allowed_block_types(library_key):  # pylint: disable=unused-argument
     library. For now, the result is the same regardless of which library is
     specified, but that may change in the future.
     """
+    # This import breaks in the LMS so keep it here. The LMS doesn't generally
+    # use content libraries APIs directly but some tests may want to use them to
+    # create libraries and then test library learning or course-library integration.
+    from cms.djangoapps.contentstore.views.helpers import xblock_type_display_name
     # TODO: return support status and template options
     # See cms/djangoapps/contentstore/views/component.py
     block_types = sorted(name for name, class_ in XBlock.load_classes())

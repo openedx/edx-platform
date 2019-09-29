@@ -85,8 +85,8 @@ def randomization_bin(seed, problem_id):
     we'll combine the system's per-student seed with the problem id in picking the bin.
     """
     r_hash = hashlib.sha1()
-    r_hash.update(str(seed))
-    r_hash.update(str(problem_id))
+    r_hash.update(six.b(str(seed)))
+    r_hash.update(six.b(str(problem_id)))
     # get the first few digits of the hash, convert to an int, then mod.
     return int(r_hash.hexdigest()[:7], 16) % NUM_RANDOMIZATION_BINS
 
@@ -294,7 +294,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         except Exception as err:  # pylint: disable=broad-except
             msg = u'cannot create LoncapaProblem {loc}: {err}'.format(
                 loc=text_type(self.location), err=err)
-            six.reraise(Exception(msg), None, sys.exc_info()[2])
+            six.reraise(Exception, Exception(msg), sys.exc_info()[2])
 
         if self.score is None:
             self.set_score(self.score_from_lcp(lcp))

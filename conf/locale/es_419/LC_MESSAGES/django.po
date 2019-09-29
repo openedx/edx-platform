@@ -119,6 +119,7 @@
 # Anthony Mangano <amangano@edx.org>, 2017
 # Antonio Pardo <apardo@alabs.org>, 2013
 # Antonio Pardo <apardo@alabs.org>, 2013
+# Ben Holt <bholt@edx.org>, 2019
 # Benjy Malca Bautista <bnmalcabis@gmail.com>, 2015
 # Cristian Salamea <ovnicraft@gmail.com>, 2013-2016
 # morsoinferno <cristobal.acosta@usach.cl>, 2014-2015
@@ -150,6 +151,7 @@
 # camilomaiden <inactive+camilomaiden@transifex.com>, 2014
 # Luis Benites <lbenitesanchez@gmail.com>, 2016
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
+# Luis Manuel Moreno <luis.moreno@edunext.co>, 2019
 # Luis Moreno <morenoluisma@gmail.com>, 2017
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013-2014
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
@@ -247,7 +249,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-01 20:42+0000\n"
+"POT-Creation-Date: 2019-09-15 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -1140,6 +1142,8 @@ msgstr ""
 msgid ""
 "Your previous request is in progress, please try again in a few moments."
 msgstr ""
+"Su solicitud anterior está en progreso, por favor intente de nuevo en unos "
+"minutos."
 
 #: common/djangoapps/student/views/management.py
 msgid "Some error occured during password change. Please try again"
@@ -8681,10 +8685,6 @@ msgstr ""
 "está vacío, el bloque estará visible para todos los estudiantes. Este campo "
 "se ignorará si el bloque solo es visible para el equipo del curso."
 
-#: lms/djangoapps/notes/views.py lms/templates/notes.html
-msgid "My Notes"
-msgstr "Mis notas"
-
 #: lms/djangoapps/program_enrollments/models.py
 msgid "One of user or external_user_key must not be null."
 msgstr ""
@@ -9611,6 +9611,15 @@ msgstr "Inscripciones Basadas en Características"
 msgid "View feature based enrollment settings"
 msgstr "Ver configuración de Inscripción basada en características"
 
+#: lms/djangoapps/support/views/index.py
+#: lms/templates/support/link_program_enrollments.html
+msgid "Link Program Enrollments"
+msgstr ""
+
+#: lms/djangoapps/support/views/index.py
+msgid "Link LMS users to program enrollments"
+msgstr ""
+
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
 msgstr "user_support_url"
@@ -10055,8 +10064,8 @@ msgid ""
 "Once you have registered and activated your account, you will see "
 "%(course_name)s listed on your dashboard."
 msgstr ""
-"Una vez te hayas registrado y hayas activado tu cuenta, verás que "
-"los%(course_name)s aparecen en tu panel del estudiante."
+"Una vez te hayas registrado y hayas activado tu cuenta, verás que el curso "
+"%(course_name)s aparece en tu panel del estudiante."
 
 #: lms/templates/instructor/edx_ace/allowedenroll/email/body.html
 msgid ""
@@ -11687,6 +11696,10 @@ msgid ""
 " are completing more problems every week, and participating in the "
 "discussion forums. What do you want to do to keep learning?"
 msgstr ""
+"Muchos estudiantes de %(platform_name)s en "
+"{start_strong}%(course_name)s{end_strong} completan más problemas cada "
+"semana y participan en los foros. ¿Qué quieres hacer para continuar "
+"aprendiendo?"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
@@ -14518,10 +14531,6 @@ msgstr ""
 msgid "Raw data:"
 msgstr "Datos planos:"
 
-#: lms/templates/notes.html
-msgid "You do not have any notes."
-msgstr "Tu no tienes ninguna anotación."
-
 #: lms/templates/preview_menu.html
 msgid "Course View"
 msgstr "Ver curso"
@@ -14907,6 +14916,11 @@ msgstr ""
 #: lms/templates/seq_module.html
 msgid "Sequence"
 msgstr "Secuencia"
+
+#: lms/templates/seq_module.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "Completed"
+msgstr ""
 
 #: lms/templates/signup_modal.html
 msgid "Sign Up for {platform_name}"
@@ -22110,7 +22124,7 @@ msgstr "Obtenga un certificado verificado"
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Upgrade ({price})"
-msgstr "Mejora({price})"
+msgstr "Mejora ({price})"
 
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Expand All"

@@ -126,7 +126,7 @@ def save_subs_to_store(subs, subs_id, item, language='en'):
 
     Returns: location of saved subtitles.
     """
-    filedata = json.dumps(subs, indent=2)
+    filedata = json.dumps(subs, indent=2).encode('utf-8')
     filename = subs_filename(subs_id, language)
     return save_to_store(filedata, filename, 'application/json', item.location)
 
@@ -654,7 +654,7 @@ class Transcript(object):
         if input_format == 'srt':
 
             if output_format == 'txt':
-                text = SubRipFile.from_string(content.decode('utf8')).text
+                text = SubRipFile.from_string(content.decode('utf-8')).text
                 return HTMLParser().unescape(text)
 
             elif output_format == 'sjson':
@@ -663,7 +663,7 @@ class Transcript(object):
                     # the exception if something went wrong in parsing the transcript.
                     srt_subs = SubRipFile.from_string(
                         # Skip byte order mark(BOM) character
-                        content.decode('utf-8-sig'),
+                        content.decode('utf-8-sig') if six.PY2 else content.encode('utf-8').decode('utf-8-sig'),
                         error_handling=SubRipFile.ERROR_RAISE
                     )
                 except Error as ex:   # Base exception from pysrt

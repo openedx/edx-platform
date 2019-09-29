@@ -811,7 +811,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
     try:
         tar_file = tarfile.open(temp_filepath)
         try:
-            safetar_extractall(tar_file, (course_dir + u'/').encode(u'utf-8'))
+            safetar_extractall(tar_file, (course_dir + u'/'))
         except SuspiciousOperation as exc:
             LOGGER.info(u'Course import %s: Unsafe tar file - %s', courselike_key, exc.args[0])
             with respect_language(language):

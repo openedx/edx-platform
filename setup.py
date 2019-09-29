@@ -27,7 +27,6 @@ setup(
             "external_link = lms.djangoapps.courseware.tabs:ExternalLinkCourseTab",
             "html_textbooks = lms.djangoapps.courseware.tabs:HtmlTextbookTabs",
             "instructor = lms.djangoapps.instructor.views.instructor_dashboard:InstructorDashboardTab",
-            "notes = lms.djangoapps.notes.views:NotesTab",
             "pdf_textbooks = lms.djangoapps.courseware.tabs:PDFTextbookTabs",
             "progress = lms.djangoapps.courseware.tabs:ProgressTab",
             "static_tab = xmodule.tabs:StaticTab",
@@ -40,7 +39,7 @@ setup(
             "course_bookmarks = openedx.features.course_bookmarks.plugins:CourseBookmarksTool",
             "course_updates = openedx.features.course_experience.plugins:CourseUpdatesTool",
             "course_reviews = openedx.features.course_experience.plugins:CourseReviewsTool",
-            "verified_upgrade = courseware.course_tools:VerifiedUpgradeTool",
+            "verified_upgrade = lms.djangoapps.courseware.course_tools:VerifiedUpgradeTool",
         ],
         "openedx.user_partition_scheme": [
             "random = openedx.core.djangoapps.user_api.partition_schemes:RandomUserPartitionScheme",
@@ -103,15 +102,6 @@ setup(
             "password_policy = openedx.core.djangoapps.password_policy.apps:PasswordPolicyConfig",
             "user_authn = openedx.core.djangoapps.user_authn.apps:UserAuthnConfig",
             "instructor = lms.djangoapps.instructor.apps:InstructorConfig",
-        ],
-        'definition_key': [
-            'bundle-olx = openedx.core.djangoapps.xblock.learning_context.keys:BundleDefinitionLocator',
-        ],
-        'context_key': [
-            'lib = openedx.core.djangoapps.content_libraries.keys:LibraryLocatorV2',
-        ],
-        'usage_key': [
-            'lb = openedx.core.djangoapps.content_libraries.keys:LibraryUsageLocatorV2',
         ],
         'openedx.learning_context': [
             'lib = openedx.core.djangoapps.content_libraries.library_context:LibraryContextImpl',

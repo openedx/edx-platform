@@ -40,6 +40,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from django_countries.fields import CountryField
+from django.utils.encoding import python_2_unicode_compatible
 from edx_django_utils.cache import RequestCache
 from edx_rest_api_client.exceptions import SlumberBaseException
 from eventtracking import tracker
@@ -55,7 +56,7 @@ from slumber.exceptions import HttpClientError, HttpServerError
 from user_util import user_util
 
 from course_modes.models import CourseMode, get_cosmetic_verified_display_price
-from courseware.models import (
+from lms.djangoapps.courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
     DynamicUpgradeDeadlineConfiguration,
     OrgDynamicUpgradeDeadlineConfiguration
@@ -64,7 +65,11 @@ from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
-from openedx.core.djangoapps.enrollments.api import _default_course_mode
+from openedx.core.djangoapps.enrollments.api import (
+    _default_course_mode,
+    get_enrollment_attributes,
+    set_enrollment_attributes
+)
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
@@ -857,7 +862,7 @@ EVENT_NAME_ENROLLMENT_DEACTIVATED = 'edx.course.enrollment.deactivated'
 EVENT_NAME_ENROLLMENT_MODE_CHANGED = 'edx.course.enrollment.mode_changed'
 
 
-@six.python_2_unicode_compatible
+@python_2_unicode_compatible
 class LoginFailures(models.Model):
     """
     This model will keep track of failed login attempts.
@@ -1083,6 +1088,7 @@ class CourseEnrollmentManager(models.Manager):
 CourseEnrollmentState = namedtuple('CourseEnrollmentState', 'mode, is_active')
 
 
+@python_2_unicode_compatible
 class CourseEnrollment(models.Model):
     """
     Represents a Student's Enrollment record for a single Course. You should
@@ -1159,7 +1165,7 @@ class CourseEnrollment(models.Model):
         # When the property .course_overview is accessed for the first time, this variable will be set.
         self._course_overview = None
 
-    def __unicode__(self):
+    def __str__(self):
         return (
             "[CourseEnrollment] {}: {} ({}); active: ({})"
         ).format(self.user, self.course_id, self.created, self.is_active)
@@ -1764,8 +1770,56 @@ class CourseEnrollment(models.Model):
         # NOTE: This is here to avoid circular references
         from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, ECOMMERCE_DATE_FORMAT
 
+        date_placed = self.get_order_attribute_value('date_placed')
+
+        if not date_placed:
+            order_number = self.get_order_attribute_value('order_number')
+            if not order_number:
+                return None
+
+            try:
+                order = ecommerce_api_client(self.user).orders(order_number).get()
+                date_placed = order['date_placed']
+                # also save the attribute so that we don't need to call ecommerce again.
+                username = self.user.username
+                enrollment_attributes = get_enrollment_attributes(username, six.text_type(self.course_id))
+                enrollment_attributes.append(
+                    {
+                        "namespace": "order",
+                        "name": "date_placed",
+                        "value": date_placed,
+                    }
+                )
+                set_enrollment_attributes(username, six.text_type(self.course_id), enrollment_attributes)
+            except HttpClientError:
+                log.warning(
+                    u"Encountered HttpClientError while getting order details from ecommerce. "
+                    u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
+                return None
+
+            except HttpServerError:
+                log.warning(
+                    u"Encountered HttpServerError while getting order details from ecommerce. "
+                    u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
+                return None
+
+            except SlumberBaseException:
+                log.warning(
+                    u"Encountered an error while getting order details from ecommerce. "
+                    u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
+                return None
+
+        refund_window_start_date = max(
+            datetime.strptime(date_placed, ECOMMERCE_DATE_FORMAT),
+            self.course_overview.start.replace(tzinfo=None)
+        )
+
+        return refund_window_start_date.replace(tzinfo=UTC) + EnrollmentRefundConfiguration.current().refund_window
+
+    def get_order_attribute_value(self, attr_name):
+        """ Get and return course enrollment order attribute's value."""
         try:
-            attribute = self.attributes.get(namespace='order', name='order_number')
+            attribute = self.attributes.get(namespace='order', name=attr_name)
         except ObjectDoesNotExist:
             return None
         except MultipleObjectsReturned:
@@ -1776,36 +1830,9 @@ class CourseEnrollment(models.Model):
                 self.user.id,
                 enrollment_id
             )
-            attribute = self.attributes.filter(namespace='order', name='order_number').last()
+            attribute = self.attributes.filter(namespace='order', name=attr_name).last()
 
-        order_number = attribute.value
-        try:
-            order = ecommerce_api_client(self.user).orders(order_number).get()
-
-        except HttpClientError:
-            log.warning(
-                u"Encountered HttpClientError while getting order details from ecommerce. "
-                u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
-            return None
-
-        except HttpServerError:
-            log.warning(
-                u"Encountered HttpServerError while getting order details from ecommerce. "
-                u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
-            return None
-
-        except SlumberBaseException:
-            log.warning(
-                u"Encountered an error while getting order details from ecommerce. "
-                u"Order={number} and user {user}".format(number=order_number, user=self.user.id))
-            return None
-
-        refund_window_start_date = max(
-            datetime.strptime(order['date_placed'], ECOMMERCE_DATE_FORMAT),
-            self.course_overview.start.replace(tzinfo=None)
-        )
-
-        return refund_window_start_date.replace(tzinfo=UTC) + EnrollmentRefundConfiguration.current().refund_window
+        return attribute.value
 
     @property
     def username(self):
@@ -2138,6 +2165,7 @@ class ManualEnrollmentAudit(models.Model):
         return cls.objects.filter(id__in=manual_enrollment_ids).update(reason="", enrolled_email=retired_email)
 
 
+@python_2_unicode_compatible
 class CourseEnrollmentAllowed(DeletableByUserValue, models.Model):
     """
     Table of users (specified by email address strings) who are allowed to enroll in a specified course.
@@ -2165,7 +2193,7 @@ class CourseEnrollmentAllowed(DeletableByUserValue, models.Model):
     class Meta(object):
         unique_together = (('email', 'course_id'),)
 
-    def __unicode__(self):
+    def __str__(self):
         return "[CourseEnrollmentAllowed] %s: %s (%s)" % (self.email, self.course_id, self.created)
 
     @classmethod
@@ -2198,6 +2226,7 @@ class CourseEnrollmentAllowed(DeletableByUserValue, models.Model):
 
 
 @total_ordering
+@python_2_unicode_compatible
 class CourseAccessRole(models.Model):
     """
     Maps users to org, courses, and roles. Used by student.roles.CourseRole and OrgRole.
@@ -2243,7 +2272,7 @@ class CourseAccessRole(models.Model):
         """
         return self._key < other._key  # pylint: disable=protected-access
 
-    def __unicode__(self):
+    def __str__(self):
         return "[CourseAccessRole] user: {}   role: {}   org: {}   course: {}".format(self.user.username, self.role, self.org, self.course_id)
 
 
@@ -2575,6 +2604,7 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
         )
 
 
+@python_2_unicode_compatible
 class EntranceExamConfiguration(models.Model):
     """
     Represents a Student's entrance exam specific data for a single Course
@@ -2594,7 +2624,7 @@ class EntranceExamConfiguration(models.Model):
     class Meta(object):
         unique_together = (('user', 'course_id'), )
 
-    def __unicode__(self):
+    def __str__(self):
         return "[EntranceExamConfiguration] %s: %s (%s) = %s" % (
             self.user, self.course_id, self.created, self.skip_entrance_exam
         )
@@ -2682,6 +2712,7 @@ class SocialLink(models.Model):  # pylint: disable=model-missing-unicode
     social_link = models.CharField(max_length=100, blank=True)
 
 
+@python_2_unicode_compatible
 class CourseEnrollmentAttribute(models.Model):
     """
     Provide additional information about the user's enrollment.
@@ -2702,7 +2733,7 @@ class CourseEnrollmentAttribute(models.Model):
         help_text=_("Value of the enrollment attribute")
     )
 
-    def __unicode__(self):
+    def __str__(self):
         """Unicode representation of the attribute. """
         return u"{namespace}:{name}, {value}".format(
             namespace=self.namespace,
@@ -2789,6 +2820,7 @@ class EnrollmentRefundConfiguration(ConfigurationModel):
         self.refund_window_microseconds = int(refund_window.total_seconds() * 1000000)
 
 
+@python_2_unicode_compatible
 class RegistrationCookieConfiguration(ConfigurationModel):
     """
     Configuration for registration cookies.
@@ -2805,7 +2837,7 @@ class RegistrationCookieConfiguration(ConfigurationModel):
         help_text=_("Name of the affiliate cookie")
     )
 
-    def __unicode__(self):
+    def __str__(self):
         """Unicode representation of this config. """
         return u"UTM: {utm_name}; AFFILIATE: {affiliate_name}".format(
             utm_name=self.utm_cookie_name,
@@ -2813,6 +2845,7 @@ class RegistrationCookieConfiguration(ConfigurationModel):
         )
 
 
+@python_2_unicode_compatible
 class UserAttribute(TimeStampedModel):
     """
     Record additional metadata about a user, stored as key/value pairs of text.
@@ -2828,12 +2861,11 @@ class UserAttribute(TimeStampedModel):
     name = models.CharField(max_length=255, help_text=_("Name of this user attribute."), db_index=True)
     value = models.CharField(max_length=255, help_text=_("Value of this user attribute."))
 
-    def __unicode__(self):
-        """Unicode representation of this attribute. """
-        return u"[{username}] {name}: {value}".format(
+    def __str__(self):
+        return "[{username}] {name}: {value}".format(
             name=self.name,
             value=self.value,
-            username=self.user.username,
+            username=self.user.username
         )
 
     @classmethod
@@ -2857,6 +2889,7 @@ class UserAttribute(TimeStampedModel):
             return None
 
 
+@python_2_unicode_compatible
 class LogoutViewConfiguration(ConfigurationModel):
     """
     DEPRECATED: Configuration for the logout view.
@@ -2864,7 +2897,7 @@ class LogoutViewConfiguration(ConfigurationModel):
     .. no_pii:
     """
 
-    def __unicode__(self):
+    def __str__(self):
         """
         Unicode representation of the instance.
         """

@@ -489,30 +489,39 @@ class ProblemPage(PageObject):
         solution_selector = '.solution-span div.detailed-solution'
         return self.q(css=solution_selector).is_present()
 
-    def is_choice_highlighted(self, choice, choices_list):
+    def is_choice_highlighted(self, choice, choices_list, show_answer=True):
         """
         Check if the given answer/choice is highlighted for choice group.
+
+        show_answer: if set, then requires each choice to be marked with a status.
+            If not set, then the status can be elswhere in the problem.
         """
-        choice_status_xpath = (u'//fieldset/div[contains(@class, "field")][{{0}}]'
-                               u'/label[contains(@class, "choicegroup_{choice}")]'
-                               u'/span[contains(@class, "status {choice}")]'.format(choice=choice))
-        any_status_xpath = u'//fieldset/div[contains(@class, "field")][{0}]/label/span'
-        for choice in choices_list:
-            if not self.q(xpath=choice_status_xpath.format(choice)).is_present():
+        if show_answer:
+            choice_status_xpath = (u'//fieldset/div[contains(@class, "field")][{{0}}]'
+                                   u'/label[contains(@class, "choicegroup_{choice}")]'
+                                   u'/span[contains(@class, "status {choice}")]'.format(choice=choice))
+            any_status_xpath = u'//fieldset/div[contains(@class, "field")][{0}]/label/span'
+        else:
+            choice_status_xpath = (u'//fieldset/div[contains(@class, "field")][{{0}}]'
+                                   u'/label[contains(@class, "choicegroup_{choice}")]'.format(choice=choice))
+            any_status_xpath = u'//div[contains(@class, "indicator-container")]/span[contains(@class, "status")]'
+
+        for possible_choice in choices_list:
+            if not self.q(xpath=choice_status_xpath.format(possible_choice)).is_present():
                 return False
 
             # Check that there is only a single status span, as there were some bugs with multiple
             # spans (with various classes) being appended.
-            if not len(self.q(xpath=any_status_xpath.format(choice)).results) == 1:
+            if not len(self.q(xpath=any_status_xpath.format(possible_choice)).results) == 1:
                 return False
 
         return True
 
-    def is_correct_choice_highlighted(self, correct_choices):
+    def is_correct_choice_highlighted(self, correct_choices, show_answer=True):
         """
         Check if correct answer/choice highlighted for choice group.
         """
-        return self.is_choice_highlighted('correct', correct_choices)
+        return self.is_choice_highlighted('correct', correct_choices, show_answer)
 
     def is_submitted_choice_highlighted(self, correct_choices):
         """

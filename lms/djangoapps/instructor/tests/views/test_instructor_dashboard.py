@@ -20,9 +20,9 @@ from six.moves import range
 
 from common.test.utils import XssTestMixin
 from course_modes.models import CourseMode
-from courseware.tabs import get_course_tab_list
-from courseware.tests.factories import StaffFactory, StudentModuleFactory, UserFactory
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.courseware.tabs import get_course_tab_list
+from lms.djangoapps.courseware.tests.factories import StaffFactory, StudentModuleFactory, UserFactory
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
 from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
@@ -92,14 +92,14 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         Returns expected dashboard enrollment message with link to Insights.
         """
         return u'Enrollment data is now available in <a href="http://example.com/courses/{}" ' \
-               'target="_blank">Example</a>.'.format(text_type(self.course.id))
+               'rel="noopener" target="_blank">Example</a>.'.format(text_type(self.course.id))
 
     def get_dashboard_analytics_message(self):
         """
         Returns expected dashboard demographic message with link to Insights.
         """
         return u'For analytics about your course, go to <a href="http://example.com/courses/{}" ' \
-               'target="_blank">Example</a>.'.format(text_type(self.course.id))
+               'rel="noopener" target="_blank">Example</a>.'.format(text_type(self.course.id))
 
     def test_instructor_tab(self):
         """

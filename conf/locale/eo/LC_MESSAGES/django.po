@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-02 09:05+0000\n"
-"PO-Revision-Date: 2019-09-02 09:05:28.849914\n"
+"POT-Creation-Date: 2019-09-22 20:51+0000\n"
+"PO-Revision-Date: 2019-09-22 20:51:02.550394\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -9584,10 +9584,6 @@ msgstr ""
 "thé ßlöçk ïs vïsïßlé_tö_stäff_önlý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя"
 " α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт ł#"
 
-#: lms/djangoapps/notes/views.py lms/templates/notes.html
-msgid "My Notes"
-msgstr "Mý Nötés Ⱡ'σяєм ιρѕυм ∂#"
-
 #: lms/djangoapps/program_enrollments/models.py
 msgid "One of user or external_user_key must not be null."
 msgstr ""
@@ -10617,6 +10613,17 @@ msgid "View feature based enrollment settings"
 msgstr ""
 "Vïéw féätüré ßäséd énröllmént séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
+
+#: lms/djangoapps/support/views/index.py
+#: lms/templates/support/link_program_enrollments.html
+msgid "Link Program Enrollments"
+msgstr "Lïnk Prögräm Énröllménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: lms/djangoapps/support/views/index.py
+msgid "Link LMS users to program enrollments"
+msgstr ""
+"Lïnk LMS üsérs tö prögräm énröllménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
 
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
@@ -16218,10 +16225,6 @@ msgstr ""
 msgid "Raw data:"
 msgstr "Räw dätä: Ⱡ'σяєм ιρѕυм ∂σł#"
 
-#: lms/templates/notes.html
-msgid "You do not have any notes."
-msgstr "Ýöü dö nöt hävé äný nötés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
 #: lms/templates/preview_menu.html
 msgid "Course View"
 msgstr "Çöürsé Vïéw Ⱡ'σяєм ιρѕυм ∂σłσя #"
@@ -16665,6 +16668,11 @@ msgstr "Néxt Ⱡ'σяєм ι#"
 #: lms/templates/seq_module.html
 msgid "Sequence"
 msgstr "Séqüénçé Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/templates/seq_module.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "Completed"
+msgstr "Çömplétéd Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/templates/signup_modal.html
 msgid "Sign Up for {platform_name}"
@@ -28275,6 +28283,14 @@ msgstr ""
 " ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρя#"
 
 #: cms/templates/settings.html
+msgid ""
+"Please note that changes here may take up to a business day to appear on "
+"your course summary page."
+msgstr ""
+"Pléäsé nöté thät çhängés héré mäý täké üp tö ä ßüsïnéss däý tö äppéär ön "
+"ýöür çöürsé sümmärý pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: cms/templates/settings.html
 msgid "Course Credit Requirements"
 msgstr "Çöürsé Çrédït Réqüïréménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
@@ -28420,6 +28436,20 @@ msgstr ""
 #: cms/templates/settings.html
 msgid "Enrollment End Time"
 msgstr "Énröllmént Énd Tïmé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: cms/templates/settings.html
+msgid "Upgrade Deadline Date"
+msgstr "Ûpgrädé Déädlïné Däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: cms/templates/settings.html
+msgid "Last day students can upgrade to a verified enrollment."
+msgstr ""
+"Läst däý stüdénts çän üpgrädé tö ä vérïfïéd énröllmént. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/templates/settings.html
+msgid "Upgrade Deadline Time"
+msgstr "Ûpgrädé Déädlïné Tïmé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: cms/templates/settings.html
 msgid "Course Details"

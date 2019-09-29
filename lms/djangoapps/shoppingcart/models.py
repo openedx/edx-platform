@@ -10,7 +10,6 @@ import smtplib
 from collections import namedtuple
 from datetime import datetime, timedelta
 from decimal import Decimal
-from io import BytesIO
 
 import pytz
 import six
@@ -26,6 +25,7 @@ from django.db.models import Count, F, Q, Sum
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from django.urls import reverse
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from model_utils.managers import InheritanceManager
@@ -35,11 +35,10 @@ from six import text_type
 from six.moves import range
 
 from course_modes.models import CourseMode
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import HTML, Text
-from shoppingcart.pdf import PDFInvoice
 from student.models import CourseEnrollment, EnrollStatusChange
 from student.signals import UNENROLL_DONE
 from track import segment
@@ -307,34 +306,6 @@ class Order(models.Model):
         self.save()
         return old_to_new_id_map
 
-    def generate_pdf_receipt(self, order_items):
-        """
-        Generates the pdf receipt for the given order_items
-        and returns the pdf_buffer.
-        """
-        items_data = []
-        for item in order_items:
-            item_total = item.qty * item.unit_cost
-            items_data.append({
-                'item_description': item.pdf_receipt_display_name,
-                'quantity': item.qty,
-                'list_price': item.get_list_price(),
-                'discount': item.get_list_price() - item.unit_cost,
-                'item_total': item_total
-            })
-        pdf_buffer = BytesIO()
-
-        PDFInvoice(
-            items_data=items_data,
-            item_id=str(self.id),
-            date=self.purchase_time,
-            is_invoice=False,
-            total_cost=self.total_cost,
-            payment_received=self.total_cost,
-            balance=0
-        ).generate_pdf(pdf_buffer)
-        return pdf_buffer
-
     def generate_registration_codes_csv(self, orderitems, site_name):
         """
         this function generates the csv file
@@ -355,7 +326,7 @@ class Order(models.Model):
 
         return csv_file, course_names
 
-    def send_confirmation_emails(self, orderitems, is_order_type_business, csv_file, pdf_file, site_name, course_names):
+    def send_confirmation_emails(self, orderitems, is_order_type_business, csv_file, site_name, course_names):
         """
         send confirmation e-mail
         """
@@ -420,11 +391,6 @@ class Order(models.Model):
 
                 if csv_file:
                     email.attach(u'RegistrationCodesRedemptionUrls.csv', csv_file.getvalue(), 'text/csv')
-                if pdf_file is not None:
-                    email.attach(u'ReceiptOrder{}.pdf'.format(str(self.id)), pdf_file.getvalue(), 'application/pdf')
-                else:
-                    file_buffer = six.StringIO(_('pdf download unavailable right now, please contact support.'))
-                    email.attach(u'pdf_not_available.txt', file_buffer.getvalue(), 'text/plain')
                 email.send()
         except (smtplib.SMTPException, BotoServerError):  # sadly need to handle diff. mail backends individually
             log.error(u'Failed sending confirmation e-mail for order %d', self.id)
@@ -492,15 +458,9 @@ class Order(models.Model):
             csv_file, course_names = self.generate_registration_codes_csv(orderitems, site_name)
 
         try:
-            pdf_file = self.generate_pdf_receipt(orderitems)
-        except Exception:  # pylint: disable=broad-except
-            log.exception('Exception at creating pdf file.')
-            pdf_file = None
-
-        try:
             self.send_confirmation_emails(
                 orderitems, self.order_type == OrderTypes.BUSINESS,
-                csv_file, pdf_file, site_name, course_names
+                csv_file, site_name, course_names
             )
         except Exception:  # pylint: disable=broad-except
             # Catch all exceptions here, since the Django view implicitly
@@ -827,6 +787,7 @@ class OrderItem(TimeStampedModel):
         self.save()
 
 
+@python_2_unicode_compatible
 class Invoice(TimeStampedModel):
     """
     This table capture all the information needed to support "invoicing"
@@ -891,33 +852,6 @@ class Invoice(TimeStampedModel):
         total = result.get('total', 0)
         return total if total else 0
 
-    def generate_pdf_invoice(self, course, course_price, quantity, sale_price):
-        """
-        Generates the pdf invoice for the given course
-        and returns the pdf_buffer.
-        """
-        discount_per_item = float(course_price) - sale_price / quantity
-        list_price = course_price - discount_per_item
-        items_data = [{
-            'item_description': course.display_name,
-            'quantity': quantity,
-            'list_price': list_price,
-            'discount': discount_per_item,
-            'item_total': quantity * list_price
-        }]
-        pdf_buffer = BytesIO()
-        PDFInvoice(
-            items_data=items_data,
-            item_id=str(self.id),
-            date=datetime.now(pytz.utc),
-            is_invoice=True,
-            total_cost=float(self.total_amount),
-            payment_received=0,
-            balance=float(self.total_amount)
-        ).generate_pdf(pdf_buffer)
-
-        return pdf_buffer
-
     def snapshot(self):
         """Create a snapshot of the invoice.
 
@@ -960,7 +894,7 @@ class Invoice(TimeStampedModel):
             ],
         }
 
-    def __unicode__(self):
+    def __str__(self):
         label = (
             six.text_type(self.internal_reference)
             if self.internal_reference
@@ -1340,6 +1274,7 @@ class RegistrationCodeRedemption(models.Model):
         return code_redemption
 
 
+@python_2_unicode_compatible
 class Coupon(models.Model):
     """
     This table contains coupon codes
@@ -1359,7 +1294,7 @@ class Coupon(models.Model):
     is_active = models.BooleanField(default=True)
     expiration_date = models.DateTimeField(null=True, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return "[Coupon] code: {} course: {}".format(self.code, self.course_id)
 
     @property
@@ -1850,6 +1785,7 @@ class CourseRegCodeItem(OrderItem):
         return data
 
 
+@python_2_unicode_compatible
 class CourseRegCodeItemAnnotation(models.Model):
     """
     A model that maps course_id to an additional annotation.  This is specifically needed because when Stanford
@@ -1865,10 +1801,11 @@ class CourseRegCodeItemAnnotation(models.Model):
     course_id = CourseKeyField(unique=True, max_length=128, db_index=True)
     annotation = models.TextField(null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return u"{} : {}".format(text_type(self.course_id), self.annotation)
 
 
+@python_2_unicode_compatible
 class PaidCourseRegistrationAnnotation(models.Model):
     """
     A model that maps course_id to an additional annotation.  This is specifically needed because when Stanford
@@ -1884,7 +1821,7 @@ class PaidCourseRegistrationAnnotation(models.Model):
     course_id = CourseKeyField(unique=True, max_length=128, db_index=True)
     annotation = models.TextField(null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return u"{} : {}".format(text_type(self.course_id), self.annotation)
 
 

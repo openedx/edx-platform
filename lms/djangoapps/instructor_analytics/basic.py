@@ -21,7 +21,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from six import text_type
 
 import xmodule.graders as xmgraders
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.grades.api import context as grades_context
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -497,7 +497,7 @@ def get_response_state(response):
     state = json.loads(problem_state)
     try:
         transformed_state = problem_state_transformer(state)
-        return json.dumps(transformed_state, encoding='utf8', ensure_ascii=False)
+        return json.dumps(transformed_state, ensure_ascii=False)
     except TypeError:
         username = response.student.username
         err_msg = (

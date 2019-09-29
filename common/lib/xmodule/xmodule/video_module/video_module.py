@@ -200,6 +200,8 @@ class VideoBlock(
         return waffle_flags()[DEPRECATE_YOUTUBE].is_enabled(self.location.course_key)
 
     def youtube_disabled_for_course(self):
+        if not self.location.context_key.is_course:
+            return False  # Only courses have this flag
         if CourseYoutubeBlockedFlag.feature_enabled(self.location.course_key):
             return True
         else:

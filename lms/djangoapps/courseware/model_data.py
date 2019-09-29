@@ -33,13 +33,13 @@ from contracts import contract, new_contract
 from django.db import DatabaseError, IntegrityError, transaction
 from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 from opaque_keys.edx.block_types import BlockTypeKeyV1
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import LearningContextKey
 from xblock.core import XBlockAside
 from xblock.exceptions import InvalidScopeError, KeyValueMultiSaveError
 from xblock.fields import Scope, UserScope
 from xblock.runtime import KeyValueStore
 
-from courseware.user_state_client import DjangoXBlockUserStateClient
+from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from xmodule.modulestore.django import modulestore
 
 from .models import StudentModule, XModuleStudentInfoField, XModuleStudentPrefsField, XModuleUserStateSummaryField
@@ -703,7 +703,7 @@ class FieldDataCache(object):
         else:
             self.asides = asides
 
-        assert isinstance(course_id, CourseKey)
+        assert isinstance(course_id, LearningContextKey)
         self.course_id = course_id
         self.user = user
         self.read_only = read_only
@@ -997,13 +997,14 @@ def set_score(user_id, usage_key, score, max_score):
     Set the score and max_score for the specified user and xblock usage.
     """
     created = False
-    kwargs = {"student_id": user_id, "module_state_key": usage_key, "course_id": usage_key.course_key}
+    kwargs = {"student_id": user_id, "module_state_key": usage_key, "course_id": usage_key.context_key}
     try:
         with transaction.atomic():
             student_module, created = StudentModule.objects.get_or_create(
                 defaults={
                     'grade': score,
                     'max_grade': max_score,
+                    'module_type': usage_key.block_type,
                 },
                 **kwargs
             )
@@ -1012,7 +1013,7 @@ def set_score(user_id, usage_key, score, max_score):
         log.exception(
             u'set_score: IntegrityError for student %s - course_id %s - usage_key %s having '
             u'score %d and max_score %d',
-            str(user_id), usage_key.course_key, usage_key, score, max_score
+            str(user_id), usage_key.context_key, usage_key, score, max_score
         )
         student_module = StudentModule.objects.get(**kwargs)
 

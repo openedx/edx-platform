@@ -12,13 +12,14 @@ import logging
 
 from django.urls import reverse
 from django.utils.translation import ugettext as _
+from opaque_keys.edx.keys import UsageKeyV2
+from opaque_keys.edx.locator import BundleDefinitionLocator
 from rest_framework.exceptions import NotFound
 import six
 from xblock.core import XBlock
 from xblock.exceptions import NoSuchViewError
 
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
-from openedx.core.djangoapps.xblock.learning_context.keys import BundleDefinitionLocator, BlockUsageKeyV2
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
 from openedx.core.djangoapps.xblock.runtime.blockstore_runtime import BlockstoreXBlockRuntime, xml_for_definition
 from openedx.core.djangoapps.xblock.runtime.runtime import XBlockRuntimeSystem
@@ -78,7 +79,7 @@ def load_block(usage_key, user):
     # set to 3.
     # field_overrides = context_impl.get_field_overrides(usage_key)
 
-    runtime = get_runtime_system().get_runtime(user_id=user.id if user else None)
+    runtime = get_runtime_system().get_runtime(user=user)
 
     return runtime.get_block(usage_key)
 
@@ -100,7 +101,7 @@ def resolve_definition(block_or_key):
     """
     if isinstance(block_or_key, BundleDefinitionLocator):
         return block_or_key
-    elif isinstance(block_or_key, BlockUsageKeyV2):
+    elif isinstance(block_or_key, UsageKeyV2):
         context_impl = get_learning_context_impl(block_or_key)
         return context_impl.definition_for_usage(block_or_key)
     elif isinstance(block_or_key, XBlock):

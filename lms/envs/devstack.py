@@ -66,7 +66,7 @@ DJFS = {
 
 ################################ DEBUG TOOLBAR ################################
 
-INSTALLED_APPS += ['debug_toolbar', 'debug_toolbar_mongo']
+INSTALLED_APPS += ['debug_toolbar']
 MIDDLEWARE_CLASSES += [
     'lms.djangoapps.discussion.django_comment_client.utils.QueryCountDebugMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
@@ -83,7 +83,6 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.sql.SQLPanel',
     'debug_toolbar.panels.signals.SignalsPanel',
     'debug_toolbar.panels.logging.LoggingPanel',
-    'debug_toolbar_mongo.panel.MongoDebugPanel',
     # ProfilingPanel has been intentionally removed for default devstack.py
     # runtimes for performance reasons. If you wish to re-enable it in your
     # local development environment, please create a new settings file
@@ -100,10 +99,6 @@ def should_show_debug_toolbar(request):
     if request.get_host().startswith('edx.devstack.lms:'):
         return False
     return True
-
-########################### API DOCS #################################
-
-FEATURES['ENABLE_API_DOCS'] = True
 
 ########################### PIPELINE #################################
 
@@ -282,6 +277,8 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_c
 REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'] += (
     'rest_framework.renderers.BrowsableAPIRenderer',
 )
+
+OPENAPI_CACHE_TIMEOUT = 0
 
 #####################################################################
 # See if the developer has any local overrides.

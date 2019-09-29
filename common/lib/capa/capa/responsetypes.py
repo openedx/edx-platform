@@ -35,6 +35,7 @@ import requests
 import six
 # specific library imports
 from calc import UndefinedVariable, UnmatchedParenthesis, evaluator
+from django.utils.encoding import python_2_unicode_compatible
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs  # uses Beautiful Soup!!! FIXME?
 from pyparsing import ParseException
@@ -108,6 +109,7 @@ class StudentInputError(Exception):
 # Main base class for CAPA responsetypes
 
 
+@python_2_unicode_compatible
 class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
     """
     Base class for CAPA responsetypes.  Each response type (ie a capa question,
@@ -130,7 +132,7 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
                                condition for a hint to be displayed
 
       - render_html          : render this Response as HTML (must return XHTML-compliant string)
-      - __unicode__          : unicode representation of this Response
+      - __str__              : unicode representation of this Response
 
     Each response type may also specify the following attributes:
 
@@ -574,7 +576,7 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
     def setup_response(self):
         pass
 
-    def __unicode__(self):
+    def __str__(self):
         return u'LoncapaProblem Response %s' % self.xml.tag
 
     def _render_response_msg_html(self, response_msg):
@@ -2471,7 +2473,7 @@ class CustomResponse(LoncapaResponse):
             msg = msg.replace('&#60;', '&lt;')
 
             # Use etree to prettify the HTML
-            msg = etree.tostring(fromstring_bs(msg), pretty_print=True)
+            msg = etree.tostring(fromstring_bs(msg), pretty_print=True).decode('utf-8')
 
             msg = msg.replace('&#13;', '')
 

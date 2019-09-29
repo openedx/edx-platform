@@ -547,8 +547,12 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
 
     def test_enrollment_already_enrolled(self):
         response = self.assert_enrollment_status()
+        response_json = json.loads(response.content.decode('utf-8'))
+
         repeat_response = self.assert_enrollment_status(expected_status=status.HTTP_200_OK)
-        self.assertEqual(json.loads(response.content.decode('utf-8')), json.loads(repeat_response.content))
+        repeat_json = json.loads(repeat_response.content.decode('utf-8'))
+
+        self.assertEqual(response_json, repeat_json)
 
     def test_get_enrollment_with_invalid_key(self):
         resp = self.client.post(
@@ -562,7 +566,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             format='json'
         )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("No course ", resp.content)
+        self.assertIn("No course ", resp.content.decode('utf-8'))
 
     def test_enrollment_throttle_for_user(self):
         """Make sure a user requests do not exceed the maximum number of requests"""
@@ -655,7 +659,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             ),
             {'include_expired': True},
         )
-        v_data = json.loads(v_response.content)
+        v_data = json.loads(v_response.content.decode('utf-8'))
 
         # Ensure that both course modes are returned
         self.assertEqual(len(v_data['course_modes']), 2)
@@ -664,7 +668,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         h_response = self.client.get(
             reverse('courseenrollmentdetails', kwargs={"course_id": six.text_type(self.course.id)}),
         )
-        h_data = json.loads(h_response.content)
+        h_data = json.loads(h_response.content.decode('utf-8'))
 
         # Ensure that only one course mode is returned and that it is honor
         self.assertEqual(len(h_data['course_modes']), 1)
@@ -1397,7 +1401,7 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         response = self._submit_unenroll(self.superuser, self.user.username)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(response.content, "")
+        self.assertEqual(response.content.decode('utf-8'), "")
         self._assert_inactive()
 
     def _assert_active(self):

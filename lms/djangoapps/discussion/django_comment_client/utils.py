@@ -18,8 +18,8 @@ from pytz import UTC
 from six import text_type
 from six.moves import map
 
-from courseware import courses
-from courseware.access import has_access
+from lms.djangoapps.courseware import courses
+from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from lms.djangoapps.discussion.django_comment_client.permissions import (
     check_permissions_by_view,
@@ -305,7 +305,8 @@ def _sort_map_entries(category_map, sort_alpha):
     for title, category in category_map["subcategories"].items():
         things.append((title, category, TYPE_SUBCATEGORY))
         _sort_map_entries(category_map["subcategories"][title], sort_alpha)
-    category_map["children"] = [(x[0], x[2]) for x in sorted(things, key=lambda x: x[1]["sort_key"])]
+    key_method = lambda x: x[1]["sort_key"] if x[1]["sort_key"] is not None else ''
+    category_map["children"] = [(x[0], x[2]) for x in sorted(things, key=key_method)]
 
 
 def get_discussion_category_map(course, user, divided_only_if_explicit=False, exclude_unstarted=True):

@@ -573,6 +573,29 @@ def get_course_run_details(course_run_key, fields):
     return course_run_details
 
 
+def is_course_run_in_program(course_run_key, program):
+    """
+    Check if a course run is part of a program.
+
+    Arguments:
+        program (dict): program data, as returned by get_programs()
+        course_run_key (CourseKey|str)
+
+    Returns: bool
+        Whether the program exists AND the course run is part of it.
+    """
+    # Right now, this function simply loads all the program data from the cache,
+    # walks the structure to collect the set of course run keys,
+    # and then sees if `course_run_key` is in that set.
+    # If we need to optimize this later, we can.
+    course_run_key_str = (
+        str(course_run_key) if isinstance(course_run_key, CourseKey)
+        else course_run_key
+    )
+    course_run_keys = course_run_keys_for_program(program)
+    return course_run_key_str in course_run_keys
+
+
 def course_run_keys_for_program(parent_program):
     """
     All of the course run keys associated with this ``parent_program``, either

@@ -20,8 +20,8 @@ from six import text_type
 from six.moves import zip, zip_longest
 
 from course_blocks.api import get_course_blocks
-from courseware.courses import get_course_by_id
-from courseware.user_state_client import DjangoXBlockUserStateClient
+from lms.djangoapps.courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.instructor_analytics.basic import list_problem_responses
 from lms.djangoapps.instructor_analytics.csvs import format_dictlist
 from lms.djangoapps.certificates.models import CertificateWhitelist, GeneratedCertificate, certificate_info_for_user
@@ -358,7 +358,6 @@ class CourseGradeReport(object):
         """
         grade_results = []
         for _, assignment_info in six.iteritems(context.graded_assignments):
-
             subsection_grades, subsection_grades_results = self._user_subsection_grades(
                 course_grade,
                 assignment_info['subsection_headers'],
@@ -380,7 +379,7 @@ class CourseGradeReport(object):
         grade_results = []
         for subsection_location in subsection_headers:
             subsection_grade = course_grade.subsection_grade(subsection_location)
-            if subsection_grade.attempted_graded:
+            if subsection_grade.attempted_graded or subsection_grade.override:
                 grade_result = subsection_grade.percent_graded
             else:
                 grade_result = u'Not Attempted'

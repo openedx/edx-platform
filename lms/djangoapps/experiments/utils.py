@@ -13,8 +13,8 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import format_course_price, get_cosmetic_verified_display_price, CourseMode
-from courseware.access import has_staff_access_to_preview_mode
-from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
+from lms.djangoapps.courseware.access import has_staff_access_to_preview_mode
+from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.catalog.utils import get_programs
@@ -35,10 +35,12 @@ logger = logging.getLogger(__name__)
 experiments_namespace = WaffleFlagNamespace(name=u'experiments')
 
 # .. toggle_name: experiments.add_programs
-# .. toggle_type: feature_flag
+# .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Toggle for adding the current course's program information to user metadata
 # .. toggle_category: experiments
+# .. toggle_use_cases: monitored_rollout
+# .. toggle_creation_date: 2019-2-25
 # .. toggle_expiration_date: None
 # .. toggle_warnings: None
 # .. toggle_tickets: REVEM-63, REVEM-198
@@ -50,10 +52,12 @@ PROGRAM_INFO_FLAG = WaffleFlag(
 )
 
 # .. toggle_name: experiments.add_dashboard_info
-# .. toggle_type: feature_flag
+# .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Toggle for adding info about each course to the dashboard metadata
 # .. toggle_category: experiments
+# .. toggle_use_cases: monitored_rollout
+# .. toggle_creation_date: 2019-3-28
 # .. toggle_expiration_date: None
 # .. toggle_warnings: None
 # .. toggle_tickets: REVEM-118

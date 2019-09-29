@@ -22,6 +22,7 @@ from pytz import UTC
 
 from contentstore.config.waffle import ENABLE_PROCTORING_PROVIDER_OVERRIDES
 from contentstore.utils import reverse_course_url, reverse_usage_url
+from course_modes.models import CourseMode
 from models.settings.course_grading import GRADING_POLICY_CHANGED_EVENT_TYPE, CourseGradingModel, hash_grading_policy
 from models.settings.course_metadata import CourseMetadata
 from models.settings.encoder import CourseSettingsEncoder
@@ -179,6 +180,29 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         elif field in encoded and encoded[field] is not None:
             self.fail(field + " included in encoding but missing from details at " + context)
 
+    @ddt.data(
+        (False, False),
+        (True, False),
+        (True, True),
+    )
+    @ddt.unpack
+    def test_upgrade_deadline(self, has_verified_mode, has_expiration_date):
+        if has_verified_mode:
+            deadline = None
+            if has_expiration_date:
+                deadline = self.course.start + datetime.timedelta(days=2)
+            CourseMode.objects.get_or_create(
+                course_id=self.course.id,
+                mode_display_name="Verified",
+                mode_slug="verified",
+                min_price=1,
+                _expiration_datetime=deadline,
+            )
+
+        settings_details_url = get_url(self.course.id)
+        response = self.client.get_html(settings_details_url)
+        self.assertEqual("Upgrade Deadline Date" in response.content, has_expiration_date and has_verified_mode)
+
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
     def test_pre_requisite_course_list_present(self):
         settings_details_url = get_url(self.course.id)
@@ -240,15 +264,14 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         (False, True, False),
         (True, True, True),
     )
-    @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
     def test_visibility_of_entrance_exam_section(self, feature_flags):
         """
         Tests entrance exam section is available if ENTRANCE_EXAMS feature is enabled no matter any other
-        feature is enabled or disabled i.e ENABLE_MKTG_SITE.
+        feature is enabled or disabled i.e ENABLE_PUBLISHER.
         """
         with patch.dict("django.conf.settings.FEATURES", {
             'ENTRANCE_EXAMS': feature_flags[0],
-            'ENABLE_MKTG_SITE': feature_flags[1]
+            'ENABLE_PUBLISHER': feature_flags[1]
         }):
             course_details_url = get_url(self.course.id)
             resp = self.client.get_html(course_details_url)
@@ -257,11 +280,11 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
                 b'<h3 id="heading-entrance-exam">' in resp.content
             )
 
-    @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
     def test_marketing_site_fetch(self):
         settings_details_url = get_url(self.course.id)
 
         with mock.patch.dict('django.conf.settings.FEATURES', {
+            'ENABLE_PUBLISHER': True,
             'ENABLE_MKTG_SITE': True,
             'ENTRANCE_EXAMS': False,
             'ENABLE_PREREQUISITE_COURSES': False
@@ -276,8 +299,6 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             self.assertContains(response, "Enrollment Start Date")
             self.assertContains(response, "Enrollment End Date")
 
-            self.assertContains(response, "Introducing Your Course")
-            self.assertContains(response, "Course Card Image")
             self.assertContains(response, "Course Short Description")
             self.assertNotContains(response, "Course About Sidebar HTML")
             self.assertNotContains(response, "Course Title")
@@ -416,7 +437,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
     def test_regular_site_fetch(self):
         settings_details_url = get_url(self.course.id)
 
-        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False,
+        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_PUBLISHER': False,
                                                                'ENABLE_EXTENDED_COURSE_DETAILS': True}):
             response = self.client.get_html(settings_details_url)
             self.assertContains(response, "Course Summary Page")
@@ -797,7 +818,6 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.fullcourse = CourseFactory.create()
         self.course_setting_url = get_url(self.course.id, 'advanced_settings_handler')
         self.fullcourse_setting_url = get_url(self.fullcourse.id, 'advanced_settings_handler')
-        self.notes_tab = {"type": "notes", "name": "My Notes"}
 
         self.request = RequestFactory().request()
         self.user = UserFactory()
@@ -1126,60 +1146,6 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertEqual(test_model['display_name']['value'], 'jolly roger', "not expected value")
         self.assertIn('advertised_start', test_model, 'Missing revised advertised_start metadata field')
         self.assertEqual(test_model['advertised_start']['value'], 'start B', "advertised_start not expected value")
-
-    def test_advanced_components_munge_tabs(self):
-        """
-        Test that adding and removing specific advanced components adds and removes tabs.
-        """
-        # First ensure that none of the tabs are visible
-        self.assertNotIn(self.notes_tab, self.course.tabs)
-
-        # Now enable student notes and verify that the "My Notes" tab has been added
-        self.client.ajax_post(self.course_setting_url, {
-            'advanced_modules': {"value": ["notes"]}
-        })
-        course = modulestore().get_course(self.course.id)
-        self.assertIn(self.notes_tab, course.tabs)
-
-        # Disable student notes and verify that the "My Notes" tab is gone
-        self.client.ajax_post(self.course_setting_url, {
-            'advanced_modules': {"value": [""]}
-        })
-        course = modulestore().get_course(self.course.id)
-        self.assertNotIn(self.notes_tab, course.tabs)
-
-    def test_advanced_components_munge_tabs_validation_failure(self):
-        with patch('contentstore.views.course._refresh_course_tabs', side_effect=InvalidTabsException):
-            resp = self.client.ajax_post(self.course_setting_url, {
-                'advanced_modules': {"value": ["notes"]}
-            })
-            self.assertEqual(resp.status_code, 400)
-
-            error_msg = [
-                {
-                    'message': 'An error occurred while trying to save your tabs',
-                    'model': {'display_name': 'Tabs Exception'}
-                }
-            ]
-            self.assertEqual(json.loads(resp.content.decode('utf-8')), error_msg)
-
-            # verify that the course wasn't saved into the modulestore
-            course = modulestore().get_course(self.course.id)
-            self.assertNotIn("notes", course.advanced_modules)
-
-    @ddt.data(
-        [{'type': 'course_info'}, {'type': 'courseware'}, {'type': 'wiki', 'is_hidden': True}],
-        [{'type': 'course_info', 'name': 'Home'}, {'type': 'courseware', 'name': 'Course'}],
-    )
-    def test_course_tab_configurations(self, tab_list):
-        self.course.tabs = tab_list
-        modulestore().update_item(self.course, self.user.id)
-        self.client.ajax_post(self.course_setting_url, {
-            'advanced_modules': {"value": ["notes"]}
-        })
-        course = modulestore().get_course(self.course.id)
-        tab_list.append(self.notes_tab)
-        self.assertEqual(tab_list, course.tabs)
 
     @patch.dict(settings.FEATURES, {'ENABLE_EDXNOTES': True})
     @patch('xmodule.util.xmodule_django.get_current_request')
@@ -1534,44 +1500,42 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
         for element in self.EDITABLE_ELEMENTS:
             self.assertNotContains(response, element)
 
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_MKTG_SITE': False})
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PUBLISHER': False})
     def test_course_details_with_disabled_setting_global_staff(self):
         """
         Test that user enrollment end date is editable in response.
 
-        Feature flag 'ENABLE_MKTG_SITE' is not enabled.
+        Feature flag 'ENABLE_PUBLISHER' is not enabled.
         User is global staff.
         """
         self._verify_editable(self._get_course_details_response(True))
 
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_MKTG_SITE': False})
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PUBLISHER': False})
     def test_course_details_with_disabled_setting_non_global_staff(self):
         """
         Test that user enrollment end date is editable in response.
 
-        Feature flag 'ENABLE_MKTG_SITE' is not enabled.
+        Feature flag 'ENABLE_PUBLISHER' is not enabled.
         User is non-global staff.
         """
         self._verify_editable(self._get_course_details_response(False))
 
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_MKTG_SITE': True})
-    @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PUBLISHER': True})
     def test_course_details_with_enabled_setting_global_staff(self):
         """
         Test that user enrollment end date is editable in response.
 
-        Feature flag 'ENABLE_MKTG_SITE' is enabled.
+        Feature flag 'ENABLE_PUBLISHER' is enabled.
         User is global staff.
         """
         self._verify_editable(self._get_course_details_response(True))
 
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_MKTG_SITE': True})
-    @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PUBLISHER': True})
     def test_course_details_with_enabled_setting_non_global_staff(self):
         """
         Test that user enrollment end date is not editable in response.
 
-        Feature flag 'ENABLE_MKTG_SITE' is enabled.
+        Feature flag 'ENABLE_PUBLISHER' is enabled.
         User is non-global staff.
         """
         self._verify_not_editable(self._get_course_details_response(False))

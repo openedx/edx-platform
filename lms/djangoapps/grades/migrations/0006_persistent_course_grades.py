@@ -6,7 +6,7 @@ import model_utils.fields
 from django.db import migrations, models
 from opaque_keys.edx.django.models import CourseKeyField
 
-from courseware.fields import UnsignedBigIntAutoField
+from lms.djangoapps.courseware.fields import UnsignedBigIntAutoField
 
 
 class Migration(migrations.Migration):

@@ -11,6 +11,7 @@ import subprocess
 import sys
 from distutils import sysconfig
 
+import six
 from paver.easy import BuildFailure, sh, task
 from six.moves import range
 
@@ -79,7 +80,7 @@ def compute_fingerprint(path_list):
             for dirname in sorted(os.listdir(path_item)):
                 path_name = os.path.join(path_item, dirname)
                 if os.path.isdir(path_name):
-                    hasher.update(str(os.stat(path_name).st_mtime))
+                    hasher.update(str(os.stat(path_name).st_mtime).encode('utf-8'))
 
         # For files, hash the contents of the file
         if os.path.isfile(path_item):
@@ -120,7 +121,7 @@ def prereq_cache(cache_name, paths, install_func):
             # Since the pip requirement files are modified during the install
             # process, we need to store the hash generated AFTER the installation
             post_install_hash = compute_fingerprint(paths)
-            cache_file.write(post_install_hash)
+            cache_file.write(post_install_hash.encode('utf-8'))
     else:
         print(u'{cache} unchanged, skipping...'.format(cache=cache_name))
 
@@ -151,13 +152,13 @@ def node_prereqs_installation():
         # the forked process has returned
         proc = subprocess.Popen(npm_command, stderr=npm_log_file)
         proc.wait()
-    except BuildFailure as error_text:
-        if cb_error_text in error_text:
+    except BuildFailure as error:
+        if cb_error_text in six.text_type(error):
             print("npm install error detected. Retrying...")
             proc = subprocess.Popen(npm_command, stderr=npm_log_file)
             proc.wait()
         else:
-            raise BuildFailure(error_text)
+            raise
     print(u"Successfully installed NPM packages. Log found at {}".format(
         npm_log_file_path
     ))
@@ -224,7 +225,7 @@ def uninstall_python_packages():
     # So that we don't constantly uninstall things, use a hash of the packages
     # to be uninstalled.  Check it, and skip this if we're up to date.
     hasher = hashlib.sha1()
-    hasher.update(repr(PACKAGES_TO_UNINSTALL))
+    hasher.update(repr(PACKAGES_TO_UNINSTALL).encode('utf-8'))
     expected_version = hasher.hexdigest()
     state_file_path = os.path.join(PREREQS_STATE_DIR, "Python_uninstall.sha1")
     create_prereqs_cache_dir()
@@ -257,7 +258,7 @@ def uninstall_python_packages():
 
     # Write our version.
     with io.open(state_file_path, "wb") as state_file:
-        state_file.write(expected_version)
+        state_file.write(expected_version.encode('utf-8'))
 
 
 def package_in_frozen(package_name, frozen_output):

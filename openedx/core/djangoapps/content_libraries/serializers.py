@@ -4,6 +4,7 @@ Serializers for the content libraries REST API
 # pylint: disable=abstract-method
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from django.core.validators import validate_unicode_slug
 from rest_framework import serializers
 
 
@@ -16,7 +17,7 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
     # is a reserved prop name in React
     id = serializers.CharField(source="key", read_only=True)
     org = serializers.SlugField(source="key.org")
-    slug = serializers.SlugField(source="key.slug")
+    slug = serializers.CharField(source="key.slug", validators=(validate_unicode_slug, ))
     bundle_uuid = serializers.UUIDField(format='hex_verbose', read_only=True)
     collection_uuid = serializers.UUIDField(format='hex_verbose', write_only=True)
     title = serializers.CharField()

@@ -215,7 +215,7 @@ class ReactivationEmailTests(EmailTestMixin, CacheIsolationTestCase):
         Send the reactivation email to the specified user,
         and return the response as json data.
         """
-        return json.loads(send_reactivation_email_for_user(user).content)
+        return json.loads(send_reactivation_email_for_user(user).content.decode('utf-8'))
 
     def assertReactivateEmailSent(self, email_user):
         """
@@ -479,8 +479,8 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
         response = confirm_email_change(self.request, self.key)
         self.assertEqual(response.status_code, 200)
         self.assertEquals(
-            mock_render_to_response(expected_template, expected_context).content,
-            response.content
+            mock_render_to_response(expected_template, expected_context).content.decode('utf-8'),
+            response.content.decode('utf-8')
         )
 
     def assertChangeEmailSent(self, test_body_type):

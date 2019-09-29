@@ -8,6 +8,7 @@ from logging import getLogger
 
 import six
 
+from django.utils.encoding import python_2_unicode_compatible
 from openedx.core.lib.cache_utils import zpickle, zunpickle
 
 from . import config
@@ -20,6 +21,7 @@ from .transformer_registry import TransformerRegistry
 logger = getLogger(__name__)  # pylint: disable=C0103
 
 
+@python_2_unicode_compatible
 class StubModel(object):
     """
     Stub model to use when storage backing is disabled.
@@ -29,7 +31,7 @@ class StubModel(object):
     def __init__(self, root_block_usage_key):
         self.data_usage_key = root_block_usage_key
 
-    def __unicode__(self):
+    def __str__(self):
         return six.text_type(self.data_usage_key)
 
     def delete(self):

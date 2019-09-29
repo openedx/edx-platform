@@ -10,11 +10,13 @@ photo verification process as generic as possible.
 """
 from __future__ import absolute_import, unicode_literals
 
+import base64
 import codecs
 import functools
 import json
 import logging
 import os.path
+import simplejson
 import uuid
 from datetime import timedelta
 from email.utils import formatdate
@@ -26,6 +28,7 @@ from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.db import models
 from django.urls import reverse
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy
@@ -142,6 +145,7 @@ class IDVerificationAttempt(StatusModel):
         )
 
 
+@python_2_unicode_compatible
 class ManualVerification(IDVerificationAttempt):
     """
     Each ManualVerification represents a user's verification that bypasses the need for
@@ -163,7 +167,7 @@ class ManualVerification(IDVerificationAttempt):
     class Meta(object):
         app_label = 'verify_student'
 
-    def __unicode__(self):
+    def __str__(self):
         return 'ManualIDVerification for {name}, status: {status}'.format(
             name=self.name,
             status=self.status,
@@ -176,6 +180,7 @@ class ManualVerification(IDVerificationAttempt):
         return False
 
 
+@python_2_unicode_compatible
 class SSOVerification(IDVerificationAttempt):
     """
     Each SSOVerification represents a Student's attempt to establish their identity
@@ -213,7 +218,7 @@ class SSOVerification(IDVerificationAttempt):
     class Meta(object):
         app_label = "verify_student"
 
-    def __unicode__(self):
+    def __str__(self):
         return 'SSOIDVerification for {name}, status: {status}'.format(
             name=self.name,
             status=self.status,
@@ -810,11 +815,10 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         faces.
         """
         face_aes_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["FACE_IMAGE_AES_KEY"]
-        face_aes_key = face_aes_key_str.decode("hex")
+        face_aes_key = codecs.decode(face_aes_key_str, 'hex')
         rsa_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["RSA_PUBLIC_KEY"]
         rsa_encrypted_face_aes_key = rsa_encrypt(face_aes_key, rsa_key_str)
-
-        return rsa_encrypted_face_aes_key.encode("base64")
+        return base64.b64encode(rsa_encrypted_face_aes_key)
 
     def create_request(self, copy_id_photo_from=None):
         """
@@ -884,7 +888,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         header_txt = "\n".join(
             u"{}: {}".format(h, v) for h, v in sorted(headers.items())
         )
-        body_txt = json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False).encode('utf-8')
+        body_txt = json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False)
 
         return header_txt + "\n\n" + body_txt
 
@@ -912,10 +916,11 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
             return fake_response
 
         headers, body = self.create_request(copy_id_photo_from=copy_id_photo_from)
+
         response = requests.post(
             settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["API_URL"],
             headers=headers,
-            data=json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False).encode('utf-8'),
+            data=simplejson.dumps(body, indent=2, sort_keys=True, ensure_ascii=False).encode('utf-8'),
             verify=False
         )
 

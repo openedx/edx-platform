@@ -12,6 +12,7 @@ from __future__ import absolute_import
 import logging
 
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 from track.backends import BaseBackend
 
@@ -31,6 +32,7 @@ LOGFIELDS = [
 ]
 
 
+@python_2_unicode_compatible
 class TrackingLog(models.Model):
     """
     Defines the fields that are stored in the tracking log database.
@@ -55,7 +57,7 @@ class TrackingLog(models.Model):
         app_label = 'track'
         db_table = 'track_trackinglog'
 
-    def __unicode__(self):
+    def __str__(self):
         fmt = (
             u"[{self.time}] {self.username}@{self.ip}: "
             u"{self.event_source}| {self.event_type} | "

@@ -25,8 +25,8 @@ from mock import patch
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.test import APITestCase
 
-from courseware.access_response import MobileAvailabilityError, StartDateError, VisibilityError
-from courseware.tests.factories import UserFactory
+from lms.djangoapps.courseware.access_response import MobileAvailabilityError, StartDateError, VisibilityError
+from lms.djangoapps.courseware.tests.factories import UserFactory
 from mobile_api.models import IgnoreMobileAvailableFlagConfig
 from mobile_api.tests.test_milestones import MobileAPIMilestonesMixin
 from mobile_api.utils import API_V1

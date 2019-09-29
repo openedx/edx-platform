@@ -306,3 +306,9 @@ class CourseAssetsFromStorage(object):
         Iterates over the items of the asset dict.
         """
         return six.iteritems(self.asset_md)
+
+    def items(self):
+        """
+        Iterates over the items of the asset dict. (Python 3 naming convention)
+        """
+        return self.iteritems()

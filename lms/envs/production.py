@@ -137,8 +137,7 @@ if STATIC_ROOT_BASE:
 # STATIC_URL_BASE specifies the base url to use for static files
 STATIC_URL_BASE = ENV_TOKENS.get('STATIC_URL_BASE', None)
 if STATIC_URL_BASE:
-    # collectstatic will fail if STATIC_URL is a unicode string
-    STATIC_URL = STATIC_URL_BASE.encode('ascii')
+    STATIC_URL = STATIC_URL_BASE
     if not STATIC_URL.endswith("/"):
         STATIC_URL += "/"
 
@@ -860,7 +859,7 @@ XBLOCK_FIELD_DATA_WRAPPERS += (
 )
 
 MODULESTORE_FIELD_OVERRIDE_PROVIDERS += (
-    'courseware.self_paced_overrides.SelfPacedDateOverrideProvider',
+    'lms.djangoapps.courseware.self_paced_overrides.SelfPacedDateOverrideProvider',
 )
 
 # PROFILE IMAGE CONFIG
@@ -920,10 +919,6 @@ CREDENTIALS_GENERATION_ROUTING_KEY = ENV_TOKENS.get('CREDENTIALS_GENERATION_ROUT
 
 # Queue to use for award program certificates
 PROGRAM_CERTIFICATES_ROUTING_KEY = ENV_TOKENS.get('PROGRAM_CERTIFICATES_ROUTING_KEY', DEFAULT_PRIORITY_QUEUE)
-
-# The extended StudentModule history table
-if FEATURES.get('ENABLE_CSMH_EXTENDED'):
-    INSTALLED_APPS.append('coursewarehistoryextended')
 
 API_ACCESS_MANAGER_EMAIL = ENV_TOKENS.get('API_ACCESS_MANAGER_EMAIL')
 API_ACCESS_FROM_EMAIL = ENV_TOKENS.get('API_ACCESS_FROM_EMAIL')
@@ -1051,6 +1046,9 @@ ICP_LICENSE_INFO = ENV_TOKENS.get('ICP_LICENSE_INFO', {})
 
 ############## Settings for CourseGraph ############################
 COURSEGRAPH_JOB_QUEUE = ENV_TOKENS.get('COURSEGRAPH_JOB_QUEUE', DEFAULT_PRIORITY_QUEUE)
+
+# How long to cache OpenAPI schemas and UI, in seconds.
+OPENAPI_CACHE_TIMEOUT = ENV_TOKENS.get('OPENAPI_CACHE_TIMEOUT', 60 * 60)
 
 ########################## Parental controls config  #######################
 

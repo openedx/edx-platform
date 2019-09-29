@@ -14,10 +14,11 @@ from celery.result import AsyncResult
 from celery.states import FAILURE, READY_STATES, REVOKED, SUCCESS
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import UsageKey
+import six
 from six import text_type
 
-from courseware.courses import get_problems_in_section
-from courseware.module_render import get_xqueue_callback_url_prefix
+from lms.djangoapps.courseware.courses import get_problems_in_section
+from lms.djangoapps.courseware.module_render import get_xqueue_callback_url_prefix
 from lms.djangoapps.instructor_task.models import PROGRESS, InstructorTask
 from util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
@@ -390,7 +391,7 @@ def encode_problem_and_student_input(usage_key, student=None):
         task_key_stub = "_{problem}".format(problem=text_type(usage_key))
 
     # create the key value by using MD5 hash:
-    task_key = hashlib.md5(task_key_stub).hexdigest()
+    task_key = hashlib.md5(six.b(task_key_stub)).hexdigest()
 
     return task_input, task_key
 
@@ -412,7 +413,7 @@ def encode_entrance_exam_and_student_input(usage_key, student=None):
         task_key_stub = "_{entranceexam}".format(entranceexam=text_type(usage_key))
 
     # create the key value by using MD5 hash:
-    task_key = hashlib.md5(task_key_stub).hexdigest()
+    task_key = hashlib.md5(task_key_stub.encode('utf-8')).hexdigest()
 
     return task_input, task_key
 

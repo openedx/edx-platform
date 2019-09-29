@@ -116,8 +116,7 @@ EDX_PLATFORM_REVISION = ENV_TOKENS.get('EDX_PLATFORM_REVISION', EDX_PLATFORM_REV
 # STATIC_URL_BASE specifies the base url to use for static files
 STATIC_URL_BASE = ENV_TOKENS.get('STATIC_URL_BASE', None)
 if STATIC_URL_BASE:
-    # collectstatic will fail if STATIC_URL is a unicode string
-    STATIC_URL = STATIC_URL_BASE.encode('ascii')
+    STATIC_URL = STATIC_URL_BASE
     if not STATIC_URL.endswith("/"):
         STATIC_URL += "/"
     STATIC_URL += 'studio/'
@@ -135,6 +134,9 @@ DEFAULT_MOBILE_AVAILABLE = ENV_TOKENS.get(
     'DEFAULT_MOBILE_AVAILABLE',
     DEFAULT_MOBILE_AVAILABLE
 )
+
+# How long to cache OpenAPI schemas and UI, in seconds.
+OPENAPI_CACHE_TIMEOUT = ENV_TOKENS.get('OPENAPI_CACHE_TIMEOUT', 60 * 60)
 
 # MEDIA_ROOT specifies the directory where user-uploaded files are stored.
 MEDIA_ROOT = ENV_TOKENS.get('MEDIA_ROOT', MEDIA_ROOT)
@@ -575,6 +577,9 @@ COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get(
     'COMPLETION_VIDEO_COMPLETE_PERCENTAGE',
     COMPLETION_VIDEO_COMPLETE_PERCENTAGE,
 )
+
+############### Settings for django-fernet-fields ##################
+FERNET_KEYS = AUTH_TOKENS.get('FERNET_KEYS', FERNET_KEYS)
 
 ####################### Enterprise Settings ######################
 

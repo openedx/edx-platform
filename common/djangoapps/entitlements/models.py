@@ -9,6 +9,7 @@ from datetime import timedelta
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.db import IntegrityError, models, transaction
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
@@ -26,6 +27,7 @@ from util.date_utils import strftime_localized
 log = logging.getLogger("common.entitlements.models")
 
 
+@python_2_unicode_compatible
 class CourseEntitlementPolicy(models.Model):
     """
     Represents the Entitlement's policy for expiration, refunds, and regaining a used certificate
@@ -138,7 +140,7 @@ class CourseEntitlementPolicy(models.Model):
                 and not entitlement.enrollment_course_run
                 and not entitlement.expired_at)
 
-    def __unicode__(self):
+    def __str__(self):
         return u'Course Entitlement Policy: expiration_period: {}, refund_period: {}, regain_period: {}, mode: {}'\
             .format(
                 self.expiration_period,
@@ -448,6 +450,7 @@ class CourseEntitlement(TimeStampedModel):
             raise IntegrityError
 
 
+@python_2_unicode_compatible
 class CourseEntitlementSupportDetail(TimeStampedModel):
     """
     Table recording support interactions with an entitlement
@@ -492,7 +495,7 @@ class CourseEntitlementSupportDetail(TimeStampedModel):
         on_delete=models.CASCADE,
     )
 
-    def __unicode__(self):
+    def __str__(self):
         """Unicode representation of an Entitlement"""
         return u'Course Entitlement Support Detail: entitlement: {}, support_user: {}, reason: {}'.format(
             self.entitlement,

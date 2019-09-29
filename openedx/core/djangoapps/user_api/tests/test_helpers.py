@@ -225,13 +225,13 @@ class StudentViewShimTest(TestCase):
         )
         response = view(HttpRequest())
         self.assertEqual(response.status_code, 403)
-        self.assertEqual(response.content, "third-party-auth")
+        self.assertEqual(response.content, b"third-party-auth")
 
     def test_non_json_response(self):
         view = self._shimmed_view(HttpResponse(content="Not a JSON dict"))
         response = view(HttpRequest())
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, "Not a JSON dict")
+        self.assertEqual(response.content, b"Not a JSON dict")
 
     @ddt.data("redirect", "redirect_url")
     def test_ignore_redirect_from_json(self, redirect_key):
@@ -243,7 +243,7 @@ class StudentViewShimTest(TestCase):
         )
         response = view(HttpRequest())
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, "")
+        self.assertEqual(response.content.decode('utf-8'), "")
 
     def test_error_from_json(self):
         view = self._shimmed_view(
@@ -254,7 +254,7 @@ class StudentViewShimTest(TestCase):
         )
         response = view(HttpRequest())
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.content, "Error!")
+        self.assertEqual(response.content, b"Error!")
 
     def test_preserve_headers(self):
         view_response = HttpResponse()

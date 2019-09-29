@@ -5,9 +5,11 @@ from __future__ import absolute_import
 
 from config_models.models import ConfigurationModel
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 
+@python_2_unicode_compatible
 class CommerceConfiguration(ConfigurationModel):
     """
     Commerce configuration
@@ -52,7 +54,7 @@ class CommerceConfiguration(ConfigurationModel):
         help_text=_('Automatically approve valid refund requests, without manual processing')
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return "Commerce configuration"
 
     @property

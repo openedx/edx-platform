@@ -22,9 +22,9 @@ from django.urls import reverse
 from mock import MagicMock, patch
 from oauth2_provider.models import Application
 
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module_for_descriptor
-from courseware.tabs import get_course_tab_list
+from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.module_render import get_module_for_descriptor
+from lms.djangoapps.courseware.tabs import get_course_tab_list
 from edxmako.shortcuts import render_to_string
 from edxnotes import helpers
 from edxnotes.decorators import edxnotes
@@ -170,6 +170,13 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
         Tests that get_html is not wrapped when problem is rendered in Studio.
         """
         self.problem.system.is_author_mode = True
+        self.assertEqual("original_get_html", self.problem.get_html())
+
+    def test_edxnotes_blockstore_runtime(self):
+        """
+        Tests that get_html is not wrapped when problem is rendered by Blockstore runtime.
+        """
+        del self.problem.descriptor.runtime.modulestore
         self.assertEqual("original_get_html", self.problem.get_html())
 
     def test_edxnotes_harvard_notes_enabled(self):

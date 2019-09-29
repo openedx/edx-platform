@@ -5,11 +5,11 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
+from opaque_keys.edx.locator import LibraryLocatorV2
 from organizations.models import Organization
 import six
-
-from openedx.core.djangoapps.content_libraries.keys import LibraryLocatorV2
 
 User = get_user_model()
 
@@ -26,7 +26,7 @@ class ContentLibraryManager(models.Manager):
         return self.get(org__short_name=library_key.org, slug=library_key.slug)
 
 
-@six.python_2_unicode_compatible  # pylint: disable=model-missing-unicode
+@python_2_unicode_compatible
 class ContentLibrary(models.Model):
     """
     A Content Library is a collection of content (XBlocks and/or static assets)
@@ -45,7 +45,7 @@ class ContentLibrary(models.Model):
     # library's opaque key:
     # e.g. "lib:org:slug" is the opaque key for a library.
     org = models.ForeignKey(Organization, on_delete=models.PROTECT, null=False)
-    slug = models.SlugField()
+    slug = models.SlugField(allow_unicode=True)
     bundle_uuid = models.UUIDField(unique=True, null=False)
 
     # How is this library going to be used?
@@ -85,7 +85,7 @@ class ContentLibrary(models.Model):
         return "ContentLibrary ({})".format(six.text_type(self.library_key))
 
 
-@six.python_2_unicode_compatible  # pylint: disable=model-missing-unicode
+@python_2_unicode_compatible
 class ContentLibraryPermission(models.Model):
     """
     Row recording permissions for a content library

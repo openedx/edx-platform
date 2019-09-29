@@ -27,10 +27,31 @@ MAX_DEFINITIONS_LOADED = 100  # How many of the most recently used XBlocks' fiel
 class BlockInstanceUniqueKey(object):
     """
     An empty object used as a unique key for each XBlock instance, see
-    BlockstoreFieldData._get_active_block(). Every XBlock instance will get a
-    unique one of these keys, even if they are otherwise identical. Its purpose
-    is similar to `id(block)`.
+    get_weak_key_for_block() and BlockstoreFieldData._get_active_block(). Every
+    XBlock instance will get a unique one of these keys, even if they are
+    otherwise identical. Its purpose is similar to `id(block)`.
     """
+
+
+def get_weak_key_for_block(block):
+    """
+    Given an XBlock instance, return an object with the same lifetime as the
+    block, suitable as a key to hold block-specific data in a WeakKeyDictionary.
+    """
+    # We would like to make the XBlock instance 'block' itself the key of
+    # BlockstoreFieldData.active_blocks, so that we have exactly one entry per
+    # XBlock instance in memory, and they'll each be automatically freed by the
+    # WeakKeyDictionary as needed. But because XModules implement
+    # __eq__() in a way that reads all field values, just attempting to use
+    # the block as a dict key here will trigger infinite recursion. So
+    # instead we key the dict on an arbitrary object,
+    # block key = BlockInstanceUniqueKey() which we create here. That way
+    # the weak reference will still cause the entry in the WeakKeyDictionary to
+    # be freed automatically when the block is no longer needed, and we
+    # still get one entry per XBlock instance.
+    if not hasattr(block, '_field_data_key_obj'):
+        block._field_data_key_obj = BlockInstanceUniqueKey()  # pylint: disable=protected-access
+    return block._field_data_key_obj  # pylint: disable=protected-access
 
 
 def get_olx_hash_for_definition_key(def_key):
@@ -123,20 +144,7 @@ class BlockstoreFieldData(FieldData):
         Get the ActiveBlock entry for the specified block, creating it if
         necessary.
         """
-        # We would like to make the XBlock instance 'block' itself the key of
-        # self.active_blocks, so that we have exactly one entry per XBlock
-        # instance in memory, and they'll each be automatically freed by the
-        # WeakKeyDictionary as needed. But because XModules implement
-        # __eq__() in a way that reads all field values, just attempting to use
-        # the block as a dict key here will trigger infinite recursion. So
-        # instead we key the dict on an arbitrary object,
-        # block key = BlockInstanceUniqueKey() which we create here. That way
-        # the weak reference will still cause the entry in self.active_blocks to
-        # be freed automatically when the block is no longer needed, and we
-        # still get one entry per XBlock instance.
-        if not hasattr(block, '_field_data_key_obj'):
-            block._field_data_key_obj = BlockInstanceUniqueKey()  # pylint: disable=protected-access
-        key = block._field_data_key_obj  # pylint: disable=protected-access
+        key = get_weak_key_for_block(block)
         if key not in self.active_blocks:
             self.active_blocks[key] = ActiveBlock(
                 olx_hash=get_olx_hash_for_definition_key(block.scope_ids.def_id),

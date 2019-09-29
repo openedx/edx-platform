@@ -220,9 +220,19 @@ FEATURES = {
     # in sync with the one in lms/envs/common.py
     'ENABLE_EDXNOTES': False,
 
+    # Toggle to enable coordination with the Publisher tool (keep in sync with lms/envs/common.py)
+    'ENABLE_PUBLISHER': False,
+
     # Show a new field in "Advanced settings" that can store custom data about a
     # course and that can be read from themes
     'ENABLE_OTHER_COURSE_SETTINGS': False,
+
+    # Write new CSM history to the extended table.
+    # This will eventually default to True and may be
+    # removed since all installs should have the separate
+    # extended history table. This is needed in the LMS and CMS
+    # for migration consistency.
+    'ENABLE_CSMH_EXTENDED': True,
 
     # Enable support for content libraries. Note that content libraries are
     # only supported in courses using split mongo.
@@ -302,9 +312,6 @@ FEATURES = {
 
     # Prevent auto auth from creating superusers or modifying existing users
     'RESTRICT_AUTOMATIC_AUTH': True,
-
-    # Set this to true to make API docs available at /api-docs/.
-    'ENABLE_API_DOCS': False,
 }
 
 ENABLE_JASMINE = False
@@ -1291,7 +1298,8 @@ INSTALLED_APPS = [
     # by installed apps.
     'openedx.core.djangoapps.oauth_dispatch.apps.OAuthDispatchAppConfig',
     'oauth_provider',
-    'courseware',
+    'lms.djangoapps.courseware',
+    'coursewarehistoryextended',
     'survey.apps.SurveyConfig',
     'lms.djangoapps.verify_student.apps.VerifyStudentConfig',
     'completion',
@@ -1349,6 +1357,8 @@ INSTALLED_APPS = [
     'openedx.features.discounts',
     'experiments',
 
+    # so sample_task is available to celery workers
+    'openedx.core.djangoapps.heartbeat',
 ]
 
 
@@ -1799,6 +1809,10 @@ COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
 DEFAULT_COURSE_VISIBILITY_IN_CATALOG = "both"
 DEFAULT_MOBILE_AVAILABLE = False
 
+
+# How long to cache OpenAPI schemas and UI, in seconds.
+OPENAPI_CACHE_TIMEOUT = 0
+
 ################# Mobile URLS ##########################
 
 # These are URLs to the app store for mobile.
@@ -1998,6 +2012,11 @@ SOCIAL_AUTH_SAML_SP_PUBLIC_CERT_DICT = {}
 FACEBOOK_APP_ID = 'FACEBOOK_APP_ID'
 FACEBOOK_APP_SECRET = 'FACEBOOK_APP_SECRET'
 FACEBOOK_API_VERSION = 'v2.1'
+
+############### Settings for django-fernet-fields ##################
+FERNET_KEYS = [
+    'DUMMY KEY CHANGE BEFORE GOING TO PRODUCTION',
+]
 
 ### Proctoring configuration (redirct URLs and keys shared between systems) ####
 PROCTORING_BACKENDS = {

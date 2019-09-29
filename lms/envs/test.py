@@ -91,8 +91,6 @@ FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
 
 FEATURES['ENABLE_BULK_ENROLLMENT_VIEW'] = True
 
-FEATURES['ENABLE_API_DOCS'] = True
-
 DEFAULT_MOBILE_AVAILABLE = True
 
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
@@ -204,10 +202,6 @@ if os.environ.get('DISABLE_MIGRATIONS'):
     # to Django 1.9, which allows setting MIGRATION_MODULES to None in order to skip migrations.
     MIGRATION_MODULES = NoOpMigrationModules()
 
-# Make sure we test with the extended history table
-FEATURES['ENABLE_CSMH_EXTENDED'] = True
-INSTALLED_APPS.append('coursewarehistoryextended')
-
 CACHES = {
     # This is the cache used for most things.
     # In staging/prod envs, the sessions also live here.
@@ -232,6 +226,13 @@ CACHES = {
     },
     'course_structure_cache': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    },
+    # Blockstore caching tests require a cache that actually works:
+    'blockstore': {
+        'KEY_PREFIX': 'blockstore',
+        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'LOCATION': 'edx_loc_mem_cache',
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     },
 }
 
@@ -594,3 +595,5 @@ ACCOUNT_MICROFRONTEND_URL = "http://account-mfe/"
 ########################## limiting dashboard courses ######################
 
 DASHBOARD_COURSE_LIMIT = 250
+
+PROCTORING_SETTINGS = {}

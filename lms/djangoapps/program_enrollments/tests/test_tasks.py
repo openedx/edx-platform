@@ -1,7 +1,7 @@
 """
 Unit tests for program_course_enrollments tasks
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from datetime import timedelta
 
@@ -77,9 +77,9 @@ class ExpireWaitingEnrollmentsTest(TestCase):
         with LogCapture(log.name) as log_capture:
             expire_waiting_enrollments(60)
 
-            program_enrollment_message_tmpl = u'Found expired program_enrollment (id={}) for program_uuid={}'
+            program_enrollment_message_tmpl = 'Found expired program_enrollment (id={}) for program_uuid={}'
             course_enrollment_message_tmpl = (
-                u'Found expired program_course_enrollment (id={}) for program_uuid={}, course_key={}'
+                'Found expired program_course_enrollment (id={}) for program_uuid={}, course_key={}'
             )
 
             log_capture.check_present(

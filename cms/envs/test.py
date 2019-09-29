@@ -308,3 +308,5 @@ derive_settings(__name__)
 SYSTEM_WIDE_ROLE_CLASSES = os.environ.get("SYSTEM_WIDE_ROLE_CLASSES", [])
 
 DEFAULT_MOBILE_AVAILABLE = True
+
+PROCTORING_SETTINGS = {}

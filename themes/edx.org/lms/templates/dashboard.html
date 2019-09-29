@@ -6,7 +6,7 @@
 import json
 import pytz
 import six
-from courseware.context_processor import user_timezone_locale_prefs
+from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from datetime import datetime, timedelta
 from django.utils import timezone
 from django.utils.translation import ugettext as _
@@ -295,7 +295,7 @@ from student.models import CourseEnrollment
           <li class="order-history">
             <span class="title">${_("Order History")}</span>
             % for order_history_item in order_history_list:
-              <span><a href="${order_history_item['receipt_url']}" target="_blank" class="edit-name">${order_history_item['order_date']}</a></span>
+              <span><a href="${order_history_item['receipt_url']}" rel="noopener" target="_blank" class="edit-name">${order_history_item['order_date']}</a></span>
             % endfor
           </li>
           % endif

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
-import json
+import base64
+import simplejson as json
 from datetime import datetime, timedelta
 
 import boto
@@ -66,8 +67,8 @@ def mock_software_secure_post(url, headers=None, data=None, **kwargs):
         assert data_dict.get(key)
 
     # The keys should be stored as Base64 strings, i.e. this should not explode
-    data_dict["PhotoIDKey"].decode("base64")
-    data_dict["UserPhotoKey"].decode("base64")
+    data_dict["PhotoIDKey"] = base64.b64decode(data_dict["PhotoIDKey"])
+    data_dict["UserPhotoKey"] = base64.b64decode(data_dict["UserPhotoKey"])
 
     response = requests.Response()
     response.status_code = 200
@@ -260,7 +261,10 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
         attempt.status = 'denied'
         attempt.error_msg = '[{"userPhotoReasons": ["Face out of view"]}, {"photoIdReasons": ["Photo hidden/No photo", "ID name not provided"]}]'
         parsed_error_msg = attempt.parsed_error_msg()
-        self.assertEquals(parsed_error_msg, ['id_image_missing_name', 'user_image_not_clear', 'id_image_not_clear'])
+        self.assertEqual(
+            sorted(parsed_error_msg),
+            sorted(['id_image_missing_name', 'user_image_not_clear', 'id_image_not_clear'])
+        )
 
     @ddt.data(
         'Not Provided',

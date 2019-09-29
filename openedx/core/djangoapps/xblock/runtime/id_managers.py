@@ -4,9 +4,9 @@ our newer Open edX-specific opaque key formats.
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from opaque_keys.edx.keys import UsageKeyV2
 from xblock.runtime import IdReader
 
-from openedx.core.djangoapps.xblock.learning_context.keys import BlockUsageKeyV2
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
 
 
@@ -23,7 +23,7 @@ class OpaqueKeyReader(IdReader):
         Returns:
             The `definition_id` the usage is derived from
         """
-        if isinstance(usage_id, BlockUsageKeyV2):
+        if isinstance(usage_id, UsageKeyV2):
             return get_learning_context_impl(usage_id).definition_for_usage(usage_id)
         raise TypeError("This version of get_definition_id doesn't support the given key type.")
 

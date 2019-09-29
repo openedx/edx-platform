@@ -65,7 +65,7 @@ class StubYouTubeHandler(StubHttpRequestHandler):
                     '<?xml version="1.0" encoding="utf-8" ?>',
                     '<transcript><text start="1.0" dur="1.0">',
                     'Equal transcripts</text></transcript>'
-                ])
+                ]).encode('utf-8')
 
                 self.send_response(
                     200, content=status_message, headers={'Content-type': 'application/xml'}
@@ -77,7 +77,7 @@ class StubYouTubeHandler(StubHttpRequestHandler):
                     '<transcript><text start="1.1" dur="5.5">',
                     'Transcripts sample, different that on server',
                     '</text></transcript>'
-                ])
+                ]).encode('utf-8')
 
                 self.send_response(
                     200, content=status_message, headers={'Content-type': 'application/xml'}
@@ -99,7 +99,7 @@ class StubYouTubeHandler(StubHttpRequestHandler):
             # Delay the response to simulate network latency
             time.sleep(self.server.config.get('time_to_response', self.DEFAULT_DELAY_SEC))
             if self.server.config.get('youtube_api_blocked'):
-                self.send_response(404, content='', headers={'Content-type': 'text/plain'})
+                self.send_response(404, content=b'', headers={'Content-type': 'text/plain'})
             else:
                 # Get the response to send from YouTube.
                 # We need to do this every time because Google sometimes sends different responses
@@ -110,7 +110,7 @@ class StubYouTubeHandler(StubHttpRequestHandler):
 
         else:
             self.send_response(
-                404, content="Unused url", headers={'Content-type': 'text/plain'}
+                404, content=b"Unused url", headers={'Content-type': 'text/plain'}
             )
 
     def _send_video_response(self, youtube_id, message):
@@ -134,7 +134,7 @@ class StubYouTubeHandler(StubHttpRequestHandler):
                 })
             )
         })
-        response = "{cb}({data})".format(cb=callback, data=json.dumps(data))
+        response = "{cb}({data})".format(cb=callback, data=json.dumps(data)).encode('utf-8')
 
         self.send_response(200, content=response, headers={'Content-type': 'text/html'})
         self.log_message("Youtube: sent response {}".format(message))
@@ -158,7 +158,7 @@ class StubYouTubeHandler(StubHttpRequestHandler):
                 "message": message,
             })
         })
-        response = "{cb}({data})".format(cb=callback, data=json.dumps(data))
+        response = "{cb}({data})".format(cb=callback, data=json.dumps(data)).encode('utf-8')
 
         self.send_response(200, content=response, headers={'Content-type': 'text/html'})
         self.log_message("Youtube: sent response {}".format(message))

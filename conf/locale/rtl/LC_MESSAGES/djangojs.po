@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-02 09:05+0000\n"
-"PO-Revision-Date: 2019-09-02 09:05:28.357671\n"
+"POT-Creation-Date: 2019-09-22 20:50+0000\n"
+"PO-Revision-Date: 2019-09-22 20:51:02.363944\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -310,57 +310,57 @@ msgstr "ذخووثرفشقغ"
 msgid "Reply to Annotation"
 msgstr "قثحمغ فخ شررخفشفهخر"
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (graded, results hidden)"
-msgid_plural "%(num_points)s points possible (graded, results hidden)"
-msgstr[0] "%(num_points)s حخهرف حخسسهزمث (لقشيثي, قثسعمفس اهييثر)"
-msgstr[1] "%(num_points)s حخهرفس حخسسهزمث (لقشيثي, قثسعمفس اهييثر)"
+msgid "{num_points} point possible (graded, results hidden)"
+msgid_plural "{num_points} points possible (graded, results hidden)"
+msgstr[0] "{num_points} حخهرف حخسسهزمث (لقشيثي, قثسعمفس اهييثر)"
+msgstr[1] "{num_points} حخهرفس حخسسهزمث (لقشيثي, قثسعمفس اهييثر)"
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (ungraded, results hidden)"
-msgid_plural "%(num_points)s points possible (ungraded, results hidden)"
-msgstr[0] "%(num_points)s حخهرف حخسسهزمث (عرلقشيثي, قثسعمفس اهييثر)"
-msgstr[1] "%(num_points)s حخهرفس حخسسهزمث (عرلقشيثي, قثسعمفس اهييثر)"
+msgid "{num_points} point possible (ungraded, results hidden)"
+msgid_plural "{num_points} points possible (ungraded, results hidden)"
+msgstr[0] "{num_points} حخهرف حخسسهزمث (عرلقشيثي, قثسعمفس اهييثر)"
+msgstr[1] "{num_points} حخهرفس حخسسهزمث (عرلقشيثي, قثسعمفس اهييثر)"
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (graded)"
-msgid_plural "%(num_points)s points possible (graded)"
-msgstr[0] "%(num_points)s حخهرف حخسسهزمث (لقشيثي)"
-msgstr[1] "%(num_points)s حخهرفس حخسسهزمث (لقشيثي)"
+msgid "{num_points} point possible (graded)"
+msgid_plural "{num_points} points possible (graded)"
+msgstr[0] "{num_points} حخهرف حخسسهزمث (لقشيثي)"
+msgstr[1] "{num_points} حخهرفس حخسسهزمث (لقشيثي)"
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
+#. Translators: {num_points} is the number of points possible (examples: 1, 3,
+#. 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (ungraded)"
-msgid_plural "%(num_points)s points possible (ungraded)"
-msgstr[0] "%(num_points)s حخهرف حخسسهزمث (عرلقشيثي)"
-msgstr[1] "%(num_points)s حخهرفس حخسسهزمث (عرلقشيثي)"
+msgid "{num_points} point possible (ungraded)"
+msgid_plural "{num_points} points possible (ungraded)"
+msgstr[0] "{num_points} حخهرف حخسسهزمث (عرلقشيثي)"
+msgstr[1] "{num_points} حخهرفس حخسسهزمث (عرلقشيثي)"
 
-#. Translators: %(earned)s is the number of points earned. %(possible)s is the
+#. Translators: {earned} is the number of points earned. {possible} is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
 #. points will always be at least 1. We pluralize based on the total number of
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(earned)s/%(possible)s point (graded)"
-msgid_plural "%(earned)s/%(possible)s points (graded)"
-msgstr[0] "%(earned)s/%(possible)s حخهرف (لقشيثي)"
-msgstr[1] "%(earned)s/%(possible)s حخهرفس (لقشيثي)"
+msgid "{earned}/{possible} point (graded)"
+msgid_plural "{earned}/{possible} points (graded)"
+msgstr[0] "{earned}/{possible} حخهرف (لقشيثي)"
+msgstr[1] "{earned}/{possible} حخهرفس (لقشيثي)"
 
-#. Translators: %(earned)s is the number of points earned. %(possible)s is the
+#. Translators: {earned} is the number of points earned. {possible} is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
 #. points will always be at least 1. We pluralize based on the total number of
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(earned)s/%(possible)s point (ungraded)"
-msgid_plural "%(earned)s/%(possible)s points (ungraded)"
-msgstr[0] "%(earned)s/%(possible)s حخهرف (عرلقشيثي)"
-msgstr[1] "%(earned)s/%(possible)s حخهرفس (عرلقشيثي)"
+msgid "{earned}/{possible} point (ungraded)"
+msgid_plural "{earned}/{possible} points (ungraded)"
+msgstr[0] "{earned}/{possible} حخهرف (عرلقشيثي)"
+msgstr[1] "{earned}/{possible} حخهرفس (عرلقشيثي)"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "The grading process is still running. Refresh the page to see updates."

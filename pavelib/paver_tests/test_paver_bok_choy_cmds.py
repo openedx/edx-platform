@@ -6,7 +6,12 @@ from __future__ import absolute_import
 
 import os
 import unittest
-from test.test_support import EnvironmentVarGuard
+import six
+
+if six.PY2:
+    from test.test_support import EnvironmentVarGuard
+else:
+    from test.support import EnvironmentVarGuard   # pylint: disable=import-error,no-name-in-module
 
 from pavelib.utils.test.suites import BokChoyTestSuite
 

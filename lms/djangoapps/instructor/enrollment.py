@@ -26,7 +26,7 @@ from submissions import api as sub_api  # installed from the edx-submissions rep
 from submissions.models import score_set
 
 from course_modes.models import CourseMode
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.grades.api import constants as grades_constants
 from lms.djangoapps.grades.api import disconnect_submissions_signal_receiver
 from lms.djangoapps.grades.api import events as grades_events

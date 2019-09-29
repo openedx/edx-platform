@@ -234,7 +234,7 @@ class CourseEndingTest(TestCase):
         Tests that the higher of the persisted grade and the grade
         from the certs table is used on the learner dashboard.
         """
-        expected_grade = max(persisted_grade, cert_grade)
+        expected_grade = max(filter(lambda x: x is not None, [persisted_grade, cert_grade]))
         user = Mock(username="fred", id="1")
         survey_url = "http://a_survey.com"
         course = Mock(
@@ -395,7 +395,7 @@ class DashboardTest(ModuleStoreTestCase):
         self.assertIsNone(course_mode_info['days_for_upsell'])
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    @patch('courseware.views.index.log.warning')
+    @patch('lms.djangoapps.courseware.views.index.log.warning')
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_blocked_course_scenario(self, log_warning):
 

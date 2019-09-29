@@ -81,8 +81,7 @@ git+https://github.com/edx/bridgekeeper.git@4e34894e4ac5d0467ed1901811a81fd87ee0
 # Our libraries:
 -e git+https://github.com/edx/codejail.git@ed3d36c27913254a23273da95ad627a1bbbffa44#egg=codejail
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
-git+https://github.com/edx/edx-ora2.git@2.2.7#egg=ora2==2.2.7
-git+https://github.com/edx/RecommenderXBlock.git@1.4.1#egg=recommender-xblock==1.4.1
+git+https://github.com/edx/edx-ora2.git@2.3.1#egg=ora2==2.3.1
 git+https://github.com/edx/crowdsourcehinter.git@a7ffc85b134b7d8909bf1fefd23dbdb8eb28e467#egg=crowdsourcehinter-xblock==0.2
 -e git+https://github.com/edx/RateXBlock.git@367e19c0f6eac8a5f002fd0f1559555f8e74bfff#egg=rate-xblock
 -e git+https://github.com/edx/DoneXBlock.git@01a14f3bd80ae47dd08cdbbe2f88f3eb88d00fba#egg=done-xblock
@@ -93,6 +92,6 @@ git+https://github.com/edx/xblock-lti-consumer.git@v1.1.8#egg=lti_consumer-xbloc
 # Third Party XBlocks
 
 git+https://github.com/joestump/python-oauth2.git@b94f69b1ad195513547924e380d9265133e995fa#egg=oauth2
-git+https://github.com/mitodl/edx-sga.git@3828ba9e413080a81b907a3381e5ffa05e063f81#egg=edx-sga==0.8.3
+git+https://github.com/mitodl/edx-sga.git@237ad328ba3f03d189c421073c85e48091041f8b#egg=edx-sga==0.0
 git+https://github.com/open-craft/xblock-poll@add89e14558c30f3c8dc7431e5cd6536fff6d941#egg=xblock-poll==1.5.1
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.4#egg=xblock-drag-and-drop-v2==2.2.4

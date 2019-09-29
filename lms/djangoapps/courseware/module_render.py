@@ -46,15 +46,15 @@ from xblock.runtime import KvsFieldData
 
 import static_replace
 from capa.xqueue_interface import XQueueInterface
-from courseware.access import get_user_role, has_access
-from courseware.entrance_exams import user_can_skip_entrance_exam, user_has_passed_entrance_exam
-from courseware.masquerade import (
+from lms.djangoapps.courseware.access import get_user_role, has_access
+from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam, user_has_passed_entrance_exam
+from lms.djangoapps.courseware.masquerade import (
     MasqueradingKeyValueStore,
     filter_displayed_blocks,
     is_masquerading_as_specific_student,
     setup_masquerade
 )
-from courseware.model_data import DjangoKeyValueStore, FieldDataCache
+from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.grades.api import GradesUtilService
@@ -1225,7 +1225,7 @@ def hash_resource(resource):
     """
     md5 = hashlib.md5()
     for data in resource:
-        md5.update(repr(data))
+        md5.update(repr(data).encode('utf-8'))
     return md5.hexdigest()
 
 
@@ -1311,7 +1311,8 @@ def append_data_to_webob_response(response, data):
 
     """
     if getattr(response, 'content_type', None) == 'application/json':
-        response_data = json.loads(response.body)
+        json_input = response.body.decode('utf-8') if isinstance(response.body, bytes) else response.body
+        response_data = json.loads(json_input)
         response_data.update(data)
-        response.body = json.dumps(response_data)
+        response.body = json.dumps(response_data).encode('utf-8')
     return response

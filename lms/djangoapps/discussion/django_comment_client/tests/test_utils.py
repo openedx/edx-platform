@@ -18,8 +18,8 @@ from six import text_type
 import lms.djangoapps.discussion.django_comment_client.utils as utils
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.tabs import get_course_tab_list
-from courseware.tests.factories import InstructorFactory
+from lms.djangoapps.courseware.tabs import get_course_tab_list
+from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from lms.djangoapps.discussion.django_comment_client.tests.unicode import UnicodeTestMixin
@@ -359,6 +359,7 @@ class CategoryMapTestMixin(object):
         Call `get_discussion_category_map`, and verify that it returns
         what is expected.
         """
+
         self.assertEqual(
             utils.get_discussion_category_map(self.course, requesting_user or self.user),
             expected
@@ -1151,38 +1152,43 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
         Verify that the beta user can access the beta and global
         discussion topics.
         """
-        self.assert_category_map_equals(
-            {
-                'subcategories': {
-                    'Week 1': {
-                        'subcategories': {},
-                        'children': [
-                            ('Visible to Beta', 'entry'),
-                            ('Visible to Everyone', 'entry')
-                        ],
-                        'entries': {
-                            'Visible to Beta': {
-                                'sort_key': None,
-                                'is_divided': False,
-                                'id': 'beta_group_discussion'
-                            },
-                            'Visible to Everyone': {
-                                'sort_key': None,
-                                'is_divided': False,
-                                'id': 'global_group_discussion'
-                            }
+
+        children = [('Visible to Beta', 'entry'), ('Visible to Everyone', 'entry')]
+
+        if six.PY3:
+            children = [('Visible to Everyone', 'entry'), ('Visible to Beta', 'entry')]
+
+        expected = {
+            'subcategories': {
+                'Week 1': {
+                    'subcategories': {},
+                    'children': children,
+                    'entries': {
+                        'Visible to Beta': {
+                            'sort_key': None,
+                            'is_divided': False,
+                            'id': 'beta_group_discussion'
+                        },
+                        'Visible to Everyone': {
+                            'sort_key': None,
+                            'is_divided': False,
+                            'id': 'global_group_discussion'
                         }
-                    }
-                },
-                'children': [('General', 'entry'), ('Week 1', 'subcategory')],
-                'entries': {
-                    'General': {
-                        'sort_key': 'General',
-                        'is_divided': False,
-                        'id': 'i4x-org-number-course-run'
                     }
                 }
             },
+            'children': [('General', 'entry'), ('Week 1', 'subcategory')],
+            'entries': {
+                'General': {
+                    'sort_key': 'General',
+                    'is_divided': False,
+                    'id': 'i4x-org-number-course-run'
+                }
+            }
+        }
+
+        self.assert_category_map_equals(
+            expected,
             requesting_user=self.beta_user
         )
 

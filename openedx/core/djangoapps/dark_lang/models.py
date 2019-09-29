@@ -5,8 +5,10 @@ from __future__ import absolute_import
 
 from config_models.models import ConfigurationModel
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class DarkLangConfig(ConfigurationModel):
     """
     Configuration for the dark_lang django app.
@@ -26,7 +28,7 @@ class DarkLangConfig(ConfigurationModel):
         help_text="A comma-separated list of language codes to release to the public as beta languages."
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return u"DarkLangConfig()"
 
     @property

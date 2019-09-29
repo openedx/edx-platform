@@ -14,6 +14,7 @@ from django.core.validators import validate_comma_separated_integer_list
 from django.db import models
 from django.db.models import Q
 from django.dispatch import receiver
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from edx_django_utils.cache import RequestCache
@@ -38,6 +39,7 @@ Mode = namedtuple('Mode',
                   ])
 
 
+@python_2_unicode_compatible
 class CourseMode(models.Model):
     """
     We would like to offer a course in a variety of modes.
@@ -211,7 +213,7 @@ class CourseMode(models.Model):
 
         mode_config = settings.COURSE_ENROLLMENT_MODES.get(self.mode_slug, {})
         min_price_for_mode = mode_config.get('min_price', 0)
-        if self.min_price < min_price_for_mode:
+        if int(self.min_price) < min_price_for_mode:
             mode_display_name = mode_config.get('display_name', self.mode_slug)
             raise ValidationError(
                 _(
@@ -791,7 +793,7 @@ class CourseMode(models.Model):
             self.bulk_sku
         )
 
-    def __unicode__(self):
+    def __str__(self):
         return u"{} : {}, min={}".format(
             self.course_id, self.mode_slug, self.min_price
         )
@@ -902,6 +904,7 @@ class CourseModesArchive(models.Model):
     expiration_datetime = models.DateTimeField(default=None, null=True, blank=True)
 
 
+@python_2_unicode_compatible
 class CourseModeExpirationConfig(ConfigurationModel):
     """
     Configuration for time period from end of course to auto-expire a course mode.
@@ -918,6 +921,6 @@ class CourseModeExpirationConfig(ConfigurationModel):
         )
     )
 
-    def __unicode__(self):
+    def __str__(self):
         """ Returns the unicode date of the verification window. """
         return six.text_type(self.verification_window)

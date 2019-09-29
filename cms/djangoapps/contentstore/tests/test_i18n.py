@@ -14,6 +14,7 @@ from django.utils.translation import get_language
 
 from contentstore.tests.utils import AjaxEnabledTestClient
 from contentstore.views.preview import _preview_module_system
+from openedx.core.lib.edx_six import get_gettext
 from xmodule.modulestore.django import ModuleI18nService
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -94,7 +95,7 @@ class TestModuleI18nService(ModuleStoreTestCase):
 
             def __init__(self, module):
                 self.module = module
-                self.old_ugettext = module.ugettext
+                self.old_ugettext = get_gettext(module)
 
             def __enter__(self):
                 def new_ugettext(*args, **kwargs):
@@ -102,9 +103,11 @@ class TestModuleI18nService(ModuleStoreTestCase):
                     output = self.old_ugettext(*args, **kwargs)
                     return "XYZ " + output
                 self.module.ugettext = new_ugettext
+                self.module.gettext = new_ugettext
 
             def __exit__(self, _type, _value, _traceback):
                 self.module.ugettext = self.old_ugettext
+                self.module.gettext = self.old_ugettext
 
         i18n_service = self.get_module_i18n_service(self.descriptor)
 
@@ -149,9 +152,9 @@ class TestModuleI18nService(ModuleStoreTestCase):
         with mock.patch('gettext.translation', return_value=_translator(domain='text', localedir=localedir,
                                                                         languages=[get_language()])):
             i18n_service = self.get_module_i18n_service(self.descriptor)
-            self.assertEqual(i18n_service.ugettext('Hello'), 'Hello')
-            self.assertNotEqual(i18n_service.ugettext('Hello'), 'fr-hello-world')
-            self.assertNotEqual(i18n_service.ugettext('Hello'), 'es-hello-world')
+            self.assertEqual(get_gettext(i18n_service)('Hello'), 'Hello')
+            self.assertNotEqual(get_gettext(i18n_service)('Hello'), 'fr-hello-world')
+            self.assertNotEqual(get_gettext(i18n_service)('Hello'), 'es-hello-world')
 
         translation.activate("fr")
         with mock.patch('gettext.translation', return_value=_translator(domain='text', localedir=localedir,
