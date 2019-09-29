@@ -2270,12 +2270,12 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         # If user try to access without login should see a bad request status code with message
         self.client.logout()
         resp = self.client.post(self.url)
-        self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
         self.assertContains(
             resp,
             u"You must be signed in to {platform_name} to create a certificate.".format(
-               platform_name=settings.PLATFORM_NAME
-            )
+                platform_name=settings.PLATFORM_NAME
+            ),
+            status_code=HttpResponseBadRequest.status_code,
         )
 
 

@@ -318,7 +318,6 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self._add_course_certificates(count=1, signatory_count=1, is_active=True)
         test_url = get_certificate_url(course_id=self.cert.course_id, uuid=self.cert.verify_uuid)
         response = self.client.get(test_url, HTTP_HOST='test.localhost')
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Post on Facebook")
         self.assertContains(response, 'test_facebook_my_site')
 

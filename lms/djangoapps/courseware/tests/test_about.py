@@ -362,7 +362,7 @@ class AboutWithInvitationOnly(SharedModuleStoreTestCase):
         self.assertContains(resp, "Enrollment in this course is by invitation only")
 
         # Check that registration button is not present
-        self.assertNotContains(response, REG_STR)
+        self.assertNotContains(resp, REG_STR)
 
     def test_invitation_only_but_allowed(self):
         """
@@ -412,14 +412,14 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
         self.assertContains(resp, "Enrollment is Closed")
 
         # Check that registration button is not present
-        self.assertNotContains(response, REG_STR)
+        self.assertNotContains(resp, REG_STR)
 
     def test_course_price_is_not_visble_in_sidebar(self):
         url = reverse('about_course', args=[text_type(self.course.id)])
         resp = self.client.get(url)
         # course price is not visible ihe course_about page when the course
         # mode is not set to honor
-        self.assertNotContains(response, '<span class="important-dates-item-text">$10</span>')
+        self.assertNotContains(resp, '<span class="important-dates-item-text">$10</span>')
 
 
 @ddt.ddt
@@ -461,7 +461,7 @@ class AboutSidebarHTMLTestCase(SharedModuleStoreTestCase):
                 self.assertContains(resp, '<section class="about-sidebar-html">')
                 self.assertContains(resp, itemfactory_data)
             else:
-                self.assertNotContains(response, '<section class="about-sidebar-html">')
+                self.assertNotContains(resp, '<section class="about-sidebar-html">')
 
 
 @patch.dict(settings.FEATURES, {'ENABLE_SHOPPING_CART': True})
@@ -534,7 +534,7 @@ class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         url = reverse('about_course', args=[text_type(self.course.id)])
         resp = self.client.get(url)
         self.assertContains(resp, "This course is in your")
-        self.assertNotContains(response, "Add buyme to Cart <span>($10 USD)</span>")
+        self.assertNotContains(resp, "Add buyme to Cart <span>($10 USD)</span>")
 
     def test_already_enrolled(self):
         """
@@ -552,7 +552,7 @@ class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         resp = self.client.get(url)
         self.assertContains(resp, "You are enrolled in this course")
         self.assertContains(resp, "View Course")
-        self.assertNotContains(response, "Add buyme to Cart <span>($10 USD)</span>")
+        self.assertNotContains(resp, "Add buyme to Cart <span>($10 USD)</span>")
 
     def test_closed_enrollment(self):
         """
@@ -564,7 +564,7 @@ class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         url = reverse('about_course', args=[text_type(self.closed_course.id)])
         resp = self.client.get(url)
         self.assertContains(resp, "Enrollment is Closed")
-        self.assertNotContains(response, "Add closed to Cart <span>($10 USD)</span>")
+        self.assertNotContains(resp, "Add closed to Cart <span>($10 USD)</span>")
 
         # course price is visible ihe course_about page when the course
         # mode is set to honor and it's price is set
@@ -618,7 +618,7 @@ class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         # Get the about page again and make sure that the page says that the course is full
         resp = self.client.get(url)
         self.assertContains(resp, "Course is full")
-        self.assertNotContains(response, "Add buyme to Cart ($10)")
+        self.assertNotContains(resp, "Add buyme to Cart ($10)")
 
     def test_free_course_display(self):
         """
@@ -630,8 +630,8 @@ class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         url = reverse('about_course', args=[text_type(course.id)])
 
         resp = self.client.get(url)
-        self.assertNotContains(response, "Add free to Cart (Free)")
-        self.assertNotContains(response, '<p class="important-dates-item-title">Price</p>')
+        self.assertNotContains(resp, "Add free to Cart (Free)")
+        self.assertNotContains(resp, '<p class="important-dates-item-title">Price</p>')
 
 
 class CourseAboutTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase):

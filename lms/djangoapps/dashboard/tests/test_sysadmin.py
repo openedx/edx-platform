@@ -258,9 +258,9 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         response = self.client.get(
             reverse('gitlogs_detail', kwargs={
                 'course_id': 'Not/Real/Testing'}))
-        self.assertIn(
+        self.assertContains(
+            response,
             'No git import logs have been recorded for this course.',
-            response.content
         )
 
     def test_gitlog_no_logs(self):

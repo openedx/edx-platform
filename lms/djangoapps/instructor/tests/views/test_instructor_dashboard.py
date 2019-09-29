@@ -246,9 +246,9 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         numbers of learners.
         """
         response = self.client.get(self.url)
-        self.assertIn(
+        self.assertContains(
+            response,
             self.GRADEBOOK_LEARNER_COUNT_MESSAGE,
-            response.content
         )
         self.assertContains(response, 'View Gradebook')
 

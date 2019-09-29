@@ -341,9 +341,9 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         # URL for update_coupon
         update_coupon_url = reverse('update_coupon', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(update_coupon_url, data=data)
-        self.assertIn(
+        self.assertContains(
+            response,
             u'coupon with the coupon id ({coupon_id}) updated Successfully'.format(coupon_id=coupon.id),
-            response.content
         )
 
         response = self.client.post(self.url)

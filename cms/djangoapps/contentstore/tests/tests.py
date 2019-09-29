@@ -202,19 +202,19 @@ class AuthTestCase(ContentStoreTestCase):
 
             for i in range(3):
                 resp = self._login(self.email, 'wrong_password{0}'.format(i))
-                self.assertEqual(resp.status_code, 403)
-                self.assertIn(
+                self.assertContains(
+                    resp,
                     'Email or password is incorrect.',
-                    resp.content
+                    status_code=403,
                 )
 
             # now the account should be locked
 
             resp = self._login(self.email, 'wrong_password')
-            self.assertEqual(resp.status_code, 403)
-            self.assertIn(
+            self.assertContains(
+                resp,
                 'This account has been temporarily locked due to excessive login failures.',
-                resp.content
+                status_code=403,
             )
 
             with freeze_time('2100-01-01'):
@@ -222,10 +222,10 @@ class AuthTestCase(ContentStoreTestCase):
 
             # make sure the failed attempt counter gets reset on successful login
             resp = self._login(self.email, 'wrong_password')
-            self.assertEqual(resp.status_code, 403)
-            self.assertIn(
+            self.assertContains(
+                resp,
                 'Email or password is incorrect.',
-                resp.content
+                status_code=403,
             )
 
             # account should not be locked out after just one attempt

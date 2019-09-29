@@ -289,10 +289,10 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         PaidCourseRegistration.add_to_order(self.cart, self.course_key)
         self.login_user()
         resp = self.client.post(reverse('add_course_to_cart', args=[text_type(self.course_key)]))
-        self.assertEqual(resp.status_code, 400)
-        self.assertIn(
+        self.assertContains(
+            resp,
             u'The course {0} is already in your cart.'.format(text_type(self.course_key)),
-            resp.content.decode('utf-8')
+            status_code=400,
         )
 
     def test_course_discount_invalid_coupon(self):
@@ -300,10 +300,10 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.add_course_to_user_cart(self.course_key)
         non_existing_code = "non_existing_code"
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': non_existing_code})
-        self.assertEqual(resp.status_code, 404)
-        self.assertIn(
+        self.assertContains(
+            resp,
             u"Discount does not exist against code '{0}'.".format(non_existing_code),
-            resp.content.decode('utf-8')
+            status_code=404,
         )
 
     def test_valid_qty_greater_then_one_and_purchase_type_should_business(self):
@@ -422,20 +422,20 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.add_course_to_user_cart(self.course_key)
         non_existing_code = "non_existing_code"
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': non_existing_code})
-        self.assertEqual(resp.status_code, 404)
-        self.assertIn(
+        self.assertContains(
+            resp,
             u"Discount does not exist against code '{0}'.".format(non_existing_code),
-            resp.content.decode('utf-8')
+            status_code=404,
         )
 
     def test_course_discount_inactive_coupon(self):
         self.add_coupon(self.course_key, False, self.coupon_code)
         self.add_course_to_user_cart(self.course_key)
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
-        self.assertEqual(resp.status_code, 404)
-        self.assertIn(
+        self.assertContains(
+            resp,
             u"Discount does not exist against code '{0}'.".format(self.coupon_code),
-            resp.content.decode('utf-8')
+            status_code=404,
         )
 
     def test_course_does_not_exist_in_cart_against_valid_coupon(self):
@@ -444,10 +444,10 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.add_course_to_user_cart(self.course_key)
 
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
-        self.assertEqual(resp.status_code, 404)
-        self.assertIn(
+        self.assertContains(
+            resp,
             u"Discount does not exist against code '{0}'.".format(self.coupon_code),
-            resp.content.decode('utf-8')
+            status_code=404,
         )
 
     def test_inactive_registration_code_returns_error(self):
@@ -462,10 +462,12 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         # now apply the inactive registration code
         # it will raise an exception
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
-        self.assertEqual(resp.status_code, 400)
-        self.assertIn(
+        self.assertContains(
+            resp,
             u"This enrollment code ({enrollment_code}) is no longer valid.".format(
-                enrollment_code=self.reg_code), resp.content.decode('utf-8'))
+                enrollment_code=self.reg_code),
+            status_code=400,
+        )
 
     def test_course_does_not_exist_in_cart_against_valid_reg_code(self):
         course_key = text_type(self.course_key) + 'testing'
@@ -473,10 +475,10 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.add_course_to_user_cart(self.course_key)
 
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
-        self.assertEqual(resp.status_code, 404)
-        self.assertIn(
+        self.assertContains(
+            resp,
             u"Code '{0}' is not valid for any course in the shopping cart.".format(self.reg_code),
-            resp.content.decode('utf-8')
+            status_code=404,
         )
 
     def test_cart_item_qty_greater_than_1_against_valid_reg_code(self):
@@ -488,10 +490,10 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         # now update the cart item quantity and then apply the registration code
         # it will raise an exception
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
-        self.assertEqual(resp.status_code, 404)
-        self.assertIn(
+        self.assertContains(
+            resp,
             "Cart item quantity should not be greater than 1 when applying activation code",
-            resp.content.decode('utf-8')
+            status_code=404,
         )
 
     @ddt.data(True, False)
@@ -535,10 +537,10 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         # now using the same coupon code against the same order.
         # Only one coupon redemption should be allowed per order.
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
-        self.assertEqual(resp.status_code, 400)
-        self.assertIn(
+        self.assertContains(
+            resp,
             "Only one coupon redemption is allowed against an order",
-            resp.content.decode('utf-8')
+            status_code=400,
         )
 
     def test_course_discount_against_two_distinct_coupon_codes(self):
@@ -557,10 +559,10 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         # Only one coupon redemption should be allowed per order.
         self.add_coupon(self.course_key, True, 'abxyz')
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': 'abxyz'})
-        self.assertEqual(resp.status_code, 400)
-        self.assertIn(
+        self.assertContains(
+            resp,
             "Only one coupon redemption is allowed against an order",
-            resp.content.decode('utf-8')
+            status_code=400,
         )
 
     def test_same_coupons_code_on_multiple_courses(self):
@@ -1272,9 +1274,9 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.assertContains(resp, 'FirstNameTesting123')
         self.assertContains(resp, '80.00')
         # check for the enrollment codes content
-        self.assertIn(
+        self.assertContains(
+            resp,
             'Please send each professional one of these unique registration codes to enroll into the course.',
-            resp.content.decode('utf-8')
         )
 
         # fetch the newly generated registration codes
@@ -1291,9 +1293,9 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.assertFalse(context['reg_code_info_list'][0]['is_redeemed'])
         self.assertFalse(context['reg_code_info_list'][1]['is_redeemed'])
 
-        self.assertIn(
+        self.assertContains(
+            resp,
             self.cart.purchase_time.strftime(u"%B %d, %Y"),
-            resp.content.decode('utf-8')
         )
         self.assertContains(resp, self.cart.company_name)
         self.assertContains(resp, self.cart.company_contact_name)
@@ -2158,9 +2160,9 @@ class CSVReportViewsTest(SharedModuleStoreTestCase):
         self.assertEqual(response['Content-Type'], 'text/csv')
         report = initialize_report(report_type, start_date, end_date)
         self.assertContains(response, ",".join(report.header()))
-        self.assertIn(
+        self.assertContains(
+            response,
             ",1,purchased,1,40.00,40.00,usd,Registration for Course: Robot Super Course,",
-            response.content
         )
 
     def test_report_csv_university_revenue_share(self):

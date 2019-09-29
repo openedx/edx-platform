@@ -327,10 +327,9 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             }
         )
         resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 200)
-        self.assertIn(
+        self.assertContains(
+            resp,
             u'To access course materials, you must score {}% or higher'.format(minimum_score_pct),
-            resp.content.decode(resp.charset)
         )
         self.assertIn(u'Your current score is 20%.', resp.content.decode(resp.charset))
 

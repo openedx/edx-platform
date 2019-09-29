@@ -293,30 +293,27 @@ class TestCommonExceptions400(TestCase):
     def test_user_doesnotexist(self):
         self.request.is_ajax.return_value = False
         resp = view_user_doesnotexist(self.request)  # pylint: disable=assignment-from-no-return
-        self.assertEqual(resp.status_code, 400)
-        self.assertIn("User does not exist", resp.content.decode("utf-8"))
+        self.assertContains(resp, "User does not exist", status_code=400)
 
     def test_user_doesnotexist_ajax(self):
         self.request.is_ajax.return_value = True
         resp = view_user_doesnotexist(self.request)  # pylint: disable=assignment-from-no-return
-        self.assertEqual(resp.status_code, 400)
-        self.assertIn("User does not exist", resp.content.decode("utf-8"))
+        self.assertContains(resp, "User does not exist", status_code=400)
 
     @ddt.data(True, False)
     def test_alreadyrunningerror(self, is_ajax):
         self.request.is_ajax.return_value = is_ajax
         resp = view_alreadyrunningerror(self.request)  # pylint: disable=assignment-from-no-return
-        self.assertEqual(resp.status_code, 400)
-        self.assertIn("Requested task is already running", resp.content.decode("utf-8"))
+        self.assertContains(resp, "Requested task is already running", status_code=400)
 
     @ddt.data(True, False)
     def test_alreadyrunningerror_with_unicode(self, is_ajax):
         self.request.is_ajax.return_value = is_ajax
         resp = view_alreadyrunningerror_unicode(self.request)  # pylint: disable=assignment-from-no-return
-        self.assertEqual(resp.status_code, 400)
-        self.assertIn(
+        self.assertContains(
+            resp,
             u'Text with unicode chárácters',
-            resp.content.decode('utf-8')
+            status_code=400,
         )
 
     @ddt.data(True, False)
@@ -326,10 +323,10 @@ class TestCommonExceptions400(TestCase):
         """
         self.request.is_ajax.return_value = is_ajax
         resp = view_queue_connection_error(self.request)  # pylint: disable=assignment-from-no-return
-        self.assertEqual(resp.status_code, 400)
-        self.assertIn(
+        self.assertContains(
+            resp,
             'Error occured. Please try again later',
-            resp.content.decode('utf-8')
+            status_code=400,
         )
 
 
