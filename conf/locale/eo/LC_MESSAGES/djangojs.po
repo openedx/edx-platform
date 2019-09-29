@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-22 20:50+0000\n"
-"PO-Revision-Date: 2019-09-22 20:51:02.363944\n"
+"POT-Creation-Date: 2019-09-29 20:50+0000\n"
+"PO-Revision-Date: 2019-09-29 20:50:57.281676\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -10603,6 +10603,10 @@ msgstr ""
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ "
 "єѕт ł#"
 
+#: cms/templates/js/copy-clipboard-button.underscore
+msgid "Copy Component Location"
+msgstr "Çöpý Çömpönént Löçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Weekly Highlight Emails"
 msgstr "Wééklý Hïghlïght Émäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
@@ -11075,6 +11079,10 @@ msgstr "Çhäptér ïnförmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт �
 msgid "Add a Chapter"
 msgstr "Àdd ä Çhäptér Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
+#: cms/templates/js/edit-title-button.underscore
+msgid "Edit Title"
+msgstr "Édït Tïtlé Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
 #: cms/templates/js/grading-editor.underscore
 msgid "Grading"
 msgstr "Grädïng Ⱡ'σяєм ιρѕυм #"
@@ -11269,10 +11277,6 @@ msgstr "Çléär Ⱡ'σяєм ιρѕ#"
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear Value"
 msgstr "Çléär Välüé Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: cms/templates/js/metadata-editor.underscore
-msgid "Component Location ID"
-msgstr "Çömpönént Löçätïön ÌD Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video-transcripts.underscore

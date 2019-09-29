@@ -29,6 +29,7 @@
 # Thắng Trần <tmt111295@gmail.com>, 2019
 # Theodora. Tôn Nữ Quý Thiện <thien.tonnu1001@gmail.com>, 2015
 # Trung V. Nguyen <trung.ngvan@gmail.com>, 2015
+# Tuan Nguyen <tuannn.bk@gmail.com>, 2019
 # Vu Bach, 2019
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/).
@@ -105,8 +106,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-22 20:42+0000\n"
-"PO-Revision-Date: 2019-07-28 20:42+0000\n"
+"POT-Creation-Date: 2019-09-29 20:42+0000\n"
+"PO-Revision-Date: 2019-09-29 20:43+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)\n"
 "Language: vi\n"
@@ -9290,6 +9291,10 @@ msgstr ""
 "bản trong phần con này sẽ suất hiện cho người học trừ khi chúng được ẩn một "
 "cách rõ ràng."
 
+#: cms/templates/js/copy-clipboard-button.underscore
+msgid "Copy Component Location"
+msgstr ""
+
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Weekly Highlight Emails"
 msgstr ""
@@ -9725,6 +9730,10 @@ msgstr "Thông tin chương"
 msgid "Add a Chapter"
 msgstr "Thêm một Chương"
 
+#: cms/templates/js/edit-title-button.underscore
+msgid "Edit Title"
+msgstr ""
+
 #: cms/templates/js/grading-editor.underscore
 msgid "Grading"
 msgstr "Đánh Giá"
@@ -9893,10 +9902,6 @@ msgstr "Xóa"
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear Value"
 msgstr "Xoá Giá trị"
-
-#: cms/templates/js/metadata-editor.underscore
-msgid "Component Location ID"
-msgstr "ID Vị trí Thành phần"
 
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video-transcripts.underscore

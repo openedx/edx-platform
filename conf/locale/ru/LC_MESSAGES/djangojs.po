@@ -7,7 +7,7 @@
 # dfxedx <ah532@ya.ru>, 2014
 # Alena Koneva <alenakoneva@ya.ru>, 2014
 # Alexander Eroshkin <gjrfytne@gmail.com>, 2019
-# Alexander Grigorov <mistersasha2103@gmail.com>, 2019
+# Александр Григоров <mistersasha2103@gmail.com>, 2019
 # Alexander Kireev <alexx6x@gmail.com>, 2019
 # Alexandr Kosharny <acosarnii@gmail.com>, 2016
 # Alexey Yuriev <yurievac@gmail.com>, 2018
@@ -177,8 +177,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-22 20:42+0000\n"
-"PO-Revision-Date: 2019-07-28 20:42+0000\n"
+"POT-Creation-Date: 2019-09-29 20:42+0000\n"
+"PO-Revision-Date: 2019-09-29 20:43+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "Language: ru\n"
@@ -9548,6 +9548,10 @@ msgstr ""
 " блоки из данного подраздела станут доступны обучающимся, за исключением "
 "блоков, намеренно скрытых авторами."
 
+#: cms/templates/js/copy-clipboard-button.underscore
+msgid "Copy Component Location"
+msgstr ""
+
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Weekly Highlight Emails"
 msgstr ""
@@ -9979,6 +9983,10 @@ msgstr "Информация о главе"
 msgid "Add a Chapter"
 msgstr "Добавить главу"
 
+#: cms/templates/js/edit-title-button.underscore
+msgid "Edit Title"
+msgstr ""
+
 #: cms/templates/js/grading-editor.underscore
 msgid "Grading"
 msgstr "Оценивание"
@@ -10146,10 +10154,6 @@ msgstr "Очистить"
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear Value"
 msgstr "Очистить значение"
-
-#: cms/templates/js/metadata-editor.underscore
-msgid "Component Location ID"
-msgstr "Идентификатор местонахождения компонента"
 
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video-transcripts.underscore

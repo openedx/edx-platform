@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-22 20:51+0000\n"
-"PO-Revision-Date: 2019-09-22 20:51:02.550394\n"
+"POT-Creation-Date: 2019-09-29 20:50+0000\n"
+"PO-Revision-Date: 2019-09-29 20:50:57.221772\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -6032,7 +6032,7 @@ msgstr ""
 "ش قثبعري قثضعثسف اشس زثثر هرهفهشفثي بخق {username} ({email}). فخ حقخذثسس "
 "فاهس قثضعثسف, حمثشسث دهسهف فاث مهرن(س) زثمخص."
 
-#: lms/djangoapps/commerce/views.py lms/djangoapps/shoppingcart/pdf.py
+#: lms/djangoapps/commerce/views.py
 msgid "Receipt"
 msgstr "قثذثهحف"
 
@@ -7265,7 +7265,7 @@ msgstr "ذخعقسث هي"
 msgid "% Discount"
 msgstr "% يهسذخعرف"
 
-#: lms/djangoapps/instructor/views/api.py lms/djangoapps/shoppingcart/pdf.py
+#: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/shoppingcart/reports.py
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -7324,11 +7324,6 @@ msgstr "ذخعمي رخف حشقسث شوخعرف شس ش يثذهوشم"
 #: lms/djangoapps/instructor/views/api.py
 msgid "Unable to generate redeem codes because of course misconfiguration."
 msgstr "عرشزمث فخ لثرثقشفث قثيثثو ذخيثس زثذشعسث خب ذخعقسث وهسذخربهلعقشفهخر."
-
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/shoppingcart/models.py
-msgid "pdf download unavailable right now, please contact support."
-msgstr "حيب يخصرمخشي عرشدشهمشزمث قهلاف رخص, حمثشسث ذخرفشذف سعححخقف."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -8420,81 +8415,6 @@ msgstr "يخرشفهخر بخق {course}"
 msgid "Donation for {platform_name}"
 msgstr "يخرشفهخر بخق {platform_name}"
 
-#: lms/djangoapps/shoppingcart/pdf.py
-#, python-brace-format
-msgid "Page {page_number} of {page_count}"
-msgstr "حشلث {page_number} خب {page_count}"
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/templates/shoppingcart/receipt.html
-msgid "Invoice"
-msgstr "هردخهذث"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Order"
-msgstr "خقيثق"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-#, python-brace-format
-msgid "{id_label} # {item_id}"
-msgstr "{id_label} # {item_id}"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-#, python-brace-format
-msgid "Date: {date}"
-msgstr "يشفث: {date}"
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/djangoapps/shoppingcart/reports.py
-msgid "Quantity"
-msgstr "ضعشرفهفغ"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid ""
-"List Price\n"
-"per item"
-msgstr ""
-"مهسف حقهذث\n"
-"حثق هفثو"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid ""
-"Discount\n"
-"per item"
-msgstr ""
-"يهسذخعرف\n"
-"حثق هفثو"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Amount"
-msgstr "شوخعرف"
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/templates/courseware/gradebook.html
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/shoppingcart/billing_details.html
-#: lms/templates/shoppingcart/receipt.html
-msgid "Total"
-msgstr "فخفشم"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Payment Received"
-msgstr "حشغوثرف قثذثهدثي"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Balance"
-msgstr "زشمشرذث"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Billing Address"
-msgstr "زهممهرل شييقثسس"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Disclaimer"
-msgstr "يهسذمشهوثق"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "TERMS AND CONDITIONS"
-msgstr "فثقوس شري ذخريهفهخرس"
-
 #. Translators: this text appears when an unfamiliar error code occurs during
 #. payment,
 #. for which we don't know a user-friendly message to display in advance.
@@ -8972,6 +8892,10 @@ msgstr "حعقذاشسث فهوث"
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Order ID"
 msgstr "خقيثق هي"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Quantity"
+msgstr "ضعشرفهفغ"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Unit Cost"
@@ -16726,6 +16650,13 @@ msgid "Search students"
 msgstr "سثشقذا سفعيثرفس"
 
 #: lms/templates/courseware/gradebook.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/receipt.html
+msgid "Total"
+msgstr "فخفشم"
+
+#: lms/templates/courseware/gradebook.html
 msgid "previous page"
 msgstr "حقثدهخعس حشلث"
 
@@ -18255,6 +18186,10 @@ msgstr ""
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "INVOICE"
 msgstr "هردخهذث"
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Date: {date}"
+msgstr "يشفث: {date}"
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "Invoice No: {invoice_number}"
@@ -20827,6 +20762,10 @@ msgstr "عسثي"
 #: lms/templates/shoppingcart/receipt.html
 msgid "Invalid"
 msgstr "هردشمهي"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Invoice"
+msgstr "هردخهذث"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Date of purchase"
@@ -25582,8 +25521,8 @@ msgid "Advanced Editor"
 msgstr "شيدشرذثي ثيهفخق"
 
 #: cms/templates/widgets/problem-edit.html
-msgid "Toggle Cheatsheet"
-msgstr "فخللمث ذاثشفساثثف"
+msgid "Markdown Help"
+msgstr "وشقنيخصر اثمح"
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Label"
