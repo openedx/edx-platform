@@ -48,9 +48,8 @@ class TestFooter(CacheIsolationTestCase):
         with with_comprehensive_theme_context(theme):
             resp = self._get_footer(accepts=accepts)
 
-        self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp["Content-Type"], content_type)
-        self.assertIn(content, resp.content.decode('utf-8'))
+        self.assertContains(resp, content)
 
     @mock.patch.dict(settings.FEATURES, {'ENABLE_FOOTER_MOBILE_APP_LINKS': True})
     @ddt.data("edx.org", None)
@@ -159,8 +158,7 @@ class TestFooter(CacheIsolationTestCase):
         with with_comprehensive_theme_context(theme):
             resp = self._get_footer(accepts="text/html", params={'language': language})
 
-        self.assertEqual(resp.status_code, 200)
-        self.assertIn(static_path, resp.content.decode('utf-8'))
+        self.assertContains(resp, static_path)
 
     @ddt.data(
         # OpenEdX
@@ -179,12 +177,10 @@ class TestFooter(CacheIsolationTestCase):
             params = {'show-openedx-logo': 1} if show_logo else {}
             resp = self._get_footer(accepts="text/html", params=params)
 
-        self.assertEqual(resp.status_code, 200)
-
         if show_logo:
-            self.assertIn('alt="Powered by Open edX"', resp.content.decode('utf-8'))
+            self.assertContains(resp, 'alt="Powered by Open edX"')
         else:
-            self.assertNotIn('alt="Powered by Open edX"', resp.content.decode('utf-8'))
+            self.assertNotContains(resp, 'alt="Powered by Open edX"')
 
     @ddt.data(
         # OpenEdX
@@ -202,12 +198,10 @@ class TestFooter(CacheIsolationTestCase):
             params = {'include-dependencies': 1} if include_dependencies else {}
             resp = self._get_footer(accepts="text/html", params=params)
 
-        self.assertEqual(resp.status_code, 200)
-
         if include_dependencies:
-            self.assertIn("vendor", resp.content.decode('utf-8'))
+            self.assertContains(resp, "vendor",)
         else:
-            self.assertNotIn("vendor", resp.content.decode('utf-8'))
+            self.assertNotContains(resp, "vendor")
 
     @ddt.data(
         # OpenEdX
@@ -239,7 +233,7 @@ class TestFooter(CacheIsolationTestCase):
             selected_language = language if language else 'en'
             self._verify_language_selector(resp, selected_language)
         else:
-            self.assertNotIn('footer-language-selector', resp.content.decode('utf-8'))
+            self.assertNotContains(resp, 'footer-language-selector')
 
     def test_no_supported_accept_type(self):
         self._set_feature_flag(True)

@@ -274,7 +274,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         resp = self.client.get(url)
         self.assertRedirects(resp, expected_url, status_code=302, target_status_code=200)
         resp = self.client.get(expected_url)
-        self.assertIn('Exam Vertical - Unit 1', resp.content)
+        self.assertContains(resp, 'Exam Vertical - Unit 1')
 
     def test_get_entrance_exam_content(self):
         """
@@ -304,8 +304,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
             }
         )
         resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 200)
-        self.assertIn('To access course materials, you must score', resp.content)
+        self.assertContains(resp, 'To access course materials, you must score')
 
     def test_entrance_exam_requirement_message_with_correct_percentage(self):
         """
@@ -378,9 +377,9 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         answer_entrance_exam_problem(self.course, self.request, self.problem_2)
 
         resp = self.client.get(url)
-        self.assertNotIn('To access course materials, you must score', resp.content)
-        self.assertIn(u'Your score is 100%. You have passed the entrance exam.', resp.content.decode(resp.charset))
-        self.assertIn('Lesson 1', resp.content)
+        self.assertNotContains(resp, 'To access course materials, you must score')
+        self.assertContains(resp, u'Your score is 100%. You have passed the entrance exam.')
+        self.assertContains(resp, 'Lesson 1')
 
     def test_entrance_exam_gating(self):
         """

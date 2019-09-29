@@ -148,11 +148,10 @@ class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase, Mi
         set_prerequisite_courses(course.id, pre_requisite_courses)
 
         resp = self.client.get('/')
-        self.assertEqual(resp.status_code, 200)
 
         # make sure both courses are visible in the catalog
-        self.assertIn('pre requisite course', resp.content)
-        self.assertIn('course that has pre requisite', resp.content)
+        self.assertContains(resp, 'pre requisite course')
+        self.assertContains(resp, 'course that has pre requisite')
 
 
 class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):

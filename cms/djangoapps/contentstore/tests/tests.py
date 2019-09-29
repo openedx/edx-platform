@@ -188,8 +188,7 @@ class AuthTestCase(ContentStoreTestCase):
             resp = self._login(self.email, 'wrong_password{0}'.format(i))
             self.assertEqual(resp.status_code, 403)
         resp = self._login(self.email, 'wrong_password')
-        self.assertEqual(resp.status_code, 403)
-        self.assertIn('Too many failed login attempts.', resp.content)
+        self.assertContains(resp, 'Too many failed login attempts.', status_code=403)
 
     @override_settings(MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED=3)
     @override_settings(MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS=2)
@@ -241,12 +240,11 @@ class AuthTestCase(ContentStoreTestCase):
         # we want to test the rendering of the activation page when the user isn't logged in
         self.client.logout()
         resp = self._activate_user(self.email)
-        self.assertEqual(resp.status_code, 200)
 
         # check the the HTML has links to the right login page. Note that this is merely a content
         # check and thus could be fragile should the wording change on this page
         expected = 'You can now <a href="' + reverse('login') + '">sign in</a>.'
-        self.assertIn(expected, resp.content.decode('utf-8'))
+        self.assertContains(resp, expected)
 
     def test_private_pages_auth(self):
         """Make sure pages that do require login work."""

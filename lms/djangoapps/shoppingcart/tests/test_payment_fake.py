@@ -57,7 +57,7 @@ class PaymentFakeViewTest(TestCase):
 
         # Expect that we were served the payment page
         # (not the error page)
-        self.assertIn("Payment Form", resp.content.decode('utf-8'))
+        self.assertContains(resp, "Payment Form")
 
     def test_rejects_invalid_signature(self):
 
@@ -74,7 +74,7 @@ class PaymentFakeViewTest(TestCase):
         )
 
         # Expect that we got an error
-        self.assertIn("Error", resp.content.decode('utf-8'))
+        self.assertContains(resp, "Error")
 
     def test_sends_valid_signature(self):
 

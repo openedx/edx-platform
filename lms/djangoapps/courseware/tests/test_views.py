@@ -1250,7 +1250,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         """
         resp = self._get_student_progress_page()
         # Test that malicious code does not appear in html
-        self.assertNotIn(malicious_code, resp.content.decode('utf-8'))
+        self.assertNotContains(resp, malicious_code)
 
     def test_pure_ungraded_xblock(self):
         ItemFactory.create(category='acid', parent_location=self.vertical.location)
@@ -2024,7 +2024,7 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
         resp = self._get_progress_page()
 
         # Test that no problem scores are present
-        self.assertIn('No problem scores in this section', resp.content.decode('utf-8'))
+        self.assertContains(resp, 'No problem scores in this section')
 
     @ddt.data(
         ('', None, False, True),
@@ -2180,8 +2180,11 @@ class GenerateUserCertTests(ModuleStoreTestCase):
     def test_user_with_out_passing_grades(self):
         # If user has no grading then json will return failed message and badrequest code
         resp = self.client.post(self.url)
-        self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
-        self.assertIn("Your certificate will be available when you pass the course.", resp.content)
+        self.assertContains(
+            resp,
+            "Your certificate will be available when you pass the course.",
+            status_code=HttpResponseBadRequest.status_code,
+        )
 
     @patch('lms.djangoapps.courseware.views.views.is_course_passed', return_value=True)
     @override_settings(CERT_QUEUE='certificates', LMS_SEGMENT_KEY="foobar")
@@ -2226,8 +2229,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             course_grade.summary = {'grade': 'Pass', 'percent': 0.75}
 
             resp = self.client.post(self.url)
-            self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
-            self.assertIn("Certificate is being created.", resp.content)
+            self.assertContains(resp, "Certificate is being created.", status_code=HttpResponseBadRequest.status_code)
 
     @override_settings(CERT_QUEUE='certificates', LMS_SEGMENT_KEY="foobar")
     def test_user_with_passing_existing_downloadable_cert(self):
@@ -2247,15 +2249,17 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             course_grade.summay = {'grade': 'Pass', 'percent': 0.75}
 
             resp = self.client.post(self.url)
-            self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
-            self.assertIn("Certificate has already been created.", resp.content)
+            self.assertContains(
+                resp,
+                "Certificate has already been created.",
+                status_code=HttpResponseBadRequest.status_code,
+            )
 
     def test_user_with_non_existing_course(self):
         # If try to access a course with valid key pattern then it will return
         # bad request code with course is not valid message
         resp = self.client.post('/courses/def/abc/in_valid/generate_user_cert')
-        self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
-        self.assertIn("Course is not valid", resp.content)
+        self.assertContains(resp, "Course is not valid", status_code=HttpResponseBadRequest.status_code)
 
     def test_user_with_invalid_course_id(self):
         # If try to access a course with invalid key pattern then 404 will return
@@ -2267,9 +2271,12 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         self.client.logout()
         resp = self.client.post(self.url)
         self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
-        self.assertIn(u"You must be signed in to {platform_name} to create a certificate.".format(
-            platform_name=settings.PLATFORM_NAME
-        ), resp.content.decode('utf-8'))
+        self.assertContains(
+            resp,
+            u"You must be signed in to {platform_name} to create a certificate.".format(
+               platform_name=settings.PLATFORM_NAME
+            )
+        )
 
 
 class ActivateIDCheckerBlock(XBlock):

@@ -91,7 +91,7 @@ class TestPasswordReset(LoginEnrollmentTestCase):
             'new_password2': 'foofoo',
         }, follow=True)
 
-        self.assertIn(success_msg, resp.content)
+        self.assertContains(resp, success_msg)
 
     @ddt.data(
         ('foo', 'foobar', 'Error in resetting your password. Please try again.'),

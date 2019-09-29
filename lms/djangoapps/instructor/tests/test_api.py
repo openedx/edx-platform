@@ -2783,19 +2783,17 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         # visit the instructor dashboard page and
         # check that the coupon redeem count should be 0
         resp = self.client.get(instructor_dashboard)
-        self.assertEqual(resp.status_code, 200)
-        self.assertIn('Number Redeemed', resp.content.decode('utf-8'))
-        self.assertIn('<td>0</td>', resp.content.decode('utf-8'))
+        self.assertContains(resp, 'Number Redeemed')
+        self.assertContains(resp, '<td>0</td>')
 
         # now make the payment of your cart items
         self.cart.purchase()
         # visit the instructor dashboard page and
         # check that the coupon redeem count should be 1
         resp = self.client.get(instructor_dashboard)
-        self.assertEqual(resp.status_code, 200)
 
-        self.assertIn('Number Redeemed', resp.content.decode('utf-8'))
-        self.assertIn('<td>1</td>', resp.content.decode('utf-8'))
+        self.assertContains(resp, 'Number Redeemed')
+        self.assertContains(resp, '<td>1</td>')
 
     def test_get_sale_records_features_csv(self):
         """

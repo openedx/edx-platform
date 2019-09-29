@@ -565,8 +565,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             },
             format='json'
         )
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("No course ", resp.content.decode('utf-8'))
+        self.assertContains(resp, "No course ", status_code=status.HTTP_400_BAD_REQUEST)
 
     def test_enrollment_throttle_for_user(self):
         """Make sure a user requests do not exceed the maximum number of requests"""
