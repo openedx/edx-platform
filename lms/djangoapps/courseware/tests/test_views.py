@@ -2358,7 +2358,7 @@ class TestIndexView(ModuleStoreTestCase):
             )
         )
         # Trigger the assertions embedded in the ViewCheckerBlocks
-        self.assertEqual(response.content.decode('utf-8').count("ViewCheckerPassed"), 3)
+        self.assertContains(response, "ViewCheckerPassed", count=3)
 
     @XBlock.register_temp_plugin(ActivateIDCheckerBlock, 'id_checker')
     def test_activate_block_id(self):
@@ -2644,7 +2644,7 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
 
         response = self.client.get(self.section_1_url)
         self.assertContains(response, 'data-mark-completed-on-view-after-delay')
-        self.assertEqual(response.content.count("data-mark-completed-on-view-after-delay"), 2)
+        self.assertContains(response, 'data-mark-completed-on-view-after-delay', count=2)
 
         request = self.request_factory.post(
             '/',
@@ -2662,7 +2662,7 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
 
         response = self.client.get(self.section_1_url)
         self.assertContains(response, 'data-mark-completed-on-view-after-delay')
-        self.assertEqual(response.content.count("data-mark-completed-on-view-after-delay"), 1)
+        self.assertContains(response, 'data-mark-completed-on-view-after-delay', count=1)
 
         request = self.request_factory.post(
             '/',
