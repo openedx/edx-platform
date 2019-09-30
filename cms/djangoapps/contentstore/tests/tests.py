@@ -189,7 +189,7 @@ class AuthTestCase(ContentStoreTestCase):
             self.assertEqual(resp.status_code, 403)
         resp = self._login(self.email, 'wrong_password')
         self.assertEqual(resp.status_code, 403)
-        self.assertIn('Too many failed login attempts.', resp.content)
+        self.assertIn(b'Too many failed login attempts.', resp.content)
 
     @override_settings(MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED=3)
     @override_settings(MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS=2)
@@ -205,7 +205,7 @@ class AuthTestCase(ContentStoreTestCase):
                 resp = self._login(self.email, 'wrong_password{0}'.format(i))
                 self.assertEqual(resp.status_code, 403)
                 self.assertIn(
-                    'Email or password is incorrect.',
+                    b'Email or password is incorrect.',
                     resp.content
                 )
 
@@ -214,7 +214,7 @@ class AuthTestCase(ContentStoreTestCase):
             resp = self._login(self.email, 'wrong_password')
             self.assertEqual(resp.status_code, 403)
             self.assertIn(
-                'This account has been temporarily locked due to excessive login failures.',
+                b'This account has been temporarily locked due to excessive login failures.',
                 resp.content
             )
 
@@ -225,7 +225,7 @@ class AuthTestCase(ContentStoreTestCase):
             resp = self._login(self.email, 'wrong_password')
             self.assertEqual(resp.status_code, 403)
             self.assertIn(
-                'Email or password is incorrect.',
+                b'Email or password is incorrect.',
                 resp.content
             )
 
@@ -319,7 +319,7 @@ class AuthTestCase(ContentStoreTestCase):
         is turned off
         """
         response = self.client.get(reverse('homepage'))
-        self.assertNotIn('<a class="action action-signup" href="/signup">Sign Up</a>', response.content)
+        self.assertNotIn(b'<a class="action action-signup" href="/signup">Sign Up</a>', response.content)
 
     @mock.patch.dict(settings.FEATURES, {"ALLOW_PUBLIC_ACCOUNT_CREATION": False})
     def test_signup_button_login_page(self):
@@ -328,7 +328,7 @@ class AuthTestCase(ContentStoreTestCase):
         is turned off
         """
         response = self.client.get(reverse('login'))
-        self.assertNotIn('<a class="action action-signup" href="/signup">Sign Up</a>', response.content)
+        self.assertNotIn(b'<a class="action action-signup" href="/signup">Sign Up</a>', response.content)
 
     @mock.patch.dict(settings.FEATURES, {"ALLOW_PUBLIC_ACCOUNT_CREATION": False})
     def test_signup_link_login_page(self):
@@ -337,7 +337,7 @@ class AuthTestCase(ContentStoreTestCase):
         is turned off
         """
         response = self.client.get(reverse('login'))
-        self.assertNotIn('<a href="/signup" class="action action-signin">Don&#39;t have a Studio Account? Sign up!</a>',
+        self.assertNotIn(b'<a href="/signup" class="action action-signin">Don&#39;t have a Studio Account? Sign up!</a>',
                          response.content)
 
 
