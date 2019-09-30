@@ -6,7 +6,7 @@ from __future__ import absolute_import
 import datetime
 import itertools
 import math
-from six import StringIO
+from six import BytesIO
 
 import ddt
 import mock
@@ -610,7 +610,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
         """
         # Create a source image...
         image = Image.new('RGB', (800, 400), 'blue')
-        image_buff = StringIO()
+        image_buff = BytesIO()
         image.save(image_buff, format='PNG')
         image_buff.seek(0)
 
@@ -843,7 +843,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
         """
         # Create a real (oversized) image...
         image = Image.new("RGB", (800, 400), "blue")
-        image_buff = StringIO()
+        image_buff = BytesIO()
         image.save(image_buff, format="JPEG")
         image_buff.seek(0)
         image_name = "big_course_image.jpeg"
@@ -888,7 +888,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
             for image_url, expected_size in [(image_urls['small'], config.small), (image_urls['large'], config.large)]:
                 image_key = StaticContent.get_location_from_path(image_url)
                 image_content = AssetManager.find(image_key)
-                image = Image.open(StringIO(image_content.data))
+                image = Image.open(BytesIO(image_content.data))
                 self.assertEqual(image.size, expected_size)
 
     @ddt.data(
@@ -920,7 +920,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
         """
         # Create a source image...
         image = Image.new("RGB", src_dimensions, "blue")
-        image_buff = StringIO()
+        image_buff = BytesIO()
         image.save(image_buff, format="PNG")
         image_buff.seek(0)
         image_name = "src_course_image.png"
@@ -940,7 +940,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
         for image_url, target in [(image_urls['small'], config.small), (image_urls['large'], config.large)]:
             image_key = StaticContent.get_location_from_path(image_url)
             image_content = AssetManager.find(image_key)
-            image = Image.open(StringIO(image_content.data))
+            image = Image.open(BytesIO(image_content.data))
 
             # Naming convention for thumbnail
             self.assertTrue(image_url.endswith('src_course_image-png-{}x{}.jpg'.format(*target)))
