@@ -70,8 +70,8 @@ class TabsEditingDescriptorTestCase(unittest.TestCase):
         test_css_file = os.path.join(test_files_dir, 'test_tabseditingdescriptor.scss')
         with open(test_css_file) as new_css:
             added_css = new_css.read()
-        self.assertEqual(css['scss'].pop(), added_css)
-        self.assertEqual(css['css'].pop(), added_css)
+        self.assertEqual(css['scss'].pop().decode('utf-8'), added_css)
+        self.assertEqual(css['css'].pop().decode('utf-8'), added_css)
 
     def test_get_context(self):
         """"test get_context"""
