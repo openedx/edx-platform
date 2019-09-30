@@ -70,8 +70,7 @@ class TabsPageTests(CourseTestCase):
         """Basic check that the Pages page responds correctly"""
 
         resp = self.client.get_html(self.url)
-        self.assertEqual(resp.status_code, 200)
-        self.assertIn('course-nav-list', resp.content.decode('utf-8'))
+        self.assertContains(resp, 'course-nav-list')
 
     def test_reorder_tabs(self):
         """Test re-ordering of tabs"""

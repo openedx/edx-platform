@@ -60,7 +60,7 @@ class TestOptoutCourseEmailsBySignal(ModuleStoreTestCase):
         email_section = '<div class="vert-left send-email" id="section-send-email">'
 
         # If this fails, it is likely because BulkEmailFlag.is_enabled() is set to False
-        self.assertIn(email_section, response.content)
+        self.assertContains(response, email_section)
 
         test_email = {
             'action': 'Send email',

@@ -180,17 +180,17 @@ class TestDashboard(SharedModuleStoreTestCase):
         # Check that initially list of user teams in course one is empty
         course_one_teams_url = reverse('teams_dashboard', args=[self.course.id])
         response = self.client.get(course_one_teams_url)
-        self.assertIn('"teams": {"count": 0', response.content)  # pylint: disable=unicode-format-string
+        self.assertContains(response, '"teams": {"count": 0')  # pylint: disable=unicode-format-string
         # Add user to a course one team
         course_one_team.add_user(self.user)
 
         # Check that list of user teams in course one is not empty, it is one now
         response = self.client.get(course_one_teams_url)
-        self.assertIn('"teams": {"count": 1', response.content)  # pylint: disable=unicode-format-string
+        self.assertContains(response, '"teams": {"count": 1')  # pylint: disable=unicode-format-string
         # Check that list of user teams in course two is still empty
         course_two_teams_url = reverse('teams_dashboard', args=[course_two.id])
         response = self.client.get(course_two_teams_url)
-        self.assertIn('"teams": {"count": 0', response.content)  # pylint: disable=unicode-format-string
+        self.assertContains(response, '"teams": {"count": 0')  # pylint: disable=unicode-format-string
 
 
 class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):

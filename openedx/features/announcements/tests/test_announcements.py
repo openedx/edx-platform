@@ -54,13 +54,13 @@ class TestGlobalAnnouncements(TestCase):
     def test_feature_flag_disabled(self):
         """Ensures that the default settings effectively disables the feature"""
         response = self.client.get('/dashboard')
-        self.assertNotIn('AnnouncementsView', response.content)
-        self.assertNotIn('<div id="announcements"', response.content)
+        self.assertNotContains(response, 'AnnouncementsView')
+        self.assertNotContains(response, '<div id="announcements"')
 
     def test_feature_flag_enabled(self):
         """Ensures that enabling the flag, enables the feature"""
         response = self.client.get('/dashboard')
-        self.assertIn('AnnouncementsView', response.content)
+        self.assertContains(response, 'AnnouncementsView')
 
     def test_pagination(self):
         url = reverse("announcements:page", kwargs={"page": 1})
@@ -79,7 +79,7 @@ class TestGlobalAnnouncements(TestCase):
         """
         url = reverse("announcements:page", kwargs={"page": 1})
         response = self.client.get(url)
-        self.assertIn("Active Announcement", response.content)
+        self.assertContains(response, "Active Announcement")
 
     def test_inactive(self):
         """
@@ -87,7 +87,7 @@ class TestGlobalAnnouncements(TestCase):
         """
         url = reverse("announcements:page", kwargs={"page": 1})
         response = self.client.get(url)
-        self.assertNotIn("Inactive Announcement", response.content)
+        self.assertNotContains(response, "Inactive Announcement")
 
     def test_formatted(self):
         """
@@ -95,4 +95,4 @@ class TestGlobalAnnouncements(TestCase):
         """
         url = reverse("announcements:page", kwargs={"page": 1})
         response = self.client.get(url)
-        self.assertIn("<strong>Formatted Announcement</strong>", response.content)
+        self.assertContains(response, "<strong>Formatted Announcement</strong>")

@@ -1559,8 +1559,7 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         # Test that malicious code does not appear in html
         url = "%s?%s=%s" % (reverse_url, 'sort_key', malicious_code)
         resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 200)
-        self.assertNotIn(malicious_code, resp.content.decode('utf-8'))
+        self.assertNotContains(resp, malicious_code)
 
     @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
     @patch('student.models.cc.User.from_django_user')
@@ -1582,8 +1581,7 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         # Test that malicious code does not appear in html
         url_string = "%s?%s=%s" % (url, 'page', malicious_code)
         resp = self.client.get(url_string)
-        self.assertEqual(resp.status_code, 200)
-        self.assertNotIn(malicious_code, resp.content.decode('utf-8'))
+        self.assertNotContains(resp, malicious_code)
 
 
 class ForumDiscussionSearchUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):

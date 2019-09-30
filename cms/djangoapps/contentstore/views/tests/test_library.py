@@ -257,8 +257,8 @@ class UnitTestLibraries(CourseTestCase):
 
         response = self.client.get(make_url_for_lib(lib.location.library_key))
         self.assertEqual(response.status_code, 200)
-        self.assertIn("<html", response.content)
-        self.assertIn(lib.display_name.encode('utf-8'), response.content)
+        self.assertContains(response, "<html")
+        self.assertContains(response, lib.display_name)
 
     @ddt.data('library-v1:Nonexistent+library', 'course-v1:Org+Course', 'course-v1:Org+Course+Run', 'invalid')
     def test_invalid_keys(self, key_str):
@@ -328,7 +328,7 @@ class UnitTestLibraries(CourseTestCase):
         response = self.client.get(manage_users_url)
         self.assertEqual(response.status_code, 200)
         # extra_user has not been assigned to the library so should not show up in the list:
-        self.assertNotIn(extra_user.username, response.content.decode('utf-8'))
+        self.assertNotContains(response, extra_user.username)
 
         # Now add extra_user to the library:
         user_details_url = reverse_course_url(
@@ -341,4 +341,4 @@ class UnitTestLibraries(CourseTestCase):
         # Now extra_user should apear in the list:
         response = self.client.get(manage_users_url)
         self.assertEqual(response.status_code, 200)
-        self.assertIn(extra_user.username, response.content.decode('utf-8'))
+        self.assertContains(response, extra_user.username)

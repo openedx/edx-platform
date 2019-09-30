@@ -121,10 +121,10 @@ class HelperMixin(object):
 
     def assert_json_failure_response_is_missing_social_auth(self, response):
         """Asserts failure on /login for missing social auth looks right."""
-        self.assertEqual(403, response.status_code)
-        self.assertIn(
+        self.assertContains(
+            response,
             u"successfully signed in to your %s account, but this account isn&#39;t linked" % self.provider.name,
-            response.content.decode(response.charset)
+            status_code=403,
         )
 
     def assert_json_failure_response_is_username_collision(self, response):

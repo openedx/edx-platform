@@ -349,8 +349,7 @@ class CertificatesListHandlerTestCase(
             self._url(),
             data=CERTIFICATE_JSON
         )
-        self.assertEqual(response.status_code, 403)
-        self.assertIn("error", response.content)
+        self.assertContains(response, "error", status_code=403)
 
     def test_audit_course_mode_is_skipped(self):
         """
