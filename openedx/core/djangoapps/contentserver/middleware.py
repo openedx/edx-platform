@@ -211,7 +211,7 @@ class StaticContentServer(object):
                 newrelic.agent.add_custom_parameter('contentserver.cacheable', True)
 
             response['Expires'] = StaticContentServer.get_expiration_value(datetime.datetime.utcnow(), cache_ttl)
-            response['Cache-Control'] = b"public, max-age={ttl}, s-maxage={ttl}".format(ttl=cache_ttl)
+            response['Cache-Control'] = u"public, max-age={ttl}, s-maxage={ttl}".format(ttl=cache_ttl)
         elif is_locked:
             if newrelic:
                 newrelic.agent.add_custom_parameter('contentserver.cacheable', False)
