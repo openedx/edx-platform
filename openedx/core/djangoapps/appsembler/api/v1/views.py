@@ -171,14 +171,14 @@ class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):
 
         # set the honor_code and honor_code like checked,
         # so we can use the already defined methods for creating an user
-        data['honor_code'] = True
-        data['terms_of_service'] = True
+        data['honor_code'] = 'True'
+        data['terms_of_service'] = 'True'
 
         if password_provided:
             try:
                 # Default behavior is True - send the email
-                data['send_activation_email'] = strtobool(
-                    str(data.get('send_activation_email', True)))
+                data['send_activation_email'] = bool(strtobool(
+                    str(data.get('send_activation_email', True))))
             except ValueError:
                 errors = {
                     'user_message': '{0} is not a valid value for "send_activation_email"'.format(
