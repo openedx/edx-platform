@@ -869,7 +869,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         user.is_active = False
         user.save()
 
-        csv_content = b"{email},{username},tester,USA".format(email=conflicting_email, username='new_test_student')
+        csv_content = "{email},{username},tester,USA".format(email=conflicting_email, username='new_test_student')
         uploaded_file = SimpleUploadedFile("temp.csv", six.b(csv_content))
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
