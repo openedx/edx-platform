@@ -2383,6 +2383,9 @@ INSTALLED_APPS = [
     # Course cards app
     'openedx.features.course_card',
 
+    # Badges app
+    'openedx.features.badging',
+
     # User Leads app
     'openedx.features.user_leads',
 
