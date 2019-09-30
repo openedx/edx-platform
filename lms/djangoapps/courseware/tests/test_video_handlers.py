@@ -1287,7 +1287,7 @@ class TestGetTranscript(TestVideo):
         00:00:00,12 --> 00:00:00,100
         Привіт, edX вітає вас.
         """)
-        self.assertEqual(text, expected_text)
+        self.assertEqual(text.decode('utf-8') if six.PY3 else text, expected_text)
         self.assertEqual(filename, u"塞.srt")
         self.assertEqual(mime_type, 'application/x-subrip; charset=utf-8')
 
