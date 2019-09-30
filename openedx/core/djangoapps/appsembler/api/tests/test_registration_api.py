@@ -76,6 +76,7 @@ class RegistrationApiViewTests(TestCase):
             'password': 'some-password',
             'send_activation_email': send_activation_email,
         }
+
         def fake_send(user, profile, user_registration=None):
             assert send_activation_email in [True, 'True', 'true'], 'activation email should not be called'
 
@@ -93,6 +94,7 @@ class RegistrationApiViewTests(TestCase):
             'name': 'Mr Potato Head',
             'send_activation_email': send_activation_email,
         }
+
         def fake_send(user, profile, user_registration=None):
             assert False, 'Should not call fake_send when no password'
 
@@ -115,4 +117,3 @@ class RegistrationApiViewTests(TestCase):
         res = self.client.post(self.url, params)
         self.assertContains(
             res, 'Invalid parameters on user creation', status_code=400)
-
