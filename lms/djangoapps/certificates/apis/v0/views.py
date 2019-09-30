@@ -21,7 +21,7 @@ from openedx.core.djangoapps.certificates.api import certificates_viewable_for_c
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.user_api.accounts.api import visible_fields
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
-from openedx.core.openapi import swagger_auto_schema, openapi
+from openedx.core import openapi
 
 
 log = logging.getLogger(__name__)
@@ -155,14 +155,12 @@ class CertificatesListView(GenericAPIView):
 
     required_scopes = ['certificates:read']
 
-    @swagger_auto_schema(manual_parameters=[
-        openapi.Parameter(
-            'username',
-            openapi.IN_PATH,
-            type=openapi.TYPE_STRING,
-            description="The users to get certificates for",
-        )
-    ])
+    @openapi.schema
+    @openapi.path_parameter(
+        'username',
+        type=openapi.TYPE_STRING,
+        description="The users to get certificates for",
+    )
     def get(self, request, username):
         """Get a paginated list of bookmarks for a user.
 

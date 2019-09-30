@@ -6,11 +6,16 @@ import textwrap
 
 from drf_yasg import openapi
 from drf_yasg.generators import OpenAPISchemaGenerator
-from drf_yasg.utils import swagger_auto_schema as drf_swagger_auto_schema
+from drf_yasg.utils import swagger_auto_schema
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
 # -- Code that will eventually be in another openapi-helpers repo -------------
+
+
+# Wildcard-import so that users of this module can use
+# definitions from drf_yasg.openapi without also importing that module.
+from drf_yasg.openapi import *  # pylint: disable=wildcard-import
 
 
 class ApiSchemaGenerator(OpenAPISchemaGenerator):
@@ -44,28 +49,27 @@ def dedent(text):
     return textwrap.dedent(text)
 
 
-_DECORATOR_DATA_FIELD = '_decorated_swagger_data'
-
-
-def swagger_auto_schema(*args, **kwargs):
+def schema(*args, **kwargs):
     """
     Decorator for documenting an OpenAPI endpoint.
 
-    Identical to `drf_yasg.utils.swagger_auto_schema`__ except that
-    description fields will be dedented properly.  All description fields
-    should be in Markdown.
+    Identical to `drf_yasg.utils.swagger_auto_schema`__ except that:
+    * If in kwargs, operation_description and operation_summary will be
+      dedented properly.
+    * Otherwise, those fields will be taken from the docstring.
+    * Any values in `view_fun._openapi_decorator_data` will be used as
+      overrides on kwargs.
 
     __ https://drf-yasg.readthedocs.io/en/stable/drf_yasg.html#drf_yasg.utils.swagger_auto_schema
 
     """
     if args and callable(args[0]):
         # decorator may be used with no argument
-        return swagger_auto_schema(*args[1:], **kwargs)(args[0])
-
-    for param in kwargs.get('manual_parameters', ()):
-        param.description = dedent(param.description)
+        return schema(*args[1:], **kwargs)(args[0])
 
     def decorator(view_func):
+        """ Returns the decorated function. """
+        # pylint: disable=protected-access
         if view_func.__doc__ is not None:
             doc_lines = view_func.__doc__.strip().split("\n")
             if 'operation_summary' not in kwargs and doc_lines:
@@ -74,23 +78,79 @@ def swagger_auto_schema(*args, **kwargs):
                 kwargs['operation_description'] = "\n".join(doc_lines[1:])
         if 'operation_description' in kwargs:
             kwargs['operation_description'] = dedent(kwargs['operation_description'])
-        decorator_kwargs = getattr(view_func, _DECORATOR_DATA_FIELD, {})
-        kwargs.update(decorator_kwargs)
-        return drf_swagger_auto_schema(**kwargs)(view_func)
+        try:
+            decorator_data = view_func._openapi_decorator_data
+        except AttributeError:
+            pass
+        else:
+            kwargs.update(decorator_data)
+        return swagger_auto_schema(**kwargs)(view_func)
     return decorator
 
 
-def api_parameter(name, in_, **kwargs):
+def parameter(name, in_, **kwargs):
     """
+    Decorator to add information about a paramter to a view function.
+
+    Takes arguments identical to openapi.Parameter.
+    Adds data to `view_fun._openapi_decorator_data`.
+    Must be used _under_ the @schema decorator. For example:
+
+        @schema
+        @parameter('param1', IN_PATH, type=STRING)
+        @parameter('param2', IN_PATH, type=INTEGER, description='...')
+        def get(self, param1, param2):
+            ...
     """
     def decorator(view_func):
-        swagger_decorator_data = getattr(view_func, _DECORATOR_DATA_FIELD, {})
-        old_parameters = swagger_decorator_data.get('manual_parameters', [])
-        parameter = openapi.Parameter(name, in_, **kwargs)
-        swagger_decorator_data['manual_parameters'] = [parameter] + old_parameters
-        setattr(view_func, _DECORATOR_DATA_FIELD, swagger_decorator_data)
+        """ Returns the decorated function. """
+        # pylint: disable=protected-access
+        try:
+            decorator_data = view_func._openapi_decorator_data
+        except AttributeError:
+            decorator_data = view_func._openapi_decorator_data = {}
+        new_parameter = openapi.Parameter(name, in_, **kwargs)
+        try:
+            decorator_data['manual_parameters'].insert(0, new_parameter)
+        except KeyError:
+            decorator_data['manual_parameters'] = [new_parameter]
         return view_func
     return decorator
+
+
+def query_parameter(name, **kwargs):
+    """
+    Identical to paramter(name, IN_QUERY, ...).
+    """
+    return parameter(name, openapi.IN_QUERY, **kwargs)
+
+
+def path_parameter(name, **kwargs):
+    """
+    Identical to paramter(name, IN_PATH, ...).
+    """
+    return parameter(name, openapi.IN_PATH, **kwargs)
+
+
+def body_parameter(name, **kwargs):
+    """
+    Identical to paramter(name, IN_BODY, ...).
+    """
+    return parameter(name, openapi.IN_BODY, **kwargs)
+
+
+def form_parameter(name, **kwargs):
+    """
+    Identical to paramter(name, IN_FORM, ...).
+    """
+    return parameter(name, openapi.IN_FORM, **kwargs)
+
+
+def header_parameter(name, **kwargs):
+    """
+    Identical to paramter(name, IN_HEADER, ...).
+    """
+    return parameter(name, openapi.IN_HEADER, **kwargs)
 
 
 def is_schema_request(request):

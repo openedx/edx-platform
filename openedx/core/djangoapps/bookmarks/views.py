@@ -26,7 +26,7 @@ from rest_framework_oauth.authentication import OAuth2Authentication
 from openedx.core.djangoapps.bookmarks.api import BookmarksLimitReachedError
 from openedx.core.lib.api.permissions import IsUserInUrl
 from openedx.core.lib.url_utils import unquote_slashes
-from openedx.core.openapi import api_parameter, swagger_auto_schema, openapi
+from openedx.core import openapi
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from . import DEFAULT_FIELDS, OPTIONAL_FIELDS, api
@@ -104,16 +104,14 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = BookmarkSerializer
 
-    @swagger_auto_schema
-    @api_parameter(
+    @openapi.schema
+    @openapi.query_parameter(
         'course_id',
-        openapi.IN_QUERY,
         type=openapi.TYPE_STRING,
         description="The id of the course to limit the list",
     )
-    @api_parameter(
+    @openapi.query_parameter(
         'fields',
-        openapi.IN_QUERY,
         type=openapi.TYPE_STRING,
         description="The fields to return: display_name, path.",
     )
@@ -198,7 +196,7 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
 
         return page
 
-    @swagger_auto_schema
+    @openapi.schema
     def post(self, request, *unused_args, **unused_kwargs):
         """Create a new bookmark for a user.
 
@@ -307,7 +305,7 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
             log.error(error_message)
             return self.error_response(error_message, error_status=status.HTTP_404_NOT_FOUND)
 
-    @swagger_auto_schema(
+    @openapi.schema(
         operation_summary="Get a specific bookmark for a user.",
         operation_description=u"""
             # Example Requests
