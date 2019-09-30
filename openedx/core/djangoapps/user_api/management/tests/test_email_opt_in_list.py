@@ -274,9 +274,13 @@ class EmailOptInListTest(ModuleStoreTestCase):
             expected_msg_regex = (
                 "^Error: too few arguments$"
             )
-        else:
+        elif num_args == 1:
             expected_msg_regex = (
                 "^Error: the following arguments are required: ORG_ALIASES$"
+            )
+        elif num_args == 0:
+            expected_msg_regex = (
+                "^Error: the following arguments are required: OUTPUT_FILENAME, ORG_ALIASES$"
             )
         with self.assertRaisesRegexp(CommandError, expected_msg_regex):
             call_command('email_opt_in_list', *args)
