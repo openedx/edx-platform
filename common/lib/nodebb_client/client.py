@@ -9,6 +9,7 @@ from pynodebb.http_client import HttpClient
 from common.lib.nodebb_client.categories import ForumCategory
 from common.lib.nodebb_client.groups import ForumGroup
 from common.lib.nodebb_client.users import ForumUser
+from common.lib.nodebb_client.badges import ForumBadge
 
 
 class NodeBBClient(Client):
@@ -30,3 +31,4 @@ class NodeBBClient(Client):
         self.posts = Post(self.http_client)
         self.groups = ForumGroup(self.http_client)
         self.categories = ForumCategory(self.http_client)
+        self.badges = ForumBadge(self.http_client)
