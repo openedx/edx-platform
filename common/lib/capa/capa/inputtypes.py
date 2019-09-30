@@ -127,6 +127,9 @@ class Status(object):
     def __eq__(self, other):
         return self._status == str(other)
 
+    def __hash__(self):
+        return hash(str(self))
+
 
 class Attribute(object):
     """
