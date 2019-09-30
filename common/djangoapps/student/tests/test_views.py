@@ -263,11 +263,11 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         set_prerequisite_courses(self.course.id, [six.text_type(self.pre_requisite_course.id)])
         response = self.client.get(reverse('dashboard'))
-        self.assertIn('<div class="prerequisites">', response.content)
+        self.assertContains(response, '<div class="prerequisites">')
 
         remove_prerequisite_course(self.course.id, get_course_milestones(self.course.id)[0])
         response = self.client.get(reverse('dashboard'))
-        self.assertNotIn('<div class="prerequisites">', response.content)
+        self.assertNotContains(response, '<div class="prerequisites">')
 
     @patch('openedx.core.djangoapps.programs.utils.get_programs')
     @patch('student.views.dashboard.get_visible_sessions_for_entitlement')
@@ -301,10 +301,10 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             'type': 'verified'
         }
         response = self.client.get(self.path)
-        self.assertIn('class="course-target-link enter-course hidden"', response.content)
-        self.assertIn('You must select a session to access the course.', response.content)
-        self.assertIn('<div class="course-entitlement-selection-container ">', response.content)
-        self.assertIn('Related Programs:', response.content)
+        self.assertContains(response, 'class="course-target-link enter-course hidden"')
+        self.assertContains(response, 'You must select a session to access the course.')
+        self.assertContains(response, '<div class="course-entitlement-selection-container ">')
+        self.assertContains(response, 'Related Programs:')
 
         # If an entitlement has already been redeemed by the user for a course run, do not let the run be selectable
         enrollment = CourseEnrollmentFactory(
@@ -326,9 +326,9 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         response = self.client.get(self.path)
         # There should be two entitlements on the course page, one prompting for a mandatory session, but no
         # select option for the courses as there is only the single course run which has already been redeemed
-        self.assertEqual(response.content.count('<li class="course-item">'), 2)
-        self.assertIn('You must select a session to access the course.', response.content)
-        self.assertNotIn('To access the course, select a session.', response.content)
+        self.assertContains(response, '<li class="course-item">', count=2)
+        self.assertContains(response, 'You must select a session to access the course.')
+        self.assertNotContains(response, 'To access the course, select a session.')
 
     @patch('student.views.dashboard.get_visible_sessions_for_entitlement')
     @patch.object(CourseOverview, 'get_from_id')
@@ -354,7 +354,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             }
         ]
         response = self.client.get(self.path)
-        self.assertEqual(response.content.count('<li class="course-item">'), 0)
+        self.assertNotContains(response, '<li class="course-item">')
 
     @patch('entitlements.api.v1.views.get_course_runs_for_course')
     @patch.object(CourseOverview, 'get_from_id')
@@ -454,9 +454,9 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         program['courses'][0]['uuid'] = entitlement.course_uuid
         mock_get_programs.return_value = [program]
         response = self.client.get(self.path)
-        self.assertEqual(response.content.count('<li class="course-item">'), 1)
-        self.assertIn('<button class="change-session btn-link "', response.content)
-        self.assertIn('Related Programs:', response.content)
+        self.assertContains(response, '<li class="course-item">', count=1)
+        self.assertContains(response, '<button class="change-session btn-link "')
+        self.assertContains(response, 'Related Programs:')
 
     @patch('openedx.core.djangoapps.programs.utils.get_programs')
     @patch('student.views.dashboard.get_visible_sessions_for_entitlement')
@@ -489,9 +489,9 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         program['courses'][0]['uuid'] = entitlement.course_uuid
         mock_get_programs.return_value = [program]
         response = self.client.get(self.path)
-        self.assertEqual(response.content.count('<li class="course-item">'), 1)
-        self.assertIn('You can no longer change sessions.', response.content)
-        self.assertIn('Related Programs:', response.content)
+        self.assertContains(response, '<li class="course-item">', count=1)
+        self.assertContains(response, 'You can no longer change sessions.')
+        self.assertContains(response, 'Related Programs:')
 
     @patch('openedx.core.djangoapps.catalog.utils.get_course_runs_for_course')
     @patch('student.views.dashboard.is_bulk_email_feature_enabled')
@@ -535,13 +535,13 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         # Ensure active users see the course list
         self.assertTrue(self.user.is_active)
         response = self.client.get(reverse('dashboard'))
-        self.assertIn('You are not enrolled in any courses yet.', response.content)
+        self.assertContains(response, 'You are not enrolled in any courses yet.')
 
         # Ensure inactive users don't see the course list
         self.user.is_active = False
         self.user.save()
         response = self.client.get(reverse('dashboard'))
-        self.assertNotIn('You are not enrolled in any courses yet.', response.content)
+        self.assertNotContains(response, 'You are not enrolled in any courses yet.')
 
     def test_show_empty_dashboard_message(self):
         """
@@ -550,15 +550,15 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         """
         empty_dashboard_message = "Check out our lovely <i>free</i> courses!"
         response = self.client.get(reverse('dashboard'))
-        self.assertIn('You are not enrolled in any courses yet.', response.content)
-        self.assertNotIn(empty_dashboard_message, response.content)
+        self.assertContains(response, 'You are not enrolled in any courses yet.')
+        self.assertNotContains(response, empty_dashboard_message)
 
         with with_site_configuration_context(configuration={
             "EMPTY_DASHBOARD_MESSAGE": empty_dashboard_message,
         }):
             response = self.client.get(reverse('dashboard'))
-            self.assertIn('You are not enrolled in any courses yet.', response.content)
-            self.assertIn(empty_dashboard_message, response.content)
+            self.assertContains(response, 'You are not enrolled in any courses yet.')
+            self.assertContains(response, empty_dashboard_message)
 
     @patch('django.conf.settings.DASHBOARD_COURSE_LIMIT', 1)
     def test_course_limit_on_dashboard(self):
@@ -575,11 +575,15 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         )
 
         response = self.client.get(reverse('dashboard'))
-        self.assertIn('1 results successfully populated', response.content)
+        self.assertContains(response, '1 results successfully populated')
 
     @staticmethod
     def _remove_whitespace_from_html_string(html):
         return ''.join(html.split())
+
+    @staticmethod
+    def _remove_whitespace_from_response(response):
+        return ''.join(response.content.decode('utf-8').split())
 
     @staticmethod
     def _pull_course_run_from_course_key(course_key_string):
@@ -665,7 +669,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         view_button_html = self._remove_whitespace_from_html_string(view_button_html)
         resume_button_html = self._remove_whitespace_from_html_string(resume_button_html)
-        dashboard_html = self._remove_whitespace_from_html_string(response.content)
+        dashboard_html = self._remove_whitespace_from_response(response)
 
         self.assertIn(
             view_button_html,
@@ -719,7 +723,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         view_button_html = self._remove_whitespace_from_html_string(view_button_html)
         resume_button_html = self._remove_whitespace_from_html_string(resume_button_html)
-        dashboard_html = self._remove_whitespace_from_html_string(response.content)
+        dashboard_html = self._remove_whitespace_from_response(response)
 
         self.assertIn(
             resume_button_html,
@@ -749,7 +753,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         schedule = ScheduleFactory(start=self.THREE_YEARS_AGO + timedelta(days=1), enrollment=enrollment)
 
         response = self.client.get(reverse('dashboard'))
-        dashboard_html = self._remove_whitespace_from_html_string(response.content.decode('utf-8'))
+        dashboard_html = self._remove_whitespace_from_response(response)
         access_expired_substring = 'Accessexpired'
         course_link_class = 'course-target-link'
 
@@ -848,7 +852,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             for button in html_for_entitlement
         ]
 
-        dashboard_html = self._remove_whitespace_from_html_string(response.content)
+        dashboard_html = self._remove_whitespace_from_response(response)
 
         for i in range(num_course_cards):
             expected_button = None
