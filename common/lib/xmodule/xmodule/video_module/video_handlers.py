@@ -534,7 +534,12 @@ class VideoStudioViewHandlers(object):
                         video=self, lang=language, output_format=Transcript.SRT
                     )
                     response = Response(transcript_content, headerlist=[
-                        ('Content-Disposition', 'attachment; filename="{}"'.format(transcript_name.encode('utf8'))),
+                        (
+                            'Content-Disposition',
+                            'attachment; filename="{}"'.format(
+                                transcript_name.encode('utf8') if six.PY2 else transcript_name
+                            )
+                        ),
                         ('Content-Language', language),
                         ('Content-Type', mime_type)
                     ])
