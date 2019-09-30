@@ -16,6 +16,7 @@ sessions. Assumes structure:
 from django.utils.translation import ugettext_lazy
 
 from .common import *
+import json
 import os
 from path import Path as path
 from uuid import uuid4
@@ -120,8 +121,12 @@ CONTENTSTORE = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': TEST_ROOT / "db" / "cms.db",
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': "edxtest",
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
         'ATOMIC_REQUESTS': True,
     },
 }
@@ -324,6 +329,23 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 ######### custom courses #########
 INSTALLED_APPS.append('openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig')
 FEATURES['CUSTOM_COURSES_EDX'] = True
+
+SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
+
+CONFIG_ROOT = path(os.environ.get('CONFIG_ROOT', ENV_ROOT))
+
+CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
+
+with open(CONFIG_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
+    AUTH_TOKENS = json.load(auth_file)
+
+NODEBB_RETRY_DELAY = 60
+NODEBB_ENDPOINT = "http://local.philanthropyu.org:4567"
+# replace NODEBB_MASTER_TOKEN with value from your setup
+NODEBB_MASTER_TOKEN = AUTH_TOKENS.get("NODEBB_MASTER_TOKEN")
+MANDRILL_API_KEY = AUTH_TOKENS.get("MANDRILL_API_KEY")
+MAILCHIMP_API_KEY = AUTH_TOKENS.get("MAILCHIMP_API_KEY")
+MAILCHIMP_LEARNERS_LIST_ID = ""
 
 ########################## VIDEO IMAGE STORAGE ############################
 VIDEO_IMAGE_SETTINGS = dict(
