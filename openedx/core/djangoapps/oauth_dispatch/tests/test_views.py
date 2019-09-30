@@ -240,11 +240,11 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
     @ddt.data('dop_app', 'dot_app')
     def test_jwt_access_token_from_header(self, client_attr):
         self._test_jwt_access_token(client_attr, headers={'HTTP_X_TOKEN_TYPE': 'jwt'})
-        
+
     @ddt.data('dop_app', 'dot_app')
     def test_jwt_access_token_from_parameter_not_header(self, client_attr):
         self._test_jwt_access_token(client_attr, token_type='jwt', headers={'HTTP_X_TOKEN_TYPE': 'invalid'})
-        
+
     @ddt.data(
         ('jwt', 'jwt'),
         (None, 'no_token_type_supplied'),
