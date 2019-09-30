@@ -67,25 +67,38 @@ class RegistrationApiViewTests(TestCase):
         res = self.client.post(self.url, params)
         self.assertContains(res, 'user_id', status_code=200)
 
-    def test_with_enable_activation_email(self):
+    @ddt.data(True, False, 'True', 'False', 'true', 'false')
+    def test_send_activation_email_with_password(self, send_activation_email):
         params = {
             'username': 'mr_potato_head',
             'email': 'mr_potato_head@example.com',
             'name': 'Mr Potato Head',
-            'send_activation_email': True,
+            'password': 'some-password',
+            'send_activation_email': send_activation_email,
         }
-        res = self.client.post(self.url, params)
-        self.assertContains(res, 'user_id', status_code=200)
+        def fake_send(user, profile, user_registration=None):
+            assert send_activation_email in [True, 'True', 'true'], 'activation email should not be called'
 
-    def test_with_disable_activation_email(self):
+        with patch('student.views.management.compose_and_send_activation_email', fake_send):
+            res = self.client.post(self.url, params)
+            self.assertContains(res, 'user_id', status_code=200)
+
+    @ddt.data(True, False, 'True', 'False', 'true', 'false')
+    def test_send_activation_email_without_password(self, send_activation_email):
+        """Should not send email. Ignores the `send_activation_email` param
+        """
         params = {
             'username': 'mr_potato_head',
             'email': 'mr_potato_head@example.com',
             'name': 'Mr Potato Head',
-            'send_activation_email': False,
+            'send_activation_email': send_activation_email,
         }
-        res = self.client.post(self.url, params)
-        self.assertContains(res, 'user_id', status_code=200)
+        def fake_send(user, profile, user_registration=None):
+            assert False, 'Should not call fake_send when no password'
+
+        with patch('student.views.management.compose_and_send_activation_email', fake_send):
+            res = self.client.post(self.url, params)
+            self.assertContains(res, 'user_id', status_code=200)
 
     @ddt.data('username', 'name')
     def test_missing_field(self, field):
@@ -102,3 +115,4 @@ class RegistrationApiViewTests(TestCase):
         res = self.client.post(self.url, params)
         self.assertContains(
             res, 'Invalid parameters on user creation', status_code=400)
+
