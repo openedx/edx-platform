@@ -515,7 +515,7 @@ class TestTranscriptDownloadDispatch(TestVideo):
     def test_download_non_en_non_ascii_filename(self, __):
         request = Request.blank('/download')
         response = self.item.transcript(request=request, dispatch='download')
-        self.assertEqual(response.body, 'Subs!')
+        self.assertEqual(response.body.decode('utf-8'), 'Subs!')
         self.assertEqual(response.headers['Content-Type'], 'application/x-subrip; charset=utf-8')
         self.assertEqual(response.headers['Content-Disposition'], 'attachment; filename="en_塞.srt"')
 
