@@ -201,7 +201,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
 
         settings_details_url = get_url(self.course.id)
         response = self.client.get_html(settings_details_url)
-        self.assertEqual("Upgrade Deadline Date" in response.content, has_expiration_date and has_verified_mode)
+        self.assertEqual(b"Upgrade Deadline Date" in response.content, has_expiration_date and has_verified_mode)
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
     def test_pre_requisite_course_list_present(self):
