@@ -652,7 +652,7 @@ class TestCourseReIndex(CourseTestCase):
         self.assertEqual(response.status_code, 200)
 
         response = self.client.post(index_url, {}, HTTP_ACCEPT='application/json')
-        self.assertEqual(response.content, '')
+        self.assertEqual(response.content, b'')
         self.assertEqual(response.status_code, 405)
 
         self.client.logout()
