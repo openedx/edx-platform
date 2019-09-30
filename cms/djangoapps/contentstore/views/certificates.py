@@ -237,7 +237,7 @@ class CertificateManager(object):
         Deserialize from a JSON representation into a Certificate object.
         'value' should be either a Certificate instance, or a valid JSON string
         """
-        if not six.PY2 and not isinstance(value, six.integer_types):
+        if not six.PY2 and isinstance(value, bytes):
             value = value.decode('utf-8')
 
         # Ensure the schema fieldset meets our expectations
