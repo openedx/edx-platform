@@ -71,8 +71,10 @@ def user_info(request):
         'year_of_birth': userprofile.year_of_birth,
         'gender': userprofile.gender,
         'language': userprofile.language,
-        'country': COUNTRIES.get(userprofile.country) if not request.POST.get('country') else request.POST.get('country'),
-        'country_of_employment': COUNTRIES.get(user_extended_profile.country_of_employment, '') if not request.POST.get('country_of_employment') else request.POST.get('country_of_employment') ,
+        'country': COUNTRIES.get(userprofile.country) if not request.POST.get('country') else request.POST.get(
+            'country'),
+        'country_of_employment': COUNTRIES.get(user_extended_profile.country_of_employment, '') if not request.POST.get(
+            'country_of_employment') else request.POST.get('country_of_employment'),
         'city': userprofile.city,
         'level_of_education': userprofile.level_of_education,
         'hours_per_week': user_extended_profile.hours_per_week if user_extended_profile.hours_per_week else '',
@@ -119,7 +121,7 @@ def user_info(request):
         'non_profile_organization': Organization.is_non_profit(user_extended_profile),
         'is_poc': user_extended_profile.is_organization_admin,
         'is_first_user': user_extended_profile.is_first_signup_in_org \
-        if user_extended_profile.organization else False,
+            if user_extended_profile.organization else False,
         'google_place_api_key': settings.GOOGLE_PLACE_API_KEY,
 
     })
@@ -141,7 +143,7 @@ def interests(request):
     namely, organization survey.
     """
     user_extended_profile = request.user.extended_profile
-    are_forms_complete = not(bool(user_extended_profile.unattended_surveys(_type='list')))
+    are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
     is_first_signup_in_org = user_extended_profile.is_first_signup_in_org \
         if user_extended_profile.organization else False
 
@@ -157,9 +159,9 @@ def interests(request):
         "interests": user_extended_profile.get_user_selected_interests(_type="fields"),
         "interested_learners": user_extended_profile.get_user_selected_interested_learners(_type="fields"),
         "personal_goals": user_extended_profile.get_user_selected_personal_goal(_type="fields"),
-        "hear_about_philanthropy":  user_extended_profile.get_user_hear_about_philanthropy(_type="fields"),
-        "hear_about_philanthropy_other":  user_extended_profile.hear_about_philanthropy_other if user_extended_profile
-                                          .hear_about_philanthropy_other else ''
+        "hear_about_philanthropy": user_extended_profile.get_user_hear_about_philanthropy(_type="fields"),
+        "hear_about_philanthropy_other": user_extended_profile.hear_about_philanthropy_other if user_extended_profile
+            .hear_about_philanthropy_other else ''
     }
 
     if request.method == 'POST':
@@ -214,7 +216,7 @@ def organization(request):
     """
     user_extended_profile = request.user.extended_profile
     _organization = user_extended_profile.organization
-    are_forms_complete = not(bool(user_extended_profile.unattended_surveys(_type='list')))
+    are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
 
     template = 'onboarding/organization_survey.html'
     next_page_url = reverse('recommendations')
@@ -243,7 +245,7 @@ def organization(request):
                 # redirect to organization detail page
                 next_page_url = reverse('org_detail_survey')
             else:
-                #update nodebb for user profile completion
+                # update nodebb for user profile completion
                 update_nodebb_for_user_status(request.user.username)
                 if user_extended_profile.is_alquity_user:
                     next_page_url = get_alquity_community_url()
@@ -318,7 +320,7 @@ def get_country_names(request):
 @transaction.atomic
 def org_detail_survey(request):
     user_extended_profile = request.user.extended_profile
-    are_forms_complete = not(bool(user_extended_profile.unattended_surveys(_type='list')))
+    are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
     latest_survey = OrganizationMetric.objects.filter(org=user_extended_profile.organization).last()
 
     initial = {
@@ -405,13 +407,24 @@ def update_account_settings(request):
     """
     View to handle update of registration extra fields
     """
+    from lms.djangoapps.onboarding.helpers import get_user_on_demand_courses, get_email_pref_on_demand_course
 
     user_extended_profile = UserExtendedProfile.objects.get(user_id=request.user.id)
     partners_opt_in = request.POST.get('partners_opt_in', '')
 
+    on_demand_courses = get_user_on_demand_courses(request.user)
+
+    first_on_demand_course_email_preference = get_email_pref_on_demand_course(
+        request.user, on_demand_courses[0].id) if len(on_demand_courses) > 0 else True
+    on_demand_courses_options = [(course.id, str(course.display_name)) for course in on_demand_courses]
+
     if request.method == 'POST':
 
-        form = forms.UpdateRegModelForm(request.POST, instance=user_extended_profile)
+        form = forms.UpdateRegModelForm(
+            on_demand_courses_options,
+            first_on_demand_course_email_preference,
+            request.POST,
+            instance=user_extended_profile)
         if form.is_valid():
             user_extended_profile = form.save(user=user_extended_profile.user, commit=True)
             save_user_partner_network_consent(user_extended_profile.user, partners_opt_in)
@@ -425,7 +438,10 @@ def update_account_settings(request):
 
     else:
         email_preferences = getattr(request.user, 'email_preferences', None)
+
         form = forms.UpdateRegModelForm(
+            on_demand_courses_options,
+            first_on_demand_course_email_preference,
             instance=user_extended_profile,
             initial={
                 'organization_name': user_extended_profile.organization.label if user_extended_profile.organization else "",
@@ -476,7 +492,7 @@ def suggest_org_admin(request):
                     if already_an_admin:
                         status = 400
                         message = ugettext_noop('%s is already admin of organization "%s"'
-                                                      % (org_admin_email, already_an_admin.label))
+                                                % (org_admin_email, already_an_admin.label))
                     elif already_suggested_as_admin:
                         message = ugettext_noop('%s is already suggested as admin of "%s" organization'
                                                 % (org_admin_email, already_suggested_as_admin.organization.label))
@@ -492,7 +508,8 @@ def suggest_org_admin(request):
                         send_admin_activation_email(org_admin_first_name, org_id, org_name, claimed_by_name,
                                                     claimed_by_email, org_admin_email, hash_key)
                 else:
-                    hash_key = OrganizationAdminHashKeys.assign_hash(organization, organization.admin, request.user.email)
+                    hash_key = OrganizationAdminHashKeys.assign_hash(organization, organization.admin,
+                                                                     request.user.email)
                     send_admin_update_email(organization.id, organization.label, organization.admin.email,
                                             organization.admin.first_name, hash_key, request.user.email,
                                             request.user.username
@@ -550,7 +567,7 @@ def get_currencies(request):
         term = request.GET.get('term', '')
         currencies = Currency.objects.filter(Q(country__icontains=term) | Q(name__icontains=term) |
                                              Q(alphabetic_code__icontains=term)).values_list('alphabetic_code',
-                                                                                               flat=True).distinct()
+                                                                                             flat=True).distinct()
     data = json.dumps(list(currencies))
     return HttpResponse(data, 'application/json')
 
@@ -563,15 +580,10 @@ def recommendations(request):
     """
     recommended_courses = get_recommended_xmodule_courses(request)
     joined_communities = get_joined_communities(request.user)
-    user_extended_profile = request.user.extended_profile
 
     context = {
         'recommended_courses': recommended_courses,
         'joined_communities': joined_communities,
-        'user_has_organization': bool(user_extended_profile.organization),
-        'is_nonprofit_org': Organization.is_non_profit(user_extended_profile),
-        'is_poc': user_extended_profile.is_organization_admin,
-        'oef_eligible_first_learner': oef_eligible_first_learner(user_extended_profile),
     }
 
     return render_to_response('onboarding/recommendations.html', context)

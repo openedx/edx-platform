@@ -1,3 +1,7 @@
+from datetime import datetime
+
+from custom_settings.models import CustomSettings
+from opaque_keys.edx.keys import CourseKey
 from pyquery import PyQuery as pq
 from django.core.urlresolvers import reverse
 from django.contrib.sites.models import Site

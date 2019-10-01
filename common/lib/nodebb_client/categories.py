@@ -51,3 +51,13 @@ class ForumCategory(Category):
             * 200 status if successful
         """
         return self.client.delete('/api/v2/categories/{}'.format(category_id))
+
+    def archive(self, category_id, **kwargs):
+        """
+        Archive(disable) a category from NodeBB, including all topics, posts and subcategories inside of it
+        (Careful: There is no confirmation!)
+        :param category_id: Id of the NodeBB category
+        :return:
+            * 200 status if successful
+        """
+        return self.client.put('/api/v2/categories/{}/disable'.format(category_id))

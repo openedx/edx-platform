@@ -70,7 +70,7 @@ class Command(BaseCommand):
                     course_name = course.display_name
                     course_url = get_course_first_chapter_link(course=course)
 
-                    template = MandrillClient.COURSE_ACTIVATION_REMINDER
+                    template = MandrillClient.COURSE_ACTIVATION_REMINDER_TEMPLATE
                     context = {
                         'first_name': first_name,
                         'course_name': course_name,

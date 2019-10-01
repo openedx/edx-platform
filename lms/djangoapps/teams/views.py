@@ -43,12 +43,12 @@ from .errors import AlreadyOnTeamInCourse, ElasticSearchConnectionError, NotEnro
 from .search_indexes import CourseTeamIndexer
 from .serializers import (
     BulkTeamCountTopicSerializer,
-    CourseTeamCreationSerializer,
     CourseTeamSerializer,
     MembershipSerializer,
     TopicSerializer,
     add_team_count
 )
+from openedx.features.teams.serializers import CustomCourseTeamCreationSerializer
 from .utils import emit_team_event
 
 TEAM_MEMBERSHIPS_PER_PAGE = 2
@@ -501,7 +501,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         data = request.data.copy()
         data['course_id'] = unicode(course_key)
 
-        serializer = CourseTeamCreationSerializer(data=data)
+        serializer = CustomCourseTeamCreationSerializer(data=data)
         add_serializer_errors(serializer, data, field_errors)
 
         if field_errors:

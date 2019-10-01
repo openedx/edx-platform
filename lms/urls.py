@@ -78,6 +78,7 @@ urlpatterns = [
 
     url(r'', include('lms.djangoapps.onboarding.urls')),
     url(r'', include('openedx.features.split_registration.urls')),
+    url(r'', include('openedx.features.ondemand_email_preferences.urls')),
     url(r'^oef/', include('lms.djangoapps.oef.urls')),
     url(r'', include('edx_notifications.server.urls')),
     url(r'^$', branding_views.index, name='root'),   # Main marketing page, or redirect to courseware
