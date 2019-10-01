@@ -2,7 +2,7 @@
 from __future__ import absolute_import
 
 import json
-from io import BytesIO
+from io import BytesIO, StringIO
 
 import ddt
 import six
@@ -307,7 +307,7 @@ class TranscriptUploadTest(CourseTestCase):
         """
         Tests that transcript upload handler works as expected.
         """
-        transcript_file_stream = BytesIO('0\n00:00:00,010 --> 00:00:00,100\nПривіт, edX вітає вас.\n\n')
+        transcript_file_stream = BytesIO('0\n00:00:00,010 --> 00:00:00,100\nПривіт, edX вітає вас.\n\n'.encode('utf-8'))
         # Make request to transcript upload handler
         response = self.client.post(
             self.view_url,

@@ -637,10 +637,12 @@ class Transcript(object):
     @staticmethod
     def convert(content, input_format, output_format):
         """
-        Convert transcript `content` from `input_format` to `output_format`.
+        Convert transcript `content` from `input_format` to `output_format`
 
-        Accepted input formats: sjson, srt.
-        Accepted output format: srt, txt, sjson.
+        Arguments:
+            content: can be both a byte or string
+            input_format: only accepts: sjson, srt
+            output_format: only accepts: srt, txt, sjson
 
         Raises:
             TranscriptsGenerationException: On parsing the invalid srt content during conversion from srt to sjson.
@@ -659,11 +661,17 @@ class Transcript(object):
 
             elif output_format == 'sjson':
                 try:
+                    if isinstance(content, six.binary_type):
+                        content = content.decode('utf-8-sig')
+                    else:
+                        content.encode('utf-8').decode('utf-8-sig')
+
                     # With error handling (set to 'ERROR_RAISE'), we will be getting
                     # the exception if something went wrong in parsing the transcript.
                     srt_subs = SubRipFile.from_string(
                         # Skip byte order mark(BOM) character
-                        content.decode('utf-8-sig') if six.PY2 else content.encode('utf-8').decode('utf-8-sig'),
+
+                        content,
                         error_handling=SubRipFile.ERROR_RAISE
                     )
                 except Error as ex:   # Base exception from pysrt
