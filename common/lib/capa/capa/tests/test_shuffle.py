@@ -282,15 +282,27 @@ class CapaShuffleTest(unittest.TestCase):
         self.assertEqual(orig_html, problem.get_html(), 'should be able to call get_html() twice')
         html = orig_html.replace('\n', ' ')  # avoid headaches with .* matching
         print(html)
-        self.assertRegexpMatches(html, r"<div>.*\[.*'Banana'.*'Apple'.*'Chocolate'.*'Donut'.*\].*</div>.*" +
-                                       r"<div>.*\[.*'C'.*'A'.*'D'.*'B'.*\].*</div>")
+        if six.PY2:
+            regex = r"<div>.*\[.*'Banana'.*'Apple'.*'Chocolate'.*'Donut'.*\].*</div>.*" +\
+                    r"<div>.*\[.*'C'.*'A'.*'D'.*'B'.*\].*</div>"
+        else:
+            regex = r"<div>.*\[.*'Chocolate'.*'Apple'.*'Banana'.*'Donut'.*\].*</div>.*" +\
+                    r"<div>.*\[.*'A'.*'B'.*'D'.*'C'.*\].*</div>"
+
+        self.assertRegexpMatches(html, regex)
         # Look at the responses in their authored order
         responses = sorted(list(problem.responders.values()), key=lambda resp: int(resp.id[resp.id.rindex('_') + 1:]))
         self.assertFalse(responses[0].has_mask())
         self.assertTrue(responses[0].has_shuffle())
         self.assertTrue(responses[1].has_shuffle())
-        self.assertEqual(responses[0].unmask_order(), ['choice_1', 'choice_0', 'choice_2', 'choice_3'])
-        self.assertEqual(responses[1].unmask_order(), ['choice_2', 'choice_0', 'choice_3', 'choice_1'])
+        if six.PY2:
+            unmask_order_0 = ['choice_1', 'choice_0', 'choice_2', 'choice_3']
+            unmask_order_1 = ['choice_2', 'choice_0', 'choice_3', 'choice_1']
+        else:
+            unmask_order_0 = ['choice_2', 'choice_0', 'choice_1', 'choice_3']
+            unmask_order_1 = ['choice_0', 'choice_1', 'choice_3', 'choice_2']
+        self.assertEqual(responses[0].unmask_order(), unmask_order_0)
+        self.assertEqual(responses[1].unmask_order(), unmask_order_1)
 
     def test_shuffle_not_with_answerpool(self):
         """Raise error if shuffle and answer-pool are both used."""
