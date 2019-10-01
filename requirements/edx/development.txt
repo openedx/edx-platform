@@ -109,7 +109,7 @@ django-storages==1.4.1
 django-user-tasks==0.2.1
 django-waffle==0.12.0
 django-webpack-loader==0.6.0
-django==1.11.24
+django==1.11.25
 djangorestframework-jwt==1.11.0
 git+https://github.com/edx/django-rest-framework-oauth.git@0a43e8525f1e3048efe4bc70c03de308a277197c#egg=djangorestframework-oauth==1.1.1
 djangorestframework-xml==1.4.0
@@ -129,7 +129,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==2.0.0
 edx-drf-extensions==2.4.0
-edx-enterprise==1.10.7
+edx-enterprise==1.10.8
 edx-i18n-tools==0.4.8
 edx-lint==1.3.0
 edx-milestones==0.2.3
