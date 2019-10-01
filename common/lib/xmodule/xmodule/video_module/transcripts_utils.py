@@ -663,7 +663,7 @@ class Transcript(object):
                     # the exception if something went wrong in parsing the transcript.
                     srt_subs = SubRipFile.from_string(
                         # Skip byte order mark(BOM) character
-                        content.decode('utf-8-sig') if six.PY2 else content.encode('utf-8').decode('utf-8-sig'),
+                        content.decode('utf-8-sig') if isinstance(content, bytes) else content,
                         error_handling=SubRipFile.ERROR_RAISE
                     )
                 except Error as ex:   # Base exception from pysrt
