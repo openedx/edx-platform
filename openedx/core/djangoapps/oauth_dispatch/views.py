@@ -96,10 +96,11 @@ class AccessTokenView(RatelimitMixin, _DispatchingView):
     ratelimit_block = True
     ratelimit_method = ALL
 
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):  # pylint: disable=arguments-differ
         response = super(AccessTokenView, self).dispatch(request, *args, **kwargs)
 
-        token_type = request.POST.get('token_type', 'no_token_type_supplied').lower()
+        token_type = request.POST.get('token_type',
+                                      request.META.get('HTTP_X_TOKEN_TYPE', 'no_token_type_supplied')).lower()
         monitoring_utils.set_custom_metric('oauth_token_type', token_type)
         monitoring_utils.set_custom_metric('oauth_grant_type', request.POST.get('grant_type', ''))
 
