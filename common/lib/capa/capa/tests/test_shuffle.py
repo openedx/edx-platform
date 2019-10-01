@@ -176,8 +176,12 @@ class CapaShuffleTest(unittest.TestCase):
         """)
         problem = new_loncapa_problem(xml_str, seed=0)
         the_html = problem.get_html()
+        if six.PY2:
+            regex = r"<div>.*\[.*'B'.*'A'.*'C'.*'D'.*'Alpha'.*'Beta'.*\].*</div>"
+        else:
+            regex = r"<div>.*\[.*'C'.*'A'.*'B'.*'D'.*'Alpha'.*'Beta'.*\].*</div>"
         # Alpha Beta held back from shuffle (tail end)
-        self.assertRegexpMatches(the_html, r"<div>.*\[.*'B'.*'A'.*'C'.*'D'.*'Alpha'.*'Beta'.*\].*</div>")
+        self.assertRegexpMatches(the_html, regex)
 
     def test_shuffle_fixed_both_ends(self):
         xml_str = textwrap.dedent("""
