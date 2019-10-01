@@ -5,6 +5,7 @@ Tests of responsetypes
 
 from __future__ import absolute_import
 
+import io
 import json
 import os
 import random
@@ -1588,6 +1589,8 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-docstring
                 if text == "There was a problem with the staff answer to this problem.":
                     text = "TRANSLATED!"
                 return text
+            gettext = ugettext
+
         problem.capa_system.i18n = FakeTranslations()
 
         with self.assertRaisesRegexp(StudentInputError, "TRANSLATED!"):
@@ -2294,7 +2297,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         # Prove that we can import code from a zipfile passed down to us.
 
         # Make a zipfile with one module in it with one function.
-        zipstring = StringIO()
+        zipstring = io.BytesIO()
         zipf = zipfile.ZipFile(zipstring, "w")
         zipf.writestr("my_helper.py", textwrap.dedent("""\
             def seventeen():

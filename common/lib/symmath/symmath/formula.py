@@ -424,7 +424,7 @@ class formula(object):
 
         # pre-process the presentation mathml before sending it to snuggletex to convert to content mathml
         try:
-            xml = self.preprocess_pmathml(self.expr)
+            xml = self.preprocess_pmathml(self.expr).decode('utf-8')
         except Exception as err:  # pylint: disable=broad-except
             log.warning('Err %s while preprocessing; expr=%s', err, self.expr)
             return "<html>Error! Cannot process pmathml</html>"
