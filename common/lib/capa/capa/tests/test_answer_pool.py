@@ -5,6 +5,7 @@ Tests the logic of the "answer-pool" attribute, e.g.
 
 from __future__ import absolute_import
 
+import six
 import textwrap
 import unittest
 
@@ -511,12 +512,19 @@ class CapaAnswerPoolTest(unittest.TestCase):
 
         problem = new_loncapa_problem(xml_str)
         the_html = problem.get_html()
-        str1 = (r"<div>.*\[.*'correct-2'.*'wrong-2'.*\].*</div>.*" +
-                r"<div>.*\[.*'wrong-1'.*'correct-2'.*'wrong-4'.*\].*</div>.*" +
-                r"<div>.*\[.*'correct-1'.*'wrong-4'.*\].*</div>.*" +
-                r"<div>.*\[.*'wrong-1'.*'wrong-2'.*'correct-1'.*\].*</div>")
+        if six.PY2:
+            regex = (r"<div>.*\[.*'correct-2'.*'wrong-2'.*\].*</div>.*" +
+                    r"<div>.*\[.*'wrong-1'.*'correct-2'.*'wrong-4'.*\].*</div>.*" +
+                    r"<div>.*\[.*'correct-1'.*'wrong-4'.*\].*</div>.*" +
+                    r"<div>.*\[.*'wrong-1'.*'wrong-2'.*'correct-1'.*\].*</div>")
+        else:
+            regex = (r"<div>.*\[.*'wrong-3'.*'correct-3'.*\].*</div>.*" +
+                    r"<div>.*\[.*'wrong-1'.*'correct-3'.*'wrong-4'.*\].*</div>.*" +
+                    r"<div>.*\[.*'correct-3'.*'wrong-3'.*\].*</div>.*" +
+                    r"<div>.*\[.*'wrong-3'.*'correct-1'.*'wrong-1'.*\].*</div>")
+
         without_new_lines = the_html.replace("\n", "")
-        self.assertRegexpMatches(without_new_lines, str1)
+        self.assertRegexpMatches(without_new_lines, regex)
 
     def test_no_answer_pool(self):
         xml_str = textwrap.dedent("""
