@@ -394,7 +394,7 @@ class TestXModuleHandler(TestCase):
     def test_xmodule_handler_return_value(self):
         response = self.module.xmodule_handler(self.request)
         self.assertIsInstance(response, webob.Response)
-        self.assertEqual(response.body, '{}')
+        self.assertEqual(response.body.decode('utf-8'), '{}')
 
     @ddt.data(
         u'{"test_key": "test_value"}',
