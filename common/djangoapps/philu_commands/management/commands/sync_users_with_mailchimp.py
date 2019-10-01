@@ -20,7 +20,10 @@ class Command(BaseCommand):
     """
 
     def send_user_to_mailchimp(self, client, users):
-        client.add_list_members_in_batch(settings.MAILCHIMP_LEARNERS_LIST_ID, {"members": users})
+        client.add_list_members_in_batch(settings.MAILCHIMP_LEARNERS_LIST_ID, {
+            "members": users,
+            "update_existing": True
+        })
 
     def get_users_data_to_send(self, users):
         users_set = []
@@ -29,12 +32,35 @@ class Command(BaseCommand):
         org_sectors = OrgSector.get_map()
 
         for user in users:
-            profile = user.profile
-            extended_profile = user.extended_profile
+            language = country = city = organization = org_type = work_area = ""
+            profile = extended_profile = None
+            try:
+                profile = user.profile
+                extended_profile = user.extended_profile
 
-            org_type = ""
-            if extended_profile.organization and extended_profile.organization.org_type:
-                org_type = org_sectors.get(extended_profile.organization.org_type, '')
+                if profile.language:
+                    language = profile.language
+
+                if profile.country:
+                    country = profile.country.name.format()
+
+                if profile.city:
+                    city = profile.city
+
+                if extended_profile.organization:
+                    organization = extended_profile.organization.label
+                    work_area = str(focus_areas.get(
+                        extended_profile.organization.focus_area, ""
+                    ))
+                    if extended_profile.organization.org_type:
+                        org_type = org_sectors.get(
+                            extended_profile.organization.org_type, ''
+                        )
+            except:
+                log.exception(
+                    "User %s does not have related object profile or extended_profile.",
+                    user.username
+                )
 
             all_certs = []
             try:
@@ -53,18 +79,17 @@ class Command(BaseCommand):
                     "merge_fields": {
                         "FULLNAME": user.get_full_name(),
                         "USERNAME": user.username,
-                        "LANG": profile.language if profile.language else "",
-                        "COUNTRY": profile.country.name.format() if profile.country else "",
-                        "CITY": profile.city if profile.city else "",
+                        "LANG": language,
+                        "COUNTRY": country,
+                        "CITY": city,
                         "DATEREGIS": str(user.date_joined.strftime("%m/%d/%Y")),
                         "LSOURCE": "",
                         "COMPLETES": ", ".join([course.display_name for course in completed_courses]),
                         "ENROLLS": get_user_active_enrollements(user.username),
                         "ENROLL_IDS": get_enrollements_course_short_ids(user.username),
-                        "ORG": extended_profile.organization.label if extended_profile.organization else "",
+                        "ORG": organization,
                         "ORGTYPE": org_type,
-                        "WORKAREA": str(focus_areas.get(extended_profile.organization.focus_area, ""))
-                        if extended_profile.organization else "",
+                        "WORKAREA": work_area,
                     }
                 }
             except Exception as ex:
