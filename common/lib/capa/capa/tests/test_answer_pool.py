@@ -5,6 +5,7 @@ Tests the logic of the "answer-pool" attribute, e.g.
 
 from __future__ import absolute_import
 
+import six
 import textwrap
 import unittest
 
@@ -606,9 +607,14 @@ class CapaAnswerPoolTest(unittest.TestCase):
         the_html = problem.get_html()
 
         str1 = r"<div>.*\[.*'wrong-1'.*'wrong-2'.*'correct-1'.*'wrong-3'.*'wrong-4'.*\].*</div>"
-        str2 = r"<div>.*\[.*'wrong-3'.*'correct-2'.*'wrong-2'.*'wrong-4'.*\].*</div>"
         str3 = r"<div>\{.*'1_solution_1'.*\}</div>"
-        str4 = r"<div>\{.*'1_solution_3'.*\}</div>"
+        if six.PY2:
+            str2 = r"<div>.*\[.*'wrong-3'.*'correct-2'.*'wrong-2'.*'wrong-4'.*\].*</div>"
+            str4 = r"<div>\{.*'1_solution_3'.*\}</div>"
+        else:
+            str2 = r"<div>.*\[.*'wrong-4'.*'correct-1'.*'wrong-3'.*'wrong-1'.*\].*</div>"
+            str4 = r"<div>\{.*'1_solution_2'.*\}</div>"
+
 
         self.assertRegexpMatches(the_html, str1)
         self.assertRegexpMatches(the_html, str2)
