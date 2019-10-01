@@ -1,5 +1,6 @@
 import re
 import pytz
+
 from dateutil.relativedelta import relativedelta
 from datetime import date, datetime
 from difflib import SequenceMatcher
@@ -7888,7 +7889,7 @@ def convert_date_to_utcdatetime(date):
     :param date:
     :return: return utc datetime object of current date object
     """
-    return pytz.UTC.localize(datetime(year=date.year,month=date.month, day=date.day))
+    return pytz.UTC.localize(datetime(year=date.year, month=date.month, day=date.day))
 
 
 def get_current_utc_date():
@@ -7953,7 +7954,7 @@ def get_org_metric_update_prompt(user):
     # becuase according to the scenario
     # https://philanthropyu.atlassian.net/browse/LP-1222?focusedCommentId=15084&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-15084
     # the user will be the admin of the organization of latest prompt
-    return OrganizationMetricUpdatePrompt.objects.filter(responsible_user_id=user.id)\
+    return OrganizationMetricUpdatePrompt.objects.filter(responsible_user_id=user.id) \
         .order_by('-latest_metric_submission').first()
 
 
@@ -8010,3 +8011,51 @@ def serialize_partner_networks():
         ))
 
     return data
+
+def get_user_on_demand_courses(user):
+    """
+        Return user on demand courses
+
+        Parameters:
+        user: user object whom courses we need.
+
+        Returns:
+        list: List of on Demand courses and empty list in case user isn't enrolled in any on demand courses which is
+        currently active.
+
+    """
+
+    from student.models import CourseEnrollment
+    from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+
+    all_user_courses = CourseEnrollment.objects.filter(user=user, is_active=True)
+    courses = []
+    for user_course in all_user_courses:
+        try:
+            today = datetime.now(utc).date()
+            courses.append(CourseOverview.objects.get(id=user_course.course_id, self_paced=True, end__gte=today))
+        except CourseOverview.DoesNotExist:
+            continue
+    return courses
+
+
+def get_email_pref_on_demand_course(user, on_demand_course_id):
+    """
+        Return email preferences of user for given on demand courses
+
+        Parameters:
+        user: user object whom courses we need.
+        on_demand_course_id: course id of on demand course which email preference would be required.
+
+        Returns:
+        list: Email preferences of given course
+
+    """
+
+    from openedx.features.ondemand_email_preferences.models import OnDemandEmailPreferences
+
+    try:
+        email_pref = OnDemandEmailPreferences.objects.get(user=user, course_id=on_demand_course_id)
+        return email_pref.is_enabled
+    except OnDemandEmailPreferences.DoesNotExist:
+        return True
