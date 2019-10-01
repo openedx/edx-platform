@@ -218,13 +218,8 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes=0-')
 
         self.assertEqual(resp.status_code, 206)  # HTTP_206_PARTIAL_CONTENT
-        self.assertEqual(
-            resp['Content-Range'],
-            b'bytes {first}-{last}/{length}'.format(
-                first=0, last=self.length_unlocked - 1,
-                length=self.length_unlocked
-            )
-        )
+        self.assertEqual(resp['Content-Range'], u'bytes {first}-{last}/{length}'
+                         .format(first=0, last=self.length_unlocked - 1, length=self.length_unlocked))
         self.assertEqual(resp['Content-Length'], str(self.length_unlocked))
 
     def test_range_request_partial_file(self):
@@ -233,13 +228,13 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         outputs partial content status code and valid Content-Range and Content-Length.
         first_byte and last_byte are chosen to be simple but non trivial values.
         """
-        first_byte = self.length_unlocked / 4
-        last_byte = self.length_unlocked / 2
+        first_byte = self.length_unlocked // 4
+        last_byte = self.length_unlocked // 2
         resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes={first}-{last}'.format(
             first=first_byte, last=last_byte))
 
         self.assertEqual(resp.status_code, 206)  # HTTP_206_PARTIAL_CONTENT
-        self.assertEqual(resp['Content-Range'], b'bytes {first}-{last}/{length}'.format(
+        self.assertEqual(resp['Content-Range'], u'bytes {first}-{last}/{length}'.format(
             first=first_byte, last=last_byte, length=self.length_unlocked))
         self.assertEqual(resp['Content-Length'], str(last_byte - first_byte + 1))
 

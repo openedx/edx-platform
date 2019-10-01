@@ -156,7 +156,7 @@ class StaticContentServer(object):
                         if 0 <= first <= last < content.length:
                             # If the byte range is satisfiable
                             response = HttpResponse(content.stream_data_in_range(first, last))
-                            response['Content-Range'] = b'bytes {first}-{last}/{length}'.format(
+                            response['Content-Range'] = u'bytes {first}-{last}/{length}'.format(
                                 first=first, last=last, length=content.length
                             )
                             response['Content-Length'] = str(last - first + 1)
