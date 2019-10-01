@@ -4,6 +4,7 @@ CMS Video
 from __future__ import absolute_import
 
 import os
+import os.path
 import time
 
 import requests
@@ -225,7 +226,7 @@ class VideoComponentPage(VideoPage):
             filename (str): asset filename
 
         """
-        return os.sep.join(__file__.split(os.sep)[:-5]) + '/data/uploads/' + filename
+        return os.sep.join(os.path.abspath(__file__).split(os.sep)[:-5]) + '/data/uploads/' + filename
 
     def upload_handout(self, handout_filename):
         """
