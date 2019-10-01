@@ -307,7 +307,7 @@ class TranscriptUploadTest(CourseTestCase):
         """
         Tests that transcript upload handler works as expected.
         """
-        transcript_file_stream = BytesIO('0\n00:00:00,010 --> 00:00:00,100\nПривіт, edX вітає вас.\n\n'.encode('utf-8'))
+        transcript_file_stream = BytesIO(u'0\n00:00:00,010 --> 00:00:00,100\nПривіт, edX вітає вас.\n\n'.encode('utf-8'))
         # Make request to transcript upload handler
         response = self.client.post(
             self.view_url,
@@ -422,7 +422,7 @@ class TranscriptUploadTest(CourseTestCase):
         """
         Tests the transcript upload handler with an invalid transcript file.
         """
-        transcript_file_stream = BytesIO('An invalid transcript SubRip file content')
+        transcript_file_stream = BytesIO(b'An invalid transcript SubRip file content')
         # Make request to transcript upload handler
         response = self.client.post(
             self.view_url,
