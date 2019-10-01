@@ -2314,7 +2314,7 @@ msgstr ""
 #: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Submit"
-msgstr "提出"
+msgstr "送信"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Submitting"
