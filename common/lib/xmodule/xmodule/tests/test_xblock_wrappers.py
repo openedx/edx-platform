@@ -409,7 +409,7 @@ class TestXModuleHandler(TestCase):
         self.module.handle_ajax = Mock(return_value=response_data)
         response = self.module.xmodule_handler(self.request)
         self.assertIsInstance(response, webob.Response)
-        self.assertEqual(response.body, '{"test_key": "test_value"}')
+        self.assertEqual(response.body.decode('utf-8'), '{"test_key": "test_value"}')
 
 
 class TestXmlExport(XBlockWrapperTestMixin, TestCase):
