@@ -817,7 +817,7 @@ class VideoExportTestCase(VideoBlockTestBase):
         xml = self.descriptor.definition_to_xml(self.file_system)
         # Check that download_video field is also set to default (False) in xml for backward compatibility
         expected = '<video url_name="SampleProblem"/>\n'
-        self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
+        self.assertEquals(expected, etree.tostring(xml, pretty_print=True).decode('utf-8'))
 
     @patch('xmodule.video_module.video_module.edxval_api', None)
     def test_export_to_xml_with_transcripts_as_none(self):
