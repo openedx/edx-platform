@@ -57,7 +57,10 @@ class Command(BaseCommand):
                             extended_profile.organization.org_type, ''
                         )
             except:
-                pass
+                log.exception(
+                    "User %s does not have related object profile or extended_profile.",
+                    user.username
+                )
 
             all_certs = []
             try:
