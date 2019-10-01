@@ -33,11 +33,19 @@ class CapaShuffleTest(unittest.TestCase):
         # shuffling 4 things with seed of 0 yields: B A C D
         # Check that the choices are shuffled
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div>.*\[.*'Banana'.*'Apple'.*'Chocolate'.*'Donut'.*\].*</div>")
+        if six.PY2:
+            regex = r"<div>.*\[.*'Banana'.*'Apple'.*'Chocolate'.*'Donut'.*\].*</div>"
+        else:
+            regex = r"<div>.*\[.*'Chocolate'.*'Apple'.*'Banana'.*'Donut'.*\].*</div>"
+        self.assertRegexpMatches(the_html, regex)
         # Check that choice name masking is enabled and that unmasking works
         response = list(problem.responders.values())[0]
         self.assertFalse(response.has_mask())
-        self.assertEqual(response.unmask_order(), ['choice_1', 'choice_0', 'choice_2', 'choice_3'])
+        if six.PY2:
+            unmask_order = ['choice_1', 'choice_0', 'choice_2', 'choice_3']
+        else:
+            unmask_order = ['choice_2', 'choice_0', 'choice_1', 'choice_3']
+        self.assertEqual(response.unmask_order(), unmask_order)
         self.assertEqual(the_html, problem.get_html(), 'should be able to call get_html() twice')
 
     def test_shuffle_custom_names(self):
