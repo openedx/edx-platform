@@ -87,7 +87,7 @@ django-storages==1.4.1
 django-user-tasks==0.2.1
 django-waffle==0.12.0
 django-webpack-loader==0.6.0
-django==1.11.24
+django==1.11.25
 djangorestframework-jwt==1.11.0
 git+https://github.com/edx/django-rest-framework-oauth.git@0a43e8525f1e3048efe4bc70c03de308a277197c#egg=djangorestframework-oauth==1.1.1
 djangorestframework-xml==1.4.0  # via edx-enterprise
