@@ -277,7 +277,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         416 Requested Range Not Satisfiable.
         """
         resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes={first}-{last}'.format(
-            first=(self.length_unlocked / 2), last=(self.length_unlocked / 4)))
+            first=(self.length_unlocked // 2), last=(self.length_unlocked // 4)))
         self.assertEqual(resp.status_code, 416)
 
     def test_range_request_malformed_out_of_bounds(self):
