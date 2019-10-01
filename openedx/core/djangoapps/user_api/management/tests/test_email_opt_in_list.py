@@ -454,18 +454,14 @@ class EmailOptInListTest(ModuleStoreTestCase):
         for user, course_id, opt_in_pref in args:
             self.assertIn({
                 "user_id": str(user.id),
-                "username": user.username.encode('utf-8'),
-                "email": user.email.encode('utf-8'),
-                "full_name": (
-                    user.profile.name.encode('utf-8')
-                    if hasattr(user, 'profile')
-                    else ''
-                ),
-                "course_id": text_type(course_id).encode('utf-8'),
-                "is_opted_in_for_email": text_type(opt_in_pref),
+                "username": user.username,
+                "email": user.email if six.PY3 else user.email.encode('utf-8'),
+                "full_name": ((user.profile.name if six.PY3 else user.profile.name.encode('utf-8')) if
+                              hasattr(user, 'profile') else ''),
+                "course_id": text_type(course_id) if six.PY3 else text_type(course_id).encode('utf-8'),
+                "is_opted_in_for_email": text_type(opt_in_pref) if six.PY3 else text_type(opt_in_pref).encode('utf-8'),
                 "preference_set_datetime": (
                     self._latest_pref_set_datetime(self.user)
                     if kwargs.get("expect_pref_datetime", True)
-                    else self.DEFAULT_DATETIME_STR
-                )
+                    else self.DEFAULT_DATETIME_STR)
             }, output[1:])
