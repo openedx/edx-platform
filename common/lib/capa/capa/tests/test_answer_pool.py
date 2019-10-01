@@ -5,6 +5,7 @@ Tests the logic of the "answer-pool" attribute, e.g.
 
 from __future__ import absolute_import
 
+import six
 import textwrap
 import unittest
 
@@ -56,15 +57,25 @@ class CapaAnswerPoolTest(unittest.TestCase):
     def test_answer_pool_4_choices_1_multiplechoiceresponse_seed1(self):
         problem = new_loncapa_problem(self.common_question_xml, seed=723)
         the_html = problem.get_html()
+
+        if six.PY2:
+            regex1 = r"<div>.*\[.*'wrong-3'.*'correct-2'.*'wrong-2'.*'wrong-4'.*\].*</div>"
+            regex2 = r"<div>\{.*'1_solution_2'.*\}</div>"
+            unmask_order = ['choice_3', 'choice_5', 'choice_1', 'choice_4']
+        else:
+            regex1 = r"<div>.*\[.*'wrong-4'.*'correct-1'.*'wrong-3'.*'wrong-1'.*\].*</div>"
+            regex2 = r"<div>\{.*'1_solution_1'.*\}</div>"
+            unmask_order = ['choice_4', 'choice_2', 'choice_3', 'choice_0']
+
         # [('choice_3', u'wrong-3'), ('choice_5', u'correct-2'), ('choice_1', u'wrong-2'), ('choice_4', u'wrong-4')]
-        self.assertRegexpMatches(the_html, r"<div>.*\[.*'wrong-3'.*'correct-2'.*'wrong-2'.*'wrong-4'.*\].*</div>")
-        self.assertRegexpMatches(the_html, r"<div>\{.*'1_solution_2'.*\}</div>")
+        self.assertRegexpMatches(the_html, regex1)
+        self.assertRegexpMatches(the_html, regex2)
         self.assertEqual(the_html, problem.get_html(), 'should be able to call get_html() twice')
         # Check about masking
         response = list(problem.responders.values())[0]
         self.assertFalse(response.has_mask())
         self.assertTrue(response.has_answerpool())
-        self.assertEqual(response.unmask_order(), ['choice_3', 'choice_5', 'choice_1', 'choice_4'])
+        self.assertEqual(response.unmask_order(), unmask_order)
 
     def test_answer_pool_4_choices_1_multiplechoiceresponse_seed2(self):
         problem = new_loncapa_problem(self.common_question_xml, seed=9)
