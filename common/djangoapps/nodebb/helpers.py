@@ -1,13 +1,11 @@
 import collections
 
 from django.core.urlresolvers import reverse
-from requests.exceptions import ConnectionError
 
 from courseware.tabs import get_course_tab_list
-from common.lib.nodebb_client.client import NodeBBClient
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from nodebb.models import DiscussionCommunity, TeamGroupChat
-from nodebb.tasks import task_update_onboarding_surveys_status
+from nodebb.tasks import task_update_onboarding_surveys_status, task_archive_community_on_nodebb
 
 from logging import getLogger
 log = getLogger(__name__)
@@ -96,3 +94,14 @@ def update_nodebb_for_user_status(username):
     Call nodebb client to update NodeBB for survey status update
     """
     task_update_onboarding_surveys_status.delay(username=username)
+
+
+def archive_course_community(course_id):
+    community = DiscussionCommunity.objects.filter(course_id=course_id).first()
+
+    if not community or not community.community_url:
+        return
+
+    category_id = community.community_url.split('/')[0]
+
+    task_archive_community_on_nodebb.delay(category_id=category_id)

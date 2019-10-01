@@ -78,6 +78,8 @@ urlpatterns = [
     # Darklang View to change the preview language (or dark language)
     url(r'^update_lang/', include('openedx.core.djangoapps.dark_lang.urls', namespace='dark_lang')),
 
+    url(r'', include('openedx.features.cms.urls')),
+
     # For redirecting to help pages.
     url(r'^help_token/', include('help_tokens.urls')),
     url(r'^api/', include('cms.djangoapps.api.urls', namespace='api')),

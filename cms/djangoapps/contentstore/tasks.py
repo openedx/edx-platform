@@ -69,7 +69,7 @@ from edxval.api import (
     create_or_update_video_transcript,
     create_external_video,
 )
-from openedx.features.course_card.helpers import initialize_course_settings
+from openedx.features.cms.helpers import apply_post_rerun_creation_tasks
 
 User = get_user_model()
 
@@ -485,8 +485,7 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
             for country_access_rule in country_access_rules:
                 clone_instance(country_access_rule, {'restricted_course': new_restricted_course})
         
-        # initialize course settings like tags stc
-        initialize_course_settings(source_course_key, destination_course_key)
+        apply_post_rerun_creation_tasks(source_course_key, destination_course_key, user_id)
 
         return "succeeded"
 

@@ -25,13 +25,15 @@ class MandrillClient(object):
     REMIND_LEARNERS_TEMPLATE = 'remind-learners'
     COURSE_INVITATION_ONLY_REGISTER_TEMPLATE = 'course-invitation-only-register-user'
     ALQUITY_FAKE_SUBMIT_CONFIRMATION_TEMPLATE = 'alquity-fake-submit-confirmation'
-    COURSE_ACTIVATION_REMINDER = 'activation-reminder'
+    COURSE_ACTIVATION_REMINDER_TEMPLATE = 'activation-reminder'
+    ON_DEMAND_SCHEDULE_EMAIL_TEMPLATE = 'on-demand-course-schedule'
+    ON_DEMAND_WEEKLY_MODULE_COMPLETE_TEMPLATE = 'module-completion-weekly-email'
     ON_DEMAND_WEEKLY_MODULE_SKIP_TEMPLATE = 'on-demand-module-skip'
 
     def __init__(self):
         self.mandrill_client = mandrill.Mandrill(settings.MANDRILL_API_KEY)
 
-    def send_mail(self, template_name, user_email, context, attachments=[]):
+    def send_mail(self, template_name, user_email, context, attachments=[], subject=None):
         """
         calls the mandrill API for the specific template and email
 
@@ -42,16 +44,21 @@ class MandrillClient(object):
         """
         global_merge_vars = [{'name': key, 'content': context[key]} for key in context]
 
+        message = {
+            'from_email': settings.NOTIFICATION_FROM_EMAIL,
+            'to': [{'email': user_email}],
+            'global_merge_vars': global_merge_vars,
+            'attachments': attachments,
+        }
+
+        if subject:
+            message.update({'subject': subject})
+
         try:
             result = self.mandrill_client.messages.send_template(
                 template_name=template_name,
                 template_content=[],
-                message={
-                    'from_email': settings.NOTIFICATION_FROM_EMAIL,
-                    'to': [{'email': user_email}],
-                    'global_merge_vars': global_merge_vars,
-                    'attachments': attachments,
-                },
+                message=message,
             )
             log.info(result)
         except mandrill.Error, e:

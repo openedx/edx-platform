@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+from custom_settings.models import CustomSettings
 from lms.djangoapps.onboarding.models import UserExtendedProfile, EmailPreference, Organization
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
@@ -59,3 +60,9 @@ def initialize_test_user(password='test', is_staff=False):
     organization.save()
 
     return user
+
+
+def save_course_custom_settings(course_key_string, course_open_date=datetime.utcnow() + timedelta(days=1)):
+    course_settings = CustomSettings(id=course_key_string, course_short_id=1, course_open_date=course_open_date)
+    course_settings.save()
+    return course_settings

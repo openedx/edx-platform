@@ -167,6 +167,7 @@ class BaseTopicSerializer(serializers.Serializer):
     description = serializers.CharField()
     name = serializers.CharField()
     id = serializers.CharField()  # pylint: disable=invalid-name
+    image = serializers.URLField(required=False)  # this is new field in the topics json in cms for region flags
 
 
 class TopicSerializer(BaseTopicSerializer):
