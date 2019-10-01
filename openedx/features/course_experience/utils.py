@@ -69,7 +69,7 @@ def get_course_outline_block_tree(request, course_id, user=None):
         if last_completed_child_position:
             # Mutex w/ NOT 'course_block_completions'
             recurse_mark_complete(
-                course_block_completions=BlockCompletion.get_course_completions(user, course_key),
+                course_block_completions=BlockCompletion.get_learning_context_completions(user, course_key),
                 latest_completion=last_completed_child_position,
                 block=block
             )

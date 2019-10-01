@@ -82,7 +82,6 @@ class BlockCompletionTransformerTestCase(TransformerRegistryTestMixin, Completio
         block = ItemFactory.create(category='comp', parent=course)
         BlockCompletion.objects.submit_completion(
             user=self.user,
-            course_key=block.location.course_key,
             block_key=block.location,
             completion=self.COMPLETION_TEST_VALUE,
         )

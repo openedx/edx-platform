@@ -569,7 +569,6 @@ def get_module_system_for_user(
         else:
             BlockCompletion.objects.submit_completion(
                 user=user,
-                course_key=course_id,
                 block_key=block.scope_ids.usage_id,
                 completion=event['completion'],
             )
@@ -614,7 +613,6 @@ def get_module_system_for_user(
             if not getattr(block, 'has_custom_completion', False):
                 BlockCompletion.objects.submit_completion(
                     user=user,
-                    course_key=course_id,
                     block_key=block.scope_ids.usage_id,
                     completion=1.0,
                 )
