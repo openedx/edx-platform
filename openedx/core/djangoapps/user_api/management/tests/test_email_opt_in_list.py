@@ -270,9 +270,18 @@ class EmailOptInListTest(ModuleStoreTestCase):
     @ddt.data(0, 1)
     def test_not_enough_args(self, num_args):
         args = ["dummy"] * num_args
-        expected_msg_regex = (
-            "^Error: too few arguments$"
-        )
+        if six.PY2:
+            expected_msg_regex = (
+                "^Error: too few arguments$"
+            )
+        elif num_args == 1:
+            expected_msg_regex = (
+                "^Error: the following arguments are required: ORG_ALIASES$"
+            )
+        elif num_args == 0:
+            expected_msg_regex = (
+                "^Error: the following arguments are required: OUTPUT_FILENAME, ORG_ALIASES$"
+            )
         with self.assertRaisesRegexp(CommandError, expected_msg_regex):
             call_command('email_opt_in_list', *args)
 
