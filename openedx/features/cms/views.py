@@ -25,34 +25,6 @@ from . import helpers
 logger = getLogger(__name__)  # pylint: disable=invalid-name
 
 
-def latest_course_reruns(courses):
-    """
-    This method evaluates only the latest reruns of all given courses
-    :param courses: list of courses to compute latest courses from
-    :return: list of latest course reruns (CourseSummary Objects)
-    """
-    courses_map = {course.id: course for course in courses}
-    latest_courses = list()
-    visited_courses = set()
-
-    for course in courses:
-        if course.id in visited_courses:
-            continue
-
-        course_group = helpers.get_course_group(course.id)
-
-        # Adding this course's group to set of visited courses
-        visited_courses |= set(course_group)
-
-        latest_course_id = course_group[0]
-
-        # Adding latest course id to list of latest course ids
-        if latest_course_id in courses_map:
-            latest_courses.append(courses_map[latest_course_id])
-
-    return latest_courses
-
-
 @expect_json
 @login_required
 @ensure_csrf_cookie
@@ -77,7 +49,7 @@ def course_multiple_rerun_handler(request):
 
         return JsonResponse(status=200)
 
-    latest_courses = latest_course_reruns(courses)
+    latest_courses = helpers.latest_course_reruns(courses)
 
     context = {
         'latest_courses': latest_courses

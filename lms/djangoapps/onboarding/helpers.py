@@ -1,5 +1,6 @@
 import re
 import pytz
+from logging import getLogger
 
 from dateutil.relativedelta import relativedelta
 from datetime import date, datetime
@@ -14,6 +15,7 @@ from oef.models import OrganizationOefUpdatePrompt
 
 
 utc = pytz.UTC
+log = getLogger(__name__)
 
 COUNTRIES = {
     'AD': 'Andorra',
@@ -8048,7 +8050,7 @@ def get_email_pref_on_demand_course(user, on_demand_course_id):
         on_demand_course_id: course id of on demand course which email preference would be required.
 
         Returns:
-        list: Email preferences of given course
+        boolean: Email preferences of given course
 
     """
 
@@ -8058,4 +8060,28 @@ def get_email_pref_on_demand_course(user, on_demand_course_id):
         email_pref = OnDemandEmailPreferences.objects.get(user=user, course_id=on_demand_course_id)
         return email_pref.is_enabled
     except OnDemandEmailPreferences.DoesNotExist:
+        log.info("No email preferences found for %s hence considered True", user)
         return True
+
+
+def get_user_anonymous_id(user, course_id):
+    """
+        Return anonymous id of user for given given course else raise exception
+
+        Parameters:
+        user: user object whom courses we need.
+        course_id: course id of course.
+
+        Returns:
+        string: Anonymous Id of user for given course
+
+    """
+
+    try:
+        from student.models import AnonymousUserId
+        return AnonymousUserId.objects.get(user=user, course_id=course_id)
+        # return anonymous_id
+    except AnonymousUserId.DoesNotExist:
+        raise AnonymousUserId.DoesNotExist('Anonymous Id doesn\'t exists for %s' % user)
+    except AnonymousUserId.MultipleObjectsReturned:
+        raise AnonymousUserId.MultipleObjectsReturned('Multiple Anonymous Ids for %s' % user)
