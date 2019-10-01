@@ -111,6 +111,9 @@
                     if (_.compact(this.errors).length) {
                     // The form did not get submitted due to validation errors.
                         $(this.el).show(); // Show in case the form was hidden for auto-submission
+                    } else {
+                        trackEvent(GTM_EVENT_CATEGORY.registration, GTM_EVENT_ACTION.registrationPage0,
+                            GTM_EVENT_LABEL.registrationPage0);
                     }
                 },
 
