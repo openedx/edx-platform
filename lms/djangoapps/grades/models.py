@@ -679,6 +679,7 @@ class PersistentSubsectionGradeOverride(models.Model):
     # model in the grades app, which will fail.
     if 'grades' in apps.app_configs:
         history = HistoricalRecords()
+        _history_user = None
 
     def __str__(self):
         return u', '.join([
@@ -734,15 +735,18 @@ class PersistentSubsectionGradeOverride(models.Model):
             log.info(u'Creating override for user ***{}*** for PersistentSubsectionGrade'
                      u'***{}*** with override data ***{}*** and derived grade_defaults ***{}***.'
                      .format(requesting_user, subsection_grade_model, override_data, grade_defaults))
-        override, _ = PersistentSubsectionGradeOverride.objects.update_or_create(
-            grade=subsection_grade_model,
-            defaults=grade_defaults,
-        )
-
-        override_history_entry = override.history.first()
-        if not override_history_entry.history_user and requesting_user:
-            override_history_entry.history_user = requesting_user
-            override_history_entry.save()
+        try:
+            override = PersistentSubsectionGradeOverride.objects.get(grade=subsection_grade_model)
+            for key, value in six.iteritems(grade_defaults):
+                setattr(override, key, value)
+        except PersistentSubsectionGradeOverride.DoesNotExist:
+            override = PersistentSubsectionGradeOverride(grade=subsection_grade_model, **grade_defaults)
+        if requesting_user:
+            # setting this on a non-field attribute which simple
+            # history reads from to determine which user to attach to
+            # the history row
+            override._history_user = requesting_user  # pylint: disable=protected-access
+        override.save()
 
         return override
 

@@ -100,7 +100,7 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
         response = self.client.get(url)
         email_section = '<div class="vert-left send-email" id="section-send-email">'
         # If this fails, it is likely because bulk_email.api.is_bulk_email_feature_enabled is set to False
-        self.assertIn(email_section, response.content)
+        self.assertContains(response, email_section)
 
     @classmethod
     def setUpClass(cls):

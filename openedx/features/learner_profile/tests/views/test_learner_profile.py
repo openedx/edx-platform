@@ -115,7 +115,7 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
         response = self.client.get(path=profile_path)
 
         for attribute in self.CONTEXT_DATA:
-            self.assertIn(attribute, response.content)
+            self.assertContains(response, attribute)
 
     def test_redirect_view(self):
         with override_waffle_flag(REDIRECT_TO_PROFILE_MICROFRONTEND, active=True):
@@ -124,7 +124,7 @@ class LearnerProfileViewTest(SiteMixin, UrlResetMixin, ModuleStoreTestCase):
             # Test with waffle flag active and site setting disabled, does not redirect
             response = self.client.get(path=profile_path)
             for attribute in self.CONTEXT_DATA:
-                self.assertIn(attribute, response.content)
+                self.assertContains(response, attribute)
 
             # Test with waffle flag active and site setting enabled, redirects to microfrontend
             site_domain = 'othersite.example.com'

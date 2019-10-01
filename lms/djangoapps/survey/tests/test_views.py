@@ -81,10 +81,9 @@ class SurveyViewsTests(ModuleStoreTestCase):
         Asserts that an authenticated user can see the survey
         """
         resp = self.client.get(self.view_url)
-        self.assertEquals(resp.status_code, 200)
 
         # is the SurveyForm html present in the HTML response?
-        self.assertIn(self.test_form, resp.content)
+        self.assertContains(resp, self.test_form)
 
     def test_unauthenticated_survey_postback(self):
         """

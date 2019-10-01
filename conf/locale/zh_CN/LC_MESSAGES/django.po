@@ -395,7 +395,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-22 20:42+0000\n"
+"POT-Creation-Date: 2019-09-29 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: ifLab <webmaster@iflab.org>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/open-edx/teams/6205/zh_CN/)\n"
@@ -5844,7 +5844,7 @@ msgid ""
 "this request, please visit the link(s) below."
 msgstr "{username} ({email}) 的退款要求已经建立。为了处理此请求，请访问以下联结(s) 。"
 
-#: lms/djangoapps/commerce/views.py lms/djangoapps/shoppingcart/pdf.py
+#: lms/djangoapps/commerce/views.py
 msgid "Receipt"
 msgstr "收据"
 
@@ -6999,7 +6999,7 @@ msgstr "课程编号"
 msgid "% Discount"
 msgstr "%折扣"
 
-#: lms/djangoapps/instructor/views/api.py lms/djangoapps/shoppingcart/pdf.py
+#: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/shoppingcart/reports.py
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -7058,11 +7058,6 @@ msgstr "无法解析总数为十进制"
 #: lms/djangoapps/instructor/views/api.py
 msgid "Unable to generate redeem codes because of course misconfiguration."
 msgstr "由于课程的错误配置，无法生成兑换码。"
-
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/shoppingcart/models.py
-msgid "pdf download unavailable right now, please contact support."
-msgstr "pdf文件现在无法下载，请联系技术支持。"
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -8084,79 +8079,6 @@ msgstr "给{course}捐款"
 msgid "Donation for {platform_name}"
 msgstr "为 {platform_name}捐款"
 
-#: lms/djangoapps/shoppingcart/pdf.py
-#, python-brace-format
-msgid "Page {page_number} of {page_count}"
-msgstr "翻到{page_count}的{page_number}"
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/templates/shoppingcart/receipt.html
-msgid "Invoice"
-msgstr "收据"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Order"
-msgstr "顺序"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-#, python-brace-format
-msgid "{id_label} # {item_id}"
-msgstr "{id_label} # {item_id}"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-#, python-brace-format
-msgid "Date: {date}"
-msgstr "日期: {date}"
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/djangoapps/shoppingcart/reports.py
-msgid "Quantity"
-msgstr "数量"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid ""
-"List Price\n"
-"per item"
-msgstr "数量"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid ""
-"Discount\n"
-"per item"
-msgstr ""
-"折扣\n"
-"每一项"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Amount"
-msgstr "量"
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/templates/courseware/gradebook.html
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/shoppingcart/billing_details.html
-#: lms/templates/shoppingcart/receipt.html
-msgid "Total"
-msgstr "总计"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Payment Received"
-msgstr "付款已收到"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Balance"
-msgstr "金额"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Billing Address"
-msgstr "账单地址"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Disclaimer"
-msgstr "免责声明"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "TERMS AND CONDITIONS"
-msgstr "条款声明"
-
 #. Translators: this text appears when an unfamiliar error code occurs during
 #. payment,
 #. for which we don't know a user-friendly message to display in advance.
@@ -8581,6 +8503,10 @@ msgstr "购买时间"
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Order ID"
 msgstr "订单ID"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Quantity"
+msgstr "数量"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Unit Cost"
@@ -15638,6 +15564,13 @@ msgid "Search students"
 msgstr "搜索学生"
 
 #: lms/templates/courseware/gradebook.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/receipt.html
+msgid "Total"
+msgstr "总计"
+
+#: lms/templates/courseware/gradebook.html
 msgid "previous page"
 msgstr "上一页"
 
@@ -17034,6 +16967,10 @@ msgstr ""
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "INVOICE"
 msgstr "发票"
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Date: {date}"
+msgstr "日期: {date}"
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "Invoice No: {invoice_number}"
@@ -19375,6 +19312,10 @@ msgstr "已使用"
 #: lms/templates/shoppingcart/receipt.html
 msgid "Invalid"
 msgstr "无效的"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Invoice"
+msgstr "收据"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Date of purchase"
@@ -23608,8 +23549,8 @@ msgid "Advanced Editor"
 msgstr "高级编辑器"
 
 #: cms/templates/widgets/problem-edit.html
-msgid "Toggle Cheatsheet"
-msgstr "切换速记"
+msgid "Markdown Help"
+msgstr ""
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Label"

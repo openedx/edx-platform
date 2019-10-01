@@ -93,7 +93,7 @@ def _create_file(content=''):
     """
     sjson_file = tempfile.NamedTemporaryFile(prefix="subs_", suffix=".srt.sjson")
     sjson_file.content_type = 'application/json'
-    sjson_file.write(textwrap.dedent(content))
+    sjson_file.write(textwrap.dedent(content).encode('utf-8'))
     sjson_file.seek(0)
     return sjson_file
 
@@ -263,7 +263,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
 
         request = Request.blank('/available_translations')
         response = self.item.transcript(request=request, dispatch='available_translations')
-        self.assertEqual(json.loads(response.body), ['uk'])
+        self.assertEqual(json.loads(response.body.decode('utf-8')), ['uk'])
 
     @patch('xmodule.video_module.transcripts_utils.get_video_transcript_content')
     def test_multiple_available_translations(self, mock_get_video_transcript_content):
@@ -289,7 +289,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
 
         request = Request.blank('/available_translations')
         response = self.item.transcript(request=request, dispatch='available_translations')
-        self.assertEqual(json.loads(response.body), ['en', 'uk'])
+        self.assertEqual(sorted(json.loads(response.body.decode('utf-8'))), sorted(['en', 'uk']))
 
     @patch('xmodule.video_module.transcripts_utils.get_video_transcript_content')
     @patch('xmodule.video_module.transcripts_utils.get_available_transcript_languages')
@@ -366,7 +366,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
         # Make request to available translations dispatch.
         request = Request.blank('/available_translations')
         response = self.item.transcript(request=request, dispatch='available_translations')
-        six.assertCountEqual(self, json.loads(response.body), result)
+        six.assertCountEqual(self, json.loads(response.body.decode('utf-8')), result)
 
     @patch('xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages')
     def test_val_available_translations_feature_disabled(self, mock_get_available_transcript_languages):
@@ -441,7 +441,7 @@ class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):
         request = Request.blank('/' + self.dispatch)
         response = self.item.transcript(request=request, dispatch=self.dispatch)
         # Assert that bumper only get its own translations.
-        self.assertEqual(json.loads(response.body), ['en', 'uk'])
+        self.assertEqual(json.loads(response.body.decode('utf-8')), ['en', 'uk'])
 
 
 @ddt.ddt

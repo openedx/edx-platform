@@ -333,15 +333,15 @@ class ViewsTestCase(ModuleStoreTestCase):
 
     def test_index_success(self):
         response = self._verify_index_response()
-        self.assertIn(six.text_type(self.problem2.location), response.content.decode("utf-8"))
+        self.assertContains(response, self.problem2.location)
 
         # re-access to the main course page redirects to last accessed view.
         url = reverse('courseware', kwargs={'course_id': six.text_type(self.course_key)})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
         response = self.client.get(response.url)
-        self.assertNotIn(six.text_type(self.problem.location), response.content.decode("utf-8"))
-        self.assertIn(six.text_type(self.problem2.location), response.content.decode("utf-8"))
+        self.assertNotContains(response, self.problem.location)
+        self.assertContains(response, self.problem2.location)
 
     def test_index_nonexistent_chapter(self):
         self._verify_index_response(expected_response_code=404, chapter_name='non-existent')
@@ -395,8 +395,8 @@ class ViewsTestCase(ModuleStoreTestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertNotIn('Problem 1', response.content)
-        self.assertNotIn('Problem 2', response.content)
+        self.assertNotContains(response, 'Problem 1')
+        self.assertNotContains(response, 'Problem 2')
 
     def _create_global_staff_user(self):
         """
@@ -467,20 +467,20 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.client.logout()
         response = self.client.get(reverse('about_course', args=[six.text_type(course.id)]))
         self.assertEqual(response.status_code, 200)
-        self.assertNotIn(in_cart_span, response.content)
+        self.assertNotContains(response, in_cart_span)
 
         # authenticated user with nothing in cart
         self.assertTrue(self.client.login(username=self.user.username, password=TEST_PASSWORD))
         response = self.client.get(reverse('about_course', args=[six.text_type(course.id)]))
         self.assertEqual(response.status_code, 200)
-        self.assertNotIn(in_cart_span, response.content)
+        self.assertNotContains(response, in_cart_span)
 
         # now add the course to the cart
         cart = shoppingcart.models.Order.get_cart_for_user(self.user)
         shoppingcart.models.PaidCourseRegistration.add_to_order(cart, course.id)
         response = self.client.get(reverse('about_course', args=[six.text_type(course.id)]))
         self.assertEqual(response.status_code, 200)
-        self.assertIn(in_cart_span, response.content)
+        self.assertContains(response, in_cart_span)
 
     def assert_enrollment_link_present(self, is_anonymous):
         """
@@ -509,8 +509,7 @@ class ViewsTestCase(ModuleStoreTestCase):
 
         # Generate the course about page content
         response = self.client.get(reverse('about_course', args=[six.text_type(course.id)]))
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(href, response.content.decode(response.charset))
+        self.assertContains(response, href)
 
     @ddt.data(True, False)
     def test_ecommerce_checkout(self, is_anonymous):
@@ -628,7 +627,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         })
         response = self.client.get(url)
         # Tests that we do not get an "Invalid x" response when passing correct arguments to view
-        self.assertNotIn('Invalid', response.content)
+        self.assertNotContains(response, 'Invalid')
 
     def test_submission_history_xss(self):
         # log into a staff account
@@ -643,7 +642,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             'location': '<script>alert("hello");</script>'
         })
         response = self.client.get(url)
-        self.assertNotIn('<script>', response.content)
+        self.assertNotContains(response, '<script>')
 
         # try it with a malicious user and a non-existent location
         url = reverse('submission_history', kwargs={
@@ -652,7 +651,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             'location': 'dummy'
         })
         response = self.client.get(url)
-        self.assertNotIn('<script>', response.content)
+        self.assertNotContains(response, '<script>')
 
     def test_submission_history_contents(self):
         # log into a staff account
@@ -729,8 +728,8 @@ class ViewsTestCase(ModuleStoreTestCase):
                 response_content = HTMLParser().unescape(response.content)
                 expected_time = datetime.now() + timedelta(hours=hour_diff)
                 expected_tz = expected_time.strftime('%Z')
-                self.assertIn(expected_tz, response_content)
-                self.assertIn(str(expected_time), response_content)
+                self.assertContains(response, expected_tz)
+                self.assertContains(response, str(expected_time))
 
     def _email_opt_in_checkbox(self, response, org_name_string=None):
         """Check if the email opt-in checkbox appears in the response content."""
@@ -749,7 +748,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         response = self.client.get(url)
         # This is a static page, so just assert that it is returned correctly
         self.assertEqual(response.status_code, 200)
-        self.assertIn('Financial Assistance Application', response.content)
+        self.assertContains(response, 'Financial Assistance Application')
 
     @ddt.data(([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.AUDIT, True, YESTERDAY),
               ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.VERIFIED, True, None),
@@ -786,7 +785,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        self.assertNotIn(str(course.id), response.content)
+        self.assertNotContains(response, str(course.id))
 
     @patch.object(CourseOverview, 'load_from_module_store', return_value=None)
     def test_financial_assistance_form_missing_course_overview(self, _mock_course_overview):
@@ -815,7 +814,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        self.assertNotIn(str(course), response.content)
+        self.assertNotContains(response, str(course))
 
     def test_financial_assistance_form(self):
         """Verify that learner can get the financial aid for the course in which
@@ -837,7 +836,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        self.assertIn(str(course), response.content)
+        self.assertContains(response, str(course))
 
     def _submit_financial_assistance_form(self, data):
         """Submit a financial assistance request."""
@@ -1251,7 +1250,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         """
         resp = self._get_student_progress_page()
         # Test that malicious code does not appear in html
-        self.assertNotIn(malicious_code, resp.content.decode('utf-8'))
+        self.assertNotContains(resp, malicious_code)
 
     def test_pure_ungraded_xblock(self):
         ItemFactory.create(category='acid', parent_location=self.vertical.location)
@@ -1950,7 +1949,7 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
         # Test individual problem scores
         if show_grades:
             # If grades are shown, we should be able to see the current problem scores.
-            self.assertIn(expected_score, response.content.decode("utf-8"))
+            self.assertContains(response, expected_score)
 
             if graded:
                 expected_summary_text = u"Problem Scores:"
@@ -1959,7 +1958,7 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
 
         else:
             # If grades are hidden, we should not be able to see the current problem scores.
-            self.assertNotIn(expected_score, response.content.decode("utf-8"))
+            self.assertNotContains(response, expected_score)
 
             if graded:
                 expected_summary_text = u"Problem scores are hidden"
@@ -1972,7 +1971,7 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
                 expected_summary_text += u'.'
 
         # Ensure that expected text is present
-        self.assertIn(expected_summary_text, response.content.decode("utf-8"))
+        self.assertContains(response, expected_summary_text)
 
         # Test overall sequential score
         if graded and max_score > 0:
@@ -1983,9 +1982,9 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
                                                      percentageString)
 
             if show_grades:
-                self.assertIn(expected_grade_summary, response.content.decode("utf-8"))
+                self.assertContains(response, expected_grade_summary)
             else:
-                self.assertNotIn(expected_grade_summary, response.content.decode("utf-8"))
+                self.assertNotContains(response, expected_grade_summary)
 
     @ddt.data(
         ('', None, False),
@@ -2025,7 +2024,7 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
         resp = self._get_progress_page()
 
         # Test that no problem scores are present
-        self.assertIn('No problem scores in this section', resp.content.decode('utf-8'))
+        self.assertContains(resp, 'No problem scores in this section')
 
     @ddt.data(
         ('', None, False, True),
@@ -2181,8 +2180,11 @@ class GenerateUserCertTests(ModuleStoreTestCase):
     def test_user_with_out_passing_grades(self):
         # If user has no grading then json will return failed message and badrequest code
         resp = self.client.post(self.url)
-        self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
-        self.assertIn("Your certificate will be available when you pass the course.", resp.content)
+        self.assertContains(
+            resp,
+            "Your certificate will be available when you pass the course.",
+            status_code=HttpResponseBadRequest.status_code,
+        )
 
     @patch('lms.djangoapps.courseware.views.views.is_course_passed', return_value=True)
     @override_settings(CERT_QUEUE='certificates', LMS_SEGMENT_KEY="foobar")
@@ -2227,8 +2229,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             course_grade.summary = {'grade': 'Pass', 'percent': 0.75}
 
             resp = self.client.post(self.url)
-            self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
-            self.assertIn("Certificate is being created.", resp.content)
+            self.assertContains(resp, "Certificate is being created.", status_code=HttpResponseBadRequest.status_code)
 
     @override_settings(CERT_QUEUE='certificates', LMS_SEGMENT_KEY="foobar")
     def test_user_with_passing_existing_downloadable_cert(self):
@@ -2248,15 +2249,17 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             course_grade.summay = {'grade': 'Pass', 'percent': 0.75}
 
             resp = self.client.post(self.url)
-            self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
-            self.assertIn("Certificate has already been created.", resp.content)
+            self.assertContains(
+                resp,
+                "Certificate has already been created.",
+                status_code=HttpResponseBadRequest.status_code,
+            )
 
     def test_user_with_non_existing_course(self):
         # If try to access a course with valid key pattern then it will return
         # bad request code with course is not valid message
         resp = self.client.post('/courses/def/abc/in_valid/generate_user_cert')
-        self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
-        self.assertIn("Course is not valid", resp.content)
+        self.assertContains(resp, "Course is not valid", status_code=HttpResponseBadRequest.status_code)
 
     def test_user_with_invalid_course_id(self):
         # If try to access a course with invalid key pattern then 404 will return
@@ -2267,10 +2270,13 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         # If user try to access without login should see a bad request status code with message
         self.client.logout()
         resp = self.client.post(self.url)
-        self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
-        self.assertIn(u"You must be signed in to {platform_name} to create a certificate.".format(
-            platform_name=settings.PLATFORM_NAME
-        ), resp.content.decode('utf-8'))
+        self.assertContains(
+            resp,
+            u"You must be signed in to {platform_name} to create a certificate.".format(
+                platform_name=settings.PLATFORM_NAME
+            ),
+            status_code=HttpResponseBadRequest.status_code,
+        )
 
 
 class ActivateIDCheckerBlock(XBlock):
@@ -2359,7 +2365,7 @@ class TestIndexView(ModuleStoreTestCase):
             )
         )
         # Trigger the assertions embedded in the ViewCheckerBlocks
-        self.assertEqual(response.content.decode('utf-8').count("ViewCheckerPassed"), 3)
+        self.assertContains(response, "ViewCheckerPassed", count=3)
 
     @XBlock.register_temp_plugin(ActivateIDCheckerBlock, 'id_checker')
     def test_activate_block_id(self):
@@ -2386,7 +2392,7 @@ class TestIndexView(ModuleStoreTestCase):
                 }
             ) + '?activate_block_id=test_block_id'
         )
-        self.assertIn("Activate Block ID: test_block_id", response.content.decode('utf-8'))
+        self.assertContains(response, "Activate Block ID: test_block_id")
 
     @ddt.data(
         [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.ANONYMOUS, False],
@@ -2630,10 +2636,10 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
         self.assertTrue(self.client.login(username=self.user.username, password='test'))
 
         response = self.client.get(self.section_1_url)
-        self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
+        self.assertNotContains(response, 'data-mark-completed-on-view-after-delay')
 
         response = self.client.get(self.section_2_url)
-        self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
+        self.assertNotContains(response, 'data-mark-completed-on-view-after-delay')
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_completion_service_enabled(self, default_store):
@@ -2644,8 +2650,8 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
         self.assertTrue(self.client.login(username=self.user.username, password='test'))
 
         response = self.client.get(self.section_1_url)
-        self.assertIn('data-mark-completed-on-view-after-delay', response.content)
-        self.assertEqual(response.content.count("data-mark-completed-on-view-after-delay"), 2)
+        self.assertContains(response, 'data-mark-completed-on-view-after-delay')
+        self.assertContains(response, 'data-mark-completed-on-view-after-delay', count=2)
 
         request = self.request_factory.post(
             '/',
@@ -2662,8 +2668,8 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
         self.assertEqual(json.loads(response.content.decode('utf-8')), {'result': "ok"})
 
         response = self.client.get(self.section_1_url)
-        self.assertIn('data-mark-completed-on-view-after-delay', response.content)
-        self.assertEqual(response.content.count("data-mark-completed-on-view-after-delay"), 1)
+        self.assertContains(response, 'data-mark-completed-on-view-after-delay')
+        self.assertContains(response, 'data-mark-completed-on-view-after-delay', count=1)
 
         request = self.request_factory.post(
             '/',
@@ -2680,10 +2686,10 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
         self.assertEqual(json.loads(response.content.decode('utf-8')), {'result': "ok"})
 
         response = self.client.get(self.section_1_url)
-        self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
+        self.assertNotContains(response, 'data-mark-completed-on-view-after-delay')
 
         response = self.client.get(self.section_2_url)
-        self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
+        self.assertNotContains(response, 'data-mark-completed-on-view-after-delay')
 
 
 @ddt.ddt
@@ -2735,7 +2741,7 @@ class TestIndexViewWithVerticalPositions(ModuleStoreTestCase):
         """
         Asserts that the expected position and the position in the response are the same
         """
-        self.assertIn('data-position="{}"'.format(expected_position), response.content)
+        self.assertContains(response, 'data-position="{}"'.format(expected_position))
 
     @ddt.data(("-1", 1), ("0", 1), ("-0", 1), ("2", 2), ("5", 1))
     @ddt.unpack
@@ -2799,7 +2805,7 @@ class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
             )
         )
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Content Locked", response.content)
+        self.assertContains(response, "Content Locked")
 
 
 class TestIndexViewWithCourseDurationLimits(ModuleStoreTestCase):
@@ -2885,8 +2891,7 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
         Test XBlockRendering with invalid usage key
         """
         response = self.get_response(usage_key='some_invalid_usage_key')
-        self.assertEqual(response.status_code, 404)
-        self.assertIn('Page not found', response.content)
+        self.assertContains(response, 'Page not found', status_code=404)
 
     def get_response(self, usage_key, url_encoded_params=None):
         """
@@ -2906,8 +2911,8 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
 
         response = self.get_response(usage_key=self.html_block.location)
         self.assertEqual(response.status_code, 200)
-        self.assertIn('data-enable-completion-on-view-service="false"', response.content)
-        self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
+        self.assertContains(response, 'data-enable-completion-on-view-service="false"')
+        self.assertNotContains(response, 'data-mark-completed-on-view-after-delay')
 
     def test_render_xblock_with_completion_service_enabled(self):
         """
@@ -2920,8 +2925,8 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
 
         response = self.get_response(usage_key=self.html_block.location)
         self.assertEqual(response.status_code, 200)
-        self.assertIn('data-enable-completion-on-view-service="true"', response.content)
-        self.assertIn('data-mark-completed-on-view-after-delay', response.content)
+        self.assertContains(response, 'data-enable-completion-on-view-service="true"')
+        self.assertContains(response, 'data-mark-completed-on-view-after-delay')
 
         request = RequestFactoryNoCsrf().post(
             '/',
@@ -2940,13 +2945,13 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
 
         response = self.get_response(usage_key=self.html_block.location)
         self.assertEqual(response.status_code, 200)
-        self.assertIn('data-enable-completion-on-view-service="false"', response.content)
-        self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
+        self.assertContains(response, 'data-enable-completion-on-view-service="false"')
+        self.assertNotContains(response, 'data-mark-completed-on-view-after-delay')
 
         response = self.get_response(usage_key=self.problem_block.location)
         self.assertEqual(response.status_code, 200)
-        self.assertIn('data-enable-completion-on-view-service="false"', response.content)
-        self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
+        self.assertContains(response, 'data-enable-completion-on-view-service="false"')
+        self.assertNotContains(response, 'data-mark-completed-on-view-after-delay')
 
 
 class TestRenderXBlockSelfPaced(TestRenderXBlock):

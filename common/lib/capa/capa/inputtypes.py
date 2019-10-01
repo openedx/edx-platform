@@ -127,6 +127,9 @@ class Status(object):
     def __eq__(self, other):
         return self._status == str(other)
 
+    def __hash__(self):
+        return hash(str(self))
+
 
 class Attribute(object):
     """
@@ -258,7 +261,7 @@ class InputTypeBase(object):
             msg = u"Error in xml '{x}': {err} ".format(
                 x=etree.tostring(xml), err=text_type(err))
             msg = Exception(msg)
-            six.reraise(Exception, msg, sys.exc_info()[2])
+            six.reraise(Exception, Exception(msg), sys.exc_info()[2])
 
     @classmethod
     def get_attributes(cls):

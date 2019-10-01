@@ -93,8 +93,7 @@ class TestCourseListing(ModuleStoreTestCase):
         """
         message = u"Are you staff on an existing {studio_name} course?".format(studio_name=settings.STUDIO_SHORT_NAME)
         response = self.client.get('/home')
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(message, response.content.decode(response.charset))
+        self.assertContains(response, message)
 
     def test_get_course_list(self):
         """

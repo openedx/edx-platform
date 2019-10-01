@@ -58,13 +58,13 @@ class TestStudentDashboardEmailView(SharedModuleStoreTestCase):
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=False)
         # Assert that the URL for the email view is in the response
         response = self.client.get(self.url)
-        self.assertIn(self.email_modal_link, response.content)
+        self.assertContains(response, self.email_modal_link)
 
     def test_email_flag_false(self):
         BulkEmailFlag.objects.create(enabled=False)
         # Assert that the URL for the email view is not in the response
         response = self.client.get(self.url)
-        self.assertNotIn(self.email_modal_link, response.content)
+        self.assertNotContains(response, self.email_modal_link)
 
     def test_email_unauthorized(self):
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=True)
@@ -73,7 +73,7 @@ class TestStudentDashboardEmailView(SharedModuleStoreTestCase):
         # Assert that the URL for the email view is not in the response
         # if this course isn't authorized
         response = self.client.get(self.url)
-        self.assertNotIn(self.email_modal_link, response.content)
+        self.assertNotContains(response, self.email_modal_link)
 
     def test_email_authorized(self):
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=True)
@@ -85,4 +85,4 @@ class TestStudentDashboardEmailView(SharedModuleStoreTestCase):
         # Assert that the URL for the email view is not in the response
         # if this course isn't authorized
         response = self.client.get(self.url)
-        self.assertIn(self.email_modal_link, response.content)
+        self.assertContains(response, self.email_modal_link)

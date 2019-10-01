@@ -358,7 +358,6 @@ class CourseGradeReport(object):
         """
         grade_results = []
         for _, assignment_info in six.iteritems(context.graded_assignments):
-
             subsection_grades, subsection_grades_results = self._user_subsection_grades(
                 course_grade,
                 assignment_info['subsection_headers'],
@@ -380,7 +379,7 @@ class CourseGradeReport(object):
         grade_results = []
         for subsection_location in subsection_headers:
             subsection_grade = course_grade.subsection_grade(subsection_location)
-            if subsection_grade.attempted_graded:
+            if subsection_grade.attempted_graded or subsection_grade.override:
                 grade_result = subsection_grade.percent_graded
             else:
                 grade_result = u'Not Attempted'

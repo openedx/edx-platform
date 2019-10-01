@@ -325,11 +325,11 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertRegexpMatches(response["Content-Type"], "^text/html(;.*)?$")
-        self.assertIn(_get_default_video_image_url(), response.content.decode('utf-8'))
+        self.assertContains(response, _get_default_video_image_url())
         # Crude check for presence of data in returned HTML
         for video in self.previous_uploads:
-            self.assertIn(video["edx_video_id"], response.content.decode('utf-8'))
-        self.assertNotIn('video_upload_pagination', response.content.decode('utf-8'))
+            self.assertContains(response, video["edx_video_id"])
+        self.assertNotContains(response, 'video_upload_pagination')
 
     @override_waffle_flag(ENABLE_VIDEO_UPLOAD_PAGINATION, active=True)
     def test_get_html_paginated(self):
@@ -338,7 +338,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         """
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertIn('video_upload_pagination', response.content.decode('utf-8'))
+        self.assertContains(response, 'video_upload_pagination')
 
     def test_post_non_json(self):
         response = self.client.post(self.url, {"files": []})
@@ -781,10 +781,11 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         self.assertEqual(response.status_code, 200)
 
         # Verify that course video button is present in the response if videos transcript feature is enabled.
-        self.assertEqual(
-            '<button class="button course-video-settings-button">' in response.content.decode('utf-8'),
-            is_video_transcript_enabled
-        )
+        button_html = '<button class="button course-video-settings-button">'
+        if is_video_transcript_enabled:
+            self.assertContains(response, button_html)
+        else:
+            self.assertNotContains(response, button_html)
 
 
 @ddt.ddt

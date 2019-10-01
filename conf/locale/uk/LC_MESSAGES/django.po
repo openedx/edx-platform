@@ -121,7 +121,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-22 20:42+0000\n"
+"POT-Creation-Date: 2019-09-29 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Ukrainian (https://www.transifex.com/open-edx/teams/6205/uk/)\n"
@@ -6188,7 +6188,7 @@ msgstr ""
 "Користувач {username} ({email}) подав запит на повернення коштів. Для "
 "обробки цього запиту, будь ласка, перейдіть по посиланню (посиланням) нижче."
 
-#: lms/djangoapps/commerce/views.py lms/djangoapps/shoppingcart/pdf.py
+#: lms/djangoapps/commerce/views.py
 msgid "Receipt"
 msgstr "Квитанція"
 
@@ -7409,7 +7409,7 @@ msgstr "Ідентифікатор курсу"
 msgid "% Discount"
 msgstr "% знижка"
 
-#: lms/djangoapps/instructor/views/api.py lms/djangoapps/shoppingcart/pdf.py
+#: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/shoppingcart/reports.py wiki/plugins/attachments/forms.py
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 msgid "Description"
@@ -7464,13 +7464,6 @@ msgid "Unable to generate redeem codes because of course misconfiguration."
 msgstr ""
 "Не вдалося генерувати компенсаційні коди із-за неправильної конфігурації "
 "курсу."
-
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/shoppingcart/models.py
-msgid "pdf download unavailable right now, please contact support."
-msgstr ""
-"зараз скачування не доступно в PDF форматі, будь-ласка, зв'яжіться з "
-"командою підтримки."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -8577,78 +8570,6 @@ msgstr "Пожертва на курс {course}"
 msgid "Donation for {platform_name}"
 msgstr "Пожертвування для {platform_name}"
 
-#: lms/djangoapps/shoppingcart/pdf.py
-#, python-brace-format
-msgid "Page {page_number} of {page_count}"
-msgstr "Сторінка {page_number} з {page_count}"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Invoice"
-msgstr "Рахунок-фактура"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Order"
-msgstr "Замовлення"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-#, python-brace-format
-msgid "{id_label} # {item_id}"
-msgstr "{id_label} # {item_id}"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-#, python-brace-format
-msgid "Date: {date}"
-msgstr "Дата: {date}"
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/djangoapps/shoppingcart/reports.py
-msgid "Quantity"
-msgstr "Кількість"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid ""
-"List Price\n"
-"per item"
-msgstr ""
-"Список цін\n"
-"за одиницю"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid ""
-"Discount\n"
-"per item"
-msgstr ""
-"Знижка\n"
-"за одиницю"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Amount"
-msgstr "Кількість"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Total"
-msgstr "Всього"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Payment Received"
-msgstr "Платіж отриманий"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Balance"
-msgstr "Залишок"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Billing Address"
-msgstr "Адреса платника"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Disclaimer"
-msgstr "Відмова від відповідальності"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "TERMS AND CONDITIONS"
-msgstr "ПОЛОЖЕННЯ І УМОВИ"
-
 #. Translators: this text appears when an unfamiliar error code occurs during
 #. payment,
 #. for which we don't know a user-friendly message to display in advance.
@@ -9098,6 +9019,10 @@ msgstr "Час замовлення"
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Order ID"
 msgstr "ID замовлення"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Quantity"
+msgstr "Кількість"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Unit Cost"
@@ -16315,6 +16240,13 @@ msgid "Search students"
 msgstr ""
 
 #: lms/templates/courseware/gradebook.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/receipt.html
+msgid "Total"
+msgstr ""
+
+#: lms/templates/courseware/gradebook.html
 msgid "previous page"
 msgstr ""
 
@@ -17697,6 +17629,10 @@ msgstr ""
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "INVOICE"
 msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Date: {date}"
+msgstr "Дата: {date}"
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "Invoice No: {invoice_number}"
@@ -20056,6 +19992,10 @@ msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Invalid"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Invoice"
 msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
@@ -24390,7 +24330,7 @@ msgid "Advanced Editor"
 msgstr ""
 
 #: cms/templates/widgets/problem-edit.html
-msgid "Toggle Cheatsheet"
+msgid "Markdown Help"
 msgstr ""
 
 #: cms/templates/widgets/problem-edit.html

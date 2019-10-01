@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-22 20:50+0000\n"
-"PO-Revision-Date: 2019-09-22 20:51:02.363944\n"
+"POT-Creation-Date: 2019-09-29 20:50+0000\n"
+"PO-Revision-Date: 2019-09-29 20:50:57.281676\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -8823,6 +8823,10 @@ msgid ""
 "hidden."
 msgstr ""
 
+#: cms/templates/js/copy-clipboard-button.underscore
+msgid "Copy Component Location"
+msgstr ""
+
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Weekly Highlight Emails"
 msgstr ""
@@ -9240,6 +9244,10 @@ msgstr ""
 msgid "Add a Chapter"
 msgstr ""
 
+#: cms/templates/js/edit-title-button.underscore
+msgid "Edit Title"
+msgstr ""
+
 #: cms/templates/js/grading-editor.underscore
 msgid "Grading"
 msgstr ""
@@ -9399,10 +9407,6 @@ msgstr ""
 #: cms/templates/js/metadata-option-entry.underscore
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear Value"
-msgstr ""
-
-#: cms/templates/js/metadata-editor.underscore
-msgid "Component Location ID"
 msgstr ""
 
 #: cms/templates/js/metadata-file-uploader-item.underscore

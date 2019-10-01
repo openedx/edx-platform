@@ -31,7 +31,7 @@ class StudioValidationMessageTest(unittest.TestCase):
             StudioValidationMessage(StudioValidationMessage.WARNING, u"bad warning", action_runtime_event=0)
 
         with pytest.raises(TypeError):
-            StudioValidationMessage(StudioValidationMessage.WARNING, u"bad warning", action_label="Non-unicode string")
+            StudioValidationMessage(StudioValidationMessage.WARNING, u"bad warning", action_label=b"Non-unicode string")
 
     def test_to_json(self):
         """

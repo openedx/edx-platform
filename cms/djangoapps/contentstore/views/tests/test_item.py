@@ -160,7 +160,7 @@ class GetItemTest(ItemTest):
         resp = self._get_preview(usage_key, data)
         self.assertEqual(resp.status_code, expected_code)
         if content_contains:
-            self.assertIn(content_contains, resp.content)
+            self.assertContains(resp, content_contains, status_code=expected_code)
         return resp
 
     @ddt.data(
@@ -1615,8 +1615,7 @@ class TestEditItem(TestEditItemSetup):
             self.seq2_update_url,
             data={'children': [six.text_type(unit_1_key)]}
         )
-        self.assertEqual(resp.status_code, 400)
-        self.assertIn("Invalid data, possibly caused by concurrent authors", resp.content)
+        self.assertContains(resp, "Invalid data, possibly caused by concurrent authors", status_code=400)
 
         # verify children
         self.assertListEqual(
@@ -1640,8 +1639,7 @@ class TestEditItem(TestEditItemSetup):
             self.seq2_update_url,
             data={'children': [six.text_type(unit_1_key)]}
         )
-        self.assertEqual(resp.status_code, 400)
-        self.assertIn("Invalid data, possibly caused by concurrent authors", resp.content)
+        self.assertContains(resp, "Invalid data, possibly caused by concurrent authors", status_code=400)
 
         # verify children
         self.assertListEqual(

@@ -148,11 +148,10 @@ class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase, Mi
         set_prerequisite_courses(course.id, pre_requisite_courses)
 
         resp = self.client.get('/')
-        self.assertEqual(resp.status_code, 200)
 
         # make sure both courses are visible in the catalog
-        self.assertIn('pre requisite course', resp.content.decode('utf-8'))
-        self.assertIn('course that has pre requisite', resp.content.decode('utf-8'))
+        self.assertContains(resp, 'pre requisite course')
+        self.assertContains(resp, 'course that has pre requisite')
 
 
 class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
@@ -202,21 +201,18 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
         # assert that the course discovery UI is not present
-        self.assertNotIn('Search for a course', response.content.decode('utf-8'))
+        self.assertNotContains(response, 'Search for a course')
 
         # check the /courses view
         response = self.client.get(reverse('courses'))
         self.assertEqual(response.status_code, 200)
 
         # assert that the course discovery UI is not present
-        self.assertNotIn('Search for a course', response.content.decode('utf-8'))
-        self.assertNotIn(
-            '<aside aria-label="Refine Your Search" class="search-facets phone-menu">',
-            response.content.decode('utf-8')
-        )
+        self.assertNotContains(response, 'Search for a course')
+        self.assertNotContains(response, '<aside aria-label="Refine Your Search" class="search-facets phone-menu">')
 
         # make sure we have the special css class on the section
-        self.assertIn('<div class="courses no-course-discovery"', response.content.decode('utf-8'))
+        self.assertContains(response, '<div class="courses no-course-discovery"')
 
     @patch('student.views.management.render_to_response', RENDER_MOCK)
     @patch('lms.djangoapps.courseware.views.views.render_to_response', RENDER_MOCK)
@@ -229,19 +225,16 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
         # assert that the course discovery UI is not present
-        self.assertIn('Search for a course', response.content.decode('utf-8'))
+        self.assertContains(response, 'Search for a course')
 
         # check the /courses view
         response = self.client.get(reverse('courses'))
         self.assertEqual(response.status_code, 200)
 
         # assert that the course discovery UI is present
-        self.assertIn('Search for a course', response.content.decode('utf-8'))
-        self.assertIn(
-            '<aside aria-label="Refine Your Search" class="search-facets phone-menu">',
-            response.content.decode('utf-8')
-        )
-        self.assertIn('<div class="courses"', response.content.decode('utf-8'))
+        self.assertContains(response, 'Search for a course')
+        self.assertContains(response, '<aside aria-label="Refine Your Search" class="search-facets phone-menu">')
+        self.assertContains(response, '<div class="courses"')
 
     @patch('student.views.management.render_to_response', RENDER_MOCK)
     @patch('lms.djangoapps.courseware.views.views.render_to_response', RENDER_MOCK)

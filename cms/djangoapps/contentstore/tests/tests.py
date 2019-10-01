@@ -188,8 +188,7 @@ class AuthTestCase(ContentStoreTestCase):
             resp = self._login(self.email, 'wrong_password{0}'.format(i))
             self.assertEqual(resp.status_code, 403)
         resp = self._login(self.email, 'wrong_password')
-        self.assertEqual(resp.status_code, 403)
-        self.assertIn('Too many failed login attempts.', resp.content)
+        self.assertContains(resp, 'Too many failed login attempts.', status_code=403)
 
     @override_settings(MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED=3)
     @override_settings(MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS=2)
@@ -203,19 +202,19 @@ class AuthTestCase(ContentStoreTestCase):
 
             for i in range(3):
                 resp = self._login(self.email, 'wrong_password{0}'.format(i))
-                self.assertEqual(resp.status_code, 403)
-                self.assertIn(
+                self.assertContains(
+                    resp,
                     'Email or password is incorrect.',
-                    resp.content
+                    status_code=403,
                 )
 
             # now the account should be locked
 
             resp = self._login(self.email, 'wrong_password')
-            self.assertEqual(resp.status_code, 403)
-            self.assertIn(
+            self.assertContains(
+                resp,
                 'This account has been temporarily locked due to excessive login failures.',
-                resp.content
+                status_code=403,
             )
 
             with freeze_time('2100-01-01'):
@@ -223,10 +222,10 @@ class AuthTestCase(ContentStoreTestCase):
 
             # make sure the failed attempt counter gets reset on successful login
             resp = self._login(self.email, 'wrong_password')
-            self.assertEqual(resp.status_code, 403)
-            self.assertIn(
+            self.assertContains(
+                resp,
                 'Email or password is incorrect.',
-                resp.content
+                status_code=403,
             )
 
             # account should not be locked out after just one attempt
@@ -241,12 +240,11 @@ class AuthTestCase(ContentStoreTestCase):
         # we want to test the rendering of the activation page when the user isn't logged in
         self.client.logout()
         resp = self._activate_user(self.email)
-        self.assertEqual(resp.status_code, 200)
 
         # check the the HTML has links to the right login page. Note that this is merely a content
         # check and thus could be fragile should the wording change on this page
         expected = 'You can now <a href="' + reverse('login') + '">sign in</a>.'
-        self.assertIn(expected, resp.content.decode('utf-8'))
+        self.assertContains(resp, expected)
 
     def test_private_pages_auth(self):
         """Make sure pages that do require login work."""
@@ -319,7 +317,7 @@ class AuthTestCase(ContentStoreTestCase):
         is turned off
         """
         response = self.client.get(reverse('homepage'))
-        self.assertNotIn('<a class="action action-signup" href="/signup">Sign Up</a>', response.content)
+        self.assertNotContains(response, '<a class="action action-signup" href="/signup">Sign Up</a>')
 
     @mock.patch.dict(settings.FEATURES, {"ALLOW_PUBLIC_ACCOUNT_CREATION": False})
     def test_signup_button_login_page(self):
@@ -328,7 +326,7 @@ class AuthTestCase(ContentStoreTestCase):
         is turned off
         """
         response = self.client.get(reverse('login'))
-        self.assertNotIn('<a class="action action-signup" href="/signup">Sign Up</a>', response.content)
+        self.assertNotContains(response, '<a class="action action-signup" href="/signup">Sign Up</a>')
 
     @mock.patch.dict(settings.FEATURES, {"ALLOW_PUBLIC_ACCOUNT_CREATION": False})
     def test_signup_link_login_page(self):

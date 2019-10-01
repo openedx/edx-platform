@@ -75,7 +75,7 @@ class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTest
         response = self.api_response(api_version=api_version)
 
         # verify static URLs are replaced in the content returned by the API
-        self.assertNotIn("\"/static/", response.content.decode('utf-8'))
+        self.assertNotContains(response, "\"/static/")
 
         # verify static URLs remain in the underlying content
         underlying_updates = modulestore().get_item(updates_usage_key)

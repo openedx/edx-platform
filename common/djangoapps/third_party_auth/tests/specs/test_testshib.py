@@ -251,8 +251,7 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         self.assertEqual(try_login_response['Location'], self.login_page_url)
         # When loading the login page, the user will see an error message:
         response = self.client.get(self.login_page_url)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('Authentication with TestShib is currently unavailable.', response.content)
+        self.assertContains(response, 'Authentication with TestShib is currently unavailable.')
 
     def test_login(self):
         """ Configure TestShib before running the login test """
@@ -373,10 +372,10 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
             """
             Return a fake assertion after checking that the input is what we expect.
             """
-            self.assertIn('private_key=fake_private_key_here', _request.body)
-            self.assertIn('user_id=myself', _request.body)
-            self.assertIn('token_url=http%3A%2F%2Fsuccessfactors.com%2Foauth%2Ftoken', _request.body)
-            self.assertIn('client_id=TatVotSEiCMteSNWtSOnLanCtBGwNhGB', _request.body)
+            self.assertIn(b'private_key=fake_private_key_here', _request.body)
+            self.assertIn(b'user_id=myself', _request.body)
+            self.assertIn(b'token_url=http%3A%2F%2Fsuccessfactors.com%2Foauth%2Ftoken', _request.body)
+            self.assertIn(b'client_id=TatVotSEiCMteSNWtSOnLanCtBGwNhGB', _request.body)
             return (200, headers, 'fake_saml_assertion')
 
         httpretty.register_uri(httpretty.POST, SAPSF_ASSERTION_URL, content_type='text/plain', body=assertion_callback)
@@ -398,10 +397,10 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
             """
             Return a fake assertion after checking that the input is what we expect.
             """
-            self.assertIn('assertion=fake_saml_assertion', _request.body)
-            self.assertIn('company_id=NCC1701D', _request.body)
-            self.assertIn('grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Asaml2-bearer', _request.body)
-            self.assertIn('client_id=TatVotSEiCMteSNWtSOnLanCtBGwNhGB', _request.body)
+            self.assertIn(b'assertion=fake_saml_assertion', _request.body)
+            self.assertIn(b'company_id=NCC1701D', _request.body)
+            self.assertIn(b'grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Asaml2-bearer', _request.body)
+            self.assertIn(b'client_id=TatVotSEiCMteSNWtSOnLanCtBGwNhGB', _request.body)
             return (200, headers, '{"access_token": "faketoken"}')
 
         httpretty.register_uri(httpretty.POST, SAPSF_TOKEN_URL, content_type='application/json', body=token_callback)

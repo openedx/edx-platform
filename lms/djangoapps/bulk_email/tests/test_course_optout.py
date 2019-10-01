@@ -57,7 +57,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         response = self.client.get(url)
         email_section = '<div class="vert-left send-email" id="section-send-email">'
         # If this fails, it is likely because BulkEmailFlag.is_enabled() is set to False
-        self.assertIn(email_section, response.content.decode('utf-8'))
+        self.assertContains(response, email_section)
 
     def test_optout_course(self):
         """

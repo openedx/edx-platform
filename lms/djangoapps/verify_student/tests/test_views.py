@@ -1340,7 +1340,7 @@ class TestCreateOrderView(ModuleStoreTestCase):
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_invalid_amount(self):
         response = self._create_order('1.a', self.course_id, expect_status_code=400)
-        self.assertIn('Selected price is not valid number.', response.content.decode('utf-8'))
+        self.assertContains(response, 'Selected price is not valid number.', status_code=400)
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_invalid_mode(self):
@@ -1348,7 +1348,11 @@ class TestCreateOrderView(ModuleStoreTestCase):
         course_id = 'Fake/999/Test_Course'
         CourseFactory.create(org='Fake', number='999', display_name='Test Course')
         response = self._create_order('50', course_id, expect_status_code=400)
-        self.assertIn('This course doesn\'t support paid certificates', response.content.decode('utf-8'))
+        self.assertContains(
+            response,
+            'This course doesn\'t support paid certificates',
+            status_code=400,
+        )
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_create_order_fail_with_get(self):
@@ -1672,8 +1676,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
             HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB: testing',
             HTTP_DATE='testdate'
         )
-        self.assertIn('Invalid JSON', response.content.decode('utf-8'))
-        self.assertEqual(response.status_code, 400)
+        self.assertContains(response, 'Invalid JSON', status_code=400)
 
     def test_invalid_dict(self):
         """
@@ -1687,8 +1690,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
             HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing',
             HTTP_DATE='testdate'
         )
-        self.assertIn('JSON should be dict', response.content.decode('utf-8'))
-        self.assertEqual(response.status_code, 400)
+        self.assertContains(response, 'JSON should be dict', status_code=400)
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
@@ -1712,8 +1714,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
             HTTP_AUTHORIZATION='test testing:testing',
             HTTP_DATE='testdate'
         )
-        self.assertIn('Access key invalid', response.content.decode('utf-8'))
-        self.assertEqual(response.status_code, 400)
+        self.assertContains(response, 'Access key invalid', status_code=400)
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
@@ -1737,8 +1738,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
             HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing',
             HTTP_DATE='testdate'
         )
-        self.assertIn('edX ID Invalid-Id not found', response.content.decode('utf-8'))
-        self.assertEqual(response.status_code, 400)
+        self.assertContains(response, 'edX ID Invalid-Id not found', status_code=400)
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
@@ -1896,7 +1896,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
             HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing',
             HTTP_DATE='testdate'
         )
-        self.assertIn('Result Unknown not understood', response.content.decode('utf-8'))
+        self.assertContains(response, 'Result Unknown not understood', status_code=400)
 
 
 class TestReverifyView(TestCase):

@@ -135,7 +135,7 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         self.setup_course(True, True)
         response = self.client.get(self.url)
         # the default backend does not support the review dashboard
-        self.assertNotIn('Review Dashboard', response.content)
+        self.assertNotContains(response, 'Review Dashboard')
 
         backend = TestBackendProvider()
         config = apps.get_app_config('edx_proctoring')
@@ -148,7 +148,7 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
                 backend='test',
             )
             response = self.client.get(self.url)
-            self.assertIn('Review Dashboard', response.content)
+            self.assertContains(response, 'Review Dashboard')
 
     def _assert_proctoring_tab_available(self, available):
         """

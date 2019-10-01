@@ -111,13 +111,11 @@ class TestOrderHistoryOnSiteDashboard(SiteMixin, ModuleStoreTestCase):
         receipt_url_cert = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.certificate_order_id})
         receipt_url_donation = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.donation_order_id})
 
-        # We need to decode because of these chars: © & ▸
-        content = response.content.decode('utf-8')
-        self.assertIn(receipt_url_course, content)
-        self.assertNotIn(receipt_url_course2, content)
-        self.assertNotIn(receipt_url, content)
-        self.assertNotIn(receipt_url_cert, content)
-        self.assertNotIn(receipt_url_donation, content)
+        self.assertContains(response, receipt_url_course)
+        self.assertNotContains(response, receipt_url_course2)
+        self.assertNotContains(response, receipt_url)
+        self.assertNotContains(response, receipt_url_cert)
+        self.assertNotContains(response, receipt_url_donation)
 
     def test_shows_orders_with_non_site_courses_only_when_no_configuration_override_exists(self):
         self.use_site(self.site_other)
@@ -133,11 +131,9 @@ class TestOrderHistoryOnSiteDashboard(SiteMixin, ModuleStoreTestCase):
             kwargs={'ordernum': self.courseless_donation_order_id},
         )
 
-        # We need to decode because of these chars: © & ▸
-        content = response.content.decode('utf-8')
-        self.assertNotIn(receipt_url_course, content)
-        self.assertNotIn(receipt_url_course2, content)
-        self.assertIn(receipt_url, content)
-        self.assertIn(receipt_url_cert, content)
-        self.assertIn(receipt_url_donation, content)
-        self.assertIn(receipt_url_courseless_donation, content)
+        self.assertNotContains(response, receipt_url_course)
+        self.assertNotContains(response, receipt_url_course2)
+        self.assertContains(response, receipt_url)
+        self.assertContains(response, receipt_url_cert)
+        self.assertContains(response, receipt_url_donation)
+        self.assertContains(response, receipt_url_courseless_donation)

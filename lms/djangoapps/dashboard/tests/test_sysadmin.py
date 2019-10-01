@@ -153,8 +153,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         # Create git loaded course
         response = self._add_edx4edx()
-        self.assertIn(Text(text_type(GitImportErrorNoDir(settings.GIT_REPO_DIR))),
-                      response.content.decode('UTF-8'))
+        self.assertContains(response, Text(text_type(GitImportErrorNoDir(settings.GIT_REPO_DIR))))
 
     def test_mongo_course_add_delete(self):
         """
@@ -212,13 +211,13 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         response = self.client.get(reverse('gitlogs'))
 
         # Check that our earlier import has a log with a link to details
-        self.assertIn('/gitlogs/course-v1:MITx+edx4edx+edx4edx', response.content.decode('utf-8'))
+        self.assertContains(response, '/gitlogs/course-v1:MITx+edx4edx+edx4edx')
 
         response = self.client.get(
             reverse('gitlogs_detail', kwargs={
                 'course_id': 'course-v1:MITx+edx4edx+edx4edx'}))
 
-        self.assertIn('======&gt; IMPORTING course', response.content.decode('utf-8'))
+        self.assertContains(response, '======&gt; IMPORTING course')
 
         self._rm_edx4edx()
 
@@ -247,7 +246,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
             with (override_settings(TIME_ZONE=timezone)):
                 date_text = get_time_display(date, tz_format, settings.TIME_ZONE)
                 response = self.client.get(reverse('gitlogs'))
-                self.assertIn(date_text, response.content.decode('UTF-8'))
+                self.assertContains(response, date_text)
 
         self._rm_edx4edx()
 
@@ -259,9 +258,9 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         response = self.client.get(
             reverse('gitlogs_detail', kwargs={
                 'course_id': 'Not/Real/Testing'}))
-        self.assertIn(
+        self.assertContains(
+            response,
             'No git import logs have been recorded for this course.',
-            response.content
         )
 
     def test_gitlog_no_logs(self):
@@ -284,7 +283,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
                 'course_id': 'course-v1:MITx+edx4edx+edx4edx'
             })
         )
-        self.assertIn('No git import logs have been recorded for this course.', response.content.decode('utf-8'))
+        self.assertContains(response, 'No git import logs have been recorded for this course.')
 
         self._rm_edx4edx()
 
@@ -315,10 +314,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
                     page
                 )
             )
-            self.assertIn(
-                u'Page {} of 2'.format(expected),
-                response.content.decode(response.charset)
-            )
+            self.assertContains(response, u'Page {} of 2'.format(expected))
 
         CourseImportLog.objects.delete()
 
@@ -358,6 +354,6 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
             reverse('gitlogs_detail', kwargs={
                 'course_id': 'course-v1:MITx+edx4edx+edx4edx'
             }))
-        self.assertIn('======&gt; IMPORTING course', response.content.decode('utf-8'))
+        self.assertContains(response, '======&gt; IMPORTING course')
 
         self._rm_edx4edx()

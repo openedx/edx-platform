@@ -469,7 +469,7 @@ class CourseAuthorization(models.Model):
 
 
 # .. toggle_name: require_course_email_auth
-# .. toggle_type: configuration_model
+# .. toggle_implementation: ConfigurationModel
 # .. toggle_default: True (enabled)
 # .. toggle_description: If the flag is enabled, course-specific authorization is required, and the course_id is either
 # not provided or not authorixed, the feature is not available.

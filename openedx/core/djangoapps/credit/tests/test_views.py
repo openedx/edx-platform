@@ -160,8 +160,7 @@ class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
 
         # POSTs without a CSRF token should fail.
         response = client.post(self.path, data=json.dumps(data), content_type=JSON)
-        self.assertEqual(response.status_code, 403)
-        self.assertIn('CSRF', response.content)
+        self.assertContains(response, 'CSRF', status_code=403)
 
         # Retrieve a CSRF token
         response = client.get('/')

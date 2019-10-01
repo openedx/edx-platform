@@ -62,11 +62,10 @@ class HelperMixin(object):
         assertions based on the provider's implementation; if you want more
         assertions in your test, override this method.
         """
-        self.assertEqual(200, response.status_code)
         # Check that the correct provider was selected.
-        self.assertIn(
+        self.assertContains(
+            response,
             u'successfully signed in with <strong>%s</strong>' % self.provider.name,
-            response.content.decode(response.charset)
         )
         # Expect that each truthy value we've prepopulated the register form
         # with is actually present.
@@ -122,10 +121,10 @@ class HelperMixin(object):
 
     def assert_json_failure_response_is_missing_social_auth(self, response):
         """Asserts failure on /login for missing social auth looks right."""
-        self.assertEqual(403, response.status_code)
-        self.assertIn(
+        self.assertContains(
+            response,
             u"successfully signed in to your %s account, but this account isn&#39;t linked" % self.provider.name,
-            response.content.decode(response.charset)
+            status_code=403,
         )
 
     def assert_json_failure_response_is_username_collision(self, response):
@@ -144,11 +143,10 @@ class HelperMixin(object):
 
     def assert_login_response_before_pipeline_looks_correct(self, response):
         """Asserts a GET of /login not in the pipeline looks correct."""
-        self.assertEqual(200, response.status_code)
         # The combined login/registration page dynamically generates the login button,
         # but we can still check that the provider name is passed in the data attribute
         # for the container element.
-        self.assertIn(self.provider.name, response.content)
+        self.assertContains(response, self.provider.name)
 
     def assert_login_response_in_pipeline_looks_correct(self, response):
         """Asserts a GET of /login in the pipeline looks correct."""
@@ -186,11 +184,10 @@ class HelperMixin(object):
 
     def assert_register_response_before_pipeline_looks_correct(self, response):
         """Asserts a GET of /register not in the pipeline looks correct."""
-        self.assertEqual(200, response.status_code)
         # The combined login/registration page dynamically generates the register button,
         # but we can still check that the provider name is passed in the data attribute
         # for the container element.
-        self.assertIn(self.provider.name, response.content)
+        self.assertContains(response, self.provider.name)
 
     def assert_social_auth_does_not_exist_for_user(self, user, strategy):
         """Asserts a user does not have an auth with the expected provider."""
@@ -489,8 +486,7 @@ class IntegrationTestMixin(testutil.TestCase, test.TestCase, HelperMixin):
     def _check_login_or_register_page(self, url, url_to_return):
         """ Shared logic for _check_login_page() and _check_register_page() """
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(self.PROVIDER_NAME, response.content)
+        self.assertContains(response, self.PROVIDER_NAME)
         context_data = response.context['data']['third_party_auth']
         provider_urls = {provider['id']: provider[url_to_return] for provider in context_data['providers']}
         self.assertIn(self.PROVIDER_ID, provider_urls)

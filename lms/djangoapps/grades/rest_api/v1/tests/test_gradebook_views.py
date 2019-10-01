@@ -1813,6 +1813,27 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
 
         assert expected_data == resp.data
 
+    def test_comment_appears(self):
+        """
+        Test that comments passed (e.g. from proctoring) appear in the history rows
+        """
+        proctoring_failure_fake_comment = "Failed Test Proctoring"
+        self.login_course_staff()
+        override = PersistentSubsectionGradeOverride.update_or_create_override(
+            requesting_user=self.global_staff,
+            subsection_grade_model=self.grade,
+            earned_all_override=0.0,
+            earned_graded_override=0.0,
+            feature=GradeOverrideFeatureEnum.proctoring,
+            comment=proctoring_failure_fake_comment
+        )
+
+        resp = self.client.get(
+            self.get_url(subsection_id=self.usage_key)
+        )
+
+        assert resp.data['history'][0]['override_reason'] == proctoring_failure_fake_comment
+
     @ddt.data(
         'login_staff',
     )

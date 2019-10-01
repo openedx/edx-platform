@@ -299,7 +299,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         self._assert_course_verification_status(VERIFY_STATUS_APPROVED)
         response2 = self.client.get(self.dashboard_url)
         self.assertContains(response2, attempt2.expiration_datetime.strftime("%m/%d/%Y"))
-        self.assertEqual(response2.content.count(attempt2.expiration_datetime.strftime("%m/%d/%Y")), 2)
+        self.assertContains(response2, attempt2.expiration_datetime.strftime("%m/%d/%Y"), count=2)
 
     def _setup_mode_and_enrollment(self, deadline, enrollment_mode):
         """Create a course mode and enrollment.
@@ -383,7 +383,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
                 # and fail if none of these are found.
                 found_msg = False
                 for message in self.NOTIFICATION_MESSAGES[status]:
-                    if message in response.content:
+                    if six.b(message) in response.content:
                         found_msg = True
                         break
 

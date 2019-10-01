@@ -35,7 +35,12 @@ from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
-from lms.djangoapps.grades.models import PersistentCourseGrade
+from lms.djangoapps.grades.course_data import CourseData
+from lms.djangoapps.grades.models import (
+    PersistentCourseGrade,
+    PersistentSubsectionGradeOverride,
+)
+from lms.djangoapps.grades.subsection_grade import CreateSubsectionGrade
 from lms.djangoapps.grades.transformer import GradesTransformer
 from lms.djangoapps.instructor_analytics.basic import UNAVAILABLE, list_problem_responses
 from lms.djangoapps.instructor_task.tasks_helper.certs import generate_students_certificates
@@ -129,7 +134,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         for i, email in enumerate(emails):
             self.create_student('student{0}'.format(i), email)
 
-        self.current_task = Mock()
+        self.current_task = Mock()  # pylint: disable=attribute-defined-outside-init
         self.current_task.update_state = Mock()
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task') as mock_current_task:
             mock_current_task.return_value = self.current_task
@@ -424,7 +429,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         self.create_student('active-student', 'active@example.com')
         self.create_student('inactive-student', 'inactive@example.com', enrollment_active=False)
 
-        self.current_task = Mock()
+        self.current_task = Mock()  # pylint: disable=attribute-defined-outside-init
         self.current_task.update_state = Mock()
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task') as mock_current_task:
@@ -763,7 +768,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content.decode('utf-8'))
+        self.assertContains(response, 'Activate Course Enrollment')
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
@@ -797,7 +802,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content.decode('utf-8'))
+        self.assertContains(response, 'Activate Course Enrollment')
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
@@ -838,7 +843,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content.decode('utf-8'))
+        self.assertContains(response, 'Activate Course Enrollment')
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
@@ -1323,7 +1328,7 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertIn('Activate Course Enrollment', response.content.decode('utf-8'))
+        self.assertContains(response, 'Activate Course Enrollment')
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
@@ -1497,7 +1502,7 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
         for i, student in enumerate(students):
             self.create_student(username=student, email='student{0}@example.com'.format(i))
 
-        self.current_task = Mock()
+        self.current_task = Mock()  # pylint: disable=attribute-defined-outside-init
         self.current_task.update_state = Mock()
         task_input = {
             'features': [
@@ -1628,7 +1633,7 @@ class MockDefaultStorage(object):
 
     def open(self, file_name):
         """Mock out DefaultStorage.open with standard python open"""
-        return open(file_name)
+        return open(file_name)  # pylint: disable=open-builtin
 
 
 @patch('lms.djangoapps.instructor_task.tasks_helper.misc.DefaultStorage', new=MockDefaultStorage)
@@ -1972,6 +1977,43 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
                 ignore_other_columns=True,
             )
 
+    def test_grade_report_with_overrides(self):
+        course_data = CourseData(self.student, course=self.course)
+        subsection_grade = CreateSubsectionGrade(self.unattempted_section, course_data.structure, {}, {})
+        grade_model = subsection_grade.update_or_create_model(self.student, force_update_subsections=True)
+
+        _ = PersistentSubsectionGradeOverride.update_or_create_override(
+            self.student,
+            grade_model,
+            earned_graded_override=2.0,
+        )
+
+        self.addCleanup(grade_model.delete)
+
+        self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
+
+        with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
+            result = CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
+            self.assertDictContainsSubset(
+                {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0},
+                result,
+            )
+            self.verify_rows_in_csv(
+                [
+                    {
+                        u'Student ID': text_type(self.student.id),
+                        u'Email': self.student.email,
+                        u'Username': self.student.username,
+                        u'Grade': '0.38',
+                        u'Homework 1: Subsection': '0.5',
+                        u'Homework 2: Unattempted': '1.0',
+                        u'Homework 3: Empty': 'Not Attempted',
+                        u'Homework (Avg)': text_type(3.0 / 6.0),
+                    },
+                ],
+                ignore_other_columns=True,
+            )
+
     @ddt.data(True, False)
     def test_fast_generation(self, create_non_zero_grade):
         if create_non_zero_grade:
@@ -2036,7 +2078,7 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
         """
         user_profile = UserFactory(username=user.username, email=user.email).profile
         user_profile.allow_certificate = not is_embargoed
-        user_profile.save()
+        user_profile.save()  # pylint: disable=no-member
 
     def _verify_csv_data(self, username, expected_data):
         """

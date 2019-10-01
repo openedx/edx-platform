@@ -7,6 +7,7 @@ from __future__ import absolute_import
 import unittest
 
 import ddt
+import six
 from bs4 import BeautifulSoup
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
@@ -100,7 +101,7 @@ class FormatHtmlTest(unittest.TestCase):
 
         html = strip_all_tags_but_br('{name}<br><script>')
         html = html.format(name='Rock & Roll')
-        self.assertEqual(html.decode(), u'Rock &amp; Roll<br>')
+        self.assertEqual(six.text_type(html), u'Rock &amp; Roll<br>')
 
     def test_clean_dengers_html_filter(self):
         """ Verify filter removes expected tags """

@@ -52,9 +52,9 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         Test Pass E-commerce Tab is in the Instructor Dashboard
         """
         response = self.client.get(self.url)
-        self.assertIn(self.ecommerce_link, response.content)
+        self.assertContains(response, self.ecommerce_link)
         # Coupons should show up for White Label sites with priced honor modes.
-        self.assertIn('Coupon Code List', response.content)
+        self.assertContains(response, 'Coupon Code List')
 
     def test_reports_section_under_e_commerce_tab(self):
         """
@@ -63,8 +63,8 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         self.use_site(site=self.site_other)
         self.client.login(username=self.instructor.username, password="test")
         response = self.client.get(self.url)
-        self.assertIn(self.ecommerce_link, response.content)
-        self.assertIn('Create Enrollment Report', response.content)
+        self.assertContains(response, self.ecommerce_link)
+        self.assertContains(response, 'Create Enrollment Report')
 
     def test_reports_section_not_under_e_commerce_tab(self):
         """
@@ -72,17 +72,17 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         value
         """
         response = self.client.get(self.url)
-        self.assertIn(self.ecommerce_link, response.content)
-        self.assertNotIn('Create Enrollment Report', response.content)
+        self.assertContains(response, self.ecommerce_link)
+        self.assertNotContains(response, 'Create Enrollment Report')
 
     def test_user_has_finance_admin_rights_in_e_commerce_tab(self):
         response = self.client.get(self.url)
-        self.assertIn(self.ecommerce_link, response.content)
+        self.assertContains(response, self.ecommerce_link)
 
         # Order/Invoice sales csv button text should render in e-commerce page
-        self.assertIn('Total Credit Card Purchases', response.content)
-        self.assertIn('Download All Credit Card Purchases', response.content)
-        self.assertIn('Download All Invoices', response.content)
+        self.assertContains(response, 'Total Credit Card Purchases')
+        self.assertContains(response, 'Download All Credit Card Purchases')
+        self.assertContains(response, 'Download All Invoices')
 
         # removing the course finance_admin role of login user
         CourseFinanceAdminRole(self.course.id).remove_users(self.instructor)
@@ -90,7 +90,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         # Order/Invoice sales csv button text should not be visible in e-commerce page if the user is not finance admin
         url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url)
-        self.assertNotIn('Download All Invoices', response.content)
+        self.assertNotContains(response, 'Download All Invoices')
 
     def test_user_view_course_price(self):
         """
@@ -98,14 +98,14 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         the instructor dashboard
         """
         response = self.client.get(self.url)
-        self.assertIn(self.ecommerce_link, response.content)
+        self.assertContains(response, self.ecommerce_link)
 
         # Total amount html should render in e-commerce page, total amount will be 0
         course_honor_mode = CourseMode.mode_for_course(self.course.id, 'honor')
 
         price = course_honor_mode.min_price
-        self.assertIn('Course price per seat: <span>$' + str(price) + '</span>', response.content)
-        self.assertNotIn('+ Set Price</a></span>', response.content)
+        self.assertContains(response, 'Course price per seat: <span>$' + str(price) + '</span>')
+        self.assertNotContains(response, '+ Set Price</a></span>')
 
         # removing the course finance_admin role of login user
         CourseFinanceAdminRole(self.course.id).remove_users(self.instructor)
@@ -113,7 +113,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         # total amount should not be visible in e-commerce page if the user is not finance admin
         url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.get(url)
-        self.assertNotIn('+ Set Price</a></span>', response.content)
+        self.assertNotContains(response, '+ Set Price</a></span>')
 
     def test_update_course_price_check(self):
         price = 200
@@ -130,13 +130,13 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         set_course_price_url = reverse('set_course_mode_price', kwargs={'course_id': text_type(self.course.id)})
         data = {'course_price': price, 'currency': 'usd'}
         response = self.client.post(set_course_price_url, data)
-        self.assertIn('CourseMode price updated successfully', response.content)
+        self.assertContains(response, 'CourseMode price updated successfully')
 
         # Course A updated total amount should be visible in e-commerce page if the user is finance admin
         url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.get(url)
 
-        self.assertIn('Course price per seat: <span>$' + str(price) + '</span>', response.content)
+        self.assertContains(response, 'Course price per seat: <span>$' + str(price) + '</span>')
 
     def test_user_admin_set_course_price(self):
         """
@@ -148,20 +148,21 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
 
         # Value Error course price should be a numeric value
         response = self.client.post(set_course_price_url, data)
-        self.assertIn("Please Enter the numeric value for the course price", response.content)
+        self.assertContains(response, "Please Enter the numeric value for the course price", status_code=400)
 
         # validation check passes and course price is successfully added
         data['course_price'] = 100
         response = self.client.post(set_course_price_url, data)
-        self.assertIn("CourseMode price updated successfully", response.content)
+        self.assertContains(response, "CourseMode price updated successfully")
 
         course_honor_mode = CourseMode.objects.get(mode_slug='honor')
         course_honor_mode.delete()
         # Course Mode not exist with mode slug honor
         response = self.client.post(set_course_price_url, data)
-        self.assertIn(
+        self.assertContains(
+            response,
             u"CourseMode with the mode slug({mode_slug}) DoesNotExist".format(mode_slug='honor'),
-            response.content
+            status_code=400,
         )
 
     def test_add_coupon(self):
@@ -180,9 +181,9 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
             )
         }
         response = self.client.post(add_coupon_url, data)
-        self.assertIn(
+        self.assertContains(
+            response,
             u"coupon with the coupon code ({code}) added successfully".format(code=data['code']),
-            response.content
         )
 
         #now add the coupon with the wrong value in the expiration_date
@@ -193,30 +194,42 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
             'expiration_date': expiration_date.strftime('"%d/%m/%Y')
         }
         response = self.client.post(add_coupon_url, data)
-        self.assertIn("Please enter the date in this format i-e month/day/year", response.content)
+        self.assertContains(
+            response,
+            "Please enter the date in this format i-e month/day/year",
+            status_code=400,
+        )
 
         data = {
             'code': 'A2314', 'course_id': text_type(self.course.id),
             'description': 'asdsasda', 'created_by': self.instructor, 'discount': 99
         }
         response = self.client.post(add_coupon_url, data)
-        self.assertIn(u"coupon with the coupon code ({code}) already exist".format(code='A2314'), response.content)
+        self.assertContains(
+            response,
+            u"coupon with the coupon code ({code}) already exist".format(code='A2314'),
+            status_code=400,
+        )
 
         response = self.client.post(self.url)
-        self.assertIn('<td>ADSADASDSAD</td>', response.content)
-        self.assertIn('<td>A2314</td>', response.content)
-        self.assertNotIn('<td>111</td>', response.content)
+        self.assertContains(response, '<td>ADSADASDSAD</td>')
+        self.assertContains(response, '<td>A2314</td>')
+        self.assertNotContains(response, '<td>111</td>')
 
         data = {
             'code': 'A2345314', 'course_id': text_type(self.course.id),
             'description': 'asdsasda', 'created_by': self.instructor, 'discount': 199
         }
         response = self.client.post(add_coupon_url, data)
-        self.assertIn("Please Enter the Coupon Discount Value Less than or Equal to 100", response.content)
+        self.assertContains(
+            response,
+            "Please Enter the Coupon Discount Value Less than or Equal to 100",
+            status_code=400,
+        )
 
         data['discount'] = '25%'
         response = self.client.post(add_coupon_url, data=data)
-        self.assertIn('Please Enter the Integer Value for Coupon Discount', response.content)
+        self.assertContains(response, 'Please Enter the Integer Value for Coupon Discount', status_code=400)
 
         course_registration = CourseRegistrationCode(
             code='Vs23Ws4j', course_id=text_type(self.course.id), created_by=self.instructor,
@@ -227,7 +240,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         data['code'] = 'Vs23Ws4j'
         response = self.client.post(add_coupon_url, data)
         msg = u"The code ({code}) that you have tried to define is already in use as a registration code"
-        self.assertIn(msg.format(code=data['code']), response.content)
+        self.assertContains(response, msg.format(code=data['code']), status_code=400)
 
     def test_delete_coupon(self):
         """
@@ -241,33 +254,35 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         coupon.save()
 
         response = self.client.post(self.url)
-        self.assertIn('<td>AS452</td>', response.content)
+        self.assertContains(response, '<td>AS452</td>')
 
         # URL for remove_coupon
         delete_coupon_url = reverse('remove_coupon', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(delete_coupon_url, {'id': coupon.id})
-        self.assertIn(
+        self.assertContains(
+            response,
             u'coupon with the coupon id ({coupon_id}) updated successfully'.format(coupon_id=coupon.id),
-            response.content
         )
 
         coupon.is_active = False
         coupon.save()
 
         response = self.client.post(delete_coupon_url, {'id': coupon.id})
-        self.assertIn(
+        self.assertContains(
+            response,
             u'coupon with the coupon id ({coupon_id}) is already inactive'.format(coupon_id=coupon.id),
-            response.content
+            status_code=400,
         )
 
         response = self.client.post(delete_coupon_url, {'id': 24454})
-        self.assertIn(
+        self.assertContains(
+            response,
             u'coupon with the coupon id ({coupon_id}) DoesNotExist'.format(coupon_id=24454),
-            response.content
+            status_code=400,
         )
 
         response = self.client.post(delete_coupon_url, {'id': ''})
-        self.assertIn('coupon id is None', response.content)
+        self.assertContains(response, 'coupon id is None', status_code=400)
 
     def test_get_coupon_info(self):
         """
@@ -282,28 +297,30 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         # URL for edit_coupon_info
         edit_url = reverse('get_coupon_info', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(edit_url, {'id': coupon.id})
-        self.assertIn(
+        self.assertContains(
+            response,
             u'coupon with the coupon id ({coupon_id}) updated successfully'.format(coupon_id=coupon.id),
-            response.content
         )
-        self.assertIn(coupon.display_expiry_date, response.content)
+        self.assertContains(response, coupon.display_expiry_date)
 
         response = self.client.post(edit_url, {'id': 444444})
-        self.assertIn(
+        self.assertContains(
+            response,
             u'coupon with the coupon id ({coupon_id}) DoesNotExist'.format(coupon_id=444444),
-            response.content
+            status_code=400,
         )
 
         response = self.client.post(edit_url, {'id': ''})
-        self.assertIn('coupon id not found"', response.content)
+        self.assertContains(response, 'coupon id not found"', status_code=400)
 
         coupon.is_active = False
         coupon.save()
 
         response = self.client.post(edit_url, {'id': coupon.id})
-        self.assertIn(
+        self.assertContains(
+            response,
             u"coupon with the coupon id ({coupon_id}) is already inactive".format(coupon_id=coupon.id),
-            response.content
+            status_code=400,
         )
 
     def test_update_coupon(self):
@@ -316,7 +333,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         )
         coupon.save()
         response = self.client.post(self.url)
-        self.assertIn('<td>AS452</td>', response.content)
+        self.assertContains(response, '<td>AS452</td>')
         data = {
             'coupon_id': coupon.id, 'code': 'AS452', 'discount': '10', 'description': 'updated_description',
             'course_id': text_type(coupon.course_id)
@@ -324,21 +341,25 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         # URL for update_coupon
         update_coupon_url = reverse('update_coupon', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(update_coupon_url, data=data)
-        self.assertIn(
+        self.assertContains(
+            response,
             u'coupon with the coupon id ({coupon_id}) updated Successfully'.format(coupon_id=coupon.id),
-            response.content
         )
 
         response = self.client.post(self.url)
-        self.assertIn('<td>updated_description</td>', response.content)
+        self.assertContains(response, '<td>updated_description</td>')
 
         data['coupon_id'] = 1000  # Coupon Not Exist with this ID
         response = self.client.post(update_coupon_url, data=data)
-        self.assertIn(u'coupon with the coupon id ({coupon_id}) DoesNotExist'.format(coupon_id=1000), response.content)
+        self.assertContains(
+            response,
+            u'coupon with the coupon id ({coupon_id}) DoesNotExist'.format(coupon_id=1000),
+            status_code=400,
+        )
 
         data['coupon_id'] = ''  # Coupon id is not provided
         response = self.client.post(update_coupon_url, data=data)
-        self.assertIn('coupon id not found', response.content)
+        self.assertContains(response, 'coupon id not found', status_code=400)
 
     def test_verified_course(self):
         """Verify the e-commerce panel shows up for verified courses as well, without Coupons """
@@ -353,9 +374,9 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
 
         # Get the response value, ensure the Coupon section is not included.
         response = self.client.get(self.url)
-        self.assertIn(self.ecommerce_link, response.content)
+        self.assertContains(response, self.ecommerce_link)
         # Coupons should show up for White Label sites with priced honor modes.
-        self.assertNotIn('Coupons List', response.content)
+        self.assertNotContains(response, 'Coupons List')
 
     def test_coupon_code_section_not_under_e_commerce_tab(self):
         """
@@ -366,8 +387,8 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         CourseMode.objects.filter(course_id=self.course.id).update(sku='test_sku')
 
         response = self.client.get(self.url)
-        self.assertIn(self.ecommerce_link, response.content)
-        self.assertNotIn('Coupon Code List', response.content)
+        self.assertContains(response, self.ecommerce_link)
+        self.assertNotContains(response, 'Coupon Code List')
 
     def test_enrollment_codes_section_not_under_e_commerce_tab(self):
         """
@@ -378,8 +399,8 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         CourseMode.objects.filter(course_id=self.course.id).update(sku='test_sku')
 
         response = self.client.get(self.url)
-        self.assertIn(self.ecommerce_link, response.content)
-        self.assertNotIn('<h3 class="hd hd-3">Enrollment Codes</h3>', response.content)
+        self.assertContains(response, self.ecommerce_link)
+        self.assertNotContains(response, '<h3 class="hd hd-3">Enrollment Codes</h3>')
 
     def test_enrollment_codes_section_visible_for_non_ecommerce_course(self):
         """
@@ -387,5 +408,5 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         e-commerce course
         """
         response = self.client.get(self.url)
-        self.assertIn(self.ecommerce_link, response.content)
-        self.assertIn('<h3 class="hd hd-3">Enrollment Codes</h3>', response.content)
+        self.assertContains(response, self.ecommerce_link)
+        self.assertContains(response, '<h3 class="hd hd-3">Enrollment Codes</h3>')

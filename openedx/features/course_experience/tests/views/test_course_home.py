@@ -962,17 +962,17 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
 
     def assert_upgrade_message_not_displayed(self):
         response = self.client.get(self.url)
-        self.assertNotIn('section-upgrade', response.content)
+        self.assertNotContains(response, 'section-upgrade')
 
     def assert_upgrade_message_displayed(self):
         response = self.client.get(self.url)
-        self.assertIn('section-upgrade', response.content)
+        self.assertContains(response, 'section-upgrade')
         url = EcommerceService().get_checkout_page_url(self.verified_mode.sku)
-        self.assertIn('<a class="btn-brand btn-upgrade"', response.content)
-        self.assertIn(url, response.content)
-        self.assertIn(
+        self.assertContains(response, '<a class="btn-brand btn-upgrade"')
+        self.assertContains(response, url)
+        self.assertContains(
+            response,
             u"Upgrade (<span class='price'>${price}</span>)".format(price=self.verified_mode.min_price),
-            response.content.decode(response.charset)
         )
 
     def test_no_upgrade_message_if_logged_out(self):
@@ -1012,5 +1012,4 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
         with SHOW_UPGRADE_MSG_ON_COURSE_HOME.override(True):
             response = self.client.get(self.url)
 
-        content = response.content.decode(response.charset)
-        assert "<span>DISCOUNT_PRICE</span>" in content
+        self.assertContains(response, "<span>DISCOUNT_PRICE</span>")

@@ -881,32 +881,6 @@ class Html5VideoTest(VideoBaseTest):
         unicode_text = "好 各位同学".decode('utf-8')
         self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
 
-    def test_full_screen_video_alignment_with_transcript_visible(self):
-        """
-        Scenario: Video is aligned correctly with transcript enabled in fullscreen mode
-        Given the course has a Video component in "HTML5" mode
-        And I have uploaded a .srt.sjson file to assets
-        And I have defined subtitles for the video
-        When I show the captions
-        And I view the video at fullscreen
-        Then the video with the transcript enabled is aligned correctly
-        """
-        self.assets.append('subs_3_yD_cEKoCk.srt.sjson')
-        data = {'sub': '3_yD_cEKoCk'}
-        self.metadata = self.metadata_for_mode('html5', additional_data=data)
-
-        # go to video
-        self.navigate_to_video()
-
-        # make sure captions are opened
-        self.video.show_captions()
-
-        # click video button "fullscreen"
-        self.video.click_player_button('fullscreen')
-
-        # check if video aligned correctly with enabled transcript
-        self.assertTrue(self.video.is_aligned(True))
-
     def test_cc_button_with_english_transcript(self):
         """
         Scenario: CC button works correctly with only english transcript in HTML5 mode
