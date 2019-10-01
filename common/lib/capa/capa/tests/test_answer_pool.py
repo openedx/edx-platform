@@ -5,6 +5,7 @@ Tests the logic of the "answer-pool" attribute, e.g.
 
 from __future__ import absolute_import
 
+import six
 import textwrap
 import unittest
 
@@ -353,11 +354,16 @@ class CapaAnswerPoolTest(unittest.TestCase):
         problem = new_loncapa_problem(xml_str)
         the_html = problem.get_html()
 
-        str1 = r"<div>.*\[.*'wrong-3'.*'correct-2'.*'wrong-2'.*'wrong-4'.*\].*</div>"
-        str2 = r"<div>.*\[.*'wrong-2'.*'wrong-1'.*'correct-2'.*\].*</div>"    # rng shared
-        # str2 = r"<div>.*\[.*'correct-2'.*'wrong-2'.*'wrong-3'.*\].*</div>"  # rng independent
-
-        str3 = r"<div>\{.*'1_solution_2'.*\}</div>"
+        if six.PY2:
+            str1 = r"<div>.*\[.*'wrong-3'.*'correct-2'.*'wrong-2'.*'wrong-4'.*\].*</div>"
+            str2 = r"<div>.*\[.*'wrong-2'.*'wrong-1'.*'correct-2'.*\].*</div>"    # rng shared
+            # str2 = r"<div>.*\[.*'correct-2'.*'wrong-2'.*'wrong-3'.*\].*</div>"  # rng independent
+            str3 = r"<div>\{.*'1_solution_2'.*\}</div>"
+        else:
+            str1 = r"<div>.*\[.*'wrong-4'.*'correct-1'.*'wrong-3'.*'wrong-1'.*\].*</div>"
+            str2 = r"<div>.*\[.*'wrong-2'.*'correct-2'.*'wrong-4'.*\].*</div>"    # rng shared
+            # str2 = r"<div>.*\[.*'correct-2'.*'wrong-2'.*'wrong-3'.*\].*</div>"  # rng independent
+            str3 = r"<div>\{.*'1_solution_1'.*\}</div>"
         str4 = r"<div>\{.*'1_solution_4'.*\}</div>"
 
         self.assertRegexpMatches(the_html, str1)
