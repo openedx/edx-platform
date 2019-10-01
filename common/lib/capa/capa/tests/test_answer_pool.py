@@ -5,6 +5,7 @@ Tests the logic of the "answer-pool" attribute, e.g.
 
 from __future__ import absolute_import
 
+import six
 import textwrap
 import unittest
 
@@ -280,11 +281,20 @@ class CapaAnswerPoolTest(unittest.TestCase):
 
         problem = new_loncapa_problem(xml_str, seed=723)
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div>.*\[.*'correct-2'.*'wrong-1'.*'wrong-2'.*.*'wrong-3'.*'wrong-4'.*\].*</div>")
-        self.assertRegexpMatches(the_html, r"<div>\{.*'1_solution_2'.*\}</div>")
+        if six.PY2:
+            regex1 = r"<div>.*\[.*'correct-2'.*'wrong-1'.*'wrong-2'.*.*'wrong-3'.*'wrong-4'.*\].*</div>"
+            regex2 = r"<div>\{.*'1_solution_2'.*\}</div>"
+            unmask_order = ['choice_5', 'choice_0', 'choice_1', 'choice_3', 'choice_4']
+        else:
+            regex1 = r"<div>.*\[.*'wrong-3'.*'correct-1'.*'wrong-4'.*.*'wrong-2'.*'wrong-1'.*\].*</div>"
+            regex2 = r"<div>\{.*'1_solution_1'.*\}</div>"
+            unmask_order = ['choice_3', 'choice_2', 'choice_4', 'choice_1', 'choice_0']
+
+        self.assertRegexpMatches(the_html, regex1)
+        self.assertRegexpMatches(the_html, regex2)
         response = list(problem.responders.values())[0]
         self.assertFalse(response.has_mask())
-        self.assertEqual(response.unmask_order(), ['choice_5', 'choice_0', 'choice_1', 'choice_3', 'choice_4'])
+        self.assertEqual(response.unmask_order(), unmask_order)
 
     def test_answer_pool_2_multiplechoiceresponses_seed1(self):
         xml_str = textwrap.dedent("""
