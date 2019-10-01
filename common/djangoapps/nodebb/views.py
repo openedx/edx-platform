@@ -59,6 +59,8 @@ def nodebb_forum_discussion(request, course_id):
         "custom_community_link": custom_community_link,
         "is_community_topic_link": is_community_topic_link,
         "browse_teams_link": browse_teams_link,
+        "course_has_ended": current_course.has_ended(),
+        "courses_page_link": reverse("courses"),
         "courseware_link": courseware_link
     }
 
