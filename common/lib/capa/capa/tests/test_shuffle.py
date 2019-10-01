@@ -79,7 +79,11 @@ class CapaShuffleTest(unittest.TestCase):
         """)
         problem = new_loncapa_problem(xml_str, seed=341)  # yields D A B C
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div>.*\[.*'Donut'.*'Apple'.*'Banana'.*'Chocolate'.*\].*</div>")
+        if six.PY2:
+            regex = r"<div>.*\[.*'Donut'.*'Apple'.*'Banana'.*'Chocolate'.*\].*</div>"
+        else:
+            regex = r"<div>.*\[.*'Banana'.*'Apple'.*'Donut'.*'Chocolate'.*\].*</div>"
+        self.assertRegexpMatches(the_html, regex)
 
     def test_shuffle_1_choice(self):
         xml_str = textwrap.dedent("""
