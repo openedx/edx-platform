@@ -2045,8 +2045,12 @@ class ProblemBlockTest(unittest.TestCase):
             event_info = mock_call[1][2]
             self.assertEqual(event_info['answers'][CapaFactory.answer_key()], 'choice_2')
             # 'permutation' key added to record how problem was shown
+            if six.PY2:
+                answerpool = ['choice_1', 'choice_3', 'choice_2', 'choice_0']
+            else:
+                answerpool = ['choice_2', 'choice_1', 'choice_3', 'choice_0']
             self.assertEqual(event_info['permutation'][CapaFactory.answer_key()],
-                             ('answerpool', ['choice_1', 'choice_3', 'choice_2', 'choice_0']))
+                             ('answerpool', answerpool))
             self.assertEqual(event_info['success'], 'incorrect')
 
     @ddt.unpack
