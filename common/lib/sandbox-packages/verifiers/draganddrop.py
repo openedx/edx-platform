@@ -287,7 +287,7 @@ class DragAndDrop(object):
     def __init__(self, correct_answer, user_answer):
         """ Populates DragAndDrop variables from user_answer and correct_answer.
         If correct_answer is dict, converts it to list.
-        Correct answer in dict form is simpe structure for fast and simple
+        Correct answer in dict form is simple structure for fast and simple
         grading. Example of correct answer dict example::
 
             correct_answer = {'name4': 't1',
@@ -340,7 +340,8 @@ class DragAndDrop(object):
         # Convert from dict answer format to list format.
         if isinstance(correct_answer, dict):
             tmp = []
-            for key, value in correct_answer.items():
+            for key in sorted(correct_answer.keys()):
+                value = correct_answer[key]
                 tmp.append({
                     'draggables': [key],
                     'targets': [value],
