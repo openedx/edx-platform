@@ -34,11 +34,13 @@ class SubsectionGradeFactory(object):
         self._cached_subsection_grades = None
         self._unsaved_subsection_grades = OrderedDict()
 
-    def create(self, subsection, read_only=False):
+    def create(self, subsection, read_only=False, force_calculate=False):
         """
         Returns the SubsectionGrade object for the student and subsection.
 
         If read_only is True, doesn't save any updates to the grades.
+        force_calculate - If true, will cause this function to return a `CreateSubsectionGrade` object if no cached
+        grade currently exists, even if the assume_zero_if_absent flag is enabled for the course.
         """
         self._log_event(
             log.debug, u"create, read_only: {0}, subsection: {1}".format(read_only, subsection.location), subsection,
@@ -46,7 +48,7 @@ class SubsectionGradeFactory(object):
 
         subsection_grade = self._get_bulk_cached_grade(subsection)
         if not subsection_grade:
-            if assume_zero_if_absent(self.course_data.course_key):
+            if assume_zero_if_absent(self.course_data.course_key) and not force_calculate:
                 subsection_grade = ZeroSubsectionGrade(subsection, self.course_data)
             else:
                 subsection_grade = CreateSubsectionGrade(
