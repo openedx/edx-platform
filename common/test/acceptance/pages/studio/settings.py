@@ -5,6 +5,7 @@ Course Schedule and Details Settings page.
 from __future__ import absolute_import, unicode_literals
 
 import os
+import os.path
 
 import six
 from bok_choy.javascript import requirejs
@@ -314,7 +315,7 @@ class SettingsPage(CoursePage):
         # Separate the list of folders in the path reaching to the current file,
         # e.g.  '... common/test/acceptance/pages/lms/instructor_dashboard.py' will result in
         #       [..., 'common', 'test', 'acceptance', 'pages', 'lms', 'instructor_dashboard.py']
-        folders_list_in_path = __file__.split(os.sep)
+        folders_list_in_path = os.path.abspath(__file__).split(os.sep)
 
         # Get rid of the last 4 elements: 'acceptance', 'pages', 'lms', and 'instructor_dashboard.py'
         # to point to the 'test' folder, a shared point in the path's tree.
