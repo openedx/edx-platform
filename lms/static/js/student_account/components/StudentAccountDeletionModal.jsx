@@ -31,7 +31,8 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
     this.props.onClose();
 
     removeLoggedInCookies();
-    window.location.href = 'https://www.edx.org';
+    // Appsembler: Changed this from edx.org to the customer's site.
+    window.location.href = location.protocol + '//' + location.host + '/';
   }
 
   deleteAccount() {
