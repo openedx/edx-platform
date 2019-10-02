@@ -107,6 +107,12 @@ CELERYBEAT_SCHEDULE = {}  # For scheduling tasks, entries can be added to this d
 with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
     ENV_TOKENS = json.load(env_file)
 
+
+# Authorizenet payment processor set a cookie for dashboard to show pending course purchased dashoard
+# notification. This cookie domain will be used to set and delete that cookie.
+ECOMMERCE_COOKIE_DOMAIN = ENV_TOKENS.get('ECOMMERCE_COOKIE_DOMAIN', None)
+
+
 # STATIC_ROOT specifies the directory where static files are
 # collected
 STATIC_ROOT_BASE = ENV_TOKENS.get('STATIC_ROOT_BASE', None)
