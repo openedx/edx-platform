@@ -16,7 +16,7 @@ import six.moves.urllib.request  # pylint: disable=import-error
 from lazy import lazy
 from six.moves.BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer  # pylint: disable=import-error
 from six.moves.socketserver import ThreadingMixIn  # pylint: disable=import-error
-
+import pdb
 LOGGER = getLogger(__name__)
 
 
@@ -105,7 +105,8 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         Retrieve the request POST parameters from the client as a dictionary.
         If no POST parameters can be interpreted, return an empty dict.
         """
-        contents = self.request_content
+        # pdb.set_trace()
+        contents = self.request_content.decode()
 
         # The POST dict will contain a list of values for each key.
         # None of our parameters are lists, however, so we map [val] --> val
@@ -209,6 +210,8 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
             self.end_headers()
 
         if content is not None:
+            if not six.PY2 and isinstance(content, six.text_type):
+                content = content.encode('utf-8')
             self.wfile.write(content)
 
     def send_json_response(self, content):
