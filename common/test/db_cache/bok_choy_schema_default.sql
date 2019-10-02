@@ -2430,7 +2430,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=595 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=598 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3999,32 +3999,6 @@ CREATE TABLE `mobile_api_mobileapiconfig` (
   PRIMARY KEY (`id`),
   KEY `mobile_api_mobileapi_changed_by_id_8799981a_fk_auth_user` (`changed_by_id`),
   CONSTRAINT `mobile_api_mobileapi_changed_by_id_8799981a_fk_auth_user` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `notes_note`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `notes_note` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `course_id` varchar(255) NOT NULL,
-  `uri` varchar(255) NOT NULL,
-  `text` longtext NOT NULL,
-  `quote` longtext NOT NULL,
-  `range_start` varchar(2048) NOT NULL,
-  `range_start_offset` int(11) NOT NULL,
-  `range_end` varchar(2048) NOT NULL,
-  `range_end_offset` int(11) NOT NULL,
-  `tags` longtext NOT NULL,
-  `created` datetime(6) DEFAULT NULL,
-  `updated` datetime(6) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `notes_note_user_id_be6c80b4_fk_auth_user_id` (`user_id`),
-  KEY `notes_note_course_id_ab1355f9` (`course_id`),
-  KEY `notes_note_uri_f9ed526c` (`uri`),
-  KEY `notes_note_created_50dd44ea` (`created`),
-  KEY `notes_note_updated_f2abc1a5` (`updated`),
-  CONSTRAINT `notes_note_user_id_be6c80b4_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `notify_notification`;
