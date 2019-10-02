@@ -145,7 +145,7 @@ git+https://github.com/mitodl/edx-sga.git@237ad328ba3f03d189c421073c85e48091041f
 edx-sphinx-theme==1.5.0
 edx-submissions==3.0.1
 edx-user-state-client==1.1.2
-edx-when==0.4
+edx-when==0.5
 edxval==1.1.27
 elasticsearch==1.9.0
 entrypoints==0.3
@@ -214,7 +214,7 @@ moto==1.3.1
 mpmath==1.1.0
 mysqlclient==1.4.4
 networkx==1.7
-newrelic==5.0.2.126
+newrelic==5.2.0.127
 nltk==3.4.5
 nodeenv==1.1.1
 numpy==1.16.5
@@ -229,7 +229,7 @@ paver==1.3.4
 pbr==5.4.3
 pdfminer.six==20181108
 piexif==1.0.2
-pillow==6.1.0
+pillow==6.2.0
 pip-tools==4.1.0
 pkgconfig==1.5.1
 pluggy==0.13.0
@@ -266,7 +266,7 @@ pytest-django==3.5.1
 pytest-faulthandler==1.6.0
 pytest-forked==1.0.2
 pytest-randomly==1.2.3
-pytest-xdist==1.29.0
+pytest-xdist==1.30.0
 pytest==4.5.0
 python-dateutil==2.4.0
 python-levenshtein==0.12.0
