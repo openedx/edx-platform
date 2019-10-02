@@ -1034,7 +1034,7 @@
     "Studio:": "Studio: ", 
     "Subject": "\u4ef6\u540d", 
     "Subject:": "\u4ef6\u540d: ", 
-    "Submit": "\u63d0\u51fa", 
+    "Submit": "\u9001\u4fe1", 
     "Submit Application": "\u7533\u8fbc\u66f8\u63d0\u51fa", 
     "Submit enrollment change": "\u53d7\u8b1b\u767b\u9332\u5909\u66f4\u3092\u63d0\u51fa", 
     "Submitted": "\u63d0\u51fa\u6e08", 
