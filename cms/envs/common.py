@@ -165,10 +165,6 @@ FEATURES = {
     'ENABLE_DISCUSSION_SERVICE': True,
     'ENABLE_TEXTBOOK': True,
 
-    # .. documented_elsewhere: true
-    # .. documented_elsewhere_name: ENABLE_STUDENT_NOTES
-    'ENABLE_STUDENT_NOTES': True,
-
     # DO NOT SET TO True IN THIS FILE
     # Doing so will cause all courses to be released on production
     'DISABLE_START_DATES': False,  # When True, all courses will be active, regardless of start date
