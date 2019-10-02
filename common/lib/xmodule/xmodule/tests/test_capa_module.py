@@ -1976,9 +1976,14 @@ class ProblemBlockTest(unittest.TestCase):
             mock_call = mock_track_function.mock_calls[1]
             event_info = mock_call[1][2]
             self.assertEqual(event_info['answers'][CapaFactory.answer_key()], 'choice_3')
+
+            if six.PY2:
+                shuffle_result = ['choice_3', 'choice_1', 'choice_2', 'choice_0']
+            else:
+                shuffle_result = ['choice_3', 'choice_0', 'choice_2', 'choice_1']
             # 'permutation' key added to record how problem was shown
             self.assertEqual(event_info['permutation'][CapaFactory.answer_key()],
-                             ('shuffle', ['choice_3', 'choice_1', 'choice_2', 'choice_0']))
+                             ('shuffle', shuffle_result))
             self.assertEqual(event_info['success'], 'correct')
 
     @unittest.skip("masking temporarily disabled")
