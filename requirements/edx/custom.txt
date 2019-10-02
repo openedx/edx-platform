@@ -12,7 +12,7 @@
 -e git+https://github.com/edx-solutions/xblock-ooyala.git@brightcove-integration#egg=xblock-ooyala==3.0.0
 git+https://github.com/edx-solutions/xblock-group-project.git@0.1.2#egg=xblock-group-project==0.1.2
 -e git+https://github.com/edx-solutions/xblock-adventure.git@v0.1.1#egg=xblock-adventure==0.1.1
--e git+https://github.com/open-craft/xblock-poll.git@v1.8.6#egg=xblock-poll==1.8.6
+-e git+https://github.com/open-craft/xblock-poll.git@v1.8.8#egg=xblock-poll==1.8.8
 -e git+https://github.com/open-craft/edx-notifications.git@9930a7069dd496e3229145d0dee8f750c9d1d7cc#egg=edx-notifications==0.8.4
 -e git+https://github.com/open-craft/problem-builder.git@v3.3.11#egg=xblock-problem-builder==3.3.11
 -e git+https://github.com/OfficeDev/xblock-officemix.git@86238f5968a08db005717dbddc346808f1ed3716#egg=xblock-officemix
