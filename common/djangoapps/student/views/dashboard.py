@@ -2,6 +2,8 @@
 Dashboard view and supporting methods
 """
 
+import json
+import base64
 import datetime
 import logging
 from collections import defaultdict
@@ -33,6 +35,7 @@ from openedx.core.djangoapps.catalog.utils import (
     get_pseudo_session_for_entitlement,
     get_visible_sessions_for_entitlement
 )
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import ProgramDataExtender, ProgramProgressMeter
@@ -549,6 +552,7 @@ def student_dashboard(request):
         The dashboard response.
 
     """
+    ECOMMERCE_TRANSACTION_COOKIE_NAME = "pendingTransactionCourse"
     user = request.user
     if not UserProfile.objects.filter(user=user).exists():
         return redirect(reverse('account_settings'))
@@ -863,6 +867,18 @@ def student_dashboard(request):
         'recovery_email_activation_message': recovery_email_activation_message,
     }
 
+    # Retrieve pendingTransactionCourse cookie to show waiting alert to the learner. It conatain encrypted
+    # course_id for which AuthorizeNet transaction has been perfromed but notification is yet to be received.
+    transaction_hash = request.COOKIES.get(ECOMMERCE_TRANSACTION_COOKIE_NAME)
+    if transaction_hash:
+        decoded_course_id =  base64.b64decode(transaction_hash)
+        transaction_course_id = CourseKey.from_string(decoded_course_id)
+        pending_transaction_course_name = CourseOverview.get_from_id(transaction_course_id).display_name
+        context.update({
+            'pending_upgrade_course_name': pending_transaction_course_name,
+        })
+
+
     if ecommerce_service.is_enabled(request.user):
         context.update({
             'use_ecommerce_payment_flow': True,
@@ -881,4 +897,6 @@ def student_dashboard(request):
 
     response = render_to_response('dashboard.html', context)
     set_logged_in_cookies(request, response, user)
+    response.delete_cookie(
+        ECOMMERCE_TRANSACTION_COOKIE_NAME, domain=settings.ECOMMERCE_COOKIE_DOMAIN)
     return response
