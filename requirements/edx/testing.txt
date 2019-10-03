@@ -27,7 +27,7 @@ apipkg==1.5               # via execnet
 appdirs==1.4.3
 argh==0.26.2
 argparse==1.4.0           # via caniusepython3
-asn1crypto==0.24.0
+asn1crypto==1.0.0
 astroid==1.6.6            # via pylint, pylint-celery
 atomicwrites==1.3.0       # via pytest
 attrs==17.4.0
@@ -125,7 +125,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==2.0.0
 edx-drf-extensions==2.4.0
-edx-enterprise==1.10.8
+edx-enterprise==2.0.0
 edx-i18n-tools==0.4.8
 edx-lint==1.4.0
 edx-milestones==0.2.3
@@ -140,8 +140,8 @@ edx-search==1.2.2
 git+https://github.com/mitodl/edx-sga.git@237ad328ba3f03d189c421073c85e48091041f8b#egg=edx-sga==0.0
 edx-submissions==3.0.1
 edx-user-state-client==1.1.2
-edx-when==0.4
-edxval==1.1.27
+edx-when==0.5.1
+edxval==1.1.28
 elasticsearch==1.9.0
 entrypoints==0.3          # via flake8
 enum34==1.1.6
@@ -207,7 +207,7 @@ moto==1.3.1
 mpmath==1.1.0
 mysqlclient==1.4.4
 networkx==1.7
-newrelic==5.0.2.126
+newrelic==5.2.0.127
 nltk==3.4.5
 nodeenv==1.1.1
 numpy==1.16.5
@@ -222,7 +222,7 @@ paver==1.3.4
 pbr==5.4.3
 pdfminer.six==20181108
 piexif==1.0.2
-pillow==6.1.0
+pillow==6.2.0
 pkgconfig==1.5.1
 pluggy==0.13.0            # via pytest, tox
 polib==1.1.0
@@ -257,7 +257,7 @@ pytest-django==3.5.1
 pytest-faulthandler==1.6.0
 pytest-forked==1.0.2      # via pytest-xdist
 pytest-randomly==1.2.3
-pytest-xdist==1.29.0
+pytest-xdist==1.30.0
 pytest==4.5.0
 python-dateutil==2.4.0
 python-levenshtein==0.12.0
