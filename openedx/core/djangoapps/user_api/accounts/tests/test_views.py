@@ -821,6 +821,9 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         Verify we handle error cases when patching the language_proficiencies
         field.
         """
+        if six.PY3:
+            expected_error_message = six.text_type(expected_error_message).replace('unicode', 'str')
+
         client = self.login_client("client", "user")
         response = self.send_patch(client, {"language_proficiencies": patch_value}, expected_status=400)
         self.assertEqual(
