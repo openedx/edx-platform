@@ -347,7 +347,7 @@ def copy_or_rename_transcript(new_name, old_name, item, delete_old=False, user=N
     filename = u'subs_{0}.srt.sjson'.format(old_name)
     content_location = StaticContent.compute_location(item.location.course_key, filename)
     transcripts = contentstore().find(content_location).data
-    save_subs_to_store(json.loads(transcripts), new_name, item)
+    save_subs_to_store(json.loads(transcripts.decode('utf-8')), new_name, item)
     item.sub = new_name
     item.save_with_metadata(user)
     if delete_old:
