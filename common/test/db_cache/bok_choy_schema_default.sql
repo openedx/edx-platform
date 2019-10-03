@@ -2430,7 +2430,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=595 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=599 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2634,8 +2634,10 @@ CREATE TABLE `edx_when_datepolicy` (
   `created` datetime(6) NOT NULL,
   `modified` datetime(6) NOT NULL,
   `abs_date` datetime(6) DEFAULT NULL,
+  `rel_date` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `edx_when_datepolicy_abs_date_1a510cd3` (`abs_date`)
+  KEY `edx_when_datepolicy_abs_date_1a510cd3` (`abs_date`),
+  KEY `edx_when_datepolicy_rel_date_836d6051` (`rel_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `edx_when_userdate`;
@@ -2646,7 +2648,7 @@ CREATE TABLE `edx_when_userdate` (
   `created` datetime(6) NOT NULL,
   `modified` datetime(6) NOT NULL,
   `abs_date` datetime(6) DEFAULT NULL,
-  `rel_date` int(11) DEFAULT NULL,
+  `rel_date` bigint(20) DEFAULT NULL,
   `reason` longtext NOT NULL,
   `actor_id` int(11) DEFAULT NULL,
   `user_id` int(11) NOT NULL,
@@ -2655,6 +2657,7 @@ CREATE TABLE `edx_when_userdate` (
   KEY `edx_when_userdate_user_id_46e8cc36_fk_auth_user_id` (`user_id`),
   KEY `edx_when_userdate_content_date_id_35c5e2e2_fk_edx_when_` (`content_date_id`),
   KEY `edx_when_userdate_actor_id_cbef1cdc_fk_auth_user_id` (`actor_id`),
+  KEY `edx_when_userdate_rel_date_954ee5b4` (`rel_date`),
   CONSTRAINT `edx_when_userdate_actor_id_cbef1cdc_fk_auth_user_id` FOREIGN KEY (`actor_id`) REFERENCES `auth_user` (`id`),
   CONSTRAINT `edx_when_userdate_content_date_id_35c5e2e2_fk_edx_when_` FOREIGN KEY (`content_date_id`) REFERENCES `edx_when_contentdate` (`id`),
   CONSTRAINT `edx_when_userdate_user_id_46e8cc36_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
