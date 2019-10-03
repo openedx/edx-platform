@@ -550,7 +550,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         sequential2 = chapter.children[1]
 
         response_content = self.client.get(course_home_url(course)).content
-        stripped_response = text_type(re.sub("\\s+", "", response_content), "utf-8")
+        stripped_response = text_type(re.sub(b"\\s+", b"", response_content), "utf-8")
 
         self.assertTrue(get_sequential_button(text_type(sequential1.location), False) in stripped_response)
         self.assertTrue(get_sequential_button(text_type(sequential2.location), True) in stripped_response)
