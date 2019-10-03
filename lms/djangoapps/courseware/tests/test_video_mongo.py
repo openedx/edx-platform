@@ -5,6 +5,7 @@ Video xmodule tests in mongo.
 
 from __future__ import absolute_import
 
+import ast
 import io
 import json
 import shutil
@@ -74,7 +75,7 @@ I am overwatch.
 TRANSCRIPT_FILE_SJSON_DATA = """{\n   "start": [10],\n   "end": [100],\n   "text": ["Hi, welcome to edxval."]\n}"""
 
 
-class TestVideoYouTube(TestVideo):
+class TestVideoYouTube(TestVideo):  # pylint: disable=test-inherits-tests
     METADATA = {}
 
     def test_video_constructor(self):
@@ -138,7 +139,7 @@ class TestVideoYouTube(TestVideo):
         )
 
 
-class TestVideoNonYouTube(TestVideo):
+class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
     """Integration tests: web client + mongo."""
     DATA = """
         <video show_captions="true"
@@ -273,6 +274,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         ).rstrip('/?')
 
     def test_get_html_track(self):
+        # pylint: disable=invalid-name
         SOURCE_XML = """
             <video show_captions="true"
             display_name="A Name"
@@ -381,8 +383,10 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             })
 
             self.assertEqual(
-                context,
-                self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context),
+                self.get_context_dict_from_string(context),
+                self.get_context_dict_from_string(
+                    self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
+                )
             )
 
     def test_get_html_source(self):
@@ -489,14 +493,17 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             })
 
             self.assertEqual(
-                context,
-                self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
+                self.get_context_dict_from_string(context),
+                self.get_context_dict_from_string(
+                    self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
+                )
             )
 
     def test_get_html_with_non_existent_edx_video_id(self):
         """
         Tests the VideoBlock get_html where a edx_video_id is given but a video is not found
         """
+        # pylint: disable=invalid-name
         SOURCE_XML = u"""
             <video show_captions="true"
             display_name="A Name"
@@ -627,9 +634,22 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         })
 
         self.assertEqual(
-            context,
-            self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
+            self.get_context_dict_from_string(context),
+            self.get_context_dict_from_string(
+                self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
+            )
         )
+
+    def get_context_dict_from_string(self, data):
+        """
+        Retrieve dictionary from string.
+        """
+        # Replace tuple and un-necessary info from inside string and get the dictionary.
+        cleaned_data = ast.literal_eval(data.split('((\'video.html\',')[1].replace("),\n {})", '').strip())  # pylint: disable=unicode-format-string
+        cleaned_data['metadata'] = OrderedDict(
+            sorted(json.loads(cleaned_data['metadata']).items(), key=lambda t: t[0])
+        )
+        return cleaned_data
 
     def test_get_html_with_existing_edx_video_id(self):
         """
@@ -656,8 +676,10 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         # expected_context, a dict to assert with context
         context, expected_context = self.helper_get_html_with_edx_video_id(data)
         self.assertEqual(
-            context,
-            self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
+            self.get_context_dict_from_string(context),
+            self.get_context_dict_from_string(
+                self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
+            )
         )
 
     def test_get_html_with_existing_unstripped_edx_video_id(self):
@@ -686,9 +708,12 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         # context returned by get_html when provided with above data
         # expected_context, a dict to assert with context
         context, expected_context = self.helper_get_html_with_edx_video_id(data)
+
         self.assertEqual(
-            context,
-            self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
+            self.get_context_dict_from_string(context),
+            self.get_context_dict_from_string(
+                self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
+            )
         )
 
     def encode_and_create_video(self, edx_video_id):
@@ -896,8 +921,10 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             })
 
             self.assertEqual(
-                context,
-                self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
+                self.get_context_dict_from_string(context),
+                self.get_context_dict_from_string(
+                    self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
+                )
             )
 
     # pylint: disable=invalid-name
@@ -999,8 +1026,10 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             })
 
             self.assertEqual(
-                context,
-                self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
+                self.get_context_dict_from_string(context),
+                self.get_context_dict_from_string(
+                    self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
+                )
             )
 
     @ddt.data(
@@ -1052,8 +1081,9 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         self.assertIn("'download_video_link': 'https://mp4.com/dm.mp4'", context)
         self.assertIn('"streams": "1.00:https://yt.com/?v=v0TFmdO4ZP0"', context)
-        self.assertIn(
-            '"sources": ["https://webm.com/dw.webm", "https://mp4.com/dm.mp4", "https://hls.com/hls.m3u8"]', context
+        self.assertEqual(
+            sorted(["https://webm.com/dw.webm", "https://mp4.com/dm.mp4", "https://hls.com/hls.m3u8"]),
+            sorted(self.get_context_dict_from_string(context)['metadata']['sources'])
         )
 
     def test_get_html_hls_no_video_id(self):
@@ -1272,6 +1302,7 @@ class TestVideoBlockInitialization(BaseTestVideoXBlock):
         """
         with patch('xmodule.video_module.video_module.edxval_api.get_urls_for_profiles') as get_urls_for_profiles:
             get_urls_for_profiles.return_value = val_video_encodings
+            # pylint: disable=line-too-long
             self.initialize_block(
                 data='<video display_name="Video" youtube_id_1_0="" download_video="true" edx_video_id="12345-67890">[]</video>'
             )
@@ -2111,7 +2142,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
             get_video_info("test_edx_video_id")
 
 
-class TestVideoWithBumper(TestVideo):
+class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
     """
     Tests rendered content in presence of video bumper.
     """
