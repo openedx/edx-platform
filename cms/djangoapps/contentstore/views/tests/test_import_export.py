@@ -211,7 +211,7 @@ class ImportTestCase(CourseTestCase):
         Check that the response for a tar.gz import with a course.xml is
         correct.
         """
-        with open(self.good_tar) as gtar:
+        with open(self.good_tar, 'rb') as gtar:
             args = {"name": self.good_tar, "course-data": [gtar]}
             resp = self.client.post(self.url, args)
 
