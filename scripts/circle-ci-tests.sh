@@ -77,17 +77,23 @@ else
             exit $EXIT
             ;;
 
-        1)  # run all of the lms unit tests
-            paver test_system -s lms --cov-args="-p"
-            ;;
+        1) # run caliper configuration tests
+            paver test_system -t openedx/features/caliper_tracking/tests/tests.py::CaliperTransformationTestCase::test_caliper_transformers --fasttest --cov-args="-p"
 
-        2)  # run all of the cms unit tests
-            paver test_system -s cms --cov-args="-p"
-            ;;
+        # The following jobs are commented out because at the moment we do not wish to run all the tests.
+        # We shall run the full test suite once Caliper transformation of logs is complete
 
-        3)  # run the commonlib unit tests
-            paver test_lib --cov-args="-p"
-            ;;
+        # 1)  # run all of the lms unit tests
+        #     paver test_system -s lms --cov-args="-p"
+        #     ;;
+
+        # 2)  # run all of the cms unit tests
+        #     paver test_system -s cms --cov-args="-p"
+        #     ;;
+
+        # 3)  # run the commonlib unit tests
+        #     paver test_lib --cov-args="-p"
+        #     ;;
 
         *)
             echo "No tests were executed in this container."
