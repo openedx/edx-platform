@@ -136,6 +136,7 @@ social-auth-core<2.0.0
 pysrt                               # Support for SubRip subtitle files, used in the video XModule
 pytz                                # Time zone information database
 PyYAML                              # Used to parse XModule resource templates
+random2                             # Used as future porting python 2 random library to python 3
 redis==2.10.6                       # celery task broker
 requests-oauthlib                   # Simplifies use of OAuth via the requests library, used for CCX and LTI
 rules                               # Django extension for rules-based authorization checks
