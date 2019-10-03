@@ -97,19 +97,6 @@ FEATURES = {
     'ENABLE_DISCUSSION_SERVICE': True,
     'ENABLE_TEXTBOOK': True,
 
-    # .. toggle_name: ENABLE_STUDENT_NOTES
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: True
-    # .. toggle_description: Enables the Student Notes API and UI.
-    # .. toggle_category: ????
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2014-11-13
-    # .. toggle_expiration_date: None
-    # .. toggle_warnings: None
-    # .. toggle_tickets: TNL-659
-    # .. toggle_status: supported
-    'ENABLE_STUDENT_NOTES': True,
-
     # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
     # this should remain off in production until digest notifications are online.
     'ENABLE_DISCUSSION_HOME_PANEL': False,
@@ -1638,7 +1625,6 @@ discussion_vendor_js = [
     'js/split.js'
 ]
 
-notes_js = ['js/notes.js']
 instructor_dash_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/instructor_dashboard/**/*.js'))
 
 verify_student_js = [
@@ -1918,10 +1904,6 @@ PIPELINE['JAVASCRIPT'] = {
     'discussion_vendor': {
         'source_filenames': discussion_vendor_js,
         'output_filename': 'js/discussion_vendor.js',
-    },
-    'notes': {
-        'source_filenames': notes_js,
-        'output_filename': 'js/notes.js',
     },
     'instructor_dash': {
         'source_filenames': instructor_dash_js,
@@ -2339,7 +2321,6 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.django_comment_common',
 
     # Notes
-    'notes',
     'edxnotes',
 
     # Splash screen
