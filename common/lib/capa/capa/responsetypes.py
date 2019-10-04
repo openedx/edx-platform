@@ -19,7 +19,7 @@ import inspect
 import json
 import logging
 import numbers
-import random
+import random2 as random
 import re
 import sys
 import textwrap
