@@ -11,12 +11,13 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.http import Http404, HttpResponseServerError
+from django.http import Http404, HttpResponseForbidden, HttpResponseServerError
 from django.shortcuts import render_to_response
 from django.template.context_processors import csrf
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.translation import get_language_bidi
+from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
 from edx_django_utils.monitoring import function_trace
@@ -31,7 +32,7 @@ from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.views.views import CourseTabView
 from lms.djangoapps.discussion.django_comment_client.base.views import track_thread_viewed_event
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY
-from lms.djangoapps.discussion.django_comment_client.permissions import get_team, has_permission
+from lms.djangoapps.discussion.django_comment_client.permissions import has_permission
 from lms.djangoapps.discussion.django_comment_client.utils import (
     add_courseware_context,
     available_division_schemes,
@@ -43,7 +44,9 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
     is_commentable_divided,
     strip_none
 )
+from lms.djangoapps.discussion.exceptions import TeamDiscussionHiddenFromUserException
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
+from lms.djangoapps.teams import api as team_api
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.djangoapps.django_comment_common.utils import (
     ThreadContext,
@@ -66,6 +69,7 @@ INLINE_THREADS_PER_PAGE = 20
 PAGES_NEARBY_DELTA = 2
 
 BOOTSTRAP_DISCUSSION_CSS_PATH = 'css/discussion/lms-discussion-bootstrap.css'
+TEAM_PERMISSION_MESSAGE = _("Access to this discussion is restricted to team members and staff.")
 
 
 def make_course_settings(course, user, include_category_map=True):
@@ -122,8 +126,10 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
     if discussion_id is not None:
         default_query_params['commentable_id'] = discussion_id
         # Use the discussion id/commentable id to determine the context we are going to pass through to the backend.
-        if get_team(discussion_id) is not None:
+        if team_api.get_team_by_discussion(discussion_id) is not None:
             default_query_params['context'] = ThreadContext.STANDALONE
+
+        _check_team_discussion_access(request, course, discussion_id)
 
     if not request.GET.get('sort_key'):
         # If the user did not select a sort key, use their last used sort key
@@ -200,7 +206,6 @@ def inline_discussion(request, course_key, discussion_id):
     """
     Renders JSON for DiscussionModules
     """
-
     with function_trace('get_course_and_user_info'):
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
         cc_user = cc.User.from_django_user(request.user)
@@ -213,6 +218,8 @@ def inline_discussion(request, course_key, discussion_id):
             )
     except ValueError:
         return HttpResponseServerError('Invalid group_id')
+    except TeamDiscussionHiddenFromUserException:
+        return HttpResponseForbidden(TEAM_PERMISSION_MESSAGE)
 
     with function_trace('get_metadata_for_threads'):
         annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
@@ -300,10 +307,17 @@ def single_thread(request, course_key, discussion_id, thread_id):
     """
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
     request.user.is_community_ta = utils.is_user_community_ta(request.user, course.id)
+
     if request.is_ajax():
         cc_user = cc.User.from_django_user(request.user)
         user_info = cc_user.to_dict()
         is_staff = has_permission(request.user, 'openclose_thread', course.id)
+
+        try:
+            _check_team_discussion_access(request, course, discussion_id)
+        except TeamDiscussionHiddenFromUserException:
+            return HttpResponseForbidden(TEAM_PERMISSION_MESSAGE)
+
         thread = _load_thread_for_viewing(
             request,
             course,
@@ -461,7 +475,7 @@ def _create_discussion_board_context(request, base_context, thread=None):
     cc_user = cc.User.from_django_user(user)
     user_info = context['user_info']
     if thread:
-
+        _check_team_discussion_access(request, course, discussion_id)
         # Since we're in page render mode, and the discussions UI will request the thread list itself,
         # we need only return the thread information for this one.
         threads = [thread.to_dict()]
@@ -760,6 +774,20 @@ class DiscussionBoardFragmentView(EdxFragmentView):
             fragment = Fragment(html)
             self.add_fragment_resource_urls(fragment)
             return fragment
+        except TeamDiscussionHiddenFromUserException:
+            log.warning(
+                u'User with id={user_id} tried to view private discussion with id={discussion_id}'.format(
+                    user_id=request.user.id,
+                    discussion_id=discussion_id
+                )
+            )
+            html = render_to_string('discussion/discussion_private_fragment.html', {
+                'disable_courseware_js': True,
+                'uses_pattern_library': True,
+            })
+            fragment = Fragment(html)
+            self.add_fragment_resource_urls(fragment)
+            return fragment
 
     def vendor_js_dependencies(self):
         """
@@ -963,3 +991,13 @@ def get_divided_discussions(course, discussion_settings):
             divided_inline_discussions.append(divided_discussion_id)
 
     return divided_course_wide_discussions, divided_inline_discussions
+
+
+def _check_team_discussion_access(request, course, discussion_id):
+    """
+    Helper function to check if the discussion is visible to the user,
+    if the user is on a team, which has the discussion set to private.
+    """
+    user_is_course_staff = has_access(request.user, "staff", course)
+    if not user_is_course_staff and not team_api.discussion_visible_by_user(discussion_id, request.user):
+        raise TeamDiscussionHiddenFromUserException()
