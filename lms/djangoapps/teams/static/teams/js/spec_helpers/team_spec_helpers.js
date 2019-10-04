@@ -143,8 +143,9 @@ define([
     };
 
     createMockDiscussionResponse = function(threads) {
+        var responseThreads = threads;
         if (_.isUndefined(threads)) {
-            threads = [
+            responseThreads = [
                 createMockPostResponse({id: '1', title: 'First Post'}),
                 createMockPostResponse({id: '2', title: 'Second Post'}),
                 createMockPostResponse({id: '3', title: 'Third Post'})
@@ -153,7 +154,7 @@ define([
         return {
             num_pages: 1,
             page: 1,
-            discussion_data: threads,
+            discussion_data: responseThreads,
             user_info: {
                 username: testUser,
                 follower_ids: [],
