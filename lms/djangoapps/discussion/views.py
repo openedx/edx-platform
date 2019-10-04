@@ -11,12 +11,13 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.http import Http404, HttpResponseServerError
+from django.http import Http404, HttpResponseForbidden, HttpResponseServerError
 from django.shortcuts import render_to_response
 from django.template.context_processors import csrf
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.translation import get_language_bidi
+from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
 from edx_django_utils.monitoring import function_trace
@@ -44,6 +45,7 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
     strip_none
 )
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
+from lms.djangoapps.teams.models import CourseTeam
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.djangoapps.django_comment_common.utils import (
     ThreadContext,
@@ -66,6 +68,7 @@ INLINE_THREADS_PER_PAGE = 20
 PAGES_NEARBY_DELTA = 2
 
 BOOTSTRAP_DISCUSSION_CSS_PATH = 'css/discussion/lms-discussion-bootstrap.css'
+TEAM_PERMISSION_MESSAGE = _("Access to this thread is restricted to team members and staff.")
 
 
 def make_course_settings(course, user, include_category_map=True):
@@ -200,7 +203,6 @@ def inline_discussion(request, course_key, discussion_id):
     """
     Renders JSON for DiscussionModules
     """
-
     with function_trace('get_course_and_user_info'):
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
         cc_user = cc.User.from_django_user(request.user)
@@ -222,6 +224,9 @@ def inline_discussion(request, course_key, discussion_id):
         course_discussion_settings = get_course_discussion_settings(course.id)
         group_names_by_id = get_group_names_by_id(course_discussion_settings)
         course_is_divided = course_discussion_settings.division_scheme is not CourseDiscussionSettings.NONE
+
+    if not _is_on_team_if_applicable(request.user, course, discussion_id):
+        return HttpResponseForbidden(TEAM_PERMISSION_MESSAGE)
 
     with function_trace('prepare_content'):
         threads = [
@@ -963,3 +968,16 @@ def get_divided_discussions(course, discussion_settings):
             divided_inline_discussions.append(divided_discussion_id)
 
     return divided_course_wide_discussions, divided_inline_discussions
+
+
+def _is_on_team_if_applicable(user, course, discussion_id):
+    """
+    Return whether (a) the user is on the appropriate team, OR
+                   (b) this is not a team discussion.
+    """
+    try:
+        team = CourseTeam.objects.get(discussion_topic_id=discussion_id)
+    except CourseTeam.DoesNotExist:
+        return True
+    is_team_member = team.users.filter(id=user.id).exists()
+    return is_team_member or has_access(user, "staff", course)
