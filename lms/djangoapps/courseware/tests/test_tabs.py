@@ -640,7 +640,6 @@ class CourseTabListTestCase(TabListTestCase):
     @patch.dict("django.conf.settings.FEATURES", {
         "ENABLE_TEXTBOOK": True,
         "ENABLE_DISCUSSION_SERVICE": True,
-        "ENABLE_STUDENT_NOTES": True,
         "ENABLE_EDXNOTES": True,
     })
     def test_iterate_displayable(self):

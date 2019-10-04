@@ -36,8 +36,9 @@ def course_has_highlights(course_key):
         )
 
         if not highlights_are_available:
-            log.error(
-                "Course team enabled highlights and provided no highlights."
+            log.warning(
+                u"Course team enabled highlights and provided no highlights in %s",
+                course_key
             )
 
         return highlights_are_available
