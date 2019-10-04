@@ -117,7 +117,7 @@ def _write_chunk(request, courselike_key):
     """
     # Upload .tar.gz to local filesystem for one-server installations not using S3 or Swift
     data_root = path(settings.GITHUB_REPO_ROOT)
-    subdir = base64.urlsafe_b64encode(repr(courselike_key))
+    subdir = base64.urlsafe_b64encode(repr(courselike_key).encode('utf-8')).decode('utf-8')
     course_dir = data_root / subdir
     filename = request.FILES['course-data'].name
 
