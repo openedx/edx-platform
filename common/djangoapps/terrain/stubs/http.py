@@ -18,7 +18,6 @@ from six.moves.BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer  # pylin
 from six.moves.socketserver import ThreadingMixIn  # pylint: disable=import-error
 LOGGER = getLogger(__name__)
 
-
 def require_params(method, *required_keys):
     """
     Decorator to ensure that the method has all the required parameters.
@@ -157,13 +156,6 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
 
             if len(self.post_dict) > 0:
                 for key, value in six.iteritems(self.post_dict):
-
-                    # Decode the params as UTF-8
-                    try:
-                        key = six.text_type(key, 'utf-8')
-                        value = six.text_type(value, 'utf-8')
-                    except UnicodeDecodeError:
-                        self.log_message("Could not decode request params as UTF-8")
 
                     self.log_message(u"Set config '{0}' to '{1}'".format(key, value))
 
