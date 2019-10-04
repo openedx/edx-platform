@@ -16,7 +16,6 @@ import six.moves.urllib.request  # pylint: disable=import-error
 from lazy import lazy
 from six.moves.BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer  # pylint: disable=import-error
 from six.moves.socketserver import ThreadingMixIn  # pylint: disable=import-error
-import pdb
 LOGGER = getLogger(__name__)
 
 
@@ -105,7 +104,6 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         Retrieve the request POST parameters from the client as a dictionary.
         If no POST parameters can be interpreted, return an empty dict.
         """
-        # pdb.set_trace()
         contents = self.request_content.decode()
 
         # The POST dict will contain a list of values for each key.
