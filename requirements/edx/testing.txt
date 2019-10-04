@@ -27,7 +27,7 @@ apipkg==1.5               # via execnet
 appdirs==1.4.3
 argh==0.26.2
 argparse==1.4.0           # via caniusepython3
-asn1crypto==0.24.0
+asn1crypto==1.0.0
 astroid==1.5.3            # via pylint, pylint-celery
 atomicwrites==1.3.0       # via pytest
 attrs==17.4.0
@@ -110,7 +110,7 @@ djangorestframework-jwt==1.11.0
 git+https://github.com/edx/django-rest-framework-oauth.git@0a43e8525f1e3048efe4bc70c03de308a277197c#egg=djangorestframework-oauth==1.1.1
 djangorestframework-xml==1.4.0
 djangorestframework==3.7.7
-docker==4.0.2             # via moto
+docker==4.1.0             # via moto
 docopt==0.6.2
 docutils==0.15.2
 drf-yasg==1.16
