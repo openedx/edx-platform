@@ -27,7 +27,7 @@ apipkg==1.5               # via execnet
 appdirs==1.4.3
 argh==0.26.2
 argparse==1.4.0           # via caniusepython3
-asn1crypto==1.0.0
+asn1crypto==1.0.1
 astroid==1.5.3            # via pylint, pylint-celery
 atomicwrites==1.3.0       # via pytest
 attrs==17.4.0
@@ -124,7 +124,7 @@ edx-django-oauth2-provider==1.3.5
 edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==2.0.0
-edx-drf-extensions==2.4.0
+edx-drf-extensions==2.4.1
 edx-enterprise==2.0.0
 edx-i18n-tools==0.4.8
 edx-lint==1.3.0
@@ -177,7 +177,7 @@ isodate==0.6.0
 isort==4.3.21
 itypes==1.1.0
 jinja2-pluralize==0.3.0
-jinja2==2.10.1
+jinja2==2.10.3
 jmespath==0.9.4
 jsondiff==1.1.1
 jsonfield==2.0.2
