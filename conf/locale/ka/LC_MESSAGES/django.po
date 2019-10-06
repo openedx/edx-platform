@@ -60,7 +60,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-22 20:42+0000\n"
+"POT-Creation-Date: 2019-09-29 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Georgian (https://www.transifex.com/open-edx/teams/6205/ka/)\n"
@@ -5979,7 +5979,7 @@ msgstr ""
 "{username} ({email})-ის მიერ ანაზღაურების მოთხოვნა ინიცირებულია. ამ "
 "მოთხოვნის სამართავად, გთხოვთ, ეწვიეთ მისამართს(ებს) ქვემოთ."
 
-#: lms/djangoapps/commerce/views.py lms/djangoapps/shoppingcart/pdf.py
+#: lms/djangoapps/commerce/views.py
 msgid "Receipt"
 msgstr "ქვითარი"
 
@@ -7183,7 +7183,7 @@ msgstr "კურსის Id"
 msgid "% Discount"
 msgstr "% ფასდაკლება"
 
-#: lms/djangoapps/instructor/views/api.py lms/djangoapps/shoppingcart/pdf.py
+#: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/shoppingcart/reports.py
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -7244,13 +7244,6 @@ msgid "Unable to generate redeem codes because of course misconfiguration."
 msgstr ""
 "კურსის არასწორი კონფიგურაციის გამო ვერ ხერხდება დაბრუნების კოდების "
 "გენერირება."
-
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/shoppingcart/models.py
-msgid "pdf download unavailable right now, please contact support."
-msgstr ""
-"ამჟამად pdf-ის ჩამოტვირთვა მიუწვდომელია. გთხოვთ, დაუკავშირდით მხარდაჭერის "
-"ჯგუფს."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -8357,81 +8350,6 @@ msgstr "შემოწირულობა {course}-თვის "
 msgid "Donation for {platform_name}"
 msgstr "შემოწირულობა {platform_name}-თვის"
 
-#: lms/djangoapps/shoppingcart/pdf.py
-#, python-brace-format
-msgid "Page {page_number} of {page_count}"
-msgstr "{page_number} გვერდი {page_count}-დან"
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/templates/shoppingcart/receipt.html
-msgid "Invoice"
-msgstr "ანგარიშფაქტურა"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Order"
-msgstr "შეკვეთა"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-#, python-brace-format
-msgid "{id_label} # {item_id}"
-msgstr "{id_label} # {item_id}"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-#, python-brace-format
-msgid "Date: {date}"
-msgstr "თარიღი: {date}"
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/djangoapps/shoppingcart/reports.py
-msgid "Quantity"
-msgstr "რაოდენობა"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid ""
-"List Price\n"
-"per item"
-msgstr ""
-"ფასის სია\n"
-"ერთეულის მიხედვით"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid ""
-"Discount\n"
-"per item"
-msgstr ""
-"ფასდაკლება\n"
-"ერთეულზე"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Amount"
-msgstr "რაოდენობა"
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/templates/courseware/gradebook.html
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/shoppingcart/billing_details.html
-#: lms/templates/shoppingcart/receipt.html
-msgid "Total"
-msgstr "სულ"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Payment Received"
-msgstr "გადახდა მიღებულია"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Balance"
-msgstr "ბალანსი"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Billing Address"
-msgstr "გადახდის მისამართი"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Disclaimer"
-msgstr "უარყოფა"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "TERMS AND CONDITIONS"
-msgstr "ხელშეკრულების პირობები"
-
 #. Translators: this text appears when an unfamiliar error code occurs during
 #. payment,
 #. for which we don't know a user-friendly message to display in advance.
@@ -8896,6 +8814,10 @@ msgstr "შესყიდვის დრო"
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Order ID"
 msgstr "გადახდის ID"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Quantity"
+msgstr "რაოდენობა"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Unit Cost"
@@ -16141,6 +16063,13 @@ msgid "Search students"
 msgstr "სტუდენტების მოძებნა"
 
 #: lms/templates/courseware/gradebook.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/receipt.html
+msgid "Total"
+msgstr "სულ"
+
+#: lms/templates/courseware/gradebook.html
 msgid "previous page"
 msgstr "წინა გვერდი"
 
@@ -17632,6 +17561,10 @@ msgstr ""
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "INVOICE"
 msgstr "ანგარიშფაქტურა"
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Date: {date}"
+msgstr "თარიღი: {date}"
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "Invoice No: {invoice_number}"
@@ -20200,6 +20133,10 @@ msgstr "გამოყენებული"
 #: lms/templates/shoppingcart/receipt.html
 msgid "Invalid"
 msgstr "არასწორი"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Invoice"
+msgstr "ანგარიშფაქტურა"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Date of purchase"
@@ -24879,8 +24816,8 @@ msgid "Advanced Editor"
 msgstr "გაფართოებული შესაძლებლობების რედაქტორი"
 
 #: cms/templates/widgets/problem-edit.html
-msgid "Toggle Cheatsheet"
-msgstr "მინიშნებების ჩართვა/გამორთვა"
+msgid "Markdown Help"
+msgstr ""
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Label"

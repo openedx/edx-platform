@@ -251,7 +251,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-22 20:42+0000\n"
+"POT-Creation-Date: 2019-09-29 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -5376,7 +5376,7 @@ msgstr ""
 
 #: common/templates/admin/student/loginfailures/change_form_template.html
 msgid "Unlock Account"
-msgstr "Desbloquee la cuenta"
+msgstr "Desbloquea la cuenta"
 
 #. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a control to allow users to exit out of this modal
@@ -6410,7 +6410,7 @@ msgstr ""
 "Se ha solicitado una devolución para {username} ({email}). Para procesar "
 "esta solicitud, visite el vínculo(s) a continuación."
 
-#: lms/djangoapps/commerce/views.py lms/djangoapps/shoppingcart/pdf.py
+#: lms/djangoapps/commerce/views.py
 msgid "Receipt"
 msgstr "Recibo"
 
@@ -6999,6 +6999,8 @@ msgid ""
 "Non usable git url provided. Expecting something like: "
 "git@github.com:edx/edx4edx_lite.git"
 msgstr ""
+"Desafortunadamente, este git de url no puede ser utilizado. Intenta algo "
+"como: git@github.com:edx/edx4edx_lite.git"
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid "Unable to get git log"
@@ -7672,7 +7674,7 @@ msgstr "Id de Curso"
 msgid "% Discount"
 msgstr "% de Descuento"
 
-#: lms/djangoapps/instructor/views/api.py lms/djangoapps/shoppingcart/pdf.py
+#: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/shoppingcart/reports.py
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -7733,13 +7735,6 @@ msgid "Unable to generate redeem codes because of course misconfiguration."
 msgstr ""
 "No fue posible generar ningún código de redención debido a una configuración"
 " incorrecta del curso."
-
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/shoppingcart/models.py
-msgid "pdf download unavailable right now, please contact support."
-msgstr ""
-"la descarga de pdf no está disponible en el momento. Por favor contacte al "
-"equipo de soporte"
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -8706,7 +8701,7 @@ msgstr ""
 
 #: lms/djangoapps/program_enrollments/models.py
 msgid "One of user or external_user_key must not be null."
-msgstr ""
+msgstr "Usuario o external_user_key no debe ser nulo."
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Order Payment Confirmation"
@@ -8864,81 +8859,6 @@ msgstr "Donación para el curso {course}"
 #, python-brace-format
 msgid "Donation for {platform_name}"
 msgstr "Donación para {platform_name}"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-#, python-brace-format
-msgid "Page {page_number} of {page_count}"
-msgstr "Página {page_number} de {page_count}"
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/templates/shoppingcart/receipt.html
-msgid "Invoice"
-msgstr "Factura"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Order"
-msgstr "Orden"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-#, python-brace-format
-msgid "{id_label} # {item_id}"
-msgstr "{id_label} # {item_id}"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-#, python-brace-format
-msgid "Date: {date}"
-msgstr "Fecha: {date}"
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/djangoapps/shoppingcart/reports.py
-msgid "Quantity"
-msgstr "Cantidad"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid ""
-"List Price\n"
-"per item"
-msgstr ""
-"Precio de lista\n"
-"por item"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid ""
-"Discount\n"
-"per item"
-msgstr ""
-"Descuento\n"
-"por item"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Amount"
-msgstr "Cantidad"
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/templates/courseware/gradebook.html
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/shoppingcart/billing_details.html
-#: lms/templates/shoppingcart/receipt.html
-msgid "Total"
-msgstr "Total"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Payment Received"
-msgstr "Pago recibido"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Balance"
-msgstr "Estado de cuenta"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Billing Address"
-msgstr "Dirección de facturación"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Disclaimer"
-msgstr "Aviso"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "TERMS AND CONDITIONS"
-msgstr "TÉRMINOS Y CONDICIONES"
 
 #. Translators: this text appears when an unfamiliar error code occurs during
 #. payment,
@@ -9425,6 +9345,10 @@ msgid "Order ID"
 msgstr "ID de la orden"
 
 #: lms/djangoapps/shoppingcart/reports.py
+msgid "Quantity"
+msgstr "Cantidad"
+
+#: lms/djangoapps/shoppingcart/reports.py
 msgid "Unit Cost"
 msgstr "Costo unitario"
 
@@ -9862,7 +9786,7 @@ msgstr "No hay resultados para perfil de usuario"
 #: lms/djangoapps/verify_student/views.py
 #, python-brace-format
 msgid "Name must be at least {min_length} character long."
-msgstr ""
+msgstr "El Nombre debe contener un mínimo de {min_length} caracteres."
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Image data is not valid."
@@ -10343,7 +10267,7 @@ msgstr "Error"
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
 msgid "Expired ID Verification"
-msgstr ""
+msgstr "verificación de ID caducada"
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
@@ -10374,13 +10298,13 @@ msgstr ""
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 msgid "You can also do this from your dashboard."
-msgstr ""
+msgstr "También puedes hacer esto desde tu panel principal."
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
 msgid "Resubmit Verification : %(lms_verification_link)s "
-msgstr ""
+msgstr "Volver a enviar la verificación: %(lms_verification_link)s"
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
@@ -10401,7 +10325,7 @@ msgstr "Gracias."
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
 msgid "The %(platform_name)s Team "
-msgstr ""
+msgstr "El %(platform_name)s equipo"
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
@@ -10411,7 +10335,7 @@ msgstr "Hola %(full_name)s, "
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/subject.txt
 #, python-format
 msgid "Your %(platform_name)s Verification has Expired"
-msgstr ""
+msgstr "Tu %(platform_name)s verificación ha expirado"
 
 #: lms/templates/wiki/article.html
 msgid "Last modified:"
@@ -17260,6 +17184,13 @@ msgid "Search students"
 msgstr "Buscar estudiantes"
 
 #: lms/templates/courseware/gradebook.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/receipt.html
+msgid "Total"
+msgstr "Total"
+
+#: lms/templates/courseware/gradebook.html
 msgid "previous page"
 msgstr "página previa"
 
@@ -18797,6 +18728,10 @@ msgstr ""
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "INVOICE"
 msgstr "FACTURA"
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Date: {date}"
+msgstr "Fecha: {date}"
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "Invoice No: {invoice_number}"
@@ -21437,6 +21372,10 @@ msgstr "Utilizado"
 #: lms/templates/shoppingcart/receipt.html
 msgid "Invalid"
 msgstr "Invalido"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Invoice"
+msgstr "Factura"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Date of purchase"
@@ -26286,8 +26225,8 @@ msgid "Advanced Editor"
 msgstr "Editor Avanzado"
 
 #: cms/templates/widgets/problem-edit.html
-msgid "Toggle Cheatsheet"
-msgstr "Alternar Trucos"
+msgid "Markdown Help"
+msgstr ""
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Label"
