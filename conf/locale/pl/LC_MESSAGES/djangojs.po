@@ -95,8 +95,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-22 20:42+0000\n"
-"PO-Revision-Date: 2019-07-28 20:42+0000\n"
+"POT-Creation-Date: 2019-10-06 20:42+0000\n"
+"PO-Revision-Date: 2019-09-29 20:43+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Polish (http://www.transifex.com/open-edx/edx-platform/language/pl/)\n"
 "Language: pl\n"
@@ -9434,6 +9434,10 @@ msgstr ""
 "tej lekcji staną się dostępne dla studentów, chyba, że są oznaczone jako "
 "ukryte."
 
+#: cms/templates/js/copy-clipboard-button.underscore
+msgid "Copy Component Location"
+msgstr ""
+
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Weekly Highlight Emails"
 msgstr "Cotygodniowe e-maile podsumowujące"
@@ -9870,6 +9874,10 @@ msgstr "Informacje o rozdziale"
 msgid "Add a Chapter"
 msgstr "Dodaj rozdział"
 
+#: cms/templates/js/edit-title-button.underscore
+msgid "Edit Title"
+msgstr ""
+
 #: cms/templates/js/grading-editor.underscore
 msgid "Grading"
 msgstr "Ocenianie"
@@ -10044,10 +10052,6 @@ msgstr "Wyczyść"
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear Value"
 msgstr "Wyczyść wartość"
-
-#: cms/templates/js/metadata-editor.underscore
-msgid "Component Location ID"
-msgstr "Identyfikator lokalizacji elementu"
 
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video-transcripts.underscore

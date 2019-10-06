@@ -118,8 +118,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-22 20:42+0000\n"
-"PO-Revision-Date: 2019-07-28 20:42+0000\n"
+"POT-Creation-Date: 2019-09-29 20:42+0000\n"
+"PO-Revision-Date: 2019-09-29 20:43+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: German (Germany) (http://www.transifex.com/open-edx/edx-platform/language/de_DE/)\n"
 "Language: de_DE\n"
@@ -9312,6 +9312,10 @@ msgid ""
 "hidden."
 msgstr ""
 
+#: cms/templates/js/copy-clipboard-button.underscore
+msgid "Copy Component Location"
+msgstr ""
+
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Weekly Highlight Emails"
 msgstr "wöchentliche E-Mails über Neuigkeiten"
@@ -9751,6 +9755,10 @@ msgstr "Kapitel Information"
 msgid "Add a Chapter"
 msgstr "Kapitel hinzufügen"
 
+#: cms/templates/js/edit-title-button.underscore
+msgid "Edit Title"
+msgstr ""
+
 #: cms/templates/js/grading-editor.underscore
 msgid "Grading"
 msgstr "Bewertung"
@@ -9919,10 +9927,6 @@ msgstr "Lösche"
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear Value"
 msgstr "Wert löschen"
-
-#: cms/templates/js/metadata-editor.underscore
-msgid "Component Location ID"
-msgstr ""
 
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video-transcripts.underscore

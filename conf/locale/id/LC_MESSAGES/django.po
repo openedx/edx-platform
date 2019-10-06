@@ -99,7 +99,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-22 20:42+0000\n"
+"POT-Creation-Date: 2019-09-29 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019\n"
 "Language-Team: Indonesian (https://www.transifex.com/open-edx/teams/6205/id/)\n"
@@ -6082,7 +6082,7 @@ msgstr ""
 "Permintaan pengembalian dana telah diajukan untuk {username} ({email}). "
 "Untuk memproses permintaan ini, silakan kunjungi tautan(s) di bawah ini."
 
-#: lms/djangoapps/commerce/views.py lms/djangoapps/shoppingcart/pdf.py
+#: lms/djangoapps/commerce/views.py
 msgid "Receipt"
 msgstr "Tanda Terima"
 
@@ -7330,7 +7330,7 @@ msgstr "Id pelatihan"
 msgid "% Discount"
 msgstr "% Diskon"
 
-#: lms/djangoapps/instructor/views/api.py lms/djangoapps/shoppingcart/pdf.py
+#: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/shoppingcart/reports.py
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -7391,11 +7391,6 @@ msgid "Unable to generate redeem codes because of course misconfiguration."
 msgstr ""
 "Tidak dapat menghasilkan kode yang diperoleh karena salah konfigurasi "
 "pelatihan."
-
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/shoppingcart/models.py
-msgid "pdf download unavailable right now, please contact support."
-msgstr "Unduh pdf tidak tersedia saat ini, silahkan hubungi bagian support."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -8457,81 +8452,6 @@ msgstr "Donasi untuk {course}"
 msgid "Donation for {platform_name}"
 msgstr "Donasi untuk {platform_name}"
 
-#: lms/djangoapps/shoppingcart/pdf.py
-#, python-brace-format
-msgid "Page {page_number} of {page_count}"
-msgstr "Halaman {page_number} dari {page_count}"
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/templates/shoppingcart/receipt.html
-msgid "Invoice"
-msgstr "Tagihan"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Order"
-msgstr "Pesanan"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-#, python-brace-format
-msgid "{id_label} # {item_id}"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/pdf.py
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-#, python-brace-format
-msgid "Date: {date}"
-msgstr "Tanggal: {date}"
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/djangoapps/shoppingcart/reports.py
-msgid "Quantity"
-msgstr "Kuantitas"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid ""
-"List Price\n"
-"per item"
-msgstr ""
-"Daftar Harga\n"
-"per item"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid ""
-"Discount\n"
-"per item"
-msgstr ""
-"Diskon\n"
-"per item"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Amount"
-msgstr "Jumlah"
-
-#: lms/djangoapps/shoppingcart/pdf.py lms/templates/courseware/gradebook.html
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/shoppingcart/billing_details.html
-#: lms/templates/shoppingcart/receipt.html
-msgid "Total"
-msgstr "Total"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Payment Received"
-msgstr "Pembayaran Diterima"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Balance"
-msgstr "Saldo"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Billing Address"
-msgstr "Alamat Tagihan"
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "Disclaimer"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/pdf.py
-msgid "TERMS AND CONDITIONS"
-msgstr "SYARAT DAN KETENTUAN"
-
 #. Translators: this text appears when an unfamiliar error code occurs during
 #. payment,
 #. for which we don't know a user-friendly message to display in advance.
@@ -8905,6 +8825,10 @@ msgstr "Waktu Pembelian"
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Order ID"
 msgstr "ID Pesanan"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Quantity"
+msgstr "Kuantitas"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Unit Cost"
@@ -16459,6 +16383,13 @@ msgid "Search students"
 msgstr "Cari siswa"
 
 #: lms/templates/courseware/gradebook.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/receipt.html
+msgid "Total"
+msgstr "Total"
+
+#: lms/templates/courseware/gradebook.html
 msgid "previous page"
 msgstr "halaman sebelumnya"
 
@@ -18012,6 +17943,10 @@ msgstr ""
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "INVOICE"
 msgstr "TAGIHAN"
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Date: {date}"
+msgstr "Tanggal: {date}"
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "Invoice No: {invoice_number}"
@@ -20615,6 +20550,10 @@ msgstr "Terpakai"
 #: lms/templates/shoppingcart/receipt.html
 msgid "Invalid"
 msgstr "Tidak valid"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Invoice"
+msgstr "Tagihan"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Date of purchase"
@@ -24978,8 +24917,8 @@ msgid "Advanced Editor"
 msgstr "Editor Tingkat Lanjut"
 
 #: cms/templates/widgets/problem-edit.html
-msgid "Toggle Cheatsheet"
-msgstr "Alihkan Contekan"
+msgid "Markdown Help"
+msgstr ""
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Label"

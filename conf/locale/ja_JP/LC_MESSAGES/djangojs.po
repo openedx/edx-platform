@@ -77,8 +77,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-09-22 20:42+0000\n"
-"PO-Revision-Date: 2019-07-28 20:42+0000\n"
+"POT-Creation-Date: 2019-09-29 20:42+0000\n"
+"PO-Revision-Date: 2019-09-29 20:43+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Japanese (Japan) (http://www.transifex.com/open-edx/edx-platform/language/ja_JP/)\n"
 "Language: ja_JP\n"
@@ -8832,6 +8832,10 @@ msgid ""
 msgstr ""
 "\"%(hide_label)s\"以外のオプションを選択すると、明示的に非表示にされていない限り、このサブセクションで公開されているユニットを見ることができます。"
 
+#: cms/templates/js/copy-clipboard-button.underscore
+msgid "Copy Component Location"
+msgstr ""
+
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Weekly Highlight Emails"
 msgstr ""
@@ -9249,6 +9253,10 @@ msgstr "チャプター情報"
 msgid "Add a Chapter"
 msgstr "チャプターを入力"
 
+#: cms/templates/js/edit-title-button.underscore
+msgid "Edit Title"
+msgstr ""
+
 #: cms/templates/js/grading-editor.underscore
 msgid "Grading"
 msgstr "採点"
@@ -9410,10 +9418,6 @@ msgstr "クリア"
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear Value"
 msgstr "値をクリア"
-
-#: cms/templates/js/metadata-editor.underscore
-msgid "Component Location ID"
-msgstr "コンポーネントロケーションID"
 
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video-transcripts.underscore
