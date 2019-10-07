@@ -335,8 +335,9 @@ class AuthTestCase(ContentStoreTestCase):
         is turned off
         """
         response = self.client.get(reverse('login'))
-        self.assertNotIn('<a href="/signup" class="action action-signin">Don&#39;t have a Studio Account? Sign up!</a>',
-                         response.content)
+        self.assertNotContains(response,
+            '<a href="/signup" class="action action-signin">Don&#39;t have a Studio Account? Sign up!</a>'
+        )
 
 
 class ForumTestCase(CourseTestCase):
