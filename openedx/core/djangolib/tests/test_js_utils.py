@@ -14,6 +14,7 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
 import six  # pylint: disable=ungrouped-imports
 import re
 
+
 class TestJSUtils(TestCase):
     """
     Test JS utils
@@ -145,7 +146,7 @@ class TestJSUtils(TestCase):
         self.assertIn("&#34;test_tuple&#34;: [1, 2, 3]", out)
         self.assertIn("&#34;test_number&#34;: 3.5", out)
         self.assertIn("&#34;test_bool&#34;: false", out)
-        self.assertIn("&#34;test_string&#34;: &#34;test-=&amp;\\\\;&#39;\\&#34;&lt;&gt;\\u2603&#34",out)
+        self.assertIn("&#34;test_string&#34;: &#34;test-=&amp;\\\\;&#39;\\&#34;&lt;&gt;\\u2603&#34", out)
         self.assertIn(u"data-test-string='test-=&amp;\\;&#39;&#34;&lt;&gt;☃'", out)
         self.assertIn("data-test-tuple='[1, 2, 3]'", out)
         self.assertIn("data-test-number='3.5'", out)
@@ -153,13 +154,13 @@ class TestJSUtils(TestCase):
 
         expected_string_for_js_in_dict = r'''test-=\u0026\\;'\"\u003c\u003e\u2603'''
         self._validate_expectation_of_string_for_js(test_dict['test_string'], expected_string_for_js_in_dict)
-        location_of_dict_in_out = output=re.search("var test_dict.*}",out)
-        var_dict_in_out = out[output.span()[0]:output.span()[1]]
+        location_of_dict_in_out = re.search("var test_dict.*}", out)
+        var_dict_in_out = out[location_of_dict_in_out.span()[0]:location_of_dict_in_out.span()[1]]
         self.assertIn('"test_number": 3.5', var_dict_in_out)
         self.assertIn('"test_string": "test-=\\u0026\\\\;\'\\"\\u003c\\u003e\\u2603"', var_dict_in_out)
         self.assertIn('"test_tuple": [1, 2, 3]', var_dict_in_out)
         self.assertIn('"test_bool": false', var_dict_in_out)
-        
+
         expected_string_for_js = u"test\\u002D\\u003D\\u0026\\u005C\\u003B\\u0027\\u0022\\u003C\\u003E☃"
         self._validate_expectation_of_string_for_js(test_dict['test_string'], expected_string_for_js)
         self.assertIn("var test_string = '" + expected_string_for_js + "'", out)
