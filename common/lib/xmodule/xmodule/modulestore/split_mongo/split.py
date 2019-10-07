@@ -755,7 +755,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         Returns the wire version for mongo. Only used to unit tests which instrument the connection.
         """
-        return self.db_connection.mongo_wire_version
+        return self.db_connection.mongo_wire_version()
 
     def _drop_database(self, database=True, collections=True, connections=True):
         """
