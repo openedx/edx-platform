@@ -816,13 +816,15 @@ def set_id_verification_status(auth_entry, strategy, details, user=None, *args, 
 
         # If there is none, create a new approved verification for the user.
         if not verifications:
-            SSOVerification.objects.create(
+            verification = SSOVerification.objects.create(
                 user=user,
                 status="approved",
                 name=user.profile.name,
                 identity_provider_type=current_provider.full_class_name,
                 identity_provider_slug=current_provider.slug,
             )
+            # Send a signal so users who have already passed their courses receive credit
+            verification.send_approval_signal(current_provider.slug)
 
 
 def get_username(strategy, details, backend, user=None, *args, **kwargs):
