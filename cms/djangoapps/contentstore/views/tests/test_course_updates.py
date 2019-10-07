@@ -62,7 +62,7 @@ class CourseUpdateTest(CourseTestCase):
         # refetch using provided id
         refetched = self.client.get_json(first_update_url)
         self.assertHTMLEqual(
-            content, json.loads(refetched.content)['content'], "get w/ provided id"
+            content, json.loads(refetched.content.decode('utf-8'))['content'], "get w/ provided id"
         )
 
         # now put in an evil update
