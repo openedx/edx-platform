@@ -6,6 +6,7 @@ import six.moves.urllib.parse as parse  # pylint: disable=import-error
 from django.conf import settings
 from django.contrib.auth import logout
 from django.shortcuts import redirect
+from django.urls import resolve, Resolver404
 from django.utils.http import urlencode
 from django.views.generic import TemplateView
 from provider.oauth2.models import Client
@@ -98,6 +99,18 @@ class LogoutView(TemplateView):
         new_query_string = urlencode(query_params, doseq=True)
         return urlunsplit((scheme, netloc, path, new_query_string, fragment))
 
+    def _is_enterprise_target(self, url):
+        """
+        Check if url belongs to enterprise app
+
+        Args: url(str): url path
+        """
+        try:
+            resolved_view = resolve(parse.unquote_plus(parse.quote(url)))
+            return 'enterprise_uuid' in resolved_view.kwargs
+        except Resolver404:
+            return False
+
     def get_context_data(self, **kwargs):
         context = super(LogoutView, self).get_context_data(**kwargs)
 
@@ -122,9 +135,11 @@ class LogoutView(TemplateView):
             if not referrer or (referrer and not uri.startswith(referrer)):
                 logout_uris.append(self._build_logout_url(uri))
 
+        target = self.target
         context.update({
-            'target': self.target,
+            'target': target,
             'logout_uris': logout_uris,
+            'enterprise_target': self._is_enterprise_target(target),
         })
 
         return context
