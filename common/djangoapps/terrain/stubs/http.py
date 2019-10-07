@@ -18,6 +18,7 @@ from six.moves.BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer  # pylin
 from six.moves.socketserver import ThreadingMixIn  # pylint: disable=import-error
 LOGGER = getLogger(__name__)
 
+
 def require_params(method, *required_keys):
     """
     Decorator to ensure that the method has all the required parameters.
