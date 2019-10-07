@@ -457,7 +457,7 @@ class LoncapaProblem(object):
             # an earlier submission, so for now skip these entirely.
             # TODO: figure out where to get file submissions when rescoring.
             if 'filesubmission' in responder.allowed_inputfields and student_answers is None:
-                _ = self.capa_system.i18n.ugettext
+                _ = get_gettext(self.capa_system.i18n)
                 raise Exception(_(u"Cannot rescore problems with possible file submissions"))
 
             # use 'student_answers' only if it is provided, and if it might contain a file
@@ -543,7 +543,7 @@ class LoncapaProblem(object):
         Returns:
             a string with the question text
         """
-        _ = self.capa_system.i18n.ugettext
+        _ = get_gettext(self.capa_system.i18n)
         # Some questions define a prompt with this format:   >>This is a prompt<<
         prompt = self.problem_data[answer_id].get('label')
 
