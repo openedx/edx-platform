@@ -292,7 +292,7 @@ def get_library_block_olx(usage_key):
         bundle_uuid=definition_key.bundle_uuid,  # pylint: disable=no-member
         path=definition_key.olx_path,  # pylint: disable=no-member
         use_draft=DRAFT_NAME,
-    )
+    ).decode('utf-8')
     return xml_str
 
 
@@ -314,7 +314,7 @@ def set_library_block_olx(usage_key, new_olx_str):
         raise ValueError("Invalid root tag in OLX, expected {}".format(block_type))
     # Write the new XML/OLX file into the library bundle's draft
     draft = get_or_create_bundle_draft(metadata.def_key.bundle_uuid, DRAFT_NAME)
-    write_draft_file(draft.uuid, metadata.def_key.olx_path, new_olx_str)
+    write_draft_file(draft.uuid, metadata.def_key.olx_path, new_olx_str.encode('utf-8'))
     # Clear the bundle cache so everyone sees the new block immediately:
     BundleCache(metadata.def_key.bundle_uuid, draft_name=DRAFT_NAME).clear()
 
@@ -347,7 +347,7 @@ def create_library_block(library_key, block_type, definition_id):
     path = "{}/{}/definition.xml".format(block_type, definition_id)
     # Write the new XML/OLX file into the library bundle's draft
     draft = get_or_create_bundle_draft(ref.bundle_uuid, DRAFT_NAME)
-    write_draft_file(draft.uuid, path, new_definition_xml)
+    write_draft_file(draft.uuid, path, new_definition_xml.encode('utf-8'))
     # Clear the bundle cache so everyone sees the new block immediately:
     BundleCache(ref.bundle_uuid, draft_name=DRAFT_NAME).clear()
     # Now return the metadata about the new block:
