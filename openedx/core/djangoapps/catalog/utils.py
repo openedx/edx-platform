@@ -119,9 +119,14 @@ def get_programs(site=None, uuid=None, uuids=None, course=None, organization=Non
             # without programs. After this is changed, log any cache misses here.
             return []
     elif site:
-        uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [])
-        if not uuids:
-            logger.warning(u'Failed to get program UUIDs from the cache for site {}.'.format(site.domain))
+        site_config = getattr(site, 'configuration', None)
+        catalog_url = site_config.get_value('COURSE_CATALOG_API_URL') if site_config else None
+        if site_config and catalog_url:
+            uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [])
+            if not uuids:
+                logger.warning(u'Failed to get program UUIDs from the cache for site {}.'.format(site.domain))
+        else:
+            uuids = []
     elif organization:
         uuids = get_programs_for_organization(organization)
         if not uuids:

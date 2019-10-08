@@ -57,6 +57,7 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 
 UTILS_MODULE = 'openedx.core.djangoapps.catalog.utils'
 User = get_user_model()  # pylint: disable=invalid-name
@@ -83,11 +84,12 @@ class TestGetPrograms(CacheIsolationTestCase):
 
         # When called before UUIDs are cached, the function should return an
         # empty list and log a warning.
-        self.assertEqual(get_programs(site=self.site), [])
-        mock_warning.assert_called_once_with(
-            u'Failed to get program UUIDs from the cache for site {}.'.format(self.site.domain)
-        )
-        mock_warning.reset_mock()
+        with with_site_configuration_context(domain=self.site.name, configuration={'COURSE_CATALOG_API_URL': 'foo'}):
+            self.assertEqual(get_programs(site=self.site), [])
+            mock_warning.assert_called_once_with(
+                u'Failed to get program UUIDs from the cache for site {}.'.format(self.site.domain)
+            )
+            mock_warning.reset_mock()
 
         # Cache UUIDs for all 3 programs.
         cache.set(
@@ -158,21 +160,22 @@ class TestGetPrograms(CacheIsolationTestCase):
         mock_cache.get.return_value = [program['uuid'] for program in programs]
         mock_cache.get_many.side_effect = fake_get_many
 
-        actual_programs = get_programs(site=self.site)
+        with with_site_configuration_context(domain=self.site.name, configuration={'COURSE_CATALOG_API_URL': 'foo'}):
+            actual_programs = get_programs(site=self.site)
 
         # All 3 cached programs should be returned. An info message should be
         # logged about the one that was initially missing, but the code should
         # be able to stitch together all the details.
-        self.assertEqual(
-            set(program['uuid'] for program in actual_programs),
-            set(program['uuid'] for program in all_programs.values())
-        )
-        self.assertFalse(mock_warning.called)
-        mock_info.assert_called_with('Failed to get details for 1 programs. Retrying.')
+            self.assertEqual(
+                set(program['uuid'] for program in actual_programs),
+                set(program['uuid'] for program in all_programs.values())
+            )
+            self.assertFalse(mock_warning.called)
+            mock_info.assert_called_with('Failed to get details for 1 programs. Retrying.')
 
-        for program in actual_programs:
-            key = PROGRAM_CACHE_KEY_TPL.format(uuid=program['uuid'])
-            self.assertEqual(program, all_programs[key])
+            for program in actual_programs:
+                key = PROGRAM_CACHE_KEY_TPL.format(uuid=program['uuid'])
+                self.assertEqual(program, all_programs[key])
 
     def test_get_one(self, mock_warning, _mock_info):
         expected_program = ProgramFactory()
