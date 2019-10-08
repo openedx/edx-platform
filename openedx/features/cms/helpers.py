@@ -372,3 +372,31 @@ def raise_rerun_creation_exception(details_dict, error_message, exception_class=
         raise exception_class(error_message)
 
     return error_message
+
+
+def latest_course_reruns(courses):
+    """
+    This method evaluates only the latest reruns of all given courses
+    :param courses: list of courses to compute latest courses from
+    :return: list of latest course reruns (CourseSummary Objects)
+    """
+    courses_map = {course.id: course for course in courses}
+    latest_courses = list()
+    visited_courses = set()
+
+    for course in courses:
+        if course.id in visited_courses:
+            continue
+
+        course_group = get_course_group(course.id)
+
+        # Adding this course's group to set of visited courses
+        visited_courses |= set(course_group)
+
+        latest_course_id = course_group[0]
+
+        # Adding latest course id to list of latest course ids
+        if latest_course_id in courses_map:
+            latest_courses.append(courses_map[latest_course_id])
+
+    return latest_courses
