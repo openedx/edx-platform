@@ -109,12 +109,12 @@ class LogoutView(TemplateView):
         Args: url(str): url path
         """
         try:
-            log.debug('evaluating url %s for enterprise target', url)
-            log.debug('quote url %s', parse.quote(url))
-            log.debug('quote_plus url %s', parse.unquote_plus(parse.quote(url)))
+            print('evaluating url %s for enterprise target', url)
+            print('quote url %s', parse.quote(url))
+            print('quote_plus url %s', parse.unquote_plus(parse.quote(url)))
             resolved_view = resolve(parse.unquote_plus(parse.quote(url)))
-            log.debug('resolved_view %s', resolved_view)
-            log.debug('resolved_view kwargs %s', resolved_view.kwargs)
+            print('resolved_view %s', resolved_view)
+            print('resolved_view kwargs %s', resolved_view.kwargs)
             return 'enterprise_uuid' in resolved_view.kwargs
         except Resolver404:
             return False
