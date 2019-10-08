@@ -177,8 +177,9 @@ class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):
         if password_provided:
             try:
                 # Default behavior is True - send the email
-                data['send_activation_email'] = bool(strtobool(
-                    str(data.get('send_activation_email', True))))
+
+                data['send_activation_email'] == self._normalize_bool_param(
+                    data.get('send_activation_email', True))
             except ValueError:
                 errors = {
                     'user_message': '{0} is not a valid value for "send_activation_email"'.format(
@@ -227,20 +228,16 @@ class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):
             return Response(errors, status=400)
         return Response({'user_id ': user_id}, status=200)
 
-    def _normalize_send_activation_email(self, value):
+    def _normalize_bool_param(self, value):
         """
         Allow string `False`/`True` to be used by the API caller.
         """
-        if value == "False":
-            value == False
-        elif value == "True":
-            value = True
-
-        if not (value == False or value == True):
-            # Return 400 Bad Request to the API caller
-            raise SomeKindOfException("Invalid request")
-
-        return value
+        # data['send_activation_email'] = bool(strtobool(
+            # str(data.get('send_activation_email', True))))
+        value = str(value)
+        if not value.lower() in ['false', 'true']:
+            raise ValidationError('invalid value {0} for boolean type'.format(value))
+        return True if value == 'true' else False
 
 
 class CourseViewSet(TahoeAuthMixin, viewsets.ReadOnlyModelViewSet):
