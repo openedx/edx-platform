@@ -10,6 +10,7 @@ from xmodule.modulestore.django import modulestore
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from custom_settings.models import CustomSettings
 from models.settings.course_metadata import CourseMetadata
+from .constants import ERROR_MESSAGES
 
 MODULE_DATE_FORMAT = '%Y-%m-%dT%H:%M:%S%z'
 RUN_DATE_FORMAT = '%Y%m%d'
@@ -250,19 +251,19 @@ def update_course_re_run_details(course_re_run_details):
         course_detail['source_course_key'] = course_key
         source_course = modulestore().get_course(course_key)
 
-        error_message = None
+        error_messages = []
 
         if not source_course.end:
-            error_message = 'This course does not have end date'
+            error_messages.append(ERROR_MESSAGES['course_end_date_missing'])
 
         if not source_course.enrollment_start:
-            error_message = 'This course does not have enrollment start date'
+            error_messages.append(ERROR_MESSAGES['enrollment_start_date_missing'])
 
         if not source_course.enrollment_end:
-            error_message = 'This course does not have enrollment end date'
+            error_messages.append(ERROR_MESSAGES['enrollment_end_date_missing'])
 
-        if error_message:
-            raise_rerun_creation_exception(course_detail, error_message, exception_class=Exception)
+        if error_messages:
+            raise_rerun_creation_exception(course_detail, ' '.join(error_messages), exception_class=Exception)
 
         run_number = calculate_next_rerun_number(source_course.id)
 
@@ -305,6 +306,10 @@ def create_new_run_id(run_dict, course, run_number):
     :param run_number: new calculated run number
     :return: complete new run id
     """
+    if not run_dict.get('release_number'):
+        raise_rerun_creation_exception(run_dict, ERROR_MESSAGES['release_number_missing'], exception_class=Exception)
+
+
     course_end_date = calculate_date_by_delta(run_dict['start'], course.start, course.end)
 
     new_run_id = "{}_{}_{}_{}".format(

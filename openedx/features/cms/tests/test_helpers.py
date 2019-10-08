@@ -5,8 +5,6 @@ from pytz import UTC
 from dateutil.parser import parse
 from datetime import datetime
 
-from . import helpers as test_helpers
-from .factories import CourseRerunFactory
 from opaque_keys.edx.locator import CourseLocator
 from custom_settings.models import CustomSettings
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -15,6 +13,10 @@ from openedx.features.cms import helpers
 from openassessment.xblock.defaults import DEFAULT_START, DEFAULT_DUE
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.course_module import CourseFields
+
+from . import helpers as test_helpers
+from .factories import CourseRerunFactory
+from ..constants import ERROR_MESSAGES
 
 
 class CourseRerunAutomationTestCase(ModuleStoreTestCase):
@@ -583,10 +585,9 @@ class CourseRerunAutomationTestCase(ModuleStoreTestCase):
         with self.assertRaises(Exception) as error:
             helpers.update_course_re_run_details(expected_course_re_run_details)
 
-        expected_error_message = 'This course does not have end date'
+        expected_error_message = ERROR_MESSAGES['course_end_date_missing']
         self.assertEqual(expected_error_message, str(error.exception))
         self.assertEqual(expected_error_message, expected_course_re_run_details[0]['error'])
-        self.assertEqual(True, expected_course_re_run_details[0]['has_errors'])
 
     def test_update_course_re_run_details_raise_enrollment_start_date_error(self):
         CourseFactory.create(
@@ -606,12 +607,11 @@ class CourseRerunAutomationTestCase(ModuleStoreTestCase):
         with self.assertRaises(Exception) as error:
             helpers.update_course_re_run_details(expected_course_re_run_details)
 
-        expected_error_message = 'This course does not have enrollment start date'
+        expected_error_message = ERROR_MESSAGES['enrollment_start_date_missing']
         self.assertEqual(expected_error_message, str(error.exception))
         self.assertEqual(expected_error_message, expected_course_re_run_details[0]['error'])
-        self.assertEqual(True, expected_course_re_run_details[0]['has_errors'])
 
-    def test_update_course_re_run_details_raise_enrollment_end_date_error(self):
+    def test_update_course_re_run_details_raise_multiple_date_errors(self):
 
         test_helpers.create_course(self.store, self.user)
 
@@ -625,10 +625,16 @@ class CourseRerunAutomationTestCase(ModuleStoreTestCase):
         with self.assertRaises(Exception) as error:
             helpers.update_course_re_run_details(expected_course_re_run_details)
 
-        expected_error_message = 'This course does not have enrollment end date'
+        expected_error_message = ' '.join(
+            [
+                ERROR_MESSAGES['course_end_date_missing'],
+                ERROR_MESSAGES['enrollment_start_date_missing'],
+                ERROR_MESSAGES['enrollment_end_date_missing']
+            ]
+        )
+
         self.assertEqual(expected_error_message, str(error.exception))
         self.assertEqual(expected_error_message, expected_course_re_run_details[0]['error'])
-        self.assertEqual(True, expected_course_re_run_details[0]['has_errors'])
 
     def test_calculate_next_rerun_number_for_valid_run(self):
         course = CourseFactory.create(
@@ -686,6 +692,11 @@ class CourseRerunAutomationTestCase(ModuleStoreTestCase):
         new_run_id = helpers.create_new_run_id(run_dict, course, run_number)
         self.assertEqual(new_run_id, "9_1.33_20191001_20191220")
 
+        run_dict['release_number'] = ""
+
+        with self.assertRaises(Exception) as error:
+            helpers.create_new_run_id(run_dict, course, run_number)
+
     def test_get_course_group_parent_course_without_reruns(self):
         course = CourseFactory.create(
             org='org',
@@ -724,7 +735,7 @@ class CourseRerunAutomationTestCase(ModuleStoreTestCase):
     def test_raise_rerun_creation_exception(self):
         details_dict = {'dummy': 'value'}
         error_message = "Testing error message"
-        expected_details_dict = {'dummy': 'value', 'error': error_message, 'has_errors': True}
+        expected_details_dict = {'dummy': 'value', 'error': error_message}
 
         with self.assertRaises(Exception) as error:
             helpers.raise_rerun_creation_exception(details_dict, error_message, Exception)
@@ -735,7 +746,7 @@ class CourseRerunAutomationTestCase(ModuleStoreTestCase):
     def test_raise_rerun_creation_exception_without_exception_class(self):
         details_dict = {'dummy': 'value'}
         error_message = "Testing error message"
-        expected_details_dict = {'dummy': 'value', 'error': error_message, 'has_errors': True}
+        expected_details_dict = {'dummy': 'value', 'error': error_message}
 
         returned_error_message = helpers.raise_rerun_creation_exception(details_dict, error_message)
 
