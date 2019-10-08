@@ -5,6 +5,7 @@ Tests for sequence module.
 from __future__ import absolute_import
 
 import json
+import re
 from datetime import timedelta
 
 import ddt
@@ -194,10 +195,15 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
                 self.sequence_4_1,
                 extra_context=dict(specific_masquerade=True),
             )
+
+            html = re.sub("\s'\\n\s+\'", ' ', html)
+
+            banner_text = "'Because the due date has passed, this assignment is hidden from the learner.'"
+            banner_text = re.sub("^'", "u'", banner_text) if six.PY2 else banner_text
+
             self.assertIn("seq_module.html", html)
             self.assertIn(
-                "'banner_text': u'Because the due date has passed, "
-                "this assignment is hidden from the learner.'",
+                "'banner_text': {}".format(banner_text),
                 html
             )
 
