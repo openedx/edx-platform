@@ -3,7 +3,6 @@ from __future__ import absolute_import, print_function
 
 import textwrap
 import unittest
-import six
 
 from capa.responsetypes import LoncapaProblemError
 from capa.tests.helpers import new_loncapa_problem, test_capa_system
@@ -59,10 +58,7 @@ class CapaShuffleTest(unittest.TestCase):
         response = list(problem.responders.values())[0]
         self.assertFalse(response.has_mask())
         self.assertTrue(response.has_shuffle())
-        if six.PY2:
-            self.assertEqual(response.unmask_order(), ['choice_0', 'choice_aaa', 'choice_1', 'choice_ddd'])
-        else:
-            self.assertEqual(response.unmask_order(), ['choice_1', 'choice_aaa', 'choice_0', 'choice_ddd'])
+        self.assertEqual(response.unmask_order(), ['choice_0', 'choice_aaa', 'choice_1', 'choice_ddd'])
 
     def test_shuffle_different_seed(self):
         xml_str = textwrap.dedent("""

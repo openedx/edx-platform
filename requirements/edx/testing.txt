@@ -270,6 +270,7 @@ pytz==2019.3
 pyuca==1.1
 pyyaml==5.1.2
 radon==4.0.0
+random2==1.0.1
 recommender-xblock==1.4.4
 redis==2.10.6
 requests-oauthlib==1.1.0
