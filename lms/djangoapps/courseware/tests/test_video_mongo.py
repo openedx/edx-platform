@@ -5,7 +5,6 @@ Video xmodule tests in mongo.
 
 from __future__ import absolute_import
 
-import ast
 import io
 import json
 import shutil
@@ -39,6 +38,7 @@ from mock import MagicMock, Mock, patch
 from path import Path as path
 from waffle.testutils import override_flag
 
+from lms.djangoapps.courseware.tests.helpers import get_context_dict_from_string
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE, waffle_flags
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
@@ -134,8 +134,10 @@ class TestVideoYouTube(TestVideo):  # pylint: disable=test-inherits-tests
         }
 
         self.assertEqual(
-            context,
-            self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context),
+            get_context_dict_from_string(context),
+            get_context_dict_from_string(
+                self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
+            )
         )
 
 
@@ -214,10 +216,15 @@ class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
             'poster': 'null',
         }
 
-        self.assertEqual(
-            context,
-            self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context),
+        expected_result = get_context_dict_from_string(
+            self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
         )
+        self.assertEqual(
+            get_context_dict_from_string(context),
+            expected_result
+        )
+        self.assertEqual(expected_result['download_video_link'], 'example.mp4')
+        self.assertEqual(expected_result['display_name'], 'A Name')
 
 
 @ddt.ddt
@@ -383,8 +390,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             })
 
             self.assertEqual(
-                self.get_context_dict_from_string(context),
-                self.get_context_dict_from_string(
+                get_context_dict_from_string(context),
+                get_context_dict_from_string(
                     self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
                 )
             )
@@ -493,8 +500,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             })
 
             self.assertEqual(
-                self.get_context_dict_from_string(context),
-                self.get_context_dict_from_string(
+                get_context_dict_from_string(context),
+                get_context_dict_from_string(
                     self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
                 )
             )
@@ -634,22 +641,11 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         })
 
         self.assertEqual(
-            self.get_context_dict_from_string(context),
-            self.get_context_dict_from_string(
+            get_context_dict_from_string(context),
+            get_context_dict_from_string(
                 self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
             )
         )
-
-    def get_context_dict_from_string(self, data):
-        """
-        Retrieve dictionary from string.
-        """
-        # Replace tuple and un-necessary info from inside string and get the dictionary.
-        cleaned_data = ast.literal_eval(data.split('((\'video.html\',')[1].replace("),\n {})", '').strip())  # pylint: disable=unicode-format-string
-        cleaned_data['metadata'] = OrderedDict(
-            sorted(json.loads(cleaned_data['metadata']).items(), key=lambda t: t[0])
-        )
-        return cleaned_data
 
     def test_get_html_with_existing_edx_video_id(self):
         """
@@ -676,8 +672,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         # expected_context, a dict to assert with context
         context, expected_context = self.helper_get_html_with_edx_video_id(data)
         self.assertEqual(
-            self.get_context_dict_from_string(context),
-            self.get_context_dict_from_string(
+            get_context_dict_from_string(context),
+            get_context_dict_from_string(
                 self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
             )
         )
@@ -710,8 +706,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         context, expected_context = self.helper_get_html_with_edx_video_id(data)
 
         self.assertEqual(
-            self.get_context_dict_from_string(context),
-            self.get_context_dict_from_string(
+            get_context_dict_from_string(context),
+            get_context_dict_from_string(
                 self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
             )
         )
@@ -921,8 +917,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             })
 
             self.assertEqual(
-                self.get_context_dict_from_string(context),
-                self.get_context_dict_from_string(
+                get_context_dict_from_string(context),
+                get_context_dict_from_string(
                     self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
                 )
             )
@@ -1026,8 +1022,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             })
 
             self.assertEqual(
-                self.get_context_dict_from_string(context),
-                self.get_context_dict_from_string(
+                get_context_dict_from_string(context),
+                get_context_dict_from_string(
                     self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
                 )
             )
@@ -1083,7 +1079,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         self.assertIn('"streams": "1.00:https://yt.com/?v=v0TFmdO4ZP0"', context)
         self.assertEqual(
             sorted(["https://webm.com/dw.webm", "https://mp4.com/dm.mp4", "https://hls.com/hls.m3u8"]),
-            sorted(self.get_context_dict_from_string(context)['metadata']['sources'])
+            sorted(get_context_dict_from_string(context)['metadata']['sources'])
         )
 
     def test_get_html_hls_no_video_id(self):
@@ -2266,7 +2262,9 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
         }
 
         expected_content = self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
-        self.assertEqual(content, expected_content)
+        self.assertEqual(
+            get_context_dict_from_string(content), get_context_dict_from_string(expected_content)
+        )
 
 
 @ddt.ddt
@@ -2358,7 +2356,7 @@ class TestAutoAdvanceVideo(TestVideo):
         with override_settings(FEATURES=self.FEATURES):
             expected_content = self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
 
-        self.assertEqual(content, expected_content)
+        self.assertEqual(get_context_dict_from_string(content), get_context_dict_from_string(expected_content))
 
     def change_course_setting_autoadvance(self, new_value):
         """
