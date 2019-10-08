@@ -21,6 +21,7 @@ from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.django import modulestore
 from . import helpers
+from .constants import ERROR_MESSAGES
 
 logger = getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -65,11 +66,12 @@ def create_multiple_reruns(course_re_run_details, course_ids, user):
             try:
                 re_run['start'] = datetime.strptime(start, '%m/%d/%Y-%H:%M').replace(tzinfo=utc)
             except ValueError:
-                helpers.raise_rerun_creation_exception(re_run, 'Start date/time format is incorrect',
+                helpers.raise_rerun_creation_exception(re_run, ERROR_MESSAGES['start_date_format_mismatch'],
                                                        exception_class=ValueError)
 
         if course['source_course_key'] not in course_ids:
-            helpers.raise_rerun_creation_exception(course, 'Course key not found', exception_class=ValueError)
+            helpers.raise_rerun_creation_exception(course, ERROR_MESSAGES['course_key_not_found'],
+                                                   exception_class=ValueError)
 
     course_re_run_details = helpers.update_course_re_run_details(course_re_run_details)
 
@@ -86,7 +88,7 @@ def create_multiple_reruns(course_re_run_details, course_ids, user):
 
             # verify user has access to the original course
             if not has_studio_write_access(user, course['source_course_key']):
-                helpers.raise_rerun_creation_exception(course, 'User does not have access to the parent course',
+                helpers.raise_rerun_creation_exception(course, ERROR_MESSAGES['unauthorized_user'],
                                                        exception_class=PermissionDenied)
 
             # create destination course key
@@ -96,8 +98,7 @@ def create_multiple_reruns(course_re_run_details, course_ids, user):
 
             # verify org course and run don't already exist
             if store.has_course(destination_course_key, ignore_case=True):
-                error_message = 'There is already a course defined with the same ID computed for this rerun'
-                helpers.raise_rerun_creation_exception(rerun, error_message)
+                helpers.raise_rerun_creation_exception(rerun, ERROR_MESSAGES['duplicate_course_id'])
                 raise DuplicateCourseError(course['source_course_key'], destination_course_key)
 
             # Prepare a rerun creation arguments list
