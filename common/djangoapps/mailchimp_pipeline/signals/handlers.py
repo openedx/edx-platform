@@ -141,6 +141,15 @@ def send_user_info_to_mailchimp(sender, user, created, kwargs):
     update_mailchimp(user.email, user_json)
 
 
+def update_user_email_in_mailchimp(old_email, new_email):
+
+    user_json = {
+        "email_address": new_email,
+    }
+
+    update_mailchimp(old_email, user_json)
+
+
 @task(routing_key=settings.HIGH_PRIORITY_QUEUE)
 def task_send_account_activation_email(data):
 
