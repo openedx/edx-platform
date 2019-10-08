@@ -9,9 +9,15 @@ from difflib import SequenceMatcher
 from django.conf import settings
 from django.core import serializers
 
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from lms.djangoapps.onboarding.models import Organization, OrganizationMetricUpdatePrompt, PartnerNetwork
+from common.lib.mandrill_client.client import MandrillClient
+from common.djangoapps.mailchimp_pipeline.signals.handlers import update_user_email_in_mailchimp
+from common.djangoapps.nodebb.tasks import task_update_user_profile_on_nodebb
 from oef.models import OrganizationOefUpdatePrompt
+from lms.djangoapps.onboarding.models import (
+    Organization, OrganizationMetricUpdatePrompt, PartnerNetwork, OrganizationAdminHashKeys
+)
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.features.data_extract.models import CourseDataExtraction
 
 
 utc = pytz.UTC
@@ -8085,3 +8091,46 @@ def get_user_anonymous_id(user, course_id):
         raise AnonymousUserId.DoesNotExist('Anonymous Id doesn\'t exists for %s' % user)
     except AnonymousUserId.MultipleObjectsReturned:
         raise AnonymousUserId.MultipleObjectsReturned('Multiple Anonymous Ids for %s' % user)
+
+
+def update_user_email(user, old_email, new_email):
+    """
+    This method updates email in NodeBB, Mailchimp, platform database. In the end emails are send
+    to user's new and old email to let him know the status.
+    :param user: user whose email is changed
+    :param old_email: user's previous email
+    :param new_email: user's new email
+    :return: None
+    """
+
+    from student.models import CourseEnrollmentAllowed, ManualEnrollmentAudit, UserProfile
+
+    # update email in mailchimp
+    update_user_email_in_mailchimp(old_email, new_email)
+
+    # update email in NodeBB
+    data_to_sync = {
+        "email": new_email
+    }
+    task_update_user_profile_on_nodebb.delay(
+        username=user.username, profile_data=data_to_sync)
+
+    # update email manually in platform database, where required
+    ManualEnrollmentAudit.objects.filter(enrolled_email=old_email).update(enrolled_email=new_email)
+    CourseEnrollmentAllowed.objects.filter(email=old_email).update(email=new_email)
+    OrganizationAdminHashKeys.objects.filter(suggested_admin_email=old_email).update(
+        suggested_admin_email=new_email)
+    CourseDataExtraction.objects.filter(emails=old_email).update(emails=new_email)
+    Organization.objects.filter(unclaimed_org_admin_email=old_email).update(
+        unclaimed_org_admin_email=new_email)
+    Organization.objects.filter(alternate_admin_email=old_email).update(
+        alternate_admin_email=new_email)
+
+    # send email to new and old account
+    context = {
+        'old_email': old_email,
+        'new_email': new_email,
+        'platform_name': configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME)
+    }
+    MandrillClient().send_mail(MandrillClient.CHANGE_USER_EMAIL_ALERT, old_email, context)
+    MandrillClient().send_mail(MandrillClient.CHANGE_USER_EMAIL_ALERT, new_email, context)
