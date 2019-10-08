@@ -885,7 +885,7 @@ class TopicDetailView(APIView):
 
         topics = [t for t in course_module.teams_topics if t['id'] == topic_id]
 
-        if len(topics) == 0:
+        if not topics:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         serializer = TopicSerializer(topics[0], context={'course_id': course_id})
