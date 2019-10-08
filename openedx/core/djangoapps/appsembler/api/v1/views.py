@@ -228,14 +228,14 @@ class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):
             return Response(errors, status=400)
         return Response({'user_id ': user_id}, status=200)
 
-    def _normalize_bool_param(self, value):
+    def _normalize_bool_param(self, unnormalized):
         """
         Allow strings of any case (upper/lower) to be used by the API caller.
         For example "False", "false", "TRUE"
         """
-        value = str(value)
-        if not value.lower() in ['false', 'true']:
-            raise ValidationError('invalid value {0} for boolean type'.format(value))
+        normalized = str(unnormalized).lower()
+        if normalized not in ['false', 'true']:
+            raise ValidationError('invalid value {unnormalized} for boolean type'.format(unnormalized))
         return True if value == 'true' else False
 
 
