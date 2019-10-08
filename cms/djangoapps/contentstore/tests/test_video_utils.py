@@ -319,7 +319,7 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
             )
         ),
         (
-            'dummy-content',
+            b'dummy-content',
             None,
             u'This image file type is not supported. Supported file types are {supported_file_formats}.'.format(
                 supported_file_formats=list(settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS.keys())
