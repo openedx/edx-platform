@@ -230,10 +230,9 @@ class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):
 
     def _normalize_bool_param(self, value):
         """
-        Allow string `False`/`True` to be used by the API caller.
+        Allow strings of any case (upper/lower) to be used by the API caller.
+        For example "False", "false", "TRUE"
         """
-        # data['send_activation_email'] = bool(strtobool(
-            # str(data.get('send_activation_email', True))))
         value = str(value)
         if not value.lower() in ['false', 'true']:
             raise ValidationError('invalid value {0} for boolean type'.format(value))
