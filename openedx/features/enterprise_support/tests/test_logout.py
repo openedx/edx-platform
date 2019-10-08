@@ -9,6 +9,7 @@ from django.urls import reverse
 
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
+from openedx.features.enterprise_support.api import enterprise_enabled
 from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 
@@ -32,7 +33,7 @@ class EnterpriseLogoutTests(EnterpriseServiceMockMixin, CacheIsolationTestCase):
             logout_path=reverse('logout'),
             redirect_url=redirect_url
         )
-
+        self.assertTrue(enterprise_enabled())
         response = self.client.get(url, HTTP_HOST='testserver')
         expected = {
             'enterprise_target': enterprise_target,
