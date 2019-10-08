@@ -1,9 +1,11 @@
 import collections
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 
 from courseware.tabs import get_course_tab_list
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from nodebb.models import DiscussionCommunity, TeamGroupChat
 from nodebb.tasks import task_update_onboarding_surveys_status, task_archive_community_on_nodebb
 
@@ -71,6 +73,28 @@ def get_community_id(course_id):
     discussion_community = DiscussionCommunity.objects.filter(course_id=course_id).first()
     if discussion_community:
         return discussion_community.community_url.split('/')[0]
+
+
+def get_course_id_by_community_id(community_id):
+    """
+        Get `course_id` based on the given `community_id`
+        using the `community_url` field from the model
+
+        Parameters
+        ----------
+        community_id : str
+                       community ID of a discussion group
+
+        Returns
+        -------
+        CourseKeyField
+            CourseKey Model object that specifies a course or is empty
+    """
+    try:
+        discussion_community = DiscussionCommunity.objects.get(community_url__startswith=(community_id + '/'))
+        return discussion_community.course_id
+    except ObjectDoesNotExist:
+        return CourseKeyField.Empty
 
 
 def get_room_id(user_info):
