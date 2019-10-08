@@ -177,7 +177,26 @@ class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):
         if password_provided:
             try:
                 # Default behavior is True - send the email
-                data['send_activation_email'] = bool(strtobool(
+    def _normalize_send_activation_email(self, value):
+        """
+        Allow string `False`/`True` to be used by the API caller.
+        """
+        if value == "False":
+            value == False
+        elif value == "True":
+            value = True
+
+        if not (value == False or value == True):
+            # Return 400 Bad Request to the API caller
+            raise SomeKindOfException("Invalid request")
+
+        return value
+
+    def create(self, request):
+        # ...
+        data['send_activation_email'] == _normalize_send_activation_email(data['send_activation_email'])
+        # ...
+
                     str(data.get('send_activation_email', True))))
             except ValueError:
                 errors = {
