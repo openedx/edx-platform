@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
--e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
+-e git+https://github.com/edx/acid-block.git@98aecba94ecbfa934e2d00262741c0ea9f557fc9#egg=acid-xblock
 -e common/lib/capa
 -e git+https://github.com/edx/codejail.git@ed3d36c27913254a23273da95ad627a1bbbffa44#egg=codejail
 -e git+https://github.com/edx/django-wiki.git@v0.0.23#egg=django-wiki
@@ -251,7 +251,7 @@ web-fragments==0.3.0
 webencodings==0.5.1       # via html5lib
 webob==1.8.5              # via xblock
 wrapt==1.10.5
-git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.4#egg=xblock-drag-and-drop-v2==2.2.4
+git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.6#egg=xblock-drag-and-drop-v2==2.2.6
 git+https://github.com/open-craft/xblock-poll@add89e14558c30f3c8dc7431e5cd6536fff6d941#egg=xblock-poll==1.5.1
 xblock-utils==1.2.2
 xblock==1.2.6
