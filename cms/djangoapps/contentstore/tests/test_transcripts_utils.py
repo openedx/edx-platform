@@ -880,7 +880,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
             language
         )
 
-        self.assertEqual(content, self.subs[language])
+        self.assertEqual(content.decode('utf-8'), self.subs[language])
         self.assertEqual(file_name, expected_filename)
         self.assertEqual(mimetype, self.srt_mime_type)
 
