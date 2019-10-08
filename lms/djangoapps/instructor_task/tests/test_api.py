@@ -123,7 +123,7 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
             submit_rescore_problem_for_all_students(request, problem_url)
 
     def _test_submit_with_long_url(self, task_function, student=None):
-        problem_url_name = 'x' * 255
+        problem_url_name = 'x' * 512
         self.define_option_problem(problem_url_name)
         location = InstructorTaskModuleTestCase.problem_location(problem_url_name)
         with self.assertRaises(ValueError):
