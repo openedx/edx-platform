@@ -105,8 +105,8 @@ class CourseTeam(models.Model):
     class Meta(object):
         app_label = "teams"
 
-    team_id = models.CharField(max_length=255, unique=True)
-    discussion_topic_id = models.CharField(max_length=255, unique=True)
+    team_id = models.SlugField(max_length=255, unique=True)
+    discussion_topic_id = models.UUIDField(unique=True)
     name = models.CharField(max_length=255, db_index=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
     topic_id = models.CharField(max_length=255, db_index=True, blank=True)
@@ -143,9 +143,9 @@ class CourseTeam(models.Model):
               team uses, as ISO 639-1 code.
 
         """
-        unique_id = uuid4().hex
-        team_id = slugify(name)[0:20] + '-' + unique_id
-        discussion_topic_id = unique_id
+        discussion_topic_id = uuid4()
+        slugified_name = slugify(name)[0:20]
+        team_id = "{}-{}".format(slugified_name, discussion_topic_id)
 
         course_team = cls(
             team_id=team_id,

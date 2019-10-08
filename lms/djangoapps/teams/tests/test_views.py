@@ -5,6 +5,7 @@ from __future__ import absolute_import
 import json
 import unittest
 from datetime import datetime
+from uuid import UUID
 
 import ddt
 import pytz
@@ -908,7 +909,10 @@ class TestDetailTeamAPI(TeamAPITestCase):
         team = self.get_team_detail(self.solar_team.team_id, status, user=user)
         if status == 200:
             self.assertEqual(team['description'], self.solar_team.description)
-            self.assertEqual(team['discussion_topic_id'], self.solar_team.discussion_topic_id)
+            self.assertEqual(
+                UUID(team['discussion_topic_id']),
+                self.solar_team.discussion_topic_id,
+            )
             self.assertEqual(parser.parse(team['last_activity_at']), LAST_ACTIVITY_AT)
 
     def test_does_not_exist(self):

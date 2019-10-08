@@ -24,7 +24,7 @@ class CourseTeamFactory(DjangoModelFactory):
         django_get_or_create = ('team_id',)
 
     team_id = factory.Sequence('team-{0}'.format)
-    discussion_topic_id = factory.LazyAttribute(lambda a: uuid4().hex)
+    discussion_topic_id = factory.LazyAttribute(lambda _: uuid4())
     name = factory.Sequence(u"Awesome Team {0}".format)
     description = "A simple description"
     last_activity_at = LAST_ACTIVITY_AT

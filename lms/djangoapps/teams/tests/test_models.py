@@ -5,6 +5,7 @@ from __future__ import absolute_import
 import itertools
 from contextlib import contextmanager
 from datetime import datetime
+from uuid import UUID
 
 import ddt
 import pytz
@@ -131,7 +132,7 @@ class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
         'comment_endorsed': comment_endorsed,
     }
 
-    DISCUSSION_TOPIC_ID = 'test_topic'
+    DISCUSSION_TOPIC_ID = UUID('fe63f65a-1e31-4851-92f4-38e9ca7f2478')
 
     def setUp(self):
         """Create a user with a team to test signals."""
