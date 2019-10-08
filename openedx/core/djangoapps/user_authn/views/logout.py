@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 
 import edx_oauth2_provider
+import logging
 import six.moves.urllib.parse as parse  # pylint: disable=import-error
 from django.conf import settings
 from django.contrib.auth import logout
@@ -14,6 +15,8 @@ from six.moves.urllib.parse import parse_qs, urlsplit, urlunsplit  # pylint: dis
 
 from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
+
+log = logging.getLogger(__name__)
 
 
 class LogoutView(TemplateView):
@@ -106,7 +109,12 @@ class LogoutView(TemplateView):
         Args: url(str): url path
         """
         try:
+            log.debug('evaluating url %s for enterprise target', url)
+            log.debug('quote url %s', parse.quote(url))
+            log.debug('quote_plus url %s', parse.unquote_plus(parse.quote(url)))
             resolved_view = resolve(parse.unquote_plus(parse.quote(url)))
+            log.debug('resolved_view %s', resolved_view)
+            log.debug('resolved_view kwargs %s', resolved_view.kwargs)
             return 'enterprise_uuid' in resolved_view.kwargs
         except Resolver404:
             return False
