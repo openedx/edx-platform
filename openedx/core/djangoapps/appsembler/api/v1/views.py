@@ -227,6 +227,21 @@ class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):
             return Response(errors, status=400)
         return Response({'user_id ': user_id}, status=200)
 
+    def _normalize_send_activation_email(self, value):
+        """
+        Allow string `False`/`True` to be used by the API caller.
+        """
+        if value == "False":
+            value == False
+        elif value == "True":
+            value = True
+
+        if not (value == False or value == True):
+            # Return 400 Bad Request to the API caller
+            raise SomeKindOfException("Invalid request")
+
+        return value
+
 
 class CourseViewSet(TahoeAuthMixin, viewsets.ReadOnlyModelViewSet):
     """Provides course information
