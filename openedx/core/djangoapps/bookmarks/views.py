@@ -26,7 +26,7 @@ from rest_framework_oauth.authentication import OAuth2Authentication
 from openedx.core.djangoapps.bookmarks.api import BookmarksLimitReachedError
 from openedx.core.lib.api.permissions import IsUserInUrl
 from openedx.core.lib.url_utils import unquote_slashes
-from openedx.core.openapi import document_api_view, openapi
+from openedx.core import apidocs
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from . import DEFAULT_FIELDS, OPTIONAL_FIELDS, api
@@ -104,21 +104,17 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = BookmarkSerializer
 
-    @document_api_view(
-        manual_parameters=[
-            openapi.Parameter(
+    @apidocs.schema(
+        parameters=[
+            apidocs.string_parameter(
                 'course_id',
-                openapi.IN_QUERY,
-                type=openapi.TYPE_STRING,
+                apidocs.ParameterLocation.QUERY,
                 description="The id of the course to limit the list",
             ),
-            openapi.Parameter(
+            apidocs.string_parameter(
                 'fields',
-                openapi.IN_QUERY,
-                type=openapi.TYPE_STRING,
-                description="""
-                    The fields to return: display_name, path.
-                    """,
+                apidocs.ParameterLocation.QUERY,
+                description="The fields to return: display_name, path.",
             ),
         ],
     )
@@ -204,7 +200,7 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
 
         return page
 
-    @document_api_view
+    @apidocs.schema()
     def post(self, request, *unused_args, **unused_kwargs):
         """Create a new bookmark for a user.
 
@@ -313,17 +309,13 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
             log.error(error_message)
             return self.error_response(error_message, error_status=status.HTTP_404_NOT_FOUND)
 
-    @document_api_view(
-        operation_summary="Get a specific bookmark for a user.",
-        operation_description=u"""
-            # Example Requests
-
-            GET /api/bookmarks/v1/bookmarks/{username},{usage_id}/?fields=display_name,path
-
-            """,
-    )
+    @apidocs.schema()
     def get(self, request, username=None, usage_id=None):
         """
+        Get a specific bookmark for a user.
+
+        # Example Requests
+
         GET /api/bookmarks/v1/bookmarks/{username},{usage_id}?fields=display_name,path
         """
         usage_key_or_response = self.get_usage_key_or_error_response(usage_id=usage_id)
