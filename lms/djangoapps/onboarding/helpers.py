@@ -10,8 +10,8 @@ from django.conf import settings
 from django.core import serializers
 
 from common.lib.mandrill_client.client import MandrillClient
-from common.djangoapps.mailchimp_pipeline.signals.handlers import update_user_email_in_mailchimp
-from common.djangoapps.nodebb.tasks import task_update_user_profile_on_nodebb
+from mailchimp_pipeline.signals.handlers import update_user_email_in_mailchimp
+from nodebb.tasks import task_update_user_profile_on_nodebb
 from oef.models import OrganizationOefUpdatePrompt
 from lms.djangoapps.onboarding.models import (
     Organization, OrganizationMetricUpdatePrompt, PartnerNetwork, OrganizationAdminHashKeys
