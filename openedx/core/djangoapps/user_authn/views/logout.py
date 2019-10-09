@@ -109,7 +109,11 @@ class LogoutView(TemplateView):
         Args: url(str): url path
         """
         try:
+            log.info('_is_enterprise_target 1: %s', url)
+            log.info('_is_enterprise_target 2: %s', parse.quote(url))
+            log.info('_is_enterprise_target 3: %s', parse.unquote_plus(parse.quote(url)))
             resolved_view = resolve(parse.unquote_plus(parse.quote(url)))
+            log.info('_is_enterprise_target 4: %s', resolved_view.kwargs)
             return 'enterprise_uuid' in resolved_view.kwargs
         except Resolver404:
             return False

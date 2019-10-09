@@ -41,7 +41,6 @@ class EnterpriseLogoutTests(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         self.mock_enterprise_customer_from_api.return_value = self.enterprise_customer
         self.addCleanup(patcher.stop)
 
-
     @ddt.data(
         ('https%3A%2F%2Ftest.edx.org%2Fcourses', False),
         ('/courses/course-v1:ARTS+D1+2018_T/course/', False),
