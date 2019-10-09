@@ -67,7 +67,7 @@ class Command(BaseCommand):
 
     def _get_results(self, filename):
         """Load results from file"""
-        with open(filename) as f:
+        with open(filename, 'rb') as f:  # pylint: disable=open-builtin
             results = f.read()
             os.remove(filename)
         return results

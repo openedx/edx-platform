@@ -295,8 +295,8 @@ class CertificatesListHandlerTestCase(
 
         # in html response
         result = self.client.get_html(self._url())
-        self.assertIn('Test certificate', result.content)
-        self.assertIn('Test description', result.content)
+        self.assertContains(result, 'Test certificate')
+        self.assertContains(result, 'Test description')
 
         # in JSON response
         response = self.client.get_json(self._url())
@@ -320,7 +320,7 @@ class CertificatesListHandlerTestCase(
 
         # in html response
         result = self.client.get_html(self._url())
-        self.assertNotIn('Test certificate', result.content)
+        self.assertNotContains(result, 'Test certificate')
 
     def test_unsupported_http_accept_header(self):
         """
