@@ -125,7 +125,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==2.0.0
 edx-drf-extensions==2.4.1
-edx-enterprise==2.0.1
+edx-enterprise==2.0.2
 edx-i18n-tools==0.4.8
 edx-lint==1.3.0
 edx-milestones==0.2.3
@@ -189,7 +189,7 @@ lazy==1.1
 lepl==5.1.3
 libsass==0.10.0
 loremipsum==1.0.5
-git+https://github.com/edx/xblock-lti-consumer.git@v1.1.8#egg=lti_consumer-xblock==1.1.8
+git+https://github.com/edx/xblock-lti-consumer.git@v1.2.1#egg=lti_consumer-xblock==1.2.1
 lxml==3.8.0
 mailsnake==1.6.4
 mako==1.0.2
