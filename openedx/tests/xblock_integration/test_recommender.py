@@ -183,7 +183,7 @@ class TestRecommender(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         if xblock_name is None:
             xblock_name = TestRecommender.XBLOCK_NAMES[0]
-        resp = json.loads(self.call_event(handler, resource, xblock_name).content)
+        resp = json.loads(self.call_event(handler, resource, xblock_name).content.decode('utf-8'))
         self.assertEqual(resp[resp_key], resp_val)
         self.assert_request_status_code(200, self.course_url)
 
@@ -376,7 +376,7 @@ class TestRecommenderWithResources(TestRecommenderResourceBase):
         self.call_event('flag_resource', resource)
         # Test
         resource['reason'] = 'reason 1'
-        resp = json.loads(self.call_event('flag_resource', resource).content)
+        resp = json.loads(self.call_event('flag_resource', resource).content.decode('utf-8'))
         self.assertEqual(resp['oldReason'], 'reason 0')
         self.assertEqual(resp['reason'], 'reason 1')
         self.assert_request_status_code(200, self.course_url)
@@ -399,7 +399,7 @@ class TestRecommenderWithResources(TestRecommenderResourceBase):
         self.logout()
         self.enroll_student(self.STUDENTS[0]['email'], self.STUDENTS[0]['password'])
         # Test
-        resp = json.loads(self.call_event('flag_resource', resource).content)
+        resp = json.loads(self.call_event('flag_resource', resource).content.decode('utf-8'))
         # The second user won't see the reason provided by the first user
         self.assertNotIn('oldReason', resp)
         self.assertEqual(resp['reason'], 'reason 0')
@@ -412,7 +412,7 @@ class TestRecommenderWithResources(TestRecommenderResourceBase):
         self.call_event('remove_resource', {"id": self.resource_id, 'reason': ''})
         self.call_event('endorse_resource', {"id": self.resource_id_second, 'reason': ''})
         # Test
-        resp = json.loads(self.call_event('export_resources', {}).content)
+        resp = json.loads(self.call_event('export_resources', {}).content.decode('utf-8'))
 
         self.assertIn(self.resource_id_second, resp['export']['recommendations'])
         self.assertNotIn(self.resource_id, resp['export']['recommendations'])
