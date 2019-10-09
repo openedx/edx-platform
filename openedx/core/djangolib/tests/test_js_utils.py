@@ -4,6 +4,7 @@
 Tests for js_utils.py
 """
 from __future__ import absolute_import
+import re
 import six.moves.html_parser  # pylint: disable=import-error
 import json
 from unittest import TestCase
@@ -12,7 +13,6 @@ from mako.template import Template
 
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 import six  # pylint: disable=ungrouped-imports
-import re
 
 
 class TestJSUtils(TestCase):
@@ -141,7 +141,6 @@ class TestJSUtils(TestCase):
             r"&#34;test_tuple&#34;: [1, 2, 3], &#34;test_string&#34;: "
             r"&#34;test-=&amp;\\;&#39;\&#34;&lt;&gt;\u2603&#34;}"
         )
-        expected_attr_json_for_html = "data-test-dict='" + expected_json_for_html + "'"
         self._validate_expectation_of_json_for_html(test_dict, expected_json_for_html)
         self.assertIn("&#34;test_tuple&#34;: [1, 2, 3]", out)
         self.assertIn("&#34;test_number&#34;: 3.5", out)
