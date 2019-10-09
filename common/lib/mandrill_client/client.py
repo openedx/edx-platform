@@ -29,6 +29,7 @@ class MandrillClient(object):
     ON_DEMAND_SCHEDULE_EMAIL_TEMPLATE = 'on-demand-course-schedule'
     ON_DEMAND_WEEKLY_MODULE_COMPLETE_TEMPLATE = 'module-completion-weekly-email'
     ON_DEMAND_WEEKLY_MODULE_SKIP_TEMPLATE = 'on-demand-module-skip'
+    ON_DEMAND_REMINDER_EMAIL_TEMPLATE = 'on-demand-reminder-email'
     CHANGE_USER_EMAIL_ALERT = 'change-user-email-alert'
 
     def __init__(self):
