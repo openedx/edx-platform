@@ -156,5 +156,5 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         """
         func = self.assertIn if available else self.assertNotIn
         response = self.client.get(self.url)
-        func(self.proctoring_link, response.content)
-        func('proctoring-wrapper', response.content)
+        func(self.proctoring_link.encode('utf-8'), response.content)
+        func(b'proctoring-wrapper', response.content)

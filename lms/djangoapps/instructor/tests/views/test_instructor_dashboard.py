@@ -265,9 +265,9 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         waffle_flag = waffle_flags()[WRITABLE_GRADEBOOK]
         with override_waffle_flag(waffle_flag, active=True):
             response = self.client.get(self.url)
-        self.assertNotIn(
-            TestInstructorDashboard.GRADEBOOK_LEARNER_COUNT_MESSAGE,
-            response.content
+        self.assertNotContains(
+            response,
+            TestInstructorDashboard.GRADEBOOK_LEARNER_COUNT_MESSAGE
         )
         self.assertContains(response, 'View Gradebook')
 
@@ -431,7 +431,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
             self.assertEquals(
                 expected_result,
-                'CCX Coaches are able to create their own Custom Courses based on this course' in response.content
+                b'CCX Coaches are able to create their own Custom Courses based on this course' in response.content
             )
 
     def test_grade_cutoffs(self):
@@ -439,7 +439,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         Verify that grade cutoffs are displayed in the correct order.
         """
         response = self.client.get(self.url)
-        self.assertContains(response, 'D: 0.5, C: 0.57, B: 0.63, A: 0.75')
+        self.assertContains(response, b'D: 0.5, C: 0.57, B: 0.63, A: 0.75')
 
     @patch('lms.djangoapps.instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 2)
     def test_calculate_page_info(self):
