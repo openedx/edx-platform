@@ -12,6 +12,7 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_un
 from openedx.features.enterprise_support.api import enterprise_enabled
 from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
+from util.url import reload_django_url_config
 
 
 @ddt.ddt
@@ -19,6 +20,10 @@ from openedx.features.enterprise_support.tests.mixins.enterprise import Enterpri
 @skip_unless_lms
 class EnterpriseLogoutTests(EnterpriseServiceMockMixin, CacheIsolationTestCase):
     """ Tests for the enterprise logout functionality. """
+
+    def setUp(self):
+        reload_django_url_config()
+        super(EnterpriseLogoutTests, self).setUp()
 
     @ddt.data(
         ('https%3A%2F%2Ftest.edx.org%2Fcourses', False),
