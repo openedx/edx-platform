@@ -152,7 +152,7 @@ lazy==1.1
 lepl==5.1.3               # via rfc6266-parser
 libsass==0.10.0
 loremipsum==1.0.5
-git+https://github.com/edx/xblock-lti-consumer.git@v1.1.8#egg=lti_consumer-xblock==1.1.8
+git+https://github.com/edx/xblock-lti-consumer.git@v1.2.1#egg=lti_consumer-xblock==1.2.1
 lxml==3.8.0
 mailsnake==1.6.4
 mako==1.0.2
