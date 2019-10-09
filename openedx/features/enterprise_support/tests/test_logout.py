@@ -4,16 +4,20 @@ Tests for logout for enterprise flow
 from __future__ import absolute_import
 
 import ddt
-import six.moves.urllib.parse as parse
-from django.test.utils import override_settings
-from django.core.urlresolvers import get_resolver
-from django.urls import reverse
+import mock
 
+from django.test.utils import override_settings
+from django.urls import reverse
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.features.enterprise_support.api import enterprise_enabled
-from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
+from openedx.features.enterprise_support.tests import (
+    FAKE_ENTERPRISE_CUSTOMER,
+    FEATURES_WITH_ENTERPRISE_ENABLED,
+    factories
+)
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
+from student.tests.factories import UserFactory
 from util.url import reload_django_url_config
 
 
@@ -24,14 +28,25 @@ class EnterpriseLogoutTests(EnterpriseServiceMockMixin, CacheIsolationTestCase):
     """ Tests for the enterprise logout functionality. """
 
     def setUp(self):
-        reload_django_url_config()
         super(EnterpriseLogoutTests, self).setUp()
+        reload_django_url_config()
+        self.user = UserFactory()
+
+        self.enterprise_customer = FAKE_ENTERPRISE_CUSTOMER
+        self.enterprise_learner = factories.EnterpriseCustomerUserFactory(user_id=self.user.id)
+
+        self.client.login(username=self.user.username, password='test')
+        patcher = mock.patch('openedx.features.enterprise_support.api.enterprise_customer_from_api')
+        self.mock_enterprise_customer_from_api = patcher.start()
+        self.mock_enterprise_customer_from_api.return_value = self.enterprise_customer
+        self.addCleanup(patcher.stop)
+
 
     @ddt.data(
-        # ('https%3A%2F%2Ftest.edx.org%2Fcourses', False),
-        # ('/courses/course-v1:ARTS+D1+2018_T/course/', False),
-        # ('invalid-url', False),
-        # ('/enterprise/c5dad9a7-741c-4841-868f-850aca3ff848/course/Microsoft+DAT206x/enroll/', True),
+        ('https%3A%2F%2Ftest.edx.org%2Fcourses', False),
+        ('/courses/course-v1:ARTS+D1+2018_T/course/', False),
+        ('invalid-url', False),
+        ('/enterprise/c5dad9a7-741c-4841-868f-850aca3ff848/course/Microsoft+DAT206x/enroll/', True),
         ('%2Fenterprise%2Fc5dad9a7-741c-4841-868f-850aca3ff848%2Fcourse%2FMicrosoft%2BDAT206x%2Fenroll%2F', True),
     )
     @ddt.unpack
@@ -41,17 +56,6 @@ class EnterpriseLogoutTests(EnterpriseServiceMockMixin, CacheIsolationTestCase):
             redirect_url=redirect_url
         )
         self.assertTrue(enterprise_enabled())
-        quote_plus_url = parse.quote_plus(url)
-        unquote_url = parse.unquote(quote_plus_url)
-
-        quoted_url = parse.quote(unquote_url)
-        unquote_plus_url = parse.unquote_plus(quoted_url)
-
-        url_keys = get_resolver(None).reverse_dict.values()
-        self.assertEqual(
-            (quote_plus_url, unquote_url, quoted_url, unquote_plus_url, url_keys),
-            ('url1', 'url2', 'url3', 'url4', 'keys'),
-        )
         response = self.client.get(url, HTTP_HOST='testserver')
         expected = {
             'enterprise_target': enterprise_target,
