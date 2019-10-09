@@ -6,6 +6,7 @@ from __future__ import absolute_import
 import ddt
 import six.moves.urllib.parse as parse
 from django.test.utils import override_settings
+from django.core.urlresolvers import get_resolver
 from django.urls import reverse
 
 
@@ -27,10 +28,10 @@ class EnterpriseLogoutTests(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         super(EnterpriseLogoutTests, self).setUp()
 
     @ddt.data(
-        ('https%3A%2F%2Ftest.edx.org%2Fcourses', False),
-        ('/courses/course-v1:ARTS+D1+2018_T/course/', False),
-        ('invalid-url', False),
-        ('/enterprise/c5dad9a7-741c-4841-868f-850aca3ff848/course/Microsoft+DAT206x/enroll/', True),
+        # ('https%3A%2F%2Ftest.edx.org%2Fcourses', False),
+        # ('/courses/course-v1:ARTS+D1+2018_T/course/', False),
+        # ('invalid-url', False),
+        # ('/enterprise/c5dad9a7-741c-4841-868f-850aca3ff848/course/Microsoft+DAT206x/enroll/', True),
         ('%2Fenterprise%2Fc5dad9a7-741c-4841-868f-850aca3ff848%2Fcourse%2FMicrosoft%2BDAT206x%2Fenroll%2F', True),
     )
     @ddt.unpack
@@ -45,9 +46,11 @@ class EnterpriseLogoutTests(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
         quoted_url = parse.quote(unquote_url)
         unquote_plus_url = parse.unquote_plus(quoted_url)
+
+        url_keys = get_resolver(None).reverse_dict.values()
         self.assertEqual(
-            (quote_plus_url, unquote_url, quoted_url, unquote_plus_url),
-            ('url1', 'url2', 'url3', 'url4'),
+            (quote_plus_url, unquote_url, quoted_url, unquote_plus_url, url_keys),
+            ('url1', 'url2', 'url3', 'url4', 'keys'),
         )
         response = self.client.get(url, HTTP_HOST='testserver')
         expected = {
