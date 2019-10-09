@@ -105,13 +105,13 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         If no POST parameters can be interpreted, return an empty dict.
         """
 
-        contents = self.request_content.decode('utf-8')
+        contents = self.request_content
 
         # The POST dict will contain a list of values for each key.
         # None of our parameters are lists, however, so we map [val] --> val
         # If the list contains multiple entries, we pick the first one
         try:
-            post_dict = six.moves.urllib.parse.parse_qs(contents, keep_blank_values=True)
+            post_dict = six.moves.urllib.parse.parse_qs(contents.decode('utf-8'), keep_blank_values=True)
             return {
                 key: list_val[0]
                 for key, list_val in post_dict.items()
