@@ -4,6 +4,7 @@ Tests for logout for enterprise flow
 from __future__ import absolute_import
 
 import ddt
+import six.moves.urllib.parse as parse
 from django.test.utils import override_settings
 from django.urls import reverse
 
@@ -39,6 +40,15 @@ class EnterpriseLogoutTests(EnterpriseServiceMockMixin, CacheIsolationTestCase):
             redirect_url=redirect_url
         )
         self.assertTrue(enterprise_enabled())
+        quote_plus_url = parse.quote_plus(url)
+        unquote_url = parse.unquote(quote_plus_url)
+
+        quoted_url = parse.quote(unquote_url)
+        unquote_plus_url = parse.unquote_plus(quoted_url)
+        self.assertEqual(
+            (quote_plus_url, unquote_url, quoted_url, unquote_plus_url),
+            ('url1', 'url2', 'url3', 'url4'),
+        )
         response = self.client.get(url, HTTP_HOST='testserver')
         expected = {
             'enterprise_target': enterprise_target,
