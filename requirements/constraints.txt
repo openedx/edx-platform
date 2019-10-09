@@ -76,3 +76,8 @@ numpy<1.17.0
 #  jsondiff==1.1.1 (from moto==1.2.0->-r requirements/edx/testing.in (line 33))
 #  jsondiff==1.2.0 (from -r requirements/edx/base.txt (line 146))
 jsondiff==1.1.1
+
+# asn1crypto had a major version bump that might have introduces some performance issues.
+# Pinning it back to see if that resolves the performance issue.
+# version 1.0.0 is the one that we upgraded to
+asn1crypto==0.24.0
