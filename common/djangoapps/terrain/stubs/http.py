@@ -111,7 +111,7 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         # None of our parameters are lists, however, so we map [val] --> val
         # If the list contains multiple entries, we pick the first one
         try:
-            post_dict = six.moves.urllib.parse.parse_qs(contents, keep_blank_values=True)
+            post_dict = six.moves.urllib.parse.parse_qs(contents.decode('utf-8'), keep_blank_values=True)
             return {
                 key: list_val[0]
                 for key, list_val in post_dict.items()
@@ -161,8 +161,8 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
 
                     # Decode the params as UTF-8
                     try:
-                        key = six.text_type(key, 'utf-8')
-                        value = six.text_type(value, 'utf-8')
+                        key = six.text_type(key)
+                        value = six.text_type(value)
                     except UnicodeDecodeError:
                         self.log_message("Could not decode request params as UTF-8")
 
