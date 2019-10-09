@@ -23,7 +23,7 @@ class ApiTestCase(TestCase):
         """
         Returns a dictionary containing the http auth header with encoded username+password
         """
-        return {'HTTP_AUTHORIZATION': 'Basic ' + base64.b64encode('%s:%s' % (username, password))}
+        return {'HTTP_AUTHORIZATION': b'Basic ' + base64.b64encode(b'%s:%s' % (username.encode(), password.encode()))}
 
     def request_with_auth(self, method, *args, **kwargs):
         """Issue a request to the given URI with the API key header"""
