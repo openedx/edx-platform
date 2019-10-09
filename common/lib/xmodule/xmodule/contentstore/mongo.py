@@ -103,17 +103,11 @@ class MongoContentStore(ContentStore):
             # It seems that this code thought that only some specific object would have the `__iter__` attribute
             # but many more objects have this in python3 and shouldn't be using the chunking logic. For string and
             # byte streams we write them directly to gridfs and convert them to byetarrys if necessary.
-            if hasattr(content.data, '__iter__') and not isinstance(content.data, (six.binary_type, six.string_types)):
+            if hasattr(content.data, '__iter__') and not isinstance(content.data, six.binary_type):
                 for chunk in content.data:
                     fp.write(chunk)
             else:
-                # Ideally we could just ensure that we don't get strings in here and only byte streams
-                # but being confident of that wolud be a lot more work than we have time for so we just
-                # handle both cases here.
-                if isinstance(content.data, six.text_type):
-                    fp.write(content.data.encode('utf-8'))
-                else:
-                    fp.write(content.data)
+                fp.write(content.data)
 
         return content
 
