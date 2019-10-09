@@ -189,13 +189,26 @@ class::
             # Configuration setting for Plugin Contexts for this app.
             PluginContexts.CONFIG: {
 
-                # Configure the Plugin Signals for each Project Type, as needed.
+                # Configure the Plugin Contexts for each Project Type, as needed.
                 ProjectType.LMS: {
 
                     # Key is the view that the app wishes to add context to and the value
                     # is the function within the app that will return additional context
                     # when called with the original context
                     u'course_dashboard': u'my_app.context_api.get_dashboard_context'
+                }
+            },
+
+            # Configuration settings for Plugin Slots for this app.
+            PluginSlots.CONFIG: {
+
+                # Configure Plugin Slots for each Project Type, as needed.
+                ProjectType.LMS: {
+
+                    # Key is the slot in the current Project Type that the app wants to inject
+                    # content into and the value is the function within the app that will return
+                    # rendered content. The function will be passed minimal context relevant to it.
+                    u'head-extra': u'my_app.slots_api.get_slot_content'
                 }
             }
         }
@@ -234,6 +247,12 @@ OR use string constants when they cannot import from djangoapps.plugins::
             u'view_context_config': {
                 u'lms.djangoapp': {
                     'course_dashboard': u'my_app.context_api.get_dashboard_context'
+                }
+            },
+
+            u'view_slots_config': {
+                u'lms.djangoapp': {
+                     u'head-extra': u'my_app.slots_api.get_head_extra_content'
                 }
             }
         }

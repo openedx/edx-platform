@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-{% load sekizai_tags i18n configuration theme_pipeline optional_include static %}
+{% load sekizai_tags i18n configuration theme_pipeline optional_include static plugin_slot %}
 <html lang="{{LANGUAGE_CODE}}">
 <head>
   <meta charset="UTF-8">
@@ -21,11 +21,13 @@
   {% render_block "css" %}
 
   {% optional_include "head-extra.html"|microsite_template_path %}
+  {% plugin_slot "lms.djangoapp" "head-extra" %}
 
   <meta name="path_prefix" content="{{EDX_ROOT_URL}}">
 </head>
 
 <body class="{% block bodyclass %}{% endblock %} lang_{{LANGUAGE_CODE}}">
+    {% plugin_slot "lms.djangoapp" "body-initial" %}
     {% load render_bundle from webpack_loader %}
     {% render_bundle "commons" %}
   <div class="window-wrap" dir="{{LANGUAGE_BIDI|yesno:'rtl,ltr'}}">
@@ -46,6 +48,7 @@
     {% javascript 'base_application' %}
 
     {% render_block "js" %}
+    {% plugin_slot "lms.djangoapp" "body-extra" %}
 </body>
 </html>
 

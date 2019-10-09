@@ -36,6 +36,7 @@ from openedx.core.djangoapps.catalog.utils import (
 )
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_attribute_values, make_providers_strings
 from openedx.core.djangoapps.plugins import constants as plugin_constants
+from openedx.core.djangoapps.plugins.decorators import view_namespace
 from openedx.core.djangoapps.plugins.plugin_contexts import get_plugins_view_context
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import ProgramDataExtender, ProgramProgressMeter
@@ -475,6 +476,7 @@ def get_dashboard_course_limit():
     return course_limit
 
 
+@view_namespace('students.views.dashboard')
 @login_required
 @ensure_csrf_cookie
 @add_maintenance_banner

@@ -85,3 +85,20 @@ class PluginContexts(object):
     additional views it would like to add context into.
     """
     CONFIG = u"view_context_config"
+
+
+class PluginSlots(object):
+    """
+    The PluginSlots enum defines dictionary field names (and default)
+    that can be specified by a Plugin App in order to configure the view
+    slots into which it would like to add addition content.
+    """
+    CONFIG = u'slots_config'
+
+    class LMSSlots:
+        HEAD_EXTRA = u'head-extra'
+        BODY_INITIAL = u'body-initial'
+        BODY_EXTRA = u'body-extra'
+
+    class StudioSlots(LMSSlots):
+        pass

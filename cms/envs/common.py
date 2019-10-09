@@ -701,6 +701,7 @@ MIDDLEWARE = [
     # Detects user-requested locale from 'accept-language' header in http request
     'django.middleware.locale.LocaleMiddleware',
 
+    'openedx.core.djangoapps.plugins.middleware.ViewNameAndSlotMiddleware',
     'codejail.django_integration.ConfigureCodeJailMiddleware',
 
     # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500

@@ -526,17 +526,6 @@ class HtmlResponse(HttpResponse):
         super(HtmlResponse, self).__init__(html, content_type='text/plain')
 
 
-class ViewNameMiddleware(MiddlewareMixin):
-    """
-    Django middleware object to inject view name into request context
-    """
-    def process_view(self, request, view_func, view_args, view_kwargs):
-        """
-        Injects the view name value into the request context
-        """
-        request.view_name = view_func.__name__
-
-
 class QueryCountDebugMiddleware(MiddlewareMixin):
     """
     This middleware will log the number of queries run

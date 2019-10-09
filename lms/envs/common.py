@@ -1561,7 +1561,7 @@ MIDDLEWARE = [
     # Must be after DarkLangMiddleware.
     'django.middleware.locale.LocaleMiddleware',
 
-    'lms.djangoapps.discussion.django_comment_client.utils.ViewNameMiddleware',
+    'openedx.core.djangoapps.plugins.middleware.ViewNameAndSlotMiddleware',
     'codejail.django_integration.ConfigureCodeJailMiddleware',
 
     # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
