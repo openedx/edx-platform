@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-asn1crypto==1.0.1         # via cryptography
+asn1crypto==0.24.0        # via cryptography
 cffi==1.12.3              # via cryptography
 cryptography==2.7
 enum34==1.1.6             # via cryptography
