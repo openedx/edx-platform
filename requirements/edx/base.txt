@@ -167,7 +167,7 @@ mysqlclient==1.4.4
 networkx==1.7
 newrelic==5.2.1.129
 nltk==3.4.5
-nodeenv==1.1.1
+nodeenv==1.3.3
 numpy==1.16.5
 git+https://github.com/joestump/python-oauth2.git@b94f69b1ad195513547924e380d9265133e995fa#egg=oauth2
 oauthlib==2.1.0
