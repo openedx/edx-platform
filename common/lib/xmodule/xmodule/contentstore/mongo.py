@@ -101,8 +101,7 @@ class MongoContentStore(ContentStore):
                               locked=getattr(content, 'locked', False)) as fp:
 
             # It seems that this code thought that only some specific object would have the `__iter__` attribute
-            # but many more objects have this in python3 and shouldn't be using the chunking logic. For string and
-            # byte streams we write them directly to gridfs and convert them to byetarrys if necessary.
+            # but the bytes object in python 3 has one and should not use the chunking logic.
             if hasattr(content.data, '__iter__') and not isinstance(content.data, six.binary_type):
                 for chunk in content.data:
                     fp.write(chunk)

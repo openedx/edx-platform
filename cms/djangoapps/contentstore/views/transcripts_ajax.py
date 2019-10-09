@@ -219,7 +219,7 @@ def upload_transcripts(request):
             # Convert 'srt' transcript into the 'sjson' and upload it to
             # configured transcript storage. For example, S3.
             sjson_subs = Transcript.convert(
-                content=transcript_file.read().decode('utf-8'),
+                content=transcript_file.read(),
                 input_format=Transcript.SRT,
                 output_format=Transcript.SJSON
             )
@@ -322,7 +322,7 @@ def check_transcripts(request):
         filename = 'subs_{0}.srt.sjson'.format(item.sub)
         content_location = StaticContent.compute_location(item.location.course_key, filename)
         try:
-            local_transcripts = contentstore().find(content_location).data.decode('utf-8')
+            local_transcripts = contentstore().find(content_location).data
             transcripts_presence['current_item_subs'] = item.sub
         except NotFoundError:
             pass
@@ -336,7 +336,7 @@ def check_transcripts(request):
             filename = 'subs_{0}.srt.sjson'.format(youtube_id)
             content_location = StaticContent.compute_location(item.location.course_key, filename)
             try:
-                local_transcripts = contentstore().find(content_location).data.decode('utf-8')
+                local_transcripts = contentstore().find(content_location).data
                 transcripts_presence['youtube_local'] = True
             except NotFoundError:
                 log.debug(u"Can't find transcripts in storage for youtube id: %s", youtube_id)

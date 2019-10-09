@@ -145,7 +145,7 @@ def youtube_video_transcript_name(youtube_text_api):
     # http://video.google.com/timedtext?type=list&v={VideoId}
     youtube_response = requests.get('http://' + youtube_text_api['url'], params=transcripts_param)
     if youtube_response.status_code == 200 and youtube_response.text:
-        youtube_data = etree.fromstring(youtube_response.text.encode('utf-8'), parser=utf8_parser)
+        youtube_data = etree.fromstring(youtube_response.content.encode('utf-8'), parser=utf8_parser)
         # iterate all transcripts information from youtube server
         for element in youtube_data:
             # search specific language code such as 'en' in transcripts info list
@@ -579,8 +579,6 @@ def get_video_transcript_content(edx_video_id, language_code):
     edx_video_id = clean_video_id(edx_video_id)
     if edxval_api and edx_video_id:
         transcript = edxval_api.get_video_transcript_data(edx_video_id, language_code)
-        if transcript and 'content' in transcript:
-            transcript['content'] = transcript['content'].decode('utf-8')
 
     return transcript
 
@@ -656,7 +654,7 @@ class Transcript(object):
         if input_format == 'srt':
 
             if output_format == 'txt':
-                text = SubRipFile.from_string(content).text
+                text = SubRipFile.from_string(content.decode('utf-8')).text
                 return HTMLParser().unescape(text)
 
             elif output_format == 'sjson':
@@ -665,7 +663,7 @@ class Transcript(object):
                     # the exception if something went wrong in parsing the transcript.
                     srt_subs = SubRipFile.from_string(
                         # Skip byte order mark(BOM) character
-                        content.encode('utf-8').decode('utf-8-sig'),
+                        content.decode('utf-8-sig') if six.PY2 else content.encode('utf-8').decode('utf-8-sig'),
                         error_handling=SubRipFile.ERROR_RAISE
                     )
                 except Error as ex:   # Base exception from pysrt
@@ -927,11 +925,11 @@ def get_transcript_for_video(video_location, subs_id, file_name, language):
     try:
         if subs_id is None:
             raise NotFoundError
-        content = Transcript.asset(video_location, subs_id, language).data.decode('utf-8')
+        content = Transcript.asset(video_location, subs_id, language).data
         base_name = subs_id
         input_format = Transcript.SJSON
     except NotFoundError:
-        content = Transcript.asset(video_location, None, language, file_name).data.decode('utf-8')
+        content = Transcript.asset(video_location, None, language, file_name).data
         base_name = os.path.splitext(file_name)[0]
         input_format = Transcript.SRT
 
