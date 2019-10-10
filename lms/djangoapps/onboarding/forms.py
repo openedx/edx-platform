@@ -47,6 +47,7 @@ def get_onboarding_autosuggesion_data(file_name):
 class BaseOnboardingModelForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('label_suffix', kwargs.get('label_suffix', '').replace(":", ""))
+        kwargs.setdefault('use_required_attribute', False)
         super(BaseOnboardingModelForm, self).__init__(*args, **kwargs)
 
 
