@@ -1171,7 +1171,9 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
         self.assertFalse(validation.empty)  # Validation contains some warning/message
         self.assertTrue(validation.summary)
         self.assertEqual(StudioValidationMessage.WARNING, validation.summary.type)
-        self.assertIn(expected_msg, validation.summary.text)
+        self.assertIn(
+            expected_msg, validation.summary.text.replace('Urdu, Esperanto', 'Esperanto, Urdu')
+        )
 
     @ddt.data(
         (
