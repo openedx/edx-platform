@@ -45,7 +45,7 @@ pipeline {
     options {
         sendSplunkConsoleLog()
         timestamps()
-        timeout(60)
+        timeout(120)
     }
     stages {
         stage('Mark build as pending on Github') {
