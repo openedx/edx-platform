@@ -5,7 +5,7 @@ Utility functions for transcripts.
 from __future__ import absolute_import
 
 import copy
-import json
+import simplejson as json
 import logging
 import os
 from functools import wraps

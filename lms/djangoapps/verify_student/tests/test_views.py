@@ -5,7 +5,7 @@ Tests of verify_student views.
 
 from __future__ import absolute_import
 
-import json
+import simplejson as json
 from datetime import timedelta
 from uuid import uuid4
 
@@ -1637,7 +1637,7 @@ class TestSubmitPhotosForVerification(TestCase):
     def _get_post_data(self):
         """Retrieve POST data from the last request. """
         last_request = moto.packages.httpretty.last_request()
-        return json.loads(last_request.body.decode('utf-8'))
+        return json.loads(last_request.body)
 
 
 class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
