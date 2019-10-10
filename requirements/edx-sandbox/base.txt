@@ -6,7 +6,7 @@
 #
 common/lib/sandbox-packages
 common/lib/symmath
-asn1crypto==0.24.0
+asn1crypto==1.0.1
 backports.functools-lru-cache==1.5  # via matplotlib
 git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4
 cffi==1.12.3
@@ -25,7 +25,7 @@ numpy==1.7.2
 pycparser==2.19
 pyparsing==2.2.0
 python-dateutil==2.8.0    # via matplotlib
-pytz==2019.2              # via matplotlib
+pytz==2019.3              # via matplotlib
 scipy==0.14.0
 singledispatch==3.4.0.3
 six==1.12.0
@@ -33,4 +33,4 @@ subprocess32==3.5.4       # via matplotlib
 sympy==0.7.1
 
 # The following packages are considered to be unsafe in a requirements file:
-# setuptools==41.2.0        # via kiwisolver
+# setuptools==41.4.0        # via kiwisolver

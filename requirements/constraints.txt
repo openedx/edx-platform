@@ -76,3 +76,9 @@ numpy<1.17.0
 #  jsondiff==1.1.1 (from moto==1.2.0->-r requirements/edx/testing.in (line 33))
 #  jsondiff==1.2.0 (from -r requirements/edx/base.txt (line 146))
 jsondiff==1.1.1
+
+
+# Constraining these so that we can slow-roll their deploy to find out which one is causing the production performance issues.
+edx-when==0.4
+edx-enterprise==1.10.8
+edx-drf-extensions==2.4.0
