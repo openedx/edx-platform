@@ -185,7 +185,7 @@ def get_transcripts_from_youtube(youtube_id, settings, i18n, youtube_transcript_
         raise GetTranscriptsFromYouTubeException(msg)
 
     sub_starts, sub_ends, sub_texts = [], [], []
-    xmltree = etree.fromstring(data.content.encode('utf-8'), parser=utf8_parser)
+    xmltree = etree.fromstring(data.content, parser=utf8_parser)
     for element in xmltree:
         if element.tag == "text":
             start = float(element.get("start"))
@@ -812,11 +812,11 @@ class VideoTranscriptsMixin(object):
                 log.debug("No subtitles for 'en' language")
                 raise ValueError
 
-            data = Transcript.asset(self.location, transcript_name, lang).data
+            data = Transcript.asset(self.location, transcript_name, lang).data.decode('utf-8')
             filename = u'{}.{}'.format(transcript_name, transcript_format)
             content = Transcript.convert(data, 'sjson', transcript_format)
         else:
-            data = Transcript.asset(self.location, None, None, other_lang[lang]).data
+            data = Transcript.asset(self.location, None, None, other_lang[lang]).data.decode('utf-8')
             filename = u'{}.{}'.format(os.path.splitext(other_lang[lang])[0], transcript_format)
             content = Transcript.convert(data, 'srt', transcript_format)
 

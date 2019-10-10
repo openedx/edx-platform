@@ -826,8 +826,8 @@ class VideoExportTestCase(VideoBlockTestBase):
         """
         self.descriptor.transcripts = None
         xml = self.descriptor.definition_to_xml(self.file_system)
-        expected = '<video url_name="SampleProblem"/>\n'
-        self.assertEquals(expected, etree.tostring(xml, pretty_print=True).decode('utf-8'))
+        expected = b'<video url_name="SampleProblem"/>\n'
+        self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
 
     @patch('xmodule.video_module.video_module.edxval_api', None)
     def test_export_to_xml_invalid_characters_in_attributes(self):
