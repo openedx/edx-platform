@@ -5,9 +5,24 @@ Utility functions for working with discounts and discounted pricing.
 from django.utils.translation import ugettext as _
 from course_modes.models import get_course_prices, format_course_price
 from openedx.core.djangolib.markup import HTML
+from web_fragments.fragment import Fragment
 
 from .applicability import can_receive_discount, discount_percentage
 
+def get_first_purchase_offer_banner_fragment(user, course):
+    if user and course and can_receive_discount(user=user, course=course):
+        # Translator: xgettext:no-python-format
+        offer_message = _(u'{banner_open}{percentage}% off your first upgrade.{span_close}'
+                          u' Discount automatically applied.{div_close}')
+        return Fragment(HTML(offer_message).format(
+            banner_open=HTML(
+                '<div class="first-purchase-offer-banner"><span class="first-purchase-offer-banner-bold">'
+            ),
+            percentage=discount_percentage(),
+            span_close=HTML('</span>'),
+            div_close=HTML('</div>')
+        ))
+    return None
 
 def format_strikeout_price(user, course, base_price=None, check_for_discount=True):
     """

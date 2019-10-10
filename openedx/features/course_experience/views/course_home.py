@@ -30,7 +30,7 @@ from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
-from openedx.features.course_experience.utils import get_first_purchase_offer_banner_fragment
+from openedx.features.discounts.utils import get_first_purchase_offer_banner_fragment
 from openedx.features.discounts.utils import format_strikeout_price
 from student.models import CourseEnrollment
 from util.views import ensure_valid_course_key
