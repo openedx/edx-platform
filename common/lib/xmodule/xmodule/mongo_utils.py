@@ -46,7 +46,7 @@ def connect_to_mongodb(
         mongo_client_class = pymongo.MongoClient
 
     # If the MongoDB server uses a separate authentication database that should be specified here
-    auth_source = kwargs.pop('auth_source', '') or None
+    auth_source = kwargs.get('authsource', '') or None
 
     # If read_preference is given as a name of a valid ReadPreference.<NAME>
     # constant such as "SECONDARY_PREFERRED" or a mongo mode such as
