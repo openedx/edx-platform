@@ -416,7 +416,7 @@ class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):
 
         request = Request.blank('/' + self.dispatch)
         response = self.item.transcript(request=request, dispatch=self.dispatch)
-        self.assertEqual(json.loads(response.body), [lang])
+        self.assertEqual(json.loads(response.body.decode('utf-8')), [lang])
 
     @patch('xmodule.video_module.transcripts_utils.get_available_transcript_languages')
     def test_multiple_available_translations(self, mock_get_transcript_languages):
@@ -441,7 +441,7 @@ class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):
         request = Request.blank('/' + self.dispatch)
         response = self.item.transcript(request=request, dispatch=self.dispatch)
         # Assert that bumper only get its own translations.
-        self.assertEqual(json.loads(response.body.decode('utf-8')), ['en', 'uk'])
+        self.assertEqual(sorted(json.loads(response.body.decode('utf-8'))), sorted(['en', 'uk']))
 
 
 @ddt.ddt
