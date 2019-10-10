@@ -43,11 +43,11 @@ class TestSafeExec(unittest.TestCase):
         rnums = [r.randint(0, 999) for _ in range(100)]
 
         # Without a seed, the results are unpredictable
-        safe_exec("rnums = [random.randint(0, 999) for _ in xrange(100)]", g)
+        safe_exec("rnums = [random.randint(0, 999) for _ in range(100)]", g)
         self.assertNotEqual(g['rnums'], rnums)
 
         # With a seed, the results are predictable
-        safe_exec("rnums = [random.randint(0, 999) for _ in xrange(100)]", g, random_seed=17)
+        safe_exec("rnums = [random.randint(0, 999) for _ in range(100)]", g, random_seed=17)
         self.assertEqual(g['rnums'], rnums)
 
     def test_random_is_still_importable(self):
@@ -58,7 +58,7 @@ class TestSafeExec(unittest.TestCase):
         # With a seed, the results are predictable even from the random module
         safe_exec(
             "import random\n"
-            "rnums = [random.randint(0, 999) for _ in xrange(100)]\n",
+            "rnums = [random.randint(0, 999) for _ in range(100)]\n",
             g, random_seed=17)
         self.assertEqual(g['rnums'], rnums)
 
