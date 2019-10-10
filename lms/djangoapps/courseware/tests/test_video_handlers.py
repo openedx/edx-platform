@@ -484,7 +484,7 @@ class TestTranscriptDownloadDispatch(TestVideo):
     def test_download_srt_exist(self, __):
         request = Request.blank('/download')
         response = self.item.transcript(request=request, dispatch='download')
-        self.assertEqual(response.body, 'Subs!')
+        self.assertEqual(response.body.decode('utf-8'), 'Subs!')
         self.assertEqual(response.headers['Content-Type'], 'application/x-subrip; charset=utf-8')
         self.assertEqual(response.headers['Content-Language'], 'en')
 
