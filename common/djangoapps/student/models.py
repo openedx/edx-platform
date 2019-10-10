@@ -18,6 +18,7 @@ import logging
 import uuid
 from collections import OrderedDict, defaultdict, namedtuple
 from datetime import datetime, timedelta
+from django.core.validators import FileExtensionValidator
 from functools import total_ordering
 from importlib import import_module
 
@@ -2843,6 +2844,18 @@ class RegistrationCookieConfiguration(ConfigurationModel):
             utm_name=self.utm_cookie_name,
             affiliate_name=self.affiliate_cookie_name
         )
+
+
+class BulkUnenrollConfiguration(ConfigurationModel):
+    """
+
+    """
+    csv_file = models.FileField(
+        validators=[FileExtensionValidator(allowed_extensions=['csv'])],
+        help_text=_("It expect that the data will be provided in a csv file format with \
+                    first row being the header and columns will be as follows: \
+                    user_id, username, email, course_id, is_verified, verification_date")
+    )
 
 
 @python_2_unicode_compatible

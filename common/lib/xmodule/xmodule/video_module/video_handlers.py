@@ -466,7 +466,7 @@ class VideoStudioViewHandlers(object):
                         # Convert SRT transcript into an SJSON format
                         # and upload it to S3.
                         sjson_subs = Transcript.convert(
-                            content=transcript_file.read(),
+                            content=transcript_file.read().decode('utf-8'),
                             input_format=Transcript.SRT,
                             output_format=Transcript.SJSON
                         )

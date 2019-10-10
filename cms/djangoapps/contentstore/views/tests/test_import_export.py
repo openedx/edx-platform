@@ -94,7 +94,7 @@ class ImportEntranceExamTestCase(CourseTestCase, MilestonesTestCaseMixin):
         self.assertIsNotNone(course)
         self.assertEquals(course.entrance_exam_enabled, False)
 
-        with open(self.entrance_exam_tar) as gtar:
+        with open(self.entrance_exam_tar, 'rb') as gtar:  # pylint: disable=open-builtin
             args = {"name": self.entrance_exam_tar, "course-data": [gtar]}
             resp = self.client.post(self.url, args)
         self.assertEquals(resp.status_code, 200)
@@ -126,7 +126,7 @@ class ImportEntranceExamTestCase(CourseTestCase, MilestonesTestCaseMixin):
         self.assertTrue(len(content_milestones))
 
         # Now import entrance exam course
-        with open(self.entrance_exam_tar) as gtar:
+        with open(self.entrance_exam_tar, 'rb') as gtar:  # pylint: disable=open-builtin
             args = {"name": self.entrance_exam_tar, "course-data": [gtar]}
             resp = self.client.post(self.url, args)
         self.assertEquals(resp.status_code, 200)
@@ -186,7 +186,7 @@ class ImportTestCase(CourseTestCase):
         Check that the response for a tar.gz import without a course.xml is
         correct.
         """
-        with open(self.bad_tar) as btar:
+        with open(self.bad_tar, 'rb') as btar:  # pylint: disable=open-builtin
             resp = self.client.post(
                 self.url,
                 {
@@ -204,14 +204,14 @@ class ImportTestCase(CourseTestCase):
             )
         )
 
-        self.assertEquals(json.loads(resp_status.content)["ImportStatus"], -2)
+        self.assertEquals(json.loads(resp_status.content.decode('utf-8'))["ImportStatus"], -2)
 
     def test_with_coursexml(self):
         """
         Check that the response for a tar.gz import with a course.xml is
         correct.
         """
-        with open(self.good_tar) as gtar:
+        with open(self.good_tar, 'rb') as gtar:  # pylint: disable=open-builtin
             args = {"name": self.good_tar, "course-data": [gtar]}
             resp = self.client.post(self.url, args)
 
@@ -230,7 +230,7 @@ class ImportTestCase(CourseTestCase):
         display_name_before_import = course.display_name
 
         # Check that global staff user can import course
-        with open(self.good_tar) as gtar:
+        with open(self.good_tar, 'rb') as gtar:  # pylint: disable=open-builtin
             args = {"name": self.good_tar, "course-data": [gtar]}
             resp = self.client.post(self.url, args)
         self.assertEquals(resp.status_code, 200)
@@ -248,7 +248,7 @@ class ImportTestCase(CourseTestCase):
 
         # Now course staff user can also successfully import course
         self.client.login(username=nonstaff_user.username, password='foo')
-        with open(self.good_tar) as gtar:
+        with open(self.good_tar, 'rb') as gtar:  # pylint: disable=open-builtin
             args = {"name": self.good_tar, "course-data": [gtar]}
             resp = self.client.post(self.url, args)
         self.assertEquals(resp.status_code, 200)
@@ -342,7 +342,7 @@ class ImportTestCase(CourseTestCase):
 
         def try_tar(tarpath):
             """ Attempt to tar an unacceptable file """
-            with open(tarpath) as tar:
+            with open(tarpath, 'rb') as tar:  # pylint: disable=open-builtin
                 args = {"name": tarpath, "course-data": [tar]}
                 resp = self.client.post(self.url, args)
             self.assertEquals(resp.status_code, 200)
@@ -376,7 +376,7 @@ class ImportTestCase(CourseTestCase):
                 kwargs={'filename': os.path.split(self.good_tar)[1]}
             )
         )
-        import_status = json.loads(resp_status.content)["ImportStatus"]
+        import_status = json.loads(resp_status.content.decode('utf-8'))["ImportStatus"]
         self.assertIn(import_status, (0, 3))
 
     def test_library_import(self):
