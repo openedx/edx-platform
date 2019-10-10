@@ -7,6 +7,10 @@ class CourseDataExtraction(models.Model):
 
     @course_id: (string) id of the course. can be gotten through to_deprecated_string() method of CourseKey object
     """
+    class Meta:
+        app_label = 'data_extract'
+
+
     course_id = models.CharField(max_length=255)
     emails = models.TextField()
 

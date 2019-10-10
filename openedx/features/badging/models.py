@@ -1,16 +1,15 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from common.djangoapps.nodebb.helpers import get_course_id_by_community_id
 from lms.djangoapps.teams.models import CourseTeamMembership
-from nodebb.models import TeamGroupChat
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
-
-from common.djangoapps.nodebb.constants import (
+from nodebb.constants import (
     COMMUNITY_ID_SPLIT_INDEX,
     TEAM_PLAYER_ENTRY_INDEX,
     CONVERSATIONALIST_ENTRY_INDEX
 )
+from nodebb.helpers import get_course_id_by_community_id
+from nodebb.models import TeamGroupChat
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 from .constants import CONVERSATIONALIST, TEAM_PLAYER
 

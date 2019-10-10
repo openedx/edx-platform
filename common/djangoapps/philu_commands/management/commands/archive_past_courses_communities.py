@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 from django.core.management.base import BaseCommand
 from lms.djangoapps.branding import get_visible_courses
-from common.djangoapps.nodebb.helpers import archive_course_community
+from nodebb.helpers import archive_course_community
 
 
 log = getLogger(__name__)

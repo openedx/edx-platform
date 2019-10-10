@@ -18,7 +18,7 @@ from helpers import get_course_related_tabs, get_all_course_progress
 from models import DiscussionCommunity, TeamGroupChat
 from openedx.features.badging.models import Badge
 from openedx.features.badging.constants import CONVERSATIONALIST
-from common.djangoapps.nodebb.constants import (
+from nodebb.constants import (
     COMMUNITY_ID_SPLIT_INDEX,
     COMMUNITY_URL_SPLIT_CHAR,
     CONVERSATIONALIST_ENTRY_INDEX

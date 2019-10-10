@@ -10,7 +10,7 @@ from django.utils.translation import ugettext as _
 from django_comment_client.utils import has_discussion_privileges
 from django_countries import countries
 
-from common.djangoapps.nodebb.constants import TEAM_PLAYER_ENTRY_INDEX
+from nodebb.constants import TEAM_PLAYER_ENTRY_INDEX
 from courseware.courses import has_access
 from lms.djangoapps.teams import is_feature_enabled
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
