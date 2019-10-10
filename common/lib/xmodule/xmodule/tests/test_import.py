@@ -564,7 +564,7 @@ class ImportTestCase(BaseCourseTestCase):
         # Expect to find an error/exception about characters in "®esources"
         expect = "InvalidKeyError"
         errors = [
-            (msg.encode("utf-8"), err.encode("utf-8"))
+            (msg, err)
             for msg, err
             in modulestore.get_course_errors(course.id)
         ]

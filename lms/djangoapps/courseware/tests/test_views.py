@@ -725,7 +725,6 @@ class ViewsTestCase(ModuleStoreTestCase):
                     'location': six.text_type(usage_key),
                 })
                 response = client.get(url)
-                response_content = HTMLParser().unescape(response.content)
                 expected_time = datetime.now() + timedelta(hours=hour_diff)
                 expected_tz = expected_time.strftime('%Z')
                 self.assertContains(response, expected_tz)
