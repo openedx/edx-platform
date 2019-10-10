@@ -57,7 +57,7 @@ class EnterpriseLearnerPortalBanner extends Component {
   render() {
     const { alertHtml, open } = this.state;
 
-    if (open) {
+    if (open && alertHtml) {
       return (
         <div className="edx-enterprise-learner-portal-banner-wrapper">
           <StatusAlert
