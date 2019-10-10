@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 
 import ddt
 from pytz import UTC
+import six
 from six import text_type
 
 from lms.djangoapps.grades.scores import compute_percent
@@ -316,7 +317,8 @@ class GraderTest(unittest.TestCase):
         (
             # no drop_count
             {'type': "Homework", 'min_count': 0},
-            u"__init__() takes at least 4 arguments (3 given)"
+            # pylint: disable=line-too-long
+            u"__init__() takes at least 4 arguments (3 given)" if six.PY2 else u"__init__() missing 1 required positional argument: 'drop_count'"
         ),
     )
     @ddt.unpack
