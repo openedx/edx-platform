@@ -96,7 +96,7 @@ class BulkUnenrollTests(SharedModuleStoreTestCase):
             lines += str(enrollment.user.id) + "," + enrollment.user.username + "," + \
                 enrollment.user.email + "," + str(enrollment.course.id) + "\n"
 
-        csv_file = SimpleUploadedFile(name='test.csv', content=lines, content_type='text/csv')
+        csv_file = SimpleUploadedFile(name='test.csv', content=lines.encode('utf-8'), content_type='text/csv')
         BulkUnenrollConfiguration.objects.create(enabled=True, csv_file=csv_file)
 
         call_command("bulk_unenroll")
@@ -110,14 +110,14 @@ class BulkUnenrollTests(SharedModuleStoreTestCase):
         for enrollment in self.enrollments:
             username = enrollment.user.username
             if username in users_unenrolled:
-                users_unenrolled[username].append(str(enrollment.course.id))
+                users_unenrolled[username].append(str(enrollment.course.id).encode('utf-8'))
             else:
-                users_unenrolled[username] = [str(enrollment.course.id)]
+                users_unenrolled[username] = [str(enrollment.course.id).encode('utf-8')]
 
             lines += str(enrollment.user.id) + "," + username + "," + \
                 enrollment.user.email + "," + str(enrollment.course.id) + "\n"
 
-        csv_file = SimpleUploadedFile(name='test.csv', content=lines, content_type='text/csv')
+        csv_file = SimpleUploadedFile(name='test.csv', content=lines.encode('utf-8'), content_type='text/csv')
         BulkUnenrollConfiguration.objects.create(enabled=True, csv_file=csv_file)
 
         with LogCapture(LOGGER_NAME) as log:

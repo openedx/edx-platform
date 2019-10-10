@@ -1553,7 +1553,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             next_versions = [struct for struct in next_entries]
             for course_structure in next_versions:
                 result.setdefault(course_structure['previous_version'], []).append(
-                    CourseLocator(version_guid=struct['_id']))
+                    CourseLocator(version_guid=next_entries[-1]['_id']))
         return VersionTree(course_locator, result)
 
     def get_block_generations(self, block_locator):

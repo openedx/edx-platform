@@ -129,7 +129,7 @@ feedparser==5.1.3
 fs-s3fs==0.1.8
 fs==2.0.18
 funcsigs==1.0.2
-future==0.17.1            # via edx-celeryutils, edx-enterprise, pyjwkest
+future==0.18.0            # via edx-celeryutils, edx-enterprise, pyjwkest
 futures==3.3.0 ; python_version == "2.7"  # via django-pipeline, python-swiftclient, s3transfer, xblock-utils
 geoip2==2.9.0
 glob2==0.7
@@ -152,7 +152,7 @@ lazy==1.1
 lepl==5.1.3               # via rfc6266-parser
 libsass==0.10.0
 loremipsum==1.0.5
-git+https://github.com/edx/xblock-lti-consumer.git@v1.1.8#egg=lti_consumer-xblock==1.1.8
+git+https://github.com/edx/xblock-lti-consumer.git@v1.2.1#egg=lti_consumer-xblock==1.2.1
 lxml==3.8.0
 mailsnake==1.6.4
 mako==1.0.2
@@ -236,7 +236,7 @@ soupsieve==1.9.4          # via beautifulsoup4
 sqlparse==0.3.0
 staff-graded-xblock==0.5
 stevedore==1.31.0
-super-csv==0.9.4
+super-csv==0.9.5
 sympy==1.4
 testfixtures==6.10.0      # via edx-enterprise
 text-unidecode==1.3       # via python-slugify

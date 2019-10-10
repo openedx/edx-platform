@@ -32,7 +32,7 @@ class Command(BaseCommand):
 
         csv_path = options['csv_path']
         if csv_path:
-            with open(csv_path) as csv_file:
+            with open(csv_path, 'rb') as csv_file:
                 self.unenroll_users(csv_file)
         else:
             csv_file = BulkUnenrollConfiguration.current().csv_file

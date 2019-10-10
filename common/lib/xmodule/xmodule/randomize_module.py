@@ -44,7 +44,7 @@ class RandomizeModule(RandomizeFields, XModule):
         # NOTE: calling self.get_children() doesn't work until we've picked a choice
         num_choices = len(self.descriptor.get_children())
 
-        if self.choice > num_choices:
+        if self.choice is not None and self.choice > num_choices:
             # Oops.  Children changed. Reset.
             self.choice = None
 
