@@ -69,6 +69,9 @@ def can_receive_discount(user, course):  # pylint: disable=unused-argument
     if DiscountRestrictionConfig.disabled_for_course_stacked_config(course):
         return False
 
+    if user.is_anonymous:
+        return False
+
     # Don't allow users who have enrolled in any courses in non-upsellable
     # modes
     if CourseEnrollment.objects.filter(user=user).exclude(mode__in=CourseMode.UPSELL_TO_VERIFIED_MODES).exists():
