@@ -773,33 +773,8 @@ class Registration(models.Model):
 
     def activate(self):
         self.user.is_active = True
-        self._track_activation()
         self.user.save(update_fields=['is_active'])
         log.info(u'User %s (%s) account is successfully activated.', self.user.username, self.user.email)
-
-    def _track_activation(self):
-        """
-        Update the isActive flag in mailchimp for activated users.
-        """
-        has_segment_key = getattr(settings, 'LMS_SEGMENT_KEY', None)
-        has_mailchimp_id = hasattr(settings, 'MAILCHIMP_NEW_USER_LIST_ID')
-        if has_segment_key and has_mailchimp_id:
-            # .. pii: Username and email are sent to Segment here. Retired directly through Segment API call in Tubular.
-            # .. pii_types: email_address, username
-            # .. pii_retirement: third_party
-            segment.identify(
-                self.user.id,  # pylint: disable=no-member
-                {
-                    'email': self.user.email,
-                    'username': self.user.username,
-                    'activated': 1,
-                },
-                {
-                    "MailChimp": {
-                        "listId": settings.MAILCHIMP_NEW_USER_LIST_ID
-                    }
-                }
-            )
 
 
 class PendingNameChange(DeletableByUserValue, models.Model):

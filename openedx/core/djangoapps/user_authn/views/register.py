@@ -266,14 +266,6 @@ def _track_user_registration(user, profile, params, third_party_provider):
                 'country': text_type(profile.country),
             }
         ]
-        # Provide additional context only if needed.
-        if hasattr(settings, 'MAILCHIMP_NEW_USER_LIST_ID'):
-            identity_args.append({
-                "MailChimp": {
-                    "listId": settings.MAILCHIMP_NEW_USER_LIST_ID
-                }
-            })
-
         # .. pii: Many pieces of PII are sent to Segment here. Retired directly through Segment API call in Tubular.
         # .. pii_types: email_address, username, name, birth_date, location, gender
         # .. pii_retirement: third_party
