@@ -129,7 +129,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==2.0.0
 edx-drf-extensions==2.4.1
-edx-enterprise==2.0.2
+edx-enterprise==2.0.3
 edx-i18n-tools==0.4.8
 edx-lint==1.3.0
 edx-milestones==0.2.3
@@ -164,7 +164,7 @@ fs-s3fs==0.1.8
 fs==2.0.18
 funcsigs==1.0.2
 functools32==3.2.3.post2 ; python_version == "2.7"
-future==0.17.1
+future==0.18.0
 futures==3.3.0 ; python_version == "2.7"
 geoip2==2.9.0
 glob2==0.7
@@ -172,7 +172,7 @@ gunicorn==19.9.0
 help-tokens==1.0.4
 html5lib==1.0.1
 httplib2==0.14.0
-httpretty==0.9.6
+httpretty==0.9.7
 idna==2.8
 imagesize==1.1.0          # via sphinx
 importlib-metadata==0.23
@@ -214,7 +214,7 @@ moto==1.3.1
 mpmath==1.1.0
 mysqlclient==1.4.4
 networkx==1.7
-newrelic==5.2.0.127
+newrelic==5.2.1.129
 nltk==3.4.5
 nodeenv==1.1.1
 numpy==1.16.5
@@ -314,7 +314,7 @@ sphinxcontrib-websupport==1.1.2  # via sphinx
 sqlparse==0.3.0
 staff-graded-xblock==0.5
 stevedore==1.31.0
-super-csv==0.9.4
+super-csv==0.9.5
 sympy==1.4
 testfixtures==6.10.0
 text-unidecode==1.3
