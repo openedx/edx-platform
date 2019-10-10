@@ -104,7 +104,7 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         Retrieve the request POST parameters from the client as a dictionary.
         If no POST parameters can be interpreted, return an empty dict.
         """
-        contents = self.request_content.decode()
+        contents = self.request_content
 
         # The POST dict will contain a list of values for each key.
         # None of our parameters are lists, however, so we map [val] --> val

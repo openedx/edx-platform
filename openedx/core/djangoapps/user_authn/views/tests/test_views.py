@@ -3,6 +3,7 @@
 
 from __future__ import absolute_import
 
+import json
 import logging
 import re
 from http.cookies import SimpleCookie
@@ -125,8 +126,11 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         self.client.logout()
 
         # Verify that the new password can be used to log in
-        result = self.client.login(username=self.USERNAME, password=self.NEW_PASSWORD)
-        self.assertTrue(result)
+        login_url = reverse('login_post')
+        response = self.client.post(login_url, {'email': self.OLD_EMAIL, 'password': self.NEW_PASSWORD})
+        assert response.status_code == 200
+        response_dict = json.loads(response.content.decode('utf-8'))
+        assert response_dict['success']
 
         # Try reusing the activation link to change the password again
         # Visit the activation link again.
@@ -141,8 +145,10 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         self.assertFalse(result)
 
         # Verify that the new password continues to be valid
-        result = self.client.login(username=self.USERNAME, password=self.NEW_PASSWORD)
-        self.assertTrue(result)
+        response = self.client.post(login_url, {'email': self.OLD_EMAIL, 'password': self.NEW_PASSWORD})
+        assert response.status_code == 200
+        response_dict = json.loads(response.content.decode('utf-8'))
+        assert response_dict['success']
 
     def test_password_change_failure(self):
         with mock.patch('openedx.core.djangoapps.user_api.accounts.api.request_password_change',
