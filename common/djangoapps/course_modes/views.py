@@ -36,7 +36,7 @@ from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from openedx.features.course_experience.utils import get_first_purchase_offer_banner_fragment
+from openedx.features.discounts.utils import get_first_purchase_offer_banner_fragment
 from openedx.features.discounts.applicability import discount_percentage
 from student.models import CourseEnrollment
 from util.db import outer_atomic
