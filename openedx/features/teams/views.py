@@ -1,25 +1,32 @@
-from django.http import Http404
-from django.core.urlresolvers import reverse
-from django.shortcuts import render_to_response, redirect
-from django_countries import countries
-from django.conf import settings
-from django.utils.translation import ugettext as _
-from django.contrib.auth.decorators import login_required
+import json
 from w3lib.url import add_or_replace_parameter
 
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
+from django.http import Http404
+from django.shortcuts import render_to_response, redirect
+from django.utils.translation import ugettext as _
 from django_comment_client.utils import has_discussion_privileges
+from django_countries import countries
+
+from nodebb.constants import TEAM_PLAYER_ENTRY_INDEX
 from courseware.courses import has_access
-from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from lms.djangoapps.teams import is_feature_enabled
-from nodebb.models import TeamGroupChat
-from student.models import CourseEnrollment, CourseAccessRole
+from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from lms.djangoapps.teams.serializers import (
     BulkTeamCountTopicSerializer,
 )
 from lms.djangoapps.teams.views import get_alphabetical_topics
+from nodebb.models import TeamGroupChat
+from openedx.features.badging.models import Badge
+from openedx.features.badging.constants import TEAM_PLAYER
+from student.models import CourseEnrollment
 
-from .helpers import serialize, validate_team_topic, make_embed_url, get_user_recommended_team, \
-    get_user_course_with_access
+
+from .decorators import can_view_teams
+from .helpers import serialize, make_embed_url, get_user_recommended_team, \
+    get_user_course_with_access, get_team_topic
 from .serializers import CustomCourseTeamSerializer
 
 
@@ -53,16 +60,22 @@ def browse_teams(request, course_id):
         {'expand': ('user',)}
     )
 
+    is_member_of_any_team = CourseTeamMembership.user_in_team_for_course(user, course.id)
+
+    course_has_ended = course.has_ended()
     context = {
         'course': course,
         'topics': topics_data,
         'recommended_teams': recommended_teams,
-        'user_country': user.profile.country.name.format()
+        'user_country': user.profile.country.name.format(),
+        'show_create_card': not is_member_of_any_team,
+        'course_has_ended': course_has_ended
     }
 
     return render_to_response("teams/browse_teams.html", context)
 
 
+@can_view_teams
 @login_required
 def browse_topic_teams(request, course_id, topic_id):
     user = request.user
@@ -95,13 +108,14 @@ def browse_topic_teams(request, course_id, topic_id):
     return render_to_response("teams/browse_topic_teams.html", context)
 
 
+@can_view_teams
 @login_required
-def create_team(request, course_id, topic_id):
+def create_team(request, course_id, topic_id=None):
     user = request.user
     course = get_user_course_with_access(course_id, user)
+    topic = get_team_topic(course, topic_id)
 
-    is_topic_valid = validate_team_topic(course, topic_id)
-    if not is_topic_valid:
+    if topic_id and not topic:
         raise Http404
 
     is_member_of_any_team = CourseTeamMembership.user_in_team_for_course(user, course.id)
@@ -111,13 +125,15 @@ def create_team(request, course_id, topic_id):
         'user_has_privilege': not is_member_of_any_team,
         'countries': list(countries),
         'languages': [[lang[0], _(lang[1])] for lang in settings.ALL_LANGUAGES],
-        'topic_id': topic_id,
+        'topic': topic,
+        'topics': course.teams_topics,
         'template_view': 'create'
     }
 
     return render_to_response("teams/create_update_team.html", context)
 
 
+@can_view_teams
 @login_required
 def my_team(request, course_id):
     user = request.user
@@ -139,6 +155,7 @@ def my_team(request, course_id):
     return render_to_response("teams/my_team.html", {'course': course})
 
 
+@can_view_teams
 @login_required
 def view_team(request, course_id, team_id):
     user = request.user
@@ -156,6 +173,7 @@ def view_team(request, course_id, team_id):
 
     topic_url = request.GET.get('topic_url', None)
     embed_url = make_embed_url(team_group_chat, user, topic_url)
+    room_id = team_group_chat.room_id
     leave_team_url = reverse('team_membership_detail', args=[team_id, user.username])
 
     team_administrator = (has_access(user, 'staff', course.id)
@@ -164,6 +182,10 @@ def view_team(request, course_id, team_id):
     is_member_of_any_team = CourseTeamMembership.user_in_team_for_course(user, course.id)
 
     is_user_member_of_this_team = bool(CourseTeamMembership.objects.filter(team=team, user=user).first())
+
+    unearned_badges_dict = Badge.get_unearned_badges(user_id=request.user.id,
+                                                     community_id=room_id,
+                                                     community_type=TEAM_PLAYER[TEAM_PLAYER_ENTRY_INDEX])
 
     context = {
         'course': course,
@@ -177,11 +199,13 @@ def view_team(request, course_id, team_id):
         'leave_team_url': leave_team_url,
         'country': str(countries.countries[team.country]),
         'language': dict(settings.ALL_LANGUAGES)[team.language],
+        'unearned_badges': json.dumps(unearned_badges_dict),
     }
 
     return render_to_response("teams/view_team.html", context)
 
 
+@can_view_teams
 @login_required
 def update_team(request, course_id, team_id):
     user = request.user
@@ -209,6 +233,7 @@ def update_team(request, course_id, team_id):
     return render_to_response("teams/create_update_team.html", context)
 
 
+@can_view_teams
 @login_required
 def edit_team_memberships(request, course_id, team_id):
     user = request.user

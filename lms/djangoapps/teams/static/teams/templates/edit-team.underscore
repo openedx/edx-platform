@@ -28,18 +28,7 @@
     <div class="team-required-fields">
     </div>
     <div class="vertical-line"></div>
-    <div class="team-optional-fields">
-        <fieldset>
-            <div class="u-field u-field-optional_description">
-                <legend aria-describedby="optional-characteristics-help">
-                    <p class="u-field-title"><%- gettext('Optional Characteristics') %></p>
-                </legend>
-                <span id="optional-characteristics-help" class="u-field-message">
-                    <p class="u-field-message-help"><%- gettext('Help other learners decide whether to join your team by specifying some characteristics for your team. Choose carefully, because fewer people might be interested in joining your team if it seems too restrictive.') %></p>
-                </span>
-            </div>
-        </fieldset>
-    </div>
+    <div class="team-optional-fields"></div>
 </div>
 
 <div class="create-team form-actions">

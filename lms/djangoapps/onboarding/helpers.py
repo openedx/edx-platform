@@ -1,5 +1,7 @@
 import re
 import pytz
+from logging import getLogger
+
 from dateutil.relativedelta import relativedelta
 from datetime import date, datetime
 from difflib import SequenceMatcher
@@ -7,12 +9,19 @@ from difflib import SequenceMatcher
 from django.conf import settings
 from django.core import serializers
 
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from lms.djangoapps.onboarding.models import Organization, OrganizationMetricUpdatePrompt, PartnerNetwork
+from common.lib.mandrill_client.client import MandrillClient
+from mailchimp_pipeline.signals.handlers import update_user_email_in_mailchimp
+from nodebb.tasks import task_update_user_profile_on_nodebb
 from oef.models import OrganizationOefUpdatePrompt
+from lms.djangoapps.onboarding.models import (
+    Organization, OrganizationMetricUpdatePrompt, PartnerNetwork, OrganizationAdminHashKeys
+)
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.features.data_extract.models import CourseDataExtraction
 
 
 utc = pytz.UTC
+log = getLogger(__name__)
 
 COUNTRIES = {
     'AD': 'Andorra',
@@ -7888,7 +7897,7 @@ def convert_date_to_utcdatetime(date):
     :param date:
     :return: return utc datetime object of current date object
     """
-    return pytz.UTC.localize(datetime(year=date.year,month=date.month, day=date.day))
+    return pytz.UTC.localize(datetime(year=date.year, month=date.month, day=date.day))
 
 
 def get_current_utc_date():
@@ -7953,7 +7962,7 @@ def get_org_metric_update_prompt(user):
     # becuase according to the scenario
     # https://philanthropyu.atlassian.net/browse/LP-1222?focusedCommentId=15084&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-15084
     # the user will be the admin of the organization of latest prompt
-    return OrganizationMetricUpdatePrompt.objects.filter(responsible_user_id=user.id)\
+    return OrganizationMetricUpdatePrompt.objects.filter(responsible_user_id=user.id) \
         .order_by('-latest_metric_submission').first()
 
 
@@ -8010,3 +8019,118 @@ def serialize_partner_networks():
         ))
 
     return data
+
+def get_user_on_demand_courses(user):
+    """
+        Return user on demand courses
+
+        Parameters:
+        user: user object whom courses we need.
+
+        Returns:
+        list: List of on Demand courses and empty list in case user isn't enrolled in any on demand courses which is
+        currently active.
+
+    """
+
+    from student.models import CourseEnrollment
+    from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+
+    all_user_courses = CourseEnrollment.objects.filter(user=user, is_active=True)
+    courses = []
+    for user_course in all_user_courses:
+        try:
+            today = datetime.now(utc).date()
+            courses.append(CourseOverview.objects.get(id=user_course.course_id, self_paced=True, end__gte=today))
+        except CourseOverview.DoesNotExist:
+            continue
+    return courses
+
+
+def get_email_pref_on_demand_course(user, on_demand_course_id):
+    """
+        Return email preferences of user for given on demand courses
+
+        Parameters:
+        user: user object whom courses we need.
+        on_demand_course_id: course id of on demand course which email preference would be required.
+
+        Returns:
+        boolean: Email preferences of given course
+
+    """
+
+    from openedx.features.ondemand_email_preferences.models import OnDemandEmailPreferences
+
+    try:
+        email_pref = OnDemandEmailPreferences.objects.get(user=user, course_id=on_demand_course_id)
+        return email_pref.is_enabled
+    except OnDemandEmailPreferences.DoesNotExist:
+        log.info("No email preferences found for %s hence considered True", user)
+        return True
+
+
+def get_user_anonymous_id(user, course_id):
+    """
+        Return anonymous id of user for given given course else raise exception
+
+        Parameters:
+        user: user object whom courses we need.
+        course_id: course id of course.
+
+        Returns:
+        string: Anonymous Id of user for given course
+
+    """
+
+    try:
+        from student.models import AnonymousUserId
+        return AnonymousUserId.objects.get(user=user, course_id=course_id)
+        # return anonymous_id
+    except AnonymousUserId.DoesNotExist:
+        raise AnonymousUserId.DoesNotExist('Anonymous Id doesn\'t exists for %s' % user)
+    except AnonymousUserId.MultipleObjectsReturned:
+        raise AnonymousUserId.MultipleObjectsReturned('Multiple Anonymous Ids for %s' % user)
+
+
+def update_user_email(user, old_email, new_email):
+    """
+    This method updates email in NodeBB, Mailchimp, platform database. In the end emails are send
+    to user's new and old email to let him know the status.
+    :param user: user whose email is changed
+    :param old_email: user's previous email
+    :param new_email: user's new email
+    :return: None
+    """
+
+    from student.models import CourseEnrollmentAllowed, ManualEnrollmentAudit, UserProfile
+
+    # update email in mailchimp
+    update_user_email_in_mailchimp(old_email, new_email)
+
+    # update email in NodeBB
+    data_to_sync = {
+        "email": new_email
+    }
+    task_update_user_profile_on_nodebb.delay(
+        username=user.username, profile_data=data_to_sync)
+
+    # update email manually in platform database, where required
+    ManualEnrollmentAudit.objects.filter(enrolled_email=old_email).update(enrolled_email=new_email)
+    CourseEnrollmentAllowed.objects.filter(email=old_email).update(email=new_email)
+    OrganizationAdminHashKeys.objects.filter(suggested_admin_email=old_email).update(
+        suggested_admin_email=new_email)
+    CourseDataExtraction.objects.filter(emails=old_email).update(emails=new_email)
+    Organization.objects.filter(unclaimed_org_admin_email=old_email).update(
+        unclaimed_org_admin_email=new_email)
+    Organization.objects.filter(alternate_admin_email=old_email).update(
+        alternate_admin_email=new_email)
+
+    # send email to new and old account
+    context = {
+        'old_email': old_email,
+        'new_email': new_email,
+        'platform_name': configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME)
+    }
+    MandrillClient().send_mail(MandrillClient.CHANGE_USER_EMAIL_ALERT, old_email, context)
+    MandrillClient().send_mail(MandrillClient.CHANGE_USER_EMAIL_ALERT, new_email, context)

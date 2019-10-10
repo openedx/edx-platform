@@ -44,10 +44,6 @@ def generate_random_team_banner_color():
     return choice(TEAM_BANNER_COLORS)
 
 
-def validate_team_topic(course, topic_id):
-    return bool(filter(lambda topic: topic['id'] == topic_id, course.teams_topics))
-
-
 def make_embed_url(team_group_chat, user, topic_url=None):
     if topic_url:
         topic = topic_url.split("topic/")[1]
@@ -79,3 +75,11 @@ def get_user_course_with_access(course_id, user):
     """
     course_key = CourseKey.from_string(course_id)
     return get_course_with_access(user, "load", course_key)
+
+
+def get_team_topic(course, topic_id):
+    if not topic_id:
+        return
+
+    topics = filter(lambda topic: topic['id'] == topic_id, course.teams_topics) or (None,)
+    return topics[0]

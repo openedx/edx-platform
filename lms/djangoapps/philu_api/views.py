@@ -17,11 +17,16 @@ from lms.djangoapps.onboarding.helpers import get_org_metric_update_prompt
 from lms.djangoapps.onboarding.models import MetricUpdatePromptRecord
 from student.models import User
 import urllib
+import json
 from django.http import HttpResponse, Http404
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 from wsgiref.util import FileWrapper
 
 from lms.djangoapps.oef.decorators import eligible_for_oef
 from lms.djangoapps.philu_api.helpers import get_encoded_token
+from openedx.features.badging.models import Badge, UserBadge
+from util.json_request import expect_json
 
 
 log = logging.getLogger("edx.philu_api")
@@ -160,6 +165,31 @@ class UpdatePromptClickRecord(APIView):
                 record.save()
                 return JsonResponse({'success': True})
         return JsonResponse({'success': False}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+
+@require_POST
+@expect_json
+@csrf_exempt
+def assign_user_badge(request):
+    data = json.loads(request.body)
+    user_id = data.get('user_id')
+    badge_id = data.get('badge_id')
+    community_id = data.get('community_id')
+    master_token = data.get('token')
+
+    if not master_token == settings.NODEBB_MASTER_TOKEN:
+        return JsonResponse({'success': False, 'message': 'Invalid master token'},
+                            status=status.HTTP_403_FORBIDDEN)
+
+    try:
+        UserBadge.assign_badge(user_id=user_id,
+                               badge_id=badge_id,
+                               community_id=community_id)
+        return JsonResponse({'success': True})
+    except Exception as e:
+        logging.exception(e)
+        return JsonResponse({'success': False, 'message': str(e)},
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 def get_user_chat(request):

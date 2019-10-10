@@ -2,6 +2,7 @@
 Views handling read (GET) requests for the Discussion tab and inline discussions.
 """
 
+import json
 import logging
 from w3lib.url import add_or_replace_parameter
 
@@ -15,6 +16,13 @@ from opaque_keys.edx.keys import CourseKey
 
 from helpers import get_course_related_tabs, get_all_course_progress
 from models import DiscussionCommunity, TeamGroupChat
+from openedx.features.badging.models import Badge
+from openedx.features.badging.constants import CONVERSATIONALIST
+from nodebb.constants import (
+    COMMUNITY_ID_SPLIT_INDEX,
+    COMMUNITY_URL_SPLIT_CHAR,
+    CONVERSATIONALIST_ENTRY_INDEX
+)
 
 log = logging.getLogger("edx.nodebb")
 
@@ -47,6 +55,11 @@ def nodebb_forum_discussion(request, course_id):
     browse_teams_link = reverse('teams_dashboard', args=[course_id])
     courseware_link = reverse('courseware', args=[course_id])
 
+    room_id = course_community.community_url.split(COMMUNITY_URL_SPLIT_CHAR)[COMMUNITY_ID_SPLIT_INDEX]
+    unearned_badges_dict = Badge.get_unearned_badges(user_id=request.user.id,
+                                                        community_id=room_id,
+                                                        community_type=CONVERSATIONALIST[CONVERSATIONALIST_ENTRY_INDEX])
+
     context = {
         "provider": current_course.org,
         "nodebb_endpoint": settings.NODEBB_ENDPOINT,
@@ -59,7 +72,10 @@ def nodebb_forum_discussion(request, course_id):
         "custom_community_link": custom_community_link,
         "is_community_topic_link": is_community_topic_link,
         "browse_teams_link": browse_teams_link,
-        "courseware_link": courseware_link
+        "course_has_ended": current_course.has_ended(),
+        "courses_page_link": reverse("courses"),
+        "courseware_link": courseware_link,
+        "unearned_badges": json.dumps(unearned_badges_dict)
     }
 
     return render(request, 'discussion_nodebb/discussion_board.html', context)

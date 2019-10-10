@@ -2383,6 +2383,12 @@ INSTALLED_APPS = [
     # Course cards app
     'openedx.features.course_card',
 
+    # Badges app
+    'openedx.features.badging',
+
+    # On demand course email preferences
+    'openedx.features.ondemand_email_preferences',
+
     # User Leads app
     'openedx.features.user_leads',
 
@@ -3541,9 +3547,6 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_c
 NOTIFICATION_FROM_EMAIL = 'info@philanthropyu.org'
 NOTIFICATION_EMAIL_SUBJECT = 'Philanthropy-U-Team Course Notification'
 
-
-# Google Place API key
-GOOGLE_PLACE_API_KEY = 'AIzaSyDhkKEySp0g2Ip8bovRHCI5KE257DSAJkA'
 
 # OEF renewal
 

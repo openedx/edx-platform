@@ -682,10 +682,10 @@ X_FRAME_OPTIONS = ENV_TOKENS.get('X_FRAME_OPTIONS', X_FRAME_OPTIONS)
 ##### Third-party auth options ################################################
 if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
     tmp_backends = ENV_TOKENS.get('THIRD_PARTY_AUTH_BACKENDS', [
-        'social_core.backends.linkedin.LinkedinOAuth2',
         'social_core.backends.azuread.AzureADOAuth2',
         'lms.djangoapps.philu_overrides.philu_third_party_auth.custom_backends.CustomFacebookOAuth',
         'lms.djangoapps.philu_overrides.philu_third_party_auth.custom_backends.CustomGoogleOAuth',
+        'lms.djangoapps.philu_overrides.philu_third_party_auth.custom_backends.CustomLinkedinOAuth',
         'third_party_auth.saml.SAMLAuthBackend',
         'third_party_auth.lti.LTIAuthBackend',
     ])
@@ -1108,6 +1108,9 @@ WRITABLE_GRADEBOOK_URL = ENV_TOKENS.get('WRITABLE_GRADEBOOK_URL', WRITABLE_GRADE
 ############## Philu Specific Settings  #########################
 # Project Base URL
 LMS_BASE_URL = ENV_TOKENS.get('LMS_BASE_URL', None)
+
+# Google Place API key
+GOOGLE_PLACE_API_KEY = AUTH_TOKENS.get('GOOGLE_PLACE_API_KEY', None)
 
 # Mandrill API_KEY
 MANDRILL_API_KEY = AUTH_TOKENS.get('MANDRILL_API_KEY', None)

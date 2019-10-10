@@ -56,9 +56,8 @@
 
                     this.teamLanguageField = new FieldViews.DropdownFieldView({
                         model: this.teamModel,
-                        title: gettext('Language'),
+                        title: gettext('Language (Required) *'),
                         valueAttribute: 'language',
-                        required: false,
                         showMessages: false,
                         titleIconName: 'fa-comment-o',
                         options: this.context.languages,
@@ -67,9 +66,8 @@
 
                     this.teamCountryField = new FieldViews.DropdownFieldView({
                         model: this.teamModel,
-                        title: gettext('Country'),
+                        title: gettext('Country (Required) *'),
                         valueAttribute: 'country',
-                        required: false,
                         showMessages: false,
                         titleIconName: 'fa-globe',
                         options: this.context.countries,
@@ -155,6 +153,8 @@
 
                     this.teamNameField.unhighlightField();
                     this.teamDescriptionField.unhighlightField();
+                    this.teamLanguageField.unhighlightField();
+                    this.teamCountryField.unhighlightField();
 
                     if (_.isEmpty(data.name.trim())) {
                         status = false;
@@ -181,6 +181,22 @@
                         this.teamDescriptionField.highlightFieldOnError();
                         srMessages.push(
                             gettext('Team description cannot have more than 300 characters.')
+                        );
+                    }
+
+                    if (_.isEmpty(data.language.trim())) {
+                        status = false;
+                        this.teamLanguageField.highlightFieldOnError();
+                        srMessages.push(
+                            gettext('Select Language.')
+                        );
+                    }
+
+                    if (_.isEmpty(data.country.trim())) {
+                        status = false;
+                        this.teamCountryField.highlightFieldOnError();
+                        srMessages.push(
+                            gettext('Select Country.')
                         );
                     }
 

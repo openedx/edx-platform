@@ -64,7 +64,7 @@ chardet==3.0.4
 click==7.0                # via user-util
 coreapi==2.3.3            # via django-rest-swagger, openapi-codec
 coreschema==0.0.4         # via coreapi
-cryptography==2.4.2
+cryptography==2.7
 cssutils==1.0.2           # via pynliner
 ddt==1.2.0
 decorator==4.3.0          # via dogapi, pycontracts

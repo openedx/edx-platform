@@ -65,6 +65,10 @@ def sync_user_profile_info_with_nodebb(sender, instance, created, **kwargs):
 @receiver(post_save, sender=UserExtendedProfile)
 def sync_extended_profile_info_with_nodebb(sender, instance, **kwargs):
     request = get_current_request()
+
+    if not request:
+        return
+
     user = instance.user
     data_to_sync = {
         "country_of_employment": COUNTRIES.get(instance.country_of_employment, ''),
