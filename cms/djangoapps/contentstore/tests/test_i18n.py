@@ -32,6 +32,8 @@ class FakeTranslations(ModuleI18nService):
         """
         return self.translations.get(msgid, msgid)
 
+    gettext = ugettext
+
     @staticmethod
     def translator(locales_map):  # pylint: disable=method-hidden
         """Build mock translator for the given locales.
@@ -123,6 +125,7 @@ class TestModuleI18nService(ModuleStoreTestCase):
             self.assertEqual(i18n_service.ugettext(self.test_language), 'dummy language')
 
     @mock.patch('django.utils.translation.ugettext', mock.Mock(return_value='XYZ-TEST-LANGUAGE'))
+    @mock.patch('django.utils.translation.gettext', mock.Mock(return_value='XYZ-TEST-LANGUAGE'))
     def test_django_translator_in_use_with_empty_block(self):
         """
         Test: Django default translator should in use if we have an empty block

@@ -8,7 +8,7 @@ from __future__ import absolute_import
 import io
 import json
 import os
-import random
+import random2 as random
 import textwrap
 import unittest
 import zipfile

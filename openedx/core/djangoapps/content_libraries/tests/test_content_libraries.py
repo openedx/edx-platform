@@ -254,7 +254,7 @@ class ContentLibrariesTest(APITestCase):
         new_olx = """
         <problem display_name="New Multi Choice Question" max_attempts="5">
             <multiplechoiceresponse>
-                <p>This is a normal capa problem. It has "maximum attempts" set to **5**.</p>
+                <p>This is a normal capa problem with unicode 🔥. It has "maximum attempts" set to **5**.</p>
                 <label>Blockstore is designed to store.</label>
                 <choicegroup type="MultipleChoice">
                     <choice correct="false">XBlock metadata only</choice>

@@ -3,7 +3,9 @@ Helpers for courseware tests.
 """
 from __future__ import absolute_import
 
+import ast
 import json
+from collections import OrderedDict
 from datetime import timedelta
 
 import six
@@ -17,10 +19,10 @@ from six import text_type
 from six.moves import range
 from xblock.field_data import DictFieldData
 
-from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.courseware.masquerade import handle_ajax, setup_masquerade
 from edxmako.shortcuts import render_to_string
+from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
+from lms.djangoapps.courseware.masquerade import handle_ajax, setup_masquerade
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.url_utils import quote_slashes
@@ -404,3 +406,15 @@ def get_expiration_banner_text(user, course, language='en'):
             expiration_date=formatted_expiration_date
         )
     return bannerText
+
+
+def get_context_dict_from_string(data):
+    """
+    Retrieve dictionary from string.
+    """
+    # Replace tuple and un-necessary info from inside string and get the dictionary.
+    cleaned_data = ast.literal_eval(data.split('((\'video.html\',')[1].replace("),\n {})", '').strip())  # pylint: disable=unicode-format-string
+    cleaned_data['metadata'] = OrderedDict(
+        sorted(json.loads(cleaned_data['metadata']).items(), key=lambda t: t[0])
+    )
+    return cleaned_data
