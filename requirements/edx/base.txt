@@ -44,7 +44,7 @@ chardet==3.0.4
 git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0
 click==7.0                # via code-annotations, user-util
 code-annotations==0.3.2   # via edx-enterprise
-contextlib2==0.6.0
+contextlib2==0.6.0.post1
 coreapi==2.3.3            # via drf-yasg
 coreschema==0.0.4         # via coreapi, drf-yasg
 git+https://github.com/edx/crowdsourcehinter.git@a7ffc85b134b7d8909bf1fefd23dbdb8eb28e467#egg=crowdsourcehinter-xblock==0.2
@@ -104,9 +104,9 @@ edx-completion==2.0.0
 edx-django-oauth2-provider==1.3.5
 edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
-edx-django-utils==2.0.0
-edx-drf-extensions==2.4.1
-edx-enterprise==2.0.3
+edx-django-utils==2.0.1
+edx-drf-extensions==2.4.0
+edx-enterprise==1.10.8
 edx-i18n-tools==0.4.8
 edx-milestones==0.2.3
 edx-oauth2-provider==1.3.1
@@ -120,7 +120,7 @@ edx-search==1.2.2
 git+https://github.com/mitodl/edx-sga.git@237ad328ba3f03d189c421073c85e48091041f8b#egg=edx-sga==0.0
 edx-submissions==3.0.1
 edx-user-state-client==1.1.2
-edx-when==0.5.1
+edx-when==0.4
 edxval==1.1.28
 elasticsearch==1.9.0      # via edx-search
 enum34==1.1.6
