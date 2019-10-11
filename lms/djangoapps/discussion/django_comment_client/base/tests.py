@@ -47,6 +47,7 @@ from openedx.core.djangoapps.django_comment_common.utils import (
     set_course_discussion_settings
 )
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
+from openedx.core.lib import teams_config
 from student.roles import CourseStaffRole, UserBasedRole
 from student.tests.factories import CourseAccessRoleFactory, CourseEnrollmentFactory, UserFactory
 from track.middleware import TrackMiddleware
@@ -1440,9 +1441,13 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
     def setUpClass(cls):
         # pylint: disable=super-method-not-called
         with super(TeamsPermissionsTestCase, cls).setUpClassAndTestData():
-            teams_configuration = {
-                'topics': [{'id': "topic_id", 'name': 'Solar Power', 'description': 'Solar power is hot'}]
-            }
+            teams_configuration = teams_config.TeamsEnabledWithTopics(
+                topics=[
+                    teams_config.Cluster(
+                        "topic_id", name="Solar Power", description="Solar power is hot"
+                    )
+                ]
+            )
             cls.course = CourseFactory.create(teams_configuration=teams_configuration)
 
     @classmethod

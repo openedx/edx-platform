@@ -31,6 +31,7 @@ from common.test.acceptance.pages.lms.teams import (
     TeamsPage
 )
 from common.test.acceptance.tests.helpers import EventsTestMixin, UniqueCourseTest, get_modal_alert
+from openedx.core.lib.teams_config import TeamsConfig
 from openedx.core.lib.tests import attr
 
 TOPICS_PER_PAGE = 12
@@ -103,13 +104,14 @@ class TeamsTabBase(EventsTestMixin, ForumsConfigMixin, UniqueCourseTest):
         )
         return json.loads(response.text)
 
-    def set_team_configuration(self, configuration, enroll_in_course=True, global_staff=False):
+    def set_team_configuration(self, configuration_data, enroll_in_course=True, global_staff=False):
         """
         Sets team configuration on the course and calls auto-auth on the user.
         """
         #pylint: disable=attribute-defined-outside-init
         self.course_fixture = CourseFixture(**self.course_info)
-        if configuration:
+        if configuration_data:
+            configuration = TeamsConfig.from_dict(configuration_data)
             self.course_fixture.add_advanced_settings(
                 {u"teams_configuration": {u"value": configuration}}
             )

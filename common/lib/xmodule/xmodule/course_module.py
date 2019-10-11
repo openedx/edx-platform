@@ -22,6 +22,7 @@ from xblock.fields import Boolean, Dict, Float, Integer, List, Scope, String
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.video_pipeline.models import VideoUploadsEnabledByDefault
 from openedx.core.lib.license import LicenseMixin
+from openedx.core.lib.teams_config import TeamsConfig, TeamsDisabled, TeamsEnabledWithTopics
 from xmodule import course_metadata_utils
 from xmodule.course_metadata_utils import DEFAULT_GRADING_POLICY, DEFAULT_START_DATE
 from xmodule.graders import grader_from_conf
@@ -256,6 +257,39 @@ class ProctoringProvider(String):
             return proctoring_backend_settings.get('DEFAULT', None)
 
         return default
+
+
+class TeamsConfigField(Dict):
+    """
+    XBlock field for teams configuration, including definitions for team
+    clusters (that is, topics/teamsets).
+
+    Serializes to JSON dictionary.
+    """
+    _default = TeamsDisabled()
+
+    def from_json(self, value):
+        """
+        Try to parse a TeamsConfig instance from a dict.
+        """
+        try:
+            return TeamsConfig.from_dict(value)
+        except ValueError:
+            log.exception("Failed to parse teams configuration.")
+            raise
+
+    def to_json(self, value):
+        """
+        Convert a TeamsConfig instance back to a dict.
+
+        If we have the data that was used to build the TeamsConfig instance,
+        return that instead of `value.to_dict()`, thus preserving the
+        data in the form that the user entered it, without the all cleaning,
+        normalization, etc. that we do when building TeamsConfig.
+        """
+        if value.source_data is not None:
+            return value.source_data
+        return value.to_dict()
 
 
 def get_available_providers():
@@ -796,7 +830,7 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
-    teams_configuration = Dict(
+    teams_configuration = TeamsConfigField(
         display_name=_("Teams Configuration"),
         # Translators: please don't translate "id".
         help=_(
@@ -1474,26 +1508,40 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
     def teams_enabled(self):
         """
         Returns whether or not teams has been enabled for this course.
-
-        Currently, teams are considered enabled when at least one topic has been configured for the course.
         """
-        if self.teams_configuration:
-            return len(self.teams_configuration.get('topics', [])) > 0
-        return False
+        # Pylint doesn't understand XBlock fields; disable no-member.
+        # pylint: disable=no-member
+        return self.teams_configuration.is_enabled
 
     @property
     def teams_max_size(self):
         """
-        Returns the max size for teams if teams has been configured, else None.
+        Returns the max size for teams if one has been set, else None.
+
+        Also returns None if teams are disabled.
+
+        TODO Remove this superfluous method (MST-18).
         """
-        return self.teams_configuration.get('max_team_size', None)
+        # Pylint doesn't understand XBlock fields; disable no-member.
+        # pylint: disable=no-member
+        if not self.teams_enabled:
+            return None
+        return self.teams_configuration.max_team_size
 
     @property
     def teams_topics(self):
         """
-        Returns the topics that have been configured for teams for this course, else None.
+        Returns the team topics that have been configured this course
+        as a list of dictionaries, or the empty list if teams are disabled.
+
+        TODO Have users of this method instead use the teams_configuration object
+             itself, (MST-18).
         """
-        return self.teams_configuration.get('topics', None)
+        # Pylint doesn't understand XBlock fields; disable no-member.
+        # pylint: disable=no-member
+        if not isinstance(self.teams_configuration, TeamsEnabledWithTopics):
+            return []
+        return [topic.to_dict() for topic in self.teams_configuration.topics]
 
     def set_user_partitions_for_scheme(self, partitions, scheme):
         """

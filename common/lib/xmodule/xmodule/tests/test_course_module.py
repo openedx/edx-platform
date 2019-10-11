@@ -15,6 +15,7 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import utc
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 
+from openedx.core.lib import teams_config
 import xmodule.course_module
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 
@@ -277,16 +278,18 @@ class TeamsConfigurationTestCase(unittest.TestCase):
     def setUp(self):
         super(TeamsConfigurationTestCase, self).setUp()
         self.course = get_dummy_course('2012-12-02T12:00')
-        self.course.teams_configuration = dict()
+        self.course.teams_configuration = teams_config.TeamsDisabled()
         self.count = itertools.count()
 
     def add_team_configuration(self, max_team_size=3, topics=None):
         """ Add a team configuration to the course. """
-        teams_configuration = {}
-        teams_configuration["topics"] = [] if topics is None else topics
+        teams_configuration_data = {}
+        teams_configuration_data["topics"] = [] if topics is None else topics
         if max_team_size is not None:
-            teams_configuration["max_team_size"] = max_team_size
-        self.course.teams_configuration = teams_configuration
+            teams_configuration_data["max_team_size"] = max_team_size
+        self.course.teams_configuration = teams_config.TeamsConfig.from_dict(
+            teams_configuration_data
+        )
 
     def make_topic(self):
         """ Make a sample topic dictionary. """
@@ -326,7 +329,7 @@ class TeamsConfigurationTestCase(unittest.TestCase):
         self.assertEqual(size, self.course.teams_max_size)
 
     def test_teams_topics_no_teams(self):
-        self.assertIsNone(self.course.teams_topics)
+        self.assertEqual(self.course.teams_topics, [])
 
     def test_teams_topics_no_topics(self):
         self.add_team_configuration(max_team_size=4)
@@ -336,7 +339,15 @@ class TeamsConfigurationTestCase(unittest.TestCase):
         topics = [self.make_topic(), self.make_topic()]
         self.add_team_configuration(max_team_size=4, topics=topics)
         self.assertTrue(self.course.teams_enabled)
-        self.assertEqual(self.course.teams_topics, topics)
+
+        # We added new fields to topics, which will be automatically added with
+        # default values as part of loading the TeamConfig.
+        processed_topics = [topic.copy() for topic in topics]
+        for topic in processed_topics:
+            topic['management'] = teams_config.Management.get_default().value
+            topic['visibility'] = teams_config.Visibility.get_default().value
+            topic['max_team_size'] = None
+        self.assertEqual(self.course.teams_topics, processed_topics)
 
 
 class SelfPacedTestCase(unittest.TestCase):
