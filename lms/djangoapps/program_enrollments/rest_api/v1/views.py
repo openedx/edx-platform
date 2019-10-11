@@ -192,7 +192,7 @@ class ProgramEnrollmentsView(
     Request body:
         * The request body will be a list of one or more students to enroll with the following schema:
             {
-                'status': A choice of the following statuses: ['enrolled', 'pending', 'canceled', 'suspended'],
+                'status': A choice of the following statuses: ['enrolled', 'pending', 'canceled', 'suspended', 'ended'],
                 student_key: string representation of a learner in partner systems,
                 'curriculum_uuid': string representation of a curriculum
             }
@@ -226,10 +226,12 @@ class ProgramEnrollmentsView(
                 * 'pending'
                 * 'canceled'
                 * 'suspended'
+                * 'ended'
             * failure statuses:
                 * 'duplicated' - the request body listed the same learner twice
                 * 'conflict' - there is an existing enrollment for that learner, curriculum and program combo
-                * 'invalid-status' - a status other than 'enrolled', 'pending', 'canceled', 'suspended' was entered
+                * 'invalid-status' - a status other than 'enrolled', 'pending', 'canceled', 'suspended',
+                  or 'ended' was entered
       * 200: OK - All students were successfully enrolled.
         * Example json response:
             {
@@ -260,7 +262,13 @@ class ProgramEnrollmentsView(
     Request body:
         * The request body will be a list of one or more students with their updated enrollment status:
             {
-                'status': A choice of the following statuses: ['enrolled', 'pending', 'canceled', 'suspended'],
+                'status': A choice of the following statuses: [
+                    'enrolled',
+                    'pending',
+                    'canceled',
+                    'suspended',
+                    'ended',
+                ],
                 student_key: string representation of a learner in partner systems
             }
         Example:
@@ -289,10 +297,12 @@ class ProgramEnrollmentsView(
                 * 'pending'
                 * 'canceled'
                 * 'suspended'
+                * 'ended'
             * failure statuses:
                 * 'duplicated' - the request body listed the same learner twice
                 * 'conflict' - there is an existing enrollment for that learner, curriculum and program combo
-                * 'invalid-status' - a status other than 'enrolled', 'pending', 'canceled', 'suspended' was entered
+                * 'invalid-status' - a status other than 'enrolled', 'pending', 'canceled', 'suspended', 'ended'
+                                     was entered
                 * 'not-in-program' - the user is not in the program and cannot be updated
       * 200: OK - All students were successfully enrolled.
         * Example json response:

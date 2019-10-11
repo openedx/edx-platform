@@ -90,6 +90,7 @@ class ProgramEnrollmentReadingTests(TestCase):
             (cls.user_3, cls.ext_3, cls.program_uuid_y, cls.curriculum_uuid_c, PEStatuses.CANCELED),  # 7
             (None, cls.ext_4, cls.program_uuid_y, cls.curriculum_uuid_c, PEStatuses.ENROLLED),        # 8
             (cls.user_1, None, cls.program_uuid_x, cls.curriculum_uuid_b, PEStatuses.SUSPENDED),      # 9
+            (cls.user_2, None, cls.program_uuid_y, cls.curriculum_uuid_c, PEStatuses.ENDED),          # 10
         ]
         for user, external_user_key, program_uuid, curriculum_uuid, status in enrollment_test_data:
             ProgramEnrollmentFactory(
@@ -148,6 +149,7 @@ class ProgramEnrollmentReadingTests(TestCase):
         # Specifying no curriculum (because ext_6 only has Program Y
         # enrollments in one curriculum, so it's not ambiguous).
         (program_uuid_y, None, None, ext_6, 6),
+        (program_uuid_y, None, username_2, None, 10),
     )
     @ddt.unpack
     def test_get_program_enrollment(

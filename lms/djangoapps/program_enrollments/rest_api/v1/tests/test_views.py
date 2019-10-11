@@ -448,8 +448,6 @@ class ProgramEnrollmentsPostTests(ProgramEnrollmentsWriteMixin, APITestCase):
     """
     add_uuid = True
 
-    view_name = 'programs_api:v1:program_enrollments'
-
     def setUp(self):
         super(ProgramEnrollmentsPostTests, self).setUp()
         self.request = self.client.post
@@ -460,9 +458,9 @@ class ProgramEnrollmentsPostTests(ProgramEnrollmentsWriteMixin, APITestCase):
         ProgramEnrollment.objects.all().delete()
 
     def test_successful_program_enrollments_no_existing_user(self):
-        statuses = ['pending', 'enrolled', 'pending']
-        external_user_keys = ['abc1', 'efg2', 'hij3']
-        curriculum_uuids = [self.curriculum_uuid, self.curriculum_uuid, uuid4()]
+        statuses = ['pending', 'enrolled', 'pending', 'ended']
+        external_user_keys = ['abc1', 'efg2', 'hij3', 'klm4']
+        curriculum_uuids = [self.curriculum_uuid, self.curriculum_uuid, uuid4(), uuid4()]
         post_data = [
             {
                 REQUEST_STUDENT_KEY: e,
@@ -478,7 +476,7 @@ class ProgramEnrollmentsPostTests(ProgramEnrollmentsWriteMixin, APITestCase):
 
         self.assertEqual(response.status_code, 200)
 
-        for i in range(3):
+        for i in range(4):
             enrollment = ProgramEnrollment.objects.get(external_user_key=external_user_keys[i])
 
             self.assertEqual(enrollment.external_user_key, external_user_keys[i])
