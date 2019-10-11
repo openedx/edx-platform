@@ -236,7 +236,7 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
         self.clear_sub_content(good_youtube_sub)
 
         with patch('xmodule.video_module.transcripts_utils.requests.get') as mock_get:
-            mock_get.return_value = Mock(status_code=200, text=response, content=response)
+            mock_get.return_value = Mock(status_code=200, text=response, content=response.encode('utf-8'))
             # Check transcripts_utils.GetTranscriptsFromYouTubeException not thrown
             transcripts_utils.download_youtube_subs(good_youtube_sub, self.course, settings)
 
@@ -303,7 +303,7 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
             <track id="0" name="Custom1" lang_code="en-GB"/>
         </transcript_list>
         """
-        mock_get.return_value = Mock(status_code=200, text=response_success, content=response_success)
+        mock_get.return_value = Mock(status_code=200, text=response_success, content=response_success.encode('utf-8'))
 
         transcript_name = transcripts_utils.youtube_video_transcript_name(youtube_text_api)
         self.assertEqual(transcript_name, 'Custom')
@@ -316,7 +316,7 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
         youtube_text_api = copy.deepcopy(settings.YOUTUBE['TEXT_API'])
         youtube_text_api['params']['v'] = 'dummy_video_id'
         response_success = "<transcript_list></transcript_list>"
-        mock_get.return_value = Mock(status_code=200, text=response_success, content=response_success)
+        mock_get.return_value = Mock(status_code=200, text=response_success, content=response_success.encode('utf-8'))
 
         transcript_name = transcripts_utils.youtube_video_transcript_name(youtube_text_api)
         self.assertIsNone(transcript_name)
@@ -335,7 +335,7 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
             <track id="0" name="Custom1" lang_code="en-GB"/>
         </transcript_list>
         """
-        mock_get.return_value = Mock(status_code=200, text=response_success, content=response_success)
+        mock_get.return_value = Mock(status_code=200, text=response_success, content=response_success.encode('utf-8'))
 
         transcript_name = transcripts_utils.youtube_video_transcript_name(youtube_text_api)
         self.assertIsNone(transcript_name)
@@ -550,7 +550,7 @@ class TestYoutubeTranscripts(unittest.TestCase):
         }
         youtube_id = 'good_youtube_id'
         with patch('xmodule.video_module.transcripts_utils.requests.get') as mock_get:
-            mock_get.return_value = Mock(status_code=200, text=response, content=response)
+            mock_get.return_value = Mock(status_code=200, text=response, content=response.encode('utf-8'))
             transcripts = transcripts_utils.get_transcripts_from_youtube(youtube_id, settings, translation)
         self.assertEqual(transcripts, expected_transcripts)
         mock_get.assert_called_with('http://video.google.com/timedtext', params={'lang': 'en', 'v': 'good_youtube_id'})
