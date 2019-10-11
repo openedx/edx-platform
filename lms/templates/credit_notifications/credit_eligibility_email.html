@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%!
   from django.utils.translation import ugettext as _
   from openedx.core.djangolib.markup import HTML, Text
@@ -18,7 +19,7 @@
       <table>
         <tr>
           <td class="cn-img-wrapper">
-            <a target="_blank" title="" href="#">
+            <a rel="noopener" target="_blank" title="" href="#">
               <img class="cn-img" src="cid:${branded_logo}">
             </a>
           </td>

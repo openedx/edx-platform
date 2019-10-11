@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%namespace name='static' file='static_content.html'/>
 <%!
 from django.conf import settings
@@ -6,7 +7,10 @@ from django_countries import countries
 from student.models import UserProfile
 from datetime import date
 import calendar
+from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangolib.js_utils import js_escaped_string
 %>
+
 
 <section id="signup-modal" class="modal signup-modal">
   <div class="inner-wrapper">
@@ -21,8 +25,8 @@ import calendar
     <div id="register">
       <header>
         <h2>
-	  ${_('Sign Up for {platform_name}').format(
-	      platform_name=u'<span class="edx">{}</span>'.format(settings.PLATFORM_NAME)
+	  ${Text(_('Sign Up for {platform_name}')).format(
+	      platform_name=HTML(u'<span class="edx">{}</span>').format(settings.PLATFORM_NAME)
 	  )}
 	</h2>
         <hr>
@@ -47,7 +51,11 @@ import calendar
           <label data-field="name" for="signup_fullname">${_('Full Name')} + ' *'</label>
 	    <input id="signup_fullname" type="text" name="name" placeholder="${_('e.g. Your Name (for certificates)')}" required />
 	  % else:
-	  <p>${_('<i>Welcome</i> {name}').format(name=extauth_id)}</p><br/>
+	  <p>${Text(_('{italic_start}Welcome{italic_end} {name}')).format(
+      italic_start=HTML('<i>'),
+      italic_end=HTML('</i>'),
+      name=extauth_id
+      )}</p><br/>
 	  <p><i>${_('Enter a public username:')}</i></p>
 
           <label data-field="username" for="signup_username">${_('Public Username')} + ' *'</label>
@@ -127,17 +135,17 @@ import calendar
         <div class="input-group">
           <label data-field="terms_of_service" class="terms-of-service" for="signup_tos">
             <input id="signup_tos" name="terms_of_service" type="checkbox" value="true">
-            ${_('I agree to the {link_start}Terms of Service{link_end}').format(
-              link_start='<a href="{url}" target="_blank">'.format(url=reverse('tos')),
-              link_end='</a>') + ' *'}
+              ${Text(_('I agree to the {link_start}Terms of Service{link_end}')).format(
+                link_start=HTML('<a href="{url}" rel="noopener" target="_blank">').format(url=reverse('tos')),
+                link_end=HTML('</a>'))} *
           </label>
 
           % if settings.REGISTRATION_EXTRA_FIELDS['honor_code'] != 'hidden':
           <label data-field="honor_code" class="honor-code" for="signup_honor">
             <input id="signup_honor" name="honor_code" type="checkbox" value="true">
-            ${_('I agree to the {link_start}Honor Code{link_end}').format(
-              link_start='<a href="{url}" target="_blank">'.format(url=reverse('honor')),
-              link_end='</a>') + ' *'}
+            ${Text(_('I agree to the {link_start}Honor Code{link_end}')).format(
+              link_start=HTML('<a href="{url}" rel="noopener" target="_blank">').format(url=reverse('honor')),
+              link_end=HTML('</a>'))} *
           </label>
           % endif
         </div>
@@ -162,12 +170,12 @@ import calendar
 <script type="text/javascript">
   (function() {
    $(document).delegate('#register_form', 'ajax:success', function(data, json, xhr) {
-     location.href="${reverse('dashboard')}";
+     location.href="${reverse('dashboard') | n, js_escaped_string}";
     });
    $(document).delegate('#register_form', 'ajax:error', function(event, jqXHR, textStatus) {
      json = $.parseJSON(jqXHR.responseText);
      $(".field-error").removeClass('field-error');
-     $('#register_error').html(json.value).stop().css("display", "block");
+     $('#register_error').text(json.value).stop().css("display", "block");
      $("[data-field='"+json.field+"']").addClass('field-error')
     });
 

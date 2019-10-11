@@ -1,4 +1,4 @@
-<%page args="license, button=False, button_size='88x31'"/>
+<%page args="license, button=False, button_size='88x31'" expression_filter="h"/>
 ## keep this synchronized with the contents of cms/templates/js/license-selector.underscore
 <%!
 from django.utils.translation import ugettext as _
@@ -40,7 +40,7 @@ def parse_license(lic):
         enabled = ["zero"]
         version = license_options.get("ver", "1.0")
     %>
-    <a rel="license" href="https://creativecommons.org/licenses/${'-'.join(enabled)}/${version}/" target="_blank">
+    <a rel="license noopener" href="https://creativecommons.org/licenses/${'-'.join(enabled)}/${version}/" target="_blank">
     % if button:
         <img src="https://licensebuttons.net/l/${'-'.join(enabled)}/${version}/${button_size}.png"
              alt="${license}"
