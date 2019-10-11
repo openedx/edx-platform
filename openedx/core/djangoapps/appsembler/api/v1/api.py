@@ -6,12 +6,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 
 from lms.djangoapps.instructor.enrollment import (
-    enroll_email,
-    get_email_params,
     get_user_email_language,
-    send_beta_role_email,
-    send_mail_to_student,
-    unenroll_email
 )
 
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
@@ -119,17 +114,17 @@ def enroll_learners_in_course(course_id, identifiers, enroll_func, **kwargs):
                 'invalidIdentifier': True,
             })
 
+        # TODO: Broad except is an anti-pattern that we should not be using:
+        #       See: https://realpython.com/the-most-diabolical-python-antipattern/
         except Exception as exc:  # pylint: disable=broad-except
             # catch and log any exceptions
             # so that one error doesn't cause a 500.
-            log.exception(u"Error while #{}ing student")
-            log.exception(exc)
+            log.exception(u"Error while enrolling student")
             results.append({
                 'identifier': identifier,
                 'error': True,
                 'error_message': str(exc),
             })
-
         else:
             ManualEnrollmentAudit.create_manual_enrollment_audit(
                 request_user, email, state_transition, reason, enrollment_obj, role

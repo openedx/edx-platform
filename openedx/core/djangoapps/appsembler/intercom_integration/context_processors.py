@@ -3,6 +3,7 @@ import hashlib
 
 from django.conf import settings
 from student.auth import user_has_role
+from student.models import CourseAccessRole
 from student.roles import CourseCreatorRole
 
 
@@ -14,9 +15,10 @@ def intercom(request):
         return data
 
     user = request.user
-    # if user is created through AMC
-    if user.is_authenticated() and user_has_role(user, CourseCreatorRole()):
-
+    if user.is_authenticated() and (
+        user_has_role(user, CourseCreatorRole())  # Course authors, which is given by default for AMC site admins
+        or CourseAccessRole.objects.filter(user=user).exists()  # Course staff, of any type
+    ):
         data['show_intercom_widget'] = True
         user_hash = hmac.new(
             str(settings.INTERCOM_APP_SECRET),
