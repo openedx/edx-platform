@@ -160,12 +160,12 @@ class StubXQueueServiceTest(unittest.TestCase):
 
         Raises an `AssertionError` if the check fails.
         """
-        # Check the response posted back to us
-        # This is the default response
-        expected_callback_dict = {
-            'xqueue_header': expected_header,
-            'xqueue_body': expected_body,
-        }
-
         # Check that the POST request was made with the correct params
-        self.post.assert_called_with(callback_url, data=expected_callback_dict)
+        assert self.post.call_count == 1
+        call_args = self.post.call_args
+        assert call_args[0] == (callback_url, )
+        assert len(call_args[1]) == 1
+        call_data = call_args[1]['data']
+        assert len(call_data) == 2
+        assert json.loads(call_data['xqueue_header']) == json.loads(expected_header)
+        assert call_data['xqueue_body'] == expected_body
