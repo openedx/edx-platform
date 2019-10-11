@@ -265,6 +265,13 @@ def _handle_instructor_task_failure(instructor_task, error):
     raise QueueConnectionError()
 
 
+def _get_async_result(task_id):
+    """
+    Use this minor indirection to facilitate mocking the AsyncResult in tests.
+    """
+    return AsyncResult(task_id)
+
+
 def get_updated_instructor_task(task_id):
     """
     Returns InstructorTask object corresponding to a given `task_id`.
@@ -282,7 +289,7 @@ def get_updated_instructor_task(task_id):
     # if the task is not already known to be done, then we need to query
     # the underlying task's result object:
     if instructor_task.task_state not in READY_STATES:
-        result = AsyncResult(task_id)
+        result = _get_async_result(task_id)
         _update_instructor_task(instructor_task, result)
 
     return instructor_task
