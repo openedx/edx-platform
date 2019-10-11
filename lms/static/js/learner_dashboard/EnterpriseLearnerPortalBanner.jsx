@@ -23,7 +23,7 @@ function setViewedBanner() {
 }
 
 function hasViewedBanner() {
-  window.localStorage.getItem(LOCAL_STORAGE_KEY);
+  return window.localStorage.getItem(LOCAL_STORAGE_KEY) != null;
 }
 
 class EnterpriseLearnerPortalBanner extends Component {
