@@ -131,6 +131,21 @@ def get_course_outline_block_tree(request, course_id, user=None):
                 # we'll use the last child.
                 block['children'][-1]['resume_block'] = True
 
+    def recurse_mark_scored(block):
+        """
+        Mark this block as 'scored' if any of its descendents are 'scored' (that is, 'has_score' and 'weight' > 0).
+        """
+        is_scored = block.get('has_score', False) and block.get('weight', 1) > 0
+        # Use a list comprehension to force the recursion over all children, rather than just stopping
+        # at the first child that is scored.
+        children_scored = any([recurse_mark_scored(child) for child in block.get('children', [])])
+        if is_scored or children_scored:
+            block['scored'] = True
+            return True
+        else:
+            block['scored'] = False
+            return False
+
     course_key = CourseKey.from_string(course_id)
     course_usage_key = modulestore().make_course_usage_key(course_key)
 
@@ -160,6 +175,8 @@ def get_course_outline_block_tree(request, course_id, user=None):
             'type',
             'due',
             'graded',
+            'has_score',
+            'weight',
             'special_exam_info',
             'show_gated_sections',
             'format'
@@ -170,6 +187,7 @@ def get_course_outline_block_tree(request, course_id, user=None):
     course_outline_root_block = all_blocks['blocks'].get(all_blocks['root'], None)
     if course_outline_root_block:
         populate_children(course_outline_root_block, all_blocks['blocks'])
+        recurse_mark_scored(course_outline_root_block)
         if user:
             set_last_accessed_default(course_outline_root_block)
             mark_blocks_completed(
