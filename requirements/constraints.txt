@@ -78,7 +78,7 @@ numpy<1.17.0
 jsondiff==1.1.1
 
 
-# Constraining these so that we can slow-roll their deploy to find out which one is causing the production performance issues.
-edx-when==0.4
-edx-enterprise==1.10.8
+# Constraining this because when we rolled it to edx.org production
+# we had a lot of memory issues and gunicorn workers started running
+# out of memory.  ARCH-1210
 edx-drf-extensions==2.4.0
