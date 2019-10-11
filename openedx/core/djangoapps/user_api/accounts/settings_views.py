@@ -148,7 +148,7 @@ def account_settings_context(request):
     }
 
     enterprise_customer = get_enterprise_customer_for_learner(user=request.user)
-    update_account_settings_context_for_enterprise(context, enterprise_customer)
+    update_account_settings_context_for_enterprise(context, enterprise_customer, user)
 
     if third_party_auth.is_enabled():
         # If the account on the third party provider is already connected with another edX account,
