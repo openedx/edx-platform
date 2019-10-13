@@ -586,8 +586,9 @@ class VideoPage(PageObject):
         time.sleep(0.2)
 
         real, expected = self._dimensions
-
-        height = abs(expected['height'] - real['height']) <= 5
+        # from pdb import set_trace
+        # set_trace()
+        height = abs(expected['height'] - real['height']) <= 20
 
         # Restore initial window size
         self.browser.set_window_size(

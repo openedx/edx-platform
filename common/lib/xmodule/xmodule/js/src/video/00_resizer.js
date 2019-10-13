@@ -89,11 +89,13 @@ function() {
 
         var alignByWidthOnly = function() {
             var data = getData(),
-                height = data.containerWidth / data.elementRatio;
+                height = data.containerWidth / data.elementRatio,
+                width = data.containerWidth > 200 ? data.containerWidth : 200;
 
+            height = height > 200 ? height : 200;
             data.element.css({
                 height: height,
-                width: data.containerWidth,
+                width: width,
                 top: 0.5 * (data.containerHeight - height),
                 left: 0
             });
@@ -106,8 +108,8 @@ function() {
                 width = data.containerHeight * data.elementRatio;
 
             data.element.css({
-                height: data.containerHeight,
-                width: data.containerHeight * data.elementRatio,
+                height: data.containerHeight > 200 ? data.containerHeight : 200,
+                width: width > 200 ? width : 200,
                 top: 0,
                 left: 0.5 * (data.containerWidth - width)
             });

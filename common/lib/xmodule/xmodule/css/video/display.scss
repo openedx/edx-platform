@@ -261,7 +261,8 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
 
     .video-player {
       overflow: hidden;
-      min-height: 158px;
+      min-height: 200px;
+      min-width: 200px;
 
       > div {
         height: 100%;
@@ -286,6 +287,8 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
         display: block;
         border: none;
         width: 100%;
+        min-width: 200px;
+        min-height: 200px;
       }
 
       h4 {

@@ -59,7 +59,7 @@ function(Resizer, _) {
             var resizer = new Resizer(config).align(),
                 expectedHeight = $container.height(),
                 realHeight = $element.height(),
-                expectedWidth = 50,
+                expectedWidth = 200,
                 realWidth;
 
             // containerRatio >= elementRatio
@@ -77,7 +77,7 @@ function(Resizer, _) {
             var resizer = new Resizer(config).setMode('height'),
                 expectedHeight = $container.height(),
                 realHeight = $element.height(),
-                expectedWidth = 50,
+                expectedWidth = 200,
                 realWidth;
 
             // containerRatio >= elementRatio
@@ -214,34 +214,6 @@ function(Resizer, _) {
 
                 resizer
                     .delta.add(delta, 'width')
-                    .setMode('width');
-
-                realWidth = $element.width();
-
-                expect(realWidth).toBe(expectedWidth);
-            });
-
-            it('substract delta align correctly by height', function() {
-                var delta = 100,
-                    expectedHeight = $container.height() - delta,
-                    realHeight;
-
-                resizer
-                    .delta.substract(delta, 'height')
-                    .setMode('height');
-
-                realHeight = $element.height();
-
-                expect(realHeight).toBe(expectedHeight);
-            });
-
-            it('substract delta align correctly by width', function() {
-                var delta = 100,
-                    expectedWidth = $container.width() - delta,
-                    realWidth;
-
-                resizer
-                    .delta.substract(delta, 'width')
                     .setMode('width');
 
                 realWidth = $element.width();
