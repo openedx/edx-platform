@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-10-06 20:51+0000\n"
-"PO-Revision-Date: 2019-10-06 20:51:30.664392\n"
+"POT-Creation-Date: 2019-10-13 20:51+0000\n"
+"PO-Revision-Date: 2019-10-13 20:51:07.597991\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -736,6 +736,18 @@ msgstr "رشوث خب فاث عفو ذخخنهث"
 #: common/djangoapps/student/models.py
 msgid "Name of the affiliate cookie"
 msgstr "رشوث خب فاث شببهمهشفث ذخخنهث"
+
+#: common/djangoapps/student/models.py
+msgid ""
+"It expect that the data will be provided in a csv file format with"
+"                     first row being the header and columns will be as "
+"follows:                     user_id, username, email, course_id, "
+"is_verified, verification_date"
+msgstr ""
+"هف ثطحثذف فاشف فاث يشفش صهمم زث حقخدهيثي هر ش ذسد بهمث بخقوشف صهفا"
+"                     بهقسف قخص زثهرل فاث اثشيثق شري ذخمعورس صهمم زث شس "
+"بخممخصس:                     عسثق_هي, عسثقرشوث, ثوشهم, ذخعقسث_هي, "
+"هس_دثقهبهثي, دثقهبهذشفهخر_يشفث"
 
 #: common/djangoapps/student/models.py
 msgid "Name of this user attribute."
@@ -25451,6 +25463,10 @@ msgstr "ذخعقسث رشدهلشفهخر"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "خعفمهرث"
+
+#: cms/templates/widgets/header.html
+msgid "Publisher"
+msgstr "حعزمهساثق"
 
 #: cms/templates/widgets/header.html
 msgid "Import"
