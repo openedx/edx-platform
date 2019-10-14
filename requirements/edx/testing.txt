@@ -27,7 +27,7 @@ apipkg==1.5               # via execnet
 appdirs==1.4.3
 argh==0.26.2
 argparse==1.4.0           # via caniusepython3
-asn1crypto==1.0.1
+asn1crypto==1.1.0
 astroid==1.5.3            # via pylint, pylint-celery
 atomicwrites==1.3.0       # via pytest
 attrs==17.4.0
