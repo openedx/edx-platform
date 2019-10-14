@@ -12,7 +12,9 @@ urlpatterns = [
 
     url(r'^email_confirm/(?P<key>[^/]*)$', views.confirm_email_change, name='confirm_email_change'),
 
-    url(r'^activate/(?P<key>[^/]*)$', views.activate_account, name="activate"),
+    # Ironwood has introduced new flow for LMS user activation, though kept old (Ficus) flow for CMS.
+    # In order to use old activation flow, for consistency, we need to use view specific to studio
+    url(r'^activate/(?P<key>[^/]*)$', views.activate_account_studio, name="activate"),
 
     url(r'^accounts/disable_account_ajax$', views.disable_account_ajax, name="disable_account_ajax"),
     url(r'^accounts/manage_user_standing', views.manage_user_standing, name='manage_user_standing'),
