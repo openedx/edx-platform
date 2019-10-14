@@ -452,7 +452,7 @@ class TestCohortApi(SharedModuleStoreTestCase):
         # this temporary file will be removed in `self.tearDown()`
         __, file_name = tempfile.mkstemp(suffix='.csv', dir=tempfile.mkdtemp())
         with open(file_name, 'w') as file_pointer:
-            file_pointer.write(payload.encode('utf-8'))
+            file_pointer.write(payload)
         path = reverse('api_cohorts:cohort_users_csv', kwargs={'course_key_string': self.course_str})
         user = self.staff_user if is_staff else self.user
         assert self.client.login(username=user.username, password=self.password)
