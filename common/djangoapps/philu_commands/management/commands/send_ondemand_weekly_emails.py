@@ -1,16 +1,15 @@
-import math
-from pytz import utc
 from datetime import datetime, timedelta
 from logging import getLogger
 
 from django.core.management.base import BaseCommand
 
 from submissions.models import Submission
+
+from philu_commands.helpers import generate_course_structure
 from common.lib.mandrill_client.client import MandrillClient
 from student.models import CourseEnrollment
 
 from xmodule.modulestore.django import modulestore
-from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.courseware.helpers import get_nth_chapter_link
 from openedx.features.ondemand_email_preferences.helpers import get_my_account_link
@@ -37,11 +36,11 @@ class Command(BaseCommand):
         courses = CourseOverview.objects.filter(self_paced=True)
 
         for course in courses:
-            try:
-                course_struct = CourseStructure.objects.get(course_id=course.id).structure
-            except CourseStructure.DoesNotExist:
+            course_struct = generate_course_structure(course.id)['structure']
+
+            if not course_struct:
                 log.error('Course doesn\'t have a proper structure.')
-                raise
+                continue
 
             course_blocks = course_struct['blocks']
             # If course doesn't have any blocks, continue.
@@ -114,9 +113,9 @@ class Command(BaseCommand):
                                         # Response submitted date must be within last
                                         # 24 hours and we are checking that below
                                         if today - timedelta(hours=HOURS_TO_WAIT_FOR_EMAIL) <= \
-                                                response_submissions.created_at.date() <= today:
+                                            response_submissions.created_at.date() <= today:
                                             atleast_one_ora_submitted = True
-                                            log.info('Response Created at: %s',response_submissions.created_at.date())
+                                            log.info('Response Created at: %s', response_submissions.created_at.date())
                                     except Submission.DoesNotExist:
                                         log.error("ORA response not submitted")
                                         chapters_skipped.update({index_chapter: sequentials.display_name})
@@ -126,8 +125,8 @@ class Command(BaseCommand):
                                     # is less than total number of modules, number of graded sub-section is
                                     # greater than 0 and atleast one ora sub mitted in last 24 hours.
                                     if index_chapter != last_chapter_index and \
-                                            graded_subsection > 0 and atleast_one_ora_submitted:
-                                        send_weekly_email(user, course, str(chapter), course_blocks, index_chapter+1)
+                                        graded_subsection > 0 and atleast_one_ora_submitted:
+                                        send_weekly_email(user, course, str(chapter), course_blocks, index_chapter + 1)
 
                                     # We need to send skip email if user has completed last
                                     # module but has skipped one or more prevedxious module.
