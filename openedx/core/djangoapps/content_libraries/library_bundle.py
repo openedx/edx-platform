@@ -314,6 +314,34 @@ class LibraryBundle(object):
         self.cache.set(('has_changes', ), result)
         return result
 
+    def get_static_prefix_for_definition(self, definition_key):
+        """
+        Given a definition key, get the path prefix used for all (public) static
+        asset files.
+
+        Example: problem/quiz1/static/
+        """
+        return self.olx_prefix(definition_key) + 'static/'
+
+    def get_static_files_for_definition(self, definition_key):
+        """
+        Return a list of the static asset files related with a particular XBlock
+        definition.
+
+        If the bundle contains files like:
+            problem/quiz1/definition.xml
+            problem/quiz1/static/image1.png
+        Then this will return
+            [BundleFile(path="image1.png", size, url, hash_digest)]
+        """
+        path_prefix = self.get_static_prefix_for_definition(definition_key)
+        path_prefix_len = len(path_prefix)
+        return [
+            blockstore_api.BundleFile(path=f.path[path_prefix_len:], size=f.size, url=f.url, hash_digest=f.hash_digest)
+            for f in get_bundle_files_cached(self.bundle_uuid, draft_name=self.draft_name)
+            if f.path.startswith(path_prefix)
+        ]
+
     @staticmethod
     def olx_prefix(definition_key):
         """

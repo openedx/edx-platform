@@ -11,9 +11,9 @@ from django.core.cache import cache
 from django.template import TemplateDoesNotExist
 from django.utils.functional import cached_property
 from fs.memoryfs import MemoryFS
+import six
 
 from edxmako.shortcuts import render_to_string
-import six
 
 
 class RuntimeShim(object):
@@ -184,17 +184,24 @@ class RuntimeShim(object):
 
     def replace_urls(self, html_str):
         """
-        Given an HTML string, replace any static file URLs like
+        Deprecated precursor to transform_static_paths_to_urls
+
+        Given an HTML string, replace any static file paths like
             /static/foo.png
-        with working URLs like
-            https://s3.example.com/course/this/assets/foo.png
+        (which are really pointing to block-specific assets stored in blockstore)
+        with working absolute URLs like
+            https://s3.example.com/blockstore/bundle17/this-block/assets/324.png
         See common/djangoapps/static_replace/__init__.py
+
+        This is generally done automatically for the HTML rendered by XBlocks,
+        but if an XBlock wants to have correct URLs in data returned by its
+        handlers, the XBlock must call this API directly.
+
+        Note that the paths are only replaced if they are in "quotes" such as if
+        they are an HTML attribute or JSON data value. Thus, to transform only a
+        single path string on its own, you must pass html_str=f'"{path}"'
         """
-        # TODO: implement or deprecate.
-        # Can we replace this with a filesystem service that has a .get_url
-        # method on all files? See comments in the 'resources_fs' property.
-        # See also the version in openedx/core/lib/xblock_utils/__init__.py
-        return html_str  # For now just return without changes.
+        return self.transform_static_paths_to_urls(self._active_block, html_str)
 
     def replace_course_urls(self, html_str):
         """

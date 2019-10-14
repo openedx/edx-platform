@@ -7,10 +7,11 @@ import logging
 
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 from organizations.models import Organization
+from rest_framework import status
 from rest_framework.exceptions import NotFound, ValidationError
-from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
-#from rest_framework import authentication, permissions
+from rest_framework.views import APIView
 
 from openedx.core.lib.api.view_utils import view_auth_classes
 from . import api
@@ -21,6 +22,8 @@ from .serializers import (
     LibraryXBlockMetadataSerializer,
     LibraryXBlockTypeSerializer,
     LibraryXBlockOlxSerializer,
+    LibraryXBlockStaticFileSerializer,
+    LibraryXBlockStaticFilesSerializer,
 )
 
 log = logging.getLogger(__name__)
@@ -43,6 +46,9 @@ def convert_exceptions(fn):
             log.exception("XBlock not found in content library")
             raise NotFound
         except api.LibraryBlockAlreadyExists as exc:
+            log.exception(exc.message)
+            raise ValidationError(exc.message)
+        except api.InvalidNameError as exc:
             log.exception(exc.message)
             raise ValidationError(exc.message)
     return wrapped_fn
@@ -261,3 +267,69 @@ class LibraryBlockOlxView(APIView):
         except ValueError as err:
             raise ValidationError(detail=str(err))
         return Response(LibraryXBlockOlxSerializer({"olx": new_olx_str}).data)
+
+
+@view_auth_classes()
+class LibraryBlockAssetListView(APIView):
+    """
+    Views to list an existing XBlock's static asset files
+    """
+    @convert_exceptions
+    def get(self, request, usage_key_str):
+        """
+        List the static asset files belonging to this block.
+        """
+        key = LibraryUsageLocatorV2.from_string(usage_key_str)
+        files = api.get_library_block_static_asset_files(key)
+        return Response(LibraryXBlockStaticFilesSerializer({"files": files}).data)
+
+
+@view_auth_classes()
+class LibraryBlockAssetView(APIView):
+    """
+    Views to work with an existing XBlock's static asset files
+    """
+    parser_classes = (MultiPartParser, )
+
+    @convert_exceptions
+    def get(self, request, usage_key_str, file_path):
+        """
+        Get a static asset file belonging to this block.
+        """
+        key = LibraryUsageLocatorV2.from_string(usage_key_str)
+        files = api.get_library_block_static_asset_files(key)
+        for f in files:
+            if f.path == file_path:
+                return Response(LibraryXBlockStaticFileSerializer(f).data)
+        raise NotFound
+
+    @convert_exceptions
+    def put(self, request, usage_key_str, file_path):
+        """
+        Replace a static asset file belonging to this block.
+        """
+        usage_key = LibraryUsageLocatorV2.from_string(usage_key_str)
+        file_wrapper = request.data['content']
+        if file_wrapper.size > 20 * 1024 * 1024:  # > 20 MiB
+            # In the future, we need a way to use file_wrapper.chunks() to read
+            # the file in chunks and stream that to Blockstore, but Blockstore
+            # currently lacks an API for streaming file uploads.
+            raise ValidationError("File too big")
+        file_content = file_wrapper.read()
+        try:
+            result = api.add_library_block_static_asset_file(usage_key, file_path, file_content)
+        except ValueError:
+            raise ValidationError("Invalid file path")
+        return Response(LibraryXBlockStaticFileSerializer(result).data)
+
+    @convert_exceptions
+    def delete(self, request, usage_key_str, file_path):  # pylint: disable=unused-argument
+        """
+        Delete a static asset file belonging to this block.
+        """
+        usage_key = LibraryUsageLocatorV2.from_string(usage_key_str)
+        try:
+            api.delete_library_block_static_asset_file(usage_key, file_path)
+        except ValueError:
+            raise ValidationError("Invalid file path")
+        return Response(status=status.HTTP_204_NO_CONTENT)

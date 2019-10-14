@@ -29,9 +29,10 @@ urlpatterns = [
             url(r'^$', views.LibraryBlockView.as_view()),
             # Get the OLX source code of the specified block:
             url(r'^olx/$', views.LibraryBlockOlxView.as_view()),
-            # TODO: Publish the draft changes made to this block:
-            # url(r'^commit/$', views.LibraryBlockCommitView.as_view()),
-            # View todo: discard draft changes
+            # CRUD for static asset files associated with a block in the library:
+            url(r'^assets/$', views.LibraryBlockAssetListView.as_view()),
+            url(r'^assets/(?P<file_path>.+)$', views.LibraryBlockAssetView.as_view()),
+            # Future: publish/discard changes for just this one block
             # Future: set a block's tags (tags are stored in a Tag bundle and linked in)
         ])),
     ])),
