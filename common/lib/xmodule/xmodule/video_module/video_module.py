@@ -481,7 +481,7 @@ class VideoBlock(
                         'There is no transcript file associated with the {lang} language.',
                         'There are no transcript files associated with the {lang} languages.',
                         len(no_transcript_lang)
-                    ).format(lang=', '.join(no_transcript_lang))
+                    ).format(lang=', '.join(sorted(no_transcript_lang)))
                 )
             )
         return validation

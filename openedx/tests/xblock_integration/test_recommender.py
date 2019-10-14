@@ -5,6 +5,7 @@ recommender system
 
 from __future__ import absolute_import
 
+import codecs
 import itertools
 import json
 from six import StringIO
@@ -650,7 +651,10 @@ class TestRecommenderFileUploading(TestRecommender):
         happens or is rejected as expected.
         """
         if 'magic_number' in test_case:
-            f_handler = StringIO(test_case['magic_number'].decode('hex'))
+            if six.PY2:
+                f_handler = StringIO(codecs.decode(test_case['magic_number'], 'hex_codec'))
+            else:
+                f_handler = StringIO(codecs.decode(test_case['magic_number'], 'hex_codec').decode('utf-8'))
         elif content is not None:
             f_handler = StringIO(json.dumps(content, sort_keys=True))
         else:

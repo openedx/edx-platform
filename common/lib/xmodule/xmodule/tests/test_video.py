@@ -826,7 +826,7 @@ class VideoExportTestCase(VideoBlockTestBase):
         """
         self.descriptor.transcripts = None
         xml = self.descriptor.definition_to_xml(self.file_system)
-        expected = '<video url_name="SampleProblem"/>\n'
+        expected = b'<video url_name="SampleProblem"/>\n'
         self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
 
     @patch('xmodule.video_module.video_module.edxval_api', None)
@@ -1171,7 +1171,9 @@ class VideoBlockIndexingTestCase(unittest.TestCase):
         self.assertFalse(validation.empty)  # Validation contains some warning/message
         self.assertTrue(validation.summary)
         self.assertEqual(StudioValidationMessage.WARNING, validation.summary.type)
-        self.assertIn(expected_msg, validation.summary.text)
+        self.assertIn(
+            expected_msg, validation.summary.text.replace('Urdu, Esperanto', 'Esperanto, Urdu')
+        )
 
     @ddt.data(
         (

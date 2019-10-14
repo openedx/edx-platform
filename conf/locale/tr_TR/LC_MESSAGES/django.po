@@ -128,7 +128,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-10-06 20:42+0000\n"
+"POT-Creation-Date: 2019-10-13 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2019\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -825,6 +825,14 @@ msgstr "UTM çerezinin adı"
 #: common/djangoapps/student/models.py
 msgid "Name of the affiliate cookie"
 msgstr "Satış ortağı çerezinin adı"
+
+#: common/djangoapps/student/models.py
+msgid ""
+"It expect that the data will be provided in a csv file format with"
+"                     first row being the header and columns will be as "
+"follows:                     user_id, username, email, course_id, "
+"is_verified, verification_date"
+msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Name of this user attribute."
@@ -25011,6 +25019,10 @@ msgstr "Ders Navigasyonu"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Taslak"
+
+#: cms/templates/widgets/header.html
+msgid "Publisher"
+msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Import"

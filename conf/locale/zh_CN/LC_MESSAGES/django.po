@@ -395,7 +395,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-10-06 20:42+0000\n"
+"POT-Creation-Date: 2019-10-13 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: ifLab <webmaster@iflab.org>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/open-edx/teams/6205/zh_CN/)\n"
@@ -1053,6 +1053,14 @@ msgstr "UTM cookie名称"
 #: common/djangoapps/student/models.py
 msgid "Name of the affiliate cookie"
 msgstr "附属cookie名称"
+
+#: common/djangoapps/student/models.py
+msgid ""
+"It expect that the data will be provided in a csv file format with"
+"                     first row being the header and columns will be as "
+"follows:                     user_id, username, email, course_id, "
+"is_verified, verification_date"
+msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Name of this user attribute."
@@ -23479,6 +23487,10 @@ msgstr "课程导航"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "大纲"
+
+#: cms/templates/widgets/header.html
+msgid "Publisher"
+msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Import"

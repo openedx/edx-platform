@@ -158,7 +158,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         """
         Provides mock result to caller of instructor_task_status, and returns resulting output.
         """
-        with patch('celery.result.AsyncResult.__new__') as mock_result_ctor:
+        with patch('lms.djangoapps.instructor_task.api_helper._get_async_result') as mock_result_ctor:
             mock_result_ctor.return_value = mock_result
             response = self._get_instructor_task_status(task_id)
         output = json.loads(response.content.decode('utf-8'))

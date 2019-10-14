@@ -126,7 +126,7 @@ class UserAPITestCase(APITestCase):
         template = '{root}/{filename}_{{size}}.{extension}'
         if has_profile_image:
             url_root = 'http://example-storage.com/profile-images'
-            filename = hashlib.md5('secret' + self.user.username.encode('utf-8')).hexdigest()
+            filename = hashlib.md5(('secret' + self.user.username).encode('utf-8')).hexdigest()
             file_extension = 'jpg'
             template += '?v={}'.format(TEST_PROFILE_IMAGE_UPLOADED_AT.strftime("%s"))
         else:

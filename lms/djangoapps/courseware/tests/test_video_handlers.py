@@ -416,7 +416,7 @@ class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):
 
         request = Request.blank('/' + self.dispatch)
         response = self.item.transcript(request=request, dispatch=self.dispatch)
-        self.assertEqual(json.loads(response.body), [lang])
+        self.assertEqual(json.loads(response.body.decode('utf-8')), [lang])
 
     @patch('xmodule.video_module.transcripts_utils.get_available_transcript_languages')
     def test_multiple_available_translations(self, mock_get_transcript_languages):
@@ -441,7 +441,7 @@ class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):
         request = Request.blank('/' + self.dispatch)
         response = self.item.transcript(request=request, dispatch=self.dispatch)
         # Assert that bumper only get its own translations.
-        self.assertEqual(json.loads(response.body.decode('utf-8')), ['en', 'uk'])
+        self.assertEqual(sorted(json.loads(response.body.decode('utf-8'))), sorted(['en', 'uk']))
 
 
 @ddt.ddt
@@ -484,7 +484,7 @@ class TestTranscriptDownloadDispatch(TestVideo):
     def test_download_srt_exist(self, __):
         request = Request.blank('/download')
         response = self.item.transcript(request=request, dispatch='download')
-        self.assertEqual(response.body, 'Subs!')
+        self.assertEqual(response.body.decode('utf-8'), 'Subs!')
         self.assertEqual(response.headers['Content-Type'], 'application/x-subrip; charset=utf-8')
         self.assertEqual(response.headers['Content-Language'], 'en')
 
@@ -1282,12 +1282,12 @@ class TestGetTranscript(TestVideo):
 
         transcripts = self.item.get_transcripts_info()
         text, filename, mime_type = self.item.get_transcript(transcripts)
-        expected_text = textwrap.dedent("""
+        expected_text = textwrap.dedent(u"""
         0
         00:00:00,12 --> 00:00:00,100
         Привіт, edX вітає вас.
         """)
-        self.assertEqual(text.decode('utf-8') if six.PY3 else text, expected_text)
+        self.assertEqual(text, expected_text)
         self.assertEqual(filename, u"塞.srt")
         self.assertEqual(mime_type, 'application/x-subrip; charset=utf-8')
 
