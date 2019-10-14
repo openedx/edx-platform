@@ -12,7 +12,7 @@ urlpatterns = [
 
     url(r'^email_confirm/(?P<key>[^/]*)$', views.confirm_email_change, name='confirm_email_change'),
 
-    url(r'^activate/(?P<key>[^/]*)$', views.activate_account, name="activate"),
+    url(r'^activate/(?P<key>[^/]*)$', views.activate_account_studio, name="activate"),
 
     url(r'^accounts/disable_account_ajax$', views.disable_account_ajax, name="disable_account_ajax"),
     url(r'^accounts/manage_user_standing', views.manage_user_standing, name='manage_user_standing'),
