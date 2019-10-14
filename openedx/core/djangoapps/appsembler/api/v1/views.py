@@ -236,7 +236,7 @@ class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):
         normalized = str(unnormalized).lower()
         if normalized not in ['false', 'true']:
             raise ValidationError('invalid value {unnormalized} for boolean type'.format(unnormalized))
-        return True if value == 'true' else False
+        return True if normalized == 'true' else False
 
 
 class CourseViewSet(TahoeAuthMixin, viewsets.ReadOnlyModelViewSet):
