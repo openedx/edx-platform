@@ -324,9 +324,9 @@ class LoginFailuresAdminTest(TestCase):
         """Setup."""
         super(LoginFailuresAdminTest, self).setUp()
         self.client.login(username=self.user.username, password='test')
-        user = UserFactory.create()
+        self.user2 = UserFactory.create()
         LoginFailures.objects.create(user=self.user, failure_count=10, lockout_until=datetime.datetime.now())
-        LoginFailures.objects.create(user=user, failure_count=2)
+        LoginFailures.objects.create(user=self.user2, failure_count=2)
 
     def tearDown(self):
         """Tear Down."""
@@ -339,8 +339,9 @@ class LoginFailuresAdminTest(TestCase):
         It shouldn't raise `TypeError`.
         """
         try:
-            map(str, LoginFailures.objects.all())
-        except TypeError, e:
+            str(LoginFailures.objects.get(user=self.user))
+            str(LoginFailures.objects.get(user=self.user2))
+        except TypeError as e:
             self.fail("Failed executing `__str__` with unicode: {0}".format(e))
 
     @ddt.data(
