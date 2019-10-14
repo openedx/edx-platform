@@ -4,6 +4,7 @@ Utility functions for capa.
 from __future__ import absolute_import
 
 import re
+import six
 from cmath import isinf, isnan
 from decimal import Decimal
 
@@ -117,7 +118,7 @@ def contextualize_text(text, context):  # private
         # Should be a separate dict of variables that should be
         # replaced.
         context_key = '$' + key
-        if context_key in text:
+        if context_key in (text.decode('utf-8') if six.PY3 and isinstance(text, bytes) else text):
             text = convert_to_str(text)
             context_value = convert_to_str(context[key])
             text = text.replace(context_key, context_value)
