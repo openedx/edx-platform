@@ -579,8 +579,6 @@ def get_video_transcript_content(edx_video_id, language_code):
     edx_video_id = clean_video_id(edx_video_id)
     if edxval_api and edx_video_id:
         transcript = edxval_api.get_video_transcript_data(edx_video_id, language_code)
-        if transcript and 'content' in transcript:
-            transcript['content'] = transcript['content'].decode('utf-8')
 
     return transcript
 
