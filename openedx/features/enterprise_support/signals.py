@@ -15,8 +15,12 @@ from email_marketing.tasks import update_user
 from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomer, EnterpriseCustomerUser
 from integrated_channels.integrated_channel.tasks import transmit_single_learner_data
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED
+from openedx.features.enterprise_support.api import enterprise_enabled
 from openedx.features.enterprise_support.tasks import clear_enterprise_customer_data_consent_share_cache
-from openedx.features.enterprise_support.utils import clear_data_consent_share_cache
+from openedx.features.enterprise_support.utils import (
+    clear_data_consent_share_cache,
+    is_enterprise_learner,
+)
 
 log = logging.getLogger(__name__)
 
@@ -73,8 +77,10 @@ def handle_enterprise_learner_passing_grade(sender, user, course_id, **kwargs): 
     """
     Listen for a learner passing a course, transmit data to relevant integrated channel
     """
-    kwargs = {
-        'username': six.text_type(user.username),
-        'course_run_id': six.text_type(course_id)
-    }
-    transmit_single_learner_data.apply_async(kwargs=kwargs)
+    if enterprise_enabled() and is_enterprise_learner(user):
+        kwargs = {
+            'username': six.text_type(user.username),
+            'course_run_id': six.text_type(course_id)
+        }
+
+        transmit_single_learner_data.apply_async(kwargs=kwargs)
