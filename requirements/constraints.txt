@@ -99,3 +99,6 @@ wrapt==1.11.*
 
 # zipp 2.0.0 requires Python >= 3.6
 zipp==1.0.0
+
+# Matplotlib 3.1 requires Python 3.6
+matplotlib<3.1
