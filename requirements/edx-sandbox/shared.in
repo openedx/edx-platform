@@ -10,6 +10,7 @@
 -c ../constraints.txt
 
 cryptography                        # Implementations of assorted cryptography algorithms
-lxml==3.8.0                         # XML parser
-networkx==1.7                       # Utilities for creating, manipulating, and studying network graphs
+lxml==4.4.1                         # XML parser
+networkx==2.2                       # Utilities for creating, manipulating, and studying network graphs
+				    # Versions above 2.2 don't support python 2
 nltk                                # Natural language processing; used by the chem package

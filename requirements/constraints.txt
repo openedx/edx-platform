@@ -13,6 +13,7 @@ functools32 ; python_version == "2.7"
 futures ; python_version == "2.7"
 python-openid ; python_version == "2.7"
 pysqlite ; python_version == "2.7"
+subprocess32 ; python_version == "2.7"
 
 # Convert text markup to HTML; used in capa problems, forums, and course wikis; pin Markdown version as tests failed for its upgrade to latest release
 Markdown==2.6.11
@@ -91,6 +92,8 @@ django-object-actions==1.1.2
 
 # Constraining this since the newer versions require Python 3
 django-debug-toolbar<2.0          # A set of panels that display debug information about the current request/response
-
-# Constraining this since the newer versions require Python 3
 django-model-utils<4.0.0
+more-itertools==5.0.0
+
+# Matplotlib 3.1 requires Python 3.6
+matplotlib<3.1
