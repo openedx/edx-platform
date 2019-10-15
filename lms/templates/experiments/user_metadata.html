@@ -40,7 +40,8 @@ for datekey in (
         'enrollment_time',
         'course_start',
         'course_end',
-        'upgrade_deadline'
+        'dynamic_upgrade_deadline',
+        'course_upgrade_deadline',
 ):
     user_metadata[datekey] = (
         context.get(datekey).isoformat() if context.get(datekey) else None
