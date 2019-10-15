@@ -3,9 +3,9 @@ Test scenarios for the crowdsource hinter xblock.
 """
 from __future__ import absolute_import
 
-import json
 import unittest
 
+import simplejson as json
 from django.conf import settings
 from django.urls import reverse
 from six import text_type
