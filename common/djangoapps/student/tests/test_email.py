@@ -31,7 +31,6 @@ from student.views import (
     confirm_email_change,
     do_email_change_request,
     generate_activation_email_context,
-    send_reactivation_email_for_user,
     validate_new_email
 )
 from third_party_auth.views import inactive_user_view

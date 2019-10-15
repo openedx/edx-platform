@@ -10,16 +10,19 @@ from celery.task import task  # pylint: disable=no-name-in-module, import-error
 from django.conf import settings
 from edx_ace import ace
 from edx_ace.errors import RecoverableChannelDeliveryError
+from edx_ace.message import Message
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger('edx.celery.task')
 
 
 @task(bind=True)
-def send_activation_email(self, msg, from_address=None):
+def send_activation_email(self, msg_string, from_address=None):
     """
     Sending an activation email to the user.
     """
+    msg = Message.from_string(msg_string)
+
     max_retries = settings.RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS
     retries = self.request.retries
 
