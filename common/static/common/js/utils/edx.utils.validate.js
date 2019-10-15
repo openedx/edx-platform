@@ -124,7 +124,7 @@
 
                         getLabel: function(id) {
                         // Extract the field label, remove the asterisk (if it appears) and any extra whitespace
-                            return $('label[for=' + id + '] > span.label-text').text().split('*')[0].trim();
+                            return $('label[for=' + id + ']').text().split('*')[0].trim();
                         },
 
                         getMessage: function($el, tests) {
