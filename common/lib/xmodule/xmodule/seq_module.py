@@ -12,6 +12,7 @@ from datetime import datetime
 from functools import reduce
 
 from pkg_resources import resource_string
+
 import six
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
