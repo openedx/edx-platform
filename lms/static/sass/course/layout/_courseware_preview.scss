@@ -83,7 +83,10 @@ $proctoring-banner-text-size: 14px;
 
     .exam-text {
       display: inline-block;
-      width: calc(100% - 250px);
+
+      @include media-breakpoint-up(md) {
+        width: calc(100% - 250px);
+      }
     }
 
     a {
