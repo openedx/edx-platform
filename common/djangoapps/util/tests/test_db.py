@@ -223,7 +223,6 @@ class MigrationTests(TestCase):
     Tests for migrations.
     """
 
-    @unittest.skip("Migration in edx-enterprise has deletes. Removing all references first. ENT-1289.")
     @override_settings(MIGRATION_MODULES={})
     def test_migrations_are_in_sync(self):
         """
