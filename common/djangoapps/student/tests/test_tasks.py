@@ -50,7 +50,7 @@ class SendActivationEmailTestCase(TestCase):
         from_address = 'task_testing@example.com'
         email_max_attempts = settings.RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS
 
-        send_activation_email.delay(self.msg, from_address=from_address)
+        send_activation_email.delay(str(self.msg), from_address=from_address)
 
         # Asserts sending email retry logging.
         for attempt in range(email_max_attempts):
@@ -79,7 +79,7 @@ class SendActivationEmailTestCase(TestCase):
         """
         from_address = 'task_testing@example.com'
 
-        send_activation_email.delay(self.msg, from_address=from_address)
+        send_activation_email.delay(str(self.msg), from_address=from_address)
 
         # Asserts that the error was logged
         mock_log.exception.assert_called_with(

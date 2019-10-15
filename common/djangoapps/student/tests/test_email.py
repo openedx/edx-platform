@@ -31,7 +31,6 @@ from student.views import (
     confirm_email_change,
     do_email_change_request,
     generate_activation_email_context,
-    send_reactivation_email_for_user,
     validate_new_email
 )
 from third_party_auth.views import inactive_user_view
@@ -104,7 +103,7 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
     # sent from an OpenEdX installation.
     OPENEDX_FRAGMENTS = [
         (
-            u"You're almost there! Use the link below to activate your account to access engaging, "
+            u"Use the link below to activate your account to access engaging, "
             u"high-quality {platform_name} courses. Note that you will not be able to log back into your "
             u"account until you have activated it.".format(
                 platform_name=settings.PLATFORM_NAME
