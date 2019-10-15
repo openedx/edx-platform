@@ -11,7 +11,6 @@ import logging
 import eventtracking
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
 from edx_rest_framework_extensions.paginators import DefaultPagination
@@ -27,7 +26,7 @@ from rest_framework_oauth.authentication import OAuth2Authentication
 from openedx.core.djangoapps.bookmarks.api import BookmarksLimitReachedError
 from openedx.core.lib.api.permissions import IsUserInUrl
 from openedx.core.lib.url_utils import unquote_slashes
-from openedx.core.openapi import swagger_auto_schema, openapi
+from openedx.core import apidocs
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from . import DEFAULT_FIELDS, OPTIONAL_FIELDS, api
@@ -97,9 +96,32 @@ class BookmarksViewMixin(object):
         )
 
 
-@method_decorator(name='get', decorator=swagger_auto_schema(
-    operation_summary="Get a paginated list of bookmarks for a user.",
-    operation_description=u"""
+class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
+    """REST endpoints for lists of bookmarks."""
+
+    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    pagination_class = BookmarksPagination
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = BookmarkSerializer
+
+    @apidocs.schema(
+        parameters=[
+            apidocs.string_parameter(
+                'course_id',
+                apidocs.ParameterLocation.QUERY,
+                description="The id of the course to limit the list",
+            ),
+            apidocs.string_parameter(
+                'fields',
+                apidocs.ParameterLocation.QUERY,
+                description="The fields to return: display_name, path.",
+            ),
+        ],
+    )
+    def get(self, request, *args, **kwargs):
+        """
+        Get a paginated list of bookmarks for a user.
+
         The list can be filtered by passing parameter "course_id=<course_id>"
         to only include bookmarks from a particular course.
 
@@ -117,31 +139,8 @@ class BookmarksViewMixin(object):
         # Example Requests
 
         GET /api/bookmarks/v1/bookmarks/?course_id={course_id1}&fields=display_name,path
-        """,
-    manual_parameters=[
-        openapi.Parameter(
-            'course_id',
-            openapi.IN_QUERY,
-            type=openapi.TYPE_STRING,
-            description="The id of the course to limit the list",
-        ),
-        openapi.Parameter(
-            'fields',
-            openapi.IN_QUERY,
-            type=openapi.TYPE_STRING,
-            description="""
-                The fields to return: display_name, path.
-                """,
-        ),
-    ],
-))
-class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
-    """REST endpoints for lists of bookmarks."""
-
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
-    pagination_class = BookmarksPagination
-    permission_classes = (permissions.IsAuthenticated,)
-    serializer_class = BookmarkSerializer
+        """
+        return super(BookmarksListView, self).get(request, *args, **kwargs)
 
     def get_serializer_context(self):
         """
@@ -201,25 +200,21 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
 
         return page
 
-    @swagger_auto_schema(
-        operation_summary="Create a new bookmark for a user.",
-        operation_description=u"""
-            The POST request only needs to contain one parameter "usage_id".
-
-            Http400 is returned if the format of the request is not correct,
-            the usage_id is invalid or a block corresponding to the usage_id
-            could not be found.
-
-            # Example Requests
-
-            POST /api/bookmarks/v1/bookmarks/
-            Request data: {"usage_id": <usage-id>}
-
-            """,
-    )
+    @apidocs.schema()
     def post(self, request, *unused_args, **unused_kwargs):
-        """Create a new bookmark for a user."""
+        """Create a new bookmark for a user.
 
+        The POST request only needs to contain one parameter "usage_id".
+
+        Http400 is returned if the format of the request is not correct,
+        the usage_id is invalid or a block corresponding to the usage_id
+        could not be found.
+
+        # Example Requests
+
+        POST /api/bookmarks/v1/bookmarks/
+        Request data: {"usage_id": <usage-id>}
+        """
         if not request.data:
             return self.error_response(ugettext_noop(u'No data provided.'), DEFAULT_USER_MESSAGE)
 
@@ -314,17 +309,13 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
             log.error(error_message)
             return self.error_response(error_message, error_status=status.HTTP_404_NOT_FOUND)
 
-    @swagger_auto_schema(
-        operation_summary="Get a specific bookmark for a user.",
-        operation_description=u"""
-            # Example Requests
-
-            GET /api/bookmarks/v1/bookmarks/{username},{usage_id}/?fields=display_name,path
-
-            """,
-    )
+    @apidocs.schema()
     def get(self, request, username=None, usage_id=None):
         """
+        Get a specific bookmark for a user.
+
+        # Example Requests
+
         GET /api/bookmarks/v1/bookmarks/{username},{usage_id}?fields=display_name,path
         """
         usage_key_or_response = self.get_usage_key_or_error_response(usage_id=usage_id)
