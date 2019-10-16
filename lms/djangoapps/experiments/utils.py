@@ -309,8 +309,10 @@ def get_base_experiment_metadata_context(course, user, enrollment, user_enrollme
         enrollment_mode = enrollment.mode
         enrollment_time = enrollment.created
 
-    # upgrade_link, dynamic_upgrade_deadline and course_upgrade_deadline should be None if user has passed their dynamic pacing deadline.
-    upgrade_link, dynamic_upgrade_deadline, course_upgrade_deadline = check_and_get_upgrade_link_and_date(user, enrollment, course)
+    # upgrade_link, dynamic_upgrade_deadline and course_upgrade_deadline should be None
+    # if user has passed their dynamic pacing deadline.
+    upgrade_link, dynamic_upgrade_deadline, course_upgrade_deadline = check_and_get_upgrade_link_and_date(
+        user, enrollment, course)
 
     return {
         'upgrade_link': upgrade_link,
