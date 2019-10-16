@@ -81,7 +81,7 @@ git+https://github.com/edx/bridgekeeper.git@4e34894e4ac5d0467ed1901811a81fd87ee0
 # Our libraries:
 -e git+https://github.com/edx/codejail.git@ed3d36c27913254a23273da95ad627a1bbbffa44#egg=codejail
 -e git+https://github.com/edx/acid-block.git@98aecba94ecbfa934e2d00262741c0ea9f557fc9#egg=acid-xblock
-git+https://github.com/edx/edx-ora2.git@2.3.1#egg=ora2==2.3.1
+git+https://github.com/edx/edx-ora2.git@2.3.2#egg=ora2==2.3.2
 git+https://github.com/edx/crowdsourcehinter.git@a7ffc85b134b7d8909bf1fefd23dbdb8eb28e467#egg=crowdsourcehinter-xblock==0.2
 -e git+https://github.com/edx/RateXBlock.git@367e19c0f6eac8a5f002fd0f1559555f8e74bfff#egg=rate-xblock
 -e git+https://github.com/edx/DoneXBlock.git@01a14f3bd80ae47dd08cdbbe2f88f3eb88d00fba#egg=done-xblock
