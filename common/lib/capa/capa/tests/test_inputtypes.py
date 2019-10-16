@@ -768,7 +768,10 @@ class MatlabTest(unittest.TestCase):
         expected_list = (textwrap.dedent(expected_string).replace('\n', ' ').strip()).split(',')
         for index, value in enumerate(expected_list):
             expected_list[index] = value.strip()
-        self.assertCountEqual(output_list,expected_list)
+        if six.PY2:
+            self.assertItemsEqual(output_list,expected_list)
+        else:
+            self.assertCountEqual(output_list,expected_list)
 
         # test html, that is correct HTML5 html, but is not parsable by XML parser.
         old_render_template = self.the_input.capa_system.render_template
