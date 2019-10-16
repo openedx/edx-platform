@@ -5,9 +5,6 @@ import hashlib
 import random
 import re
 import string
-
-if "choices" not in dir(random):
-    raise ImportError("Python 3.6+ required for random.choices")
 #####
 
 
@@ -58,26 +55,27 @@ def main(args, env):
         help=argparse.SUPPRESS,
     )
     my_args = parser.parse_args(sys.argv[1:])
+    bucket_number = my_args.number
 
     hash = hash_exp(my_args.exp, my_args.user)
     digest = bucket_int(hash)
-    bucket = digest % my_args.number
-
-    print(f"{my_args.user} is in bucket: {bucket}")
-    if my_args.print_args:
-        print(f"* Args:\n\t{my_args}\n* Computed:\n\tdigest: {digest} - hash: {hash} - {abbreviate(my_args.exp)}")
-        return 0
-
-    if my_args.check_only:
-        return 0
+    bucket = digest % bucket_number
 
     abbrev = my_args.abbrev
     if abbrev is None:
         abbrev = abbreviate(my_args.exp)
 
+    print("{user} is in bucket: {bucket}".format(user=my_args.user, bucket=bucket))
+    if my_args.print_args:
+        print("* Args:\n\t{my_args}\n* Computed:\n\tdigest: {digest} - hash: {hash} - {abbrev}".format(**vars()))
+        return 0
+
+    if my_args.check_only:
+        return 0
+
     bucket_list = my_args.buckets
     if not bucket_list:
-        bucket_list = range(my_args.number)
+        bucket_list = range(bucket_number)
 
     # TODO: validate more of the arguments
     # HACK: currently not enforcing the naming rules:
@@ -85,10 +83,10 @@ def main(args, env):
     # - Usernames can only contain letters (A-Z, a-z), numerals (0-9), underscores (_), and hyphens (-).)
     print("Generated names:")
     for i in bucket_list:
-        if i >= my_args.number:
-            print(f"    (Skipped {i}, experiment only has {my_args.number} buckets)")
+        if i >= bucket_number:
+            print("    (Skipped {i}, experiment only has {bucket_number} buckets)".format(**vars()))
             continue
-        print("    " + name_for(i, abbrev, my_args.exp, my_args.user, my_args.number))
+        print("    " + name_for(i, abbrev, my_args.exp, my_args.user, bucket_number))
 
     return 0
 #####
@@ -111,15 +109,16 @@ def bucket_int(hash):
 def name_for(bucket, abbrev, exp, name, number):
     if abbrev:
         abbrev += "-"
-    name_base = f"{name}-{abbrev}{bucket}-"
-    for _ in range(100 * number):
-        s = "".join(random.choices(string.digits + string.ascii_lowercase, k=5))  # NOTE: requires python 3.6+
+    name_base = "{name}-{abbrev}{bucket}-".format(**vars())
+    tries = 100 * number
+    for _ in range(tries):
+        s = "".join([ random.choice(string.digits + string.ascii_lowercase) for _ in range(5) ])
         n = name_base + s
         b = bucket_int(hash_exp(exp, n)) % number
         if bucket == b:
             return n
     else:
-        raise RuntimeError(f"Failed to generate a name for bucket {bucket} in {100 * number} tries")
+        raise RuntimeError("Failed to generate a name for bucket {bucket} in {tries} tries".format(**vars()))
 
 
 def abbreviate(exp):
