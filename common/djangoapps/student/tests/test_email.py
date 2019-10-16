@@ -103,7 +103,7 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
     # sent from an OpenEdX installation.
     OPENEDX_FRAGMENTS = [
         (
-            u"You're almost there! Use the link below to activate your account to access engaging, "
+            u"Use the link below to activate your account to access engaging, "
             u"high-quality {platform_name} courses. Note that you will not be able to log back into your "
             u"account until you have activated it.".format(
                 platform_name=settings.PLATFORM_NAME
