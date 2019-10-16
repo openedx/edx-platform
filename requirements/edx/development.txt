@@ -329,7 +329,7 @@ unidiff==0.5.5
 uritemplate==3.0.0
 urllib3==1.25.6
 user-util==0.1.5
-virtualenv==16.7.5
+virtualenv==16.7.6
 voluptuous==0.11.7
 vulture==1.1
 watchdog==0.9.0
