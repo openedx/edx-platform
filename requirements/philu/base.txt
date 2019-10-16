@@ -8,7 +8,5 @@ channels==1.1.8
 asgi-redis==1.4.3
 imgkit==1.0.1
 -e git+https://github.com/philanthropy-u/xblock-poll#egg=xblock-poll
-# this commit is in zeshan/LP-1530
-# TODO: Merge this branch with master. OR simply rename it to master because it already contains philu and ironwood's code
--e git+https://github.com/philanthropy-u/edx-notifications.git@f6fed1c035ffb3f0ef4e255f034b193e05148744#egg=edx-notifications
+-e git+https://github.com/philanthropy-u/edx-notifications.git@9c602923d0e8a7b512a52bc4d0df5c7043286386#egg=edx-notifications
 -e git+https://github.com/philanthropy-u/django-simple-history.git@9187c9b4907da5a2a0564eff45929fd15b784309#egg=django-simple-history
