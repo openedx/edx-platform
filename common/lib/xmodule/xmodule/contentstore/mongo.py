@@ -56,7 +56,7 @@ class MongoContentStore(ContentStore):
         """
         Closes any open connections to the underlying databases
         """
-        self.fs_files.database.connection.close()
+        self.fs_files.database.client.close()
 
     def _drop_database(self, database=True, collections=True, connections=True):
         """
@@ -70,10 +70,10 @@ class MongoContentStore(ContentStore):
 
         If connections is True, then close the connection to the database as well.
         """
-        connection = self.fs_files.database.connection
+        client = self.fs_files.database.client
 
         if database:
-            connection.drop_database(self.fs_files.database)
+            client.drop_database(self.fs_files.database)
         elif collections:
             self.fs_files.drop()
             self.chunks.drop()
