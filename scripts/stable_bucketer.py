@@ -112,7 +112,7 @@ def name_for(bucket, abbrev, exp, name, number):
     name_base = "{name}-{abbrev}{bucket}-".format(**vars())
     tries = 100 * number
     for _ in range(tries):
-        s = "".join([ random.choice(string.digits + string.ascii_lowercase) for _ in range(5) ])
+        s = "".join([random.choice(string.digits + string.ascii_lowercase) for _ in range(5)])
         n = name_base + s
         b = bucket_int(hash_exp(exp, n)) % number
         if bucket == b:
