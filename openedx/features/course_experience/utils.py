@@ -11,9 +11,15 @@ from web_fragments.fragment import Fragment
 
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
+from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
 from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.cache_utils import request_cached
-from openedx.features.discounts.applicability import can_receive_discount, discount_percentage
+from openedx.features.discounts.applicability import (
+    can_receive_discount,
+    get_discount_expiration_date,
+    discount_percentage
+)
+from openedx.features.discounts.utils import format_strikeout_price
 from xmodule.modulestore.django import modulestore
 
 
@@ -192,16 +198,27 @@ def get_resume_block(block):
 
 
 def get_first_purchase_offer_banner_fragment(user, course):
-    if user and course and can_receive_discount(user=user, course=course):
-        # Translator: xgettext:no-python-format
-        offer_message = _(u'{banner_open}{percentage}% off your first upgrade.{span_close}'
-                          u' Discount automatically applied.{div_close}')
-        return Fragment(HTML(offer_message).format(
-            banner_open=HTML(
-                '<div class="first-purchase-offer-banner"><span class="first-purchase-offer-banner-bold">'
-            ),
-            percentage=discount_percentage(),
-            span_close=HTML('</span>'),
-            div_close=HTML('</div>')
-        ))
+    if user and course:
+        discount_expiration_date = get_discount_expiration_date(user, course)
+        if (discount_expiration_date and
+                can_receive_discount(user=user, course=course, discount_expiration_date=discount_expiration_date)):
+            # Translator: xgettext:no-python-format
+            offer_message = _(u'{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% '
+                              u'[{strikeout_price}]{span_close}{br}Discount will be automatically applied at checkout. '
+                              u'{a_open}Upgrade Now{a_close}{div_close}')
+            return Fragment(HTML(offer_message).format(
+                a_open=HTML(u'<a href="{upgrade_link}">').format(
+                    upgrade_link=verified_upgrade_deadline_link(user=user, course=course)
+                ),
+                a_close=HTML('</a>'),
+                br=HTML('<br>'),
+                banner_open=HTML(
+                    '<div class="first-purchase-offer-banner"><span class="first-purchase-offer-banner-bold">'
+                ),
+                discount_expiration_date=discount_expiration_date.strftime(u'%B %d'),
+                percentage=discount_percentage(),
+                span_close=HTML('</span>'),
+                div_close=HTML('</div>'),
+                strikeout_price=HTML(format_strikeout_price(user, course, check_for_discount=False)[0])
+            ))
     return None

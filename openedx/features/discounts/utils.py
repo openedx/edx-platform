@@ -9,7 +9,7 @@ from openedx.core.djangolib.markup import HTML
 from .applicability import can_receive_discount, discount_percentage
 
 
-def format_strikeout_price(user, course, base_price=None):
+def format_strikeout_price(user, course, base_price=None, check_for_discount=True):
     """
     Return a formatted price, including a struck-out original price if a discount applies, and also
         whether a discount was applied, as the tuple (formatted_price, has_discount).
@@ -19,7 +19,7 @@ def format_strikeout_price(user, course, base_price=None):
 
     original_price = format_course_price(base_price)
 
-    if can_receive_discount(user, course):
+    if not check_for_discount or can_receive_discount(user, course):
         discount_price = base_price * ((100.0 - discount_percentage()) / 100)
         if discount_price == int(discount_price):
             discount_price = format_course_price("{:0.0f}".format(discount_price))
