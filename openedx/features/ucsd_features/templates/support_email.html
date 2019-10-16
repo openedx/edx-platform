@@ -1,0 +1,21 @@
+{% extends 'base_email.html' %}
+{% block body %}
+    <p><b>Requester Name:</b> {{name}}</p>
+    <p><b>Requester Email:</b> {{email}}</p>
+    <p>{{ body }}</p>
+    <hr>
+    {% if course %}
+        Course Name: {{course}}
+        <br>
+    {% endif %}
+    {% if custom_fields or additional_info %}
+        {% for field_dict in custom_fields %}
+            {% for key, value in field_dict.items %}
+                <p><b>{{key}}:</b> {{value}}</p>
+            {% endfor %}
+        {% endfor %}
+        {% for info_dict in additional_info.items %}
+            <p><b>{{info_dict.0}}</b>: {{info_dict.1}}</p>
+        {% endfor %}
+    {% endif %}
+{% endblock body %}

@@ -8,13 +8,14 @@ from urlparse import urljoin
 from django.conf import settings
 import requests
 from rest_framework import status
+from openedx.features.ucsd_features.utils import send_notification_email_to_support
 
 log = logging.getLogger(__name__)
 
-
 def create_zendesk_ticket(requester_name, requester_email, subject, body, custom_fields=None, uploads=None, tags=None):
     """
-    Create a Zendesk ticket via API.
+    Create a Zendesk ticket via API or send an email to support team.
+    Use ENABLE_EMAIL_INSTEAD_ZENDESK flag to switch between zendesk ticket or support email
 
     Note that we do this differently in other locations (lms/djangoapps/commerce/signals.py and
     common/djangoapps/util/views.py). Both of those callers use basic auth, and should be switched over to this oauth
@@ -23,6 +24,16 @@ def create_zendesk_ticket(requester_name, requester_email, subject, body, custom
     def _std_error_message(details, payload):
         """Internal helper to standardize error message. This allows for simpler splunk alerts."""
         return 'zendesk_proxy action required\n{}\nNo ticket created for payload {}'.format(details, payload)
+
+    if settings.FEATURES.get("ENABLE_EMAIL_INSTEAD_ZENDESK", True):
+        is_email_sent = send_notification_email_to_support(
+            subject=subject,
+            body=body,
+            name=requester_name,
+            email=requester_email,
+            custom_fields=custom_fields
+        )
+        return status.HTTP_201_CREATED if is_email_sent else status.HTTP_503_SERVICE_UNAVAILABLE
 
     if tags:
         # Remove duplicates from tags list
