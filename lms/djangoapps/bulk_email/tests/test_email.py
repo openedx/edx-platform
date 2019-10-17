@@ -158,9 +158,9 @@ class SendEmailWithMockedUgettextMixin(object):
 
             e.g.
 
-            >>> mock_ugettext('Hello') == '@AR Hello@'
+            >>> mock_ugettext('Hello') == 'AR Hello'
             """
-            return u'@{lang} {text}@'.format(
+            return u'{lang} {text}'.format(
                 lang=get_language().upper(),
                 text=text,
             )
@@ -193,7 +193,7 @@ class LocalizedFromAddressPlatformLangTestCase(SendEmailWithMockedUgettextMixin,
         """
         self.assertIsNone(self.course.language)  # Sanity check
         message = self.send_email()
-        self.assertRegexpMatches(message.from_email, '@EO .* Course Staff@')
+        self.assertRegexpMatches(message.from_email, 'EO .* Course Staff')
 
 
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
@@ -225,7 +225,7 @@ class LocalizedFromAddressCourseLangTestCase(SendEmailWithMockedUgettextMixin, E
         The course language should override the platform's.
         """
         message = self.send_email()
-        self.assertRegexpMatches(message.from_email, '@AR .* Course Staff@')
+        self.assertRegexpMatches(message.from_email, 'AR .* Course Staff')
 
 
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
