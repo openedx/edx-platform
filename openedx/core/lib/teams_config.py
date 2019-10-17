@@ -16,7 +16,7 @@ import six
 log = logging.getLogger(__name__)
 
 
-@six.add_metaclass(ABCMeta)  # Makes TeamsConfig an abstract base class.
+@six.add_metaclass(ABCMeta)  # Allows TeamsConfig to have abstract methods
 class TeamsConfig(object):
     """
     Abstract base teams configuration for a course.
@@ -221,6 +221,7 @@ class TeamsEnabledWithTeamsets(TeamsEnabled):
 class Cluster(object):
     """
     A configuration for a set of teams.
+    May be either a Topic or a Teamset.
 
     Configuration options:
     * id - URL slug uniquely identifying this cluster within the course.
@@ -232,9 +233,6 @@ class Cluster(object):
     * team_management - Instructor/Student team management.
     * team_visibility - Public/Private team visibility.
     """
-    valid_id_pattern = r'[A-Za-z0-9_-]+'
-    valid_id_regexp = re.compile('^{}$'.format(valid_id_pattern))
-
     def __init__(
             self,
             id_,
@@ -244,51 +242,59 @@ class Cluster(object):
             team_management=None,
             team_visibility=None
     ):
-        """
-        Create a Cluster.
-
-        Raises ValueError if `id` is invalid.
-
-        Fallbacks for missing/invalid values:
-        * `name` defaults to the value of `id`.
-        * `description` defaults to "" (empty string).
-        * `max_team_size` falls back to None.
-        * `team_management` and `team_visibility` fall back to their
-          respective `get_default()`s.
-
-        Notes:
-        * `max_team_size` is changed to None when using instructor team management.
-        """
-        is_id_valid = isinstance(id_, six.string_types) and self.valid_id_regexp.match(id_)
-        if not is_id_valid:
-            raise ValueError(
-                "cluster id must be string matching {}; is {}".format(
-                    self.valid_id_pattern, id_
-                )
-            )
+        self._validate_id(id_)
         self.id = id_
-        if name and isinstance(name, six.string_types):
-            self.name = name
+        self._name = name
+        self._description = description
+        self._max_team_size = max_team_size
+        self._team_management = team_management
+        self._team_visibility = team_visibility
+
+    @property
+    def name(self):
+        if self._name and isinstance(self._name, six.string_types):
+            return self._name
         else:
-            self.name = id_
-        if isinstance(description, six.string_types):
-            self.description = description
+            return self.id
+
+    @property
+    def description(self):
+        if isinstance(self._description, six.string_types):
+            return self._description
         else:
-            self.description = ""
-        self._max_team_size = _clean_max_team_size(max_team_size)
-        self.team_management = _clean_enum_value(team_management, ClusterTeamManagement)
-        self.team_visibility = _clean_enum_value(team_visibility, ClusterTeamVisibility)
+            return ""
 
     @property
     def max_team_size(self):
-        """
-        Return max_team_size if the team management scheme allows for max
-        team sizes; otherwise, return None.
-        """
         if self.team_management.team_size_limit_enabled:
-            return self._max_team_size
+            return _clean_max_team_size(self._max_team_size)
         else:
             return None
+
+    @property
+    def team_management(self):
+        return _clean_enum_value(self._team_management, ClusterTeamManagement)
+
+    @property
+    def team_visibility(self):
+        return _clean_enum_value(self._team_visibility, ClusterTeamVisibility)
+
+    _valid_id_pattern = r'[A-Za-z0-9_-]+'
+    _valid_id_regexp = re.compile('^{}$'.format(_valid_id_pattern))
+
+    @classmethod
+    def _validate_id(cls, id_):
+        """
+        Raise ValueError if `id_` is not valid URL slug.
+        """
+        is_string = isinstance(id_, six.string_types)
+        if is_string and cls._valid_id_regexp.match(id_):
+            return
+        raise ValueError(
+            "cluster id must be string matching {}; is {}".format(
+                cls._valid_id_pattern, id_
+            )
+        )
 
     @classmethod
     def from_dict(cls, data):
