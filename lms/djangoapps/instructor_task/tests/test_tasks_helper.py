@@ -99,7 +99,7 @@ from ..tasks_helper.utils import UPDATE_STATUS_FAILED, UPDATE_STATUS_SUCCEEDED
 _TEAMS_CONFIG = teams_config.TeamsEnabledWithTopics(
     max_team_size=2,
     topics=[
-        teams_config.Cluster("topic-id", name="Topic", description="A Topic"),
+        teams_config.Topic("topic-id", name="Topic", description="A Topic"),
     ],
 )
 

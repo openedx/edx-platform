@@ -1443,7 +1443,7 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
         with super(TeamsPermissionsTestCase, cls).setUpClassAndTestData():
             teams_configuration = teams_config.TeamsEnabledWithTopics(
                 topics=[
-                    teams_config.Cluster(
+                    teams_config.Topic(
                         "topic_id", name="Solar Power", description="Solar power is hot"
                     )
                 ]

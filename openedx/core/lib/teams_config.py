@@ -46,7 +46,7 @@ class TeamsConfig(object):
         if topics_data and teamsets_data:
             raise ValueError("Only one of (teams, topics) may be specified.")
         elif topics_data:
-            topics = cls._load_clusters(topics_data)
+            topics = cls._load_clusters(Topic, topics_data)
             if topics:
                 return TeamsEnabledWithTopics(
                     topics=topics,
@@ -54,7 +54,7 @@ class TeamsConfig(object):
                     source_data=data,
                 )
         elif teamsets_data:
-            teamsets = cls._load_clusters(teamsets_data)
+            teamsets = cls._load_clusters(Teamset, teamsets_data)
             if teamsets:
                 return TeamsEnabledWithTeamsets(
                     teamsets=teamsets,
@@ -64,7 +64,7 @@ class TeamsConfig(object):
         return TeamsDisabled(source_data=data)
 
     @staticmethod
-    def _load_clusters(clusters_data):
+    def _load_clusters(clusters_class, clusters_data):
         """
         Load list of Clusters from list of dictionaries.
         """
@@ -76,7 +76,7 @@ class TeamsConfig(object):
         cluster_ids = set()
         for cluster_data in clusters_data:
             try:
-                cluster = Cluster.from_dict(cluster_data)
+                cluster = clusters_class.from_dict(cluster_data)
             except ValueError:
                 # Drop badly-configured clusters.
                 log.exception("Error while parsing team cluster; skipping cluster.")
@@ -218,6 +218,7 @@ class TeamsEnabledWithTeamsets(TeamsEnabled):
         return self.teamsets
 
 
+@six.add_metaclass(ABCMeta)  # Allows Cluster to have abstract methods
 class Cluster(object):
     """
     A configuration for a set of teams.
@@ -249,6 +250,14 @@ class Cluster(object):
         self._max_team_size = max_team_size
         self._team_management = team_management
         self._team_visibility = team_visibility
+
+    @abstractmethod
+    def get_clustering_scheme(cls):  # pylint: disable=no-self-argument
+        """
+        Returns the clustering scheme that uses this type of cluster.
+        """
+        # Override as a classmethod.
+        pass
 
     @property
     def name(self):
@@ -328,16 +337,46 @@ class Cluster(object):
         }
 
 
+class Topic(Cluster):
+    """
+    A configuration for a set of teams, which are
+    generally formed for the purpose of discussing some subject.
+
+    This is the type of `Cluster` that is used under `ClusteringScheme.topics`.
+    """
+    @classmethod
+    def get_clustering_scheme(cls):
+        """
+        Returns the clustering scheme that uses this type of cluster.
+        """
+        return ClusteringScheme.topics
+
+
+class Teamset(Cluster):
+    """
+    A configuration for a set of teams, which are
+    generally formed for the purpose of completing a set of assignments.
+
+    This is the type of `Cluster` that is used under `ClusteringScheme.teamsets`.
+    """
+    @classmethod
+    def get_clustering_scheme(cls):
+        """
+        Returns the clustering scheme that uses this type of cluster.
+        """
+        return ClusteringScheme.teamsets
+
+
 class ClusteringScheme(Enum):
     """
     The scheme with which the course's teams are divided into clusters.
 
     Under a "topics" scheme, each cluster is a Topic, which generally is a set
-    teams that are related in subject material.
+    teams formed for the purpose of discussing some subject.
     Students may join ONE TEAM per COURSE.
 
     Under a "teamsets" scheme, each cluster is a Teamset, which generally is a
-    set of teams formed around an assignment.
+    set of teams formed for the purpose of completing a set of assignments.
     Students may join ONE TEAM per TEAMSET.
     This scheme allows greater flexibility in that a student may work with
     different teams of students for different assignments, all within the

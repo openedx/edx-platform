@@ -3038,7 +3038,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
                 teams_configuration=teams_config.TeamsEnabledWithTopics(
                     max_team_size=2,
                     topics=[
-                        teams_config.Cluster('topic', name='Topic', description='A Topic'),
+                        teams_config.Topic('topic', name='Topic', description='A Topic'),
                     ],
                 ),
             )
