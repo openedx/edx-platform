@@ -23,7 +23,7 @@ class CountryField(serializers.Field):
 
     COUNTRY_CODES = list(dict(countries).keys())
 
-    def to_representation(self, obj): # pylint: disable=arguments-differ
+    def to_representation(self, obj):  # pylint: disable=arguments-differ
         """
         Represent the country as a 2-character unicode identifier.
         """
@@ -165,21 +165,14 @@ class MembershipSerializer(serializers.ModelSerializer):
         read_only_fields = ("date_joined", "last_activity_at")
 
 
-class BaseTopicSerializer(serializers.Serializer):
+class BaseTopicSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """Serializes a topic without team_count."""
     description = serializers.CharField()
     name = serializers.CharField()
     id = serializers.CharField()  # pylint: disable=invalid-name
 
-    # Required overrides of abstract base class methods, but we don't use them
-    def create(self, validated_data):
-        pass
 
-    def update(self, instance, validated_data):
-        pass
-
-
-class TopicSerializer(BaseTopicSerializer):
+class TopicSerializer(BaseTopicSerializer):  # pylint: disable=abstract-method
     """
     Adds team_count to the basic topic serializer, checking if team_count
     is already present in the topic data, and if not, querying the CourseTeam
@@ -202,14 +195,14 @@ class BulkTeamCountTopicListSerializer(serializers.ListSerializer):  # pylint: d
     List serializer for efficiently serializing a set of topics.
     """
 
-    def to_representation(self, obj): # pylint: disable=arguments-differ
+    def to_representation(self, obj):  # pylint: disable=arguments-differ
         """Adds team_count to each topic. """
         data = super(BulkTeamCountTopicListSerializer, self).to_representation(obj)
         add_team_count(data, self.context["course_id"])
         return data
 
 
-class BulkTeamCountTopicSerializer(BaseTopicSerializer):
+class BulkTeamCountTopicSerializer(BaseTopicSerializer):  # pylint: disable=abstract-method
     """
     Serializes a set of topics, adding the team_count field to each topic as a bulk operation.
     Requires that `context` is provided with a valid course_id in order to filter teams within the course.
