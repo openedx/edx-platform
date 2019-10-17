@@ -752,7 +752,7 @@ class MatlabTest(unittest.TestCase):
         self.assertIn('}</div>', output_string)
         self.assertIn('<div>{', output_string)
         output_string = output_string.replace('}</div>', '')
-        output_string = output_string.replace('<div>{',' ')
+        output_string = output_string.replace('<div>{', '')
         output_list = output_string.split(',')
         for index, value in enumerate(output_list):
             output_list[index] = value.strip()
@@ -760,11 +760,11 @@ class MatlabTest(unittest.TestCase):
         expected_string = u"""
         \'matlab_editor_js\': \'/dummy-static/js/vendor/CodeMirror/octave.js\',
         \'value\': \'print "good evening"\', \'hidden\': \'\',
-        \'msg\': \'Submitted. As soon as a response is returned, this message will be replaced by that feedback.\',
+        \'msg\': u\'Submitted. As soon as a response is returned, this message will be replaced by that feedback.\',
         \'status\': Status(\'queued\'), \'response_data\': {}, \'queue_msg\': \'\', \'mode\': \'\',
         \'id\': \'prob_1_2\', \'queue_len\': \'3\', \'tabsize\': 4, \'STATIC_URL\': \'/dummy-static/\',
         \'linenumbers\': \'true\', \'cols\': \'80\', \'button_enabled\': True, \'rows\': \'10\',
-        \'describedby_html\': Markup(\'aria-describedby="status_prob_1_2"\')"""
+        \'describedby_html\': Markup(u\'aria-describedby="status_prob_1_2"\')"""
         expected_list = (textwrap.dedent(expected_string).replace('\n', ' ').strip()).split(',')
         for index, value in enumerate(expected_list):
             expected_list[index] = value.strip()
