@@ -751,13 +751,13 @@ class MatlabTest(unittest.TestCase):
         output_string = etree.tostring(output).decode('utf-8')
         self.assertIn('}</div>', output_string)
         self.assertIn('<div>{', output_string)
-        output_string = output_string.replace('}</div>','')
-        output_string = output_string.replace('<div>{','')
+        output_string = output_string.replace('}</div>', '')
+        output_string = output_string.replace('<div>{',' ')
         output_list = output_string.split(',')
         for index, value in enumerate(output_list):
             output_list[index] = value.strip()
-        
-        expected_string = """
+
+        expected_string = u"""
         \'matlab_editor_js\': \'/dummy-static/js/vendor/CodeMirror/octave.js\',
         \'value\': \'print "good evening"\', \'hidden\': \'\',
         \'msg\': \'Submitted. As soon as a response is returned, this message will be replaced by that feedback.\',
@@ -769,9 +769,9 @@ class MatlabTest(unittest.TestCase):
         for index, value in enumerate(expected_list):
             expected_list[index] = value.strip()
         if six.PY2:
-            self.assertItemsEqual(output_list,expected_list)
+            self.assertItemsEqual(output_list, expected_list)
         else:
-            self.assertCountEqual(output_list,expected_list)
+            self.assertCountEqual(output_list, expected_list)
 
         # test html, that is correct HTML5 html, but is not parsable by XML parser.
         old_render_template = self.the_input.capa_system.render_template
