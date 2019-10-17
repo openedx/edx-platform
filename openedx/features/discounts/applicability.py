@@ -89,6 +89,10 @@ def can_receive_discount(user, course, discount_expiration_date=None):
 
     # TODO: Add additional conditions to return False here
 
+    # anonymous users should never get the discount
+    if user.is_anonymous:
+        return False
+
     # Check if discount has expired
     if not discount_expiration_date:
         discount_expiration_date = get_discount_expiration_date(user, course)
@@ -111,9 +115,6 @@ def can_receive_discount(user, course, discount_expiration_date=None):
 
     # Site, Partner, Course or Course Run not excluded from lms-controlled discounts
     if DiscountRestrictionConfig.disabled_for_course_stacked_config(course):
-        return False
-
-    if user.is_anonymous:
         return False
 
     # Don't allow users who have enrolled in any courses in non-upsellable
