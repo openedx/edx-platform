@@ -23,11 +23,7 @@ class CountryField(serializers.Field):
 
     COUNTRY_CODES = list(dict(countries).keys())
 
-<<<<<<< HEAD
-    def to_representation(self, obj): # pylint: disable=arguments-differ
-=======
     def to_representation(self, obj):  # pylint: disable=arguments-differ
->>>>>>> 9946fd39180c5c9a408124845554ed3189d6d4b7
         """
         Represent the country as a 2-character unicode identifier.
         """
@@ -175,13 +171,6 @@ class BaseTopicSerializer(serializers.Serializer):  # pylint: disable=abstract-m
     name = serializers.CharField()
     id = serializers.CharField()  # pylint: disable=invalid-name
 
-    # Required overrides of abstract base class methods, but we don't use them
-    def create(self, validated_data):
-        pass
-
-    def update(self, instance, validated_data):
-        pass
-
 
 class TopicSerializer(BaseTopicSerializer):  # pylint: disable=abstract-method
     """
@@ -206,18 +195,14 @@ class BulkTeamCountTopicListSerializer(serializers.ListSerializer):  # pylint: d
     List serializer for efficiently serializing a set of topics.
     """
 
-<<<<<<< HEAD
-    def to_representation(self, obj): # pylint: disable=arguments-differ
-=======
     def to_representation(self, obj):  # pylint: disable=arguments-differ
->>>>>>> 9946fd39180c5c9a408124845554ed3189d6d4b7
         """Adds team_count to each topic. """
         data = super(BulkTeamCountTopicListSerializer, self).to_representation(obj)
         add_team_count(data, self.context["course_id"])
         return data
 
 
-class BulkTeamCountTopicSerializer(BaseTopicSerializer):
+class BulkTeamCountTopicSerializer(BaseTopicSerializer):  # pylint: disable=abstract-method
     """
     Serializes a set of topics, adding the team_count field to each topic as a bulk operation.
     Requires that `context` is provided with a valid course_id in order to filter teams within the course.
