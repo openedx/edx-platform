@@ -923,7 +923,7 @@ TRACKING_SEGMENTIO_SOURCE_MAP = {
 GOOGLE_ANALYTICS_ACCOUNT = None
 GOOGLE_SITE_VERIFICATION_ID = ''
 GOOGLE_ANALYTICS_LINKEDIN = 'GOOGLE_ANALYTICS_LINKEDIN_DUMMY'
-#GOOGLE_ANALYTICS_TRACKING_ID = ""
+GOOGLE_ANALYTICS_TRACKING_ID = 'GOOGLE_ANALYTICS_TRACKING_DUMMY'
 
 ######################## BRANCH.IO ###########################
 BRANCH_IO_KEY = ''
@@ -1172,7 +1172,6 @@ MEDIA_URL = '/media/'
 # Locale/Internationalization
 CELERY_TIMEZONE = 'UTC'
 TIME_ZONE = 'UTC'
-#TIME_ZONE = 'America/New_York'
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 # these languages display right to left
 LANGUAGES_BIDI = ("he", "ar", "fa", "ur", "fa-ir", "rtl")
