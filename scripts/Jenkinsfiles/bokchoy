@@ -19,7 +19,7 @@ def runBokchoyTests() {
 }
 
 def bokchoyTestCleanup() {
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/bok_choy/*.coverage*,test_root/log/**/*.log,test_root/log/**/*.png'
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/bok_choy/*.coverage*,test_root/log/**/*.log,test_root/log/**/*.png,reports/bok_choy/**/xunit.xml'
     junit '**/reports/bok_choy/**/xunit.xml'
     sendSplunkFile excludes: '', includes: '**/timing*.log', sizeLimit: '10MB'
 }
