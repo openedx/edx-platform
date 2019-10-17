@@ -366,6 +366,11 @@ class Cluster(object):
             'team_visibility': self.team_visibility.value,
         }
 
+    @property
+    def are_team_discussions_private(self):
+        return self.team_visibility == ClusterTeamVisibility.private
+
+
     def __eq__(self, other):
         """
         Checks equality, based on __class__ and values of properties
