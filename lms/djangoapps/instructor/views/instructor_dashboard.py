@@ -204,8 +204,9 @@ def instructor_dashboard_2(request, course_id):
     openassessment_blocks = [
         block for block in openassessment_blocks if block.parent is not None
     ]
-    if len(openassessment_blocks) > 0:
-        sections.append(_section_open_response_assessment(request, course, openassessment_blocks, access))
+    # TODO: Uncomment this code after upgrading ora2
+    # if len(openassessment_blocks) > 0:
+    #     sections.append(_section_open_response_assessment(request, course, openassessment_blocks, access))
 
     disable_buttons = not _is_small_course(course_key)
 
