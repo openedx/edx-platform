@@ -73,8 +73,18 @@ def get_discount_expiration_date(user, course):
                 content_availability_date = enrollment.created
     except CourseEnrollment.schedule.RelatedObjectDoesNotExist:
         content_availability_date = max(enrollment.created, course.start)
+    discount_expiration_date = content_availability_date + timedelta(weeks=1)
 
-    return content_availability_date + timedelta(weeks=1)
+    # If the course has an upgrade deadline and discount time limit would put the discount expiration date
+    # after the deadline, then change the expiration date to be the upgrade deadline
+    verified_mode = CourseMode.verified_mode_for_course(course=course, include_expired=True)
+    if not verified_mode:
+        return None
+    upgrade_deadline = verified_mode.expiration_datetime
+    if upgrade_deadline and discount_expiration_date > upgrade_deadline:
+        discount_expiration_date = upgrade_deadline
+
+    return discount_expiration_date
 
 
 def can_receive_discount(user, course, discount_expiration_date=None):
