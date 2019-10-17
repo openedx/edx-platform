@@ -1608,21 +1608,12 @@ class CourseEnrollment(models.Model):
         The name of this method is long, but was the end result of hashing out a
         number of alternatives, so pylint can stuff it (disable=invalid-name)
         """
+        enrollments = cls.enrollments_for_user(user).select_related('schedule', 'course', 'course__image_set')
 
         if courses_limit:
-            enrollments = cls.enrollments_for_user(user).order_by('-created')[:courses_limit]
+            return enrollments.order_by('-created')[:courses_limit]
         else:
-            enrollments = cls.enrollments_for_user(user)
-
-        enrollments.select_related('schedule')
-
-        overviews = CourseOverview.get_from_ids_if_exists(
-            enrollment.course_id for enrollment in enrollments
-        )
-        for enrollment in enrollments:
-            enrollment._course_overview = overviews.get(enrollment.course_id)  # pylint: disable=protected-access
-
-        return enrollments
+            return enrollments
 
     @classmethod
     def enrollment_status_hash_cache_key(cls, user):
