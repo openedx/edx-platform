@@ -154,7 +154,7 @@ class TeamsEnabled(TeamsConfig):
             cluster = self.clusters[cluster_id]
         except KeyError:
             raise ValueError("Cluster '{}' does not exist.".format(cluster_id))
-        if not cluster.management.team_size_limit_enabled:
+        if not cluster.team_management.team_size_limit_enabled:
             return None
         if cluster.max_team_size is not None:
             # Explicitly check against None,
@@ -218,29 +218,6 @@ class TeamsEnabledWithTeamsets(TeamsEnabled):
         return self.teamsets
 
 
-class ClusteringScheme(Enum):
-    """
-    The scheme with which the course's teams are divided into clusters.
-    """
-
-    # Under a "topics" scheme, each cluster is a Topic, which generally is a set
-    # teams that are related in subject material.
-    # Students may join ONE TEAM per COURSE.
-    topics = "topics"
-
-    # Under a "teamsets" scheme, each cluster is a Teamset, which generally is a
-    # set of teams formed around an assignment.
-    # Students may join ONE TEAM per TEAMSET.
-    # This scheme allows greater flexibility in that a student may work with
-    # different teams of students for different assignments, all within the
-    # same course.
-    teamsets = "teamsets"
-
-    @classmethod
-    def get_default(cls):
-        return cls.topics
-
-
 class Cluster(object):
     """
     A configuration for a set of teams.
@@ -252,8 +229,8 @@ class Cluster(object):
     * max_team_size - Maximum size allowed for teams within cluster.
         If None, falls back to TeamsConfig-level max_team_size.
         If that is None, then there is no team size maximum.
-    * management - Instructor/Student team management.
-    * visibility - Public/Private team visibility.
+    * team_management - Instructor/Student team management.
+    * team_visibility - Public/Private team visibility.
     """
     valid_id_pattern = r'[A-Za-z0-9_-]+'
     valid_id_regexp = re.compile('^{}$'.format(valid_id_pattern))
@@ -264,8 +241,8 @@ class Cluster(object):
             name=None,
             description=None,
             max_team_size=None,
-            management=None,
-            visibility=None
+            team_management=None,
+            team_visibility=None
     ):
         """
         Create a Cluster.
@@ -276,10 +253,11 @@ class Cluster(object):
         * `name` defaults to the value of `id`.
         * `description` defaults to "" (empty string).
         * `max_team_size` falls back to None.
-        * `management` and `visibility` fall back to their respective `get_default()`s.
+        * `team_management` and `team_visibility` fall back to their
+          respective `get_default()`s.
 
         Notes:
-        * `max_team_size` is changed to None when using instructor management.
+        * `max_team_size` is changed to None when using instructor team management.
         """
         is_id_valid = isinstance(id_, six.string_types) and self.valid_id_regexp.match(id_)
         if not is_id_valid:
@@ -298,16 +276,16 @@ class Cluster(object):
         else:
             self.description = ""
         self._max_team_size = _clean_max_team_size(max_team_size)
-        self.management = _clean_enum_value(management, Management)
-        self.visibility = _clean_enum_value(visibility, Visibility)
+        self.team_management = _clean_enum_value(team_management, ClusterTeamManagement)
+        self.team_visibility = _clean_enum_value(team_visibility, ClusterTeamVisibility)
 
     @property
     def max_team_size(self):
         """
-        Return max_team_size if the management scheme allows for max
+        Return max_team_size if the team management scheme allows for max
         team sizes; otherwise, return None.
         """
-        if self.management.team_size_limit_enabled:
+        if self.team_management.team_size_limit_enabled:
             return self._max_team_size
         else:
             return None
@@ -326,8 +304,8 @@ class Cluster(object):
             name=data.get('name'),
             description=data.get('description'),
             max_team_size=data.get('max_team_size'),
-            management=data.get('management'),
-            visibility=data.get('visibility'),
+            team_management=data.get('team_management'),
+            team_visibility=data.get('team_visibility'),
         )
 
     def to_dict(self):
@@ -339,20 +317,50 @@ class Cluster(object):
             'name': self.name,
             'description': self.description,
             'max_team_size': self.max_team_size,
-            'management': self.management.value,
-            'visibility': self.visibility.value,
+            'team_management': self.team_management.value,
+            'team_visibility': self.team_visibility.value,
         }
 
 
-class Management(Enum):
+class ClusteringScheme(Enum):
     """
-    Managment scheme for a cluster of temas.
-    """
+    The scheme with which the course's teams are divided into clusters.
 
-    # Instructor creates and assigns teams.
+    Under a "topics" scheme, each cluster is a Topic, which generally is a set
+    teams that are related in subject material.
+    Students may join ONE TEAM per COURSE.
+
+    Under a "teamsets" scheme, each cluster is a Teamset, which generally is a
+    set of teams formed around an assignment.
+    Students may join ONE TEAM per TEAMSET.
+    This scheme allows greater flexibility in that a student may work with
+    different teams of students for different assignments, all within the
+    same course.
+    """
+    topics = "topics"
+    teamsets = "teamsets"
+
+    @classmethod
+    def get_default(cls):
+        return cls.topics
+
+
+class ClusterTeamManagement(Enum):
+    """
+    Management scheme for teams within a cluster.
+
+    Under "instructor" management, only instructors may create and assign teams,
+    and they may do so using bulk CSV upload (MST-9) or from a UI within the
+    team (MST-13).
+    Students may not modify create teams, join them, leave them, or otherwise
+    modify team membership within the cluster.
+
+    Under "student" management, students may freely create, join, and leave
+    teams (within the constraints of the ClusteringScheme).
+    Instructors may also modify team membership from the UI within the team,
+    but nothing stops the students from overriding the instructor's changes.
+    """
     instructor = "instructor"
-
-    # Students are free to create, join, and leave teams.
     student = "student"
 
     @classmethod
@@ -364,15 +372,19 @@ class Management(Enum):
         return self == self.student
 
 
-class Visibility(Enum):
+class ClusterTeamVisibility(Enum):
     """
-    Visibility settings for a cluster of teams.
-    """
+    Visibility setting for teams within a cluster.
 
-    # Any enrolled student can see team details, discussions, etc.
+    Under "public" visibility, any enrolled student can see team details,
+    discussions, etc.
+
+    Under "private" visibility, only team members and course staff can team
+    details, discussions, etc.
+
+    This may be reevaluated in MST-23.
+    """
     public = "public"
-
-    # Only team members and course staff can team details, discussions, etc.
     private = "private"
 
     @classmethod
