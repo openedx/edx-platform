@@ -3,11 +3,21 @@ Tests for Course Teams configuration.
 """
 from __future__ import absolute_import, unicode_literals
 
+from collections import namedtuple
+
 import ddt
 import six
 from django.test import TestCase
 
-from ..teams_config import TeamsConfig, TeamsEnabledWithTeamsets, TeamsEnabledWithTopics
+from ..teams_config import (
+    ClusterTeamManagement,
+    ClusterTeamVisibility,
+    TeamsConfig,
+    TeamsEnabledWithTeamsets,
+    TeamsEnabledWithTopics,
+    Teamset,
+    Topic
+)
 
 
 @ddt.ddt
@@ -154,3 +164,54 @@ class TeamsConfigTests(TestCase):
     def test_bad_data_gives_value_errors(self, data, error_message_snippet):
         with six.assertRaisesRegex(self, ValueError, error_message_snippet):
             TeamsConfig.from_dict(data)
+
+    INVALID_VALUE = namedtuple('InvalidValue', ['message'])(
+        message="this invalid value should be substituted for a fallback"
+    )
+    CONFIG_FROM_INVALID_VALUES = TeamsEnabledWithTeamsets(
+        max_team_size=INVALID_VALUE,
+        teamsets=[
+            Teamset(
+                "id-X",
+                name=INVALID_VALUE,
+                description=INVALID_VALUE,
+                max_team_size=INVALID_VALUE,
+                team_visibility=INVALID_VALUE,
+                team_management=INVALID_VALUE,
+            )
+        ],
+        source_data=INVALID_VALUE,
+    )
+    CONFIG_FROM_FALLBACK_VALUES = TeamsEnabledWithTeamsets(
+        max_team_size=None,
+        teamsets=[
+            Teamset(
+                "id-X",
+                name="id-X",
+                description="",
+                max_team_size=None,
+                team_management=ClusterTeamManagement.get_default(),
+                team_visibility=ClusterTeamVisibility.get_default(),
+            )
+        ],
+        source_data=None,
+    )
+
+    def test_fallbacks_and_equality(self):
+        """
+        Test that a config built with invalid arguments falls back to default
+        values, and is equal to a config built with the default values.
+
+        Also, test that source_data is ignored for equality.
+        """
+        assert self.CONFIG_FROM_INVALID_VALUES == self.CONFIG_FROM_FALLBACK_VALUES
+
+    PRIVATE_TOPIC = Topic("id-X", team_management=ClusterTeamVisibility.private)
+    PRIVATE_TOPIC_2 = Topic("id-X", team_management=ClusterTeamVisibility.private)
+    PRIVATE_TEAMSET = Teamset("id-X", team_management=ClusterTeamVisibility.private)
+    PUBLIC_TOPIC = Topic("id-X", team_management=ClusterTeamVisibility.public)
+
+    def test_inequality(self):
+        assert self.PRIVATE_TOPIC == self.PRIVATE_TOPIC_2
+        assert self.PRIVATE_TOPIC != self.PRIVATE_TEAMSET
+        assert self.PRIVATE_TOPIC != self.PUBLIC_TOPIC

@@ -16,8 +16,124 @@ import six
 log = logging.getLogger(__name__)
 
 
-@six.add_metaclass(ABCMeta)  # Allows TeamsConfig to have abstract methods
-class TeamsConfig(object):
+@six.add_metaclass(ABCMeta)  # Let JsonDictMixin and its subclasses have abstract methods
+class JsonDictMixin(object):
+    """
+    Mixin for classes whose instances can be converted to a JSON-friendly dict.
+
+    Override `get_keys` as classmethod to specify the names of
+    attributes that should go into the dictionary returned by `to_dict`
+    and used to define `__eq__` and `__repr__`.
+
+    Override the `get_id_string` instance method to specify that ID string that
+    should be used in `__str__`.
+    """
+    def __str__(self):
+        """
+        Return string like <ClassName string-identifier>.
+        """
+        return "<{} {}>".format(self.__class__.__name__, self.get_id_string())
+
+    def get_id_string(self):
+        """
+        Override to return a short string identifying this instance.
+        """
+        return "instance@{}".format(id(self))
+
+    def to_dict(self):
+        return self._jsonify(self._get_attribute_dict())
+
+    def __repr__(self):
+        """
+        Return representation like ClassName(key1=value1, key2=value2, ...).
+        """
+        return "{}({})".format(
+            self.__class__.__name__,
+            ", ".join(
+                "{}={}".format(key, repr(value))
+                for key, value in six.iteritems(self._get_attribute_dict())
+            )
+        )
+
+    def __eq__(self, other):
+        """
+        Define equality based on (1) equality of class and (2) equality of `to_dict`.
+        """
+        if not isinstance(other, self.__class__):
+            return False
+        my_dict, other_dict = self.to_dict(), other.to_dict()
+        return my_dict == other_dict
+
+    def __ne__(self, other):
+        """
+        Overrides default inequality to be the inverse of our custom equality.
+
+        Safe to remove once we're in Python 3 -- Py3 does this for us.
+        """
+        return not self.__eq__(other)
+
+    def _get_attribute_dict(self):
+        """
+        Returns a dict from attribute names to attribute values.
+        """
+        keys = self.get_keys()
+        try:
+            return {key: getattr(self, key) for key in keys}
+        except AttributeError:
+            template = (
+                "One or more attribute names returned by get_keys [{}]"
+                "are not defined on class {}"
+            ).format(", ".join(keys), self.__class__)
+            raise ValueError(template)
+
+    @abstractmethod
+    def get_keys(cls):  # pylint: disable=no-self-argument
+        """
+        Override as classmethod to return names of attributes that are important
+        to the value of this class's instances, which we'll use for string/JSON
+        representations and equality checks.
+        """
+        pass
+
+    @classmethod
+    def _jsonify(cls, value):
+        """
+        Try to convert `value` to a JSON-friendly value.
+
+        Allowable values include strings, numbers, booleans, enums and lists of
+        JSONify-able values, dicts from strings to JSONify-able values,
+        JsonDictMixin instances, and None.
+        """
+        error_message = "{} cannot be converted to JSON-friendly representation".format(
+            str(value)
+        )
+        if isinstance(value, six.string_types):
+            return value
+        if isinstance(value, six.integer_types):
+            return value
+        if isinstance(value, float):
+            return value
+        if isinstance(value, bool):
+            return value
+        if isinstance(value, Enum):
+            return cls._jsonify(value.value)
+        if isinstance(value, list):
+            return [cls._jsonify(element) for element in value]
+        if isinstance(value, dict):
+            if not all(isinstance(key, six.string_types) for key in value):
+                raise TypeError(error_message)
+            return {
+                key: cls._jsonify(key_value)
+                for key, key_value in six.iteritems(value)
+            }
+        if isinstance(value, JsonDictMixin):
+            return value.to_dict()
+        if value is None:
+            return None
+        raise TypeError(error_message)
+
+
+class TeamsConfig(JsonDictMixin):
     """
     Abstract base teams configuration for a course.
     """
@@ -40,7 +156,7 @@ class TeamsConfig(object):
             return TeamsDisabled(source_data=None)
         if not isinstance(data, dict):
             raise ValueError("data to build TeamConfig must be a dict")
-        max_team_size = _clean_max_team_size(data.get("max_team_size"))
+        max_team_size = _clean_max_team_size(data.get("m_ax_team_size"))
         topics_data = data.get(ClusteringScheme.topics.value)
         teamsets_data = data.get(ClusteringScheme.teamsets.value)
         if topics_data and teamsets_data:
@@ -91,46 +207,18 @@ class TeamsConfig(object):
             cluster_ids.add(cluster.id)
         return clusters
 
-    @abstractmethod
-    def to_dict(self):
-        """
-        Return this teams config as JSON-ifyable dictionary.
-        """
-        pass
-
-    @abstractmethod
-    def __eq__(self, other):
-        pass
-
-    def __ne__(self, other):
-        """
-        Overrides default inequality to be the inverse of our custom equality.
-
-        Safe to remove once we're in Python 3 -- Py3 does this for us.
-        """
-        return not self.__eq__(other)
-
 
 class TeamsDisabled(TeamsConfig):
     """
     Teams are disabled for a course.
     """
+    @classmethod
+    def get_keys(cls):
+        return []
+
     @property
     def is_enabled(self):
         return False
-
-    def to_dict(self):
-        """
-        Return this teams config as JSON-ifyable dictionary.
-        """
-        return {}
-
-    def __eq__(self, other):
-        """
-        Checks equality, based on __class__
-        (source_data is ignored for this check).
-        """
-        return isinstance(other, self.__class__)
 
 
 class TeamsEnabled(TeamsConfig):
@@ -181,28 +269,6 @@ class TeamsEnabled(TeamsConfig):
             return cluster.max_team_size
         return self.max_team_size
 
-    def to_dict(self):
-        """
-        Return this teams config as JSON-ifyable dictionary.
-        """
-        clusters_key = self.clustering_scheme.value
-        clusters = [cluster.to_dict() for cluster in self.clusters]
-        return {
-            clusters_key: clusters,
-            "max_team_size": self.max_team_size,
-        }
-
-    def __eq__(self, other):
-        """
-        Checks equality, based on __class__, clusters, and max_team_size
-        (source_data is ignored for this check).
-        """
-        return (
-            isinstance(other, self.__class__) and
-            self.clusters == other.clusters and
-            self.max_team_size == other.max_team_size
-        )
-
 
 class TeamsEnabledWithTopics(TeamsEnabled):
     """
@@ -214,6 +280,10 @@ class TeamsEnabledWithTopics(TeamsEnabled):
             max_team_size=max_team_size,
             source_data=None,
         )
+
+    @classmethod
+    def get_keys(cls):
+        return ["topics", "max_team_size"]
 
     @property
     def clustering_scheme(self):
@@ -235,6 +305,10 @@ class TeamsEnabledWithTeamsets(TeamsEnabled):
             source_data=None,
         )
 
+    @classmethod
+    def get_keys(cls):
+        return ["teamsets", "max_team_size"]
+
     # Temporarily disable this configuration until it is implemented (MST-9).
     def is_enabled(self):
         return False
@@ -248,8 +322,7 @@ class TeamsEnabledWithTeamsets(TeamsEnabled):
         return self.teamsets
 
 
-@six.add_metaclass(ABCMeta)  # Allows Cluster to have abstract methods
-class Cluster(object):
+class Cluster(JsonDictMixin):
     """
     A configuration for a set of teams.
     May be either a Topic or a Teamset.
@@ -259,8 +332,7 @@ class Cluster(object):
     * name - Human-friendly name of the cluster.
     * description - Human-friendly description of the cluster.
     * max_team_size - Maximum size allowed for teams within cluster.
-        If None, falls back to TeamsConfig-level max_team_size.
-        If that is None, then there is no team size maximum.
+        None indicates that this Cluster specifies no max team size.
     * team_management - Instructor/Student team management.
     * team_visibility - Public/Private team visibility.
     """
@@ -281,6 +353,20 @@ class Cluster(object):
         self._team_management = team_management
         self._team_visibility = team_visibility
 
+    def get_id_string(self):
+        return self.id
+
+    @classmethod
+    def get_keys(cls):
+        return [
+            "id",
+            "name",
+            "description",
+            "max_team_size",
+            "team_management",
+            "team_visibility",
+        ]
+
     @abstractmethod
     def get_clustering_scheme(cls):  # pylint: disable=no-self-argument
         """
@@ -291,6 +377,9 @@ class Cluster(object):
 
     @property
     def name(self):
+        """
+        Return name of cluster, falling back to `id`.
+        """
         if self._name and isinstance(self._name, six.string_types):
             return self._name
         else:
@@ -298,6 +387,9 @@ class Cluster(object):
 
     @property
     def description(self):
+        """
+        Return description of cluster, falling back to the empty string.
+        """
         if isinstance(self._description, six.string_types):
             return self._description
         else:
@@ -305,6 +397,9 @@ class Cluster(object):
 
     @property
     def max_team_size(self):
+        """
+        Return max team size of cluster, falling back to None.
+        """
         if self.team_management.team_size_limit_enabled:
             return _clean_max_team_size(self._max_team_size)
         else:
@@ -353,46 +448,9 @@ class Cluster(object):
             team_visibility=data.get('team_visibility'),
         )
 
-    def to_dict(self):
-        """
-        Return this Cluster as JSON-ifyable dictionary.
-        """
-        return {
-            'id': self.id,
-            'name': self.name,
-            'description': self.description,
-            'max_team_size': self.max_team_size,
-            'team_management': self.team_management.value,
-            'team_visibility': self.team_visibility.value,
-        }
-
     @property
     def are_team_discussions_private(self):
         return self.team_visibility == ClusterTeamVisibility.private
-
-
-    def __eq__(self, other):
-        """
-        Checks equality, based on __class__ and values of properties
-        (*not* the values of the arguments to the constructor).
-        """
-        return (
-            isinstance(other, self.__class__) and
-            self.id == other.id and
-            self.name == other.name and
-            self.description == other.description and
-            self.max_team_size == other.max_team_size and
-            self.team_management == other.team_management and
-            self.team_visibility == other.team_visibility
-        )
-
-    def __ne__(self, other):
-        """
-        Overrides default inequality to be the inverse of our custom equality.
-
-        Safe to remove once we're in Python 3 -- Py3 does this for us.
-        """
-        return not self.__eq__(other)
 
 
 class Topic(Cluster):
