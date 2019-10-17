@@ -447,8 +447,8 @@ class VideoEditorTest(CMSVideoBaseTest):
         self._create_video_component()
 
         langs_info = [
-            ('zh_HANS', 'simplified_chinese.srt', '在线学习是革'),
-            ('zh_HANT', 'traditional_chinese.srt', '在線學習是革')
+            ('zh_HANS', 'simplified_chinese.srt', u'在线学习是革'),
+            ('zh_HANT', 'traditional_chinese.srt', u'在線學習是革')
         ]
 
         for lang_code, lang_file, lang_text in langs_info:
