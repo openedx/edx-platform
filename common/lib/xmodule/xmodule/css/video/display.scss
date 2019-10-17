@@ -259,6 +259,11 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
       }
     }
 
+    video{
+     min-width: 200px;
+     min-height: 200px;
+    }
+
     .video-player {
       overflow: hidden;
       min-height: 200px;
