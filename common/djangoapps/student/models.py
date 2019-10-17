@@ -1614,6 +1614,8 @@ class CourseEnrollment(models.Model):
         else:
             enrollments = cls.enrollments_for_user(user)
 
+        enrollments.select_related('schedule')
+
         overviews = CourseOverview.get_from_ids_if_exists(
             enrollment.course_id for enrollment in enrollments
         )

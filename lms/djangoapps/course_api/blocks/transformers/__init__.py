@@ -44,6 +44,8 @@ SUPPORTED_FIELDS = [
     SupportedFieldType('graded'),
     SupportedFieldType('format'),
     SupportedFieldType('due'),
+    SupportedFieldType('has_score'),
+    SupportedFieldType('weight'),
     SupportedFieldType('show_correctness'),
     # 'student_view_data'
     SupportedFieldType(StudentViewTransformer.STUDENT_VIEW_DATA, StudentViewTransformer),
