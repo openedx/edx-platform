@@ -180,11 +180,7 @@ class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
 
     DISCUSSION_TOPIC_ID = 'test_topic'
 
-<<<<<<< HEAD
-    def setUp(self): # pylint: disable=arguments-differ
-=======
     def setUp(self):  # pylint: disable=arguments-differ
->>>>>>> 9946fd39180c5c9a408124845554ed3189d6d4b7
         """Create a user with a team to test signals."""
         super(TeamSignalsTest, self).setUp('lms.djangoapps.teams.utils.tracker')
         self.user = UserFactory.create(username="user")
