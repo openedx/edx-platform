@@ -98,6 +98,18 @@ class TeamsConfig(object):
         """
         pass
 
+    @abstractmethod
+    def __eq__(self, other):
+        pass
+
+    def __ne__(self, other):
+        """
+        Overrides default inequality to be the inverse of our custom equality.
+
+        Safe to remove once we're in Python 3 -- Py3 does this for us.
+        """
+        return not self.__eq__(other)
+
 
 class TeamsDisabled(TeamsConfig):
     """
@@ -112,6 +124,13 @@ class TeamsDisabled(TeamsConfig):
         Return this teams config as JSON-ifyable dictionary.
         """
         return {}
+
+    def __eq__(self, other):
+        """
+        Checks equality, based on __class__
+        (source_data is ignored for this check).
+        """
+        return isinstance(other, self.__class__)
 
 
 class TeamsEnabled(TeamsConfig):
@@ -172,6 +191,17 @@ class TeamsEnabled(TeamsConfig):
             clusters_key: clusters,
             "max_team_size": self.max_team_size,
         }
+
+    def __eq__(self, other):
+        """
+        Checks equality, based on __class__, clusters, and max_team_size
+        (source_data is ignored for this check).
+        """
+        return (
+            isinstance(other, self.__class__) and
+            self.clusters == other.clusters and
+            self.max_team_size == other.max_team_size
+        )
 
 
 class TeamsEnabledWithTopics(TeamsEnabled):
@@ -335,6 +365,29 @@ class Cluster(object):
             'team_management': self.team_management.value,
             'team_visibility': self.team_visibility.value,
         }
+
+    def __eq__(self, other):
+        """
+        Checks equality, based on __class__ and values of properties
+        (*not* the values of the arguments to the constructor).
+        """
+        return (
+            isinstance(other, self.__class__) and
+            self.id == other.id and
+            self.name == other.name and
+            self.description == other.description and
+            self.max_team_size == other.max_team_size and
+            self.team_management == other.team_management and
+            self.team_visibility == other.team_visibility
+        )
+
+    def __ne__(self, other):
+        """
+        Overrides default inequality to be the inverse of our custom equality.
+
+        Safe to remove once we're in Python 3 -- Py3 does this for us.
+        """
+        return not self.__eq__(other)
 
 
 class Topic(Cluster):
