@@ -314,7 +314,6 @@ FEATURES = {
     'PREVIEW_LMS_BASE': "preview.localhost:18000",
     'ENABLE_GRADE_DOWNLOADS': True,
     'ENABLE_MKTG_SITE': False,
-    # 'ENABLE_THIRD_PARTY_AUTH': True,
     'ENABLE_DISCUSSION_HOME_PANEL': True,
     'ENABLE_COMBINED_LOGIN_REGISTRATION': True,
     'ENABLE_CORS_HEADERS': False,
@@ -683,7 +682,6 @@ DOC_STORE_CONFIG = {
     'db': 'edxapp',
     'host': 'localhost',
     'replicaSet': '',
-    # 'password': 'password',
     'user': 'edxapp',
     'port': 27017,
     'collection': 'modulestore',
@@ -886,7 +884,6 @@ STATICFILES_DIRS = [
 # Locale/Internationalization
 CELERY_TIMEZONE = 'UTC'
 TIME_ZONE = 'UTC'
-# TIME_ZONE = 'America/New_York'
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGES_BIDI = lms.envs.common.LANGUAGES_BIDI
 
