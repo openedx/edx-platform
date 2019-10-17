@@ -248,7 +248,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self.video.show_captions()
 
         # Verify that we see "好 各位同学" text in the transcript
-        unicode_text = "好 各位同学".decode('utf-8')
+        unicode_text = u"好 各位同学"
         self.assertIn(unicode_text, self.video.captions_text)
 
     def test_cc_button(self):
@@ -333,7 +333,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self.navigate_to_video()
 
         # check if we can download transcript in "srt" format that has text "好 各位同学"
-        unicode_text = "好 各位同学".decode('utf-8')
+        unicode_text = u"好 各位同学"
         self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
 
     def test_download_button_two_transcript_languages(self):
@@ -364,11 +364,11 @@ class YouTubeVideoTest(VideoBaseTest):
         self.assertTrue(self.video.select_language('zh'))
 
         # check if we see "好 各位同学" text in the captions
-        unicode_text = "好 各位同学".decode('utf-8')
+        unicode_text = u"好 各位同学"
         self.assertIn(unicode_text, self.video.captions_text)
 
         # check if we can download transcript in "srt" format that has text "好 各位同学"
-        unicode_text = "好 各位同学".decode('utf-8')
+        unicode_text = u"好 各位同学"
         self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
 
     def test_fullscreen_video_alignment_on_transcript_toggle(self):
@@ -600,7 +600,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self._verify_closed_caption_text('Welcome to edX.')
 
         self.video.select_language('zh')
-        unicode_text = "我们今天要讲的题目是".decode('utf-8')
+        unicode_text = u"我们今天要讲的题目是"
         self.video.click_transcript_line(line_no=1)
         self._verify_closed_caption_text(unicode_text)
 
@@ -836,11 +836,11 @@ class Html5VideoTest(VideoBaseTest):
         self.navigate_to_video()
 
         # check if we see "好 各位同学" text in the captions
-        unicode_text = "好 各位同学".decode('utf-8')
+        unicode_text = u"好 各位同学"
         self.assertIn(unicode_text, self.video.captions_text)
 
         # check if we can download transcript in "srt" format that has text "好 各位同学"
-        unicode_text = "好 各位同学".decode('utf-8')
+        unicode_text = u"好 各位同学"
         self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
 
     def test_download_button_two_transcript_languages(self):
@@ -873,12 +873,12 @@ class Html5VideoTest(VideoBaseTest):
         self.assertTrue(self.video.select_language('zh'))
 
         # check if we see "好 各位同学" text in the captions
-        unicode_text = "好 各位同学".decode('utf-8')
+        unicode_text = u"好 各位同学"
 
         self.assertIn(unicode_text, self.video.captions_text)
 
         # Then I can download transcript in "srt" format that has text "好 各位同学"
-        unicode_text = "好 各位同学".decode('utf-8')
+        unicode_text = u"好 各位同学"
         self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
 
     def test_cc_button_with_english_transcript(self):
@@ -921,7 +921,7 @@ class Html5VideoTest(VideoBaseTest):
         self.video.show_captions()
 
         # check if we see "好 各位同学" text in the captions
-        unicode_text = "好 各位同学".decode('utf-8')
+        unicode_text = u"好 各位同学"
         self.assertIn(unicode_text, self.video.captions_text)
 
     def test_video_rendering(self):
