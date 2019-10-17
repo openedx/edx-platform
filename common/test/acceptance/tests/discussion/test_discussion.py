@@ -1337,7 +1337,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
 
     def check_search_alert_messages(self, expected):
         actual = self.page.get_search_alert_messages()
-        self.assertTrue(all(map(lambda msg, sub: msg.lower().find(sub.lower()) >= 0, actual, expected)))
+        self.assertTrue(all(list(map(lambda msg, sub: msg.lower().find(sub.lower()) >= 0, actual, expected))))
 
     @attr(shard=2)
     def test_no_rewrite(self):
