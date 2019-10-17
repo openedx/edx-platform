@@ -5,7 +5,7 @@
 -e git+https://github.com/edx-solutions/xblock-image-explorer.git@v1.1.5#egg=xblock-image-explorer==1.1.5
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop.git@92ee2055a16899090a073e1df81e35d5293ad767#egg=xblock-drag-and-drop
 # FIXME: temp hash, until (https://github.com/edx-solutions/xblock-drag-and-drop-v2/pull/207 is merged into `master`)
--e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@e23842a92490b695f096bc59d8e6d1bc3e81c512#egg=xblock-drag-and-drop-v2==2.2.5
+-e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@4e5996c2ecabfbbc0de4137d3cd74231540dbb72#egg=xblock-drag-and-drop-v2==2.2.6
 # This is required for A2E courses that were created with the temporary (xblock-drag-and-drop-v2-new) DnDv2 branch to continue to work.
 # FIXME: bump version to 2.1.6 when https://github.com/edx-solutions/xblock-drag-and-drop-v2/pull/154 merged and tagged
 -e git+https://github.com/open-craft/xblock-drag-and-drop-v2.git@82c9dc5e16d10793e8b79e60661e1a78893fce25#egg=xblock-drag-and-drop-v2-new
