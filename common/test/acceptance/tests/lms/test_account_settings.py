@@ -195,11 +195,11 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             },
             {
                 'title': 'Social Media Links',
-                'fields': [
+                'fields': sorted([
                     'Twitter Link',
                     'Facebook Link',
                     'LinkedIn Link',
-                ]
+                ])
             },
             {
                 'title': 'Delete My Account',
@@ -207,7 +207,9 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             },
         ]
 
-        self.assertEqual(self.account_settings_page.sections_structure(), expected_sections_structure)
+        sections_structure = self.account_settings_page.sections_structure()
+        sections_structure[2]['fields'] = sorted(sections_structure[2]['fields'])
+        self.assertEqual(sections_structure, expected_sections_structure)
 
     def _test_readonly_field(self, field_id, title, value):
         """

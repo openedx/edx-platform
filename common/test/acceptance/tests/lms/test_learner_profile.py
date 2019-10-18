@@ -491,10 +491,22 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, AcceptanceTest):
         self.assert_default_image_has_public_access(profile_page)
 
         profile_page.upload_file(filename='generic_csv.csv')
-        self.assertEqual(
-            profile_page.profile_image_message,
-            "The file must be one of the following types: .gif, .png, .jpeg, .jpg."
+        self.assertIn(
+            "The file must be one of the following types:", profile_page.profile_image_message,
         )
+        self.assertIn(
+            ".png", profile_page.profile_image_message,
+        )
+        self.assertIn(
+            ".gif", profile_page.profile_image_message,
+        )
+        self.assertIn(
+            ".jpeg", profile_page.profile_image_message,
+        )
+        self.assertIn(
+            ".jpg", profile_page.profile_image_message,
+        )
+
         profile_page.visit()
         self.assertTrue(profile_page.profile_has_default_image)
 
