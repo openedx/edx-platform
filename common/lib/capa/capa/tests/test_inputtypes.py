@@ -754,7 +754,7 @@ class MatlabTest(unittest.TestCase):
         output_string = output_string.replace('<div>{', '')
         output_list = output_string.split(',')
         for index, value in enumerate(output_list):
-            output_list[index] = value.replace('u\'','\'').strip()
+            output_list[index] = value.replace('u\'', '\'').strip()
 
         expected_string = u"""
         \'matlab_editor_js\': \'/dummy-static/js/vendor/CodeMirror/octave.js\',
@@ -766,7 +766,7 @@ class MatlabTest(unittest.TestCase):
         \'describedby_html\': Markup(\'aria-describedby="status_prob_1_2"\')"""
         expected_list = (textwrap.dedent(expected_string).replace('\n', ' ').strip()).split(',')
         for index, value in enumerate(expected_list):
-            expected_list[index] = value.replace('u\'','\'').strip()
+            expected_list[index] = value.replace('u\'', '\'').strip()
         six.assertCountEqual(self, output_list, expected_list)
 
         # test html, that is correct HTML5 html, but is not parsable by XML parser.
@@ -790,11 +790,11 @@ class MatlabTest(unittest.TestCase):
         assert element_tags.count('audio') == 1
         audio_index = element_tags.index('audio')
 
-        six.assertCountEqual(self,element_keys[audio_index],['autobuffer', 'controls', 'autoplay', 'src'])
+        six.assertCountEqual(self, element_keys[audio_index], ['autobuffer', 'controls', 'autoplay', 'src'])
         self.assertEqual(elements[audio_index].get('src'), 'data:audio/wav;base64=')
         self.assertEqual(elements[audio_index].text, 'Audio is not supported on this browser.')
         href_index = element_keys.index(['href'])
-        self.assertEqual(elements[href_index].get('href'),'https://endpoint.mss-mathworks.com/media/filename.wav')
+        self.assertEqual(elements[href_index].get('href'), 'https://endpoint.mss-mathworks.com/media/filename.wav')
         id_index = element_keys.index(['id'])
         self.assertEqual(elements[id_index].get('id'), 'mwAudioPlaceHolder')
         output_string = etree.tostring(output).decode('utf-8')
