@@ -334,7 +334,6 @@ class CourseFields(object):
         default="Empty",
         display_name=_("Course Display Name"),
         scope=Scope.settings,
-        hide_on_enabled_publisher=True
     )
     course_edit_method = String(
         display_name=_("Course Editor"),
