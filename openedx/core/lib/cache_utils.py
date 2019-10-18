@@ -2,17 +2,19 @@
 Utilities related to caching.
 """
 from __future__ import absolute_import
+
 import collections
 import functools
 import itertools
 import zlib
-import wrapt
 
+import six
+import wrapt
 from django.utils.encoding import force_text
 from edx_django_utils.cache import RequestCache
 from six import iteritems
-from six.moves import map
 from six.moves import cPickle as pickle
+from six.moves import map
 
 
 def request_cached(namespace=None, arg_map_function=None, request_cache_getter=None):
@@ -156,7 +158,10 @@ def zpickle(data):
 
 def zunpickle(zdata):
     """Given a zlib compressed pickled serialization, returns the deserialized data."""
-    return pickle.loads(zlib.decompress(zdata))
+    if six.PY2:
+        return pickle.loads(zlib.decompress(zdata))
+    else:
+        return pickle.loads(zlib.decompress(zdata), encoding='latin1')
 
 
 def get_cache(name):
