@@ -57,8 +57,8 @@ def main(args, env):
     my_args = parser.parse_args(sys.argv[1:])
     bucket_number = my_args.number
 
-    hash = hash_exp(my_args.exp, my_args.user)
-    digest = bucket_int(hash)
+    hashed = hash_exp(my_args.exp, my_args.user)
+    digest = bucket_int(hashed)
     bucket = digest % bucket_number
 
     abbrev = my_args.abbrev
@@ -67,7 +67,7 @@ def main(args, env):
 
     print("{user} is in bucket: {bucket}".format(user=my_args.user, bucket=bucket))
     if my_args.print_args:
-        print("* Args:\n\t{my_args}\n* Computed:\n\tdigest: {digest} - hash: {hash} - {abbrev}".format(**vars()))
+        print("* Args:\n\t{my_args}\n* Computed:\n\tdigest: {digest} - hash: {hashed} - {abbrev}".format(**vars()))
         return 0
 
     if my_args.check_only:
@@ -100,8 +100,8 @@ def hash_exp(exp, name):
     return hasher.hexdigest()
 
 
-def bucket_int(hash):
-    s = re.sub("[0-7]", "0", hash)
+def bucket_int(hashed):
+    s = re.sub("[0-7]", "0", hashed)
     s = re.sub("[8-9a-f]", "1", s)
     return int(s, 2)
 
