@@ -12,6 +12,7 @@ from unittest import skip
 
 import ddt
 import httpretty
+from django.conf import settings
 from django.contrib import auth
 from freezegun import freeze_time
 from mock import MagicMock, patch
@@ -158,7 +159,15 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         'attributes': {u'urn:oid:0.9.2342.19200300.100.1.1': [u'myself']}
     }
 
-    def test_full_pipeline_succeeds_for_unlinking_testshib_account(self):
+    @patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
+    @patch('openedx.features.enterprise_support.api.get_enterprise_customer_for_learner')
+    @patch('openedx.core.djangoapps.user_api.accounts.settings_views.get_enterprise_customer_for_learner')
+    def test_full_pipeline_succeeds_for_unlinking_testshib_account(
+        self,
+        mock_get_enterprise_customer_for_learner_settings_view,
+        mock_get_enterprise_customer_for_learner,
+        mock_enterprise_customer_for_request,
+    ):
 
         # First, create, the request and strategy that store pipeline state,
         # configure the backend, and mock out wire traffic.
@@ -185,6 +194,15 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         EnterpriseCustomerIdentityProvider.objects.get_or_create(enterprise_customer=enterprise_customer,
                                                                  provider_id=self.provider.provider_id)
 
+        enterprise_customer_data = {
+            'uuid': enterprise_customer.uuid,
+            'name': enterprise_customer.name,
+            'identity_provider': 'saml-default',
+        }
+        mock_enterprise_customer_for_request.return_value = enterprise_customer_data
+        mock_get_enterprise_customer_for_learner.return_value = enterprise_customer_data
+        mock_get_enterprise_customer_for_learner_settings_view.return_value = enterprise_customer_data
+
         # Instrument the pipeline to get to the dashboard with the full expected state.
         self.client.get(
             pipeline.get_login_url(self.provider.provider_id, pipeline.AUTH_ENTRY_LOGIN))
@@ -201,34 +219,39 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         self.assert_account_settings_context_looks_correct(account_settings_context(request), linked=True)
         self.assert_social_auth_exists_for_user(request.user, strategy)
 
-        # Fire off the disconnect pipeline without the user information.
-        actions.do_disconnect(
-            request.backend,
-            None,
-            None,
-            redirect_field_name=auth.REDIRECT_FIELD_NAME,
-            request=request
-        )
-        self.assertFalse(
-            EnterpriseCustomerUser.objects.filter(enterprise_customer=enterprise_customer, user_id=user.id).count() == 0
-        )
-
-        # Fire off the disconnect pipeline to unlink.
-        self.assert_redirect_after_pipeline_completes(
+        FEATURES_WITH_ENTERPRISE_ENABLED = settings.FEATURES.copy()
+        FEATURES_WITH_ENTERPRISE_ENABLED['ENABLE_ENTERPRISE_INTEGRATION'] = True
+        with patch.dict("django.conf.settings.FEATURES", FEATURES_WITH_ENTERPRISE_ENABLED):
+            # Fire off the disconnect pipeline without the user information.
             actions.do_disconnect(
                 request.backend,
-                user,
+                None,
                 None,
                 redirect_field_name=auth.REDIRECT_FIELD_NAME,
                 request=request
             )
-        )
-        # Now we expect to be in the unlinked state, with no backend entry.
-        self.assert_account_settings_context_looks_correct(account_settings_context(request), linked=False)
-        self.assert_social_auth_does_not_exist_for_user(user, strategy)
-        self.assertTrue(
-            EnterpriseCustomerUser.objects.filter(enterprise_customer=enterprise_customer, user_id=user.id).count() == 0
-        )
+            self.assertNotEqual(
+                EnterpriseCustomerUser.objects.filter(enterprise_customer=enterprise_customer, user_id=user.id).count(),
+                0
+            )
+
+            # Fire off the disconnect pipeline to unlink.
+            self.assert_redirect_after_pipeline_completes(
+                actions.do_disconnect(
+                    request.backend,
+                    user,
+                    None,
+                    redirect_field_name=auth.REDIRECT_FIELD_NAME,
+                    request=request
+                )
+            )
+            # Now we expect to be in the unlinked state, with no backend entry.
+            self.assert_account_settings_context_looks_correct(account_settings_context(request), linked=False)
+            self.assert_social_auth_does_not_exist_for_user(user, strategy)
+            self.assertEqual(
+                EnterpriseCustomerUser.objects.filter(enterprise_customer=enterprise_customer, user_id=user.id).count(),
+                0
+            )
 
     def get_response_data(self):
         """Gets dict (string -> object) of merged data about the user."""
