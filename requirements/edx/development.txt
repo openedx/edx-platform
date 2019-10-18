@@ -28,7 +28,6 @@ apipkg==1.5
 appdirs==1.4.3
 argh==0.26.2
 argparse==1.4.0
-asn1crypto==1.2.0
 astroid==1.5.3
 atomicwrites==1.3.0
 attrs==17.4.0
@@ -66,7 +65,7 @@ coreschema==0.0.4
 coverage==5.0a6
 git+https://github.com/nedbat/coverage_pytest_plugin.git@29de030251471e200ff255eb9e549218cd60e872#egg=coverage_pytest_plugin==0.0
 git+https://github.com/edx/crowdsourcehinter.git@a7ffc85b134b7d8909bf1fefd23dbdb8eb28e467#egg=crowdsourcehinter-xblock==0.2
-cryptography==2.7
+cryptography==2.8
 cssselect==1.1.0
 cssutils==1.0.2
 ddt==1.2.1
@@ -164,7 +163,7 @@ fs-s3fs==0.1.8
 fs==2.0.18
 funcsigs==1.0.2
 functools32==3.2.3.post2 ; python_version == "2.7"
-future==0.18.0
+future==0.18.1
 futures==3.3.0 ; python_version == "2.7"
 geoip2==2.9.0
 glob2==0.7
@@ -178,7 +177,7 @@ imagesize==1.1.0          # via sphinx
 importlib-metadata==0.23
 inflect==2.1.0
 inflection==0.3.1
-ipaddress==1.0.22
+ipaddress==1.0.23
 isodate==0.6.0
 isort==4.3.21
 itypes==1.1.0
