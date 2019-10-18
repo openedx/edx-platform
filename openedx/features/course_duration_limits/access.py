@@ -241,6 +241,10 @@ def course_expiration_wrapper(user, block, view, frag, context):  # pylint: disa
 
 
 def offer_banner_wrapper(user, block, view, frag, context):  # pylint: disable=W0613
+    """
+    A wrapper that prepends the First Purchase Discount banner if
+    the user hasn't upgraded yet.
+    """
     if block.category != "vertical":
         return frag
 
