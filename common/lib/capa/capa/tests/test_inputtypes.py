@@ -25,7 +25,6 @@ import xml.sax.saxutils as saxutils
 from collections import OrderedDict
 
 import six
-import pdb
 from lxml import etree
 from lxml.html import fromstring
 from mock import ANY, patch
@@ -749,29 +748,26 @@ class MatlabTest(unittest.TestCase):
         # usual output
         output = self.the_input.get_html()
         output_string = etree.tostring(output).decode('utf-8')
-        self.assertIn('}</div>', output_string)
-        self.assertIn('<div>{', output_string)
+        assert output_string.startswith('<div>{')
+        assert output_string.endswith('}</div>')
         output_string = output_string.replace('}</div>', '')
         output_string = output_string.replace('<div>{', '')
         output_list = output_string.split(',')
         for index, value in enumerate(output_list):
-            output_list[index] = value.strip()
+            output_list[index] = value.replace('u\'','\'').strip()
 
         expected_string = u"""
         \'matlab_editor_js\': \'/dummy-static/js/vendor/CodeMirror/octave.js\',
         \'value\': \'print "good evening"\', \'hidden\': \'\',
-        \'msg\': u\'Submitted. As soon as a response is returned, this message will be replaced by that feedback.\',
+        \'msg\': \'Submitted. As soon as a response is returned, this message will be replaced by that feedback.\',
         \'status\': Status(\'queued\'), \'response_data\': {}, \'queue_msg\': \'\', \'mode\': \'\',
         \'id\': \'prob_1_2\', \'queue_len\': \'3\', \'tabsize\': 4, \'STATIC_URL\': \'/dummy-static/\',
         \'linenumbers\': \'true\', \'cols\': \'80\', \'button_enabled\': True, \'rows\': \'10\',
-        \'describedby_html\': Markup(u\'aria-describedby="status_prob_1_2"\')"""
+        \'describedby_html\': Markup(\'aria-describedby="status_prob_1_2"\')"""
         expected_list = (textwrap.dedent(expected_string).replace('\n', ' ').strip()).split(',')
         for index, value in enumerate(expected_list):
-            expected_list[index] = value.strip()
-        if six.PY2:
-            self.assertItemsEqual(output_list, expected_list)
-        else:
-            self.assertCountEqual(output_list, expected_list)
+            expected_list[index] = value.replace('u\'','\'').strip()
+        six.assertCountEqual(self, output_list, expected_list)
 
         # test html, that is correct HTML5 html, but is not parsable by XML parser.
         old_render_template = self.the_input.capa_system.render_template
@@ -783,17 +779,30 @@ class MatlabTest(unittest.TestCase):
             """).replace('\n', '')
 
         output = self.the_input.get_html()
+        elements = []
+        element_tags = []
+        element_keys = []
+        for element in output.iter():
+            elements.append(element)
+            element_tags.append(element.tag)
+            element_keys.append(element.keys())
+        assert element_tags.count('div') == 4
+        assert element_tags.count('audio') == 1
+        audio_index = element_tags.index('audio')
+
+        six.assertCountEqual(self,element_keys[audio_index],['autobuffer', 'controls', 'autoplay', 'src'])
+        self.assertEqual(elements[audio_index].get('src'), 'data:audio/wav;base64=')
+        self.assertEqual(elements[audio_index].text, 'Audio is not supported on this browser.')
+        href_index = element_keys.index(['href'])
+        self.assertEqual(elements[href_index].get('href'),'https://endpoint.mss-mathworks.com/media/filename.wav')
+        id_index = element_keys.index(['id'])
+        self.assertEqual(elements[id_index].get('id'), 'mwAudioPlaceHolder')
         output_string = etree.tostring(output).decode('utf-8')
-        if six.PY2:
-            self.assertRegexpMatches(output_string, "div.*mwAudioPlaceHolder")
-            self.assertRegexpMatches(output_string, "audio.*Audio is not supported.*audio")
-            self.assertRegexpMatches(output_string, "div.*Right click.*href.*media.*here.*click.*download.*div")
-            self.assertRegexpMatches(output_string, "div .*style=.*ul.*div")
-        else:
-            self.assertRegex(output_string, "div.*mwAudioPlaceHolder")
-            self.assertRegex(output_string, "audio.*Audio is not supported.*audio")
-            self.assertRegex(output_string, "div.*Right click.*href.*media.*here.*click.*download.*div")
-            self.assertRegex(output_string, "div .*style=.*ul.*div")
+
+        six.assertRegex(self, output_string, "div.*mwAudioPlaceHolder")
+        six.assertRegex(self, output_string, "audio.*Audio is not supported.*audio")
+        six.assertRegex(self, output_string, "div.*Right click.*href.*media.*here.*click.*download.*div")
+        six.assertRegex(self, output_string, "div .*style=.*ul.*div")
         # check that exception is raised during parsing for html.
         self.the_input.capa_system.render_template = lambda *args: "<aaa"
         with self.assertRaises(etree.XMLSyntaxError):
