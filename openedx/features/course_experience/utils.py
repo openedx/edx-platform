@@ -146,6 +146,20 @@ def get_course_outline_block_tree(request, course_id, user=None):
             block['scored'] = False
             return False
 
+    def recurse_mark_auth_denial(block):
+        """
+        Mark this block as 'scored' if any of its descendents are 'scored' (that is, 'has_score' and 'weight' > 0).
+        """
+        own_denial_reason = {block['authorization_denial_reason']} if 'authorization_denial_reason' in block else set()
+        # Use a list comprehension to force the recursion over all children, rather than just stopping
+        # at the first child that is scored.
+        child_denial_reasons = own_denial_reason.union(
+            *(recurse_mark_auth_denial(child) for child in block.get('children', []))
+        )
+        if child_denial_reasons:
+            block['all_denial_reasons'] = child_denial_reasons
+        return child_denial_reasons
+
     course_key = CourseKey.from_string(course_id)
     course_usage_key = modulestore().make_course_usage_key(course_key)
 
@@ -188,6 +202,7 @@ def get_course_outline_block_tree(request, course_id, user=None):
     if course_outline_root_block:
         populate_children(course_outline_root_block, all_blocks['blocks'])
         recurse_mark_scored(course_outline_root_block)
+        recurse_mark_auth_denial(course_outline_root_block)
         if user:
             set_last_accessed_default(course_outline_root_block)
             mark_blocks_completed(

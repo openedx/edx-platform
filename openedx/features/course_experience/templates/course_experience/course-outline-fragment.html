@@ -5,6 +5,7 @@
 <%namespace name='static' file='../static_content.html'/>
 
 <%!
+import json
 from datetime import date
 
 from django.utils.translation import ugettext as _
@@ -164,8 +165,9 @@ self_paced = context.get('self_paced', False)
                         if vertical_is_access_denied:
                             continue
                         scored = 'scored' if vertical.get('scored', False) else ''
+                        access_restricted = list(vertical.get('all_denial_reasons', []))
                         %>
-                                    <li class="vertical outline-item focusable ${scored}">
+                                    <li class="vertical outline-item focusable ${scored}" data-access-denied="${json.dumps(access_restricted)}">
                                         <a class="outline-item focusable"
                                             % if enable_links:
                                                 href="${ vertical['lms_web_url'] }"
