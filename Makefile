@@ -26,9 +26,11 @@ docs: api-docs guides ## build all the developer documentation for this reposito
 swagger: ## generate the swagger.yaml file
 	DJANGO_SETTINGS_MODULE=docs.docs_settings python manage.py lms generate_swagger --generator-class=openedx.core.apidocs.ApiSchemaGenerator -o $(SWAGGER)
 
-api-docs: swagger	## build the REST api docs
+api-docs-sphinx: swagger	## generate the sphinx source files for api-docs
 	rm -f docs/api/gen/*
-	python docs/sw2md.py $(SWAGGER) docs/api/gen
+	python docs/sw2sphinxopenapi.py $(SWAGGER) docs/api/gen
+
+api-docs: api-docs-sphinx	## build the REST api docs
 	cd docs/api; make html
 
 guides:	## build the developer guide docs

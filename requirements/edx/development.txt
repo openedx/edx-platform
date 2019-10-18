@@ -56,7 +56,6 @@ click-log==0.3.2
 click==7.0
 code-annotations==0.3.2
 colorama==0.4.1
-commonmark==0.9.1         # via recommonmark
 configparser==4.0.2
 contextlib2==0.6.0.post1
 cookies==2.2.1
@@ -280,7 +279,6 @@ pyyaml==5.1.2
 radon==4.0.0
 random2==1.0.1
 recommender-xblock==1.4.5
-recommonmark==0.6.0
 redis==2.10.6
 requests-oauthlib==1.1.0
 requests==2.22.0
@@ -309,6 +307,7 @@ sorl-thumbnail==12.3
 sortedcontainers==2.1.0
 soupsieve==1.9.4
 sphinx==1.8.5
+sphinxcontrib-openapi[markdown]==0.5.0
 sphinxcontrib-websupport==1.1.2  # via sphinx
 sqlparse==0.3.0
 staff-graded-xblock==0.5
