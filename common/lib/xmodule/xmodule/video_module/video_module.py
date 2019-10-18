@@ -678,21 +678,21 @@ class VideoBlock(
             ('download_track', json.dumps(self.download_track)),
             ('download_video', json.dumps(self.download_video))
         ]
-        for attr in attrs:
+        for key, value in attrs:
             # Mild workaround to ensure that tests pass -- if a field
             # is set to its default value, we don't write it out.
-            if attr[1]:
-                if attr[0] in self.fields and self.fields[attr[0]].is_set_on(self):
+            if value:
+                if key in self.fields and self.fields[key].is_set_on(self):
                     try:
-                        xml.set(attr[0], six.text_type(attr[1]))
+                        xml.set(key, six.text_type(value))
                     except UnicodeDecodeError:
-                        exception_message = format_xml_exception_message(self.location, attr[0], attr[1])
+                        exception_message = format_xml_exception_message(self.location, key, value)
                         log.exception(exception_message)
                         # If exception is UnicodeDecodeError set value using unicode 'utf-8' scheme.
                         log.info("Setting xml value using 'utf-8' scheme.")
-                        xml.set(attr[0], six.text_type(attr[1], 'utf-8'))
+                        xml.set(key, six.text_type(value, 'utf-8'))
                     except ValueError:
-                        exception_message = format_xml_exception_message(self.location, attr[0], attr[1])
+                        exception_message = format_xml_exception_message(self.location, key, value)
                         log.exception(exception_message)
                         raise
 
