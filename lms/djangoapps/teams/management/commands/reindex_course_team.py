@@ -52,10 +52,10 @@ class Command(BaseCommand):
         from ...search_indexes import CourseTeamIndexer
 
         if options['all']:
-            if len(options['course_team_ids']) > 0:
+            if options['course_team_ids']:
                 raise CommandError('Course teams cannot be specified when --all is also specified')
         else:
-            if len(options['course_team_ids']) == 0:
+            if not options['course_team_ids']:
                 raise CommandError('At least one course_team_id or --all needs to be specified')
 
         if not settings.FEATURES.get('ENABLE_TEAMS', False):

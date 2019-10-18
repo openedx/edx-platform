@@ -101,6 +101,8 @@ class CourseTeam(models.Model):
 
     .. no_pii:
     """
+    def __unicode__(self):
+        return '[CourseTeam id={}]'.format(self.team_id)
 
     class Meta(object):
         app_label = "teams"
@@ -188,6 +190,9 @@ class CourseTeamMembership(models.Model):
     .. no_pii:
     """
 
+    def __unicode__(self):
+        return "[CourseTeamMembership user={}, team={}]".format(self.user, self.team)
+
     class Meta(object):
         app_label = "teams"
         unique_together = (('user', 'team'),)
@@ -223,7 +228,7 @@ class CourseTeamMembership(models.Model):
                     )
         super(CourseTeamMembership, self).__setattr__(name, value)
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):  # pylint: disable=arguments-differ
         """Customize save method to set the last_activity_at if it does not
         currently exist. Also resets the team's size if this model is
         being created.
@@ -237,7 +242,7 @@ class CourseTeamMembership(models.Model):
         if should_reset_team_size:
             self.team.reset_team_size()
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *args, **kwargs):  # pylint: disable=arguments-differ
         """Recompute the related team's team_size after deleting a membership"""
         super(CourseTeamMembership, self).delete(*args, **kwargs)
         self.team.reset_team_size()
