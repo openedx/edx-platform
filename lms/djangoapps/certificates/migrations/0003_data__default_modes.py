@@ -22,7 +22,7 @@ def forwards(apps, schema_editor):
             file_name = '{0}{1}'.format(mode, '.png')
             conf.icon.save(
                 'badges/{}'.format(file_name),
-                File(open(settings.PROJECT_ROOT / 'static' / 'images' / 'default-badges' / file_name))
+                File(open(settings.PROJECT_ROOT / 'static' / 'images' / 'default-badges' / file_name, 'rb'))
             )
 
             conf.save()
