@@ -40,10 +40,3 @@ class RecoveryEmailCreate(BaseMessageType):
         super(RecoveryEmailCreate, self).__init__(*args, **kwargs)
 
         self.options['transactional'] = True
-
-
-class AccountActivation(BaseMessageType):
-    def __init__(self, *args, **kwargs):
-        super(AccountActivation, self).__init__(*args, **kwargs)
-
-        self.options['transactional'] = True

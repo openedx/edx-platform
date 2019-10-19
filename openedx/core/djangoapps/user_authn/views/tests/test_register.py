@@ -19,7 +19,6 @@ from django.test.utils import override_settings
 from django.urls import reverse
 
 from lms.djangoapps.discussion.notification_prefs import NOTIFICATION_PREF_KEY
-from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangoapps.django_comment_common.models import ForumsConfig
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
@@ -92,7 +91,7 @@ def get_mock_pipeline_data(username=TEST_USERNAME, email=TEST_EMAIL):
         ]
     }
 )
-class TestCreateAccount(EmailTemplateTagMixin, SiteMixin, TestCase):
+class TestCreateAccount(SiteMixin, TestCase):
     """Tests for account creation"""
 
     def setUp(self):
