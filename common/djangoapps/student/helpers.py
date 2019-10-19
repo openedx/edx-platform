@@ -220,40 +220,6 @@ def check_verify_status_by_course(user, course_enrollments):
     return status_by_course
 
 
-def auth_pipeline_urls(auth_entry, redirect_url=None):
-    """Retrieve URLs for each enabled third-party auth provider.
-
-    These URLs are used on the "sign up" and "sign in" buttons
-    on the login/registration forms to allow users to begin
-    authentication with a third-party provider.
-
-    Optionally, we can redirect the user to an arbitrary
-    url after auth completes successfully.  We use this
-    to redirect the user to a page that required login,
-    or to send users to the payment flow when enrolling
-    in a course.
-
-    Args:
-        auth_entry (string): Either `pipeline.AUTH_ENTRY_LOGIN` or `pipeline.AUTH_ENTRY_REGISTER`
-
-    Keyword Args:
-        redirect_url (unicode): If provided, send users to this URL
-            after they successfully authenticate.
-
-    Returns:
-        dict mapping provider IDs to URLs
-
-    """
-    if not third_party_auth.is_enabled():
-        return {}
-
-    return {
-        provider.provider_id: third_party_auth.pipeline.get_login_url(
-            provider.provider_id, auth_entry, redirect_url=redirect_url
-        ) for provider in third_party_auth.provider.Registry.displayed_for_login()
-    }
-
-
 # Query string parameters that can be passed to the "finish_auth" view to manage
 # things like auto-enrollment.
 POST_AUTH_PARAMS = ('course_id', 'enrollment_action', 'course_mode', 'email_opt_in', 'purchase_workflow')

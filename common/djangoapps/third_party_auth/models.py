@@ -275,7 +275,7 @@ class ProviderConfig(ConfigurationModel):
     def get_register_form_data(cls, pipeline_kwargs):
         """Gets dict of data to display on the register form.
 
-        openedx.core.djangoapps.user_authn.views.deprecated.register_user uses this to populate
+        register_user uses this to populate
         the new account creation form with values supplied by the user's chosen
         provider, preventing duplicate data entry.
 

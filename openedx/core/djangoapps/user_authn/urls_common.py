@@ -11,10 +11,12 @@ from __future__ import absolute_import
 from django.conf import settings
 from django.conf.urls import url
 
-from .views import auto_auth, deprecated, login, logout
+from openedx.core.djangoapps.user_api.views import RegistrationView
+from .views import auto_auth, login, logout
+
 
 urlpatterns = [
-    url(r'^create_account$', deprecated.create_account, name='create_account'),
+    url(r'^create_account$', RegistrationView.as_view(), name='create_account'),
     url(r'^login_post$', login.login_user, name='login_post'),
     url(r'^login_ajax$', login.login_user, name="login"),
     url(r'^login_ajax/(?P<error>[^/]*)$', login.login_user),

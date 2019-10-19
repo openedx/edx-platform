@@ -82,8 +82,6 @@ FEATURES['ENABLE_VERIFIED_CERTIFICATES'] = True
 # Toggles embargo on for testing
 FEATURES['EMBARGO'] = True
 
-FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
-
 # Enable the milestones app in tests to be consistent with it being enabled in production
 FEATURES['MILESTONES_APP'] = True
 
