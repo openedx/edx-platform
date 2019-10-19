@@ -222,8 +222,6 @@ FEATURES['ENABLE_SERVICE_STATUS'] = True
 # Toggles embargo on for testing
 FEATURES['EMBARGO'] = True
 
-FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
-
 TEST_THEME = COMMON_ROOT / "test" / "test-theme"
 
 # For consistency in user-experience, keep the value of this setting in sync with

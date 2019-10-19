@@ -21,8 +21,9 @@ from social_django import utils as social_utils
 from social_django import views as social_views
 
 from lms.djangoapps.commerce.tests import TEST_API_URL
-from openedx.core.djangoapps.user_authn.views.deprecated import signin_user, create_account, register_user
+from openedx.core.djangoapps.user_api.views import RegistrationView
 from openedx.core.djangoapps.user_authn.views.login import login_user
+from openedx.core.djangoapps.user_authn.views.login_form import login_and_registration_form
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context
 from student import models as student_models
@@ -30,6 +31,10 @@ from student.tests.factories import UserFactory
 
 from third_party_auth import middleware, pipeline
 from third_party_auth.tests import testutil
+
+
+def create_account(request):
+    return RegistrationView().post(request)
 
 
 class HelperMixin(object):
@@ -65,14 +70,18 @@ class HelperMixin(object):
         # Check that the correct provider was selected.
         self.assertContains(
             response,
-            u'successfully signed in with <strong>%s</strong>' % self.provider.name,
+            u'"errorMessage": null'
+        )
+        self.assertContains(
+            response,
+            u'"currentProvider": "{}"'.format(self.provider.name),
         )
         # Expect that each truthy value we've prepopulated the register form
         # with is actually present.
         form_field_data = self.provider.get_register_form_data(pipeline_kwargs)
         for prepopulated_form_data in form_field_data:
             if prepopulated_form_data in required_fields:
-                self.assertIn(form_field_data[prepopulated_form_data], response.content.decode('utf-8'))
+                self.assertContains(response, form_field_data[prepopulated_form_data])
 
     # pylint: disable=invalid-name
     def assert_account_settings_context_looks_correct(self, context, duplicate=False, linked=None):
@@ -129,10 +138,10 @@ class HelperMixin(object):
 
     def assert_json_failure_response_is_username_collision(self, response):
         """Asserts the json response indicates a username collision."""
-        self.assertEqual(400, response.status_code)
+        self.assertEqual(409, response.status_code)
         payload = json.loads(response.content.decode('utf-8'))
         self.assertFalse(payload.get('success'))
-        self.assertIn('belongs to an existing account', payload.get('value'))
+        self.assertIn('belongs to an existing account', payload['username'][0]['user_message'])
 
     def assert_json_success_response_looks_correct(self, response):
         """Asserts the json response indicates success and redirection."""
@@ -285,7 +294,6 @@ class HelperMixin(object):
         """Creates user, profile, registration, and (usually) social auth.
 
         This synthesizes what happens during /register.
-        See student.views.register and student.helpers.do_create_account.
         """
         response_data = self.get_response_data()
         uid = strategy.request.backend.get_user_id(response_data, response_data)
@@ -541,7 +549,6 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         actions.do_complete(request.backend, social_views._do_login,  # pylint: disable=protected-access
                             request=request)
 
-        signin_user(strategy.request)
         login_user(strategy.request)
         actions.do_complete(request.backend, social_views._do_login,  # pylint: disable=protected-access
                             request=request)
@@ -598,7 +605,6 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
                             request=request)
 
         with self._patch_edxmako_current_request(strategy.request):
-            signin_user(strategy.request)
             login_user(strategy.request)
             actions.do_complete(request.backend, social_views._do_login, user=user,  # pylint: disable=protected-access
                                 request=request)
@@ -665,7 +671,6 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
                             request=request)
 
         with self._patch_edxmako_current_request(strategy.request):
-            signin_user(strategy.request)
             login_user(strategy.request)
             actions.do_complete(request.backend, social_views._do_login,  # pylint: disable=protected-access
                                 user=user, request=request)
@@ -710,7 +715,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         # At this point we know the pipeline has resumed correctly. Next we
         # fire off the view that displays the login form and posts it via JS.
         with self._patch_edxmako_current_request(strategy.request):
-            self.assert_login_response_in_pipeline_looks_correct(signin_user(strategy.request))
+            self.assert_login_response_in_pipeline_looks_correct(login_user(strategy.request))
 
         # Next, we invoke the view that handles the POST, and expect it
         # redirects to /auth/complete. In the browser ajax handlers will
@@ -806,7 +811,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         # fire off the view that displays the registration form.
         with self._patch_edxmako_current_request(request):
             self.assert_register_response_in_pipeline_looks_correct(
-                register_user(strategy.request),
+                login_and_registration_form(strategy.request, initial_mode='register'),
                 pipeline.get(request)['kwargs'],
                 ['name', 'username', 'email']
             )
@@ -881,7 +886,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
 
         with self._patch_edxmako_current_request(request):
             self.assert_register_response_in_pipeline_looks_correct(
-                register_user(strategy.request),
+                login_and_registration_form(strategy.request, initial_mode='register'),
                 pipeline.get(request)['kwargs'],
                 ['name', 'username', 'email']
             )

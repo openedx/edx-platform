@@ -21,7 +21,6 @@ from social_django.models import UserSocialAuth
 from testfixtures import LogCapture
 
 from enterprise.models import EnterpriseCustomerIdentityProvider, EnterpriseCustomerUser
-from openedx.core.djangoapps.user_authn.views.deprecated import signin_user
 from openedx.core.djangoapps.user_authn.views.login import login_user
 from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context
 from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerFactory
@@ -192,7 +191,6 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
                             request=request)
 
         with self._patch_edxmako_current_request(strategy.request):
-            signin_user(strategy.request)
             login_user(strategy.request)
             actions.do_complete(request.backend, social_views._do_login, user=user,  # pylint: disable=protected-access
                                 request=request)
