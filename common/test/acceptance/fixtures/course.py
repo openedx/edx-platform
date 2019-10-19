@@ -398,7 +398,7 @@ class CourseFixture(XBlockContainerFixture):
         for asset_name in self._assets:
             asset_file_path = test_dir + '/data/uploads/' + asset_name
 
-            asset_file = open(asset_file_path)
+            asset_file = open(asset_file_path, mode='rb')  # pylint: disable=open-builtin
             files = {'file': (asset_name, asset_file, mimetypes.guess_type(asset_file_path)[0])}
 
             headers = {
