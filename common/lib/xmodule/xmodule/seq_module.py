@@ -367,7 +367,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             'banner_text': banner_text,
             'save_position': view != PUBLIC_VIEW,
             'show_completion': view != PUBLIC_VIEW,
-            'gated_content': self._get_gated_content_info(prereq_met, prereq_meta_info),
+            'gated_content': self._get_gated_content_info(prereq_met, prereq_meta_info)
         }
         fragment.add_content(self.system.render_template("seq_module.html", params))
 
