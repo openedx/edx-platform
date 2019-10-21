@@ -4,6 +4,7 @@ Functions that can are used to modify XBlock fragments for use in the LMS and St
 
 from __future__ import absolute_import
 import datetime
+import hashlib
 import json
 import logging
 import re
@@ -550,3 +551,20 @@ def get_aside_from_xblock(xblock, aside_type):
         xblock.core.XBlockAside: Instance of an xblock aside
     """
     return xblock.runtime.get_aside_of_type(xblock, aside_type)
+
+
+def hash_resource(resource):
+    """
+    Hash a :class:`web_fragments.fragment.FragmentResource
+    Those hash values are used to avoid loading the resources
+    multiple times.
+    """
+    md5 = hashlib.md5()
+    for data in resource:
+        if isinstance(data, bytes):
+            md5.update(data)
+        elif isinstance(data, six.string_types):
+            md5.update(data.encode('utf-8'))
+        else:
+            md5.update(repr(data).encode('utf-8'))
+    return md5.hexdigest()

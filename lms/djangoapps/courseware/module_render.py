@@ -76,6 +76,7 @@ from openedx.core.lib.url_utils import quote_slashes, unquote_slashes
 from openedx.core.lib.xblock_utils import (
     add_staff_markup,
     get_aside_from_xblock,
+    hash_resource,
     is_xblock_aside,
     replace_course_urls,
     replace_jump_to_id_urls,
@@ -1217,16 +1218,6 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
             raise
 
     return webob_to_django_response(resp)
-
-
-def hash_resource(resource):
-    """
-    Hash a :class:`web_fragments.fragment.FragmentResource
-    """
-    md5 = hashlib.md5()
-    for data in resource:
-        md5.update(repr(data).encode('utf-8'))
-    return md5.hexdigest()
 
 
 @api_view(['GET'])
