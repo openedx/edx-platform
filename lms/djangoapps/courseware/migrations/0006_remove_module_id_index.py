@@ -16,6 +16,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='studentmodule',
             name='module_state_key',
-            field=opaque_keys.edx.django.models.UsageKeyField(db_column=b'module_id', max_length=255),
+            field=opaque_keys.edx.django.models.UsageKeyField(db_column='module_id', max_length=255),
         ),
     ]
