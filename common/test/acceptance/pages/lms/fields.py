@@ -4,6 +4,7 @@ Mixins for fields.
 """
 from __future__ import absolute_import
 
+import six
 from bok_choy.promise import EmptyPromise
 
 from common.test.acceptance.tests.helpers import get_selected_option_text, select_option_by_text
@@ -69,9 +70,9 @@ class FieldsMixin(object):
         Return the title of a field.
         """
         self.wait_for_field(field_id)
-
-        query = self.q(css=u'.u-field-{} .u-field-title'.format(field_id))
-        return query.text[0] if query.present else None
+        # pylint: disable=unicode-format-string
+        query = self.q(css=six.u('.u-field-{} .u-field-title').format(field_id))
+        return sorted(query.text)[0] if query.present else None
 
     def message_for_field(self, field_id):
         """

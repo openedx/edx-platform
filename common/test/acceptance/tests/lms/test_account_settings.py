@@ -407,11 +407,11 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         Test behaviour of one of the social media links field.
         """
         self._test_text_field(
-            u'social_links',
-            u'Twitter Link',
+            six.u('social_links'),
+            six.u('Facebook Link'),
             self.social_link,
-            u'www.google.com/invalidlink',
-            [u'https://www.twitter.com/edX', self.social_link],
+            six.u('www.google.com/invalidlink)'),
+            [six.u('https://www.twitter.com/edX'), self.social_link],
         )
 
     def test_linked_accounts(self):
