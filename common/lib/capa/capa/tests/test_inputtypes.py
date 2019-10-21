@@ -799,10 +799,6 @@ class MatlabTest(unittest.TestCase):
         self.assertEqual(elements[id_index].get('id'), 'mwAudioPlaceHolder')
         output_string = etree.tostring(output).decode('utf-8')
 
-        six.assertRegex(self, output_string, "div.*mwAudioPlaceHolder")
-        six.assertRegex(self, output_string, "audio.*Audio is not supported.*audio")
-        six.assertRegex(self, output_string, "div.*Right click.*href.*media.*here.*click.*download.*div")
-        six.assertRegex(self, output_string, "div .*style=.*ul.*div")
         # check that exception is raised during parsing for html.
         self.the_input.capa_system.render_template = lambda *args: "<aaa"
         with self.assertRaises(etree.XMLSyntaxError):
