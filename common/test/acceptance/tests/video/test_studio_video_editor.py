@@ -179,8 +179,8 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.save_unit_settings()
         self.edit_component()
         self.open_advanced_tab()
-        self.assertEqual(self.video.translations(), ['zh', 'uk'])
-        self.assertEqual(list(self.video.caption_languages.keys()), ['zh', 'uk'])
+        self.assertEqual(sorted(self.video.translations()), sorted(['zh', 'uk']))
+        self.assertEqual(sorted(list(self.video.caption_languages.keys())), sorted(['zh', 'uk']))
         zh_unicode_text = u"好 各位同学"
         self.assertTrue(self.video.download_translation('zh', zh_unicode_text))
         uk_unicode_text = u"Привіт, edX вітає вас."
@@ -399,8 +399,8 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.assertTrue(self.video.is_captions_visible())
         unicode_text = u"好 各位同学"
         self.assertIn(unicode_text, self.video.captions_text)
-        self.assertEqual(list(self.video.caption_languages.keys()), [u'ab', u'uk'])
-        self.assertEqual(list(self.video.caption_languages.keys())[0], 'ab')
+        self.assertEqual(sorted(list(self.video.caption_languages.keys())), sorted([u'ab', u'uk']))
+        self.assertEqual(sorted(list(self.video.caption_languages.keys()))[0], 'ab')
 
     def test_upload_transcript_with_BOM(self):
         """
