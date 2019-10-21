@@ -178,7 +178,7 @@ class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):
             try:
                 # Default behavior is True - send the email
 
-                data['send_activation_email'] == self._normalize_bool_param(
+                data['send_activation_email'] = self._normalize_bool_param(
                     data.get('send_activation_email', True))
             except ValueError:
                 errors = {
