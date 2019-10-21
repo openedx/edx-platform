@@ -24,8 +24,8 @@ class Migration(migrations.Migration):
                 ('user_id', models.IntegerField()),
                 ('course_id', CourseKeyField(max_length=255)),
                 ('usage_key', UsageKeyField(max_length=255)),
-                ('subtree_edited_date', models.DateTimeField(verbose_name=b'last content edit timestamp')),
-                ('course_version', models.CharField(max_length=255, verbose_name=b'guid of latest course version', blank=True)),
+                ('subtree_edited_date', models.DateTimeField(verbose_name='last content edit timestamp')),
+                ('course_version', models.CharField(max_length=255, verbose_name='guid of latest course version', blank=True)),
                 ('earned_all', models.FloatField()),
                 ('possible_all', models.FloatField()),
                 ('earned_graded', models.FloatField()),
@@ -43,7 +43,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='persistentsubsectiongrade',
             name='visible_blocks',
-            field=models.ForeignKey(to='grades.VisibleBlocks', db_column=b'visible_blocks_hash', to_field=b'hashed', on_delete=models.CASCADE),
+            field=models.ForeignKey(to='grades.VisibleBlocks', db_column='visible_blocks_hash', to_field='hashed', on_delete=models.CASCADE),
         ),
         migrations.AlterUniqueTogether(
             name='persistentsubsectiongrade',
