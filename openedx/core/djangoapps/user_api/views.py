@@ -150,7 +150,8 @@ class RegistrationView(APIView):
             return response
 
         response = self._create_response(
-            {'redirect_url': self._get_third_party_auth_redirect_url(request)},
+            # {'redirect_url': self._get_third_party_auth_redirect_url(request)},
+            {},
             status_code=200,
         )
         set_logged_in_cookies(request, response, user)
