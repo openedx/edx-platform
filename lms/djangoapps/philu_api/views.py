@@ -16,6 +16,8 @@ from mailchimp_pipeline.tasks import update_enrollments_completions_at_mailchimp
 from lms.djangoapps.onboarding.helpers import get_org_metric_update_prompt
 from lms.djangoapps.onboarding.models import MetricUpdatePromptRecord
 from student.models import User
+from philu_overrides.helpers import reactivation_email_for_user_custom
+
 import urllib
 import json
 from django.http import HttpResponse, Http404
@@ -254,3 +256,15 @@ def send_alquity_fake_confirmation_email(request):
         logging.exception(ex)
         success = False
     return JsonResponse({'success': success})
+
+
+def resend_activation_email(request):
+    user = request.user
+    success = True
+    try:
+        if not activated:
+            reactivation_email_for_user_custom(request, user)
+    except Exception as ex:
+        logging.exception(ex)
+        success = False
+    return JsonResponse({'success': success, 'email': user.email})
