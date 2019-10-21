@@ -21,6 +21,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from mock import Mock, patch
 from six import iteritems
+from social_django.models import UserSocialAuth
 
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
@@ -88,6 +89,11 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, Retireme
         self.different_user = UserFactory.create(password=self.password)
         self.staff_user = UserFactory(is_staff=True, password=self.password)
         self.reset_tracker()
+
+        enterprise_patcher = patch('openedx.features.enterprise_support.api.get_enterprise_customer_for_learner')
+        enterprise_learner_patcher = enterprise_patcher.start()
+        enterprise_learner_patcher.return_value = {}
+        self.addCleanup(enterprise_learner_patcher.stop)
 
     def test_get_username_provided(self):
         """Test the difference in behavior when a username is supplied to get_account_settings."""
@@ -240,6 +246,8 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, Retireme
             (True, False),
             # is_synch_learner_profile_data
             (True, False),
+            # has `UserSocialAuth` record
+            (True, False),
         )
     )
     @ddt.unpack
@@ -248,9 +256,11 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, Retireme
         field_name_value,
         is_enterprise_user,
         is_synch_learner_profile_data,
+        has_user_social_auth_record,
         mock_auth_provider,
         mock_customer,
     ):
+        idp_backend_name = 'tpa-saml'
         mock_customer.return_value = {}
         if is_enterprise_user:
             mock_customer.return_value.update({
@@ -259,13 +269,25 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, Retireme
                 'identity_provider': 'saml-ubc'
             })
         mock_auth_provider.return_value.sync_learner_profile_data = is_synch_learner_profile_data
+        mock_auth_provider.return_value.backend_name = idp_backend_name
 
         update_data = {field_name_value[0]: field_name_value[1]}
 
+        user_fullname_editable = False
+        if has_user_social_auth_record:
+            UserSocialAuth.objects.create(
+                provider=idp_backend_name,
+                user=self.user
+            )
+        else:
+            UserSocialAuth.objects.all().delete()
+            # user's fullname is editable if no `UserSocialAuth` record exists
+            user_fullname_editable = field_name_value[0] == 'name'
+
         # prevent actual email change requests
         with patch('openedx.core.djangoapps.user_api.accounts.api.student_views.do_email_change_request'):
-            # expect field un-editability only when both of the following conditions are met
-            if is_enterprise_user and is_synch_learner_profile_data:
+            # expect field un-editability only when all of the following conditions are met
+            if is_enterprise_user and is_synch_learner_profile_data and not user_fullname_editable:
                 with self.assertRaises(AccountValidationError) as validation_error:
                     update_account_settings(self.user, update_data)
                     field_errors = validation_error.exception.field_errors

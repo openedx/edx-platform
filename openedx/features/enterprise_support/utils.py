@@ -16,6 +16,7 @@ from enterprise.models import EnterpriseCustomerUser
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings
 from openedx.core.djangolib.markup import HTML, Text
+from social_django.models import UserSocialAuth
 
 
 def get_cache_key(**kwargs):
@@ -232,21 +233,21 @@ def _set_experiments_is_enterprise_cookie(request, response, experiments_is_ente
     )
 
 
-def update_account_settings_context_for_enterprise(context, enterprise_customer):
+def update_account_settings_context_for_enterprise(context, enterprise_customer, user):
     """
     Take processed context for account settings page and update it taking enterprise customer into account.
 
      Arguments:
-         context (dict): Context for account settings page.
-         enterprise_customer (dict): data for enterprise customer
-
+        context (dict): Context for account settings page.
+        enterprise_customer (dict): data for enterprise customer
+        user (User): request user
     """
     enterprise_context = {
         'enterprise_name': enterprise_customer['name'] if enterprise_customer else None,
         'sync_learner_profile_data': _get_sync_learner_profile_data(enterprise_customer),
         'edx_support_url': configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK),
         'enterprise_readonly_account_fields': {
-            'fields': settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS
+            'fields': list(get_enterprise_readonly_account_fields(user))
         }
     }
     context.update(enterprise_context)
@@ -260,8 +261,33 @@ def get_enterprise_readonly_account_fields(user):
     from openedx.features.enterprise_support.api import get_enterprise_customer_for_learner
     enterprise_customer = get_enterprise_customer_for_learner(user)
 
+    enterprise_readonly_account_fields = list(settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS)
+
+    # if user has no `UserSocialAuth` record then allow to edit `fullname`
+    # whether the `sync_learner_profile_data` is enabled or disabled
+    user_social_auth_record = _user_has_social_auth_record(user, enterprise_customer)
+    if not user_social_auth_record:
+        enterprise_readonly_account_fields.remove('name')
+
     sync_learner_profile_data = _get_sync_learner_profile_data(enterprise_customer)
-    return set(settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS) if sync_learner_profile_data else set()
+    return set(enterprise_readonly_account_fields) if sync_learner_profile_data else set()
+
+
+def _user_has_social_auth_record(user, enterprise_customer):
+    """
+    Return True if a `UserSocialAuth` record exists for `user` False otherwise.
+    """
+    if enterprise_customer:
+        identity_provider = third_party_auth.provider.Registry.get(
+            provider_id=enterprise_customer['identity_provider'],
+        )
+        if identity_provider:
+            return UserSocialAuth.objects.select_related('user').filter(
+                provider=identity_provider.backend_name,
+                user=user
+            ).exists()
+
+    return False
 
 
 def _get_sync_learner_profile_data(enterprise_customer):

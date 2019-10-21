@@ -27,6 +27,7 @@ from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
+from openedx.features.enterprise_support.utils import get_enterprise_readonly_account_fields
 
 
 @skip_unless_lms
@@ -106,7 +107,8 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
             self.assertEqual(context['edx_support_url'], settings.SUPPORT_SITE_LINK)
             self.assertEqual(context['enterprise_name'], None)
             self.assertEqual(
-                context['enterprise_readonly_account_fields'], {'fields': settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS}
+                context['enterprise_readonly_account_fields'],
+                {'fields': list(get_enterprise_readonly_account_fields(self.user))}
             )
             expected_beta_language = {'code': 'lt-lt', 'name': settings.LANGUAGE_DICT.get('lt-lt')}
             self.assertEqual(context['beta_language'], expected_beta_language)
@@ -152,7 +154,8 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
         self.assertEqual(context['edx_support_url'], settings.SUPPORT_SITE_LINK)
         self.assertEqual(context['enterprise_name'], dummy_enterprise_customer['name'])
         self.assertEqual(
-            context['enterprise_readonly_account_fields'], {'fields': settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS}
+            context['enterprise_readonly_account_fields'],
+            {'fields': list(get_enterprise_readonly_account_fields(self.user))}
         )
 
     def test_view(self):
