@@ -1,4 +1,7 @@
-"""Errors thrown in the Team API"""
+"""
+Errors thrown in the Team API.
+"""
+from __future__ import absolute_import, unicode_literals
 
 
 class TeamAPIRequestError(Exception):

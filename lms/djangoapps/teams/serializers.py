@@ -1,5 +1,7 @@
-"""Defines serializers used by the Team API."""
-from __future__ import absolute_import
+"""
+Defines serializers used by the Team API.
+"""
+from __future__ import absolute_import, unicode_literals
 
 from copy import deepcopy
 

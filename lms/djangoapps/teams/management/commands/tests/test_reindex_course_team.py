@@ -1,8 +1,7 @@
 """
-Tests for course_team reindex command
+Tests for course_team reindex command.
 """
-
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import ddt
 from django.core.management import CommandError, call_command
