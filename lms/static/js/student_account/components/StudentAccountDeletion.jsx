@@ -96,13 +96,22 @@ export class StudentAccountDeletion extends React.Component {
       },
     );
 
+    const bodyDeletion2 = StringUtils.interpolate(
+      gettext('This includes access to {siteName} from your employer’s or university’s system and access to private sites offered by {additionalSiteSpecificDeletionText}.'),
+      {
+        siteName: this.props.siteName,
+        additionalSiteSpecificDeletionText: this.props.additionalSiteSpecificDeletionText,
+      },
+    );
+
+
     return (
       <div className="account-deletion-details">
         <p className="account-settings-header-subtitle">{ gettext('We’re sorry to see you go!') }</p>
         <p className="account-settings-header-subtitle">{noteDeletion}</p>
         <p className="account-settings-header-subtitle">
               <span>{bodyDeletion} </span>
-              <span>{ gettext('This includes access to edx.org from your employer’s or university’s system and access to private sites offered by MIT Open Learning, Wharton Executive Education, and Harvard Medical School.') }</span>
+              <span>{bodyDeletion2}</span>
         </p>
         <p
           className="account-settings-header-subtitle"
@@ -146,9 +155,10 @@ export class StudentAccountDeletion extends React.Component {
         }
         {deletionModalOpen && <StudentAccountDeletionModal
           onClose={this.closeDeletionModal}
+          additionalSiteSpecificDeletionText={this.props.additionalSiteSpecificDeletionText}
+          mktgRootLink={this.props.mktgRootLink}
           platformName={this.props.platformName}
           siteName={this.props.siteName}
-          mktgRootLink={this.props.mktgRootLink}
         />}
       </div>
     );
@@ -160,13 +170,15 @@ StudentAccountDeletion.propTypes = {
   socialAccountLinks: PropTypes.shape({
     providers: PropTypes.arrayOf(PropTypes.object),
   }).isRequired,
+  additionalSiteSpecificDeletionText: PropTypes.string,
+  mktgRootLink: PropTypes.string,
   platformName: PropTypes.string,
   siteName: PropTypes.string,
-  mktgRootLink: PropTypes.string,
 };
 
 StudentAccountDeletion.defaultProps = {
+  additionalSiteSpecificDeletionText: '',
+  mktgRootLink: '',
   platformName: '',
   siteName: '',
-  mktgRootLink: '',
 };

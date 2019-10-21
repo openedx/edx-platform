@@ -19,9 +19,10 @@ const wrapperRendered = setInterval(() => {
       props: {
         socialAccountLinks: window.auth,
         isActive: window.isActive,
+        additionalSiteSpecificDeletionText: window.additionalSiteSpecificDeletionText,
+        mktgRootLink: window.mktgRootLink,
         platformName: window.platformName,
-        siteName: window.siteName,
-        mktgRootLink: window.mktgRootLink
+        siteName: window.siteName
       },
     });
   }

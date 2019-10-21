@@ -116,6 +116,15 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
       },
     );
 
+    const bodyDeletion2 = StringUtils.interpolate(
+      gettext('This includes access to {siteName} from your employer’s or university’s system and access to private sites offered by {additionalSiteSpecificDeletionText}.'),
+      {
+        siteName: this.props.siteName,
+        additionalSiteSpecificDeletionText: this.props.additionalSiteSpecificDeletionText,
+      },
+    );
+
+
     return (
       <div className="delete-confirmation-wrapper">
         <Modal
@@ -155,7 +164,7 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
                       <h3 className="alert-title">{noteDeletion}</h3>
                       <p>
                         <span>{bodyDeletion} </span>
-                        <span>{ gettext('This includes access to edx.org from your employer’s or university’s system and access to private sites offered by MIT Open Learning, Wharton Executive Education, and Harvard Medical School.') }</span>
+                        <span>{bodyDeletion2}</span>
                       </p>
                       <p dangerouslySetInnerHTML={{ __html: loseAccessText }} />
                     </div>
@@ -216,16 +225,18 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
 
 StudentAccountDeletionConfirmationModal.propTypes = {
   onClose: PropTypes.func,
+  additionalSiteSpecificDeletionText: PropTypes.string,
+  mktgRootLink: PropTypes.string,
   platformName: PropTypes.string,
   siteName: PropTypes.string,
-  mktgRootLink: PropTypes.string,
 };
 
 StudentAccountDeletionConfirmationModal.defaultProps = {
   onClose: () => {},
+  additionalSiteSpecificDeletionText: "",
+  mktgRootLink: "",
   platformName: "",
   siteName: "",
-  mktgRootLink: "",
 };
 
 export default StudentAccountDeletionConfirmationModal;
