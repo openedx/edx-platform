@@ -119,8 +119,8 @@ class CourseTeam(models.Model):
     class Meta(object):
         app_label = "teams"
 
-    team_id = models.CharField(max_length=255, unique=True)
-    discussion_topic_id = models.CharField(max_length=255, unique=True)
+    team_id = models.SlugField(max_length=255, unique=True)
+    discussion_topic_id = models.SlugField(max_length=255, unique=True)
     name = models.CharField(max_length=255, db_index=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
     topic_id = models.CharField(max_length=255, db_index=True, blank=True)
