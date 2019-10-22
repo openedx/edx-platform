@@ -1291,7 +1291,6 @@ class ProgressPageTests(ProgressPageBaseTests):
         """
         # Create a new course, a user which will not be enrolled in course, admin user for staff access
         course = CourseFactory.create(default_store=default_store)
-        not_enrolled_user = UserFactory.create()
         admin = AdminFactory.create()
         self.assertTrue(self.client.login(username=admin.username, password='test'))
 
