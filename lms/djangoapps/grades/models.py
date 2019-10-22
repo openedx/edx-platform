@@ -781,15 +781,15 @@ class PersistentSubsectionGradeOverrideHistory(models.Model):
     .. no_pii:
     """
     OVERRIDE_FEATURES = (
-        (constants.GradeOverrideFeatureEnum.proctoring, 'proctoring'),
-        (constants.GradeOverrideFeatureEnum.gradebook, 'gradebook'),
+        (constants.GradeOverrideFeatureEnum.proctoring, u'proctoring'),
+        (constants.GradeOverrideFeatureEnum.gradebook, u'gradebook'),
     )
 
-    CREATE_OR_UPDATE = 'CREATEORUPDATE'
-    DELETE = 'DELETE'
+    CREATE_OR_UPDATE = u'CREATEORUPDATE'
+    DELETE = u'DELETE'
     OVERRIDE_ACTIONS = (
-        (CREATE_OR_UPDATE, 'create_or_update'),
-        (DELETE, 'delete')
+        (CREATE_OR_UPDATE, u'create_or_update'),
+        (DELETE, u'delete')
     )
 
     class Meta(object):
