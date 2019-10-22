@@ -5,7 +5,8 @@ set -e
 source $HOME/jenkins_env
 
 NODE_ENV_DIR=$HOME/nenv
-NODE_VERSION=8.9.3
+NODEENV_VERSION=1.3.3
+NODE_VERSION=12.11.1
 
 NODE_INSTALL_COMMAND="nodeenv --node=$NODE_VERSION --prebuilt $NODE_ENV_DIR --force --verbose"
 
@@ -52,14 +53,14 @@ source $HOME/edx-venv/bin/activate
 PATH=$PATH:node_modules/.bin
 
 echo "setting up nodeenv"
-pip install nodeenv
+pip install nodeenv==$NODEENV_VERSION
 # Ensure we are starting with a clean node env directory
 rm -rf $NODE_ENV_DIR
 
 # Occasionally, the command to install node hangs. We need to catch that and retry.
 # Note that this will retry even if the command itself fails.
 WAIT_COUNT=0
-until timeout 60s $NODE_INSTALL_COMMAND || [ $WAIT_COUNT -eq 2 ]; do
+until timeout 120s $NODE_INSTALL_COMMAND || [ $WAIT_COUNT -eq 2 ]; do
     echo "re-trying to install node version..."
     sleep 2
     WAIT_COUNT=$((WAIT_COUNT+1))
