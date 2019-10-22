@@ -39,3 +39,18 @@ class DiscountRestrictionConfig(StackedConfigurationModel):
         return "DiscountRestrictionConfig(disabled={!r})".format(
             self.disabled
         )
+
+
+@python_2_unicode_compatible
+class DiscountPercentageConfig(StackedConfigurationModel):
+    """
+    A ConfigurationModel to configure the discount percentage for the first purchase discount
+    """
+    STACKABLE_FIELDS = ('percentage',)
+    percentage = models.PositiveIntegerField()
+
+    def __str__(self):
+        return "DiscountPercentageConfig(enabled={!r},percentage={!r})".format(
+            self.enabled,
+            self.percentage
+        )

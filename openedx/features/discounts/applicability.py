@@ -20,7 +20,7 @@ from course_modes.models import CourseMode
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
-from openedx.features.discounts.models import DiscountRestrictionConfig
+from openedx.features.discounts.models import DiscountPercentageConfig, DiscountRestrictionConfig
 from student.models import CourseEnrollment
 from track import segment
 
@@ -181,9 +181,11 @@ def _is_in_holdback(user):
     return bucket == 0
 
 
-def discount_percentage():
+def discount_percentage(course):
     """
     Get the configured discount amount.
     """
-    # TODO: Add configuration information here
+    configured_percentage = DiscountPercentageConfig.current(course_key=course.id).percentage
+    if configured_percentage:
+        return configured_percentage
     return 15
