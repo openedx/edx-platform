@@ -22,7 +22,6 @@ from openedx.core.djangoapps.catalog.utils import get_course_run_details
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from openedx.features.discounts.utils import get_first_purchase_offer_banner_fragment
 from student.models import CourseEnrollment
 from util.date_utils import strftime_localized
 
@@ -238,28 +237,3 @@ def course_expiration_wrapper(user, block, view, frag, context):  # pylint: disa
     course_expiration_fragment.add_fragment_resources(frag)
 
     return course_expiration_fragment
-
-
-def offer_banner_wrapper(user, block, view, frag, context):  # pylint: disable=W0613
-    """
-    A wrapper that prepends the First Purchase Discount banner if
-    the user hasn't upgraded yet.
-    """
-    if block.category != "vertical":
-        return frag
-
-    course = CourseOverview.get_from_id(block.course_id)
-    offer_banner_fragment = get_first_purchase_offer_banner_fragment(user, course)
-
-    if not offer_banner_fragment:
-        return frag
-
-    # Course content must be escaped to render correctly due to the way the
-    # way the XBlock rendering works. Transforming the safe markup to unicode
-    # escapes correctly.
-    offer_banner_fragment.content = six.text_type(offer_banner_fragment.content)
-
-    offer_banner_fragment.add_content(frag.content)
-    offer_banner_fragment.add_fragment_resources(frag)
-
-    return offer_banner_fragment
