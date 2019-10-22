@@ -128,6 +128,9 @@ FEATURES['CERTIFICATES_HTML_VIEW'] = True
 ########################## AUTHOR PERMISSION #######################
 FEATURES['ENABLE_CREATOR_GROUP'] = False
 
+################### FRONTEND APPLICATION PUBLISHER URL ###################
+FEATURES['FRONTEND_APP_PUBLISHER_URL'] = 'http://localhost:18400'
+
 ################################# DJANGO-REQUIRE ###############################
 
 # Whether to run django-require in debug mode.

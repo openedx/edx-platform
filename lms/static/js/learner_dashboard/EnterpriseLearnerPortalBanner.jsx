@@ -23,7 +23,7 @@ function setViewedBanner() {
 }
 
 function hasViewedBanner() {
-  window.localStorage.getItem(LOCAL_STORAGE_KEY);
+  return window.localStorage.getItem(LOCAL_STORAGE_KEY) != null;
 }
 
 class EnterpriseLearnerPortalBanner extends Component {
@@ -57,7 +57,7 @@ class EnterpriseLearnerPortalBanner extends Component {
   render() {
     const { alertHtml, open } = this.state;
 
-    if (open) {
+    if (open && alertHtml) {
       return (
         <div className="edx-enterprise-learner-portal-banner-wrapper">
           <StatusAlert

@@ -11,9 +11,15 @@ from web_fragments.fragment import Fragment
 
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
+from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
 from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.cache_utils import request_cached
-from openedx.features.discounts.applicability import can_receive_discount, discount_percentage
+from openedx.features.discounts.applicability import (
+    can_receive_discount,
+    get_discount_expiration_date,
+    discount_percentage
+)
+from openedx.features.discounts.utils import format_strikeout_price
 from xmodule.modulestore.django import modulestore
 
 
@@ -125,6 +131,35 @@ def get_course_outline_block_tree(request, course_id, user=None):
                 # we'll use the last child.
                 block['children'][-1]['resume_block'] = True
 
+    def recurse_mark_scored(block):
+        """
+        Mark this block as 'scored' if any of its descendents are 'scored' (that is, 'has_score' and 'weight' > 0).
+        """
+        is_scored = block.get('has_score', False) and block.get('weight', 1) > 0
+        # Use a list comprehension to force the recursion over all children, rather than just stopping
+        # at the first child that is scored.
+        children_scored = any([recurse_mark_scored(child) for child in block.get('children', [])])
+        if is_scored or children_scored:
+            block['scored'] = True
+            return True
+        else:
+            block['scored'] = False
+            return False
+
+    def recurse_mark_auth_denial(block):
+        """
+        Mark this block as 'scored' if any of its descendents are 'scored' (that is, 'has_score' and 'weight' > 0).
+        """
+        own_denial_reason = {block['authorization_denial_reason']} if 'authorization_denial_reason' in block else set()
+        # Use a list comprehension to force the recursion over all children, rather than just stopping
+        # at the first child that is scored.
+        child_denial_reasons = own_denial_reason.union(
+            *(recurse_mark_auth_denial(child) for child in block.get('children', []))
+        )
+        if child_denial_reasons:
+            block['all_denial_reasons'] = child_denial_reasons
+        return child_denial_reasons
+
     course_key = CourseKey.from_string(course_id)
     course_usage_key = modulestore().make_course_usage_key(course_key)
 
@@ -154,6 +189,8 @@ def get_course_outline_block_tree(request, course_id, user=None):
             'type',
             'due',
             'graded',
+            'has_score',
+            'weight',
             'special_exam_info',
             'show_gated_sections',
             'format'
@@ -164,6 +201,8 @@ def get_course_outline_block_tree(request, course_id, user=None):
     course_outline_root_block = all_blocks['blocks'].get(all_blocks['root'], None)
     if course_outline_root_block:
         populate_children(course_outline_root_block, all_blocks['blocks'])
+        recurse_mark_scored(course_outline_root_block)
+        recurse_mark_auth_denial(course_outline_root_block)
         if user:
             set_last_accessed_default(course_outline_root_block)
             mark_blocks_completed(
@@ -192,16 +231,27 @@ def get_resume_block(block):
 
 
 def get_first_purchase_offer_banner_fragment(user, course):
-    if user and course and can_receive_discount(user=user, course=course):
-        # Translator: xgettext:no-python-format
-        offer_message = _(u'{banner_open}{percentage}% off your first upgrade.{span_close}'
-                          u' Discount automatically applied.{div_close}')
-        return Fragment(HTML(offer_message).format(
-            banner_open=HTML(
-                '<div class="first-purchase-offer-banner"><span class="first-purchase-offer-banner-bold">'
-            ),
-            percentage=discount_percentage(),
-            span_close=HTML('</span>'),
-            div_close=HTML('</div>')
-        ))
+    if user and course:
+        discount_expiration_date = get_discount_expiration_date(user, course)
+        if (discount_expiration_date and
+                can_receive_discount(user=user, course=course, discount_expiration_date=discount_expiration_date)):
+            # Translator: xgettext:no-python-format
+            offer_message = _(u'{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% '
+                              u'[{strikeout_price}]{span_close}{br}Discount will be automatically applied at checkout. '
+                              u'{a_open}Upgrade Now{a_close}{div_close}')
+            return Fragment(HTML(offer_message).format(
+                a_open=HTML(u'<a href="{upgrade_link}">').format(
+                    upgrade_link=verified_upgrade_deadline_link(user=user, course=course)
+                ),
+                a_close=HTML('</a>'),
+                br=HTML('<br>'),
+                banner_open=HTML(
+                    '<div class="first-purchase-offer-banner"><span class="first-purchase-offer-banner-bold">'
+                ),
+                discount_expiration_date=discount_expiration_date.strftime(u'%B %d'),
+                percentage=discount_percentage(),
+                span_close=HTML('</span>'),
+                div_close=HTML('</div>'),
+                strikeout_price=HTML(format_strikeout_price(user, course, check_for_discount=False)[0])
+            ))
     return None

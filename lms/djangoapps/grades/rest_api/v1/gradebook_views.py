@@ -1060,14 +1060,16 @@ class SubsectionGradeView(GradeViewMixin, APIView):
             original_grade = PersistentSubsectionGrade.read_grade(user_id, usage_key)
             if original_grade is not None and hasattr(original_grade, 'override'):
                 override = original_grade.override
-                history = list(original_grade.override.history.all().order_by('history_date')[:history_record_limit])
+                # pylint: disable=no-member
+                history = list(PersistentSubsectionGradeOverride.history.filter(grade_id=original_grade.id).order_by(
+                    'history_date'
+                )[:history_record_limit])
             grade_data = {
                 'earned_all': original_grade.earned_all,
                 'possible_all': original_grade.possible_all,
                 'earned_graded': original_grade.earned_graded,
                 'possible_graded': original_grade.possible_graded,
             }
-
         except PersistentSubsectionGrade.DoesNotExist:
             grade_data = self._get_grade_data_for_not_attempted_assignment(user_id, usage_key)
 

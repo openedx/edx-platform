@@ -412,19 +412,24 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         url = reverse('create_mode', args=[six.text_type(self.course.id)])
         response = self.client.get(url, parameters)
 
+        CourseEnrollmentFactory(
+            is_active=True,
+            course_id=self.course.id,
+            user=self.user
+        )
+
         response = self.client.get(
             reverse('course_modes_choose', args=[six.text_type(self.course.id)]),
             follow=False,
         )
 
-        bannerText = u'''<div class="first-purchase-offer-banner"><span class="first-purchase-offer-banner-bold">
-                     15% off your first upgrade.</span> Discount automatically applied.</div>'''
+        banner = u'''<div class="first-purchase-offer-banner">'''
         button = u'''<button type="submit" name="verified_mode">
                     <span>Pursue a Verified Certificate</span>
                     (<span class="upgrade-price-string">$8.50 USD</span>
                     <del> <span class="upgrade-price-string">$10 USD</span></del>)
                     </button>'''
-        self.assertContains(response, bannerText, html=True)
+        self.assertContains(response, banner)
         self.assertContains(response, button, html=True)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

@@ -267,7 +267,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             response = self.client.get(self.url)
         self.assertNotIn(
             TestInstructorDashboard.GRADEBOOK_LEARNER_COUNT_MESSAGE,
-            response.content
+            response.content.decode('utf-8')
         )
         self.assertContains(response, 'View Gradebook')
 
@@ -429,10 +429,9 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
             response = self.client.get(self.url)
 
-            self.assertEquals(
-                expected_result,
-                'CCX Coaches are able to create their own Custom Courses based on this course' in response.content
-            )
+            self.assertEquals(expected_result,
+                              'CCX Coaches are able to create their own Custom Courses based on this course'
+                              in response.content.decode('utf-8'))
 
     def test_grade_cutoffs(self):
         """

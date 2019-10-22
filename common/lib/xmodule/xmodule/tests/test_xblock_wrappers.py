@@ -12,6 +12,7 @@ from unittest.case import SkipTest, TestCase
 
 import ddt
 import webob
+from webob.multidict import MultiDict
 from factory import (
     BUILD_STRATEGY,
     Factory,
@@ -385,11 +386,11 @@ class TestXModuleHandler(TestCase):
 
     def test_xmodule_handler_passed_data(self):
         self.module.xmodule_handler(self.request)
-        self.module.handle_ajax.assert_called_with(None, self.request.POST)
+        self.module.handle_ajax.assert_called_with(None, MultiDict(self.request.POST))
 
     def test_xmodule_handler_dispatch(self):
         self.module.xmodule_handler(self.request, 'dispatch')
-        self.module.handle_ajax.assert_called_with('dispatch', self.request.POST)
+        self.module.handle_ajax.assert_called_with('dispatch', MultiDict(self.request.POST))
 
     def test_xmodule_handler_return_value(self):
         response = self.module.xmodule_handler(self.request)

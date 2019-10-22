@@ -257,7 +257,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         resp = self.client.get(url)
         self.assertRedirects(resp, expected_url, status_code=302, target_status_code=200)
         resp = self.client.get(expected_url)
-        self.assertNotIn('Exam Vertical - Unit 1', resp.content)
+        self.assertNotContains(resp, 'Exam Vertical - Unit 1')
 
     def test_entrance_exam_content_presence(self):
         """
@@ -353,8 +353,8 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         )
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
-        self.assertNotIn('To access course materials, you must score', resp.content)
-        self.assertNotIn('You have passed the entrance exam.', resp.content)
+        self.assertNotContains(resp, 'To access course materials, you must score')
+        self.assertNotContains(resp, 'You have passed the entrance exam.')
 
     # TODO: LEARNER-71: Do we need to adjust or remove this test?
     @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)

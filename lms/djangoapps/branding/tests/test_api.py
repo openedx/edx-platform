@@ -146,8 +146,6 @@ class TestFooter(TestCase):
                  'icon-class': 'fa-facebook-square', 'title': 'Facebook'},
                 {'url': '#', 'action': 'Follow \xe9dX on Twitter', 'name': 'twitter',
                  'icon-class': 'fa-twitter-square', 'title': 'Twitter'},
-                {'url': '#', 'action': 'Subscribe to the \xe9dX YouTube channel',
-                 'name': 'youtube', 'icon-class': 'fa-youtube-square', 'title': 'Youtube'},
                 {'url': '#', 'action': 'Follow \xe9dX on LinkedIn', 'name': 'linkedin',
                  'icon-class': 'fa-linkedin-square', 'title': 'LinkedIn'},
                 {'url': '#', 'action': 'Follow \xe9dX on Google+', 'name': 'google_plus',

@@ -86,6 +86,6 @@ class ApiTestCase(TestCase):
         # Django rest framework interprets basic auth headers
         # as an attempt to authenticate with the API.
         # We don't want this for views available to anonymous users.
-        basic_auth_header = "Basic " + base64.b64encode('username:password')
+        basic_auth_header = "Basic " + base64.b64encode('username:password'.encode('utf-8')).decode('utf-8')
         response = getattr(self.client, method)(uri, HTTP_AUTHORIZATION=basic_auth_header)
         self.assertNotEqual(response.status_code, 403)

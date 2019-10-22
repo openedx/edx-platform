@@ -19,6 +19,7 @@ from entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.django_comment_common.models import Role
+from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
@@ -79,7 +80,7 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
     """
     if enrollment is None and course is None:
         logger.warn(u'Must specify either an enrollment or a course')
-        return (None, None)
+        return (None, None, None)
 
     if enrollment:
         if course is None:
@@ -97,7 +98,7 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
                                 course.id.deprecated
                                 )
                         )
-            return (None, None)
+            return (None, None, None)
 
         if enrollment.user_id != user.id:
             logger.warn(u'{} refers to a different user than {} which was supplied. Enrollment user id={}, repr={!r}. '
@@ -109,7 +110,7 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
                                                          user.id,
                                                          )
                         )
-            return (None, None)
+            return (None, None, None)
 
     if enrollment is None:
         enrollment = CourseEnrollment.get_enrollment(user, course.id)
@@ -117,10 +118,11 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
     if user.is_authenticated and verified_upgrade_link_is_valid(enrollment):
         return (
             verified_upgrade_deadline_link(user, course),
-            enrollment.upgrade_deadline
+            enrollment.upgrade_deadline,
+            enrollment.course_upgrade_deadline,
         )
 
-    return (None, None)
+    return (None, None, None)
 
 
 # TODO: clean up as part of REVEM-199 (START)
@@ -260,11 +262,11 @@ def get_experiment_user_metadata_context(course, user):
     audit_enrollments = None
     has_non_audit_enrollments = False
     try:
-        user_enrollments = CourseEnrollment.objects.select_related('course').filter(user_id=user.id)
+        user_enrollments = CourseEnrollment.objects.select_related('course', 'schedule').filter(user_id=user.id)
         has_non_audit_enrollments = user_enrollments.exclude(mode__in=CourseMode.UPSELL_TO_VERIFIED_MODES).exists()
         # TODO: clean up as part of REVO-28 (END)
         enrollment = CourseEnrollment.objects.select_related(
-            'course'
+            'course', 'schedule'
         ).get(user_id=user.id, course_id=course.id)
     except CourseEnrollment.DoesNotExist:
         pass  # Not enrolled, use the default values
@@ -304,20 +306,31 @@ def get_base_experiment_metadata_context(course, user, enrollment, user_enrollme
     # TODO: clean up as part of REVEM-199 (START)
     program_key = get_program_context(course, user_enrollments)
     # TODO: clean up as part of REVEM-199 (END)
+    schedule_start = None
     if enrollment and enrollment.is_active:
         enrollment_mode = enrollment.mode
         enrollment_time = enrollment.created
 
-    # upgrade_link and upgrade_date should be None if user has passed their dynamic pacing deadline.
-    upgrade_link, upgrade_date = check_and_get_upgrade_link_and_date(user, enrollment, course)
+        try:
+            schedule_start = enrollment.schedule.start
+        except Schedule.DoesNotExist:
+            pass
+
+    # upgrade_link, dynamic_upgrade_deadline and course_upgrade_deadline should be None
+    # if user has passed their dynamic pacing deadline.
+    upgrade_link, dynamic_upgrade_deadline, course_upgrade_deadline = check_and_get_upgrade_link_and_date(
+        user, enrollment, course
+    )
 
     return {
         'upgrade_link': upgrade_link,
         'upgrade_price': six.text_type(get_cosmetic_verified_display_price(course)),
         'enrollment_mode': enrollment_mode,
         'enrollment_time': enrollment_time,
+        'schedule_start': schedule_start,
         'pacing_type': 'self_paced' if course.self_paced else 'instructor_paced',
-        'upgrade_deadline': upgrade_date,
+        'dynamic_upgrade_deadline': dynamic_upgrade_deadline,
+        'course_upgrade_deadline': course_upgrade_deadline,
         'audit_access_deadline': get_audit_access_expiration(user, course),
         'course_key': course.id,
         'course_start': course.start,

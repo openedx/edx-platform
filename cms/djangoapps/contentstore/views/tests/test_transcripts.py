@@ -261,7 +261,7 @@ class TestUploadTranscripts(BaseTranscripts):
 
         # Verify transcript content
         actual_transcript = get_video_transcript_content(video.edx_video_id, language_code=u'en')
-        actual_sjson_content = json.loads(actual_transcript['content'])
+        actual_sjson_content = json.loads(actual_transcript['content'].decode('utf-8'))
         expected_sjson_content = json.loads(Transcript.convert(
             self.contents['good'],
             input_format=Transcript.SRT,
@@ -449,7 +449,7 @@ class TestChooseTranscripts(BaseTranscripts):
 
         # Verify transcript content
         actual_transcript = get_video_transcript_content(video.edx_video_id, language_code=u'en')
-        actual_sjson_content = json.loads(actual_transcript['content'])
+        actual_sjson_content = json.loads(actual_transcript['content'].decode('utf-8'))
         expected_sjson_content = json.loads(self.sjson_subs)
         self.assertDictEqual(actual_sjson_content, expected_sjson_content)
 
@@ -566,7 +566,7 @@ class TestRenameTranscripts(BaseTranscripts):
 
         # Verify transcript content
         actual_transcript = get_video_transcript_content(video.edx_video_id, language_code=u'en')
-        actual_sjson_content = json.loads(actual_transcript['content'])
+        actual_sjson_content = json.loads(actual_transcript['content'].decode('utf-8'))
         expected_sjson_content = json.loads(self.sjson_subs)
         self.assertDictEqual(actual_sjson_content, expected_sjson_content)
 
@@ -694,7 +694,7 @@ class TestReplaceTranscripts(BaseTranscripts):
 
         # Verify transcript content
         actual_transcript = get_video_transcript_content(video.edx_video_id, language_code=u'en')
-        actual_sjson_content = json.loads(actual_transcript['content'])
+        actual_sjson_content = json.loads(actual_transcript['content'].decode('utf-8'))
         expected_sjson_content = json.loads(SJSON_TRANSCRIPT_CONTENT)
         self.assertDictEqual(actual_sjson_content, expected_sjson_content)
 

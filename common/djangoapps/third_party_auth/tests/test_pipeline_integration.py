@@ -588,3 +588,19 @@ class SetIDVerificationStatusTestCase(testutil.TestCase, test.TestCase):
                 identity_provider_type=self.provider_class_name,
                 identity_provider_slug=self.provider_slug,
             ).count() == 2
+
+    def test_verification_signal(self):
+        """
+        Verification signal is sent upon approval.
+        """
+        with mock.patch('openedx.core.djangoapps.signals.signals.LEARNER_NOW_VERIFIED.send_robust') as mock_signal:
+            # Begin the pipeline.
+            pipeline.set_id_verification_status(
+                auth_entry=pipeline.AUTH_ENTRY_LOGIN,
+                strategy=self.strategy,
+                details=self.details,
+                user=self.user,
+            )
+
+        # Ensure a verification signal was sent
+        self.assertEqual(mock_signal.call_count, 1)

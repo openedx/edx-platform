@@ -53,6 +53,12 @@ class TestApplicability(ModuleStoreTestCase):
         """
         Ensure first purchase offer banner only displays for courses with a non-expired verified mode
         """
+        CourseEnrollmentFactory(
+            is_active=True,
+            course_id=self.course.id,
+            user=self.user
+        )
+
         applicability = can_receive_discount(user=self.user, course=self.course)
         self.assertEqual(applicability, True)
 
@@ -86,6 +92,12 @@ class TestApplicability(ModuleStoreTestCase):
         """
         Ensure that only users who have not already purchased courses receive the discount.
         """
+        CourseEnrollmentFactory(
+            is_active=True,
+            course_id=self.course.id,
+            user=self.user
+        )
+
         for mode in existing_enrollments:
             CourseEnrollmentFactory.create(mode=mode, user=self.user)
 
@@ -102,6 +114,12 @@ class TestApplicability(ModuleStoreTestCase):
         """
         Ensure that only users who have not already purchased courses receive the discount.
         """
+        CourseEnrollmentFactory(
+            is_active=True,
+            course_id=self.course.id,
+            user=self.user
+        )
+
         if entitlement_mode is not None:
             CourseEntitlementFactory.create(mode=entitlement_mode, user=self.user)
 

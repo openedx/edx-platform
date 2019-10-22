@@ -17,7 +17,7 @@ import openedx.core.djangoapps.lang_pref.views
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
-from openedx.core.openapi import schema_view
+from openedx.core.apidocs import schema_view
 
 
 django_autodiscover()

@@ -10,9 +10,10 @@ not other discounts like coupons or enterprise/program offers configured in ecom
 """
 from __future__ import absolute_import
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from crum import get_current_request, impersonate
+from django.utils import timezone
 import pytz
 
 from course_modes.models import CourseMode
@@ -43,7 +44,50 @@ DISCOUNT_APPLICABILITY_FLAG = WaffleFlag(
 DISCOUNT_APPLICABILITY_HOLDBACK = 'first_purchase_discount_holdback'
 
 
-def can_receive_discount(user, course):  # pylint: disable=unused-argument
+def get_discount_expiration_date(user, course):
+    """
+    Returns the date when the discount expires for the user.
+    Returns none if the user is not enrolled.
+    """
+    course_enrollment = CourseEnrollment.objects.filter(
+        user=user,
+        course=course.id,
+        mode__in=CourseMode.UPSELL_TO_VERIFIED_MODES
+    )
+    if len(course_enrollment) != 1:
+        return None
+
+    enrollment = course_enrollment.first()
+    try:
+        # Content availability date is equivalent to max(enrollment date, course start date)
+        # for most people. Using the schedule date will provide flexibility to deal with
+        # more complex business rules in the future.
+        content_availability_date = enrollment.schedule.start
+        # We have anecdotally observed a case where the schedule.start was
+        # equal to the course start, but should have been equal to the enrollment start
+        # https://openedx.atlassian.net/browse/PROD-58
+        # This section is meant to address that case
+        if enrollment.created and course.start:
+            if (content_availability_date.date() == course.start.date() and
+               course.start < enrollment.created < timezone.now()):
+                content_availability_date = enrollment.created
+    except CourseEnrollment.schedule.RelatedObjectDoesNotExist:
+        content_availability_date = max(enrollment.created, course.start)
+    discount_expiration_date = content_availability_date + timedelta(weeks=1)
+
+    # If the course has an upgrade deadline and discount time limit would put the discount expiration date
+    # after the deadline, then change the expiration date to be the upgrade deadline
+    verified_mode = CourseMode.verified_mode_for_course(course=course, include_expired=True)
+    if not verified_mode:
+        return None
+    upgrade_deadline = verified_mode.expiration_datetime
+    if upgrade_deadline and discount_expiration_date > upgrade_deadline:
+        discount_expiration_date = upgrade_deadline
+
+    return discount_expiration_date
+
+
+def can_receive_discount(user, course, discount_expiration_date=None):
     """
     Check all the business logic about whether this combination of user and course
     can receive a discount.
@@ -54,6 +98,20 @@ def can_receive_discount(user, course):  # pylint: disable=unused-argument
             return False
 
     # TODO: Add additional conditions to return False here
+
+    # anonymous users should never get the discount
+    if user.is_anonymous:
+        return False
+
+    # Check if discount has expired
+    if not discount_expiration_date:
+        discount_expiration_date = get_discount_expiration_date(user, course)
+
+    if discount_expiration_date is None:
+        return False
+
+    if discount_expiration_date < timezone.now():
+        return False
 
     # Course end date needs to be in the future
     if course.has_ended():

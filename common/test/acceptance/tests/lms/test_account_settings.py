@@ -195,11 +195,11 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             },
             {
                 'title': 'Social Media Links',
-                'fields': [
+                'fields': sorted([
                     'Twitter Link',
                     'Facebook Link',
                     'LinkedIn Link',
-                ]
+                ])
             },
             {
                 'title': 'Delete My Account',
@@ -207,7 +207,9 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             },
         ]
 
-        self.assertEqual(self.account_settings_page.sections_structure(), expected_sections_structure)
+        sections_structure = self.account_settings_page.sections_structure()
+        sections_structure[2]['fields'] = sorted(sections_structure[2]['fields'])
+        self.assertEqual(sections_structure, expected_sections_structure)
 
     def _test_readonly_field(self, field_id, title, value):
         """
@@ -407,11 +409,11 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         Test behaviour of one of the social media links field.
         """
         self._test_text_field(
-            u'social_links',
-            u'Twitter Link',
+            six.u('social_links'),
+            six.u('Facebook Link'),
             self.social_link,
-            u'www.google.com/invalidlink',
-            [u'https://www.twitter.com/edX', self.social_link],
+            six.u('www.google.com/invalidlink)'),
+            [six.u('https://www.twitter.com/edX'), self.social_link],
         )
 
     def test_linked_accounts(self):

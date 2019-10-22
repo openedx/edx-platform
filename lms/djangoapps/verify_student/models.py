@@ -228,6 +228,23 @@ class SSOVerification(IDVerificationAttempt):
         """Whether or not the status from this attempt should be displayed to the user."""
         return False
 
+    def send_approval_signal(self, approved_by='None'):
+        """
+        Send a signal indicating that this verification was approved.
+        """
+        log.info(u"Verification for user '{user_id}' approved by '{reviewer}' SSO.".format(
+            user_id=self.user, reviewer=approved_by
+        ))
+
+        # Emit signal to find and generate eligible certificates
+        LEARNER_NOW_VERIFIED.send_robust(
+            sender=SSOVerification,
+            user=self.user
+        )
+
+        message = u'LEARNER_NOW_VERIFIED signal fired for {user} from SSOVerification'
+        log.info(message.format(user=self.user.username))
+
 
 class PhotoVerification(IDVerificationAttempt):
     """
@@ -317,7 +334,7 @@ class PhotoVerification(IDVerificationAttempt):
     error_msg = models.TextField(blank=True)
 
     # Non-required field. External services can add any arbitrary codes as time
-    # goes on. We don't try to define an exhuastive list -- this is just
+    # goes on. We don't try to define an exhaustive list -- this is just
     # capturing it so that we can later query for the common problems.
     error_code = models.CharField(blank=True, max_length=50)
 
@@ -404,7 +421,7 @@ class PhotoVerification(IDVerificationAttempt):
             of `reviewed_by_user_id` and `reviewed_by_service` will be changed
             to whoever is doing the approving, and `error_msg` will be reset.
             The only record that this record was ever denied would be in our
-            logs. This should be a relatively rare occurence.
+            logs. This should be a relatively rare occurrence.
         """
         # If someone approves an outdated version of this, the first one wins
         if self.status == "approved":
@@ -425,7 +442,7 @@ class PhotoVerification(IDVerificationAttempt):
             user=self.user
         )
 
-        message = u'LEARNER_NOW_VERIFIED signal fired for {user}'
+        message = u'LEARNER_NOW_VERIFIED signal fired for {user} from PhotoVerification'
         log.info(message.format(user=self.user.username))
 
     @status_before_must_be("must_retry", "submitted", "approved", "denied")
@@ -458,7 +475,7 @@ class PhotoVerification(IDVerificationAttempt):
             previous values of `reviewed_by_user_id` and `reviewed_by_service`
             will be changed to whoever is doing the denying. The only record
             that this record was ever approved would be in our logs. This should
-            be a relatively rare occurence.
+            be a relatively rare occurrence.
         `denied` → `denied`
             Update the error message and reviewing_user/reviewing_service. Just
             lets you amend the error message in case there were additional
@@ -533,20 +550,20 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
     sensitive nature of the data, the following security precautions are taken:
 
     1. The snapshot of their face is encrypted using AES-256 in CBC mode. All
-       face photos are encypted with the same key, and this key is known to
+       face photos are encrypted with the same key, and this key is known to
        both Software Secure and edx-platform.
 
     2. The snapshot of a user's photo ID is also encrypted using AES-256, but
        the key is randomly generated using os.urandom. Every verification
        attempt has a new key. The AES key is then encrypted using a public key
-       provided by Software Secure. We store only the RSA-encryped AES key.
+       provided by Software Secure. We store only the RSA-encrypted AES key.
        Since edx-platform does not have Software Secure's private RSA key, it
        means that we can no longer even read photo ID.
 
     3. The encrypted photos are base64 encoded and stored in an S3 bucket that
        edx-platform does not have read access to.
 
-    Note: this model handles *inital* verifications (which you must perform
+    Note: this model handles *initial* verifications (which you must perform
     at the time you register for a verified cert).
 
     .. pii: The User's name is stored in the parent model, this one stores links to face and photo ID images

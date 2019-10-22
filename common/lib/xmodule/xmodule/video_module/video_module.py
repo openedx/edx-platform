@@ -481,7 +481,7 @@ class VideoBlock(
                         'There is no transcript file associated with the {lang} language.',
                         'There are no transcript files associated with the {lang} languages.',
                         len(no_transcript_lang)
-                    ).format(lang=', '.join(no_transcript_lang))
+                    ).format(lang=', '.join(sorted(no_transcript_lang)))
                 )
             )
         return validation
@@ -669,16 +669,16 @@ class VideoBlock(
         if youtube_string and youtube_string != '1.00:3_yD_cEKoCk':
             xml.set('youtube', six.text_type(youtube_string))
         xml.set('url_name', self.url_name)
-        attrs = {
-            'display_name': self.display_name,
-            'show_captions': json.dumps(self.show_captions),
-            'start_time': self.start_time,
-            'end_time': self.end_time,
-            'sub': self.sub,
-            'download_track': json.dumps(self.download_track),
-            'download_video': json.dumps(self.download_video),
-        }
-        for key, value in attrs.items():
+        attrs = [
+            ('display_name', self.display_name),
+            ('show_captions', json.dumps(self.show_captions)),
+            ('start_time', self.start_time),
+            ('end_time', self.end_time),
+            ('sub', self.sub),
+            ('download_track', json.dumps(self.download_track)),
+            ('download_video', json.dumps(self.download_video))
+        ]
+        for key, value in attrs:
             # Mild workaround to ensure that tests pass -- if a field
             # is set to its default value, we don't write it out.
             if value:

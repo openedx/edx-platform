@@ -415,6 +415,38 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
             "test_thread_id"
         )
 
+    def test_private_team_thread_html(self, mock_request):
+        discussion_topic_id = 'dummy_discussion_id'
+        thread_id = 'test_thread_id'
+        CourseTeamFactory.create(discussion_topic_id=discussion_topic_id)
+        user_not_in_team = UserFactory.create()
+        CourseEnrollmentFactory.create(user=user_not_in_team, course_id=self.course.id)
+        self.client.login(username=user_not_in_team.username, password='test')
+
+        mock_request.side_effect = make_mock_request_impl(
+            course=self.course,
+            text="dummy",
+            thread_id=thread_id,
+            commentable_id=discussion_topic_id
+        )
+        with patch('lms.djangoapps.teams.api.is_team_discussion_private', autospec=True) as mocked:
+            mocked.return_value = True
+            response = self.client.get(
+                reverse('single_thread', kwargs={
+                    'course_id': six.text_type(self.course.id),
+                    'discussion_id': discussion_topic_id,
+                    'thread_id': thread_id,
+                })
+            )
+            self.assertEquals(response.status_code, 200)
+            self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
+            html = response.content.decode('utf-8')
+            # Verify that the access denied error message is in the HTML
+            self.assertIn(
+                'This is a private discussion. You do not have permissions to view this discussion',
+                html
+            )
+
 
 @ddt.ddt
 @patch('requests.request', autospec=True)
@@ -432,18 +464,18 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         # course is outside the context manager that is verifying the number of queries,
         # and with split mongo, that method ends up querying disabled_xblocks (which is then
         # cached and hence not queried as part of call_single_thread).
-        (ModuleStoreEnum.Type.mongo, False, 1, 5, 2, 23, 8),
-        (ModuleStoreEnum.Type.mongo, False, 50, 5, 2, 23, 8),
+        (ModuleStoreEnum.Type.mongo, False, 1, 5, 2, 24, 9),
+        (ModuleStoreEnum.Type.mongo, False, 50, 5, 2, 24, 9),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, False, 1, 3, 3, 23, 8),
-        (ModuleStoreEnum.Type.split, False, 50, 3, 3, 23, 8),
+        (ModuleStoreEnum.Type.split, False, 1, 3, 3, 24, 9),
+        (ModuleStoreEnum.Type.split, False, 50, 3, 3, 24, 9),
 
         # Enabling Enterprise integration should have no effect on the number of mongo queries made.
-        (ModuleStoreEnum.Type.mongo, True, 1, 5, 2, 23, 8),
-        (ModuleStoreEnum.Type.mongo, True, 50, 5, 2, 23, 8),
+        (ModuleStoreEnum.Type.mongo, True, 1, 5, 2, 24, 9),
+        (ModuleStoreEnum.Type.mongo, True, 50, 5, 2, 24, 9),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, True, 1, 3, 3, 23, 8),
-        (ModuleStoreEnum.Type.split, True, 50, 3, 3, 23, 8),
+        (ModuleStoreEnum.Type.split, True, 1, 3, 3, 24, 9),
+        (ModuleStoreEnum.Type.split, True, 50, 3, 3, 24, 9),
     )
     @ddt.unpack
     def test_number_of_mongo_queries(
@@ -653,6 +685,22 @@ class SingleThreadAccessTestCase(CohortedTestCase):
             thread_group_id=self.student_cohort.id
         )
         self.assertEqual(resp.status_code, 200)
+
+    def test_private_team_thread(self, mock_request):
+        CourseTeamFactory.create(discussion_topic_id='dummy_discussion_id')
+        user_not_in_team = UserFactory.create()
+        CourseEnrollmentFactory(user=user_not_in_team, course_id=self.course.id)
+
+        with patch('lms.djangoapps.teams.api.is_team_discussion_private', autospec=True) as mocked:
+            mocked.return_value = True
+            response = self.call_view(
+                mock_request,
+                'non_cohorted_topic',
+                user_not_in_team,
+                None
+            )
+            self.assertEqual(403, response.status_code)
+            self.assertEqual(views.TEAM_PERMISSION_MESSAGE, response.content)
 
 
 @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
@@ -912,6 +960,7 @@ class InlineDiscussionContextTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         )
 
         self.team.add_user(self.user)
+        self.user_not_in_team = UserFactory.create()
 
     def test_context_can_be_standalone(self, mock_request):
         mock_request.side_effect = make_mock_request_impl(
@@ -931,6 +980,28 @@ class InlineDiscussionContextTestCase(ForumsEnableMixin, ModuleStoreTestCase):
 
         json_response = json.loads(response.content.decode('utf-8'))
         self.assertEqual(json_response['discussion_data'][0]['context'], ThreadContext.STANDALONE)
+
+    def test_private_team_discussion(self, mock_request):
+        # First set the team discussion to be private
+        CourseEnrollmentFactory(user=self.user_not_in_team, course_id=self.course.id)
+        request = RequestFactory().get("dummy_url")
+        request.user = self.user_not_in_team
+
+        mock_request.side_effect = make_mock_request_impl(
+            course=self.course,
+            text="dummy text",
+            commentable_id=self.discussion_topic_id
+        )
+
+        with patch('lms.djangoapps.teams.api.is_team_discussion_private', autospec=True) as mocked:
+            mocked.return_value = True
+            response = views.inline_discussion(
+                request,
+                six.text_type(self.course.id),
+                self.discussion_topic_id,
+            )
+            self.assertEqual(response.status_code, 403)
+            self.assertEqual(response.content.decode('utf-8'), views.TEAM_PERMISSION_MESSAGE)
 
 
 @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)

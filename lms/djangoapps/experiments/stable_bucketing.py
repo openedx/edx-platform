@@ -1,6 +1,11 @@
 """
 An implementation of a stable bucketing algorithm that can be used
 to reliably group users into experiments.
+
+An implementation of this is available as a standalone command-line
+tool, `scripts/stable_bucketer`, which can both validate the
+bucketing of a username and generate recognizable usernames for
+particular experiment buckets for testing.
 """
 
 import hashlib

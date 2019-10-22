@@ -8,9 +8,12 @@ from __future__ import absolute_import
 import os
 import os.path
 import uuid
+import csv
+import unicodecsv
+import six
+
 from datetime import datetime
 
-import unicodecsv
 from bok_choy.promise import EmptyPromise
 from pytz import UTC, utc
 
@@ -322,7 +325,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         """
         filename = self.instructor_dashboard_page.get_asset_path(filename)
         with open(filename, 'w+') as csv_file:
-            writer = unicodecsv.writer(csv_file)
+            writer = csv.writer(csv_file) if six.PY3 else unicodecsv.writer(csv_file)
             for line in csv_text_as_lists:
                 writer.writerow(line)
         self.addCleanup(os.remove, filename)

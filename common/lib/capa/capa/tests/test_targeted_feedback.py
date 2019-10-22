@@ -100,7 +100,7 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         problem.student_answers = {'1_2_1': 'choice_3'}
 
         the_html = problem.get_html()
-        without_new_lines = the_html.replace("\n", "")
+        without_new_lines = the_html.replace("\\n", "").replace("\n", "")
         # pylint: disable=line-too-long
         self.assertRegexpMatches(without_new_lines, r"<targetedfeedback explanation-id=\"feedback3\" role=\"group\" aria-describedby=\"1_2_1-legend\">\s*<span class=\"sr\">Incorrect</span>.*3rd WRONG solution")
         self.assertNotRegexpMatches(without_new_lines, r"feedback1|feedback2|feedbackC")
@@ -114,7 +114,7 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         problem.student_answers = {'1_2_1': 'choice_0'}
 
         the_html = problem.get_html()
-        without_new_lines = the_html.replace("\n", "")
+        without_new_lines = the_html.replace("\\n", "").replace("\n", "")
         # pylint: disable=line-too-long
         self.assertRegexpMatches(without_new_lines, r"<targetedfeedback explanation-id=\"feedback1\" role=\"group\" aria-describedby=\"1_2_1-legend\">\s*<span class=\"sr\">Incorrect</span>.*1st WRONG solution")
         self.assertRegexpMatches(without_new_lines, r"<div>\{.*'1_solution_1'.*\}</div>")
@@ -127,7 +127,7 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         problem.student_answers = {'1_2_1': 'choice_2'}
 
         the_html = problem.get_html()
-        without_new_lines = the_html.replace("\n", "")
+        without_new_lines = the_html.replace("\\n", "").replace("\n", "")
         # pylint: disable=line-too-long
         self.assertRegexpMatches(without_new_lines,
                                  r"<targetedfeedback explanation-id=\"feedbackC\" role=\"group\" aria-describedby=\"1_2_1-legend\">\s*<span class=\"sr\">Correct</span>.*Feedback on your correct solution...")

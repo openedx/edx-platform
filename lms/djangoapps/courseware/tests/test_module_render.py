@@ -513,7 +513,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         decoded or otherwise.
         """
         resources = ['ASCII text', u'❄ I am a special snowflake.', "❄ So am I, but I didn't tell you."]
-        self.assertEqual(hash_resource(resources), 'a76e27c8e80ca3efd7ce743093aa59e0')
+        self.assertEqual(hash_resource(resources), '50c2ae79fbce9980e0803848914b0a09')
 
 
 @ddt.ddt

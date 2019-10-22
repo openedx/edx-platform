@@ -747,29 +747,27 @@ class MatlabTest(unittest.TestCase):
     def test_get_html(self):
         # usual output
         output = self.the_input.get_html()
-        if six.PY2:
-            expected_string = """
-            <div>{\'status\': Status(\'queued\'), \'button_enabled\': True, \'rows\': \'10\',
-            \'queue_len\': \'3\', \'mode\': \'\', \'tabsize\': 4, \'cols\': \'80\', \'STATIC_URL\': \'/dummy-static/\',
-            \'linenumbers\': \'true\', \'queue_msg\': \'\', \'value\': \'print "good evening"\',
-            \'msg\': u\'Submitted. As soon as a response is returned, this message will be replaced by that feedback.\',
-            \'matlab_editor_js\': \'/dummy-static/js/vendor/CodeMirror/octave.js\',
-            \'hidden\': \'\', \'id\': \'prob_1_2\',
-            \'describedby_html\': Markup(u\'aria-describedby="status_prob_1_2"\'), \'response_data\': {}}</div>
-            """
-        else:
-            expected_string = """
-            <div>{\'matlab_editor_js\': \'/dummy-static/js/vendor/CodeMirror/octave.js\',
-            \'value\': \'print "good evening"\', \'hidden\': \'\',
-            \'msg\': \'Submitted. As soon as a response is returned, this message will be replaced by that feedback.\',
-            \'status\': Status(\'queued\'), \'response_data\': {}, \'queue_msg\': \'\', \'mode\': \'\',
-            \'id\': \'prob_1_2\', \'queue_len\': \'3\', \'tabsize\': 4, \'STATIC_URL\': \'/dummy-static/\',
-            \'linenumbers\': \'true\', \'cols\': \'80\', \'button_enabled\': True, \'rows\': \'10\',
-            \'describedby_html\': Markup(\'aria-describedby="status_prob_1_2"\')}</div>"""
-        self.assertEqual(
-            etree.tostring(output).decode('utf-8'),
-            textwrap.dedent(expected_string).replace('\n', ' ').strip(),
-        )
+        output_string = etree.tostring(output).decode('utf-8')
+        assert output_string.startswith('<div>{')
+        assert output_string.endswith('}</div>')
+        output_string = output_string.replace('}</div>', '')
+        output_string = output_string.replace('<div>{', '')
+        output_list = output_string.split(',')
+        for index, value in enumerate(output_list):
+            output_list[index] = value.replace('u\'', '\'').strip()
+
+        expected_string = u"""
+        \'matlab_editor_js\': \'/dummy-static/js/vendor/CodeMirror/octave.js\',
+        \'value\': \'print "good evening"\', \'hidden\': \'\',
+        \'msg\': \'Submitted. As soon as a response is returned, this message will be replaced by that feedback.\',
+        \'status\': Status(\'queued\'), \'response_data\': {}, \'queue_msg\': \'\', \'mode\': \'\',
+        \'id\': \'prob_1_2\', \'queue_len\': \'3\', \'tabsize\': 4, \'STATIC_URL\': \'/dummy-static/\',
+        \'linenumbers\': \'true\', \'cols\': \'80\', \'button_enabled\': True, \'rows\': \'10\',
+        \'describedby_html\': Markup(\'aria-describedby="status_prob_1_2"\')"""
+        expected_list = (textwrap.dedent(expected_string).replace('\n', ' ').strip()).split(',')
+        for index, value in enumerate(expected_list):
+            expected_list[index] = value.replace('u\'', '\'').strip()
+        six.assertCountEqual(self, output_list, expected_list)
 
         # test html, that is correct HTML5 html, but is not parsable by XML parser.
         old_render_template = self.the_input.capa_system.render_template
@@ -781,24 +779,25 @@ class MatlabTest(unittest.TestCase):
             """).replace('\n', '')
 
         output = self.the_input.get_html()
-        if six.PY2:
-            expected_string = """
-            <div class='matlabResponse'><div id='mwAudioPlaceHolder'>
-            <audio src='data:audio/wav;base64=' autobuffer="" controls="" autoplay="">Audio is not supported on this browser.</audio>
-            <div>Right click <a href="https://endpoint.mss-mathworks.com/media/filename.wav">here</a> and click \"Save As\" to download the file</div></div>
-            <div style='white-space:pre' class='commandWindowOutput'/><ul/></div>
-            """
-        else:
-            expected_string = """
-            <div class="matlabResponse"><div id="mwAudioPlaceHolder">
-            <audio autobuffer="" controls="" autoplay="" src="data:audio/wav;base64=">Audio is not supported on this browser.</audio>
-            <div>Right click <a href="https://endpoint.mss-mathworks.com/media/filename.wav">here</a> and click \"Save As\" to download the file</div></div>
-            <div style="white-space:pre" class="commandWindowOutput"/><ul/></div>
-            """
-        self.assertEqual(
-            etree.tostring(output).decode('utf-8'),
-            textwrap.dedent(expected_string).replace('\n', '').replace('\'', '\"')
-        )
+        elements = []
+        element_tags = []
+        element_keys = []
+        for element in output.iter():
+            elements.append(element)
+            element_tags.append(element.tag)
+            element_keys.append(element.keys())
+        assert element_tags.count('div') == 4
+        assert element_tags.count('audio') == 1
+        audio_index = element_tags.index('audio')
+
+        six.assertCountEqual(self, element_keys[audio_index], ['autobuffer', 'controls', 'autoplay', 'src'])
+        self.assertEqual(elements[audio_index].get('src'), 'data:audio/wav;base64=')
+        self.assertEqual(elements[audio_index].text, 'Audio is not supported on this browser.')
+        href_index = element_keys.index(['href'])
+        self.assertEqual(elements[href_index].get('href'), 'https://endpoint.mss-mathworks.com/media/filename.wav')
+        id_index = element_keys.index(['id'])
+        self.assertEqual(elements[id_index].get('id'), 'mwAudioPlaceHolder')
+        output_string = etree.tostring(output).decode('utf-8')
 
         # check that exception is raised during parsing for html.
         self.the_input.capa_system.render_template = lambda *args: "<aaa"

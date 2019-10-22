@@ -166,7 +166,11 @@ class TeamsDashboardView(GenericAPIView):
             "team_memberships_url": reverse('team_membership_list', request=request),
             "my_teams_url": reverse('teams_list', request=request),
             "team_membership_detail_url": reverse('team_membership_detail', args=['team_id', user.username]),
+<<<<<<< HEAD
             "languages": [[lang[0], _(lang[1])] for lang in settings.ALL_LANGUAGES], # pylint: disable=translation-of-non-string
+=======
+            "languages": [[lang[0], _(lang[1])] for lang in settings.ALL_LANGUAGES],  # pylint: disable=translation-of-non-string
+>>>>>>> 9946fd39180c5c9a408124845554ed3189d6d4b7
             "countries": list(countries),
             "disable_courseware_js": True,
             "teams_base_url": reverse('teams_dashboard', request=request, kwargs={'course_id': course_id}),

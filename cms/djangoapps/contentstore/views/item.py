@@ -51,7 +51,12 @@ from models.settings.course_grading import CourseGradingModel
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.waffle_utils import WaffleSwitch
 from openedx.core.lib.gating import api as gating_api
-from openedx.core.lib.xblock_utils import request_token, wrap_xblock, wrap_xblock_aside
+from openedx.core.lib.xblock_utils import (
+    hash_resource,
+    request_token,
+    wrap_xblock,
+    wrap_xblock_aside,
+)
 from static_replace import replace_static_urls
 from student.auth import has_studio_read_access, has_studio_write_access
 from util.date_utils import get_default_time_display
@@ -85,15 +90,6 @@ ALWAYS = lambda x: True
 
 
 highlights_setting = WaffleSwitch(u'dynamic_pacing', u'studio_course_update')
-
-
-def hash_resource(resource):
-    """
-    Hash a :class:`web_fragments.fragment.FragmentResource`.
-    """
-    md5 = hashlib.md5()
-    md5.update(repr(resource).encode('utf-8'))
-    return md5.hexdigest()
 
 
 def _filter_entrance_exam_grader(graders):
