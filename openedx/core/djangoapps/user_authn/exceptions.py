@@ -7,7 +7,7 @@ from openedx.core.djangolib.markup import Text
 
 class AuthFailedError(Exception):
     """
-    This is a helper for the login view, allowing the various sub-methods to early out with an appropriate failure
+    This is a helper for the login view, allowing the various sub-methods to error out with an appropriate failure
     message.
     """
     def __init__(self, value=None, redirect=None, redirect_url=None):
