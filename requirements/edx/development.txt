@@ -8,7 +8,7 @@
 -e common/lib/capa
 -e git+https://github.com/edx/codejail.git@33758da2609bd72c2c18efc2d4bdb93596523d5e#egg=codejail
 -e git+https://github.com/edx/django-wiki.git@v0.0.23#egg=django-wiki
--e git+https://github.com/edx/DoneXBlock.git@01a14f3bd80ae47dd08cdbbe2f88f3eb88d00fba#egg=done-xblock
+-e git+https://github.com/edx/DoneXBlock.git@2.0#egg=done-xblock
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
 -e .
 -e git+https://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
