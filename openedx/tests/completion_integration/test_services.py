@@ -79,7 +79,6 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
         # Proper completions for the given runtime
         BlockCompletion.objects.submit_completion(
             user=self.user,
-            course_key=self.course_key,
             block_key=self.html.location,
             completion=1.0,
         )
@@ -87,7 +86,6 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
         for idx, block_key in enumerate(self.block_keys[0:3]):
             BlockCompletion.objects.submit_completion(
                 user=self.user,
-                course_key=self.course_key,
                 block_key=block_key,
                 completion=1.0 - (0.2 * idx),
             )
@@ -96,7 +94,6 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
         for idx, block_key in enumerate(self.block_keys[2:]):
             BlockCompletion.objects.submit_completion(
                 user=self.other_user,
-                course_key=self.course_key,
                 block_key=block_key,
                 completion=0.9 - (0.2 * idx),
             )
@@ -104,8 +101,7 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
         # Wrong course
         BlockCompletion.objects.submit_completion(
             user=self.user,
-            course_key=self.other_course_key,
-            block_key=self.block_keys[4],
+            block_key=self.other_course_key.make_usage_key('problem', 'other'),
             completion=0.75,
         )
 
@@ -137,7 +133,6 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
         for block_key in self.block_keys:
             BlockCompletion.objects.submit_completion(
                 user=self.user,
-                course_key=self.course_key,
                 block_key=block_key,
                 completion=1.0
             )
@@ -153,7 +148,6 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
             # Mark all the child blocks completed except the last one
             BlockCompletion.objects.submit_completion(
                 user=self.user,
-                course_key=self.course_key,
                 block_key=self.block_keys[i],
                 completion=1.0
             )

@@ -11,7 +11,7 @@ from datetime import datetime
 
 import six.moves.urllib.parse
 from completion.exceptions import UnavailableCompletionData
-from completion.utilities import get_key_to_last_completed_course_block
+from completion.utilities import get_key_to_last_completed_block
 from django.conf import settings
 from django.contrib.auth import load_backend
 from django.contrib.auth.models import User
@@ -686,7 +686,7 @@ def get_resume_urls_for_enrollments(user, enrollments):
     resume_course_urls = OrderedDict()
     for enrollment in enrollments:
         try:
-            block_key = get_key_to_last_completed_course_block(user, enrollment.course_id)
+            block_key = get_key_to_last_completed_block(user, enrollment.course_id)
             url_to_block = reverse(
                 'jump_to',
                 kwargs={'course_id': enrollment.course_id, 'location': block_key}

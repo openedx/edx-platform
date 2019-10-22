@@ -106,7 +106,6 @@ class CompletionUtilsTestCase(SharedModuleStoreTestCase, CompletionWaffleTestMix
         for block in self.course.children[0].children[0].children:
             models.BlockCompletion.objects.submit_completion(
                 user=self.engaged_user,
-                course_key=self.course.id,
                 block_key=block.location,
                 completion=1.0
             )

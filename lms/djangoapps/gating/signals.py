@@ -37,7 +37,9 @@ def evaluate_subsection_completion_milestones(**kwargs):
     evaluation of any milestone which can be completed.
     """
     instance = kwargs['instance']
-    course_id = six.text_type(instance.course_key)
+    course_id = six.text_type(instance.context_key)
+    if not instance.context_key.is_course:
+        return  # Content in a library or some other thing that doesn't support milestones
     block_id = six.text_type(instance.block_key)
     user_id = instance.user_id
     task_evaluate_subsection_completion_milestones(course_id, block_id, user_id)

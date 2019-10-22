@@ -364,10 +364,12 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         course_key = CourseKey.from_string(str(course.id))
         # Fake a visit to sequence2/vertical2
         block_key = UsageKey.from_string(six.text_type(sequential.location))
+        if block_key.course_key.run is None:
+            # Old mongo keys must be annotated with course run info before calling submit_completion:
+            block_key = block_key.replace(course_key=course_key)
         completion = 1.0
         BlockCompletion.objects.submit_completion(
             user=self.user,
-            course_key=course_key,
             block_key=block_key,
             completion=completion
         )
