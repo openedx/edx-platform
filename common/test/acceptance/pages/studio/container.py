@@ -660,7 +660,7 @@ class XBlockWrapper(PageObject):
 
     @property
     def editor_selector(self):
-        return '.xblock-studio_view'
+        return u'.xblock-studio_view'
 
     def _click_button(self, button_name):
         """
