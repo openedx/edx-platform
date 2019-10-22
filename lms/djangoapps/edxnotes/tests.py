@@ -340,7 +340,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     }
                 ]
             }
-        )
+        ).encode('utf-8')
 
         six.assertCountEqual(
             self,
@@ -410,7 +410,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         Tests the result if incorrect json is received.
         """
-        mock_get.return_value.content = "Error"
+        mock_get.return_value.content = b"Error"
         self.assertRaises(EdxNotesParseError, helpers.get_notes, self.request, self.course)
 
     @patch("edxnotes.helpers.requests.get", autospec=True)
@@ -418,7 +418,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         Tests the result if an empty response is received.
         """
-        mock_get.return_value.content = json.dumps({})
+        mock_get.return_value.content = json.dumps({}).encode('utf-8')
         self.assertRaises(EdxNotesParseError, helpers.get_notes, self.request, self.course)
 
     @patch("edxnotes.helpers.requests.get", autospec=True)
@@ -447,7 +447,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     u"updated": datetime(2014, 11, 19, 8, 6, 16, 00000).isoformat(),
                 }
             ]
-        })
+        }).encode('utf-8')
 
         six.assertCountEqual(
             self,
@@ -517,7 +517,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         Tests the result if incorrect json is received.
         """
-        mock_get.return_value.content = "Error"
+        mock_get.return_value.content = b"Error"
         self.assertRaises(EdxNotesParseError, helpers.get_notes, self.request, self.course)
 
     @patch("edxnotes.helpers.requests.get", autospec=True)
@@ -525,7 +525,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         Tests the result if incorrect data structure is received.
         """
-        mock_get.return_value.content = json.dumps({"1": 2})
+        mock_get.return_value.content = json.dumps({"1": 2}).encode('utf-8')
         self.assertRaises(EdxNotesParseError, helpers.get_notes, self.request, self.course)
 
     @patch("edxnotes.helpers.requests.get", autospec=True)
@@ -533,7 +533,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         Tests no results.
         """
-        mock_get.return_value.content = json.dumps(NOTES_API_EMPTY_RESPONSE)
+        mock_get.return_value.content = json.dumps(NOTES_API_EMPTY_RESPONSE).encode('utf-8')
         six.assertCountEqual(
             self,
             NOTES_VIEW_EMPTY_RESPONSE,
@@ -1206,7 +1206,7 @@ class EdxNotesRetireAPITest(ModuleStoreTestCase):
         """
         Tests that 204 response is received on success.
         """
-        mock_post.return_value.content = ''
+        mock_post.return_value.content = b''
         mock_post.return_value.status_code = 204
         headers = self._build_jwt_headers(self.superuser)
         response = self.client.post(
