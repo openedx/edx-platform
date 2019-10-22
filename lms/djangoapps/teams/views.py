@@ -1,6 +1,7 @@
-"""HTTP endpoints for the Teams API."""
-
-from __future__ import absolute_import
+"""
+HTTP endpoints for the Teams API.
+"""
+from __future__ import absolute_import, unicode_literals
 
 import logging
 

@@ -1,7 +1,7 @@
 """
 The Python API other app should use to work with Teams feature
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from lms.djangoapps.teams.models import CourseTeam
 
