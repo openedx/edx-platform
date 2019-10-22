@@ -105,14 +105,14 @@ class EnrollStatusChange(object):
     # complete a paid course purchase
     paid_complete = 'paid_complete'
 
-UNENROLLED_TO_ALLOWEDTOENROLL = 'from unenrolled to allowed to enroll'
-ALLOWEDTOENROLL_TO_ENROLLED = 'from allowed to enroll to enrolled'
-ENROLLED_TO_ENROLLED = 'from enrolled to enrolled'
-ENROLLED_TO_UNENROLLED = 'from enrolled to unenrolled'
-UNENROLLED_TO_ENROLLED = 'from unenrolled to enrolled'
-ALLOWEDTOENROLL_TO_UNENROLLED = 'from allowed to enroll to enrolled'
-UNENROLLED_TO_UNENROLLED = 'from unenrolled to unenrolled'
-DEFAULT_TRANSITION_STATE = 'N/A'
+UNENROLLED_TO_ALLOWEDTOENROLL = u'from unenrolled to allowed to enroll'
+ALLOWEDTOENROLL_TO_ENROLLED = u'from allowed to enroll to enrolled'
+ENROLLED_TO_ENROLLED = u'from enrolled to enrolled'
+ENROLLED_TO_UNENROLLED = u'from enrolled to unenrolled'
+UNENROLLED_TO_ENROLLED = u'from unenrolled to enrolled'
+ALLOWEDTOENROLL_TO_UNENROLLED = u'from allowed to enroll to enrolled'
+UNENROLLED_TO_UNENROLLED = u'from unenrolled to unenrolled'
+DEFAULT_TRANSITION_STATE = u'N/A'
 SCORE_RECALCULATION_DELAY_ON_ENROLLMENT_UPDATE = 30
 
 TRANSITION_STATES = (
@@ -390,8 +390,8 @@ class UserStanding(models.Model):
 
     .. no_pii:
     """
-    ACCOUNT_DISABLED = "disabled"
-    ACCOUNT_ENABLED = "enabled"
+    ACCOUNT_DISABLED = u"disabled"
+    ACCOUNT_ENABLED = u"enabled"
     USER_STANDING_CHOICES = (
         (ACCOUNT_DISABLED, u"Account Disabled"),
         (ACCOUNT_ENABLED, u"Account Enabled"),
@@ -441,7 +441,7 @@ class UserProfile(models.Model):
     name = models.CharField(blank=True, max_length=255, db_index=True)
 
     meta = models.TextField(blank=True)  # JSON dictionary for future expansion
-    courseware = models.CharField(blank=True, max_length=255, default='course.xml')
+    courseware = models.CharField(blank=True, max_length=255, default=u'course.xml')
 
     # Language is deprecated and no longer used. Old rows exist that have
     # user-entered free form text values (ex. "English"), some of which have
@@ -459,10 +459,10 @@ class UserProfile(models.Model):
     VALID_YEARS = list(range(this_year, this_year - 120, -1))
     year_of_birth = models.IntegerField(blank=True, null=True, db_index=True)
     GENDER_CHOICES = (
-        ('m', ugettext_noop('Male')),
-        ('f', ugettext_noop('Female')),
+        (u'm', ugettext_noop(u'Male')),
+        (u'f', ugettext_noop(u'Female')),
         # Translators: 'Other' refers to the student's gender
-        ('o', ugettext_noop('Other/Prefer Not to Say'))
+        (u'o', ugettext_noop(u'Other/Prefer Not to Say'))
     )
     gender = models.CharField(
         blank=True, null=True, max_length=6, db_index=True, choices=GENDER_CHOICES
@@ -473,17 +473,17 @@ class UserProfile(models.Model):
     # ('p_se', 'Doctorate in science or engineering'),
     # ('p_oth', 'Doctorate in another field'),
     LEVEL_OF_EDUCATION_CHOICES = (
-        ('p', ugettext_noop('Doctorate')),
-        ('m', ugettext_noop("Master's or professional degree")),
-        ('b', ugettext_noop("Bachelor's degree")),
-        ('a', ugettext_noop("Associate degree")),
-        ('hs', ugettext_noop("Secondary/high school")),
-        ('jhs', ugettext_noop("Junior secondary/junior high/middle school")),
-        ('el', ugettext_noop("Elementary/primary school")),
+        (u'p', ugettext_noop(u'Doctorate')),
+        (u'm', ugettext_noop(u"Master's or professional degree")),
+        (u'b', ugettext_noop(u"Bachelor's degree")),
+        (u'a', ugettext_noop(u"Associate degree")),
+        (u'hs', ugettext_noop(u"Secondary/high school")),
+        (u'jhs', ugettext_noop(u"Junior secondary/junior high/middle school")),
+        (u'el', ugettext_noop(u"Elementary/primary school")),
         # Translators: 'None' refers to the student's level of education
-        ('none', ugettext_noop("No formal education")),
+        (u'none', ugettext_noop(u"No formal education")),
         # Translators: 'Other' refers to the student's level of education
-        ('other', ugettext_noop("Other education"))
+        (u'other', ugettext_noop(u"Other education"))
     )
     level_of_education = models.CharField(
         blank=True, null=True, max_length=6, db_index=True,
@@ -763,7 +763,7 @@ class Registration(models.Model):
         db_table = "auth_registration"
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
+    activation_key = models.CharField((u'activation key'), max_length=32, unique=True, db_index=True)
 
     def register(self, user):
         # MINOR TODO: Switch to crypto-secure key
@@ -800,7 +800,7 @@ class PendingEmailChange(DeletableByUserValue, models.Model):
     """
     user = models.OneToOneField(User, unique=True, db_index=True, on_delete=models.CASCADE)
     new_email = models.CharField(blank=True, max_length=255, db_index=True)
-    activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
+    activation_key = models.CharField((u'activation key'), max_length=32, unique=True, db_index=True)
 
     def request_change(self, email):
         """Request a change to a user's email.
@@ -830,7 +830,7 @@ class PendingSecondaryEmailChange(DeletableByUserValue, models.Model):
     """
     user = models.OneToOneField(User, unique=True, db_index=True, on_delete=models.CASCADE)
     new_secondary_email = models.CharField(blank=True, max_length=255, db_index=True)
-    activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
+    activation_key = models.CharField((u'activation key'), max_length=32, unique=True, db_index=True)
 
 
 EVENT_NAME_ENROLLMENT_ACTIVATED = 'edx.course.enrollment.activated'
@@ -2429,7 +2429,7 @@ class DashboardConfiguration(ConfigurationModel):
     """
     recent_enrollment_time_delta = models.PositiveIntegerField(
         default=0,
-        help_text="The number of seconds in which a new enrollment is considered 'recent'. "
+        help_text=u"The number of seconds in which a new enrollment is considered 'recent'. "
                   "Used to display notifications."
     )
 
@@ -2469,7 +2469,7 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
     )
 
     # Deprecated
-    dashboard_tracking_code = models.TextField(default="", blank=True)
+    dashboard_tracking_code = models.TextField(default=u"", blank=True)
 
     trk_partner_name = models.CharField(
         max_length=10,
@@ -2819,8 +2819,8 @@ class BulkUnenrollConfiguration(ConfigurationModel):
 
     """
     csv_file = models.FileField(
-        validators=[FileExtensionValidator(allowed_extensions=['csv'])],
-        help_text=_("It expect that the data will be provided in a csv file format with \
+        validators=[FileExtensionValidator(allowed_extensions=[u'csv'])],
+        help_text=_(u"It expect that the data will be provided in a csv file format with \
                     first row being the header and columns will be as follows: \
                     user_id, username, email, course_id, is_verified, verification_date")
     )
