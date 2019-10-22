@@ -16,7 +16,6 @@ from mailchimp_pipeline.tasks import update_enrollments_completions_at_mailchimp
 from lms.djangoapps.onboarding.helpers import get_org_metric_update_prompt
 from lms.djangoapps.onboarding.models import MetricUpdatePromptRecord
 from student.models import User
-from philu_overrides.helpers import reactivation_email_for_user_custom
 
 import urllib
 import json
@@ -28,6 +27,7 @@ from wsgiref.util import FileWrapper
 from lms.djangoapps.oef.decorators import eligible_for_oef
 from lms.djangoapps.philu_api.helpers import get_encoded_token
 from openedx.features.badging.models import Badge, UserBadge
+from philu_overrides.helpers import reactivation_email_for_user_custom
 from util.json_request import expect_json
 
 
@@ -260,11 +260,13 @@ def send_alquity_fake_confirmation_email(request):
 
 def resend_activation_email(request):
     user = request.user
-    success = True
+    activated = user.is_active
     try:
         if not activated:
             reactivation_email_for_user_custom(request, user)
+            return JsonResponse({'success': True, 'email': user.email}, status=status.HTTP_200_OK)
+        else:
+            return JsonResponse({'success': False}, status=status.HTTP_409_CONFLICT)
     except Exception as ex:
         logging.exception(ex)
-        success = False
-    return JsonResponse({'success': success, 'email': user.email})
+        return JsonResponse({'success': False}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
