@@ -700,7 +700,10 @@ class SingleThreadAccessTestCase(CohortedTestCase):
                 None
             )
             self.assertEqual(403, response.status_code)
-            self.assertEqual(views.TEAM_PERMISSION_MESSAGE, response.content)
+            self.assertEqual(
+                views.TEAM_PERMISSION_MESSAGE,
+                response.content.decode('utf-8'),
+            )
 
 
 @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)

@@ -1,6 +1,8 @@
-""" Search index used to load data into elasticsearch"""
+"""
+Search index used to load data into elasticsearch.
+"""
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import logging
 from functools import wraps

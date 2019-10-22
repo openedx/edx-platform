@@ -2,10 +2,10 @@
 """
 Tests for Python APIs of the Teams app
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
-from uuid import uuid4
 import unittest
+from uuid import uuid4
 
 from opaque_keys.edx.keys import CourseKey
 
