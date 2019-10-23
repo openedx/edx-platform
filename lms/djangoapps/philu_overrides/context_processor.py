@@ -1,10 +1,11 @@
 from django.conf import settings
+from django.urls import reverse
 
 from lms.djangoapps.onboarding.helpers import get_org_metric_update_prompt, \
     is_org_detail_prompt_available, is_org_detail_platform_overlay_available, \
     get_org_oef_update_prompt, is_org_oef_prompt_available
-from lms.djangoapps.philu_overrides.constants import ACTIVATION_ERROR, ACTIVATION_ALERT_TYPE, \
-    ACTIVATION_RESEND_LINK, ORG_DETAILS_UPDATE_ALERT, ORG_OEF_UPDATE_ALERT, ACTIVATION_BANNER_ID
+from lms.djangoapps.philu_overrides.constants import ACTIVATION_ALERT_TYPE, ACTIVATION_ERROR_MSG_FORMAT, \
+    ORG_DETAILS_UPDATE_ALERT, ORG_OEF_UPDATE_ALERT
 
 
 def get_global_alert_messages(request):
@@ -30,9 +31,7 @@ def get_global_alert_messages(request):
         if request.user.is_authenticated() and not request.user.is_active and '/activate/' not in request.path:
             alert_messages.append({
                 "type": ACTIVATION_ALERT_TYPE,
-                "alert": ACTIVATION_ERROR,
-                "link":  ACTIVATION_RESEND_LINK,
-                "banner_id": ACTIVATION_BANNER_ID
+                "alert": ACTIVATION_ERROR_MSG_FORMAT.format(reverse('resend_activation_email'))
             })
 
     if '/oef/dashboard' in request.path:
