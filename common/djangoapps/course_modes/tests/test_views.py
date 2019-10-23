@@ -398,8 +398,8 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
 
         self.assertEquals(course_mode, expected_mode)
 
-    @patch('openedx.features.course_experience.utils.can_receive_discount')
-    @patch('openedx.features.course_experience.utils.discount_percentage')
+    @patch('openedx.features.discounts.utils.can_receive_discount')
+    @patch('openedx.features.discounts.utils.discount_percentage')
     def test_discount_on_track_selection(self, discount_percentage_mock, can_receive_discount_mock):
         can_receive_discount_mock.return_value = True
         discount_percentage_mock.return_value = 15

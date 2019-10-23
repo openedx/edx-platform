@@ -2,11 +2,43 @@
 Utility functions for working with discounts and discounted pricing.
 """
 
+import six
 from django.utils.translation import ugettext as _
 from course_modes.models import get_course_prices, format_course_price
+from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangolib.markup import HTML
+from web_fragments.fragment import Fragment
+from openedx.features.discounts.applicability import (
+    can_receive_discount,
+    get_discount_expiration_date,
+    discount_percentage
+)
 
-from .applicability import can_receive_discount, discount_percentage
+
+def offer_banner_wrapper(user, block, view, frag, context):  # pylint: disable=W0613
+    """
+    A wrapper that prepends the First Purchase Discount banner if
+    the user hasn't upgraded yet.
+    """
+    if block.category != "vertical":
+        return frag
+
+    course = CourseOverview.get_from_id(block.course_id)
+    offer_banner_fragment = get_first_purchase_offer_banner_fragment(user, course)
+
+    if not offer_banner_fragment:
+        return frag
+
+    # Course content must be escaped to render correctly due to the way the
+    # way the XBlock rendering works. Transforming the safe markup to unicode
+    # escapes correctly.
+    offer_banner_fragment.content = six.text_type(offer_banner_fragment.content)
+
+    offer_banner_fragment.add_content(frag.content)
+    offer_banner_fragment.add_fragment_resources(frag)
+
+    return offer_banner_fragment
 
 
 def format_strikeout_price(user, course, base_price=None, check_for_discount=True):
@@ -55,3 +87,35 @@ def format_strikeout_price(user, course, base_price=None, check_for_discount=Tru
         )
     else:
         return (HTML(u"<span class='price'>{}</span>").format(original_price), False)
+
+
+def get_first_purchase_offer_banner_fragment(user, course):
+    """
+    Return an HTML Fragment with First Purcahse Discount message,
+    which has the discount_expiration_date, price,
+    discount percentage and a link to upgrade.
+    """
+    if user and course:
+        discount_expiration_date = get_discount_expiration_date(user, course)
+        if (discount_expiration_date and
+                can_receive_discount(user=user, course=course, discount_expiration_date=discount_expiration_date)):
+            # Translator: xgettext:no-python-format
+            offer_message = _(u'{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% '
+                              u'[{strikeout_price}]{span_close}{br}Discount will be automatically applied at checkout. '
+                              u'{a_open}Upgrade Now{a_close}{div_close}')
+            return Fragment(HTML(offer_message).format(
+                a_open=HTML(u'<a href="{upgrade_link}">').format(
+                    upgrade_link=verified_upgrade_deadline_link(user=user, course=course)
+                ),
+                a_close=HTML('</a>'),
+                br=HTML('<br>'),
+                banner_open=HTML(
+                    '<div class="first-purchase-offer-banner"><span class="first-purchase-offer-banner-bold">'
+                ),
+                discount_expiration_date=discount_expiration_date.strftime(u'%B %d'),
+                percentage=discount_percentage(),
+                span_close=HTML('</span>'),
+                div_close=HTML('</div>'),
+                strikeout_price=HTML(format_strikeout_price(user, course, check_for_discount=False)[0])
+            ))
+    return None

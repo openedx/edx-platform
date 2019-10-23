@@ -85,6 +85,7 @@ from openedx.core.lib.xblock_utils import (
 from openedx.core.lib.xblock_utils import request_token as xblock_request_token
 from openedx.core.lib.xblock_utils import wrap_xblock
 from openedx.features.course_duration_limits.access import course_expiration_wrapper
+from openedx.features.discounts.utils import offer_banner_wrapper
 from student.models import anonymous_id_for_user, user_by_anonymous_id
 from student.roles import CourseBetaTesterRole
 from track import contexts
@@ -729,6 +730,7 @@ def get_module_system_for_user(
 
     block_wrappers.append(partial(display_access_messages, user))
     block_wrappers.append(partial(course_expiration_wrapper, user))
+    block_wrappers.append(partial(offer_banner_wrapper, user))
 
     if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):
         if is_masquerading_as_specific_student(user, course_id):
