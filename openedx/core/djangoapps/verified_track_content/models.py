@@ -28,7 +28,7 @@ from student.models import CourseEnrollment
 
 log = logging.getLogger(__name__)
 
-DEFAULT_VERIFIED_COHORT_NAME = "Verified Learners"
+DEFAULT_VERIFIED_COHORT_NAME = u"Verified Learners"
 
 
 @receiver(post_save, sender=CourseEnrollment)
@@ -170,15 +170,15 @@ class MigrateVerifiedTrackCohortsSetting(ConfigurationModel):
     old_course_key = CourseKeyField(
         max_length=255,
         blank=False,
-        help_text="Course key for which to migrate verified track cohorts from"
+        help_text=u"Course key for which to migrate verified track cohorts from"
     )
     rerun_course_key = CourseKeyField(
         max_length=255,
         blank=False,
-        help_text="Course key for which to migrate verified track cohorts to enrollment tracks to"
+        help_text=u"Course key for which to migrate verified track cohorts to enrollment tracks to"
     )
     audit_cohort_names = models.TextField(
-        help_text="Comma-separated list of audit cohort names"
+        help_text=u"Comma-separated list of audit cohort names"
     )
 
     @classmethod
