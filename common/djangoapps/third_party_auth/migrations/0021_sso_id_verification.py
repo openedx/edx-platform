@@ -15,16 +15,16 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='ltiproviderconfig',
             name='enable_sso_id_verification',
-            field=models.BooleanField(default=False, help_text=b'Use the presence of a profile from a trusted third party as proof of identity verification.'),
+            field=models.BooleanField(default=False, help_text=u'Use the presence of a profile from a trusted third party as proof of identity verification.'),
         ),
         migrations.AddField(
             model_name='oauth2providerconfig',
             name='enable_sso_id_verification',
-            field=models.BooleanField(default=False, help_text=b'Use the presence of a profile from a trusted third party as proof of identity verification.'),
+            field=models.BooleanField(default=False, help_text=u'Use the presence of a profile from a trusted third party as proof of identity verification.'),
         ),
         migrations.AddField(
             model_name='samlproviderconfig',
             name='enable_sso_id_verification',
-            field=models.BooleanField(default=False, help_text=b'Use the presence of a profile from a trusted third party as proof of identity verification.'),
+            field=models.BooleanField(default=False, help_text=u'Use the presence of a profile from a trusted third party as proof of identity verification.'),
         ),
     ]
