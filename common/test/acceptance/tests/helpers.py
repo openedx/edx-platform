@@ -660,11 +660,13 @@ class EventsTestMixin(TestCase):
         """
         if in_order:
             for expected_event, actual_event in zip(expected_events, actual_events):
-                assert_event_matches(
-                    expected_event,
-                    actual_event,
-                    tolerate=EventMatchTolerates.lenient()
-                )
+                expected_field = (None if expected_event.get('event') is None else
+                                  expected_event.get('event').get('field'))
+                has_field = expected_field is not None
+                actual_event_to_compare = (next(item for item in actual_events if item.get('event').get('field') ==
+                                                expected_field)) if has_field else actual_event
+
+                assert_event_matches(expected_event, actual_event_to_compare, tolerate=EventMatchTolerates.lenient())
         else:
             for expected_event in expected_events:
                 actual_event = next(event for event in actual_events if is_matching_event(expected_event, event))
