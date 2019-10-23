@@ -485,7 +485,7 @@ class LoncapaProblem(object):
 
         # include solutions from <solution>...</solution> stanzas
         for entry in self.tree.xpath("//" + "|//".join(solution_tags)):
-            answer = etree.tostring(entry)
+            answer = etree.tostring(entry).decode('utf-8')
             if answer:
                 answer_map[entry.get('id')] = contextualize_text(answer, self.context)
 
