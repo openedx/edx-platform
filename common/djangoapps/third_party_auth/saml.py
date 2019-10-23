@@ -19,8 +19,8 @@ from social_core.exceptions import AuthForbidden
 from openedx.core.djangoapps.theming.helpers import get_current_request
 from third_party_auth.exceptions import IncorrectConfigurationException
 
-STANDARD_SAML_PROVIDER_KEY = 'standard_saml_provider'
-SAP_SUCCESSFACTORS_SAML_KEY = 'sap_success_factors'
+STANDARD_SAML_PROVIDER_KEY = u'standard_saml_provider'
+SAP_SUCCESSFACTORS_SAML_KEY = u'sap_success_factors'
 log = logging.getLogger(__name__)
 
 
