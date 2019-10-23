@@ -48,7 +48,7 @@ from student.models import LinkedInAddToProfileConfiguration
 from util import organizations_helpers as organization_api
 from util.date_utils import strftime_localized
 from util.views import handle_500
-from lms.djangoapps.philu_overrides.certificates.webview import override_update_social_context
+from lms.djangoapps.philu_overrides.certificates.webview import override_update_certificate_context
 
 
 log = logging.getLogger(__name__)
@@ -591,7 +591,7 @@ def render_html_view(request, user_id, course_id):
 
         # Append social sharing info
         # _update_social_context(request, context, course, user, user_certificate, platform_name)
-        override_update_social_context(request, context, course, user, user_certificate, platform_name)
+        override_update_certificate_context(request, context, course, user, user_certificate, platform_name)
 
         # Append/Override the existing view context values with certificate specific values
         _update_certificate_context(context, course, user_certificate, platform_name)

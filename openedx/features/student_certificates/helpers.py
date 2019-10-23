@@ -32,10 +32,18 @@ def get_certificate_image_url(certificate):
     :param certificate:
     :return: return s3 url of corresponding image of the certificate
     """
+    return get_certificate_image_url_by_uuid(certificate.verify_uuid)
+
+
+def get_certificate_image_url_by_uuid(verify_uuid):
+    """
+    :param certificate uuid:
+    :return: return s3 url of corresponding image of the certificate
+    """
     return 'https://s3.amazonaws.com/{bucket}/{prefix}/{uuid}.jpg'.format(
         bucket=getattr(settings, "FILE_UPLOAD_STORAGE_BUCKET_NAME", None),
         prefix=CERTIFICATE_IMG_PREFIX,
-        uuid=certificate.verify_uuid
+        uuid=verify_uuid
     )
 
 
