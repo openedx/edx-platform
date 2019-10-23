@@ -33,7 +33,7 @@ class BrandingInfoConfig(ConfigurationModel):
         app_label = "branding"
 
     configuration = TextField(
-        help_text="JSON data of Configuration for Video Branding."
+        help_text=u"JSON data of Configuration for Video Branding."
     )
 
     def clean(self):

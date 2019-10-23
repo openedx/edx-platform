@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
             name='ApplicationOrganization',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('relation_type', models.CharField(choices=[(b'content_org', 'Content Provider')], default=b'content_org', max_length=32)),
+                ('relation_type', models.CharField(choices=[(u'content_org', 'Content Provider')], default=u'content_org', max_length=32)),
                 ('application', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='organizations', to=settings.OAUTH2_PROVIDER_APPLICATION_MODEL)),
                 ('organization', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='organizations.Organization')),
             ],
