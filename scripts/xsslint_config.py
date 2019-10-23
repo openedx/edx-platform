@@ -21,6 +21,7 @@ SKIP_DIRS = (
     '.pycharm_helpers',
     'common/static/xmodule/modules',
     'common/static/bundles',
+    'docs',
     'perf_tests',
     'node_modules',
     'reports/diff_quality',
