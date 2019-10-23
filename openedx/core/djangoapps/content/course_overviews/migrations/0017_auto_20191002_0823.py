@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='simulatecoursepublishconfig',
             name='arguments',
-            field=models.TextField(blank=True, default=b'', help_text=b'Useful for manually running a Jenkins job. Specify like "--delay 10 --receivers A B C         --courses X Y Z".'),
+            field=models.TextField(blank=True, default=u'', help_text=u'Useful for manually running a Jenkins job. Specify like "--delay 10 --receivers A B C         --courses X Y Z".'),
         ),
     ]

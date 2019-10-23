@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ('version', models.IntegerField()),
                 ('id', opaque_keys.edx.django.models.CourseKeyField(db_index=True, max_length=255)),
                 ('_location', opaque_keys.edx.django.models.UsageKeyField(max_length=255)),
-                ('org', models.TextField(default=b'outdated_entry', max_length=255)),
+                ('org', models.TextField(default=u'outdated_entry', max_length=255)),
                 ('display_name', models.TextField(null=True)),
                 ('display_number_with_default', models.TextField()),
                 ('display_org_with_default', models.TextField()),
