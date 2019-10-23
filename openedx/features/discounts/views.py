@@ -73,6 +73,8 @@ class CourseUserDiscount(DeveloperErrorViewMixin, APIView):
         course_key = CourseKey.from_string(course_key_string)
         course = CourseOverview.get_from_id(course_key)
         discount_applicable = can_receive_discount(user=request.user, course=course)
+        # HACK: Disable discount for mobile payment test
+        discount_applicable = discount_applicable and request.COOKIES.get('REV_934', None) != 'mobile'
         discount_percent = discount_percentage()
         payload = {'discount_applicable': discount_applicable, 'discount_percent': discount_percent}
         return Response({
@@ -136,6 +138,8 @@ class CourseUserDiscountWithUserParam(DeveloperErrorViewMixin, APIView):
         course = CourseOverview.get_from_id(course_key)
         user = User.objects.get(id=user_id)
         discount_applicable = can_receive_discount(user=user, course=course)
+        # HACK: Disable discount for mobile payment test
+        discount_applicable = discount_applicable and request.COOKIES.get('REV_934', None) != 'mobile'
         discount_percent = discount_percentage()
         payload = {'discount_applicable': discount_applicable, 'discount_percent': discount_percent}
         return Response({
