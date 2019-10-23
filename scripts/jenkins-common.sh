@@ -4,12 +4,6 @@ set -e
 
 source $HOME/jenkins_env
 
-NODE_ENV_DIR=$HOME/nenv
-NODEENV_VERSION=1.3.3
-NODE_VERSION=12.11.1
-
-NODE_INSTALL_COMMAND="nodeenv --node=$NODE_VERSION --prebuilt $NODE_ENV_DIR --force --verbose"
-
 # Clear the mongo database
 # Note that this prevents us from running jobs in parallel on a single worker.
 mongo --quiet --eval 'db.getMongo().getDBNames().forEach(function(i){db.getSiblingDB(i).dropDatabase()})'
@@ -52,28 +46,6 @@ source $HOME/edx-venv/bin/activate
 # add the node packages dir to PATH
 PATH=$PATH:node_modules/.bin
 
-echo "setting up nodeenv"
-pip install nodeenv==$NODEENV_VERSION
-# Ensure we are starting with a clean node env directory
-rm -rf $NODE_ENV_DIR
-
-# Occasionally, the command to install node hangs. We need to catch that and retry.
-# Note that this will retry even if the command itself fails.
-WAIT_COUNT=0
-until timeout 120s $NODE_INSTALL_COMMAND || [ $WAIT_COUNT -eq 2 ]; do
-    echo "re-trying to install node version..."
-    sleep 2
-    WAIT_COUNT=$((WAIT_COUNT+1))
-done
-
-# If we tried the max number of times, we need to quit.
-if [ $WAIT_COUNT -eq 2 ]; then
-    echo "Node environment installation command was not successful. Exiting."
-    exit 1
-fi
-
-source $NODE_ENV_DIR/bin/activate
-echo "done setting up nodeenv"
 echo "node version is `node --version`"
 echo "npm version is `npm --version`"
 
