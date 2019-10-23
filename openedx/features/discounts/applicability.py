@@ -49,6 +49,10 @@ def get_discount_expiration_date(user, course):
     Returns the date when the discount expires for the user.
     Returns none if the user is not enrolled.
     """
+    # anonymous users should never get the discount
+    if user.is_anonymous:
+        return None
+
     course_enrollment = CourseEnrollment.objects.filter(
         user=user,
         course=course.id,
@@ -98,10 +102,6 @@ def can_receive_discount(user, course, discount_expiration_date=None):
             return False
 
     # TODO: Add additional conditions to return False here
-
-    # anonymous users should never get the discount
-    if user.is_anonymous:
-        return False
 
     # Check if discount has expired
     if not discount_expiration_date:

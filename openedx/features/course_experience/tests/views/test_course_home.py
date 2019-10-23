@@ -413,8 +413,8 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         )
         self.assertRedirects(response, expected_url)
 
-    @mock.patch('openedx.features.course_experience.utils.discount_percentage')
-    @mock.patch('openedx.features.course_experience.utils.can_receive_discount')
+    @mock.patch('openedx.features.discounts.utils.discount_percentage')
+    @mock.patch('openedx.features.discounts.utils.can_receive_discount')
     @ddt.data(
         [True, 15],
         [True, 13],

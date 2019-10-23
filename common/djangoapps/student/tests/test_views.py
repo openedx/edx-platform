@@ -703,7 +703,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             for number in range(5)
         ]
 
-        submit_completions_for_testing(self.user, course_key, block_keys)
+        submit_completions_for_testing(self.user, block_keys)
 
         response = self.client.get(reverse('dashboard'))
 
@@ -816,7 +816,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                 ]
                 last_completed_block_string = str(block_keys[-1])
 
-                submit_completions_for_testing(self.user, course_key, block_keys)
+                submit_completions_for_testing(self.user, block_keys)
 
             html_for_view_buttons.append(
                 self._get_html_for_view_course_button(

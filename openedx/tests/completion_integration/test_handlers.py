@@ -49,7 +49,7 @@ class ScorableCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
 
     def setUp(self):
         super(ScorableCompletionHandlerTestCase, self).setUp()
-        self.block_key = self.course_key.make_usage_key(block_type='problem', block_id='red')
+        self.block_key = self.context_key.make_usage_key(block_type='problem', block_id='red')
 
     def call_scorable_block_completion_handler(self, block_key, score_deleted=None):
         """
@@ -64,7 +64,7 @@ class ScorableCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
         handlers.scorable_block_completion(
             sender=self,
             user_id=self.user.id,
-            course_id=six.text_type(self.course_key),
+            course_id=six.text_type(self.context_key),
             usage_id=six.text_type(block_key),
             weighted_earned=0.0,
             weighted_possible=3.0,
@@ -83,39 +83,39 @@ class ScorableCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
         self.call_scorable_block_completion_handler(self.block_key, score_deleted)
         completion = BlockCompletion.objects.get(
             user=self.user,
-            course_key=self.course_key,
+            context_key=self.context_key,
             block_key=self.block_key,
         )
         self.assertEqual(completion.completion, expected_completion)
 
     @XBlock.register_temp_plugin(CustomScorableBlock, 'custom_scorable')
     def test_handler_skips_custom_block(self):
-        custom_block_key = self.course_key.make_usage_key(block_type='custom_scorable', block_id='green')
+        custom_block_key = self.context_key.make_usage_key(block_type='custom_scorable', block_id='green')
         self.call_scorable_block_completion_handler(custom_block_key)
         completion = BlockCompletion.objects.filter(
             user=self.user,
-            course_key=self.course_key,
+            context_key=self.context_key,
             block_key=custom_block_key,
         )
         self.assertFalse(completion.exists())
 
     @XBlock.register_temp_plugin(ExcludedScorableBlock, 'excluded_scorable')
     def test_handler_skips_excluded_block(self):
-        excluded_block_key = self.course_key.make_usage_key(block_type='excluded_scorable', block_id='blue')
+        excluded_block_key = self.context_key.make_usage_key(block_type='excluded_scorable', block_id='blue')
         self.call_scorable_block_completion_handler(excluded_block_key)
         completion = BlockCompletion.objects.filter(
             user=self.user,
-            course_key=self.course_key,
+            context_key=self.context_key,
             block_key=excluded_block_key,
         )
         self.assertFalse(completion.exists())
 
     def test_handler_skips_discussion_block(self):
-        discussion_block_key = self.course_key.make_usage_key(block_type='discussion', block_id='blue')
+        discussion_block_key = self.context_key.make_usage_key(block_type='discussion', block_id='blue')
         self.call_scorable_block_completion_handler(discussion_block_key)
         completion = BlockCompletion.objects.filter(
             user=self.user,
-            course_key=self.course_key,
+            context_key=self.context_key,
             block_key=discussion_block_key,
         )
         self.assertFalse(completion.exists())
@@ -125,7 +125,7 @@ class ScorableCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
             grades_signals.PROBLEM_WEIGHTED_SCORE_CHANGED.send_robust(
                 sender=self,
                 user_id=self.user.id,
-                course_id=six.text_type(self.course_key),
+                course_id=six.text_type(self.context_key),
                 usage_id=six.text_type(self.block_key),
                 weighted_earned=0.0,
                 weighted_possible=3.0,
@@ -145,13 +145,13 @@ class DisabledCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
 
     def setUp(self):
         super(DisabledCompletionHandlerTestCase, self).setUp()
-        self.block_key = self.course_key.make_usage_key(block_type='problem', block_id='red')
+        self.block_key = self.context_key.make_usage_key(block_type='problem', block_id='red')
 
     def test_disabled_handler_does_not_submit_completion(self):
         handlers.scorable_block_completion(
             sender=self,
             user_id=self.user.id,
-            course_id=six.text_type(self.course_key),
+            course_id=six.text_type(self.context_key),
             usage_id=six.text_type(self.block_key),
             weighted_earned=0.0,
             weighted_possible=3.0,
@@ -161,6 +161,6 @@ class DisabledCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
         with self.assertRaises(BlockCompletion.DoesNotExist):
             BlockCompletion.objects.get(
                 user=self.user,
-                course_key=self.course_key,
+                context_key=self.context_key,
                 block_key=self.block_key
             )

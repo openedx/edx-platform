@@ -6,6 +6,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import json
 import unittest
 
+from completion.test_utils import CompletionWaffleTestMixin
 from django.conf import settings
 from django.test import TestCase
 from organizations.models import Organization
@@ -20,6 +21,7 @@ from openedx.core.djangoapps.content_libraries.tests.test_content_libraries impo
     URL_BLOCK_GET_HANDLER_URL,
 )
 from openedx.core.djangoapps.xblock import api as xblock_api
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.lib import blockstore_api
 from student.tests.factories import UserFactory
 from xmodule.unit_block import UnitBlock
@@ -93,7 +95,7 @@ class ContentLibraryRuntimeTest(ContentLibraryContentTestMixin, TestCase):
 @unittest.skipUnless(settings.RUN_BLOCKSTORE_TESTS, "Requires a running Blockstore server")
 # We can remove the line below to enable this in Studio once we implement a session-backed
 # field data store which we can use for both studio users and anonymous users
-@unittest.skipUnless(settings.ROOT_URLCONF == "lms.urls", "Student State is only saved in the LMS")
+@skip_unless_lms
 class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase):
     """
     Test that the Blockstore-based XBlock runtime can store and retrieve student
@@ -195,7 +197,7 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
         # Now they should be equal, because we've saved and re-loaded instance2:
         self.assertEqual(block_instance1.user_str, block_instance2.user_str)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == "lms.urls", "Scores are only used in the LMS")
+    @skip_unless_lms  # Scores are only used in the LMS
     def test_scores_persisted(self):
         """
         Test that a block's emitted scores are cached in StudentModule
@@ -260,3 +262,58 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
         sm = get_score(self.student_a, block_id)
         self.assertEqual(sm.grade, 1)
         self.assertEqual(sm.max_grade, 1)
+
+
+@unittest.skipUnless(settings.RUN_BLOCKSTORE_TESTS, "Requires a running Blockstore server")
+@skip_unless_lms  # No completion tracking in Studio
+class ContentLibraryXBlockCompletionTest(ContentLibraryContentTestMixin, CompletionWaffleTestMixin, TestCase):
+    """
+    Test that the Blockstore-based XBlocks can track their completion status
+    using the completion library.
+    """
+
+    def setUp(self):
+        super(ContentLibraryXBlockCompletionTest, self).setUp()
+        # Enable the completion waffle flag for these tests
+        self.override_waffle_switch(True)
+
+    def test_mark_complete_via_handler(self):
+        """
+        Test that a "complete on view" XBlock like the HTML block can be marked
+        as complete using the LmsBlockMixin.publish_completion handler.
+        """
+        block_id = library_api.create_library_block(self.library.key, "html", "completable_html").usage_key
+        new_olx = """
+        <html display_name="Read this HTML">
+            <![CDATA[
+                <p>This is some <strong>HTML</strong>.</p>
+            ]]>
+        </html>
+        """.strip()
+        library_api.set_library_block_olx(block_id, new_olx)
+        library_api.publish_changes(self.library.key)
+
+        # We should get a REST API for retrieving completion data; for now use python
+
+        def get_block_completion_status():
+            """ Get block completion status (0 to 1) """
+            block = xblock_api.load_block(block_id, self.student_a)
+            assert hasattr(block, 'publish_completion')
+            service = block.runtime.service(block, 'completion')
+            return service.get_completions([block_id])[block_id]
+
+        # At first the block is not completed
+        self.assertEqual(get_block_completion_status(), 0)
+
+        # Now call the 'publish_completion' handler:
+        client = APIClient()
+        client.login(username=self.student_a.username, password='edx')
+        result = client.get(URL_BLOCK_GET_HANDLER_URL.format(block_key=block_id, handler_name='publish_completion'))
+        publish_completion_url = result.data["handler_url"]
+
+        # This will test the 'completion' service and the completion event handler:
+        result2 = client.post(publish_completion_url, {"completion": 1.0}, format='json')
+        self.assertEqual(result2.status_code, 200)
+
+        # Now the block is completed
+        self.assertEqual(get_block_completion_status(), 1)

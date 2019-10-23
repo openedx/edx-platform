@@ -5,6 +5,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import logging
 
 from completion import waffle as completion_waffle
+from completion.models import BlockCompletion
+from completion.services import CompletionService
 import crum
 from django.contrib.auth import get_user_model
 from django.utils.lru_cache import lru_cache
@@ -131,8 +133,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
         if event_type == 'grade':
             return self.handle_grade_event
         elif event_type == 'completion':
-            if completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
-                return self.handle_completion_event
+            return self.handle_completion_event
         return None
 
     def log_event_to_tracking_log(self, block, event_type, event_data):
@@ -167,16 +168,13 @@ class XBlockRuntime(RuntimeShim, Runtime):
         """
         Submit a completion object for the block.
         """
-        block_key = block.scope_ids.usage_id
-        # edx-completion needs to be updated to support learning contexts, which is coming soon in a separate PR.
-        # For now just log a debug statement to confirm this plumbing is ready to send those events through.
-        log.debug("Completion event for block {}: new completion = {}".format(block_key, event['completion']))
-        # BlockCompletion.objects.submit_completion(
-        #     user=self.user,
-        #     course_key=block_key.context_key,
-        #     block_key=block_key,
-        #     completion=event['completion'],
-        # )
+        if not completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+            return
+        BlockCompletion.objects.submit_completion(
+            user=self.user,
+            block_key=block.scope_ids.usage_id,
+            completion=event['completion'],
+        )
 
     def applicable_aside_types(self, block):
         """ Disable XBlock asides in this runtime """
@@ -213,6 +211,9 @@ class XBlockRuntime(RuntimeShim, Runtime):
                     self.block_field_datas[block.scope_ids] = None
                     raise
             return self.block_field_datas[block.scope_ids]
+        elif service_name == "completion":
+            context_key = block.scope_ids.usage_id.context_key
+            return CompletionService(user=self.user, context_key=context_key)
         # Check if the XBlockRuntimeSystem wants to handle this:
         service = self.system.get_service(block, service_name)
         # Otherwise, fall back to the base implementation which loads services

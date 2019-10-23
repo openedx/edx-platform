@@ -7,6 +7,8 @@ Studio APIs cover use cases like adding/deleting/editing blocks.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from django.contrib.auth import get_user_model
+from django.views.decorators.clickjacking import xframe_options_exempt
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import permissions
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.exceptions import PermissionDenied, AuthenticationFailed
@@ -68,12 +70,19 @@ def get_handler_url(request, usage_key_str, handler_name):
     return Response({"handler_url": handler_url})
 
 
-@api_view(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
-@authentication_classes([])  # Disable session authentication; we don't need it and don't want CSRF checks
-@permission_classes((permissions.AllowAny, ))
+# We cannot use DRF for this endpoint because its Request object is incompatible
+# with the API expected by XBlock handlers.
+# See https://github.com/edx/edx-platform/pull/19253
+# and https://github.com/edx/XBlock/pull/383 for context.
+@csrf_exempt
+@xframe_options_exempt
 def xblock_handler(request, user_id, secure_token, usage_key_str, handler_name, suffix):
     """
     Run an XBlock's handler and return the result
+
+    This endpoint has a unique authentication scheme that involves a temporary
+    auth token included in the URL (see below). As a result it can be exempt
+    from CSRF, session auth, and JWT/OAuth.
     """
     user_id = int(user_id)  # User ID comes from the URL, not session auth
     usage_key = UsageKey.from_string(usage_key_str)

@@ -11,6 +11,7 @@ from organizations.models import Organization
 from rest_framework.test import APITestCase
 
 from student.tests.factories import UserFactory
+from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx.core.lib import blockstore_api
 
 # Define the URLs here - don't use reverse() because we want to detect
@@ -29,7 +30,7 @@ URL_BLOCK_GET_HANDLER_URL = '/api/xblock/v2/xblocks/{block_key}/handler_url/{han
 
 
 @unittest.skipUnless(settings.RUN_BLOCKSTORE_TESTS, "Requires a running Blockstore server")
-@unittest.skipUnless(settings.ROOT_URLCONF == "cms.urls", "Content Libraries REST API is only available in Studio")
+@skip_unless_cms  # Content Libraries REST API is only available in Studio
 class ContentLibrariesTest(APITestCase):
     """
     Test for Blockstore-based Content Libraries

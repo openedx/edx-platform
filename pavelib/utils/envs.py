@@ -281,7 +281,7 @@ class Env(object):
         """
         django_setting_value = cls.get_django_setting(django_setting, system, settings)
         pattern = re.compile(
-            u"[\"']{setting}[\"']: [\"'](?P<setting_value>.*)[\"']".format(setting=nested_django_setting)
+            u"[\"']{setting}[\"']: [\"'](?P<setting_value>.*?)[\"']".format(setting=nested_django_setting)
         )
         match = pattern.search(django_setting_value)
         if match:

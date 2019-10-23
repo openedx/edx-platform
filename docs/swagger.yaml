@@ -130,7 +130,7 @@ paths:
           type: string
         - name: fields
           in: query
-          description: "The fields to return: display_name, path.\n"
+          description: 'The fields to return: display_name, path.'
           type: string
       responses:
         '200':
@@ -156,8 +156,7 @@ paths:
     get:
       operationId: bookmarks_v1_bookmarks_read
       summary: Get a specific bookmark for a user.
-      description: "# Example Requests\n\nGET /api/bookmarks/v1/bookmarks/{username},{usage_id}/?fields=display_name,path\n\
-        \n"
+      description: "# Example Requests\n\nGET /api/bookmarks/v1/bookmarks/{username},{usage_id}?fields=display_name,path"
       parameters: []
       responses:
         '200':
