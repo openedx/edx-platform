@@ -18,6 +18,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='commerceconfiguration',
             name='basket_checkout_page',
-            field=models.CharField(default=b'/basket/add/', help_text='Path to course(s) checkout page hosted by the E-Commerce service.', max_length=255),
+            field=models.CharField(default=u'/basket/add/', help_text='Path to course(s) checkout page hosted by the E-Commerce service.', max_length=255),
         ),
     ]
