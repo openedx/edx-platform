@@ -18,9 +18,9 @@ scipy==0.14.0                       # Math, science, and engineering library
 sympy==0.7.1                        # Symbolic math library
 git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4
 git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0
+git+https://github.com/stvstnfrd/openedx-symmath.git@create-package#egg=symmath==0.4
 
 # Install these packages from the edx-platform working tree
 # NOTE: if you change code in these packages, you MUST change the version
 # number in its setup.py or the code WILL NOT be installed during deploy.
 -e common/lib/sandbox-packages
--e common/lib/symmath

@@ -5,7 +5,7 @@
 #    make upgrade
 #
 common/lib/sandbox-packages
-common/lib/symmath
+git+https://github.com/stvstnfrd/openedx-symmath.git@create-package#egg=symmath==0.4
 backports.functools-lru-cache==1.5  # via matplotlib
 git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4
 cffi==1.13.1
