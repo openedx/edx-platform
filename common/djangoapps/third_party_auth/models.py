@@ -565,7 +565,10 @@ class SAMLProviderConfig(ProviderConfig):
         ))
     attr_user_permanent_id = models.CharField(
         max_length=128, blank=True, verbose_name=u"User ID Attribute",
-        help_text=u"URN of the SAML attribute that we can use as a unique, persistent user ID. Leave blank for default.")
+        help_text=(
+            u"URN of the SAML attribute that we can use as a unique, "
+            "persistent user ID. Leave blank for default."
+        ))
     attr_full_name = models.CharField(
         max_length=128, blank=True, verbose_name=u"Full Name Attribute",
         help_text=u"URN of SAML attribute containing the user's full name. Leave blank for default.")
