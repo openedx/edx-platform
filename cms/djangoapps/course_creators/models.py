@@ -28,10 +28,10 @@ class CourseCreator(models.Model):
 
     .. no_pii:
     """
-    UNREQUESTED = 'unrequested'
-    PENDING = 'pending'
-    GRANTED = 'granted'
-    DENIED = 'denied'
+    UNREQUESTED = u'unrequested'
+    PENDING = u'pending'
+    GRANTED = u'granted'
+    DENIED = u'denied'
 
     # Second value is the "human-readable" version.
     STATES = (
@@ -42,7 +42,7 @@ class CourseCreator(models.Model):
     )
 
     user = models.OneToOneField(User, help_text=_("Studio user"), on_delete=models.CASCADE)
-    state_changed = models.DateTimeField('state last updated', auto_now_add=True,
+    state_changed = models.DateTimeField(u'state last updated', auto_now_add=True,
                                          help_text=_("The date when state was last updated"))
     state = models.CharField(max_length=24, blank=False, choices=STATES, default=UNREQUESTED,
                              help_text=_("Current course creator state"))
