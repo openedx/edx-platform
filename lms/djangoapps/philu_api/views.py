@@ -259,8 +259,11 @@ def send_alquity_fake_confirmation_email(request):
     return JsonResponse({'success': success})
 
 
+@csrf_exempt
 def resend_activation_email(request):
-    user = request.user
+    data = json.loads(request.body)
+    user_id = data.get('user_id')
+    user = User.objects.get(id=user_id)
     activated = user.is_active
     try:
         if not activated:
