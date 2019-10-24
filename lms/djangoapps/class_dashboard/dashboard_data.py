@@ -16,6 +16,7 @@ from lms.djangoapps.instructor_analytics.csvs import create_csv_response
 from util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata
+from openedx.core.lib.grade_utils import round_away_from_zero
 
 # Used to limit the length of list displayed to the screen.
 MAX_SCREEN_LIST_LENGTH = 250
@@ -193,7 +194,7 @@ def get_d3_problem_grade_distrib(course_id):
                             for (grade, count_grade) in problem_info['grade_distrib']:
                                 percent = 0.0
                                 if max_grade > 0:
-                                    percent = round((grade * 100.0) / max_grade, 1)
+                                    percent = round_away_from_zero((grade * 100.0) / max_grade, 1)
 
                                 # Compute percent of students with this grade
                                 student_count_percent = 0
@@ -352,7 +353,7 @@ def get_d3_section_grade_distrib(course_id, section):
             for (grade, count_grade) in grade_distrib[problem]['grade_distrib']:
                 percent = 0.0
                 if max_grade > 0:
-                    percent = round((grade * 100.0) / max_grade, 1)
+                    percent = round_away_from_zero((grade * 100.0) / max_grade, 1)
 
                 # Construct tooltip for problem in grade distibution view
                 tooltip = {
@@ -513,7 +514,7 @@ def get_students_problem_grades(request, csv=False):
 
             student_dict['percent'] = 0
             if student['max_grade'] > 0:
-                student_dict['percent'] = round(student['grade'] * 100 / student['max_grade'])
+                student_dict['percent'] = round_away_from_zero(student['grade'] * 100 / student['max_grade'])
             results.append(student_dict)
 
         max_exceeded = False
@@ -535,7 +536,7 @@ def get_students_problem_grades(request, csv=False):
         for student in students:
             percent = 0
             if student['max_grade'] > 0:
-                percent = round(decimal.Decimal(student['grade'] * 100 / student['max_grade']), 1)
+                percent = round_away_from_zero((student['grade'] * 100 / student['max_grade']), 1)
             results.append([student['student__profile__name'], student['student__username'], student['grade'], percent])
 
         response = create_csv_response(filename, header, results)
