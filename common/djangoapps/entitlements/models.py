@@ -172,7 +172,7 @@ class CourseEntitlement(TimeStampedModel):
         blank=True,
         on_delete=models.CASCADE,
     )
-    order_number = models.CharField(max_length=128, null=True)
+    order_number = models.CharField(max_length=128, null=True, blank=True)
     refund_locked = models.BooleanField(default=False)
     _policy = models.ForeignKey(CourseEntitlementPolicy, null=True, blank=True, on_delete=models.CASCADE)
 
@@ -448,6 +448,14 @@ class CourseEntitlement(TimeStampedModel):
             )
             # Force Transaction reset with an Integrity error exception, this will revert all previous transactions
             raise IntegrityError
+
+    def save(self, *args, **kwargs):
+        """
+        Null out empty strings in order_number
+        """
+        if not self.order_number:
+            self.order_number = None
+        super(CourseEntitlement, self).save(*args, **kwargs)
 
 
 @python_2_unicode_compatible
