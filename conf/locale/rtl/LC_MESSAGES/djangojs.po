@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-10-13 20:50+0000\n"
-"PO-Revision-Date: 2019-10-13 20:51:07.520066\n"
+"POT-Creation-Date: 2019-10-23 12:23+0000\n"
+"PO-Revision-Date: 2019-10-23 12:23:39.655609\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -243,6 +243,14 @@ msgstr "قثوخدهرل"
 #: lms/static/js/views/fields.js
 msgid "Your changes have been saved."
 msgstr "غخعق ذاشرلثس اشدث زثثر سشدثي."
+
+#. Translators: This message will be added to the front of messages of type
+#. warning,
+#. e.g. "Warning: this component has not been configured yet".
+#: cms/static/js/views/xblock_validation.js
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Warning"
+msgstr "صشقرهرل"
 
 #. Translators: This message will be added to the front of messages of type
 #. error,
@@ -2103,16 +2111,16 @@ msgid "This post could not be reopened. Refresh the page and try again."
 msgstr "فاهس حخسف ذخعمي رخف زث قثخحثرثي. قثبقثسا فاث حشلث شري فقغ شلشهر."
 
 #: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Show Discussion"
+msgstr "ساخص يهسذعسسهخر"
+
+#: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "Hide Discussion"
 msgstr "اهيث يهسذعسسهخر"
 
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "This discussion could not be loaded. Refresh the page and try again."
 msgstr "فاهس يهسذعسسهخر ذخعمي رخف زث مخشيثي. قثبقثسا فاث حشلث شري فقغ شلشهر."
-
-#: common/static/common/js/discussion/views/discussion_inline_view.js
-msgid "Show Discussion"
-msgstr "ساخص يهسذعسسهخر"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "There are no posts in this topic yet."
@@ -6914,13 +6922,6 @@ msgstr "سثففهرلس"
 #: cms/static/js/views/xblock_outline.js
 msgid "New {component_type}"
 msgstr "رثص {component_type}"
-
-#. Translators: This message will be added to the front of messages of type
-#. warning,
-#. e.g. "Warning: this component has not been configured yet".
-#: cms/static/js/views/xblock_validation.js
-msgid "Warning"
-msgstr "صشقرهرل"
 
 #: cms/static/js/xblock_asides/structured_tags.js
 msgid "Updating Tags"

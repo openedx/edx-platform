@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-10-13 20:50+0000\n"
-"PO-Revision-Date: 2019-10-13 20:51:07.520066\n"
+"POT-Creation-Date: 2019-10-23 12:23+0000\n"
+"PO-Revision-Date: 2019-10-23 12:23:39.655609\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -243,6 +243,14 @@ msgstr "Rémövïng Ⱡ'σяєм ιρѕυм ∂#"
 #: lms/static/js/views/fields.js
 msgid "Your changes have been saved."
 msgstr "Ýöür çhängés hävé ßéén sävéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#. Translators: This message will be added to the front of messages of type
+#. warning,
+#. e.g. "Warning: this component has not been configured yet".
+#: cms/static/js/views/xblock_validation.js
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Warning"
+msgstr "Wärnïng Ⱡ'σяєм ιρѕυм #"
 
 #. Translators: This message will be added to the front of messages of type
 #. error,
@@ -2197,6 +2205,10 @@ msgstr ""
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Show Discussion"
+msgstr "Shöw Dïsçüssïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "Hide Discussion"
 msgstr "Hïdé Dïsçüssïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
@@ -2205,10 +2217,6 @@ msgid "This discussion could not be loaded. Refresh the page and try again."
 msgstr ""
 "Thïs dïsçüssïön çöüld nöt ßé löädéd. Réfrésh thé pägé änd trý ägäïn. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: common/static/common/js/discussion/views/discussion_inline_view.js
-msgid "Show Discussion"
-msgstr "Shöw Dïsçüssïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "There are no posts in this topic yet."
@@ -7807,13 +7815,6 @@ msgstr "Séttïngs Ⱡ'σяєм ιρѕυм ∂#"
 #: cms/static/js/views/xblock_outline.js
 msgid "New {component_type}"
 msgstr "Néw {component_type} Ⱡ'σяєм ιρѕυм #"
-
-#. Translators: This message will be added to the front of messages of type
-#. warning,
-#. e.g. "Warning: this component has not been configured yet".
-#: cms/static/js/views/xblock_validation.js
-msgid "Warning"
-msgstr "Wärnïng Ⱡ'σяєм ιρѕυм #"
 
 #: cms/static/js/xblock_asides/structured_tags.js
 msgid "Updating Tags"

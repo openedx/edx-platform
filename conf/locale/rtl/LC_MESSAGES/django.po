@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-10-13 20:51+0000\n"
-"PO-Revision-Date: 2019-10-13 20:51:07.597991\n"
+"POT-Creation-Date: 2019-10-23 12:23+0000\n"
+"PO-Revision-Date: 2019-10-23 12:23:39.672573\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -6848,6 +6848,10 @@ msgstr "دهثص يهسذعسسهخر"
 msgid "Response to %(thread_title)s"
 msgstr "قثسحخرسث فخ %(thread_title)s"
 
+#: lms/djangoapps/discussion/views.py
+msgid "Access to this discussion is restricted to team members and staff."
+msgstr "شذذثسس فخ فاهس يهسذعسسهخر هس قثسفقهذفثي فخ فثشو وثوزثقس شري سفشبب."
+
 #: lms/djangoapps/edxnotes/helpers.py
 msgid "EdxNotes Service is unavailable. Please try again in a few minutes."
 msgstr "ثيطرخفثس سثقدهذث هس عرشدشهمشزمث. حمثشسث فقغ شلشهر هر ش بثص وهرعفثس."
@@ -9750,6 +9754,20 @@ msgid "Signed Out"
 msgstr "سهلرثي خعف"
 
 #: lms/templates/logout.html
+msgid "We are signing you in."
+msgstr "صث شقث سهلرهرل غخع هر."
+
+#: lms/templates/logout.html
+msgid ""
+"\n"
+"              This may take a minute. If you are not redirected, go to the home page.\n"
+"            "
+msgstr ""
+"\n"
+"              فاهس وشغ فشنث ش وهرعفث. هب غخع شقث رخف قثيهقثذفثي, لخ فخ فاث اخوث حشلث.\n"
+"            "
+
+#: lms/templates/logout.html
 msgid "You have signed out."
 msgstr "غخع اشدث سهلرثي خعف."
 
@@ -12193,11 +12211,13 @@ msgstr "قثدهثصس"
 #: openedx/features/course_experience/utils.py
 #, no-python-format, python-brace-format
 msgid ""
-"{banner_open}{percentage}% off your first upgrade.{span_close} Discount "
-"automatically applied.{div_close}"
+"{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% "
+"[{strikeout_price}]{span_close}{br}Discount will be automatically applied at"
+" checkout. {a_open}Upgrade Now{a_close}{div_close}"
 msgstr ""
-"{banner_open}{percentage}% خبب غخعق بهقسف عحلقشيث.{span_close} يهسذخعرف "
-"شعفخوشفهذشممغ شححمهثي.{div_close}"
+"{banner_open} عحلقشيث زغ {discount_expiration_date} شري سشدث {percentage}% "
+"[{strikeout_price}]{span_close}{br}يهسذخعرف صهمم زث شعفخوشفهذشممغ شححمهثي شف"
+" ذاثذنخعف. {a_open}عحلقشيث رخص{a_close}{div_close}"
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
@@ -13461,6 +13481,18 @@ msgstr "رثص فخحهذ بخقو"
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
 msgid "Discussion thread list"
 msgstr "يهسذعسسهخر فاقثشي مهسف"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_private_fragment.html
+msgid "Private Discussion"
+msgstr "حقهدشفث يهسذعسسهخر"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_private_fragment.html
+msgid ""
+"This is a private discussion. You do not have permissions to view this "
+"discussion"
+msgstr ""
+"فاهس هس ش حقهدشفث يهسذعسسهخر. غخع يخ رخف اشدث حثقوهسسهخرس فخ دهثص فاهس "
+"يهسذعسسهخر"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/discussion/_user_profile.html

@@ -162,7 +162,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-10-06 20:42+0000\n"
+"POT-Creation-Date: 2019-10-20 20:42+0000\n"
 "PO-Revision-Date: 2019-09-29 20:43+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -358,6 +358,14 @@ msgstr "Eliminando"
 #: lms/static/js/views/fields.js
 msgid "Your changes have been saved."
 msgstr "Sus cambios han sido guardados."
+
+#. Translators: This message will be added to the front of messages of type
+#. warning,
+#. e.g. "Warning: this component has not been configured yet".
+#: cms/static/js/views/xblock_validation.js
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Warning"
+msgstr ""
 
 #. Translators: This message will be added to the front of messages of type
 #. error,
@@ -2224,6 +2232,10 @@ msgstr ""
 "nuevamente."
 
 #: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Show Discussion"
+msgstr "Mostrar Discusión"
+
+#: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "Hide Discussion"
 msgstr "Ocultar Discusión"
 
@@ -2231,10 +2243,6 @@ msgstr "Ocultar Discusión"
 msgid "This discussion could not be loaded. Refresh the page and try again."
 msgstr ""
 "No se pudo cargar esta discusión. Recarga la página e intenta nuevamente."
-
-#: common/static/common/js/discussion/views/discussion_inline_view.js
-msgid "Show Discussion"
-msgstr "Mostrar Discusión"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "There are no posts in this topic yet."
@@ -7170,13 +7178,6 @@ msgstr "Configuración"
 #: cms/static/js/views/xblock_outline.js
 msgid "New {component_type}"
 msgstr "Nuevo {component_type}"
-
-#. Translators: This message will be added to the front of messages of type
-#. warning,
-#. e.g. "Warning: this component has not been configured yet".
-#: cms/static/js/views/xblock_validation.js
-msgid "Warning"
-msgstr "Advertencia"
 
 #: cms/static/js/xblock_asides/structured_tags.js
 msgid "Updating Tags"
