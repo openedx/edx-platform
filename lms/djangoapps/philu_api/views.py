@@ -260,18 +260,19 @@ def send_alquity_fake_confirmation_email(request):
 
 
 @csrf_exempt
+@require_POST
 def resend_activation_email(request):
     data = json.loads(request.body)
     user_id = data.get('user_id')
-    user = User.objects.get(id=user_id)
-    activated = user.is_active
     try:
+        user = User.objects.get(id=user_id)
+        activated = user.is_active
         if not activated:
             reactivation_email_for_user_custom(request, user)
-            return JsonResponse({'success': True, 'email': user.email}, status=status.HTTP_200_OK)
+            return JsonResponse({'email': user.email}, status=status.HTTP_200_OK)
         else:
             # the user's account has already been activated
-            return JsonResponse({'success': False}, status=status.HTTP_409_CONFLICT)
+            return JsonResponse({}, status=status.HTTP_409_CONFLICT)
     except Exception as ex:
         logging.exception(ex)
-        return JsonResponse({'success': False}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return JsonResponse({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

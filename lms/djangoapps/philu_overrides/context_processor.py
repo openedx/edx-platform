@@ -31,7 +31,7 @@ def get_global_alert_messages(request):
         if request.user.is_authenticated() and not request.user.is_active and '/activate/' not in request.path:
             alert_messages.append({
                 "type": ACTIVATION_ALERT_TYPE,
-                "alert": ACTIVATION_ERROR_MSG_FORMAT.format(reverse('resend_activation_email'), request.user.id)
+                "alert": ACTIVATION_ERROR_MSG_FORMAT.format(api_endpoint=reverse('resend_activation_email'), user_id=request.user.id)
             })
 
     if '/oef/dashboard' in request.path:
