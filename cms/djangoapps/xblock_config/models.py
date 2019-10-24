@@ -23,8 +23,8 @@ class StudioConfig(ConfigurationModel):
     .. no_pii:
     """
     disabled_blocks = TextField(
-        default="about course_info static_tab",
-        help_text="Space-separated list of XBlocks on which XBlockAsides should never render in studio",
+        default=u"about course_info static_tab",
+        help_text=u"Space-separated list of XBlocks on which XBlockAsides should never render in studio",
     )
 
     @classmethod
