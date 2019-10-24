@@ -91,7 +91,7 @@ def get_discount_expiration_date(user, course):
     return discount_expiration_date
 
 
-def can_receive_discount(user, course, discount_expiration_date=None):
+def can_receive_discount(user, course, discount_expiration_date=None, mobile_app=False):
     """
     Check all the business logic about whether this combination of user and course
     can receive a discount.
@@ -100,6 +100,9 @@ def can_receive_discount(user, course, discount_expiration_date=None):
     with impersonate(user):
         if not DISCOUNT_APPLICABILITY_FLAG.is_enabled():
             return False
+
+    if mobile_app:  # HACK: suppress on mobile, cleanup with REV-999
+        return False
 
     # TODO: Add additional conditions to return False here
 
