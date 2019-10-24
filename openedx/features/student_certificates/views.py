@@ -1,17 +1,12 @@
-import base64
 import pdfkit
-import requests
-import shutil
 
 from datetime import datetime
-from tempfile import TemporaryFile
-from PIL import Image
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
-from constants import TWITTER_META_TITLE_FMT, COURSE_URL_FMT
+from constants import COURSE_URL_FMT, PDF_RESPONSE_HEADER, PDFKIT_IMAGE_PATH, TWITTER_META_TITLE_FMT
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.philu_api.helpers import get_course_custom_settings
@@ -24,8 +19,11 @@ from lms.djangoapps.certificates.models import (
 
 from helpers import (
     get_certificate_image_url,
-    get_philu_certificate_social_context,
-    get_certificate_image_url_by_uuid
+    get_certificate_image_url_by_uuid,
+    get_image_and_size_from_url,
+    get_pdfkit_html,
+    get_pdfkit_options,
+    get_philu_certificate_social_context
 )
 
 
@@ -169,6 +167,8 @@ def shared_student_achievements(request, certificate_uuid):
     return response
 
 
+@login_required
+@ensure_csrf_cookie
 def download_certificate_pdf(request, certificate_uuid):
     """
     Convert user certificate image on S3 bucket to PDF file and download it for end user
@@ -177,39 +177,15 @@ def download_certificate_pdf(request, certificate_uuid):
     :return: downloadable PDF file
     """
 
-    url = get_certificate_image_url_by_uuid(certificate_uuid)
+    certificate_image_url = get_certificate_image_url_by_uuid(certificate_uuid)
+    image_base64, image_width, image_height = get_image_and_size_from_url(certificate_image_url)
 
-    with requests.get(url, stream=True) as req:
-        if req.status_code != 200:
-            raise Exception("Unable to download certificate")
+    certificate_image_html = get_pdfkit_html(image_base64)
+    pdfkit_options = get_pdfkit_options(image_width, image_height)
 
-        with TemporaryFile() as temp_file:
-            shutil.copyfileobj(req.raw, temp_file)
-            temp_file.seek(0)
-            image_base64 = base64.b64encode(temp_file.read())
-            image_file = Image.open(temp_file)
-            page_width, page_height = image_file.size
+    pdf_document_object = pdfkit.from_string(certificate_image_html, PDFKIT_IMAGE_PATH, pdfkit_options)
 
-    options = {
-        'page-width': '{}px'.format(page_width),
-        'page-height': '{}px'.format(page_height),
-        'margin-left': '0.0in',
-        'margin-right': '0.0in',
-        'margin-bottom': '0.0in',
-        'margin-top': '0.0in',
-        'encoding': "UTF-8",
-        'no-outline': None,
-        'disable-smart-shrinking': None,
-        'print-media-type': None
-    }
+    response_pdf_certificate = HttpResponse(pdf_document_object, content_type='application/pdf')
+    response_pdf_certificate['Content-Disposition'] = PDF_RESPONSE_HEADER.format(certificate_pdf_name='certificate')
 
-    # Creating html to add certificate image. Due to bug in pdfkit, body and html
-    # need 0 padding style, otherwise image tag would have sufficed
-    img = '<img src="data:image/png;base64,%s"/>' % image_base64
-    html = '<html><head><style>body,html{padding:0;margin:0;font-size:0;}</style></head><body>%s</body></html>' % img
-
-    # Use false instead of output path to save pdf to a variable
-    pdf = pdfkit.from_string(html, False, options)
-    response = HttpResponse(pdf, content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="certificate.pdf"'
-    return response
+    return response_pdf_certificate

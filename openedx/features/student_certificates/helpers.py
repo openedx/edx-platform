@@ -1,9 +1,25 @@
+import base64
 import boto
+import requests
+import shutil
+
 from boto.s3.key import Key
 from django.conf import settings
+from PIL import Image
+from tempfile import TemporaryFile
 
 from lms.djangoapps.philu_api.helpers import get_course_custom_settings, get_social_sharing_urls
-from constants import TWITTER_META_TITLE_FMT, SOCIAL_MEDIA_SHARE_URL_FMT, TWITTER_TWEET_TEXT_FMT
+from constants import (
+    PAGE_HEIGHT,
+    PAGE_WIDTH,
+    PDFKIT_HTML_STRING,
+    PDFKIT_IMAGE_TAG,
+    PDFKIT_OPTIONS,
+    SOCIAL_MEDIA_SHARE_URL_FMT,
+    TMPDIR,
+    TWITTER_META_TITLE_FMT,
+    TWITTER_TWEET_TEXT_FMT
+)
 
 CERTIFICATE_IMG_PREFIX = 'certificates_images'
 
@@ -68,7 +84,7 @@ def get_certificate_image_path(img_name):
     :param certificate:
     :return: image path of the certificate
     """
-    return '/tmp/{img}'.format(img=img_name)
+    return '{tmp_dir}/{img}'.format(tmp_dir=TMPDIR, img=img_name)
 
 
 def get_certificate_img_key(img_name):
@@ -97,3 +113,46 @@ def get_philu_certificate_social_context(course, certificate):
         certificate_uuid=certificate.verify_uuid), meta_tags, tweet_text)
 
     return social_sharing_urls
+
+
+def get_image_and_size_from_url(url):
+    """
+    Download image from url to a temp file, get image dimensions and encode to base64
+    :param url: image url
+    :return: base64 image, image width and image height
+    """
+    with requests.get(url, stream=True) as response:
+        if response.status_code != 200:
+            raise Exception("Unable to download certificate for url {}".format(url), response.status_code)
+
+        with TemporaryFile(dir=TMPDIR) as certificate_image_file:
+            # copy the contents of image request to our temporary file
+            shutil.copyfileobj(response.raw, certificate_image_file)
+            certificate_image_file.seek(0) # file will be read from beginning
+            image_base64 = base64.b64encode(certificate_image_file.read())
+            image_file = Image.open(certificate_image_file)
+            page_width, page_height = image_file.size
+    return image_base64, page_width, page_height
+
+
+def get_pdfkit_options(image_width, image_height):
+    """
+    Add image width and height in to pdfkit options
+    :param image_width: image width in pixel
+    :param image_height: image height in pixel
+    :return: pdfkit options dict
+    """
+    PDFKIT_OPTIONS[PAGE_HEIGHT] = PDFKIT_OPTIONS[PAGE_HEIGHT].format(image_height)
+    PDFKIT_OPTIONS[PAGE_WIDTH] = PDFKIT_OPTIONS[PAGE_WIDTH].format(image_width)
+
+    return PDFKIT_OPTIONS
+
+
+def get_pdfkit_html(image_base64):
+    """
+    Create basic html template with base64 image source. Due to bug in pdfkit, body and html
+    need 0 padding style, otherwise image tag would have sufficed
+    :param image_base64:
+    :return: html
+    """
+    return PDFKIT_HTML_STRING.format(image_tag=PDFKIT_IMAGE_TAG.format(base64_img=image_base64))
