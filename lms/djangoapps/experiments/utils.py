@@ -114,6 +114,8 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
 
     if enrollment is None:
         enrollment = CourseEnrollment.get_enrollment(user, course.id)
+        if enrollment is None:
+            return (None, None, None)
 
     if user.is_authenticated and verified_upgrade_link_is_valid(enrollment):
         return (
@@ -122,7 +124,7 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
             enrollment.course_upgrade_deadline,
         )
 
-    return (None, None, None)
+    return (None, None, enrollment.course_upgrade_deadline)
 
 
 # TODO: clean up as part of REVEM-199 (START)
