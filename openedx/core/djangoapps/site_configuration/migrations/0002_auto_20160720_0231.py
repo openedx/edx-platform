@@ -14,11 +14,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='siteconfiguration',
             name='enabled',
-            field=models.BooleanField(default=False, verbose_name=b'Enabled'),
+            field=models.BooleanField(default=False, verbose_name=u'Enabled'),
         ),
         migrations.AddField(
             model_name='siteconfigurationhistory',
             name='enabled',
-            field=models.BooleanField(default=False, verbose_name=b'Enabled'),
+            field=models.BooleanField(default=False, verbose_name=u'Enabled'),
         ),
     ]
