@@ -4,7 +4,6 @@ PageObjects related to the AcidBlock
 
 from __future__ import absolute_import
 
-import six
 from bok_choy.page_object import PageObject
 from bok_choy.promise import BrokenPromise, EmptyPromise
 

@@ -206,21 +206,21 @@ class TranscriptMigrationSetting(ConfigurationModel):
         )
     force_update = BooleanField(
         default=False,
-        help_text="Flag to force migrate transcripts for the requested courses, overwrite if already present."
+        help_text=u"Flag to force migrate transcripts for the requested courses, overwrite if already present."
     )
     command_run = PositiveIntegerField(default=0)
     batch_size = PositiveIntegerField(default=0)
     commit = BooleanField(
         default=False,
-        help_text="Dry-run or commit."
+        help_text=u"Dry-run or commit."
     )
     all_courses = BooleanField(
         default=False,
-        help_text="Process all courses."
+        help_text=u"Process all courses."
     )
     course_ids = TextField(
         blank=False,
-        help_text="Whitespace-separated list of course keys for which to migrate transcripts."
+        help_text=u"Whitespace-separated list of course keys for which to migrate transcripts."
     )
 
     def increment_run(self):
@@ -261,15 +261,15 @@ class VideoThumbnailSetting(ConfigurationModel):
     videos_per_task = PositiveIntegerField(default=0)
     commit = BooleanField(
         default=False,
-        help_text="Dry-run or commit."
+        help_text=u"Dry-run or commit."
     )
     all_course_videos = BooleanField(
         default=False,
-        help_text="Process all videos."
+        help_text=u"Process all videos."
     )
     course_ids = TextField(
         blank=True,
-        help_text="Whitespace-separated list of course ids for which to update videos."
+        help_text=u"Whitespace-separated list of course ids for which to update videos."
     )
 
     def increment_run(self):
