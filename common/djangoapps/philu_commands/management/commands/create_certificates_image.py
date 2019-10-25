@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.core.management.base import BaseCommand
 
-from certificates.models import GeneratedCertificate
+from lms.djangoapps.certificates.models import GeneratedCertificate
 from openedx.features.student_certificates.tasks import task_create_certificate_img_and_upload_to_s3
 
 
