@@ -117,7 +117,7 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
     );
 
     const bodyDeletion2 = StringUtils.interpolate(
-      gettext('This includes access to {siteName} from your employer’s or university’s system and access to private sites offered by {additionalSiteSpecificDeletionText}.'),
+      gettext('This includes access to {siteName} from your employer’s or university’s system{additionalSiteSpecificDeletionText}.'),
       {
         siteName: this.props.siteName,
         additionalSiteSpecificDeletionText: this.props.additionalSiteSpecificDeletionText,
