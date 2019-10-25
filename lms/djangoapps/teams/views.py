@@ -28,6 +28,7 @@ from rest_framework_oauth.authentication import OAuth2Authentication
 
 from lms.djangoapps.courseware.courses import get_course_with_access, has_access
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
+from lms.djangoapps.teams import api as teams_api
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.permissions import IsStaffOrReadOnly
@@ -206,6 +207,24 @@ class TeamsDashboardView(GenericAPIView):
         # be a dictionary with keys "count", "next", "previous", and "results"
         # (where "results" is set to the value of the original list)
         return paginator.get_paginated_response(serializer.data).data
+
+
+def is_staff(user, course_key, access_username=None):
+    """Returns True if the user is staff.
+
+    Args:
+      user (User): The user to check access for.
+      course_key (CourseKey): The key to the course which we are checking access to.
+      access_username (string): If provided, access_username must match user.username for non staff access.
+
+    Returns:
+      bool: True if the user is staff, False otherwise.
+    """
+    if user.is_staff:
+        return True
+    if CourseStaffRole(course_key).has_user(user):
+        return True
+    return False
 
 
 def has_team_api_access(user, course_key, access_username=None):
@@ -1115,6 +1134,12 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         if course_module.teams_max_size is not None and team.users.count() >= course_module.teams_max_size:
             return Response(
                 build_api_error(ugettext_noop("This team is already full.")),
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if teams_api.is_instructor_managed_team(team) and not is_staff(request.user, team.course_id, access_username=username)):
+            return Response(
+                build_api_error(ugettext_noop("You can't join an instructor managed team.")),
                 status=status.HTTP_400_BAD_REQUEST
             )
 
