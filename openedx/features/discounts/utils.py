@@ -52,7 +52,7 @@ def format_strikeout_price(user, course, base_price=None, check_for_discount=Tru
     original_price = format_course_price(base_price)
 
     if not check_for_discount or can_receive_discount(user, course):
-        discount_price = base_price * ((100.0 - discount_percentage()) / 100)
+        discount_price = base_price * ((100.0 - discount_percentage(course)) / 100)
         if discount_price == int(discount_price):
             discount_price = format_course_price("{:0.0f}".format(discount_price))
         else:
