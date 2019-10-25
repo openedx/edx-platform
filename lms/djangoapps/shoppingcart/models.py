@@ -61,32 +61,32 @@ log = logging.getLogger("shoppingcart")
 
 ORDER_STATUSES = (
     # The user is selecting what he/she wants to purchase.
-    ('cart', 'cart'),
+    (u'cart', u'cart'),
 
     # The user has been sent to the external payment processor.
     # At this point, the order should NOT be modified.
     # If the user returns to the payment flow, he/she will start a new order.
-    ('paying', 'paying'),
+    (u'paying', u'paying'),
 
     # The user has successfully purchased the items in the order.
-    ('purchased', 'purchased'),
+    (u'purchased', u'purchased'),
 
     # The user's order has been refunded.
-    ('refunded', 'refunded'),
+    (u'refunded', u'refunded'),
 
     # The user's order went through, but the order was erroneously left
     # in 'cart'.
-    ('defunct-cart', 'defunct-cart'),
+    (u'defunct-cart', u'defunct-cart'),
 
     # The user's order went through, but the order was erroneously left
     # in 'paying'.
-    ('defunct-paying', 'defunct-paying'),
+    (u'defunct-paying', u'defunct-paying'),
 )
 
 # maps order statuses to their defunct states
 ORDER_STATUS_MAP = {
-    'cart': 'defunct-cart',
-    'paying': 'defunct-paying',
+    u'cart': u'defunct-cart',
+    u'paying': u'defunct-paying',
 }
 
 # we need a tuple to represent the primary key of various OrderItem subclasses
@@ -97,12 +97,12 @@ class OrderTypes(object):
     """
     This class specify purchase OrderTypes.
     """
-    PERSONAL = 'personal'
-    BUSINESS = 'business'
+    PERSONAL = u'personal'
+    BUSINESS = u'business'
 
     ORDER_TYPES = (
-        (PERSONAL, 'personal'),
-        (BUSINESS, 'business'),
+        (PERSONAL, u'personal'),
+        (BUSINESS, u'business'),
     )
 
 
@@ -120,8 +120,8 @@ class Order(models.Model):
         app_label = "shoppingcart"
 
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
-    currency = models.CharField(default="usd", max_length=8)  # lower case ISO currency codes
-    status = models.CharField(max_length=32, default='cart', choices=ORDER_STATUSES)
+    currency = models.CharField(default=u"usd", max_length=8)  # lower case ISO currency codes
+    status = models.CharField(max_length=32, default=u'cart', choices=ORDER_STATUSES)
     purchase_time = models.DateTimeField(null=True, blank=True)
     refunded_time = models.DateTimeField(null=True, blank=True)
     # Now we store data needed to generate a reasonable receipt
@@ -146,7 +146,7 @@ class Order(models.Model):
     recipient_name = models.CharField(max_length=255, null=True, blank=True)
     recipient_email = models.CharField(max_length=255, null=True, blank=True)
     customer_reference_number = models.CharField(max_length=63, null=True, blank=True)
-    order_type = models.CharField(max_length=32, default='personal', choices=OrderTypes.ORDER_TYPES)
+    order_type = models.CharField(max_length=32, default=u'personal', choices=OrderTypes.ORDER_TYPES)
 
     @classmethod
     def get_cart_for_user(cls, user):
@@ -617,17 +617,17 @@ class OrderItem(TimeStampedModel):
     # this is denormalized, but convenient for SQL queries for reports, etc. user should always be = order.user
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     # this is denormalized, but convenient for SQL queries for reports, etc. status should always be = order.status
-    status = models.CharField(max_length=32, default='cart', choices=ORDER_STATUSES, db_index=True)
+    status = models.CharField(max_length=32, default=u'cart', choices=ORDER_STATUSES, db_index=True)
     qty = models.IntegerField(default=1)
     unit_cost = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
     list_price = models.DecimalField(decimal_places=2, max_digits=30, null=True)
-    line_desc = models.CharField(default="Misc. Item", max_length=1024)
-    currency = models.CharField(default="usd", max_length=8)  # lower case ISO currency codes
+    line_desc = models.CharField(default=u"Misc. Item", max_length=1024)
+    currency = models.CharField(default=u"usd", max_length=8)  # lower case ISO currency codes
     fulfilled_time = models.DateTimeField(null=True, db_index=True)
     refund_requested_time = models.DateTimeField(null=True, db_index=True)
     service_fee = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
     # general purpose field, not user-visible.  Used for reporting
-    report_comments = models.TextField(default="")
+    report_comments = models.TextField(default=u"")
 
     @property
     def line_cost(self):
@@ -914,17 +914,17 @@ class Invoice(TimeStampedModel):
 
 INVOICE_TRANSACTION_STATUSES = (
     # A payment/refund is in process, but money has not yet been transferred
-    ('started', 'started'),
+    (u'started', u'started'),
 
     # A payment/refund has completed successfully
     # This should be set ONLY once money has been successfully exchanged.
-    ('completed', 'completed'),
+    (u'completed', u'completed'),
 
     # A payment/refund was promised, but was cancelled before
     # money had been transferred.  An example would be
     # cancelling a refund check before the recipient has
     # a chance to deposit it.
-    ('cancelled', 'cancelled')
+    (u'cancelled', u'cancelled')
 )
 
 
@@ -956,7 +956,7 @@ class InvoiceTransaction(TimeStampedModel):
         )
     )
     currency = models.CharField(
-        default="usd",
+        default=u"usd",
         max_length=8,
         help_text=ugettext_lazy("Lower-case ISO currency codes")
     )
@@ -967,7 +967,7 @@ class InvoiceTransaction(TimeStampedModel):
     )
     status = models.CharField(
         max_length=32,
-        default='started',
+        default=u'started',
         choices=INVOICE_TRANSACTION_STATUSES,
         help_text=ugettext_lazy(
             "The status of the payment or refund. "
@@ -1053,7 +1053,7 @@ class InvoiceItem(TimeStampedModel):
         help_text=ugettext_lazy("The price per item sold, including discounts.")
     )
     currency = models.CharField(
-        default="usd",
+        default=u"usd",
         max_length=8,
         help_text=ugettext_lazy("Lower-case ISO currency codes")
     )
@@ -2078,12 +2078,12 @@ class Donation(OrderItem):
 
     # Types of donations
     DONATION_TYPES = (
-        ("general", "A general donation"),
-        ("course", "A donation to a particular course")
+        (u"general", u"A general donation"),
+        (u"course", u"A donation to a particular course")
     )
 
     # The type of donation
-    donation_type = models.CharField(max_length=32, default="general", choices=DONATION_TYPES)
+    donation_type = models.CharField(max_length=32, default=u"general", choices=DONATION_TYPES)
 
     # If a donation is made for a specific course, then store the course ID here.
     # If the donation is made to the organization as a whole,
