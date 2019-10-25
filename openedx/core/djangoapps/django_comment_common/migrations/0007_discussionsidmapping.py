@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             name='DiscussionsIdMapping',
             fields=[
                 ('course_id', opaque_keys.edx.django.models.CourseKeyField(db_index=True, max_length=255, primary_key=True, serialize=False)),
-                ('mapping', jsonfield.fields.JSONField(help_text=b'Key/value store mapping discussion IDs to discussion XBlock usage keys.')),
+                ('mapping', jsonfield.fields.JSONField(help_text=u'Key/value store mapping discussion IDs to discussion XBlock usage keys.')),
             ],
             options={
                 'db_table': 'django_comment_common_discussionsidmapping',

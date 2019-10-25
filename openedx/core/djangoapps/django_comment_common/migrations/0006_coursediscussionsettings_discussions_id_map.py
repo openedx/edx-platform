@@ -16,6 +16,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='coursediscussionsettings',
             name='discussions_id_map',
-            field=jsonfield.fields.JSONField(blank=True, help_text=b'Key/value store mapping discussion IDs to discussion XBlock usage keys.', null=True),
+            field=jsonfield.fields.JSONField(blank=True, help_text=u'Key/value store mapping discussion IDs to discussion XBlock usage keys.', null=True),
         ),
     ]
