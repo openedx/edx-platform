@@ -262,17 +262,20 @@ def send_alquity_fake_confirmation_email(request):
 @csrf_exempt
 @require_POST
 def resend_activation_email(request):
-    data = json.loads(request.body)
-    user_id = data.get('user_id')
     try:
+        data = json.loads(request.body)
+        user_id = data.get('user_id')
         user = User.objects.get(id=user_id)
         activated = user.is_active
         if not activated:
             reactivation_email_for_user_custom(request, user)
-            return JsonResponse({'email': user.email}, status=status.HTTP_200_OK)
+            activation_response = JsonResponse(data={'email': user.email}, status=status.HTTP_200_OK)
         else:
             # the user's account has already been activated
-            return JsonResponse({}, status=status.HTTP_409_CONFLICT)
+            activation_response = JsonResponse(data = {}, status=status.HTTP_409_CONFLICT)
     except Exception as ex:
         logging.exception(ex)
-        return JsonResponse({}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        activation_response = JsonResponse(data = {}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    activation_response["Access-Control-Allow-Origin"] = settings.NODEBB_ENDPOINT
+    return activation_response
