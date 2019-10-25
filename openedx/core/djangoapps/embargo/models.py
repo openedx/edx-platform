@@ -88,7 +88,7 @@ class EmbargoedState(ConfigurationModel):
     # The countries to embargo
     embargoed_countries = models.TextField(
         blank=True,
-        help_text="A comma-separated list of country codes that fall under U.S. embargo restrictions"
+        help_text=u"A comma-separated list of country codes that fall under U.S. embargo restrictions"
     )
 
     @property
@@ -127,15 +127,15 @@ class RestrictedCourse(models.Model):
     COURSE_LIST_CACHE_KEY = 'embargo.restricted_courses'
     MESSAGE_URL_CACHE_KEY = 'embargo.message_url_path.{access_point}.{course_key}'
 
-    ENROLL_MSG_KEY_CHOICES = tuple([
+    ENROLL_MSG_KEY_CHOICES = tuple(sorted([
         (msg_key, msg.description)
         for msg_key, msg in six.iteritems(ENROLL_MESSAGES)
-    ])
+    ]))
 
-    COURSEWARE_MSG_KEY_CHOICES = tuple([
+    COURSEWARE_MSG_KEY_CHOICES = tuple(sorted([
         (msg_key, msg.description)
         for msg_key, msg in six.iteritems(COURSEWARE_MESSAGES)
-    ])
+    ]))
 
     course_key = CourseKeyField(
         max_length=255, db_index=True, unique=True,
@@ -145,14 +145,14 @@ class RestrictedCourse(models.Model):
     enroll_msg_key = models.CharField(
         max_length=255,
         choices=ENROLL_MSG_KEY_CHOICES,
-        default='default',
+        default=u'default',
         help_text=ugettext_lazy(u"The message to show when a user is blocked from enrollment.")
     )
 
     access_msg_key = models.CharField(
         max_length=255,
         choices=COURSEWARE_MSG_KEY_CHOICES,
-        default='default',
+        default=u'default',
         help_text=ugettext_lazy(u"The message to show when a user is blocked from accessing a course.")
     )
 
@@ -422,12 +422,12 @@ class CountryAccessRule(models.Model):
     .. no_pii:
     """
 
-    WHITELIST_RULE = 'whitelist'
-    BLACKLIST_RULE = 'blacklist'
+    WHITELIST_RULE = u'whitelist'
+    BLACKLIST_RULE = u'blacklist'
 
     RULE_TYPE_CHOICES = (
-        (WHITELIST_RULE, 'Whitelist (allow only these countries)'),
-        (BLACKLIST_RULE, 'Blacklist (block these countries)'),
+        (WHITELIST_RULE, u'Whitelist (allow only these countries)'),
+        (BLACKLIST_RULE, u'Blacklist (block these countries)'),
     )
 
     rule_type = models.CharField(
@@ -694,12 +694,12 @@ class IPFilter(ConfigurationModel):
     """
     whitelist = models.TextField(
         blank=True,
-        help_text="A comma-separated list of IP addresses that should not fall under embargo restrictions."
+        help_text=u"A comma-separated list of IP addresses that should not fall under embargo restrictions."
     )
 
     blacklist = models.TextField(
         blank=True,
-        help_text="A comma-separated list of IP addresses that should fall under embargo restrictions."
+        help_text=u"A comma-separated list of IP addresses that should fall under embargo restrictions."
     )
 
     class IPFilterList(object):

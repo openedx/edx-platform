@@ -30,7 +30,7 @@ class SiteConfiguration(models.Model):
     .. no_pii:
     """
     site = models.OneToOneField(Site, related_name='configuration', on_delete=models.CASCADE)
-    enabled = models.BooleanField(default=False, verbose_name="Enabled")
+    enabled = models.BooleanField(default=False, verbose_name=u"Enabled")
     values = JSONField(
         null=False,
         blank=True,
@@ -151,7 +151,7 @@ class SiteConfigurationHistory(TimeStampedModel):
     .. no_pii:
     """
     site = models.ForeignKey(Site, related_name='configuration_histories', on_delete=models.CASCADE)
-    enabled = models.BooleanField(default=False, verbose_name="Enabled")
+    enabled = models.BooleanField(default=False, verbose_name=u"Enabled")
     values = JSONField(
         null=False,
         blank=True,
