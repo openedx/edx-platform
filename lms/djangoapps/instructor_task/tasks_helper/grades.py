@@ -24,6 +24,7 @@ from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.instructor_analytics.basic import list_problem_responses
 from lms.djangoapps.instructor_analytics.csvs import format_dictlist
+from lms.djangoapps.instructor_task.config.waffle import problem_grade_report_verified_only
 from lms.djangoapps.certificates.models import CertificateWhitelist, GeneratedCertificate, certificate_info_for_user
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.grades.api import context as grades_context
@@ -525,7 +526,12 @@ class ProblemGradeReport(object):
         start_date = datetime.now(UTC)
         status_interval = 100
         task_id = _xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None
-        enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id, include_inactive=True)
+
+        enrolled_students = CourseEnrollment.objects.users_enrolled_in(
+            course_id,
+            include_inactive=True,
+            verified_only=problem_grade_report_verified_only(course_id),
+        )
         task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
 
         # This struct encapsulates both the display names of each static item in the
