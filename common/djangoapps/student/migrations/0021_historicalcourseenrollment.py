@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
                 ('id', models.IntegerField(auto_created=True, blank=True, db_index=True, verbose_name='ID')),
                 ('created', models.DateTimeField(blank=True, db_index=True, editable=False, null=True)),
                 ('is_active', models.BooleanField(default=True)),
-                ('mode', models.CharField(default=b'audit', max_length=100)),
+                ('mode', models.CharField(default=u'audit', max_length=100)),
                 ('history_id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
                 ('history_date', models.DateTimeField()),
                 ('history_change_reason', models.CharField(max_length=100, null=True)),

@@ -145,13 +145,13 @@ class CourseMode(models.Model):
 
     history = HistoricalRecords()
 
-    HONOR = 'honor'
-    PROFESSIONAL = 'professional'
-    VERIFIED = 'verified'
-    AUDIT = 'audit'
-    NO_ID_PROFESSIONAL_MODE = 'no-id-professional'
-    CREDIT_MODE = 'credit'
-    MASTERS = 'masters'
+    HONOR = u'honor'
+    PROFESSIONAL = u'professional'
+    VERIFIED = u'verified'
+    AUDIT = u'audit'
+    NO_ID_PROFESSIONAL_MODE = u'no-id-professional'
+    CREDIT_MODE = u'credit'
+    MASTERS = u'masters'
 
     DEFAULT_MODE = Mode(
         settings.COURSE_MODE_DEFAULTS['slug'],

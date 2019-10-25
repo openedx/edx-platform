@@ -792,13 +792,13 @@ WIKI_ENABLED = True
 
 COURSE_MODE_DEFAULTS = {
     'bulk_sku': None,
-    'currency': 'usd',
+    'currency': u'usd',
     'description': None,
     'expiration_datetime': None,
     'min_price': 0,
-    'name': _('Audit'),
+    'name': _(u'Audit'),
     'sku': None,
-    'slug': 'audit',
+    'slug': u'audit',
     'suggested_prices': '',
 }
 
