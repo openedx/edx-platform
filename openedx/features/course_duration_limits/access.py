@@ -54,6 +54,39 @@ class AuditExpiredError(AccessError):
                                                 additional_context_user_message)
 
 
+def get_user_course_duration(user, course):
+    """
+    Return a timedelta measuring the duration of the course for a particular user.
+
+    Business Logic:
+      - Course access duration is bounded by the min and max duration.
+      - If course fields are missing, default course access duration to MIN_DURATION.
+    """
+
+    access_duration = MIN_DURATION
+
+    verified_mode = CourseMode.verified_mode_for_course(course=course, include_expired=True)
+
+    if not verified_mode:
+        return None
+
+    enrollment = CourseEnrollment.get_enrollment(user, course.id)
+    if enrollment is None or enrollment.mode != CourseMode.AUDIT:
+        return None
+
+    # The user course expiration date is the content availability date
+    # plus the weeks_to_complete field from course-discovery.
+    discovery_course_details = get_course_run_details(course.id, ['weeks_to_complete'])
+    expected_weeks = discovery_course_details.get('weeks_to_complete')
+    if expected_weeks:
+        access_duration = timedelta(weeks=expected_weeks)
+
+    # Course access duration is bounded by the min and max duration.
+    access_duration = max(MIN_DURATION, min(MAX_DURATION, access_duration))
+
+    return access_duration
+
+
 def get_user_course_expiration_date(user, course):
     """
     Return expiration date for given user course pair.
@@ -63,11 +96,8 @@ def get_user_course_expiration_date(user, course):
       - Course access duration is bounded by the min and max duration.
       - If course fields are missing, default course access duration to MIN_DURATION.
     """
-    access_duration = MIN_DURATION
-
-    verified_mode = CourseMode.verified_mode_for_course(course=course, include_expired=True)
-
-    if not verified_mode:
+    access_duration = get_user_course_duration(user, course)
+    if access_duration is None:
         return None
 
     enrollment = CourseEnrollment.get_enrollment(user, course.id)
@@ -89,16 +119,6 @@ def get_user_course_expiration_date(user, course):
                 content_availability_date = enrollment.created
     except CourseEnrollment.schedule.RelatedObjectDoesNotExist:
         content_availability_date = max(enrollment.created, course.start)
-
-    # The user course expiration date is the content availability date
-    # plus the weeks_to_complete field from course-discovery.
-    discovery_course_details = get_course_run_details(course.id, ['weeks_to_complete'])
-    expected_weeks = discovery_course_details.get('weeks_to_complete')
-    if expected_weeks:
-        access_duration = timedelta(weeks=expected_weeks)
-
-    # Course access duration is bounded by the min and max duration.
-    access_duration = max(MIN_DURATION, min(MAX_DURATION, access_duration))
 
     return content_availability_date + access_duration
 
