@@ -258,7 +258,7 @@ pylint==1.7.6
 pymongo==2.9.1
 pynliner==0.8.0
 pyparsing==2.2.0
-pyquery==1.4.0
+pyquery==1.4.1
 pyrsistent==0.15.4        # via jsonschema
 pysqlite==2.8.3 ; python_version == "2.7"
 pysrt==1.1.1
