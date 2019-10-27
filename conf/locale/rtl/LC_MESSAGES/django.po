@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-10-23 12:23+0000\n"
-"PO-Revision-Date: 2019-10-23 12:23:39.672573\n"
+"POT-Creation-Date: 2019-10-27 20:51+0000\n"
+"PO-Revision-Date: 2019-10-27 20:51:14.639006\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -12208,17 +12208,6 @@ msgstr "عحيشفثس"
 msgid "Reviews"
 msgstr "قثدهثصس"
 
-#: openedx/features/course_experience/utils.py
-#, no-python-format, python-brace-format
-msgid ""
-"{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% "
-"[{strikeout_price}]{span_close}{br}Discount will be automatically applied at"
-" checkout. {a_open}Upgrade Now{a_close}{div_close}"
-msgstr ""
-"{banner_open} عحلقشيث زغ {discount_expiration_date} شري سشدث {percentage}% "
-"[{strikeout_price}]{span_close}{br}يهسذخعرف صهمم زث شعفخوشفهذشممغ شححمهثي شف"
-" ذاثذنخعف. {a_open}عحلقشيث رخص{a_close}{div_close}"
-
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
 msgid "{sign_in_link} or {register_link} and then enroll in this course."
@@ -12298,6 +12287,20 @@ msgstr ""
 "بخق ثطشوحمث, هب \"يهسشزمثي\" هس مثبف شس \"عرنرخصر\" هر فاث ذخعقسث ذخرفثطف, "
 "فاثر فاشف ذخعقسث صهمم زث يهسشزمثي خرمغ هب فاث خقل فاشف هف هس هر هس يهسشزمثي."
 
+#: openedx/features/discounts/admin.py
+msgid ""
+"These define the context to configure the percentage for the first purchase "
+"discount.If multiple contexts apply to a course (for example, if "
+"configuration is specified for the course specifically, and for the org that"
+" the course is in, then the more specific context overrides the more general"
+" context."
+msgstr ""
+"فاثسث يثبهرث فاث ذخرفثطف فخ ذخربهلعقث فاث حثقذثرفشلث بخق فاث بهقسف حعقذاشسث "
+"يهسذخعرف.هب وعمفهحمث ذخرفثطفس شححمغ فخ ش ذخعقسث (بخق ثطشوحمث, هب "
+"ذخربهلعقشفهخر هس سحثذهبهثي بخق فاث ذخعقسث سحثذهبهذشممغ, شري بخق فاث خقل فاشف"
+" فاث ذخعقسث هس هر, فاثر فاث وخقث سحثذهبهذ ذخرفثطف خدثققهيثس فاث وخقث لثرثقشم"
+" ذخرفثطف."
+
 #: openedx/features/discounts/models.py
 msgid "Disabled"
 msgstr "يهسشزمثي"
@@ -12310,6 +12313,17 @@ msgid ""
 msgstr ""
 "{s_sr}خقهلهرشم حقهذث: {s_op}{original_price}{e_p}, يهسذخعرف حقهذث: "
 "{e_sr}{formatted_discount_price}"
+
+#: openedx/features/discounts/utils.py
+#, no-python-format, python-brace-format
+msgid ""
+"{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% "
+"[{strikeout_price}]{span_close}{br}Discount will be automatically applied at"
+" checkout. {a_open}Upgrade Now{a_close}{div_close}"
+msgstr ""
+"{banner_open} عحلقشيث زغ {discount_expiration_date} شري سشدث {percentage}% "
+"[{strikeout_price}]{span_close}{br}يهسذخعرف صهمم زث شعفخوشفهذشممغ شححمهثي شف"
+" ذاثذنخعف. {a_open}عحلقشيث رخص{a_close}{div_close}"
 
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format

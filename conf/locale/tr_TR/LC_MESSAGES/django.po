@@ -73,7 +73,7 @@
 # mehmet gülöz <mehmetguloz47@gmail.com>, 2015
 # msare <mervesareakin@gmail.com>, 2014
 # Muhammad Adeel Khan <adeel@edx.org>, 2019
-# Murat Bişkin <murat@muratbiskin.com>, 2013
+# a56fc07028489bb2b53400de33ba6a83, 2013
 # Onur Bektas <mustafaonurbektas@gmail.com>, 2013
 # Onur Bektas <mustafaonurbektas@gmail.com>, 2013
 # Pelin Çılgın <pelincilgin@hotmail.com>, 2015
@@ -100,7 +100,7 @@
 # Kerim Kaan <ben@kerimkaan.com>, 2013
 # Kubilay <kubilayinceoren10@gmail.com>, 2015
 # Mehmet Kokoç <kokocmehmet@gmail.com>, 2017
-# Murat Bişkin <murat@muratbiskin.com>, 2013
+# a56fc07028489bb2b53400de33ba6a83, 2013
 # Onur Bektas <mustafaonurbektas@gmail.com>, 2013
 # ElektrikAkar <volkan.kumtepeli@gmail.com>, 2014
 # Yasar Celep <yasar.celep@hotmail.com>, 2017
@@ -114,7 +114,7 @@
 # Hakan Şenel <hgsenel@gmail.com>, 2014
 # Kubilay <kubilayinceoren10@gmail.com>, 2015
 # Mehmet Kokoç <kokocmehmet@gmail.com>, 2017
-# Murat Bişkin <murat@muratbiskin.com>, 2014
+# a56fc07028489bb2b53400de33ba6a83, 2014
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)
 # Copyright (C) 2019 edX
@@ -128,7 +128,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2019-10-20 20:42+0000\n"
+"POT-Creation-Date: 2019-10-27 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2019\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -12106,14 +12106,6 @@ msgstr "Güncellemeler"
 msgid "Reviews"
 msgstr "İncelemeler"
 
-#: openedx/features/course_experience/utils.py
-#, no-python-format, python-brace-format
-msgid ""
-"{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% "
-"[{strikeout_price}]{span_close}{br}Discount will be automatically applied at"
-" checkout. {a_open}Upgrade Now{a_close}{div_close}"
-msgstr ""
-
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
 msgid "{sign_in_link} or {register_link} and then enroll in this course."
@@ -12182,6 +12174,15 @@ msgid ""
 "then that course will be Disabled only if the org that it is in is Disabled."
 msgstr ""
 
+#: openedx/features/discounts/admin.py
+msgid ""
+"These define the context to configure the percentage for the first purchase "
+"discount.If multiple contexts apply to a course (for example, if "
+"configuration is specified for the course specifically, and for the org that"
+" the course is in, then the more specific context overrides the more general"
+" context."
+msgstr ""
+
 #: openedx/features/discounts/models.py
 msgid "Disabled"
 msgstr ""
@@ -12191,6 +12192,14 @@ msgstr ""
 msgid ""
 "{s_sr}Original price: {s_op}{original_price}{e_p}, discount price: "
 "{e_sr}{formatted_discount_price}"
+msgstr ""
+
+#: openedx/features/discounts/utils.py
+#, no-python-format, python-brace-format
+msgid ""
+"{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% "
+"[{strikeout_price}]{span_close}{br}Discount will be automatically applied at"
+" checkout. {a_open}Upgrade Now{a_close}{div_close}"
 msgstr ""
 
 #: openedx/features/enterprise_support/api.py
