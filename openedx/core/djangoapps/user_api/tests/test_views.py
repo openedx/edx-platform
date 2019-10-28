@@ -2,7 +2,6 @@
 
 from __future__ import absolute_import
 
-import datetime
 import json
 from unittest import skipUnless
 
@@ -37,7 +36,6 @@ from third_party_auth.tests.utils import (
     ThirdPartyOAuthTestMixinGoogle
 )
 from util.password_policy_validators import (
-    DEFAULT_MAX_PASSWORD_LENGTH,
     create_validator_config,
     password_validators_instruction_texts,
     password_validators_restrictions
@@ -564,155 +562,6 @@ class PreferenceUsersListViewTest(UserApiTestCase):
             self.assertUserIsValid(user)
         all_user_uris = [user["url"] for user in first_page_users + second_page_users]
         self.assertEqual(len(set(all_user_uris)), 2)
-
-
-@ddt.ddt
-@skip_unless_lms
-class LoginSessionViewTest(UserAPITestCase):
-    """Tests for the login end-points of the user API. """
-
-    USERNAME = "bob"
-    EMAIL = "bob@example.com"
-    PASSWORD = "password"
-
-    def setUp(self):
-        super(LoginSessionViewTest, self).setUp()
-        self.url = reverse("user_api_login_session")
-
-    @ddt.data("get", "post")
-    def test_auth_disabled(self, method):
-        self.assertAuthDisabled(method, self.url)
-
-    def test_allowed_methods(self):
-        self.assertAllowedMethods(self.url, ["GET", "POST", "HEAD", "OPTIONS"])
-
-    def test_put_not_allowed(self):
-        response = self.client.put(self.url)
-        self.assertHttpMethodNotAllowed(response)
-
-    def test_delete_not_allowed(self):
-        response = self.client.delete(self.url)
-        self.assertHttpMethodNotAllowed(response)
-
-    def test_patch_not_allowed(self):
-        response = self.client.patch(self.url)
-        self.assertHttpMethodNotAllowed(response)
-
-    def test_login_form(self):
-        # Retrieve the login form
-        response = self.client.get(self.url, content_type="application/json")
-        self.assertHttpOK(response)
-
-        # Verify that the form description matches what we expect
-        form_desc = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(form_desc["method"], "post")
-        self.assertEqual(form_desc["submit_url"], self.url)
-        self.assertEqual(form_desc["fields"], [
-            {
-                "name": "email",
-                "defaultValue": "",
-                "type": "email",
-                "required": True,
-                "label": "Email",
-                "placeholder": "username@domain.com",
-                "instructions": u"The email address you used to register with {platform_name}".format(
-                    platform_name=settings.PLATFORM_NAME
-                ),
-                "restrictions": {
-                    "min_length": EMAIL_MIN_LENGTH,
-                    "max_length": EMAIL_MAX_LENGTH
-                },
-                "errorMessages": {},
-                "supplementalText": "",
-                "supplementalLink": "",
-            },
-            {
-                "name": "password",
-                "defaultValue": "",
-                "type": "password",
-                "required": True,
-                "label": "Password",
-                "placeholder": "",
-                "instructions": "",
-                "restrictions": {
-                    "max_length": DEFAULT_MAX_PASSWORD_LENGTH,
-                },
-                "errorMessages": {},
-                "supplementalText": "",
-                "supplementalLink": "",
-            },
-        ])
-
-    def test_login(self):
-        # Create a test user
-        UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
-
-        # Login
-        response = self.client.post(self.url, {
-            "email": self.EMAIL,
-            "password": self.PASSWORD,
-        })
-        self.assertHttpOK(response)
-
-        # Verify that we logged in successfully by accessing
-        # a page that requires authentication.
-        response = self.client.get(reverse("dashboard"))
-        self.assertHttpOK(response)
-
-    def test_session_cookie_expiry(self):
-        # Create a test user
-        UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
-
-        # Login and remember me
-        data = {
-            "email": self.EMAIL,
-            "password": self.PASSWORD,
-        }
-
-        response = self.client.post(self.url, data)
-        self.assertHttpOK(response)
-
-        # Verify that the session expiration was set correctly
-        cookie = self.client.cookies[settings.SESSION_COOKIE_NAME]
-        expected_expiry = datetime.datetime.utcnow() + datetime.timedelta(weeks=4)
-        self.assertIn(expected_expiry.strftime('%d-%b-%Y'), cookie.get('expires'))
-
-    def test_invalid_credentials(self):
-        # Create a test user
-        UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
-
-        # Invalid password
-        response = self.client.post(self.url, {
-            "email": self.EMAIL,
-            "password": "invalid"
-        })
-        self.assertHttpForbidden(response)
-
-        # Invalid email address
-        response = self.client.post(self.url, {
-            "email": "invalid@example.com",
-            "password": self.PASSWORD,
-        })
-        self.assertHttpForbidden(response)
-
-    def test_missing_login_params(self):
-        # Create a test user
-        UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
-
-        # Missing password
-        response = self.client.post(self.url, {
-            "email": self.EMAIL,
-        })
-        self.assertHttpBadRequest(response)
-
-        # Missing email
-        response = self.client.post(self.url, {
-            "password": self.PASSWORD,
-        })
-        self.assertHttpBadRequest(response)
-
-        # Missing both email and password
-        response = self.client.post(self.url, {})
 
 
 @ddt.ddt
