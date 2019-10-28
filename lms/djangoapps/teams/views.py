@@ -1137,7 +1137,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if teams_api.is_instructor_managed_team(team) and not is_staff(request.user, team.course_id, access_username=username)):
+        if teams_api.is_instructor_managed_team(team) and not is_staff(request.user, team.course_id, access_username=username):
             return Response(
                 build_api_error(ugettext_noop("You can't join an instructor managed team.")),
                 status=status.HTTP_400_BAD_REQUEST
@@ -1277,6 +1277,11 @@ class MembershipDetailView(ExpandableFieldViewMixin, GenericAPIView):
     def delete(self, request, team_id, username):
         """DELETE /api/team/v0/team_membership/{team_id},{username}"""
         team = self.get_team(team_id)
+        if teams_api.is_instructor_managed_team(team) and not is_staff(request.user, team.course_id, access_username=username):
+            return Response(
+                build_api_error(ugettext_noop("You can't leave an instructor managed team.")),
+                status=status.HTTP_400_BAD_REQUEST
+            )
         if has_team_api_access(request.user, team.course_id, access_username=username):
             membership = self.get_membership(username, team)
             removal_method = 'self_removal'
