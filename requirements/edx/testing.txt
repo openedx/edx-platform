@@ -55,7 +55,7 @@ click-log==0.3.2          # via edx-lint
 click==7.0
 code-annotations==0.3.2
 colorama==0.4.1           # via radon
-configparser==4.0.2       # via entrypoints, flake8, importlib-metadata, pylint
+configparser==4.0.2
 contextlib2==0.6.0.post1
 cookies==2.2.1            # via moto
 coreapi==2.3.3
@@ -67,7 +67,7 @@ cryptography==2.8
 cssselect==1.1.0
 cssutils==1.0.2
 ddt==1.2.1
-decorator==4.4.0
+decorator==4.4.1
 defusedxml==0.5.0
 diff-cover==0.9.8
 distlib==0.2.9.post0      # via caniusepython3
@@ -168,8 +168,8 @@ html5lib==1.0.1
 httplib2==0.14.0
 httpretty==0.9.7
 idna==2.8
-importlib-metadata==0.23  # via pluggy, tox
-inflect==2.1.0
+importlib-metadata==0.23
+inflect==3.0.1
 inflection==0.3.1
 ipaddress==1.0.23
 isodate==0.6.0
@@ -183,7 +183,7 @@ jsonfield==2.0.2
 jsonpickle==1.2           # via aws-xray-sdk
 kombu==3.0.37
 laboratory==1.0.2
-lazy-object-proxy==1.4.2  # via astroid
+lazy-object-proxy==1.4.3  # via astroid
 lazy==1.1
 lepl==5.1.3
 libsass==0.10.0
@@ -201,7 +201,7 @@ mccabe==0.6.1             # via flake8, pylint
 mock==3.0.5
 git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a#egg=MongoDBProxy==0.1.0+edx.2
 mongoengine==0.10.0
-more-itertools==5.0.0     # via pytest, zipp
+more-itertools==5.0.0
 moto==1.3.1
 mpmath==1.1.0
 mysqlclient==1.4.4
@@ -215,7 +215,7 @@ oauthlib==2.1.0
 git+https://github.com/edx/edx-ora2.git@2.3.2#egg=ora2==2.3.2
 packaging==19.2           # via caniusepython3, tox
 path.py==8.2.1
-pathlib2==2.3.5           # via importlib-metadata, pytest, pytest-django
+pathlib2==2.3.5
 pathtools==0.1.2
 paver==1.3.4
 pbr==5.4.3
@@ -247,7 +247,7 @@ pylint==1.7.6             # via edx-lint, pylint-celery, pylint-django
 pymongo==2.9.1
 pynliner==0.8.0
 pyparsing==2.2.0
-pyquery==1.4.0
+pyquery==1.4.1
 pysqlite==2.8.3 ; python_version == "2.7"
 pysrt==1.1.1
 pytest-attrib==0.1.3
@@ -282,7 +282,7 @@ ruamel.yaml==0.16.5
 rules==2.1
 s3transfer==0.1.13
 sailthru-client==2.2.3
-scandir==1.10.0           # via pathlib2
+scandir==1.10.0
 scipy==1.2.1
 selenium==3.141.0
 semantic-version==2.8.2
@@ -332,7 +332,7 @@ xblock==1.2.8
 xmlsec==1.3.3
 xmltodict==0.12.0         # via moto
 xss-utils==0.1.1
-zipp==0.6.0               # via importlib-metadata
+zipp==0.6.0
 
 # The following packages are considered to be unsafe in a requirements file:
-# setuptools==41.4.0        # via caniusepython3, fs, lazy, pytest, python-levenshtein
+# setuptools==41.5.0        # via caniusepython3, fs, lazy, pytest, python-levenshtein

@@ -4,11 +4,18 @@
 #
 #    make upgrade
 #
+configparser==4.0.2       # via importlib-metadata
+contextlib2==0.6.0.post1  # via importlib-metadata
 coverage==5.0a6
 diff-cover==0.9.8
-inflect==2.1.0            # via jinja2-pluralize
+importlib-metadata==0.23  # via inflect
+inflect==3.0.1            # via jinja2-pluralize
 jinja2-pluralize==0.3.0   # via diff-cover
 jinja2==2.10.3            # via diff-cover, jinja2-pluralize
 markupsafe==1.1.1         # via jinja2
+more-itertools==5.0.0     # via zipp
+pathlib2==2.3.5           # via importlib-metadata
 pygments==2.4.2           # via diff-cover
-six==1.12.0               # via diff-cover
+scandir==1.10.0           # via pathlib2
+six==1.12.0               # via diff-cover, more-itertools, pathlib2
+zipp==0.6.0               # via importlib-metadata
