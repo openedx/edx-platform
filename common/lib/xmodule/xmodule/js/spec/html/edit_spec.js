@@ -40,6 +40,14 @@ describe('HTMLEditingDescriptor', function() {
       expect(visualEditorStub.getContent()).toEqual('text /c4x/foo/bar/asset/image.jpg');
     });
     it('Enables spellcheck', () => expect($('.html-editor iframe')[0].contentDocument.body.spellcheck).toBe(true));
+    it('Retains ascii characters', function() {
+      const editorData = '<a href="/static/Programación_Gas.pptx">fóó</a>';
+      const expectedData = '<p><a href="/static/Programación_Gas.pptx">fóó</a></p>'
+
+      this.descriptor.getVisualEditor().setContent(editorData)
+      const savedContent = this.descriptor.getVisualEditor().getContent()
+      expect(savedContent).toEqual(expectedData);
+    });
   });
   describe('Raw HTML Editor', function() {
     beforeEach(function() {
