@@ -1,10 +1,12 @@
+import pdfkit
+
 from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
-from constants import TWITTER_META_TITLE_FMT, COURSE_URL_FMT
+from constants import COURSE_URL_FMT, PDF_RESPONSE_HEADER, PDFKIT_IMAGE_PATH, TWITTER_META_TITLE_FMT
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.philu_api.helpers import get_course_custom_settings
@@ -15,7 +17,14 @@ from lms.djangoapps.certificates.models import (
     GeneratedCertificate,
     CertificateStatuses)
 
-from helpers import get_certificate_image_url, get_philu_certificate_social_context
+from helpers import (
+    get_certificate_image_url,
+    get_certificate_image_url_by_uuid,
+    get_image_and_size_from_url,
+    get_pdfkit_html,
+    get_pdfkit_options,
+    get_philu_certificate_social_context
+)
 
 
 @login_required
@@ -156,3 +165,27 @@ def shared_student_achievements(request, certificate_uuid):
 
     response = render_to_response('shared_certificate.html', context)
     return response
+
+
+@login_required
+@ensure_csrf_cookie
+def download_certificate_pdf(request, certificate_uuid):
+    """
+    Convert user certificate image on S3 bucket to PDF file and download it for end user
+    :param request: HttpRequest obj
+    :param certificate_uuid: certificate unique id
+    :return: downloadable PDF file
+    """
+
+    certificate_image_url = get_certificate_image_url_by_uuid(certificate_uuid)
+    image_base64, image_width, image_height = get_image_and_size_from_url(certificate_image_url)
+
+    certificate_image_html = get_pdfkit_html(image_base64)
+    pdfkit_options = get_pdfkit_options(image_width, image_height)
+
+    pdf_document_object = pdfkit.from_string(certificate_image_html, PDFKIT_IMAGE_PATH, pdfkit_options)
+
+    response_pdf_certificate = HttpResponse(pdf_document_object, content_type='application/pdf')
+    response_pdf_certificate['Content-Disposition'] = PDF_RESPONSE_HEADER.format(certificate_pdf_name='certificate')
+
+    return response_pdf_certificate
