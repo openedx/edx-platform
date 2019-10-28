@@ -11,18 +11,24 @@ from __future__ import absolute_import
 from django.conf import settings
 from django.conf.urls import url
 
-from .views.register import RegistrationView
-from .views import auto_auth, login, logout
+from .views import auto_auth, login, logout, register
 
 
 urlpatterns = [
-    url(r'^create_account$', RegistrationView.as_view(), name='create_account'),
+    # Registration
+    url(r'^create_account$', register.RegistrationView.as_view(), name='create_account'),
+    url(r'^user_api/v1/account/registration/$', register.RegistrationView.as_view(),
+        name="user_api_registration"),
+
+    # Login
     url(r'^login_post$', login.login_user, name='login_post'),
     url(r'^login_ajax$', login.login_user, name="login"),
     url(r'^login_ajax/(?P<error>[^/]*)$', login.login_user),
+    url(r'^user_api/v1/account/login_session/$', login.LoginSessionView.as_view(),
+        name="user_api_login_session"),
+
+    # Login Refresh of JWT Cookies
     url(r'^login_refresh$', login.login_refresh, name="login_refresh"),
-    url(r'^user_api/v1/account/registration/$', RegistrationView.as_view(),
-        name="user_api_registration"),
 
     url(r'^logout$', logout.LogoutView.as_view(), name='logout'),
 ]
