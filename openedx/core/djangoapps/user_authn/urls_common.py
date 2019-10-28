@@ -11,7 +11,7 @@ from __future__ import absolute_import
 from django.conf import settings
 from django.conf.urls import url
 
-from openedx.core.djangoapps.user_api.views import RegistrationView
+from .views.register import RegistrationView
 from .views import auto_auth, login, logout
 
 
@@ -21,6 +21,8 @@ urlpatterns = [
     url(r'^login_ajax$', login.login_user, name="login"),
     url(r'^login_ajax/(?P<error>[^/]*)$', login.login_user),
     url(r'^login_refresh$', login.login_refresh, name="login_refresh"),
+    url(r'^user_api/v1/account/registration/$', RegistrationView.as_view(),
+        name="user_api_registration"),
 
     url(r'^logout$', logout.LogoutView.as_view(), name='logout'),
 ]
