@@ -16,6 +16,7 @@ from course_modes.models import CourseMode
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, is_commerce_service_configured
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
+from openedx.features.ucsd_features.utils import send_notification_email_to_support
 from student.models import CourseEnrollment
 from .models import CommerceConfiguration
 
@@ -358,11 +359,21 @@ def _generate_refund_notification_body(student, refund_ids):
 
 def create_zendesk_ticket(requester_name, requester_email, subject, body, tags=None):
     """
-    Create a Zendesk ticket via API.
+    Send email to support team or create a Zendesk ticket via API.
+    Use ENABLE_EMAIL_INSTEAD_ZENDESK flag to switch between zendesk ticket or support email
 
-    Returns:
-        bool: False if we are unable to create the ticket for any reason
+    Returns: a boolean value indicating if either email has been sent successfully or
+             ticket has been created.
     """
+    if settings.FEATURES.get("ENABLE_EMAIL_INSTEAD_ZENDESK", True):
+        is_email_sent = send_notification_email_to_support(
+            subject=subject,
+            body=body,
+            name=requester_name,
+            email=requester_email,
+        )
+        return is_email_sent
+
     if not (settings.ZENDESK_URL and settings.ZENDESK_USER and settings.ZENDESK_API_KEY):
         log.error('Zendesk is not configured. Cannot create a ticket.')
         return False

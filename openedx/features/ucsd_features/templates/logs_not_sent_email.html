@@ -1,0 +1,10 @@
+{% extends 'base_email.html' %}
+{% block body %}
+    <p>{{ body }}</p>
+    <br>
+
+    {% for info_dict in additional_info.items %}
+        <p><b>{{info_dict.0}}</b>: {{info_dict.1}}</p>
+        <br>
+    {% endfor %}
+{% endblock body %}

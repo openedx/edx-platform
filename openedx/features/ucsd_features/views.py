@@ -1,18 +1,10 @@
 import json
-
-from django.core.mail import send_mail
 from django.conf import settings
-from django.views.decorators.http import require_http_methods
-from django.http import HttpResponse
 from rest_framework import status
-
-email_template = '''
-    Course : {course}
-    Name: {name}
-    Email : {email}
-
-    {body}
-    '''
+from django.http import HttpResponse
+from django.core.mail import send_mail
+from django.views.decorators.http import require_http_methods
+from openedx.features.ucsd_features.utils import send_notification_email_to_support
 
 
 @require_http_methods(["POST"])
@@ -21,21 +13,15 @@ def email_support(request):
     A View that will send user support (contact-form) emails to a specific
     account.
     """
-
     body = json.loads(request.body)
-    subject = body['subject']
 
-    data = {
-        'name': body['requester']['name'],
-        'email': body['requester']['email'],
-        'body': body['comment']['body'],
-        'course': body['custom_fields'][0]['value']
-    }
-
-    content = email_template.format(**data)
-    response = send_mail(subject, content, settings.DEFAULT_FROM_EMAIL,
-                         settings.SUPPORT_DESK_EMAILS, fail_silently=False)
-
+    response = send_notification_email_to_support(
+        subject=body['subject'],
+        body=body['comment']['body'],
+        name=body['requester']['name'],
+        email=body['requester']['email'],
+        course=body['custom_fields'][0]['value']
+    )
     if response:
         return HttpResponse(status=status.HTTP_201_CREATED)
     else:
