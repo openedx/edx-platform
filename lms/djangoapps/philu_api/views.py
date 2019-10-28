@@ -277,5 +277,4 @@ def resend_activation_email(request):
         logging.exception(ex)
         activation_response = JsonResponse(data = {}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    activation_response["Access-Control-Allow-Origin"] = settings.NODEBB_ENDPOINT
     return activation_response
