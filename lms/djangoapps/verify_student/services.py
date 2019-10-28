@@ -171,6 +171,7 @@ class IDVerificationService(object):
             'status': 'none',
             'error': '',
             'should_display': True,
+            'verification_expiry': '',
         }
 
         # We need to check the user's most recent attempt.
@@ -212,6 +213,8 @@ class IDVerificationService(object):
 
         elif attempt.status == 'approved':
             user_status['status'] = 'approved'
+            if getattr(attempt, 'expiry_date', None):
+                user_status['verification_expiry'] = attempt.expiry_date.date().strftime("%m/%d/%Y")
 
         elif attempt.status in ['submitted', 'approved', 'must_retry']:
             # user_has_valid_or_pending does include 'approved', but if we are

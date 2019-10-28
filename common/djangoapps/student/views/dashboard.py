@@ -857,6 +857,7 @@ def student_dashboard(request):
         'reverifications': reverifications,
         'verification_display': verification_status['should_display'],
         'verification_status': verification_status['status'],
+        'verification_expiry': verification_status['verification_expiry'],
         'verification_status_by_course': verify_status_by_course,
         'verification_errors': verification_errors,
         'block_courses': block_courses,
