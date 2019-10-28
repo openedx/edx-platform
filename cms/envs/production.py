@@ -605,6 +605,19 @@ RETIREMENT_STATES = ENV_TOKENS.get('RETIREMENT_STATES', RETIREMENT_STATES)
 ############## Settings for Course Enrollment Modes ######################
 COURSE_ENROLLMENT_MODES = ENV_TOKENS.get('COURSE_ENROLLMENT_MODES', COURSE_ENROLLMENT_MODES)
 
+############### Settings for UCSD Support #####################
+SUPPORT_DESK_EMAILS = ENV_TOKENS.get('SUPPORT_DESK_EMAILS')
+
+############### Settings for Edx Caliper Tracking #####################
+if FEATURES.get('ENABLE_EVENT_CALIPERIZATION'):
+    INSTALLED_APPS.insert(
+        INSTALLED_APPS.index('eventtracking.django.apps.EventTrackingConfig'),
+        'openedx_caliper_tracking'
+    )
+CALIPER_DELIVERY_ENDPOINT = ENV_TOKENS.get('CALIPER_DELIVERY_ENDPOINT')
+CALIPER_DELIVERY_AUTH_TOKEN = AUTH_TOKENS.get('CALIPER_DELIVERY_AUTH_TOKEN')
+CALIPER_KAFKA_SETTINGS = ENV_TOKENS.get('CALIPER_KAFKA_SETTINGS')
+
 ####################### Plugin Settings ##########################
 
 # This is at the bottom because it is going to load more settings after base settings are loaded
