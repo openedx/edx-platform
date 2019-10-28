@@ -73,6 +73,10 @@ class Command(BaseCommand):
         for i in xrange(0, len(ids), chunk_size):
             yield ids[i:i + chunk_size]
 
+    def replace_values(self, values, original, replacement):
+        values = [[replacement if v == original else v for v in value] for value in values]
+        return values
+
     def handle(self, *args, **options):
         batch_size = options['size']
         sleep_between = options['sleep_between']
@@ -135,6 +139,13 @@ class Command(BaseCommand):
                         raise Exception(u"Database count: %s does not match input count: %s" % (count, len(ids)))
 
                     values = [[row[column.upper()] for column in columns] for row in rows]
+
+                    # Replace 'NULL' with None
+                    values = self.replace_values(values, 'NULL', None)
+                    # Replace 'true' with True
+                    values = self.replace_values(values, 'true', True)
+                    # Replace 'false' with False
+                    values = self.replace_values(values, 'false', False)
                     # Add history columns data
                     for value in values:
                         value.extend([history_date, self.HISTORY_CHANGE_REASON, '+', self.HISTORY_USER_ID])
