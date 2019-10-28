@@ -80,7 +80,7 @@ class Migration(migrations.Migration):
             options={
                 'get_latest_by': 'created',
             },
-        ), 
+        ),
         migrations.CreateModel(
             name='CreditRequirement',
             fields=[
