@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='studentmodule',
             name='done',
-            field=models.CharField(choices=[(b'na', b'NOT_APPLICABLE'), (b'f', b'FINISHED'), (b'i', b'INCOMPLETE')], default=b'na', max_length=8),
+            field=models.CharField(choices=[(u'na', u'NOT_APPLICABLE'), (u'f', u'FINISHED'), (u'i', u'INCOMPLETE')], default=u'na', max_length=8),
         ),
     ]
