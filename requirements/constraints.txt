@@ -82,3 +82,6 @@ jsondiff==1.1.1
 # we had a lot of memory issues and gunicorn workers started running
 # out of memory.  ARCH-1210
 edx-drf-extensions==2.4.0
+
+# Constraining this since the newer versions require Python 3
+more-itertools==5.0.0
