@@ -33,9 +33,6 @@ def listen_for_social_auth_creation(sender, instance, created, **kwargs):  # pyl
     """
     Post-save signal that will attempt to link a social auth entry with waiting enrollments
     """
-    if not created:
-        return
-
     try:
         matriculate_learner(instance.user, instance.uid)
     except Exception as e:
