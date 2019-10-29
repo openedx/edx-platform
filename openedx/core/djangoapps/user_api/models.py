@@ -45,7 +45,7 @@ class UserPreference(models.Model):
 
     .. no_pii: Stores arbitrary key/value pairs, currently none are PII. If that changes, update this annotation.
     """
-    KEY_REGEX = r"[-_a-zA-Z0-9]+"
+    KEY_REGEX = u"[-_a-zA-Z0-9]+"
     user = models.ForeignKey(User, db_index=True, related_name="preferences", on_delete=models.CASCADE)
     key = models.CharField(max_length=255, db_index=True, validators=[RegexValidator(KEY_REGEX)])
     value = models.TextField()

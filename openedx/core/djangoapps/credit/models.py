@@ -30,7 +30,7 @@ from opaque_keys.edx.django.models import CourseKeyField
 
 from openedx.core.lib.cache_utils import request_cached
 
-CREDIT_PROVIDER_ID_REGEX = r"[a-z,A-Z,0-9,\-]+"
+CREDIT_PROVIDER_ID_REGEX = u"[a-z,A-Z,0-9,\\-]+"
 log = logging.getLogger(__name__)
 
 
@@ -52,8 +52,8 @@ class CreditProvider(TimeStampedModel):
         validators=[
             RegexValidator(
                 regex=CREDIT_PROVIDER_ID_REGEX,
-                message="Only alphanumeric characters and hyphens (-) are allowed",
-                code="invalid_provider_id",
+                message=u"Only alphanumeric characters and hyphens (-) are allowed",
+                code=u"invalid_provider_id",
             )
         ],
         help_text=ugettext_lazy(
@@ -84,7 +84,7 @@ class CreditProvider(TimeStampedModel):
     )
 
     provider_url = models.URLField(
-        default="",
+        default=u"",
         help_text=ugettext_lazy(
             "URL of the credit provider.  If automatic integration is "
             "enabled, this will the the end-point that we POST to "
@@ -95,7 +95,7 @@ class CreditProvider(TimeStampedModel):
     )
 
     provider_status_url = models.URLField(
-        default="",
+        default=u"",
         help_text=ugettext_lazy(
             "URL from the credit provider where the user can check the status "
             "of his or her request for credit.  This is displayed to students "
@@ -104,7 +104,7 @@ class CreditProvider(TimeStampedModel):
     )
 
     provider_description = models.TextField(
-        default="",
+        default=u"",
         help_text=ugettext_lazy(
             "Description for the credit provider displayed to users."
         )
@@ -121,7 +121,7 @@ class CreditProvider(TimeStampedModel):
     )
 
     eligibility_email_message = models.TextField(
-        default="",
+        default=u"",
         help_text=ugettext_lazy(
             "Plain text or html content for displaying custom message inside "
             "credit eligibility email content which is sent when user has met "
@@ -130,7 +130,7 @@ class CreditProvider(TimeStampedModel):
     )
 
     receipt_email_message = models.TextField(
-        default="",
+        default=u"",
         help_text=ugettext_lazy(
             "Plain text or html content for displaying custom message inside "
             "credit receipt email content which is sent *after* paying to get "
@@ -139,7 +139,7 @@ class CreditProvider(TimeStampedModel):
     )
 
     thumbnail_url = models.URLField(
-        default="",
+        default=u"",
         max_length=255,
         help_text=ugettext_lazy(
             "Thumbnail image url of the credit provider."
@@ -300,7 +300,7 @@ class CreditRequirement(TimeStampedModel):
     course = models.ForeignKey(CreditCourse, related_name="credit_requirements", on_delete=models.CASCADE)
     namespace = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
-    display_name = models.CharField(max_length=255, default="")
+    display_name = models.CharField(max_length=255, default=u"")
     order = models.PositiveIntegerField(default=0)
     criteria = JSONField()
     active = models.BooleanField(default=True)
@@ -677,14 +677,14 @@ class CreditRequest(TimeStampedModel):
     provider = models.ForeignKey(CreditProvider, related_name="credit_requests", on_delete=models.CASCADE)
     parameters = JSONField()
 
-    REQUEST_STATUS_PENDING = "pending"
-    REQUEST_STATUS_APPROVED = "approved"
-    REQUEST_STATUS_REJECTED = "rejected"
+    REQUEST_STATUS_PENDING = u"pending"
+    REQUEST_STATUS_APPROVED = u"approved"
+    REQUEST_STATUS_REJECTED = u"rejected"
 
     REQUEST_STATUS_CHOICES = (
-        (REQUEST_STATUS_PENDING, "Pending"),
-        (REQUEST_STATUS_APPROVED, "Approved"),
-        (REQUEST_STATUS_REJECTED, "Rejected"),
+        (REQUEST_STATUS_PENDING, u"Pending"),
+        (REQUEST_STATUS_APPROVED, u"Approved"),
+        (REQUEST_STATUS_REJECTED, u"Rejected"),
     )
     status = models.CharField(
         max_length=255,
