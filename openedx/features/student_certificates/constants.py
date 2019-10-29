@@ -1,3 +1,5 @@
+from string import ascii_uppercase
+
 TWITTER_TWEET_TEXT_FMT = 'I just completed @PhilanthropyUni\'s free online {course_name} ' \
                          'course and earned this certificate. Start learning today: ' \
                          '{base_url}/{course_url}/{course_id}/{about_url}'
@@ -22,4 +24,9 @@ PDFKIT_OPTIONS = {
     'no-outline': None,
     'print-media-type': None
 }
-TMPDIR="/tmp" # path of directory to store files (certificate images) temporarily
+# path of directory to store files (certificate images) temporarily
+TMPDIR="/tmp"
+
+CERTIFICATE_VERIFICATION_KEY_LENGTH = 10
+CERTIFICATE_VERIFICATION_SALT_CHARACTERS = [c for c in ascii_uppercase[16:]]
+HEX_ROT_10_MAP = {format(i, 'x').upper(): c for i, c in enumerate(ascii_uppercase[:16])}

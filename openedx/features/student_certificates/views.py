@@ -5,6 +5,8 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from constants import COURSE_URL_FMT, PDF_RESPONSE_HEADER, PDFKIT_IMAGE_PATH, TWITTER_META_TITLE_FMT
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -25,6 +27,7 @@ from helpers import (
     get_pdfkit_options,
     get_philu_certificate_social_context
 )
+from models import CertificateVerificationKey
 
 
 @login_required
@@ -189,3 +192,9 @@ def download_certificate_pdf(request, certificate_uuid):
     response_pdf_certificate['Content-Disposition'] = PDF_RESPONSE_HEADER.format(certificate_pdf_name='certificate')
 
     return response_pdf_certificate
+
+
+def verify_certificate(request, key):
+    certificate_verification_key_obj = get_object_or_404(CertificateVerificationKey, verification_key=key)
+    certificate_uuid = certificate_verification_key_obj.generated_certificate.verify_uuid
+    return redirect(reverse('shared_achievements', kwargs={'certificate_uuid': certificate_uuid}))
