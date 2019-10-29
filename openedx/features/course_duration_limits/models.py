@@ -128,7 +128,7 @@ class CourseDurationLimitConfig(StackedConfigurationModel):
         student_masquerade = is_masquerading_as_specific_student(user, course_key)
 
         # check if user is in holdback
-        if (no_masquerade or student_masquerade) and is_in_holdback(user):
+        if (no_masquerade or student_masquerade) and is_in_holdback(user, enrollment):
             return False
 
         not_student_masquerade = is_masquerading and not student_masquerade

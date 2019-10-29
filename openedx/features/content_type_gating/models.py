@@ -134,7 +134,7 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
             return False
 
         # check if user is in holdback
-        if user_variable_represents_correct_user and is_in_holdback(user):
+        if user_variable_represents_correct_user and is_in_holdback(user, enrollment):
             return False
 
         if not correct_modes_for_fbe(course_key, enrollment, user):
