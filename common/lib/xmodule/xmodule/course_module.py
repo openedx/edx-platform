@@ -22,6 +22,7 @@ from xblock.fields import Boolean, Dict, Float, Integer, List, Scope, String
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.video_pipeline.models import VideoUploadsEnabledByDefault
 from openedx.core.lib.license import LicenseMixin
+from openedx.core.lib.teams_config import TeamsConfig
 from xmodule import course_metadata_utils
 from xmodule.course_metadata_utils import DEFAULT_GRADING_POLICY, DEFAULT_START_DATE
 from xmodule.graders import grader_from_conf
@@ -1471,11 +1472,40 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         return course_metadata_utils.clean_course_key(self.location.course_key, padding_char)
 
     @property
+    def teams_conf(self):
+        """
+        Returns a TeamsConfig object wrapping the dict `teams_configuration`.
+
+        TODO: In MST-18, `teams_configuration` will be a custom field that
+        parses its input into a TeamsConfig object.
+        All references to this property will become references to
+        `.teams_configuration`.
+        """
+        # If the `teams_configuration` dict hasn't changed, return a cached
+        # `TeamsConfig` to avoid re-parsing things.
+        # If it has changed, recompute the `TeamsConfig`.
+        try:
+            cached_teams_conf, cached_teams_conf_source = (
+                self._teams_conf, self._teams_conf_source
+            )
+        except AttributeError:
+            pass
+        else:
+            if cached_teams_conf_source == self.teams_configuration:
+                return cached_teams_conf
+        self._teams_conf_source = self.teams_configuration
+        self._teams_conf = TeamsConfig(self._teams_conf_source)
+        return self._teams_conf
+
+    @property
     def teams_enabled(self):
         """
         Returns whether or not teams has been enabled for this course.
 
         Currently, teams are considered enabled when at least one topic has been configured for the course.
+
+        Deprecated; please use `self.teams_conf.is_enabled` instead.
+        Will be removed (TODO MST-18).
         """
         if self.teams_configuration:
             return len(self.teams_configuration.get('topics', [])) > 0
@@ -1485,6 +1515,9 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
     def teams_max_size(self):
         """
         Returns the max size for teams if teams has been configured, else None.
+
+        Deprecated; please use `self.teams_conf.calc_max_team_size(...)` instead.
+        Will be removed (TODO MST-18).
         """
         return self.teams_configuration.get('max_team_size', None)
 
@@ -1492,6 +1525,9 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
     def teams_topics(self):
         """
         Returns the topics that have been configured for teams for this course, else None.
+
+        Deprecated; please use `self.teams_conf.teamsets` instead.
+        Will be removed (TODO MST-18).
         """
         return self.teams_configuration.get('topics', None)
 
