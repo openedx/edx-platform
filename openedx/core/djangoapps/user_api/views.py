@@ -98,11 +98,17 @@ class LoginSessionView(APIView):
 
 
 class RegistrationView(APIView):
+    # pylint: disable=missing-docstring
     """HTTP end-points for creating a new user. """
 
     # This end-point is available to anonymous users,
     # so do not require authentication.
     authentication_classes = []
+
+    @method_decorator(transaction.non_atomic_requests)
+    @method_decorator(sensitive_post_parameters("password"))
+    def dispatch(self, request, *args, **kwargs):
+        return super(RegistrationView, self).dispatch(request, *args, **kwargs)
 
     @method_decorator(ensure_csrf_cookie)
     def get(self, request):
@@ -129,11 +135,25 @@ class RegistrationView(APIView):
             HttpResponse: 403 operation not allowed
         """
         data = request.POST.copy()
+        self._handle_terms_of_service(data)
 
+        response = self._handle_duplicate_email_username(data)
+        if response:
+            return response
+
+        response, user = self._create_account(request, data)
+        if response:
+            return response
+
+        response = self._create_response({}, status_code=200)
+        set_logged_in_cookies(request, response, user)
+        return response
+
+    def _handle_duplicate_email_username(self, data):
+        # TODO Verify whether this check is needed here - it may be duplicated in user_api.
         email = data.get('email')
         username = data.get('username')
 
-        # Handle duplicate email/username
         conflicts = check_account_exists(email=email, username=username)
         if conflicts:
             conflict_messages = {
@@ -144,8 +164,9 @@ class RegistrationView(APIView):
                 field: [{"user_message": conflict_messages[field]}]
                 for field in conflicts
             }
-            return JsonResponse(errors, status=409)
+            return self._create_response(errors, status_code=409)
 
+    def _handle_terms_of_service(self, data):
         # Backwards compatibility: the student view expects both
         # terms of service and honor code values.  Since we're combining
         # these into a single checkbox, the only value we may get
@@ -156,33 +177,32 @@ class RegistrationView(APIView):
         if data.get("honor_code") and "terms_of_service" not in data:
             data["terms_of_service"] = data["honor_code"]
 
+    def _create_account(self, request, data):
+        response, user = None, None
         try:
             user = create_account_with_params(request, data)
         except AccountValidationError as err:
             errors = {
                 err.field: [{"user_message": text_type(err)}]
             }
-            return JsonResponse(errors, status=409)
+            response = self._create_response(errors, status_code=409)
         except ValidationError as err:
-            # Should only get non-field errors from this function
+            # Should only get field errors from this exception
             assert NON_FIELD_ERRORS not in err.message_dict
             # Only return first error for each field
             errors = {
                 field: [{"user_message": error} for error in error_list]
                 for field, error_list in err.message_dict.items()
             }
-            return JsonResponse(errors, status=400)
+            response = self._create_response(errors, status_code=400)
         except PermissionDenied:
-            return HttpResponseForbidden(_("Account creation not allowed."))
+            response = HttpResponseForbidden(_("Account creation not allowed."))
 
-        response = JsonResponse({"success": True})
-        set_logged_in_cookies(request, response, user)
-        return response
+        return response, user
 
-    @method_decorator(transaction.non_atomic_requests)
-    @method_decorator(sensitive_post_parameters("password"))
-    def dispatch(self, request, *args, **kwargs):
-        return super(RegistrationView, self).dispatch(request, *args, **kwargs)
+    def _create_response(self, response_dict, status_code):
+        response_dict['success'] = (status_code == 200)
+        return JsonResponse(response_dict, status=status_code)
 
 
 class PasswordResetView(APIView):

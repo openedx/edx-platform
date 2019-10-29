@@ -17,7 +17,6 @@ from django.views.decorators.http import require_http_methods
 import third_party_auth
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.user_api.api import (
     RegistrationFormFactory,
@@ -25,8 +24,6 @@ from openedx.core.djangoapps.user_api.api import (
     get_password_reset_form
 )
 from openedx.core.djangoapps.user_authn.cookies import are_logged_in_cookies_set
-from openedx.core.djangoapps.user_authn.views.deprecated import register_user as old_register_view
-from openedx.core.djangoapps.user_authn.views.deprecated import signin_user as old_login_view
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from openedx.features.enterprise_support.utils import (
     handle_enterprise_cookies_for_logistration,
@@ -71,30 +68,24 @@ def login_and_registration_form(request, initial_mode="login"):
     if '?' in redirect_to:
         try:
             next_args = six.moves.urllib.parse.parse_qs(six.moves.urllib.parse.urlparse(redirect_to).query)
-            provider_id = next_args['tpa_hint'][0]
-            tpa_hint_provider = third_party_auth.provider.Registry.get(provider_id=provider_id)
-            if tpa_hint_provider:
-                if tpa_hint_provider.skip_hinted_login_dialog:
-                    # Forward the user directly to the provider's login URL when the provider is configured
-                    # to skip the dialog.
-                    if initial_mode == "register":
-                        auth_entry = pipeline.AUTH_ENTRY_REGISTER
-                    else:
-                        auth_entry = pipeline.AUTH_ENTRY_LOGIN
-                    return redirect(
-                        pipeline.get_login_url(provider_id, auth_entry, redirect_url=redirect_to)
-                    )
-                third_party_auth_hint = provider_id
-                initial_mode = "hinted_login"
+            if 'tpa_hint' in next_args:
+                provider_id = next_args['tpa_hint'][0]
+                tpa_hint_provider = third_party_auth.provider.Registry.get(provider_id=provider_id)
+                if tpa_hint_provider:
+                    if tpa_hint_provider.skip_hinted_login_dialog:
+                        # Forward the user directly to the provider's login URL when the provider is configured
+                        # to skip the dialog.
+                        if initial_mode == "register":
+                            auth_entry = pipeline.AUTH_ENTRY_REGISTER
+                        else:
+                            auth_entry = pipeline.AUTH_ENTRY_LOGIN
+                        return redirect(
+                            pipeline.get_login_url(provider_id, auth_entry, redirect_url=redirect_to)
+                        )
+                    third_party_auth_hint = provider_id
+                    initial_mode = "hinted_login"
         except (KeyError, ValueError, IndexError) as ex:
             log.exception(u"Unknown tpa_hint provider: %s", ex)
-
-    # We are defaulting to true because all themes should now be using the newer page.
-    if is_request_in_themed_site() and not configuration_helpers.get_value('ENABLE_COMBINED_LOGIN_REGISTRATION', True):
-        if initial_mode == "login":
-            return old_login_view(request)
-        elif initial_mode == "register":
-            return old_register_view(request)
 
     # Account activation message
     account_activation_messages = [

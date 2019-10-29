@@ -825,9 +825,10 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
         })
         self.assertEqual(response.status_code, 400)
         response_json = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
+        self.assertDictEqual(
             response_json,
             {
+                "success": False,
                 "email": [{
                     "user_message": (
                         u"It looks like {} belongs to an existing account. "
@@ -867,9 +868,10 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
         })
         self.assertEqual(response.status_code, 409)
         response_json = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
+        self.assertDictEqual(
             response_json,
             {
+                "success": False,
                 "email": [{
                     "user_message": (
                         u"It looks like {} belongs to an existing account. "
@@ -909,9 +911,10 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             })
         self.assertEqual(response.status_code, 409)
         response_json = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
+        self.assertDictEqual(
             response_json,
             {
+                "success": False,
                 "username": [{
                     "user_message": (
                         u"It looks like {} belongs to an existing account. "
@@ -946,9 +949,10 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
         })
         self.assertEqual(response.status_code, 400)
         response_json = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
+        self.assertDictEqual(
             response_json,
             {
+                "success": False,
                 "email": [{
                     "user_message": (
                         u"It looks like {} belongs to an existing account. "
@@ -983,9 +987,10 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
         })
         self.assertEqual(response.status_code, 409)
         response_json = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
+        self.assertDictEqual(
             response_json,
             {
+                u"success": False,
                 u"username": [{
                     u"user_message": (
                         u"An account with the Public Username '{}' already exists."
@@ -1019,9 +1024,10 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
         })
         self.assertEqual(response.status_code, 400)
         response_json = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
+        self.assertDictEqual(
             response_json,
             {
+                "success": False,
                 "email": [{
                     "user_message": (
                         u"It looks like {} belongs to an existing account. "
@@ -2182,9 +2188,10 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         })
         self.assertEqual(response.status_code, 409)
         response_json = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
+        self.assertDictEqual(
             response_json,
             {
+                "success": False,
                 "email": [{
                     "user_message": (
                         u"It looks like {} belongs to an existing account. "
@@ -2217,9 +2224,10 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         })
         self.assertEqual(response.status_code, 409)
         response_json = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
+        self.assertDictEqual(
             response_json,
             {
+                "success": False,
                 "username": [{
                     "user_message": (
                         u"It looks like {} belongs to an existing account. "
@@ -2252,9 +2260,10 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         })
         self.assertEqual(response.status_code, 409)
         response_json = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
+        self.assertDictEqual(
             response_json,
             {
+                "success": False,
                 "username": [{
                     "user_message": (
                         u"It looks like {} belongs to an existing account. "
@@ -2295,9 +2304,10 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         )
         self.assertEqual(response.status_code, 400)
         response_json = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
+        self.assertDictEqual(
             response_json,
             {
+                u"success": False,
                 u"username": [{u"user_message": USERNAME_BAD_LENGTH_MSG}],
                 u"password": [{u"user_message": u"This field is required."}],
             }
@@ -2454,18 +2464,24 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
         """Assert that the given response was an error for the access_token field with the given error message."""
         self.assertEqual(response.status_code, 400)
         response_json = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
+        self.assertDictEqual(
             response_json,
-            {"access_token": [{"user_message": expected_error_message}]}
+            {
+                "success": False,
+                "access_token": [{"user_message": expected_error_message}],
+            }
         )
 
     def _assert_third_party_session_expired_error(self, response, expected_error_message):
         """Assert that given response is an error due to third party session expiry"""
         self.assertEqual(response.status_code, 400)
         response_json = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
+        self.assertDictEqual(
             response_json,
-            {"session_expired": [{"user_message": expected_error_message}]}
+            {
+                "success": False,
+                "session_expired": [{"user_message": expected_error_message}],
+            }
         )
 
     def _verify_user_existence(self, user_exists, social_link_exists, user_is_active=None, username=None):

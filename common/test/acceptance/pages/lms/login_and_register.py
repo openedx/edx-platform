@@ -110,10 +110,6 @@ class ResetPasswordPage(PageObject):
 class CombinedLoginAndRegisterPage(PageObject):
     """Interact with combined login and registration page.
 
-    This page is currently hidden behind the feature flag
-    `ENABLE_COMBINED_LOGIN_REGISTRATION`, which is enabled
-    in the bok choy settings.
-
     When enabled, the new page is available from either
     `/login` or `/register`; the new page is also served at
     `/account/login/` or `/account/register/`, where it was
