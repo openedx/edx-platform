@@ -8,10 +8,11 @@ import logging
 from django.conf import settings
 from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.utils.translation.trans_real import parse_accept_lang_header
+
 from openedx.core.djangoapps.lang_pref import COOKIE_DURATION, LANGUAGE_HEADER, LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.errors import UserAPIInternalError, UserAPIRequestError
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
-
+from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
 log = logging.getLogger(__name__)
 
@@ -83,12 +84,13 @@ class LanguagePreferenceMiddleware(object):
                 log.info(u'setting language cookie to {lang} for the user:{username} and request url'
                          u' was {url}'.format(lang=user_pref, username=current_user.username,
                                               url=request.build_absolute_uri()))
-                response.set_cookie(
-                    settings.LANGUAGE_COOKIE,
-                    value=user_pref,
-                    domain=settings.SESSION_COOKIE_DOMAIN,
-                    max_age=COOKIE_DURATION,
-                )
+                if not is_request_from_mobile_app(request):
+                    response.set_cookie(
+                        settings.LANGUAGE_COOKIE,
+                        value=user_pref,
+                        domain=settings.SESSION_COOKIE_DOMAIN,
+                        max_age=COOKIE_DURATION,
+                    )
             else:
                 log.info(u'deleting language cookie to {lang} for the user:{username} and request url'
                          u' was {url}'.format(lang=user_pref, username=current_user.username,
