@@ -1,5 +1,5 @@
 """
-Django management command to archive course community on nodeBB.
+Django management command to generate CertificateVerificationKey objects.
 """
 from logging import getLogger
 from django.core.management.base import BaseCommand
