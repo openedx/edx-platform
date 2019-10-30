@@ -53,7 +53,7 @@ for timedeltakey in (
     'course_duration',
 ):
     user_metadata[timedeltakey] = (
-        context.get(timedeltakey).total_seconds() if context.get(timedeltake) else None
+        context.get(timedeltakey).total_seconds() if context.get(timedeltakey) else None
     )
 
 course_key = context.get('course_key')
