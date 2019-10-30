@@ -1,0 +1,34 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+
+{% load i18n %}
+{% load static %}
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <p><b>Requester Name:</b> {{name}}</p>
+            <p><b>Requester Email:</b> {{email}}</p>
+            <p>{{ body }}</p>
+            <hr>
+            {% if course %}
+                Course Name: {{course}}
+                <br>
+            {% endif %}
+            {% if custom_fields or additional_info %}
+                {% for field_dict in custom_fields %}
+                    {% for key, value in field_dict.items %}
+                        <p><b>{{key}}:</b> {{value}}</p>
+                    {% endfor %}
+                {% endfor %}
+                {% for info_dict in additional_info.items %}
+                    <p><b>{{info_dict.0}}</b>: {{info_dict.1}}</p>
+                {% endfor %}
+            {% endif %}
+
+            {% block google_analytics_pixel %}
+                <img src="{{ ga_tracking_pixel_url }}" alt="" role="presentation" aria-hidden="true" style="display: block;"/>
+            {% endblock %}
+        </td>
+    </tr>
+</table>
+{% endblock %}
