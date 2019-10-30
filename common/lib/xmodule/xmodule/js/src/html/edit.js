@@ -101,6 +101,7 @@
           theme: "modern",
           skin: 'studio-tmce4',
           schema: "html5",
+          entity_encoding: "raw",
 
           /*
           Necessary to preserve relative URLs to our images.
