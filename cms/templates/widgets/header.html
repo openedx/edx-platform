@@ -2,6 +2,7 @@
 <%namespace name='static' file='../static_content.html'/>
 <%!
   import six
+  from six.moves.urllib.parse import quote
   from django.conf import settings
   from django.urls import reverse
   from django.utils.translation import ugettext as _
@@ -20,6 +21,7 @@
       % if context_course:
       <%
             course_key = context_course.id
+            url_encoded_course_key = quote(six.text_type(course_key), safe='')
             index_url = reverse('course_handler', kwargs={'course_key_string': six.text_type(course_key)})
             course_team_url = reverse('course_team_handler', kwargs={'course_key_string': six.text_type(course_key)})
             assets_url = reverse('assets_handler', kwargs={'course_key_string': six.text_type(course_key)})
@@ -108,7 +110,7 @@
                   % endif
                   % if frontend_app_publisher_url:
                   <li class="nav-item nav-course-courseware-videos">
-                    <a href="${frontend_app_publisher_url}/course-runs/${course_key}">${_("Publisher")}</a>
+                    <a href="${frontend_app_publisher_url}/course-runs/${url_encoded_course_key}">${_("Publisher")}</a>
                   </li>
                   % endif
                 </ul>
