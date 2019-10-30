@@ -614,10 +614,12 @@ if FEATURES.get('ENABLE_EVENT_CALIPERIZATION'):
         INSTALLED_APPS.index('eventtracking.django.apps.EventTrackingConfig'),
         'openedx_caliper_tracking'
     )
-CALIPER_DELIVERY_ENDPOINT = ENV_TOKENS.get('CALIPER_DELIVERY_ENDPOINT')
-CALIPER_DELIVERY_AUTH_TOKEN = AUTH_TOKENS.get('CALIPER_DELIVERY_AUTH_TOKEN')
-CALIPER_KAFKA_SETTINGS = ENV_TOKENS.get('CALIPER_KAFKA_SETTINGS')
+    if FEATURES.get('ENABLE_CALIPER_EVENTS_DELIVERY'):
+        CALIPER_DELIVERY_ENDPOINT = ENV_TOKENS.get('CALIPER_DELIVERY_ENDPOINT')
+        CALIPER_DELIVERY_AUTH_TOKEN = AUTH_TOKENS.get('CALIPER_DELIVERY_AUTH_TOKEN')
 
+    if FEATURES.get('ENABLE_KAFKA_FOR_CALIPER'):
+        CALIPER_KAFKA_SETTINGS = ENV_TOKENS.get('CALIPER_KAFKA_SETTINGS')
 ####################### Plugin Settings ##########################
 
 # This is at the bottom because it is going to load more settings after base settings are loaded
