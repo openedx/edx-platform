@@ -12,7 +12,7 @@ import six
 from django.conf import settings
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.http import HttpResponse
-from django.test.client import RequestFactory
+from django.test.client import Client, RequestFactory
 from django.urls import reverse
 from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.utils.translation.trans_real import parse_accept_lang_header
@@ -43,6 +43,7 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
         self.request.user = self.user
         self.request.META['HTTP_ACCEPT_LANGUAGE'] = 'ar;q=1.0'
         self.session_middleware.process_request(self.request)
+        self.client = Client()
 
     def test_logout_shouldnt_remove_cookie(self):
 
@@ -254,3 +255,21 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
 
         with self.assertNumQueries(1):
             self.middleware.process_response(self.request, response)
+
+    @mock.patch('openedx.core.djangoapps.lang_pref.middleware.is_request_from_mobile_app')
+    @mock.patch('openedx.core.djangoapps.lang_pref.middleware.get_user_preference')
+    def test_lang_pref_cookie_must_not_sent_to_mobile(self, mock_get_user_preference, mock_is_mobile_request):
+        """
+        Test to verify language preference cookie must not be set for mobile requests
+        """
+        mock_get_user_preference.return_value = 'test_value'
+        mock_is_mobile_request.return_value = True
+
+        response = self.client.get('/')
+        self.middleware.process_response(self.request, response)
+        self.assertFalse(response.cookies.get('openedx-language-preference'))
+
+        mock_is_mobile_request.return_value = False
+        response = self.client.get('/')
+        self.middleware.process_response(self.request, response)
+        self.assertTrue(response.cookies.get('openedx-language-preference'))
