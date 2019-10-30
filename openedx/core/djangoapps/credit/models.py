@@ -302,6 +302,7 @@ class CreditRequirement(TimeStampedModel):
     name = models.CharField(max_length=255)
     display_name = models.CharField(max_length=255, default=u"")
     order = models.PositiveIntegerField(default=0)
+    order_number = models.PositiveIntegerField(default=0)
     criteria = JSONField()
     active = models.BooleanField(default=True)
 
@@ -335,6 +336,7 @@ class CreditRequirement(TimeStampedModel):
                 "display_name": requirement["display_name"],
                 "criteria": requirement["criteria"],
                 "order": order,
+                "order_number": order,
                 "active": True
             }
         )
@@ -342,6 +344,7 @@ class CreditRequirement(TimeStampedModel):
             credit_requirement.criteria = requirement["criteria"]
             credit_requirement.active = True
             credit_requirement.order = order
+            credit_requirement.order_number = order
             credit_requirement.display_name = requirement["display_name"]
             credit_requirement.save()
 
